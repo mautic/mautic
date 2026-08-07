@@ -41,7 +41,15 @@ final class StageControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, '/s/stages/edit/'.$stage->getId());
+=======
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/stages/edit/'.$stage->getId());
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/stages/edit/'.$stage->getId());
+>>>>>>> 222589fde5 (cs)
         $form    = $crawler->selectButton('Save')->form();
         $form['stage[projects]']->setValue((string) $project->getId());
 

@@ -383,7 +383,15 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $this->em->persist($company);
         $this->em->flush();
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/new/');
+=======
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, 's/contacts/new/');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/new/');
+>>>>>>> 222589fde5 (cs)
         $form    = $crawler->filterXPath('//form[@name="lead"]')->form();
         $form->setValues(
             [
@@ -537,7 +545,15 @@ final class LeadControllerTest extends MauticMysqlTestCase
     #[TestDox('Ensure correct Preferred Timezone placeholder on add/edit contact page')]
     public function testEnsureCorrectPreferredTimeZonePlaceHolderOnContactPage(): void
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler             = $this->client->request(Request::METHOD_GET, '/s/contacts/new');
+=======
+        $crawler             = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/contacts/new');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler             = $this->client->request(Request::METHOD_GET, '/s/contacts/new');
+>>>>>>> 222589fde5 (cs)
         $elementPlaceholder  = $crawler->filter('#lead_timezone')->filter('select')->attr('data-placeholder');
         $expectedPlaceholder = self::getContainer()->get(TranslatorInterface::class)->trans('mautic.lead.field.timezone');
         $this->assertEquals($expectedPlaceholder, $elementPlaceholder);
@@ -551,7 +567,15 @@ final class LeadControllerTest extends MauticMysqlTestCase
 
     public function testQuickAddAction(): void
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/contacts/quickAdd');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/contacts/quickAdd');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/contacts/quickAdd');
+>>>>>>> 222589fde5 (cs)
 
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
     }
@@ -565,7 +589,15 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $firstnameField->setIsRequired(true);
         $fieldModel->getRepository()->saveEntity($firstnameField);
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/new/');
+=======
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, 's/contacts/new/');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/new/');
+>>>>>>> 222589fde5 (cs)
         $form    = $crawler->filterXPath('//form[@name="lead"]')->form();
         $form->setValues(
             [
@@ -580,7 +612,15 @@ final class LeadControllerTest extends MauticMysqlTestCase
 
     public function testAddContactsErrorMessageForEmailWithTwoDots(): void
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/new/');
+=======
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, 's/contacts/new/');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/new/');
+>>>>>>> 222589fde5 (cs)
         $form    = $crawler->filterXPath('//form[@name="lead"]')->form();
         $form->setValues(
             [
@@ -733,7 +773,15 @@ EMAIL;
 
     public function testLookupTypeFieldOnError(): void
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/new/');
+=======
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, 's/contacts/new/');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/new/');
+>>>>>>> 222589fde5 (cs)
         $form    = $crawler->filterXPath('//form[@name="lead"]')->form();
         $form->setValues(
             [
@@ -750,7 +798,15 @@ EMAIL;
     {
         $email = 'duplicate@email.a';
         $this->createContact($email);
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/quickAdd');
+=======
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, 's/contacts/quickAdd');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/quickAdd');
+>>>>>>> 222589fde5 (cs)
         $form    = $crawler->filter('form[name="lead"]')->form([
             'lead' => [
                 'email' => $email,
@@ -769,7 +825,15 @@ EMAIL;
     {
         $email = 'duplicate@email.a';
         $this->createContact($email);
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/new');
+=======
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, 's/contacts/new');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/new');
+>>>>>>> 222589fde5 (cs)
         $form    = $crawler->filter('form[name="lead"]')->form([
             'lead' => [
                 'email' => $email,
@@ -930,7 +994,15 @@ EMAIL;
         $this->em->persist($company);
         $this->em->flush();
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/new/');
+=======
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, 's/contacts/new/');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/new/');
+>>>>>>> 222589fde5 (cs)
         $form    = $crawler->filterXPath('//form[@name="lead"]')->form();
         $form->setValues(
             [
@@ -1142,7 +1214,15 @@ EMAIL;
 
     public function testMultipleCompanyFeature(): void
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler     = $this->client->request(Request::METHOD_GET, 's/contacts/new/');
+=======
+        $crawler     = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, 's/contacts/new/');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler     = $this->client->request(Request::METHOD_GET, 's/contacts/new/');
+>>>>>>> 222589fde5 (cs)
         $multiple    = $crawler->filterXPath('//*[@id="lead_companies"]')->attr('multiple');
         $this->assertSame('multiple', $multiple);
     }

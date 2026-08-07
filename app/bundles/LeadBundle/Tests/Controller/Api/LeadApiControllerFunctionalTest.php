@@ -53,7 +53,15 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testDisabledApi(): void
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, '/api/contacts/new', ['email' => 'apiemail1@email.com']);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/contacts/new', ['email' => 'apiemail1@email.com']);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, '/api/contacts/new', ['email' => 'apiemail1@email.com']);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_FORBIDDEN, $clientResponse->getStatusCode(), $clientResponse->getContent());
         $this->assertEquals(
@@ -64,7 +72,15 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testActivityApi(): void
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/api/contacts/activity');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/contacts/activity');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/api/contacts/activity');
+>>>>>>> 222589fde5 (cs)
         self::assertResponseIsSuccessful();
         $this->assertArrayHasKey('events', json_decode($this->client->getResponse()->getContent(), true));
         $this->assertArrayHasKey('filters', json_decode($this->client->getResponse()->getContent(), true));
@@ -211,7 +227,15 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ];
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, '/api/contacts/batch/new', $payload);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/contacts/batch/new', $payload);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, '/api/contacts/batch/new', $payload);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
 
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
@@ -264,7 +288,15 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ];
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_PUT, '/api/contacts/batch/edit', $payload);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_PUT, '/api/contacts/batch/edit', $payload);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_PUT, '/api/contacts/batch/edit', $payload);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
 
         $this->assertResponseIsSuccessful();
@@ -506,7 +538,15 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
      */
     public function testEmptyResponseReturnsJsonObject(): void
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/api/contacts?where[0][val]=unicorn&where[0][col]=email&where[0][expr]=eq');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/contacts?where[0][val]=unicorn&where[0][col]=email&where[0][expr]=eq');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/api/contacts?where[0][val]=unicorn&where[0][col]=email&where[0][expr]=eq');
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $this->assertEquals('{"total":"0","contacts":{}}', $clientResponse->getContent());
@@ -525,7 +565,15 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
             ['email' => 'batcheditcontact1-updated@gmail.com', 'id' => $contact->getId()],
         ];
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_PUT, '/api/contacts/batch/edit', $payload);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_PUT, '/api/contacts/batch/edit', $payload);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_PUT, '/api/contacts/batch/edit', $payload);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
 
         self::assertResponseIsSuccessful($clientResponse->getContent());
@@ -543,7 +591,15 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
             ['email' => 'batchemail1@email.com', 'id' => 'rubbish'],
         ];
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_PUT, '/api/contacts/batch/edit', $payload);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_PUT, '/api/contacts/batch/edit', $payload);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_PUT, '/api/contacts/batch/edit', $payload);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
 
         self::assertResponseIsSuccessful($clientResponse->getContent());
@@ -565,7 +621,15 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // Test with an apostropy with URL encoding.
         $this->client->request(
+<<<<<<< HEAD
+<<<<<<< HEAD
             Request::METHOD_GET,
+=======
+            \Symfony\Component\HttpFoundation\Request::METHOD_GET,
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+            Request::METHOD_GET,
+>>>>>>> 222589fde5 (cs)
             '/api/contacts',
             [
                 'where' => [
@@ -690,7 +754,15 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         // test: create the same contact, merge it based on unique identifier (email) - without loosing the owner and stage
         unset($updatedValues['owner']);
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, '/api/contacts/new', $updatedValues);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/contacts/new', $updatedValues);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, '/api/contacts/new', $updatedValues);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -753,7 +825,15 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
 
         $this->client->request(
+<<<<<<< HEAD
+<<<<<<< HEAD
             Request::METHOD_PATCH,
+=======
+            \Symfony\Component\HttpFoundation\Request::METHOD_PATCH,
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+            Request::METHOD_PATCH,
+>>>>>>> 222589fde5 (cs)
             sprintf('/api/contacts/%d/edit', $contactId),
             $updatedValues
         );
@@ -836,7 +916,15 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ];
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, '/api/contacts/batch/new', $payload);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/contacts/batch/new', $payload);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, '/api/contacts/batch/new', $payload);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         $contactId      = $response['contacts'][0]['id'];
@@ -858,7 +946,15 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $payload[0]['lastname'] = '';
 
         // Lets try to create the same contact to see that the values are not re-setted
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, '/api/contacts/batch/new', $payload);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/contacts/batch/new', $payload);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, '/api/contacts/batch/new', $payload);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -881,7 +977,15 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $payload[0]['lastname']           = '';
 
         // Lets try to create the same contact to see that the values are not re-setted
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, '/api/contacts/batch/new', $payload);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/contacts/batch/new', $payload);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, '/api/contacts/batch/new', $payload);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -898,7 +1002,15 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $payload[0]['lastname']           = '';
 
         // Lets try to create the same contact to see that the values are not re-setted
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, '/api/contacts/batch/new', $payload);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/contacts/batch/new', $payload);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, '/api/contacts/batch/new', $payload);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -927,7 +1039,15 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ];
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, '/api/contacts/batch/new', $updatedValues);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/contacts/batch/new', $updatedValues);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, '/api/contacts/batch/new', $updatedValues);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -946,7 +1066,15 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($updatedValues[0]['owner'], $response['contacts'][0]['owner']['id']);
 
         // Test getting a contact
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/api/contacts/'.$contactId);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/contacts/'.$contactId);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/api/contacts/'.$contactId);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -965,7 +1093,15 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // Test fetching the batch of contacts
         $this->client->request(
+<<<<<<< HEAD
+<<<<<<< HEAD
             Request::METHOD_GET, '/api/contacts');
+=======
+            \Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/contacts');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+            Request::METHOD_GET, '/api/contacts');
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -997,7 +1133,15 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ];
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_PATCH, '/api/contacts/batch/edit', $updatedValues);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_PATCH, '/api/contacts/batch/edit', $updatedValues);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_PATCH, '/api/contacts/batch/edit', $updatedValues);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -1023,7 +1167,15 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ];
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_PATCH, '/api/contacts/batch/edit', $updatedValues);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_PATCH, '/api/contacts/batch/edit', $updatedValues);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_PATCH, '/api/contacts/batch/edit', $updatedValues);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -1171,7 +1323,15 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($dncChannel, $dncResponse['contact']['doNotContact'][0]['channel']);
 
         // Check DNC is recorded in the contact activity.
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, "/api/contacts/{$contactId}/activity");
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, "/api/contacts/{$contactId}/activity");
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, "/api/contacts/{$contactId}/activity");
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         self::assertResponseIsSuccessful($clientResponse->getContent());
         $activityResponse = json_decode($clientResponse->getContent(), true);
@@ -1272,7 +1432,15 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         // Call endpoint
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/api/contacts/activity');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/contacts/activity');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/api/contacts/activity');
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $responseJson = json_decode($clientResponse->getContent());
@@ -1300,7 +1468,15 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $expectedDatesOrder = ['2013-03-25', '2013-03-20', '2013-03-15', '2013-03-10', '2013-03-05'];
 
         // Call endpoint
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/api/contacts/'.$contact->getId().'/activity');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/contacts/'.$contact->getId().'/activity');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/api/contacts/'.$contact->getId().'/activity');
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $responseJson = json_decode($clientResponse->getContent());
@@ -1352,7 +1528,15 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         // Test API endpoint for campaign 1
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/api/contacts', ['search' => 'campaign:'.$campaign1->getId()]);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/contacts', ['search' => 'campaign:'.$campaign1->getId()]);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/api/contacts', ['search' => 'campaign:'.$campaign1->getId()]);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $response = json_decode($clientResponse->getContent(), true);
@@ -1364,7 +1548,15 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertArrayNotHasKey($contact4->getId(), $response['contacts']);
 
         // Test API endpoint for campaign 2
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/api/contacts', ['search' => 'campaign:'.$campaign2->getId()]);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/contacts', ['search' => 'campaign:'.$campaign2->getId()]);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/api/contacts', ['search' => 'campaign:'.$campaign2->getId()]);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $response = json_decode($clientResponse->getContent(), true);
@@ -1385,7 +1577,15 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $contact = $this->createContactWithNote($owner, 'contact-notes-ok@test.com');
 
         $this->authenticateApiUser($owner);
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/api/contacts/'.$contact->getId().'/notes');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/contacts/'.$contact->getId().'/notes');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/api/contacts/'.$contact->getId().'/notes');
+>>>>>>> 222589fde5 (cs)
 
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful($response->getContent());
@@ -1400,7 +1600,15 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $contact = $this->createContactWithNote($owner, 'contact-notes-denied@test.com');
 
         $this->authenticateApiUser($owner);
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/api/contacts/'.$contact->getId().'/notes');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/contacts/'.$contact->getId().'/notes');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/api/contacts/'.$contact->getId().'/notes');
+>>>>>>> 222589fde5 (cs)
 
         $response = $this->client->getResponse();
         $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN, $response->getContent());

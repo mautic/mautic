@@ -58,7 +58,15 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
      */
     public function testIndexActionWhenNotFiltered(): void
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/categories?tmpl=list&bundle=category');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/categories?tmpl=list&bundle=category');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/categories?tmpl=list&bundle=category');
+>>>>>>> 222589fde5 (cs)
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
 
@@ -72,7 +80,15 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
      */
     public function testIndexActionWhenFiltered(): void
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/categories/page?tmpl=list&bundle=page');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/categories/page?tmpl=list&bundle=page');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/categories/page?tmpl=list&bundle=page');
+>>>>>>> 222589fde5 (cs)
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
 
@@ -196,7 +212,15 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
             'validators'
         );
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, 's/categories/category/delete/'.$category->getId(), [], [], [
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, 's/categories/category/delete/'.$category->getId(), [], [], [
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, 's/categories/category/delete/'.$category->getId(), [], [], [
+>>>>>>> 222589fde5 (cs)
             'HTTP_Content-Type'     => 'application/x-www-form-urlencoded; charset=UTF-8',
             'HTTP_X-Requested-With' => 'XMLHttpRequest',
             'HTTP_X-CSRF-Token'     => $this->getCsrfToken('mautic_ajax_post'),
@@ -230,7 +254,15 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         $parameters = 'ids=["'.$category->getId().'"]';
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, 's/categories/category/batchDelete?'.$parameters, [], [], [
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, 's/categories/category/batchDelete?'.$parameters, [], [], [
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, 's/categories/category/batchDelete?'.$parameters, [], [], [
+>>>>>>> 222589fde5 (cs)
             'HTTP_Content-Type'     => 'application/x-www-form-urlencoded; charset=UTF-8',
             'HTTP_X-Requested-With' => 'XMLHttpRequest',
             'HTTP_X-CSRF-Token'     => $this->getCsrfToken('mautic_ajax_post'),

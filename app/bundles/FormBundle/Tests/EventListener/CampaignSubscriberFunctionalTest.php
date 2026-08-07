@@ -60,7 +60,15 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         ];
 
         // Creating the form via API so it would create the submission table.
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $formPayload);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/forms/new', $formPayload);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $formPayload);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
 
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);

@@ -175,7 +175,15 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ];
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, '/api/segments/batch/new', $payload);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/segments/batch/new', $payload);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, '/api/segments/batch/new', $payload);
+>>>>>>> 222589fde5 (cs)
         $clientResponse  = $this->client->getResponse();
         $segmentResponse = json_decode($clientResponse->getContent(), true);
         $segmentAId      = $segmentResponse['lists'][0]['id'];
@@ -193,7 +201,15 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
             'customHtml' => '<h1>Email content created by an API test</h1>',
         ];
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, '/api/emails/new', $payload);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/emails/new', $payload);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, '/api/emails/new', $payload);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         $emailId        = $response['email']['id'];
@@ -216,7 +232,15 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
             'publicPreview' => true,
             'sendToDnc'     => true,
         ];
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_PATCH, "/api/emails/{$emailId}/edit", $patchPayload);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_PATCH, "/api/emails/{$emailId}/edit", $patchPayload);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_PATCH, "/api/emails/{$emailId}/edit", $patchPayload);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -236,7 +260,15 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $payload['lists']         = [$segmentAId, $segmentBId];
         $payload['language']      = 'en'; // Must be present for PUT as all empty values are being cleared.
         $payload['publicPreview'] = false; // Must be present for PUT as all empty values are being cleared.
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_PUT, "/api/emails/{$emailId}/edit", $payload);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_PUT, "/api/emails/{$emailId}/edit", $payload);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_PUT, "/api/emails/{$emailId}/edit", $payload);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -253,7 +285,15 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertFalse($response['email']['sendToDnc']);
 
         // Get:
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, "/api/emails/{$emailId}");
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, "/api/emails/{$emailId}");
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, "/api/emails/{$emailId}");
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -266,7 +306,15 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['customHtml'], $response['email']['customHtml']);
 
         // Delete:
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_DELETE, "/api/emails/{$emailId}/delete");
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_DELETE, "/api/emails/{$emailId}/delete");
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_DELETE, "/api/emails/{$emailId}/delete");
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -279,7 +327,15 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['customHtml'], $response['email']['customHtml']);
 
         // Get (ensure it's deleted):
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, "/api/emails/{$emailId}");
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, "/api/emails/{$emailId}");
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, "/api/emails/{$emailId}");
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -287,7 +343,15 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(404, $response['errors'][0]['code']);
 
         // Delete also testing segments:
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_DELETE, "/api/segments/batch/delete?ids={$segmentAId},{$segmentBId}", []);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_DELETE, "/api/segments/batch/delete?ids={$segmentAId},{$segmentBId}", []);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_DELETE, "/api/segments/batch/delete?ids={$segmentAId},{$segmentBId}", []);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -301,7 +365,15 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $trackingHash = 'tracking_hash_123';
 
         // Create new email reply.
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, "/api/emails/reply/{$trackingHash}");
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, "/api/emails/reply/{$trackingHash}");
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, "/api/emails/reply/{$trackingHash}");
+>>>>>>> 222589fde5 (cs)
         $response     = $this->client->getResponse();
         $responseData = json_decode($response->getContent(), true);
 
@@ -473,7 +545,15 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
             'sendToDnc'  => true,
         ];
         $this->em->clear();
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, '/api/emails/new', $payload);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/emails/new', $payload);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, '/api/emails/new', $payload);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         $this->assertArrayHasKey('sendToDnc', $response['email'], print_r($response, true));
@@ -496,7 +576,15 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $statRepository->saveEntity($stat);
 
         // Create new email reply.
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, "/api/emails/reply/{$trackingHash}");
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, "/api/emails/reply/{$trackingHash}");
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, "/api/emails/reply/{$trackingHash}");
+>>>>>>> 222589fde5 (cs)
         $response = $this->client->getResponse();
 
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
@@ -504,7 +592,15 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // Get the email reply that was just created from the stat API.
         $statReplyQuery = ['where' => [['col' => 'stat_id', 'expr' => 'eq', 'val' => $stat->getId()]]];
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/api/stats/email_stat_replies', $statReplyQuery);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/stats/email_stat_replies', $statReplyQuery);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/api/stats/email_stat_replies', $statReplyQuery);
+>>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
         $fetchedReplyData = json_decode($this->client->getResponse()->getContent(), true);
 
@@ -515,7 +611,15 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // Get the email stat that was just updated from the stat API.
         $statQuery = ['where' => [['col' => 'id', 'expr' => 'eq', 'val' => $stat->getId()]]];
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/api/stats/email_stats', $statQuery);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/stats/email_stats', $statQuery);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/api/stats/email_stats', $statQuery);
+>>>>>>> 222589fde5 (cs)
         $fetchedStatData = json_decode($this->client->getResponse()->getContent(), true);
 
         // Check that the email stat was updated correctly/
@@ -598,7 +702,15 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $emailId = $email->getId();
 
         // Send to segment:
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, "/api/emails/{$emailId}/send");
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, "/api/emails/{$emailId}/send");
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, "/api/emails/{$emailId}/send");
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $sendResponse   = json_decode($clientResponse->getContent(), true);
 
@@ -622,7 +734,15 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($email);
         $this->em->flush();
         $emailId = $email->getId();
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, "/api/emails/{$emailId}/contact/{$contactId}/send", ['tokens' => ['{custom-token}' => 'custom <b>value</b>']]);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, "/api/emails/{$emailId}/contact/{$contactId}/send", ['tokens' => ['{custom-token}' => 'custom <b>value</b>']]);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, "/api/emails/{$emailId}/contact/{$contactId}/send", ['tokens' => ['{custom-token}' => 'custom <b>value</b>']]);
+>>>>>>> 222589fde5 (cs)
 
         $clientResponse = $this->client->getResponse();
 
@@ -641,7 +761,15 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $emailId = $email->getId();
         // Send to segment:
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, "/api/emails/{$emailId}/send");
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, "/api/emails/{$emailId}/send");
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, "/api/emails/{$emailId}/send");
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $sendResponse   = json_decode($clientResponse->getContent(), true);
 
@@ -667,7 +795,15 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($email);
         $this->em->flush();
         $emailId = $email->getId();
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, "/api/emails/{$emailId}/contact/{$contactId}/send");
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, "/api/emails/{$emailId}/contact/{$contactId}/send");
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, "/api/emails/{$emailId}/contact/{$contactId}/send");
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
 
         $this->assertResponseIsSuccessful();
@@ -685,7 +821,15 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $emailId = $email->getId();
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, "/api/emails/{$emailId}/contact/{$contactId}/send");
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, "/api/emails/{$emailId}/contact/{$contactId}/send");
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, "/api/emails/{$emailId}/contact/{$contactId}/send");
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
 
         $this->assertResponseIsSuccessful();

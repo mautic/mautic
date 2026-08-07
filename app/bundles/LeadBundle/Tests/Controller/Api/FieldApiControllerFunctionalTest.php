@@ -218,7 +218,15 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         // Call endpoint
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/api/contacts/'.$contact->getId());
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/contacts/'.$contact->getId());
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/api/contacts/'.$contact->getId());
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $responseJson = \json_decode($clientResponse->getContent(), true, 512, \JSON_THROW_ON_ERROR);
@@ -236,7 +244,15 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
 
         $this->client->request(
+<<<<<<< HEAD
+<<<<<<< HEAD
             Request::METHOD_PATCH,
+=======
+            \Symfony\Component\HttpFoundation\Request::METHOD_PATCH,
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+            Request::METHOD_PATCH,
+>>>>>>> 222589fde5 (cs)
             sprintf('/api/contacts/%d/edit', $contact->getId()),
             $updatedValues
         );
@@ -256,7 +272,15 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
 
         $this->client->request(
+<<<<<<< HEAD
+<<<<<<< HEAD
             Request::METHOD_PATCH,
+=======
+            \Symfony\Component\HttpFoundation\Request::METHOD_PATCH,
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+            Request::METHOD_PATCH,
+>>>>>>> 222589fde5 (cs)
             sprintf('/api/contacts/%d/edit', $contact->getId()),
             $updatedValues
         );
@@ -330,7 +354,15 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         // Call endpoint
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/api/contacts/'.$contact->getId());
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/contacts/'.$contact->getId());
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/api/contacts/'.$contact->getId());
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $responseJson = \json_decode($clientResponse->getContent(), true, 512, \JSON_THROW_ON_ERROR);
@@ -348,7 +380,15 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
 
         $this->client->request(
+<<<<<<< HEAD
+<<<<<<< HEAD
             Request::METHOD_PATCH,
+=======
+            \Symfony\Component\HttpFoundation\Request::METHOD_PATCH,
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+            Request::METHOD_PATCH,
+>>>>>>> 222589fde5 (cs)
             sprintf('/api/contacts/%d/edit', $contact->getId()),
             $updatedValues
         );
@@ -368,7 +408,15 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
 
         $this->client->request(
+<<<<<<< HEAD
+<<<<<<< HEAD
             Request::METHOD_PATCH,
+=======
+            \Symfony\Component\HttpFoundation\Request::METHOD_PATCH,
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+            Request::METHOD_PATCH,
+>>>>>>> 222589fde5 (cs)
             sprintf('/api/contacts/%d/edit', $contact->getId()),
             $updatedValues
         );
@@ -399,7 +447,15 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         // Test creating a new field
 
         $typeSafePayload = $this->generateTypeSafePayload($payload);
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, '/api/fields/contact/new', $typeSafePayload);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/fields/contact/new', $typeSafePayload);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, '/api/fields/contact/new', $typeSafePayload);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -428,7 +484,15 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
     private function assertGetResponse(array $payload, int $id): void
     {
         // Test get and that the field was published
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, sprintf('/api/fields/contact/%s', $id));
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, sprintf('/api/fields/contact/%s', $id));
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, sprintf('/api/fields/contact/%s', $id));
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
@@ -446,7 +510,15 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
     private function assertPatchResponse(array $payload, int $id, string $alias): void
     {
         $typeSafePayload = $this->generateTypeSafePayload($payload);
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_PATCH, sprintf('/api/fields/contact/%s/edit', $id), $typeSafePayload);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_PATCH, sprintf('/api/fields/contact/%s/edit', $id), $typeSafePayload);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_PATCH, sprintf('/api/fields/contact/%s/edit', $id), $typeSafePayload);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $response = json_decode($clientResponse->getContent(), true);
@@ -470,7 +542,15 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
     private function assertDeleteResponse(array $payload, int $id, string $alias, bool $isBackground): void
     {
         // Test the field is deleted
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_DELETE, sprintf('/api/fields/contact/%s/delete', $id));
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_DELETE, sprintf('/api/fields/contact/%s/delete', $id));
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_DELETE, sprintf('/api/fields/contact/%s/delete', $id));
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $response = json_decode($clientResponse->getContent(), true);
@@ -573,12 +653,28 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         // Try deleting field which is used in segment.
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_DELETE, sprintf('/api/fields/contact/%s/delete', $id));
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_DELETE, sprintf('/api/fields/contact/%s/delete', $id));
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_DELETE, sprintf('/api/fields/contact/%s/delete', $id));
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_CONFLICT, $clientResponse->getStatusCode());
 
         // Test with Bulk Delete.
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_DELETE, sprintf('/api/fields/contact/batch/delete?ids=%s', $id));
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_DELETE, sprintf('/api/fields/contact/batch/delete?ids=%s', $id));
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_DELETE, sprintf('/api/fields/contact/batch/delete?ids=%s', $id));
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $this->assertStringContainsString(

@@ -101,7 +101,15 @@ final class ListApiController extends CommonApiController
         $withCounts = $request->query->has('withCounts');
         $response   = parent::getEntitiesAction($request, $userHelper);
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         if ($withCounts && $response instanceof Response && Response::HTTP_OK === $response->getStatusCode()) {
+=======
+        if ($withCounts && $response instanceof Response && \Symfony\Component\HttpFoundation\Response::HTTP_OK === $response->getStatusCode()) {
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        if ($withCounts && $response instanceof Response && Response::HTTP_OK === $response->getStatusCode()) {
+>>>>>>> 222589fde5 (cs)
             $content = json_decode($response->getContent(), true);
 
             if (isset($content['lists']) && is_array($content['lists'])) {

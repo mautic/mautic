@@ -87,7 +87,15 @@ final class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
     public function testForbiddenDeleteAction(): void
     {
         $this->createAndLoginUser();
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/dwc/delete');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/dwc/delete');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/dwc/delete');
+>>>>>>> 222589fde5 (cs)
 
         self::assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
     }
@@ -105,7 +113,15 @@ final class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, '/s/dwc/edit/'.$dynamicContent->getId());
+=======
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/dwc/edit/'.$dynamicContent->getId());
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/dwc/edit/'.$dynamicContent->getId());
+>>>>>>> 222589fde5 (cs)
         $form    = $crawler->selectButton('Save')->form();
         $form['dwc[projects]']->setValue((string) $project->getId());
 

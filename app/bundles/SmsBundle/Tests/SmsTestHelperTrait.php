@@ -23,7 +23,7 @@ trait SmsTestHelperTrait
         $crawler  = $this->client->request(Request::METHOD_GET, 's/plugins/config/'.$integration->getName());
         $response = $this->client->getResponse();
 
-        Assert::assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
+        Assert::assertSame(Response::HTTP_OK, $response->getStatusCode(), (string) $response->getContent());
 
         $saveButton = $crawler->selectButton('integration_details[buttons][save]');
         $form       = $saveButton->form();
@@ -36,7 +36,7 @@ trait SmsTestHelperTrait
         $this->client->submit($form);
 
         $response = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
+        Assert::assertSame(Response::HTTP_OK, $response->getStatusCode(), (string) $response->getContent());
 
         $transportChain = $this->getContainer()->get(TransportChain::class);
         \assert($transportChain instanceof TransportChain);

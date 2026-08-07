@@ -20,6 +20,7 @@ return RectorConfig::configure()
         phpunitNarrowAsserts: true,
         privatization: true,
         codeQuality: true,
+        // symfonyCodeQuality: true,
     )
     ->withPhpLevel(120)
     ->withCache(__DIR__.'/var/cache/rector')
@@ -52,6 +53,9 @@ return RectorConfig::configure()
     ->reportUnusedSkips()
     ->withComposerBased(phpunit: true, symfony: true)
     ->withSkip([
+        Rector\Symfony\CodeQuality\Rector\ClassMethod\ActionSuffixRemoverRector::class,
+        Rector\Symfony\CodeQuality\Rector\Class_\ControllerMethodInjectionToConstructorRector::class,
+
         // @todo move to "twig" group
         Rector\Symfony\Symfony73\Rector\Class_\GetFiltersToAsTwigFilterAttributeRector::class,
         Rector\Symfony\Symfony73\Rector\Class_\GetFunctionsToAsTwigFunctionAttributeRector::class,

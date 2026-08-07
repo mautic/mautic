@@ -46,7 +46,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST, $clientResponse->getContent());
-        $this->assertSame('{"error":"Invalid request param"}', $clientResponse->getContent(), $clientResponse->getContent());
+        $this->assertSame('{"error":"Invalid request param"}', $clientResponse->getContent(), (string) $clientResponse->getContent());
     }
 
     public function testLookupActionWithInvalidLookupFormField(): void
@@ -55,7 +55,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST, $clientResponse->getContent());
-        $this->assertSame('{"error":"Invalid request param"}', $clientResponse->getContent(), $clientResponse->getContent());
+        $this->assertSame('{"error":"Invalid request param"}', $clientResponse->getContent(), (string) $clientResponse->getContent());
     }
 
     public function testLookupActionWithTooFewLetters(): void
@@ -66,7 +66,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST, $clientResponse->getContent());
-        $this->assertSame('{"error":"Invalid request param"}', $clientResponse->getContent(), $clientResponse->getContent());
+        $this->assertSame('{"error":"Invalid request param"}', $clientResponse->getContent(), (string) $clientResponse->getContent());
     }
 
     public function testLookupActionWithCompanyData(): void

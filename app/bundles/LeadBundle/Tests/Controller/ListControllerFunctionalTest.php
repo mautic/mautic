@@ -520,7 +520,15 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
             'validators'
         );
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, 's/segments/delete/'.$list1->getId(), [], [], $this->createAjaxHeaders());
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, 's/segments/delete/'.$list1->getId(), [], [], $this->createAjaxHeaders());
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, 's/segments/delete/'.$list1->getId(), [], [], $this->createAjaxHeaders());
+>>>>>>> 222589fde5 (cs)
 
         $clientResponse     = $this->client->getResponse();
         $clientResponseBody = json_decode($clientResponse->getContent(), true);
@@ -559,7 +567,15 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         $parameters = 'ids=["'.$list1->getId().'","'.$list2->getId().'"]';
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, 's/segments/batchDelete?'.$parameters, [], [], $this->createAjaxHeaders());
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, 's/segments/batchDelete?'.$parameters, [], [], $this->createAjaxHeaders());
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, 's/segments/batchDelete?'.$parameters, [], [], $this->createAjaxHeaders());
+>>>>>>> 222589fde5 (cs)
 
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
@@ -913,7 +929,15 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $dnc->setDateAdded(new \DateTime());
         $this->em->persist($dnc);
         $this->em->flush();
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, sprintf('/s/segments/view/%d', $segment->getId()));
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, sprintf('/s/segments/view/%d', $segment->getId()));
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, sprintf('/s/segments/view/%d', $segment->getId()));
+>>>>>>> 222589fde5 (cs)
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $html = $response->getContent();

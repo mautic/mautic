@@ -397,7 +397,7 @@ final class PublicControllerTest extends TestCase
             $redirectId
         );
         $this->assertSame($targetUrl, $response->getTargetUrl());
-        $this->assertSame(Response::HTTP_FOUND, $response->getStatusCode());
+        $this->assertSame(Response::HTTP_FOUND, $response->getStatusCode(), (string) $response->getContent());
     }
 
     public static function provideRedirectUrls(): \Generator

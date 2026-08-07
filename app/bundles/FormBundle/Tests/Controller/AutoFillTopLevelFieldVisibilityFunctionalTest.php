@@ -96,7 +96,7 @@ final class AutoFillTopLevelFieldVisibilityFunctionalTest extends MauticMysqlTes
 
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
         $clientResponse = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), (string) $clientResponse->getContent());
 
         $response = json_decode($clientResponse->getContent(), true);
 

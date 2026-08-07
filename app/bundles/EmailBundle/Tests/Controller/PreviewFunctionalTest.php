@@ -135,7 +135,15 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
     {
         // Create custom field
         $this->client->request(
+<<<<<<< HEAD
+<<<<<<< HEAD
             Request::METHOD_POST,
+=======
+            \Symfony\Component\HttpFoundation\Request::METHOD_POST,
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+            Request::METHOD_POST,
+>>>>>>> 222589fde5 (cs)
             '/api/fields/contact/new',
             [
                 'label'      => 'bool',
@@ -151,7 +159,15 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
 
         // Create some contacts
         $this->client->request(
+<<<<<<< HEAD
+<<<<<<< HEAD
             Request::METHOD_POST,
+=======
+            \Symfony\Component\HttpFoundation\Request::METHOD_POST,
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+            Request::METHOD_POST,
+>>>>>>> 222589fde5 (cs)
             '/api/contacts/batch/new',
             [
                 [

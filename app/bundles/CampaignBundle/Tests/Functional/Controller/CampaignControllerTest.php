@@ -277,7 +277,15 @@ final class CampaignControllerTest extends MauticMysqlTestCase
         $before = $now->modify('-1 month');
         $after  = $now->modify('+1 month');
         $url    = sprintf('s/campaigns/event/stats/%d/%s/%s', $campaign->getId(), $before->format('Y-m-d'), $after->format('Y-m-d'));
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, $url);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, $url);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, $url);
+>>>>>>> 222589fde5 (cs)
         $response = $this->client->getResponse();
         $body     = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $this->client->restart();
@@ -323,7 +331,15 @@ final class CampaignControllerTest extends MauticMysqlTestCase
 
         $this->loginOtherUser($nonAdminUser);
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/campaigns/export/'.$this->campaign->getId());
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/campaigns/export/'.$this->campaign->getId());
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/campaigns/export/'.$this->campaign->getId());
+>>>>>>> 222589fde5 (cs)
 
         $response = $this->client->getResponse();
 
@@ -338,7 +354,15 @@ final class CampaignControllerTest extends MauticMysqlTestCase
         $this->loginOtherUser($nonAdminUser);
 
         $this->client->request(
+<<<<<<< HEAD
+<<<<<<< HEAD
             Request::METHOD_GET,
+=======
+            \Symfony\Component\HttpFoundation\Request::METHOD_GET,
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+            Request::METHOD_GET,
+>>>>>>> 222589fde5 (cs)
             '/s/campaigns/batchExport',
             [
                 'filetype' => 'zip',
@@ -359,7 +383,15 @@ final class CampaignControllerTest extends MauticMysqlTestCase
 
         $this->loginOtherUser($nonAdminUser);
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/campaigns/export/'.$this->campaign->getId());
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/campaigns/export/'.$this->campaign->getId());
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/campaigns/export/'.$this->campaign->getId());
+>>>>>>> 222589fde5 (cs)
 
         $response = $this->client->getResponse();
 
@@ -372,7 +404,15 @@ final class CampaignControllerTest extends MauticMysqlTestCase
 
         $this->loginOtherUser($nonAdminUser);
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/campaigns/export/999999'); // Non-existent campaign ID
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/campaigns/export/999999'); // Non-existent campaign ID
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/campaigns/export/999999'); // Non-existent campaign ID
+>>>>>>> 222589fde5 (cs)
 
         $response = $this->client->getResponse();
 
@@ -392,7 +432,15 @@ final class CampaignControllerTest extends MauticMysqlTestCase
 
         $this->loginOtherUser($nonAdminUser);
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/campaigns/export/'.$this->campaign->getId());
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/campaigns/export/'.$this->campaign->getId());
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/campaigns/export/'.$this->campaign->getId());
+>>>>>>> 222589fde5 (cs)
 
         $response        = $this->client->getResponse();
         $responseContent = $response->getContent();
@@ -415,7 +463,15 @@ final class CampaignControllerTest extends MauticMysqlTestCase
 
         $this->loginOtherUser($nonAdminUser);
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/campaigns/batchExport');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/campaigns/batchExport');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/campaigns/batchExport');
+>>>>>>> 222589fde5 (cs)
 
         $response = $this->client->getResponse();
 
@@ -428,7 +484,15 @@ final class CampaignControllerTest extends MauticMysqlTestCase
 
         $this->loginOtherUser($nonAdminUser);
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/campaigns/batchExport', [
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/campaigns/batchExport', [
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/campaigns/batchExport', [
+>>>>>>> 222589fde5 (cs)
             'ids' => json_encode([]), // Empty IDs to trigger query
         ]);
 
@@ -450,7 +514,15 @@ final class CampaignControllerTest extends MauticMysqlTestCase
 
         $this->loginOtherUser($nonAdminUser);
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/campaigns/batchExport', [
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/campaigns/batchExport', [
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/campaigns/batchExport', [
+>>>>>>> 222589fde5 (cs)
             'ids' => json_encode([$this->campaign->getId()]),
         ]);
 

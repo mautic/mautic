@@ -73,7 +73,15 @@ final class CompanyControllerTest extends MauticMysqlTestCase
      */
     public function testViewActionCompany(): void
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler                = $this->client->request(Request::METHOD_GET, '/s/companies/view/'.$this->company1Id);
+=======
+        $crawler                = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/companies/view/'.$this->company1Id);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler                = $this->client->request(Request::METHOD_GET, '/s/companies/view/'.$this->company1Id);
+>>>>>>> 222589fde5 (cs)
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
         /** @var CompanyModel $model */
@@ -91,7 +99,15 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $this->createLead();
         $segment = $this->createSegment();
         $this->testSymfonyCommand('mautic:segments:update', ['--list-id' => $segment->getId()]);
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler  = $this->client->request(Request::METHOD_GET, "s/company/graph/{$this->company1Id}");
+=======
+        $crawler  = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, "s/company/graph/{$this->company1Id}");
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler  = $this->client->request(Request::METHOD_GET, "s/company/graph/{$this->company1Id}");
+>>>>>>> 222589fde5 (cs)
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $body           = json_decode($response->getContent(), true);
@@ -111,7 +127,15 @@ final class CompanyControllerTest extends MauticMysqlTestCase
      */
     public function testEditActionCompany(): void
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler                = $this->client->request(Request::METHOD_GET, '/s/companies/edit/'.$this->company1Id);
+=======
+        $crawler                = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/companies/edit/'.$this->company1Id);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler                = $this->client->request(Request::METHOD_GET, '/s/companies/edit/'.$this->company1Id);
+>>>>>>> 222589fde5 (cs)
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
         /** @var CompanyModel $model */
@@ -130,7 +154,15 @@ final class CompanyControllerTest extends MauticMysqlTestCase
 
     public function testEditAndCancelActionCompany(): void
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, '/s/companies/edit/'.$this->company1Id);
+=======
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/companies/edit/'.$this->company1Id);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/companies/edit/'.$this->company1Id);
+>>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
         $buttonCrawler = $crawler->selectButton('Cancel');
         $form          = $buttonCrawler->form();
@@ -175,7 +207,15 @@ final class CompanyControllerTest extends MauticMysqlTestCase
             ->setEmail('example@idstart.com');
         $leadModel->saveEntity($lead3);
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler        = $this->client->request(Request::METHOD_GET, '/s/company/'.$this->company1Id.'/contacts/');
+=======
+        $crawler        = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/company/'.$this->company1Id.'/contacts/');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler        = $this->client->request(Request::METHOD_GET, '/s/company/'.$this->company1Id.'/contacts/');
+>>>>>>> 222589fde5 (cs)
         $leadsTableRows = $crawler->filterXPath("//table[@id='leadTable']//tbody//tr");
 
         $this->assertResponseIsSuccessful();
@@ -186,7 +226,15 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $this->assertStringContainsString('/s/contacts/view/'.$lead1->getId(), (string) $clientResponse->getContent());
         $this->assertStringContainsString('1 item', (string) $clientResponse->getContent());
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler        = $this->client->request(Request::METHOD_GET, '/s/company/'.$this->company2Id.'/contacts/');
+=======
+        $crawler        = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/company/'.$this->company2Id.'/contacts/');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler        = $this->client->request(Request::METHOD_GET, '/s/company/'.$this->company2Id.'/contacts/');
+>>>>>>> 222589fde5 (cs)
         $leadsTableRows = $crawler->filterXPath("//table[@id='leadTable']//tbody//tr");
 
         $this->assertResponseIsSuccessful();
@@ -306,7 +354,15 @@ final class CompanyControllerTest extends MauticMysqlTestCase
      */
     public function testNewActionCompany(): void
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/companies/new/');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/companies/new/');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/companies/new/');
+>>>>>>> 222589fde5 (cs)
         $clientResponse         = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
     }
@@ -323,7 +379,15 @@ final class CompanyControllerTest extends MauticMysqlTestCase
 
     public function testNewCompanyMergeButtonVisible(): void
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/companies/new/');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/companies/new/');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/companies/new/');
+>>>>>>> 222589fde5 (cs)
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
@@ -352,7 +416,15 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, '/s/companies/edit/'.$this->company1Id);
+=======
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/companies/edit/'.$this->company1Id);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/companies/edit/'.$this->company1Id);
+>>>>>>> 222589fde5 (cs)
         $form    = $crawler->selectButton('Save')->form();
         $form['company[projects]']->setValue((string) $project->getId());
 
@@ -370,7 +442,15 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $leadA = $this->createLead();
         $leadB = $this->createLead('F1', 'L1', 'f@l.com', '123');
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, '/s/companies/edit/'.$this->company1Id);
+=======
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/companies/edit/'.$this->company1Id);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/companies/edit/'.$this->company1Id);
+>>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
 
         $buttonCrawler = $crawler->selectButton('Save & Close');
@@ -405,7 +485,15 @@ final class CompanyControllerTest extends MauticMysqlTestCase
 
     public function testIndexAction(): void
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/companies');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/companies');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/companies');
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
 

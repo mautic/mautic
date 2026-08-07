@@ -68,7 +68,15 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testMailerCallbackWhenNoTransportProccessesIt(): void
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, '/mailer/callback');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/mailer/callback');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, '/mailer/callback');
+>>>>>>> 222589fde5 (cs)
 
         self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
         $this->assertSame('No email transport that could process this callback was found', $this->client->getResponse()->getContent());
@@ -77,7 +85,15 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
     public function testMailerCallbackWhenTransportDoesNotProccessIt(): void
     {
         self::getContainer()->get(EventDispatcherInterface::class)->addListener(EmailEvents::ON_TRANSPORT_WEBHOOK, fn (): null => null /* exists but does nothing */);
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, '/mailer/callback');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/mailer/callback');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, '/mailer/callback');
+>>>>>>> 222589fde5 (cs)
 
         self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
         $this->assertSame('No email transport that could process this callback was found', $this->client->getResponse()->getContent());
@@ -86,7 +102,15 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
     public function testMailerCallbackWhenTransportProccessesIt(): void
     {
         self::getContainer()->get(EventDispatcherInterface::class)->addListener(EmailEvents::ON_TRANSPORT_WEBHOOK, fn (TransportWebhookEvent $event) => $event->setResponse(new Response('OK')));
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, '/mailer/callback');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/mailer/callback');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, '/mailer/callback');
+>>>>>>> 222589fde5 (cs)
 
         self::assertResponseIsSuccessful();
         $this->assertSame('OK', $this->client->getResponse()->getContent());
@@ -100,7 +124,15 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
+=======
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler = $this->client->request(Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
+>>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
 
         $this->assertStringContainsString('form/submit?formId='.$stat->getEmail()->getUnsubscribeForm()->getId(), (string) $crawler->filter('form')->eq(0)->attr('action'));
@@ -115,12 +147,20 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
+>>>>>>> 222589fde5 (cs)
 
         $this->em->clear();
 
         $entity = self::getContainer()->get(PageRepository::class)->getEntity($stat->getEmail()->getPreferenceCenter()->getId());
-        $this->assertSame(1, $entity->getHits(), $this->client->getResponse()->getContent());
+        $this->assertSame(1, $entity->getHits(), (string) $this->client->getResponse()->getContent());
     }
 
     public function testContactPreferencesSaveMessage(): void
@@ -129,7 +169,15 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $stat = $this->getStat(null, $lead);
         $this->em->flush();
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
+=======
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler = $this->client->request(Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
+>>>>>>> 222589fde5 (cs)
 
         self::assertResponseIsSuccessful();
         $form = $crawler->filter('form')->form();
@@ -165,7 +213,15 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
+=======
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler = $this->client->request(Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
+>>>>>>> 222589fde5 (cs)
 
         $this->assertStringContainsString('form/submit?formId='.$stat->getEmail()->getUnsubscribeForm()->getId(), (string) $crawler->filter('form')->eq(0)->attr('action'));
         $this->assertResponseIsSuccessful();
@@ -179,7 +235,15 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
+=======
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler = $this->client->request(Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
+>>>>>>> 222589fde5 (cs)
 
         $this->assertStringContainsString('form/submit?formId='.$stat->getEmail()->getUnsubscribeForm()->getId(), (string) $crawler->filter('form')->eq(0)->attr('action'));
         $this->assertResponseIsSuccessful();
@@ -193,7 +257,15 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
+=======
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler = $this->client->request(Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
+>>>>>>> 222589fde5 (cs)
 
         $this->assertStringNotContainsString('form/submit?formId=', $crawler->html());
         $this->assertResponseIsSuccessful();
@@ -204,7 +276,15 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $lead = $this->createLead();
         $stat = $this->getStat(null, $lead);
         $this->em->flush();
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, '/email/unsubscribe/'.$stat->getTrackingHash(), [
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/email/unsubscribe/'.$stat->getTrackingHash(), [
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, '/email/unsubscribe/'.$stat->getTrackingHash(), [
+>>>>>>> 222589fde5 (cs)
             'List-Unsubscribe' => 'One-Click',
         ]);
         $this->assertResponseIsSuccessful();
@@ -218,7 +298,15 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $lead = $this->createLead();
         $stat = $this->getStat(null, $lead);
         $this->em->flush();
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_HEAD, '/email/unsubscribe/'.$stat->getTrackingHash());
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_HEAD, '/email/unsubscribe/'.$stat->getTrackingHash());
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_HEAD, '/email/unsubscribe/'.$stat->getTrackingHash());
+>>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
         $dncCollection = $stat->getLead()->getDoNotContact();
         $this->assertCount(0, $dncCollection);
@@ -231,7 +319,15 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $preferencesCenter = $this->createCustomPreferencesPage('{segmentlist}{saveprefsbutton}');
         $stat              = $this->getStat(null, $lead, $preferencesCenter);
         $this->em->flush();
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
+=======
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler = $this->client->request(Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
+>>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
         $tokenInput = $crawler->filter('input[name="lead_contact_frequency_rules[_token]"]');
         $this->assertCount(1, $tokenInput, $this->client->getResponse()->getContent());
@@ -258,7 +354,15 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $stat = $this->getStat(null, $lead, $page);
         $this->em->flush();
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
+=======
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler = $this->client->request(Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
+>>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('Save preferences', $crawler->html());
     }
@@ -326,7 +430,15 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $stat = $this->getStat(null, $lead, $page);
         $this->em->flush();
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
+=======
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler = $this->client->request(Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
+>>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
 
         $translator = self::getContainer()->get(TranslatorInterface::class);
@@ -433,7 +545,15 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $email->setCustomHtml('some content');
         $this->em->persist($email);
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/email/preview/'.$email->getId());
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/email/preview/'.$email->getId());
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/email/preview/'.$email->getId());
+>>>>>>> 222589fde5 (cs)
         $this->assertTrue($this->client->getResponse()->isNotFound(), $this->client->getResponse()->getContent());
 
         $email->setPublicPreview(true);
@@ -441,7 +561,15 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/email/preview/'.$email->getId());
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/email/preview/'.$email->getId());
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/email/preview/'.$email->getId());
+>>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
     }
 
@@ -462,7 +590,15 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/email/preview/'.$email->getId());
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/email/preview/'.$email->getId());
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/email/preview/'.$email->getId());
+>>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
     }
 
@@ -628,7 +764,15 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         // Get the unsubscribe page
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
+=======
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler = $this->client->request(Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
+>>>>>>> 222589fde5 (cs)
 
         self::assertResponseIsSuccessful();
 
@@ -638,7 +782,15 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $href = $unsubscribeAllLink->attr('href');
 
         // Click the link for unsubscribe all
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, $href);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, $href);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, $href);
+>>>>>>> 222589fde5 (cs)
 
         self::assertResponseIsSuccessful();
 
@@ -672,7 +824,15 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->logoutUser();
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
+=======
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler = $this->client->request(Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
+>>>>>>> 222589fde5 (cs)
 
         $this->assertResponseIsSuccessful();
         $form = $crawler->filter('form')->form();
@@ -706,7 +866,15 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
+=======
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler = $this->client->request(Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
+>>>>>>> 222589fde5 (cs)
 
         $this->assertResponseIsSuccessful();
 

@@ -51,7 +51,15 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $title   = 'Remote image asset with query string';
         $fileUrl = 'https://fastly.picsum.photos/id/13/2500/1667.jpg?hmac=SoX9UoHhN8HyklRA4A3vcCWJMVtiBXUg0W4ljWTor7s';
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawlerCreate = $this->client->request(Request::METHOD_GET, '/s/assets/new');
+=======
+        $crawlerCreate = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/assets/new');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawlerCreate = $this->client->request(Request::METHOD_GET, '/s/assets/new');
+>>>>>>> 222589fde5 (cs)
         $createForm    = $crawlerCreate->selectButton('Save')->form();
         $createForm->setValues([
             'asset[title]'           => $title,
@@ -66,7 +74,15 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $asset = $this->em->getRepository(Asset::class)->findOneBy(['title' => $title]);
         $this->assertInstanceOf(Asset::class, $asset, 'Asset should be created successfully');
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawlerEdit = $this->client->request(Request::METHOD_GET, '/s/assets/edit/'.$asset->getId());
+=======
+        $crawlerEdit = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/assets/edit/'.$asset->getId());
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawlerEdit = $this->client->request(Request::METHOD_GET, '/s/assets/edit/'.$asset->getId());
+>>>>>>> 222589fde5 (cs)
         $editForm    = $crawlerEdit->selectButton('Save')->form();
 
         $crawlerAfterEdit = $this->client->submit($editForm);
@@ -168,7 +184,15 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
     public function testAssetSizes(): void
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/ajax?action=email:getAttachmentsSize&assets%5B%5D='.$this->asset->getId());
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/ajax?action=email:getAttachmentsSize&assets%5B%5D='.$this->asset->getId());
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/ajax?action=email:getAttachmentsSize&assets%5B%5D='.$this->asset->getId());
+>>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
         $this->assertSame('{"size":"178 bytes"}', $this->client->getResponse()->getContent());
     }
@@ -178,7 +202,15 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
      */
     public function testPreviewActionStreamByDefault(): void
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/assets/preview/'.$this->asset->getId());
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/assets/preview/'.$this->asset->getId());
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/assets/preview/'.$this->asset->getId());
+>>>>>>> 222589fde5 (cs)
         ob_start();
         $response = $this->client->getResponse();
         $response->sendContent();
@@ -196,7 +228,15 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
      */
     public function testPreviewActionStreamIsZero(): void
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/assets/preview/'.$this->asset->getId().'?stream=0&download=1');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/assets/preview/'.$this->asset->getId().'?stream=0&download=1');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/assets/preview/'.$this->asset->getId().'?stream=0&download=1');
+>>>>>>> 222589fde5 (cs)
         ob_start();
         $response = $this->client->getResponse();
         $response->sendContent();
@@ -213,7 +253,15 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
      */
     public function testPreviewActionStreamDownloadAreZero(): void
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/assets/preview/'.$this->asset->getId().'?stream=0&download=0');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/assets/preview/'.$this->asset->getId().'?stream=0&download=0');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/assets/preview/'.$this->asset->getId().'?stream=0&download=0');
+>>>>>>> 222589fde5 (cs)
         ob_start();
         $response = $this->client->getResponse();
         $response->sendContent();
@@ -347,7 +395,15 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $tmpDir = 'tmp_'.substr(md5(uniqid()), 0, 13);
 
         $this->client->request(
+<<<<<<< HEAD
+<<<<<<< HEAD
             Request::METHOD_POST,
+=======
+            \Symfony\Component\HttpFoundation\Request::METHOD_POST,
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+            Request::METHOD_POST,
+>>>>>>> 222589fde5 (cs)
             '/s/_uploader/asset/upload',
             ['tempId' => '../../'.$tmpDir],
             ['file'   => $uploadedFile],
@@ -492,7 +548,15 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $this->em->flush();
         $this->em->clear();
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, '/s/assets/edit/'.$asset->getId());
+=======
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/assets/edit/'.$asset->getId());
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/assets/edit/'.$asset->getId());
+>>>>>>> 222589fde5 (cs)
         $form    = $crawler->selectButton('Save')->form();
         $form['asset[projects]']->setValue((string) $project->getId());
 
@@ -519,7 +583,15 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
     public function testCreateNewRemoteAssetWithValidateRemoteDomainsEnabled(string $file, bool $isAllowed): void
     {
         $message = 'The remote domain in the URL is not allowed due to security reasons.';
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, '/s/assets/new');
+=======
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/assets/new');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/assets/new');
+>>>>>>> 222589fde5 (cs)
         $form    = $crawler->selectButton('Save')->form();
         $form->setValues([
             'asset[title]'           => 'Title',

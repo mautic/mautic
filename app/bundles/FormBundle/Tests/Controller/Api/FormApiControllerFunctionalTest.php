@@ -95,7 +95,15 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
     #[DataProvider('formDataProvider')]
     public function testAddAndEditForms(array $payload, array $expectedResponse): void
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/forms/new', $payload);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -123,7 +131,15 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         }
 
         // Edit PATCH:
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_PATCH, "/api/forms/{$formId}/edit", ['name' => $expectedResponse['newName']]);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_PATCH, "/api/forms/{$formId}/edit", ['name' => $expectedResponse['newName']]);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_PATCH, "/api/forms/{$formId}/edit", ['name' => $expectedResponse['newName']]);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $responsePatch  = json_decode($clientResponse->getContent(), true);
         $this->assertResponseIsSuccessful();
@@ -468,12 +484,28 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $tag1Payload = ['tag' => 'add this'];
         $tag2Payload = ['tag' => 'remove this'];
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, '/api/tags/new', $tag1Payload);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/tags/new', $tag1Payload);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, '/api/tags/new', $tag1Payload);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         $tag1Id         = $response['tag']['id'];
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, '/api/tags/new', $tag2Payload);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/tags/new', $tag2Payload);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, '/api/tags/new', $tag2Payload);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         $tag2Id         = $response['tag']['id'];
@@ -507,7 +539,15 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
 
         // Create form with lead.changetags action:
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/forms/new', $payload);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -663,7 +703,15 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ];
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/forms/new', $payload);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 

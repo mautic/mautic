@@ -149,7 +149,15 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
             $payload['lists'] = [$segmentId];
         }
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, '/api/emails/new', $payload);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/emails/new', $payload);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, '/api/emails/new', $payload);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -169,13 +177,21 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
 
     private function sendEmailViaApi(int $emailId): void
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, "/api/emails/{$emailId}/send");
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, "/api/emails/{$emailId}/send");
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, "/api/emails/{$emailId}/send");
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         self::assertResponseIsSuccessful();
         $this->assertSame(json_decode($clientResponse->getContent(), true, 512, JSON_THROW_ON_ERROR), [
             'success'          => 1,
             'sentCount'        => 1,
             'failedRecipients' => 0,
-        ], $clientResponse->getContent());
+        ], (string) $clientResponse->getContent());
     }
 }

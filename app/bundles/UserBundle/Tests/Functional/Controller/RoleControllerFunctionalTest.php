@@ -212,14 +212,30 @@ final class RoleControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($this->createUser('user3', $role2));
         $this->em->flush();
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, '/s/roles?tmpl=list&search='.$uniquePrefix.'&orderby=user_count&orderbydir=DESC');
+=======
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/roles?tmpl=list&search='.$uniquePrefix.'&orderby=user_count&orderbydir=DESC');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/roles?tmpl=list&search='.$uniquePrefix.'&orderby=user_count&orderbydir=DESC');
+>>>>>>> 222589fde5 (cs)
         $rows    = $crawler->filter('#roleTable tbody tr');
 
         $this->assertSame($uniquePrefix.' 1', trim($rows->eq(0)->filter('td')->eq(1)->text()));
         $this->assertSame($uniquePrefix.' 2', trim($rows->eq(1)->filter('td')->eq(1)->text()));
         $this->assertSame($uniquePrefix.' 3', trim($rows->eq(2)->filter('td')->eq(1)->text()));
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, '/s/roles?tmpl=list&search='.$uniquePrefix.'&orderby=user_count&orderbydir=ASC');
+=======
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/roles?tmpl=list&search='.$uniquePrefix.'&orderby=user_count&orderbydir=ASC');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/roles?tmpl=list&search='.$uniquePrefix.'&orderby=user_count&orderbydir=ASC');
+>>>>>>> 222589fde5 (cs)
         $rows    = $crawler->filter('#roleTable tbody tr');
 
         $this->assertSame($uniquePrefix.' 3', trim($rows->eq(0)->filter('td')->eq(1)->text()));

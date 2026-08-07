@@ -52,7 +52,15 @@ final class TagControllerTest extends MauticMysqlTestCase
      */
     public function testIndexActionWhenNotFiltered(): void
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/tags');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/tags');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/tags');
+>>>>>>> 222589fde5 (cs)
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
 
@@ -66,7 +74,15 @@ final class TagControllerTest extends MauticMysqlTestCase
      */
     public function testIndexActionWhenFiltered(): void
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/tags?search=tag1');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/tags?search=tag1');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/tags?search=tag1');
+>>>>>>> 222589fde5 (cs)
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
 
@@ -87,7 +103,15 @@ final class TagControllerTest extends MauticMysqlTestCase
         $otherTag->setDescription('No related content.');
         $this->tagRepository->saveEntity($otherTag);
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/tags?search=test');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/tags?search=test');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/tags?search=test');
+>>>>>>> 222589fde5 (cs)
         $clientResponse        = $this->client->getResponse();
         $clientResponseContent = $clientResponse->getContent();
 
@@ -99,7 +123,15 @@ final class TagControllerTest extends MauticMysqlTestCase
     public function testTagDeletion(): void
     {
         $tagId = $this->tagRepository->findOneBy([])->getId();
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, '/s/tags/delete/'.$tagId);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/s/tags/delete/'.$tagId);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, '/s/tags/delete/'.$tagId);
+>>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
         $this->assertNotInstanceOf(Tag::class, $this->tagRepository->find($tagId), 'Assert that tag is deleted');
     }
@@ -119,7 +151,15 @@ final class TagControllerTest extends MauticMysqlTestCase
 
         $this->assertSame(1, $this->countLeadTagAssociations($tagId));
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, '/s/tags/delete/'.$tagId);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/s/tags/delete/'.$tagId);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, '/s/tags/delete/'.$tagId);
+>>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
         $this->assertNotInstanceOf(Tag::class, $this->tagRepository->find($tagId), 'Assert that tag is deleted');
         $this->assertSame(0, $this->countLeadTagAssociations($tagId));
@@ -133,7 +173,15 @@ final class TagControllerTest extends MauticMysqlTestCase
         $tag = $this->tagRepository->findOneBy([]);
         $this->assertInstanceOf(Tag::class, $tag);
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/tags/view/'.$tag->getId());
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/tags/view/'.$tag->getId());
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/tags/view/'.$tag->getId());
+>>>>>>> 222589fde5 (cs)
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
         $this->assertResponseIsSuccessful();
@@ -143,7 +191,15 @@ final class TagControllerTest extends MauticMysqlTestCase
     public function testViewActionNotFound(): void
     {
         $this->client->followRedirects(false);
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/tags/view/99999');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/tags/view/99999');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/tags/view/99999');
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $this->assertTrue($clientResponse->isRedirection(), 'Must be redirect response.');
     }
@@ -168,7 +224,15 @@ final class TagControllerTest extends MauticMysqlTestCase
         $tag     = $this->tagRepository->findOneBy([]);
         $this->assertInstanceOf(Tag::class, $tag);
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler                = $this->client->request(Request::METHOD_GET, '/s/tags/edit/'.$tag->getId());
+=======
+        $crawler                = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/tags/edit/'.$tag->getId());
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler                = $this->client->request(Request::METHOD_GET, '/s/tags/edit/'.$tag->getId());
+>>>>>>> 222589fde5 (cs)
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
         $this->assertResponseIsSuccessful();
@@ -184,7 +248,15 @@ final class TagControllerTest extends MauticMysqlTestCase
     public function testEditActionNotFound(): void
     {
         $this->client->followRedirects(false);
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/tags/edit/99999');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/tags/edit/99999');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/tags/edit/99999');
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $this->assertTrue($clientResponse->isRedirection(), 'Must be redirect response.');
     }
@@ -195,7 +267,15 @@ final class TagControllerTest extends MauticMysqlTestCase
     public function testNewAction(): void
     {
         $TagName        = 'Test tag';
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler        = $this->client->request(Request::METHOD_GET, '/s/tags/new');
+=======
+        $crawler        = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/tags/new');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler        = $this->client->request(Request::METHOD_GET, '/s/tags/new');
+>>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
 
         $form = $crawler->selectButton('Save')->form();
@@ -207,7 +287,15 @@ final class TagControllerTest extends MauticMysqlTestCase
 
     public function testNewActionValidation(): void
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, '/s/tags/new');
+=======
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/tags/new');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/tags/new');
+>>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
 
         $buttonCrawler  = $crawler->selectButton('Save');
@@ -221,7 +309,15 @@ final class TagControllerTest extends MauticMysqlTestCase
     public function testNewActionDuplicateTag(): void
     {
         $TagName        = $this->tagRepository->findOneBy([])->getTag();
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler        = $this->client->request(Request::METHOD_GET, '/s/tags/new');
+=======
+        $crawler        = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/tags/new');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler        = $this->client->request(Request::METHOD_GET, '/s/tags/new');
+>>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
 
         $form = $crawler->selectButton('Save')->form();
@@ -235,7 +331,15 @@ final class TagControllerTest extends MauticMysqlTestCase
     {
         $tags   = $this->tagRepository->findAll();
         $tagsId = array_map(fn (Tag $tag) => $tag->getId(), $tags);
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, '/s/tags/batchDelete?ids='.json_encode($tagsId), [], [], $this->createAjaxHeaders());
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/s/tags/batchDelete?ids='.json_encode($tagsId), [], [], $this->createAjaxHeaders());
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, '/s/tags/batchDelete?ids='.json_encode($tagsId), [], [], $this->createAjaxHeaders());
+>>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
         $this->assertEmpty($this->tagRepository->count([]), 'All tags must be deleted.');
     }
@@ -271,7 +375,15 @@ final class TagControllerTest extends MauticMysqlTestCase
         $tags       = $this->tagRepository->findAll();
         $primaryTag = $tags[0];
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, self::MERGE_ROUTE_BASE.$primaryTag->getId());
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, self::MERGE_ROUTE_BASE.$primaryTag->getId());
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, self::MERGE_ROUTE_BASE.$primaryTag->getId());
+>>>>>>> 222589fde5 (cs)
         $this->client->getResponse();
         $this->assertResponseIsSuccessful('Return code must be 200.');
 
@@ -284,7 +396,15 @@ final class TagControllerTest extends MauticMysqlTestCase
         $tags       = $this->tagRepository->findAll();
         $currentTag = $tags[0];
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, self::MERGE_ROUTE_BASE.$currentTag->getId());
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, self::MERGE_ROUTE_BASE.$currentTag->getId());
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, self::MERGE_ROUTE_BASE.$currentTag->getId());
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful('Return code must be 200.');
 
@@ -303,7 +423,15 @@ final class TagControllerTest extends MauticMysqlTestCase
 
     public function testMergeActionWithInvalidTag(): void
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, self::MERGE_ROUTE_BASE.'999999');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, self::MERGE_ROUTE_BASE.'999999');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, self::MERGE_ROUTE_BASE.'999999');
+>>>>>>> 222589fde5 (cs)
         $this->client->getResponse();
         $this->assertResponseIsSuccessful('Return code must be 200 (redirect with error).');
     }
@@ -317,7 +445,15 @@ final class TagControllerTest extends MauticMysqlTestCase
         $secondaryTagId = (int) $secondaryTag->getId();
 
         // Test that the merge action returns the correct response
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, self::MERGE_ROUTE_BASE.$secondaryTagId);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, self::MERGE_ROUTE_BASE.$secondaryTagId);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, self::MERGE_ROUTE_BASE.$secondaryTagId);
+>>>>>>> 222589fde5 (cs)
         $response = $this->client->getResponse();
 
         // Debug: check what status code and content we're getting

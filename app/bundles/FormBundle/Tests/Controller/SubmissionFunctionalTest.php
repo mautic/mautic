@@ -70,7 +70,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
         $clientResponse = $this->client->getResponse();
 
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), (string) $clientResponse->getContent());
 
         $response = json_decode($clientResponse->getContent(), true);
         $formId   = $response['form']['id'];
@@ -89,7 +89,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         $this->client->submit($form);
 
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), (string) $clientResponse->getContent());
 
         // Check the redirect
         $currentUrl = $this->client->getRequest()->getUri();
@@ -130,7 +130,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
         $clientResponse = $this->client->getResponse();
 
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), (string) $clientResponse->getContent());
 
         $response = json_decode($clientResponse->getContent(), true);
         $formId   = $response['form']['id'];
@@ -233,7 +233,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $response       = json_decode($clientResponse->getContent(), true);
         $formId         = $response['form']['id'];
 
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), (string) $clientResponse->getContent());
 
         // Add conditional state field dependent on the country field:
         $patchPayload = [
@@ -325,7 +325,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $response       = json_decode($clientResponse->getContent(), true);
         $formId         = $response['form']['id'];
 
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), (string) $clientResponse->getContent());
 
         // Add conditional state field dependent on the country field:
         $patchPayload = [
@@ -464,7 +464,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $response       = json_decode($clientResponse->getContent(), true);
         $formId         = $response['form']['id'];
 
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), (string) $clientResponse->getContent());
 
         $campaignSources = ['forms' => [$formId => $formId]];
 
@@ -531,7 +531,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $response       = json_decode($clientResponse->getContent(), true);
         $formId         = $response['form']['id'];
 
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), (string) $clientResponse->getContent());
 
         // Submit the form:
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
@@ -572,7 +572,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         ]);
         $clientResponse = $this->client->getResponse();
 
-        $this->assertSame(Response::HTTP_FORBIDDEN, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertSame(Response::HTTP_FORBIDDEN, $clientResponse->getStatusCode(), (string) $clientResponse->getContent());
     }
 
     private function createUser(): User
@@ -705,7 +705,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $response       = json_decode($clientResponse->getContent(), true);
         $formId         = $response['form']['id'];
 
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), (string) $clientResponse->getContent());
 
         // Submit the form:
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
@@ -839,7 +839,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $response       = json_decode($clientResponse->getContent(), true);
         $formId         = $response['form']['id'];
 
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), (string) $clientResponse->getContent());
 
         // Submit the form
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
@@ -1070,7 +1070,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $response       = json_decode($clientResponse->getContent(), true);
         $formId         = $response['form']['id'];
 
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), (string) $clientResponse->getContent());
 
         // Submit the form
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
@@ -1253,7 +1253,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $formId         = json_decode($clientResponse->getContent(), true)['form']['id'];
 
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode());
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), (string) $clientResponse->getContent());
 
         // Submit the form directly via POST
         $this->client->request(
@@ -1319,7 +1319,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
         $clientResponse = $this->client->getResponse();
 
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), (string) $clientResponse->getContent());
 
         $responseData = json_decode($clientResponse->getContent(), true);
         $formId       = $responseData['form']['id'];
@@ -1362,7 +1362,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         );
 
         $secondResponse = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_FOUND, $secondResponse->getStatusCode());
+        $this->assertSame(Response::HTTP_FOUND, $secondResponse->getStatusCode(), (string) $secondResponse->getContent());
 
         $redirectUrl = $secondResponse->headers->get('Location');
         $this->assertNotNull($redirectUrl);
@@ -1438,7 +1438,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $formId         = $response['form']['id'];
         $formAlias      = $response['form']['alias'];
 
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), (string) $clientResponse->getContent());
 
         // Submit the form:
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");

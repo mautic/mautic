@@ -161,7 +161,15 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
 
         // Create:
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, '/api/segments/new', $payload);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/segments/new', $payload);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, '/api/segments/new', $payload);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -229,7 +237,15 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         // Edit:
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_PATCH, "/api/segments/{$segmentId}/edit", ['name' => 'API segment renamed']);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_PATCH, "/api/segments/{$segmentId}/edit", ['name' => 'API segment renamed']);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_PATCH, "/api/segments/{$segmentId}/edit", ['name' => 'API segment renamed']);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -239,7 +255,15 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['description'], $response['list']['description']);
 
         // Get:
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, "/api/segments/{$segmentId}");
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, "/api/segments/{$segmentId}");
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, "/api/segments/{$segmentId}");
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -249,7 +273,15 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['description'], $response['list']['description']);
 
         // Delete:
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_DELETE, "/api/segments/{$segmentId}/delete");
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_DELETE, "/api/segments/{$segmentId}/delete");
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_DELETE, "/api/segments/{$segmentId}/delete");
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -259,7 +291,15 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['description'], $response['list']['description']);
 
         // Get (ensure it's deleted):
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, "/api/segments/{$segmentId}");
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, "/api/segments/{$segmentId}");
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, "/api/segments/{$segmentId}");
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -301,7 +341,15 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ];
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, '/api/segments/batch/new', $payload);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/segments/batch/new', $payload);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, '/api/segments/batch/new', $payload);
+>>>>>>> 222589fde5 (cs)
         $clientResponse  = $this->client->getResponse();
         $response1       = json_decode($clientResponse->getContent(), true);
 
@@ -327,7 +375,15 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         }
 
         // Lets try to create the same segment to see that the values are not re-setted
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_PATCH, '/api/segments/batch/edit', $response1['lists']);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_PATCH, '/api/segments/batch/edit', $response1['lists']);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_PATCH, '/api/segments/batch/edit', $response1['lists']);
+>>>>>>> 222589fde5 (cs)
         $clientResponse  = $this->client->getResponse();
         $response2       = json_decode($clientResponse->getContent(), true);
 
@@ -400,7 +456,15 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
             'leadlist_id'   => $segment->getId(),
         ]);
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_PATCH, "/api/segments/{$segment->getId()}/edit", ['isPublished' => 0]);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_PATCH, "/api/segments/{$segment->getId()}/edit", ['isPublished' => 0]);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_PATCH, "/api/segments/{$segment->getId()}/edit", ['isPublished' => 0]);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         self::assertResponseStatusCodeSame(Response::HTTP_UNPROCESSABLE_ENTITY);
@@ -433,7 +497,15 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($campaign);
         $this->em->flush();
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_PATCH, "/api/segments/{$segment->getId()}/edit", ['isPublished' => 0]);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_PATCH, "/api/segments/{$segment->getId()}/edit", ['isPublished' => 0]);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_PATCH, "/api/segments/{$segment->getId()}/edit", ['isPublished' => 0]);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         self::assertResponseIsSuccessful();
@@ -465,7 +537,15 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $list2 = $this->saveSegment('s2', 's2', $filter);
         $this->em->clear();
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_PATCH, "/api/segments/{$list1->getId()}/edit", ['name' => 'API segment renamed', 'isPublished' => false]);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_PATCH, "/api/segments/{$list1->getId()}/edit", ['name' => 'API segment renamed', 'isPublished' => false]);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_PATCH, "/api/segments/{$list1->getId()}/edit", ['name' => 'API segment renamed', 'isPublished' => false]);
+>>>>>>> 222589fde5 (cs)
         $expectedErrorMessage = sprintf('isPublished: The segment %s is used in %s, please go back and check segments before unpublishing', 'API segment renamed', $list2->getName());
 
         $clientResponse = $this->client->getResponse();
@@ -505,7 +585,15 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
             ['id' => $list2->getId(), 'isPublished' => false],
         ];
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_PATCH, '/api/segments/batch/edit', $segments);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_PATCH, '/api/segments/batch/edit', $segments);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_PATCH, '/api/segments/batch/edit', $segments);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -540,7 +628,15 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $list2 = $this->saveSegment('s2', 's2', $filter);
         $this->em->clear();
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_PATCH, "/api/segments/{$list1->getId()}/edit", ['isPublished' => false]);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_PATCH, "/api/segments/{$list1->getId()}/edit", ['isPublished' => false]);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_PATCH, "/api/segments/{$list1->getId()}/edit", ['isPublished' => false]);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         self::assertResponseStatusCodeSame(Response::HTTP_UNPROCESSABLE_ENTITY);
@@ -562,7 +658,15 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
             'alias'  => 'kitty',
             'bundle' => 'segment',
         ];
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, '/api/categories/new', $categoryPayload);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/categories/new', $categoryPayload);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, '/api/categories/new', $categoryPayload);
+>>>>>>> 222589fde5 (cs)
         $clientResponse     = $this->client->getResponse();
         $response           = json_decode($clientResponse->getContent(), true);
         $categoryId         = $response['category']['id'];
@@ -574,7 +678,15 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
 
         // Create:
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, '/api/segments/new', $segmentPayload);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/segments/new', $segmentPayload);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, '/api/segments/new', $segmentPayload);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         if (!empty($response['errors'][0])) {
@@ -584,7 +696,15 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $segmentId = $response['list']['id'];
 
         // Get segment with category by id:
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, "/api/segments/{$segmentId}");
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, "/api/segments/{$segmentId}");
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, "/api/segments/{$segmentId}");
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -592,7 +712,15 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($segmentPayload['category'], $response['list']['category']['id']);
 
         // Search segments by category:
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/api/segments?search=category:kitty');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/segments?search=category:kitty');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/api/segments?search=category:kitty');
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -700,7 +828,15 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
             'leadlist_id' => $segment->getId(),
         ]);
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_DELETE, "/api/segments/{$segment->getId()}/delete");
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_DELETE, "/api/segments/{$segment->getId()}/delete");
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_DELETE, "/api/segments/{$segment->getId()}/delete");
+>>>>>>> 222589fde5 (cs)
 
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
@@ -753,7 +889,15 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         ]);
 
         $ids = $segment1->getId().','.$segment2->getId();
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_DELETE, "/api/segments/batch/delete?ids={$ids}");
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_DELETE, "/api/segments/batch/delete?ids={$ids}");
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_DELETE, "/api/segments/batch/delete?ids={$ids}");
+>>>>>>> 222589fde5 (cs)
 
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);

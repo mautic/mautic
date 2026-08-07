@@ -40,7 +40,15 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
      */
     public function testIndexActionWhenNotFiltered(): void
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/forms');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/forms');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/forms');
+>>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
     }
 
@@ -49,7 +57,15 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
      */
     public function testIndexActionWhenFiltering(): void
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/forms?search=has%3Aresults&tmpl=list');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/forms?search=has%3Aresults&tmpl=list');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/forms?search=has%3Aresults&tmpl=list');
+>>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
     }
 
@@ -58,7 +74,15 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
      */
     public function testNewActionForm(): void
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/forms/new/');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/forms/new/');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/forms/new/');
+>>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
     }
 
@@ -67,7 +91,15 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
      */
     public function testSaveActionForm(): void
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, '/s/forms/new/');
+=======
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/forms/new/');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/forms/new/');
+>>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
 
         $form = $crawler->filterXPath('//form[@name="mauticform"]')->form();
@@ -95,7 +127,15 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testNewActionCheckDisplayMessageOptionsForm(): void
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/forms/new');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/forms/new');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/forms/new');
+>>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
         $clientResponse = $this->client->getResponse();
         self::assertResponseStatusCodeSame(Response::HTTP_OK, $clientResponse->getContent());
@@ -106,7 +146,15 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testErrorValidationWithHideFormTypeWithoutMessage(): void
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, '/s/forms/new/');
+=======
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/forms/new/');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/forms/new/');
+>>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
 
         $selectedValue = $crawler->filter('#mauticform_postAction option:selected')->attr('value');
@@ -130,7 +178,15 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testSuccessWithHideForm(): void
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, '/s/forms/new/');
+=======
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/forms/new/');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/forms/new/');
+>>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
 
         $selectedValue = $crawler->filter('#mauticform_postAction option:selected')->attr('value');
@@ -183,13 +239,29 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
                 ],
             ],
         ];
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $formPayload);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/forms/new', $formPayload);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $formPayload);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, json_encode($languageHelper->getLanguageChoices()));
         $form     = $response['form'];
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, '/form/'.$form['id']);
+=======
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/form/'.$form['id']);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler = $this->client->request(Request::METHOD_GET, '/form/'.$form['id']);
+>>>>>>> 222589fde5 (cs)
         $this->assertStringContainsString('Merci de patienter...', $crawler->html());
         $this->assertStringContainsString('Ceci est requis.', $crawler->html());
 
@@ -210,7 +282,15 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, sprintf('/s/forms/edit/%d', $form->getId()));
+=======
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, sprintf('/s/forms/edit/%d', $form->getId()));
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler = $this->client->request(Request::METHOD_GET, sprintf('/s/forms/edit/%d', $form->getId()));
+>>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
 
         $formElement = $crawler->filterXPath('//form[@name="mauticform"]')->form();
@@ -233,7 +313,15 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, sprintf('/s/forms/edit/%d', $form->getId()));
+=======
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, sprintf('/s/forms/edit/%d', $form->getId()));
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler = $this->client->request(Request::METHOD_GET, sprintf('/s/forms/edit/%d', $form->getId()));
+>>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
 
         $formElement = $crawler->filterXPath('//form[@name="mauticform"]')->form();
@@ -285,11 +373,27 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         // Verify form creation
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, sprintf('/s/forms/edit/%d', $form->getId()));
         $this->assertResponseIsSuccessful();
 
         // Visit the form preview page
         $this->client->request(Request::METHOD_GET, sprintf('/s/forms/preview/%d', $form->getId()));
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, sprintf('/s/forms/edit/%d', $form->getId()));
+        $this->assertResponseIsSuccessful();
+
+        // Visit the form preview page
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, sprintf('/s/forms/preview/%d', $form->getId()));
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, sprintf('/s/forms/edit/%d', $form->getId()));
+        $this->assertResponseIsSuccessful();
+
+        // Visit the form preview page
+        $this->client->request(Request::METHOD_GET, sprintf('/s/forms/preview/%d', $form->getId()));
+>>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('First Option', (string) $this->client->getResponse()->getContent());
         $this->assertStringContainsString('Second Option', (string) $this->client->getResponse()->getContent());
@@ -344,7 +448,15 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         // Edit and submit the form to be able to push action into session
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler     = $this->client->request(Request::METHOD_GET, sprintf('/s/forms/edit/%d', $form->getId()));
+=======
+        $crawler     = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, sprintf('/s/forms/edit/%d', $form->getId()));
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler     = $this->client->request(Request::METHOD_GET, sprintf('/s/forms/edit/%d', $form->getId()));
+>>>>>>> 222589fde5 (cs)
         $formElement = $crawler->filterXPath('//form[@name="mauticform"]')->form();
         $this->client->submit($formElement);
         $this->assertResponseIsSuccessful();
@@ -422,7 +534,15 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, sprintf('/s/forms/edit/%d', $form->getId()));
+=======
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, sprintf('/s/forms/edit/%d', $form->getId()));
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler = $this->client->request(Request::METHOD_GET, sprintf('/s/forms/edit/%d', $form->getId()));
+>>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
 
         $translator = $this->getContainer()->get(TranslatorInterface::class);
@@ -682,7 +802,15 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler     = $this->client->request(Request::METHOD_GET, '/s/forms/edit/'.$form->getId());
+=======
+        $crawler     = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/forms/edit/'.$form->getId());
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler     = $this->client->request(Request::METHOD_GET, '/s/forms/edit/'.$form->getId());
+>>>>>>> 222589fde5 (cs)
         $formCrawler = $crawler->selectButton('Save')->form();
         $formCrawler['mauticform[projects]']->setValue((string) $project->getId());
 
@@ -703,7 +831,15 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         // Request the form details view
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, sprintf('/s/forms/view/%d', $form->getId()));
+=======
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, sprintf('/s/forms/view/%d', $form->getId()));
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler = $this->client->request(Request::METHOD_GET, sprintf('/s/forms/view/%d', $form->getId()));
+>>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
 
         // Check if preview panel exists
@@ -744,7 +880,15 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         // Request the form preview instead of view
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, sprintf('/s/forms/preview/%d', $form->getId()));
+=======
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, sprintf('/s/forms/preview/%d', $form->getId()));
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler = $this->client->request(Request::METHOD_GET, sprintf('/s/forms/preview/%d', $form->getId()));
+>>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
 
         // Check that the slider input has the oninput attribute

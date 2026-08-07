@@ -78,7 +78,15 @@ final class PageControllerTest extends MauticMysqlTestCase
         ]);
         $leadsBeforeTest   = $this->connection->fetchAllAssociative('SELECT `id` FROM `'.$this->prefix.'leads`;');
         $leadIdsBeforeTest = array_column($leadsBeforeTest, 'id');
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/page-page-landingPageTracking');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/page-page-landingPageTracking');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/page-page-landingPageTracking');
+>>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
 
         $sql = 'SELECT `id` FROM `'.$this->prefix.'leads`';
@@ -117,7 +125,15 @@ final class PageControllerTest extends MauticMysqlTestCase
         ]);
         $leadsBeforeTest   = $this->connection->fetchAllAssociative('SELECT `id` FROM `'.$this->prefix.'leads`;');
         $leadIdsBeforeTest = array_column($leadsBeforeTest, 'id');
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/page-page-landingPageTrackingSecondVisit');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/page-page-landingPageTrackingSecondVisit');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/page-page-landingPageTrackingSecondVisit');
+>>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
         $sql = 'SELECT `id` FROM `'.$this->prefix.'leads`';
         if ([] !== $leadIdsBeforeTest) {
@@ -134,7 +150,15 @@ final class PageControllerTest extends MauticMysqlTestCase
         );
         $this->assertCount(1, $eventLogsAfterFirstVisit);
         $this->assertSame('created_contact', reset($eventLogsAfterFirstVisit)['action']);
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/page-page-landingPageTrackingSecondVisit');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/page-page-landingPageTrackingSecondVisit');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/page-page-landingPageTrackingSecondVisit');
+>>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
         $eventLogsAfterSecondVisit = $this->connection->fetchAllAssociative('
           SELECT `id`, `action`
@@ -156,7 +180,15 @@ final class PageControllerTest extends MauticMysqlTestCase
         $timestamp  = \time();
         $page       = $this->createTestPage();
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, "/{$page->getAlias()}?utm_source=linkedin&utm_medium=social&utm_campaign=mautic&utm_content=".$timestamp);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, "/{$page->getAlias()}?utm_source=linkedin&utm_medium=social&utm_campaign=mautic&utm_content=".$timestamp);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, "/{$page->getAlias()}?utm_source=linkedin&utm_medium=social&utm_campaign=mautic&utm_content=".$timestamp);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
 
@@ -199,7 +231,15 @@ final class PageControllerTest extends MauticMysqlTestCase
      */
     public function testViewActionPage(): void
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/pages/view/'.$this->id);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/pages/view/'.$this->id);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/pages/view/'.$this->id);
+>>>>>>> 222589fde5 (cs)
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
         /** @var PageModel $model */
@@ -215,7 +255,15 @@ final class PageControllerTest extends MauticMysqlTestCase
      */
     public function testNewActionPage(): void
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/pages/new/');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/pages/new/');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/pages/new/');
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
     }
@@ -223,7 +271,15 @@ final class PageControllerTest extends MauticMysqlTestCase
     /* Get landing page's submissions list */
     public function testListLandingPageSubmissions(): void
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, 's/pages/results/'.$this->id);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, 's/pages/results/'.$this->id);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, 's/pages/results/'.$this->id);
+>>>>>>> 222589fde5 (cs)
         $clientResponse         = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());

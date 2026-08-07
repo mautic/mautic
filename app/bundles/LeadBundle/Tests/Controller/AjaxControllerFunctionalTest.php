@@ -57,7 +57,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(
             [['lead_id' => (string) $contact->getId(), 'manually_added' => '1', 'manually_removed' => '0']],
             $this->getMembersForCampaign($campaign->getId()),
-            $this->client->getResponse()->getContent()
+            (string) $this->client->getResponse()->getContent()
         );
 
         $this->assertArrayHasKey('success', $response, 'The response does not contain the `success` param.');

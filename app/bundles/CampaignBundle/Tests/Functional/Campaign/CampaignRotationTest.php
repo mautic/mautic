@@ -76,7 +76,15 @@ final class CampaignRotationTest extends MauticMysqlTestCase
             $this->campaignWithJump->getId()
         );
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, sprintf('/%s', $this->page->getAlias()));
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, sprintf('/%s', $this->page->getAlias()));
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, sprintf('/%s', $this->page->getAlias()));
+>>>>>>> 222589fde5 (cs)
 
         self::assertResponseIsSuccessful();
 
@@ -95,7 +103,15 @@ final class CampaignRotationTest extends MauticMysqlTestCase
             $this->campaignWithJump->getId()
         );
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, sprintf('/%s', $this->page->getAlias()));
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, sprintf('/%s', $this->page->getAlias()));
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, sprintf('/%s', $this->page->getAlias()));
+>>>>>>> 222589fde5 (cs)
 
         self::assertResponseIsSuccessful();
 

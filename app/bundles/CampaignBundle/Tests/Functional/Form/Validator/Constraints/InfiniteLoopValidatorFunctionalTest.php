@@ -40,7 +40,7 @@ final class InfiniteLoopValidatorFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $responseData = json_decode($response->getContent(), true);
-        $this->assertSame($success, $responseData['success'], $response->getContent());
+        $this->assertSame($success, $responseData['success'], (string) $response->getContent());
 
         if ($expectedString) {
             $this->assertStringContainsString($expectedString, (string) $responseData['newContent']);

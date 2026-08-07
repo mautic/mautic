@@ -119,7 +119,15 @@ final class ClearbitController extends FormController
             );
         }
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         return new Response('Bad Request', Response::HTTP_BAD_REQUEST);
+=======
+        return new Response('Bad Request', \Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        return new Response('Bad Request', Response::HTTP_BAD_REQUEST);
+>>>>>>> 222589fde5 (cs)
     }
 
     /**
@@ -269,7 +277,15 @@ final class ClearbitController extends FormController
             );
         }
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         return new Response('Bad Request', Response::HTTP_BAD_REQUEST);
+=======
+        return new Response('Bad Request', \Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        return new Response('Bad Request', Response::HTTP_BAD_REQUEST);
+>>>>>>> 222589fde5 (cs)
     }
 
     /* COMPANY */
@@ -362,7 +378,15 @@ final class ClearbitController extends FormController
             );
         }
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         return new Response('Bad Request', Response::HTTP_BAD_REQUEST);
+=======
+        return new Response('Bad Request', \Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        return new Response('Bad Request', Response::HTTP_BAD_REQUEST);
+>>>>>>> 222589fde5 (cs)
     }
 
     /**
@@ -511,6 +535,14 @@ final class ClearbitController extends FormController
             );
         }
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         return new Response('Bad Request', Response::HTTP_BAD_REQUEST);
+=======
+        return new Response('Bad Request', \Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        return new Response('Bad Request', Response::HTTP_BAD_REQUEST);
+>>>>>>> 222589fde5 (cs)
     }
 }

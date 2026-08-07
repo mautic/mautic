@@ -47,6 +47,14 @@ final class SecurityController extends CommonController
 
     public function loginCheckAction(): Response
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         return new Response('', Response::HTTP_BAD_REQUEST);
+=======
+        return new Response('', \Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        return new Response('', Response::HTTP_BAD_REQUEST);
+>>>>>>> 222589fde5 (cs)
     }
 }

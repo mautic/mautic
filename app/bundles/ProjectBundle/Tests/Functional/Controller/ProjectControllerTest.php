@@ -47,7 +47,15 @@ final class ProjectControllerTest extends MauticMysqlTestCase
     #[DataProvider('indexUrlsProvider')]
     public function testIndexActionDisplaysProjects(string $url): void
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, $url);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, $url);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, $url);
+>>>>>>> 222589fde5 (cs)
         $clientResponse        = $this->client->getResponse();
         $clientResponseContent = $clientResponse->getContent();
 
@@ -67,7 +75,15 @@ final class ProjectControllerTest extends MauticMysqlTestCase
 
     public function testIndexActionWhenFiltered(): void
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/projects?search=project1');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/projects?search=project1');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/projects?search=project1');
+>>>>>>> 222589fde5 (cs)
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
 
@@ -91,7 +107,15 @@ final class ProjectControllerTest extends MauticMysqlTestCase
 
         $projectId = $project->getId();
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, '/s/projects/delete/'.$projectId);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/s/projects/delete/'.$projectId);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, '/s/projects/delete/'.$projectId);
+>>>>>>> 222589fde5 (cs)
 
         $this->assertResponseIsSuccessful();
         $this->assertNull($this->projectRepository->find($projectId), 'Assert that project is deleted');
@@ -102,7 +126,15 @@ final class ProjectControllerTest extends MauticMysqlTestCase
     {
         $project = $this->projectRepository->findOneBy([]);
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/projects/view/'.$project->getId());
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/projects/view/'.$project->getId());
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/projects/view/'.$project->getId());
+>>>>>>> 222589fde5 (cs)
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
         $this->assertResponseIsSuccessful();
@@ -112,7 +144,15 @@ final class ProjectControllerTest extends MauticMysqlTestCase
     public function testViewActionNotFound(): void
     {
         $this->client->followRedirects(false);
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/projects/view/99999');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/projects/view/99999');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/projects/view/99999');
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $this->assertTrue($clientResponse->isRedirection(), 'Must be redirect response.');
     }
@@ -121,7 +161,15 @@ final class ProjectControllerTest extends MauticMysqlTestCase
     {
         $projectName            = 'Test project';
         $project                = $this->projectRepository->findOneBy([]);
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler                = $this->client->request(Request::METHOD_GET, '/s/projects/edit/'.$project->getId());
+=======
+        $crawler                = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/projects/edit/'.$project->getId());
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler                = $this->client->request(Request::METHOD_GET, '/s/projects/edit/'.$project->getId());
+>>>>>>> 222589fde5 (cs)
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
         $this->assertResponseIsSuccessful();
@@ -137,7 +185,15 @@ final class ProjectControllerTest extends MauticMysqlTestCase
     public function testEditActionNotFound(): void
     {
         $this->client->followRedirects(false);
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/projects/edit/99999');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/projects/edit/99999');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/projects/edit/99999');
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $this->assertTrue($clientResponse->isRedirection(), 'Must be redirect response.');
     }
@@ -145,7 +201,15 @@ final class ProjectControllerTest extends MauticMysqlTestCase
     public function testNewAction(): void
     {
         $projectName = 'Test project';
+<<<<<<< HEAD
+<<<<<<< HEAD
         $crawler     = $this->client->request(Request::METHOD_GET, '/s/projects/new');
+=======
+        $crawler     = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/projects/new');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $crawler     = $this->client->request(Request::METHOD_GET, '/s/projects/new');
+>>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
 
         $form = $crawler->selectButton('Save')->form();
@@ -159,7 +223,15 @@ final class ProjectControllerTest extends MauticMysqlTestCase
     {
         $projects   = $this->projectRepository->findAll();
         $projectsId = array_map(fn (Project $project): ?int => $project->getId(), $projects);
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, '/s/projects/batchDelete?ids='.json_encode($projectsId));
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/s/projects/batchDelete?ids='.json_encode($projectsId));
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, '/s/projects/batchDelete?ids='.json_encode($projectsId));
+>>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
         $this->assertEmpty($this->projectRepository->count([]), 'All projects must be deleted.');
     }

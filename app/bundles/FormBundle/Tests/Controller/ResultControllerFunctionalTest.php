@@ -46,7 +46,15 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
             'postAction'  => 'return',
         ];
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $formPayload);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/forms/new', $formPayload);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $formPayload);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
 
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
@@ -98,7 +106,15 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
             'postAction'  => 'return',
         ];
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $formPayload);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/forms/new', $formPayload);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $formPayload);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
 
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
@@ -107,7 +123,15 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
         $formId   = $form['id'];
 
         // Submit a form result (simulate a contact submission)
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, "/form/{$formId}", [
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, "/form/{$formId}", [
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, "/form/{$formId}", [
+>>>>>>> 222589fde5 (cs)
             'mauticform[email]'  => 'test@example.com',
             'mauticform[formId]' => $formId,
             'mauticform[return]' => '',
@@ -115,7 +139,15 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         // Call the addToSegmentAction
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, "/s/forms/results/{$formId}/add-to-segment");
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, "/s/forms/results/{$formId}/add-to-segment");
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, "/s/forms/results/{$formId}/add-to-segment");
+>>>>>>> 222589fde5 (cs)
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('form', (string) $response->getContent());
@@ -140,7 +172,15 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
             'postAction'  => 'return',
         ];
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $formPayload);
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/forms/new', $formPayload);
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $formPayload);
+>>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
 
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);

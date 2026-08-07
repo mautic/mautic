@@ -72,7 +72,15 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
         $this->loginUser($user);
 
         // Make a dummy request to initialize session
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/');
+>>>>>>> 222589fde5 (cs)
         $session = $this->client->getRequest()->getSession();
 
         // Simulate import summary with NEW entities to trigger undo
@@ -87,7 +95,15 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
         ]);
         $session->save();
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/campaign/import/undo');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/campaign/import/undo');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/campaign/import/undo');
+>>>>>>> 222589fde5 (cs)
         $response = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
@@ -101,7 +117,15 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
         $this->loginUser($user);
 
         // Dummy request to initialize session
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/');
+>>>>>>> 222589fde5 (cs)
         $session = $this->client->getRequest()->getSession();
 
         // Simulate import summary with only UPDATE (no NEW data)
@@ -116,7 +140,15 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
         ]);
         $session->save();
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/campaign/import/undo');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/campaign/import/undo');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/campaign/import/undo');
+>>>>>>> 222589fde5 (cs)
         $response = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
@@ -129,7 +161,15 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/');
+>>>>>>> 222589fde5 (cs)
         $session = $this->client->getRequest()->getSession();
         $session->set('mautic.campaign.import.step', 2);
         $session->set('mautic.campaign.import.file', __DIR__.'/Fixtures/empty.zip');
@@ -139,7 +179,15 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
         $importHelper->method('readZipFile')->willReturn([]);
         self::getContainer()->set(ImportHelper::class, $importHelper);
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/campaign/import/progress');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/campaign/import/progress');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/campaign/import/progress');
+>>>>>>> 222589fde5 (cs)
         $response = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
@@ -150,7 +198,15 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
         $this->loginUser($user);
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/');
+>>>>>>> 222589fde5 (cs)
         $session = $this->client->getRequest()->getSession();
 
         $fixturesDir = __DIR__.'/Fixtures';
@@ -169,7 +225,15 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
         $importHelper->method('readZipFile')->willReturn(FixtureHelper::getPayload());
         self::getContainer()->set(ImportHelper::class, $importHelper);
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/campaign/import/progress');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/campaign/import/progress');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/campaign/import/progress');
+>>>>>>> 222589fde5 (cs)
         $response = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
@@ -182,7 +246,15 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/');
+>>>>>>> 222589fde5 (cs)
         $session = $this->client->getRequest()->getSession();
         $session->set('mautic.campaign.import.step', 3);
         $session->set('mautic.campaign.import.file', __DIR__.'/Fixtures/empty.zip');
@@ -192,7 +264,15 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
         $importHelper->method('readZipFile')->willReturn([]);
         self::getContainer()->set(ImportHelper::class, $importHelper);
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/campaign/import/progress');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/campaign/import/progress');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/campaign/import/progress');
+>>>>>>> 222589fde5 (cs)
         $response = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
@@ -203,7 +283,15 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
         $this->loginUser($user);
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/');
+>>>>>>> 222589fde5 (cs)
         $session = $this->client->getRequest()->getSession();
 
         $fixturesDir = __DIR__.'/Fixtures';
@@ -222,7 +310,15 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
         $importHelper->method('readZipFile')->willReturn(FixtureHelper::getPayload());
         self::getContainer()->set(ImportHelper::class, $importHelper);
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/campaign/import/progress');
+=======
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/campaign/import/progress');
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+        $this->client->request(Request::METHOD_GET, '/s/campaign/import/progress');
+>>>>>>> 222589fde5 (cs)
         $response = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
@@ -247,7 +343,15 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
         ];
 
         $this->client->request(
+<<<<<<< HEAD
+<<<<<<< HEAD
             Request::METHOD_POST,
+=======
+            \Symfony\Component\HttpFoundation\Request::METHOD_POST,
+>>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
+=======
+            Request::METHOD_POST,
+>>>>>>> 222589fde5 (cs)
             '/s/campaign/import/upload',
             ['campaign_import' => []], // POST data
             ['campaign_import' => ['campaignFile' => $fileArray]]
