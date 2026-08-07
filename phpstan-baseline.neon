@@ -2710,12 +2710,6 @@ parameters:
 			path: app/bundles/CoreBundle/IpLookup/GeoipsLookup.php
 
 		-
-			message: '#^Dead catch \- Exception is never thrown in the try block\.$#'
-			identifier: catch.neverThrown
-			count: 1
-			path: app/bundles/CoreBundle/IpLookup/IP2LocationAPILookup.php
-
-		-
 			message: '#^Method Mautic\\CoreBundle\\IpLookup\\IP2LocationAPILookup\:\:parseResponse\(\) has parameter \$response with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
