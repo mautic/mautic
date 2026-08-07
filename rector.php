@@ -21,7 +21,8 @@ return RectorConfig::configure()
         privatization: true,
         codeQuality: true,
     )
-    ->withPhpSets(php82: true)
+    // take it one by one
+    ->withPhpLevel(100)
     ->withCache(__DIR__.'/var/cache/rector')
     ->withTypeGuardedClasses([
         // common controllers
