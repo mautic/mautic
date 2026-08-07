@@ -38,11 +38,15 @@ final readonly class MauticDenyAccessListener
             return;
         }
 
-        $resourceMetadata   = $this->resourceMetadataFactory->create($attributes['resource_class']);
-        $operation          = $resourceMetadata->getOperation($attributes['operation_name']);
+        $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
+        $operation        = $resourceMetadata->getOperation($attributes['operation_name']);
         $securityExpression = $operation->getSecurity() ?? null;
-        $permission         = is_string($securityExpression) ? $this->extractPermission($securityExpression) : null;
 
+        if (null === $securityExpression || !is_string($securityExpression)) {
+            return;
+        }
+
+        $permission = $this->extractPermission($securityExpression);
         if (null === $permission) {
             return;
         }
@@ -113,18 +117,22 @@ final readonly class MauticDenyAccessListener
 
     private function resolveOwner(mixed $requestObject): mixed
     {
-        $owner = 0;
-
-        if (is_object($requestObject)) {
-            if (method_exists($requestObject, 'getPermissionUser')) {
-                $owner = $requestObject->getPermissionUser() ?? 0;
-            } elseif (method_exists($requestObject, 'getCreatedBy')) {
-                $owner = $requestObject->getCreatedBy() ?? 0;
-            } elseif (method_exists($requestObject, 'getOwner')) {
-                $owner = $requestObject->getOwner() ?? 0;
-            }
+        if (!is_object($requestObject)) {
+            return 0;
         }
 
-        return $owner;
+        if (method_exists($requestObject, 'getPermissionUser')) {
+            return $requestObject->getPermissionUser() ?? 0;
+        }
+
+        if (method_exists($requestObject, 'getCreatedBy')) {
+            return $requestObject->getCreatedBy() ?? 0;
+        }
+
+        if (method_exists($requestObject, 'getOwner')) {
+            return $requestObject->getOwner() ?? 0;
+        }
+
+        return 0;
     }
 }
