@@ -177,6 +177,7 @@ final class MauticDenyAccessListenerTest extends TestCase
         $requestObject = new class($customObjectMock) {
             public function __construct(
 <<<<<<< HEAD
+<<<<<<< HEAD
                 private readonly object $customObject,
             ) {
 =======
@@ -184,6 +185,10 @@ final class MauticDenyAccessListenerTest extends TestCase
             )
             {
 >>>>>>> 2beec055b7 ([types] add known constant types)
+=======
+                private readonly object $customObject,
+            ) {
+>>>>>>> 7839f55c02 (cs)
             }
 
             public function getCustomObject(): object
@@ -233,6 +238,7 @@ final class MauticDenyAccessListenerTest extends TestCase
         $requestObject = new class($customFieldMock) {
             public function __construct(
 <<<<<<< HEAD
+<<<<<<< HEAD
                 private readonly object $customField,
             ) {
 =======
@@ -240,6 +246,10 @@ final class MauticDenyAccessListenerTest extends TestCase
             )
             {
 >>>>>>> 2beec055b7 ([types] add known constant types)
+=======
+                private readonly object $customField,
+            ) {
+>>>>>>> 7839f55c02 (cs)
             }
 
             public function getCustomField(): object
