@@ -263,7 +263,7 @@ final class TestApiPlatformPermissionContextSubscriber implements EventSubscribe
     private function resolvePermissionContext(string $permission, mixed $requestObject): array
     {
         $resolvedRequestObject = $this->resolveRequestObjectFromPath($permission, $requestObject);
-        $permissionWithoutPath = preg_replace('#\([^)]*+\)#', '', $permission, 1) ?? $permission;
+        $permissionWithoutPath = preg_replace('#\(.*?\)#', '', $permission, 1) ?? $permission;
 
         return [$this->replacePermissionPlaceholder($permissionWithoutPath, $resolvedRequestObject), $resolvedRequestObject];
     }
@@ -297,22 +297,28 @@ final class TestApiPlatformPermissionContextSubscriber implements EventSubscribe
 
     private function replacePermissionPlaceholder(string $permission, mixed $requestObject): string
     {
-        $resolvedPermission = $permission;
-
-        if (is_object($requestObject) && preg_match('#\[(.*?)\]#', $permission, $matches) && !empty($matches[1])) {
-            $getter = 'get'.ucfirst($matches[1]);
-            if (method_exists($requestObject, $getter)) {
-                $objectId = $requestObject->{$getter}();
-                if (is_object($objectId) && method_exists($objectId, 'getId')) {
-                    $objectId = $objectId->getId();
-                }
-
-                if (null !== $objectId && '' !== (string) $objectId) {
-                    $resolvedPermission = preg_replace('#\[(.*?)\]#', (string) $objectId, $permission, 1) ?? $permission;
-                }
-            }
+        if (!is_object($requestObject)) {
+            return $permission;
         }
 
-        return $resolvedPermission;
+        if (!preg_match('#\[(.*?)\]#', $permission, $matches) || empty($matches[1])) {
+            return $permission;
+        }
+
+        $getter = 'get'.ucfirst($matches[1]);
+        if (!method_exists($requestObject, $getter)) {
+            return $permission;
+        }
+
+        $objectId = $requestObject->{$getter}();
+        if (is_object($objectId) && method_exists($objectId, 'getId')) {
+            $objectId = $objectId->getId();
+        }
+
+        if (null === $objectId || '' === (string) $objectId) {
+            return $permission;
+        }
+
+        return preg_replace('#\[(.*?)\]#', (string) $objectId, $permission, 1) ?? $permission;
     }
 }
