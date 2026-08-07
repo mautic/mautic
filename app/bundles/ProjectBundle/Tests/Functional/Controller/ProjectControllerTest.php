@@ -47,7 +47,7 @@ final class ProjectControllerTest extends MauticMysqlTestCase
     #[DataProvider('indexUrlsProvider')]
     public function testIndexActionDisplaysProjects(string $url): void
     {
-        $this->client->request('GET', $url);
+        $this->client->request(Request::METHOD_GET, $url);
         $clientResponse        = $this->client->getResponse();
         $clientResponseContent = $clientResponse->getContent();
 
@@ -67,7 +67,7 @@ final class ProjectControllerTest extends MauticMysqlTestCase
 
     public function testIndexActionWhenFiltered(): void
     {
-        $this->client->request('GET', '/s/projects?search=project1');
+        $this->client->request(Request::METHOD_GET, '/s/projects?search=project1');
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
 
@@ -91,7 +91,7 @@ final class ProjectControllerTest extends MauticMysqlTestCase
 
         $projectId = $project->getId();
 
-        $this->client->request('POST', '/s/projects/delete/'.$projectId);
+        $this->client->request(Request::METHOD_POST, '/s/projects/delete/'.$projectId);
 
         $this->assertResponseIsSuccessful();
         $this->assertNull($this->projectRepository->find($projectId), 'Assert that project is deleted');
@@ -102,7 +102,7 @@ final class ProjectControllerTest extends MauticMysqlTestCase
     {
         $project = $this->projectRepository->findOneBy([]);
 
-        $this->client->request('GET', '/s/projects/view/'.$project->getId());
+        $this->client->request(Request::METHOD_GET, '/s/projects/view/'.$project->getId());
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
         $this->assertResponseIsSuccessful();
@@ -112,7 +112,7 @@ final class ProjectControllerTest extends MauticMysqlTestCase
     public function testViewActionNotFound(): void
     {
         $this->client->followRedirects(false);
-        $this->client->request('GET', '/s/projects/view/99999');
+        $this->client->request(Request::METHOD_GET, '/s/projects/view/99999');
         $clientResponse = $this->client->getResponse();
         $this->assertTrue($clientResponse->isRedirection(), 'Must be redirect response.');
     }
@@ -121,7 +121,7 @@ final class ProjectControllerTest extends MauticMysqlTestCase
     {
         $projectName            = 'Test project';
         $project                = $this->projectRepository->findOneBy([]);
-        $crawler                = $this->client->request('GET', '/s/projects/edit/'.$project->getId());
+        $crawler                = $this->client->request(Request::METHOD_GET, '/s/projects/edit/'.$project->getId());
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
         $this->assertResponseIsSuccessful();
@@ -137,7 +137,7 @@ final class ProjectControllerTest extends MauticMysqlTestCase
     public function testEditActionNotFound(): void
     {
         $this->client->followRedirects(false);
-        $this->client->request('GET', '/s/projects/edit/99999');
+        $this->client->request(Request::METHOD_GET, '/s/projects/edit/99999');
         $clientResponse = $this->client->getResponse();
         $this->assertTrue($clientResponse->isRedirection(), 'Must be redirect response.');
     }
@@ -145,7 +145,7 @@ final class ProjectControllerTest extends MauticMysqlTestCase
     public function testNewAction(): void
     {
         $projectName = 'Test project';
-        $crawler     = $this->client->request('GET', '/s/projects/new');
+        $crawler     = $this->client->request(Request::METHOD_GET, '/s/projects/new');
         $this->assertResponseIsSuccessful();
 
         $form = $crawler->selectButton('Save')->form();
@@ -159,7 +159,7 @@ final class ProjectControllerTest extends MauticMysqlTestCase
     {
         $projects   = $this->projectRepository->findAll();
         $projectsId = array_map(fn (Project $project): ?int => $project->getId(), $projects);
-        $this->client->request('POST', '/s/projects/batchDelete?ids='.json_encode($projectsId));
+        $this->client->request(Request::METHOD_POST, '/s/projects/batchDelete?ids='.json_encode($projectsId));
         $this->assertResponseIsSuccessful();
         $this->assertEmpty($this->projectRepository->count([]), 'All projects must be deleted.');
     }

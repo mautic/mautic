@@ -23,7 +23,7 @@ final class AssetWidgetDataApiControllerFunctionalTest extends MauticMysqlTestCa
     #[DataProvider('assetWidgetTypesProvider')]
     public function testAssetWidgetDataEndpointReturnsNonEmptyDataForApiLibraryShape(string $type): void
     {
-        $this->client->request('GET', '/api/data/'.$type);
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/data/'.$type);
         $response = $this->client->getResponse();
 
         $this->assertNotSame(

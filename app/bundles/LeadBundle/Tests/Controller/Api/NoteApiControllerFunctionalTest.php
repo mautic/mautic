@@ -33,7 +33,7 @@ final class NoteApiControllerFunctionalTest extends MauticMysqlTestCase
         ], 'Note API Role');
         $this->authenticateApiUser($apiUser);
 
-        $this->client->request('GET', '/api/notes/'.$note->getId());
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/notes/'.$note->getId());
         $getResponse = $this->client->getResponse();
 
         $this->assertResponseIsSuccessful($getResponse->getContent());
@@ -41,7 +41,7 @@ final class NoteApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($note->getId(), $getPayload['note']['id']);
         $this->assertSame('Existing API note', $getPayload['note']['text']);
 
-        $this->client->request('POST', '/api/notes/new', [
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/notes/new', [
             'lead' => $contact->getId(),
             'text' => 'Created from API',
         ]);
@@ -71,7 +71,7 @@ final class NoteApiControllerFunctionalTest extends MauticMysqlTestCase
         ], 'Note API Role');
         $this->authenticateApiUser($apiUser);
 
-        $this->client->request('POST', '/api/notes/new', [
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/notes/new', [
             'lead' => $contact->getId(),
             'text' => 'Forbidden note creation',
         ]);

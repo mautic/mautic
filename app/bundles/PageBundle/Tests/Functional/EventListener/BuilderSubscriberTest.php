@@ -89,7 +89,7 @@ final class BuilderSubscriberTest extends MauticMysqlTestCase
             'secretHash' => $mailHashHelper->getEmailHash($lead->getEmail()),
         ], UrlGeneratorInterface::ABSOLUTE_PATH);
 
-        $crawler = $this->client->request('GET', $unsubscribeUrl);
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, $unsubscribeUrl);
 
         $this->assertTrue($this->client->getResponse()->isSuccessful(), $this->client->getResponse()->getContent());
 

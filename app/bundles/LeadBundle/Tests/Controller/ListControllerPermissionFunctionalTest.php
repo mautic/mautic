@@ -654,7 +654,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $this->assertTrue($segment->isPublished());
 
         $this->client->request(
-            'POST',
+            Request::METHOD_POST,
             '/s/ajax',
             [
                 'action' => 'togglePublishStatus',
@@ -689,7 +689,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $segment = $this->createSegment('Segment Without Publish', $user);
 
         $this->client->request(
-            'POST',
+            Request::METHOD_POST,
             '/s/ajax',
             [
                 'action' => 'togglePublishStatus',

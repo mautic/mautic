@@ -40,7 +40,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
      */
     public function testIndexActionWhenNotFiltered(): void
     {
-        $this->client->request('GET', '/s/forms');
+        $this->client->request(Request::METHOD_GET, '/s/forms');
         $this->assertResponseIsSuccessful();
     }
 
@@ -49,7 +49,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
      */
     public function testIndexActionWhenFiltering(): void
     {
-        $this->client->request('GET', '/s/forms?search=has%3Aresults&tmpl=list');
+        $this->client->request(Request::METHOD_GET, '/s/forms?search=has%3Aresults&tmpl=list');
         $this->assertResponseIsSuccessful();
     }
 
@@ -58,7 +58,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
      */
     public function testNewActionForm(): void
     {
-        $this->client->request('GET', '/s/forms/new/');
+        $this->client->request(Request::METHOD_GET, '/s/forms/new/');
         $this->assertResponseIsSuccessful();
     }
 
@@ -67,7 +67,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
      */
     public function testSaveActionForm(): void
     {
-        $crawler = $this->client->request('GET', '/s/forms/new/');
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/forms/new/');
         $this->assertResponseIsSuccessful();
 
         $form = $crawler->filterXPath('//form[@name="mauticform"]')->form();
@@ -95,7 +95,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testNewActionCheckDisplayMessageOptionsForm(): void
     {
-        $this->client->request('GET', '/s/forms/new');
+        $this->client->request(Request::METHOD_GET, '/s/forms/new');
         $this->assertResponseIsSuccessful();
         $clientResponse = $this->client->getResponse();
         self::assertResponseStatusCodeSame(Response::HTTP_OK, $clientResponse->getContent());
@@ -106,7 +106,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testErrorValidationWithHideFormTypeWithoutMessage(): void
     {
-        $crawler = $this->client->request('GET', '/s/forms/new/');
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/forms/new/');
         $this->assertResponseIsSuccessful();
 
         $selectedValue = $crawler->filter('#mauticform_postAction option:selected')->attr('value');
@@ -130,7 +130,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testSuccessWithHideForm(): void
     {
-        $crawler = $this->client->request('GET', '/s/forms/new/');
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/forms/new/');
         $this->assertResponseIsSuccessful();
 
         $selectedValue = $crawler->filter('#mauticform_postAction option:selected')->attr('value');
@@ -183,13 +183,13 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
                 ],
             ],
         ];
-        $this->client->request('POST', '/api/forms/new', $formPayload);
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $formPayload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, json_encode($languageHelper->getLanguageChoices()));
         $form     = $response['form'];
 
-        $crawler = $this->client->request('GET', '/form/'.$form['id']);
+        $crawler = $this->client->request(Request::METHOD_GET, '/form/'.$form['id']);
         $this->assertStringContainsString('Merci de patienter...', $crawler->html());
         $this->assertStringContainsString('Ceci est requis.', $crawler->html());
 
@@ -210,7 +210,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $crawler = $this->client->request('GET', sprintf('/s/forms/edit/%d', $form->getId()));
+        $crawler = $this->client->request(Request::METHOD_GET, sprintf('/s/forms/edit/%d', $form->getId()));
         $this->assertResponseIsSuccessful();
 
         $formElement = $crawler->filterXPath('//form[@name="mauticform"]')->form();
@@ -233,7 +233,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $crawler = $this->client->request('GET', sprintf('/s/forms/edit/%d', $form->getId()));
+        $crawler = $this->client->request(Request::METHOD_GET, sprintf('/s/forms/edit/%d', $form->getId()));
         $this->assertResponseIsSuccessful();
 
         $formElement = $crawler->filterXPath('//form[@name="mauticform"]')->form();
@@ -285,11 +285,11 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         // Verify form creation
-        $this->client->request('GET', sprintf('/s/forms/edit/%d', $form->getId()));
+        $this->client->request(Request::METHOD_GET, sprintf('/s/forms/edit/%d', $form->getId()));
         $this->assertResponseIsSuccessful();
 
         // Visit the form preview page
-        $this->client->request('GET', sprintf('/s/forms/preview/%d', $form->getId()));
+        $this->client->request(Request::METHOD_GET, sprintf('/s/forms/preview/%d', $form->getId()));
         $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('First Option', (string) $this->client->getResponse()->getContent());
         $this->assertStringContainsString('Second Option', (string) $this->client->getResponse()->getContent());
@@ -344,7 +344,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         // Edit and submit the form to be able to push action into session
-        $crawler     = $this->client->request('GET', sprintf('/s/forms/edit/%d', $form->getId()));
+        $crawler     = $this->client->request(Request::METHOD_GET, sprintf('/s/forms/edit/%d', $form->getId()));
         $formElement = $crawler->filterXPath('//form[@name="mauticform"]')->form();
         $this->client->submit($formElement);
         $this->assertResponseIsSuccessful();
@@ -422,7 +422,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $crawler = $this->client->request('GET', sprintf('/s/forms/edit/%d', $form->getId()));
+        $crawler = $this->client->request(Request::METHOD_GET, sprintf('/s/forms/edit/%d', $form->getId()));
         $this->assertResponseIsSuccessful();
 
         $translator = $this->getContainer()->get(TranslatorInterface::class);
@@ -682,7 +682,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $crawler     = $this->client->request('GET', '/s/forms/edit/'.$form->getId());
+        $crawler     = $this->client->request(Request::METHOD_GET, '/s/forms/edit/'.$form->getId());
         $formCrawler = $crawler->selectButton('Save')->form();
         $formCrawler['mauticform[projects]']->setValue((string) $project->getId());
 
@@ -703,7 +703,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         // Request the form details view
-        $crawler = $this->client->request('GET', sprintf('/s/forms/view/%d', $form->getId()));
+        $crawler = $this->client->request(Request::METHOD_GET, sprintf('/s/forms/view/%d', $form->getId()));
         $this->assertResponseIsSuccessful();
 
         // Check if preview panel exists
@@ -744,7 +744,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         // Request the form preview instead of view
-        $crawler = $this->client->request('GET', sprintf('/s/forms/preview/%d', $form->getId()));
+        $crawler = $this->client->request(Request::METHOD_GET, sprintf('/s/forms/preview/%d', $form->getId()));
         $this->assertResponseIsSuccessful();
 
         // Check that the slider input has the oninput attribute

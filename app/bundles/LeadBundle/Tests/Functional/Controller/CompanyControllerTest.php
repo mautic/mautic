@@ -16,14 +16,14 @@ final class CompanyControllerTest extends MauticMysqlTestCase
 
     public function testMergeAction(): void
     {
-        $this->client->request('GET', '/s/companies/merge/1');
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/companies/merge/1');
         $this->assertResponseIsSuccessful();
     }
 
     public function testMergeActionWithoutPermission(): void
     {
         $this->createAndLoginUser();
-        $this->client->request('GET', '/s/companies/merge/1');
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/companies/merge/1');
         $clientResponse         = $this->client->getResponse();
         $this->assertEquals(403, $clientResponse->getStatusCode());
     }

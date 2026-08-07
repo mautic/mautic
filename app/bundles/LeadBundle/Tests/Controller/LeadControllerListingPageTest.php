@@ -28,7 +28,7 @@ final class LeadControllerListingPageTest extends MauticMysqlTestCase
     {
         $this->createContact($location);
 
-        $crawler    = $this->client->request('GET', 's/contacts');
+        $crawler    = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, 's/contacts');
         $rowContent = $crawler->filterXPath("//table[@id='leadTable']//tbody//tr");
 
         $this->assertStringEndsWith($expected, $rowContent->text());

@@ -90,7 +90,7 @@ final class Issue9488Test extends MauticMysqlTestCase
      */
     private function createContacts(): array
     {
-        $this->client->request('POST', '/api/contacts/batch/new', $this->contacts);
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/contacts/batch/new', $this->contacts);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 

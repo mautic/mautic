@@ -67,7 +67,7 @@ final class SegmentFilterFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame(0, $exitCode, $applicationTester->getDisplay());
 
-        $this->client->request('GET', '/api/contacts?search=segment:group-a-points-gte1');
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/contacts?search=segment:group-a-points-gte1');
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $response = json_decode($clientResponse->getContent(), true);

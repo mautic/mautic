@@ -15,7 +15,7 @@ final class AbstractFormControllerTest extends MauticMysqlTestCase
         $returnUrl   = 'http://localhost/s/forms';
 
         $this->client->request(
-            'GET',
+            \Symfony\Component\HttpFoundation\Request::METHOD_GET,
             "/s/action/unlock/{$objectModel}/{$objectId}",
             [
                 'returnUrl' => urlencode($returnUrl),
@@ -37,7 +37,7 @@ final class AbstractFormControllerTest extends MauticMysqlTestCase
         $invalidReturnUrl = 'invalid-url';
 
         $this->client->request(
-            'GET',
+            \Symfony\Component\HttpFoundation\Request::METHOD_GET,
             "/s/action/unlock/{$objectModel}/{$objectId}",
             [
                 'returnUrl' => $invalidReturnUrl,
@@ -59,7 +59,7 @@ final class AbstractFormControllerTest extends MauticMysqlTestCase
         $returnUrl   = 'https://malicious.com/s/forms';
 
         $this->client->request(
-            'GET',
+            \Symfony\Component\HttpFoundation\Request::METHOD_GET,
             "/s/action/unlock/{$objectModel}/{$objectId}",
             [
                 'returnUrl' => urlencode($returnUrl),

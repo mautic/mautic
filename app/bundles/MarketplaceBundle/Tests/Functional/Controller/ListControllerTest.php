@@ -35,7 +35,7 @@ final class ListControllerTest extends MauticMysqlTestCase
         $allowlist = self::getContainer()->get(Allowlist::class);
         $allowlist->clearCache();
 
-        $crawler = $this->client->request('GET', 's/marketplace');
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, 's/marketplace');
 
         self::assertResponseIsSuccessful($this->client->getResponse()->getContent());
 
@@ -66,7 +66,7 @@ final class ListControllerTest extends MauticMysqlTestCase
         $allowlist = self::getContainer()->get(Allowlist::class);
         $allowlist->clearCache();
 
-        $crawler = $this->client->request('GET', 's/marketplace');
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, 's/marketplace');
 
         self::assertResponseIsSuccessful();
 

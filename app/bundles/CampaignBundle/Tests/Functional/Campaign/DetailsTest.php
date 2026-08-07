@@ -41,7 +41,7 @@ final class DetailsTest extends MauticMysqlTestCase
         $this->em->persist($campaign);
         $this->em->flush();
 
-        $this->client->request('GET', sprintf('/s/campaigns/view/%s', $campaign->getId()));
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, sprintf('/s/campaigns/view/%s', $campaign->getId()));
 
         $response = $this->client->getResponse();
         self::assertResponseIsSuccessful();

@@ -86,7 +86,7 @@ final class CampaignEventSubscriberFunctionalTest extends MauticMysqlTestCase
             ];
         }
 
-        $this->client->request('POST', '/api/contacts/batch/new', $contacts);
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/contacts/batch/new', $contacts);
         $response = json_decode($this->client->getResponse()->getContent(), true);
         $contacts = $response['contacts'];
         $this->assertCount(150, $contacts);

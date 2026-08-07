@@ -39,7 +39,7 @@ final class SegmentLogReportSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $this->client->request('GET', 'api/reports/'.$report->getId());
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, 'api/reports/'.$report->getId());
         $clientResponse = $this->client->getResponse();
         $this->assertResponseStatusCodeSame(200, $clientResponse->getContent());
 

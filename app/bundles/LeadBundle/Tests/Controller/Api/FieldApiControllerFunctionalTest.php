@@ -218,7 +218,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         // Call endpoint
-        $this->client->request('GET', '/api/contacts/'.$contact->getId());
+        $this->client->request(Request::METHOD_GET, '/api/contacts/'.$contact->getId());
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $responseJson = \json_decode($clientResponse->getContent(), true, 512, \JSON_THROW_ON_ERROR);
@@ -236,7 +236,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
 
         $this->client->request(
-            'PATCH',
+            Request::METHOD_PATCH,
             sprintf('/api/contacts/%d/edit', $contact->getId()),
             $updatedValues
         );
@@ -256,7 +256,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
 
         $this->client->request(
-            'PATCH',
+            Request::METHOD_PATCH,
             sprintf('/api/contacts/%d/edit', $contact->getId()),
             $updatedValues
         );
@@ -330,7 +330,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         // Call endpoint
-        $this->client->request('GET', '/api/contacts/'.$contact->getId());
+        $this->client->request(Request::METHOD_GET, '/api/contacts/'.$contact->getId());
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $responseJson = \json_decode($clientResponse->getContent(), true, 512, \JSON_THROW_ON_ERROR);
@@ -348,7 +348,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
 
         $this->client->request(
-            'PATCH',
+            Request::METHOD_PATCH,
             sprintf('/api/contacts/%d/edit', $contact->getId()),
             $updatedValues
         );
@@ -368,7 +368,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
 
         $this->client->request(
-            'PATCH',
+            Request::METHOD_PATCH,
             sprintf('/api/contacts/%d/edit', $contact->getId()),
             $updatedValues
         );
@@ -399,7 +399,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         // Test creating a new field
 
         $typeSafePayload = $this->generateTypeSafePayload($payload);
-        $this->client->request('POST', '/api/fields/contact/new', $typeSafePayload);
+        $this->client->request(Request::METHOD_POST, '/api/fields/contact/new', $typeSafePayload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -428,7 +428,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
     private function assertGetResponse(array $payload, int $id): void
     {
         // Test get and that the field was published
-        $this->client->request('GET', sprintf('/api/fields/contact/%s', $id));
+        $this->client->request(Request::METHOD_GET, sprintf('/api/fields/contact/%s', $id));
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
@@ -446,7 +446,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
     private function assertPatchResponse(array $payload, int $id, string $alias): void
     {
         $typeSafePayload = $this->generateTypeSafePayload($payload);
-        $this->client->request('PATCH', sprintf('/api/fields/contact/%s/edit', $id), $typeSafePayload);
+        $this->client->request(Request::METHOD_PATCH, sprintf('/api/fields/contact/%s/edit', $id), $typeSafePayload);
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $response = json_decode($clientResponse->getContent(), true);
@@ -470,7 +470,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
     private function assertDeleteResponse(array $payload, int $id, string $alias, bool $isBackground): void
     {
         // Test the field is deleted
-        $this->client->request('DELETE', sprintf('/api/fields/contact/%s/delete', $id));
+        $this->client->request(Request::METHOD_DELETE, sprintf('/api/fields/contact/%s/delete', $id));
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $response = json_decode($clientResponse->getContent(), true);
@@ -573,12 +573,12 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         // Try deleting field which is used in segment.
-        $this->client->request('DELETE', sprintf('/api/fields/contact/%s/delete', $id));
+        $this->client->request(Request::METHOD_DELETE, sprintf('/api/fields/contact/%s/delete', $id));
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_CONFLICT, $clientResponse->getStatusCode());
 
         // Test with Bulk Delete.
-        $this->client->request('DELETE', sprintf('/api/fields/contact/batch/delete?ids=%s', $id));
+        $this->client->request(Request::METHOD_DELETE, sprintf('/api/fields/contact/batch/delete?ids=%s', $id));
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $this->assertStringContainsString(

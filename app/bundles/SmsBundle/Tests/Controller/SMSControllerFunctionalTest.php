@@ -34,7 +34,7 @@ final class SMSControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $crawler = $this->client->request('GET', self::EDIT_SMS_PATH.$sms->getId());
+        $crawler = $this->client->request(Request::METHOD_GET, self::EDIT_SMS_PATH.$sms->getId());
         $form    = $crawler->selectButton('Save')->form();
         $form['sms[projects]']->setValue((string) $project->getId());
 

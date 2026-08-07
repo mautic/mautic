@@ -42,7 +42,7 @@ final class ProjectEntityLookupLimitTest extends MauticMysqlTestCase
         $this->createTestEmails();
 
         // Act: trigger AJAX lookup endpoint
-        $this->client->request('GET', self::LOOKUP_CHOICE_LIST_URL, [
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, self::LOOKUP_CHOICE_LIST_URL, [
             'entityType' => 'email',
             'filter'     => 'Common',
         ]);

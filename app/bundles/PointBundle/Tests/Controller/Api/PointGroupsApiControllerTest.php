@@ -20,7 +20,7 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
         $translator = self::getContainer()->get(TranslatorInterface::class);
 
         // Create a new point group
-        $this->client->request('POST', '/api/points/groups/new', [
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/points/groups/new', [
             'name'        => 'New Point Group',
             'description' => 'Description of the new point group',
         ]);
@@ -36,7 +36,7 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
         $this->assertEquals('Description of the new point group', $createdData['description']);
 
         // Retrieve all point groups
-        $this->client->request('GET', '/api/points/groups');
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/points/groups');
         $getAllResponse = $this->client->getResponse();
 
         $this->assertResponseIsSuccessful();
@@ -54,7 +54,7 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
             'description' => 'Updated description of the point group',
         ];
 
-        $this->client->request('PATCH', "/api/points/groups/{$createdData['id']}/edit", $updatePayload);
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_PATCH, "/api/points/groups/{$createdData['id']}/edit", $updatePayload);
         $updateResponse = $this->client->getResponse();
 
         $this->assertResponseIsSuccessful();
@@ -65,7 +65,7 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
         $this->assertEquals('Updated description of the point group', $updatedData['description']);
 
         // Delete the created point group
-        $this->client->request('DELETE', "/api/points/groups/{$createdData['id']}/delete");
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_DELETE, "/api/points/groups/{$createdData['id']}/delete");
         $deleteResponse = $this->client->getResponse();
 
         $this->assertResponseIsSuccessful();
@@ -76,7 +76,7 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
         $this->assertEquals('Updated description of the point group', $deleteData['description']);
 
         // Try to GET the group that should no longer exist
-        $this->client->request('GET', "/api/points/groups/{$createdData['id']}");
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, "/api/points/groups/{$createdData['id']}");
         $getResponse = $this->client->getResponse();
         $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
         $responseData = json_decode($getResponse->getContent(), true);
@@ -137,7 +137,7 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
         ]);
 
         // Try to GET the group points that should not exist
-        $this->client->request('GET', "/api/contacts/{$contact->getId()}/points/groups/0");
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, "/api/contacts/{$contact->getId()}/points/groups/0");
         $response = $this->client->getResponse();
         $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
         $responseData = json_decode($response->getContent(), true);
@@ -147,7 +147,7 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
         $this->assertSame($translator->trans('mautic.lead.event.api.point.group.not.found'), $responseData['errors'][0]['message']);
 
         // Try to GET the group points for a contact that should not exist
-        $this->client->request('GET', '/api/contacts/0/points/groups/0');
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/contacts/0/points/groups/0');
         $response = $this->client->getResponse();
         $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
         $responseData = json_decode($response->getContent(), true);
@@ -159,7 +159,7 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
 
     private function adjustPointsAndAssert(Lead $contact, Group $pointGroup, string $operator, int $value, int $expectedScore): void
     {
-        $this->client->request('POST', "/api/contacts/{$contact->getId()}/points/groups/{$pointGroup->getId()}/{$operator}/{$value}");
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, "/api/contacts/{$contact->getId()}/points/groups/{$pointGroup->getId()}/{$operator}/{$value}");
         $adjustResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $responseData = json_decode($adjustResponse->getContent(), true);
@@ -171,7 +171,7 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
      */
     private function assertContactPointGroups(Lead $contact, array $expectedGroups): void
     {
-        $this->client->request('GET', "/api/contacts/{$contact->getId()}/points/groups");
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, "/api/contacts/{$contact->getId()}/points/groups");
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $responseData = json_decode($response->getContent(), true);
@@ -181,7 +181,7 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
 
     private function assertContactSinglePointGroup(Lead $contact, Group $pointGroup, int $expectedScore): void
     {
-        $this->client->request('GET', "/api/contacts/{$contact->getId()}/points/groups/{$pointGroup->getId()}");
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, "/api/contacts/{$contact->getId()}/points/groups/{$pointGroup->getId()}");
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $responseData = json_decode($response->getContent(), true);

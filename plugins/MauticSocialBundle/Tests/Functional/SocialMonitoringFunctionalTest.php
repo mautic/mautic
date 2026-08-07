@@ -12,18 +12,18 @@ final class SocialMonitoringFunctionalTest extends MauticMysqlTestCase
 {
     public function testHideSocialMonitoring(): void
     {
-        $crawler = $this->client->request('GET', '/s/config/edit');
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/config/edit');
         $this->assertStringNotContainsString('Social Settings', $crawler->filter('.list-group-tabs')->text());
         $this->assertStringNotContainsString('Social Monitoring', $crawler->filter('.sidebar-left .sidebar-content')->text());
 
-        $crawler = $this->client->request('GET', '/s/forms/new');
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/forms/new');
         $this->assertStringNotContainsString('Social Login', $crawler->filter('#fields-container select.form-builder-new-component')->text());
     }
 
     public function testShowSocialMonitoring(): void
     {
         $this->createIntegration();
-        $crawler = $this->client->request('GET', '/s/config/edit');
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/config/edit');
         $this->assertStringContainsString('Social Settings', $crawler->filter('.list-group-tabs')->text());
     }
 

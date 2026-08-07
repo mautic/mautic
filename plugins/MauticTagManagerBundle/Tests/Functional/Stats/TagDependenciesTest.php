@@ -26,7 +26,7 @@ final class TagDependenciesTest extends MauticMysqlTestCase
         $campaign  = $this->createCampaignWithChangeTag($tag);
         $campaign2 = $this->createCampaignWithTagCondition($tag);
 
-        $this->client->request('GET', "/s/tags/view/{$tag->getId()}");
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, "/s/tags/view/{$tag->getId()}");
         $clientResponse = $this->client->getResponse();
         $content        = $clientResponse->getContent();
         $searchIds      = implode(',', [$campaign->getId(), $campaign2->getId()]);
@@ -54,7 +54,7 @@ final class TagDependenciesTest extends MauticMysqlTestCase
 
         $this->createSegment('other');
 
-        $this->client->request('GET', "/s/tags/view/{$tag->getId()}");
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, "/s/tags/view/{$tag->getId()}");
         $clientResponse = $this->client->getResponse();
         $content        = $clientResponse->getContent();
         $searchIds      = implode(',', [$segmentWithTag->getId()]);
@@ -68,7 +68,7 @@ final class TagDependenciesTest extends MauticMysqlTestCase
         $form = $this->createForm('form-with-tag-action');
         $this->createFormActionChangeTags($form, $tag->getTag());
 
-        $this->client->request('GET', "/s/tags/view/{$tag->getId()}");
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, "/s/tags/view/{$tag->getId()}");
         $clientResponse = $this->client->getResponse();
         $content        = $clientResponse->getContent();
         $searchIds      = implode(',', [$form->getId()]);
@@ -81,7 +81,7 @@ final class TagDependenciesTest extends MauticMysqlTestCase
 
         $pointActionIsSent = $this->createPointTriggerWithChangeTagsEvent($tag);
 
-        $this->client->request('GET', "/s/tags/view/{$tag->getId()}");
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, "/s/tags/view/{$tag->getId()}");
         $clientResponse = $this->client->getResponse();
         $content        = $clientResponse->getContent();
         $searchIds      = implode(',', [$pointActionIsSent->getId()]);
@@ -92,7 +92,7 @@ final class TagDependenciesTest extends MauticMysqlTestCase
     {
         $tag         = $this->createTag('TagA');
         $report      = $this->createReportWithTag($tag->getId());
-        $this->client->request('GET', "/s/tags/view/{$tag->getId()}");
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, "/s/tags/view/{$tag->getId()}");
         $clientResponse = $this->client->getResponse();
         $content        = $clientResponse->getContent();
         $searchIds      = implode(',', [$report->getId()]);
@@ -103,7 +103,7 @@ final class TagDependenciesTest extends MauticMysqlTestCase
     {
         $tag         = $this->createTag('TagA');
         $this->createReportWithTagEmpty();
-        $this->client->request('GET', "/s/tags/view/{$tag->getId()}");
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, "/s/tags/view/{$tag->getId()}");
         $this->assertResponseIsSuccessful();
     }
 

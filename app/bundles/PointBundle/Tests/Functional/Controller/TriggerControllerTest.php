@@ -23,7 +23,7 @@ final class TriggerControllerTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $crawler = $this->client->request('GET', '/s/points/triggers/edit/'.$trigger->getId());
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/points/triggers/edit/'.$trigger->getId());
         $form    = $crawler->selectButton('Save')->form();
         $form['pointtrigger[projects]']->setValue((string) $project->getId());
 

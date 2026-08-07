@@ -277,7 +277,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
         $before = $now->modify('-1 month');
         $after  = $now->modify('+1 month');
         $url    = sprintf('s/campaigns/event/stats/%d/%s/%s', $campaign->getId(), $before->format('Y-m-d'), $after->format('Y-m-d'));
-        $this->client->request('GET', $url);
+        $this->client->request(Request::METHOD_GET, $url);
         $response = $this->client->getResponse();
         $body     = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $this->client->restart();
@@ -323,7 +323,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
 
         $this->loginOtherUser($nonAdminUser);
 
-        $this->client->request('GET', '/s/campaigns/export/'.$this->campaign->getId());
+        $this->client->request(Request::METHOD_GET, '/s/campaigns/export/'.$this->campaign->getId());
 
         $response = $this->client->getResponse();
 
@@ -338,7 +338,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
         $this->loginOtherUser($nonAdminUser);
 
         $this->client->request(
-            'GET',
+            Request::METHOD_GET,
             '/s/campaigns/batchExport',
             [
                 'filetype' => 'zip',
@@ -359,7 +359,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
 
         $this->loginOtherUser($nonAdminUser);
 
-        $this->client->request('GET', '/s/campaigns/export/'.$this->campaign->getId());
+        $this->client->request(Request::METHOD_GET, '/s/campaigns/export/'.$this->campaign->getId());
 
         $response = $this->client->getResponse();
 
@@ -372,7 +372,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
 
         $this->loginOtherUser($nonAdminUser);
 
-        $this->client->request('GET', '/s/campaigns/export/999999'); // Non-existent campaign ID
+        $this->client->request(Request::METHOD_GET, '/s/campaigns/export/999999'); // Non-existent campaign ID
 
         $response = $this->client->getResponse();
 
@@ -392,7 +392,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
 
         $this->loginOtherUser($nonAdminUser);
 
-        $this->client->request('GET', '/s/campaigns/export/'.$this->campaign->getId());
+        $this->client->request(Request::METHOD_GET, '/s/campaigns/export/'.$this->campaign->getId());
 
         $response        = $this->client->getResponse();
         $responseContent = $response->getContent();
@@ -415,7 +415,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
 
         $this->loginOtherUser($nonAdminUser);
 
-        $this->client->request('GET', '/s/campaigns/batchExport');
+        $this->client->request(Request::METHOD_GET, '/s/campaigns/batchExport');
 
         $response = $this->client->getResponse();
 
@@ -428,7 +428,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
 
         $this->loginOtherUser($nonAdminUser);
 
-        $this->client->request('GET', '/s/campaigns/batchExport', [
+        $this->client->request(Request::METHOD_GET, '/s/campaigns/batchExport', [
             'ids' => json_encode([]), // Empty IDs to trigger query
         ]);
 
@@ -450,7 +450,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
 
         $this->loginOtherUser($nonAdminUser);
 
-        $this->client->request('GET', '/s/campaigns/batchExport', [
+        $this->client->request(Request::METHOD_GET, '/s/campaigns/batchExport', [
             'ids' => json_encode([$this->campaign->getId()]),
         ]);
 

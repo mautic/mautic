@@ -383,7 +383,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $this->em->persist($company);
         $this->em->flush();
 
-        $crawler = $this->client->request('GET', 's/contacts/new/');
+        $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/new/');
         $form    = $crawler->filterXPath('//form[@name="lead"]')->form();
         $form->setValues(
             [
@@ -537,7 +537,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
     #[TestDox('Ensure correct Preferred Timezone placeholder on add/edit contact page')]
     public function testEnsureCorrectPreferredTimeZonePlaceHolderOnContactPage(): void
     {
-        $crawler             = $this->client->request('GET', '/s/contacts/new');
+        $crawler             = $this->client->request(Request::METHOD_GET, '/s/contacts/new');
         $elementPlaceholder  = $crawler->filter('#lead_timezone')->filter('select')->attr('data-placeholder');
         $expectedPlaceholder = self::getContainer()->get(TranslatorInterface::class)->trans('mautic.lead.field.timezone');
         $this->assertEquals($expectedPlaceholder, $elementPlaceholder);
@@ -551,7 +551,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
 
     public function testQuickAddAction(): void
     {
-        $this->client->request('GET', '/s/contacts/quickAdd');
+        $this->client->request(Request::METHOD_GET, '/s/contacts/quickAdd');
 
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
     }
@@ -565,7 +565,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $firstnameField->setIsRequired(true);
         $fieldModel->getRepository()->saveEntity($firstnameField);
 
-        $crawler = $this->client->request('GET', 's/contacts/new/');
+        $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/new/');
         $form    = $crawler->filterXPath('//form[@name="lead"]')->form();
         $form->setValues(
             [
@@ -580,7 +580,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
 
     public function testAddContactsErrorMessageForEmailWithTwoDots(): void
     {
-        $crawler = $this->client->request('GET', 's/contacts/new/');
+        $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/new/');
         $form    = $crawler->filterXPath('//form[@name="lead"]')->form();
         $form->setValues(
             [
@@ -733,7 +733,7 @@ EMAIL;
 
     public function testLookupTypeFieldOnError(): void
     {
-        $crawler = $this->client->request('GET', 's/contacts/new/');
+        $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/new/');
         $form    = $crawler->filterXPath('//form[@name="lead"]')->form();
         $form->setValues(
             [
@@ -750,7 +750,7 @@ EMAIL;
     {
         $email = 'duplicate@email.a';
         $this->createContact($email);
-        $crawler = $this->client->request('GET', 's/contacts/quickAdd');
+        $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/quickAdd');
         $form    = $crawler->filter('form[name="lead"]')->form([
             'lead' => [
                 'email' => $email,
@@ -769,7 +769,7 @@ EMAIL;
     {
         $email = 'duplicate@email.a';
         $this->createContact($email);
-        $crawler = $this->client->request('GET', 's/contacts/new');
+        $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/new');
         $form    = $crawler->filter('form[name="lead"]')->form([
             'lead' => [
                 'email' => $email,
@@ -930,7 +930,7 @@ EMAIL;
         $this->em->persist($company);
         $this->em->flush();
 
-        $crawler = $this->client->request('GET', 's/contacts/new/');
+        $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/new/');
         $form    = $crawler->filterXPath('//form[@name="lead"]')->form();
         $form->setValues(
             [
@@ -1142,7 +1142,7 @@ EMAIL;
 
     public function testMultipleCompanyFeature(): void
     {
-        $crawler     = $this->client->request('GET', 's/contacts/new/');
+        $crawler     = $this->client->request(Request::METHOD_GET, 's/contacts/new/');
         $multiple    = $crawler->filterXPath('//*[@id="lead_companies"]')->attr('multiple');
         $this->assertSame('multiple', $multiple);
     }

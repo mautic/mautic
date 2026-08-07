@@ -22,7 +22,7 @@ final class TimelineControllerTest extends MauticMysqlTestCase
         $contact = $this->createLead('TestFirstName');
         $this->em->flush();
 
-        $this->client->request('GET', '/s/contacts/timeline/'.$contact->getId());
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/contacts/timeline/'.$contact->getId());
         $this->assertResponseIsSuccessful();
     }
 
@@ -37,7 +37,7 @@ final class TimelineControllerTest extends MauticMysqlTestCase
         ]);
         $this->em->flush();
 
-        $this->client->request('POST', '/s/contacts/timeline/'.$contact->getId(), [
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/s/contacts/timeline/'.$contact->getId(), [
             'search' => 'test',
             'leadId' => $contact->getId(),
         ]);
@@ -55,7 +55,7 @@ final class TimelineControllerTest extends MauticMysqlTestCase
         $this->em->persist($contact);
         $this->em->flush();
 
-        $this->client->request('GET', '/s/contacts/timeline/batchExport/'.$contact->getId());
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/contacts/timeline/batchExport/'.$contact->getId());
         $this->assertResponseIsSuccessful();
     }
 
@@ -68,7 +68,7 @@ final class TimelineControllerTest extends MauticMysqlTestCase
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => self::SALES_USER]);
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
-        $this->client->request('GET', '/s/contacts/timeline/batchExport/'.$contact->getId());
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/contacts/timeline/batchExport/'.$contact->getId());
         $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
     }
 }

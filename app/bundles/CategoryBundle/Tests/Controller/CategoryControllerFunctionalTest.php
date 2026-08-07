@@ -58,7 +58,7 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
      */
     public function testIndexActionWhenNotFiltered(): void
     {
-        $this->client->request('GET', '/s/categories?tmpl=list&bundle=category');
+        $this->client->request(Request::METHOD_GET, '/s/categories?tmpl=list&bundle=category');
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
 
@@ -72,7 +72,7 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
      */
     public function testIndexActionWhenFiltered(): void
     {
-        $this->client->request('GET', '/s/categories/page?tmpl=list&bundle=page');
+        $this->client->request(Request::METHOD_GET, '/s/categories/page?tmpl=list&bundle=page');
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
 
@@ -196,7 +196,7 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
             'validators'
         );
 
-        $this->client->request('POST', 's/categories/category/delete/'.$category->getId(), [], [], [
+        $this->client->request(Request::METHOD_POST, 's/categories/category/delete/'.$category->getId(), [], [], [
             'HTTP_Content-Type'     => 'application/x-www-form-urlencoded; charset=UTF-8',
             'HTTP_X-Requested-With' => 'XMLHttpRequest',
             'HTTP_X-CSRF-Token'     => $this->getCsrfToken('mautic_ajax_post'),
@@ -230,7 +230,7 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         $parameters = 'ids=["'.$category->getId().'"]';
-        $this->client->request('POST', 's/categories/category/batchDelete?'.$parameters, [], [], [
+        $this->client->request(Request::METHOD_POST, 's/categories/category/batchDelete?'.$parameters, [], [], [
             'HTTP_Content-Type'     => 'application/x-www-form-urlencoded; charset=UTF-8',
             'HTTP_X-Requested-With' => 'XMLHttpRequest',
             'HTTP_X-CSRF-Token'     => $this->getCsrfToken('mautic_ajax_post'),

@@ -23,7 +23,7 @@ final class MessageControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $crawler = $this->client->request('GET', '/s/messages/edit/'.$message->getId());
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/messages/edit/'.$message->getId());
         $form    = $crawler->selectButton('Save')->form();
         $form['message[projects]']->setValue((string) $project->getId());
 

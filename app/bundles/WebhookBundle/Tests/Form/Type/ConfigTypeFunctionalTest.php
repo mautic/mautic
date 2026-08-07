@@ -11,7 +11,7 @@ final class ConfigTypeFunctionalTest extends MauticMysqlTestCase
 {
     public function testSendEmailDetailsToggleIsOnByDefault(): void
     {
-        $crawler = $this->client->request('GET', '/s/config/edit');
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/config/edit');
 
         // Updated CSS selector based on the new ID
         $yesSpan = $crawler->filter('#config_webhookconfig_webhook_email_details_label > div > span');

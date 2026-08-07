@@ -16,7 +16,7 @@ final class LeadCompanyControllerTest extends MauticMysqlTestCase
 
     public function testSimpleCompanyFeature(): void
     {
-        $crawler     = $this->client->request('GET', 's/contacts/new/');
+        $crawler     = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, 's/contacts/new/');
         $multiple    = $crawler->filterXPath('//*[@id="lead_companies"]')->attr('multiple');
         $this->assertNull($multiple);
     }

@@ -242,7 +242,7 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
-        $this->client->request('GET', "/s/dashboard/widget/{$widget->getId()}", [], [], $this->createAjaxHeaders());
+        $this->client->request(Request::METHOD_GET, "/s/dashboard/widget/{$widget->getId()}", [], [], $this->createAjaxHeaders());
 
         self::assertResponseIsSuccessful();
         $this->assertStringContainsString('TestFN TestLN', (string) $this->client->getResponse()->getContent());

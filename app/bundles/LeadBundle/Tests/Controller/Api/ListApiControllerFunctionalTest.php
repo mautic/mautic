@@ -161,7 +161,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
 
         // Create:
-        $this->client->request('POST', '/api/segments/new', $payload);
+        $this->client->request(Request::METHOD_POST, '/api/segments/new', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -229,7 +229,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         // Edit:
-        $this->client->request('PATCH', "/api/segments/{$segmentId}/edit", ['name' => 'API segment renamed']);
+        $this->client->request(Request::METHOD_PATCH, "/api/segments/{$segmentId}/edit", ['name' => 'API segment renamed']);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -239,7 +239,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['description'], $response['list']['description']);
 
         // Get:
-        $this->client->request('GET', "/api/segments/{$segmentId}");
+        $this->client->request(Request::METHOD_GET, "/api/segments/{$segmentId}");
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -249,7 +249,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['description'], $response['list']['description']);
 
         // Delete:
-        $this->client->request('DELETE', "/api/segments/{$segmentId}/delete");
+        $this->client->request(Request::METHOD_DELETE, "/api/segments/{$segmentId}/delete");
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -259,7 +259,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['description'], $response['list']['description']);
 
         // Get (ensure it's deleted):
-        $this->client->request('GET', "/api/segments/{$segmentId}");
+        $this->client->request(Request::METHOD_GET, "/api/segments/{$segmentId}");
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -301,7 +301,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ];
 
-        $this->client->request('POST', '/api/segments/batch/new', $payload);
+        $this->client->request(Request::METHOD_POST, '/api/segments/batch/new', $payload);
         $clientResponse  = $this->client->getResponse();
         $response1       = json_decode($clientResponse->getContent(), true);
 
@@ -327,7 +327,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         }
 
         // Lets try to create the same segment to see that the values are not re-setted
-        $this->client->request('PATCH', '/api/segments/batch/edit', $response1['lists']);
+        $this->client->request(Request::METHOD_PATCH, '/api/segments/batch/edit', $response1['lists']);
         $clientResponse  = $this->client->getResponse();
         $response2       = json_decode($clientResponse->getContent(), true);
 
@@ -400,7 +400,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
             'leadlist_id'   => $segment->getId(),
         ]);
 
-        $this->client->request('PATCH', "/api/segments/{$segment->getId()}/edit", ['isPublished' => 0]);
+        $this->client->request(Request::METHOD_PATCH, "/api/segments/{$segment->getId()}/edit", ['isPublished' => 0]);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         self::assertResponseStatusCodeSame(Response::HTTP_UNPROCESSABLE_ENTITY);
@@ -433,7 +433,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($campaign);
         $this->em->flush();
 
-        $this->client->request('PATCH', "/api/segments/{$segment->getId()}/edit", ['isPublished' => 0]);
+        $this->client->request(Request::METHOD_PATCH, "/api/segments/{$segment->getId()}/edit", ['isPublished' => 0]);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         self::assertResponseIsSuccessful();
@@ -465,7 +465,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $list2 = $this->saveSegment('s2', 's2', $filter);
         $this->em->clear();
 
-        $this->client->request('PATCH', "/api/segments/{$list1->getId()}/edit", ['name' => 'API segment renamed', 'isPublished' => false]);
+        $this->client->request(Request::METHOD_PATCH, "/api/segments/{$list1->getId()}/edit", ['name' => 'API segment renamed', 'isPublished' => false]);
         $expectedErrorMessage = sprintf('isPublished: The segment %s is used in %s, please go back and check segments before unpublishing', 'API segment renamed', $list2->getName());
 
         $clientResponse = $this->client->getResponse();
@@ -505,7 +505,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
             ['id' => $list2->getId(), 'isPublished' => false],
         ];
 
-        $this->client->request('PATCH', '/api/segments/batch/edit', $segments);
+        $this->client->request(Request::METHOD_PATCH, '/api/segments/batch/edit', $segments);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -540,7 +540,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $list2 = $this->saveSegment('s2', 's2', $filter);
         $this->em->clear();
 
-        $this->client->request('PATCH', "/api/segments/{$list1->getId()}/edit", ['isPublished' => false]);
+        $this->client->request(Request::METHOD_PATCH, "/api/segments/{$list1->getId()}/edit", ['isPublished' => false]);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         self::assertResponseStatusCodeSame(Response::HTTP_UNPROCESSABLE_ENTITY);
@@ -562,7 +562,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
             'alias'  => 'kitty',
             'bundle' => 'segment',
         ];
-        $this->client->request('POST', '/api/categories/new', $categoryPayload);
+        $this->client->request(Request::METHOD_POST, '/api/categories/new', $categoryPayload);
         $clientResponse     = $this->client->getResponse();
         $response           = json_decode($clientResponse->getContent(), true);
         $categoryId         = $response['category']['id'];
@@ -574,7 +574,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
 
         // Create:
-        $this->client->request('POST', '/api/segments/new', $segmentPayload);
+        $this->client->request(Request::METHOD_POST, '/api/segments/new', $segmentPayload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         if (!empty($response['errors'][0])) {
@@ -584,7 +584,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $segmentId = $response['list']['id'];
 
         // Get segment with category by id:
-        $this->client->request('GET', "/api/segments/{$segmentId}");
+        $this->client->request(Request::METHOD_GET, "/api/segments/{$segmentId}");
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -592,7 +592,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($segmentPayload['category'], $response['list']['category']['id']);
 
         // Search segments by category:
-        $this->client->request('GET', '/api/segments?search=category:kitty');
+        $this->client->request(Request::METHOD_GET, '/api/segments?search=category:kitty');
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -700,7 +700,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
             'leadlist_id' => $segment->getId(),
         ]);
 
-        $this->client->request('DELETE', "/api/segments/{$segment->getId()}/delete");
+        $this->client->request(Request::METHOD_DELETE, "/api/segments/{$segment->getId()}/delete");
 
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
@@ -753,7 +753,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         ]);
 
         $ids = $segment1->getId().','.$segment2->getId();
-        $this->client->request('DELETE', "/api/segments/batch/delete?ids={$ids}");
+        $this->client->request(Request::METHOD_DELETE, "/api/segments/batch/delete?ids={$ids}");
 
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);

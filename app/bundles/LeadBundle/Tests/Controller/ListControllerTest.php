@@ -49,7 +49,7 @@ final class ListControllerTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $this->client->request('GET', '/s/segments');
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/segments');
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('February 7, 2020', (string) $clientResponse->getContent());
@@ -62,7 +62,7 @@ final class ListControllerTest extends MauticMysqlTestCase
      */
     public function testIndexActionWhenFiltering(): void
     {
-        $this->client->request('GET', '/s/segments?search=has%3Aresults&tmpl=list');
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/segments?search=has%3Aresults&tmpl=list');
         $this->assertResponseIsSuccessful('Return code must be 200.');
     }
 
@@ -70,7 +70,7 @@ final class ListControllerTest extends MauticMysqlTestCase
     {
         $contacts = $this->createContacts();
         $segment  = $this->addContactsToSegment($contacts, 'MySeg');
-        $this->client->request('GET', sprintf('/s/segments/view/%d', $segment->getId()));
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, sprintf('/s/segments/view/%d', $segment->getId()));
         $response = $this->client->getResponse();
         self::assertResponseIsSuccessful();
         $this->assertStringContainsString('MySeg', (string) $response->getContent());
@@ -86,7 +86,7 @@ final class ListControllerTest extends MauticMysqlTestCase
         $pageId   = 1;
         $contacts = $this->createContacts();
         $segment  = $this->addContactsToSegment($contacts, 'MySeg');
-        $this->client->request('GET', sprintf('/s/segment/view/%d/contact/%d', $segment->getId(), $pageId));
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, sprintf('/s/segment/view/%d/contact/%d', $segment->getId(), $pageId));
         $response = $this->client->getResponse();
         self::assertResponseIsSuccessful();
         $this->assertStringContainsString('Kane', (string) $response->getContent());
@@ -185,7 +185,7 @@ final class ListControllerTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $this->client->request('GET', sprintf('/s/segments/clone/%d', $list->getId()));
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, sprintf('/s/segments/clone/%d', $list->getId()));
 
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful('Return code must be 200.');
@@ -211,7 +211,7 @@ final class ListControllerTest extends MauticMysqlTestCase
         $this->em->persist($segment);
         $this->em->flush();
 
-        $this->client->request('GET', '/api/segments?search=filters_field:custom_field_test');
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/segments?search=filters_field:custom_field_test');
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('Segment filter', (string) $clientResponse->getContent());
