@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Form\Type;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\FormBundle\Collection\FieldCollection;
 use Mautic\FormBundle\Collection\ObjectCollection;
 use Mautic\FormBundle\Collector\AlreadyMappedFieldCollectorInterface;
@@ -76,7 +77,8 @@ final class FieldTypeTest extends TypeTestCase
                     $this->translator,
                     $this->objectCollector,
                     $this->fieldCollector,
-                    $this->createStub(AlreadyMappedFieldCollectorInterface::class)
+                    $this->createStub(AlreadyMappedFieldCollectorInterface::class),
+                    $this->createStub(CoreParametersHelper::class)
                 ),
                 FormFieldBooleanType::class => new FormFieldBooleanType(),
                 FormFieldRatingType::class  => new FormFieldRatingType($this->translator),
