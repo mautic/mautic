@@ -53,7 +53,7 @@ JS;
 
         return new Response(
             $js,
-            200,
+            Response::HTTP_OK,
             [
                 'Content-Type'           => 'application/javascript',
             ]

@@ -59,7 +59,7 @@ final readonly class ApiSubscriber implements EventSubscriberInterface
                         ],
                     ],
                 ],
-                403
+                \Symfony\Component\HttpFoundation\Response::HTTP_FORBIDDEN
             );
 
             $event->setResponse($response);
@@ -82,7 +82,7 @@ final readonly class ApiSubscriber implements EventSubscriberInterface
                         ],
                     ],
                 ],
-                403
+                \Symfony\Component\HttpFoundation\Response::HTTP_FORBIDDEN
             );
 
             $event->setResponse($response);

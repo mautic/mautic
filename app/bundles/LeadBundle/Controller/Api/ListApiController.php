@@ -101,7 +101,7 @@ final class ListApiController extends CommonApiController
         $withCounts = $request->query->has('withCounts');
         $response   = parent::getEntitiesAction($request, $userHelper);
 
-        if ($withCounts && $response instanceof Response && 200 === $response->getStatusCode()) {
+        if ($withCounts && $response instanceof Response && Response::HTTP_OK === $response->getStatusCode()) {
             $content = json_decode($response->getContent(), true);
 
             if (isset($content['lists']) && is_array($content['lists'])) {

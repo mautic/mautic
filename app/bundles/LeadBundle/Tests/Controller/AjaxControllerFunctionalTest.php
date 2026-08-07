@@ -122,7 +122,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->setCsrfHeader();
         $this->client->xmlHttpRequest(Request::METHOD_POST, '/s/ajax', $payload);
-        $this->assertEquals(403, $this->client->getResponse()->getStatusCode(), 'The user without campaign edit own/others permissions should not access toggle lead campaign action.');
+        $this->assertEquals(\Symfony\Component\HttpFoundation\Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode(), 'The user without campaign edit own/others permissions should not access toggle lead campaign action.');
     }
 
     public function testSegmentDependencyTreeWithNotExistingSegment(): void

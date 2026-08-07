@@ -27,7 +27,7 @@ final class AssetWidgetDataApiControllerFunctionalTest extends MauticMysqlTestCa
         $response = $this->client->getResponse();
 
         $this->assertNotSame(
-            404,
+            \Symfony\Component\HttpFoundation\Response::HTTP_NOT_FOUND,
             $response->getStatusCode(),
             'Unexpected 404 for widget "'.$type.'". Body: '.$response->getContent()
         );

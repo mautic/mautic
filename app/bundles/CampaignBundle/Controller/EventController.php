@@ -526,7 +526,7 @@ final class EventController extends CommonFormController
         if (empty($event)) {
             return new JsonResponse([
                 'error' => $this->translator->trans('mautic.campaign.event.clone.request.missing'),
-            ], 400);
+            ], \Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST);
         }
         $session->remove('mautic.campaign.events.clone.storage');
 

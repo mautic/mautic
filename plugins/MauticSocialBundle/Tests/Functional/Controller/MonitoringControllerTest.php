@@ -37,7 +37,7 @@ final class MonitoringControllerTest extends MauticMysqlTestCase
         $this->createAndLoginUser();
         $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/monitoring');
         $response = $this->client->getResponse();
-        $this->assertEquals(403, $response->getStatusCode());
+        $this->assertEquals(\Symfony\Component\HttpFoundation\Response::HTTP_FORBIDDEN, $response->getStatusCode());
     }
 
     public function testNewWithoutPermission(): void
@@ -45,7 +45,7 @@ final class MonitoringControllerTest extends MauticMysqlTestCase
         $this->createAndLoginUser();
         $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/monitoring/new');
         $response = $this->client->getResponse();
-        $this->assertEquals(403, $response->getStatusCode());
+        $this->assertEquals(\Symfony\Component\HttpFoundation\Response::HTTP_FORBIDDEN, $response->getStatusCode());
     }
 
     public function testEditWithoutPermission(): void
@@ -53,7 +53,7 @@ final class MonitoringControllerTest extends MauticMysqlTestCase
         $this->createAndLoginUser();
         $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/monitoring/edit/1');
         $response = $this->client->getResponse();
-        $this->assertEquals(403, $response->getStatusCode());
+        $this->assertEquals(\Symfony\Component\HttpFoundation\Response::HTTP_FORBIDDEN, $response->getStatusCode());
     }
 
     private function createAndLoginUser(): User

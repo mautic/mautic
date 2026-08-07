@@ -119,7 +119,7 @@ final class FullContactController extends FormController
             );
         }
 
-        return new Response('Bad Request', 400);
+        return new Response('Bad Request', Response::HTTP_BAD_REQUEST);
     }
 
     /**
@@ -269,7 +269,7 @@ final class FullContactController extends FormController
             );
         }
 
-        return new Response('Bad Request', 400);
+        return new Response('Bad Request', Response::HTTP_BAD_REQUEST);
     }
 
     /* COMPANY */
@@ -362,7 +362,7 @@ final class FullContactController extends FormController
             );
         }
 
-        return new Response('Bad Request', 400);
+        return new Response('Bad Request', Response::HTTP_BAD_REQUEST);
     }
 
     /**
@@ -511,6 +511,6 @@ final class FullContactController extends FormController
             );
         }
 
-        return new Response('Bad Request', 400);
+        return new Response('Bad Request', Response::HTTP_BAD_REQUEST);
     }
 }
