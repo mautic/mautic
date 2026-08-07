@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
@@ -38,10 +39,16 @@ final class CompanyControllerTest extends MauticMysqlTestCase
 
     public function testBatchOwnersActionPost(): void
     {
+        $owner = $this->createUser($this->createRole());
+        $company = new Company();
+        $company->setName('Batch owner company');
+        $this->em->persist($company);
+        $this->em->flush();
+
         $this->client->request('POST', '/s/companies/batchOwners/0', [
             'lead_batch_owner' => [
-                'ids'      => '[]',
-                'addowner' => '0',
+                'ids'      => json_encode([$company->getId()], JSON_THROW_ON_ERROR),
+                'addowner' => (string) $owner->getId(),
             ],
         ]);
 
@@ -50,6 +57,11 @@ final class CompanyControllerTest extends MauticMysqlTestCase
 
         $this->assertTrue($response['closeModal']);
         $this->assertArrayHasKey('flashes', $response);
+
+        $this->em->clear();
+        $updatedCompany = $this->em->getRepository(Company::class)->find($company->getId());
+        $this->assertInstanceOf(Company::class, $updatedCompany);
+        $this->assertSame($owner->getId(), $updatedCompany->getOwner()?->getId());
     }
 
     private function createAndLoginUser(): User
