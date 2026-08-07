@@ -343,10 +343,8 @@ final class RoleController extends FormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false): Response
     {
         if (!$this->security->isGranted(self::PERMISSION_EDIT)) {
             $this->throwAccessDenied();
@@ -498,10 +496,8 @@ final class RoleController extends FormController
      * Delete's a role.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         if (!$this->security->isGranted(self::PERMISSION_DELETE)) {
             $this->throwAccessDenied();
