@@ -289,7 +289,7 @@ final class TestApiPlatformPermissionContextSubscriber implements EventSubscribe
     private function extractPath(string $permission): ?string
     {
         if (preg_match('#\((.*?)\)#', $permission, $matches)) {
-            return $matches[1];
+            return $matches[1] ?? null;
         }
 
         return null;
