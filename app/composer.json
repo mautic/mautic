@@ -16,7 +16,7 @@
     ]
   },
   "require": {
-    "php": "~8.2",
+    "php": "~8.4",
     "ext-iconv": "*",
     "ext-imap": "*",
     "ext-pdo": "*",
