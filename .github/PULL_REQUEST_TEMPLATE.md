@@ -48,7 +48,7 @@ Please write a short README for your feature/bugfix. This will help people under
 ### 📋 Steps to test this PR:
 
 <!--
-This part is crucial. Take the time to write very clear, annotated and step by step test instructions, because testers may not be developers.
+This part is really important. If you want your PR to be merged, take the time to write very clear, annotated and step by step test instructions. Do not assume any previous knowledge - testers may not be developers. Do not write steps performed by the CI. These steps are for manual testing.
 -->
 1. Open this PR on GitHub Codespaces or pull down for testing locally (see docs on testing PRs [here](https://contribute.mautic.org/contributing-to-mautic/tester))
 2. 
