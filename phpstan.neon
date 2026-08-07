@@ -4,15 +4,17 @@ includes:
 parameters:
 	tmpDir: ./var/phpstan-cache
 	level: 6
-	reportUnmatchedIgnoredErrors: false
+
+	#reportUnmatchedIgnoredErrors: false
+
 	treatPhpDocTypesAsCertain: false
 	parallel:
 		processTimeout: 1000.0
     # see https://github.com/tomasVotruba/type-coverage
 	type_coverage:
-		return: 88.1
-		param: 75.4
-		property: 69.5
+		return: 88.3
+		param: 75.7
+		property: 71.6
 		# wait for PHP 8.3 before changing
 		constant: 3
 		declare: 73
@@ -88,8 +90,10 @@ parameters:
 		- '#is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject#'
 		- '#Call to an undefined method PHPUnit\\Framework\\MockObject\\MockObject#'
 		- '#expects (.*?) PHPUnit\\Framework\\MockObject\\MockObject given#'
-		# on purpose
-		- '#Call to method PHPUnit\\Framework\\Assert::assertInstanceOf\(\) with (.*?) and (.*?) will always evaluate to#'
+
+		# on purposelater
+		#- '#Call to method PHPUnit\\Framework\\Assert::assertInstanceOf\(\) with (.*?) and (.*?) will always evaluate to#'
+
 		# can't figure out what the right type should be for FormBuilderInterface
 		- '#buildForm\(\) expects Symfony\\Component\\Form\\FormBuilderInterface<array<mixed>\|null>, Symfony\\Component\\Form\\FormBuilderInterface<array<mixed>\|null> given#'
 		# on purpose type check
@@ -195,11 +199,6 @@ parameters:
 			identifier: mautic.noTablePrefixDefinitionInTests
 			path: app/bundles/CoreBundle/Test/EventListener/MaintenanceSubscriberTest.php
 
-		# the concrete Form is created by the form factory, not autowired
-		-
-			identifier: mautic.preferInterfaceInConstructor
-			path: app/bundles/ApiBundle/Controller/oAuth2/AuthorizeController.php
-
 		# not useful, rather pedantic from phsptan-* extensions
 		-
 			identifier: argument.templateType
@@ -268,6 +267,7 @@ rules:
 	- Utils\PHPStan\Rule\NoEntityManagerGetRepositoryRule
 	- Utils\PHPStan\Rule\PreferInterfaceInConstructorRule
 	- Utils\PHPStan\Rule\NoPropertyToPropertyAssignRule
+	- Utils\PHPStan\Rule\ControllerMethodMustReturnResponseRule
 
 	- Utils\PHPStan\Rule\NoServicesInBundleConfigRule
 	#- Utils\PHPStan\Rule\NoUnusedServiceAliasRule
