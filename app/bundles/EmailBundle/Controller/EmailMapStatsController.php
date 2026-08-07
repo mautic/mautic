@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 final class EmailMapStatsController extends AbstractController
 {
-    public const MAP_OPTIONS = [
+    public const array MAP_OPTIONS = [
         'read_count' => [
             'label' => 'mautic.email.stat.read',
             'unit'  => 'Read',
@@ -26,7 +26,7 @@ final class EmailMapStatsController extends AbstractController
         ],
     ];
 
-    public const LEGEND_TEXT = 'Total: %total (%withCountry with country)';
+    public const string LEGEND_TEXT = 'Total: %total (%withCountry with country)';
 
     public function __construct(
         private readonly EmailModel $model,

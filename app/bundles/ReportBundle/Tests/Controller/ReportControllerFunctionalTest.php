@@ -25,9 +25,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class ReportControllerFunctionalTest extends MauticMysqlTestCase
 {
-    private const TEST_EMAIL         = 'test@email.com';
+    private const string TEST_EMAIL         = 'test@email.com';
 
-    private const DEFAULT_TEST_EMAIL = 'default@email.com';
+    private const string DEFAULT_TEST_EMAIL = 'default@email.com';
 
     public function testHitRepositoryMostVisited(): void
     {

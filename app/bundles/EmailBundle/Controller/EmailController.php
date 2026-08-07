@@ -63,7 +63,7 @@ final class EmailController extends FormController
         $this->leadRepository = $leadRepository;
     }
 
-    public const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
+    public const string EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
 
     private bool $invalidHtmlError = false;
 

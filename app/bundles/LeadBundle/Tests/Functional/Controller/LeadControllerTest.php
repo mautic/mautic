@@ -22,11 +22,11 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class LeadControllerTest extends MauticMysqlTestCase
 {
-    public const USERNAME           = 'jhony';
+    public const string USERNAME           = 'jhony';
 
-    private const BATCH_EXPORT_PATH = 's/contacts/batchExport';
+    private const string BATCH_EXPORT_PATH = 's/contacts/batchExport';
 
-    private const SIGNATURE_TOKEN   = '{signature}';
+    private const string SIGNATURE_TOKEN   = '{signature}';
 
     /**
      * @var array<string>

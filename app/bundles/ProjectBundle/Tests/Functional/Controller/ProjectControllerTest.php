@@ -18,7 +18,7 @@ use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class ProjectControllerTest extends MauticMysqlTestCase
 {
-    public const USERNAME = 'johny';
+    public const string USERNAME = 'johny';
 
     private ProjectRepository $projectRepository;
 

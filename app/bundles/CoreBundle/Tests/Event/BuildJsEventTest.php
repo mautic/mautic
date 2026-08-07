@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 final class BuildJsEventTest extends TestCase
 {
-    public const TEST_JS = <<<JS
+    public const string TEST_JS = <<<JS
 /** some comment */
 console.log('logging this');
 JS;

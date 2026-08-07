@@ -15,7 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 final class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends MauticMysqlTestCase
 {
-    private const HOUR_DATE_FORMAT = 'Y-m-d H:00:00';
+    private const string HOUR_DATE_FORMAT = 'Y-m-d H:00:00';
 
     private static string $timezone;
 

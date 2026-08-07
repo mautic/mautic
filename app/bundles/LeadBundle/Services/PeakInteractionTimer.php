@@ -33,13 +33,13 @@ class PeakInteractionTimer
 
     public const DEFAULT_MAX_OPTIMAL_DAYS        = 3;
 
-    private const MINUTES_START_OF_HOUR   = 0;
+    private const int MINUTES_START_OF_HOUR   = 0;
 
     // Start of the hour
-    private const HOUR_FORMAT             = 'G';
+    private const string HOUR_FORMAT             = 'G';
 
     // 0 through 23
-    private const DAY_FORMAT              = 'N'; // ISO 8601 numeric representation of the day of the week
+    private const string DAY_FORMAT              = 'N'; // ISO 8601 numeric representation of the day of the week
 
     private ?\DateTimeZone $defaultTimezone = null;
 

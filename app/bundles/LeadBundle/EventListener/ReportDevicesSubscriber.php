@@ -14,7 +14,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class ReportDevicesSubscriber implements EventSubscriberInterface
 {
-    public const DEVICES = 'contact.devices';
+    public const string DEVICES = 'contact.devices';
 
     public function __construct(
         private FieldsBuilder $fieldsBuilder,

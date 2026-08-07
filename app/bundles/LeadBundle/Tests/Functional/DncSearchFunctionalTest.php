@@ -13,7 +13,7 @@ final class DncSearchFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
-    private const MESSAGE_EMAIL_DNC_SHOULD_APPEAR_IN_EMAIL_SEARCH = 'Contact with email DNC should appear in dnc:email search';
+    private const string MESSAGE_EMAIL_DNC_SHOULD_APPEAR_IN_EMAIL_SEARCH = 'Contact with email DNC should appear in dnc:email search';
 
     public function testDncSearchWithAnyChannel(): void
     {

@@ -7,7 +7,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 final class GlobalSearchEvent extends Event
 {
-    public const RESULTS_LIMIT = 3;
+    public const int RESULTS_LIMIT = 3;
 
     private array $results = [];
 

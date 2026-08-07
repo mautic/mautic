@@ -25,11 +25,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class CampaignEventSubscriber implements EventSubscriberInterface
 {
-    public const LOOPS_TO_FAIL = 100;
+    public const int LOOPS_TO_FAIL = 100;
 
-    private const MINIMUM_CONTACTS_FOR_DISABLE = 100;
+    private const int MINIMUM_CONTACTS_FOR_DISABLE = 100;
 
-    private const DISABLE_CAMPAIGN_THRESHOLD   = 0.35;
+    private const float DISABLE_CAMPAIGN_THRESHOLD   = 0.35;
 
     public function __construct(
         private EventRepository $eventRepository,

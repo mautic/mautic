@@ -15,7 +15,7 @@ final class StatHelperPassTest extends TestCase
     /**
      * There are 6 stat helpers in the container, keep a small reserve for removed ones.
      */
-    private const MINIMAL_STAT_HELPER_COUNT = 6;
+    private const int MINIMAL_STAT_HELPER_COUNT = 6;
 
     public function testStatHelpersAreAddedToStatHelperContainer(): void
     {

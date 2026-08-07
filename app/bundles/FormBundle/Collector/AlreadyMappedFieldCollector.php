@@ -11,7 +11,7 @@ use Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface;
  */
 final readonly class AlreadyMappedFieldCollector implements AlreadyMappedFieldCollectorInterface
 {
-    private const EXPIRATION_IN_SECONDS = 18000;
+    private const int EXPIRATION_IN_SECONDS = 18000;
 
     public function __construct(
         private CacheProviderTagAwareInterface $cacheProvider,

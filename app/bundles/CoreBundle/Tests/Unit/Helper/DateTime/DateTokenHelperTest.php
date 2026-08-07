@@ -12,15 +12,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class DateTokenHelperTest extends \PHPUnit\Framework\TestCase
 {
-    public const DATE_FORMAT      = 'F j, Y';
+    public const string DATE_FORMAT      = 'F j, Y';
 
-    public const TIME_FORMAT      = 'g:i a';
+    public const string TIME_FORMAT      = 'g:i a';
 
-    public const DATE_TIME_FORMAT = self::DATE_FORMAT.' '.self::TIME_FORMAT;
+    public const string DATE_TIME_FORMAT = self::DATE_FORMAT.' '.self::TIME_FORMAT;
 
-    public const TIMEZONE        = 'Europe/Paris';
+    public const string TIMEZONE        = 'Europe/Paris';
 
-    public const TIMEZONE_CUSTOM = 'America/Chicago';
+    public const string TIMEZONE_CUSTOM = 'America/Chicago';
 
     public function testGetTokens(): void
     {

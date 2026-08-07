@@ -12,9 +12,9 @@ class ExpressionBuilder extends BaseExpressionBuilder
 
     public const BETWEEN  = 'BETWEEN';
 
-    private const IN_LAST = 'inLast';
+    private const string IN_LAST = 'inLast';
 
-    private const IN_NEXT = 'inNext';
+    private const string IN_NEXT = 'inNext';
 
     /**
      * Creates a between comparison expression.

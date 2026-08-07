@@ -14,9 +14,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class ReportSubscriber implements EventSubscriberInterface
 {
-    public const MOBILE_NOTIFICATIONS       = 'mobile_notifications';
+    public const string MOBILE_NOTIFICATIONS       = 'mobile_notifications';
 
-    public const MOBILE_NOTIFICATIONS_STATS = 'mobile_notifications.stats';
+    public const string MOBILE_NOTIFICATIONS_STATS = 'mobile_notifications.stats';
 
     public function __construct(
         private Connection $db,

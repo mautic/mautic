@@ -14,7 +14,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 {
-    private const SUBDOMAIN_URL = 'subdomain_url.com';
+    private const string SUBDOMAIN_URL = 'subdomain_url.com';
 
     private string $prefix;
 

@@ -48,14 +48,14 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
     /**
      * There are 300 local event subscribers in the container, keep a small reserve for removed ones.
      */
-    private const MINIMAL_EVENT_SUBSCRIBER_COUNT = 297;
+    private const int MINIMAL_EVENT_SUBSCRIBER_COUNT = 297;
 
     /**
      * Local event subscribers per hand-picked event, to catch a subscriber that silently stops listening.
      *
      * @var array<string, string[]>
      */
-    private const EXPECTED_EVENT_SUBSCRIBER_CLASSES = [
+    private const array EXPECTED_EVENT_SUBSCRIBER_CLASSES = [
         LogoutEvent::class => [
             LogoutListener::class,
         ],

@@ -78,13 +78,13 @@ class PageModel extends FormModel implements GlobalSearchInterface
      * We have to limit length of some fields
      * to store them in the database.
      */
-    private const MAX_FIELD_LENGTH = 191;
+    private const int MAX_FIELD_LENGTH = 191;
 
     /**
      * An encoding to use to calculate
      * length of a field.
      */
-    private const STRING_ENCODING = 'UTF-8';
+    private const string STRING_ENCODING = 'UTF-8';
 
     /**
      * @var bool

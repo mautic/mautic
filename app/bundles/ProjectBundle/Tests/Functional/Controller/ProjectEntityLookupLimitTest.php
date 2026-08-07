@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class ProjectEntityLookupLimitTest extends MauticMysqlTestCase
 {
-    private const LOOKUP_CHOICE_LIST_URL = '/s/ajax?action=project:getLookupChoiceList';
+    private const string LOOKUP_CHOICE_LIST_URL = '/s/ajax?action=project:getLookupChoiceList';
 
     /**
      * Create 2000 test emails.

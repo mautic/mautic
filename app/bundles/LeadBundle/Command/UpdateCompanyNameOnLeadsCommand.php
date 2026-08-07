@@ -18,7 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 )]
 final readonly class UpdateCompanyNameOnLeadsCommand
 {
-    public const COMMAND_NAME = 'mautic:company:update_lead_company';
+    public const string COMMAND_NAME = 'mautic:company:update_lead_company';
 
     public function __construct(
         private CompanyLeadRepository $companyLeadRepository,

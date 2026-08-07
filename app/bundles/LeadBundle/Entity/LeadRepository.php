@@ -31,9 +31,9 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     use ExpressionHelperTrait;
     use OperatorListTrait;
 
-    private const EXISTS_EXPRESSION     = 'EXISTS';
+    private const string EXISTS_EXPRESSION     = 'EXISTS';
 
-    private const NOT_EXISTS_EXPRESSION = 'NOT EXISTS';
+    private const string NOT_EXISTS_EXPRESSION = 'NOT EXISTS';
 
     private CompanyRepository $companyRepository;
 

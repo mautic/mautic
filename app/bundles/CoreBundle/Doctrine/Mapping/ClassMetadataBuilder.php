@@ -20,7 +20,7 @@ final class ClassMetadataBuilder extends OrmClassMetadataBuilder
     /**
      * Max length of indexed VARCHAR fields for UTF8MB4 encoding.
      */
-    public const MAX_VARCHAR_INDEXED_LENGTH = 191;
+    public const int MAX_VARCHAR_INDEXED_LENGTH = 191;
 
     public function __construct(ClassMetadataInfo $cm)
     {

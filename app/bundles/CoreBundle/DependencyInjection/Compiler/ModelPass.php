@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 final class ModelPass implements CompilerPassInterface
 {
-    public const TAG = 'mautic.model';
+    public const string TAG = 'mautic.model';
 
     public function process(ContainerBuilder $container): void
     {

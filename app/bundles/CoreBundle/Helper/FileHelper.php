@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Helper;
 
 final class FileHelper
 {
-    public const BYTES_TO_MEGABYTES_RATIO = 1_048_576;
+    public const int BYTES_TO_MEGABYTES_RATIO = 1_048_576;
 
     public static function convertBytesToMegabytes($b): float
     {

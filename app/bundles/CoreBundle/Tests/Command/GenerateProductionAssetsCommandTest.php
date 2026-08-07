@@ -10,9 +10,9 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
 final class GenerateProductionAssetsCommandTest extends MauticMysqlTestCase
 {
-    private const CKEDITOR_FILE_NAME      = 'ckeditor.js';
+    private const string CKEDITOR_FILE_NAME      = 'ckeditor.js';
 
-    private const TEMP_CKEDITOR_FILE_NAME = 'temp_ckeditor.js';
+    private const string TEMP_CKEDITOR_FILE_NAME = 'temp_ckeditor.js';
 
     private Filesystem $filesystem;
 

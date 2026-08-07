@@ -17,10 +17,8 @@ final class SalesforceApi extends CrmApi
 {
     /**
      * This regular expression parses missing field's name from the error message.
-     *
-     * @var string
      */
-    public const REGEXP_MISSING_FIELD = "/ERROR\sat\sRow.+No\ssuch\scolumn\s'([^']+)'\son\sentity\s'([^']+)'/m";
+    public const string REGEXP_MISSING_FIELD = "/ERROR\sat\sRow.+No\ssuch\scolumn\s'([^']+)'\son\sentity\s'([^']+)'/m";
 
     private string $object          = 'Lead';
 

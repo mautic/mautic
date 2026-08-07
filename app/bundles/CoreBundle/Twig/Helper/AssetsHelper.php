@@ -15,12 +15,12 @@ final class AssetsHelper
     /**
      * Used for Mautic app.
      */
-    public const CONTEXT_APP = 'app';
+    public const string CONTEXT_APP = 'app';
 
     /**
      * Used within the content iframe when building content with a theme.
      */
-    public const CONTEXT_BUILDER = 'builder';
+    public const string CONTEXT_BUILDER = 'builder';
 
     private ?AssetGenerationHelper $assetHelper = null;
 

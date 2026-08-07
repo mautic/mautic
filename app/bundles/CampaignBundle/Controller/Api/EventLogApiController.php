@@ -34,7 +34,7 @@ final class EventLogApiController extends FetchCommonApiController
 {
     use LeadAccessTrait;
 
-    private const LOG_SERIALIZATION = 30;
+    private const int LOG_SERIALIZATION = 30;
 
     private ?Campaign $campaign = null;
 

@@ -15,7 +15,7 @@ final class PullTransifexCommandFunctionalTest extends MauticMysqlTestCase
 {
     use ClientMockTrait;
 
-    private const FAKE_TRANSLATION_DIR = __DIR__.'/../Fixtures/Transifex/Translations';
+    private const string FAKE_TRANSLATION_DIR = __DIR__.'/../Fixtures/Transifex/Translations';
 
     private Filesystem $filesystem;
 

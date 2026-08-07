@@ -8,10 +8,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class MaxMindDoNotSellDownloadHelper
 {
-    /**
-     * @var string
-     */
-    public const REMOTE_DATA = 'https://api.maxmind.com/privacy/exclusions';
+    public const string REMOTE_DATA = 'https://api.maxmind.com/privacy/exclusions';
 
     /**
      * @var array<string>

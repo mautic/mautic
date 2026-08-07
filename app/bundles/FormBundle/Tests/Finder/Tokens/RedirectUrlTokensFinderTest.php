@@ -12,26 +12,26 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(RedirectUrlTokensFinder::class)]
 final class RedirectUrlTokensFinderTest extends TestCase
 {
-    private const NOT_VALID_URLS = [
+    private const array NOT_VALID_URLS = [
         'ttps://example.com',
         'https://example',
         'https:/example.com',
         'example.com?test1=123&test2=abc',
     ];
 
-    private const HOMEPAGE_URLS = [
+    private const array HOMEPAGE_URLS = [
         'https://example.com/',
         'https://example.com',
     ];
 
-    private const PAGE_URLS = [
+    private const array PAGE_URLS = [
         'https://example.com/page1/',
         'https://example.com/page2/lorem-ipsum/',
         'https://example.com/page2/lorem-ipsum?test1&test2',
         'https://example.com/page2/lorem-ipsum?test1=123&test2=abc',
     ];
 
-    private const TOKENIZED_URLS = [
+    private const array TOKENIZED_URLS = [
         '{pagelink=123}/page2/lorem-ipsum?{formfield=abc}&{contactfield=abc123}',
         '{pagelink=123}/page2/lorem-ipsum?test1&test2&{formfield=abc}&{contactfield=abc123}',
         '{pagelink=123}/page2/lorem-ipsum?test1=123&test2=abc&{formfield=abc}&{contactfield=abc123}',

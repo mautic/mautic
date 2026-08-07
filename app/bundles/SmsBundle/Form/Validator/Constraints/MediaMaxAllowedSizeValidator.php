@@ -13,7 +13,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 final class MediaMaxAllowedSizeValidator extends ConstraintValidator
 {
-    private const MAX_MEDIA_SIZE_IN_BYTES = 5000000;
+    private const int MAX_MEDIA_SIZE_IN_BYTES = 5000000;
 
     public function __construct(
         private readonly AssetsHelper $assetsHelper,

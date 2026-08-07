@@ -17,9 +17,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class CsvExporterTest extends \PHPUnit\Framework\TestCase
 {
-    public const DATEONLYFORMAT = 'F j, Y';
+    public const string DATEONLYFORMAT = 'F j, Y';
 
-    public const TIMEONLYFORMAT          = 'g:i a';
+    public const string TIMEONLYFORMAT          = 'g:i a';
 
     private CsvExporter $csvExporter;
 

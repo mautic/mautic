@@ -16,19 +16,19 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 final class RoleController extends FormController
 {
-    private const PERMISSION_VIEW = 'user:roles:view';
+    private const string PERMISSION_VIEW = 'user:roles:view';
 
-    private const PERMISSION_CREATE = 'user:roles:create';
+    private const string PERMISSION_CREATE = 'user:roles:create';
 
-    private const PERMISSION_EDIT   = 'user:roles:edit';
+    private const string PERMISSION_EDIT   = 'user:roles:edit';
 
-    private const PERMISSION_DELETE = 'user:roles:delete';
+    private const string PERMISSION_DELETE = 'user:roles:delete';
 
-    private const FLASH_MENU_LINK = '%menu_link%';
+    private const string FLASH_MENU_LINK = '%menu_link%';
 
-    private const FLASH_URL       = '%url%';
+    private const string FLASH_URL       = '%url%';
 
-    private const TEMPLATE_FORM = '@MauticUser/Role/form.html.twig';
+    private const string TEMPLATE_FORM = '@MauticUser/Role/form.html.twig';
 
     private RoleModel $roleModel;
 

@@ -6,7 +6,7 @@ use Mautic\PageBundle\Model\PageModel;
 
 class TokenHelper
 {
-    private const REGEX = '/{pagelink=(.*?)}/';
+    private const string REGEX = '/{pagelink=(.*?)}/';
 
     public function __construct(
         protected PageModel $model,

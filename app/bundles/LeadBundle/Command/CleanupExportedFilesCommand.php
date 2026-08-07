@@ -19,12 +19,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 )]
 final class CleanupExportedFilesCommand extends Command
 {
-    public const COMMAND_NAME = 'mautic:contacts:cleanup_exported_files';
+    public const string COMMAND_NAME = 'mautic:contacts:cleanup_exported_files';
 
-    /**
-     * @var string
-     */
-    private const CLEANUP_DAYS = 'cleanupAfterDays';
+    private const string CLEANUP_DAYS = 'cleanupAfterDays';
 
     public function __construct(
         private readonly CoreParametersHelper $coreParametersHelper,

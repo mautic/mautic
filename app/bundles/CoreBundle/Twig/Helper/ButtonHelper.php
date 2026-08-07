@@ -14,47 +14,47 @@ final class ButtonHelper
     /**
      * List dropdown actions.
      */
-    public const LOCATION_LIST_ACTIONS = 'list_actions';
+    public const string LOCATION_LIST_ACTIONS = 'list_actions';
 
     /**
      * Toolbar actions.
      */
-    public const LOCATION_TOOLBAR_ACTIONS = 'toolbar_actions';
+    public const string LOCATION_TOOLBAR_ACTIONS = 'toolbar_actions';
 
     /**
      * Toolbar actions.
      */
-    public const LOCATION_TOOLBAR_BULK_ACTIONS = 'toolbar_bulk_actions';
+    public const string LOCATION_TOOLBAR_BULK_ACTIONS = 'toolbar_bulk_actions';
 
     /**
      * Page actions.
      */
-    public const LOCATION_PAGE_ACTIONS = 'page_actions';
+    public const string LOCATION_PAGE_ACTIONS = 'page_actions';
 
     /**
      * Navbar actions.
      */
-    public const LOCATION_NAVBAR = 'navbar_actions';
+    public const string LOCATION_NAVBAR = 'navbar_actions';
 
     /**
      * Bulk actions.
      */
-    public const LOCATION_BULK_ACTIONS = 'bulk_actions';
+    public const string LOCATION_BULK_ACTIONS = 'bulk_actions';
 
     /**
      * Buttons are displayed in group and/or dropdown depending on button count.
      */
-    public const TYPE_BUTTON_DROPDOWN = 'button-dropdown';
+    public const string TYPE_BUTTON_DROPDOWN = 'button-dropdown';
 
     /**
      * Buttons are displayed in dropdown depending on button count.
      */
-    public const TYPE_DROPDOWN = 'dropdown';
+    public const string TYPE_DROPDOWN = 'dropdown';
 
     /**
      * Buttons are grouped together.
      */
-    public const TYPE_GROUP = 'group';
+    public const string TYPE_GROUP = 'group';
 
     /**
      * Location of the buttons.

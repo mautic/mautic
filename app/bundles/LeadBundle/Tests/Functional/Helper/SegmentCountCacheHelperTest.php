@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 
 final class SegmentCountCacheHelperTest extends MauticMysqlTestCase
 {
-    private const SEGMENT_ID = 1;
+    private const int SEGMENT_ID = 1;
 
     private SegmentCountCacheHelper $segmentCountCacheHelper;
 

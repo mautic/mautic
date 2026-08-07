@@ -19,7 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 )]
 final class SegmentCountCacheCommand extends Command
 {
-    public const COMMAND_NAME = 'lead:list:count-cache-update';
+    public const string COMMAND_NAME = 'lead:list:count-cache-update';
 
     public function __construct(
         private readonly LeadListRepository $leadListRepository,

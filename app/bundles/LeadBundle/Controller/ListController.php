@@ -47,9 +47,9 @@ final class ListController extends FormController
         $this->leadListRepository = $leadListRepository;
     }
 
-    public const ROUTE_SEGMENT_CONTACTS = 'mautic_segment_contacts';
+    public const string ROUTE_SEGMENT_CONTACTS = 'mautic_segment_contacts';
 
-    public const SEGMENT_CONTACT_FIELDS = ['id', 'company', 'city', 'state', 'country'];
+    public const array SEGMENT_CONTACT_FIELDS = ['id', 'company', 'city', 'state', 'country'];
 
     private array $listFilters = [];
 

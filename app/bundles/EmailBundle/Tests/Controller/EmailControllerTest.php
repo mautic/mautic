@@ -38,10 +38,7 @@ use Twig\Environment;
 
 final class EmailControllerTest extends TestCase
 {
-    /**
-     * @var string
-     */
-    public const NEW_CATEGORY_TITLE = 'New category';
+    public const string NEW_CATEGORY_TITLE = 'New category';
 
     /**
      * @var MockObject&Session

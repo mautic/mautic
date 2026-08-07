@@ -14,13 +14,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class ReportSubscriber implements EventSubscriberInterface
 {
-    public const CONTEXT_GROUP_SCORE = 'group.score';
+    public const string CONTEXT_GROUP_SCORE = 'group.score';
 
-    public const GROUP_PREFIX        = 'pl';
+    public const string GROUP_PREFIX        = 'pl';
 
-    public const GROUP_SCORE_PREFIX  = 'ls';
+    public const string GROUP_SCORE_PREFIX  = 'ls';
 
-    public const GROUP_COLUMNS = [
+    public const array GROUP_COLUMNS = [
         self::GROUP_PREFIX.'.id' => [
             'alias' => 'group_id',
             'label' => 'mautic.point.report.group_id',

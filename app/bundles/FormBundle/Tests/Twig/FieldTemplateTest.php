@@ -11,13 +11,13 @@ use Twig\Environment;
 
 final class FieldTemplateTest extends MauticMysqlTestCase
 {
-    private const FIELD_LABEL         = 'Test Field';
+    private const string FIELD_LABEL         = 'Test Field';
 
-    private const FULL_WIDTH_CLASS    = 'mauticform-100';
+    private const string FULL_WIDTH_CLASS    = 'mauticform-100';
 
-    private const TEXT_FIELD_TEMPLATE = '@MauticForm/Field/text.html.twig';
+    private const string TEXT_FIELD_TEMPLATE = '@MauticForm/Field/text.html.twig';
 
-    private const RADIO_GROUP_FIELD_TEMPLATE = '@MauticForm/Field/radiogrp.html.twig';
+    private const string RADIO_GROUP_FIELD_TEMPLATE = '@MauticForm/Field/radiogrp.html.twig';
 
     public function testFieldTemplateRendersWithCssClasses(): void
     {

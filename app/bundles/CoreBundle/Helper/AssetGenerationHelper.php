@@ -9,7 +9,7 @@ final readonly class AssetGenerationHelper
 {
     // Temporary array of libraries to load from node_modules before we switch
     // to Symfony Encore. This is the first step to load libraries from NPM.
-    private const NODE_MODULES = [
+    private const array NODE_MODULES = [
         'mousetrap/mousetrap.js', // Needed for keyboard shortcuts
         'jquery/dist/jquery.js', // Needed for everything. It's the underlying framework.
         '../vendor/twbs/bootstrap-sass/assets/javascripts/bootstrap.js', // Needed for the UI components like modal boxes.

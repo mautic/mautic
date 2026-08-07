@@ -17,7 +17,7 @@ final class TaggedServiceWiringSmokeTest extends AbstractContainerSmokeTestCase
      *
      * @var array<string, int>
      */
-    private const EXPECTED_COLLECTED_SERVICE_COUNTS = [
+    private const array EXPECTED_COLLECTED_SERVICE_COUNTS = [
         'mautic.email.stats.helper_container'                     => 6,
         'mautic.helper.update_checks'                             => 2,
         'mautic.integrations.helper'                              => 4,

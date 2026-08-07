@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class FileController extends AjaxController
 {
-    public const EDITOR_CKEDITOR = 'ckeditor';
+    public const string EDITOR_CKEDITOR = 'ckeditor';
 
     private array $response = [];
 

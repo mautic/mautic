@@ -19,7 +19,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
 )]
 final class ListCommand extends Command
 {
-    public const NAME = 'mautic:marketplace:list';
+    public const string NAME = 'mautic:marketplace:list';
 
     public function __construct(
         private readonly PluginCollector $pluginCollector,

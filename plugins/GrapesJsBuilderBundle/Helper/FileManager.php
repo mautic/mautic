@@ -15,7 +15,7 @@ use Symfony\Component\Finder\SplFileInfo;
 
 final readonly class FileManager
 {
-    public const GRAPESJS_IMAGES_DIRECTORY = '';
+    public const string GRAPESJS_IMAGES_DIRECTORY = '';
 
     public function __construct(
         private FileUploader $fileUploader,

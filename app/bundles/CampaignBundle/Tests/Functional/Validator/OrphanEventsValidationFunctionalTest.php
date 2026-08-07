@@ -15,7 +15,7 @@ final class OrphanEventsValidationFunctionalTest extends MauticMysqlTestCase
 {
     use CampaignControllerTrait;
 
-    private const ORPHAN_EVENTS_ERROR_MESSAGE =
+    private const string ORPHAN_EVENTS_ERROR_MESSAGE =
         'One or more events are orphaned and must be linked to a node before proceeding';
 
     public function testCampaignWithConnectedEventsShouldSaveSuccessfully(): void

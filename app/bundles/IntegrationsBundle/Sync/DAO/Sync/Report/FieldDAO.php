@@ -8,11 +8,11 @@ use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 
 final class FieldDAO
 {
-    public const FIELD_CHANGED   = 'changed';
+    public const string FIELD_CHANGED   = 'changed';
 
-    public const FIELD_REQUIRED  = 'required';
+    public const string FIELD_REQUIRED  = 'required';
 
-    public const FIELD_UNCHANGED = 'unchanged';
+    public const string FIELD_UNCHANGED = 'unchanged';
 
     private ?\DateTimeInterface $changeDateTime = null;
 

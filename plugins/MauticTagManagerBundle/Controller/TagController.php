@@ -40,13 +40,13 @@ final class TagController extends FormController
         $this->tagRepository = $tagRepository;
     }
 
-    private const PERMISSION_VIEW   = 'tagManager:tagManager:view';
+    private const string PERMISSION_VIEW   = 'tagManager:tagManager:view';
 
-    private const PERMISSION_EDIT   = 'tagManager:tagManager:edit';
+    private const string PERMISSION_EDIT   = 'tagManager:tagManager:edit';
 
-    private const PERMISSION_DELETE = 'tagManager:tagManager:delete';
+    private const string PERMISSION_DELETE = 'tagManager:tagManager:delete';
 
-    private const PERMISSION_CREATE = 'tagManager:tagManager:create';
+    private const string PERMISSION_CREATE = 'tagManager:tagManager:create';
 
     /**
      * Generate's default list view.

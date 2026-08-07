@@ -10,17 +10,17 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 final class ProjectPermissions extends AbstractPermissions
 {
-    private const PERMISSION_BASE = 'project:project';
+    private const string PERMISSION_BASE = 'project:project';
 
-    public const CAN_VIEW         = self::PERMISSION_BASE.':view';
+    public const string CAN_VIEW         = self::PERMISSION_BASE.':view';
 
-    public const CAN_EDIT         = self::PERMISSION_BASE.':edit';
+    public const string CAN_EDIT         = self::PERMISSION_BASE.':edit';
 
-    public const CAN_CREATE       = self::PERMISSION_BASE.':create';
+    public const string CAN_CREATE       = self::PERMISSION_BASE.':create';
 
-    public const CAN_DELETE       = self::PERMISSION_BASE.':delete';
+    public const string CAN_DELETE       = self::PERMISSION_BASE.':delete';
 
-    public const CAN_ASSOCIATE    = self::PERMISSION_BASE.':associate';
+    public const string CAN_ASSOCIATE    = self::PERMISSION_BASE.':associate';
 
     /**
      * @param mixed[] $params

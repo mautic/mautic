@@ -15,7 +15,7 @@ final class AuditLogControllerTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 
-    private const SALES_USER = 'sales';
+    private const string SALES_USER = 'sales';
 
     /**
      * @throws OptimisticLockException

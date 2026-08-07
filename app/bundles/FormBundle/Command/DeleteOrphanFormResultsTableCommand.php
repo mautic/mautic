@@ -21,7 +21,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 )]
 final class DeleteOrphanFormResultsTableCommand extends Command
 {
-    public const COMMAND_NAME = 'mautic:forms:delete-results-table';
+    public const string COMMAND_NAME = 'mautic:forms:delete-results-table';
 
     private readonly Connection $conn;
 

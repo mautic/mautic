@@ -84,7 +84,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     public const TABLE_NAME = 'emails';
 
-    private const SETTINGS_PREFIX = 'settings_';
+    private const string SETTINGS_PREFIX = 'settings_';
 
     /**
      * @var int

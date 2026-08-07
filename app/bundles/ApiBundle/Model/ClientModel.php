@@ -21,14 +21,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 final class ClientModel extends FormModel implements GlobalSearchInterface
 {
-    /**
-     * @var string
-     */
-    public const API_MODE_OAUTH2 = 'oauth2';
+    public const string API_MODE_OAUTH2 = 'oauth2';
 
     private ?string $apiMode = null;
 
-    private const DEFAULT_API_MODE = 'oauth2';
+    private const string DEFAULT_API_MODE = 'oauth2';
 
     private RequestStack $requestStack;
 

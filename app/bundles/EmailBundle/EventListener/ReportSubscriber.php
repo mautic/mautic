@@ -26,27 +26,27 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class ReportSubscriber implements EventSubscriberInterface
 {
-    public const CONTEXT_EMAILS       = 'emails';
+    public const string CONTEXT_EMAILS       = 'emails';
 
-    public const CONTEXT_EMAIL_STATS  = 'email.stats';
+    public const string CONTEXT_EMAIL_STATS  = 'email.stats';
 
-    public const EMAILS_PREFIX        = 'e';
+    public const string EMAILS_PREFIX        = 'e';
 
-    public const EMAIL_STATS_PREFIX   = 'es';
+    public const string EMAIL_STATS_PREFIX   = 'es';
 
-    public const EMAIL_VARIANT_PREFIX = 'vp';
+    public const string EMAIL_VARIANT_PREFIX = 'vp';
 
-    public const DNC_PREFIX           = 'dnc';
+    public const string DNC_PREFIX           = 'dnc';
 
-    public const CLICK_PREFIX         = 'cut';
+    public const string CLICK_PREFIX         = 'cut';
 
-    public const TRACKABLE_PREFIX     = 'tr';
+    public const string TRACKABLE_PREFIX     = 'tr';
 
-    public const REDIRECT_PREFIX      = 'pr';
+    public const string REDIRECT_PREFIX      = 'pr';
 
-    public const CLICK_THROUGH_PREFIX = 'ct';
+    public const string CLICK_THROUGH_PREFIX = 'ct';
 
-    public const DNC_COLUMNS = [
+    public const array DNC_COLUMNS = [
         'unsubscribed' => [
             'alias'   => 'unsubscribed',
             'label'   => 'mautic.email.report.unsubscribed',
@@ -82,7 +82,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
         ],
     ];
 
-    public const EMAIL_STATS_COLUMNS = [
+    public const array EMAIL_STATS_COLUMNS = [
         self::EMAIL_STATS_PREFIX.'.email_address' => [
             'label' => 'mautic.email.report.stat.email_address',
             'type'  => 'email',
@@ -123,7 +123,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
         ],
     ];
 
-    public const EMAIL_VARIANT_COLUMNS = [
+    public const array EMAIL_VARIANT_COLUMNS = [
         self::EMAIL_VARIANT_PREFIX.'.id' => [
             'label' => 'mautic.email.report.variant_parent_id',
             'type'  => 'int',
@@ -134,7 +134,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
         ],
     ];
 
-    public const CLICK_COLUMNS = [
+    public const array CLICK_COLUMNS = [
         'hits' => [
             'alias'   => 'hits',
             'label'   => 'mautic.email.report.hits_count',

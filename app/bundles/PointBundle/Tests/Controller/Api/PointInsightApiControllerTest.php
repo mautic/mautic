@@ -12,7 +12,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class PointInsightApiControllerTest extends MauticMysqlTestCase
 {
-    private const UPDATED_NAME = 'Updated Point Insight';
+    private const string UPDATED_NAME = 'Updated Point Insight';
 
     public function testPointInsightCRUDActions(): void
     {

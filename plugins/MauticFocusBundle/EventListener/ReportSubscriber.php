@@ -11,23 +11,23 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class ReportSubscriber implements EventSubscriberInterface
 {
-    public const CONTEXT_FOCUS_STATS = 'focus_stats';
+    public const string CONTEXT_FOCUS_STATS = 'focus_stats';
 
-    public const CONTEXT_FOCUS_LEADS = 'focus_leads';
+    public const string CONTEXT_FOCUS_LEADS = 'focus_leads';
 
-    public const FOCUS_GROUP         = 'focus';
+    public const string FOCUS_GROUP         = 'focus';
 
-    public const PREFIX_FOCUS        = 'f';
+    public const string PREFIX_FOCUS        = 'f';
 
-    public const PREFIX_STATS        = 'fs';
+    public const string PREFIX_STATS        = 'fs';
 
-    public const PREFIX_REDIRECTS    = 'r';
+    public const string PREFIX_REDIRECTS    = 'r';
 
-    public const PREFIX_TRACKABLES   = 't';
+    public const string PREFIX_TRACKABLES   = 't';
 
-    public const PREFIX_CATEGORIES   = 'c';
+    public const string PREFIX_CATEGORIES   = 'c';
 
-    public const PREFIX_LEADS        = 'l';
+    public const string PREFIX_LEADS        = 'l';
 
     public static function getSubscribedEvents(): array
     {

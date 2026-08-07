@@ -14,7 +14,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 final class ConfigControllerTest extends MauticMysqlTestCase
 {
-    private const API_KEY = 'test_api_key_123';
+    private const string API_KEY = 'test_api_key_123';
 
     private string $configRoute;
 

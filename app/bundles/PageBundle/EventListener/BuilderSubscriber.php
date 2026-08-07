@@ -21,37 +21,37 @@ use Twig\Environment;
 
 final class BuilderSubscriber implements EventSubscriberInterface
 {
-    private const pageTokenRegex         = '{pagelink=(.*?)}';
+    private const string pageTokenRegex         = '{pagelink=(.*?)}';
 
-    private const dwcTokenRegex          = '{dwc=(.*?)}';
+    private const string dwcTokenRegex          = '{dwc=(.*?)}';
 
-    private const langBarRegex           = '{langbar}';
+    private const string langBarRegex           = '{langbar}';
 
-    private const shareButtonsRegex      = '{sharebuttons}';
+    private const string shareButtonsRegex      = '{sharebuttons}';
 
-    private const titleRegex             = '{pagetitle}';
+    private const string titleRegex             = '{pagetitle}';
 
-    private const descriptionRegex       = '{pagemetadescription}';
+    private const string descriptionRegex       = '{pagemetadescription}';
 
-    public const brandName                = '{brand=name}';
+    public const string brandName                = '{brand=name}';
 
-    public const segmentListRegex         = '{segmentlist}';
+    public const string segmentListRegex         = '{segmentlist}';
 
-    public const categoryListRegex        = '{categorylist}';
+    public const string categoryListRegex        = '{categorylist}';
 
-    public const channelfrequency         = '{channelfrequency}';
+    public const string channelfrequency         = '{channelfrequency}';
 
-    public const preferredchannel         = '{preferredchannel}';
+    public const string preferredchannel         = '{preferredchannel}';
 
-    public const saveprefsRegex           = '{saveprefsbutton}';
+    public const string saveprefsRegex           = '{saveprefsbutton}';
 
-    public const successmessage           = '{successmessage}';
+    public const string successmessage           = '{successmessage}';
 
-    public const identifierToken          = '{leadidentifier}';
+    public const string identifierToken          = '{leadidentifier}';
 
-    public const saveButtonContainerClass = 'prefs-saveprefs';
+    public const string saveButtonContainerClass = 'prefs-saveprefs';
 
-    public const firstSlotAttribute       = ' data-prefs-center-first="1"';
+    public const string firstSlotAttribute       = ' data-prefs-center-first="1"';
 
     /**
      * @var array<string,string>

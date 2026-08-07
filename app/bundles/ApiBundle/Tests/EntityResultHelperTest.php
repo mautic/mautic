@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 final class EntityResultHelperTest extends TestCase
 {
-    public const NEW_TITLE = 'Callback Title';
+    public const string NEW_TITLE = 'Callback Title';
 
     public function testGetArrayEntities(): void
     {

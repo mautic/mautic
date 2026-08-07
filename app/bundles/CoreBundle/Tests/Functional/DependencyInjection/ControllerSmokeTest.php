@@ -9,7 +9,7 @@ final class ControllerSmokeTest extends AbstractContainerSmokeTestCase
     /**
      * There are 157 controllers in the container, keep a small reserve for removed ones.
      */
-    private const MINIMAL_CONTROLLER_COUNT = 154;
+    private const int MINIMAL_CONTROLLER_COUNT = 154;
 
     public function testAllControllersCanBeCreated(): void
     {

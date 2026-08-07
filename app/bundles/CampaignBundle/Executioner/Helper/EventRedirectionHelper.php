@@ -15,7 +15,7 @@ use Psr\Log\LoggerInterface;
  */
 class EventRedirectionHelper
 {
-    private const MAX_DEPTH = 20;
+    private const int MAX_DEPTH = 20;
 
     public function __construct(
         private readonly LoggerInterface $logger,

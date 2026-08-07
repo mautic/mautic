@@ -15,7 +15,7 @@ use Mautic\PointBundle\Model\PointGroupModel;
 
 final class PointInsightsFunctionalTest extends MauticMysqlTestCase
 {
-    private const GROUP_A_SUFFIX = ' (Group A)';
+    private const string GROUP_A_SUFFIX = ' (Group A)';
 
     protected $useCleanupRollback = false;
 

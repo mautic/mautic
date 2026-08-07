@@ -11,7 +11,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class EditorFontsSubscriber implements EventSubscriberInterface
 {
-    public const PARAMETER_EDITOR_FONTS = 'editor_fonts';
+    public const string PARAMETER_EDITOR_FONTS = 'editor_fonts';
 
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,

@@ -33,7 +33,7 @@ final class FieldAliasToFqcnMap
     /**
      * @format [field alias => field FQCN]
      */
-    public const MAP = [
+    public const array MAP = [
         'boolean'     => BooleanType::class,
         'country'     => CountryType::class,
         'date'        => DateType::class,

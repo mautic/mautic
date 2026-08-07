@@ -47,7 +47,7 @@ class WebhookModel extends FormModel
 
     public const IMMEDIATE_PROCESS = 'immediate_process';
 
-    private const DELETE_BATCH_LIMIT = 5000;
+    private const int DELETE_BATCH_LIMIT = 5000;
 
     public const WEBHOOK_LOG_MAX = 1000;
 

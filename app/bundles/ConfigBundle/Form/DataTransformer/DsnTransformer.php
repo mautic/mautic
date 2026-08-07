@@ -14,7 +14,7 @@ use Symfony\Component\Form\DataTransformerInterface;
  */
 final readonly class DsnTransformer implements DataTransformerInterface
 {
-    private const PASSWORD_MASK = '🔒';
+    private const string PASSWORD_MASK = '🔒';
 
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,

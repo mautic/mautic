@@ -18,7 +18,7 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 
-    private const PREHEADER_TEXT = 'Preheader text';
+    private const string PREHEADER_TEXT = 'Preheader text';
 
     protected $useCleanupRollback = false;
 

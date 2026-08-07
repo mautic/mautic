@@ -12,7 +12,7 @@ use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class CompanyControllerTest extends MauticMysqlTestCase
 {
-    public const USERNAME = 'jhony';
+    public const string USERNAME = 'jhony';
 
     public function testMergeAction(): void
     {

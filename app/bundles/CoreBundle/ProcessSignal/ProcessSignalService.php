@@ -12,7 +12,7 @@ class ProcessSignalService
 
     public const SIGINT   = 2;
 
-    private const SIGNALS = [self::SIGTERM, self::SIGINT];
+    private const array SIGNALS = [self::SIGTERM, self::SIGINT];
 
     private ?int $signal  = null;
 

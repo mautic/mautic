@@ -39,7 +39,7 @@ TXT
 )]
 final class PullTransifexCommand extends Command
 {
-    public const NAME = 'mautic:transifex:pull';
+    public const string NAME = 'mautic:transifex:pull';
 
     public function __construct(
         private readonly TransifexFactory $transifexFactory,

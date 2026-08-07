@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 final class AssetsSubscriberTest extends TestCase
 {
-    private const ASSET_SUBDIR = 'plugins/GrapesJsBuilderBundle/Assets/library/js/dist';
+    private const string ASSET_SUBDIR = 'plugins/GrapesJsBuilderBundle/Assets/library/js/dist';
 
     private MockObject&CustomAssetsEvent $assetsEvent;
 

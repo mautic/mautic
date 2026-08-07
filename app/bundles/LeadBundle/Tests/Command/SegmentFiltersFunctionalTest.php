@@ -18,7 +18,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 final class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
 {
-    private const FIELD_NAME = 'car';
+    private const string FIELD_NAME = 'car';
 
     protected $useCleanupRollback = false;
 

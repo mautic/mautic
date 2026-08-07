@@ -16,7 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 )]
 final class RemoveCommand extends Command
 {
-    public const NAME = 'mautic:marketplace:remove';
+    public const string NAME = 'mautic:marketplace:remove';
 
     public function __construct(
         private readonly ComposerHelper $composer,

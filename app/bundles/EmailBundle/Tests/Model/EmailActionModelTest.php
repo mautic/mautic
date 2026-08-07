@@ -15,9 +15,9 @@ use PHPUnit\Framework\TestCase;
 
 final class EmailActionModelTest extends TestCase
 {
-    public const NEW_CATEGORY_TITLE = 'New category';
+    public const string NEW_CATEGORY_TITLE = 'New category';
 
-    public const OLD_CATEGORY_TITLE = 'Old category';
+    public const string OLD_CATEGORY_TITLE = 'Old category';
 
     /**
      * @var MockObject&EmailModel

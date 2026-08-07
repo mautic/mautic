@@ -6,7 +6,7 @@ namespace Mautic\CoreBundle\Helper;
 
 final class PrivateAddressChecker
 {
-    private const PRIVATE_IP_RANGES = [
+    private const array PRIVATE_IP_RANGES = [
         '10.0.0.0/8',      // RFC1918
         '172.16.0.0/12',   // RFC1918
         '192.168.0.0/16',  // RFC1918

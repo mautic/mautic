@@ -12,18 +12,14 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 final class GeneratedColumnsProvider implements GeneratedColumnsProviderInterface
 {
     /**
-     * @var string
-     *
      * @see https://dev.mysql.com/doc/refman/5.7/en/innodb-foreign-key-constraints.html#innodb-foreign-key-generated-columns
      */
-    public const MYSQL_MINIMUM_VERSION = '5.7.14';
+    public const string MYSQL_MINIMUM_VERSION = '5.7.14';
 
     /**
-     * @var string
-     *
      * @see https://mariadb.com/kb/en/library/generated-columns
      */
-    public const MARIADB_MINIMUM_VERSION = '10.2.6';
+    public const string MARIADB_MINIMUM_VERSION = '10.2.6';
 
     private GeneratedColumns $generatedColumns;
 

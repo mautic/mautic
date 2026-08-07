@@ -18,7 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 )]
 final readonly class DeleteCompanyLeads
 {
-    public const COMMAND_NAME = 'mautic:company:delete_company_leads';
+    public const string COMMAND_NAME = 'mautic:company:delete_company_leads';
 
     public function __construct(
         private CompanyLeadRepository $companyLeadRepository,
