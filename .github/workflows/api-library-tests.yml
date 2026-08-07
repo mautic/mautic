@@ -19,7 +19,7 @@ permissions:
 
 jobs:
   api-library:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     name: PHPUnit (api-library)
 
     services:
@@ -59,16 +59,16 @@ jobs:
 
     - name: Install Apache
       # Apache serves Mautic over HTTP so the api-library tests can hit a live instance.
-      # The mod-php version below must exist in the ubuntu-24.04 image; keep it in sync
+      # The mod-php version below must exist in the ubuntu-26.04 image; keep it in sync
       # with the range in app/release_metadata.json.
       run: |
         sudo apt-get update -o Acquire::Retries=3
-        sudo apt-get install -y --no-install-recommends apache2 libapache2-mod-php8.4
+        sudo apt-get install -y --no-install-recommends apache2 libapache2-mod-php8.5
 
         sudo a2enmod rewrite
-        sudo sed -i 's,^session.save_handler =.*$,session.save_handler = redis,' /etc/php/8.4/apache2/php.ini
-        sudo sed -i 's,^;session.save_path =.*$,session.save_path = "tcp://127.0.0.1:6379",' /etc/php/8.4/apache2/php.ini
-        sudo sed -i 's,^memory_limit =.*$,memory_limit = 256M,' /etc/php/8.4/apache2/php.ini
+        sudo sed -i 's,^session.save_handler =.*$,session.save_handler = redis,' /etc/php/8.5/apache2/php.ini
+        sudo sed -i 's,^;session.save_path =.*$,session.save_path = "tcp://127.0.0.1:6379",' /etc/php/8.5/apache2/php.ini
+        sudo sed -i 's,^memory_limit =.*$,memory_limit = 256M,' /etc/php/8.5/apache2/php.ini
         sudo service apache2 restart
 
     - name: Clone mautic/api-library
