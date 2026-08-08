@@ -25,21 +25,6 @@ return RectorConfig::configure()
     )
     ->withPhpSets(php84: true)
     ->withCache(__DIR__.'/var/cache/rector')
-    ->withTypeGuardedClasses([
-        // common controllers
-        Mautic\CoreBundle\Controller\AbstractStandardFormController::class,
-        Mautic\CoreBundle\Controller\CommonController::class,
-        Mautic\CoreBundle\Controller\AbstractFormController::class,
-        Mautic\ApiBundle\Controller\CommonApiController::class,
-        Mautic\ApiBundle\Controller\FetchCommonApiController::class,
-        Mautic\PluginBundle\Integration\AbstractIntegration::class,
-        Mautic\LeadBundle\Controller\Api\CustomFieldsApiControllerTrait::class,
-        // other objects
-        CommonRepository::class,
-        Mautic\CoreBundle\Security\Permissions\AbstractPermissions::class,
-        MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration::class,
-        Mautic\PluginBundle\Integration\AbstractIntegration::class,
-    ])
     ->withRules([
         Rector\PHPUnit\CodeQuality\Rector\ClassMethod\AssertClassToThisAssertRector::class,
         Rector\TypeDeclarationDocblocks\Rector\Property\MergePhpstanDocTagIntoNativeRector::class,
