@@ -117,12 +117,53 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->onReportGenerate($event);
 
         $sql = $this->queryBuilder->getSQL();
-        $leadsJoinPosition = strpos($sql, MAUTIC_TABLE_PREFIX.'leads l');
-        $segmentJoinPosition = strpos($sql, MAUTIC_TABLE_PREFIX.'lead_lists_leads s');
 
-        $this->assertNotFalse($leadsJoinPosition);
-        $this->assertNotFalse($segmentJoinPosition);
-        $this->assertLessThan($segmentJoinPosition, $leadsJoinPosition);
+        $this->assertStringContainsString(MAUTIC_TABLE_PREFIX.'lead_lists_leads s', $sql);
+        $this->assertMatchesRegularExpression(
+            '/JOIN '.preg_quote(MAUTIC_TABLE_PREFIX, '/').'lead_lists_leads s ON s\.lead_id = es\.lead_id/i',
+            $sql
+        );
+        // Contact columns still get the leads join; segment membership must not depend on it.
+        $this->assertStringContainsString(MAUTIC_TABLE_PREFIX.'leads l', $sql);
+    }
+
+    public function testOnReportGenerateForEmailStatsSegmentFilterWithoutContactColumns(): void
+    {
+        $this->report->expects($this->once())
+            ->method('getSource')
+            ->willReturn(ReportSubscriber::CONTEXT_EMAIL_STATS);
+
+        $this->report
+            ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
+            ->willReturn(['es.date_sent']);
+
+        $this->report
+            ->method('getFilters')
+            ->willReturn([
+                [
+                    'column'    => 's.leadlist_id',
+                    'glue'      => 'and',
+                    'condition' => 'eq',
+                    'value'     => '1',
+                ],
+            ]);
+
+        $event = new ReportGeneratorEvent(
+            $this->report,
+            [],
+            $this->queryBuilder,
+            $this->channelListHelper
+        );
+
+        $this->subscriber->onReportGenerate($event);
+
+        $sql = $this->queryBuilder->getSQL();
+
+        $this->assertMatchesRegularExpression(
+            '/JOIN '.preg_quote(MAUTIC_TABLE_PREFIX, '/').'lead_lists_leads s ON s\.lead_id = es\.lead_id/i',
+            $sql
+        );
+        $this->assertStringNotContainsString(MAUTIC_TABLE_PREFIX.'leads l', $sql);
     }
 
     public function testOnReportGenerateForEmailStatsWhenDncIsUsed(): void
