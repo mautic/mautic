@@ -171,8 +171,12 @@ final class AssetExtension extends AbstractExtension
      * @param array<string> $protocols
      * @param array<mixed>  $attributes
      */
-    public function makeLinks(string $text, array $protocols = ['http', 'mail'], array $attributes = []): string
+    public function makeLinks(?string $text, array $protocols = ['http', 'mail'], array $attributes = []): string
     {
-        return $this->assetsHelper->makeLinks($text, $protocols, $attributes);
+        if (null === $text) {
+            return '';
+        }
+
+        return $this->assetsHelper->makeLinks($text, $protocols, $attributes) ?? '';
     }
 }
