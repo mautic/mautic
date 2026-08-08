@@ -401,7 +401,7 @@ final class CampaignApiController extends CommonApiController
     /**
      * Get a list of events.
      */
-    public function exportCampaignAction(Request $request, int $campaignId): Response
+    public function exportCampaignAction(int $campaignId): Response
     {
         // Check if the campaign exists
         $campaign = $this->model->getEntity($campaignId);

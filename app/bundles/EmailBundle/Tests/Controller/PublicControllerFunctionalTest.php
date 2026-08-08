@@ -120,7 +120,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $entity = self::getContainer()->get(PageRepository::class)->getEntity($stat->getEmail()->getPreferenceCenter()->getId());
-        $this->assertSame(1, $entity->getHits(), $this->client->getResponse()->getContent());
+        $this->assertSame(1, $entity->getHits(), (string) $this->client->getResponse()->getContent());
     }
 
     public function testContactPreferencesSaveMessage(): void

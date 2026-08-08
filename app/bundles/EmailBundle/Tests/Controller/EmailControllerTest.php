@@ -159,7 +159,7 @@ final class EmailControllerTest extends TestCase
             ->willReturn($this->sessionMock);
         $this->requestStack->push($request);
         $response = $this->controller->sendAction($request, 5);
-        $this->assertSame(\Symfony\Component\HttpFoundation\Response::HTTP_FOUND, $response->getStatusCode());
+        $this->assertSame(\Symfony\Component\HttpFoundation\Response::HTTP_FOUND, $response->getStatusCode(), (string) $response->getContent());
     }
 
     public function testSendActionWhenEntityFoundButNotPublished(): void
@@ -191,7 +191,7 @@ final class EmailControllerTest extends TestCase
             ->willReturn($this->sessionMock);
         $this->requestStack->push($request);
         $response = $this->controller->sendAction($request, 5);
-        $this->assertSame(\Symfony\Component\HttpFoundation\Response::HTTP_FOUND, $response->getStatusCode());
+        $this->assertSame(\Symfony\Component\HttpFoundation\Response::HTTP_FOUND, $response->getStatusCode(), (string) $response->getContent());
     }
 
     public function testThatExampleEmailsHaveTestStringInTheirSubject(): void

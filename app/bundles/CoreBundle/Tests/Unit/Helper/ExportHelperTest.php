@@ -89,7 +89,7 @@ final class ExportHelperTest extends TestCase
 
         $response = $this->exportHelper->downloadAsZip($zipFilePath, 'exported.zip');
 
-        $this->assertSame(\Symfony\Component\HttpFoundation\Response::HTTP_OK, $response->getStatusCode());
+        $this->assertSame(\Symfony\Component\HttpFoundation\Response::HTTP_OK, $response->getStatusCode(), (string) $response->getContent());
         $this->assertSame('application/zip', $response->headers->get('Content-Type'));
         $this->assertSame('attachment; filename="exported.zip"', $response->headers->get('Content-Disposition'));
     }
@@ -177,7 +177,7 @@ final class ExportHelperTest extends TestCase
     {
         $stream = $this->exportHelper->exportDataAs($this->dummyData, ExportHelper::EXPORT_TYPE_CSV, 'demo-file.csv');
 
-        $this->assertSame(\Symfony\Component\HttpFoundation\Response::HTTP_OK, $stream->getStatusCode());
+        $this->assertSame(\Symfony\Component\HttpFoundation\Response::HTTP_OK, $stream->getStatusCode(), (string) $stream->getContent());
         $this->assertFalse($stream->isEmpty());
 
         ob_start();
@@ -199,7 +199,7 @@ final class ExportHelperTest extends TestCase
     {
         $stream = $this->exportHelper->exportDataAs($this->dummyData, ExportHelper::EXPORT_TYPE_EXCEL, 'demo-file.xlsx');
 
-        $this->assertSame(\Symfony\Component\HttpFoundation\Response::HTTP_OK, $stream->getStatusCode());
+        $this->assertSame(\Symfony\Component\HttpFoundation\Response::HTTP_OK, $stream->getStatusCode(), (string) $stream->getContent());
         $this->assertFalse($stream->isEmpty());
 
         ob_start();
@@ -274,7 +274,7 @@ final class ExportHelperTest extends TestCase
     public function testExportDataAsExcel(): void
     {
         $stream = $this->exportHelper->exportDataAs($this->dummyData, ExportHelper::EXPORT_TYPE_EXCEL, 'demo.xlsx');
-        $this->assertSame(\Symfony\Component\HttpFoundation\Response::HTTP_OK, $stream->getStatusCode());
+        $this->assertSame(\Symfony\Component\HttpFoundation\Response::HTTP_OK, $stream->getStatusCode(), (string) $stream->getContent());
         $this->assertFalse($stream->isEmpty());
 
         ob_start();

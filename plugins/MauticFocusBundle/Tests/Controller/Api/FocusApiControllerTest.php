@@ -59,6 +59,6 @@ final class FocusApiControllerTest extends MauticMysqlTestCase
         $createdItem = json_decode($response->getContent(), true)['focus'];
 
         $this->assertNotEmpty($createdItem['id'], $response->getContent());
-        $this->assertSame($this->testPayload['name'], $createdItem['name'], $response->getContent());
+        $this->assertSame($this->testPayload['name'], $createdItem['name'], (string) $response->getContent());
     }
 }

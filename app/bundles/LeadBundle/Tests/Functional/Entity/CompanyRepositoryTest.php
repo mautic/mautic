@@ -176,6 +176,6 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
             'success'          => 1,
             'sentCount'        => 1,
             'failedRecipients' => 0,
-        ], $clientResponse->getContent());
+        ], (string) $clientResponse->getContent());
     }
 }

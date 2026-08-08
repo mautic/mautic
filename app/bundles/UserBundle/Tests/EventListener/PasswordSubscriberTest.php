@@ -10,6 +10,7 @@ use Mautic\UserBundle\Exception\WeakPasswordException;
 use Mautic\UserBundle\Model\PasswordStrengthEstimatorModel;
 use Mautic\UserBundle\Security\Authentication\Token\PluginToken;
 use Mautic\UserBundle\Security\Authenticator\Passport\Badge\PasswordStrengthBadge;
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
@@ -58,6 +59,7 @@ final class PasswordSubscriberTest extends TestCase
         );
     }
 
+    #[DoesNotPerformAssertions]
     public function testThatItDoesntThrowExceptionIfPasswordIsStrong(): void
     {
         $passwordStrengthBadge = new PasswordStrengthBadge(uniqid('password_strength', true));
@@ -72,7 +74,5 @@ final class PasswordSubscriberTest extends TestCase
                 )
             )
         );
-
-        $this->addToAssertionCount(1); // Verify that no exception is thrown
     }
 }

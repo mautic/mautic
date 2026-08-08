@@ -128,7 +128,7 @@ final class WebhookControllerTest extends TestCase
         $testResponse = $controller->sendHookTestAction($request, $client, $pathsHelper);
         // If you encounter errors here, please check \Mautic\WebhookBundle\Controller\AjaxController::processWebhookTest
         // or inside the Client mock.
-        $this->assertSame(Response::HTTP_OK, $testResponse->getStatusCode());
+        $this->assertSame(Response::HTTP_OK, $testResponse->getStatusCode(), (string) $testResponse->getContent());
 
         $changes = ['dateIdentified' => $isNew];
 

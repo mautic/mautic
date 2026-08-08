@@ -83,7 +83,7 @@ final class SamlTest extends MauticMysqlTestCase
         ]);
         $this->client->submit($configForm);
         $clientResponse = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), (string) $clientResponse->getContent());
         $content = $clientResponse->getContent();
         $this->assertNotFalse($content);
         $this->assertStringContainsString('Configuration successfully updated', $content);
@@ -174,7 +174,7 @@ final class SamlTest extends MauticMysqlTestCase
 
         $this->client->followRedirect();
         $clientResponse = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), (string) $clientResponse->getContent());
         $content = $clientResponse->getContent();
         $this->assertNotFalse($content);
         $this->assertStringContainsString('user1@example.com user1@example.com', $content);

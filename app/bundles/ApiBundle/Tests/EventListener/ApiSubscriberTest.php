@@ -83,7 +83,7 @@ final class ApiSubscriberTest extends CommonMocks
             ->with($this->isInstanceOf(JsonResponse::class))
             ->willReturnCallback(
                 function (JsonResponse $response): void {
-                    $this->assertSame(\Symfony\Component\HttpFoundation\Response::HTTP_FORBIDDEN, $response->getStatusCode());
+                    $this->assertSame(\Symfony\Component\HttpFoundation\Response::HTTP_FORBIDDEN, $response->getStatusCode(), (string) $response->getContent());
                 }
             );
 
