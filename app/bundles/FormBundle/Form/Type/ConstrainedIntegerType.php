@@ -23,7 +23,8 @@ final class ConstrainedIntegerType extends IntegerType
             if (!is_array($constraints)) {
                 return false;
             }
-            return array_all($constraints, fn($constraint) => $constraint instanceof Constraint);
+
+            return array_all($constraints, fn ($constraint) => $constraint instanceof Constraint);
         });
     }
 }
