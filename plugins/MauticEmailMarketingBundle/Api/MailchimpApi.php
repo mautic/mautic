@@ -42,9 +42,9 @@ final class MailchimpApi extends EmailMarketingApi
                 $errors[] = $error['message'];
             }
             throw new ApiErrorException(implode(' ', $errors));
-        } else {
-            return $response;
         }
+
+        return $response;
     }
 
     public function getLists()

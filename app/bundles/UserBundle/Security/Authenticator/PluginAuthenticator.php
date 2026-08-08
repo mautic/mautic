@@ -180,7 +180,7 @@ final class PluginAuthenticator extends AbstractAuthenticator
 
         $response = null;
         if (null === $token->getResponse()) {
-            $response = $this->authenticationHandler->onAuthenticationSuccess($request, $token);
+            return $this->authenticationHandler->onAuthenticationSuccess($request, $token);
         }
 
         return $response;

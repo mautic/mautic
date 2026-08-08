@@ -85,7 +85,7 @@ final class EmojiHelper
 
         if ('emoji' !== $to) {
             // Parse out missed emojis
-            $text = self::removeEmoji($text);
+            return self::removeEmoji($text);
         }
 
         return $text;

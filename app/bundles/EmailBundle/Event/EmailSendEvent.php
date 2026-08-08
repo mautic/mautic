@@ -253,7 +253,7 @@ class EmailSendEvent extends CommonEvent
         $tokens = $this->tokens;
 
         if ($includeGlobal && null !== $this->helper) {
-            $tokens = array_merge($this->helper->getGlobalTokens(), $tokens);
+            return array_merge($this->helper->getGlobalTokens(), $tokens);
         }
 
         return $tokens;

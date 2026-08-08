@@ -121,12 +121,10 @@ final class NotificationModel extends FormModel implements AjaxLookupModelInterf
     public function getEntity($id = null): ?Notification
     {
         if (null === $id) {
-            $entity = new Notification();
-        } else {
-            $entity = parent::getEntity($id);
+            return new Notification();
         }
 
-        return $entity;
+        return parent::getEntity($id);
     }
 
     public function saveEntity($entity, $unlock = true): void

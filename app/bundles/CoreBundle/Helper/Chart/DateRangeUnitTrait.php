@@ -33,7 +33,7 @@ trait DateRangeUnitTrait
             $unit = 'm';
         }
         if ($dayDiff > 1000) {
-            $unit = 'Y';
+            return 'Y';
         }
 
         return $unit;

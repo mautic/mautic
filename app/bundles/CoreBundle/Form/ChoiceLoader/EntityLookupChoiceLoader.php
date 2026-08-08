@@ -137,7 +137,7 @@ final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         array_multisort($prepped_keys, SORT_NATURAL | SORT_FLAG_CASE, $prepped);
 
         if ($includeNew && $modalRoute) {
-            $prepped = array_replace([$this->translator->trans('mautic.core.createnew') => 'new'], $prepped);
+            return array_replace([$this->translator->trans('mautic.core.createnew') => 'new'], $prepped);
         }
 
         return $prepped;

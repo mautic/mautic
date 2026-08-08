@@ -326,12 +326,10 @@ class AssetModel extends FormModel implements GlobalSearchInterface
     public function getEntity($id = null): ?Asset
     {
         if (null === $id) {
-            $entity = new Asset();
-        } else {
-            $entity = parent::getEntity($id);
+            return new Asset();
         }
 
-        return $entity;
+        return parent::getEntity($id);
     }
 
     /**
@@ -476,7 +474,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         $size = $this->assetRepository->getAssetSize($assets);
 
         if ($size) {
-            $size = Asset::convertBytesToHumanReadable($size);
+            return Asset::convertBytesToHumanReadable($size);
         }
 
         return $size;

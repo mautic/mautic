@@ -486,7 +486,7 @@ class FormModel extends AbstractCommonModel
         $reservedWords    = $databasePlatform->getReservedKeywordsList();
 
         if ($reservedWords->isKeyword($alias) || is_numeric($alias)) {
-            $alias = $prefix.$alias;
+            return $prefix.$alias;
         }
 
         return $alias;

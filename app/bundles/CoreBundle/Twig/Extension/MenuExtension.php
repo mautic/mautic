@@ -74,7 +74,7 @@ final class MenuExtension extends AbstractExtension
         $classes .= ($item->actsLikeLast() && isset($options['lastClass'])) ? " {$options['lastClass']}" : '';
 
         if ('' !== $classes) {
-            $classesArray = ['class' => trim($classes)];
+            return ['class' => trim($classes)];
         }
 
         return $classesArray;

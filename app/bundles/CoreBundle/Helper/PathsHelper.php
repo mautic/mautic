@@ -231,7 +231,7 @@ class PathsHelper
     private function removeTrailingSlash(string $dir): string
     {
         if (str_ends_with($dir, '/')) {
-            $dir = substr($dir, 0, -1);
+            return substr($dir, 0, -1);
         }
 
         return $dir;

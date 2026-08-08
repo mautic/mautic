@@ -106,7 +106,7 @@ class TrackableModel extends AbstractCommonModel
         }
 
         if ($shortenUrl) {
-            $trackedUrl = $this->redirectModel->shortenUrl($trackedUrl);
+            return $this->redirectModel->shortenUrl($trackedUrl);
         }
 
         return $trackedUrl;
@@ -331,20 +331,16 @@ class TrackableModel extends AbstractCommonModel
 
     /**
      * @phpstan-impure
-     *
-     * @return array
      */
-    protected function extractTrackablesFromContent($content)
+    protected function extractTrackablesFromContent($content): array
     {
         if (0 !== preg_match('/<[^<]+>/', $content)) {
             // Parse as HTML
-            $trackableUrls = $this->extractTrackablesFromHtml($content);
-        } else {
-            // Parse as plain text
-            $trackableUrls = $this->extractTrackablesFromText($content);
+            return $this->extractTrackablesFromHtml($content);
         }
 
-        return $trackableUrls;
+        // Parse as plain text
+        return $this->extractTrackablesFromText($content);
     }
 
     /**

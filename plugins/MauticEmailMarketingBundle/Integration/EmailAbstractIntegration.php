@@ -89,7 +89,7 @@ abstract class EmailAbstractIntegration extends AbstractIntegration
         }
 
         if (empty($config['integration']) || (!empty($config['integration']) && $config['integration'] == $this->getName())) {
-            $featureSettings = array_merge($featureSettings, $config['config']);
+            return array_merge($featureSettings, $config['config']);
         }
 
         return $featureSettings;
