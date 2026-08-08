@@ -1257,11 +1257,24 @@ class MailHelper
         if (empty($customHtml) && $template) {
             $logicalName = $this->themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
 
-            $customHtml = $this->themeHelper->renderThemeTemplate($logicalName, [
+            $renderedHtml = $this->themeHelper->renderThemeTemplate($logicalName, [
                 'content'  => $email->getContent(),
                 'email'    => $email,
                 'template' => $template,
             ]);
+
+            // Bundled themes since Mautic 5 are MJML. GrapesJS compiles them into
+            // customHtml client-side; sending the raw theme template as text/html
+            // delivers uncompiled <mjml> markup to recipients.
+            if (str_contains((string) $renderedHtml, '<mjml>')) {
+                $this->logger->warning(sprintf(
+                    'Email%s uses MJML theme "%s" with empty customHtml; skipping theme HTML fallback to avoid sending uncompiled MJML.',
+                    null !== $email->getId() ? ' ID '.$email->getId() : '',
+                    $template
+                ));
+            } else {
+                $customHtml = $renderedHtml;
+            }
         }
 
         $this->setBody($customHtml, 'text/html', null, $ignoreTrackingPixel);
