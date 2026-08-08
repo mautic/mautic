@@ -32,6 +32,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class UserModelTest extends TestCase
 {
     private UserModel $userModel;

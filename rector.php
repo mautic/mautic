@@ -76,6 +76,8 @@ return RectorConfig::configure()
         ],
 
         // handle next
+        \Rector\PHPUnit\PHPUnit120\Rector\Class_\AllowMockObjectsWithoutExpectationsAttributeRector::class,
+
         Rector\EarlyReturn\Rector\Return_\PreparedValueToEarlyReturnRector::class,
         Rector\EarlyReturn\Rector\StmtsAwareInterface\ReturnEarlyIfVariableRector::class,
         Rector\Symfony\CodeQuality\Rector\Class_\LoadValidatorMetadataToAttributeRector::class,

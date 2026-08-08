@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class ButtonSubscriberTest extends TestCase
 {
     private MockObject&IntegrationsHelper $integrationsHelper;

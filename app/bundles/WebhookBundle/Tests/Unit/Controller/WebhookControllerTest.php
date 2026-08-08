@@ -44,6 +44,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class WebhookControllerTest extends TestCase
 {
     #[DataProvider('provideNewOrUpdate')]

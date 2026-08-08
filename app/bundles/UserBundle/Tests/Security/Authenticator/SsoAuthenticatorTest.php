@@ -30,6 +30,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordC
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class SsoAuthenticatorTest extends TestCase
 {
     #[DataProvider('provideIsPost')]

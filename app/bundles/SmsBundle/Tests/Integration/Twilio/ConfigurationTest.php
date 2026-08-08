@@ -11,6 +11,7 @@ use Mautic\SmsBundle\Integration\Twilio\Configuration;
 use PHPUnit\Framework\MockObject\MockObject;
 use Twilio\Exceptions\ConfigurationException;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     private MockObject&IntegrationHelper $integrationHelper;
