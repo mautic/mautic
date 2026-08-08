@@ -430,9 +430,9 @@ class ThemeHelper implements ThemeHelperInterface
                 }
             }
 
-            $this->sandboxEnv->addRuntimeLoader(new class($this->twig) implements RuntimeLoaderInterface {
+            $this->sandboxEnv->addRuntimeLoader(new readonly class($this->twig) implements RuntimeLoaderInterface {
                 public function __construct(
-                    private readonly Environment $twig,
+                    private Environment $twig,
                 ) {
                 }
 

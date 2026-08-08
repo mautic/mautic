@@ -21,7 +21,7 @@ return RectorConfig::configure()
         privatization: true,
         codeQuality: true,
     )
-    // ->withPhpSets(php82: true)
+    ->withPhpLevel(120)
     ->withCache(__DIR__.'/var/cache/rector')
     ->withTypeGuardedClasses([
         // common controllers
@@ -39,8 +39,6 @@ return RectorConfig::configure()
         Mautic\PluginBundle\Integration\AbstractIntegration::class,
     ])
     ->withRules([
-        Rector\TypeDeclaration\Rector\StmtsAwareInterface\SafeDeclareStrictTypesRector::class,
-
         Rector\PHPUnit\CodeQuality\Rector\ClassMethod\AssertClassToThisAssertRector::class,
         Rector\TypeDeclarationDocblocks\Rector\Property\MergePhpstanDocTagIntoNativeRector::class,
 
@@ -57,9 +55,10 @@ return RectorConfig::configure()
         // @todo move to "twig" group
         Rector\Symfony\Symfony73\Rector\Class_\GetFiltersToAsTwigFilterAttributeRector::class,
         Rector\Symfony\Symfony73\Rector\Class_\GetFunctionsToAsTwigFunctionAttributeRector::class,
-
-        // is deprecated, messy code
-        Rector\Strict\Rector\Empty_\DisallowedEmptyRuleFixerRector::class,
+        Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector::class,
+        Rector\EarlyReturn\Rector\If_\ChangeIfElseValueAssignToEarlyReturnRector::class,
+        Rector\EarlyReturn\Rector\If_\RemoveAlwaysElseRector::class,
+        Rector\PHPUnit\PHPUnit60\Rector\ClassMethod\AddDoesNotPerformAssertionToNonAssertingTestRector::class,
 
         // intentional parent property assign override
         Rector\CodeQuality\Rector\Class_\InlineConstructorDefaultToPropertyRector::class => [
@@ -67,10 +66,16 @@ return RectorConfig::configure()
         ],
 
         // handle next
+        Rector\EarlyReturn\Rector\Return_\PreparedValueToEarlyReturnRector::class,
+        Rector\EarlyReturn\Rector\StmtsAwareInterface\ReturnEarlyIfVariableRector::class,
         Rector\Symfony\CodeQuality\Rector\Class_\LoadValidatorMetadataToAttributeRector::class,
         Rector\TypeDeclaration\Rector\StmtsAwareInterface\SafeDeclareStrictTypesRector::class,
         Utils\Rector\ModelGetRepositoryToRepositoryServiceRector::class => [
             __DIR__.'/app/bundles/PageBundle/Form/Type/PreferenceCenterListType.php',
+        ],
+
+        Rector\TypeDeclaration\Rector\ClassMethod\AddParamTypeDeclarationRector::class => [
+            __DIR__.'/app/bundles/LeadBundle/Tests/Form/Type/FilterTypeTest.php',
         ],
 
         // preference to compare null over object
@@ -80,8 +85,6 @@ return RectorConfig::configure()
             // doctrine magic
             __DIR__.'/app/bundles/CoreBundle/EventListener/DoctrineEventsSubscriber.php',
         ],
-
-        Rector\Symfony\Symfony30\Rector\ClassMethod\RemoveDefaultGetBlockPrefixRector::class,
 
         // test fixtures
         __DIR__.'/plugins/*/node_modules/*',

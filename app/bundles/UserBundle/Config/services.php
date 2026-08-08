@@ -101,7 +101,7 @@ return function (ContainerConfigurator $configurator): void {
         ->args([Mautic\UserBundle\Entity\Permission::class]);
     $services->alias(Doctrine\ORM\EntityManager::class, 'mautic.permission.manager');
     $services->set('mautic.security.saml.entity_descriptor_provider', LightSaml\Builder\EntityDescriptor\SimpleEntityDescriptorBuilder::class)
-        ->factory([Mautic\UserBundle\Security\SAML\EntityDescriptorProviderFactory::class, 'build'])
+        ->factory(Mautic\UserBundle\Security\SAML\EntityDescriptorProviderFactory::build(...))
         ->args([param('lightsaml.own.entity_id'), service('router'), param('lightsaml.route.login_check'), service('lightsaml.own.credential_store')]);
     $services->alias(LightSaml\Builder\EntityDescriptor\SimpleEntityDescriptorBuilder::class, 'mautic.security.saml.entity_descriptor_provider');
     $services->set('mautic.user.fixture.role', Mautic\UserBundle\DataFixtures\ORM\LoadRoleData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
