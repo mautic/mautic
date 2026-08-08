@@ -86,6 +86,45 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->queryBuilder       = new QueryBuilder($this->connectionMock);
     }
 
+    public function testOnReportGenerateForEmailStatsWhenSegmentFilterIsUsed(): void
+    {
+        $this->report->expects($this->once())
+            ->method('getSource')
+            ->willReturn(ReportSubscriber::CONTEXT_EMAIL_STATS);
+
+        $this->report
+            ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
+            ->willReturn(['l.firstname']);
+
+        $this->report
+            ->method('getFilters')
+            ->willReturn([
+                [
+                    'column'    => 's.leadlist_id',
+                    'glue'      => 'and',
+                    'condition' => 'eq',
+                    'value'     => '1',
+                ],
+            ]);
+
+        $event = new ReportGeneratorEvent(
+            $this->report,
+            [],
+            $this->queryBuilder,
+            $this->channelListHelper
+        );
+
+        $this->subscriber->onReportGenerate($event);
+
+        $sql = $this->queryBuilder->getSQL();
+        $leadsJoinPosition = strpos($sql, MAUTIC_TABLE_PREFIX.'leads l');
+        $segmentJoinPosition = strpos($sql, MAUTIC_TABLE_PREFIX.'lead_lists_leads s');
+
+        $this->assertNotFalse($leadsJoinPosition);
+        $this->assertNotFalse($segmentJoinPosition);
+        $this->assertLessThan($segmentJoinPosition, $leadsJoinPosition);
+    }
+
     public function testOnReportGenerateForEmailStatsWhenDncIsUsed(): void
     {
         $this->report->expects($this->once())
