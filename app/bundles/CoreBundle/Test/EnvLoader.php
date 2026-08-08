@@ -16,6 +16,6 @@ final class EnvLoader
         $reflection     = new \ReflectionClass(Dotenv::class);
         $vendorRootPath = dirname($reflection->getFileName(), 4);
 
-        (new Dotenv())->loadEnv($vendorRootPath.'/.env');
+        new Dotenv()->loadEnv($vendorRootPath.'/.env');
     }
 }

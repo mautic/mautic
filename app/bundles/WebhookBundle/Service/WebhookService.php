@@ -20,7 +20,7 @@ class WebhookService
     {
         $webHookHealthCheckTime = $this->coreParametersHelper->get('webhook_health_check_time', 300);
 
-        return (new \DateTimeImmutable())->modify(sprintf('-%d seconds', $webHookHealthCheckTime));
+        return new \DateTimeImmutable()->modify(sprintf('-%d seconds', $webHookHealthCheckTime));
     }
 
     public function isWebhookHealthy(Webhook $webhook): bool
@@ -52,7 +52,7 @@ class WebhookService
             return false;
         }
         $webhookFailureNotificationTime = $this->coreParametersHelper->get('first_webhook_failure_notification_time', 3600);
-        $healthyWebhookTime             = (new \DateTimeImmutable())->modify(sprintf('-%d seconds', $webhookFailureNotificationTime));
+        $healthyWebhookTime             = new \DateTimeImmutable()->modify(sprintf('-%d seconds', $webhookFailureNotificationTime));
 
         return $webhook->getUnHealthySince() < $healthyWebhookTime;
     }
@@ -63,7 +63,7 @@ class WebhookService
             return true;
         }
         $webhookFailureNotificationInterval = $this->coreParametersHelper->get('webhook_failure_notification_interval', 86400);
-        $healthyWebhookTime                 = (new \DateTimeImmutable())->modify(sprintf('-%d seconds', $webhookFailureNotificationInterval));
+        $healthyWebhookTime                 = new \DateTimeImmutable()->modify(sprintf('-%d seconds', $webhookFailureNotificationInterval));
 
         return $webhook->getLastNotificationSentAt() < $healthyWebhookTime;
     }

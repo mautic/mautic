@@ -120,7 +120,7 @@ final readonly class Calculator
             $yesterday = $today;
         }
 
-        $yesterday = (new \DateTime(CalculatorHelper::getWeekDateString($yesterday)))->modify('+1 week')->format('Y-W');
+        $yesterday = new \DateTime(CalculatorHelper::getWeekDateString($yesterday))->modify('+1 week')->format('Y-W');
 
         if ($this->toDateTime) {
             /** @var \DateTime $tomorrow */

@@ -252,7 +252,7 @@ class SubmissionRepository extends CommonRepository
     public function getFilterExpr($q, array $filter, ?string $unique = null): array
     {
         if ('s.date_submitted' === $filter['column']) {
-            $date       = (new DateTimeHelper($filter['value'], 'Y-m-d'))->toUtcString();
+            $date       = new DateTimeHelper($filter['value'], 'Y-m-d')->toUtcString();
             $date1      = $this->generateRandomParameterName();
             $date2      = $this->generateRandomParameterName();
             $parameters = [$date1 => $date.' 00:00:00', $date2 => $date.' 23:59:59'];

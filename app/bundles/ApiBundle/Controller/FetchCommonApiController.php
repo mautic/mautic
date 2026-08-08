@@ -518,7 +518,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
             if (method_exists($class, 'loadMetadata')) {
                 $class::loadMetadata($classMetdata);
             }
-            $defaultValues += (new \ReflectionClass($class))->getDefaultProperties();
+            $defaultValues += new \ReflectionClass($class)->getDefaultProperties();
         }
 
         // These are the mapped columns

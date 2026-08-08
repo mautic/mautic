@@ -129,7 +129,7 @@ final class ParameterLoader
             return;
         }
 
-        $finder = (new Finder())
+        $finder = new Finder()
             ->files()
             ->followLinks()
             ->depth('== 0')

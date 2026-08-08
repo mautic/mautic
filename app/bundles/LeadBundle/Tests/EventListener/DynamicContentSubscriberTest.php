@@ -47,7 +47,7 @@ final class DynamicContentSubscriberTest extends TestCase
                 'filter'   => null,
             ],
         ];
-        $contact = (new Lead())->setId($contactId);
+        $contact = new Lead()->setId($contactId);
 
         $event = new ContactFiltersEvaluateEvent($filters, $contact);
 
@@ -66,7 +66,7 @@ final class DynamicContentSubscriberTest extends TestCase
                 'filter'   => null,
             ],
         ];
-        $contact = (new Lead())->setId($contactId);
+        $contact = new Lead()->setId($contactId);
 
         $event = new ContactFiltersEvaluateEvent($filters, $contact);
 
@@ -90,7 +90,7 @@ final class DynamicContentSubscriberTest extends TestCase
                 'filter'   => null,
             ],
         ];
-        $contact = (new Lead())->setId($contactId);
+        $contact = new Lead()->setId($contactId);
 
         $event = new ContactFiltersEvaluateEvent($filters, $contact);
 
@@ -114,7 +114,7 @@ final class DynamicContentSubscriberTest extends TestCase
                 'filter'   => ['something'],
             ],
         ];
-        $contact = (new Lead())->setId($contactId);
+        $contact = new Lead()->setId($contactId);
 
         $event = new ContactFiltersEvaluateEvent($filters, $contact);
 
@@ -138,7 +138,7 @@ final class DynamicContentSubscriberTest extends TestCase
                 'filter'   => ['something'],
             ],
         ];
-        $contact = (new Lead())->setId($contactId);
+        $contact = new Lead()->setId($contactId);
 
         $event = new ContactFiltersEvaluateEvent($filters, $contact);
 
@@ -162,7 +162,7 @@ final class DynamicContentSubscriberTest extends TestCase
                 'filter'   => ['something'],
             ],
         ];
-        $contact = (new Lead())->setId($contactId);
+        $contact = new Lead()->setId($contactId);
 
         $event = new ContactFiltersEvaluateEvent($filters, $contact);
 
@@ -186,7 +186,7 @@ final class DynamicContentSubscriberTest extends TestCase
                 'filter'   => ['something'],
             ],
         ];
-        $contact = (new Lead())->setId($contactId);
+        $contact = new Lead()->setId($contactId);
 
         $event = new ContactFiltersEvaluateEvent($filters, $contact);
 

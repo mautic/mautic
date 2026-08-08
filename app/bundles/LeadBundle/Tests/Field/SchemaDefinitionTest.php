@@ -18,7 +18,7 @@ final class SchemaDefinitionTest extends TestCase
     public function testGetSchemaDefinition(string $alias, string $type, bool $isUnique, ?int $length, array $expected): void
     {
         $this->assertSame($expected, SchemaDefinition::getSchemaDefinition($alias, $type, $isUnique, $length));
-        $this->assertSame($expected, (new SchemaDefinition())->getSchemaDefinitionNonStatic($alias, $type, $isUnique, $length));
+        $this->assertSame($expected, new SchemaDefinition()->getSchemaDefinitionNonStatic($alias, $type, $isUnique, $length));
     }
 
     /**

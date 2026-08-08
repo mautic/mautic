@@ -30,9 +30,9 @@ final class PageHitNotificationHandlerTest extends TestCase
         $redirectObject->setRedirectId((string) $redirectId);
 
         [$hitObject, $pageObject, $leadObject] = [
-            (new Hit())->setCode(7),
-            (new Page())->setAlias('james_bond'),
-            (new Lead())->setId($leadId),
+            new Hit()->setCode(7),
+            new Page()->setAlias('james_bond'),
+            new Lead()->setId($leadId),
         ];
 
         $hitRepoMock = $this->createMock(HitRepository::class);

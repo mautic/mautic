@@ -472,7 +472,7 @@ final class SubmissionModel extends CommonFormModel
         $queryArgs['simpleResults']  = true;
         $results                     = $this->getEntities($queryArgs);
 
-        $date = (new DateTimeHelper())->toLocalString();
+        $date = new DateTimeHelper()->toLocalString();
         $name = str_replace(' ', '_', $date).'_'.$form->getAlias();
 
         switch ($format) {
@@ -579,7 +579,7 @@ final class SubmissionModel extends CommonFormModel
         $results    = $this->getEntitiesByPage($queryArgs);
         $results    = $results['results'];
 
-        $date = (new DateTimeHelper())->toLocalString();
+        $date = new DateTimeHelper()->toLocalString();
         $name = str_replace(' ', '_', $date).'_'.$page->getAlias();
 
         switch ($format) {

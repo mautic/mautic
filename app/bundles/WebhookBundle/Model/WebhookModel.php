@@ -532,7 +532,7 @@ class WebhookModel extends FormModel
      */
     public function getWebhookQueues(Webhook $webhook)
     {
-        $webhookRetryTime = (new \DateTimeImmutable())
+        $webhookRetryTime = new \DateTimeImmutable()
             ->modify(sprintf('-%d seconds', $this->webhookRetryDelay))
             ->format(DateTimeHelper::FORMAT_DB);
         $parameters = [

@@ -717,7 +717,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->frequencyRepository->method('getAppliedFrequencyRules')
             ->willReturn([['lead_id' => 1, 'frequency_number' => 1, 'frequency_time' => 'DAY']]);
 
-        $leadEntity = (new Lead())
+        $leadEntity = new Lead()
             ->setEmail('someone@domain.com');
 
         $this->entityManager

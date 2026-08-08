@@ -512,7 +512,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
             return false;
         }
 
-        $aWhileBack = (new \DateTime())->modify('-2 days');
+        $aWhileBack = new \DateTime()->modify('-2 days');
 
         return $dateModified >= $aWhileBack;
     }

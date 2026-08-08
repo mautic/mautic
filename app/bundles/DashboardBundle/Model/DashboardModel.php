@@ -139,7 +139,7 @@ class DashboardModel extends FormModel
             'mautic.dashboard.generated_by',
             [
                 '%name%' => $this->userHelper->getUser()->getName(),
-                '%date%' => (new \DateTime())->format('Y-m-d H:i:s'),
+                '%date%' => new \DateTime()->format('Y-m-d H:i:s'),
             ]
         );
     }

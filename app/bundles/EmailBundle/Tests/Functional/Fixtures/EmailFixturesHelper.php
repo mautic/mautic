@@ -32,7 +32,7 @@ final readonly class EmailFixturesHelper
         string $customHtml = 'Test Html',
         array $segments = [],
     ): Email {
-        $email = (new Email())
+        $email = new Email()
             ->setName($name)
             ->setSubject($subject)
             ->setEmailType($emailType)

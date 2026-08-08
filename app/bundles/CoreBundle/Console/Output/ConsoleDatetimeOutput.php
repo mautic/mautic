@@ -16,7 +16,7 @@ final class ConsoleDatetimeOutput extends ConsoleOutput implements ConsoleOutput
      */
     protected function doWrite(string $message, bool $newline): void
     {
-        $date = (new \DateTime())->format('Y-m-d H:i:s');
+        $date = new \DateTime()->format('Y-m-d H:i:s');
 
         if (!empty($message)) {
             $message = sprintf('[%s] %s', $date, $message);

@@ -1878,7 +1878,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
         $q                     = $query->prepareTimeDataQuery('email_stats', $column, $filter);
         $columnWithTimezone    = 't.'.$column;
-        $defaultTimezoneOffset = (new DateTimeHelper())->getLocalTimezoneOffset();
+        $defaultTimezoneOffset = new DateTimeHelper()->getLocalTimezoneOffset();
         $columnName            = "CONVERT_TZ({$columnWithTimezone}, '+00:00', '{$defaultTimezoneOffset}')";
         $q->select('CONCAT(TIME_FORMAT('.$columnName.', \''.$format.'\'),\'-\',TIME_FORMAT('.$columnName.' + INTERVAL 1 HOUR, \''.$format.'\'),\'\') as hour, COUNT(t.id) AS count')
         ->groupBy('hour')

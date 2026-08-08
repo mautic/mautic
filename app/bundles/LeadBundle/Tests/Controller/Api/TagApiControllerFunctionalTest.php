@@ -123,8 +123,8 @@ final class TagApiControllerFunctionalTest extends MauticMysqlTestCase
         $tagRepository = $this->em->getRepository(Tag::class);
         $this->assertInstanceOf(TagRepository::class, $tagRepository);
 
-        $matchingTag = (new Tag('alpha_tag'))->setDescription('Contains the test keyword.');
-        $otherTag    = (new Tag('beta_tag'))->setDescription('No relevant text here.');
+        $matchingTag = new Tag('alpha_tag')->setDescription('Contains the test keyword.');
+        $otherTag    = new Tag('beta_tag')->setDescription('No relevant text here.');
 
         $tagRepository->saveEntity($matchingTag, false);
         $tagRepository->saveEntity($otherTag);

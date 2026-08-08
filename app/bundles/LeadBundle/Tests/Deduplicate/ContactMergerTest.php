@@ -91,13 +91,13 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
     public function testMergeIpAddresses(): void
     {
         $winner = new Lead();
-        $winner->addIpAddress((new IpAddress('1.2.3.4'))->setIpDetails(['extra' => 'from winner']));
-        $winner->addIpAddress((new IpAddress('4.3.2.1'))->setIpDetails(['extra' => 'from winner']));
-        $winner->addIpAddress((new IpAddress('5.6.7.8'))->setIpDetails(['extra' => 'from winner']));
+        $winner->addIpAddress(new IpAddress('1.2.3.4')->setIpDetails(['extra' => 'from winner']));
+        $winner->addIpAddress(new IpAddress('4.3.2.1')->setIpDetails(['extra' => 'from winner']));
+        $winner->addIpAddress(new IpAddress('5.6.7.8')->setIpDetails(['extra' => 'from winner']));
 
         $loser = new Lead();
-        $loser->addIpAddress((new IpAddress('5.6.7.8'))->setIpDetails(['extra' => 'from loser']));
-        $loser->addIpAddress((new IpAddress('8.7.6.5'))->setIpDetails(['extra' => 'from loser']));
+        $loser->addIpAddress(new IpAddress('5.6.7.8')->setIpDetails(['extra' => 'from loser']));
+        $loser->addIpAddress(new IpAddress('8.7.6.5')->setIpDetails(['extra' => 'from loser']));
 
         $this->getMerger()->mergeIpAddressHistory($winner, $loser);
 

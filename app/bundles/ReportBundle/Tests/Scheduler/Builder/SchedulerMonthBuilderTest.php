@@ -19,7 +19,7 @@ final class SchedulerMonthBuilderTest extends \PHPUnit\Framework\TestCase
 
         $schedulerEntity = new SchedulerEntity(true, SchedulerEnum::UNIT_DAILY, SchedulerEnum::DAY_MO, SchedulerEnum::MONTH_FREQUENCY_FIRST);
 
-        $startDate = (new \DateTime())->setTime(0, 0)->modify('+1 day');
+        $startDate = new \DateTime()->setTime(0, 0)->modify('+1 day');
         $rule      = new Rule();
         $rule->setStartDate($startDate)
             ->setCount(1);

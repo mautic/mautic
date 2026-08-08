@@ -32,7 +32,7 @@ final class PublishState
         // keep previous state
 
         if (isset($auditLog->getDetails()['publishUp'][1])) {
-            $this->publishUp = (new \DateTimeImmutable($auditLog->getDetails()['publishUp'][1]))->setTimezone(new \DateTimeZone('UTC'));
+            $this->publishUp = new \DateTimeImmutable($auditLog->getDetails()['publishUp'][1])->setTimezone(new \DateTimeZone('UTC'));
         }
 
         if ($this->publishUp < $this->dateAdded) {
@@ -40,7 +40,7 @@ final class PublishState
         }
 
         if (isset($auditLog->getDetails()['publishDown'][1])) {
-            $this->publishDown = (new \DateTimeImmutable($auditLog->getDetails()['publishDown'][1]))->setTimezone(new \DateTimeZone('UTC'));
+            $this->publishDown = new \DateTimeImmutable($auditLog->getDetails()['publishDown'][1])->setTimezone(new \DateTimeZone('UTC'));
         }
 
         if ($this->publishDown < $this->dateAdded) {

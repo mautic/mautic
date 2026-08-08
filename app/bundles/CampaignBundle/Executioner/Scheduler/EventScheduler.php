@@ -197,7 +197,7 @@ class EventScheduler
         }
 
         $lastPublishDate   = $this->publishStateService->getLastPublishDate($event->getCampaign());
-        $scheduledInterval = (new DateTimeHelper())->buildInterval($interval, $unit);
+        $scheduledInterval = new DateTimeHelper()->buildInterval($interval, $unit);
 
         if (RepublishBehavior::RESTART_ON_PUBLISH->value === $campaignRepublishBehavior && $lastPublishDate) {
             $lastPublishDatePlusInterval = \DateTimeImmutable::createFromInterface($lastPublishDate)->add($scheduledInterval);
@@ -210,11 +210,11 @@ class EventScheduler
             $unublishedSeconds = $this->publishStateService->getUnublishedSecondsSince($event->getCampaign(), $log->getDateTriggered()); // Date triggered is set to date when the log was created for unexecuted logs.
             $ellapsedSeconds   = $lastPublishDate->getTimestamp() - $log->getDateTriggered()->getTimestamp(); // Seconds since the event log was created and now.
             $publishedSeconds  = $ellapsedSeconds - $unublishedSeconds;
-            $secondsToAdd      = (new DateTimeHelper())->intervalToSeconds($scheduledInterval) - $publishedSeconds;
+            $secondsToAdd      = new DateTimeHelper()->intervalToSeconds($scheduledInterval) - $publishedSeconds;
             $newTriggerDate    = \DateTimeImmutable::createFromInterface($lastPublishDate);
 
             if ($secondsToAdd > 0) {
-                $newTriggerDate = $newTriggerDate->add((new DateTimeHelper())->buildInterval($secondsToAdd, 'S'));
+                $newTriggerDate = $newTriggerDate->add(new DateTimeHelper()->buildInterval($secondsToAdd, 'S'));
             }
 
             $log->setTriggerDate(\DateTime::createFromImmutable($newTriggerDate), 'Campaign republish behavior: count_only_while_published');

@@ -75,7 +75,7 @@ final class UTCDateTimeImmutableTypeTest extends TestCase
 
     private function convertDateTimezone(string $date, string $timezoneFrom, string $timezoneTo): string
     {
-        return (new \DateTimeImmutable($date, new \DateTimeZone($timezoneFrom)))
+        return new \DateTimeImmutable($date, new \DateTimeZone($timezoneFrom))
             ->setTimezone(new \DateTimeZone($timezoneTo))
             ->format(DateTimeHelper::FORMAT_DB);
     }

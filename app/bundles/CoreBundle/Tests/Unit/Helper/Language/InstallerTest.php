@@ -56,6 +56,6 @@ final class InstallerTest extends \PHPUnit\Framework\TestCase
         $this->assertFileDoesNotExist($translationsDirectory.'/tmp/es');
 
         // cleanup the test
-        (new Filesystem())->remove($languagePath);
+        new Filesystem()->remove($languagePath);
     }
 }

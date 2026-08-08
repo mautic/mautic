@@ -91,20 +91,20 @@ final class ReportExporterTest extends \PHPUnit\Framework\TestCase
                 $invocationCount = $invokedCount->numberOfInvocations();
                 if (0 < $invocationCount && $invocationCount <= 6) {
                     $this->assertSame($report1, $report);
-                    $this->assertEquals((new \DateTime())->setTime(0, 0), $exportOptions->getDateFrom());
-                    $this->assertEquals((new \DateTime('yesterday'))->setTime(23, 59, 59), $exportOptions->getDateTo());
+                    $this->assertEquals(new \DateTime()->setTime(0, 0), $exportOptions->getDateFrom());
+                    $this->assertEquals(new \DateTime('yesterday')->setTime(23, 59, 59), $exportOptions->getDateTo());
                 }
 
                 if (6 < $invocationCount && $invocationCount <= 12) {
                     $this->assertSame($report2, $report);
-                    $this->assertEquals((new \DateTime())->setTime(0, 0), $exportOptions->getDateFrom());
-                    $this->assertEquals((new \DateTime('yesterday'))->setTime(23, 59, 59), $exportOptions->getDateTo());
+                    $this->assertEquals(new \DateTime()->setTime(0, 0), $exportOptions->getDateFrom());
+                    $this->assertEquals(new \DateTime('yesterday')->setTime(23, 59, 59), $exportOptions->getDateTo());
                 }
 
                 if (12 < $invocationCount && $invocationCount <= 18) {
                     $this->assertSame($reportNow, $report);
-                    $this->assertEquals((new \DateTime())->setTime(0, 0)->sub(new \DateInterval('P10Y')), $exportOptions->getDateFrom());
-                    $this->assertEquals((new \DateTime('yesterday'))->setTime(23, 59, 59), $exportOptions->getDateTo());
+                    $this->assertEquals(new \DateTime()->setTime(0, 0)->sub(new \DateInterval('P10Y')), $exportOptions->getDateFrom());
+                    $this->assertEquals(new \DateTime('yesterday')->setTime(23, 59, 59), $exportOptions->getDateTo());
                 }
 
                 return $reportDataResult;

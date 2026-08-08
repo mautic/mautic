@@ -42,6 +42,6 @@ final class FocusBundleExtension extends AbstractExtension
 
     public function minifyCss(string $css): string
     {
-        return (new Minify\CSS($css))->minify();
+        return new Minify\CSS($css)->minify();
     }
 }

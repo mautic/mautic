@@ -116,7 +116,7 @@ final class ReleaseParserTest extends TestCase
             ]
         );
 
-        (new ReleaseParser($client))->getLatestSupportedRelease([['html_url' => 'foo://bar']], $mauticVersion, $stability);
+        new ReleaseParser($client)->getLatestSupportedRelease([['html_url' => 'foo://bar']], $mauticVersion, $stability);
     }
 
     public function testLatestVersionSupportedExceptionThrownIfMetadataNotFound(): void
@@ -136,7 +136,7 @@ final class ReleaseParserTest extends TestCase
             ]
         );
 
-        (new ReleaseParser($client))->getLatestSupportedRelease([['html_url' => 'foo://bar']], $mauticVersion, $stability);
+        new ReleaseParser($client)->getLatestSupportedRelease([['html_url' => 'foo://bar']], $mauticVersion, $stability);
     }
 
     /**

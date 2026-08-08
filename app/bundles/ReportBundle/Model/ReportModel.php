@@ -381,7 +381,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
      */
     public function exportResults($format, Report $report, ReportDataResult $reportDataResult, $handle = null, $page = null)
     {
-        $date = (new DateTimeHelper())->toLocalString();
+        $date = new DateTimeHelper()->toLocalString();
         $name = str_replace(' ', '_', $date).'_'.InputHelper::alphanum($report->getName(), false, '-');
 
         switch ($format) {

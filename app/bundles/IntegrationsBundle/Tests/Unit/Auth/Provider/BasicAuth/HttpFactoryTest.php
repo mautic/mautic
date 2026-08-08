@@ -14,7 +14,7 @@ final class HttpFactoryTest extends TestCase
 {
     public function testType(): void
     {
-        $this->assertSame('basic_auth', (new HttpFactory())->getAuthType());
+        $this->assertSame('basic_auth', new HttpFactory()->getAuthType());
     }
 
     public function testMissingUsernameThrowsException(): void
@@ -33,7 +33,7 @@ final class HttpFactoryTest extends TestCase
             }
         };
 
-        (new HttpFactory())->getClient($credentials);
+        new HttpFactory()->getClient($credentials);
     }
 
     public function testMissingPasswordThrowsException(): void
@@ -52,7 +52,7 @@ final class HttpFactoryTest extends TestCase
             }
         };
 
-        (new HttpFactory())->getClient($credentials);
+        new HttpFactory()->getClient($credentials);
     }
 
     public function testInstantiatedClientIsReturned(): void

@@ -32,7 +32,7 @@ final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         private $options = [],
     ) {
         if (is_array($options)) {
-            $options = (new OptionsResolver())->setDefaults($options);
+            $options = new OptionsResolver()->setDefaults($options);
         }
 
         $this->options = $options;

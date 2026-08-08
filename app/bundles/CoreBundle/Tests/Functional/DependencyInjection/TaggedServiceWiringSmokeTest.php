@@ -51,7 +51,7 @@ final class TaggedServiceWiringSmokeTest extends AbstractContainerSmokeTestCase
     {
         $count = 0;
 
-        foreach ((new \ReflectionObject($service))->getProperties() as $property) {
+        foreach (new \ReflectionObject($service)->getProperties() as $property) {
             if (!$property->isInitialized($service)) {
                 continue;
             }

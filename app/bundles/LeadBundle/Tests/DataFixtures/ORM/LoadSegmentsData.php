@@ -910,7 +910,7 @@ final class LoadSegmentsData extends AbstractFixture implements OrderedFixtureIn
                         'type'       => 'datetime',
                         'operator'   => 'gte',
                         'properties' => [
-                            'filter' => (new \DateTime())->format('Y-m-d H:i'),
+                            'filter' => new \DateTime()->format('Y-m-d H:i'),
                         ],
                     ],
                 ],
@@ -946,7 +946,7 @@ final class LoadSegmentsData extends AbstractFixture implements OrderedFixtureIn
                         'type'       => 'datetime',
                         'operator'   => 'gte',
                         'properties' => [
-                            'filter' => (new \DateTime())->format('Y-m-d H:i'),
+                            'filter' => new \DateTime()->format('Y-m-d H:i'),
                         ],
                     ],
                 ],

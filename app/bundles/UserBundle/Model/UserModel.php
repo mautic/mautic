@@ -248,7 +248,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
         $userToken = new UserToken();
         $userToken->setUser($user)
             ->setAuthorizator(UserTokenAuthorizator::RESET_PASSWORD_AUTHORIZATOR)
-            ->setExpiration((new \DateTime())->add(new \DateInterval('PT24H')))
+            ->setExpiration(new \DateTime()->add(new \DateInterval('PT24H')))
             ->setOneTimeOnly();
 
         return $this->userTokenService->generateSecret($userToken, 64);
@@ -415,11 +415,11 @@ class UserModel extends FormModel implements GlobalSearchInterface
     public function createInvite(string $email, Role $role): UserInvite
     {
         $inviteToken = $this->createInviteToken();
-        $invite      = (new UserInvite($role))
+        $invite      = new UserInvite($role)
             ->setEmail($email)
             ->setTokenSelector($inviteToken['selector'])
             ->setTokenVerifierHash(password_hash($inviteToken['verifier'], PASSWORD_DEFAULT))
-            ->setExpiration((new \DateTime())->add(new \DateInterval('PT48H')));
+            ->setExpiration(new \DateTime()->add(new \DateInterval('PT48H')));
         $this->userInviteRepository->revokeOutstandingInvites($email);
         $this->em->persist($invite);
         $this->em->flush();

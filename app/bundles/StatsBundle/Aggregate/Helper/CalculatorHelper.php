@@ -11,7 +11,7 @@ final class CalculatorHelper
      */
     public static function getYearLabel($year, $labelFormat): string
     {
-        return (new \DateTime(self::getYearDateString($year)))->format($labelFormat);
+        return new \DateTime(self::getYearDateString($year))->format($labelFormat);
     }
 
     public static function getYearDateString($year): string
@@ -50,7 +50,7 @@ final class CalculatorHelper
      */
     public static function getMonthLabel($month, $labelFormat): string
     {
-        return (new \DateTime(self::getMonthDateString($month)))->format($labelFormat);
+        return new \DateTime(self::getMonthDateString($month))->format($labelFormat);
     }
 
     public static function getMonthDateString($month): string
@@ -89,7 +89,7 @@ final class CalculatorHelper
      */
     public static function getDayLabel($day, $labelFormat): string
     {
-        return (new \DateTime(self::getDayDateString($day)))->format($labelFormat);
+        return new \DateTime(self::getDayDateString($day))->format($labelFormat);
     }
 
     public static function getDayDateString($day): string
@@ -104,7 +104,7 @@ final class CalculatorHelper
      */
     public static function getWeekFromDayString($date): string
     {
-        return (new \DateTime($date))->format('Y-W');
+        return new \DateTime($date)->format('Y-W');
     }
 
     /**
@@ -115,7 +115,7 @@ final class CalculatorHelper
      */
     public static function getWeekLabel($date, $labelFormat = 'Y-W'): string
     {
-        return (new \DateTime(self::getWeekDateString($date)))->format($labelFormat);
+        return new \DateTime(self::getWeekDateString($date))->format($labelFormat);
     }
 
     public static function getWeekDateString($date): string
@@ -164,7 +164,7 @@ final class CalculatorHelper
             return;
         }
 
-        $yesterday = (new \DateTime(self::getDayDateString($yesterday)))->modify('-1 day');
+        $yesterday = new \DateTime(self::getDayDateString($yesterday))->modify('-1 day');
         $today     = new \DateTime(self::getDayDateString($today));
 
         while ($yesterday < $today) {
@@ -178,7 +178,7 @@ final class CalculatorHelper
      */
     public static function getHourLabel($hour, $labelFormat): string
     {
-        return (new \DateTime(self::getHourDateString($hour)))->format($labelFormat);
+        return new \DateTime(self::getHourDateString($hour))->format($labelFormat);
     }
 
     public static function getHourDateString($hour): string

@@ -178,7 +178,7 @@ class GrapesJsBuilderModel extends AbstractCommonModel
         }
 
         $content['grapesjsbuilder']['editorState'] = $editorState;
-        $content['grapesjsbuilder']['updatedAt']   = (new \DateTime())->format('c');
+        $content['grapesjsbuilder']['updatedAt']   = new \DateTime()->format('c');
 
         return $content;
     }

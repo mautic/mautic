@@ -123,7 +123,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
                             [
                                 'column' => 'l.date_added',
                                 'expr'   => 'lte',
-                                'value'  => (new DateTimeHelper($entity->getDateAdded()))->toUtcString(),
+                                'value'  => new DateTimeHelper($entity->getDateAdded())->toUtcString(),
                             ],
                         ],
                     ],

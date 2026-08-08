@@ -34,7 +34,7 @@ final class UploadControllerFunctionalTest extends MauticMysqlTestCase
 
     protected function beforeTearDown(): void
     {
-        (new Filesystem())->remove($this->cleanupPaths);
+        new Filesystem()->remove($this->cleanupPaths);
     }
 
     public function testUploadWithWrongClientMimetype(): void

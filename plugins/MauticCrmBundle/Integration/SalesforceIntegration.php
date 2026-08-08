@@ -1370,7 +1370,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         // Get the last time the campaign was synced to prevent resyncing the entire SF campaign
         $cacheKey     = $this->getName().'.CampaignSync.'.$campaignId;
         $lastSyncDate = $this->getCache()->get($cacheKey);
-        $syncStarted  = (new \DateTime())->format('c');
+        $syncStarted  = new \DateTime()->format('c');
 
         if (false === $lastSyncDate) {
             // Sync all records

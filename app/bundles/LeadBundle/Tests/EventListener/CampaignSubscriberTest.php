@@ -414,9 +414,9 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $properties    = [
             'points' => 10,
         ];
-        $event         = (new Event())->setProperties($properties);
+        $event         = new Event()->setProperties($properties);
         $event->setType('lead.updatelead');
-        $lead          = (new Lead())->setEmail('tester@mautic.org');
+        $lead          = new Lead()->setEmail('tester@mautic.org');
 
         $leadEventLog = $this->createMock(LeadEventLog::class);
         $leadEventLog

@@ -209,7 +209,7 @@ final class ImportController extends FormController
             $this->requestStack->getSession()->set('mautic.'.$object.'.import.step', self::STEP_UPLOAD_CSV);
         }
 
-        $progress = (new Progress())->bindArray($this->requestStack->getSession()->get('mautic.'.$object.'.import.progress', [0, 0]));
+        $progress = new Progress()->bindArray($this->requestStack->getSession()->get('mautic.'.$object.'.import.progress', [0, 0]));
         $import   = $this->importModel->getEntity();
         $action   = $this->generateUrl('mautic_import_action', ['object' => $request->get('object'), 'objectAction' => 'new']);
 

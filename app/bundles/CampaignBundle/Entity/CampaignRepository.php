@@ -44,7 +44,7 @@ class CampaignRepository extends CommonRepository
 
     public function setCampaignAsDeleted(int $campaignId): void
     {
-        $dateTime = (new \DateTime())->format('Y-m-d H:i:s');
+        $dateTime = new \DateTime()->format('Y-m-d H:i:s');
 
         $this->getEntityManager()->getConnection()->update(
             MAUTIC_TABLE_PREFIX.Event::TABLE_NAME,

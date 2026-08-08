@@ -47,7 +47,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $eventAccessor = $this->createStub(ActionAccessor::class);
         $event         = new Event();
-        $lead          = (new Lead())->setEmail('tester@mautic.org');
+        $lead          = new Lead()->setEmail('tester@mautic.org');
 
         $event->setType(Event::TYPE_ACTION);
 
@@ -71,8 +71,8 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testOnCampaignTriggerActionSendEmailToUserWithSendingTheEmail(): void
     {
         $eventAccessor = $this->createStub(ActionAccessor::class);
-        $event         = (new Event())->setType('email.send.to.user');
-        $lead          = (new Lead())->setEmail('tester@mautic.org');
+        $event         = new Event()->setType('email.send.to.user');
+        $lead          = new Lead()->setEmail('tester@mautic.org');
 
         $leadEventLog = $this->createMock(LeadEventLog::class);
         $leadEventLog
@@ -98,8 +98,8 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testOnCampaignTriggerActionSendEmailToUserWithError(): void
     {
         $eventAccessor = $this->createStub(ActionAccessor::class);
-        $event         = (new Event())->setType('email.send.to.user');
-        $lead          = (new Lead())->setEmail('tester@mautic.org');
+        $event         = new Event()->setType('email.send.to.user');
+        $lead          = new Lead()->setEmail('tester@mautic.org');
 
         $leadEventLog = $this->createMock(LeadEventLog::class);
         $leadEventLog
@@ -146,7 +146,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $eventAccessor = $this->createStub(ActionAccessor::class);
         $event         = new Event();
-        $lead          = (new Lead())->setEmail('tester@mautic.org');
+        $lead          = new Lead()->setEmail('tester@mautic.org');
 
         $leadEventLog = $this->createMock(LeadEventLog::class);
         $leadEventLog

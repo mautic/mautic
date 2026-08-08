@@ -67,7 +67,7 @@ final class StatCollection
             $dateTimeString = CalculatorHelper::getWeekDateString($matches[1].'-'.$matches[2]);
             $dateTime       = new \DateTime($dateTimeString, new \DateTimeZone('UTC'));
         } elseif (4 === strlen($dateTimeInUTC) && is_numeric($dateTimeInUTC)) {
-            $dateTime = (new \DateTime('now', new \DateTimeZone('UTC')))
+            $dateTime = new \DateTime('now', new \DateTimeZone('UTC'))
                 ->setDate($dateTimeInUTC, 1, 1)
                 ->setTime(0, 0);
         } else {

@@ -78,7 +78,7 @@ final class WebhookControllerTest extends TestCase
         ];
 
         $this->assertArrayHasKey('timestamp', $leadPayload[0]);
-        $leadPayload[0]['timestamp'] = (new \DateTime())->format(\DateTimeInterface::ATOM);
+        $leadPayload[0]['timestamp'] = new \DateTime()->format(\DateTimeInterface::ATOM);
         $realTestPayload             = [
             $eventUnderTest => $leadPayload,
         ];

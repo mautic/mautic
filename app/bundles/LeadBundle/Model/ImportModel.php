@@ -567,7 +567,7 @@ class ImportModel extends FormModel
      */
     public function getUniqueFileName(): string
     {
-        return (new DateTimeHelper())->toUtcString('YmdHis').'.csv';
+        return new DateTimeHelper()->toUtcString('YmdHis').'.csv';
     }
 
     /**

@@ -167,7 +167,7 @@ final class AjaxController extends CommonAjaxController
     public function sendTestEmailAction(TransportInterface $transport, UserHelper $userHelper, CoreParametersHelper $parametersHelper): JsonResponse
     {
         $user  = $userHelper->getUser();
-        $email = (new MauticMessage())
+        $email = new MauticMessage()
             ->subject($this->translator->trans('mautic.email.config.mailer.transport.test_send.subject'))
             ->text($this->translator->trans('mautic.email.config.mailer.transport.test_send.body'))
             ->from(new Address($parametersHelper->get('mailer_from_email'), $parametersHelper->get('mailer_from_name') ?: ''))

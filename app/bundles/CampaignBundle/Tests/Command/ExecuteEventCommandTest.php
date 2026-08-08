@@ -179,7 +179,7 @@ final class ExecuteEventCommandTest extends AbstractCampaignCommand
         $campaign      = $fixtureHelper->createCampaign('Scheduled event test');
         $fixtureHelper->addContactToCampaign($contact, $campaign);
         $hour = new \DateTime();
-        $hour->add((new DateTimeHelper())->buildInterval($interval, $unit));
+        $hour->add(new DateTimeHelper()->buildInterval($interval, $unit));
         $fixtureHelper->createCampaignWithScheduledEvent($campaign, $interval, $unit, $hour);
 
         $this->em->flush();

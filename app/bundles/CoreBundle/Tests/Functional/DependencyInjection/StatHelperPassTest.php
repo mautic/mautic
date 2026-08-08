@@ -25,7 +25,7 @@ final class StatHelperPassTest extends TestCase
         $statHelperContainer = $kernel->getContainer()->get(StatHelperContainer::class);
         $this->assertInstanceOf(StatHelperContainer::class, $statHelperContainer);
 
-        $helpers = (new \ReflectionProperty(StatHelperContainer::class, 'helpers'))
+        $helpers = new \ReflectionProperty(StatHelperContainer::class, 'helpers')
             ->getValue($statHelperContainer);
 
         $this->assertGreaterThanOrEqual(self::MINIMAL_STAT_HELPER_COUNT, count($helpers));
