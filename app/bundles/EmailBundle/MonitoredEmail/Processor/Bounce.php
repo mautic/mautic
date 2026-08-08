@@ -61,7 +61,7 @@ class Bounce implements ProcessorInterface
 
         if (!$bounce) {
             try {
-                $bounce = (new Parser($this->message))->parse();
+                $bounce = new Parser($this->message)->parse();
             } catch (BounceNotFound) {
                 return false;
             }

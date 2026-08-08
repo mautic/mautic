@@ -39,7 +39,7 @@ final class ReferenceResolverTest extends TestCase
         $userReference     = $this->createReference('user', 4);
         $notFoundReference = $this->createReference('company', 5);
 
-        $changedObject = (new ObjectChangeDAO('integration', 'lead', '1', 'Lead', '00Q4H00000juXes'))
+        $changedObject = new ObjectChangeDAO('integration', 'lead', '1', 'Lead', '00Q4H00000juXes')
             ->addField(new FieldDAO('company', new NormalizedValueDAO('reference', $companyReference, $companyReference)))
             ->addField(new FieldDAO('user', new NormalizedValueDAO('reference', $userReference, $userReference)))
             ->addField(new FieldDAO('city', new NormalizedValueDAO('text', 'Some city', 'Some city')))
@@ -75,7 +75,7 @@ final class ReferenceResolverTest extends TestCase
 
         $companyReference  = $this->createReference('company', 3);
 
-        $changedObject = (new ObjectChangeDAO('integration', 'company', '1', 'Lead', '00Q4H00000juXes'))
+        $changedObject = new ObjectChangeDAO('integration', 'company', '1', 'Lead', '00Q4H00000juXes')
             ->addField(new FieldDAO('company', new NormalizedValueDAO('reference', $companyReference, $companyReference)));
 
         $this->referenceResolver->resolveReferences('company', [$changedObject]);

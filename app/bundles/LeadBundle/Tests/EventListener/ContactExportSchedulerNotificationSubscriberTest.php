@@ -20,7 +20,7 @@ final class ContactExportSchedulerNotificationSubscriberTest extends TestCase
     {
         $requestingUser = $this->createUser(10, 'Requester User', 'requester@example.com');
 
-        $contactExportScheduler = (new ContactExportScheduler())
+        $contactExportScheduler = new ContactExportScheduler()
             ->setUser($requestingUser)
             ->setScheduledDateTime(new \DateTimeImmutable('2026-05-12 10:30:00 +00:00'))
             ->setData(['fileType' => 'csv']);
@@ -67,7 +67,7 @@ final class ContactExportSchedulerNotificationSubscriberTest extends TestCase
     {
         $requestingUser = $this->createUser(10, 'Requester User', 'requester@example.com');
 
-        $contactExportScheduler = (new ContactExportScheduler())
+        $contactExportScheduler = new ContactExportScheduler()
             ->setUser($requestingUser)
             ->setScheduledDateTime(new \DateTimeImmutable('2026-05-12 10:30:00 +00:00'))
             ->setData(['fileType' => 'csv']);

@@ -151,7 +151,7 @@ class FocusModel extends FormModel implements GlobalSearchInterface
 
         $content = $this->getContent($focusArray, $isPreview, $url);
         $data    = [
-            'js'    => (new Minify\JS($javascript))->minify(),
+            'js'    => new Minify\JS($javascript)->minify(),
             'focus' => InputHelper::minifyHTML($content['focus']),
             'form'  => InputHelper::minifyHTML($content['form']),
         ];

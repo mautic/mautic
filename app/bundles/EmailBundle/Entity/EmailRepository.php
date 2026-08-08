@@ -272,7 +272,7 @@ class EmailRepository extends CommonRepository
 
         if ($sendStopDate) {
             $segmentQb->andWhere($segmentQb->expr()->lt('ll.date_added', ':sendStopDate'));
-            $q->setParameter('sendStopDate', (new DateTimeHelper($sendStopDate))->toUtcString());
+            $q->setParameter('sendStopDate', new DateTimeHelper($sendStopDate)->toUtcString());
         }
 
         if ($countOnly) {

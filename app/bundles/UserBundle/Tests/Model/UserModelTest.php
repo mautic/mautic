@@ -321,7 +321,7 @@ final class UserModelTest extends TestCase
 
     public function testGetInviteReturnsNullWhenInviteExpired(): void
     {
-        $invite = (new UserInvite(new Role()))
+        $invite = new UserInvite(new Role())
             ->setExpiration(new \DateTimeImmutable('-1 minute'));
 
         $this->userInviteRepository->expects($this->once())
@@ -338,7 +338,7 @@ final class UserModelTest extends TestCase
 
     public function testGetInviteReturnsNullWhenTokenVerifierDoesNotMatch(): void
     {
-        $invite = (new UserInvite(new Role()))
+        $invite = new UserInvite(new Role())
             ->setTokenVerifierHash(password_hash('expected-verifier', PASSWORD_DEFAULT))
             ->setExpiration(new \DateTimeImmutable('+1 minute'));
 
@@ -356,7 +356,7 @@ final class UserModelTest extends TestCase
 
     public function testGetInviteReturnsNullWhenInviteAlreadyUsed(): void
     {
-        $invite = (new UserInvite(new Role()))
+        $invite = new UserInvite(new Role())
             ->setUsed(true)
             ->setTokenVerifierHash(password_hash('verifier', PASSWORD_DEFAULT))
             ->setExpiration(new \DateTimeImmutable('+1 minute'));
@@ -384,7 +384,7 @@ final class UserModelTest extends TestCase
 
     public function testGetInviteReturnsActiveInvite(): void
     {
-        $invite = (new UserInvite(new Role()))
+        $invite = new UserInvite(new Role())
             ->setTokenVerifierHash(password_hash('verifier', PASSWORD_DEFAULT))
             ->setExpiration(new \DateTimeImmutable('+1 minute'));
 

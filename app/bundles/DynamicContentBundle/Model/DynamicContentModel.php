@@ -142,7 +142,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
                 'lead_id'            => $lead->getId(),
                 'dynamic_content_id' => $dwc->getId(),
                 'slot'               => ':slot',
-                'date_added'         => $qb->expr()->literal((new \DateTime())->format('Y-m-d H:i:s')),
+                'date_added'         => $qb->expr()->literal(new \DateTime()->format('Y-m-d H:i:s')),
             ])->setParameter('slot', $slot);
 
         $qb->executeStatement();

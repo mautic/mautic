@@ -60,7 +60,7 @@ final class UpdateLeadFormActionFunctionalTest extends MauticMysqlTestCase
             $leadFieldValue = $lead->getFieldValue($field);
             if ('{datetime=now}' === $value) {
                 $actualValue = \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $leadFieldValue);
-                $diff        = abs($actualValue->getTimestamp() - (new \DateTime())->getTimestamp());
+                $diff        = abs($actualValue->getTimestamp() - new \DateTime()->getTimestamp());
                 $this->assertLessThan(60, $diff, "The {$field} is not within 60 seconds of now.");
             } else {
                 $this->assertEquals($value, $leadFieldValue ?? null, "Field {$field} does not match");

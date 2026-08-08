@@ -314,7 +314,7 @@ class EventRepository extends CommonRepository
             return;
         }
 
-        $dateTime = (new \DateTime())->format(DateTimeHelper::FORMAT_DB);
+        $dateTime = new \DateTime()->format(DateTimeHelper::FORMAT_DB);
         $conn     = $this->getEntityManager()->getConnection();
 
         // First, get all events current state in one query

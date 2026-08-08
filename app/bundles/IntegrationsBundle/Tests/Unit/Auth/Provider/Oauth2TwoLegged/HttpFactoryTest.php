@@ -29,7 +29,7 @@ final class HttpFactoryTest extends TestCase
 {
     public function testType(): void
     {
-        $this->assertSame('oauth2_two_legged', (new HttpFactory())->getAuthType());
+        $this->assertSame('oauth2_two_legged', new HttpFactory()->getAuthType());
     }
 
     public function testInvalidCredentialsThrowsException(): void
@@ -39,7 +39,7 @@ final class HttpFactoryTest extends TestCase
         $credentials = new class() implements AuthCredentialsInterface {
         };
 
-        (new HttpFactory())->getClient($credentials);
+        new HttpFactory()->getClient($credentials);
     }
 
     public function testMissingAuthorizationUrlThrowsException(): void
@@ -63,7 +63,7 @@ final class HttpFactoryTest extends TestCase
             }
         };
 
-        (new HttpFactory())->getClient($credentials);
+        new HttpFactory()->getClient($credentials);
     }
 
     public function testMissingClientIdThrowsException(): void
@@ -87,7 +87,7 @@ final class HttpFactoryTest extends TestCase
             }
         };
 
-        (new HttpFactory())->getClient($credentials);
+        new HttpFactory()->getClient($credentials);
     }
 
     public function testMissingClientSecretIdThrowsException(): void
@@ -111,7 +111,7 @@ final class HttpFactoryTest extends TestCase
             }
         };
 
-        (new HttpFactory())->getClient($credentials);
+        new HttpFactory()->getClient($credentials);
     }
 
     public function testMissingUsernameThrowsException(): void
@@ -145,7 +145,7 @@ final class HttpFactoryTest extends TestCase
             }
         };
 
-        (new HttpFactory())->getClient($credentials);
+        new HttpFactory()->getClient($credentials);
     }
 
     public function testMissingPasswordThrowsException(): void
@@ -179,7 +179,7 @@ final class HttpFactoryTest extends TestCase
             }
         };
 
-        (new HttpFactory())->getClient($credentials);
+        new HttpFactory()->getClient($credentials);
     }
 
     public function testInstantiatedClientIsReturned(): void
@@ -232,7 +232,7 @@ final class HttpFactoryTest extends TestCase
     {
         $credentials = $this->getCredentials();
 
-        $client = (new HttpFactory())->getClient($credentials);
+        $client = new HttpFactory()->getClient($credentials);
 
         $middleware = $this->extractMiddleware($client);
 
@@ -283,7 +283,7 @@ final class HttpFactoryTest extends TestCase
             }
         };
 
-        $client              = (new HttpFactory())->getClient($credentials);
+        $client              = new HttpFactory()->getClient($credentials);
         $middleware          = $this->extractMiddleware($client);
         $reflectedMiddleware = new \ReflectionClass($middleware);
         $grantType           = $this->getProperty($reflectedMiddleware, $middleware, 'grantType');
@@ -310,7 +310,7 @@ final class HttpFactoryTest extends TestCase
             }
         };
 
-        $client              = (new HttpFactory())->getClient($credentials);
+        $client              = new HttpFactory()->getClient($credentials);
         $middleware          = $this->extractMiddleware($client);
         $reflectedMiddleware = new \ReflectionClass($middleware);
         $grantType           = $this->getProperty($reflectedMiddleware, $middleware, 'grantType');
@@ -330,7 +330,7 @@ final class HttpFactoryTest extends TestCase
             ->method('getCredentialsSigner')
             ->willReturn($signerInterface);
 
-        $client              = (new \Mautic\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\HttpFactory())->getClient($credentials, $clientCredentialSigner);
+        $client              = new \Mautic\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\HttpFactory()->getClient($credentials, $clientCredentialSigner);
         $middleware          = $this->extractMiddleware($client);
         $reflectedMiddleware = new \ReflectionClass($middleware);
         $this->assertSame($signerInterface, $this->getProperty($reflectedMiddleware, $middleware, 'clientCredentialsSigner'));
@@ -340,7 +340,7 @@ final class HttpFactoryTest extends TestCase
             ->method('getTokenPersistence')
             ->willReturn($kamermansTokenPersistence);
 
-        $client              = (new HttpFactory())->getClient($credentials, $tokenPersistence);
+        $client              = new HttpFactory()->getClient($credentials, $tokenPersistence);
         $middleware          = $this->extractMiddleware($client);
         $reflectedMiddleware = new \ReflectionClass($middleware);
         $this->assertSame($kamermansTokenPersistence, $this->getProperty($reflectedMiddleware, $middleware, 'tokenPersistence'));
@@ -350,7 +350,7 @@ final class HttpFactoryTest extends TestCase
             ->method('getTokenSigner')
             ->willReturn($accessTokenSigner);
 
-        $client              = (new HttpFactory())->getClient($credentials, $tokenPersistence);
+        $client              = new HttpFactory()->getClient($credentials, $tokenPersistence);
         $middleware          = $this->extractMiddleware($client);
         $reflectedMiddleware = new \ReflectionClass($middleware);
         $this->assertSame($accessTokenSigner, $this->getProperty($reflectedMiddleware, $middleware, 'accessTokenSigner'));

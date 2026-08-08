@@ -16,10 +16,10 @@ final class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
     public function testUpdateLead(): void
     {
         // Create Leads
-        $contactA = (new Lead())->setEmail('one@example.com');
+        $contactA = new Lead()->setEmail('one@example.com');
         $this->em->persist($contactA);
 
-        $contactB = (new Lead())->setEmail('two@example.com');
+        $contactB = new Lead()->setEmail('two@example.com');
         $this->em->persist($contactB);
 
         $this->em->flush();

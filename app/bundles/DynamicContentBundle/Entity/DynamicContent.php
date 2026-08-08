@@ -235,7 +235,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         $metadata->addPropertyConstraint('content', new NoNesting());
 
         $metadata->addPropertyConstraint('type', new NotBlank(message: 'mautic.core.type.required'));
-        $metadata->addPropertyConstraint('type', new Choice(choices: (new TypeList())->getChoices()));
+        $metadata->addPropertyConstraint('type', new Choice(choices: new TypeList()->getChoices()));
 
         $metadata->addConstraint(new SlotNameType());
 

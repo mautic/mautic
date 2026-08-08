@@ -16,8 +16,8 @@ final class MaintenanceSubscriberTest extends MauticMysqlTestCase
     {
         // Insert the audit_log and notification
         $prefix        = self::getContainer()->getParameter('mautic.db_table_prefix');
-        $threeDaysAgo  = (new \DateTime('3 days ago', new \DateTimeZone('UTC')))->format('Y-m-d H:i:s');
-        $today         = (new \DateTime('+1 min', new \DateTimeZone('UTC')))->format('Y-m-d H:i:s');
+        $threeDaysAgo  = new \DateTime('3 days ago', new \DateTimeZone('UTC'))->format('Y-m-d H:i:s');
+        $today         = new \DateTime('+1 min', new \DateTimeZone('UTC'))->format('Y-m-d H:i:s');
 
         $connection    = $this->em->getConnection();
         $connection->executeQuery("INSERT INTO {$prefix}audit_log (user_id, user_name, bundle, object, object_id, action, details, date_added, ip_address)

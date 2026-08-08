@@ -29,7 +29,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         if ($fromCache) {
             $contactCountDetail = [
                 'contactCount'   => $expectedContacts,
-                'countFetchedAt' => (new DateTimeHelper())->toUtcString(),
+                'countFetchedAt' => new DateTimeHelper()->toUtcString(),
             ];
             $item = $cacheProvider->getItem(sprintf('%s.%s.%s', 'campaign', $campaign->getId(), 'lead'));
             $item->set($contactCountDetail);

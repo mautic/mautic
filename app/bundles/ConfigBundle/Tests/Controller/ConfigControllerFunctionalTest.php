@@ -128,7 +128,7 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         // insert published record
         $this->connection->insert($this->prefix.'pages', [
             'is_published' => 1,
-            'date_added'   => (new \DateTime())->format('Y-m-d H:i:s'),
+            'date_added'   => new \DateTime()->format('Y-m-d H:i:s'),
             'title'        => 'page1',
             'alias'        => 'page1',
             'template'     => 'blank',
@@ -144,7 +144,7 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         // insert unpublished record
         $this->connection->insert($this->prefix.'pages', [
             'is_published' => 0,
-            'date_added'   => (new \DateTime())->format('Y-m-d H:i:s'),
+            'date_added'   => new \DateTime()->format('Y-m-d H:i:s'),
             'title'        => 'page2',
             'alias'        => 'page2',
             'template'     => 'blank',
@@ -160,7 +160,7 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         // insert published record
         $this->connection->insert($this->prefix.'pages', [
             'is_published' => 1,
-            'date_added'   => (new \DateTime())->format('Y-m-d H:i:s'),
+            'date_added'   => new \DateTime()->format('Y-m-d H:i:s'),
             'title'        => 'page3',
             'alias'        => 'page3',
             'template'     => 'blank',

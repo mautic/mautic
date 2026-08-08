@@ -136,7 +136,7 @@ final class ImportController extends AbstractFormController
                 $this->requestStack->getSession()->remove('mautic.campaign.import.summary');
                 try {
                     // Ensure the import directory exists
-                    (new Filesystem())->mkdir($importDir, 0755);
+                    new Filesystem()->mkdir($importDir, 0755);
 
                     // Remove existing file if it exists
                     if (file_exists($fullPath)) {
@@ -230,7 +230,7 @@ final class ImportController extends AbstractFormController
         }
 
         $uniqueId = bin2hex(random_bytes(8));
-        $fileName = sprintf('%s_%s.zip', (new DateTimeHelper())->toUtcString('YmdHis'), $uniqueId);
+        $fileName = sprintf('%s_%s.zip', new DateTimeHelper()->toUtcString('YmdHis'), $uniqueId);
 
         $session->set('mautic.campaign.import.file', $fileName);
 

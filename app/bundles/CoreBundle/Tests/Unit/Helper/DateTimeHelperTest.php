@@ -67,7 +67,7 @@ final class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetLocalTimezoneOffset(): void
     {
-        $timezone = (new ParameterLoader())->getParameterBag()->get('default_timezone');
+        $timezone = new ParameterLoader()->getParameterBag()->get('default_timezone');
         $helper   = new DateTimeHelper('now', DateTimeHelper::FORMAT_DB, $timezone);
         $date     = new \DateTime();
         $date->setTimezone(new \DateTimeZone($timezone));

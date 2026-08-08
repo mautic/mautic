@@ -1815,7 +1815,7 @@ class LeadModel extends FormModel
         $leadCompanies = $this->companyModel->getCompanyLeadRepository()->getCompaniesByLeadId($lead->getId());
 
         $requestedCompanies = new Collection($companies);
-        $currentCompanies   = (new Collection($leadCompanies))->keyBy('company_id');
+        $currentCompanies   = new Collection($leadCompanies)->keyBy('company_id');
 
         // Add companies that are not in the array of found companies
         $addCompanies = $requestedCompanies->reject(

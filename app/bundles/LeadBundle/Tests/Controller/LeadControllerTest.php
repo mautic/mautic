@@ -859,7 +859,7 @@ EMAIL;
         $companyField->setValue($expectedCompanies);
         $crawler    = $this->client->submit($form);
         $companies  = $this->getCompanyLeads($leadId);
-        $collection = (new Collection($companies))->keyBy('company_id');
+        $collection = new Collection($companies)->keyBy('company_id');
         // Should have only one company associated
         $this->assertCount(count($expectedCompanies), $collection);
         $this->assertEquals($expectedCompanies, $collection->keys()->toArray());
@@ -884,16 +884,16 @@ EMAIL;
         $contactModel = self::getContainer()->get(LeadModel::class);
 
         // Create companies
-        $company = (new Company())
+        $company = new Company()
             ->setName('Co.');
-        $newCompany = (new Company())
+        $newCompany = new Company()
             ->setName('New Co.');
         $companyModel->saveEntities([$company, $newCompany]);
         $companyId    = $company->getId();
         $newCompanyId = $newCompany->getId();
 
         // Create contact with first 'Co.' company
-        $contact = (new Lead())
+        $contact = new Lead()
             ->setFirstname('C1')
             ->setCompany($company);
         $contactModel->saveEntity($contact);

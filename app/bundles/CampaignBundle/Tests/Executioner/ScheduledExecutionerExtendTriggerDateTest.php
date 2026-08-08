@@ -81,7 +81,7 @@ final class ScheduledExecutionerExtendTriggerDateTest extends AbstractCampaignCo
         $logId         = $eventLog->getId();
         $commandTester = $this->testSymfonyCommand('mautic:campaigns:execute', [
             '--scheduled-log-ids' => (string) $logId,
-            '--execution-time'    => (new \DateTime('2025-01-10 00:02:00'))->format(Interval::LOG_DATE_FORMAT),
+            '--execution-time'    => new \DateTime('2025-01-10 00:02:00')->format(Interval::LOG_DATE_FORMAT),
         ]);
 
         $this->assertSame(0, $commandTester->getStatusCode());

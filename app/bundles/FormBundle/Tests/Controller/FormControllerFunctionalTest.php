@@ -530,7 +530,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
                     'user_id'   => [1],
                 ],
                 'entities' => [
-                    (new Email())->setName('Email')
+                    new Email()->setName('Email')
                         ->setSubject('Test Subject')
                         ->setIsPublished(true),
                 ],

@@ -141,7 +141,7 @@ class MessageQueueModel extends FormModel
     ): bool {
         $messageQueues = [];
 
-        $scheduledDate = (new \DateTime())->add($scheduledInterval);
+        $scheduledDate = new \DateTime()->add($scheduledInterval);
 
         foreach ($leads as $lead) {
             $leadId = (is_array($lead)) ? $lead['id'] : $lead->getId();

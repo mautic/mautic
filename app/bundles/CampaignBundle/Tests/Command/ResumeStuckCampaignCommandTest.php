@@ -179,7 +179,7 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
         // Contact 8 - Not Stuck as event is added after first event is executed
         $this->createEventLog($contact8, $rootEmail, $campaign, 1);
         $log = $this->createEventLog($contact8, $conditionEvent, $campaign, 1);
-        $log->setDateTriggered((new \DateTime())->modify('-5 minutes'));
+        $log->setDateTriggered(new \DateTime()->modify('-5 minutes'));
 
         $this->em->flush();
 
