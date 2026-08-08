@@ -96,7 +96,6 @@ abstract class AbstractCommonModel implements MauticModelInterface
         // set the translator
         $repo = $this->getRepository();
 
-        $repo->setTranslator($this->translator);
         $repo->setCurrentUser($this->userHelper->getUser());
 
         return $repo->getEntities($args);
