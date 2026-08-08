@@ -392,13 +392,7 @@ final class TagController extends FormController
     private function isTagUnique(Tag $tag): bool
     {
         $existingTags = $this->tagRepository->getTagsByName([$tag->getTag()]);
-        foreach ($existingTags as $existingTag) {
-            if ($existingTag->getId() != $tag->getId()) {
-                return false;
-            }
-        }
-
-        return true;
+        return array_all($existingTags, fn($existingTag) => !($existingTag->getId() != $tag->getId()));
     }
 
     /**

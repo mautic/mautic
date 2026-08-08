@@ -628,14 +628,7 @@ SQL;
         if ([] === $segmentIds) {
             return true; // Contact is not associated wit any segment
         }
-
-        foreach ($expectedSegmentIds as $expectedSegmentId) {
-            if (in_array($expectedSegmentId, $segmentIds)) { // No exact type comparison used!
-                return false;
-            }
-        }
-
-        return true;
+        return array_all($expectedSegmentIds, fn($expectedSegmentId) => !in_array($expectedSegmentId, $segmentIds));
     }
 
     /**
