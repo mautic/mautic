@@ -24,6 +24,7 @@ use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -86,56 +87,33 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->queryBuilder       = new QueryBuilder($this->connectionMock);
     }
 
-    public function testOnReportGenerateForEmailStatsWhenSegmentFilterIsUsed(): void
+    /**
+     * @return \Iterator<string, array{0: list<string>, 1: bool}>
+     */
+    public static function emailStatsSegmentFilterColumnsProvider(): \Iterator
     {
-        $this->report->expects($this->once())
-            ->method('getSource')
-            ->willReturn(ReportSubscriber::CONTEXT_EMAIL_STATS);
-
-        $this->report
-            ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
-            ->willReturn(['l.firstname']);
-
-        $this->report
-            ->method('getFilters')
-            ->willReturn([
-                [
-                    'column'    => 's.leadlist_id',
-                    'glue'      => 'and',
-                    'condition' => 'eq',
-                    'value'     => '1',
-                ],
-            ]);
-
-        $event = new ReportGeneratorEvent(
-            $this->report,
-            [],
-            $this->queryBuilder,
-            $this->channelListHelper
-        );
-
-        $this->subscriber->onReportGenerate($event);
-
-        $sql = $this->queryBuilder->getSQL();
-
-        $this->assertStringContainsString(MAUTIC_TABLE_PREFIX.'lead_lists_leads s', $sql);
-        $this->assertMatchesRegularExpression(
-            '/JOIN '.preg_quote(MAUTIC_TABLE_PREFIX, '/').'lead_lists_leads s ON s\.lead_id = es\.lead_id/i',
-            $sql
-        );
-        // Contact columns still get the leads join; segment membership must not depend on it.
-        $this->assertStringContainsString(MAUTIC_TABLE_PREFIX.'leads l', $sql);
+        yield 'with contact columns' => [['l.firstname'], true];
+        yield 'without contact columns' => [['es.date_sent'], false];
     }
 
-    public function testOnReportGenerateForEmailStatsSegmentFilterWithoutContactColumns(): void
-    {
+    /**
+     * Segment membership must join via email_stats (`es.lead_id`), not leads (`l`),
+     * so Contact Name columns / segment filters do not depend on leads alias order.
+     *
+     * @param list<string> $columns
+     */
+    #[DataProvider('emailStatsSegmentFilterColumnsProvider')]
+    public function testOnReportGenerateForEmailStatsSegmentFilterJoinsViaEmailStats(
+        array $columns,
+        bool $expectsLeadJoin
+    ): void {
         $this->report->expects($this->once())
             ->method('getSource')
             ->willReturn(ReportSubscriber::CONTEXT_EMAIL_STATS);
 
         $this->report
             ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
-            ->willReturn(['es.date_sent']);
+            ->willReturn($columns);
 
         $this->report
             ->method('getFilters')
@@ -163,7 +141,12 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             '/JOIN '.preg_quote(MAUTIC_TABLE_PREFIX, '/').'lead_lists_leads s ON s\.lead_id = es\.lead_id/i',
             $sql
         );
-        $this->assertStringNotContainsString(MAUTIC_TABLE_PREFIX.'leads l', $sql);
+
+        if ($expectsLeadJoin) {
+            $this->assertStringContainsString(MAUTIC_TABLE_PREFIX.'leads l', $sql);
+        } else {
+            $this->assertStringNotContainsString(MAUTIC_TABLE_PREFIX.'leads l', $sql);
+        }
     }
 
     public function testOnReportGenerateForEmailStatsWhenDncIsUsed(): void
