@@ -338,13 +338,11 @@ class TrackableModel extends AbstractCommonModel
     {
         if (0 !== preg_match('/<[^<]+>/', $content)) {
             // Parse as HTML
-            $trackableUrls = $this->extractTrackablesFromHtml($content);
-        } else {
-            // Parse as plain text
-            $trackableUrls = $this->extractTrackablesFromText($content);
+            return $this->extractTrackablesFromHtml($content);
         }
 
-        return $trackableUrls;
+        // Parse as plain text
+        return $this->extractTrackablesFromText($content);
     }
 
     /**

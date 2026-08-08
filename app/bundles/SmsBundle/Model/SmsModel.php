@@ -154,12 +154,10 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
     public function getEntity($id = null): ?Sms
     {
         if (null === $id) {
-            $entity = new Sms();
-        } else {
-            $entity = parent::getEntity($id);
+            return new Sms();
         }
 
-        return $entity;
+        return parent::getEntity($id);
     }
 
     /**

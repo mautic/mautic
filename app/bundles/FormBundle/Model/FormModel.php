@@ -354,12 +354,10 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         $html = $this->getFormHtml($form, $useCache);
 
         if ($withScript) {
-            $html = $this->getFormScript($form)."\n\n".$this->removeScriptTag($html);
-        } else {
-            $html = $this->removeScriptTag($html);
+            return $this->getFormScript($form)."\n\n".$this->removeScriptTag($html);
         }
 
-        return $html;
+        return $this->removeScriptTag($html);
     }
 
     /**

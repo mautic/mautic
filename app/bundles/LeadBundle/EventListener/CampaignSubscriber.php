@@ -755,12 +755,10 @@ final class CampaignSubscriber implements EventSubscriberInterface
 
         $now    = new \DateTime();
         if (OperatorOptions::LESS_THAN == $operator) {
-            $result = ($now < $objEffectiveDate);
-        } else {
-            $result = ($now > $objEffectiveDate);
+            return $now < $objEffectiveDate;
         }
 
-        return $result;
+        return $now > $objEffectiveDate;
     }
 
     public function onCampaignTriggerActionSetManipulator(CampaignExecutionEvent $event): void

@@ -106,12 +106,11 @@ class InstallService
 
             // Load local config to override parameters
             include $localConfigFile;
-            $localParameters = $parameters;
-        } else {
-            $localParameters = [];
+
+            return $parameters;
         }
 
-        return $localParameters;
+        return [];
     }
 
     /**
