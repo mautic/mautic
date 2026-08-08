@@ -331,10 +331,8 @@ class TrackableModel extends AbstractCommonModel
 
     /**
      * @phpstan-impure
-     *
-     * @return array
      */
-    protected function extractTrackablesFromContent($content)
+    protected function extractTrackablesFromContent($content): array
     {
         if (0 !== preg_match('/<[^<]+>/', $content)) {
             // Parse as HTML

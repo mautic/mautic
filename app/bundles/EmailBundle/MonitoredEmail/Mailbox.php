@@ -727,7 +727,7 @@ class Mailbox
     /**
      * Retrieve the quota settings per user.
      *
-     * @return array - FALSE in the case of call failure
+     * @return array|false - FALSE in the case of call failure
      */
     protected function getQuota(): array|bool
     {
@@ -737,7 +737,7 @@ class Mailbox
     /**
      * Return quota limit in KB.
      *
-     * @return int - FALSE in the case of call failure
+     * @return int|false - FALSE in the case of call failure
      */
     public function getQuotaLimit()
     {
@@ -752,7 +752,7 @@ class Mailbox
     /**
      * Return quota usage in KB.
      *
-     * @return int - FALSE in the case of call failure
+     * @return int|false - FALSE in the case of call failure
      */
     public function getQuotaUsage()
     {
