@@ -32,7 +32,7 @@
                                             </td>
                                         {% elseif 'id' != cellName %}
                                             <td>
-                                                {% if cell is string %}
+                                                {% if cell is not null and cell is string %}
                                                     {{ assetMakeLinks(cell) }}
                                                 {% else %}
                                                     {{ cell }}

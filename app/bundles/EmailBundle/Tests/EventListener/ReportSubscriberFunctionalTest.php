@@ -289,6 +289,86 @@ final class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestC
         ], $result['data']);
     }
 
+    public function testEmailStatReportWithContactFirstNameOnly(): void
+    {
+        $email = $this->createEmail('Email');
+
+        $contact = $this->createContact('test1@example.com');
+        $contact->setFirstname('TestContact');
+        $this->em->flush();
+
+        $this->emulateEmailSend($email, [$contact]);
+
+        $report = new Report();
+        $report->setName('Email sent stats with contact first name only');
+        $report->setSource('email.stats');
+        $report->setColumns(['l.firstname']);
+        $this->em->persist($report);
+        $this->em->flush();
+
+        $crawler            = $this->client->request(Request::METHOD_GET, "/s/reports/view/{$report->getId()}");
+        $this->assertResponseIsSuccessful();
+        $crawlerReportTable = $crawler->filterXPath('//table[@id="reportTable"]')->first();
+
+        $table = array_slice($this->domTableToArray($crawlerReportTable), 1);
+
+        $this->assertSame([
+            ['1', 'TestContact'],
+        ], $table);
+    }
+
+    public function testEmailStatReportWithContactFirstNameAndSegmentFilter(): void
+    {
+        $email = $this->createEmail('Email');
+
+        $contact = $this->createContact('segment-contact@example.com');
+        $contact->setFirstname('SegmentContact');
+        $this->em->flush();
+
+        $segment = new \Mautic\LeadBundle\Entity\LeadList();
+        $segment->setName('Report segment');
+        $segment->setAlias('report-segment');
+        $segment->setIsPublished(true);
+        $this->em->persist($segment);
+        $this->em->flush();
+
+        $segmentLead = new \Mautic\LeadBundle\Entity\ListLead();
+        $segmentLead->setList($segment);
+        $segmentLead->setLead($contact);
+        $segmentLead->setManuallyRemoved(false);
+        $segmentLead->setManuallyAdded(true);
+        $segmentLead->setDateAdded(new \DateTime());
+        $this->em->persist($segmentLead);
+        $this->em->flush();
+
+        $this->emulateEmailSend($email, [$contact]);
+
+        $report = new Report();
+        $report->setName('Email sent stats with contact first name and segment filter');
+        $report->setSource('email.stats');
+        $report->setColumns(['l.firstname']);
+        $report->setFilters([
+            [
+                'column'    => 's.leadlist_id',
+                'glue'      => 'and',
+                'condition' => 'eq',
+                'value'     => $segment->getId(),
+            ],
+        ]);
+        $this->em->persist($report);
+        $this->em->flush();
+
+        $crawler            = $this->client->request(Request::METHOD_GET, "/s/reports/view/{$report->getId()}");
+        $this->assertResponseIsSuccessful();
+        $crawlerReportTable = $crawler->filterXPath('//table[@id="reportTable"]')->first();
+
+        $table = array_slice($this->domTableToArray($crawlerReportTable), 1);
+
+        $this->assertSame([
+            ['1', 'SegmentContact'],
+        ], $table);
+    }
+
     private function createContact(string $email): Lead
     {
         $contact = new Lead();
