@@ -508,7 +508,8 @@ final class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestC
         $this->assertResponseIsSuccessful();
         $crawlerReportTable = $crawler->filterXPath('//table[@id="reportTable"]')->first();
 
-        $table = array_slice($this->domTableToArray($crawlerReportTable), 1);
+        // Skip header row and the trailing Totals row.
+        $table = array_slice($this->domTableToArray($crawlerReportTable), 1, 1);
 
         $this->assertSame([
             ['1', 'TestContact'],
@@ -525,6 +526,7 @@ final class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestC
 
         $segment = new \Mautic\LeadBundle\Entity\LeadList();
         $segment->setName('Report segment');
+        $segment->setPublicName('Report segment');
         $segment->setAlias('report-segment');
         $segment->setIsPublished(true);
         $this->em->persist($segment);
@@ -560,7 +562,8 @@ final class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestC
         $this->assertResponseIsSuccessful();
         $crawlerReportTable = $crawler->filterXPath('//table[@id="reportTable"]')->first();
 
-        $table = array_slice($this->domTableToArray($crawlerReportTable), 1);
+        // Skip header row and the trailing Totals row.
+        $table = array_slice($this->domTableToArray($crawlerReportTable), 1, 1);
 
         $this->assertSame([
             ['1', 'SegmentContact'],
