@@ -250,7 +250,7 @@ class InstallService
         }
 
         // Check if connection works and/or create database if applicable
-        $schemaHelper = new SchemaHelper($dbParams);
+        $schemaHelper = new SchemaHelper($dbParams, $this->entityManager);
 
         try {
             $schemaHelper->testConnection();
@@ -296,8 +296,7 @@ class InstallService
      */
     public function createSchemaStep(array $dbParams): array
     {
-        $schemaHelper = new SchemaHelper($dbParams);
-        $schemaHelper->setEntityManager($this->entityManager);
+        $schemaHelper = new SchemaHelper($dbParams, $this->entityManager);
 
         $messages = [];
         try {
