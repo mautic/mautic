@@ -64,7 +64,7 @@ return function (ContainerConfigurator $configurator): void {
         ->args([param('mautic.ip_lookup_service'), param('mautic.ip_lookup_auth'), param('mautic.ip_lookup_config'), service('mautic.http.client')]);
     $services->alias(Mautic\CoreBundle\IpLookup\AbstractLookup::class, 'mautic.ip_lookup');
     $services->set('mautic.native.connector', Symfony\Contracts\HttpClient\HttpClientInterface::class)
-        ->factory([Symfony\Component\HttpClient\HttpClient::class, 'create']);
+        ->factory(Symfony\Component\HttpClient\HttpClient::create(...));
     $services->alias(Symfony\Contracts\HttpClient\HttpClientInterface::class, 'mautic.native.connector');
     $services->set('mautic.translation.loader', Mautic\CoreBundle\Loader\TranslationLoader::class)->tag('translation.loader', ['alias' => 'mautic']);
     $services->alias(Mautic\CoreBundle\Loader\TranslationLoader::class, 'mautic.translation.loader');
