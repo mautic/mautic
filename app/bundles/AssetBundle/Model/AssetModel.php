@@ -476,7 +476,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         $size = $this->assetRepository->getAssetSize($assets);
 
         if ($size) {
-            $size = Asset::convertBytesToHumanReadable($size);
+            return Asset::convertBytesToHumanReadable($size);
         }
 
         return $size;

@@ -27,7 +27,7 @@ final class UrlHelper
 
         // anchor
         if (isset($anchorParts[1])) {
-            $url = sprintf('%s#%s', $url, $anchorParts[1]);
+            return sprintf('%s#%s', $url, $anchorParts[1]);
         }
 
         return $url;
@@ -188,7 +188,7 @@ final class UrlHelper
 
         // Set default scheme to http if missing
         if (empty($scheme)) {
-            $url = sprintf('http%s', $url);
+            return sprintf('http%s', $url);
         }
 
         return $url;

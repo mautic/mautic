@@ -187,7 +187,7 @@ final class SalesforceApi extends CrmApi
         $createdLeadData = [];
 
         if (isset($data['Email'])) {
-            $createdLeadData = $this->createObject($data, 'Lead');
+            return $this->createObject($data, 'Lead');
         }
 
         return $createdLeadData;

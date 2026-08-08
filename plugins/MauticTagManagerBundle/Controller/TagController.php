@@ -179,7 +179,7 @@ final class TagController extends FormController
 
         $response = $this->handleNewActionPost($request, $tagDependencies, $tag, $form, $returnUrl, $page);
         if (null === $response) {
-            $response = $this->delegateView([
+            return $this->delegateView([
                 'viewParameters' => [
                     'form'   => $form->createView(),
                     'entity' => $tag,

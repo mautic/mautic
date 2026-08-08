@@ -106,7 +106,7 @@ class TrackableModel extends AbstractCommonModel
         }
 
         if ($shortenUrl) {
-            $trackedUrl = $this->redirectModel->shortenUrl($trackedUrl);
+            return $this->redirectModel->shortenUrl($trackedUrl);
         }
 
         return $trackedUrl;

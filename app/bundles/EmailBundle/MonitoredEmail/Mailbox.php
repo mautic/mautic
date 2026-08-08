@@ -743,7 +743,7 @@ class Mailbox
     {
         $quota = $this->getQuota();
         if (is_array($quota)) {
-            $quota = $quota['STORAGE']['limit'];
+            return $quota['STORAGE']['limit'];
         }
 
         return $quota;
@@ -758,7 +758,7 @@ class Mailbox
     {
         $quota = $this->getQuota();
         if (is_array($quota)) {
-            $quota = $quota['STORAGE']['usage'];
+            return $quota['STORAGE']['usage'];
         }
 
         return $quota;

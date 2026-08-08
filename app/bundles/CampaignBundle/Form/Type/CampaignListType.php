@@ -38,7 +38,7 @@ final class CampaignListType extends AbstractType
                     ksort($choices);
 
                     if ($options['include_this']) {
-                        $choices = [$options['this_translation'] => 'this'] + $choices;
+                        return [$options['this_translation'] => 'this'] + $choices;
                     }
 
                     return $choices;

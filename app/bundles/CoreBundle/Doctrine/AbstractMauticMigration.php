@@ -207,7 +207,7 @@ abstract class AbstractMauticMigration extends AbstractMigration
         $idDataType  = self::COLUMN_TYPE_SIGNED;
 
         if (true === $idColumn->getUnsigned()) {
-            $idDataType = self::COLUMN_TYPE_UNSIGNED;
+            return self::COLUMN_TYPE_UNSIGNED;
         }
 
         return $idDataType;

@@ -1292,7 +1292,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
         $url = $this->getRequestTokenUrl();
         if (!empty($url)) {
-            $result = $this->makeRequest(
+            return $this->makeRequest(
                 $url,
                 [],
                 'POST',
@@ -1792,7 +1792,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                 || (!empty($config['integration'])
                     && $config['integration'] == $this->getName()))
         ) {
-            $featureSettings = array_merge($featureSettings, $config['config']);
+            return array_merge($featureSettings, $config['config']);
         }
 
         return $featureSettings;
@@ -2374,7 +2374,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         }
 
         if ([] !== $formattedFields) {
-            $fields = $formattedFields;
+            return $formattedFields;
         }
 
         return $fields;

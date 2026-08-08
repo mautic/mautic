@@ -82,7 +82,7 @@ final class HubspotApi extends CrmApi
         // Format data for request
         $formattedLeadData = $this->integration->formatLeadDataForCreateOrUpdate($data, $lead, $updateLink);
         if ($formattedLeadData) {
-            $result = $this->request('v1/contact/createOrUpdate/email/'.$email, $formattedLeadData, 'POST');
+            return $this->request('v1/contact/createOrUpdate/email/'.$email, $formattedLeadData, 'POST');
         }
 
         return $result;

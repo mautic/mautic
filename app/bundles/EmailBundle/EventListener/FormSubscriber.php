@@ -99,7 +99,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         }
 
         if ($currentLead instanceof Lead) {
-            $currentLead = $currentLead->getProfileFields();
+            return $currentLead->getProfileFields();
         }
 
         return $currentLead;

@@ -308,7 +308,7 @@ class MailHelper
             // properly populate metadata for this transport
 
             if ($result = $this->queue($dispatchSendEvent)) {
-                $result = $this->flushQueue(['To', 'Cc', 'Bcc']);
+                return $this->flushQueue(['To', 'Cc', 'Bcc']);
             }
 
             return $result;
@@ -1834,7 +1834,7 @@ class MailHelper
 
         // If empty, replace with null so that email clients do not show empty name because of To: '' <email@domain.com>
         if (empty($name)) {
-            $name = null;
+            return null;
         }
 
         return $name;

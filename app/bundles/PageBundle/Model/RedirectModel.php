@@ -86,7 +86,7 @@ class RedirectModel extends FormModel
         }
 
         if ($shortenUrl) {
-            $url = $this->shortenUrl($url);
+            return $this->shortenUrl($url);
         }
 
         return $url;
@@ -120,7 +120,7 @@ class RedirectModel extends FormModel
         $redirect = $this->redirectRepository->findOneBy(['url' => $url]);
 
         if (null == $redirect) {
-            $redirect = $this->createRedirectEntity($url);
+            return $this->createRedirectEntity($url);
         }
 
         return $redirect;
