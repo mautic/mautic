@@ -177,13 +177,11 @@ final class PluginAuthenticator extends AbstractAuthenticator
 
         $loginEvent = new InteractiveLoginEvent($request, $token);
         $this->dispatcher->dispatch($loginEvent, SecurityEvents::INTERACTIVE_LOGIN);
-
-        $response = null;
         if (null === $token->getResponse()) {
             return $this->authenticationHandler->onAuthenticationSuccess($request, $token);
         }
 
-        return $response;
+        return null;
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response

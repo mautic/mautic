@@ -21,6 +21,7 @@ return RectorConfig::configure()
         privatization: true,
         codeQuality: true,
         symfonyCodeQuality: true,
+        earlyReturn: true,
     )
     ->withPhpLevel(120)
     ->withCache(__DIR__.'/var/cache/rector')

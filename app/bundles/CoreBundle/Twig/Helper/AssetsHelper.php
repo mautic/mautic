@@ -124,13 +124,12 @@ final class AssetsHelper
         }
 
         $path = $this->appendVersion($path, $version);
-        $url  = $this->packages->getUrl($path, $packageName);
 
         if ($absolute) {
             return $this->siteUrl.'/'.$path;
         }
 
-        return $url;
+        return $this->packages->getUrl($path, $packageName);
     }
 
     /**
