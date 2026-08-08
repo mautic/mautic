@@ -41,7 +41,7 @@ final readonly class OwnershipScopedCollectionExtension implements QueryCollecti
         }
 
         $securityExpression = $operation->getSecurity();
-        if (null === $securityExpression || !is_string($securityExpression)) {
+        if (null === $securityExpression) {
             return;
         }
 
