@@ -136,7 +136,7 @@ class CommonRepository extends ServiceEntityRepository
      * @throws \Doctrine\ORM\Mapping\MappingException
      * @throws \Exception
      */
-    public function createFromArray($className, &$data): object
+    public function createFromArray($className, array &$data): object
     {
         $entity        = new $className();
         $meta          = $this->_em->getClassMetadata($className);
@@ -189,10 +189,9 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * Delete an entity through the repository.
      *
-     * @param object $entity
-     * @param bool   $flush  true by default; use false if persisting in batches
+     * @param bool $flush true by default; use false if persisting in batches
      */
-    public function deleteEntity($entity, $flush = true): void
+    public function deleteEntity(object $entity, $flush = true): void
     {
         // delete entity
         $this->_em->remove($entity);
@@ -209,10 +208,7 @@ class CommonRepository extends ServiceEntityRepository
         }
     }
 
-    /**
-     * @param object $entity
-     */
-    public function detachEntity($entity): void
+    public function detachEntity(object $entity): void
     {
         $this->getEntityManager()->detach($entity);
     }
@@ -428,10 +424,7 @@ class CommonRepository extends ServiceEntityRepository
         return $entity;
     }
 
-    /**
-     * @return ExpressionBuilder
-     */
-    public function getExpressionBuilder()
+    public function getExpressionBuilder(): ExpressionBuilder
     {
         if (null === $this->expressionBuilder) {
             $this->expressionBuilder = new ExpressionBuilder();
@@ -816,10 +809,9 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * Save an entity through the repository.
      *
-     * @param object $entity
-     * @param bool   $flush  true by default; use false if persisting in batches
+     * @param bool $flush true by default; use false if persisting in batches
      */
-    public function saveEntity($entity, $flush = true): void
+    public function saveEntity(object $entity, $flush = true): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -940,11 +932,9 @@ class CommonRepository extends ServiceEntityRepository
      *
      * @param array $clause ['col' => 'column_a', 'dir' => 'ASC']
      *
-     * @return array
-     *
      * @throws \InvalidArgumentException
      */
-    protected function validateOrderByClause($clause)
+    protected function validateOrderByClause(array $clause): array
     {
         $msg = '"%s" is missing in the order by clause array.';
         if (empty($clause['col'])) {
@@ -1794,11 +1784,8 @@ class CommonRepository extends ServiceEntityRepository
 
     /**
      * Sanitizes a string to alphanum plus characters in the second argument.
-     *
-     * @param string $sqlAttr
-     * @param array  $allowedCharacters
      */
-    protected function sanitize($sqlAttr, $allowedCharacters = []): string
+    protected function sanitize(string $sqlAttr, array $allowedCharacters = []): string
     {
         return InputHelper::alphanum($sqlAttr, false, null, $allowedCharacters);
     }

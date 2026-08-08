@@ -1599,7 +1599,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     protected function getMauticContactsToUpdate(
-        &$checkEmailsInSF,
+        array &$checkEmailsInSF,
         $mauticLeadFieldString,
         &$sfObject,
         array &$trackedContacts,

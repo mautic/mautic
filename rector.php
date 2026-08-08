@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Mautic\CoreBundle\Entity\CommonRepository;
 use Rector\Config\RectorConfig;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
 use Utils\Rector\UnserializeToSerializerDecodeRector;

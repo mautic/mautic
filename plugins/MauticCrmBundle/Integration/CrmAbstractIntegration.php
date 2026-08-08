@@ -459,7 +459,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     /**
      * @return array|mixed
      */
-    protected function getFormFieldsByObject($object, $settings = [])
+    protected function getFormFieldsByObject($object, array $settings = [])
     {
         $settings['feature_settings']['objects'] = [$object => $object];
 
@@ -473,7 +473,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      *
      * @return array
      */
-    protected function getPriorityFieldsForMautic($config, $entityObject = null, $priorityObject = 'mautic')
+    protected function getPriorityFieldsForMautic(array $config, $entityObject = null, $priorityObject = 'mautic')
     {
         return $this->cleanPriorityFields(
             $this->getFieldsByPriority($config, $priorityObject, 1),
@@ -486,7 +486,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      *
      * @return array
      */
-    protected function getPriorityFieldsForIntegration($config, $entityObject = null, $priorityObject = 'mautic')
+    protected function getPriorityFieldsForIntegration(array $config, $entityObject = null, $priorityObject = 'mautic')
     {
         return $this->cleanPriorityFields(
             $this->getFieldsByPriority($config, $priorityObject, 0),
@@ -509,7 +509,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      *
      * @return array
      */
-    protected function cleanPriorityFields($fieldsToUpdate, $objects = null)
+    protected function cleanPriorityFields(array $fieldsToUpdate, $objects = null)
     {
         if (!isset($fieldsToUpdate['leadFields'])) {
             return $fieldsToUpdate;
@@ -535,7 +535,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         return [$fromDate, $toDate];
     }
 
-    public function getBlankFieldsToUpdateInMautic($matchedFields, $leadFieldValues, $objectFields, $integrationData, $object = 'Lead')
+    public function getBlankFieldsToUpdateInMautic(array $matchedFields, array $leadFieldValues, $objectFields, array $integrationData, $object = 'Lead')
     {
         foreach ($objectFields as $integrationField => $mauticField) {
             if (isset($leadFieldValues[$mauticField]) && empty($leadFieldValues[$mauticField]['value']) && !empty($integrationData[$integrationField.'__'.$object]) && $this->translator->trans('mautic.integration.form.lead.unknown') !== $integrationData[$integrationField.'__'.$object]) {
@@ -546,7 +546,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         return $matchedFields;
     }
 
-    public function getBlankFieldsToUpdate($fields, $sfRecord, $objectFields, $config)
+    public function getBlankFieldsToUpdate(array $fields, $sfRecord, array $objectFields, array $config)
     {
         // check if update blank fields is selected
         if (isset($config['updateBlanks']) && isset($config['updateBlanks'][0])

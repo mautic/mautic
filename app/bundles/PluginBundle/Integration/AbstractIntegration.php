@@ -354,7 +354,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return void|array
      */
-    public function mergeApiKeys($mergeKeys, $withKeys = [], $return = false)
+    public function mergeApiKeys(array $mergeKeys, $withKeys = [], $return = false)
     {
         if (empty($withKeys)) {
             $withKeys = $this->keys;
@@ -654,7 +654,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return mixed|string|ResponseInterface
      */
-    public function makeRequest($url, $parameters = [], $method = 'GET', $settings = [])
+    public function makeRequest($url, $parameters = [], $method = 'GET', array $settings = [])
     {
         // If not authorizing the session itself, check isAuthorized which will refresh tokens if applicable
         if (empty($settings['authorize_session'])) {
@@ -875,7 +875,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return array
      */
-    public function prepareRequest($url, $parameters, $method, $settings, $authType)
+    public function prepareRequest(string $url, $parameters, string $method, array $settings, $authType)
     {
         $clientIdKey     = $this->getClientIdKey();
         $clientSecretKey = $this->getClientSecretKey();
@@ -1074,7 +1074,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @throws ApiErrorException if OAuth2 state does not match
      */
-    public function authCallback($settings = [], $parameters = [])
+    public function authCallback(array $settings = [], $parameters = [])
     {
         $authType = $this->getAuthenticationType();
 
@@ -1779,11 +1779,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Merges a config from integration_list with feature settings.
      *
-     * @param array $config
-     *
      * @return array|mixed
      */
-    public function mergeConfigToFeatureSettings($config = [])
+    public function mergeConfigToFeatureSettings(array $config = [])
     {
         $featureSettings = $this->settings->getFeatureSettings();
 
@@ -2123,11 +2121,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Get available company fields for choices in the config UI.
      *
-     * @param array $settings
-     *
      * @return array
      */
-    public function getFormCompanyFields($settings = [])
+    public function getFormCompanyFields(array $settings = [])
     {
         $settings['feature_settings']['objects']['company'] = 'company';
 
@@ -2309,12 +2305,11 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * @param CommonEntity|null $entity
-     * @param array             $params
      * @param bool              $ignoreEntityChanges
      *
      * @return bool|\DateTime|null
      */
-    protected function getLastSyncDate($entity = null, $params = [], $ignoreEntityChanges = true)
+    protected function getLastSyncDate($entity = null, array $params = [], $ignoreEntityChanges = true)
     {
         $isNew = ($entity instanceof FormEntity) && $entity->isNew();
         if (!$isNew && !$ignoreEntityChanges && isset($params['start']) && $entity && method_exists($entity, 'getChanges')) {
@@ -2358,7 +2353,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return array
      */
-    public function formatMatchedFields($fields)
+    public function formatMatchedFields(array $fields)
     {
         $formattedFields = [];
 
@@ -2403,7 +2398,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return mixed
      */
-    public function getCompoundMauticFields($lead)
+    public function getCompoundMauticFields(array $lead)
     {
         if ($lead['internal_entity_id']) {
             $lead['mauticContactId']                   = $lead['internal_entity_id'];

@@ -16,10 +16,8 @@ abstract class AbstractFormController extends CommonController
 
     /**
      * @param string $objectModel
-     *
-     * @return RedirectResponse
      */
-    public function unlockAction(Request $request, $objectId, $objectModel)
+    public function unlockAction(Request $request, $objectId, $objectModel): RedirectResponse
     {
         $model                = $this->getModel($objectModel);
         $entity               = $model->getEntity($objectId);
@@ -222,7 +220,7 @@ abstract class AbstractFormController extends CommonController
      *
      * @return array
      */
-    protected function refererPostActionVars($vars)
+    protected function refererPostActionVars(array $vars)
     {
         $request = $this->getCurrentRequest();
         if (empty($request->server->get('HTTP_REFERER'))) {
