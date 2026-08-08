@@ -20,7 +20,7 @@ return RectorConfig::configure()
         phpunitNarrowAsserts: true,
         privatization: true,
         codeQuality: true,
-        // symfonyCodeQuality: true,
+        symfonyCodeQuality: true,
     )
     ->withPhpLevel(120)
     ->withCache(__DIR__.'/var/cache/rector')
@@ -53,12 +53,17 @@ return RectorConfig::configure()
     ->reportUnusedSkips()
     ->withComposerBased(phpunit: true, symfony: true)
     ->withSkip([
-        Rector\Symfony\CodeQuality\Rector\ClassMethod\ActionSuffixRemoverRector::class,
-        Rector\Symfony\CodeQuality\Rector\Class_\ControllerMethodInjectionToConstructorRector::class,
+        PHPUnit\Metadata\DoesNotPerformAssertions::class => [
+            __DIR__.'/app/bundles/CoreBundle/Tests/Twig/TwigIntegrationTestTrait.php',
+        ],
+        Rector\PHPUnit\PHPUnit60\Rector\ClassMethod\AddDoesNotPerformAssertionToNonAssertingTestRector::class => [
+            __DIR__.'/app/bundles/CoreBundle/Tests/Twig/TwigIntegrationTestTrait.php',
+        ],
 
         // @todo move to "twig" group
         Rector\Symfony\Symfony73\Rector\Class_\GetFiltersToAsTwigFilterAttributeRector::class,
         Rector\Symfony\Symfony73\Rector\Class_\GetFunctionsToAsTwigFunctionAttributeRector::class,
+
         Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector::class,
         Rector\EarlyReturn\Rector\If_\ChangeIfElseValueAssignToEarlyReturnRector::class,
         Rector\EarlyReturn\Rector\If_\RemoveAlwaysElseRector::class,
@@ -73,7 +78,6 @@ return RectorConfig::configure()
         Rector\EarlyReturn\Rector\Return_\PreparedValueToEarlyReturnRector::class,
         Rector\EarlyReturn\Rector\StmtsAwareInterface\ReturnEarlyIfVariableRector::class,
         Rector\Symfony\CodeQuality\Rector\Class_\LoadValidatorMetadataToAttributeRector::class,
-        Rector\TypeDeclaration\Rector\StmtsAwareInterface\SafeDeclareStrictTypesRector::class,
         Utils\Rector\ModelGetRepositoryToRepositoryServiceRector::class => [
             __DIR__.'/app/bundles/PageBundle/Form/Type/PreferenceCenterListType.php',
         ],

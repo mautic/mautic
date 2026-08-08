@@ -169,15 +169,7 @@ class CampaignController extends AbstractStandardFormController
             return new JsonResponse([
                 'error'   => $this->translator->trans('mautic.campaign.error.export.file_not_found', ['%path%' => $filePath], 'flashes'),
                 'flashes' => $this->getFlashContent(),
-<<<<<<< HEAD
-<<<<<<< HEAD
             ], Response::HTTP_BAD_REQUEST);
-=======
-            ], \Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST);
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-            ], Response::HTTP_BAD_REQUEST);
->>>>>>> 222589fde5 (cs)
         }
 
         return $exportHelper->downloadAsZip($filePath, $exportFileName);
@@ -268,15 +260,7 @@ class CampaignController extends AbstractStandardFormController
             return new JsonResponse([
                 'error'   => $this->translator->trans('mautic.campaign.error.export.no_campaigns_selected', [], 'flashes'),
                 'flashes' => $this->getFlashContent(),
-<<<<<<< HEAD
-<<<<<<< HEAD
             ], Response::HTTP_BAD_REQUEST);
-=======
-            ], \Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST);
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-            ], Response::HTTP_BAD_REQUEST);
->>>>>>> 222589fde5 (cs)
         }
 
         foreach ($objectIds as $objectId) {

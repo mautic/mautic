@@ -22,15 +22,7 @@ final class JsController extends CommonController
 
         return new Response(
             json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
-<<<<<<< HEAD
-<<<<<<< HEAD
             Response::HTTP_OK,
-=======
-            \Symfony\Component\HttpFoundation\Response::HTTP_OK,
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-            Response::HTTP_OK,
->>>>>>> 222589fde5 (cs)
             [
                 'Content-Type' => 'application/json',
             ]
@@ -41,15 +33,7 @@ final class JsController extends CommonController
     {
         return new Response(
             "importScripts('https://cdn.onesignal.com/sdks/OneSignalSDK.js');",
-<<<<<<< HEAD
-<<<<<<< HEAD
             Response::HTTP_OK,
-=======
-            \Symfony\Component\HttpFoundation\Response::HTTP_OK,
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-            Response::HTTP_OK,
->>>>>>> 222589fde5 (cs)
             [
                 'Service-Worker-Allowed' => '/',
                 'Content-Type'           => 'application/javascript',
@@ -61,15 +45,7 @@ final class JsController extends CommonController
     {
         return new Response(
             "importScripts('https://cdn.onesignal.com/sdks/OneSignalSDK.js');",
-<<<<<<< HEAD
-<<<<<<< HEAD
             Response::HTTP_OK,
-=======
-            \Symfony\Component\HttpFoundation\Response::HTTP_OK,
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-            Response::HTTP_OK,
->>>>>>> 222589fde5 (cs)
             [
                 'Service-Worker-Allowed' => '/',
                 'Content-Type'           => 'application/javascript',

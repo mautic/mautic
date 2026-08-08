@@ -297,15 +297,7 @@ class CommonController extends AbstractController implements MauticController
      */
     public function removeTrailingSlashAction(Request $request, TrailingSlashHelper $trailingSlashHelper): RedirectResponse
     {
-<<<<<<< HEAD
-<<<<<<< HEAD
         return $this->redirect($trailingSlashHelper->getSafeRedirectUrl($request), Response::HTTP_MOVED_PERMANENTLY);
-=======
-        return $this->redirect($trailingSlashHelper->getSafeRedirectUrl($request), \Symfony\Component\HttpFoundation\Response::HTTP_MOVED_PERMANENTLY);
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        return $this->redirect($trailingSlashHelper->getSafeRedirectUrl($request), Response::HTTP_MOVED_PERMANENTLY);
->>>>>>> 222589fde5 (cs)
     }
 
     /**

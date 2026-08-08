@@ -178,15 +178,7 @@ final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
     {
         $from = date('Y-m-d', strtotime('-2 months'));
         $to   = date('Y-m-d', strtotime('-1 month'));
-<<<<<<< HEAD
-<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, sprintf('s/campaigns/graph/%d/%s/%s', $campaignId, $from, $to));
-=======
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, sprintf('s/campaigns/graph/%d/%s/%s', $campaignId, $from, $to));
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        $this->client->request(Request::METHOD_GET, sprintf('s/campaigns/graph/%d/%s/%s', $campaignId, $from, $to));
->>>>>>> 222589fde5 (cs)
         $response      = $this->client->getResponse();
         $body          = json_decode($response->getContent(), true);
         $crawler       = new Crawler($body['newContent']);
@@ -221,15 +213,7 @@ final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
         $from = date('Y-m-d', strtotime('-2 months'));
         $to   = date('Y-m-d', strtotime('-1 month'));
         $url  = sprintf('s/campaigns/event/stats/%d/%s/%s', $campaignId, $from, $to);
-<<<<<<< HEAD
-<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, $url);
-=======
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, $url);
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        $this->client->request(Request::METHOD_GET, $url);
->>>>>>> 222589fde5 (cs)
         $response = $this->client->getResponse();
         $body     = json_decode($response->getContent(), true);
         $this->client->restart();
@@ -372,15 +356,7 @@ final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
     public function testCampaignView(): void
     {
         $campaign = $this->saveSomeCampaignLeadEventLogs();
-<<<<<<< HEAD
-<<<<<<< HEAD
         $crawler  = $this->client->request(Request::METHOD_GET, sprintf('/s/campaigns/view/%d', $campaign->getId()));
-=======
-        $crawler  = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, sprintf('/s/campaigns/view/%d', $campaign->getId()));
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        $crawler  = $this->client->request(Request::METHOD_GET, sprintf('/s/campaigns/view/%d', $campaign->getId()));
->>>>>>> 222589fde5 (cs)
         $response = $this->client->getResponse();
         self::assertResponseIsSuccessful();
         $this->assertStringContainsString('Campaign ABC', (string) $response->getContent());
@@ -395,15 +371,7 @@ final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
         $from     = date('Y-m-d', strtotime('-2 months'));
         $to       = date('Y-m-d', strtotime('-1 month'));
         $campaign = $this->saveSomeCampaignLeadEventLogs();
-<<<<<<< HEAD
-<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, sprintf('s/campaigns/event/stats/%d/%s/%s', $campaign->getId(), $from, $to));
-=======
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, sprintf('s/campaigns/event/stats/%d/%s/%s', $campaign->getId(), $from, $to));
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        $this->client->request(Request::METHOD_GET, sprintf('s/campaigns/event/stats/%d/%s/%s', $campaign->getId(), $from, $to));
->>>>>>> 222589fde5 (cs)
         $response = $this->client->getResponse();
         self::assertResponseIsSuccessful();
         $body     = json_decode($response->getContent(), true);

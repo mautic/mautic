@@ -37,15 +37,7 @@ final class PublicController extends CommonController
 
             $content = $this->focusModel->generateJavascript($focus);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
             return new Response($content, Response::HTTP_OK, ['Content-Type' => 'application/javascript']);
-=======
-            return new Response($content, \Symfony\Component\HttpFoundation\Response::HTTP_OK, ['Content-Type' => 'application/javascript']);
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-            return new Response($content, Response::HTTP_OK, ['Content-Type' => 'application/javascript']);
->>>>>>> 222589fde5 (cs)
         }
 
         return new Response('', Response::HTTP_NOT_FOUND);

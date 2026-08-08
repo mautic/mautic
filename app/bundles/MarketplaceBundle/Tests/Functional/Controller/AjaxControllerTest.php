@@ -56,11 +56,7 @@ final class AjaxControllerTest extends AbstractMauticTestCase
         $response = $controller->installPackageAction($request);
 
         $this->assertSame('{"success":true}', $response->getContent());
-<<<<<<< HEAD
-        $this->assertSame(\Symfony\Component\HttpFoundation\Response::HTTP_OK, $response->getStatusCode());
-=======
         $this->assertSame(\Symfony\Component\HttpFoundation\Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
     }
 
     public function testRemovePackageAction(): void
@@ -78,11 +74,7 @@ final class AjaxControllerTest extends AbstractMauticTestCase
         $response = $controller->removePackageAction($request);
 
         $this->assertSame('{"success":true}', $response->getContent());
-<<<<<<< HEAD
-        $this->assertSame(\Symfony\Component\HttpFoundation\Response::HTTP_OK, $response->getStatusCode());
-=======
         $this->assertSame(\Symfony\Component\HttpFoundation\Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
     }
 
     private function generateController(bool $isPackageInstalled): AjaxController

@@ -49,15 +49,7 @@ final class JsController extends CommonController
             $this->dispatcher->dispatch($event, CoreEvents::BUILD_MAUTIC_JS);
         }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
         return new Response($event->getJs(), Response::HTTP_OK, ['Content-Type' => 'application/javascript']);
-=======
-        return new Response($event->getJs(), \Symfony\Component\HttpFoundation\Response::HTTP_OK, ['Content-Type' => 'application/javascript']);
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        return new Response($event->getJs(), Response::HTTP_OK, ['Content-Type' => 'application/javascript']);
->>>>>>> 222589fde5 (cs)
     }
 
     /**

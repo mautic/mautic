@@ -109,15 +109,7 @@ final class PublicController extends AbstractFormController
                 if ($requestUri != $url) {
                     $model->hitPage($entity, $request, 301, $lead, $query);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
                     return $this->redirect($url, Response::HTTP_MOVED_PERMANENTLY);
-=======
-                    return $this->redirect($url, \Symfony\Component\HttpFoundation\Response::HTTP_MOVED_PERMANENTLY);
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-                    return $this->redirect($url, Response::HTTP_MOVED_PERMANENTLY);
->>>>>>> 222589fde5 (cs)
                 }
             }
 
@@ -129,15 +121,7 @@ final class PublicController extends AbstractFormController
                 $model->hitPage($entity, $request, 301, $lead, $query);
                 $url = $model->generateUrl($parentVariant, false);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
                 return $this->redirect($url, Response::HTTP_MOVED_PERMANENTLY);
-=======
-                return $this->redirect($url, \Symfony\Component\HttpFoundation\Response::HTTP_MOVED_PERMANENTLY);
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-                return $this->redirect($url, Response::HTTP_MOVED_PERMANENTLY);
->>>>>>> 222589fde5 (cs)
             }
 
             // First determine the A/B test to display if applicable
@@ -252,15 +236,7 @@ final class PublicController extends AbstractFormController
                             $url = $model->generateUrl($translatedEntity, false);
                             $model->hitPage($entity, $request, 302, $lead, $query);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
                             return $this->redirect($url, Response::HTTP_FOUND);
-=======
-                            return $this->redirect($url, \Symfony\Component\HttpFoundation\Response::HTTP_FOUND);
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-                            return $this->redirect($url, Response::HTTP_FOUND);
->>>>>>> 222589fde5 (cs)
                         }
                     }
                 }

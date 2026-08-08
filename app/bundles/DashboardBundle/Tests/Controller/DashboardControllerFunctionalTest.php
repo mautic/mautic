@@ -242,15 +242,7 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
-<<<<<<< HEAD
-<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, "/s/dashboard/widget/{$widget->getId()}", [], [], $this->createAjaxHeaders());
-=======
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, "/s/dashboard/widget/{$widget->getId()}", [], [], $this->createAjaxHeaders());
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        $this->client->request(Request::METHOD_GET, "/s/dashboard/widget/{$widget->getId()}", [], [], $this->createAjaxHeaders());
->>>>>>> 222589fde5 (cs)
 
         self::assertResponseIsSuccessful();
         $this->assertStringContainsString('TestFN TestLN', (string) $this->client->getResponse()->getContent());

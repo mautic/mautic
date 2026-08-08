@@ -62,15 +62,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         ]);
 
         // Check the details page
-<<<<<<< HEAD
-<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId());
-=======
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/reports/view/'.$report->getId());
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId());
->>>>>>> 222589fde5 (cs)
 
         self::assertResponseIsSuccessful();
     }
@@ -90,15 +82,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($report);
         $this->em->flush();
 
-<<<<<<< HEAD
-<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId().'?tmpl=list&name=report.'.$report->getId());
-=======
-        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/reports/view/'.$report->getId().'?tmpl=list&name=report.'.$report->getId());
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId().'?tmpl=list&name=report.'.$report->getId());
->>>>>>> 222589fde5 (cs)
 
         $crawlerReportTable = $crawler->filterXPath('//table[@id="reportTable"]')->first();
         $crawlerReportTable = $this->domTableToArray($crawlerReportTable);
@@ -109,15 +93,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
             ['3', 'test page 3', '30'],
         ], array_slice($crawlerReportTable, 1, 3));
 
-<<<<<<< HEAD
-<<<<<<< HEAD
         $crawler            = $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId().'?tmpl=list&name=report.'.$report->getId().'&orderby=p.hits');
-=======
-        $crawler            = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/reports/view/'.$report->getId().'?tmpl=list&name=report.'.$report->getId().'&orderby=p.hits');
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        $crawler            = $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId().'?tmpl=list&name=report.'.$report->getId().'&orderby=p.hits');
->>>>>>> 222589fde5 (cs)
         $crawlerReportTable = $crawler->filterXPath('//table[@id="reportTable"]')->first();
         $crawlerReportTable = $this->domTableToArray($crawlerReportTable);
 
@@ -185,15 +161,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         // Check sql injection in parameter id
         $this->assertSqlInjectionNotWork('/s/reports/view/'.$report->getId().'\'?tmpl=list&name=report.'.$report->getId().'&orderby=a_id');
 
-<<<<<<< HEAD
-<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId().'?tmpl=list&name=report.'.$report->getId().'&orderby=a_id');
-=======
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/reports/view/'.$report->getId().'?tmpl=list&name=report.'.$report->getId().'&orderby=a_id');
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId().'?tmpl=list&name=report.'.$report->getId().'&orderby=a_id');
->>>>>>> 222589fde5 (cs)
         self::assertResponseIsSuccessful();
     }
 
@@ -212,15 +180,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         self::getContainer()->get(ReportModel::class)->saveEntity($report);
 
         // Check the details page
-<<<<<<< HEAD
-<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId());
-=======
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/reports/view/'.$report->getId());
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId());
->>>>>>> 222589fde5 (cs)
         self::assertResponseIsSuccessful();
     }
 
@@ -320,15 +280,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         ];
 
         // Get report view
-<<<<<<< HEAD
-<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId());
-=======
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/reports/view/'.$report->getId());
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId());
->>>>>>> 222589fde5 (cs)
         $response = $this->client->getResponse();
         self::assertResponseIsSuccessful();
 
@@ -383,15 +335,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->getContainer()->get(ReportModel::class)->saveEntity($report);
 
         // Check the details page
-<<<<<<< HEAD
-<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId());
-=======
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/reports/view/'.$report->getId());
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId());
->>>>>>> 222589fde5 (cs)
         self::assertResponseIsSuccessful();
         $response = $this->client->getResponse();
 
@@ -420,15 +364,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->getContainer()->get(ReportModel::class)->saveEntity($report);
 
         // Check the details page
-<<<<<<< HEAD
-<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId());
-=======
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/reports/view/'.$report->getId());
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId());
->>>>>>> 222589fde5 (cs)
         self::assertResponseIsSuccessful();
     }
 
@@ -514,29 +450,13 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         self::getContainer()->get(ReportModel::class)->saveEntity($report);
 
         // Check the details page
-<<<<<<< HEAD
-<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/reports/'.$report->getId());
-=======
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/reports/'.$report->getId());
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        $this->client->request(Request::METHOD_GET, '/s/reports/'.$report->getId());
->>>>>>> 222589fde5 (cs)
         $clientResponse        = $this->client->getResponse();
         $clientResponseContent = $clientResponse->getContent();
         $this->assertStringContainsString('<small><b>This is allowed HTML</b></small>', (string) $clientResponseContent);
 
         // Check the list
-<<<<<<< HEAD
-<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/reports');
-=======
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/reports');
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        $this->client->request(Request::METHOD_GET, '/s/reports');
->>>>>>> 222589fde5 (cs)
         $clientResponse        = $this->client->getResponse();
         $clientResponseContent = $clientResponse->getContent();
         $this->assertStringContainsString('<small><b>This is allowed HTML</b></small>', (string) $clientResponseContent);
@@ -559,8 +479,6 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $report->setColumns($coulmns);
         $this->getContainer()->get(ReportModel::class)->saveEntity($report);
         $xssHeader     = '<script>alert(1)</script>';
-<<<<<<< HEAD
-<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/mtracking.gif?page_url='.$xssHeader);
         $this->assertResponseStatusCodeSame(200);
         $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId());
@@ -568,22 +486,6 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringNotContainsString($xssHeader, (string) $this->client->getResponse()->getContent());
 
         $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId().'/export/html');
-=======
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/mtracking.gif?page_url='.$xssHeader);
-=======
-        $this->client->request(Request::METHOD_GET, '/mtracking.gif?page_url='.$xssHeader);
->>>>>>> 222589fde5 (cs)
-        $this->assertResponseStatusCodeSame(200);
-        $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId());
-        $this->assertResponseStatusCodeSame(200);
-        $this->assertStringNotContainsString($xssHeader, (string) $this->client->getResponse()->getContent());
-
-<<<<<<< HEAD
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/reports/view/'.$report->getId().'/export/html');
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId().'/export/html');
->>>>>>> 222589fde5 (cs)
         $this->assertStringNotContainsString($xssHeader, (string) $this->client->getResponse()->getContent());
     }
 
@@ -733,15 +635,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
 
     private function assertSqlInjectionNotWork(string $url): void
     {
-<<<<<<< HEAD
-<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, $url);
-=======
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, $url);
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        $this->client->request(Request::METHOD_GET, $url);
->>>>>>> 222589fde5 (cs)
         $this->assertStringNotContainsString(
             'You have an error in your SQL syntax',
             (string) $this->client->getResponse()->getContent()
@@ -770,15 +664,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->getContainer()->get(ReportModel::class)->saveEntity($report);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId());
-=======
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/reports/view/'.$report->getId());
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId());
->>>>>>> 222589fde5 (cs)
         self::assertResponseIsSuccessful();
 
         $content  = $this->client->getResponse()->getcontent();
@@ -823,15 +709,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $reportModel->method('getFilterList')->willReturn($filterDefinitions);
         self::getContainer()->set('mautic.report.model.report', $reportModel);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId());
-=======
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/reports/view/'.$report->getId());
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId());
->>>>>>> 222589fde5 (cs)
         self::assertResponseIsSuccessful();
 
         $content = $this->client->getResponse()->getContent();

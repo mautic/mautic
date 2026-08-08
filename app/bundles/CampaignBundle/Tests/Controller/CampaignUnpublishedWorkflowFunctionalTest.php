@@ -13,15 +13,7 @@ final class CampaignUnpublishedWorkflowFunctionalTest extends AbstractCampaignTe
     public function testCreateCampaignPageShouldNotContainConformation(): void
     {
         // Check the message in the Campaign edit page
-<<<<<<< HEAD
-<<<<<<< HEAD
         $crawler  = $this->client->request(Request::METHOD_GET, '/s/campaigns/new');
-=======
-        $crawler  = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/campaigns/new');
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        $crawler  = $this->client->request(Request::METHOD_GET, '/s/campaigns/new');
->>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
 
         $attributes = [
@@ -49,15 +41,7 @@ final class CampaignUnpublishedWorkflowFunctionalTest extends AbstractCampaignTe
         $translator = self::getContainer()->get(TranslatorInterface::class);
 
         // Check the message in the Campaign edit page
-<<<<<<< HEAD
-<<<<<<< HEAD
         $crawler  = $this->client->request(Request::METHOD_GET, sprintf('/s/campaigns/edit/%d', $campaign->getId()));
-=======
-        $crawler  = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, sprintf('/s/campaigns/edit/%d', $campaign->getId()));
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        $crawler  = $this->client->request(Request::METHOD_GET, sprintf('/s/campaigns/edit/%d', $campaign->getId()));
->>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
 
         $republishBehavior = $translator->trans('mautic.campaignconfig.campaign_republish_behavior.'.$campaign->getRepublishBehavior());
@@ -89,15 +73,7 @@ final class CampaignUnpublishedWorkflowFunctionalTest extends AbstractCampaignTe
         $translator = self::getContainer()->get(TranslatorInterface::class);
 
         // Check the message in the Campaign listing page
-<<<<<<< HEAD
-<<<<<<< HEAD
         $crawler  = $this->client->request(Request::METHOD_GET, '/s/campaigns');
-=======
-        $crawler  = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/campaigns');
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        $crawler  = $this->client->request(Request::METHOD_GET, '/s/campaigns');
->>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
 
         $republishBehavior = $translator->trans('mautic.campaignconfig.campaign_republish_behavior.'.$campaign->getRepublishBehavior());

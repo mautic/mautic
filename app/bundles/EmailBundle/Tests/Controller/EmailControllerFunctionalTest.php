@@ -77,15 +77,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->detach($email);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/emails');
-=======
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/emails');
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        $this->client->request(Request::METHOD_GET, '/s/emails');
->>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful('Return code must be 200');
         $this->assertStringContainsString('February 7, 2020', (string) $clientResponse->getContent());
@@ -106,15 +98,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
      */
     public function testIndexActionWhenFiltering(): void
     {
-<<<<<<< HEAD
-<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/emails?search=has%3Aresults&tmpl=list');
-=======
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/emails?search=has%3Aresults&tmpl=list');
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        $this->client->request(Request::METHOD_GET, '/s/emails?search=has%3Aresults&tmpl=list');
->>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
     }
 
@@ -902,15 +886,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-<<<<<<< HEAD
-<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/edit/'.$email->getId());
-=======
-        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/emails/edit/'.$email->getId());
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/edit/'.$email->getId());
->>>>>>> 222589fde5 (cs)
         $form    = $crawler->selectButton('Save')->form();
         $form['emailform[projects]']->setValue((string) $project->getId());
 
@@ -930,15 +906,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->assertEmailVersion($email->getId(), $version);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/edit/'.$email->getId());
-=======
-        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/emails/edit/'.$email->getId());
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/edit/'.$email->getId());
->>>>>>> 222589fde5 (cs)
         $form    = $crawler->selectButton('Save')->form();
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();

@@ -53,15 +53,7 @@ JS;
 
         return new Response(
             $js,
-<<<<<<< HEAD
-<<<<<<< HEAD
             Response::HTTP_OK,
-=======
-            \Symfony\Component\HttpFoundation\Response::HTTP_OK,
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-            Response::HTTP_OK,
->>>>>>> 222589fde5 (cs)
             [
                 'Content-Type'           => 'application/javascript',
             ]

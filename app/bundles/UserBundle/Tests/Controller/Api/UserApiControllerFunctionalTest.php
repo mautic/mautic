@@ -209,15 +209,7 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         $userData['role'] = sprintf('/api/v2/roles/%d', $role->getId());
 
         $this->client->request(
-<<<<<<< HEAD
-<<<<<<< HEAD
             Request::METHOD_POST,
-=======
-            \Symfony\Component\HttpFoundation\Request::METHOD_POST,
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-            Request::METHOD_POST,
->>>>>>> 222589fde5 (cs)
             '/api/v2/users',
             [],
             [],
@@ -258,15 +250,7 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
 
             // Verify we can log in with the new user (simulates authentication)
             $this->loginUser($user);
-<<<<<<< HEAD
-<<<<<<< HEAD
             $this->client->request(Request::METHOD_GET, '/s/dashboard');
-=======
-            $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/dashboard');
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-            $this->client->request(Request::METHOD_GET, '/s/dashboard');
->>>>>>> 222589fde5 (cs)
 
             // Assert we can access the dashboard successfully
             $this->assertResponseIsSuccessful();

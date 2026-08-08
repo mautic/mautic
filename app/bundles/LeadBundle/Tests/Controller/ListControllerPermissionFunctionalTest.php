@@ -654,15 +654,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $this->assertTrue($segment->isPublished());
 
         $this->client->request(
-<<<<<<< HEAD
-<<<<<<< HEAD
             Request::METHOD_POST,
-=======
-            \Symfony\Component\HttpFoundation\Request::METHOD_POST,
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-            Request::METHOD_POST,
->>>>>>> 222589fde5 (cs)
             '/s/ajax',
             [
                 'action' => 'togglePublishStatus',
@@ -697,15 +689,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $segment = $this->createSegment('Segment Without Publish', $user);
 
         $this->client->request(
-<<<<<<< HEAD
-<<<<<<< HEAD
             Request::METHOD_POST,
-=======
-            \Symfony\Component\HttpFoundation\Request::METHOD_POST,
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-            Request::METHOD_POST,
->>>>>>> 222589fde5 (cs)
             '/s/ajax',
             [
                 'action' => 'togglePublishStatus',
@@ -714,15 +698,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
             ]
         );
 
-<<<<<<< HEAD
-<<<<<<< HEAD
         $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
-=======
-        $this->assertEquals(\Symfony\Component\HttpFoundation\Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
->>>>>>> 222589fde5 (cs)
 
         $this->em->refresh($segment);
         $this->assertTrue($segment->isPublished());

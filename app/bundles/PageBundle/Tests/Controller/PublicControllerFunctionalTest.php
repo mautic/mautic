@@ -16,15 +16,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testTrackingImageAction(): void
     {
-<<<<<<< HEAD
-<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/mtracking.gif?url=http%3A%2F%2Fmautic.org');
-=======
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/mtracking.gif?url=http%3A%2F%2Fmautic.org');
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        $this->client->request(Request::METHOD_GET, '/mtracking.gif?url=http%3A%2F%2Fmautic.org');
->>>>>>> 222589fde5 (cs)
 
         $this->assertResponseStatusCodeSame(200);
     }
@@ -123,15 +115,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
     {
         $this->logoutUser();
 
-<<<<<<< HEAD
-<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, '/mtc/event', [
-=======
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/mtc/event', [
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        $this->client->request(Request::METHOD_POST, '/mtc/event', [
->>>>>>> 222589fde5 (cs)
             'page_url' => 'https://example.com?Company=%3Cimg+src+onerror%3Dalert%28%27Company%27%29%3E',
         ]);
         $this->assertResponseIsSuccessful();
@@ -140,29 +124,13 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $response = json_decode($this->client->getResponse()->getContent(), true);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, sprintf('/s/contacts/view/%d', $response['id']));
-=======
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, sprintf('/s/contacts/view/%d', $response['id']));
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        $this->client->request(Request::METHOD_GET, sprintf('/s/contacts/view/%d', $response['id']));
->>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
         $content = $this->client->getResponse()->getContent();
 
         $this->assertStringNotContainsString('<img src onerror=alert(\'Company\')>', (string) $content);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, sprintf('/s/contacts/edit/%d', $response['id']));
-=======
-        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, sprintf('/s/contacts/edit/%d', $response['id']));
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        $crawler = $this->client->request(Request::METHOD_GET, sprintf('/s/contacts/edit/%d', $response['id']));
->>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
         $content = $this->client->getResponse()->getContent();
 

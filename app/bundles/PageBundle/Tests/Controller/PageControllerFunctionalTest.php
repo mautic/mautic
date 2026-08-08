@@ -92,15 +92,7 @@ final class PageControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-<<<<<<< HEAD
-<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, '/s/pages/edit/'.$page->getId());
-=======
-        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/pages/edit/'.$page->getId());
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/pages/edit/'.$page->getId());
->>>>>>> 222589fde5 (cs)
         $form    = $crawler->selectButton('Save')->form();
         $form['page[projects]']->setValue((string) $project->getId());
 
@@ -147,15 +139,7 @@ final class PageControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->assertPageVersion($page->getId(), $version);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
         $crawler = $this->client->request(Request::METHOD_GET, '/s/pages/edit/'.$page->getId());
-=======
-        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/pages/edit/'.$page->getId());
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/pages/edit/'.$page->getId());
->>>>>>> 222589fde5 (cs)
         $form    = $crawler->selectButton('Save')->form();
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();

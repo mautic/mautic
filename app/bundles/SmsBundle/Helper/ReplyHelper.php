@@ -62,21 +62,9 @@ final readonly class ReplyHelper
                 }
             }
         } catch (BadRequestHttpException) {
-<<<<<<< HEAD
-<<<<<<< HEAD
             return new Response('invalid request', Response::HTTP_BAD_REQUEST);
         } catch (NotFoundHttpException) {
             return new Response('', Response::HTTP_NOT_FOUND);
-=======
-            return new Response('invalid request', \Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST);
-        } catch (NotFoundHttpException) {
-            return new Response('', \Symfony\Component\HttpFoundation\Response::HTTP_NOT_FOUND);
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-            return new Response('invalid request', Response::HTTP_BAD_REQUEST);
-        } catch (NotFoundHttpException) {
-            return new Response('', Response::HTTP_NOT_FOUND);
->>>>>>> 222589fde5 (cs)
         } catch (NumberNotFoundException $exception) {
             $this->logger->debug(
                 sprintf(

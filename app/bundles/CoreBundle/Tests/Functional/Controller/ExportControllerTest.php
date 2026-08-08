@@ -84,15 +84,7 @@ final class ExportControllerTest extends MauticMysqlTestCase
         $this->getContainer()->get(ReportModel::class)->saveEntity($report);
 
         // Check the details page
-<<<<<<< HEAD
-<<<<<<< HEAD
         $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId());
-=======
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/reports/view/'.$report->getId());
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId());
->>>>>>> 222589fde5 (cs)
         $this->assertResponseIsSuccessful();
 
         $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId().'');
@@ -219,15 +211,7 @@ final class ExportControllerTest extends MauticMysqlTestCase
             ],
         ];
 
-<<<<<<< HEAD
-<<<<<<< HEAD
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $formPayload);
-=======
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/forms/new', $formPayload);
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        $this->client->request(Request::METHOD_POST, '/api/forms/new', $formPayload);
->>>>>>> 222589fde5 (cs)
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
         $response = json_decode($clientResponse->getContent(), true);

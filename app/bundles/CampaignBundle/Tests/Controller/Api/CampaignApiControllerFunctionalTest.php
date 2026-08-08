@@ -402,15 +402,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
 
         // Assert that access is denied
-<<<<<<< HEAD
-<<<<<<< HEAD
         $this->assertEquals(Response::HTTP_FORBIDDEN, $response->getStatusCode());
-=======
-        $this->assertEquals(\Symfony\Component\HttpFoundation\Response::HTTP_FORBIDDEN, $response->getStatusCode());
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        $this->assertEquals(Response::HTTP_FORBIDDEN, $response->getStatusCode());
->>>>>>> 222589fde5 (cs)
     }
 
     public function testImportCampaignActionJson(): void
@@ -430,15 +422,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         // Debug early exit if something fails
-<<<<<<< HEAD
-<<<<<<< HEAD
         if (Response::HTTP_CREATED !== $clientResponse->getStatusCode()) {
-=======
-        if (\Symfony\Component\HttpFoundation\Response::HTTP_CREATED !== $clientResponse->getStatusCode()) {
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        if (Response::HTTP_CREATED !== $clientResponse->getStatusCode()) {
->>>>>>> 222589fde5 (cs)
             $this->fail('Import failed with error: '.$clientResponse->getContent());
         }
 
@@ -485,15 +469,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         unlink($zipPath);
         unlink($asset);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
         if (Response::HTTP_CREATED !== $response->getStatusCode()) {
-=======
-        if (\Symfony\Component\HttpFoundation\Response::HTTP_CREATED !== $response->getStatusCode()) {
->>>>>>> a7c9fd10b7 ([probe] [symfony] use symfony code-quality set)
-=======
-        if (Response::HTTP_CREATED !== $response->getStatusCode()) {
->>>>>>> 222589fde5 (cs)
             $this->fail('Import failed with error: '.$response->getContent());
         }
 
