@@ -61,6 +61,7 @@ trait TwigIntegrationTestTrait
      * @param string                $deprecation
      */
     #[DataProvider('integrationTestDataProvider')]
+    #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
     public function testIntegration($file, $message, $condition, $templates, $exception, $outputs, $deprecation = ''): void
     {
         $this->doIntegrationTest($file, $message, $condition, $templates, $exception, $outputs, $deprecation);
@@ -78,6 +79,7 @@ trait TwigIntegrationTestTrait
      * @param mixed $outputs
      * @param mixed $deprecation
      */
+    #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
     public function testLegacyIntegration($file = null, $message = null, $condition = null, $templates = null, $exception = null, $outputs = null, $deprecation = ''): void
     {
         $this->markTestSkipped('Legacy Twig tests are not applicable to this project');

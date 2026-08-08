@@ -42,7 +42,7 @@ final readonly class MauticDenyAccessListener
         $operation        = $resourceMetadata->getOperation($attributes['operation_name']);
         $securityExpression = $operation->getSecurity() ?? null;
 
-        if (null === $securityExpression || !is_string($securityExpression)) {
+        if (null === $securityExpression) {
             return;
         }
 

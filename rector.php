@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Rector\Config\RectorConfig;
+use Rector\TypeDeclaration\Rector\ClassMethod\AddParamTypeDeclarationRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
 use Utils\Rector\UnserializeToSerializerDecodeRector;
 
@@ -39,8 +40,6 @@ return RectorConfig::configure()
         Mautic\PluginBundle\Integration\AbstractIntegration::class,
     ])
     ->withRules([
-        Rector\TypeDeclaration\Rector\StmtsAwareInterface\SafeDeclareStrictTypesRector::class,
-
         Rector\PHPUnit\CodeQuality\Rector\ClassMethod\AssertClassToThisAssertRector::class,
         Rector\TypeDeclarationDocblocks\Rector\Property\MergePhpstanDocTagIntoNativeRector::class,
 
@@ -59,7 +58,15 @@ return RectorConfig::configure()
         Rector\Symfony\Symfony73\Rector\Class_\GetFunctionsToAsTwigFunctionAttributeRector::class,
 
         // is deprecated, messy code
-        Rector\Strict\Rector\Empty_\DisallowedEmptyRuleFixerRector::class,
+        AddParamTypeDeclarationRector::class => [
+            // test fixtures
+            __DIR__.'/app/bundles/LeadBundle/Tests/Form/Type/FilterTypeTest.php',
+        ],
+
+        // handled in another PR
+        Rector\EarlyReturn\Rector\Return_\PreparedValueToEarlyReturnRector::class,
+        Rector\EarlyReturn\Rector\StmtsAwareInterface\ReturnEarlyIfVariableRector::class,
+        Rector\EarlyReturn\Rector\If_\ChangeIfElseValueAssignToEarlyReturnRector::class,
 
         // intentional parent property assign override
         Rector\CodeQuality\Rector\Class_\InlineConstructorDefaultToPropertyRector::class => [
@@ -68,7 +75,6 @@ return RectorConfig::configure()
 
         // handle next
         Rector\Symfony\CodeQuality\Rector\Class_\LoadValidatorMetadataToAttributeRector::class,
-        Rector\TypeDeclaration\Rector\StmtsAwareInterface\SafeDeclareStrictTypesRector::class,
         Utils\Rector\ModelGetRepositoryToRepositoryServiceRector::class => [
             __DIR__.'/app/bundles/PageBundle/Form/Type/PreferenceCenterListType.php',
         ],
@@ -80,8 +86,6 @@ return RectorConfig::configure()
             // doctrine magic
             __DIR__.'/app/bundles/CoreBundle/EventListener/DoctrineEventsSubscriber.php',
         ],
-
-        Rector\Symfony\Symfony30\Rector\ClassMethod\RemoveDefaultGetBlockPrefixRector::class,
 
         // test fixtures
         __DIR__.'/plugins/*/node_modules/*',

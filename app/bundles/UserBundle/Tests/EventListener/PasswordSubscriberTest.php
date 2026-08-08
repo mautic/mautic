@@ -58,6 +58,7 @@ final class PasswordSubscriberTest extends TestCase
         );
     }
 
+    #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
     public function testThatItDoesntThrowExceptionIfPasswordIsStrong(): void
     {
         $passwordStrengthBadge = new PasswordStrengthBadge(uniqid('password_strength', true));
