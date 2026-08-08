@@ -24,6 +24,8 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 final class CompanyController extends FormController
 {
+    private const MAX_BATCH_REMOVE_CONTACTS = 1000;
+
     use LeadDetailsTrait;
 
     private \Mautic\LeadBundle\Entity\CompanyRepository $companyRepository;
@@ -192,11 +194,11 @@ final class CompanyController extends FormController
     /**
      * Removes selected contacts from a company.
      */
-    public function batchRemoveContactsAction(Request $request, $objectId): Response
+    public function batchRemoveContactsAction(Request $request, string|int $companyId): Response
     {
         $returnUrl = $this->generateUrl('mautic_company_action', [
             'objectAction' => 'view',
-            'objectId'     => $objectId,
+            'objectId'     => $companyId,
         ]);
         $flashes = [];
 
@@ -204,7 +206,7 @@ final class CompanyController extends FormController
             'returnUrl'       => $returnUrl,
             'viewParameters'  => [
                 'objectAction' => 'view',
-                'objectId'     => $objectId,
+                'objectId'     => $companyId,
             ],
             'contentTemplate' => 'Mautic\LeadBundle\Controller\CompanyController::viewAction',
             'passthroughVars' => [
@@ -213,7 +215,7 @@ final class CompanyController extends FormController
             ],
         ];
 
-        $company = $this->companyModel->getEntity($objectId);
+        $company = $this->companyModel->getEntity($companyId);
         if (null === $company) {
             $flashes[] = [
                 'type'    => 'error',
@@ -229,19 +231,13 @@ final class CompanyController extends FormController
         } elseif (Request::METHOD_POST === $request->getMethod()) {
             $ids = json_decode($request->query->get('ids', '[]'), true);
 
-            if (is_array($ids)) {
-                $companyContactIds = array_map(
-                    intval(...),
-                    array_column(
-                        $this->companyModel->getCompanyLeadRepository()->getCompanyLeads($objectId),
-                        'lead_id'
-                    )
-                );
+            if (is_array($ids) && count($ids) <= self::MAX_BATCH_REMOVE_CONTACTS) {
+                $companyLeadRepository = $this->companyModel->getCompanyLeadRepository();
                 $removed = 0;
 
-                foreach ($ids as $contactId) {
+                foreach (array_unique(array_map(intval(...), $ids)) as $contactId) {
                     $contactId = (int) $contactId;
-                    if (!in_array($contactId, $companyContactIds, true)) {
+                    if (!$companyLeadRepository->getCompanyLeadEntity($contactId, (int) $companyId)) {
                         continue;
                     }
 
@@ -274,6 +270,12 @@ final class CompanyController extends FormController
                     'type'    => 'notice',
                     'msg'     => 'mautic.company.contacts.notice.batch_removed',
                     'msgVars' => ['%count%' => $removed],
+                ];
+            } elseif (is_array($ids)) {
+                $flashes[] = [
+                    'type'    => 'error',
+                    'msg'     => 'mautic.company.contacts.error.batch_limit',
+                    'msgVars' => ['%limit%' => self::MAX_BATCH_REMOVE_CONTACTS],
                 ];
             }
         }
