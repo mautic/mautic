@@ -314,7 +314,7 @@ final class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestC
     private function assertEmailStatsContactFirstNameReport(
         string $emailAddress,
         string $firstName,
-        ?string $segmentAlias
+        ?string $segmentAlias,
     ): void {
         $email = $this->createEmail('Email');
 

@@ -105,7 +105,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     #[DataProvider('emailStatsSegmentFilterColumnsProvider')]
     public function testOnReportGenerateForEmailStatsSegmentFilterJoinsViaEmailStats(
         array $columns,
-        bool $expectsLeadJoin
+        bool $expectsLeadJoin,
     ): void {
         $this->report->expects($this->once())
             ->method('getSource')
