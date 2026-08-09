@@ -41,9 +41,15 @@
     "phpstan/phpstan-doctrine": "^2.0.28",
     "phpstan/phpstan-phpunit": "^2.0.18",
     "phpstan/phpstan-symfony": "^2.0.20",
+<<<<<<< HEAD
     "phpunit/phpunit": "^12.0",
     "rector/type-perfect": "^2.1.4",
+=======
+    "phpunit/phpunit": "^11.5",
+>>>>>>> 4ea9d681bd (add composer dependency analyser)
     "rector/rector": "dev-main",
+    "rector/type-perfect": "^2.1.4",
+    "shipmonk/composer-dependency-analyser": "*",
     "symfony/browser-kit": "~7.4.0",
     "symfony/dom-crawler": "~7.4.0",
     "symfony/maker-bundle": "^1.64",
