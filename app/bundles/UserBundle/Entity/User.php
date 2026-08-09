@@ -44,6 +44,8 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[UniqueEntity(fields: ['username'], message: 'mautic.user.user.username.unique', repositoryMethod: 'checkUniqueUsernameEmail')]
+#[UniqueEntity(fields: ['email'], message: 'mautic.user.user.email.unique', repositoryMethod: 'checkUniqueUsernameEmail', groups: ['User', 'SecondPass'])]
 class User extends FormEntity implements UserInterface, EquatableInterface, PasswordAuthenticatedUserInterface, CacheInvalidateInterface
 {
     public const CACHE_NAMESPACE = 'User';
@@ -233,8 +235,6 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
             message: 'mautic.user.user.username.notblank'
         ));
 
-        $metadata->addConstraint(new UniqueEntity(fields: ['username'], message: 'mautic.user.user.username.unique', repositoryMethod: 'checkUniqueUsernameEmail'));
-
         $metadata->addPropertyConstraint('firstName', new Assert\NotBlank(
             message: 'mautic.user.user.firstname.notblank'
         ));
@@ -248,8 +248,6 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         ));
 
         $metadata->addPropertyConstraint('email', new Assert\Email(message: 'mautic.user.user.email.valid', groups: ['SecondPass']));
-
-        $metadata->addConstraint(new UniqueEntity(fields: ['email'], message: 'mautic.user.user.email.unique', repositoryMethod: 'checkUniqueUsernameEmail', groups: ['User', 'SecondPass']));
 
         $metadata->addPropertyConstraint('position', new Assert\Length(max: 191, maxMessage: 'mautic.user.user.position.toolong'));
 
