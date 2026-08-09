@@ -10,6 +10,7 @@ use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Validation;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class FormFieldSliderTypeTest extends TypeTestCase
 {
     protected function getExtensions(): array

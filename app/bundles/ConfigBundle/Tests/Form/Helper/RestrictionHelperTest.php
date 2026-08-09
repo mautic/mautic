@@ -50,6 +50,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  * Mocking a representative ConfigForm by leveraging Symfony's TypeTestCase to test RestrictionHelper.
  */
 #[CoversClass(RestrictionHelper::class)]
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class RestrictionHelperTest extends TypeTestCase
 {
     private string $displayMode = RestrictionHelper::MODE_REMOVE;

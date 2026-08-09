@@ -465,6 +465,7 @@ final class DynamicFiltersTypeTest extends TestCase
     }
 }
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class DynamicFiltersTypeIntegrationTest extends TypeTestCase
 {
     public function testFilterWithValueIsSet(): void
