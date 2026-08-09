@@ -80,7 +80,7 @@ final class ReferenceResolverTest extends TestCase
     {
         $result = $this->createMock(Result::class);
         $result->method('fetchOne')
-            ->willReturnOnConsecutiveCalls('Company name');
+            ->willReturn('Company name');
 
         $queryBuilder = $this->createMock(QueryBuilder::class);
         $queryBuilder->method('executeQuery')

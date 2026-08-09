@@ -57,9 +57,6 @@ return RectorConfig::configure()
         // handle later
         Rector\PHPUnit\PHPUnit120\Rector\Class_\AllowMockObjectsForDataProviderRector::class,
 
-        PHPUnit\Metadata\DoesNotPerformAssertions::class => [
-            __DIR__.'/app/bundles/CoreBundle/Tests/Twig/TwigIntegrationTestTrait.php',
-        ],
         Rector\PHPUnit\PHPUnit60\Rector\ClassMethod\AddDoesNotPerformAssertionToNonAssertingTestRector::class => [
             __DIR__.'/app/bundles/CoreBundle/Tests/Twig/TwigIntegrationTestTrait.php',
         ],
@@ -68,15 +65,9 @@ return RectorConfig::configure()
         Rector\Symfony\Symfony73\Rector\Class_\GetFiltersToAsTwigFilterAttributeRector::class,
         Rector\Symfony\Symfony73\Rector\Class_\GetFunctionsToAsTwigFunctionAttributeRector::class,
 
-        Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector::class,
         Rector\EarlyReturn\Rector\If_\ChangeIfElseValueAssignToEarlyReturnRector::class,
         Rector\EarlyReturn\Rector\If_\RemoveAlwaysElseRector::class,
         Rector\PHPUnit\PHPUnit60\Rector\ClassMethod\AddDoesNotPerformAssertionToNonAssertingTestRector::class,
-
-        // intentional parent property assign override
-        Rector\CodeQuality\Rector\Class_\InlineConstructorDefaultToPropertyRector::class => [
-            __DIR__.'/app/bundles/ApiBundle/Entity/oAuth2/Client.php',
-        ],
 
         // handle next
         Rector\PHPUnit\PHPUnit120\Rector\Class_\AllowMockObjectsWithoutExpectationsAttributeRector::class,
@@ -86,10 +77,6 @@ return RectorConfig::configure()
         Rector\Symfony\CodeQuality\Rector\Class_\LoadValidatorMetadataToAttributeRector::class,
         Utils\Rector\ModelGetRepositoryToRepositoryServiceRector::class => [
             __DIR__.'/app/bundles/PageBundle/Form/Type/PreferenceCenterListType.php',
-        ],
-
-        Rector\TypeDeclaration\Rector\ClassMethod\AddParamTypeDeclarationRector::class => [
-            __DIR__.'/app/bundles/LeadBundle/Tests/Form/Type/FilterTypeTest.php',
         ],
 
         // preference to compare null over object
