@@ -16,7 +16,7 @@ class TagRepository extends CommonRepository
      * @param Tag  $entity
      * @param bool $flush  true by default; use false if persisting in batches
      */
-    public function deleteEntity($entity, $flush = true): void
+    public function deleteEntity(object $entity, $flush = true): void
     {
         if ($entity instanceof Tag && null !== $entity->getId()) {
             $this->deleteLeadAssociations((int) $entity->getId());

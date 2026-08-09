@@ -102,7 +102,7 @@ final class GrapesJsControllerTest extends TestCase
             /**
              * @return AbstractCommonModel<object>
              */
-            protected function getModel($modelNameKey): MauticModelInterface
+            protected function getModel(string $modelNameKey): MauticModelInterface
             {
                 return new class($this->testEntity) extends AbstractCommonModel {
                     public function __construct(

@@ -132,7 +132,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
      *
      * @return array
      */
-    public function authCallback($settings = [], $parameters = [])
+    public function authCallback(array $settings = [], $parameters = [])
     {
         if (isset($this->keys['version']) && '6' == $this->keys['version']) {
             $success = $this->isAuthorized();
@@ -172,11 +172,9 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
     /**
      * Get available company fields for choices in the config UI.
      *
-     * @param array $settings
-     *
      * @return array
      */
-    public function getFormCompanyFields($settings = [])
+    public function getFormCompanyFields(array $settings = [])
     {
         return $this->getFormFieldsByObject('company', $settings);
     }
@@ -577,7 +575,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
     /**
      * @return array
      */
-    public function prepareRequest($url, $parameters, $method, $settings, $authType)
+    public function prepareRequest(string $url, $parameters, string $method, array $settings, $authType)
     {
         if ('oauth2' == $authType && empty($settings['authorize_session']) && isset($this->keys['access_token'])) {
             // Append the access token as the oauth-token header
@@ -1569,7 +1567,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
      *
      * @return array
      */
-    protected function cleanPriorityFields($fieldsToUpdate, $objects = null)
+    protected function cleanPriorityFields(array $fieldsToUpdate, $objects = null)
     {
         if (null === $objects) {
             $objects = ['Leads', 'Contacts'];
@@ -1635,7 +1633,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
      *
      * @return mixed
      */
-    protected function getPriorityFieldsForMautic($config, $object = null, $priorityObject = 'mautic')
+    protected function getPriorityFieldsForMautic(array $config, $object = null, $priorityObject = 'mautic')
     {
         $fields = parent::getPriorityFieldsForMautic($config, $object, $priorityObject);
 

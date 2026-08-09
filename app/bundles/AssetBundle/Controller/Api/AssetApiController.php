@@ -71,10 +71,8 @@ final class AssetApiController extends CommonApiController
 
     /**
      * Convert posted parameters into what the form needs in order to successfully bind.
-     *
-     * @return mixed
      */
-    protected function prepareParametersForBinding(Request $request, $parameters, $entity, $action)
+    protected function prepareParametersForBinding(Request $request, array $parameters, object $entity, string $action): array
     {
         $assetDir = $this->parametersHelper->get('upload_dir');
         $entity->setUploadDir($assetDir);

@@ -469,10 +469,8 @@ class CommonController extends AbstractController implements MauticController
 
     /**
      * Get's the content of error page.
-     *
-     * @return Response
      */
-    public function renderException(\Exception $e)
+    public function renderException(\Exception $e): Response
     {
         $request = $this->getCurrentRequest();
 

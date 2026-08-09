@@ -1,4 +1,4 @@
-r<?php
+<?php
 
 namespace Mautic\InstallBundle\Helper;
 

@@ -58,7 +58,7 @@ final class CorePermissionsTest extends MauticMysqlTestCase
             /**
              * @param mixed[] $userPermissions
              */
-            public function isGranted($userPermissions, $name, $level): bool
+            public function isGranted(array $userPermissions, $name, $level): bool
             {
                 throw new \BadMethodCallException('This method should not be invoked.');
             }

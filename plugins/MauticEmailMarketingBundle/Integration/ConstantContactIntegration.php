@@ -44,7 +44,7 @@ final class ConstantContactIntegration extends EmailAbstractIntegration
      *
      * @return bool|string false if no error; otherwise the error string
      */
-    public function authCallback($settings = [], $parameters = [])
+    public function authCallback(array $settings = [], $parameters = [])
     {
         // Constanct Contact doesn't like POST
         $settings['method'] = 'GET';

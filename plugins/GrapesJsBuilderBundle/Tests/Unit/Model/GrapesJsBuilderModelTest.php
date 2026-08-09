@@ -45,10 +45,9 @@ final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             }
 
             /**
-             * @param object $entity
-             * @param bool   $flush
+             * @param bool $flush
              */
-            public function saveEntity($entity, $flush = true): void
+            public function saveEntity(object $entity, $flush = true): void
             {
                 ++$this->saveEntityCallCount;
             }
@@ -69,10 +68,9 @@ final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             }
 
             /**
-             * @param object $entity
-             * @param bool   $flush
+             * @param bool $flush
              */
-            public function saveEntity($entity, $flush = true): void
+            public function saveEntity(object $entity, $flush = true): void
             {
                 ++$this->saveEntityCallCount;
             }
@@ -152,7 +150,7 @@ final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             /**
              * @param Email $entity
              */
-            public function saveEntity($entity, $flush = true): void
+            public function saveEntity(object $entity, $flush = true): void
             {
                 ++$this->saveEntityCallCount;
 
@@ -177,7 +175,7 @@ final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             /**
              * @param GrapesJsBuilder $entity
              */
-            public function saveEntity($entity, $flush = true): void
+            public function saveEntity(object $entity, $flush = true): void
             {
                 ++$this->saveEntityCallCount;
 

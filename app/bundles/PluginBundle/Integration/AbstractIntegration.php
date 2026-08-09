@@ -2260,9 +2260,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * @param array $mapping array of [$mauticId => ['entity' => FormEntity, 'integration_entity_id' => $integrationId]]
-     * @param array $params
      */
-    protected function buildIntegrationEntities(array $mapping, $integrationEntity, $internalEntity, $params = [])
+    protected function buildIntegrationEntities(array $mapping, $integrationEntity, $internalEntity, array $params = [])
     {
         $integrationEntities = $this->integrationEntityRepository->getIntegrationEntities(
             $this->getName(),

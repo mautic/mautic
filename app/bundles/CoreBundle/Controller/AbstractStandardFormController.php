@@ -649,10 +649,8 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
     /**
      * Provide the direction for default ordering.
-     *
-     * @return string
      */
-    protected function getDefaultOrderDirection()
+    protected function getDefaultOrderDirection(): string
     {
         return 'ASC';
     }
@@ -1144,7 +1142,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
         );
     }
 
-    protected function getDataForExport(AbstractCommonModel $model, array $args, ?callable $resultsCallback = null, ?int $start = 0)
+    protected function getDataForExport(AbstractCommonModel $model, array $args, ?callable $resultsCallback = null, ?int $start = 0): ?array
     {
         return parent::getDataForExport($model, $args, $resultsCallback, $start);
     }

@@ -55,7 +55,7 @@ final class FoursquareIntegration extends SocialIntegration
      *
      * @return mixed|string
      */
-    public function makeRequest($url, $parameters = [], $method = 'GET', $settings = [])
+    public function makeRequest($url, $parameters = [], $method = 'GET', array $settings = [])
     {
         $settings[$this->getAuthTokenKey()] = 'oauth_token';
 
