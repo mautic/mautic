@@ -110,6 +110,7 @@ class Form extends FormEntity implements UuidInterface
      * @var string|null
      */
     #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
+    #[IsPostActionRedirectUrl(groups: ['urlRequired'])]
     private $postActionProperty;
 
     /**
@@ -315,8 +316,6 @@ class Form extends FormEntity implements UuidInterface
         $metadata->addPropertyConstraint('postActionProperty', new Assert\NotBlank(message: 'mautic.form.form.postactionproperty_message.notblank', groups: ['messageRequired']));
 
         $metadata->addPropertyConstraint('postActionProperty', new Assert\NotBlank(message: 'mautic.form.form.postactionproperty_redirect.notblank', groups: ['urlRequired']));
-
-        $metadata->addPropertyConstraint('postActionProperty', new IsPostActionRedirectUrl(groups: ['urlRequired']));
 
         $metadata->addPropertyConstraint('postActionProperty', new Assert\NotBlank(message: 'mautic.form.form.postactionproperty_hideform.notblank', groups: ['hideformRequired']));
 
