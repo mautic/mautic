@@ -134,7 +134,7 @@ final class EventLogModel extends AbstractCommonModel
                 );
             }
 
-            $log = (new LeadEventLog())
+            $log = new LeadEventLog()
                 ->setLead($contact)
                 ->setEvent($event);
             $created = true;

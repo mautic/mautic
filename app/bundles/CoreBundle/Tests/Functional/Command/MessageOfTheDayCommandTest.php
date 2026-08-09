@@ -114,8 +114,8 @@ final class MessageOfTheDayCommandTest extends MauticMysqlTestCase
                         'content'  => [
                             'cli' => ['Active timed message'],
                         ],
-                        'start' => (new \DateTime('-1 day'))->format('c'),
-                        'end'   => (new \DateTime('+1 day'))->format('c'),
+                        'start' => new \DateTime('-1 day')->format('c'),
+                        'end'   => new \DateTime('+1 day')->format('c'),
                     ],
                 ],
             ],
@@ -135,8 +135,8 @@ final class MessageOfTheDayCommandTest extends MauticMysqlTestCase
                         'content'  => [
                             'cli' => ['Expired timed message'],
                         ],
-                        'start' => (new \DateTime('-3 days'))->format('c'),
-                        'end'   => (new \DateTime('-1 day'))->format('c'),
+                        'start' => new \DateTime('-3 days')->format('c'),
+                        'end'   => new \DateTime('-1 day')->format('c'),
                     ],
                 ],
             ],

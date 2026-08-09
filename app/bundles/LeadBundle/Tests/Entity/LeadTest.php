@@ -66,7 +66,7 @@ final class LeadTest extends TestCase
         $lead = new Lead();
 
         foreach ($frequencyRules as $channel => $rule) {
-            $frequencyRule = (new FrequencyRule())
+            $frequencyRule = new FrequencyRule()
                 ->setPreferredChannel((bool) $rule['preferredChannel'])
                 ->setFrequencyNumber($rule['frequencyNumber'])
                 ->setFrequencyTime($rule['frequencyTime'])
@@ -77,7 +77,7 @@ final class LeadTest extends TestCase
             $lead->addFrequencyRule($frequencyRule);
         }
 
-        $dnc = (new DoNotContact())->setChannel('channel4');
+        $dnc = new DoNotContact()->setChannel('channel4');
         $lead->addDoNotContactEntry($dnc);
 
         $channelRules = Lead::generateChannelRules($lead->getFrequencyRules()->toArray(), $lead->getDoNotContact()->toArray());
@@ -212,7 +212,7 @@ final class LeadTest extends TestCase
         $lead = new Lead();
         $lead->addUpdatedField('attribution', 100);
         $lead->checkAttributionDate();
-        $this->assertEquals((new \DateTime())->format('Y-m-d'), $lead->getFieldValue('attribution_date'));
+        $this->assertEquals(new \DateTime()->format('Y-m-d'), $lead->getFieldValue('attribution_date'));
         $this->assertNotEmpty($lead->getChanges());
     }
 
@@ -278,8 +278,8 @@ final class LeadTest extends TestCase
 
     public function testIpAddressChanges(): void
     {
-        $ip1 = (new IpAddress())->setIpAddress('1.2.3.4');
-        $ip2 = (new IpAddress())->setIpAddress('1.2.3.5');
+        $ip1 = new IpAddress()->setIpAddress('1.2.3.4');
+        $ip2 = new IpAddress()->setIpAddress('1.2.3.5');
 
         $contact = new Lead();
 
@@ -304,13 +304,13 @@ final class LeadTest extends TestCase
     {
         $lead = new Lead();
 
-        $lead->addEventLog((new LeadEventLog())->setAction('first')->setDateAdded(new \DateTime('2017-01-01')));
-        $lead->addEventLog((new LeadEventLog())->setAction('first')->setDateAdded(new \DateTime('2018-01-01')));
-        $lead->addEventLog($lastFirst = (new LeadEventLog())->setAction('first')->setDateAdded(new \DateTime('2019-01-01')));
+        $lead->addEventLog(new LeadEventLog()->setAction('first')->setDateAdded(new \DateTime('2017-01-01')));
+        $lead->addEventLog(new LeadEventLog()->setAction('first')->setDateAdded(new \DateTime('2018-01-01')));
+        $lead->addEventLog($lastFirst = new LeadEventLog()->setAction('first')->setDateAdded(new \DateTime('2019-01-01')));
 
-        $lead->addEventLog((new LeadEventLog())->setAction('second')->setDateAdded(new \DateTime('2017-01-01')));
-        $lead->addEventLog((new LeadEventLog())->setAction('second')->setDateAdded(new \DateTime('2018-01-01')));
-        $lead->addEventLog($lastSecond = (new LeadEventLog())->setAction('second')->setDateAdded(new \DateTime('2019-01-01')));
+        $lead->addEventLog(new LeadEventLog()->setAction('second')->setDateAdded(new \DateTime('2017-01-01')));
+        $lead->addEventLog(new LeadEventLog()->setAction('second')->setDateAdded(new \DateTime('2018-01-01')));
+        $lead->addEventLog($lastSecond = new LeadEventLog()->setAction('second')->setDateAdded(new \DateTime('2019-01-01')));
 
         $this->assertSame($lastFirst, $lead->getLastEventLogByAction('first'));
         $this->assertSame($lastSecond, $lead->getLastEventLogByAction('second'));

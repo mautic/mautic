@@ -24,7 +24,7 @@ final class HttpFactoryTest extends TestCase
 {
     public function testType(): void
     {
-        $this->assertSame('oauth2_three_legged', (new HttpFactory())->getAuthType());
+        $this->assertSame('oauth2_three_legged', new HttpFactory()->getAuthType());
     }
 
     public function testMissingAuthorizationUrlThrowsException(): void
@@ -53,7 +53,7 @@ final class HttpFactoryTest extends TestCase
             }
         };
 
-        (new HttpFactory())->getClient($credentials);
+        new HttpFactory()->getClient($credentials);
     }
 
     public function testMissingTokenUrlThrowsException(): void
@@ -82,7 +82,7 @@ final class HttpFactoryTest extends TestCase
             }
         };
 
-        (new HttpFactory())->getClient($credentials);
+        new HttpFactory()->getClient($credentials);
     }
 
     public function testBaseURISetOnBaseUriAwareCredentials(): void
@@ -129,7 +129,7 @@ final class HttpFactoryTest extends TestCase
             }
         };
 
-        $client = (new HttpFactory())->getClient($credentials);
+        $client = new HttpFactory()->getClient($credentials);
         /**
          * Even though the method getConfig is deprecated it won't get deprecated
          * https://github.com/guzzle/guzzle/issues/3114#issuecomment-1627228395.
@@ -164,7 +164,7 @@ final class HttpFactoryTest extends TestCase
             }
         };
 
-        (new HttpFactory())->getClient($credentials);
+        new HttpFactory()->getClient($credentials);
     }
 
     public function testMissingClientSecretThrowsException(): void
@@ -193,7 +193,7 @@ final class HttpFactoryTest extends TestCase
             }
         };
 
-        (new HttpFactory())->getClient($credentials);
+        new HttpFactory()->getClient($credentials);
     }
 
     public function testInstantiatedClientIsReturned(): void
@@ -256,7 +256,7 @@ final class HttpFactoryTest extends TestCase
     {
         $credentials = $this->getCredentials();
 
-        $client = (new HttpFactory())->getClient($credentials);
+        $client = new HttpFactory()->getClient($credentials);
 
         $middleware = $this->extractMiddleware($client);
 
@@ -289,7 +289,7 @@ final class HttpFactoryTest extends TestCase
             ->method('getCredentialsSigner')
             ->willReturn($signerInterface);
 
-        $client              = (new HttpFactory())->getClient($credentials, $clientCredentialSigner);
+        $client              = new HttpFactory()->getClient($credentials, $clientCredentialSigner);
         $middleware          = $this->extractMiddleware($client);
         $reflectedMiddleware = new \ReflectionClass($middleware);
         $this->assertSame($signerInterface, $this->getProperty($reflectedMiddleware, $middleware, 'clientCredentialsSigner'));
@@ -299,7 +299,7 @@ final class HttpFactoryTest extends TestCase
             ->method('getTokenPersistence')
             ->willReturn($kamermansTokenPersistence);
 
-        $client              = (new HttpFactory())->getClient($credentials, $tokenPersistence);
+        $client              = new HttpFactory()->getClient($credentials, $tokenPersistence);
         $middleware          = $this->extractMiddleware($client);
         $reflectedMiddleware = new \ReflectionClass($middleware);
         $this->assertSame($kamermansTokenPersistence, $this->getProperty($reflectedMiddleware, $middleware, 'tokenPersistence'));
@@ -309,7 +309,7 @@ final class HttpFactoryTest extends TestCase
             ->method('getTokenSigner')
             ->willReturn($accessTokenSigner);
 
-        $client              = (new HttpFactory())->getClient($credentials, $tokenPersistence);
+        $client              = new HttpFactory()->getClient($credentials, $tokenPersistence);
         $middleware          = $this->extractMiddleware($client);
         $reflectedMiddleware = new \ReflectionClass($middleware);
         $this->assertSame($accessTokenSigner, $this->getProperty($reflectedMiddleware, $middleware, 'accessTokenSigner'));

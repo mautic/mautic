@@ -565,7 +565,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     {
         $alias = $this->getTableAlias();
 
-        return (new SegmentQueryBuilder($this->getEntityManager()->getConnection()))
+        return new SegmentQueryBuilder($this->getEntityManager()->getConnection())
             ->from(MAUTIC_TABLE_PREFIX.'leads', $alias);
     }
 

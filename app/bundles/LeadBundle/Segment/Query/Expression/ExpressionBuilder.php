@@ -143,6 +143,6 @@ class ExpressionBuilder extends BaseExpressionBuilder
             self::IN_NEXT => ' 00:00:00',
         ];
 
-        return $this->literal((new DateTimeHelper())->toUtcString('Y-m-d').$timeStamps[$operator]);
+        return $this->literal(new DateTimeHelper()->toUtcString('Y-m-d').$timeStamps[$operator]);
     }
 }

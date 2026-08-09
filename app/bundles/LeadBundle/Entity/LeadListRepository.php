@@ -689,7 +689,7 @@ SQL;
 
     public function setSegmentAsDeleted(int $leadListId): void
     {
-        $dateTime = (new \DateTimeImmutable())->format(DateTimeHelper::FORMAT_DB);
+        $dateTime = new \DateTimeImmutable()->format(DateTimeHelper::FORMAT_DB);
 
         $this->getEntityManager()->getConnection()->update(
             MAUTIC_TABLE_PREFIX.LeadList::TABLE_NAME,

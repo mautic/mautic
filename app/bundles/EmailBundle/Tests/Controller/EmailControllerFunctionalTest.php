@@ -1227,7 +1227,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $form          = $crawler->selectButton('schedule_send[buttons][save]')->form();
 
         // Set publish up date to 1 hour ago
-        $publishUpDate = (new \DateTime('now -30 minutes'))->format('Y-m-d H:i');
+        $publishUpDate = new \DateTime('now -30 minutes')->format('Y-m-d H:i');
         $form['schedule_send[publishUp]']->setValue($publishUpDate);
         $form['schedule_send[continueSending]']->setValue('0');
 
@@ -1275,7 +1275,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $form          = $crawler->selectButton('schedule_send[buttons][save]')->form();
 
         // Set publish up date to 1 hour ago
-        $publishUpDate = (new \DateTime('now -1 hour'))->format('Y-m-d H:i');
+        $publishUpDate = new \DateTime('now -1 hour')->format('Y-m-d H:i');
         $form['schedule_send[publishUp]']->setValue($publishUpDate);
         $form['schedule_send[continueSending]']->setValue('1');
 
@@ -1322,7 +1322,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $form    = $crawler->selectButton('schedule_send[buttons][save]')->form();
 
         // Set publish up date to 1 hour ago
-        $publishUpDate = (new \DateTime('now'))->format('Y-m-d H:i');
+        $publishUpDate = new \DateTime('now')->format('Y-m-d H:i');
         $form['schedule_send[publishUp]']->setValue($publishUpDate);
 
         $this->client->submit($form);

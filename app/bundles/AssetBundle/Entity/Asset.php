@@ -1334,7 +1334,7 @@ class Asset extends FormEntity implements UuidInterface
             return '';
         }
 
-        $mimeType = (string) (new \finfo(FILEINFO_MIME_TYPE))->buffer($chunk);
+        $mimeType = (string) new \finfo(FILEINFO_MIME_TYPE)->buffer($chunk);
 
         return $this->extractMimeType($mimeType);
     }

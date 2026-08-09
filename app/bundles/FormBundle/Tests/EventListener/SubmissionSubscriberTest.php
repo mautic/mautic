@@ -19,7 +19,7 @@ final class SubmissionSubscriberTest extends TestCase
         $repository->expects($this->once())->method('incrementSubmissionCount')->with(42);
         $repository->expects($this->never())->method('decrementSubmissionCount');
 
-        (new SubmissionSubscriber($repository))->postPersist($this->args($this->submissionForForm(42)));
+        new SubmissionSubscriber($repository)->postPersist($this->args($this->submissionForForm(42)));
     }
 
     public function testPostRemoveDecrementsCount(): void
@@ -28,7 +28,7 @@ final class SubmissionSubscriberTest extends TestCase
         $repository->expects($this->once())->method('decrementSubmissionCount')->with(7);
         $repository->expects($this->never())->method('incrementSubmissionCount');
 
-        (new SubmissionSubscriber($repository))->postRemove($this->args($this->submissionForForm(7)));
+        new SubmissionSubscriber($repository)->postRemove($this->args($this->submissionForForm(7)));
     }
 
     public function testIgnoresNonSubmissionEntity(): void

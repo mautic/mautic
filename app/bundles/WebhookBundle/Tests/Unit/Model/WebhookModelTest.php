@@ -87,7 +87,7 @@ final class WebhookModelTest extends TestCase
 
     public function testGetEventsOrderbyDirWhenSetInWebhook(): void
     {
-        $webhook = (new Webhook())->setEventsOrderbyDir('DESC');
+        $webhook = new Webhook()->setEventsOrderbyDir('DESC');
         $this->assertEquals('DESC', $this->model->getEventsOrderbyDir($webhook));
     }
 
@@ -242,7 +242,7 @@ final class WebhookModelTest extends TestCase
 
         $this->webhookQueueRepository->method('getTableAlias')->willReturn('w');
 
-        $webhookRetryTime = (new \DateTimeImmutable())
+        $webhookRetryTime = new \DateTimeImmutable()
             ->format(DateTimeHelper::FORMAT_DB);
         $this->webhookQueueRepository->expects($this->once())
             ->method('getEntities')
@@ -311,7 +311,7 @@ final class WebhookModelTest extends TestCase
         $webhook->setEventsOrderbyDir('ASC');
 
         $this->webhookQueueRepository->method('getTableAlias')->willReturn('w');
-        $webhookRetryTime = (new \DateTimeImmutable())
+        $webhookRetryTime = new \DateTimeImmutable()
             ->format(DateTimeHelper::FORMAT_DB);
         $expected = [
             'iterable_mode' => true,

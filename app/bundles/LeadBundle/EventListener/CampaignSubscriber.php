@@ -656,8 +656,8 @@ final class CampaignSubscriber implements EventSubscriberInterface
                         $pageUrl = html_entity_decode($pageHitUrl);
                         if (fnmatch($url, $pageUrl)) {
                             if ($hit['dateLeft'] && $totalSpentTime) {
-                                $realTotalSpentTime = (new \DateTime($hit['dateLeft']->format('Y-m-d H:i')))->getTimestamp() -
-                                    (new \DateTime($hit['dateHit']->format('Y-m-d H:i')))->getTimestamp();
+                                $realTotalSpentTime = new \DateTime($hit['dateLeft']->format('Y-m-d H:i'))->getTimestamp() -
+                                    new \DateTime($hit['dateHit']->format('Y-m-d H:i'))->getTimestamp();
                                 if ($realTotalSpentTime >= $totalSpentTime) {
                                     $event->setResult(true);
 
@@ -673,8 +673,8 @@ final class CampaignSubscriber implements EventSubscriberInterface
 
                     if (!empty($page) && (int) $page === (int) $pageId) {
                         if ($hit['dateLeft'] && $totalSpentTime) {
-                            $realTotalSpentTime = (new \DateTime($hit['dateLeft']->format('Y-m-d H:i')))->getTimestamp() -
-                                (new \DateTime($hit['dateHit']->format('Y-m-d H:i')))->getTimestamp();
+                            $realTotalSpentTime = new \DateTime($hit['dateLeft']->format('Y-m-d H:i'))->getTimestamp() -
+                                new \DateTime($hit['dateHit']->format('Y-m-d H:i'))->getTimestamp();
                             if ($realTotalSpentTime >= $totalSpentTime) {
                                 $event->setResult(true);
 

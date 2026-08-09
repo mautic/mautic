@@ -65,7 +65,7 @@ final class PageControllerTest extends MauticMysqlTestCase
         $this->logoutUser();
         $this->connection->insert($this->prefix.'pages', [
             'is_published' => true,
-            'date_added'   => (new \DateTime())->format('Y-m-d H:i:s'),
+            'date_added'   => new \DateTime()->format('Y-m-d H:i:s'),
             'title'        => 'Page:Page:LandingPageTracking',
             'alias'        => 'page-page-landingPageTracking',
             'template'     => 'blank',
@@ -105,7 +105,7 @@ final class PageControllerTest extends MauticMysqlTestCase
     {
         $this->connection->insert($this->prefix.'pages', [
             'is_published' => true,
-            'date_added'   => (new \DateTime())->format('Y-m-d H:i:s'),
+            'date_added'   => new \DateTime()->format('Y-m-d H:i:s'),
             'title'        => 'Page:Page:LandingPageTrackingSecondVisit',
             'alias'        => 'page-page-landingPageTrackingSecondVisit',
             'template'     => 'blank',

@@ -37,7 +37,7 @@ final class MessageType extends AbstractFormStandardType
         foreach ($channels as $channelType => $channel) {
             if (!isset($messageChannels[$channelType])) {
                 $message->addChannel(
-                    (new Channel())
+                    new Channel()
                         ->setChannel($channelType)
                         ->setMessage($message)
                 );

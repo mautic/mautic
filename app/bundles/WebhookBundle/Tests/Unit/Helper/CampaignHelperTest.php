@@ -46,8 +46,8 @@ final class CampaignHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->campaignHelper = new CampaignHelper($this->client, $this->createStub(EventDispatcherInterface::class), $companyRepository);
 
-        $ipCollection->add((new IpAddress())->setIpAddress('127.0.0.1'));
-        $ipCollection->add((new IpAddress())->setIpAddress('127.0.0.2'));
+        $ipCollection->add(new IpAddress()->setIpAddress('127.0.0.1'));
+        $ipCollection->add(new IpAddress()->setIpAddress('127.0.0.2'));
 
         $this->contact->expects($this->once())
             ->method('getProfileFields')

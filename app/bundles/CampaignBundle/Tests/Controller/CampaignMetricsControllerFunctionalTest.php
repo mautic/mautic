@@ -122,8 +122,8 @@ final class CampaignMetricsControllerFunctionalTest extends MauticMysqlTestCase
         // Generate expected hour labels based on the actual time format
         $expectedHoursLabels = [];
         for ($hour = 0; $hour < 24; ++$hour) {
-            $startTime             = (new \DateTime())->setTime($hour, 0);
-            $endTime               = (new \DateTime())->setTime(($hour + 1) % 24, 0);
+            $startTime             = new \DateTime()->setTime($hour, 0);
+            $endTime               = new \DateTime()->setTime(($hour + 1) % 24, 0);
             $expectedHoursLabels[] = $startTime->format($timeFormat).' - '.$endTime->format($timeFormat);
         }
 

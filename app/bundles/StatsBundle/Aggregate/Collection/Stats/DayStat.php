@@ -26,7 +26,7 @@ final class DayStat implements StatInterface
      */
     public function getHour($hour)
     {
-        $key = (new \DateTime("{$this->day} {$hour}:00:00"))->format('Y-m-d H');
+        $key = new \DateTime("{$this->day} {$hour}:00:00")->format('Y-m-d H');
 
         if (!isset($this->stats[$key])) {
             $this->stats[$key] = new HourStat($key);

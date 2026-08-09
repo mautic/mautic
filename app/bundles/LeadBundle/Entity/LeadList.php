@@ -479,7 +479,7 @@ class LeadList extends FormEntity implements UuidInterface
 
     public function setLastBuiltDateToCurrentDatetime(): void
     {
-        $now = (new DateTimeHelper())->getUtcDateTime();
+        $now = new DateTimeHelper()->getUtcDateTime();
         $this->setLastBuiltDate($now);
     }
 

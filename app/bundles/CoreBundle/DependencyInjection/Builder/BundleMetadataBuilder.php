@@ -127,7 +127,7 @@ final class BundleMetadataBuilder
             $this->ipLookupServices = array_merge($foundIpLookupServices, $this->ipLookupServices);
         }
 
-        (new PermissionClassMetadata($metadata))->build();
+        new PermissionClassMetadata($metadata)->build();
 
         $this->buildMappings($metadata);
     }

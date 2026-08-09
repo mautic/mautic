@@ -48,7 +48,7 @@ final readonly class CampaignContactCountHelper
 
             $contactCountDetail = [
                 'contactCount'   => (int) $count['contact_count'],
-                'countFetchedAt' => (new DateTimeHelper())->getUtcDateTime()->format(DATE_ATOM),
+                'countFetchedAt' => new DateTimeHelper()->getUtcDateTime()->format(DATE_ATOM),
             ];
             $contactCounts[$campaignId] = $contactCountDetail;
             $this->setContactCountInCache($campaignId, $contactCountDetail);

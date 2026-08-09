@@ -55,7 +55,7 @@ class LeadFieldDeleter
         $leadField->setColumnIsNotRemoved();
         $leadField->setModifiedBy($currentUser);
         $leadField->setModifiedByUser($currentUser?->getName());
-        $leadField->setDateModified((new DateTimeHelper())->getDateTime());
+        $leadField->setDateModified(new DateTimeHelper()->getDateTime());
         $leadField->setIsPublished(false);
 
         $this->leadFieldRepository->saveEntity($leadField);

@@ -831,16 +831,16 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $contactA->setDateModified(new \DateTime('-1 hour'));
 
         $contactB = new Lead();
-        $contactB->setDateModified((new \DateTime())->modify('+1 day'));
+        $contactB->setDateModified(new \DateTime()->modify('+1 day'));
 
         $contactC = new Lead();
-        $contactC->setDateModified((new \DateTime())->modify('-1 day'));
+        $contactC->setDateModified(new \DateTime()->modify('-1 day'));
 
         $contactD = new Lead();
-        $contactD->setDateModified((new \DateTime())->modify('-2 day'));
+        $contactD->setDateModified(new \DateTime()->modify('-2 day'));
 
         $contactE = new Lead();
-        $contactE->setDateModified((new \DateTime())->modify('+2 day'));
+        $contactE->setDateModified(new \DateTime()->modify('+2 day'));
 
         $this->em->persist($contactA);
         $this->em->persist($contactB);
@@ -896,10 +896,10 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $contactA->setDateModified(new \DateTime('-1 hour'));
 
         $contactB = new Lead();
-        $contactB->setDateModified((new \DateTime())->modify('+1 day'));
+        $contactB->setDateModified(new \DateTime()->modify('+1 day'));
 
         $contactC = new Lead();
-        $contactC->setDateModified((new \DateTime())->modify('-1 day'));
+        $contactC->setDateModified(new \DateTime()->modify('-1 day'));
 
         $this->em->persist($contactA);
         $this->em->persist($contactB);

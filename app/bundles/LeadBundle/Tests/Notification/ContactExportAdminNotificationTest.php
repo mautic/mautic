@@ -24,7 +24,7 @@ final class ContactExportAdminNotificationTest extends TestCase
         $otherAdmin             = $this->createUser(11, 'Admin User', 'admin@example.com', true, true);
         $sameAdmin              = $this->createUser(10, 'Requester User', 'requester@example.com', true, true);
         $inactiveAdmin          = $this->createUser(12, 'Inactive Admin', 'inactive@example.com', false, true);
-        $contactExportScheduler = (new ContactExportScheduler())
+        $contactExportScheduler = new ContactExportScheduler()
             ->setUser($requestingUser)
             ->setScheduledDateTime(new \DateTimeImmutable('2026-05-12 10:30:00 +00:00'))
             ->setData(['fileType' => 'csv']);
@@ -102,7 +102,7 @@ final class ContactExportAdminNotificationTest extends TestCase
         $thirdAdmin             = $this->createUser(14, 'Audit Admin', 'audit@example.com', true, true);
         $sameAdmin              = $this->createUser(10, 'Requester User', 'requester@example.com', true, true);
         $inactiveAdmin          = $this->createUser(12, 'Inactive Admin', 'inactive@example.com', false, true);
-        $contactExportScheduler = (new ContactExportScheduler())
+        $contactExportScheduler = new ContactExportScheduler()
             ->setUser($requestingUser)
             ->setScheduledDateTime(new \DateTimeImmutable('2026-05-12 10:30:00 +00:00'))
             ->setData(['fileType' => 'csv']);
@@ -185,7 +185,7 @@ final class ContactExportAdminNotificationTest extends TestCase
     {
         $requestingUser = $this->createUser(10, 'Requester User', 'requester@example.com', true, true);
 
-        $contactExportScheduler = (new ContactExportScheduler())
+        $contactExportScheduler = new ContactExportScheduler()
             ->setUser($requestingUser)
             ->setScheduledDateTime(new \DateTimeImmutable('2026-05-12 10:30:00 +00:00'))
             ->setData(['fileType' => 'csv']);

@@ -924,12 +924,12 @@ class MailHelper
         $this->checkBatchMaxRecipients();
 
         try {
-            $fullAddress          = (new AddressDTO($address, $name))->toMailerAddress();
-            $encodedAddressLength = strlen((new MailboxListHeader('To', [$fullAddress]))->getBodyAsString());
+            $fullAddress          = new AddressDTO($address, $name)->toMailerAddress();
+            $encodedAddressLength = strlen(new MailboxListHeader('To', [$fullAddress])->getBodyAsString());
 
             if ($encodedAddressLength > $this->addressLengthLimit) {
                 // When encoded address with name length doesn't meet the limit, use only the email
-                $shortAddress = (new AddressDTO($address))->toMailerAddress();
+                $shortAddress = new AddressDTO($address)->toMailerAddress();
                 $this->message->addTo($shortAddress);
             } else {
                 $this->message->addTo($fullAddress);
@@ -969,7 +969,7 @@ class MailHelper
                     $addressName = $value ?: $name; // Use provided name or default
                 }
 
-                $recipientAddresses[] = (new AddressDTO($address, $addressName))->toMailerAddress();
+                $recipientAddresses[] = new AddressDTO($address, $addressName)->toMailerAddress();
             }
 
             if ('cc' === $type) {
@@ -1008,7 +1008,7 @@ class MailHelper
         $this->checkBatchMaxRecipients(1, 'cc');
 
         try {
-            $this->message->addCc((new AddressDTO($address, $name ?? ''))->toMailerAddress());
+            $this->message->addCc(new AddressDTO($address, $name ?? '')->toMailerAddress());
 
             return true;
         } catch (\Exception $e) {
@@ -1040,7 +1040,7 @@ class MailHelper
         $this->checkBatchMaxRecipients(1, 'bcc');
 
         try {
-            $this->message->addBcc((new AddressDTO($address, $name))->toMailerAddress());
+            $this->message->addBcc(new AddressDTO($address, $name)->toMailerAddress());
 
             return true;
         } catch (\Exception $e) {
@@ -1092,7 +1092,7 @@ class MailHelper
 
         try {
             foreach ((array) $addresses as $address) {
-                $this->message->replyTo((new AddressDTO($address, $name))->toMailerAddress());
+                $this->message->replyTo(new AddressDTO($address, $name)->toMailerAddress());
             }
         } catch (\Exception $e) {
             $this->logError($e, 'reply to');

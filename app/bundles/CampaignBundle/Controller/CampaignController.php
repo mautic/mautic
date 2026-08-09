@@ -191,7 +191,7 @@ class CampaignController extends AbstractStandardFormController
             return $this->notFound();
         }
 
-        $date           = (new \DateTimeImmutable())->format(DateTimeHelper::FORMAT_DB);
+        $date           = new \DateTimeImmutable()->format(DateTimeHelper::FORMAT_DB);
         $exportFileName = $this->translator->trans('mautic.campaign.campaign_export_file.name', ['%date%' => $date]);
 
         $event = new EntityExportEvent(Campaign::ENTITY_NAME, $objectId);
@@ -234,7 +234,7 @@ class CampaignController extends AbstractStandardFormController
         $orderByDir  = $session->get('mautic.campaign.orderbydir', 'ASC');
 
         $ids            = $request->get('ids');
-        $date           = (new \DateTimeImmutable())->format(DateTimeHelper::FORMAT_DB);
+        $date           = new \DateTimeImmutable()->format(DateTimeHelper::FORMAT_DB);
         $exportFileName = $this->translator->trans('mautic.campaign.campaign_export_file.name', ['%date%' => $date]);
         $objectIds      = json_decode($ids, true);
 

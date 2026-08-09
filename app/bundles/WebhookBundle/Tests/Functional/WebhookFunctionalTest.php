@@ -140,15 +140,15 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
         $webhookQueues = $this->getWebhookQueue($webhook->getId());
         foreach ($webhookQueues as $webhookQueue) {
             $webhookQueue->setRetries(2);
-            $webhookQueue->setDateModified((new \DateTimeImmutable())->modify('-3601 seconds'));
+            $webhookQueue->setDateModified(new \DateTimeImmutable()->modify('-3601 seconds'));
             $this->em->persist($webhookQueue);
             $this->em->flush();
         }
 
         $webhook->setCreatedBy($createdByUserId);
         $webhook->setModifiedBy($createdByUserId);
-        $webhook->setUnHealthySince((new \DateTimeImmutable())->modify('-3601 seconds'));
-        $webhook->setMarkedUnhealthyAt((new \DateTimeImmutable())->modify('-3601 seconds'));
+        $webhook->setUnHealthySince(new \DateTimeImmutable()->modify('-3601 seconds'));
+        $webhook->setMarkedUnhealthyAt(new \DateTimeImmutable()->modify('-3601 seconds'));
 
         $this->testSymfonyCommand(ProcessWebhookQueuesCommand::COMMAND_NAME, ['--webhook-id' => $webhook->getId()]);
 
@@ -182,7 +182,7 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
     {
         $this->mockSuccessfulWebhookResponse(2);
         $webhook = $this->createWebhook();
-        $webhook->setMarkedUnhealthyAt((new \DateTimeImmutable())->modify('-301 seconds'));
+        $webhook->setMarkedUnhealthyAt(new \DateTimeImmutable()->modify('-301 seconds'));
         $this->em->persist($webhook);
         $this->em->flush();
         $this->createContacts();

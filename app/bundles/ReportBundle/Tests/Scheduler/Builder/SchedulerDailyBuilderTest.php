@@ -19,7 +19,7 @@ final class SchedulerDailyBuilderTest extends \PHPUnit\Framework\TestCase
 
         $schedulerEntity = new SchedulerEntity(true, SchedulerEnum::UNIT_DAILY, null, null);
 
-        $startDate = (new \DateTime())->setTime(0, 0)->modify('+1 day');
+        $startDate = new \DateTime()->setTime(0, 0)->modify('+1 day');
         $rule      = new Rule();
         $rule->setStartDate($startDate)
             ->setCount(1);

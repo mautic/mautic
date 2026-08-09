@@ -18,14 +18,14 @@ final class WebhookTest extends \PHPUnit\Framework\TestCase
     public function testWasModifiedRecentlyWithWebhookModifiedAWhileBack(): void
     {
         $webhook = new Webhook();
-        $webhook->setDateModified((new \DateTime())->modify('-20 days'));
+        $webhook->setDateModified(new \DateTime()->modify('-20 days'));
         $this->assertFalse($webhook->wasModifiedRecently());
     }
 
     public function testWasModifiedRecentlyWithWebhookModifiedRecently(): void
     {
         $webhook = new Webhook();
-        $webhook->setDateModified((new \DateTime())->modify('-2 hours'));
+        $webhook->setDateModified(new \DateTime()->modify('-2 hours'));
         $this->assertTrue($webhook->wasModifiedRecently());
     }
 

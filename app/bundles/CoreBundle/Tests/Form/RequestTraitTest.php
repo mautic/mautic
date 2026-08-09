@@ -23,7 +23,7 @@ final class RequestTraitTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $formConfigBuilder = new FormConfigBuilder('foo', null, $this->createStub(EventDispatcherInterface::class));
-        $formConfigBuilder->setFormFactory((new FormFactoryBuilder())->getFormFactory());
+        $formConfigBuilder->setFormFactory(new FormFactoryBuilder()->getFormFactory());
         $formConfigBuilder->setCompound(true);
         $formConfigBuilder->setDataMapper(
             $this->createStub(DataMapperInterface::class)

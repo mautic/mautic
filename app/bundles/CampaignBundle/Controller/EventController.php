@@ -70,7 +70,7 @@ final class EventController extends CommonFormController
             $type                 = $event['type'];
             $eventType            = $event['eventType'];
             $campaignId           = $event['campaignId'];
-            $event['triggerDate'] = (!empty($event['triggerDate'])) ? (new DateTimeHelper($event['triggerDate']))->getDateTime() : null;
+            $event['triggerDate'] = (!empty($event['triggerDate'])) ? new DateTimeHelper($event['triggerDate'])->getDateTime() : null;
         } else {
             $type       = $request->query->get('type');
             $eventType  = $request->query->get('eventType');
@@ -561,7 +561,7 @@ final class EventController extends CommonFormController
         string $action,
     ): array {
         // Merge default event properties with provided event data
-        $event = array_merge((new Event())->convertToArray(), $event);
+        $event = array_merge(new Event()->convertToArray(), $event);
 
         // Determine the template
         $template = $event['settings']['template'] ?? '@MauticCampaign/Event/_generic.html.twig';

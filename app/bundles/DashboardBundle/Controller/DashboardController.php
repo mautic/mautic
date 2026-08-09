@@ -541,6 +541,6 @@ final class DashboardController extends AbstractFormController
      */
     private function getNameFromRequest(Request $request): string
     {
-        return $request->get('name', (new \DateTime())->format('Y-m-dTH:i:s'));
+        return $request->get('name', new \DateTime()->format('Y-m-dTH:i:s'));
     }
 }

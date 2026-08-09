@@ -14,15 +14,15 @@ final class ObjectMappingsDAOTest extends TestCase
     {
         $objectMappings = new ObjectMappingsDAO();
 
-        $objectMappings->addNewObjectMapping((new ObjectMapping())->setIntegrationObjectName('foonew'));
-        $objectMappings->addNewObjectMapping((new ObjectMapping())->setIntegrationObjectName('barnew'));
+        $objectMappings->addNewObjectMapping(new ObjectMapping()->setIntegrationObjectName('foonew'));
+        $objectMappings->addNewObjectMapping(new ObjectMapping()->setIntegrationObjectName('barnew'));
         $mappings = $objectMappings->getNewMappings();
         $this->assertCount(2, $mappings);
         $this->assertEquals('foonew', $mappings[0]->getIntegrationObjectName());
         $this->assertEquals('barnew', $mappings[1]->getIntegrationObjectName());
 
-        $objectMappings->addUpdatedObjectMapping((new ObjectMapping())->setIntegrationObjectName('fooupdate'));
-        $objectMappings->addUpdatedObjectMapping((new ObjectMapping())->setIntegrationObjectName('barupdate'));
+        $objectMappings->addUpdatedObjectMapping(new ObjectMapping()->setIntegrationObjectName('fooupdate'));
+        $objectMappings->addUpdatedObjectMapping(new ObjectMapping()->setIntegrationObjectName('barupdate'));
         $mappings = $objectMappings->getUpdatedMappings();
         $this->assertCount(2, $mappings);
         $this->assertEquals('fooupdate', $mappings[0]->getIntegrationObjectName());
