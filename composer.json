@@ -23,7 +23,13 @@
   "require": {
     "composer/installers": "^2.3",
     "cweagans/composer-patches": "^1.7.3",
-    "mautic/core-lib": "^7.0"
+    "doctrine/persistence": "^3.4",
+    "mautic/core-lib": "^7.0",
+    "symfony/console": "~7.4.0",
+    "symfony/event-dispatcher": "~7.4.0",
+    "symfony/form": "~7.4.0",
+    "symfony/validator": "~7.4.0",
+    "twig/twig": "^3.0"
   },
   "require-dev": {
     "codeception/codeception": "^5.1",
@@ -35,25 +41,22 @@
     "liip/functional-test-bundle": "^4.3",
     "liip/test-fixtures-bundle": "^3.5",
     "mautic/transifex": "^5.0",
+    "nikic/php-parser": "^5.0",
     "phpstan/extension-installer": "^1.4",
     "phpstan/phpstan": "^2.2.6",
     "phpstan/phpstan-deprecation-rules": "^2.0.4",
     "phpstan/phpstan-doctrine": "^2.0.28",
     "phpstan/phpstan-phpunit": "^2.0.18",
     "phpstan/phpstan-symfony": "^2.0.20",
-<<<<<<< HEAD
     "phpunit/phpunit": "^12.0",
-    "rector/type-perfect": "^2.1.4",
-=======
-    "phpunit/phpunit": "^11.5",
->>>>>>> 4ea9d681bd (add composer dependency analyser)
     "rector/rector": "dev-main",
     "rector/type-perfect": "^2.1.4",
-    "shipmonk/composer-dependency-analyser": "*",
+    "shipmonk/composer-dependency-analyser": "^1.8.4",
     "symfony/browser-kit": "~7.4.0",
     "symfony/dom-crawler": "~7.4.0",
     "symfony/maker-bundle": "^1.64",
     "symfony/phpunit-bridge": "~7.4.0",
+    "symfony/security-core": "~7.4.0",
     "symfony/var-dumper": "~7.4.0",
     "symfony/web-profiler-bundle": "~7.4.0",
     "symplify/easy-coding-standard": "^13.2.17",

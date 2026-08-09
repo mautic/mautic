@@ -4,11 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-<<<<<<< HEAD
-    "content-hash": "e93e10094b4a219460791e15e49dce53",
-=======
-    "content-hash": "7e4f2e8732b5cbe47d21c05f614b359a",
->>>>>>> 4ea9d681bd (add composer dependency analyser)
+    "content-hash": "3b5e43f4c544b00691cee2435b28e521",
     "packages": [
         {
             "name": "api-platform/core",
@@ -8822,16 +8818,16 @@
         },
         {
             "name": "symfony/console",
-            "version": "v7.4.15",
+            "version": "v7.4.16",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "088ec6fe0ef6819cbc301174093b6bfa4ad26930"
+                "reference": "f4c69c9aed03abf933b294257d618bdd9b30a06d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/088ec6fe0ef6819cbc301174093b6bfa4ad26930",
-                "reference": "088ec6fe0ef6819cbc301174093b6bfa4ad26930",
+                "url": "https://api.github.com/repos/symfony/console/zipball/f4c69c9aed03abf933b294257d618bdd9b30a06d",
+                "reference": "f4c69c9aed03abf933b294257d618bdd9b30a06d",
                 "shasum": ""
             },
             "require": {
@@ -8896,7 +8892,7 @@
                 "terminal"
             ],
             "support": {
-                "source": "https://github.com/symfony/console/tree/v7.4.15"
+                "source": "https://github.com/symfony/console/tree/v7.4.16"
             },
             "funding": [
                 {
@@ -8916,7 +8912,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-07-27T13:51:00+00:00"
+            "time": "2026-07-31T12:37:14+00:00"
         },
         {
             "name": "symfony/dependency-injection",
@@ -9795,16 +9791,16 @@
         },
         {
             "name": "symfony/form",
-            "version": "v7.4.9",
+            "version": "v7.4.16",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/form.git",
-                "reference": "b6c107af659106abec1771d9d7d22da528644d3a"
+                "reference": "b8a828839e0c0e6ba97d69736c92b5472198b163"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/form/zipball/b6c107af659106abec1771d9d7d22da528644d3a",
-                "reference": "b6c107af659106abec1771d9d7d22da528644d3a",
+                "url": "https://api.github.com/repos/symfony/form/zipball/b8a828839e0c0e6ba97d69736c92b5472198b163",
+                "reference": "b8a828839e0c0e6ba97d69736c92b5472198b163",
                 "shasum": ""
             },
             "require": {
@@ -9874,7 +9870,7 @@
             "description": "Allows to easily create, process and reuse HTML forms",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/form/tree/v7.4.9"
+                "source": "https://github.com/symfony/form/tree/v7.4.16"
             },
             "funding": [
                 {
@@ -9894,7 +9890,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-04-29T14:39:19+00:00"
+            "time": "2026-08-07T10:37:34+00:00"
         },
         {
             "name": "symfony/framework-bundle",
@@ -12757,16 +12753,16 @@
         },
         {
             "name": "symfony/security-core",
-            "version": "v7.4.12",
+            "version": "v7.4.15",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/security-core.git",
-                "reference": "efff84605474ec682c7d9c6278088811e6f3caaa"
+                "reference": "bf45a7f56ed79c7228dd39eb1c5c42c575b53fc7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/security-core/zipball/efff84605474ec682c7d9c6278088811e6f3caaa",
-                "reference": "efff84605474ec682c7d9c6278088811e6f3caaa",
+                "url": "https://api.github.com/repos/symfony/security-core/zipball/bf45a7f56ed79c7228dd39eb1c5c42c575b53fc7",
+                "reference": "bf45a7f56ed79c7228dd39eb1c5c42c575b53fc7",
                 "shasum": ""
             },
             "require": {
@@ -12824,7 +12820,7 @@
             "description": "Symfony Security Component - Core Library",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/security-core/tree/v7.4.12"
+                "source": "https://github.com/symfony/security-core/tree/v7.4.15"
             },
             "funding": [
                 {
@@ -12844,7 +12840,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-05-15T06:48:59+00:00"
+            "time": "2026-07-19T19:34:23+00:00"
         },
         {
             "name": "symfony/security-csrf",
@@ -13832,16 +13828,16 @@
         },
         {
             "name": "symfony/validator",
-            "version": "v7.4.14",
+            "version": "v7.4.16",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/validator.git",
-                "reference": "306d904336166d001751759351d40d5e82312596"
+                "reference": "3aee77358ab14090337183657e554668bc94ab4a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/validator/zipball/306d904336166d001751759351d40d5e82312596",
-                "reference": "306d904336166d001751759351d40d5e82312596",
+                "url": "https://api.github.com/repos/symfony/validator/zipball/3aee77358ab14090337183657e554668bc94ab4a",
+                "reference": "3aee77358ab14090337183657e554668bc94ab4a",
                 "shasum": ""
             },
             "require": {
@@ -13912,7 +13908,7 @@
             "description": "Provides tools to validate values",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/validator/tree/v7.4.14"
+                "source": "https://github.com/symfony/validator/tree/v7.4.16"
             },
             "funding": [
                 {
@@ -13932,7 +13928,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-06-27T06:16:12+00:00"
+            "time": "2026-08-06T09:41:15+00:00"
         },
         {
             "name": "symfony/var-dumper",
@@ -16108,20 +16104,20 @@
         },
         {
             "name": "myclabs/deep-copy",
-            "version": "1.13.4",
+            "version": "1.14.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/myclabs/DeepCopy.git",
-                "reference": "07d290f0c47959fd5eed98c95ee5602db07e0b6a"
+                "reference": "8680aa248f8e07bc8fb43f56f0f5fc77a0c96aae"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/myclabs/DeepCopy/zipball/07d290f0c47959fd5eed98c95ee5602db07e0b6a",
-                "reference": "07d290f0c47959fd5eed98c95ee5602db07e0b6a",
+                "url": "https://api.github.com/repos/myclabs/DeepCopy/zipball/8680aa248f8e07bc8fb43f56f0f5fc77a0c96aae",
+                "reference": "8680aa248f8e07bc8fb43f56f0f5fc77a0c96aae",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.1 || ^8.0"
+                "php": "^8.0"
             },
             "conflict": {
                 "doctrine/collections": "<1.6.8",
@@ -16156,15 +16152,15 @@
             ],
             "support": {
                 "issues": "https://github.com/myclabs/DeepCopy/issues",
-                "source": "https://github.com/myclabs/DeepCopy/tree/1.13.4"
+                "source": "https://github.com/myclabs/DeepCopy/tree/1.14.0"
             },
             "funding": [
                 {
-                    "url": "https://tidelift.com/funding/github/packagist/myclabs/deep-copy",
-                    "type": "tidelift"
+                    "url": "https://github.com/mnapoli",
+                    "type": "github"
                 }
             ],
-            "time": "2025-08-01T08:46:24+00:00"
+            "time": "2026-08-11T10:17:44+00:00"
         },
         {
             "name": "nette/utils",
