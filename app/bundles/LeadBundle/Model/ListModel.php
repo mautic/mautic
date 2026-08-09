@@ -92,8 +92,6 @@ class ListModel extends FormModel implements GlobalSearchInterface
 
     public function getRepository(): LeadListRepository
     {
-        $this->leadListRepository->setDispatcher($this->dispatcher);
-
         return $this->leadListRepository;
     }
 

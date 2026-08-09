@@ -266,6 +266,7 @@ rules:
 	- Utils\PHPStan\Rule\ControllerMethodMustReturnResponseRule
 
 	- Utils\PHPStan\Rule\NoServicesInBundleConfigRule
+	- Utils\PHPStan\Rule\NoServiceInMethodParameterRule
 	#- Utils\PHPStan\Rule\NoUnusedServiceAliasRule
 	- Utils\PHPStan\Rule\NoParentConstructorForwardingRule
 	- Utils\PHPStan\Rule\NoServiceJugglingRule

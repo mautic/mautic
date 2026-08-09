@@ -9,6 +9,7 @@ use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Table;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Test\EnvLoader;
 use Mautic\InstallBundle\Helper\SchemaHelper;
 use PHPUnit\Framework\TestCase;
@@ -80,7 +81,7 @@ final class InstallSchemaTest extends TestCase
 
     public function testBackupIndexesWithConfigOptions(): void
     {
-        $schemaHelper = new SchemaHelper($this->dbParams);
+        $schemaHelper = new SchemaHelper($this->dbParams, $this->createStub(EntityManagerInterface::class));
 
         // Make the backupExistingSchema method public so we can test that functionality without mocking all the SchemaHelper's functionality.
         $controllerReflection = new \ReflectionClass(SchemaHelper::class);

@@ -31,7 +31,6 @@ final class CampaignRepositoryTest extends TestCase
             'mautic.campaign.campaign.searchcommand.ispending' => 'is:pending',
             default                                            => $id,
         });
-
         $this->repository->autowireCommonRepository($translator);
     }
 

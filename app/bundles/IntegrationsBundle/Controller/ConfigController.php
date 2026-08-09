@@ -26,8 +26,6 @@ use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormNotesInterface;
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
 use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\PluginBundle\Entity\Integration;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -40,17 +38,12 @@ final class ConfigController extends AbstractFormController
      */
     private $integrationObject;
 
-    /**
-     * @var Integration
-     */
-    private $integrationConfiguration;
+    private ?Integration $integrationConfiguration = null;
 
     public function editAction(
         Request $request,
         ConfigIntegrationsHelper $integrationsHelper,
-        EventDispatcherInterface $dispatcher,
         FieldValidationHelper $fieldValidator,
-        FormFactoryInterface $formFactory,
         FormExtension $formExtension,
         string $integration,
     ): Response {
@@ -67,13 +60,13 @@ final class ConfigController extends AbstractFormController
         }
 
         $event = new FormLoadEvent($this->integrationConfiguration);
-        $dispatcher->dispatch($event, IntegrationEvents::INTEGRATION_CONFIG_FORM_LOAD);
+        $this->dispatcher->dispatch($event, IntegrationEvents::INTEGRATION_CONFIG_FORM_LOAD);
 
         // Create the form
-        $form = $this->getForm($formFactory);
+        $form = $this->getForm();
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            return $this->submitForm($request, $integrationsHelper, $fieldValidator, $dispatcher, $formFactory, $formExtension, $form);
+            return $this->submitForm($request, $integrationsHelper, $fieldValidator, $formExtension, $form);
         }
 
         // Clear the session of previously stored fields in case it got stuck
@@ -90,8 +83,6 @@ final class ConfigController extends AbstractFormController
         Request $request,
         ConfigIntegrationsHelper $integrationsHelper,
         FieldValidationHelper $fieldValidator,
-        EventDispatcherInterface $eventDispatcher,
-        FormFactoryInterface $formFactory,
         FormExtension $formExtension,
         FormInterface $form,
     ): JsonResponse|Response {
@@ -131,7 +122,8 @@ final class ConfigController extends AbstractFormController
 
         // Dispatch event prior to saving the Integration. Bundles/plugins may need to modify some field values before save
         $configEvent = new ConfigSaveEvent($this->integrationConfiguration);
-        $eventDispatcher->dispatch($configEvent, IntegrationEvents::INTEGRATION_CONFIG_BEFORE_SAVE);
+
+        $this->dispatcher->dispatch($configEvent, IntegrationEvents::INTEGRATION_CONFIG_BEFORE_SAVE);
 
         // Show the form if there are errors and the plugin is published or the authorized button was clicked
         $integrationDetailsPost = $request->request->all()['integration_details'] ?? [];
@@ -144,13 +136,13 @@ final class ConfigController extends AbstractFormController
         $integrationsHelper->saveIntegrationConfiguration($this->integrationConfiguration);
 
         // Dispatch after save event
-        $eventDispatcher->dispatch($configEvent, IntegrationEvents::INTEGRATION_CONFIG_AFTER_SAVE);
+        $this->dispatcher->dispatch($configEvent, IntegrationEvents::INTEGRATION_CONFIG_AFTER_SAVE);
 
         // Show the form if the apply button was clicked
         if ($this->isFormApplied($form)) {
             // Regenerate the form
             $this->resetFieldsInSession($request);
-            $form = $this->getForm($formFactory);
+            $form = $this->getForm();
 
             return $this->showForm($request, $form, $formExtension);
         }
@@ -162,9 +154,9 @@ final class ConfigController extends AbstractFormController
     /**
      * @return FormInterface<mixed>
      */
-    private function getForm(FormFactoryInterface $formFactory): FormInterface
+    private function getForm(): FormInterface
     {
-        return $formFactory->create(
+        return $this->createForm(
             $this->integrationObject->getConfigFormName() ?: IntegrationConfigType::class,
             $this->integrationConfiguration,
             [

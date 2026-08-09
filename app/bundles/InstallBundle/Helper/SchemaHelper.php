@@ -19,8 +19,6 @@ final class SchemaHelper
 {
     private Connection $db;
 
-    private ?EntityManagerInterface $em = null;
-
     /**
      * @var AbstractPlatform
      */
@@ -36,8 +34,10 @@ final class SchemaHelper
     /**
      * @throws \Doctrine\DBAL\Exception
      */
-    public function __construct(array $dbParams)
-    {
+    public function __construct(
+        array $dbParams,
+        private readonly EntityManagerInterface $entityManager,
+    ) {
         // suppress display of errors as we know its going to happen while testing the connection
         ini_set('display_errors', '0');
 
@@ -57,11 +57,6 @@ final class SchemaHelper
         $this->db = DriverManager::getConnection($dbParams);
 
         $this->dbParams = $dbParams;
-    }
-
-    public function setEntityManager(EntityManagerInterface $em): void
-    {
-        $this->em = $em;
     }
 
     /**
@@ -132,14 +127,14 @@ final class SchemaHelper
         $this->platform = $this->db->getDatabasePlatform();
         $backupPrefix   = (!empty($this->dbParams['backup_prefix'])) ? $this->dbParams['backup_prefix'] : 'bak_';
 
-        $metadatas = $this->em->getMetadataFactory()->getAllMetadata();
+        $metadatas = $this->entityManager->getMetadataFactory()->getAllMetadata();
         if (empty($metadatas)) {
             $this->db->close();
 
             return false;
         }
 
-        $schemaTool    = new SchemaTool($this->em);
+        $schemaTool    = new SchemaTool($this->entityManager);
         $installSchema = $schemaTool->getSchemaFromMetadata($metadatas);
         $mauticTables  = [];
 
@@ -148,7 +143,7 @@ final class SchemaHelper
             $mauticTables[$tableName] = $this->generateBackupName($this->dbParams['table_prefix'], $backupPrefix, $tableName);
         }
 
-        $isSqlite = $this->em->getConnection()->getDatabasePlatform() instanceof SqlitePlatform;
+        $isSqlite = $this->entityManager->getConnection()->getDatabasePlatform() instanceof SqlitePlatform;
         $sql      = $isSqlite ? [] : ['SET foreign_key_checks = 0;'];
         if ($this->dbParams['backup_tables']) {
             $sql = array_merge($sql, $this->backupExistingSchema($tables, $mauticTables, $backupPrefix));

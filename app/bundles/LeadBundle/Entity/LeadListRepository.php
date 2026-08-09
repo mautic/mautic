@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends CommonRepository<LeadList>
@@ -358,8 +359,10 @@ class LeadListRepository extends CommonRepository
         return $objectFilters;
     }
 
-    public function setDispatcher(EventDispatcherInterface $dispatcher): void
-    {
+    #[Required]
+    public function autowireLeadListRepository(
+        EventDispatcherInterface $dispatcher,
+    ): void {
         $this->dispatcher = $dispatcher;
     }
 
