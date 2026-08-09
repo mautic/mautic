@@ -2358,7 +2358,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             // Pass in the whole config
             $fields = $fieldsToUpdate;
         } else {
-            $fields = array_flip($fieldsToUpdate ?? []);
+            $fields = array_flip($fieldsToUpdate);
         }
 
         return $this->prepareFieldsForSync($fields, $fieldsToUpdate, $objects);

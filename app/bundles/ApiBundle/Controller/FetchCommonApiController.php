@@ -29,14 +29,13 @@ use Mautic\CoreBundle\Model\MauticModelInterface;
 use Mautic\CoreBundle\Security\Exception\PermissionException;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
-use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @template E of object
+ * @template TEntity of object
  */
 class FetchCommonApiController extends AbstractFOSRestController implements MauticController
 {
@@ -45,88 +44,73 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
 
     /**
      * If set to true, serializer will not return null values.
-     *
-     * @var bool
      */
-    protected $customSelectRequested = false;
+    protected bool $customSelectRequested = false;
 
     /**
      * Class for the entity.
      *
-     * @var class-string<E>
+     * @var string|class-string<TEntity>
      */
-    protected $entityClass;
+    protected string $entityClass = '';
 
     /**
      * Key to return for entity lists.
-     *
-     * @var string
      */
-    protected $entityNameMulti;
+    protected string $entityNameMulti;
 
     /**
      * Key to return for a single entity.
-     *
-     * @var string
      */
-    protected $entityNameOne;
+    protected string $entityNameOne;
 
     /**
      * Custom JMS strategies to add to the view's context.
      *
      * @var array<int, ExclusionStrategyInterface>
      */
-    protected $exclusionStrategies = [];
+    protected array $exclusionStrategies = [];
 
     /**
      * Pass to the model's getEntities() method.
      *
      * @var array<mixed>
      */
-    protected $extraGetEntitiesArguments = [];
+    protected array $extraGetEntitiesArguments = [];
 
-    /**
-     * @var bool
-     */
-    protected $inBatchMode = false;
+    protected bool $inBatchMode = false;
 
     /**
      * Used to set default filters for entity lists such as restricting to owning user.
      *
      * @var array<array<string, mixed>>
      */
-    protected $listFilters = [];
+    protected array $listFilters = [];
 
     /**
      * Model object for processing the entity.
      *
-     * @var AbstractCommonModel<E>|null
+     * @var AbstractCommonModel<TEntity>|null
      */
     protected $model;
 
     /**
      * The level parent/children should stop loading if applicable.
-     *
-     * @var int
      */
-    protected $parentChildrenLevelDepth = 3;
+    protected int $parentChildrenLevelDepth = 3;
 
     /**
      * Permission base for the entity such as page:pages.
-     *
-     * @var string|null
      */
-    protected $permissionBase;
+    protected ?string $permissionBase = null;
 
     /**
      * @var array<int, string>
      */
-    protected $serializerGroups = [];
-
-    protected ContainerBagInterface $parametersContainer;
+    protected array $serializerGroups = [];
 
     /**
-     * @param ModelFactory<E> $modelFactory
+     * @param ModelFactory<TEntity> $modelFactory
      */
     public function __construct(
         protected CorePermissions $security,
@@ -144,7 +128,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         }
 
         $event = new ApiInitializeEvent(
-            (string) $this->entityClass,
+            $this->entityClass,
             $this->serializerGroups,
             $this->exclusionStrategies,
         );
@@ -495,7 +479,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     /**
      * Get the default properties of an entity and parents.
      *
-     * @param E $entity
+     * @param TEntity $entity
      *
      * @return array<mixed>
      */
@@ -556,7 +540,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     /**
      * Gives child controllers opportunity to analyze and do whatever to an entity before going through serializer.
      *
-     * @param E $entity
+     * @param TEntity $entity
      */
     protected function preSerializeEntity(object $entity, string $action = 'view'): void
     {
@@ -565,7 +549,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     /**
      * Prepares entities returned from repository getEntities().
      *
-     * @param array<mixed>|Paginator<E> $results
+     * @param array<mixed>|Paginator<TEntity> $results
      *
      * @return array{0: array<mixed>|\ArrayObject<int,mixed>, 1: int}
      */
@@ -580,8 +564,8 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     }
 
     /**
-     * @param array<mixed>|Paginator<E> $results
-     * @param callable|null             $callback
+     * @param array<mixed>|Paginator<TEntity> $results
+     * @param callable|null                   $callback
      *
      * @return array{0: array<mixed>|\ArrayObject<int,mixed>, 1: int}
      */
@@ -651,8 +635,8 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
 
     /**
      * @param array<int, array<string|int>> $errors
-     * @param E|null                        $entity
-     * @param array<int, E|null>            $entities
+     * @param TEntity|null                  $entity
+     * @param array<int, TEntity|null>      $entities
      */
     protected function setBatchError(int $key, string $msg, int $code, array &$errors, array &$entities = [], ?object $entity = null): void
     {
