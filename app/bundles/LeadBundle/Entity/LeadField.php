@@ -44,6 +44,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[LeadFieldMinimumLength]
 class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInterface
 {
     use UuidTrait;
@@ -329,8 +330,6 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
                 }
             },
         ));
-
-        $metadata->addConstraint(new LeadFieldMinimumLength());
     }
 
     /**

@@ -43,6 +43,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[ReportAssert\ScheduleIsValid]
 class Report extends FormEntity implements SchedulerInterface, UuidInterface
 {
     use UuidTrait;
@@ -222,8 +223,6 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
         $metadata->addPropertyConstraint('name', new NotBlank(message: 'mautic.core.name.required'));
 
         $metadata->addPropertyConstraint('toAddress', new EmailAssert\MultipleEmailsValid());
-
-        $metadata->addConstraint(new ReportAssert\ScheduleIsValid());
     }
 
     /**

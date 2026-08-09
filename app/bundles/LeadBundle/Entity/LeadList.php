@@ -46,6 +46,9 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[UniqueUserAlias(field: 'alias', message: 'mautic.lead.list.alias.unique')]
+#[SegmentUsedInCampaigns]
+#[SegmentInUse]
 class LeadList extends FormEntity implements UuidInterface
 {
     use UuidTrait;
@@ -185,14 +188,6 @@ class LeadList extends FormEntity implements UuidInterface
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(
             message: 'mautic.core.name.required'
         ));
-
-        $metadata->addConstraint(new UniqueUserAlias([
-            'field'   => 'alias',
-            'message' => 'mautic.lead.list.alias.unique',
-        ]));
-
-        $metadata->addConstraint(new SegmentUsedInCampaigns());
-        $metadata->addConstraint(new SegmentInUse());
     }
 
     /**

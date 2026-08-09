@@ -56,6 +56,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  * @use TranslationEntityTrait<Page>
  * @use VariantEntityTrait<Page>
  */
+#[EntityEvent]
 class Page extends FormEntity implements TranslationEntityInterface, VariantEntityInterface, UuidInterface, OptimisticLockInterface
 {
     use TranslationEntityTrait;
@@ -361,8 +362,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
                 }
             },
         ));
-
-        $metadata->addConstraint(new EntityEvent());
     }
 
     /**
