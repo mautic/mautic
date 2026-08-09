@@ -9,6 +9,7 @@ use Mautic\FormBundle\Form\Type\FormFieldConditionType;
 use Mautic\FormBundle\Helper\PropertiesAccessor;
 use Mautic\FormBundle\Model\FieldModel;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Rule\AnyInvokedCount;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -124,7 +125,8 @@ final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
             ->method('getChoices')
             ->with(['some_choice_here' => 'Some choice here'])
             ->willReturn(['some_choice_here' => 'Some choice here']);
-        $matcher = $this->any();
+
+        $matcher = new AnyInvokedCount();
 
         $this->formBuilder->expects($matcher)->method('add')
             ->willReturnCallback(

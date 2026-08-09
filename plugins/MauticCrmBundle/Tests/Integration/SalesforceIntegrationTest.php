@@ -18,6 +18,7 @@ use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use Mautic\UserBundle\Entity\RoleRepository;
 use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Rule\AnyInvokedCount;
 
 final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 {
@@ -734,14 +735,16 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                 }
             );
 
+        $matcher = new AnyInvokedCount();
+
         $this->integrationEntityRepository
-            ->expects($spy = $this->any())
+            ->expects($matcher)
             ->method('getIntegrationsEntityId')
             ->willReturnCallback(
-                function () use ($spy): array {
+                function () use ($matcher): array {
                     // WARNING: this is using a PHPUnit undocumented workaround:
                     // https://github.com/sebastianbergmann/phpunit/issues/3888
-                    $spyParentProperties = $this->getParentPrivateProperties($spy);
+                    $spyParentProperties = $this->getParentPrivateProperties($matcher);
                     $invocations         = $spyParentProperties['invocations'];
 
                     if (count($invocations) > $this->getMaxInvocations('getIntegrationsEntityId')) {

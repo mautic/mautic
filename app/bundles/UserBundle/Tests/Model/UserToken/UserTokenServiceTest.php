@@ -11,6 +11,7 @@ use Mautic\UserBundle\Entity\UserTokenRepositoryInterface;
 use Mautic\UserBundle\Model\UserToken\UserTokenService;
 use PHPUnit\Framework\MockObject\MockObject;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class UserTokenServiceTest extends \PHPUnit\Framework\TestCase
 {
     /**

@@ -12,6 +12,7 @@ use Mautic\UserBundle\Security\SAML\User\UserMapper;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class UserMapperTest extends TestCase
 {
     private UserMapper $mapper;

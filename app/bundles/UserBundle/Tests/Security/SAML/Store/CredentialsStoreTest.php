@@ -11,6 +11,7 @@ use Mautic\UserBundle\Security\SAML\Store\CredentialsStore;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class CredentialsStoreTest extends TestCase
 {
     private string $cacheDir;

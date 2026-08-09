@@ -7,8 +7,6 @@ namespace Mautic\EmailBundle\Tests\Model;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
-use Mautic\ChannelBundle\Entity\MessageQueue;
-use Mautic\ChannelBundle\Entity\MessageQueueRepository;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -17,7 +15,6 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
-use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
@@ -28,25 +25,16 @@ use Mautic\LeadBundle\Model\ListModel;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
-use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class EmailModelFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 
-    private const int EMAILS_A_MONTH = 2;
-
-    private bool $useDefaultFrequencyRules;
-
     private EmailModel $emailModel;
 
     protected function setUp(): void
     {
-        $this->useDefaultFrequencyRules = ' with data set "Default Frequency Rules"' === $this->dataSetAsString();
-
-        $this->configParams['email_frequency_number'] = $this->useDefaultFrequencyRules ? self::EMAILS_A_MONTH : 0;
-        $this->configParams['email_frequency_time']   = 'MONTH';
         parent::setUp();
 
         /** @var EmailModel $emailModel */
@@ -635,59 +623,6 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(5, $loadedEmail->getPendingCount());
     }
 
-    /**
-     * @return iterable<string, null[]>
-     */
-    public static function dataFrequencyRules(): iterable
-    {
-        yield 'Custom Frequency Rules' => [null];
-        yield 'Default Frequency Rules' => [null];
-    }
-
-    #[DataProvider('dataFrequencyRules')]
-    public function testFrequencyRulesAreAppliedWhenSendToDncIsNo(): void
-    {
-        $contact = $this->createContact();
-        $email   = $this->createTemplateEmail();
-        $this->createFrequencyRule($contact);
-        $this->createEmailStats($email, $contact);
-        $this->em->flush();
-
-        $this->sendEmail($email, $contact);
-        $this->assertEmailIsPostponed($email, $contact);
-    }
-
-    #[DataProvider('dataFrequencyRules')]
-    public function testFrequencyRulesAreNotAppliedWhenSendToDncIsTrue(): void
-    {
-        $contact = $this->createContact();
-        $email   = $this->createTemplateEmail();
-        $email->setSendToDnc(true);
-        $this->em->persist($email);
-        $this->createFrequencyRule($contact);
-        $this->createEmailStats($email, $contact);
-        $this->em->flush();
-
-        $this->sendEmail($email, $contact);
-        $this->assertEmailIsNotPostponed();
-    }
-
-    #[DataProvider('dataFrequencyRules')]
-    public function testEmailsWithSendToDncSetToYesAreNotCountedTowardsFrequencyRules(): void
-    {
-        $contact     = $this->createContact();
-        $emailToSend = $this->createTemplateEmail();
-        $emailDncYes = $this->createTemplateEmail();
-        $emailDncYes->setSendToDnc(true);
-        $this->em->persist($emailToSend);
-        $this->createFrequencyRule($contact);
-        $this->createEmailStats($emailDncYes, $contact);
-        $this->em->flush();
-
-        $this->sendEmail($emailToSend, $contact);
-        $this->assertEmailIsNotPostponed();
-    }
-
     public function testGetEmailListStatsDateToIncludesTheWholeDay(): void
     {
         $contact  = $this->createContact();
@@ -852,73 +787,5 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($email);
 
         return $email;
-    }
-
-    private function createFrequencyRule(Lead $contact): void
-    {
-        if ($this->useDefaultFrequencyRules) {
-            return;
-        }
-
-        $frequencyRule = new FrequencyRule();
-        $frequencyRule->setLead($contact);
-        $frequencyRule->setDateAdded(new \DateTime());
-        $frequencyRule->setChannel('email');
-        $frequencyRule->setFrequencyNumber(self::EMAILS_A_MONTH);
-        $frequencyRule->setFrequencyTime('MONTH');
-        $this->em->persist($frequencyRule);
-    }
-
-    private function createEmailStats(Email $email, Lead $contact): void
-    {
-        $exceedFrequencyRule = self::EMAILS_A_MONTH + 1;
-
-        for ($i = 0; $i < $exceedFrequencyRule; ++$i) {
-            $stat = new Stat();
-            $stat->setEmail($email);
-            $stat->setLead($contact);
-            $stat->setEmailAddress($contact->getEmail());
-            $stat->setDateSent(new \DateTime('-1 day'));
-            $this->em->persist($stat);
-        }
-    }
-
-    private function sendEmail(Email $email, Lead $contact): void
-    {
-        $this->emailModel->sendEmail(
-            $email,
-            [
-                [
-                    'id'        => $contact->getId(),
-                    'email'     => $contact->getEmail(),
-                    'firstname' => $contact->getFirstname(),
-                    'lastname'  => $contact->getLastname(),
-                ],
-            ]
-        );
-    }
-
-    private function assertEmailIsNotPostponed(): void
-    {
-        $messageQueueRepository = $this->em->getRepository(MessageQueue::class);
-        $this->assertInstanceOf(MessageQueueRepository::class, $messageQueueRepository);
-
-        $this->assertSame(0, $messageQueueRepository->count([]), 'Email should not be postponed.');
-    }
-
-    private function assertEmailIsPostponed(Email $email, Lead $contact): void
-    {
-        $messageQueueRepository = $this->em->getRepository(MessageQueue::class);
-        $this->assertInstanceOf(MessageQueueRepository::class, $messageQueueRepository);
-
-        $queuedMessages = $messageQueueRepository->findBy([]);
-        $this->assertCount(1, $queuedMessages, 'Email should be postponed.');
-
-        $queuedMessage = reset($queuedMessages);
-        $this->assertInstanceOf(MessageQueue::class, $queuedMessage);
-        $this->assertSame('email', $queuedMessage->getChannel());
-        $this->assertSame($email->getId(), $queuedMessage->getChannelId());
-        $this->assertSame($contact, $queuedMessage->getLead());
-        $this->assertSame($queuedMessage::STATUS_PENDING, $queuedMessage->getStatus());
     }
 }

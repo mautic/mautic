@@ -19,6 +19,7 @@ use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Validation;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class ConfigTypeTest extends TypeTestCase
 {
     public function testSubmitEmptyTrustedHosts(): void

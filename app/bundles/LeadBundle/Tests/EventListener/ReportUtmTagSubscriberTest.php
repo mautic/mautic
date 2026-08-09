@@ -14,6 +14,7 @@ use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Rule\AnyInvokedCount;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -240,7 +241,8 @@ final class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('from')
             ->with(MAUTIC_TABLE_PREFIX.'lead_utmtags', 'utm')
             ->willReturn($queryBuilderMock);
-        $matcher = $this->any();
+
+        $matcher = new AnyInvokedCount();
 
         $queryBuilderMock->expects($matcher)->method('leftJoin')
             ->willReturnCallback(function (...$parameters) use ($matcher, $queryBuilderMock): MockObject {

@@ -20,6 +20,7 @@ use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Rule\AnyInvokedCount;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -347,7 +348,7 @@ final class LegacyEventDispatcherTest extends TestCase
         $this->contactTracker->expects($this->exactly(2))
             ->method('setSystemContact');
         // Legacy custom event should dispatch
-        $matcher = $this->any();
+        $matcher = new AnyInvokedCount();
 
         // Legacy custom event should dispatch
         $this->dispatcher->expects($matcher)->method('dispatch')
@@ -386,7 +387,8 @@ final class LegacyEventDispatcherTest extends TestCase
 
         $this->contactTracker->expects($this->exactly(2))
             ->method('setSystemContact');
-        $matcher = $this->any();
+
+        $matcher = new AnyInvokedCount();
 
         // Should pass
         $this->dispatcher->expects($matcher)->method('dispatch')

@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Form\Type\LookupType;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Form\Test\TypeTestCase;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class LookupTypeTest extends TypeTestCase
 {
     /**

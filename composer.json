@@ -41,7 +41,7 @@
     "phpstan/phpstan-doctrine": "^2.0.28",
     "phpstan/phpstan-phpunit": "^2.0.18",
     "phpstan/phpstan-symfony": "^2.0.20",
-    "phpunit/phpunit": "^11.5",
+    "phpunit/phpunit": "^12.0",
     "rector/type-perfect": "^2.1.4",
     "rector/rector": "dev-main",
     "symfony/browser-kit": "~7.4.0",

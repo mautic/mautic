@@ -11,6 +11,7 @@ use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Rule\AnyInvokedCount;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -305,7 +306,8 @@ final class ReportGeneratorEventTest extends TestCase
             ->method('andWhere')
             ->with($condition)
             ->willReturn($this->queryBuilder);
-        $matcher = $this->any();
+
+        $matcher = new AnyInvokedCount();
 
         $this
             ->queryBuilder
@@ -355,7 +357,7 @@ final class ReportGeneratorEventTest extends TestCase
             ->method('andWhere')
             ->with($condition)
             ->willReturn($this->queryBuilder);
-        $matcher = $this->any();
+        $matcher = new AnyInvokedCount();
 
         $this
             ->queryBuilder

@@ -25,6 +25,7 @@ use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Rule\AnyInvokedCount;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -218,7 +219,8 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $eventMock->expects($this->once())
             ->method('getRequestedGraphs')
             ->willReturn(['mautic.email.graph.pie.read.ingored.unsubscribed.bounced']);
-        $matcher = $this->any();
+
+        $matcher = new AnyInvokedCount();
 
         $eventMock->expects($matcher)->method('checkContext')->willReturnCallback(function (...$parameters) use ($matcher): true {
             if (1 === $matcher->numberOfInvocations()) {
@@ -270,7 +272,8 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $eventMock         = $this->createMock(ReportGraphEvent::class);
         $chartQueryMock    = $this->createStub(ChartQuery::class);
         $translatorMock    = $this->createStub(TranslatorInterface::class);
-        $matcher           = $this->any();
+
+        $matcher           = new AnyInvokedCount();
 
         $eventMock->expects($matcher)
             ->method('checkContext')->willReturnCallback(function (...$parameters) use ($matcher): true {
@@ -329,7 +332,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $eventMock->expects($this->once())
             ->method('getRequestedGraphs')
             ->willReturn(['mautic.email.table.most.emails.failed']);
-        $matcher = $this->any();
+        $matcher = new AnyInvokedCount();
 
         $eventMock->expects($matcher)->method('checkContext')->willReturnCallback(function (...$parameters) use ($matcher) {
             if (1 === $matcher->numberOfInvocations()) {
