@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
-use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
 use Utils\Rector\UnserializeToSerializerDecodeRector;
 
 return RectorConfig::configure()
@@ -41,12 +40,6 @@ return RectorConfig::configure()
         // handle later
         Rector\PHPUnit\PHPUnit120\Rector\Class_\AllowMockObjectsForDataProviderRector::class,
 
-<<<<<<< HEAD
-        // this would escalate to runtime report, not what we want
-        Rector\Php84\Rector\Class_\DeprecatedAnnotationToDeprecatedAttributeRector::class,
-
-=======
->>>>>>> 4fca68c722 (cleanup rector.php config)
         // @todo move to "twig" group
         Rector\Symfony\Symfony73\Rector\Class_\GetFiltersToAsTwigFilterAttributeRector::class,
         Rector\Symfony\Symfony73\Rector\Class_\GetFunctionsToAsTwigFunctionAttributeRector::class,
@@ -54,8 +47,6 @@ return RectorConfig::configure()
         // handle next
         Rector\PHPUnit\PHPUnit120\Rector\Class_\AllowMockObjectsWithoutExpectationsAttributeRector::class,
 
-        Rector\EarlyReturn\Rector\Return_\PreparedValueToEarlyReturnRector::class,
-        Rector\EarlyReturn\Rector\StmtsAwareInterface\ReturnEarlyIfVariableRector::class,
         Rector\Symfony\CodeQuality\Rector\Class_\LoadValidatorMetadataToAttributeRector::class,
         Utils\Rector\ModelGetRepositoryToRepositoryServiceRector::class => [
             __DIR__.'/app/bundles/PageBundle/Form/Type/PreferenceCenterListType.php',
@@ -93,12 +84,6 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/EmailBundle/Entity/EmailDraft.php',
             __DIR__.'/app/bundles/EmailBundle/Helper/MailHelper.php',
             __DIR__.'/app/bundles/CoreBundle/Twig/Helper/DateHelper.php',
-        ],
-
-        // Avoiding breaking BC breaks with forced return types in public methods
-        ReturnTypeFromReturnNewRector::class => [
-            __DIR__.'/app/bundles/IntegrationsBundle/Sync/SyncProcess/Direction/Integration/ObjectChangeGenerator.php',
-            __DIR__.'/app/bundles/IntegrationsBundle/Sync/SyncProcess/Direction/Internal/ObjectChangeGenerator.php',
         ],
 
         Rector\DeadCode\Rector\Property\RemoveUnusedPrivatePropertyRector::class => [

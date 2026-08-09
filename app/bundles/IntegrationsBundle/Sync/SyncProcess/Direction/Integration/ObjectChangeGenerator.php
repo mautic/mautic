@@ -33,7 +33,7 @@ class ObjectChangeGenerator
         ObjectMappingDAO $objectMapping,
         ReportObjectDAO $internalObject,
         ReportObjectDAO $integrationObject,
-    ): \Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO {
+    ): ObjectChangeDAO {
         $objectChange = new ObjectChangeDAO(
             $mappingManual->getIntegration(),
             $integrationObject->getObject(),

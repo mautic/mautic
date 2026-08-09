@@ -78,7 +78,7 @@ final class ObjectChangeGeneratorTest extends TestCase
             $syncReport->getObject($objectName, 2)
         );
 
-        $this->assertEquals($integration, $objectChangeDAO->getIntegration());
+        $this->assertSame($integration, $objectChangeDAO->getIntegration());
 
         // object and object ID should be Mautic's (from the Mautic's POV)
         $this->assertEquals(Contact::NAME, $objectChangeDAO->getObject());
@@ -145,7 +145,7 @@ final class ObjectChangeGeneratorTest extends TestCase
             $syncReport->getObject($objectName, 2)
         );
 
-        $this->assertEquals($integration, $objectChangeDAO->getIntegration());
+        $this->assertSame($integration, $objectChangeDAO->getIntegration());
 
         // object and object ID should be Mautic's (from the Mautic's POV)
         $this->assertEquals(Contact::NAME, $objectChangeDAO->getObject());
