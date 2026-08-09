@@ -393,7 +393,7 @@ final class TagController extends FormController
     {
         $existingTags = $this->tagRepository->getTagsByName([$tag->getTag()]);
 
-        return array_all($existingTags, fn (Tag $existingTag): bool => !($existingTag->getId() != $tag->getId()));
+        return array_all($existingTags, fn (Tag $existingTag): bool => $existingTag->getId() == $tag->getId());
     }
 
     /**
