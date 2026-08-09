@@ -14,6 +14,7 @@ use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Mautic\IntegrationsBundle\Integration\Interfaces\BuilderInterface;
 use Mautic\PluginBundle\Entity\Integration;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\Finder;
@@ -193,7 +194,12 @@ final class ThemeHelperTest extends TestCase
         }
     }
 
-    public function testThemeInstallRejectsParentDirectoryZipSlip(): void
+    /**
+     * @param list<array{0: string, 1: string}> $zipEntries
+     * @param list<string>                      $escapedPaths absolute paths that must not be written
+     */
+    #[DataProvider('zipSlipThemeInstallProvider')]
+    public function testThemeInstallRejectsZipSlipEntries(array $zipEntries, array $escapedPaths): void
     {
         $themeRoot = sys_get_temp_dir().'/theme_install_'.uniqid();
         $this->pathsHelper->method('getSystemPath')
@@ -205,9 +211,9 @@ final class ThemeHelperTest extends TestCase
 
         $zip = new \ZipArchive();
         $zip->open($zipPath, \ZipArchive::CREATE);
-        $zip->addFromString('config.json', json_encode(['features' => []], JSON_THROW_ON_ERROR));
-        $zip->addFromString('html/message.html.twig', '<p>Message</p>');
-        $zip->addFromString('../outside.txt', 'zip-slip');
+        foreach ($zipEntries as [$name, $contents]) {
+            $zip->addFromString($name, $contents);
+        }
         $zip->close();
 
         $thrown = false;
@@ -219,7 +225,9 @@ final class ThemeHelperTest extends TestCase
             $this->assertSame('mautic.core.update.error_extracting_package', $exception->getMessage());
         } finally {
             $filesystem = new Filesystem();
-            $this->assertFileDoesNotExist($themeRoot.'/outside.txt');
+            foreach ($escapedPaths as $escapedPath) {
+                $this->assertFileDoesNotExist(str_replace('{themeRoot}', $themeRoot, $escapedPath));
+            }
             $this->assertDirectoryDoesNotExist($themeRoot.'/'.$zipName);
             $filesystem->remove([$themeRoot, $zipPath]);
         }
@@ -227,73 +235,42 @@ final class ThemeHelperTest extends TestCase
         $this->assertTrue($thrown);
     }
 
-    public function testThemeInstallRejectsAbsolutePathZipSlip(): void
+    /**
+     * @return \Generator<string, array{0: list<array{0: string, 1: string}>, 1: list<string>}>
+     */
+    public static function zipSlipThemeInstallProvider(): \Generator
     {
-        $themeRoot = sys_get_temp_dir().'/theme_install_'.uniqid();
-        $this->pathsHelper->method('getSystemPath')
-            ->with('themes', true)
-            ->willReturn($themeRoot);
+        $config  = json_encode(['features' => []], JSON_THROW_ON_ERROR);
+        $message = '<p>Message</p>';
+        $page    = '<p>Page</p>';
 
-        $zipPath = sys_get_temp_dir().'/theme_install_'.uniqid().'.zip';
-        $zipName = basename($zipPath, '.zip');
+        yield 'parent directory entry' => [
+            [
+                ['config.json', $config],
+                ['html/message.html.twig', $message],
+                ['../outside.txt', 'zip-slip'],
+            ],
+            ['{themeRoot}/outside.txt'],
+        ];
 
-        $zip = new \ZipArchive();
-        $zip->open($zipPath, \ZipArchive::CREATE);
-        $zip->addFromString('config.json', json_encode(['features' => []], JSON_THROW_ON_ERROR));
-        $zip->addFromString('html/message.html.twig', '<p>Message</p>');
-        $zip->addFromString('/tmp/absolute-theme-slip.txt', 'zip-slip');
-        $zip->close();
+        yield 'absolute path entry' => [
+            [
+                ['config.json', $config],
+                ['html/message.html.twig', $message],
+                ['/tmp/absolute-theme-slip.txt', 'zip-slip'],
+            ],
+            ['/tmp/absolute-theme-slip.txt'],
+        ];
 
-        $thrown = false;
-
-        try {
-            $this->themeHelper->install($zipPath);
-        } catch (\Exception $exception) {
-            $thrown = true;
-            $this->assertSame('mautic.core.update.error_extracting_package', $exception->getMessage());
-        } finally {
-            $filesystem = new Filesystem();
-            $this->assertFileDoesNotExist('/tmp/absolute-theme-slip.txt');
-            $this->assertDirectoryDoesNotExist($themeRoot.'/'.$zipName);
-            $filesystem->remove([$themeRoot, $zipPath]);
-        }
-
-        $this->assertTrue($thrown);
-    }
-
-    public function testThemeInstallRejectsWrappedParentDirectoryZipSlip(): void
-    {
-        $themeRoot = sys_get_temp_dir().'/theme_install_'.uniqid();
-        $this->pathsHelper->method('getSystemPath')
-            ->with('themes', true)
-            ->willReturn($themeRoot);
-
-        $zipPath = sys_get_temp_dir().'/theme_install_'.uniqid().'.zip';
-        $zipName = basename($zipPath, '.zip');
-
-        $zip = new \ZipArchive();
-        $zip->open($zipPath, \ZipArchive::CREATE);
-        $zip->addFromString('my-theme/config.json', json_encode(['features' => []], JSON_THROW_ON_ERROR));
-        $zip->addFromString('my-theme/html/message.html.twig', '<p>Message</p>');
-        $zip->addFromString('my-theme/html/page.html.twig', '<p>Page</p>');
-        $zip->addFromString('my-theme/../../outside.txt', 'zip-slip');
-        $zip->close();
-
-        $thrown = false;
-
-        try {
-            $this->themeHelper->install($zipPath);
-        } catch (\Exception $exception) {
-            $thrown = true;
-            $this->assertSame('mautic.core.update.error_extracting_package', $exception->getMessage());
-        } finally {
-            $filesystem = new Filesystem();
-            $this->assertFileDoesNotExist($themeRoot.'/outside.txt');
-            $this->assertDirectoryDoesNotExist($themeRoot.'/'.$zipName);
-            $filesystem->remove([$themeRoot, $zipPath]);
-        }
-
-        $this->assertTrue($thrown);
+        yield 'wrapped parent directory entry' => [
+            [
+                ['my-theme/config.json', $config],
+                ['my-theme/html/message.html.twig', $message],
+                ['my-theme/html/page.html.twig', $page],
+                ['my-theme/../../outside.txt', 'zip-slip'],
+            ],
+            ['{themeRoot}/outside.txt'],
+        ];
     }
 
     public function testThemeFallbackToDefaultIfTemplateIsMissing(): void

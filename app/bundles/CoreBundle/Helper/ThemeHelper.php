@@ -416,11 +416,6 @@ class ThemeHelper implements ThemeHelperInterface
                 $targetFile = substr($file, strlen($archivePrefix) + 1);
             }
 
-            if ($this->isUnsafeArchivePath($targetFile)) {
-                $zipper->close();
-                throw new \Exception('mautic.core.update.error_extracting_package');
-            }
-
             try {
                 $destination = $this->getSafeThemeDestination($themePath, $targetFile);
             } catch (\Exception) {
@@ -490,23 +485,13 @@ class ThemeHelper implements ThemeHelperInterface
         }
 
         $normalized = str_replace('\\', '/', $path);
-
         if (Path::isAbsolute($normalized)) {
             return true;
         }
 
         $trimmed = rtrim($normalized, '/');
-        if ('' === $trimmed) {
-            return false;
-        }
 
-        foreach (explode('/', $trimmed) as $segment) {
-            if ('..' === $segment) {
-                return true;
-            }
-        }
-
-        return false;
+        return '' !== $trimmed && in_array('..', explode('/', $trimmed), true);
     }
 
     /**
