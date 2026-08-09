@@ -23,7 +23,6 @@ use Mautic\CoreBundle\Entity\SkipModifiedInterface;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ApiResource(
     shortName: 'Webhooks',
@@ -121,6 +120,11 @@ class Webhook extends FormEntity implements SkipModifiedInterface
      * @var string|null
      */
     #[Groups(['webhook:read', 'webhook:write'])]
+    #[Assert\Choice([
+        null,
+        Order::Ascending->value,
+        Order::Descending->value,
+    ])]
     private $eventsOrderbyDir;
 
     private ?\DateTimeImmutable $markedUnhealthyAt      = null;
@@ -189,20 +193,6 @@ class Webhook extends FormEntity implements SkipModifiedInterface
                 ]
             )
             ->build();
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint(
-            'eventsOrderbyDir',
-            new Assert\Choice(
-                [
-                    null,
-                    Order::Ascending->value,
-                    Order::Descending->value,
-                ]
-            )
-        );
     }
 
     /**
