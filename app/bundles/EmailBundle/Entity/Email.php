@@ -147,12 +147,14 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      * @var string|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[\Symfony\Component\Validator\Constraints\Email(message: 'mautic.core.email.required')]
     private $replyToAddress;
 
     /**
      * @var string|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[\Symfony\Component\Validator\Constraints\Email(message: 'mautic.core.email.required')]
     private $bccAddress;
 
     /**
@@ -479,20 +481,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $metadata->addPropertyConstraint(
             'fromAddress',
             new EmailOrEmailTokenList(allowMultiple: false),
-        );
-
-        $metadata->addPropertyConstraint(
-            'replyToAddress',
-            new \Symfony\Component\Validator\Constraints\Email(
-                message: 'mautic.core.email.required'
-            )
-        );
-
-        $metadata->addPropertyConstraint(
-            'bccAddress',
-            new \Symfony\Component\Validator\Constraints\Email(
-                message: 'mautic.core.email.required'
-            )
         );
 
         $metadata->addPropertyConstraint('subject', new TextOnlyDynamicContent());

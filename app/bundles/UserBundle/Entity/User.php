@@ -99,6 +99,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
      */
     #[Groups(['user:read', 'user:write'])]
     #[Assert\NotBlank(message: 'mautic.user.user.email.valid')]
+    #[Assert\Email(message: 'mautic.user.user.email.valid', groups: ['SecondPass'])]
     private $email;
 
     /**
@@ -238,8 +239,6 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addConstraint(new UniqueEntity(fields: ['username'], message: 'mautic.user.user.username.unique', repositoryMethod: 'checkUniqueUsernameEmail'));
-
-        $metadata->addPropertyConstraint('email', new Assert\Email(message: 'mautic.user.user.email.valid', groups: ['SecondPass']));
 
         $metadata->addConstraint(new UniqueEntity(fields: ['email'], message: 'mautic.user.user.email.unique', repositoryMethod: 'checkUniqueUsernameEmail', groups: ['User', 'SecondPass']));
 
