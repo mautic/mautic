@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Twig\Sandbox\ThemeSandboxPolicy;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -350,12 +351,15 @@ class ThemeHelper implements ThemeHelperInterface
         $config = [];
         for ($i = 0; $i < $zipper->numFiles; ++$i) {
             $entry = $zipper->getNameIndex($i);
-            if (str_starts_with($entry, '/')) {
-                $entry = substr($entry, 1);
+            $entry = str_replace('\\', '/', $entry);
+
+            if ($this->isUnsafeArchivePath($entry)) {
+                $zipper->close();
+                throw new \Exception('mautic.core.update.error_extracting_package');
             }
 
             $zipEntries[] = $entry;
-            $extension = pathinfo($entry, PATHINFO_EXTENSION);
+            $extension    = pathinfo($entry, PATHINFO_EXTENSION);
 
             // Check for required files
             if (in_array($entry, $requiredFiles)) {
@@ -412,7 +416,18 @@ class ThemeHelper implements ThemeHelperInterface
                 $targetFile = substr($file, strlen($archivePrefix) + 1);
             }
 
-            $destination = $themePath.'/'.$targetFile;
+            if ($this->isUnsafeArchivePath($targetFile)) {
+                $zipper->close();
+                throw new \Exception('mautic.core.update.error_extracting_package');
+            }
+
+            try {
+                $destination = $this->getSafeThemeDestination($themePath, $targetFile);
+            } catch (\Exception) {
+                $zipper->close();
+                throw new \Exception('mautic.core.update.error_extracting_package');
+            }
+
             if (str_ends_with($file, '/')) {
                 if (!is_dir($destination) && !mkdir($destination, 0755, true) && !is_dir($destination)) {
                     $zipper->close();
@@ -463,6 +478,56 @@ class ThemeHelper implements ThemeHelperInterface
         unlink($zipFile);
 
         return true;
+    }
+
+    /**
+     * Reject absolute paths and parent-directory segments that could escape the theme directory.
+     */
+    private function isUnsafeArchivePath(string $path): bool
+    {
+        if ('' === $path) {
+            return false;
+        }
+
+        $normalized = str_replace('\\', '/', $path);
+
+        if (Path::isAbsolute($normalized)) {
+            return true;
+        }
+
+        $trimmed = rtrim($normalized, '/');
+        if ('' === $trimmed) {
+            return false;
+        }
+
+        foreach (explode('/', $trimmed) as $segment) {
+            if ('..' === $segment) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Build a destination path under the theme directory, rejecting zip-slip escapes.
+     *
+     * @throws \Exception
+     */
+    private function getSafeThemeDestination(string $themePath, string $relativePath): string
+    {
+        if ($this->isUnsafeArchivePath($relativePath)) {
+            throw new \Exception('mautic.core.update.error_extracting_package');
+        }
+
+        $themeRoot   = Path::canonicalize($themePath);
+        $destination = Path::canonicalize($themePath.'/'.$relativePath);
+
+        if ($destination !== $themeRoot && !Path::isBasePath($themeRoot, $destination)) {
+            throw new \Exception('mautic.core.update.error_extracting_package');
+        }
+
+        return $destination;
     }
 
     /**
