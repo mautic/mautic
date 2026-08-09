@@ -70,6 +70,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
      */
     #[Groups(['user:write'])]
     #[Assert\NotBlank(message: 'mautic.user.user.password.notblank', groups: ['CheckPasswordNotBlank'])]
+    #[Assert\Length(min: 6, minMessage: 'mautic.user.user.password.minlength', groups: ['CheckPassword'])]
     private $plainPassword;
 
     /**
@@ -104,6 +105,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
      * @var string|null
      */
     #[Groups(['user:read', 'user:write'])]
+    #[Assert\Length(max: 191, maxMessage: 'mautic.user.user.position.toolong')]
     private $position;
 
     /**
@@ -240,10 +242,6 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         $metadata->addPropertyConstraint('email', new Assert\Email(message: 'mautic.user.user.email.valid', groups: ['SecondPass']));
 
         $metadata->addConstraint(new UniqueEntity(fields: ['email'], message: 'mautic.user.user.email.unique', repositoryMethod: 'checkUniqueUsernameEmail', groups: ['User', 'SecondPass']));
-
-        $metadata->addPropertyConstraint('position', new Assert\Length(max: 191, maxMessage: 'mautic.user.user.position.toolong'));
-
-        $metadata->addPropertyConstraint('plainPassword', new Assert\Length(min: 6, minMessage: 'mautic.user.user.password.minlength', groups: ['CheckPassword']));
 
         $metadata->addPropertyConstraint('plainPassword', new NotWeak(message: 'mautic.user.user.password.weak', groups: ['CheckPassword']));
 
