@@ -138,6 +138,7 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
      * @var array<mixed>
      */
     #[Groups(['sms:read', 'sms:write'])]
+    #[Count(max: 10, maxMessage: 'mautic.sms.form.max.media.error')]
     private array $media = [];
 
     #[Groups(['sms:read', 'sms:write'])]
@@ -227,11 +228,6 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $metadata->addPropertyConstraint(
-            'media',
-            new Count(max: 10, maxMessage: 'mautic.sms.form.max.media.error')
-        );
-
         $metadata->addConstraint(new Callback(
             function (Sms $sms, ExecutionContextInterface $context): void {
                 $type      = $sms->getSmsType();

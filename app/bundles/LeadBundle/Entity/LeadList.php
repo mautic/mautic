@@ -24,7 +24,6 @@ use Mautic\LeadBundle\Validator\Constraints\SegmentUsedInCampaigns;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ApiResource(
     shortName: 'Segments',
@@ -182,23 +181,6 @@ class LeadList extends FormEntity implements UuidInterface
         $builder->addNullableField('deleted', 'datetime');
 
         static::addUuidField($builder);
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-<<<<<<< HEAD
-        $metadata->addPropertyConstraint('name', new Assert\NotBlank(
-            message: 'mautic.core.name.required'
-        ));
-=======
-        $metadata->addConstraint(new UniqueUserAlias([
-            'field'   => 'alias',
-            'message' => 'mautic.lead.list.alias.unique',
-        ]));
-
-        $metadata->addConstraint(new SegmentUsedInCampaigns());
-        $metadata->addConstraint(new SegmentInUse());
->>>>>>> 81c5c7b1d1 ([symfony] move NotBlank property constraints from loadValidatorMetadata() to property attributes)
     }
 
     /**

@@ -9,7 +9,9 @@ namespace Mautic\CoreBundle\Helper\EmojiMap;
  */
 final class UnicodeToShortEmojiMap
 {
-    /** @var array<string, string> */
+    /**
+     * @var array<string, string>
+     */
     public static array $map = [
         "\xc2\xa9"                                                                                                     => ':copyright:',
         "\xf3\xbe\xac\xa9"                                                                                             => ':copyright:',

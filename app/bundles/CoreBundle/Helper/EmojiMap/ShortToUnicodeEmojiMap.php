@@ -9,7 +9,9 @@ namespace Mautic\CoreBundle\Helper\EmojiMap;
  */
 final class ShortToUnicodeEmojiMap
 {
-    /** @var array<string, string> */
+    /**
+     * @var array<string, string>
+     */
     public static array $map = [
         ':copyright:'                                              => "\xc2\xa9",
         ':registered:'                                             => "\xc2\xae",
@@ -1355,7 +1357,9 @@ final class ShortToUnicodeEmojiMap
         ':woman-kiss-woman:'                                       => "\xf0\x9f\x91\xa9\xe2\x80\x8d\xe2\x9d\xa4\xef\xb8\x8f\xe2\x80\x8d\xf0\x9f\x92\x8b\xe2\x80\x8d\xf0\x9f\x91\xa9",
     ];
 
-    /** @var array<string, string> */
+    /**
+     * @var array<string, string>
+     */
     public static array $exceptions = [
         // Outlook email rendering
         "microsoft-com\xf0\x9f\x8f\xa2office" => 'microsoft-com:office:office',
