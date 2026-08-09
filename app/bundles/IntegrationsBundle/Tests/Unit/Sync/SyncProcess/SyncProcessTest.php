@@ -148,7 +148,8 @@ final class SyncProcessTest extends TestCase
         $this->internalSyncDataExchange->expects($this->once())
             ->method('executeSyncOrder')
             ->willReturn($objectMappings);
-        $matcher = $this->any();
+
+        $matcher = $this->exactly(3);
 
         $this->eventDispatcher->expects($matcher)
             ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher): object {

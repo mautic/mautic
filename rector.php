@@ -76,7 +76,7 @@ return RectorConfig::configure()
         ],
 
         // handle next
-        \Rector\PHPUnit\PHPUnit120\Rector\Class_\AllowMockObjectsWithoutExpectationsAttributeRector::class,
+        Rector\PHPUnit\PHPUnit120\Rector\Class_\AllowMockObjectsWithoutExpectationsAttributeRector::class,
 
         Rector\EarlyReturn\Rector\Return_\PreparedValueToEarlyReturnRector::class,
         Rector\EarlyReturn\Rector\StmtsAwareInterface\ReturnEarlyIfVariableRector::class,

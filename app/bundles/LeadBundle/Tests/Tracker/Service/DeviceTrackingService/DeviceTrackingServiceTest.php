@@ -12,6 +12,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingService;
+use PHPUnit\Framework\MockObject\Rule\AnyInvokedCount;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -259,7 +260,7 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
         $this->security->expects($this->once())
             ->method('isAnonymous')
             ->willReturn(true);
-        $matcher = $this->any();
+        $matcher = new AnyInvokedCount();
 
         $this->leadDeviceRepositoryMock->expects($matcher)->method('getByTrackingId')
             ->willReturnCallback(function (...$parameters) use ($matcher, $trackingId, $trackedLeadDeviceMock) {
@@ -291,7 +292,8 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
         $leadDeviceMock->expects($this->once())
             ->method('getLead')
             ->willReturn(new Lead());
-        $matcher = $this->any();
+
+        $matcher = new AnyInvokedCount();
 
         $this->cookieHelperMock->expects($matcher)->method('setCookie')
             ->willReturnCallback(function (...$parameters) use ($matcher, $uniqueTrackingIdentifier): void {
@@ -351,7 +353,8 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
             ->method('getLead')
             ->willReturn(new Lead());
 
-        $matcher = $this->any();
+        $matcher = new AnyInvokedCount();
+
         $this->cookieHelperMock->expects($matcher)->method('setCookie')
             ->willReturnCallback(function (...$parameters) use ($matcher, $uniqueTrackingIdentifier): void {
                 if (1 === $matcher->numberOfInvocations()) {
