@@ -32,8 +32,16 @@ final class ReferenceResolverTest extends TestCase
 
     public function testResolveLeadReferences(): void
     {
+        $result = $this->createMock(Result::class);
+        $result->method('fetchOne')
+            ->willReturnOnConsecutiveCalls('Company name', false);
+
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $queryBuilder->method('executeQuery')
+            ->willReturn($result);
+
         $this->connection->method('createQueryBuilder')
-            ->willReturn($this->createQueryBuilder('Company name', false));
+            ->willReturn($queryBuilder);
 
         $companyReference  = $this->createReference('company', 3);
         $userReference     = $this->createReference('user', 4);
@@ -70,8 +78,16 @@ final class ReferenceResolverTest extends TestCase
 
     public function testResolveCompanyReferences(): void
     {
+        $result = $this->createMock(Result::class);
+        $result->method('fetchOne')
+            ->willReturnOnConsecutiveCalls('Company name');
+
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $queryBuilder->method('executeQuery')
+            ->willReturn($result);
+
         $this->connection->method('createQueryBuilder')
-            ->willReturn($this->createQueryBuilder('Company name'));
+            ->willReturn($queryBuilder);
 
         $companyReference  = $this->createReference('company', 3);
 
@@ -93,23 +109,5 @@ final class ReferenceResolverTest extends TestCase
         $reference->setValue($value);
 
         return $reference;
-    }
-
-    /**
-     * @param mixed $returnValues
-     *
-     * @return QueryBuilder&MockObject
-     */
-    private function createQueryBuilder(...$returnValues): MockObject
-    {
-        $result = $this->createMock(Result::class);
-        $result->method('fetchOne')
-            ->willReturnOnConsecutiveCalls(...$returnValues);
-
-        $queryBuilder = $this->createMock(QueryBuilder::class);
-        $queryBuilder->method('executeQuery')
-            ->willReturn($result);
-
-        return $queryBuilder;
     }
 }
