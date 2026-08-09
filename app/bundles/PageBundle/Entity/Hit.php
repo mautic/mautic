@@ -10,8 +10,8 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\PageBundle\Validator\PageHit;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
+#[PageHit]
 class Hit
 {
     public const TABLE_NAME = 'page_hits';
@@ -285,11 +285,6 @@ class Hit
                 ]
             )
             ->build();
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addConstraint(new PageHit());
     }
 
     public function getId(): int

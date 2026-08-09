@@ -21,7 +21,6 @@ use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\ProjectBundle\Validator\Constraints\UniqueName;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ApiResource(
     operations: [
@@ -41,6 +40,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[UniqueName]
 class Project extends FormEntity implements UuidInterface
 {
     use UuidTrait;
@@ -107,11 +107,6 @@ class Project extends FormEntity implements UuidInterface
                 ]
             )
             ->build();
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addConstraint(new UniqueName());
     }
 
     public function getId(): ?int

@@ -6517,18 +6517,6 @@ parameters:
 			path: app/bundles/LeadBundle/Form/Validator/Constraints/FieldAliasKeywordValidator.php
 
 		-
-			message: '#^Property Mautic\\LeadBundle\\Form\\Validator\\Constraints\\UniqueUserAlias\:\:\$field has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/LeadBundle/Form/Validator/Constraints/UniqueUserAlias.php
-
-		-
-			message: '#^Property Mautic\\LeadBundle\\Form\\Validator\\Constraints\\UniqueUserAlias\:\:\$message has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/LeadBundle/Form/Validator/Constraints/UniqueUserAlias.php
-
-		-
 			message: '#^Access to an undefined property Symfony\\Component\\Validator\\Constraint\:\:\$field\.$#'
 			identifier: property.notFound
 			count: 1

@@ -69,6 +69,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  * @use VariantEntityTrait<Email>
  * @use TranslationEntityTrait<Email>
  */
+#[EmailLists]
+#[EntityEvent]
+#[ScheduleDateRange]
+#[ValidEmailLinks]
 class Email extends FormEntity implements VariantEntityInterface, TranslationEntityInterface, UuidInterface, OptimisticLockInterface
 {
     use VariantEntityTrait;
@@ -516,11 +520,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         );
 
         $metadata->addPropertyConstraint('subject', new TextOnlyDynamicContent());
-
-        $metadata->addConstraint(new EmailLists());
-        $metadata->addConstraint(new EntityEvent());
-        $metadata->addConstraint(new ScheduleDateRange());
-        $metadata->addConstraint(new ValidEmailLinks());
 
         $metadata->addConstraint(new Callback(
             function (Email $email, ExecutionContextInterface $context): void {

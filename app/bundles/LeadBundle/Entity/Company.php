@@ -41,6 +41,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[UniqueCustomField(object: 'company')]
 class Company extends FormEntity implements CustomFieldEntityInterface, IdentifierFieldEntityInterface
 {
     use CustomFieldEntityTrait;
@@ -262,7 +263,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $metadata->addConstraint(new UniqueCustomField(object: 'company'));
         $metadata->addPropertyConstraint('score', new Assert\Range(min: 0, max: 2147483647));
     }
 

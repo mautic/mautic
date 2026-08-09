@@ -57,6 +57,8 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  * @use TranslationEntityTrait<Sms>
  * @use VariantEntityTrait<Sms>
  */
+#[EntityEvent]
+#[MediaMaxAllowedSize]
 class Sms extends FormEntity implements UuidInterface, TranslationEntityInterface, VariantEntityInterface
 {
     use UuidTrait;
@@ -255,9 +257,6 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
                 }
             },
         ));
-
-        $metadata->addConstraint(new EntityEvent());
-        $metadata->addConstraint(new MediaMaxAllowedSize());
     }
 
     /**
