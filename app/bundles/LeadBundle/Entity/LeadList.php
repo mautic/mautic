@@ -69,6 +69,7 @@ class LeadList extends FormEntity implements UuidInterface
      * @var string
      */
     #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
+    #[Assert\NotBlank(message: 'mautic.core.name.required')]
     private $name;
 
     /**
@@ -185,9 +186,19 @@ class LeadList extends FormEntity implements UuidInterface
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
+<<<<<<< HEAD
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(
             message: 'mautic.core.name.required'
         ));
+=======
+        $metadata->addConstraint(new UniqueUserAlias([
+            'field'   => 'alias',
+            'message' => 'mautic.lead.list.alias.unique',
+        ]));
+
+        $metadata->addConstraint(new SegmentUsedInCampaigns());
+        $metadata->addConstraint(new SegmentInUse());
+>>>>>>> 81c5c7b1d1 ([symfony] move NotBlank property constraints from loadValidatorMetadata() to property attributes)
     }
 
     /**

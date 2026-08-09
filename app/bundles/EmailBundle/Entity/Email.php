@@ -100,6 +100,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      * @var string
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[NotBlank(message: 'mautic.core.name.required')]
     private $name;
 
     /**
@@ -112,6 +113,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      * @var string|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[NotBlank(message: 'mautic.core.subject.required')]
     private $subject;
 
     /**
@@ -473,21 +475,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     {
         $metadata->addPropertyConstraint(
             'name',
-            new NotBlank(
-                message: 'mautic.core.name.required'
-            )
-        );
-
-        $metadata->addPropertyConstraint(
-            'name',
             new Length(max: self::MAX_NAME_SUBJECT_LENGTH, maxMessage: 'mautic.email.name.length')
-        );
-
-        $metadata->addPropertyConstraint(
-            'subject',
-            new NotBlank(
-                message: 'mautic.core.subject.required'
-            )
         );
 
         $metadata->addPropertyConstraint(

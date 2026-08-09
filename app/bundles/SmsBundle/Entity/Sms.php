@@ -78,6 +78,7 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
      * @var string
      */
     #[Groups(['sms:read', 'sms:write'])]
+    #[NotBlank(message: 'mautic.core.name.required')]
     private $name;
 
     /**
@@ -226,11 +227,6 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $metadata->addPropertyConstraint(
-            'name',
-            new NotBlank(message: 'mautic.core.name.required')
-        );
-
         $metadata->addPropertyConstraint(
             'media',
             new Count(max: 10, maxMessage: 'mautic.sms.form.max.media.error')

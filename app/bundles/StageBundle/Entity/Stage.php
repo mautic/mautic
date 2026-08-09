@@ -57,6 +57,7 @@ class Stage extends FormEntity implements UuidInterface
      * @var string
      */
     #[Groups(['stage:read', 'stage:write'])]
+    #[Assert\NotBlank(message: 'mautic.core.name.required')]
     private $name;
 
     /**
@@ -135,8 +136,6 @@ class Stage extends FormEntity implements UuidInterface
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $metadata->addPropertyConstraint('name', new Assert\NotBlank(message: 'mautic.core.name.required'));
-
         $metadata->addConstraint(new UniqueEntity(fields: ['weight'], message: 'mautic.stage.weight.unique'));
     }
 

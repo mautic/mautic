@@ -59,6 +59,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
      * @var ?string
      */
     #[Groups(['webhook:read', 'webhook:write'])]
+    #[NotBlank(message: 'mautic.core.name.required')]
     private $name;
 
     /**
@@ -71,6 +72,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
      * @var ?string
      */
     #[Groups(['webhook:read', 'webhook:write'])]
+    #[NotBlank(message: 'mautic.core.valid_url_required')]
     private $webhookUrl;
 
     /**
@@ -191,22 +193,8 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint(
-            'name',
-            new NotBlank(
-                message: 'mautic.core.name.required'
-            )
-        );
-
-        $metadata->addPropertyConstraint(
             'webhookUrl',
             new Assert\Url(
-                message: 'mautic.core.valid_url_required'
-            )
-        );
-
-        $metadata->addPropertyConstraint(
-            'webhookUrl',
-            new NotBlank(
                 message: 'mautic.core.valid_url_required'
             )
         );

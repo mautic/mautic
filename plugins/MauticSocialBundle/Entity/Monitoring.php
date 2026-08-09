@@ -16,7 +16,6 @@ use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ApiResource(
     operations: [
@@ -51,6 +50,7 @@ class Monitoring extends FormEntity implements UuidInterface
      * @var string
      */
     #[Groups(['monitoring:read', 'monitoring:write'])]
+    #[Assert\NotBlank(message: 'mautic.core.title.required')]
     private $title;
 
     /**
@@ -75,6 +75,7 @@ class Monitoring extends FormEntity implements UuidInterface
      * @var string|null
      */
     #[Groups(['monitoring:read', 'monitoring:write'])]
+    #[Assert\NotBlank(message: 'mautic.social.network.type')]
     private $networkType;
 
     /**
@@ -138,17 +139,6 @@ class Monitoring extends FormEntity implements UuidInterface
     /**
      * Constraints for required fields.
      */
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('title', new Assert\NotBlank(
-            message: 'mautic.core.title.required'
-        ));
-
-        $metadata->addPropertyConstraint('networkType', new Assert\NotBlank(
-            message: 'mautic.social.network.type'
-        ));
-    }
-
     /**
      * @return mixed
      */
