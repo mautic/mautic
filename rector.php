@@ -23,7 +23,7 @@ return RectorConfig::configure()
         symfonyCodeQuality: true,
         earlyReturn: true,
     )
-    ->withPhpLevel(120)
+    ->withPhpSets(php84: true)
     ->withCache(__DIR__.'/var/cache/rector')
     ->withTypeGuardedClasses([
         // common controllers
@@ -54,12 +54,18 @@ return RectorConfig::configure()
     ->reportUnusedSkips()
     ->withComposerBased(phpunit: true, symfony: true)
     ->withSkip([
+<<<<<<< HEAD
         // handle later
         Rector\PHPUnit\PHPUnit120\Rector\Class_\AllowMockObjectsForDataProviderRector::class,
 
+=======
+>>>>>>> 036f5748ad ([php 8.4] make use of array_* functions)
         Rector\PHPUnit\PHPUnit60\Rector\ClassMethod\AddDoesNotPerformAssertionToNonAssertingTestRector::class => [
             __DIR__.'/app/bundles/CoreBundle/Tests/Twig/TwigIntegrationTestTrait.php',
         ],
+
+        // this would escalate to runtime report, not what we want
+        Rector\Php84\Rector\Class_\DeprecatedAnnotationToDeprecatedAttributeRector::class,
 
         // @todo move to "twig" group
         Rector\Symfony\Symfony73\Rector\Class_\GetFiltersToAsTwigFilterAttributeRector::class,

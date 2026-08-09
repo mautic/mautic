@@ -75,12 +75,6 @@ class BotRatioHelper
             return true;
         }
 
-        foreach ($this->blockedUserAgents as $blockedUserAgent) {
-            if (str_contains($userAgent, $blockedUserAgent)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($this->blockedUserAgents, fn (string $blockedUserAgent): bool => str_contains($userAgent, $blockedUserAgent));
     }
 }

@@ -89,12 +89,6 @@ class DateOptionFactory
             ' ago', // 5 days ago
         ];
 
-        foreach ($notations as $notation) {
-            if (str_contains($timeframe, $notation)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($notations, fn (string $notation): bool => str_contains($timeframe, $notation));
     }
 }
