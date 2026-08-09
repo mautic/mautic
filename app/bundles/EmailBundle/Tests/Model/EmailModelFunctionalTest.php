@@ -47,6 +47,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
 
         $this->configParams['email_frequency_number'] = $this->useDefaultFrequencyRules ? self::EMAILS_A_MONTH : 0;
         $this->configParams['email_frequency_time']   = 'MONTH';
+
         parent::setUp();
 
         /** @var EmailModel $emailModel */
@@ -854,7 +855,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         return $email;
     }
 
-    private function createFrequencyRule(Lead $contact): void
+    private function createFrequencyRule(Lead $contact, bool $useDefaultFrequencyRules): void
     {
         if ($this->useDefaultFrequencyRules) {
             return;

@@ -306,6 +306,7 @@ final class ReportGeneratorEventTest extends TestCase
             ->method('andWhere')
             ->with($condition)
             ->willReturn($this->queryBuilder);
+
         $matcher = new AnyInvokedCount();
 
         $this
