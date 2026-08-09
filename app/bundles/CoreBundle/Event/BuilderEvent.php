@@ -149,14 +149,7 @@ class BuilderEvent extends Event
                 if (!is_array($tokenKeys)) {
                     $tokenKeys = [$tokenKeys];
                 }
-
-                $found = false;
-                foreach ($tokenKeys as $token) {
-                    if (0 === stripos($token, $this->tokenFilter)) {
-                        $found = true;
-                        break;
-                    }
-                }
+                $found = array_any($tokenKeys, fn ($token): bool => 0 === stripos($token, $this->tokenFilter));
 
                 if (!$found) {
                     $requested = false;

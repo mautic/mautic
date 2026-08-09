@@ -304,13 +304,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
         $columns = $this->getReport()->getSelectAndAggregatorAndOrderAndGroupByColumns();
 
         if (is_array($column)) {
-            foreach ($column as $checkMe) {
-                if (in_array($checkMe, $columns, true)) {
-                    return true;
-                }
-            }
-
-            return false;
+            return array_any($column, fn ($checkMe): bool => in_array($checkMe, $columns, true));
         }
 
         return in_array($column, $columns, true);
@@ -326,13 +320,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
         $this->buildSortedFilters();
 
         if (is_array($column)) {
-            foreach ($column as $checkMe) {
-                if (isset($this->sortedFilters[$checkMe])) {
-                    return true;
-                }
-            }
-
-            return false;
+            return array_any($column, fn ($checkMe): bool => isset($this->sortedFilters[$checkMe]));
         }
 
         return isset($this->sortedFilters[$column]);

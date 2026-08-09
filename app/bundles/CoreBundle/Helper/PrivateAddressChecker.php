@@ -64,13 +64,8 @@ final class PrivateAddressChecker
 
         if (!filter_var($host, FILTER_VALIDATE_IP)) {
             $ips = $this->resolveHostName($host);
-            foreach ($ips as $ip) {
-                if ($this->isPrivateIp($ip)) {
-                    return true;
-                }
-            }
 
-            return false;
+            return array_any($ips, fn (string $ip): bool => $this->isPrivateIp($ip));
         }
 
         return $this->isPrivateIp($host);
@@ -158,13 +153,7 @@ final class PrivateAddressChecker
 
             $ips = $this->resolveHostName($host);
 
-            foreach ($ips as $ip) {
-                if (in_array($ip, $this->allowedPrivateAddresses, true)) {
-                    return true;
-                }
-            }
-
-            return false;
+            return array_any($ips, fn (string $ip): bool => in_array($ip, $this->allowedPrivateAddresses, true));
         } catch (\Exception $e) {
             throw new \InvalidArgumentException('URL validation failed: '.$e->getMessage(), $e->getCode(), $e);
         }
