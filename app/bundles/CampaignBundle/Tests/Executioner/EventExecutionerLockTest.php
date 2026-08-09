@@ -28,8 +28,10 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
 
     private EventDispatcherInterface $eventDispatcher;
 
-    protected function setUp(): void // @phpstan-ignore phpunit.callParent
+    protected function setUp(): void
     {
+        parent::setUp();
+
         $this->loggerTraitSetup();
 
         $this->eventExecutioner = self::getContainer()->get(EventExecutioner::class);

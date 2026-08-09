@@ -26,14 +26,14 @@
     "mautic/core-lib": "^7.0"
   },
   "require-dev": {
-    "codeception/codeception": "^5.1",
-    "codeception/module-asserts": "^3.0",
-    "codeception/module-db": "^3.1",
-    "codeception/module-webdriver": "^4.0",
+    "codeception/codeception": "^5.3|^6.0",
+    "codeception/module-asserts": "^3.0|^4.0",
+    "codeception/module-db": "^3.1|^4.0",
+    "codeception/module-webdriver": "^4.0|^5.0",
     "friendsofphp/php-cs-fixer": "^v3.95.11",
     "http-interop/http-factory-guzzle": "^1.0",
-    "liip/functional-test-bundle": "^4.3",
-    "liip/test-fixtures-bundle": "^3.5",
+    "liip/functional-test-bundle": "^4.3|^5.0",
+    "liip/test-fixtures-bundle": "^3.5|^4.0",
     "mautic/transifex": "^5.0",
     "phpstan/extension-installer": "^1.4",
     "phpstan/phpstan": "^2.2.6",
@@ -41,7 +41,7 @@
     "phpstan/phpstan-doctrine": "^2.0.28",
     "phpstan/phpstan-phpunit": "^2.0.18",
     "phpstan/phpstan-symfony": "^2.0.20",
-    "phpunit/phpunit": "^12.0",
+    "phpunit/phpunit": "^13.0",
     "rector/type-perfect": "^2.1.4",
     "rector/rector": "dev-main",
     "symfony/browser-kit": "~7.4.0",
@@ -194,7 +194,7 @@
   },
   "config": {
     "platform": {
-      "php": "8.4.0"
+      "php": "8.4.1"
     },
     "bin-dir": "bin",
     "component-dir": "media/assets",
