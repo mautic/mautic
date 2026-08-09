@@ -54,15 +54,8 @@ return RectorConfig::configure()
     ->reportUnusedSkips()
     ->withComposerBased(phpunit: true, symfony: true)
     ->withSkip([
-<<<<<<< HEAD
         // handle later
         Rector\PHPUnit\PHPUnit120\Rector\Class_\AllowMockObjectsForDataProviderRector::class,
-
-=======
->>>>>>> 036f5748ad ([php 8.4] make use of array_* functions)
-        Rector\PHPUnit\PHPUnit60\Rector\ClassMethod\AddDoesNotPerformAssertionToNonAssertingTestRector::class => [
-            __DIR__.'/app/bundles/CoreBundle/Tests/Twig/TwigIntegrationTestTrait.php',
-        ],
 
         // this would escalate to runtime report, not what we want
         Rector\Php84\Rector\Class_\DeprecatedAnnotationToDeprecatedAttributeRector::class,
