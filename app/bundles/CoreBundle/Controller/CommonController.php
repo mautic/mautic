@@ -203,7 +203,7 @@ class CommonController extends AbstractController implements MauticController
             );
 
             $contentTemplate   = $event->getTemplate();
-            $parameters        = $event->getVars(); // @phpstan-ignore parameterByRef.type
+            $parameters        = $event->getVars();
         }
 
         // It's not uncommon that the vars are array of mixed. Not just strings. I beliveve this is Symfony's issue.

@@ -389,9 +389,6 @@ final class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 
     public function testHandleDeletesGracefullyWithHasOptedOutOfEmailAsMissingField(): void
     {
-        /**
-         * @phpstan-ignore-next-line
-         */
         $cache = $this->createMock(CacheStorageHelper::class);
 
         $cache
@@ -451,9 +448,6 @@ final class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 
     public function testHandleDeletesGracefully(): void
     {
-        /**
-         * @phpstan-ignore-next-line
-         */
         $cache = $this->createMock(CacheStorageHelper::class);
 
         $cache

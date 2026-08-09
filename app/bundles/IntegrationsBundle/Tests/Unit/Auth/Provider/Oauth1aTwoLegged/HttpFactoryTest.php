@@ -34,7 +34,7 @@ final class HttpFactoryTest extends TestCase
         $credentials->method('getAuthUrl')->willReturn('AuthUrlValue');
         $httpFactory = new HttpFactory();
         $client      = $httpFactory->getClient($credentials);
-        $config      = $client->getConfig(); /** @phpstan-ignore-line Deprecated. Must be refactored for Guzzle 8 */
+        $config      = $client->getConfig();
         $this->assertSame('oauth', $config['auth']);
         $this->assertSame('AuthUrlValue', $config['base_uri']->getPath());
         $this->assertTrue($config['handler']->hasHandler());

@@ -91,7 +91,7 @@ final class ImportTest extends StandardImportTestHelper
         $import->increaseIgnoredCount();
 
         $expectedCount = 2 + $expectedCount;
-        $this->assertSame($expectedCount, $import->getProcessedRows()); // @phpstan-ignore argument.unresolvableType (I don't see anything wrong)
+        $this->assertSame($expectedCount, $import->getProcessedRows());
     }
 
     public function testGetProgressPercentage(): void

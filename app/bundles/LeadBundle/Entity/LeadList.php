@@ -315,7 +315,7 @@ class LeadList extends FormEntity implements UuidInterface
     public function getFilters()
     {
         if (is_array($this->filters)) {
-            return $this->setFirstFilterGlueToAnd($this->addLegacyParams($this->filters)); // @phpstan-ignore method.deprecated
+            return $this->setFirstFilterGlueToAnd($this->addLegacyParams($this->filters));
         }
 
         return $this->filters;

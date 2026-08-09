@@ -1114,7 +1114,6 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         ];
 
         // Required: CampaignSubscriber::onCampaignTriggerCondition only supports CampaignExecutionEvent (deprecated)
-        // @phpstan-ignore-next-line new.deprecated
         $event = new CampaignExecutionEvent($eventArgs, true);
 
         $dispatcher = self::getContainer()->get(EventDispatcherInterface::class);

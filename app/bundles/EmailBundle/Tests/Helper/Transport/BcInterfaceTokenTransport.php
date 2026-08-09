@@ -16,7 +16,7 @@ final class BcInterfaceTokenTransport implements TransportInterface
     /**
      * @var array<string, mixed>
      */
-    private array $transports = []; // @phpstan-ignore-line
+    private array $transports = [];
 
     /**
      * @var string[]

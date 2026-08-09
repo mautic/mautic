@@ -10,25 +10,16 @@ use Mautic\IntegrationsBundle\Sync\DAO\Value\ReferenceValueDAO;
 
 final class ExampleClassWithPrivateProperty
 {
-    /**
-     * @phpstan-ignore-next-line
-     */
     private string $test = 'value';
 }
 
 final class ExampleClassWithProtectedProperty
 {
-    /**
-     * @phpstan-ignore-next-line
-     */
     private string $test = 'value';
 }
 
 final class ExampleClassWithPublicProperty
 {
-    /**
-     * @phpstan-ignore-next-line
-     */
     public $test = 'value';
 }
 

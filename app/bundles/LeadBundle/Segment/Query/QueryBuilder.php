@@ -73,7 +73,7 @@ class QueryBuilder extends BaseQueryBuilder
             return $sql;
         }
 
-        $sql = match ($this->getType()) { /** @phpstan-ignore-line this method is deprecated. We'll have to find a way how to refactor this method. */
+        $sql = match ($this->getType()) {
             3 /* self::INSERT */ => $this->parentMethod('getSQLForInsert'),
             1 /* self::DELETE */ => $this->parentMethod('getSQLForDelete'),
             2 /* self::UPDATE */ => $this->parentMethod('getSQLForUpdate'),

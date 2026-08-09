@@ -25,7 +25,6 @@ final class ConfigurationTest extends \PHPUnit\Framework\TestCase
         $integrationSettings = new Integration();
         $integrationSettings->setIsPublished(true);
         $integrationSettings->setFeatureSettings(['messaging_service_sid' => '123']);
-        /** @phpstan-ignore classConstant.deprecatedClass */
         $this->integrationObject = $this->createMock(AbstractIntegration::class);
         $this->integrationObject->method('getIntegrationSettings')
             ->willReturn($integrationSettings);

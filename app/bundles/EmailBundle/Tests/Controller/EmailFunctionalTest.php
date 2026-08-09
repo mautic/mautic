@@ -39,7 +39,7 @@ final class EmailFunctionalTest extends MauticMysqlTestCase
         $form = $crawler->selectButton(self::SAVE_AND_CLOSE)->form();
 
         // change lists/excludedLists and submit the form
-        $form['emailform[excludedLists]']->setValue([$listOne->getId(), $listThree->getId()]); // @phpstan-ignore-line
+        $form['emailform[excludedLists]']->setValue([$listOne->getId(), $listThree->getId()]);
         $crawler = $this->client->submit($form);
 
         self::assertResponseIsSuccessful();

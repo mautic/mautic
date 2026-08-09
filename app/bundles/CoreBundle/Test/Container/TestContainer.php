@@ -17,8 +17,8 @@ final class TestContainer extends BaseTestContainer
     public function set(string $id, $service): void
     {
         $closure = static function (ContainerInterface $container) use ($id, $service): void {
-            $container->services[$id] = $service; // @phpstan-ignore-line
-            $container->privates[$id] = $service; // @phpstan-ignore-line
+            $container->services[$id] = $service;
+            $container->privates[$id] = $service;
         };
         \Closure::bind($closure, null, $this->publicContainer)($this->publicContainer);
     }

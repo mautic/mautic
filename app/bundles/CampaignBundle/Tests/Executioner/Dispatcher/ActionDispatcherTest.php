@@ -36,7 +36,6 @@ final class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
 
         $this->dispatcher         = $this->createMock(EventDispatcherInterface::class);
         $this->scheduler          = $this->createMock(EventScheduler::class);
-        /** @phpstan-ignore classConstant.deprecatedClass */
         $this->legacyDispatcher   = $this->createMock(LegacyEventDispatcher::class);
     }
 

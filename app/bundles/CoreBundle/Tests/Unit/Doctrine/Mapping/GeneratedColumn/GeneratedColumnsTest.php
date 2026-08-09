@@ -46,7 +46,7 @@ final class GeneratedColumnsTest extends TestCase
         $generatedColumn2->setOriginalDateColumn('date_added', 'd');
         $this->generatedColumns->add($generatedColumn2);
 
-        $this->assertSame($generatedColumn2, $this->generatedColumns->getForOriginalDateColumnAndUnit('date_added', 'd')); // @phpstan-ignore method.deprecated
+        $this->assertSame($generatedColumn2, $this->generatedColumns->getForOriginalDateColumnAndUnit('date_added', 'd'));
     }
 
     #[DataProvider('dataGetForOriginalDateColumnAndUnitUnexpectedValue')]
@@ -57,7 +57,7 @@ final class GeneratedColumnsTest extends TestCase
         $this->generatedColumns->add($generatedColumn);
 
         $this->expectException(\UnexpectedValueException::class);
-        $this->generatedColumns->getForOriginalDateColumnAndUnit($column, $unit);  // @phpstan-ignore method.deprecated
+        $this->generatedColumns->getForOriginalDateColumnAndUnit($column, $unit);
     }
 
     /**

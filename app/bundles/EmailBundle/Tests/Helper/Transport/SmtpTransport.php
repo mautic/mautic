@@ -15,7 +15,7 @@ final class SmtpTransport implements TransportInterface
     /**
      * @var array<string, mixed>
      */
-    private array $transports = []; // @phpstan-ignore-line
+    private array $transports = [];
 
     public Email $sentMessage;
 

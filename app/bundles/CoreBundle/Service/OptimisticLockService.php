@@ -45,7 +45,7 @@ final readonly class OptimisticLockService implements OptimisticLockServiceInter
         return ++$expectedVersion === $entity->getVersion();
     }
 
-    private function buildUpdateQuery(OptimisticLockInterface $entity, ?string &$versionColumn = null): QueryBuilder // @phpstan-ignore parameterByRef.unusedType
+    private function buildUpdateQuery(OptimisticLockInterface $entity, ?string &$versionColumn = null): QueryBuilder
     {
         $className     = $entity::class;
         $metadata      = $this->entityManager->getClassMetadata($className);

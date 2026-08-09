@@ -149,9 +149,6 @@ final class DsnType extends AbstractType
         ]);
     }
 
-    /**
-     * @phpstan-ignore-next-line
-     */
     public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['currentDsn'] = $this->getCurrentDsn($form->getName());

@@ -34,7 +34,6 @@ final class MobileNotificationDetailsTypeTest extends TypeTestCase
 
         $this->integrationSettings = $this->createMock(Integration::class);
 
-        // @phpstan-ignore-next-line
         $integration = $this->createMock(AbstractIntegration::class);
         $integration->method('getIntegrationSettings')
             ->willReturn($this->integrationSettings);

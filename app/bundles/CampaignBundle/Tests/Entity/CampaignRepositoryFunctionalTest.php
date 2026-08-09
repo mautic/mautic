@@ -138,7 +138,7 @@ final class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertSame([], $result);
     }
 
-    private function createLead(Campaign $campaign, ?CampaignLead &$campaignLead = null): Lead // @phpstan-ignore parameterByRef.unusedType
+    private function createLead(Campaign $campaign, ?CampaignLead &$campaignLead = null): Lead
     {
         $lead = new Lead();
         $this->em->persist($lead);

@@ -711,9 +711,6 @@ final class CampaignSubscriber implements EventSubscriberInterface
     /**
      * @throws \Exception
      */
-    /**
-     * @phpstan-ignore-next-line
-     */
     public function onCampaignTriggerConditionContactAdded(CampaignExecutionEvent $event): bool
     {
         $campaign = $this->campaignModel->getEntity($event->getEvent()['campaign']['id']);
@@ -810,7 +807,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
      * device specified in the
      * CampaignExecutionEvent's settings.
      */
-    private function validateContactDevice(CampaignExecutionEvent $campaignExecutionEvent, Lead $contact, LeadDeviceRepository $leadDeviceRepository): bool // @phpstan-ignore parameter.deprecatedClass
+    private function validateContactDevice(CampaignExecutionEvent $campaignExecutionEvent, Lead $contact, LeadDeviceRepository $leadDeviceRepository): bool
     {
         $campaignExecutionEventConfig = $campaignExecutionEvent->getConfig();
         $deviceType                   = empty($campaignExecutionEventConfig['device_type']) ? null : $campaignExecutionEventConfig['device_type'];

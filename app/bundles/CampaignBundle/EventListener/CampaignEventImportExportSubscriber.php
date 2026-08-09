@@ -118,9 +118,6 @@ final readonly class CampaignEventImportExportSubscriber implements EventSubscri
         ];
     }
 
-    /**
-     * @phpstan-ignore-next-line
-     */
     private function handleChannelExport(Event $campaignEvent, array &$data, EntityExportEvent $event): void
     {
         $channel      = $campaignEvent->getChannel();
@@ -196,9 +193,6 @@ final readonly class CampaignEventImportExportSubscriber implements EventSubscri
         $event->addDependencyEntity(Event::ENTITY_NAME, $dependencies);
     }
 
-    /**
-     * @phpstan-ignore-next-line
-     */
     private function mergeExportData(array &$data, EntityExportEvent $subEvent): void
     {
         foreach ($subEvent->getEntities() as $key => $values) {
@@ -211,9 +205,6 @@ final readonly class CampaignEventImportExportSubscriber implements EventSubscri
         }
     }
 
-    /**
-     * @phpstan-ignore-next-line
-     */
     private function exportEntity(string $entityName, ?int $entityId, array &$data, EntityExportEvent $event): void
     {
         if ($entityId) {

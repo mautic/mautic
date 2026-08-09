@@ -361,7 +361,7 @@ final class HttpFactoryTest extends TestCase
      */
     private function extractMiddleware(ClientInterface $client): OAuth2Middleware
     {
-        $handler    = $client->getConfig()['handler']; /** @phpstan-ignore-line Deprecated. Must be refactored for Guzzle 8 */
+        $handler    = $client->getConfig()['handler'];
         $reflection = new \ReflectionClass($handler);
         $property   = $reflection->getProperty('stack');
 
