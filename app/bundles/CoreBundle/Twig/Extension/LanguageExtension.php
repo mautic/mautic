@@ -5,21 +5,13 @@ namespace Mautic\CoreBundle\Twig\Extension;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Intl\Languages;
-use Twig\Extension\AbstractExtension;
-use Twig\TwigFilter;
+use Twig\Attribute\AsTwigFilter;
 
-final class LanguageExtension extends AbstractExtension
+final readonly class LanguageExtension
 {
     public function __construct(
-        private readonly Security $security,
+        private Security $security,
     ) {
-    }
-
-    public function getFilters(): array
-    {
-        return [
-            new TwigFilter('language_name', $this->getLanguageName(...)),
-        ];
     }
 
     /**
@@ -30,6 +22,7 @@ final class LanguageExtension extends AbstractExtension
      *
      * @return string The language name
      */
+    #[AsTwigFilter(name: 'language_name')]
     public function getLanguageName(string $code, ?string $displayLocale = null): string
     {
         if (null === $displayLocale) {

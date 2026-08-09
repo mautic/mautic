@@ -4,26 +4,14 @@ declare(strict_types=1);
 
 namespace Mautic\InstallBundle\Twig;
 
-use Twig\Extension\AbstractExtension;
-use Twig\TwigFilter;
+use Twig\Attribute\AsTwigFilter;
 
 /**
  * TwigExtension class.
  */
-final class TwigExtension extends AbstractExtension
+final class TwigExtension
 {
-    /**
-     * getFilters function.
-     *
-     * @return mixed[]
-     */
-    public function getFilters(): array
-    {
-        return [
-            new TwigFilter('phpversion', $this->phpversion(...)),
-        ];
-    }
-
+    #[AsTwigFilter(name: 'phpversion')]
     public function phpversion(string $value = ''): string|bool
     {
         return phpversion($value);
