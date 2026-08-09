@@ -1392,7 +1392,7 @@ final class MailHelperTest extends TestCase
 
     public function testSetEmailSkipsMjmlThemeFallbackWhenCustomHtmlEmpty(): void
     {
-        $this->coreParametersHelper->method('get')->willReturnMap([
+        $this->coreParametersHelper->expects($this->atLeast(4))->method('get')->willReturnMap([
             ['mailer_from_email', null, 'nobody@nowhere.com'],
             ['mailer_from_name', null, 'No Body'],
             ['minify_email_html', null, false],
@@ -1426,12 +1426,12 @@ MJML;
 
         $this->assertTrue($mailer->setEmail($email));
         $this->assertSame('', $mailer->getBody());
-        $this->assertStringNotContainsString('<mjml>', (string) $mailer->getBody());
+        $this->assertStringNotContainsString('<mjml>', $mailer->getBody());
     }
 
     public function testSetEmailStillUsesHtmlThemeFallbackWhenCustomHtmlEmpty(): void
     {
-        $this->coreParametersHelper->method('get')->willReturnMap([
+        $this->coreParametersHelper->expects($this->atLeast(4))->method('get')->willReturnMap([
             ['mailer_from_email', null, 'nobody@nowhere.com'],
             ['mailer_from_name', null, 'No Body'],
             ['minify_email_html', null, false],

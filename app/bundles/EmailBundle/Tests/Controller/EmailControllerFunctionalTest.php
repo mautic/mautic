@@ -1211,7 +1211,9 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(1, $response['success']);
         $this->assertNotEmpty($response['subject']);
         $this->assertEquals($email->getSubject(), $response['subject']);
-        $this->assertNotEmpty($response['body']);
+        // Blank theme is MJML; with empty customHtml, MailHelper skips the theme
+        // fallback so the import body stays empty rather than raw uncompiled <mjml>.
+        $this->assertSame('', $response['body']);
     }
 
     public function testSegmentEmailSendWithoutContinueSending(): void
