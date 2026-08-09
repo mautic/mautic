@@ -388,8 +388,10 @@ class CommonApiController extends FetchCommonApiController
      * Convert posted parameters into what the form needs in order to successfully bind.
      *
      * @param mixed[] $parameters
+     *
+     * @return mixed[]|Response
      */
-    protected function prepareParametersForBinding(Request $request, array $parameters, object $entity, string $action): array
+    protected function prepareParametersForBinding(Request $request, array $parameters, object $entity, string $action)
     {
         return $parameters;
     }
