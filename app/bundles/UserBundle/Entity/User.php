@@ -44,6 +44,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[Assert\GroupSequence(['User', 'SecondPass', 'CheckPassword'])]
 class User extends FormEntity implements UserInterface, EquatableInterface, PasswordAuthenticatedUserInterface, CacheInvalidateInterface
 {
     public const CACHE_NAMESPACE = 'User';
@@ -262,8 +263,6 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         $metadata->addPropertyConstraint('plainPassword', new Assert\Length(min: 6, minMessage: 'mautic.user.user.password.minlength', groups: ['CheckPassword']));
 
         $metadata->addPropertyConstraint('plainPassword', new NotWeak(message: 'mautic.user.user.password.weak', groups: ['CheckPassword']));
-
-        $metadata->setGroupSequence(['User', 'SecondPass', 'CheckPassword']);
     }
 
     public static function determineValidationGroups(Form $form): array
