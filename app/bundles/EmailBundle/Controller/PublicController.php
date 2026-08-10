@@ -215,7 +215,7 @@ final class PublicController extends CommonFormController
         $isHeadRequest          = $request->isMethod(Request::METHOD_HEAD);
 
         if ($isOneClickUnsubscribe) {
-            return $this->oneClickUnsubscribe($model, $stat);
+            return $this->oneClickUnsubscribe($model, $stat, $urlEmail, $secretHash);
         }
 
         if (!$urlEmail || !$secretHash) {
@@ -898,12 +898,24 @@ final class PublicController extends CommonFormController
         return array_merge($showParamsBasedOnConfiguration, $showParamsBasedOnContent);
     }
 
-    private function oneClickUnsubscribe(EmailModel $model, ?Stat $stat): Response
+    private function oneClickUnsubscribe(EmailModel $model, ?Stat $stat, ?string $urlEmail, ?string $secretHash): Response
     {
         if (!$stat) {
-            $statsNotFount = $this->translator->trans('mautic.email.stat_record.not_found');
+            return new Response($this->translator->trans('mautic.email.stat_record.not_found'), Response::HTTP_NOT_FOUND);
+        }
 
-            return new Response($statsNotFount, Response::HTTP_NOT_FOUND);
+        if (!$urlEmail || !$secretHash) {
+            return new Response($this->translator->trans('mautic.email.stat_record.not_found'), Response::HTTP_BAD_REQUEST);
+        }
+
+        $isCorrectHash = $this->emailAddressLinkMatcher->matchesLink(
+            $urlEmail,
+            $secretHash,
+            $stat->getEmailAddress()
+        );
+
+        if (!$isCorrectHash) {
+            return new Response($this->translator->trans('mautic.email.stat_record.not_found'), Response::HTTP_FORBIDDEN);
         }
 
         // RFC 8058 One-Click unsubscribe

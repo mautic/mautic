@@ -209,6 +209,19 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(DoNotContact::UNSUBSCRIBED, $dncCollection->first()->getReason());
     }
 
+    public function testOneClickUnsubscribeWithWrongSecretHashIsForbidden(): void
+    {
+        $lead = $this->createLead();
+        $stat = $this->getStat(null, $lead);
+        $this->em->flush();
+        $this->client->request('POST', "/email/unsubscribe/{$stat->getTrackingHash()}/{$stat->getEmailAddress()}/wronghash", [
+            'List-Unsubscribe' => 'One-Click',
+        ]);
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+        $dncCollection = $stat->getLead()->getDoNotContact();
+        $this->assertCount(0, $dncCollection);
+    }
+
     public function testHeadRequestWithNoShowContactPreferences(): void
     {
         $lead = $this->createLead();
