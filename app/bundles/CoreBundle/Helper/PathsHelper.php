@@ -68,6 +68,7 @@ class PathsHelper
         // Get local_root (webroot) from parameters - this is auto-detected from composer.json
         // for recommended-project installations, or can be explicitly set in paths_local.php
         $localRootParam = $this->removeTrailingSlash((string) $coreParametersHelper->get('local_root'));
+        // @phpstan-ignore nullCoalesce.offset (paths['root'] is always set by paths_helper.php include)
         $this->localRoot = '' !== $localRootParam ? $localRootParam : ($this->paths['root'] ?? $rootDir);
     }
 
