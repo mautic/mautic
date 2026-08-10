@@ -16,7 +16,7 @@ class ContactExportScheduler
 
     private ?User $user = null; // Created by
 
-    #[Assert\NotBlank(message: 'mautic.lead.import.dir.notblank')]
+    #[Assert\NotBlank()]
     private \DateTimeImmutable $scheduledDateTime;
 
     /**
