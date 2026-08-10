@@ -35,7 +35,6 @@ use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\DoNotContact as DNC;
-use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 use Mautic\LeadBundle\Entity\Lead;
@@ -88,6 +87,7 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Intl\Countries;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends FormModel<Lead>
@@ -122,6 +122,8 @@ class LeadModel extends FormModel
     private array $flattenedFields = [];
 
     private array $fieldsByGroup = [];
+
+    private DoNotContact $doNotContact;
 
     public function __construct(
         protected RequestStack $requestStack,
@@ -163,11 +165,20 @@ class LeadModel extends FormModel
         private readonly StageRepository $stageRepository,
         private readonly UserRepository $userRepository,
         private readonly CompanyLeadRepository $companyLeadRepository,
-        private readonly DoNotContactRepository $doNotContactRepository,
         private readonly StatRepository $statRepository,
         private readonly CompanyRepository $companyRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
+    }
+
+    /**
+     * Use to avoid circular dependency.
+     */
+    #[Required]
+    public function autowireLeadModel(
+        DoNotContact $doNotContact,
+    ): void {
+        $this->doNotContact = $doNotContact;
     }
 
     public function getRepository(): LeadRepository
@@ -2187,7 +2198,7 @@ class LeadModel extends FormModel
 
         $channels = [];
         foreach ($allChannels as $channel) {
-            if (DNC::IS_CONTACTABLE === $this->isContactable($lead, $channel)) {
+            if (DNC::IS_CONTACTABLE === $this->doNotContact->isContactable($lead, $channel)) {
                 $channels[$channel] = $channel;
             }
         }
@@ -2204,7 +2215,7 @@ class LeadModel extends FormModel
 
         $channels = [];
         foreach ($allChannels as $channel) {
-            if (DNC::IS_CONTACTABLE !== $this->isContactable($lead, $channel)) {
+            if (DNC::IS_CONTACTABLE !== $this->doNotContact->isContactable($lead, $channel)) {
                 $channels[$channel] = $channel;
             }
         }
@@ -2361,39 +2372,6 @@ class LeadModel extends FormModel
         }
 
         return $lead;
-    }
-
-    /**
-     * @deprecated 2.12.0 to be removed in 3.0; use Mautic\LeadBundle\Model\DoNotContact instead
-     *
-     * @param string $channel
-     *
-     * @return int
-     *
-     * @see DNC This method can return boolean false, so be
-     *                                             sure to always compare the return value against
-     *                                             the class constants of DoNotContact
-     */
-    public function isContactable(Lead $lead, $channel)
-    {
-        if (is_array($channel)) {
-            $channel = key($channel);
-        }
-
-        $dncEntries = $this->doNotContactRepository->getEntriesByLeadAndChannel($lead, $channel);
-
-        // If the lead has no entries in the DNC table, we're good to go
-        if (empty($dncEntries)) {
-            return DNC::IS_CONTACTABLE;
-        }
-
-        foreach ($dncEntries as $dnc) {
-            if (DNC::IS_CONTACTABLE !== $dnc->getReason()) {
-                return $dnc->getReason();
-            }
-        }
-
-        return DNC::IS_CONTACTABLE;
     }
 
     public function getAvailableLeadFields(): array
