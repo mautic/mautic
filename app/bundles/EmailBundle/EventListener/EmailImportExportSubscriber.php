@@ -163,6 +163,16 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
                 null,
                 ['object_to_populate' => $email]
             );
+
+            // The serializer's MetadataAwareNameConverter does not map
+            // custom_html → customHtml (the Doctrine column name differs
+            // from the property name), so the imported email's compiled HTML
+            // was silently lost. Set it manually to preserve the body and
+            // satisfy the MJML save validation.
+            if (isset($element['custom_html']) && !$email->getCustomHtml()) {
+                $email->setCustomHtml($element['custom_html']);
+            }
+
             $this->emailModel->saveEntity($email);
 
             $event->addEntityIdMap((int) $element['id'], $email->getId());
