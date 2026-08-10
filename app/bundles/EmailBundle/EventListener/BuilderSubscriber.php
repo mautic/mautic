@@ -4,7 +4,6 @@ namespace Mautic\EmailBundle\EventListener;
 
 use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
@@ -182,7 +181,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
         $unsubscribeLink = $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash]);
         $unsubscribeText = \Mautic\LeadBundle\Helper\TokenHelper::findLeadTokens($unsubscribeText, $lead, true);
         $unsubscribeText = str_replace('|URL|', $unsubscribeLink, $unsubscribeText);
-        $event->addToken('{unsubscribe_text}', EmojiHelper::toHtml($unsubscribeText));
+        $event->addToken('{unsubscribe_text}', $unsubscribeText);
         $event->addToken('{unsubscribe_url}', $unsubscribeLink);
         $event->addToken('{dnc_url}', $this->emailModel->buildUrl('mautic_email_unsubscribe_all', ['idHash' => $idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash]));
         $event->addToken('{resubscribe_url}', $this->emailModel->buildUrl('mautic_email_resubscribe', ['idHash' => $idHash]));
@@ -193,7 +192,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
         }
         $webviewLink = $this->emailModel->buildUrl('mautic_email_webview', ['idHash' => $idHash]);
         $webviewText = str_replace('|URL|', $webviewLink, $webviewText);
-        $event->addToken('{webview_text}', EmojiHelper::toHtml($webviewText));
+        $event->addToken('{webview_text}', $webviewText);
 
         // Show public email preview if the lead is not known to prevent 404
         if (empty($lead['id']) && $email) {
@@ -217,9 +216,9 @@ final class BuilderSubscriber implements EventSubscriberInterface
             $signatureText = str_replace('|FROM_NAME|', $fromName, nl2br($signatureText));
         }
 
-        $event->addToken('{signature}', EmojiHelper::toHtml($signatureText));
+        $event->addToken('{signature}', $signatureText);
 
-        $event->addToken('{subject}', EmojiHelper::toHtml($event->getSubject()));
+        $event->addToken('{subject}', $event->getSubject());
         $event->addToken('{brand=name}', (string) $this->coreParametersHelper->get('brand_name'));
     }
 

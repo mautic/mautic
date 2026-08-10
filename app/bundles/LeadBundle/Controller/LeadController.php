@@ -1518,7 +1518,6 @@ final class LeadController extends FormController
                         $mailer->setEmail($emailEntity);
                     }
 
-                    // Ensure safe emoji for notification
                     if ($mailer->send(true, false)) {
                         $mailer->createEmailStat();
                         $this->addFlashMessage(

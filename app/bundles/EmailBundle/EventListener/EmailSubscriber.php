@@ -3,7 +3,6 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\EmailEvents;
@@ -133,7 +132,7 @@ final readonly class EmailSubscriber implements EventSubscriberInterface
 
             if (null !== $stat) {
                 $reason = $this->translator->trans('mautic.email.dnc.failed', [
-                    '%subject%' => EmojiHelper::toShort($message->getSubject()),
+                    '%subject%' => $message->getSubject(),
                 ]);
                 $this->emailModel->setDoNotContact($stat, $reason);
             }
@@ -162,7 +161,7 @@ final readonly class EmailSubscriber implements EventSubscriberInterface
         if ($stat->getRetryCount() > self::RETRY_COUNT) {
             // tried too many times so just fail
             $reason = $this->translator->trans('mautic.email.dnc.retries', [
-                '%subject%' => EmojiHelper::toShort($message->getSubject()),
+                '%subject%' => $message->getSubject(),
             ]);
             $this->emailModel->setDoNotContact($stat, $reason);
         } else {
