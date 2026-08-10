@@ -26,13 +26,8 @@ final class LeadPermissions extends AbstractPermissions
 
     public const string LISTS_FULL         = 'lead:lists:full';
 
-    /**
-     * @param mixed[] $params
-     */
-    public function __construct(array $params)
+    public function __construct()
     {
-        parent::__construct($params);
-
         $this->permissions = [
             'fields' => [
                 'full' => 1024,

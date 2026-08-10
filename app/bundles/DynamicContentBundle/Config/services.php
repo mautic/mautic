@@ -24,4 +24,5 @@ return function (ContainerConfigurator $configurator): void {
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
     $services->set(Mautic\DynamicContentBundle\Helper\DynamicContentHelper::class);
     $services->alias('mautic.dynamicContent.model.dynamicContent', Mautic\DynamicContentBundle\Model\DynamicContentModel::class);
+    $services->set(Mautic\DynamicContentBundle\Security\Permissions\DynamicContentPermissions::class);
 };

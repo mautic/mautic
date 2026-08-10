@@ -256,4 +256,5 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.core.model.auditlog', Mautic\CoreBundle\Model\AuditLogModel::class);
     $services->alias('mautic.core.model.notification', Mautic\CoreBundle\Model\NotificationModel::class);
     $services->alias('mautic.core.model.form', Mautic\CoreBundle\Model\FormModel::class);
+    $services->set(Mautic\CoreBundle\Security\Permissions\SystemPermissions::class);
 };

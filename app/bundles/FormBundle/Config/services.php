@@ -59,4 +59,5 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.form.model.form', Mautic\FormBundle\Model\FormModel::class);
     $services->alias('mautic.form.model.submission', Mautic\FormBundle\Model\SubmissionModel::class);
     $services->alias('mautic.form.model.submission_result_loader', Mautic\FormBundle\Model\SubmissionResultLoader::class);
+    $services->set(Mautic\FormBundle\Security\Permissions\FormPermissions::class);
 };

@@ -8,12 +8,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 final class UserPermissions extends AbstractPermissions
 {
-    /**
-     * @param mixed[] $params
-     */
-    public function __construct(array $params)
+    public function __construct()
     {
-        parent::__construct($params);
         $this->permissions = [
             'profile' => [
                 'editusername' => 1,

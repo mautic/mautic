@@ -57,3 +57,35 @@
 - `Mautic\PluginBundle\Integration\AbstractIntegration::getCache()` returns `Psr\SimpleCache\CacheInterface` instead of `CacheStorageHelper`, and its 2nd constructor argument is now `Mautic\CacheBundle\Cache\CacheProviderInterface`. Keys stay namespaced per integration, so `$this->cache->set('leadFields', $fields)` in an integration keeps working unchanged.
 - `Mautic\DashboardBundle\Event\WidgetDetailEvent`: the legacy filesystem widget cache is gone. `setCacheDir()` and `setCacheTimeout()` were removed, the `$cacheProvider` constructor argument is now required, and `setTemplateData()` lost its 2nd `$skipCache` parameter. Widget data is cached only through `Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface`, with the lifetime taken from `Widget::getCacheTimeout()`.
 - `Mautic\DashboardBundle\Factory\WidgetDetailEventFactory` no longer takes `UserHelper`, `CoreParametersHelper` and `PathsHelper` constructor arguments.
+
+## Changed code
+
+- `Mautic\CoreBundle\Security\Permissions\AbstractPermissions::definePermissions()` was removed. Define the permissions in the constructor instead:
+
+    ```diff
+    -public function definePermissions(): void
+    +public function __construct()
+     {
+         $this->addStandardPermissions('categories');
+     }
+    ```
+
+    Permission classes that already define their permissions in the constructor need no change.
+
+- The resolved Mautic parameters are injected into `AbstractPermissions` by the autowired `setCoreParametersHelper()` method, so `$this->params` is available in every method except the constructor. The `array $params` constructor argument is deprecated and defaults to an empty array; drop it from your permission class:
+
+    ```diff
+    -public function __construct(array $params)
+    +public function __construct()
+     {
+    -    parent::__construct($params);
+    -
+         $this->addStandardPermissions('categories');
+     }
+    ```
+
+- All permission classes are now registered as services and tagged with `mautic.permissions`, instead of being instantiated on the fly by `Mautic\CoreBundle\Security\Permissions\CorePermissions`. A permission class that is not registered as a service is still instantiated on the fly. Register it in the bundle's `Config/services.php` to have it managed by the container and to autowire other services into it; the `mautic.permissions` tag is added automatically to every `AbstractPermissions` child registered with autoconfiguration enabled:
+
+    ```php
+    $services->set(MauticPlugin\AcmeBundle\Security\Permissions\AcmePermissions::class);
+    ```

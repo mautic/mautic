@@ -148,4 +148,5 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.lead.model.export_scheduler', Mautic\LeadBundle\Model\ContactExportSchedulerModel::class);
     $services->alias('mautic.lead.repository.list_lead', Mautic\LeadBundle\Entity\ListLeadRepository::class);
     $services->get(Mautic\LeadBundle\Validator\Constraints\SegmentDateValidator::class)->tag('validator.constraint_validator');
+    $services->set(Mautic\LeadBundle\Security\Permissions\LeadPermissions::class);
 };

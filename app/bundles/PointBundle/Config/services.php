@@ -26,4 +26,5 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.point.model.trigger', Mautic\PointBundle\Model\TriggerModel::class);
     $services->alias('mautic.point.model.group', Mautic\PointBundle\Model\PointGroupModel::class);
     $services->alias('mautic.point.model.insight', Mautic\PointBundle\Model\InsightModel::class);
+    $services->set(Mautic\PointBundle\Security\Permissions\PointPermissions::class);
 };

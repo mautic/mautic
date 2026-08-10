@@ -97,10 +97,6 @@ class CorePermissions implements ResetInterface
             }
         }
 
-        if ($permissionObject->isEnabled()) {
-            $permissionObject->definePermissions();
-        }
-
         return $permissionObject;
     }
 
@@ -458,7 +454,10 @@ class CorePermissions implements ResetInterface
 
         $permissionClass = $this->getPermissionClasses()[$class];
 
-        return new $permissionClass($this->getParams());
+        $permissionObject = new $permissionClass($this->getParams());
+        $permissionObject->setCoreParametersHelper($this->coreParametersHelper);
+
+        return $permissionObject;
     }
 
     /**
