@@ -21,7 +21,6 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ApiResource(
     operations: [
@@ -80,6 +79,7 @@ class Focus extends FormEntity implements UuidInterface
      * @var string
      */
     #[Groups(['focus:read', 'focus:write'])]
+    #[NotBlank(message: 'mautic.core.name.required')]
     private $name;
 
     #[Groups(['focus:read', 'focus:write'])]
@@ -89,6 +89,7 @@ class Focus extends FormEntity implements UuidInterface
      * @var string
      */
     #[Groups(['focus:read', 'focus:write'])]
+    #[NotBlank(message: 'mautic.focus.error.select_type')]
     private $type;
 
     /**
@@ -101,6 +102,7 @@ class Focus extends FormEntity implements UuidInterface
      * @var string
      */
     #[Groups(['focus:read', 'focus:write'])]
+    #[NotBlank(message: 'mautic.focus.error.select_style')]
     private $style;
 
     /**
@@ -140,30 +142,6 @@ class Focus extends FormEntity implements UuidInterface
     public function __construct()
     {
         $this->initializeProjects();
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint(
-            'name',
-            new NotBlank(
-                message: 'mautic.core.name.required'
-            )
-        );
-
-        $metadata->addPropertyConstraint(
-            'type',
-            new NotBlank(
-                message: 'mautic.focus.error.select_type'
-            )
-        );
-
-        $metadata->addPropertyConstraint(
-            'style',
-            new NotBlank(
-                message: 'mautic.focus.error.select_style'
-            )
-        );
     }
 
     public function __clone()

@@ -23,7 +23,6 @@ use Mautic\CoreBundle\Entity\SkipModifiedInterface;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ApiResource(
     shortName: 'Webhooks',
@@ -59,6 +58,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
      * @var ?string
      */
     #[Groups(['webhook:read', 'webhook:write'])]
+    #[NotBlank(message: 'mautic.core.name.required')]
     private $name;
 
     /**
@@ -71,6 +71,8 @@ class Webhook extends FormEntity implements SkipModifiedInterface
      * @var ?string
      */
     #[Groups(['webhook:read', 'webhook:write'])]
+    #[NotBlank(message: 'mautic.core.valid_url_required')]
+    #[Assert\Url(message: 'mautic.core.valid_url_required')]
     private $webhookUrl;
 
     /**
@@ -118,6 +120,11 @@ class Webhook extends FormEntity implements SkipModifiedInterface
      * @var string|null
      */
     #[Groups(['webhook:read', 'webhook:write'])]
+    #[Assert\Choice([
+        null,
+        Order::Ascending->value,
+        Order::Descending->value,
+    ])]
     private $eventsOrderbyDir;
 
     private ?\DateTimeImmutable $markedUnhealthyAt      = null;
@@ -186,41 +193,6 @@ class Webhook extends FormEntity implements SkipModifiedInterface
                 ]
             )
             ->build();
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint(
-            'name',
-            new NotBlank(
-                message: 'mautic.core.name.required'
-            )
-        );
-
-        $metadata->addPropertyConstraint(
-            'webhookUrl',
-            new Assert\Url(
-                message: 'mautic.core.valid_url_required'
-            )
-        );
-
-        $metadata->addPropertyConstraint(
-            'webhookUrl',
-            new NotBlank(
-                message: 'mautic.core.valid_url_required'
-            )
-        );
-
-        $metadata->addPropertyConstraint(
-            'eventsOrderbyDir',
-            new Assert\Choice(
-                [
-                    null,
-                    Order::Ascending->value,
-                    Order::Descending->value,
-                ]
-            )
-        );
     }
 
     /**
