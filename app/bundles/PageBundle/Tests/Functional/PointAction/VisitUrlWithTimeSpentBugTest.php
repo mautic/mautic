@@ -64,7 +64,7 @@ final class VisitUrlWithTimeSpentBugTest extends MauticMysqlTestCase
             ],
         ];
 
-        $helper = static::getContainer()->get(PointActionHelper::class);
+        $helper = self::getContainer()->get(PointActionHelper::class);
         $this->assertInstanceOf(PointActionHelper::class, $helper);
 
         // Evaluate using the REVISIT hit — should return TRUE (accumulative time met)
