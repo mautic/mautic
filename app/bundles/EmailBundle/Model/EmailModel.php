@@ -80,6 +80,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
+use Twig\Error\Error as TwigError;
 
 /**
  * @extends FormModel<Email>
@@ -225,6 +226,13 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             $entity->setEmailType('template');
         }
 
+        // Block the bad state early: a published email with an MJML theme and
+        // empty customHtml has no compiled body. GrapesJS should compile the
+        // theme into customHtml before publishing; sending without it delivers
+        // uncompiled <mjml> or an empty body. Drafts are allowed through so the
+        // user can save and open the builder later.
+        $this->validateMjmlThemeHasCustomHtml($entity);
+
         // Ensure that list emails are published
         if ('list' == $entity->getEmailType()) {
             // Ensure that this email has the same lists assigned as the translated parent if applicable
@@ -302,7 +310,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
                 'email'    => $email,
                 'template' => $template,
             ]);
-        } catch (\Throwable) {
+        } catch (TwigError) {
             // If the theme template cannot be rendered, skip validation —
             // MailHelper::setEmail() will handle the fallback at send time.
             return;
@@ -323,6 +331,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $i         = 0;
         foreach ($entities as $entity) {
             $isNew = !(bool) $entity->getId();
+
+            if ($entity instanceof Email) {
+                $this->validateMjmlThemeHasCustomHtml($entity);
+            }
 
             // set some defaults
             $this->setTimestamps($entity, $isNew, $unlock);
