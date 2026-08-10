@@ -8,34 +8,19 @@ use Mautic\CoreBundle\Twig\Helper\ButtonHelper;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Twig\Extension\AbstractExtension;
-use Twig\TwigFunction;
+use Twig\Attribute\AsTwigFunction;
 
-final class ButtonExtension extends AbstractExtension
+final readonly class ButtonExtension
 {
     public function __construct(
-        private readonly ButtonHelper $buttonHelper,
-        private readonly RequestStack $requestStack,
-        private readonly UrlGeneratorInterface $router,
-        private readonly TranslatorInterface $translator,
+        private ButtonHelper $buttonHelper,
+        private RequestStack $requestStack,
+        private UrlGeneratorInterface $router,
+        private TranslatorInterface $translator,
     ) {
     }
 
-    public function getFunctions(): array
-    {
-        return [
-            new TwigFunction('buttonReset', $this->reset(...), ['is_safe' => ['all']]),
-            new TwigFunction('buttonAdd', $this->addButton(...), ['is_safe' => ['all']]),
-            new TwigFunction('buttonSetMenuLink', $this->setMenuLink(...), ['is_safe' => ['all']]),
-            new TwigFunction('buttonSetWrappingTags', $this->setWrappingTags(...), ['is_safe' => ['all']]),
-            new TwigFunction('buttonSetGroupType', $this->setGroupType(...), ['is_safe' => ['all']]),
-            new TwigFunction('buttonGetCount', $this->getButtonCount(...)),
-            new TwigFunction('buttonsRender', $this->render(...), ['is_safe' => ['all']]),
-            new TwigFunction('buttonsAdd', $this->addButtons(...), ['is_safe' => ['all']]),
-            new TwigFunction('buttonsAddFromTemplate', $this->addButtonsFromTemplate(...), ['is_safe' => ['all']]),
-        ];
-    }
-
+    #[AsTwigFunction(name: 'buttonReset', isSafe: ['all'])]
     public function reset(string $location, string $groupType = ButtonHelper::TYPE_GROUP, $item = null): void
     {
         $this->buttonHelper->reset(
@@ -49,26 +34,31 @@ final class ButtonExtension extends AbstractExtension
     /**
      * @param array<string,mixed> $button
      */
+    #[AsTwigFunction(name: 'buttonAdd', isSafe: ['all'])]
     public function addButton(array $button): void
     {
         $this->buttonHelper->addButton($button);
     }
 
+    #[AsTwigFunction(name: 'buttonSetMenuLink', isSafe: ['all'])]
     public function setMenuLink(?string $menuLink): void
     {
         $this->buttonHelper->setMenuLink($menuLink);
     }
 
+    #[AsTwigFunction(name: 'buttonSetWrappingTags', isSafe: ['all'])]
     public function setWrappingTags(?string $wrapOpeningTag, ?string $wrapClosingTag): void
     {
         $this->buttonHelper->setWrappingTags($wrapOpeningTag, $wrapClosingTag);
     }
 
+    #[AsTwigFunction(name: 'buttonSetGroupType', isSafe: ['all'])]
     public function setGroupType(string $groupType): void
     {
         $this->buttonHelper->setGroupType($groupType);
     }
 
+    #[AsTwigFunction(name: 'buttonGetCount')]
     public function getButtonCount(): int
     {
         return $this->buttonHelper->getButtonCount();
@@ -77,11 +67,13 @@ final class ButtonExtension extends AbstractExtension
     /**
      * @param array<array<string,mixed>> $buttons
      */
+    #[AsTwigFunction(name: 'buttonsAdd', isSafe: ['all'])]
     public function addButtons(array $buttons): void
     {
         $this->buttonHelper->addButtons($buttons);
     }
 
+    #[AsTwigFunction(name: 'buttonsRender', isSafe: ['all'])]
     public function render(string $dropdownHtml = '', string $closingDropdownHtml = ''): string
     {
         return $this->buttonHelper->renderButtons($dropdownHtml, $closingDropdownHtml);
@@ -94,6 +86,7 @@ final class ButtonExtension extends AbstractExtension
      * @param array<string,string> $routeVars
      * @param mixed                $item
      */
+    #[AsTwigFunction(name: 'buttonsAddFromTemplate', isSafe: ['all'])]
     public function addButtonsFromTemplate(
         array $templateButtons,
         array $query,

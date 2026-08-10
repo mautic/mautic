@@ -5,23 +5,16 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Twig\Extension;
 
 use Mautic\CoreBundle\Helper\AppVersion;
-use Twig\Extension\AbstractExtension;
-use Twig\TwigFunction;
+use Twig\Attribute\AsTwigFunction;
 
-final class VersionExtension extends AbstractExtension
+final readonly class VersionExtension
 {
     public function __construct(
-        private readonly AppVersion $appVersion,
+        private AppVersion $appVersion,
     ) {
     }
 
-    public function getFunctions(): array
-    {
-        return [
-            new TwigFunction('mauticAppVersion', $this->getVersion(...)),
-        ];
-    }
-
+    #[AsTwigFunction(name: 'mauticAppVersion')]
     public function getVersion(): string
     {
         return $this->appVersion->getVersion();

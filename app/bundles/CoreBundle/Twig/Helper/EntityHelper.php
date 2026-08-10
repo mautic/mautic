@@ -5,25 +5,13 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Twig\Helper;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Twig\Extension\AbstractExtension;
-use Twig\TwigFunction;
+use Twig\Attribute\AsTwigFunction;
 
-final class EntityHelper extends AbstractExtension
+final readonly class EntityHelper
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager,
+        private EntityManagerInterface $entityManager,
     ) {
-    }
-
-    /**
-     * Registers the custom Twig functions.
-     */
-    public function getFunctions(): array
-    {
-        return [
-            new TwigFunction('getEntity', $this->getEntity(...)),
-            new TwigFunction('getEntities', $this->getEntities(...)),
-        ];
     }
 
     /**
@@ -34,6 +22,7 @@ final class EntityHelper extends AbstractExtension
      *
      * @return object|null The retrieved entity or null if not found
      */
+    #[AsTwigFunction(name: 'getEntity')]
     public function getEntity(string $entityName, int|string|null $id): ?object
     {
         return null !== $id ? $this->entityManager->getRepository($entityName)->find($id) : null;
@@ -47,6 +36,7 @@ final class EntityHelper extends AbstractExtension
      *
      * @return object[] The array of retrieved entities
      */
+    #[AsTwigFunction(name: 'getEntities')]
     public function getEntities(string $entityName, array $ids): array
     {
         return $this->entityManager->getRepository($entityName)->findBy(['id' => $ids]);
