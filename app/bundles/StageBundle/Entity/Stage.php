@@ -21,7 +21,6 @@ use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ApiResource(
     operations: [
@@ -42,6 +41,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[UniqueEntity(fields: ['weight'], message: 'mautic.stage.weight.unique')]
 class Stage extends FormEntity implements UuidInterface
 {
     use UuidTrait;
@@ -132,11 +132,6 @@ class Stage extends FormEntity implements UuidInterface
 
         static::addUuidField($builder);
         self::addProjectsField($builder, 'stage_projects_xref', 'stage_id');
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addConstraint(new UniqueEntity(fields: ['weight'], message: 'mautic.stage.weight.unique'));
     }
 
     /**

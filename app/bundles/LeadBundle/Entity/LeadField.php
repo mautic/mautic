@@ -45,6 +45,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     ]
 )]
 #[LeadFieldMinimumLength]
+#[UniqueEntity(fields: ['alias'], message: 'mautic.lead.field.alias.unique')]
 class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInterface
 {
     use UuidTrait;
@@ -313,8 +314,6 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $metadata->addConstraint(new UniqueEntity(fields: ['alias'], message: 'mautic.lead.field.alias.unique'));
-
         $metadata->addConstraint(new Assert\Callback(
             function (LeadField $field, ExecutionContextInterface $context): void {
                 $violations = $context->getValidator()->validate($field, [new FieldAliasKeyword()]);
