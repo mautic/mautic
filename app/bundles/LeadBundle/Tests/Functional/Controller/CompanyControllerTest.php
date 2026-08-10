@@ -61,7 +61,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $this->em->clear();
         $updatedCompany = $this->em->getRepository(Company::class)->find($company->getId());
         $this->assertInstanceOf(Company::class, $updatedCompany);
-        $this->assertSame($owner->getId(), $updatedCompany->getOwner()?->getId());
+        $this->assertSame($owner->getId(), $updatedCompany->getOwner()->getId());
     }
 
     private function createAndLoginUser(): User
