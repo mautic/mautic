@@ -225,11 +225,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             $entity->setEmailType('template');
         }
 
-        // Block the bad state early: an MJML theme with empty customHtml has no
-        // compiled body. GrapesJS should compile the theme into customHtml before
-        // saving; sending without it delivers uncompiled <mjml> or an empty body.
-        $this->validateMjmlThemeHasCustomHtml($entity);
-
         // Ensure that list emails are published
         if ('list' == $entity->getEmailType()) {
             // Ensure that this email has the same lists assigned as the translated parent if applicable
@@ -281,20 +276,21 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     }
 
     /**
-     * Validate that an email using an MJML theme has compiled customHtml.
+     * Validate that a published email using an MJML theme has compiled customHtml.
      *
      * Bundled themes since Mautic 5 use MJML. GrapesJS compiles the MJML into
-     * customHtml client-side. If an email is saved with an MJML theme but empty
-     * customHtml, it has no usable body — sending would deliver uncompiled
-     * <mjml> markup or an empty email. This method blocks that bad state at
-     * save time so it is caught before send.
+     * customHtml client-side. If a published email is saved with an MJML theme
+     * but empty customHtml, it has no usable body — sending would deliver
+     * uncompiled <mjml> markup or an empty email. This method blocks that bad
+     * state at save time so it is caught before send. Unpublished/draft emails
+     * are allowed through so the user can save and open the builder later.
      *
      * @throws MjmlThemeEmptyCustomHtmlException
      */
     public function validateMjmlThemeHasCustomHtml(Email $email): void
     {
         $template = $email->getTemplate();
-        if (empty($template) || !empty($email->getCustomHtml())) {
+        if (empty($template) || !empty($email->getCustomHtml()) || !$email->getIsPublished()) {
             return;
         }
 
