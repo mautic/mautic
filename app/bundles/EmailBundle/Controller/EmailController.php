@@ -575,6 +575,7 @@ final class EmailController extends FormController
 
                     try {
                         // form is valid so process the data
+                        $model->validateMjmlThemeHasCustomHtml($entity);
                         $model->saveEntity($entity);
 
                         $this->addFlashMessage(
@@ -782,6 +783,7 @@ final class EmailController extends FormController
 
                     // form is valid so process the data
                     try {
+                        $model->validateMjmlThemeHasCustomHtml($entity);
                         $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                         if ($emailConfig->isDraftEnabled() && !empty($entity->getId())) {
@@ -1029,6 +1031,7 @@ final class EmailController extends FormController
 
                     try {
                         // form is valid so process the data
+                        $model->validateMjmlThemeHasCustomHtml($entity);
                         $model->saveEntity($entity);
 
                         $this->addFlashMessage(
