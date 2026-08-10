@@ -53,7 +53,13 @@ final class LookupHelperTest extends TestCase
 
     public function testConstructorLeavesIntegrationNullWhenNotFound(): void
     {
+<<<<<<< HEAD
         $this->integrationsHelper->expects($this->once())->method('getIntegration')->with('Clearbit')
+=======
+        $this->integrationsHelper
+            ->expects($this->once())
+            ->method('getIntegration')->with('Clearbit')
+>>>>>>> ffc6833b1b (make sure LookupHelperTest has expects)
             ->willThrowException(new IntegrationNotFoundException());
 
         $helper = $this->makeHelper();
@@ -63,7 +69,13 @@ final class LookupHelperTest extends TestCase
 
     public function testGetClearbitReturnsFalseWhenIntegrationNotPublished(): void
     {
+<<<<<<< HEAD
         $this->integrationsHelper->expects($this->once())->method('getIntegration')->with('Clearbit')
+=======
+        $this->integrationsHelper
+            ->expects($this->once())
+            ->method('getIntegration')->with('Clearbit')
+>>>>>>> ffc6833b1b (make sure LookupHelperTest has expects)
             ->willReturn($this->makeIntegration(false));
 
         $helper = $this->makeHelper();
@@ -73,7 +85,12 @@ final class LookupHelperTest extends TestCase
 
     public function testGetClearbitReturnsPersonInstanceWhenPublished(): void
     {
+<<<<<<< HEAD
         $this->integrationsHelper->expects($this->once())->method('getIntegration')->with('Clearbit')
+=======
+        $this->integrationsHelper->expects($this->once())
+            ->method('getIntegration')->with('Clearbit')
+>>>>>>> ffc6833b1b (make sure LookupHelperTest has expects)
             ->willReturn($this->makeIntegration(true, ['apikey' => 'abc123']));
 
         $helper = $this->makeHelper();
@@ -83,7 +100,13 @@ final class LookupHelperTest extends TestCase
 
     public function testGetClearbitReturnsCompanyInstanceWhenPublishedAndPersonFalse(): void
     {
+<<<<<<< HEAD
         $this->integrationsHelper->expects($this->once())->method('getIntegration')->with('Clearbit')
+=======
+        $this->integrationsHelper
+            ->expects($this->once())
+            ->method('getIntegration')->with('Clearbit')
+>>>>>>> ffc6833b1b (make sure LookupHelperTest has expects)
             ->willReturn($this->makeIntegration(true, ['apikey' => 'abc123']));
 
         $helper = $this->makeHelper();
@@ -93,11 +116,22 @@ final class LookupHelperTest extends TestCase
 
     public function testLookupContactReturnsEarlyWhenLeadHasNoEmail(): void
     {
+<<<<<<< HEAD
         $this->integrationsHelper->expects($this->once())->method('getIntegration')->with('Clearbit')
             ->willReturn($this->makeIntegration(true, ['apikey' => 'abc123']));
 
         $lead = $this->createMock(Lead::class);
         $lead->expects($this->once())->method('getEmail')->willReturn(null);
+=======
+        $this->integrationsHelper
+            ->expects($this->once())
+            ->method('getIntegration')->with('Clearbit')
+            ->willReturn($this->makeIntegration(true, ['apikey' => 'abc123']));
+
+        $lead = $this->createMock(Lead::class);
+        $lead->expects($this->once())
+            ->method('getEmail')->willReturn(null);
+>>>>>>> ffc6833b1b (make sure LookupHelperTest has expects)
 
         $this->leadModel->expects($this->never())->method('saveEntity');
         $this->leadRepository->expects($this->never())->method('saveEntity');
@@ -107,11 +141,21 @@ final class LookupHelperTest extends TestCase
 
     public function testLookupContactSkipsLookupWhenCheckAutoAndAutoUpdateDisabled(): void
     {
+<<<<<<< HEAD
         $this->integrationsHelper->expects($this->once())->method('getIntegration')->with('Clearbit')
             ->willReturn($this->makeIntegration(true, ['apikey' => 'abc123', 'auto_update' => '0']));
 
         $lead = $this->createMock(Lead::class);
         $lead->expects($this->once())->method('getEmail')->willReturn('john@example.com');
+=======
+        $this->integrationsHelper
+            ->expects($this->once())
+            ->method('getIntegration')->with('Clearbit')
+            ->willReturn($this->makeIntegration(true, ['apikey' => 'abc123', 'auto_update' => '0']));
+
+        $lead = new Lead();
+        $lead->setEmail('john@example.com');
+>>>>>>> ffc6833b1b (make sure LookupHelperTest has expects)
 
         $this->leadModel->expects($this->never())->method('saveEntity');
         $this->leadRepository->expects($this->never())->method('saveEntity');
@@ -121,11 +165,23 @@ final class LookupHelperTest extends TestCase
 
     public function testLookupCompanyReturnsEarlyWhenNoWebsite(): void
     {
+<<<<<<< HEAD
         $this->integrationsHelper->expects($this->once())->method('getIntegration')->with('Clearbit')
             ->willReturn($this->makeIntegration(true, ['apikey' => 'abc123']));
 
         $company = $this->createMock(Company::class);
         $company->expects($this->once())->method('getFieldValue')->with('companywebsite')->willReturn(null);
+=======
+        $this->integrationsHelper
+            ->expects($this->once())
+            ->method('getIntegration')->with('Clearbit')
+            ->willReturn($this->makeIntegration(true, ['apikey' => 'abc123']));
+
+        $company = $this->createMock(Company::class);
+        $company
+            ->expects($this->once())
+            ->method('getFieldValue')->with('companywebsite')->willReturn(null);
+>>>>>>> ffc6833b1b (make sure LookupHelperTest has expects)
 
         $this->companyModel->expects($this->never())->method('saveEntity');
         $this->companyRepository->expects($this->never())->method('saveEntity');
@@ -135,14 +191,25 @@ final class LookupHelperTest extends TestCase
 
     public function testValidateRequestReturnsFalseWhenNonceDoesNotMatch(): void
     {
+<<<<<<< HEAD
         $this->integrationsHelper->expects($this->once())->method('getIntegration')->with('Clearbit')
+=======
+        $this->integrationsHelper
+            ->expects($this->once())
+            ->method('getIntegration')->with('Clearbit')
+>>>>>>> ffc6833b1b (make sure LookupHelperTest has expects)
             ->willThrowException(new IntegrationNotFoundException());
 
         $lead = new Lead();
         $lead->setId(7);
         $lead->setSocialCache(['clearbit' => ['clearbit#7#2026072612' => 'x', 'nonce' => 'right-nonce']]);
 
+<<<<<<< HEAD
         $this->leadModel->expects($this->once())->method('getEntity')->with('7')->willReturn($lead);
+=======
+        $this->leadModel->expects($this->once())
+            ->method('getEntity')->with('7')->willReturn($lead);
+>>>>>>> ffc6833b1b (make sure LookupHelperTest has expects)
 
         $result = $this->makeHelper()->validateRequest('clearbit#7#2026072612#3#wrong-nonce', 'person');
 
@@ -151,14 +218,26 @@ final class LookupHelperTest extends TestCase
 
     public function testValidateRequestReturnsEntityWhenNonceMatches(): void
     {
+<<<<<<< HEAD
         $this->integrationsHelper->expects($this->once())->method('getIntegration')->with('Clearbit')
+=======
+        $this->integrationsHelper
+            ->expects($this->once())
+            ->method('getIntegration')->with('Clearbit')
+>>>>>>> ffc6833b1b (make sure LookupHelperTest has expects)
             ->willThrowException(new IntegrationNotFoundException());
 
         $lead = new Lead();
         $lead->setId(7);
         $lead->setSocialCache(['clearbit' => ['clearbit_notify#7#2026072612' => 'x', 'nonce' => 'the-nonce']]);
 
+<<<<<<< HEAD
         $this->leadModel->expects($this->once())->method('getEntity')->with('7')->willReturn($lead);
+=======
+        $this->leadModel
+            ->expects($this->once())
+            ->method('getEntity')->with('7')->willReturn($lead);
+>>>>>>> ffc6833b1b (make sure LookupHelperTest has expects)
 
         $result = $this->makeHelper()->validateRequest('clearbit_notify#7#2026072612#3#the-nonce', 'person');
 
@@ -169,10 +248,20 @@ final class LookupHelperTest extends TestCase
 
     public function testValidateRequestReturnsFalseWhenEntityNotFound(): void
     {
+<<<<<<< HEAD
         $this->integrationsHelper->expects($this->once())->method('getIntegration')->with('Clearbit')
             ->willThrowException(new IntegrationNotFoundException());
 
         $this->leadModel->expects($this->once())->method('getEntity')->with('99')->willReturn(null);
+=======
+        $this->integrationsHelper
+            ->expects($this->once())
+            ->method('getIntegration')->with('Clearbit')
+            ->willThrowException(new IntegrationNotFoundException());
+
+        $this->leadModel->expects($this->once())
+            ->method('getEntity')->with('99')->willReturn(null);
+>>>>>>> ffc6833b1b (make sure LookupHelperTest has expects)
 
         $result = $this->makeHelper()->validateRequest('clearbit#99#2026072612#3#some-nonce', 'person');
 
