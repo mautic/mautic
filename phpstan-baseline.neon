@@ -2374,36 +2374,6 @@ parameters:
 			path: app/bundles/CoreBundle/Helper/DateTimeHelper.php
 
 		-
-			message: '#^Property Mautic\\CoreBundle\\Helper\\EmojiMap\\HtmlToUnicodeEmojiMap\:\:\$map has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Helper/EmojiMap/HtmlToUnicodeEmojiMap.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Helper\\EmojiMap\\ShortToUnicodeEmojiMap\:\:\$exceptions has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Helper/EmojiMap/ShortToUnicodeEmojiMap.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Helper\\EmojiMap\\ShortToUnicodeEmojiMap\:\:\$map has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Helper/EmojiMap/ShortToUnicodeEmojiMap.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Helper\\EmojiMap\\UnicodeToHtmlEmojiMap\:\:\$map has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Helper/EmojiMap/UnicodeToHtmlEmojiMap.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Helper\\EmojiMap\\UnicodeToShortEmojiMap\:\:\$map has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Helper/EmojiMap/UnicodeToShortEmojiMap.php
-
-		-
 			message: '#^Parameter \#1 \$prefix of function uniqid expects string, int\<0, max\> given\.$#'
 			identifier: argument.type
 			count: 1
