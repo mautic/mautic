@@ -22,7 +22,7 @@ final class TwigFunctionSmokeTest extends KernelTestCase
      *
      * @var string[]
      */
-    private const EXPECTED_FUNCTIONS = [
+    private const array EXPECTED_FUNCTIONS = [
         'mauticAppVersion',      // CoreBundle, VersionExtension
         'securityIsGranted',     // CoreBundle, SecurityExtension
         'dateToFull',            // CoreBundle, DateExtension
@@ -52,10 +52,11 @@ final class TwigFunctionSmokeTest extends KernelTestCase
     public function testKnownTwigFunctionsAreLoadedInEnvironment(): void
     {
         $twigEnvironment = self::getContainer()->get(Environment::class);
-        \assert($twigEnvironment instanceof Environment);
+        $this->assertInstanceOf(Environment::class, $twigEnvironment);
 
         foreach (self::EXPECTED_FUNCTIONS as $name) {
-            $this->assertNotNull(
+            $this->assertInstanceOf(
+                \Twig\TwigFunction::class,
                 $twigEnvironment->getFunction($name),
                 sprintf('Twig function "%s" is not loaded in the Twig environment.', $name)
             );
@@ -68,7 +69,7 @@ final class TwigFunctionSmokeTest extends KernelTestCase
     public function testGetClassFunctionRendersShortClassName(): void
     {
         $twigEnvironment = self::getContainer()->get(Environment::class);
-        \assert($twigEnvironment instanceof Environment);
+        $this->assertInstanceOf(Environment::class, $twigEnvironment);
 
         $rendered = $twigEnvironment->createTemplate('{{ get_class(class) }}')
             ->render(['class' => TelType::class]);
@@ -85,7 +86,7 @@ final class TwigFunctionSmokeTest extends KernelTestCase
     public function testIncludeScriptFunctionRendersScriptTag(): void
     {
         $twigEnvironment = self::getContainer()->get(Environment::class);
-        \assert($twigEnvironment instanceof Environment);
+        $this->assertInstanceOf(Environment::class, $twigEnvironment);
 
         $assetFilePath = 'app/bundles/IntegrationsBundle/Assets/js/integrations.js';
 
@@ -105,7 +106,7 @@ final class TwigFunctionSmokeTest extends KernelTestCase
     public function testDeclaredTwigFunctionsAreLoadedInEnvironment(): void
     {
         $twigEnvironment = self::getContainer()->get(Environment::class);
-        \assert($twigEnvironment instanceof Environment);
+        $this->assertInstanceOf(Environment::class, $twigEnvironment);
 
         $declaredFunctionCount = 0;
         $missingFunctions      = [];

@@ -9,10 +9,10 @@ use Symfony\Component\Form\FormRendererInterface;
 use Symfony\Component\Form\FormView;
 use Twig\Attribute\AsTwigFunction;
 
-final class FormExtension
+final readonly class FormExtension
 {
     public function __construct(
-        private readonly FormRendererInterface $formRenderer,
+        private FormRendererInterface $formRenderer,
     ) {
     }
 

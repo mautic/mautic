@@ -25,7 +25,7 @@ final class TwigCallableRegistrationTest extends TestCase
     /**
      * @var array<class-string, string>
      */
-    private const ATTRIBUTE_TO_KIND = [
+    private const array ATTRIBUTE_TO_KIND = [
         AsTwigFilter::class   => 'filter',
         AsTwigFunction::class => 'function',
         AsTwigTest::class     => 'test',
@@ -44,7 +44,7 @@ final class TwigCallableRegistrationTest extends TestCase
                 continue;
             }
 
-            $twigEnvironment->addExtension((new \ReflectionClass($class))->newInstanceWithoutConstructor());
+            $twigEnvironment->addExtension(new \ReflectionClass($class)->newInstanceWithoutConstructor());
         }
 
         self::$twigEnvironment = $twigEnvironment;
@@ -167,7 +167,7 @@ final class TwigCallableRegistrationTest extends TestCase
     {
         $projectDirectory = dirname(__DIR__, 5);
 
-        $finder = (new Finder())
+        $finder = new Finder()
             ->files()
             ->in([$projectDirectory.'/app/bundles', $projectDirectory.'/plugins'])
             ->name('*.php')
