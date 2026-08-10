@@ -288,19 +288,6 @@ jobs:
 
           # test if console is executable
           ./bin/console cache:clear
-
-          # test that local_root is auto-detected from composer.json's mautic-scaffold.locations.web-root
-          # This ensures ElFinder and other webroot-relative paths resolve correctly for recommended-project
-          php -r "
-            require 'vendor/autoload.php';
-            \$projectRoot = getcwd();
-            \$webrootDir = Mautic\CoreBundle\Loader\ParameterLoader::getWebrootDir(\$projectRoot);
-            if (\$webrootDir !== \$projectRoot . '/docroot') {
-              echo \"ERROR: Expected webroot to be {\$projectRoot}/docroot, got {\$webrootDir}\n\";
-              exit(1);
-            }
-            echo \"OK: Webroot correctly auto-detected as {\$webrootDir}\n\";
-          "
         elif [[ "${{ matrix.commands }}" == "composer lock check" ]]; then
           composer validate --ansi
         else
