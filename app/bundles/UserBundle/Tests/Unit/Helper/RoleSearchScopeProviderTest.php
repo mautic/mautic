@@ -13,6 +13,8 @@ final class RoleSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
     protected function createProvider(): RoleSearchScopeProvider
     {
+        // RoleModel is final; PHPStan cannot resolve createMock()'s return type for final classes.
+        // @phpstan-ignore method.unresolvableReturnType
         $roleModel  = $this->createMock(RoleModel::class);
         $translator = $this->createMock(TranslatorInterface::class);
 

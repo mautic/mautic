@@ -13,6 +13,8 @@ final class PointInsightSearchScopeProviderTest extends SearchScopeProviderTestC
 {
     protected function createProvider(): PointInsightSearchScopeProvider
     {
+        // InsightModel is final; PHPStan cannot resolve createMock()'s return type for final classes.
+        // @phpstan-ignore method.unresolvableReturnType
         $insightModel = $this->createMock(InsightModel::class);
         $translator   = $this->createMock(TranslatorInterface::class);
 

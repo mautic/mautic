@@ -13,6 +13,8 @@ final class TagSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
     protected function createProvider(): TagSearchScopeProvider
     {
+        // TagRepository is final; PHPStan cannot resolve createMock()'s return type for final classes.
+        // @phpstan-ignore method.unresolvableReturnType
         $tagRepository = $this->createMock(TagRepository::class);
         $translator    = $this->createMock(TranslatorInterface::class);
 

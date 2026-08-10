@@ -13,6 +13,8 @@ final class ProjectSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
     protected function createProvider(): ProjectSearchScopeProvider
     {
+        // ProjectRepository is final; PHPStan cannot resolve createMock()'s return type for final classes.
+        // @phpstan-ignore method.unresolvableReturnType
         $projectRepository = $this->createMock(ProjectRepository::class);
         $translator        = $this->createMock(TranslatorInterface::class);
 

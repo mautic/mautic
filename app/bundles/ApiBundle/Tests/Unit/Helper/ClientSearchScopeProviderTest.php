@@ -13,6 +13,8 @@ final class ClientSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
     protected function createProvider(): ClientSearchScopeProvider
     {
+        // ClientModel is final; PHPStan cannot resolve createMock()'s return type for final classes.
+        // @phpstan-ignore method.unresolvableReturnType
         $clientModel = $this->createMock(ClientModel::class);
         $translator  = $this->createMock(TranslatorInterface::class);
 
