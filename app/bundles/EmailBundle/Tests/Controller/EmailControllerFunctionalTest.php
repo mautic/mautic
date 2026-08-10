@@ -983,6 +983,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $form['emailform[subject]']->setValue('Email publish test');
         $form['emailform[name]']->setValue('Email publish test');
         $form['emailform[template]']->setValue('blank');
+        $form['emailform[customHtml]']->setValue('<p>Test html</p>');
 
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
@@ -1028,6 +1029,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $form['emailform[subject]']->setValue('Email publish test');
         $form['emailform[name]']->setValue('Email publish test');
         $form['emailform[template]']->setValue('blank');
+        $form['emailform[customHtml]']->setValue('<p>Test html</p>');
 
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
