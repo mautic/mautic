@@ -1495,8 +1495,10 @@ Mautic.activateSearchScope = function (searchEl) {
     }
 
     const initialSearch = (scopeSelect.attr('data-initial-search') || searchInput.val() || '').trim();
-    Mautic.applySearchScopeState(searchInput, initialSearch);
+    // Keep lastSearchStr in sync before mutating the input so typeahead/Chosen
+    // init cannot trigger a redundant live-search that briefly empties the list.
     MauticVars.lastSearchStr = initialSearch;
+    Mautic.applySearchScopeState(searchInput, initialSearch);
 
     Mautic.activateSearchScopeChosen(scopeSelect);
 
@@ -1509,6 +1511,11 @@ Mautic.activateSearchScope = function (searchEl) {
         }
 
         const scopedValue = Mautic.composeScopedSearchValue(command, searchInput.val().trim());
+        // Chosen may emit change during initialization; skip no-op reloads.
+        if (scopedValue === MauticVars.lastSearchStr) {
+            return;
+        }
+
         MauticVars.lastSearchStr = scopedValue;
 
         const scopeChangeEvent = mQuery.Event('keyup', {which: 13});
