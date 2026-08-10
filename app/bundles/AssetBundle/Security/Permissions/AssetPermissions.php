@@ -2,17 +2,11 @@
 
 namespace Mautic\AssetBundle\Security\Permissions;
 
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Symfony\Component\Form\FormBuilderInterface;
 
 final class AssetPermissions extends AbstractPermissions
 {
-    public function __construct(CoreParametersHelper $coreParametersHelper)
-    {
-        parent::__construct($coreParametersHelper->all());
-    }
-
     public function definePermissions(): void
     {
         $this->addExtendedPermissions('assets');

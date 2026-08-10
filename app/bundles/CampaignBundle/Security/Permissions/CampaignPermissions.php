@@ -9,12 +9,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 final class CampaignPermissions extends AbstractPermissions
 {
-    /**
-     * @param mixed[] $params
-     */
-    public function __construct(array $params)
+    public function definePermissions(): void
     {
-        parent::__construct($params);
         $this->addExtendedPermissions('campaigns');
         $this->addStandardPermissions(['categories']);
         $this->addStandardPermissions(['imports']);

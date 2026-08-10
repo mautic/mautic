@@ -28,4 +28,5 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.point.repository.lead_point_log', Mautic\PointBundle\Entity\LeadPointLogRepository::class);
     $services->alias('mautic.point.repository.lead_trigger_log', Mautic\PointBundle\Entity\LeadTriggerLogRepository::class);
     $services->alias('mautic.point.model.insight', Mautic\PointBundle\Model\InsightModel::class);
+    $services->set(Mautic\PointBundle\Security\Permissions\PointPermissions::class);
 };

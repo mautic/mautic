@@ -25,7 +25,7 @@ final class MarketplacePermissions extends AbstractPermissions
         CoreParametersHelper $coreParametersHelper,
         private readonly Config $config,
     ) {
-        parent::__construct($coreParametersHelper->all());
+        parent::__construct($coreParametersHelper);
     }
 
     public function definePermissions(): void

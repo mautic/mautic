@@ -29,4 +29,5 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->alias('mautic.webhook.model.webhook', Mautic\WebhookBundle\Model\WebhookModel::class);
     $services->alias('mautic.webhook.repository.queue', Mautic\WebhookBundle\Entity\WebhookQueueRepository::class);
+    $services->set(Mautic\WebhookBundle\Security\Permissions\WebhookPermissions::class);
 };

@@ -24,4 +24,5 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias(MauticPlugin\MauticFocusBundle\Helper\TokenHelper::class, 'mautic.focus.helper.token');
 
     $services->alias('mautic.focus.model.focus', MauticPlugin\MauticFocusBundle\Model\FocusModel::class);
+    $services->set(MauticPlugin\MauticFocusBundle\Security\Permissions\FocusPermissions::class);
 };

@@ -33,4 +33,5 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('notification_helper', Mautic\NotificationBundle\Helper\NotificationHelper::class);
 
     $services->alias('mautic.notification.api', Mautic\NotificationBundle\Api\OneSignalApi::class);
+    $services->set(Mautic\NotificationBundle\Security\Permissions\NotificationPermissions::class);
 };

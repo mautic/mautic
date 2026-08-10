@@ -39,4 +39,5 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.page.repository.hit', Mautic\PageBundle\Entity\HitRepository::class);
     $services->alias('mautic.page.repository.page', Mautic\PageBundle\Entity\PageRepository::class);
     $services->alias('mautic.page.repository.redirect', Mautic\PageBundle\Entity\RedirectRepository::class);
+    $services->set(Mautic\PageBundle\Security\Permissions\PagePermissions::class);
 };

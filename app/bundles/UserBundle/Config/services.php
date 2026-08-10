@@ -140,4 +140,5 @@ return function (ContainerConfigurator $configurator): void {
             service('security.password_hasher_factory'),
             [], // This will be replaced by the compiler pass
         ]);
+    $services->set(Mautic\UserBundle\Security\Permissions\UserPermissions::class);
 };

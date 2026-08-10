@@ -81,4 +81,5 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->get(Mautic\EmailBundle\EventListener\WebhookSubscriber::class)
         ->arg('$includeDetails', '%mautic.webhook_email_details%');
+    $services->set(Mautic\EmailBundle\Security\Permissions\EmailPermissions::class);
 };

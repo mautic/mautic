@@ -24,4 +24,5 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.stage.model.stage', Mautic\StageBundle\Model\StageModel::class);
     $services->alias('mautic.stage.repository.lead_stage_log', Mautic\StageBundle\Entity\LeadStageLogRepository::class);
     $services->alias('mautic.stage.repository.stage', Mautic\StageBundle\Entity\StageRepository::class);
+    $services->set(Mautic\StageBundle\Security\Permissions\StagePermissions::class);
 };

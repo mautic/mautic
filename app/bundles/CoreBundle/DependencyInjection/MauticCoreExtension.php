@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\DependencyInjection;
 
+use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -33,6 +34,9 @@ final class MauticCoreExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container): void
     {
+        $container->registerForAutoconfiguration(AbstractPermissions::class)
+            ->addTag('mautic.permissions');
+
         // For the project:
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../../../config'));
         $loader->load('services.php');

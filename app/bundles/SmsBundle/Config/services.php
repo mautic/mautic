@@ -46,4 +46,5 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.sms.model.sms', Mautic\SmsBundle\Model\SmsModel::class);
     $services->alias('mautic.sms.repository.stat', Mautic\SmsBundle\Entity\StatRepository::class);
     $services->alias('mautic.sms.callback_handler_container', Mautic\SmsBundle\Callback\HandlerContainer::class);
+    $services->set(Mautic\SmsBundle\Security\Permissions\SmsPermissions::class);
 };

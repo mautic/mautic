@@ -7,12 +7,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 final class PagePermissions extends AbstractPermissions
 {
-    /**
-     * @param mixed[] $params
-     */
-    public function __construct(array $params)
+    public function definePermissions(): void
     {
-        parent::__construct($params);
         $this->addExtendedPermissions('pages');
         $this->addStandardPermissions('categories');
         $this->addExtendedPermissions('preference_center');

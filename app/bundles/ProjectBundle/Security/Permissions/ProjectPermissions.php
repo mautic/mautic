@@ -22,13 +22,8 @@ final class ProjectPermissions extends AbstractPermissions
 
     public const string CAN_ASSOCIATE    = self::PERMISSION_BASE.':associate';
 
-    /**
-     * @param mixed[] $params
-     */
-    public function __construct(array $params)
+    public function definePermissions(): void
     {
-        parent::__construct($params);
-
         $this->addStandardPermissions([$this->getName()], false);
 
         // Add the associate permission directly to the permissions array

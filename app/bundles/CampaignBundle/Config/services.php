@@ -77,4 +77,5 @@ return function (ContainerConfigurator $configurator): void {
             ->decorate(Mautic\CampaignBundle\Executioner\ScheduledExecutioner::class)
             ->tag('kernel.reset', ['method' => 'reset']);
     }
+    $services->set(Mautic\CampaignBundle\Security\Permissions\CampaignPermissions::class);
 };

@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Security\Permissions;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\UserBundle\Form\Type\PermissionListType;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -12,9 +13,14 @@ abstract class AbstractPermissions
      */
     protected $permissions = [];
 
-    public function __construct(
-        protected array $params,
-    ) {
+    /**
+     * @var mixed[]
+     */
+    protected array $params;
+
+    public function __construct(CoreParametersHelper $coreParametersHelper)
+    {
+        $this->params = $coreParametersHelper->all();
     }
 
     /**

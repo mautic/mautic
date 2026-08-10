@@ -7,13 +7,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 final class CategoryPermissions extends AbstractPermissions
 {
-    /**
-     * @param mixed[] $params
-     */
-    public function __construct(array $params)
+    public function definePermissions(): void
     {
-        parent::__construct($params);
-
         $this->addStandardPermissions('categories');
     }
 

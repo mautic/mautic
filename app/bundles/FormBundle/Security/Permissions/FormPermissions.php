@@ -7,12 +7,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 final class FormPermissions extends AbstractPermissions
 {
-    /**
-     * @param mixed[] $params
-     */
-    public function __construct(array $params)
+    public function definePermissions(): void
     {
-        parent::__construct($params);
         $this->addCustomPermission('export', ['enable' => 1024]);
         $this->addExtendedPermissions('forms');
         $this->addStandardPermissions('categories');

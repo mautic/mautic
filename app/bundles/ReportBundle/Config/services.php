@@ -47,4 +47,5 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->set(Mautic\ReportBundle\Helper\ReportHelper::class)
         ->tag('twig.helper', ['alias' => 'report']);
+    $services->set(Mautic\ReportBundle\Security\Permissions\ReportPermissions::class);
 };

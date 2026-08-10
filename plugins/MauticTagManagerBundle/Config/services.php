@@ -26,4 +26,5 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.tagmanager.repository.tag', MauticPlugin\MauticTagManagerBundle\Entity\TagRepository::class);
     $services->alias('mautic.integration.tagmanager', MauticPlugin\MauticTagManagerBundle\Integration\TagManagerIntegration::class);
     $services->alias('mautic.integration.tagmanager.config', MauticPlugin\MauticTagManagerBundle\Integration\Support\ConfigSupport::class);
+    $services->set(MauticPlugin\MauticTagManagerBundle\Security\Permissions\TagManagerPermissions::class);
 };

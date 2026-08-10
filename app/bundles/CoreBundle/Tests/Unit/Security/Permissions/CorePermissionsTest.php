@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Security\Permissions;
 
-use Mautic\ApiBundle\Security\Permissions\ApiPermissions;
 use Mautic\AssetBundle\Security\Permissions\AssetPermissions;
 use Mautic\CampaignBundle\Security\Permissions\CampaignPermissions;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -32,7 +31,6 @@ final class CorePermissionsTest extends \PHPUnit\Framework\TestCase
             $this->createStub(TranslatorInterface::class),
             $this->coreParametersHelper,
             [
-                $this->mockBundleArray(ApiPermissions::class),
                 $this->mockBundleArray(AssetPermissions::class),
                 $this->mockBundleArray(CampaignPermissions::class),
             ],
@@ -47,18 +45,22 @@ final class CorePermissionsTest extends \PHPUnit\Framework\TestCase
         $this->coreParametersHelper->method('all')
             ->willReturn(['parameter_a' => 'value_a']);
 
-        $assetPermissions = new AssetPermissions($this->coreParametersHelper);
-        $this->corePermissions->setPermissionObject($assetPermissions);
-        $permissionObjects = $this->corePermissions->getPermissionObjects();
+        $assetPermissions    = new AssetPermissions($this->coreParametersHelper);
+        $campaignPermissions = new CampaignPermissions($this->coreParametersHelper);
+        $focusPermissions    = new FocusPermissions($this->coreParametersHelper);
 
-        // Even though the AssetPermissions object was set upfront there are
-        // still 4 objects available.
-        // The other three were instantiated to keep BC.
-        $this->assertCount(4, $permissionObjects);
+        $this->corePermissions->setPermissionObject($assetPermissions);
+        $this->corePermissions->setPermissionObject($campaignPermissions);
+        $this->corePermissions->setPermissionObject($focusPermissions);
+
+        // Only the permission objects registered as services are available.
+        $permissionObjects = $this->corePermissions->getPermissionObjects();
+        $this->assertCount(3, $permissionObjects);
 
         $this->assertSame($assetPermissions, $this->corePermissions->getPermissionObject('asset'));
         $this->assertSame($assetPermissions, $this->corePermissions->getPermissionObject(AssetPermissions::class));
-        $this->assertSame($permissionObjects['campaign'], $this->corePermissions->getPermissionObject(CampaignPermissions::class));
+        $this->assertSame($campaignPermissions, $this->corePermissions->getPermissionObject(CampaignPermissions::class));
+        $this->assertSame($focusPermissions, $this->corePermissions->getPermissionObject(FocusPermissions::class));
     }
 
     /**

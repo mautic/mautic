@@ -30,4 +30,5 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->set(Mautic\ChannelBundle\Helper\ChannelListHelper::class)
         ->tag('twig.helper', ['alias' => 'channel']);
+    $services->set(Mautic\ChannelBundle\Security\Permissions\ChannelPermissions::class);
 };
