@@ -44,11 +44,8 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
-<<<<<<< HEAD
 #[LeadFieldMinimumLength]
-=======
 #[UniqueEntity(fields: ['alias'], message: 'mautic.lead.field.alias.unique')]
->>>>>>> 84755710cc ([symfony] Validator attributes: UniqueEntity on Stage, User and LeadField entities)
 class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInterface
 {
     use UuidTrait;
