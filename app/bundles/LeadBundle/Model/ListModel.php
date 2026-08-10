@@ -489,7 +489,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
                         $output->writeln('');
                     }
 
-                    return $leadsProcessed;
+                    return $this->finishRebuild($leadList, $leadsProcessed, $batchLimiters);
                 }
             }
 
@@ -570,7 +570,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
                         $output->writeln('');
                     }
 
-                    return $leadsProcessed;
+                    return $this->finishRebuild($leadList, $leadsProcessed, $batchLimiters);
                 }
             }
 
@@ -580,14 +580,57 @@ class ListModel extends FormModel implements GlobalSearchInterface
             }
         }
 
-        if ($this->coreParametersHelper->get('update_segment_contact_count_in_background', false)) {
-            $this->segmentCountCacheHelper->invalidateSegmentContactCount($segmentId);
-        } else {
-            $totalLeadCount = $this->getRepository()->getLeadCount($segmentId);
-            $this->segmentCountCacheHelper->setSegmentContactCount($segmentId, (int) $totalLeadCount);
+        return $this->finishRebuild($leadList, $leadsProcessed, $batchLimiters, true);
+    }
+
+    /**
+     * Persist segment membership cache and mark the rebuild finished when no work remains.
+     *
+     * @param array<string, mixed> $batchLimiters
+     */
+    private function finishRebuild(LeadList $leadList, int $leadsProcessed, array $batchLimiters, bool $knownComplete = false): int
+    {
+        $segmentId = $leadList->getId();
+        $this->refreshSegmentContactCount($segmentId);
+
+        if ($knownComplete || $this->isSegmentRebuildComplete($leadList, $batchLimiters)) {
+            $leadList->setLastBuiltDateToCurrentDatetime();
         }
 
         return $leadsProcessed;
+    }
+
+    /**
+     * @param array<string, mixed> $batchLimiters
+     */
+    private function isSegmentRebuildComplete(LeadList $leadList, array $batchLimiters): bool
+    {
+        // Ignore maxId/dateTime caps from the current run so we detect any remaining work.
+        unset($batchLimiters['maxId'], $batchLimiters['dateTime']);
+
+        try {
+            $newLeadsCount    = $this->leadSegmentService->getNewLeadListLeadsCount($leadList, $batchLimiters);
+            $orphanLeadsCount = $this->leadSegmentService->getOrphanedLeadListLeadsCount($leadList);
+        } catch (FieldNotFoundException|SegmentNotFoundException|TableNotFoundException) {
+            return false;
+        }
+
+        $segmentId = $leadList->getId();
+
+        return 0 === (int) ($newLeadsCount[$segmentId]['count'] ?? 0)
+            && 0 === (int) ($orphanLeadsCount[$segmentId]['count'] ?? 0);
+    }
+
+    private function refreshSegmentContactCount(int $segmentId): void
+    {
+        if ($this->coreParametersHelper->get('update_segment_contact_count_in_background', false)) {
+            $this->segmentCountCacheHelper->invalidateSegmentContactCount($segmentId);
+
+            return;
+        }
+
+        $totalLeadCount = $this->getRepository()->getLeadCount($segmentId);
+        $this->segmentCountCacheHelper->setSegmentContactCount($segmentId, (int) $totalLeadCount);
     }
 
     /**

@@ -13,6 +13,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\Tag;
+use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -113,20 +114,100 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
             },
         ];
 
-        // But the last built date will not update if we limit how many contacts to process.
+        // When --max-contacts caps a run that still leaves contacts to process,
+        // last built date stays unchanged so the UI keeps showing "Building".
         // Also testing the timing option = 1.
         yield [
             fn (): array => ['--max-contacts' => 1, '--timing' => 1],
             function (LeadList $segment, string $output): void {
-                Assert::assertEquals(
+                // Only one contact matches; the cap is reached but the rebuild is still complete.
+                Assert::assertGreaterThan(
                     new \DateTime('2000-01-01 00:00:00'),
                     $segment->getLastBuiltDate()
                 );
-                Assert::assertNull($segment->getLastBuiltTime());
+                Assert::assertNotNull($segment->getLastBuiltTime());
                 Assert::assertStringContainsString('Total time:', $output);
                 Assert::assertStringContainsString('seconds', $output);
             },
         ];
+    }
+
+    public function testMaxContactsPartialRebuildKeepsBuildingAndUpdatesCountCache(): void
+    {
+        $contacts = [];
+        foreach (['one@example.com', 'two@example.com', 'three@example.com'] as $email) {
+            $contact = new Lead();
+            $contact->setEmail($email);
+            $this->em->persist($contact);
+            $contacts[] = $contact;
+        }
+
+        $segment = new LeadList();
+        $segment->setName('Partial rebuild segment');
+        $segment->setPublicName('Partial rebuild segment');
+        $segment->setAlias('partial-rebuild-segment');
+        $segment->setFilters([
+            [
+                'glue'     => 'and',
+                'field'    => 'email',
+                'object'   => 'lead',
+                'type'     => 'email',
+                'filter'   => 'example.com',
+                'display'  => null,
+                'operator' => 'like',
+            ],
+        ]);
+
+        $longTimeAgo = new \DateTime('2000-01-01 00:00:00');
+        $segment->setDateModified(new \DateTime());
+        $segment->setLastBuiltDate($longTimeAgo);
+
+        $this->em->persist($segment);
+        $this->em->flush();
+        $segmentId = $segment->getId();
+        $this->em->clear();
+
+        $this->assertTrue(
+            $this->em->find(LeadList::class, $segmentId)->needsRebuild(),
+            'Segment should show as building before the partial rebuild'
+        );
+
+        $output = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, [
+            '--list-id'      => $segmentId,
+            '--max-contacts' => 1,
+        ]);
+        $this->assertSame(Command::SUCCESS, $output->getStatusCode());
+
+        /** @var LeadList $segment */
+        $segment = $this->em->find(LeadList::class, $segmentId);
+        $this->assertEquals($longTimeAgo, $segment->getLastBuiltDate());
+        $this->assertTrue($segment->needsRebuild());
+
+        /** @var LeadListRepository $leadListRepository */
+        $leadListRepository = $this->em->getRepository(LeadList::class);
+        $this->assertSame(1, $leadListRepository->getLeadCount([$segmentId]));
+
+        /** @var SegmentCountCacheHelper $segmentCountCacheHelper */
+        $segmentCountCacheHelper = self::getContainer()->get(SegmentCountCacheHelper::class);
+        $this->assertSame(1, $segmentCountCacheHelper->getSegmentContactCount($segmentId));
+
+        // Drain the remaining contacts; the final capped run should mark the rebuild finished.
+        $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, [
+            '--list-id'      => $segmentId,
+            '--max-contacts' => 1,
+        ]);
+        $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, [
+            '--list-id'      => $segmentId,
+            '--max-contacts' => 1,
+        ]);
+
+        $this->em->clear();
+        /** @var LeadList $segment */
+        $segment = $this->em->find(LeadList::class, $segmentId);
+        $this->assertGreaterThan($longTimeAgo, $segment->getLastBuiltDate());
+        $this->assertNotNull($segment->getLastBuiltTime());
+        $this->assertSame(3, $leadListRepository->getLeadCount([$segmentId]));
+        $this->assertSame(3, $segmentCountCacheHelper->getSegmentContactCount($segmentId));
     }
 
     /**
