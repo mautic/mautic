@@ -30,7 +30,7 @@ final class WebhookRepositoryTest extends TestCase
             'mautic.core.searchcommand.category' => 'category',
             default => $id,
         });
-        $repository->setTranslator($translator);
+        $repository->autowireCommonRepository($translator);
 
         return $repository;
     }

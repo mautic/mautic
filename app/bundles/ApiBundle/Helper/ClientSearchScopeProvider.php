@@ -4,15 +4,18 @@ declare(strict_types=1);
 
 namespace Mautic\ApiBundle\Helper;
 
-use Mautic\ApiBundle\Model\ClientModel;
 use Mautic\CoreBundle\Helper\AbstractSearchScopeProvider;
 use Mautic\CoreBundle\Helper\SearchScopePresets;
+use Mautic\CoreBundle\Model\FormModel;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ClientSearchScopeProvider extends AbstractSearchScopeProvider
 {
+    /**
+     * @param FormModel<object> $clientModel
+     */
     public function __construct(
-        private readonly ClientModel $clientModel,
+        private readonly FormModel $clientModel,
         TranslatorInterface $translator,
     ) {
         parent::__construct($translator);

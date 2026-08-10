@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\ProjectBundle\Tests\Unit\Helper;
 
+use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
-use Mautic\ProjectBundle\Entity\ProjectRepository;
 use Mautic\ProjectBundle\Helper\ProjectSearchScopeProvider;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -13,9 +13,7 @@ final class ProjectSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
     protected function createProvider(): ProjectSearchScopeProvider
     {
-        // ProjectRepository is final; PHPStan cannot resolve createMock()'s return type for final classes.
-        // @phpstan-ignore method.unresolvableReturnType
-        $projectRepository = $this->createMock(ProjectRepository::class);
+        $projectRepository = $this->createMock(CommonRepository::class);
         $translator        = $this->createMock(TranslatorInterface::class);
 
         $translator->method('trans')

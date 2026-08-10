@@ -27,7 +27,7 @@ final class ClientRepositoryTest extends TestCase
             'mautic.api.client.searchcommand.redirecturi' => 'redirecturi',
             default => $id,
         });
-        $repository->setTranslator($translator);
+        $repository->autowireCommonRepository($translator);
 
         return $repository;
     }

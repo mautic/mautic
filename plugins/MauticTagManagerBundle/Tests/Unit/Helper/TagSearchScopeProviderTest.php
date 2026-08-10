@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MauticPlugin\MauticTagManagerBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
-use MauticPlugin\MauticTagManagerBundle\Entity\TagRepository;
+use Mautic\LeadBundle\Entity\TagRepository;
 use MauticPlugin\MauticTagManagerBundle\Helper\TagSearchScopeProvider;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -13,8 +13,6 @@ final class TagSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
     protected function createProvider(): TagSearchScopeProvider
     {
-        // TagRepository is final; PHPStan cannot resolve createMock()'s return type for final classes.
-        // @phpstan-ignore method.unresolvableReturnType
         $tagRepository = $this->createMock(TagRepository::class);
         $translator    = $this->createMock(TranslatorInterface::class);
 

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\ApiBundle\Tests\Unit\Helper;
 
 use Mautic\ApiBundle\Helper\ClientSearchScopeProvider;
-use Mautic\ApiBundle\Model\ClientModel;
+use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -13,9 +13,7 @@ final class ClientSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
     protected function createProvider(): ClientSearchScopeProvider
     {
-        // ClientModel is final; PHPStan cannot resolve createMock()'s return type for final classes.
-        // @phpstan-ignore method.unresolvableReturnType
-        $clientModel = $this->createMock(ClientModel::class);
+        $clientModel = $this->createMock(FormModel::class);
         $translator  = $this->createMock(TranslatorInterface::class);
 
         $translator->method('trans')

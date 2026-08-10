@@ -4,18 +4,16 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Tests\Unit\Helper;
 
+use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Mautic\UserBundle\Helper\RoleSearchScopeProvider;
-use Mautic\UserBundle\Model\RoleModel;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class RoleSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
     protected function createProvider(): RoleSearchScopeProvider
     {
-        // RoleModel is final; PHPStan cannot resolve createMock()'s return type for final classes.
-        // @phpstan-ignore method.unresolvableReturnType
-        $roleModel  = $this->createMock(RoleModel::class);
+        $roleModel  = $this->createMock(FormModel::class);
         $translator = $this->createMock(TranslatorInterface::class);
 
         $translator->method('trans')

@@ -6,13 +6,16 @@ namespace Mautic\PointBundle\Helper;
 
 use Mautic\CoreBundle\Helper\AbstractSearchScopeProvider;
 use Mautic\CoreBundle\Helper\SearchScopePresets;
-use Mautic\PointBundle\Model\InsightModel;
+use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class PointInsightSearchScopeProvider extends AbstractSearchScopeProvider
 {
+    /**
+     * @param CommonFormModel<object> $insightModel
+     */
     public function __construct(
-        private readonly InsightModel $insightModel,
+        private readonly CommonFormModel $insightModel,
         TranslatorInterface $translator,
     ) {
         parent::__construct($translator);

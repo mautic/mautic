@@ -6,7 +6,7 @@ namespace MauticPlugin\MauticTagManagerBundle\Helper;
 
 use Mautic\CoreBundle\Helper\AbstractSearchScopeProvider;
 use Mautic\CoreBundle\Helper\SearchScopePresets;
-use MauticPlugin\MauticTagManagerBundle\Entity\TagRepository;
+use Mautic\LeadBundle\Entity\TagRepository;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class TagSearchScopeProvider extends AbstractSearchScopeProvider
