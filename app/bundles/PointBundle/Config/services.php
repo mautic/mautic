@@ -5,6 +5,8 @@ declare(strict_types=1);
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
+
 return function (ContainerConfigurator $configurator): void {
     $services = $configurator->services()
         ->defaults()
@@ -28,4 +30,8 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.point.repository.lead_point_log', Mautic\PointBundle\Entity\LeadPointLogRepository::class);
     $services->alias('mautic.point.repository.lead_trigger_log', Mautic\PointBundle\Entity\LeadTriggerLogRepository::class);
     $services->alias('mautic.point.model.insight', Mautic\PointBundle\Model\InsightModel::class);
+
+    // InsightModel is final (not mockable); provider typehints FormModel for unit tests.
+    $services->get(Mautic\PointBundle\Helper\PointInsightSearchScopeProvider::class)
+        ->arg('$insightModel', service(Mautic\PointBundle\Model\InsightModel::class));
 };

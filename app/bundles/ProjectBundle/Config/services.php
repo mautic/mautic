@@ -5,6 +5,8 @@ declare(strict_types=1);
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
+
 return function (ContainerConfigurator $configurator): void {
     $services = $configurator->services()
         ->defaults()
@@ -21,4 +23,8 @@ return function (ContainerConfigurator $configurator): void {
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
 
     $services->alias('mautic.project.model.project', Mautic\ProjectBundle\Model\ProjectModel::class);
+
+    // ProjectRepository is final (not mockable); provider typehints CommonRepository for unit tests.
+    $services->get(Mautic\ProjectBundle\Helper\ProjectSearchScopeProvider::class)
+        ->arg('$projectRepository', service(Mautic\ProjectBundle\Entity\ProjectRepository::class));
 };
