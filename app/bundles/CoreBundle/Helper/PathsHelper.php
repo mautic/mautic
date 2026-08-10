@@ -67,7 +67,8 @@ class PathsHelper
 
         // Get local_root (webroot) from parameters - this is auto-detected from composer.json
         // for recommended-project installations, or can be explicitly set in paths_local.php
-        $this->localRoot = $this->removeTrailingSlash((string) $coreParametersHelper->get('local_root')) ?: $this->paths['root'];
+        $localRootParam = $this->removeTrailingSlash((string) $coreParametersHelper->get('local_root'));
+        $this->localRoot = '' !== $localRootParam ? $localRootParam : ($this->paths['root'] ?? $rootDir);
     }
 
     public function getLocalConfigurationFile(): string

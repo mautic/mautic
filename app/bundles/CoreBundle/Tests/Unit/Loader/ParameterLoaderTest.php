@@ -50,7 +50,7 @@ final class ParameterLoaderTest extends TestCase
 
         $result = ParameterLoader::getWebrootDir($tempDir);
 
-        $this->assertEquals($tempDir, $result);
+        $this->assertSame($tempDir, $result);
 
         // Cleanup
         unlink($tempDir.'/composer.json');
@@ -77,7 +77,7 @@ final class ParameterLoaderTest extends TestCase
 
         $result = ParameterLoader::getWebrootDir($tempDir);
 
-        $this->assertEquals($tempDir.'/docroot', $result);
+        $this->assertSame($tempDir.'/docroot', $result);
 
         // Cleanup
         unlink($tempDir.'/composer.json');
@@ -101,7 +101,7 @@ final class ParameterLoaderTest extends TestCase
 
         $result = ParameterLoader::getWebrootDir($tempDir);
 
-        $this->assertEquals($tempDir.'/public', $result);
+        $this->assertSame($tempDir.'/public', $result);
 
         // Cleanup
         unlink($tempDir.'/composer.json');
@@ -128,7 +128,7 @@ final class ParameterLoaderTest extends TestCase
 
         $result = ParameterLoader::getWebrootDir($tempDir);
 
-        $this->assertEquals($tempDir, $result);
+        $this->assertSame($tempDir, $result);
 
         // Cleanup
         unlink($tempDir.'/composer.json');
