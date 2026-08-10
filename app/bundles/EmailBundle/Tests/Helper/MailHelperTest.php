@@ -1416,6 +1416,16 @@ MJML;
         $this->themeHelper->method('renderThemeTemplate')
             ->willReturn($mjml);
 
+        // Use a mock logger so we can assert the warning is logged exactly once.
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
+            ->method('warning')
+            ->willReturnCallback(function (string $message): void {
+                $this->assertStringContainsString('MJML theme "blank"', $message);
+                $this->assertStringContainsString('empty customHtml', $message);
+            });
+        $this->logger = $logger;
+
         $mailer = $this->createMailHelperWithTransport(new SmtpTransport());
 
         $email = new Email();
@@ -1424,7 +1434,51 @@ MJML;
         $email->setCustomHtml('');
         $email->setPlainText('Plain text body.');
 
+        // With plainText set, setEmail() still succeeds — the body is empty
+        // but the plain text part carries the content.
         $this->assertTrue($mailer->setEmail($email));
+        $this->assertSame('', $mailer->getBody());
+        $this->assertStringNotContainsString('<mjml>', $mailer->getBody());
+    }
+
+    public function testSetEmailFailsWhenMjmlThemeSkippedAndNoPlainText(): void
+    {
+        $this->coreParametersHelper->expects($this->atLeast(4))->method('get')->willReturnMap([
+            ['mailer_from_email', null, 'nobody@nowhere.com'],
+            ['mailer_from_name', null, 'No Body'],
+            ['minify_email_html', null, false],
+            ['mailer_append_tracking_pixel', null, false],
+        ]);
+
+        $mjml = <<<'MJML'
+<mjml>
+    <mj-body>
+        <mj-section>
+            <mj-column>
+                <mj-text>Hello World!</mj-text>
+            </mj-column>
+        </mj-section>
+    </mj-body>
+</mjml>
+MJML;
+
+        $this->themeHelper->method('checkForTwigTemplate')
+            ->willReturn('@themes/blank/html/email.html.twig');
+        $this->themeHelper->method('renderThemeTemplate')
+            ->willReturn($mjml);
+
+        $mailer = $this->createMailHelperWithTransport(new SmtpTransport());
+
+        $email = new Email();
+        $email->setSubject('MJML empty body test');
+        $email->setTemplate('blank');
+        $email->setCustomHtml('');
+        // No plain text — the email has no usable body after the MJML skip.
+
+        // setEmail() must hard-fail (return false) so the send is aborted
+        // rather than delivering an empty email.
+        $this->assertFalse($mailer->setEmail($email));
+        $this->assertNotEmpty($mailer->getErrors());
         $this->assertSame('', $mailer->getBody());
         $this->assertStringNotContainsString('<mjml>', $mailer->getBody());
     }

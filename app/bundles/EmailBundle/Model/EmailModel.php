@@ -46,6 +46,7 @@ use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
 use Mautic\EmailBundle\Exception\FailedToSendToContactException;
+use Mautic\EmailBundle\Exception\MjmlThemeEmptyCustomHtmlException;
 use Mautic\EmailBundle\Form\Type\EmailType;
 use Mautic\EmailBundle\Helper\BotRatioHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
@@ -224,6 +225,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             $entity->setEmailType('template');
         }
 
+        // Block the bad state early: an MJML theme with empty customHtml has no
+        // compiled body. GrapesJS should compile the theme into customHtml before
+        // saving; sending without it delivers uncompiled <mjml> or an empty body.
+        $this->validateMjmlThemeHasCustomHtml($entity);
+
         // Ensure that list emails are published
         if ('list' == $entity->getEmailType()) {
             // Ensure that this email has the same lists assigned as the translated parent if applicable
@@ -271,6 +277,43 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             }
         } else {
             parent::saveEntity($entity, false);
+        }
+    }
+
+    /**
+     * Validate that an email using an MJML theme has compiled customHtml.
+     *
+     * Bundled themes since Mautic 5 use MJML. GrapesJS compiles the MJML into
+     * customHtml client-side. If an email is saved with an MJML theme but empty
+     * customHtml, it has no usable body — sending would deliver uncompiled
+     * <mjml> markup or an empty email. This method blocks that bad state at
+     * save time so it is caught before send.
+     *
+     * @throws MjmlThemeEmptyCustomHtmlException
+     */
+    public function validateMjmlThemeHasCustomHtml(Email $email): void
+    {
+        $template = $email->getTemplate();
+        if (empty($template) || !empty($email->getCustomHtml())) {
+            return;
+        }
+
+        $logicalName = $this->themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
+
+        try {
+            $renderedHtml = $this->themeHelper->renderThemeTemplate($logicalName, [
+                'content'  => $email->getContent(),
+                'email'    => $email,
+                'template' => $template,
+            ]);
+        } catch (\Throwable) {
+            // If the theme template cannot be rendered, skip validation —
+            // MailHelper::setEmail() will handle the fallback at send time.
+            return;
+        }
+
+        if (str_contains($renderedHtml, '<mjml>')) {
+            throw new MjmlThemeEmptyCustomHtmlException(sprintf('The "%s" theme uses MJML which must be compiled into customHtml before saving. Please open the email in the builder to compile the template.', $template));
         }
     }
 
