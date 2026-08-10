@@ -17,6 +17,25 @@ class AuditLogRepository extends CommonRepository
     use TimelineTrait;
 
     /**
+     * Updates lead object ID after a lead merge.
+     *
+     * @param int $fromLeadId
+     * @param int $toLeadId
+     */
+    public function updateLead($fromLeadId, $toLeadId): void
+    {
+        $this->_em->getConnection()->createQueryBuilder()
+            ->update(MAUTIC_TABLE_PREFIX.'audit_log')
+            ->set('object_id', (string) $toLeadId)
+            ->where('bundle = :bundle')
+            ->andWhere('object = :object')
+            ->andWhere('object_id = '.(int) $fromLeadId)
+            ->setParameter('bundle', 'lead')
+            ->setParameter('object', 'lead')
+            ->executeStatement();
+    }
+
+    /**
      * @return int
      */
     public function getAuditLogsCount(Lead $lead, ?array $filters = null)

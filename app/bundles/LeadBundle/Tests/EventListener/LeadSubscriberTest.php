@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Entity\AuditLog;
+use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -12,11 +14,14 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Tests\CommonMocks;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
+use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Event\LeadEvent;
+use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\EventListener\LeadSubscriber;
 use Mautic\LeadBundle\Helper\LeadChangeEventDispatcher;
@@ -92,6 +97,68 @@ class LeadSubscriberTest extends CommonMocks
         $this->segmentCountCacheHelper = $this->createMock(SegmentCountCacheHelper::class);
         $this->coreParametersHelper    = $this->createMock(CoreParametersHelper::class);
         $this->companyLeadRepository   = $this->createMock(CompanyLeadRepository::class);
+    }
+
+    public function testPreLeadMergeMovesRelatedLogsToVictor(): void
+    {
+        $victor = new Lead();
+        $victor->setId(125491);
+
+        $loser = new Lead();
+        $loser->setId(124295);
+
+        $leadEventLogRepository = $this->createMock(LeadEventLogRepository::class);
+        $leadEventLogRepository->expects($this->once())
+            ->method('updateLead')
+            ->with($loser->getId(), $victor->getId());
+
+        $doNotContactRepository = $this->createMock(DoNotContactRepository::class);
+        $doNotContactRepository->expects($this->once())
+            ->method('updateLead')
+            ->with($loser->getId(), $victor->getId());
+
+        $auditLogRepository = $this->createMock(AuditLogRepository::class);
+        $auditLogRepository->expects($this->once())
+            ->method('updateLead')
+            ->with($loser->getId(), $victor->getId());
+
+        $matcher = $this->exactly(3);
+
+        $this->entityManager->expects($matcher)
+            ->method('getRepository')
+            ->willReturnCallback(function (string $class) use ($matcher, $leadEventLogRepository, $doNotContactRepository, $auditLogRepository) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame(LeadEventLog::class, $class);
+
+                    return $leadEventLogRepository;
+                }
+
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame(DoNotContact::class, $class);
+
+                    return $doNotContactRepository;
+                }
+
+                $this->assertSame(AuditLog::class, $class);
+
+                return $auditLogRepository;
+            });
+
+        $subscriber = new LeadSubscriber(
+            $this->ipLookupHelper,
+            $this->auditLogModel,
+            $this->leadEventDispatcher,
+            $this->dncReasonHelper,
+            $this->entityManager,
+            $this->translator,
+            $this->router,
+            $this->leadListRepository,
+            $this->segmentCountCacheHelper,
+            $this->coreParametersHelper,
+            $this->companyLeadRepository
+        );
+
+        $subscriber->preLeadMerge(new LeadMergeEvent($victor, $loser));
     }
 
     public function testOnLeadPostSaveWillNotProcessTheSameLeadTwice(): void

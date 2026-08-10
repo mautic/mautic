@@ -26,6 +26,21 @@ class DoNotContactRepository extends CommonRepository
     }
 
     /**
+     * Updates lead ID after a lead merge.
+     *
+     * @param int $fromLeadId
+     * @param int $toLeadId
+     */
+    public function updateLead($fromLeadId, $toLeadId): void
+    {
+        $this->_em->getConnection()->createQueryBuilder()
+            ->update(MAUTIC_TABLE_PREFIX.'lead_donotcontact')
+            ->set('lead_id', (string) $toLeadId)
+            ->where('lead_id = '.(int) $fromLeadId)
+            ->executeStatement();
+    }
+
+    /**
      * @param string|null                         $channel
      * @param array<int,int|string>|int|null      $ids
      * @param int|null                            $reason
