@@ -12,6 +12,8 @@ use MauticPlugin\MauticCrmBundle\Integration\HubspotIntegration;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class HubspotApiTest extends TestCase
 {
@@ -113,7 +115,12 @@ final class HubspotApiTest extends TestCase
         $this->expectException(InvalidEmailException::class);
         $this->expectExceptionMessage($expectedMessage);
 
-        $api = new HubspotApi($this->createStub(EmailValidator::class), $integration);
+        $emailValidator = new EmailValidator(
+            $this->createStub(TranslatorInterface::class),
+            $this->createStub(EventDispatcherInterface::class)
+        );
+
+        $api = new HubspotApi($emailValidator, $integration);
         $api->createLead(['email' => $email], null);
     }
 }
