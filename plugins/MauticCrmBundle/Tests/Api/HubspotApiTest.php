@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MauticPlugin\MauticCrmBundle\Tests\Api;
 
 use Mautic\EmailBundle\Exception\InvalidEmailException;
+use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCrmBundle\Api\HubspotApi;
 use MauticPlugin\MauticCrmBundle\Integration\HubspotIntegration;
@@ -48,7 +49,9 @@ final class HubspotApiTest extends TestCase
         $this->expectExceptionMessage($message);
         $this->expectExceptionCode($code);
 
-        $api = new HubspotApi($integration);
+        $emailValidatorMock = $this->createStub(EmailValidator::class);
+
+        $api = new HubspotApi($emailValidatorMock, $integration);
         $api->getLeadFields();
 
         self::fail('ApiErrorException not thrown');
@@ -80,7 +83,7 @@ final class HubspotApiTest extends TestCase
         $this->expectExceptionMessage($message);
         $this->expectExceptionCode(0);
 
-        $api = new HubspotApi($integration);
+        $api = new HubspotApi($this->createStub(EmailValidator::class), $integration);
         $api->getLeadFields();
 
         self::fail('ApiErrorException not thrown');
@@ -110,7 +113,7 @@ final class HubspotApiTest extends TestCase
         $this->expectException(InvalidEmailException::class);
         $this->expectExceptionMessage($expectedMessage);
 
-        $api = new HubspotApi($integration);
+        $api = new HubspotApi($this->createStub(EmailValidator::class), $integration);
         $api->createLead(['email' => $email], null);
     }
 }

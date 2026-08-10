@@ -4,7 +4,6 @@ namespace Mautic\DashboardBundle\Event;
 
 use Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface;
 use Mautic\CoreBundle\Event\CommonEvent;
-use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Exception\CouldNotFormatDateTimeException;
@@ -270,32 +269,12 @@ class WidgetDetailEvent extends CommonEvent
 
     /**
      * @throws \Psr\Cache\InvalidArgumentException
-     *                                             Checks the cache for the widget data.
-     *                                             If cache exists, it sets the TemplateData.
+     *
+     * Checks the cache for the widget data.
+     * If cache exists, it sets the TemplateData.
      */
     public function isCached(): bool
     {
-        if (!$this->cacheDir && $this->usesLegacyCache()) {
-            return false;
-        }
-
-        if ($this->usesLegacyCache()) {
-            if (0 === $this->cacheTimeout) {
-                return false;
-            }
-
-            $cache = new CacheStorageHelper(CacheStorageHelper::ADAPTOR_FILESYSTEM, $this->uniqueCacheDir, null, $this->cacheDir);
-            $data  = $cache->get($this->getUniqueWidgetId());
-
-            if ($data) {
-                $this->widget->setCached(true);
-                $this->setTemplateData($data, true);
-
-                return true;
-            }
-
-            return false;
-        }
         $cachedItem = $this->cacheProvider->getItem($this->getCacheKey());
         if (!$cachedItem->isHit()) {
             return false;
