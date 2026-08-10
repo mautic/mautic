@@ -89,17 +89,11 @@ class PointInsight extends FormEntity
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $metadata->addPropertyConstraint('name', new Assert\NotBlank([
-            'message' => 'mautic.core.name.required',
-        ]));
+        $metadata->addPropertyConstraint('name', new Assert\NotBlank(message: 'mautic.core.name.required'));
 
-        $metadata->addPropertyConstraint('insightType', new Assert\NotBlank([
-            'message' => 'mautic.point.insight.type.required',
-        ]));
+        $metadata->addPropertyConstraint('insightType', new Assert\NotBlank(message: 'mautic.point.insight.type.required'));
 
-        $metadata->addPropertyConstraint('insightAction', new Assert\NotBlank([
-            'message' => 'mautic.point.insight.action.required',
-        ]));
+        $metadata->addPropertyConstraint('insightAction', new Assert\NotBlank(message: 'mautic.point.insight.action.required'));
     }
 
     /**

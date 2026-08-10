@@ -2,14 +2,13 @@
 
 namespace Mautic\PageBundle\Helper;
 
-use Doctrine\ORM\EntityManagerInterface;
-use Mautic\PageBundle\Entity\Hit;
+use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\Page;
 
 class PointActionHelper
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager,
+        private readonly HitRepository $hitRepository,
     ) {
     }
 
@@ -44,11 +43,10 @@ class PointActionHelper
             return false;
         }
 
-        $urlMatches     = fnmatch($limitToUrl, $url);
-        $hitRepository  = $this->entityManager->getRepository(Hit::class);
-        $lead           = $eventDetails->getLead();
-        $urlWithSqlWC   = str_replace('*', '%', $limitToUrl);
-        $now            = new \DateTime();
+        $urlMatches   = fnmatch($limitToUrl, $url);
+        $lead         = $eventDetails->getLead();
+        $urlWithSqlWC = str_replace('*', '%', $limitToUrl);
+        $now          = new \DateTime();
 
         $hasDwellTimeConditions = !empty($action['properties']['accumulative_time']) || !empty($action['properties']['page_hits']);
 
@@ -57,13 +55,21 @@ class PointActionHelper
         // a contact must revisit the same page for points to be awarded after time threshold is crossed.
         // See https://github.com/mautic/mautic/issues/12336
         if ($hasDwellTimeConditions) {
-            $hitStats = $hitRepository->getDwellTimesForUrl($urlWithSqlWC, ['leadId' => $lead->getId()]);
+            $hitStats = $this->hitRepository->getDwellTimesForUrl($urlWithSqlWC, ['leadId' => $lead->getId()]);
 
             if (!empty($action['properties']['accumulative_time'])) {
-                $changePoints['accumulative_time'] = isset($hitStats['sum']) && $action['properties']['accumulative_time'] <= $hitStats['sum'];
+                if (isset($hitStats['sum'])) {
+                    $changePoints['accumulative_time'] = $action['properties']['accumulative_time'] <= $hitStats['sum'];
+                } else {
+                    $changePoints['accumulative_time'] = false;
+                }
             }
             if (!empty($action['properties']['page_hits'])) {
-                $changePoints['page_hits'] = isset($hitStats['count']) && $hitStats['count'] >= $action['properties']['page_hits'];
+                if (isset($hitStats['count'])) {
+                    $changePoints['page_hits'] = $hitStats['count'] >= $action['properties']['page_hits'];
+                } else {
+                    $changePoints['page_hits'] = false;
+                }
             }
         }
 
@@ -72,13 +78,17 @@ class PointActionHelper
         if ($urlMatches) {
             if (isset($action['properties']['first_time']) && true === $action['properties']['first_time']) {
                 if (!isset($hitStats)) {
-                    $hitStats = $hitRepository->getDwellTimesForUrl($urlWithSqlWC, ['leadId' => $lead->getId()]);
+                    $hitStats = $this->hitRepository->getDwellTimesForUrl($urlWithSqlWC, ['leadId' => $lead->getId()]);
                 }
-                $changePoints['first_time'] = empty($hitStats['count']);
+                if (isset($hitStats['count']) && $hitStats['count']) {
+                    $changePoints['first_time'] = false;
+                } else {
+                    $changePoints['first_time'] = true;
+                }
             }
 
             if ($action['properties']['returns_within'] || $action['properties']['returns_after']) {
-                $latestHit = $hitRepository->getLatestHit(['leadId' => $lead->getId(), 'urls' => [$urlWithSqlWC], 'second_to_last' => $eventDetails->getId()]);
+                $latestHit = $this->hitRepository->getLatestHit(['leadId' => $lead->getId(), 'urls' => [$urlWithSqlWC], 'second_to_last' => $eventDetails->getId()]);
             } else {
                 $latestHit = null;
             }

@@ -12,10 +12,13 @@ use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList as Segment;
 use Mautic\PageBundle\Entity\Page;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-#[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
-#[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
+#[PreserveGlobalState(false)]
+#[RunTestsInSeparateProcesses]
 final class BuilderSubscriberTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
@@ -64,7 +67,7 @@ final class BuilderSubscriberTest extends MauticMysqlTestCase
      * @param mixed[]           $configParams
      * @param array<string,int> $selectorsAndExpectedCounts
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('frequencyFormRenderingDataProvider')]
+    #[DataProvider('frequencyFormRenderingDataProvider')]
     public function testUnsubscribeFormRendersPreferenceCenterPageCorrectly(array $configParams, array $selectorsAndExpectedCounts, bool $hasPreferenceCenter): void
     {
         $emailStat = $this->createStat(
@@ -77,7 +80,7 @@ final class BuilderSubscriberTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
-        $mailHashHelper = static::getContainer()->get(MailHashHelper::class);
+        $mailHashHelper = self::getContainer()->get(MailHashHelper::class);
         $this->assertInstanceOf(MailHashHelper::class, $mailHashHelper);
 
         $unsubscribeUrl = $this->router->generate('mautic_email_unsubscribe', [
@@ -90,7 +93,7 @@ final class BuilderSubscriberTest extends MauticMysqlTestCase
 
         $this->assertTrue($this->client->getResponse()->isSuccessful(), $this->client->getResponse()->getContent());
 
-        $form = $crawler->filter(static::FORM_SELECTOR);
+        $form = $crawler->filter(self::FORM_SELECTOR);
         $html = $form->html();
 
         foreach ($selectorsAndExpectedCounts as $selector => $expectedCount) {
@@ -105,12 +108,12 @@ final class BuilderSubscriberTest extends MauticMysqlTestCase
         }
 
         // Ensure the token and save button are always included within the <form> tag
-        $this->assertCount(1, $form->filter(static::TOKEN_SELECTOR), sprintf('The following HTML does not contain the _token. %s', $html));
+        $this->assertCount(1, $form->filter(self::TOKEN_SELECTOR), sprintf('The following HTML does not contain the _token. %s', $html));
 
         if ($hasPreferenceCenter) {
-            $this->assertCount(1, $form->filter(static::CUSTOM_SAVE_BUTTON_SELECTOR), sprintf('The following HTML does not contain the save button. %s', $html));
+            $this->assertCount(1, $form->filter(self::CUSTOM_SAVE_BUTTON_SELECTOR), sprintf('The following HTML does not contain the save button. %s', $html));
         } else {
-            $this->assertCount(1, $form->filter(static::DEFAULT_SAVE_BUTTON_SELECTOR), sprintf('The following HTML does not contain the save button. %s', $html));
+            $this->assertCount(1, $form->filter(self::DEFAULT_SAVE_BUTTON_SELECTOR), sprintf('The following HTML does not contain the save button. %s', $html));
         }
     }
 
@@ -125,10 +128,10 @@ final class BuilderSubscriberTest extends MauticMysqlTestCase
                 'show_contact_pause_dates'        => 1,
             ],
             [
-                static::CUSTOM_SEGMENT_SELECTOR           => 1, // determined by show_contact_segments
-                static::CUSTOM_CATEGORY_SELECTOR          => 1, // determined by show_contact_categories
-                static::CUSTOM_PREFERRED_CHANNEL_SELECTOR => 1, // determined by show_contact_preferred_channels
-                static::CUSTOM_CHANNEL_FREQ_SELECTOR      => 1, // determined by EITHER show_contact_frequency & show_contact_pause_dates
+                self::CUSTOM_SEGMENT_SELECTOR           => 1, // determined by show_contact_segments
+                self::CUSTOM_CATEGORY_SELECTOR          => 1, // determined by show_contact_categories
+                self::CUSTOM_PREFERRED_CHANNEL_SELECTOR => 1, // determined by show_contact_preferred_channels
+                self::CUSTOM_CHANNEL_FREQ_SELECTOR      => 1, // determined by EITHER show_contact_frequency & show_contact_pause_dates
             ],
             true,
         ];
@@ -142,10 +145,10 @@ final class BuilderSubscriberTest extends MauticMysqlTestCase
                 'show_contact_pause_dates'        => 1,
             ],
             [
-                static::CUSTOM_SEGMENT_SELECTOR           => 0, // determined by show_contact_segments
-                static::CUSTOM_CATEGORY_SELECTOR          => 0, // determined by show_contact_categories
-                static::CUSTOM_PREFERRED_CHANNEL_SELECTOR => 1, // determined by show_contact_preferred_channels
-                static::CUSTOM_CHANNEL_FREQ_SELECTOR      => 1, // determined by EITHER show_contact_frequency & show_contact_pause_dates
+                self::CUSTOM_SEGMENT_SELECTOR           => 0, // determined by show_contact_segments
+                self::CUSTOM_CATEGORY_SELECTOR          => 0, // determined by show_contact_categories
+                self::CUSTOM_PREFERRED_CHANNEL_SELECTOR => 1, // determined by show_contact_preferred_channels
+                self::CUSTOM_CHANNEL_FREQ_SELECTOR      => 1, // determined by EITHER show_contact_frequency & show_contact_pause_dates
             ],
             true,
         ];
@@ -159,10 +162,10 @@ final class BuilderSubscriberTest extends MauticMysqlTestCase
                 'show_contact_pause_dates'        => 0,
             ],
             [
-                static::CUSTOM_SEGMENT_SELECTOR           => 1, // determined by show_contact_segments
-                static::CUSTOM_CATEGORY_SELECTOR          => 1, // determined by show_contact_categories
-                static::CUSTOM_PREFERRED_CHANNEL_SELECTOR => 0, // determined by show_contact_preferred_channels
-                static::CUSTOM_CHANNEL_FREQ_SELECTOR      => 0, // determined by EITHER show_contact_frequency & show_contact_pause_dates
+                self::CUSTOM_SEGMENT_SELECTOR           => 1, // determined by show_contact_segments
+                self::CUSTOM_CATEGORY_SELECTOR          => 1, // determined by show_contact_categories
+                self::CUSTOM_PREFERRED_CHANNEL_SELECTOR => 0, // determined by show_contact_preferred_channels
+                self::CUSTOM_CHANNEL_FREQ_SELECTOR      => 0, // determined by EITHER show_contact_frequency & show_contact_pause_dates
             ],
             true,
         ];
@@ -176,10 +179,10 @@ final class BuilderSubscriberTest extends MauticMysqlTestCase
                 'show_contact_pause_dates'        => 0,
             ],
             [
-                static::CUSTOM_SEGMENT_SELECTOR           => 0, // determined by show_contact_segments
-                static::CUSTOM_CATEGORY_SELECTOR          => 0, // determined by show_contact_categories
-                static::CUSTOM_PREFERRED_CHANNEL_SELECTOR => 0, // determined by show_contact_preferred_channels
-                static::CUSTOM_CHANNEL_FREQ_SELECTOR      => 1, // determined by EITHER show_contact_frequency & show_contact_pause_dates
+                self::CUSTOM_SEGMENT_SELECTOR           => 0, // determined by show_contact_segments
+                self::CUSTOM_CATEGORY_SELECTOR          => 0, // determined by show_contact_categories
+                self::CUSTOM_PREFERRED_CHANNEL_SELECTOR => 0, // determined by show_contact_preferred_channels
+                self::CUSTOM_CHANNEL_FREQ_SELECTOR      => 1, // determined by EITHER show_contact_frequency & show_contact_pause_dates
             ],
             true,
         ];
@@ -193,11 +196,11 @@ final class BuilderSubscriberTest extends MauticMysqlTestCase
                 'show_contact_pause_dates'        => 1,
             ],
             [
-                static::CUSTOM_SEGMENT_SELECTOR           => 0, // determined by show_contact_segments
-                static::CUSTOM_CATEGORY_SELECTOR          => 0, // determined by show_contact_categories
-                static::CUSTOM_PREFERRED_CHANNEL_SELECTOR => 0, // determined by show_contact_preferred_channels
-                static::CUSTOM_CHANNEL_FREQ_SELECTOR      => 0, // determined by show_contact_frequency
-                static::DEFAULT_PAUSE_DATES_SELECTOR      => 1, // determined by show_contact_pause_dates
+                self::CUSTOM_SEGMENT_SELECTOR           => 0, // determined by show_contact_segments
+                self::CUSTOM_CATEGORY_SELECTOR          => 0, // determined by show_contact_categories
+                self::CUSTOM_PREFERRED_CHANNEL_SELECTOR => 0, // determined by show_contact_preferred_channels
+                self::CUSTOM_CHANNEL_FREQ_SELECTOR      => 0, // determined by show_contact_frequency
+                self::DEFAULT_PAUSE_DATES_SELECTOR      => 1, // determined by show_contact_pause_dates
             ],
             true,
         ];
@@ -211,10 +214,10 @@ final class BuilderSubscriberTest extends MauticMysqlTestCase
                 'show_contact_pause_dates'        => 0,
             ],
             [
-                static::CUSTOM_SEGMENT_SELECTOR           => 0, // determined by show_contact_segments
-                static::CUSTOM_CATEGORY_SELECTOR          => 0, // determined by show_contact_categories
-                static::CUSTOM_PREFERRED_CHANNEL_SELECTOR => 0, // determined by show_contact_preferred_channels
-                static::CUSTOM_CHANNEL_FREQ_SELECTOR      => 0, // determined by EITHER show_contact_frequency & show_contact_pause_dates
+                self::CUSTOM_SEGMENT_SELECTOR           => 0, // determined by show_contact_segments
+                self::CUSTOM_CATEGORY_SELECTOR          => 0, // determined by show_contact_categories
+                self::CUSTOM_PREFERRED_CHANNEL_SELECTOR => 0, // determined by show_contact_preferred_channels
+                self::CUSTOM_CHANNEL_FREQ_SELECTOR      => 0, // determined by EITHER show_contact_frequency & show_contact_pause_dates
             ],
             true,
         ];
@@ -228,11 +231,11 @@ final class BuilderSubscriberTest extends MauticMysqlTestCase
                 'show_contact_pause_dates'        => 1,
             ],
             [
-                static::DEFAULT_SEGMENT_SELECTOR           => 1, // determined by show_contact_segments
-                static::DEFAULT_CATEGORY_SELECTOR          => 1, // determined by show_contact_categories
-                static::DEFAULT_PREFERRED_CHANNEL_SELECTOR => 1, // determined by show_contact_preferred_channels
-                static::DEFAULT_CHANNEL_FREQ_SELECTOR      => 1, // determined by show_contact_frequency. This differs from a custom page.
-                static::DEFAULT_PAUSE_DATES_SELECTOR       => 1, // determined FIRST by show_contact_frequency, then by show_contact_pause_dates
+                self::DEFAULT_SEGMENT_SELECTOR           => 1, // determined by show_contact_segments
+                self::DEFAULT_CATEGORY_SELECTOR          => 1, // determined by show_contact_categories
+                self::DEFAULT_PREFERRED_CHANNEL_SELECTOR => 1, // determined by show_contact_preferred_channels
+                self::DEFAULT_CHANNEL_FREQ_SELECTOR      => 1, // determined by show_contact_frequency. This differs from a custom page.
+                self::DEFAULT_PAUSE_DATES_SELECTOR       => 1, // determined FIRST by show_contact_frequency, then by show_contact_pause_dates
             ],
             false,
         ];
@@ -246,11 +249,11 @@ final class BuilderSubscriberTest extends MauticMysqlTestCase
                 'show_contact_pause_dates'        => 1,
             ],
             [
-                static::DEFAULT_SEGMENT_SELECTOR           => 0, // determined by show_contact_segments
-                static::DEFAULT_CATEGORY_SELECTOR          => 0, // determined by show_contact_categories
-                static::DEFAULT_PREFERRED_CHANNEL_SELECTOR => 1, // determined by show_contact_preferred_channels
-                static::DEFAULT_CHANNEL_FREQ_SELECTOR      => 1, // determined by show_contact_frequency. This differs from a custom page.
-                static::DEFAULT_PAUSE_DATES_SELECTOR       => 1, // determined FIRST by show_contact_frequency, then by show_contact_pause_dates
+                self::DEFAULT_SEGMENT_SELECTOR           => 0, // determined by show_contact_segments
+                self::DEFAULT_CATEGORY_SELECTOR          => 0, // determined by show_contact_categories
+                self::DEFAULT_PREFERRED_CHANNEL_SELECTOR => 1, // determined by show_contact_preferred_channels
+                self::DEFAULT_CHANNEL_FREQ_SELECTOR      => 1, // determined by show_contact_frequency. This differs from a custom page.
+                self::DEFAULT_PAUSE_DATES_SELECTOR       => 1, // determined FIRST by show_contact_frequency, then by show_contact_pause_dates
             ],
             false,
         ];
@@ -264,11 +267,11 @@ final class BuilderSubscriberTest extends MauticMysqlTestCase
                 'show_contact_pause_dates'        => 0,
             ],
             [
-                static::DEFAULT_SEGMENT_SELECTOR           => 1, // determined by show_contact_segments
-                static::DEFAULT_CATEGORY_SELECTOR          => 1, // determined by show_contact_categories
-                static::DEFAULT_PREFERRED_CHANNEL_SELECTOR => 0, // determined by show_contact_preferred_channels
-                static::DEFAULT_CHANNEL_FREQ_SELECTOR      => 0, // determined by show_contact_frequency. This differs from a custom page.
-                static::DEFAULT_PAUSE_DATES_SELECTOR       => 0, // determined FIRST by show_contact_frequency, then by show_contact_pause_dates
+                self::DEFAULT_SEGMENT_SELECTOR           => 1, // determined by show_contact_segments
+                self::DEFAULT_CATEGORY_SELECTOR          => 1, // determined by show_contact_categories
+                self::DEFAULT_PREFERRED_CHANNEL_SELECTOR => 0, // determined by show_contact_preferred_channels
+                self::DEFAULT_CHANNEL_FREQ_SELECTOR      => 0, // determined by show_contact_frequency. This differs from a custom page.
+                self::DEFAULT_PAUSE_DATES_SELECTOR       => 0, // determined FIRST by show_contact_frequency, then by show_contact_pause_dates
             ],
             false,
         ];
@@ -282,11 +285,11 @@ final class BuilderSubscriberTest extends MauticMysqlTestCase
                 'show_contact_pause_dates'        => 0,
             ],
             [
-                static::DEFAULT_SEGMENT_SELECTOR           => 0, // determined by show_contact_segments
-                static::DEFAULT_CATEGORY_SELECTOR          => 0, // determined by show_contact_categories
-                static::DEFAULT_PREFERRED_CHANNEL_SELECTOR => 0, // determined by show_contact_preferred_channels
-                static::DEFAULT_CHANNEL_FREQ_SELECTOR      => 1, // determined by show_contact_frequency. This differs from a custom page.
-                static::DEFAULT_PAUSE_DATES_SELECTOR       => 0, // determined FIRST by show_contact_frequency, then by show_contact_pause_dates
+                self::DEFAULT_SEGMENT_SELECTOR           => 0, // determined by show_contact_segments
+                self::DEFAULT_CATEGORY_SELECTOR          => 0, // determined by show_contact_categories
+                self::DEFAULT_PREFERRED_CHANNEL_SELECTOR => 0, // determined by show_contact_preferred_channels
+                self::DEFAULT_CHANNEL_FREQ_SELECTOR      => 1, // determined by show_contact_frequency. This differs from a custom page.
+                self::DEFAULT_PAUSE_DATES_SELECTOR       => 0, // determined FIRST by show_contact_frequency, then by show_contact_pause_dates
             ],
             false,
         ];
@@ -300,11 +303,11 @@ final class BuilderSubscriberTest extends MauticMysqlTestCase
                 'show_contact_pause_dates'        => 1,
             ],
             [
-                static::DEFAULT_SEGMENT_SELECTOR           => 0, // determined by show_contact_segments
-                static::DEFAULT_CATEGORY_SELECTOR          => 0, // determined by show_contact_categories
-                static::DEFAULT_PREFERRED_CHANNEL_SELECTOR => 0, // determined by show_contact_preferred_channels
-                static::DEFAULT_CHANNEL_FREQ_SELECTOR      => 0, // determined by show_contact_frequency. This differs from a custom page.
-                static::DEFAULT_PAUSE_DATES_SELECTOR       => 0, // determined FIRST by show_contact_frequency, then by show_contact_pause_dates
+                self::DEFAULT_SEGMENT_SELECTOR           => 0, // determined by show_contact_segments
+                self::DEFAULT_CATEGORY_SELECTOR          => 0, // determined by show_contact_categories
+                self::DEFAULT_PREFERRED_CHANNEL_SELECTOR => 0, // determined by show_contact_preferred_channels
+                self::DEFAULT_CHANNEL_FREQ_SELECTOR      => 0, // determined by show_contact_frequency. This differs from a custom page.
+                self::DEFAULT_PAUSE_DATES_SELECTOR       => 0, // determined FIRST by show_contact_frequency, then by show_contact_pause_dates
             ],
             false,
         ];
@@ -318,11 +321,11 @@ final class BuilderSubscriberTest extends MauticMysqlTestCase
                 'show_contact_pause_dates'        => 0,
             ],
             [
-                static::DEFAULT_SEGMENT_SELECTOR           => 0, // determined by show_contact_segments
-                static::DEFAULT_CATEGORY_SELECTOR          => 0, // determined by show_contact_categories
-                static::DEFAULT_PREFERRED_CHANNEL_SELECTOR => 0, // determined by show_contact_preferred_channels
-                static::DEFAULT_CHANNEL_FREQ_SELECTOR      => 0, // determined by show_contact_frequency. This differs from a custom page.
-                static::DEFAULT_PAUSE_DATES_SELECTOR       => 0, // determined FIRST by show_contact_frequency, then by show_contact_pause_dates
+                self::DEFAULT_SEGMENT_SELECTOR           => 0, // determined by show_contact_segments
+                self::DEFAULT_CATEGORY_SELECTOR          => 0, // determined by show_contact_categories
+                self::DEFAULT_PREFERRED_CHANNEL_SELECTOR => 0, // determined by show_contact_preferred_channels
+                self::DEFAULT_CHANNEL_FREQ_SELECTOR      => 0, // determined by show_contact_frequency. This differs from a custom page.
+                self::DEFAULT_PAUSE_DATES_SELECTOR       => 0, // determined FIRST by show_contact_frequency, then by show_contact_pause_dates
             ],
             false,
         ];

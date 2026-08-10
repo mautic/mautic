@@ -36,7 +36,7 @@ final class SearchSubscriberTest extends TestCase
         $emailRepository   = $this->createStub(EmailRepository::class);
         $connection        = $this->getMockedConnection();
         $mockPlatform      = $this->createMock(AbstractPlatform::class);
-        $leadModel         = $this->createMock(LeadModel::class);
+        $leadModel         = $this->createStub(LeadModel::class);
         $companyModel      = $this->createStub(CompanyModel::class);
         $listModel         = $this->createStub(ListModel::class);
         $translator        = $this->createMock(TranslatorInterface::class);
@@ -85,9 +85,6 @@ final class SearchSubscriberTest extends TestCase
         $contactRepository->method('createQueryBuilder')
             ->willReturn(new QueryBuilder($connection));
 
-        $leadModel->method('getRepository')
-            ->willReturn($contactRepository);
-
         $translator
             ->method('trans')
             ->willReturnCallback(function (string $key): ?string {
@@ -102,7 +99,8 @@ final class SearchSubscriberTest extends TestCase
             $translator,
             $security,
             $twig,
-            $globalSearch
+            $globalSearch,
+            $contactRepository
         );
 
         $dispatcher = new EventDispatcher();

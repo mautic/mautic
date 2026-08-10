@@ -24,7 +24,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class ConfigType extends AbstractType
+final class ConfigType extends AbstractType
 {
     public const MINIFY_EMAIL_HTML = 'minify_email_html';
 
@@ -245,9 +245,7 @@ class ConfigType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]
@@ -266,11 +264,27 @@ class ConfigType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.email.required',
-                        ]
+                        message: 'mautic.core.email.required'
                     ),
-                    new EmailOrEmailTokenList(['allowMultiple' => false]),
+                    new EmailOrEmailTokenList(allowMultiple: false),
+                ],
+            ]
+        );
+
+        $builder->add(
+            'mailer_reply_to_email',
+            TextType::class,
+            [
+                'label'       => 'mautic.email.reply_to_email',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => [
+                    'class'    => 'form-control',
+                    'tooltip'  => 'mautic.email.reply_to_email.tooltip',
+                    'onchange' => 'Mautic.disableSendTestEmailButton(this)',
+                ],
+                'required'    => false,
+                'constraints' => [
+                    new Email(message: 'mautic.core.email.required', mode: Email::VALIDATION_MODE_HTML5),
                 ],
             ]
         );
@@ -289,32 +303,7 @@ class ConfigType extends AbstractType
                 'required'    => false,
                 'constraints' => [
                     new Email(
-                        [
-                            'message' => 'mautic.core.email.required',
-                            'mode'    => Email::VALIDATION_MODE_HTML5,
-                        ]
-                    ),
-                ],
-            ]
-        );
-
-        $builder->add(
-            'mailer_reply_to_email',
-            TextType::class,
-            [
-                'label'       => 'mautic.email.reply_to_email',
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => [
-                    'class'    => 'form-control',
-                    'tooltip'  => 'mautic.email.reply_to_email.tooltip',
-                    'onchange' => 'Mautic.disableSendTestEmailButton(this)',
-                ],
-                'required'    => false,
-                'constraints' => [
-                    new Email(
-                        [
-                            'message' => 'mautic.core.email.required',
-                        ]
+                        message: 'mautic.core.email.required'
                     ),
                 ],
             ]

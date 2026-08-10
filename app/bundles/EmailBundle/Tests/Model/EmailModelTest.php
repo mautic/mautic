@@ -7,6 +7,8 @@ namespace Mautic\EmailBundle\Tests\Model;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
+use Mautic\CampaignBundle\Entity\CampaignRepository;
+use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\ChannelBundle\Entity\MessageQueueRepository;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Entity\IpAddress;
@@ -20,15 +22,18 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Test\Doctrine\DBALMocker;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Entity\CopyRepository;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatDevice;
+use Mautic\EmailBundle\Entity\StatDeviceRepository;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Event\EmailEvent;
 use Mautic\EmailBundle\Helper\BotRatioHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Helper\StatsCollectionHelper;
+use Mautic\EmailBundle\Model\AbTest\EmailVariantConverterService;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Model\EmailStatModel;
 use Mautic\EmailBundle\Model\SendEmailToContact;
@@ -42,15 +47,18 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PageBundle\Entity\RedirectRepository;
+use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -276,7 +284,17 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->emailStatModel,
             $this->botRatioHelperMock,
             $this->abTestSettingsServiceMock,
-            $this->createStub(\Mautic\EmailBundle\Model\AbTest\EmailVariantConverterService::class),
+            $this->createStub(EmailVariantConverterService::class),
+            $this->emailRepository, // $emailRepository
+            $this->createStub(CopyRepository::class), // $copyRepository
+            $this->createStub(StatDeviceRepository::class), // $statDeviceRepository
+            $this->leadDeviceRepository, // $leadDeviceRepository
+            $this->createStub(CampaignRepository::class), // $campaignRepository
+            $this->createStub(DoNotContactRepository::class), // $doNotContactRepository
+            $this->createStub(TrackableRepository::class), // $trackableRepository
+            $this->createStub(LeadRepository::class), // $leadRepository
+            $this->createStub(LeadEventLogRepository::class), // $leadEventLogRepository
+            $this->companyRepository, // $companyRepository
         );
 
         $this->emailStatModel->method('getRepository')->willReturn($this->statRepository);
@@ -384,16 +402,6 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
 
         $this->frequencyRepository->method('getAppliedFrequencyRules')
             ->willReturn([]);
-
-        $this->entityManager
-            ->method('getRepository')
-            ->willReturnMap(
-                [
-                    [\Mautic\LeadBundle\Entity\FrequencyRule::class, $this->frequencyRepository],
-                    [Email::class, $this->emailRepository],
-                    [Stat::class, $this->statRepository],
-                ]
-            );
 
         $this->companyRepository->method('getCompaniesForContacts')
             ->willReturn([]);
@@ -529,16 +537,6 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->frequencyRepository->method('getAppliedFrequencyRules')
             ->willReturn([]);
 
-        $this->entityManager
-            ->method('getRepository')
-            ->willReturnMap(
-                [
-                    [\Mautic\LeadBundle\Entity\FrequencyRule::class, $this->frequencyRepository],
-                    [Email::class, $this->emailRepository],
-                    [Stat::class, $this->statRepository],
-                ]
-            );
-
         $this->companyRepository->method('getCompaniesForContacts')
             ->willReturn([]);
 
@@ -589,19 +587,9 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->emailRepository->method('getDoNotEmailList')
             ->willReturn([1 => 'someone@domain.com']);
 
-        $this->entityManager
-            ->method('getRepository')
-            ->willReturnMap(
-                [
-                    [Email::class, $this->emailRepository],
-                    [Stat::class, $this->statRepository],
-                    [\Mautic\LeadBundle\Entity\FrequencyRule::class, $this->frequencyRepository],
-                ]
-            );
-
         // If it makes it to the point of calling getContactCompanies then DNC failed
-        $this->companyModel->expects($this->exactly(0))
-            ->method('getRepository');
+        $this->companyRepository->expects($this->exactly(0))
+            ->method('getCompaniesForContacts');
 
         $this->emailEntity->method('getId')
             ->willReturn(1);
@@ -609,7 +597,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(0, $this->emailModel->sendEmail($this->emailEntity, [1 => ['id' => 1, 'email' => 'someone@domain.com']]));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataStatRecordExistance')]
+    #[DataProvider('dataStatRecordExistance')]
     public function testSendSegmentEmailToContact(bool $recordExist): void
     {
         $sendToContactModelMock  = $this->createMock(SendEmailToContact::class);
@@ -641,7 +629,17 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->emailStatModel,
             $this->botRatioHelperMock,
             $this->abTestSettingsServiceMock,
-            $this->createStub(\Mautic\EmailBundle\Model\AbTest\EmailVariantConverterService::class),
+            $this->createStub(EmailVariantConverterService::class),
+            $this->emailRepository, // $emailRepository
+            $this->createStub(CopyRepository::class), // $copyRepository
+            $this->createStub(StatDeviceRepository::class), // $statDeviceRepository
+            $this->leadDeviceRepository, // $leadDeviceRepository
+            $this->createStub(CampaignRepository::class), // $campaignRepository
+            $this->createStub(DoNotContactRepository::class), // $doNotContactRepository
+            $this->createStub(TrackableRepository::class), // $trackableRepository
+            $this->createStub(LeadRepository::class), // $leadRepository
+            $this->createStub(LeadEventLogRepository::class), // $leadEventLogRepository
+            $this->companyRepository, // $companyRepository
         );
 
         $contacts = [
@@ -665,16 +663,6 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
 
         $this->companyModel->method('getRepository')
             ->willReturn($this->companyRepository);
-
-        $this->entityManager
-            ->method('getRepository')
-            ->willReturnMap(
-                [
-                    [\Mautic\LeadBundle\Entity\FrequencyRule::class, $this->frequencyRepository],
-                    [Email::class, $this->emailRepository],
-                    [Stat::class, $this->statRepository],
-                ]
-            );
 
         $email = new class() extends Email {
             public function getId(): int
@@ -729,16 +717,6 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->frequencyRepository->method('getAppliedFrequencyRules')
             ->willReturn([['lead_id' => 1, 'frequency_number' => 1, 'frequency_time' => 'DAY']]);
 
-        $this->entityManager
-            ->method('getRepository')
-            ->willReturnMap(
-                [
-                    [Email::class, $this->emailRepository],
-                    [Stat::class, $this->statRepository],
-                    [\Mautic\LeadBundle\Entity\FrequencyRule::class, $this->frequencyRepository],
-                    [\Mautic\ChannelBundle\Entity\MessageQueue::class, $this->createStub(MessageQueueRepository::class)],
-                ]
-            );
         $leadEntity = (new Lead())
             ->setEmail('someone@domain.com');
 
@@ -751,16 +729,21 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
         $coreParametersHelper = $this->createStub(CoreParametersHelper::class);
 
         $messageModel = new MessageQueueModel(
-            $this->leadModel,
-            $this->companyModel,
-            $coreParametersHelper,
             $this->entityManager,
             $this->createStub(CorePermissions::class),
             $this->eventDispatcher,
             $this->createStub(UrlGeneratorInterface::class),
             $this->translator,
             $this->userHelper,
-            $this->createStub(LoggerInterface::class)
+            $this->createStub(LoggerInterface::class),
+            $coreParametersHelper,
+        );
+        $messageModel->autowireMessageQueueModel(
+            $this->leadModel,
+            $this->companyModel,
+            $this->createStub(MessageQueueRepository::class),
+            $this->frequencyRepository,
+            $this->createStub(LeadRepository::class)
         );
 
         $emailModel = new EmailModel(
@@ -791,7 +774,17 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->emailStatModel,
             $this->botRatioHelperMock,
             $this->abTestSettingsServiceMock,
-            $this->createStub(\Mautic\EmailBundle\Model\AbTest\EmailVariantConverterService::class),
+            $this->createStub(EmailVariantConverterService::class),
+            $this->emailRepository, // $emailRepository
+            $this->createStub(CopyRepository::class), // $copyRepository
+            $this->createStub(StatDeviceRepository::class), // $statDeviceRepository
+            $this->leadDeviceRepository, // $leadDeviceRepository
+            $this->createStub(CampaignRepository::class), // $campaignRepository
+            $this->createStub(DoNotContactRepository::class), // $doNotContactRepository
+            $this->createStub(TrackableRepository::class), // $trackableRepository
+            $this->createStub(LeadRepository::class), // $leadRepository
+            $this->createStub(LeadEventLogRepository::class), // $leadEventLogRepository
+            $this->companyRepository, // $companyRepository
         );
 
         $this->emailEntity->method('getId')
@@ -854,10 +847,8 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->entityManager->expects($this->exactly(2))
             ->method('flush');
 
-        $this->entityManager->expects($this->exactly(0))
-            ->method('getRepository')
-            ->with(LeadDevice::class)
-            ->willReturn($this->leadDeviceRepository);
+        $this->leadDeviceRepository->expects($this->never())
+            ->method('find');
 
         $this->botRatioHelperMock->expects($this->once())
             ->method('isHitByBot')
@@ -911,11 +902,6 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $this->entityManager->expects($this->once())
-            ->method('getRepository')
-            ->with(LeadDevice::class)
-            ->willReturn($this->leadDeviceRepository);
-
         $this->entityManager->expects($this->exactly(2))
             ->method('flush');
 
@@ -928,10 +914,6 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
 
     public function testGetLookupResultsWithNameIsKey(): void
     {
-        $this->entityManager->expects($this->once())
-            ->method('getRepository')
-            ->willReturn($this->emailRepository);
-
         $this->emailRepository->expects($this->once())
             ->method('getEmailList')
             ->with(
@@ -960,10 +942,6 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
 
     public function testGetLookupResultsWithWithDefaultOptions(): void
     {
-        $this->entityManager->expects($this->once())
-            ->method('getRepository')
-            ->willReturn($this->emailRepository);
-
         $this->emailRepository->expects($this->once())
             ->method('getEmailList')
             ->with(
@@ -1034,7 +1012,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
                 [
                     [Stat::class, $this->statRepository],
                     [DoNotContactEntity::class, $doNotContactRepo],
-                    [\Mautic\PageBundle\Entity\Trackable::class, $trackableRepo],
+                    [Trackable::class, $trackableRepo],
                 ]
             );
 

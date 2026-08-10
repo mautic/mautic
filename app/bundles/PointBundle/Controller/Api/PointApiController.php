@@ -26,7 +26,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Point>
  */
-class PointApiController extends CommonApiController
+final class PointApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
@@ -47,7 +47,7 @@ class PointApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        protected LeadModel $leadModel,
+        private LeadModel $leadModel,
         PointModel $pointModel,
     ) {
         $this->model            = $pointModel;
@@ -80,10 +80,8 @@ class PointApiController extends CommonApiController
      * @param int    $leadId
      * @param string $operator
      * @param int    $delta
-     *
-     * @return Response
      */
-    public function adjustPointsAction(Request $request, IpLookupHelper $ipLookupHelper, $leadId, $operator, $delta)
+    public function adjustPointsAction(Request $request, IpLookupHelper $ipLookupHelper, $leadId, $operator, $delta): Response
     {
         $lead = $this->checkLeadAccess($leadId, 'edit');
         if ($lead instanceof Response) {
@@ -104,12 +102,11 @@ class PointApiController extends CommonApiController
      *
      * @param int $delta
      */
-    protected function logApiPointChange(Request $request, IpLookupHelper $ipLookupHelper, $lead, $delta, $operator)
+    protected function logApiPointChange(Request $request, IpLookupHelper $ipLookupHelper, $lead, $delta, $operator): void
     {
-        $trans      = $this->translator;
         $ip         = $ipLookupHelper->getIpAddress();
-        $eventName  = InputHelper::clean($request->request->get('eventName', $trans->trans('mautic.lead.lead.submitaction.operator_'.$operator)));
-        $actionName = InputHelper::clean($request->request->get('actionName', $trans->trans('mautic.lead.event.api')));
+        $eventName  = InputHelper::clean($request->request->get('eventName', $this->translator->trans('mautic.lead.lead.submitaction.operator_'.$operator)));
+        $actionName = InputHelper::clean($request->request->get('actionName', $this->translator->trans('mautic.lead.event.api')));
 
         $lead->adjustPoints($delta, $operator);
         $lead->addPointsChangeLogEntry('API', $eventName, $actionName, $delta, $ip);

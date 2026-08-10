@@ -7,15 +7,18 @@ namespace Mautic\LeadBundle\Tests\Controller;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Command\SegmentCountCacheCommand;
+use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Model\ProjectModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,7 +30,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
 
     private LeadListRepository $listRepo;
 
-    protected SegmentCountCacheHelper $segmentCountCacheHelper;
+    private SegmentCountCacheHelper $segmentCountCacheHelper;
 
     private LeadRepository $leadRepo;
 
@@ -40,18 +43,16 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->configParams['update_segment_contact_count_in_background'] = 'testSegmentCountInBackground' === $this->name();
         $this->configParams['delete_segment_in_background']               = false;
         parent::setUp();
-        $this->listModel = static::getContainer()->get('mautic.lead.model.list');
+        $this->listModel = self::getContainer()->get(ListModel::class);
         $this->assertInstanceOf(ListModel::class, $this->listModel);
         $this->listRepo = $this->listModel->getRepository();
-        $this->assertInstanceOf(LeadListRepository::class, $this->listRepo);
         /** @var LeadModel $leadModel */
-        $leadModel = static::getContainer()->get('mautic.lead.model.lead');
+        $leadModel = self::getContainer()->get(LeadModel::class);
         $this->assertInstanceOf(LeadModel::class, $leadModel);
-        $this->segmentCountCacheHelper = static::getContainer()->get('mautic.helper.segment.count.cache');
+        $this->segmentCountCacheHelper = self::getContainer()->get(SegmentCountCacheHelper::class);
         $this->leadRepo                = $leadModel->getRepository();
-        $this->assertInstanceOf(LeadRepository::class, $this->leadRepo);
         $this->prefix                  = self::getContainer()->getParameter('mautic.db_table_prefix');
-        $this->translator              = self::getContainer()->get('translator');
+        $this->translator              = self::getContainer()->get(TranslatorInterface::class);
         $this->assertInstanceOf(TranslatorInterface::class, $this->translator);
     }
 
@@ -170,7 +171,6 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $segment = $this->listRepo->find($segmentId);
         $this->assertInstanceOf(LeadList::class, $segment);
         $this->assertInstanceOf(\DateTimeInterface::class, $segment->getLastBuiltDate());
-        $this->assertInstanceOf(LeadList::class, $segment);
 
         // Set last built date in the future to allow testing without waiting.
         // (Same second built date as the modified date is shown as "Building" still in the UI).
@@ -806,7 +806,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertNotInstanceOf(LeadList::class, $segmentExistCheck);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dateFieldProvider')]
+    #[DataProvider('dateFieldProvider')]
     public function testWarningOnInvalidDateField(?string $filter, bool $shouldContainError, string $operator = '='): void
     {
         $segment = $this->saveSegment(
@@ -875,7 +875,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/view/'.$segment->getId());
         $this->assertResponseIsSuccessful();
 
-        $translator = self::getContainer()->get('translator');
+        $translator = self::getContainer()->get(TranslatorInterface::class);
 
         $this->assertStringContainsString($translator->trans('mautic.core.recent.activity'), (string) $this->client->getResponse()->getContent());
         $this->assertCount(2, $crawler->filterXPath('//ul[contains(@class, "media-list-feed")]/li'));
@@ -891,14 +891,14 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $contact2->setFirstname('DNC');
         $this->em->persist($contact2);
         $this->em->flush();
-        $segmentContact1 = new \Mautic\LeadBundle\Entity\ListLead();
+        $segmentContact1 = new ListLead();
         $segmentContact1->setList($segment);
         $segmentContact1->setLead($contact1);
         $segmentContact1->setDateAdded(new \DateTime());
         $segmentContact1->setManuallyAdded(false);
         $segmentContact1->setManuallyRemoved(false);
         $this->em->persist($segmentContact1);
-        $segmentContact2 = new \Mautic\LeadBundle\Entity\ListLead();
+        $segmentContact2 = new ListLead();
         $segmentContact2->setList($segment);
         $segmentContact2->setLead($contact2);
         $segmentContact2->setDateAdded(new \DateTime());
@@ -906,10 +906,10 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $segmentContact2->setManuallyRemoved(false);
         $this->em->persist($segmentContact2);
         $this->em->flush();
-        $dnc = new \Mautic\LeadBundle\Entity\DoNotContact();
+        $dnc = new DoNotContact();
         $dnc->setChannel('email');
         $dnc->setLead($contact2);
-        $dnc->setReason(\Mautic\LeadBundle\Entity\DoNotContact::UNSUBSCRIBED);
+        $dnc->setReason(DoNotContact::UNSUBSCRIBED);
         $dnc->setDateAdded(new \DateTime());
         $this->em->persist($dnc);
         $this->em->flush();
@@ -921,6 +921,84 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('2', (string) $html);
         $this->assertStringContainsString('Active contacts', (string) $html);
         $this->assertStringContainsString('1', (string) $html);
+    }
+
+    /**
+     * @param array<mixed> $filter
+     */
+    #[DataProvider('relativeDateInvalidIntervalValues')]
+    public function testSegmentRelativeDateFilterOnlySupportPositiveNumber(string $operator, array $filter, string $interval, string $message): void
+    {
+        $filterData = [[
+            'glue'        => 'and',
+            'field'       => 'date_identified',
+            'object'      => 'lead',
+            'type'        => 'datetime',
+            'operator'    => $operator,
+            'properties'  => [
+                'filter' => $filter,
+            ],
+        ]];
+        $list = $this->saveSegment('s1', 's1', $filterData);
+        $this->em->clear();
+
+        $this->client->request(Request::METHOD_POST, '/s/ajax', ['action' => 'togglePublishStatus', 'model' => 'lead.list', 'id' => $list->getId()]);
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$list->getId());
+        $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
+        $form['leadlist[filters][0][properties][filter][interval]']->setValue($interval);
+
+        $this->client->submit($form);
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        $this->assertStringContainsString($message, (string) $this->client->getResponse()->getContent());
+
+        $rows = $this->listRepo->findAll();
+        $this->assertCount(1, $rows);
+    }
+
+    public static function relativeDateInvalidIntervalValues(): iterable
+    {
+        yield [
+            'inLast',
+            [
+                'interval' => '1',
+                'unit'     => 'day',
+            ],
+            '-2',
+            'This value should be positive.',
+        ];
+
+        yield [
+            'inNext',
+            [
+                'interval' => '1',
+                'unit'     => 'day',
+            ],
+            'foo',
+            'Please enter an integer.',
+        ];
+
+        yield [
+            'inLast',
+            [
+                'interval' => '1',
+                'unit'     => 'day',
+            ],
+            '2.5',
+            'Please enter an integer.',
+        ];
+
+        yield [
+            'inLast',
+            [
+                'interval' => '',
+                'unit'     => 'day',
+            ],
+            '',
+            'This value should not be blank.',
+        ];
     }
 
     /**

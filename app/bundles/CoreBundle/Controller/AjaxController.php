@@ -13,6 +13,7 @@ use Mautic\CoreBundle\IpLookup\AbstractLocalDataLookup;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Mautic\CoreBundle\IpLookup\IpLookupFormInterface;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Service\SearchCommandListInterface;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -21,14 +22,16 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class AjaxController extends CommonController
 {
-    private \Mautic\CoreBundle\Model\NotificationModel $notificationModel;
+    private NotificationModel $notificationModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireCoreAjaxController(\Mautic\CoreBundle\Model\NotificationModel $notificationModel): void
-    {
+    #[Required]
+    public function autowireCoreAjaxController(
+        NotificationModel $notificationModel,
+    ): void {
         $this->notificationModel = $notificationModel;
     }
 
@@ -154,17 +157,16 @@ class AjaxController extends CommonController
         $model      = InputHelper::clean($request->query->get('model'));
         $commands   = $this->getModel($model)->getCommandList();
         $dataArray  = [];
-        $translator = $this->translator;
         foreach ($commands as $k => $c) {
             if (is_array($c)) {
                 foreach ($c as $subc) {
-                    $command = $translator->trans($k);
+                    $command = $this->translator->trans($k);
                     $command = (!str_contains($command, ':')) ? $command.':' : $command;
 
-                    $dataArray[$command.$translator->trans($subc)] = ['value' => $command.$translator->trans($subc)];
+                    $dataArray[$command.$this->translator->trans($subc)] = ['value' => $command.$this->translator->trans($subc)];
                 }
             } else {
-                $command = $translator->trans($c);
+                $command = $this->translator->trans($c);
                 $command = (!str_contains($command, ':')) ? $command.':' : $command;
 
                 $dataArray[$command] = ['value' => $command];
@@ -178,7 +180,6 @@ class AjaxController extends CommonController
     public function globalCommandListAction(SearchCommandListInterface $searchCommandList): JsonResponse
     {
         $allCommands = $searchCommandList->getList();
-        $translator  = $this->translator;
         $dataArray   = [];
         $dupChecker  = [];
         foreach ($allCommands as $commands) {
@@ -187,18 +188,18 @@ class AjaxController extends CommonController
             // $dataArray[$header] = array();
             foreach ($commands as $k => $c) {
                 if (is_array($c)) {
-                    $command = $translator->trans($k);
+                    $command = $this->translator->trans($k);
                     $command = (!str_contains($command, ':')) ? $command.':' : $command;
 
                     foreach ($c as $subc) {
-                        $subcommand = $command.$translator->trans($subc);
+                        $subcommand = $command.$this->translator->trans($subc);
                         if (!in_array($subcommand, $dupChecker)) {
                             $dataArray[]  = ['value' => $subcommand];
                             $dupChecker[] = $subcommand;
                         }
                     }
                 } else {
-                    $command = $translator->trans($k);
+                    $command = $this->translator->trans($k);
                     $command = (!str_contains($command, ':')) ? $command.':' : $command;
 
                     if (!in_array($command, $dupChecker)) {
@@ -226,7 +227,7 @@ class AjaxController extends CommonController
 
         $post = $request->request->all();
         unset($post['model'], $post['id'], $post['action']);
-        if (!empty($post)) {
+        if ([] !== $post) {
             $extra = http_build_query($post);
         } else {
             $extra = '';

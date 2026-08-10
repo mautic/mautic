@@ -7,6 +7,7 @@ namespace Mautic\ProjectBundle\Tests\Functional;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\ProjectBundle\Entity\Project;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -18,7 +19,7 @@ abstract class AbstractProjectSearchTestCase extends MauticMysqlTestCase
      * @param string[] $expectedEntities
      * @param string[] $unexpectedEntities
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('searchDataProvider')]
+    #[DataProvider('searchDataProvider')]
     abstract public function testProjectSearch(string $searchTerm, array $expectedEntities, array $unexpectedEntities): void;
 
     /**

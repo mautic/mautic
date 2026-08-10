@@ -7,6 +7,7 @@ namespace Mautic\ChannelBundle\Tests\Controller\Api;
 use Mautic\ChannelBundle\Entity\Channel;
 use Mautic\ChannelBundle\Entity\Message;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class MessageApiControllerTest extends MauticMysqlTestCase
 {
@@ -38,7 +39,7 @@ JSON;
      * @param mixed[] $payload
      * @param mixed[] $expectedResponsePayload
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('patchProvider')]
+    #[DataProvider('patchProvider')]
     public function testEditMessageWithPatch(array $payload, array $expectedResponsePayload): void
     {
         $channel = new Channel();

@@ -33,7 +33,7 @@ final class AutowireMethodNameMustMatchClassRuleTest extends RuleTestCase
         $this->analyse([__DIR__.'/Fixture/SetterAutowireController.php'], [
             [
                 'Method "setSomeModel()" has the #[Required] attribute, so it must be named "autowireSetterAutowireController()". Rename it to keep the autowired method unique in the class hierarchy.',
-                9,
+                11,
             ],
         ]);
     }

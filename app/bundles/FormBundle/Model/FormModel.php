@@ -37,6 +37,7 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -70,13 +71,14 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly FormRepository $formRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): FormRepository
     {
-        return $this->em->getRepository(Form::class);
+        return $this->formRepository;
     }
 
     public function getPermissionBase(): string
@@ -89,7 +91,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         return 'getName';
     }
 
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Form) {
             throw new MethodNotAllowedHttpException(['Form']);
@@ -393,7 +395,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
      */
     public function getLeadSubmissions(Form $form, $leadId, $limit = 200): array
     {
-        return $this->getRepository()->getFormResults(
+        return $this->formRepository->getFormResults(
             $form,
             [
                 'leadId' => $leadId,
@@ -471,7 +473,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
 
             if ($persist) {
                 // bypass model function as events aren't needed for this
-                $this->getRepository()->saveEntity($entity);
+                $this->formRepository->saveEntity($entity);
             }
         }
 
@@ -741,6 +743,10 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
      */
     public function populateValuesWithLead(Form $form, &$formHtml, ?string $formName = null): void
     {
+        if (!(bool) $this->coreParametersHelper->get('form_field_autofill', false)) {
+            return;
+        }
+
         $formName ??= $form->generateFormName();
         $fields            = $form->getFields();
         $autoFillFields    = [];
@@ -1086,13 +1092,13 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
 
         if (!$this->canViewOthersEntity()) {
             $filter['force'][] = [
-                'column' => $this->getRepository()->getTableAlias().'.createdBy',
+                'column' => $this->formRepository->getTableAlias().'.createdBy',
                 'expr'   => 'eq',
                 'value'  => $this->userHelper->getUser()->getId(),
             ];
         }
 
-        return $this->getRepository()->getEntitiesForGlobalSearch($filter);
+        return $this->formRepository->getEntitiesForGlobalSearch($filter);
     }
 
     private function compareFieldOrder(Field $a, Field $b): int

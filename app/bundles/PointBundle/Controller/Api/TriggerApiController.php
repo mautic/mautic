@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Entity\TriggerEvent;
+use Mautic\PointBundle\Entity\TriggerRepository;
 use Mautic\PointBundle\Model\TriggerEventModel;
 use Mautic\PointBundle\Model\TriggerModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -24,7 +25,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Trigger>
  */
-class TriggerApiController extends CommonApiController
+final class TriggerApiController extends CommonApiController
 {
     /**
      * @var TriggerModel|null
@@ -38,13 +39,14 @@ class TriggerApiController extends CommonApiController
         RouterInterface $router,
         FormFactoryInterface $formFactory,
         AppVersion $appVersion,
-        private readonly ?RequestStack $requestStack,
+        private readonly RequestStack $requestStack,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
         TriggerModel $triggerModel,
         private readonly TriggerEventModel $triggerEventModel,
+        private readonly TriggerRepository $triggerRepository,
     ) {
         $this->model            = $triggerModel;
         $this->entityClass      = Trigger::class;
@@ -75,7 +77,7 @@ class TriggerApiController extends CommonApiController
 
             // Save the entitz first to get the ID.
             // Using the repository function to not trigger the listeners twice.
-            $this->model->getRepository()->saveEntity($entity);
+            $this->triggerRepository->saveEntity($entity);
         }
 
         $requestTriggerIds = [];

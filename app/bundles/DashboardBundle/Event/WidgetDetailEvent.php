@@ -73,7 +73,7 @@ class WidgetDetailEvent extends CommonEvent
             $this->getUniqueWidgetId(),
         ];
 
-        $params = $this->getWidget()->getParams();
+        $params = $this->widget->getParams();
 
         foreach (['dateTo', 'dateFrom'] as $dateParameter) {
             if (isset($params[$dateParameter])) {
@@ -265,18 +265,18 @@ class WidgetDetailEvent extends CommonEvent
             return $this->uniqueId;
         }
 
-        $params = $this->getWidget()->getParams();
+        $params = $this->widget->getParams();
         // Unset dateFrom and dateTo since they constantly change
         unset($params['dateFrom'], $params['dateTo']);
 
         $uniqueSettings = [
             'params' => $params,
-            'width'  => $this->getWidget()->getWidth(),
-            'height' => $this->getWidget()->getHeight(),
+            'width'  => $this->widget->getWidth(),
+            'height' => $this->widget->getHeight(),
             'locale' => $this->translator->getLocale(),
         ];
 
-        return $this->uniqueId = $this->getType().'_'.substr(md5(json_encode($uniqueSettings)), 0, 16);
+        return $this->uniqueId = $this->type.'_'.substr(md5(json_encode($uniqueSettings)), 0, 16);
     }
 
     /**

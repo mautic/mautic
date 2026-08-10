@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class EventRepositoryFunctionalTest extends MauticMysqlTestCase
 {
@@ -30,11 +31,11 @@ final class EventRepositoryFunctionalTest extends MauticMysqlTestCase
         yield 'Publish Down in the future' => [null, new \DateTime('+1 day'), 1];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataGetContactPendingEventsConsidersCampaignPublishUpAndDown')]
+    #[DataProvider('dataGetContactPendingEventsConsidersCampaignPublishUpAndDown')]
     public function testGetContactPendingEventsConsidersCampaignPublishUpAndDown(?\DateTime $publishUp, ?\DateTime $publishDown, int $expectedCount): void
     {
         /** @var EventRepository $repository */
-        $repository = static::getContainer()->get('mautic.campaign.repository.event');
+        $repository = self::getContainer()->get(EventRepository::class);
         $this->assertInstanceOf(EventRepository::class, $repository);
 
         $campaign = $this->createCampaign();
@@ -53,7 +54,7 @@ final class EventRepositoryFunctionalTest extends MauticMysqlTestCase
     public function testSetEventsAsDeletedWithRedirectUpdatesChains(): void
     {
         /** @var EventRepository $repository */
-        $repository = static::getContainer()->get('mautic.campaign.repository.event');
+        $repository = self::getContainer()->get(EventRepository::class);
         $this->assertInstanceOf(EventRepository::class, $repository);
 
         $campaign = $this->createCampaign();
@@ -158,7 +159,7 @@ final class EventRepositoryFunctionalTest extends MauticMysqlTestCase
 
         // 4. Call the method under test
         /** @var EventRepository $repository */
-        $repository   = self::getContainer()->get('mautic.campaign.repository.event');
+        $repository   = self::getContainer()->get(EventRepository::class);
         $this->assertInstanceOf(EventRepository::class, $repository);
         $resultEmails = $repository->getCampaignEmailEvents($campaign->getId());
 

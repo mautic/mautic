@@ -10,8 +10,10 @@ use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionParameters;
 use Mautic\LeadBundle\Segment\Decorator\Date\Day\DateDayYesterday;
 use Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(DateDayYesterday::class)]
+#[CoversClass(DateDayYesterday::class)]
 final class DateDayYesterdayTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetOperatorBetween(): void
@@ -72,7 +74,7 @@ final class DateDayYesterdayTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('2018-03-01%', $filterDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataProviderForOperatorAndType')]
+    #[DataProvider('dataProviderForOperatorAndType')]
     public function testGetParameterValueSingle(string $operator, string $type, string $expectedDateValue): void
     {
         $dateDecorator    = $this->createStub(DateDecorator::class);

@@ -2,7 +2,7 @@
 
 namespace Mautic\FormBundle\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -44,6 +44,7 @@ use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Helper\CustomFieldValueHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
@@ -54,6 +55,7 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\StageBundle\Entity\Stage;
+use Mautic\StageBundle\Entity\StageRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -69,19 +71,19 @@ use Twig\Environment;
 /**
  * @extends CommonFormModel<Submission>
  */
-class SubmissionModel extends CommonFormModel
+final class SubmissionModel extends CommonFormModel
 {
     public function __construct(
-        protected IpLookupHelper $ipLookupHelper,
-        protected Environment $twig,
-        protected FormModel $formModel,
-        protected PageModel $pageModel,
-        protected LeadModel $leadModel,
-        protected CampaignModel $campaignModel,
-        protected MembershipManager $membershipManager,
-        protected LeadFieldModel $leadFieldModel,
-        protected CompanyModel $companyModel,
-        protected FormFieldHelper $fieldHelper,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly Environment $twig,
+        private readonly FormModel $formModel,
+        private readonly PageModel $pageModel,
+        private readonly LeadModel $leadModel,
+        private readonly CampaignModel $campaignModel,
+        private readonly MembershipManager $membershipManager,
+        private readonly LeadFieldModel $leadFieldModel,
+        private readonly CompanyModel $companyModel,
+        private readonly FormFieldHelper $fieldHelper,
         private readonly UploadFieldValidator $uploadFieldValidator,
         private readonly FormUploader $formUploader,
         private readonly DeviceTrackingServiceInterface $deviceTrackingService,
@@ -90,7 +92,7 @@ class SubmissionModel extends CommonFormModel
         private readonly ContactTracker $contactTracker,
         private readonly ContactMerger $contactMerger,
         private readonly FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
-        EntityManager $em,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,
@@ -98,13 +100,17 @@ class SubmissionModel extends CommonFormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly SubmissionRepository $submissionRepository,
+        private readonly LeadRepository $leadRepository,
+        private readonly StageRepository $stageRepository,
+        private readonly UserRepository $userRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): SubmissionRepository
     {
-        return $this->em->getRepository(Submission::class);
+        return $this->submissionRepository;
     }
 
     /**
@@ -174,7 +180,7 @@ class SubmissionModel extends CommonFormModel
 
             if ($f->isCaptchaType()) {
                 $captcha = $this->fieldHelper->validateFieldValue($type, $value, $f);
-                if (!empty($captcha)) {
+                if ([] !== $captcha) {
                     $props = $f->getProperties();
                     // check for a custom message
                     $validationErrors[$alias] = (!empty($props['errorMessage'])) ? $props['errorMessage'] : implode('<br />', $captcha);
@@ -313,12 +319,12 @@ class SubmissionModel extends CommonFormModel
         }
 
         // return errors if there any
-        if (!empty($validationErrors)) {
+        if ([] !== $validationErrors) {
             return ['errors' => $validationErrors];
         }
 
         // Create/update lead
-        if (!empty($leadFieldMatches)) {
+        if ([] !== $leadFieldMatches) {
             $lead = $this->createLeadFromSubmit($form, $leadFieldMatches, $leadFields, $company);
         }
 
@@ -405,11 +411,9 @@ class SubmissionModel extends CommonFormModel
     {
         $this->formUploader->deleteUploadedFiles($submission);
 
-        $submissionRepository = $this->getRepository();
-
         // deleting form submission record in form results table
         try {
-            $submissionRepository->deleteFormResultsTableRecord($submission);
+            $this->submissionRepository->deleteFormResultsTableRecord($submission);
         } catch (\Exception $e) {
             $this->logger->error($e);
         }
@@ -425,11 +429,9 @@ class SubmissionModel extends CommonFormModel
     public function deleteEntities($ids): array
     {
         if (!empty($ids)) {
-            $submissionRepository = $this->getRepository();
-
             // deleting form submission record in form results table
             try {
-                $submissionRepository->batchDeleteFormResultsTableRecord($ids);
+                $this->submissionRepository->batchDeleteFormResultsTableRecord($ids);
             } catch (\Exception $e) {
                 $this->logger->error($e);
             }
@@ -445,7 +447,7 @@ class SubmissionModel extends CommonFormModel
      */
     public function getEntities(array $args = [])
     {
-        return $this->getRepository()->getEntities($args);
+        return $this->submissionRepository->getEntities($args);
     }
 
     /**
@@ -455,7 +457,7 @@ class SubmissionModel extends CommonFormModel
      */
     public function getEntitiesByPage(array $args = []): array
     {
-        return $this->getRepository()->getEntitiesByPage($args);
+        return $this->submissionRepository->getEntitiesByPage($args);
     }
 
     /**
@@ -990,7 +992,7 @@ class SubmissionModel extends CommonFormModel
 
         // Check for duplicate lead
         /** @var Lead[] $leads */
-        $leads = (!empty($uniqueFieldsWithData)) ? $this->em->getRepository(Lead::class)->getLeadsByUniqueFields(
+        $leads = (!empty($uniqueFieldsWithData)) ? $this->leadRepository->getLeadsByUniqueFields(
             $uniqueFieldsWithData,
             $leadId
         ) : [];
@@ -1084,7 +1086,7 @@ class SubmissionModel extends CommonFormModel
 
         // Set stage.
         if (!empty($data['stagebyname'])) {
-            $stage = $this->em->getRepository(Stage::class)->findOneBy(['name' => $data['stagebyname']]);
+            $stage = $this->stageRepository->findOneBy(['name' => $data['stagebyname']]);
 
             if ($stage instanceof Stage) {
                 $lead->setStage($stage);
@@ -1095,7 +1097,7 @@ class SubmissionModel extends CommonFormModel
                     sprintf('%d:%s', $stage->getId(), $stage->getName()),
                     $this->translator->trans(
                         'mautic.stage.import.action.name',
-                        ['%name%' => $this->userHelper->getUser()->getUsername()]
+                        ['%name%' => $this->userHelper->getUser()->getUserIdentifier()]
                     )
                 );
             } else {
@@ -1109,15 +1111,11 @@ class SubmissionModel extends CommonFormModel
             }
         }
 
-        // Set owner
-        $userRepo = $this->em->getRepository(User::class);
-        \assert($userRepo instanceof UserRepository);
-
         $user = null;
         if (!empty($data['ownerbyemail'])) {
-            $user = $userRepo->findOneBy(['email' => $data['ownerbyemail']]);
+            $user = $this->userRepository->findOneBy(['email' => $data['ownerbyemail']]);
         } elseif (!empty($data['ownerbyid'])) {
-            $user = $userRepo->find($data['ownerbyid']);
+            $user = $this->userRepository->find($data['ownerbyid']);
         }
 
         if ($user instanceof User) {
@@ -1148,7 +1146,7 @@ class SubmissionModel extends CommonFormModel
         }
 
         $companyFieldMatches = $getCompanyData($leadFieldMatches);
-        if (!empty($companyFieldMatches)) {
+        if ([] !== $companyFieldMatches) {
             [$company, $leadAdded, $companyEntity] = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $lead, $this->companyModel);
             $companyChangeLog                      = null;
             if ($leadAdded) {
@@ -1160,7 +1158,7 @@ class SubmissionModel extends CommonFormModel
                 $this->companyModel->saveEntity($companyEntity);
             }
 
-            if (!empty($company) and $companyEntity instanceof Company) {
+            if (!empty($company) && $companyEntity instanceof Company) {
                 // Save after the lead in for new leads created through the API and maybe other places
                 $this->companyModel->addLeadToCompany($companyEntity, $lead);
                 $this->leadModel->setPrimaryCompany($companyEntity->getId(), $lead->getId());
@@ -1174,14 +1172,12 @@ class SubmissionModel extends CommonFormModel
     }
 
     /**
-     * Validates a field value.
-     *
      * @return bool|string True if valid; otherwise string with invalid reason
      */
     protected function validateFieldValue(Field $field, $value)
     {
         $standardValidation = $this->fieldHelper->validateFieldValue($field->getType(), $value, $field);
-        if (!empty($standardValidation)) {
+        if ([] !== $standardValidation) {
             return $standardValidation;
         }
 

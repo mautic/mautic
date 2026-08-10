@@ -5,24 +5,29 @@ namespace Mautic\StageBundle\Controller;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\StageBundle\Entity\Stage;
+use Mautic\StageBundle\Entity\StageRepository;
 use Mautic\StageBundle\Form\Type\StageMergeType;
 use Mautic\StageBundle\Model\StageModel;
 use Mautic\StageBundle\Security\Permissions\StagePermissions;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class StageController extends AbstractFormController
+final class StageController extends AbstractFormController
 {
+    private StageRepository $stageRepository;
+
     private StageModel $stageModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireStageController(
         StageModel $stageModel,
+        StageRepository $stageRepository,
     ): void {
         $this->stageModel = $stageModel;
+        $this->stageRepository = $stageRepository;
     }
 
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
@@ -201,7 +206,7 @@ class StageController extends AbstractFormController
             $themes[] = $actions['actions'][$actionType]['formTheme'];
         }
 
-        $stageWeights = $this->stageModel->getRepository()->getStageWeights();
+        $stageWeights = $this->stageRepository->getStageWeights();
 
         return $this->delegateView(
             [
@@ -233,10 +238,8 @@ class StageController extends AbstractFormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function editAction(Request $request, FormFactoryInterface $formFactory, $objectId, $ignorePost = false)
+    public function editAction(Request $request, FormFactoryInterface $formFactory, $objectId, $ignorePost = false): Response
     {
         $entity = $this->stageModel->getEntity($objectId);
 
@@ -354,7 +357,7 @@ class StageController extends AbstractFormController
             $themes[] = $actions['actions'][$actionType]['formTheme'];
         }
 
-        $stageWeights = $this->stageModel->getRepository()->getStageWeights();
+        $stageWeights = $this->stageRepository->getStageWeights();
 
         return $this->delegateView(
             [
@@ -434,7 +437,7 @@ class StageController extends AbstractFormController
             $this->throwAccessDenied();
         }
 
-        $stages = $model->getRepository()->getStages(false, (string) $secondaryStage->getId());
+        $stages = $this->stageRepository->getStages(false, (string) $secondaryStage->getId());
 
         $action = $this->generateUrl('mautic_stage_action', ['objectAction' => 'merge', 'objectId' => $secondaryStage->getId()]);
 
@@ -480,10 +483,8 @@ class StageController extends AbstractFormController
      * Deletes the entity.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         $page      = $request->getSession()->get('mautic.stage.page', 1);
         $returnUrl = $this->generateUrl('mautic_stage_index', ['page' => $page]);
@@ -580,7 +581,7 @@ class StageController extends AbstractFormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $this->stageModel->deleteEntities($deleteIds);
 
                 $flashes[] = [

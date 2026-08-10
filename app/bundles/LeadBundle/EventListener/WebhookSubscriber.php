@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\ChannelSubscriptionChange;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
@@ -15,11 +16,12 @@ use Mautic\WebhookBundle\Model\WebhookModel;
 use Mautic\WebhookBundle\WebhookEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class WebhookSubscriber implements EventSubscriberInterface
+final readonly class WebhookSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly WebhookModel $webhookModel,
-        private readonly LeadModel $leadModel,
+        private WebhookModel $webhookModel,
+        private LeadModel $leadModel,
+        private LeadRepository $leadRepository,
     ) {
     }
 
@@ -292,7 +294,7 @@ class WebhookSubscriber implements EventSubscriberInterface
 
             if ($detachContactReference) {
                 $detachContactReference = false;
-                $this->leadModel->getRepository()->detachEntity($contact);
+                $this->leadRepository->detachEntity($contact);
             }
         }
     }

@@ -4,20 +4,21 @@ require 'autoload.php';
 
 $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__.'/app/bundles')
-    ->exclude('CoreBundle/Tests/_support/_generated')
     ->in(__DIR__.'/app/config')
     ->in(__DIR__.'/app/middlewares')
     ->in(__DIR__.'/app/migrations')
     ->in(__DIR__.'/plugins')
+    ->in(__DIR__.'/tests')
     ->in(__DIR__.'/utils')
     // rector rule fixtures are test data, not code, and reformatting them breaks the expected output
     ->notName('*.php.inc')
     ->in(__DIR__.'/.github/workflows/mautic-asset-upload')
+    ->exclude('_support/_generated')
+    ->exclude('node_modules')
     ->append([
         __DIR__.'/app/AppKernel.php',
         __DIR__.'/app/AppTestKernel.php',
         __DIR__.'/rector.php',
-        __DIR__.'/rector-older-symfony.php',
         __DIR__.'/.php-cs-fixer.php',
         __DIR__.'/ecs.php',
     ]);

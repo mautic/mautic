@@ -6,6 +6,7 @@ use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Mautic\CampaignBundle\Entity\Result\CountResult;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
@@ -626,7 +627,7 @@ class CampaignRepository extends CommonRepository
             );
         $q->groupBy('c.id');
 
-        if (!empty($campaignIds)) {
+        if ([] !== $campaignIds) {
             $q->where($q->expr()->in('c.id', ':campaignIds'));
             $q->setParameter('campaignIds', $campaignIds, ArrayParameterType::INTEGER);
         }
@@ -667,7 +668,7 @@ class CampaignRepository extends CommonRepository
             ->setParameter('id', $id)
             ->andWhere('e.channelId IS NOT NULL')
             ->getQuery()
-            ->setHydrationMode(\Doctrine\ORM\Query::HYDRATE_ARRAY)
+            ->setHydrationMode(Query::HYDRATE_ARRAY)
             ->getResult();
 
         $return = [];

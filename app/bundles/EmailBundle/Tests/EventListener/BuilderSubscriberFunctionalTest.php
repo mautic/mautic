@@ -10,6 +10,7 @@ use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 
 final class BuilderSubscriberFunctionalTest extends MauticMysqlTestCase
@@ -38,7 +39,7 @@ final class BuilderSubscriberFunctionalTest extends MauticMysqlTestCase
         yield 'Invalid tag attribute for unsubscribe_url' => ['<!DOCTYPE html><htm><body><a href="https://localhost">link</a><a id="{unsubscribe_url}">unsubscribe</a></body></html>'];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataOneTrackingLinkIsNotUsedForDifferentContacts')]
+    #[DataProvider('dataOneTrackingLinkIsNotUsedForDifferentContacts')]
     public function testOneTrackingLinkIsNotUsedForDifferentContacts(string $content): void
     {
         $numContacts = 3;

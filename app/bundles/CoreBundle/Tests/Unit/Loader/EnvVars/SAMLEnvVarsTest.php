@@ -10,20 +10,11 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 
 final class SAMLEnvVarsTest extends TestCase
 {
-    /**
-     * @var ParameterBag
-     */
-    protected $config;
+    private ParameterBag $config;
 
-    /**
-     * @var ParameterBag
-     */
-    protected $defaultConfig;
+    private ParameterBag $defaultConfig;
 
-    /**
-     * @var ParameterBag
-     */
-    protected $envVars;
+    private ParameterBag $envVars;
 
     protected function setUp(): void
     {

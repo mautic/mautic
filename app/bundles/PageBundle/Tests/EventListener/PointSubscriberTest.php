@@ -9,6 +9,8 @@ use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageHitEvent;
 use Mautic\PageBundle\EventListener\PointSubscriber;
+use Mautic\PageBundle\Form\Type\PointActionPageHitType;
+use Mautic\PageBundle\Form\Type\PointActionUrlHitType;
 use Mautic\PageBundle\Helper\PointActionHelper;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Model\PointModel;
@@ -39,7 +41,7 @@ final class PointSubscriberTest extends TestCase
                     'label'       => 'mautic.page.point.action.pagehit',
                     'description' => 'mautic.page.point.action.pagehit_descr',
                     'callback'    => [PointActionHelper::class, 'validatePageHit'],
-                    'formType'    => \Mautic\PageBundle\Form\Type\PointActionPageHitType::class,
+                    'formType'    => PointActionPageHitType::class,
                 ], $parameters[1]);
             }
             if (2 === $matcher->numberOfInvocations()) {
@@ -49,7 +51,7 @@ final class PointSubscriberTest extends TestCase
                     'label'       => 'mautic.page.point.action.urlhit',
                     'description' => 'mautic.page.point.action.urlhit_descr',
                     'callback'    => [$pointActionHelper, 'validateUrlHit'],
-                    'formType'    => \Mautic\PageBundle\Form\Type\PointActionUrlHitType::class,
+                    'formType'    => PointActionUrlHitType::class,
                     'formTheme'   => '@MauticPage/FormTheme/Point/pointaction_urlhit_widget.html.twig',
                 ], $parameters[1]);
             }

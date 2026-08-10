@@ -17,24 +17,26 @@ use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Stats\EmailDependencies;
 use Mautic\PageBundle\Form\Type\AbTestPropertiesType;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Address;
+use Symfony\Contracts\Service\Attribute\Required;
 use Twig\Environment;
 
-class AjaxController extends CommonAjaxController
+final class AjaxController extends CommonAjaxController
 {
     use VariantAjaxControllerTrait;
     use AjaxLookupControllerTrait;
 
     private EmailModel $emailModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireEmailAjaxController(EmailModel $emailModel): void
-    {
+    #[Required]
+    public function autowireEmailAjaxController(
+        EmailModel $emailModel,
+    ): void {
         $this->emailModel = $emailModel;
     }
 
@@ -43,8 +45,8 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($this->getAbTestForm(
             $request,
             $emailModel,
-            fn ($formType, $formOptions): \Symfony\Component\Form\FormInterface => $formFactory->create(AbTestPropertiesType::class, [], ['formType' => $formType, 'formTypeOptions' => $formOptions]),
-            fn (\Symfony\Component\Form\FormInterface $form): string => $this->renderView('@MauticEmail/AbTest/form.html.twig', ['form' => $this->setFormTheme($form, $twig, ['@MauticEmail/AbTest/form.html.twig', '@MauticEmail/FormTheme/Email/layout.html.twig'])]),
+            fn ($formType, $formOptions): FormInterface => $formFactory->create(AbTestPropertiesType::class, [], ['formType' => $formType, 'formTypeOptions' => $formOptions]),
+            fn (FormInterface $form): string => $this->renderView('@MauticEmail/AbTest/form.html.twig', ['form' => $this->setFormTheme($form, $twig, ['@MauticEmail/AbTest/form.html.twig', '@MauticEmail/FormTheme/Email/layout.html.twig'])]),
             'email_abtest_settings',
             'emailform'
         ));
@@ -163,7 +165,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function sendTestEmailAction(TransportInterface $transport, UserHelper $userHelper, CoreParametersHelper $parametersHelper): Response
+    public function sendTestEmailAction(TransportInterface $transport, UserHelper $userHelper, CoreParametersHelper $parametersHelper): JsonResponse
     {
         $user  = $userHelper->getUser();
         $email = (new MauticMessage())

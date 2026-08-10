@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
+use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -24,10 +25,23 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Submission>
  */
-class SubmissionApiController extends CommonApiController
+final class SubmissionApiController extends CommonApiController
 {
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, SubmissionModel $formSubmissionModel)
-    {
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        SubmissionModel $formSubmissionModel,
+        private readonly FormModel $formModel,
+    ) {
         $this->model            = $formSubmissionModel;
         $this->entityClass      = Submission::class;
         $this->entityNameOne    = 'submission';
@@ -115,8 +129,7 @@ class SubmissionApiController extends CommonApiController
      */
     protected function getFormOrResponseWithError($formId)
     {
-        $formModel = $this->getModel('form');
-        $form      = $formModel->getEntity($formId);
+        $form = $this->formModel->getEntity($formId);
 
         if (!$form) {
             return $this->notFound();

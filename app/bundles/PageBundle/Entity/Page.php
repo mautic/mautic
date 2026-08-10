@@ -9,6 +9,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
@@ -219,8 +220,8 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
 
     public function __construct()
     {
-        $this->translationChildren = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->variantChildren     = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->translationChildren = new ArrayCollection();
+        $this->variantChildren     = new ArrayCollection();
         $this->initializeProjects();
     }
 
@@ -319,9 +320,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $metadata->addPropertyConstraint('title', new NotBlank([
-            'message' => 'mautic.core.title.required',
-        ]));
+        $metadata->addPropertyConstraint('title', new NotBlank(message: 'mautic.core.title.required'));
 
         $metadata->addConstraint(new Callback(
             function (Page $page, ExecutionContextInterface $context): void {
@@ -332,7 +331,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
                         $page->getRedirectUrl(),
                         [
                             new Assert\Url(),
-                            new NotBlank(['message' => 'mautic.core.value.required']),
+                            new NotBlank(message: 'mautic.core.value.required'),
                         ],
                     );
 
@@ -808,12 +807,12 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
 
     public function hasDraft(): bool
     {
-        return null !== $this->getDraft();
+        return null !== $this->draft;
     }
 
     public function getDraftContent(): ?string
     {
-        return $this->hasDraft() ? $this->getDraft()->getHtml() : null;
+        return $this->hasDraft() ? $this->draft->getHtml() : null;
     }
 
     public function getDraft(): ?PageDraft

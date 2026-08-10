@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
@@ -19,6 +20,8 @@ use Mautic\FormBundle\Collector\AlreadyMappedFieldCollectorInterface;
 use Mautic\FormBundle\Collector\MappedObjectCollector;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Entity\FormRepository;
+use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\Exception\ValidationException;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Model\FormModel;
@@ -47,10 +50,11 @@ class FormController extends CommonFormController
         RequestStack $requestStack,
         CorePermissions $security,
         private readonly FormModel $formModel,
-        private readonly \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel,
+        private readonly AuditLogModel $auditLogModel,
         private readonly SubmissionModel $submissionModel,
+        private readonly SubmissionRepository $submissionRepository,
+        private readonly FormRepository $formRepository,
     ) {
-        // @phpstan-ignore-next-line FormController extends deprecated AbstractStandardFormController; fix requires class hierarchy refactoring
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
@@ -242,7 +246,7 @@ class FormController extends CommonFormController
             $activeFormFields[] = $field;
         }
 
-        $submissionCounts = $this->submissionModel->getRepository()->getSubmissionCounts($activeForm);
+        $submissionCounts = $this->submissionRepository->getSubmissionCounts($activeForm);
 
         return $this->delegateView(
             [
@@ -311,7 +315,7 @@ class FormController extends CommonFormController
                     $fields = array_diff_key($modifiedFields, array_flip($deletedFields));
 
                     // make sure that at least one field is selected
-                    if (empty($fields)) {
+                    if ([] === $fields) {
                         // set the error
                         $form->addError(
                             new FormError(
@@ -333,7 +337,7 @@ class FormController extends CommonFormController
                             // Save the form first and new actions so that new fields are available to actions.
                             // Using the repository function to not trigger the listeners twice.
 
-                            $this->formModel->getRepository()->saveEntity($entity);
+                            $this->formRepository->saveEntity($entity);
 
                             // Only save actions that are not to be deleted
                             $actions = array_diff_key($modifiedActions, array_flip($deletedActions));
@@ -476,10 +480,8 @@ class FormController extends CommonFormController
      * @param int|Form $objectId
      * @param bool     $ignorePost
      * @param bool     $forceTypeSelection
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false, $forceTypeSelection = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false, $forceTypeSelection = false): Response
     {
         $formData         = $request->request->all()['mauticform'] ?? [];
         $sessionId        = $formData['sessionId'] ?? null;
@@ -567,7 +569,7 @@ class FormController extends CommonFormController
 
                 if ($valid = $this->isFormValid($form)) {
                     // make sure that at least one field is selected
-                    if (empty($fields)) {
+                    if ([] === $fields) {
                         // set the error
                         $form->addError(
                             new FormError(
@@ -594,7 +596,7 @@ class FormController extends CommonFormController
                         // save the form first so that new fields are available to actions
                         // use the repository method to not trigger listeners twice
                         try {
-                            $this->formModel->getRepository()->saveEntity($entity);
+                            $this->formRepository->saveEntity($entity);
 
                             if (count($actions)) {
                                 // Now set and persist the actions
@@ -956,10 +958,8 @@ class FormController extends CommonFormController
      * Deletes the entity.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         $page      = $request->getSession()->get('mautic.form.page', 1);
         $returnUrl = $this->generateUrl('mautic_form_index', ['page' => $page]);
@@ -1067,7 +1067,7 @@ class FormController extends CommonFormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $this->formModel->deleteEntities($deleteIds);
 
                 $flashes[] = [

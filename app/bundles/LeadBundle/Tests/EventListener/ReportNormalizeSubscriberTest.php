@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\ReportBundle\Entity\Report;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -20,11 +21,11 @@ final class ReportNormalizeSubscriberTest extends MauticMysqlTestCase
     /**
      * @param array<int, array<string, array<string, array<string, array<int,string>>|string>|string>> $properties
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('normalizeData')]
+    #[DataProvider('normalizeData')]
     public function testOnReportDisplay(string $value, string $type, array $properties, string $expected): void
     {
         /** @var FieldModel $fieldModel */
-        $fieldModel = static::getContainer()->get('mautic.lead.model.field');
+        $fieldModel = self::getContainer()->get(FieldModel::class);
         $this->assertInstanceOf(FieldModel::class, $fieldModel);
         $field = new LeadField();
         $field->setType($type);

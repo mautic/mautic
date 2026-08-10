@@ -105,7 +105,7 @@ class PageDraft
 
     public function isPublicPreview(): bool
     {
-        return (bool) $this->publicPreview;
+        return $this->publicPreview;
     }
 
     public function setPublicPreview(bool $publicPreview): void

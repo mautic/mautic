@@ -9,8 +9,10 @@ use Mautic\AssetBundle\AssetEvents;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\AssetRepository;
 use Mautic\AssetBundle\Entity\Download;
+use Mautic\AssetBundle\Entity\DownloadRepository;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CacheBundle\Cache\CacheProvider;
+use Mautic\CategoryBundle\Entity\CategoryRepository;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -18,6 +20,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
@@ -25,6 +28,7 @@ use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactor
 use Mautic\LeadBundle\Tracker\Service\DeviceCreatorService\DeviceCreatorService;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -70,6 +74,8 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
 
     private LoggerInterface&\PHPUnit\Framework\MockObject\Stub $logger;
 
+    private AssetRepository&MockObject $assetRepository;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -94,6 +100,7 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
         $this->translator            = $this->createStub(Translator::class);
         $this->userHelper            = $this->createStub(UserHelper::class);
         $this->logger                = $this->createStub(LoggerInterface::class);
+        $this->assetRepository       = $this->createMock(AssetRepository::class);
 
         $this->assetModel = new AssetModel(
             $this->leadModel,
@@ -112,6 +119,10 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
             $this->userHelper,
             $this->logger,
             $this->coreParametersHelper,
+            $this->createStub(EmailRepository::class),
+            $this->assetRepository,
+            $this->createStub(DownloadRepository::class),
+            $this->createStub(CategoryRepository::class),
         );
     }
 
@@ -201,7 +212,7 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
                     return false;
                 }
 
-                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->requestStack->expects($this->once())
@@ -220,14 +231,7 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
             ->method('getTrackedDevice')
             ->willReturn(null);
 
-        $assetRepository = $this->createMock(AssetRepository::class);
-
-        $this->entityManager->expects($this->once())
-            ->method('getRepository')
-            ->with(Asset::class)
-            ->willReturn($assetRepository);
-
-        $assetRepository->expects($this->once())
+        $this->assetRepository->expects($this->once())
             ->method('upDownloadCount')
             ->with(
                 $asset->getId(),
@@ -315,6 +319,10 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
                 $this->userHelper,
                 $this->logger,
                 $this->coreParametersHelper,
+                $this->createStub(EmailRepository::class),
+                $this->createStub(AssetRepository::class),
+                $this->createStub(DownloadRepository::class),
+                $this->createStub(CategoryRepository::class),
             ])
             ->onlyMethods(['getEntity'])
             ->getMock();

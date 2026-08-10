@@ -12,16 +12,16 @@ use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
 use Mautic\LeadBundle\Helper\FieldAliasHelper;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class FieldController extends FormController
+final class FieldController extends FormController
 {
     private FieldModel $fieldModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireFieldController(
         FieldModel $fieldModel,
     ): void {
@@ -124,10 +124,8 @@ class FieldController extends FormController
 
     /**
      * Generate's new form and processes post data.
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
-    public function newAction(Request $request, ?LeadField $entity = null)
+    public function newAction(Request $request, ?LeadField $entity = null): Response
     {
         if (!$this->security->isGranted('lead:fields:full')) {
             $this->throwAccessDenied();
@@ -241,10 +239,8 @@ class FieldController extends FormController
      * Generate's edit form and processes post data.
      *
      * @param bool|false $ignorePost
-     *
-     * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false): Response
     {
         if (!$this->security->isGranted('lead:fields:full')) {
             $this->throwAccessDenied();
@@ -402,10 +398,8 @@ class FieldController extends FormController
 
     /**
      * Delete a field.
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         if (!$this->security->isGranted('lead:fields:full')) {
             $this->throwAccessDenied();

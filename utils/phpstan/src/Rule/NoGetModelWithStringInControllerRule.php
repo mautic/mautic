@@ -45,6 +45,12 @@ final class NoGetModelWithStringInControllerRule implements Rule
      */
     public function processNode(Node $node, Scope $scope): array
     {
+        // inside a trait the scope file is the controller using it, so the very same call would be reported
+        // once per controller, in a file that does not contain it
+        if ($scope->isInTrait()) {
+            return [];
+        }
+
         if (!str_ends_with($scope->getFile(), self::CONTROLLER_SUFFIX)) {
             return [];
         }
@@ -75,6 +81,7 @@ final class NoGetModelWithStringInControllerRule implements Rule
             $firstArg->value->value
         ))
             ->identifier('mautic.noGetModelWithStringInController')
+            ->nonIgnorable()
             ->build();
 
         return [$ruleError];

@@ -57,9 +57,7 @@ final class FormSubmitActionUserEmailTypeTest extends \PHPUnit\Framework\TestCas
                         ],
                         'required'    => true,
                         'constraints' => new NotBlank(
-                            [
-                                'message' => 'mautic.core.value.required',
-                            ]
+                            message: 'mautic.core.value.required'
                         ),
                     ], $parameters[2]);
                 }

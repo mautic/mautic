@@ -3,54 +3,54 @@
 namespace Mautic\StageBundle\Model;
 
 use Doctrine\DBAL\ParameterType;
-use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Translation\Translator;
-use Mautic\LeadBundle\Entity\StagesChangeLog;
 use Mautic\LeadBundle\Entity\StagesChangeLogRepository;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\StageBundle\Entity\LeadStageLog;
 use Mautic\StageBundle\Entity\LeadStageLogRepository;
 use Mautic\StageBundle\Entity\Stage;
+use Mautic\StageBundle\Entity\StageRepository;
 use Mautic\StageBundle\Event\StageBuilderEvent;
 use Mautic\StageBundle\Event\StageEvent;
 use Mautic\StageBundle\Form\Type\StageType;
 use Mautic\StageBundle\StageEvents;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends CommonFormModel<Stage>
  */
 class StageModel extends CommonFormModel implements GlobalSearchInterface
 {
-    public function __construct(
-        protected LeadModel $leadModel,
-        UserHelper $userHelper,
-        EntityManager $em,
-        CorePermissions $security,
-        EventDispatcherInterface $dispatcher,
-        UrlGeneratorInterface $router,
-        Translator $translator,
-        LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper,
-    ) {
-        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
+    protected LeadModel $leadModel;
+
+    private StageRepository $stageRepository;
+
+    private StagesChangeLogRepository $stagesChangeLogRepository;
+
+    private LeadStageLogRepository $leadStageLogRepository;
+
+    #[Required]
+    public function autowireStageModel(
+        LeadModel $leadModel,
+        StageRepository $stageRepository,
+        StagesChangeLogRepository $stagesChangeLogRepository,
+        LeadStageLogRepository $leadStageLogRepository,
+    ): void {
+        $this->leadModel                 = $leadModel;
+        $this->stageRepository           = $stageRepository;
+        $this->stagesChangeLogRepository = $stagesChangeLogRepository;
+        $this->leadStageLogRepository    = $leadStageLogRepository;
     }
 
-    public function getRepository(): \Mautic\StageBundle\Entity\StageRepository
+    public function getRepository(): StageRepository
     {
-        return $this->em->getRepository(Stage::class);
+        return $this->stageRepository;
     }
 
     public function getPermissionBase(): string
@@ -61,7 +61,7 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Stage) {
             throw new MethodNotAllowedHttpException(['Stage']);
@@ -190,13 +190,9 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
                 ->setParameter('secondaryStageId', $secondaryStageId, ParameterType::INTEGER)
                 ->executeStatement();
 
-            /** @var StagesChangeLogRepository $changeLogRepo */
-            $changeLogRepo = $this->em->getRepository(StagesChangeLog::class);
-            $changeLogRepo->updateStage($secondaryStageId, $primaryStageId);
+            $this->stagesChangeLogRepository->updateStage($secondaryStageId, $primaryStageId);
 
-            /** @var LeadStageLogRepository $leadStageLogRepo */
-            $leadStageLogRepo = $this->em->getRepository(LeadStageLog::class);
-            $leadStageLogRepo->updateStage($secondaryStageId, $primaryStageId);
+            $this->leadStageLogRepository->updateStage($secondaryStageId, $primaryStageId);
 
             $this->deleteEntity($secondaryStage);
         });
@@ -209,6 +205,6 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
         $user = (!$this->security->isGranted('stage:stages:viewother')) ?
             $this->userHelper->getUser() : false;
 
-        return $this->getRepository()->getStages($user);
+        return $this->stageRepository->getStages($user);
     }
 }

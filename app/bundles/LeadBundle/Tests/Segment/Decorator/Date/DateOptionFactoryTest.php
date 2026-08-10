@@ -25,8 +25,10 @@ use Mautic\LeadBundle\Segment\Decorator\Date\Year\DateYearThis;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\RelativeDate;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(DateOptionFactory::class)]
+#[CoversClass(DateOptionFactory::class)]
 final class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testBirthday(): void
@@ -208,7 +210,7 @@ final class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
         yield [DateDefault::class, 'day of January 2021'];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('getRelativeDateNotations')]
+    #[DataProvider('getRelativeDateNotations')]
     public function testRelativeDateNotations(string $expectedResult, string $filterName): void
     {
         $filterDecorator = $this->getFilterDecorator($filterName);

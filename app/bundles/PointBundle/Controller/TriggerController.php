@@ -8,19 +8,21 @@ use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Model\TriggerEventModel;
 use Mautic\PointBundle\Model\TriggerModel;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class TriggerController extends FormController
+final class TriggerController extends FormController
 {
     private TriggerEventModel $triggerEventModel;
 
     private TriggerModel $triggerModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireTriggerController(TriggerEventModel $triggerEventModel, TriggerModel $triggerModel): void
-    {
+    #[Required]
+    public function autowireTriggerController(
+        TriggerEventModel $triggerEventModel,
+        TriggerModel $triggerModel,
+    ): void {
         $this->triggerEventModel = $triggerEventModel;
         $this->triggerModel      = $triggerModel;
     }
@@ -50,7 +52,7 @@ class TriggerController extends FormController
         $filter     = ['string' => $search, 'force' => []];
         $orderBy    = $request->getSession()->get('mautic.point.trigger.orderby', 't.name');
         $orderByDir = $request->getSession()->get('mautic.point.trigger.orderbydir', 'ASC');
-        $triggers   = $this->getModel('point.trigger')->getEntities(
+        $triggers   = $this->triggerModel->getEntities(
             [
                 'start'      => $start,
                 'limit'      => $limit,
@@ -106,7 +108,7 @@ class TriggerController extends FormController
      */
     public function viewAction(Request $request, $objectId): Response
     {
-        $entity = $this->getModel('point.trigger')->getEntity($objectId);
+        $entity = $this->triggerModel->getEntity($objectId);
 
         // set the page we came from
         $page = $request->getSession()->get('mautic.point.trigger.page', 1);
@@ -186,7 +188,7 @@ class TriggerController extends FormController
 
         // set added/updated events
         $addEvents     = $session->get('mautic.point.'.$sessionId.'.triggerevents.modified', []);
-        if (!empty($triggerEvents)) {
+        if ([] !== $triggerEvents) {
             $addEvents += $triggerEvents;
             $session->set('mautic.point.'.$sessionId.'.triggerevents.modified', $triggerEvents);
         }
@@ -205,7 +207,7 @@ class TriggerController extends FormController
                     $events = array_diff_key($addEvents, array_flip($deletedEvents));
 
                     // make sure that at least one action is selected
-                    if (empty($events)) {
+                    if ([] === $events) {
                         // set the error
                         $form->addError(new FormError(
                             $this->translator->trans('mautic.core.value.required', [], 'validators')
@@ -254,7 +256,7 @@ class TriggerController extends FormController
                     ],
                 ]);
             }
-        } elseif (!empty($triggerEvents)) {
+        } elseif ([] !== $triggerEvents) {
             // The clone part, no need to clear session here.
             $addEvents     = $triggerEvents;
             $deletedEvents = [];
@@ -290,10 +292,8 @@ class TriggerController extends FormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return JsonResponse|Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false): Response
     {
         $entity     = $this->triggerModel->getEntity($objectId);
         $session    = $request->getSession();
@@ -351,7 +351,7 @@ class TriggerController extends FormController
 
                 if ($valid = $this->isFormValid($form)) {
                     // make sure that at least one field is selected
-                    if (empty($events)) {
+                    if ([] === $events) {
                         // set the error
                         $form->addError(new FormError(
                             $this->translator->trans('mautic.core.value.required', [], 'validators')
@@ -490,10 +490,8 @@ class TriggerController extends FormController
 
     /**
      * Deletes the entity.
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         $page      = $request->getSession()->get('mautic.point.trigger.page', 1);
         $returnUrl = $this->generateUrl('mautic_pointtrigger_index', ['page' => $page]);
@@ -587,7 +585,7 @@ class TriggerController extends FormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $this->triggerModel->deleteEntities($deleteIds);
 
                 $flashes[] = [

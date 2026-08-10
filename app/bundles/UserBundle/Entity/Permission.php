@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\UserBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
@@ -183,6 +185,6 @@ class Permission implements CacheInvalidateInterface, UuidInterface
 
     public function getPermissionUser(): mixed
     {
-        return $this->getRole()->getCreatedBy();
+        return $this->role->getCreatedBy();
     }
 }

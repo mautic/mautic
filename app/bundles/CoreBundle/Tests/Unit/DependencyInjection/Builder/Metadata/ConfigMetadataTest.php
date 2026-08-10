@@ -6,6 +6,7 @@ namespace Mautic\CoreBundle\Tests\Unit\DependencyInjection\Builder\Metadata;
 
 use Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadata;
 use Mautic\CoreBundle\DependencyInjection\Builder\Metadata\ConfigMetadata;
+use Mautic\CoreBundle\IpLookup\ExtremeIpLookup;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -61,7 +62,7 @@ final class ConfigMetadataTest extends TestCase
             [
                 'extreme-ip' => [
                     'display_name' => 'Extreme-IP',
-                    'class'        => \Mautic\CoreBundle\IpLookup\ExtremeIpLookup::class,
+                    'class'        => ExtremeIpLookup::class,
                 ],
             ],
             $configMetadata->getIpLookupServices()

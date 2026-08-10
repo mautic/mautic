@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Twig\Extension;
 
 use Mautic\CoreBundle\Twig\Extension\HtmlExtension;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class HtmlExtensionTest extends TestCase
@@ -12,7 +13,7 @@ final class HtmlExtensionTest extends TestCase
     /**
      * @param array<string, mixed> $expected
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('convertStringToArrayProvider')]
+    #[DataProvider('convertStringToArrayProvider')]
     public function testConvertStringToArray(string $input, array|bool $expected): void
     {
         $extension = new HtmlExtension();

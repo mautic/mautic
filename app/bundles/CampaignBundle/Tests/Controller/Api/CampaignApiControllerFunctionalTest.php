@@ -19,6 +19,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -458,7 +459,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
             Request::METHOD_POST,
             '/api/campaigns/import',
             [],
-            ['file'         => new \Symfony\Component\HttpFoundation\File\UploadedFile($zipPath, 'import.zip')],
+            ['file'         => new UploadedFile($zipPath, 'import.zip')],
             ['CONTENT_TYPE' => 'multipart/form-data']
         );
 
@@ -564,7 +565,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $filePath = $this->createTemporaryFile('txt');
 
         // Upload the invalid file
-        $file = new \Symfony\Component\HttpFoundation\File\UploadedFile($filePath, 'test.txt', null, null, true);
+        $file = new UploadedFile($filePath, 'test.txt', null, null, true);
 
         $this->client->request(Request::METHOD_POST, '/api/campaigns/import', [], ['file' => $file]);
 
@@ -585,7 +586,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // Create a temporary file with a non-ZIP extension
         $filePath = $this->createTemporaryFile('txt');
-        $file     = new \Symfony\Component\HttpFoundation\File\UploadedFile($filePath, 'test.txt', null, null, true);
+        $file     = new UploadedFile($filePath, 'test.txt', null, null, true);
 
         $this->client->request(Request::METHOD_POST, '/api/campaigns/import', [], ['file' => $file]);
 
@@ -614,7 +615,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
             $this->fail('Failed to create test ZIP file.');
         }
 
-        $file = new \Symfony\Component\HttpFoundation\File\UploadedFile($zipPath, 'test.zip', null, null, true);
+        $file = new UploadedFile($zipPath, 'test.zip', null, null, true);
 
         try {
             $this->client->request(Request::METHOD_POST, '/api/campaigns/import', [], ['file' => $file]);

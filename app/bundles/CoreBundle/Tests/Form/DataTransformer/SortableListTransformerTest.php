@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Form\DataTransformer;
 
 use Mautic\CoreBundle\Form\DataTransformer\SortableListTransformer;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class SortableListTransformerTest extends TestCase
@@ -13,7 +14,7 @@ final class SortableListTransformerTest extends TestCase
      * @param array<string, array<int|string, string>>    $input
      * @param array<string, array<array<string, string>>> $expected
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('standardListProvider')]
+    #[DataProvider('standardListProvider')]
     public function testTransformStandardListWithLabels(array $input, array $expected): void
     {
         $transformer = new SortableListTransformer(withLabels: true, useKeyValuePairs: false);
@@ -26,7 +27,7 @@ final class SortableListTransformerTest extends TestCase
      * @param array<string, string>                       $input
      * @param array<string, array<array<string, string>>> $expected
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('keyValuePairProvider')]
+    #[DataProvider('keyValuePairProvider')]
     public function testTransformKeyValuePairs(array $input, array $expected): void
     {
         $transformer = new SortableListTransformer(withLabels: true, useKeyValuePairs: true);
@@ -39,7 +40,7 @@ final class SortableListTransformerTest extends TestCase
      * @param array<string, array<int|string, string>> $input
      * @param array<string, array<string>>             $expected
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('standardListWithoutLabelsProvider')]
+    #[DataProvider('standardListWithoutLabelsProvider')]
     public function testTransformListWithoutLabels(array $input, array $expected): void
     {
         $transformer = new SortableListTransformer(withLabels: false, useKeyValuePairs: false);
@@ -68,7 +69,7 @@ final class SortableListTransformerTest extends TestCase
      * @param array<string, array<array<string, string>>> $input
      * @param array<string, string>                       $expected
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('reverseKeyValuePairProvider')]
+    #[DataProvider('reverseKeyValuePairProvider')]
     public function testReverseTransformKeyValuePairs(array $input, array $expected): void
     {
         $transformer = new SortableListTransformer(withLabels: true, useKeyValuePairs: true);

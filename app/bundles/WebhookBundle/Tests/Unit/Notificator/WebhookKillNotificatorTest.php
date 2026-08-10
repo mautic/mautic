@@ -14,6 +14,7 @@ use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Event\WebhookNotificationEvent;
 use Mautic\WebhookBundle\Notificator\WebhookKillNotificator;
 use Mautic\WebhookBundle\Notificator\WebhookNotificationSender;
+use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -242,7 +243,7 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
                     return $this->details;
                 }
 
-                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->webhook->expects($this->once())

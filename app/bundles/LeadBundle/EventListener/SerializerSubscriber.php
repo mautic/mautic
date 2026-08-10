@@ -8,10 +8,10 @@ use JMS\Serializer\EventDispatcher\ObjectEvent;
 use Mautic\LeadBundle\Entity\LeadField;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class SerializerSubscriber implements EventSubscriberInterface
+final readonly class SerializerSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly RequestStack $requestStack,
+        private RequestStack $requestStack,
     ) {
     }
 

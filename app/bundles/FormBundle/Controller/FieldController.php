@@ -26,17 +26,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
 
-class FieldController extends CommonFormController
+final class FieldController extends CommonFormController
 {
-    private FieldModel $fieldModel;
-
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireFieldController(
-        FieldModel $fieldModel,
-    ): void {
-        $this->fieldModel = $fieldModel;
-    }
-
     public function __construct(
         private readonly FormModel $formModel,
         private readonly FieldModel $formFieldModel,
@@ -57,7 +48,6 @@ class FieldController extends CommonFormController
         $this->fieldHelper                 = $fieldHelper;
         $this->formFactory                 = $formFactory;
 
-        // @phpstan-ignore-next-line FormController extends deprecated AbstractStandardFormController; fix requires class hierarchy refactoring
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
@@ -126,7 +116,7 @@ class FieldController extends CommonFormController
 
                     // Generate or ensure a unique alias
                     $alias          = empty($formField['alias']) ? $formField['label'] : $formField['alias'];
-                    $formField['alias'] = $this->fieldModel->generateAlias($alias, $aliases);
+                    $formField['alias'] = $this->formFieldModel->generateAlias($alias, $aliases);
 
                     // Force required for captcha if not a honeypot
                     if ('captcha' == $formField['type']) {
@@ -393,7 +383,7 @@ class FieldController extends CommonFormController
             $this->throwAccessDenied();
         }
 
-        $formField = (array_key_exists($objectId, $fields)) ? $fields[$objectId] : null;
+        $formField = $fields[$objectId] ?? null;
 
         if ('POST' === $request->getMethod() && null !== $formField) {
             if ($formField['mappedObject'] && $formField['mappedField']) {
@@ -427,12 +417,9 @@ class FieldController extends CommonFormController
      */
     private function getFieldForm($formId, array $formField)
     {
-        // fire the form builder event
-        $formModel = $this->getModel('form.form');
-        \assert($formModel instanceof FormModel);
         $customComponents = $this->formModel->getCustomComponents();
         $customParams     = $customComponents['fields'][$formField['type']] ?? false;
-        $form = $this->fieldModel->createForm(
+        $form = $this->formFieldModel->createForm(
             $formField,
             $this->formFactory,
             (!empty($formField['id'])) ?

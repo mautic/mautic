@@ -9,8 +9,9 @@ use Mautic\PluginBundle\PluginEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
-class CanPublishValidator extends ConstraintValidator
+final class CanPublishValidator extends ConstraintValidator
 {
     public function __construct(
         private readonly EventDispatcherInterface $eventDispatcher,
@@ -23,7 +24,7 @@ class CanPublishValidator extends ConstraintValidator
             return;
         }
         if (!$constraint instanceof CanPublish) {
-            throw new \Symfony\Component\Validator\Exception\UnexpectedTypeException($constraint, CanPublish::class);
+            throw new UnexpectedTypeException($constraint, CanPublish::class);
         }
         $event = new PluginIsPublishedEvent($value, $constraint->integrationName);
         $event = $this->eventDispatcher->dispatch($event, PluginEvents::PLUGIN_IS_PUBLISHED_STATE_CHANGING);

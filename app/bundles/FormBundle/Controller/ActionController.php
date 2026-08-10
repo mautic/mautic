@@ -9,12 +9,13 @@ use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class ActionController extends CommonFormController
+final class ActionController extends CommonFormController
 {
     private FormModel $formModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireActionController(
         FormModel $formModel,
     ): void {
@@ -152,7 +153,7 @@ class ActionController extends CommonFormController
         $actions    = $session->get('mautic.form.'.$formId.'.actions.modified', []);
         $success    = 0;
         $valid      = $cancelled      = false;
-        $formAction = array_key_exists($objectId, $actions) ? $actions[$objectId] : null;
+        $formAction = $actions[$objectId] ?? null;
 
         if (null !== $formAction) {
             $actionType             = $formAction['type'];
@@ -287,7 +288,7 @@ class ActionController extends CommonFormController
             $this->throwAccessDenied();
         }
 
-        $formAction = (array_key_exists($objectId, $actions)) ? $actions[$objectId] : null;
+        $formAction = $actions[$objectId] ?? null;
         if ('POST' === $request->getMethod() && null !== $formAction) {
             // add the field to the delete list
             if (!in_array($objectId, $delete)) {

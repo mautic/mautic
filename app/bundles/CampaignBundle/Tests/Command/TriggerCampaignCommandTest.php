@@ -20,6 +20,7 @@ use Mautic\LeadBundle\Entity\Lead as Contact;
 use Mautic\LeadBundle\Entity\ListLeadRepository;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class TriggerCampaignCommandTest extends AbstractCampaignCommand
 {
@@ -34,7 +35,7 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         putenv('CAMPAIGN_EXECUTIONER_SCHEDULER_ACKNOWLEDGE_SECONDS=1');
 
-        $this->segmentCountCacheHelper = static::getContainer()->get('mautic.helper.segment.count.cache');
+        $this->segmentCountCacheHelper = self::getContainer()->get(SegmentCountCacheHelper::class);
     }
 
     public function beforeTearDown(): void
@@ -98,7 +99,7 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(0, $stats);
 
         // Wait 6 seconds then execute the campaign again to send scheduled events
-        static::getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
+        self::getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1, '-l' => 10]);
 
         // Send email 1 should no longer be scheduled
@@ -142,7 +143,7 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(25, $byEvent[10]);
 
         // Wait another 6 seconds to go beyond the inaction timeframe
-        static::getContainer()->get(InactiveExecutioner::class)->setNowTime(new \DateTime('+'.(self::CONDITION_SECONDS * 2).' seconds'));
+        self::getContainer()->get(InactiveExecutioner::class)->setNowTime(new \DateTime('+'.(self::CONDITION_SECONDS * 2).' seconds'));
 
         // Execute the command again to trigger inaction related events
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1, '-l' => 10]);
@@ -265,7 +266,7 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(0, $stats);
 
         // Wait 6 seconds then execute the campaign again to send scheduled events
-        static::getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
+        self::getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-id' => 1]);
 
         // Send email 1 should no longer be scheduled
@@ -309,7 +310,7 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(1, $byEvent[10]);
 
         // Wait 6 seconds to go beyond the inaction timeframe
-        static::getContainer()->get(InactiveExecutioner::class)->setNowTime(new \DateTime('+'.(self::CONDITION_SECONDS * 2).' seconds'));
+        self::getContainer()->get(InactiveExecutioner::class)->setNowTime(new \DateTime('+'.(self::CONDITION_SECONDS * 2).' seconds'));
 
         // Execute the command again to trigger inaction related events
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-id' => 1]);
@@ -426,7 +427,7 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(0, $stats);
 
         // Wait 6 seconds then execute the campaign again to send scheduled events
-        static::getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
+        self::getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3,4,19']);
 
         // Send email 1 should no longer be scheduled
@@ -469,7 +470,7 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(2, $byEvent[10]);
 
         // Wait 6 seconds to go beyond the inaction timeframe
-        static::getContainer()->get(InactiveExecutioner::class)->setNowTime(new \DateTime('+'.(self::CONDITION_SECONDS * 2).' seconds'));
+        self::getContainer()->get(InactiveExecutioner::class)->setNowTime(new \DateTime('+'.(self::CONDITION_SECONDS * 2).' seconds'));
 
         // Execute the command again to trigger inaction related events
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3,4,19']);
@@ -817,7 +818,7 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
      * @param array<array{dateAdded: string, details: array<string, array<int, mixed>>}> $auditLogs
      * @param array<int, array<string, string>>                                          $expectedTriggerDateLog
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('republishBehaviorProvider')]
+    #[DataProvider('republishBehaviorProvider')]
     public function testTriggerCampaignCommandWithRepublishBehavior(
         string $republishBehavior,
         string $triggerMode,

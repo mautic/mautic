@@ -13,6 +13,8 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\TrailingSlashHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
+use Mautic\CoreBundle\Model\MauticModelInterface;
+use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
@@ -29,7 +31,9 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Service\Attribute\Required;
+use Twig\Environment;
 
 class CommonController extends AbstractController implements MauticController
 {
@@ -39,15 +43,27 @@ class CommonController extends AbstractController implements MauticController
 
     private PageModel $pageModel;
 
-    private \Mautic\CoreBundle\Model\NotificationModel $notificationModel;
+    private NotificationModel $notificationModel;
+
+    protected RouterInterface $router;
+
+    protected HttpKernelInterface $httpKernel;
+
+    protected Environment $twig;
 
     #[Required]
     public function autowireCommonController(
         PageModel $pageModel,
-        \Mautic\CoreBundle\Model\NotificationModel $notificationModel,
+        NotificationModel $notificationModel,
+        RouterInterface $router,
+        HttpKernelInterface $httpKernel,
+        Environment $twig,
     ): void {
         $this->pageModel = $pageModel;
         $this->notificationModel = $notificationModel;
+        $this->router = $router;
+        $this->httpKernel = $httpKernel;
+        $this->twig = $twig;
     }
 
     /**
@@ -61,16 +77,15 @@ class CommonController extends AbstractController implements MauticController
         protected EventDispatcherInterface $dispatcher,
         protected Translator $translator,
         private FlashBag $flashBag,
-        private ?RequestStack $requestStack,
-        protected ?CorePermissions $security,
+        private RequestStack $requestStack,
+        protected CorePermissions $security,
     ) {
         $this->user = $userHelper->getUser();
     }
 
     protected function getCurrentRequest(): Request
     {
-        $request = null !== $this->requestStack ? $this->requestStack->getCurrentRequest() : null;
-
+        $request = $this->requestStack->getCurrentRequest();
         if (null === $request) {
             throw new \RuntimeException('Request is not set.');
         }
@@ -153,7 +168,7 @@ class CommonController extends AbstractController implements MauticController
      * : ($modelNameKey is 'webhook' ? \Mautic\WebhookBundle\Model\WebhookModel
      *     : \Mautic\CoreBundle\Model\AbstractCommonModel<object>)))))))))))))))))))))))))))))))))))))))))))))))))
      */
-    protected function getModel($modelNameKey): \Mautic\CoreBundle\Model\MauticModelInterface
+    protected function getModel($modelNameKey): MauticModelInterface
     {
         return $this->modelFactory->getModel($modelNameKey);
     }
@@ -173,7 +188,7 @@ class CommonController extends AbstractController implements MauticController
         $path['_controller'] = $controller;
         $subRequest          = $this->requestStack->getCurrentRequest()->duplicate($query, $request, $path);
 
-        return $this->container->get('http_kernel')->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
+        return $this->httpKernel->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
     }
 
     /**
@@ -367,7 +382,7 @@ class CommonController extends AbstractController implements MauticController
             $ajaxRouteName = false;
 
             try {
-                $routeParams   = $this->container->get('router')->match($routePath);
+                $routeParams   = $this->router->match($routePath);
                 $ajaxRouteName = $routeParams['_route'];
 
                 $request->attributes->set('ajaxRoute',

@@ -4,18 +4,16 @@ namespace MauticPlugin\MauticEmailMarketingBundle\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
 
-class MailchimpApi extends EmailMarketingApi
+final class MailchimpApi extends EmailMarketingApi
 {
     private string $version = '3.0';
 
     /**
-     * @param string $method
-     *
      * @return mixed|string
      *
      * @throws ApiErrorException
      */
-    protected function request($endpoint, array $parameters = [], $method = 'GET')
+    private function request(string $endpoint, array $parameters = [], string $method = 'GET')
     {
         if (isset($this->keys['password'])) {
             // Extract the dc from the key

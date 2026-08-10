@@ -7,6 +7,7 @@ namespace Mautic\PageBundle\Tests\Functional\Model;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\Page;
+use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 
 final class PageHitCookieTest extends MauticMysqlTestCase
@@ -44,7 +45,7 @@ final class PageHitCookieTest extends MauticMysqlTestCase
         // Verify the cookie was set
         $cookieJar   = $this->client->getCookieJar();
         $cookie      = $cookieJar->get('mautic_referer_id');
-        $this->assertInstanceOf(\Symfony\Component\BrowserKit\Cookie::class, $cookie, 'Cookie mautic_referer_id should be set');
+        $this->assertInstanceOf(Cookie::class, $cookie, 'Cookie mautic_referer_id should be set');
 
         $cookieValue = $cookie->getValue();
         $this->assertNotSame('', $cookieValue, 'Cookie value should not be empty');

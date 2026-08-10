@@ -14,7 +14,7 @@ use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
+final class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
 {
     use TimelineEventLogTrait;
 

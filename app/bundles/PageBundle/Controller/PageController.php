@@ -20,21 +20,22 @@ use Mautic\PageBundle\Event\PageEditSubmitEvent;
 use Mautic\PageBundle\Exception\InvalidRenderedHtmlException;
 use Mautic\PageBundle\Helper\PageConfig;
 use Mautic\PageBundle\Model\PageModel;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class PageController extends FormController
+final class PageController extends FormController
 {
     use FormErrorMessagesTrait;
 
     private PageModel $pageModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowirePageController(PageModel $pageModel): void
-    {
+    #[Required]
+    public function autowirePageController(
+        PageModel $pageModel,
+    ): void {
         $this->pageModel = $pageModel;
     }
 
@@ -104,12 +105,10 @@ class PageController extends FormController
             ];
         }
 
-        $translator = $this->translator;
-
         // do not list variants in the main list
         $filter['force'][] = ['column' => 'p.variantParent', 'expr' => 'isNull'];
 
-        $langSearchCommand = $translator->trans('mautic.core.searchcommand.lang');
+        $langSearchCommand = $this->translator->trans('mautic.core.searchcommand.lang');
         if (!str_contains($search, "{$langSearchCommand}:")) {
             $filter['force'][] = ['column' => 'p.translationParent', 'expr' => 'isNull'];
         }
@@ -480,8 +479,6 @@ class PageController extends FormController
 
     /**
      * Generates edit form and processes post data.
-     *
-     * @return JsonResponse|Response
      */
     public function editAction(
         Request $request,
@@ -490,7 +487,7 @@ class PageController extends FormController
         ThemeHelper $themeHelper,
         int $objectId,
         bool $ignorePost = false,
-    ) {
+    ): Response {
         $entity     = $model->getEntity($objectId);
         $session    = $request->getSession();
         $page       = $request->getSession()->get('mautic.page.page', 1);
@@ -714,10 +711,8 @@ class PageController extends FormController
 
     /**
      * Deletes the entity.
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, PageModel $model, $objectId)
+    public function deleteAction(Request $request, PageModel $model, $objectId): Response
     {
         $page      = $request->getSession()->get('mautic.page.page', 1);
         $returnUrl = $this->generateUrl('mautic_page_index', ['page' => $page]);
@@ -816,7 +811,7 @@ class PageController extends FormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $this->pageModel->deleteEntities($deleteIds);
 
                 $flashes[] = [
@@ -918,10 +913,8 @@ class PageController extends FormController
 
     /**
      * Make the variant the main.
-     *
-     * @return Response
      */
-    public function winnerAction(Request $request, PageModel $model, $objectId)
+    public function winnerAction(Request $request, PageModel $model, $objectId): Response
     {
         // todo - add confirmation to button click
         $page      = $request->getSession()->get('mautic.page.page', 1);

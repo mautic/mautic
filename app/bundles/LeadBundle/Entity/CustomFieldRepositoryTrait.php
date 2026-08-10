@@ -292,7 +292,7 @@ trait CustomFieldRepositoryTrait
     /**
      * Function to remove non custom field columns from an arrayed lead row.
      */
-    protected function removeNonFieldColumns(array &$r, array $fixedFields = [])
+    protected function removeNonFieldColumns(array &$r, array $fixedFields = []): void
     {
         $baseCols = $this->getBaseColumns($this->getClassName(), true);
         foreach ($baseCols as $c) {
@@ -399,7 +399,7 @@ trait CustomFieldRepositoryTrait
         return $this->customFieldList;
     }
 
-    protected function prepareDbalFieldsForSave(array &$fields)
+    protected function prepareDbalFieldsForSave(array &$fields): void
     {
         // Ensure booleans are integers
         foreach ($fields as $field => &$value) {
@@ -445,7 +445,7 @@ trait CustomFieldRepositoryTrait
     /**
      * Inherit and use in class if required to do something with the entity after persisting.
      */
-    protected function postSaveEntity($entity)
+    protected function postSaveEntity($entity): void
     {
         // Inherit and use if required
     }

@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Field\CustomFieldColumn;
 use Mautic\LeadBundle\Field\Dispatcher\FieldSaveDispatcher;
 use Mautic\LeadBundle\Field\FieldList;
@@ -21,6 +22,7 @@ use Mautic\LeadBundle\Field\LeadFieldDeleter;
 use Mautic\LeadBundle\Field\LeadFieldSaver;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\ListModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -32,11 +34,11 @@ final class FieldModelTest extends MauticMysqlTestCase
     /**
      * @param array<string, mixed[]> $filters
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataForGetFieldsProperties')]
+    #[DataProvider('dataForGetFieldsProperties')]
     public function testGetFieldsProperties(array $filters, int $expectedCount): void
     {
         /** @var FieldModel $fieldModel */
-        $fieldModel = self::getContainer()->get('mautic.lead.model.field');
+        $fieldModel = self::getContainer()->get(FieldModel::class);
 
         // Create an unpublished lead field.
         $field = new LeadField();
@@ -98,7 +100,7 @@ final class FieldModelTest extends MauticMysqlTestCase
     public function testSingleContactFieldIsCreatedAndDeleted(): void
     {
         /** @var FieldModel $fieldModel */
-        $fieldModel = static::getContainer()->get('mautic.lead.model.field');
+        $fieldModel = self::getContainer()->get(FieldModel::class);
 
         $field = new LeadField();
         $field->setName('Test Field')
@@ -115,7 +117,7 @@ final class FieldModelTest extends MauticMysqlTestCase
     public function testSingleCompanyFieldIsCreatedAndDeleted(): void
     {
         /** @var FieldModel $fieldModel */
-        $fieldModel = static::getContainer()->get('mautic.lead.model.field');
+        $fieldModel = self::getContainer()->get(FieldModel::class);
 
         $field = new LeadField();
         $field->setName('Test Field')
@@ -132,7 +134,7 @@ final class FieldModelTest extends MauticMysqlTestCase
     public function testMultipleFieldsAreCreatedAndDeleted(): void
     {
         /** @var FieldModel $fieldModel */
-        $fieldModel = static::getContainer()->get('mautic.lead.model.field');
+        $fieldModel = self::getContainer()->get(FieldModel::class);
 
         $leadField = new LeadField();
         $leadField->setName('Test Field')
@@ -211,6 +213,7 @@ final class FieldModelTest extends MauticMysqlTestCase
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(CoreParametersHelper::class),
+            $this->createStub(LeadRepository::class), // $leadRepository
         );
 
         $result = $fieldModel->generateUniqueFieldAlias('alias');
@@ -251,6 +254,7 @@ final class FieldModelTest extends MauticMysqlTestCase
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(CoreParametersHelper::class),
+            $this->createStub(LeadRepository::class), // $leadRepository
         );
         $this->assertTrue($model->isUsedField($leadField));
     }
@@ -296,7 +300,7 @@ final class FieldModelTest extends MauticMysqlTestCase
 
         $this->connection->getConfiguration()->setSQLLogger($stack); /** @phpstan-ignore-line SQLLogger is deprecated */
         /** @var FieldModel $fieldModel */
-        $fieldModel = $this->getContainer()->get('mautic.lead.model.field');
+        $fieldModel = $this->getContainer()->get(FieldModel::class);
 
         // Ensure the index exists
         $emailField = $fieldModel->getEntityByAlias('email');

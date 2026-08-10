@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PointBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
@@ -318,6 +320,6 @@ class TriggerEvent implements UuidInterface
 
     public function getPermissionUser(): mixed
     {
-        return $this->getTrigger()->getCreatedBy();
+        return $this->trigger->getCreatedBy();
     }
 }

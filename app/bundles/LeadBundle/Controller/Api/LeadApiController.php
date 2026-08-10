@@ -6,7 +6,6 @@ use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\CampaignBundle\Model\CampaignModel;
-use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\ArrayHelper;
@@ -24,9 +23,13 @@ use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\DeviceModel;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\NoteModel;
+use Mautic\StageBundle\Model\StageModel;
+use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -38,13 +41,11 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Lead>
  */
-class LeadApiController extends CommonApiController
+final class LeadApiController extends CommonApiController
 {
     use CustomFieldsApiControllerTrait;
     use FrequencyRuleTrait;
     use LeadDetailsTrait;
-
-    public const MODEL_ID = 'lead.lead';
 
     /**
      * @var LeadModel|null
@@ -71,11 +72,14 @@ class LeadApiController extends CommonApiController
         CoreParametersHelper $coreParametersHelper,
         private CampaignModel $campaignModel,
         private FieldModel $leadFieldModel,
+        LeadModel $leadModel,
+        private StageModel $stageModel,
+        private UserModel $userModel,
+        private DeviceModel $deviceModel,
+        private NoteModel $noteModel,
     ) {
         $this->doNotContactModel = $doNotContactModel;
 
-        $leadModel = $modelFactory->getModel(self::MODEL_ID);
-        \assert($leadModel instanceof LeadModel);
         $this->model            = $leadModel;
         $this->entityClass      = Lead::class;
         $this->entityNameOne    = 'contact';
@@ -162,7 +166,7 @@ class LeadApiController extends CommonApiController
 
         $defaultPageLimit = (int) $this->coreParametersHelper->get('default_pagelimit');
 
-        $results = $this->getModel('lead.note')->getEntities(
+        $results = $this->noteModel->getEntities(
             [
                 'start'  => $request->query->get('start', '0'),
                 'limit'  => $request->query->getInt('limit', $defaultPageLimit),
@@ -214,7 +218,7 @@ class LeadApiController extends CommonApiController
 
         $defaultPagelimit = (int) $this->coreParametersHelper->get('default_pagelimit');
 
-        $results = $this->getModel('lead.device')->getEntities(
+        $results = $this->deviceModel->getEntities(
             [
                 'start'  => $request->query->get('start', '0'),
                 'limit'  => $request->query->getInt('limit', $defaultPagelimit),
@@ -400,10 +404,8 @@ class LeadApiController extends CommonApiController
 
     /**
      * Adds a DNC to the contact.
-     *
-     * @return Response
      */
-    public function addDncAction(Request $request, $id, $channel)
+    public function addDncAction(Request $request, $id, $channel): Response
     {
         $entity = $this->model->getEntity((int) $id);
 
@@ -434,8 +436,7 @@ class LeadApiController extends CommonApiController
 
         $comments = InputHelper::clean($request->request->get('comments'));
 
-        $doNotContact = $this->doNotContactModel;
-        $doNotContact->addDncForContact($entity->getId(), $channel, $reason, $comments);
+        $this->doNotContactModel->addDncForContact($entity->getId(), $channel, $reason, $comments);
         $view = $this->view([$this->entityNameOne => $entity]);
 
         return $this->handleView($view);
@@ -446,8 +447,6 @@ class LeadApiController extends CommonApiController
      */
     public function removeDncAction($id, $channel): Response
     {
-        $doNotContact = $this->doNotContactModel;
-
         $entity = $this->model->getEntity((int) $id);
 
         if (null === $entity) {
@@ -458,7 +457,7 @@ class LeadApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $result = $doNotContact->removeDncForContact($entity->getId(), $channel);
+        $result = $this->doNotContactModel->removeDncForContact($entity->getId(), $channel);
         $view   = $this->view(
             [
                 'recordFound'        => $result,
@@ -475,10 +474,8 @@ class LeadApiController extends CommonApiController
      * @param int              $id
      * @param string           $method
      * @param array<mixed>|int $data
-     *
-     * @return Response
      */
-    protected function applyUtmTagsAction($id, $method, $data)
+    protected function applyUtmTagsAction($id, $method, $data): Response
     {
         $entity = $this->model->getEntity((int) $id);
 
@@ -580,11 +577,9 @@ class LeadApiController extends CommonApiController
             $existingEntity = $this->model->checkForDuplicateContact($this->entityRequestParameters);
             \assert($existingEntity instanceof Lead);
 
-            $contactMerger = $this->contactMerger;
-
             if ($entity->getId() && $existingEntity->getId()) {
                 try {
-                    $entity = $contactMerger->merge($entity, $existingEntity);
+                    $entity = $this->contactMerger->merge($entity, $existingEntity);
                 } catch (SameContactException) {
                 }
             } elseif ($existingEntity->getId()) {
@@ -607,13 +602,13 @@ class LeadApiController extends CommonApiController
         }
 
         if (isset($parameters['owner'])) {
-            $owner = $this->getModel('user.user')->getEntity((int) $parameters['owner']);
+            $owner = $this->userModel->getEntity((int) $parameters['owner']);
             $entity->setOwner($owner);
             unset($parameters['owner']);
         }
 
         if (isset($parameters['stage'])) {
-            $stage = $this->getModel('stage.stage')->getEntity((int) $parameters['stage']);
+            $stage = $this->stageModel->getEntity((int) $parameters['stage']);
             $entity->setStage($stage);
             unset($parameters['stage']);
         }
@@ -625,7 +620,6 @@ class LeadApiController extends CommonApiController
         // Since the request can be from 3rd party, check for an IP address if included
         if (isset($this->entityRequestParameters['ipAddress'])) {
             $ipAddress = $this->ipLookupHelper->getIpAddress($this->entityRequestParameters['ipAddress']);
-            \assert($ipAddress instanceof IpAddress);
 
             if (!$entity->getIpAddresses()->contains($ipAddress)) {
                 $entity->addIpAddress($ipAddress);
@@ -649,19 +643,17 @@ class LeadApiController extends CommonApiController
 
                 $reason = (int) ArrayHelper::getValue('reason', $dnc, DoNotContact::MANUAL);
 
-                $doNotContact = $this->doNotContactModel;
-
                 if (DoNotContact::IS_CONTACTABLE === $reason) {
                     if (!empty($entity->getId())) {
                         // Remove DNC record
-                        $doNotContact->removeDncForContact($entity->getId(), $channel, false);
+                        $this->doNotContactModel->removeDncForContact($entity->getId(), $channel, false);
                     }
                 } elseif (empty($entity->getId())) {
                     // Contact doesn't exist yet. Directly create a DNC record on the entity.
-                    $doNotContact->createDncRecord($entity, $channel, $reason, $comments);
+                    $this->doNotContactModel->createDncRecord($entity, $channel, $reason, $comments);
                 } else {
                     // Add DNC record to existing contact
-                    $doNotContact->addDncForContact($entity->getId(), $channel, $reason, $comments, false);
+                    $this->doNotContactModel->addDncForContact($entity->getId(), $channel, $reason, $comments, false);
                 }
             }
             unset($parameters['doNotContact']);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
@@ -13,7 +15,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<CampaignEventPointType>
  */
-class CampaignEventPointType extends AbstractType
+final class CampaignEventPointType extends AbstractType
 {
     public function __construct(
         private readonly TypeOperatorProviderInterface $typeOperatorProvider,

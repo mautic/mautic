@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Doctrine\Helper;
 
 use Mautic\CoreBundle\Doctrine\Helper\FulltextKeyword;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class FulltextKeywordTest extends TestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataDefault')]
+    #[DataProvider('dataDefault')]
     public function testDefault(string $value, string $expected): void
     {
         $fulltextKeyword = new FulltextKeyword($value);
@@ -29,7 +30,7 @@ final class FulltextKeywordTest extends TestCase
         yield ['', ''];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataInflectingEnabled')]
+    #[DataProvider('dataInflectingEnabled')]
     public function testInflectingEnabled(string $value, string $expected): void
     {
         $fulltextKeyword = new FulltextKeyword($value, true, true, true);
@@ -49,7 +50,7 @@ final class FulltextKeywordTest extends TestCase
         yield ['', ''];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataWordSearchDisabled')]
+    #[DataProvider('dataWordSearchDisabled')]
     public function testWordSearchDisabled(string $value, string $expected): void
     {
         $fulltextKeyword = new FulltextKeyword($value, true, false);
@@ -69,7 +70,7 @@ final class FulltextKeywordTest extends TestCase
         yield ['', ''];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataBooleanModeDisabled')]
+    #[DataProvider('dataBooleanModeDisabled')]
     public function testBooleanModeDisabled(string $value, string $expected): void
     {
         $fulltextKeyword = new FulltextKeyword($value, false);

@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\StageBundle\Entity\Stage;
+use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -22,7 +23,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Stage>
  */
-class StageApiController extends CommonApiController
+final class StageApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
@@ -38,7 +39,7 @@ class StageApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        \Mautic\StageBundle\Model\StageModel $stageModel,
+        StageModel $stageModel,
         private LeadModel $leadModel,
     ) {
         $this->model            = $stageModel;

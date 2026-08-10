@@ -16,6 +16,7 @@ use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\EventListener\FormSubscriber;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -109,7 +110,7 @@ New line',
         $this->subscriber->onFormSubmitActionSendEmail($submissionEvent);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('toCcBccProvider')]
+    #[DataProvider('toCcBccProvider')]
     public function testOnFormSubmitSendsIfOneOfEmailsEmailsWereSet(?string $to, ?string $cc, ?string $bcc): void
     {
         $subject    = 'subject';

@@ -8,6 +8,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\AssetRepository;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -26,12 +27,12 @@ final class AssetRepositoryTest extends TestCase
             'mautic.asset.asset.searchcommand.ispending' => 'is:pending',
             default                                      => $id,
         });
-        $repository->setTranslator($translator);
+        $repository->autowireCommonRepository($translator);
 
         return $repository;
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataExpirationFilters')]
+    #[DataProvider('dataExpirationFilters')]
     public function testAddSearchCommandWhereClauseHandlesExpirationFilters(string $command, string $expected): void
     {
         $repository = $this->getRepository();

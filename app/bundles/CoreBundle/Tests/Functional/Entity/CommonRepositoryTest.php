@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Functional\Entity;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Attributes\TestDox;
 
 final class CommonRepositoryTest extends MauticMysqlTestCase
 {
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that is:mine does not throw an exception due to bad DQL')]
+    #[TestDox('Test that is:mine does not throw an exception due to bad DQL')]
     public function testIsMineSearchCommandDoesntCauseExceptionDueToBadDQL(): void
     {
         $this->client->request('GET', 's/contacts?search=is:mine');

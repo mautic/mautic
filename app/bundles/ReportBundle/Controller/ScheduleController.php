@@ -4,16 +4,19 @@ namespace Mautic\ReportBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\ReportBundle\Scheduler\Date\DateBuilder;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class ScheduleController extends CommonAjaxController
+final class ScheduleController extends CommonAjaxController
 {
-    private \Mautic\ReportBundle\Model\ReportModel $reportModel;
+    private ReportModel $reportModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireScheduleController(\Mautic\ReportBundle\Model\ReportModel $reportModel): void
-    {
+    #[Required]
+    public function autowireScheduleController(
+        ReportModel $reportModel,
+    ): void {
         $this->reportModel = $reportModel;
     }
 
@@ -45,7 +48,6 @@ class ScheduleController extends CommonAjaxController
         /** @var \Mautic\ReportBundle\Entity\Report $report */
         $report = $this->reportModel->getEntity($reportId);
 
-        /** @var \Mautic\CoreBundle\Security\Permissions\CorePermissions $security */
         $security = $this->security;
 
         if (empty($report)) {

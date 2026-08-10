@@ -9,11 +9,13 @@ use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
+use Mautic\FormBundle\Entity\FieldRepository;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
@@ -22,34 +24,40 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class PublicController extends CommonFormController
+final class PublicController extends CommonFormController
 {
+    private CompanyRepository $companyRepository;
+
+    private FieldRepository $fieldRepository;
+
     private SubmissionModel $submissionModel;
 
     private FormModel $formModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowirePublicController(
         FormModel $formModel,
         SubmissionModel $submissionModel,
+        FieldRepository $fieldRepository,
+        CompanyRepository $companyRepository,
     ): void {
         $this->formModel = $formModel;
         $this->submissionModel = $submissionModel;
+        $this->fieldRepository = $fieldRepository;
+        $this->companyRepository = $companyRepository;
     }
 
     private array $tokens = [];
 
-    /**
-     * @return RedirectResponse|Response
-     */
     public function submitAction(
         Request $request,
         DateHelper $dateTemplateHelper,
         PageTokenHelper $pageTokenHelper,
         NotificationModel $notificationModel,
         UserRepository $userRepository,
-    ) {
+    ): Response {
         if ('POST' !== $request->getMethod()) {
             $this->throwAccessDenied();
         }
@@ -135,8 +143,6 @@ class PublicController extends CommonFormController
             if (null === $form) {
                 $result['error'] = $this->translator->trans('mautic.form.submit.error.unavailable', [], 'flashes');
             } else {
-                \assert($form instanceof Form);
-
                 $result['form']               = $form;
                 $result['postAction']         = $form->getPostAction();
                 $result['postActionProperty'] = $form->getPostActionProperty();
@@ -668,10 +674,10 @@ class PublicController extends CommonFormController
             return new JsonResponse($vagueErrorMessage, JsonResponse::HTTP_BAD_REQUEST);
         }
 
-        if (!$fieldModel->getRepository()->fieldExistsByFormAndType($formId, 'companyLookup')) {
+        if (!$this->fieldRepository->fieldExistsByFormAndType($formId, 'companyLookup')) {
             return new JsonResponse($vagueErrorMessage, JsonResponse::HTTP_BAD_REQUEST);
         }
 
-        return new JsonResponse($companyModel->getRepository()->getCompanyLookupData($search));
+        return new JsonResponse($this->companyRepository->getCompanyLookupData($search));
     }
 }

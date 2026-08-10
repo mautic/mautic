@@ -7,6 +7,7 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Model\SmsModel;
@@ -17,18 +18,18 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class SmsController extends FormController
+final class SmsController extends FormController
 {
     use EntityContactsTrait;
 
-    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
+    private AuditLogModel $auditLogModel;
 
     private SmsModel $smsModel;
 
     #[Required]
     public function autowireSmsController(
         SmsModel $smsModel,
-        \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel,
+        AuditLogModel $auditLogModel,
     ): void {
         $this->smsModel = $smsModel;
         $this->auditLogModel = $auditLogModel;
@@ -255,10 +256,8 @@ class SmsController extends FormController
      * Generates new form and processes post data.
      *
      * @param Sms $entity
-     *
-     * @return RedirectResponse|Response
      */
-    public function newAction(Request $request, $entity = null)
+    public function newAction(Request $request, $entity = null): Response
     {
         if (!$entity instanceof Sms) {
             /** @var Sms $entity */
@@ -389,10 +388,8 @@ class SmsController extends FormController
     /**
      * @param bool $ignorePost
      * @param bool $forceTypeSelection
-     *
-     * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false, $forceTypeSelection = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false, $forceTypeSelection = false): JsonResponse|RedirectResponse|Response
     {
         $method  = $request->getMethod();
         $entity  = $this->smsModel->getEntity($objectId);
@@ -578,10 +575,8 @@ class SmsController extends FormController
 
     /**
      * Deletes the entity.
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         $page      = $request->getSession()->get('mautic.sms.page', 1);
         $returnUrl = $this->generateUrl('mautic_sms_index', ['page' => $page]);
@@ -686,7 +681,7 @@ class SmsController extends FormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $this->smsModel->deleteEntities($deleteIds);
 
                 $flashes[] = [
@@ -726,15 +721,13 @@ class SmsController extends FormController
 
     /**
      * @param int $page
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
     public function contactsAction(
         Request $request,
         PageHelperFactoryInterface $pageHelperFactory,
         $objectId,
         $page = 1,
-    ) {
+    ): Response {
         return $this->generateContactsGrid(
             $request,
             $pageHelperFactory,

@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\EmailBundle\Entity\CopyRepository;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Helper\FromEmailHelper;
@@ -23,7 +24,6 @@ use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\EventListener\OwnerSubscriber;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Entity\User;
@@ -42,7 +42,7 @@ final class OwnerSubscriberTest extends TestCase
     /**
      * @var array<int, array<string, int|string|null>>
      */
-    protected array $contacts = [
+    private array $contacts = [
         [
             'id'        => 1,
             'email'     => 'contact1@somewhere.com',
@@ -89,8 +89,7 @@ final class OwnerSubscriberTest extends TestCase
 
     public function testOnEmailBuild(): void
     {
-        $leadModel  = $this->getMockLeadModel();
-        $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
+        $subscriber = new OwnerSubscriber($this->getMockTranslator(), $this->getMockLeadRepository());
         $event      = new EmailBuilderEvent($this->getMockTranslator());
         $subscriber->onEmailBuild($event);
 
@@ -102,8 +101,7 @@ final class OwnerSubscriberTest extends TestCase
 
     public function testOnEmailGenerate(): void
     {
-        $leadModel  = $this->getMockLeadModel();
-        $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
+        $subscriber = new OwnerSubscriber($this->getMockTranslator(), $this->getMockLeadRepository());
 
         $mailer = $this->getMockMailer($this->contacts[0]);
         $event  = $this->getEmailSendEvent($mailer);
@@ -121,8 +119,7 @@ final class OwnerSubscriberTest extends TestCase
 
     public function testOnEmailGenerateWithFakeOwner(): void
     {
-        $leadModel  = $this->getMockLeadModel();
-        $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
+        $subscriber = new OwnerSubscriber($this->getMockTranslator(), $this->getMockLeadRepository());
 
         $mailer = $this->getMockMailer($this->contacts[1]);
         $event  = $this->getEmailSendEvent($mailer);
@@ -136,8 +133,7 @@ final class OwnerSubscriberTest extends TestCase
 
     public function testOnEmailGenerateWithNoOwner(): void
     {
-        $leadModel  = $this->getMockLeadModel();
-        $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
+        $subscriber = new OwnerSubscriber($this->getMockTranslator(), $this->getMockLeadRepository());
 
         $mailer = $this->getMockMailer($this->contacts[4]);
         $event  = $this->getEmailSendEvent($mailer);
@@ -155,8 +151,7 @@ final class OwnerSubscriberTest extends TestCase
 
     public function testOnEmailDisplay(): void
     {
-        $leadModel  = $this->getMockLeadModel();
-        $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
+        $subscriber = new OwnerSubscriber($this->getMockTranslator(), $this->getMockLeadRepository());
 
         $mailer = $this->getMockMailer($this->contacts[0]);
         $event  = $this->getEmailSendEvent($mailer);
@@ -170,8 +165,7 @@ final class OwnerSubscriberTest extends TestCase
 
     public function testOnEmailDisplayWithFakeOwner(): void
     {
-        $leadModel  = $this->getMockLeadModel();
-        $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
+        $subscriber = new OwnerSubscriber($this->getMockTranslator(), $this->getMockLeadRepository());
 
         $mailer = $this->getMockMailer($this->contacts[1]);
         $event  = $this->getEmailSendEvent($mailer);
@@ -185,8 +179,7 @@ final class OwnerSubscriberTest extends TestCase
 
     public function testOnEmailDisplayWithNoOwner(): void
     {
-        $leadModel  = $this->getMockLeadModel();
-        $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
+        $subscriber = new OwnerSubscriber($this->getMockTranslator(), $this->getMockLeadRepository());
 
         $mailer = $this->getMockMailer($this->contacts[4]);
         $event  = $this->getEmailSendEvent($mailer);
@@ -202,7 +195,7 @@ final class OwnerSubscriberTest extends TestCase
         $this->assertEquals('', $tokens['{ownerfield=lastname}']);
     }
 
-    protected function getMockLeadModel(): LeadModel&MockObject
+    protected function getMockLeadRepository(): LeadRepository&MockObject
     {
         $mockLeadRepository = $this->createMock(LeadRepository::class);
 
@@ -215,16 +208,7 @@ final class OwnerSubscriberTest extends TestCase
                 ]
             );
 
-        $mockLeadModel = $this->createMock(LeadModel::class);
-
-        $mockLeadModel->method('getRepository')
-            ->willReturn($mockLeadRepository);
-
-        $mockMailboxHelper = $this->createMock(Mailbox::class);
-        $mockMailboxHelper->method('isConfigured')
-            ->willReturn(false);
-
-        return $mockLeadModel;
+        return $mockLeadRepository;
     }
 
     /**
@@ -298,6 +282,7 @@ final class OwnerSubscriberTest extends TestCase
             $this->createStub(RedirectModel::class),
             $this->createStub(SMimeHelper::class),
             $this->createStub(EmailStatModel::class),
+            $this->createStub(CopyRepository::class),
         );
         $mailerHelper->setLead($lead);
 
@@ -323,11 +308,9 @@ final class OwnerSubscriberTest extends TestCase
         foreach ($this->onSmsTokenReplacementProvider() as $data) {
             [$content, $expected, $lead] = $data;
 
-            $leadModel      = $this->createMock(LeadModel::class);
             $leadRepository = $this->createMock(LeadRepository::class);
             $leadRepository->method('getLeadOwner')->willReturn(['first_name' => 'John', 'last_name' => 'Doe']);
-            $leadModel->method('getRepository')->willReturn($leadRepository);
-            $subscriber = new OwnerSubscriber($leadModel, $this->createStub(TranslatorInterface::class));
+            $subscriber = new OwnerSubscriber($this->createStub(TranslatorInterface::class), $leadRepository);
 
             $event = new TokenReplacementEvent($content, $lead);
             $subscriber->onSmsTokenReplacement($event);

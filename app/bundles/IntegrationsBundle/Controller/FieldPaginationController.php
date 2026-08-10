@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class FieldPaginationController extends CommonController
+final class FieldPaginationController extends CommonController
 {
     public function paginateAction(
         Request $request,

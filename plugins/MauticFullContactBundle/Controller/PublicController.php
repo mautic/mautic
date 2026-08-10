@@ -2,37 +2,51 @@
 
 namespace MauticPlugin\MauticFullContactBundle\Controller;
 
+use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\FormBundle\Controller\FormController;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
 use MauticPlugin\MauticFullContactBundle\Helper\LookupHelper;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class PublicController extends FormController
+final class PublicController extends FormController
 {
-    private \Mautic\LeadBundle\Model\CompanyModel $companyModel;
+    private CompanyRepository $companyRepository;
 
-    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
+    private LeadRepository $leadRepository;
 
-    private \Mautic\CoreBundle\Model\NotificationModel $notificationModel;
+    private CompanyModel $companyModel;
+
+    private LeadModel $leadModel;
+
+    private NotificationModel $notificationModel;
 
     private UserModel $userModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowirePublicController(
-        \Mautic\LeadBundle\Model\LeadModel $leadModel,
-        \Mautic\LeadBundle\Model\CompanyModel $companyModel,
-        \Mautic\CoreBundle\Model\NotificationModel $notificationModel,
+        LeadModel $leadModel,
+        CompanyModel $companyModel,
+        NotificationModel $notificationModel,
         UserModel $userModel,
+        LeadRepository $leadRepository,
+        CompanyRepository $companyRepository,
     ): void {
         $this->leadModel = $leadModel;
         $this->companyModel = $companyModel;
         $this->notificationModel = $notificationModel;
         $this->userModel = $userModel;
+        $this->leadRepository = $leadRepository;
+        $this->companyRepository = $companyRepository;
     }
 
     /**
@@ -203,9 +217,9 @@ class PublicController extends FormController
             $lead->setSocialCache($socialCache);
 
             $this->leadModel->setFieldValues($lead, $data);
-            $this->leadModel->getRepository()->saveEntity($lead);
+            $this->leadRepository->saveEntity($lead);
 
-            if ($notify && (!isset($lead->imported) || !$lead->imported)) {
+            if ($notify && (!$lead->imported)) {
                 if ($user = $this->userModel->getEntity($notify)) {
                     $this->addNewNotification(
                         sprintf($this->translator->trans('mautic.plugin.fullcontact.contact_retrieved'), $lead->getEmail()),
@@ -217,7 +231,7 @@ class PublicController extends FormController
             }
         } catch (\Exception $ex) {
             try {
-                if ($notify && $lead && (!isset($lead->imported) || !$lead->imported)) {
+                if ($notify && $lead && (!$lead->imported)) {
                     if ($user = $this->userModel->getEntity($notify)) {
                         $this->addNewNotification(
                             sprintf(
@@ -357,7 +371,7 @@ class PublicController extends FormController
             $company->setSocialCache($socialCache);
 
             $this->companyModel->setFieldValues($company, $data);
-            $this->companyModel->getRepository()->saveEntity($company);
+            $this->companyRepository->saveEntity($company);
 
             if ($notify) {
                 if ($user = $this->userModel->getEntity($notify)) {

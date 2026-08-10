@@ -7,19 +7,22 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FileHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Oneup\UploaderBundle\Templating\Helper\UploaderHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class AssetController extends FormController
+final class AssetController extends FormController
 {
-    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
+    private AuditLogModel $auditLogModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireAssetController(\Mautic\CoreBundle\Model\AuditLogModel $auditLogModel): void
-    {
+    #[Required]
+    public function autowireAssetController(
+        AuditLogModel $auditLogModel,
+    ): void {
         $this->auditLogModel = $auditLogModel;
     }
 
@@ -396,10 +399,8 @@ class AssetController extends FormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function editAction(Request $request, UploaderHelper $uploaderHelper, IntegrationHelper $integrationHelper, AssetModel $model, $objectId, $ignorePost = false)
+    public function editAction(Request $request, UploaderHelper $uploaderHelper, IntegrationHelper $integrationHelper, AssetModel $model, $objectId, $ignorePost = false): Response
     {
         $entity = $model->getEntity($objectId);
 
@@ -589,10 +590,8 @@ class AssetController extends FormController
      * Deletes the entity.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, AssetModel $model, $objectId)
+    public function deleteAction(Request $request, AssetModel $model, $objectId): Response
     {
         $page      = $request->getSession()->get('mautic.asset.page', 1);
         $returnUrl = $this->generateUrl('mautic_asset_index', ['page' => $page]);
@@ -694,7 +693,7 @@ class AssetController extends FormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $model->deleteEntities($deleteIds);
 
                 $flashes[] = [
@@ -716,8 +715,6 @@ class AssetController extends FormController
 
     /**
      * Renders the container for the remote file browser.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function remoteAction(Request $request, IntegrationHelper $integrationHelper): Response
     {

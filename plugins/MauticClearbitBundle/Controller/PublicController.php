@@ -2,9 +2,11 @@
 
 namespace MauticPlugin\MauticClearbitBundle\Controller;
 
+use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\FormBundle\Controller\FormController;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
@@ -12,24 +14,29 @@ use MauticPlugin\MauticClearbitBundle\Helper\LookupHelper;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class PublicController extends FormController
+final class PublicController extends FormController
 {
-    private \Mautic\CoreBundle\Model\NotificationModel $notificationModel;
+    private CompanyModel $companyModel;
+
+    private NotificationModel $notificationModel;
 
     private UserModel $userModel;
 
     private LeadModel $leadModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowirePublicController(
-        \Mautic\CoreBundle\Model\NotificationModel $notificationModel,
+        NotificationModel $notificationModel,
         UserModel $userModel,
         LeadModel $leadModel,
+        CompanyModel $companyModel,
     ): void {
         $this->notificationModel = $notificationModel;
         $this->userModel = $userModel;
         $this->leadModel = $leadModel;
+        $this->companyModel = $companyModel;
     }
 
     /**
@@ -165,7 +172,7 @@ class PublicController extends FormController
                 $this->leadModel->setFieldValues($lead, $data);
                 $this->leadModel->saveEntity($lead);
 
-                if ($notify && (!isset($lead->imported) || !$lead->imported)) {
+                if ($notify && (!$lead->imported)) {
                     if ($user = $this->userModel->getEntity($notify)) {
                         $this->addNewNotification(
                             sprintf($this->translator->trans('mautic.plugin.clearbit.contact_retrieved'), $lead->getEmail()),
@@ -179,8 +186,6 @@ class PublicController extends FormController
                 /*  COMPANY STUFF */
 
                 if ('company' === $request->request->get('type')) {
-                    /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
-                    $model = $this->getModel('lead.company');
                     /** @var Company $company */
                     $company    = $validatedRequest['entity'];
                     $currFields = $company->getFields(true);
@@ -250,8 +255,8 @@ class PublicController extends FormController
                     unset($socialCache['clearbit']['nonce']);
                     $company->setSocialCache($socialCache);
 
-                    $model->setFieldValues($company, $data);
-                    $model->saveEntity($company);
+                    $this->companyModel->setFieldValues($company, $data);
+                    $this->companyModel->saveEntity($company);
 
                     if ($notify) {
                         if ($user = $this->userModel->getEntity($notify)) {

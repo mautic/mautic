@@ -30,21 +30,15 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * @extends FetchCommonApiController<LeadEventLog>
  */
-class EventLogApiController extends FetchCommonApiController
+final class EventLogApiController extends FetchCommonApiController
 {
     use LeadAccessTrait;
 
     private const LOG_SERIALIZATION = 30;
 
-    /**
-     * @var Campaign
-     */
-    protected $campaign;
+    private ?Campaign $campaign = null;
 
-    /**
-     * @var Lead
-     */
-    protected $contact;
+    private ?Lead $contact = null;
 
     /**
      * @var EventLogModel|null
@@ -64,6 +58,7 @@ class EventLogApiController extends FetchCommonApiController
         EventLogModel $campaignEventLogModel,
         private LeadModel $leadModel,
         private CampaignModel $campaignModel,
+        private EventModel $eventModel,
     ) {
         $this->model                    = $campaignEventLogModel;
         $this->entityClass              = LeadEventLog::class;
@@ -93,10 +88,8 @@ class EventLogApiController extends FetchCommonApiController
 
     /**
      * Get a list of events.
-     *
-     * @return Response
      */
-    public function getContactEventsAction(Request $request, UserHelper $userHelper, $contactId, $campaignId = null)
+    public function getContactEventsAction(Request $request, UserHelper $userHelper, $contactId, $campaignId = null): Response
     {
         // Ensure contact exists and user has access
         $contact = $this->checkLeadAccess($contactId, 'view');
@@ -143,10 +136,7 @@ class EventLogApiController extends FetchCommonApiController
         return $this->getEntitiesAction($request, $userHelper);
     }
 
-    /**
-     * @return Response
-     */
-    public function editContactEventAction(Request $request, $eventId, $contactId)
+    public function editContactEventAction(Request $request, $eventId, $contactId): Response
     {
         $parameters = $request->request->all();
 
@@ -155,11 +145,8 @@ class EventLogApiController extends FetchCommonApiController
         if ($contact instanceof Response) {
             return $contact;
         }
-
-        /** @var EventModel $eventModel */
-        $eventModel = $this->getModel('campaign.event');
         /** @var Event $event */
-        $event = $eventModel->getEntity($eventId);
+        $event = $this->eventModel->getEntity($eventId);
         if (null === $event || !$event->getId()) {
             return $this->notFound();
         }
@@ -202,7 +189,7 @@ class EventLogApiController extends FetchCommonApiController
 
         $errors= [];
 
-        $events   = $this->getBatchEntities($parameters, $errors, false, 'eventId', $this->getModel('campaign.event'), false);
+        $events   = $this->getBatchEntities($parameters, $errors, false, 'eventId', $this->eventModel, false);
         $contacts = $this->getBatchEntities($parameters, $errors, false, 'contactId', $this->leadModel, false);
 
         $this->inBatchMode = true;
@@ -248,7 +235,7 @@ class EventLogApiController extends FetchCommonApiController
             $this->entityNameMulti => $events,
         ];
 
-        if (!empty($errors)) {
+        if ([] !== $errors) {
             $payload['errors'] = $errors;
         }
 

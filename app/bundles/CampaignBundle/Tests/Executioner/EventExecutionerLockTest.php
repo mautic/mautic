@@ -32,8 +32,8 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
     {
         $this->loggerTraitSetup();
 
-        $this->eventExecutioner = self::getContainer()->get('mautic.campaign.event_executioner');
-        $this->eventDispatcher  = self::getContainer()->get('event_dispatcher');
+        $this->eventExecutioner = self::getContainer()->get(EventExecutioner::class);
+        $this->eventDispatcher  = self::getContainer()->get(EventDispatcherInterface::class);
     }
 
     public function testLogsAreSkippedWhenAlreadyExecuted(): void

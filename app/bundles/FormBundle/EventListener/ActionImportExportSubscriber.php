@@ -15,7 +15,9 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UuidHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\FormBundle\Entity\Action;
+use Mautic\FormBundle\Entity\ActionRepository;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Model\ActionModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -27,6 +29,8 @@ final class ActionImportExportSubscriber implements EventSubscriberInterface
 
     public function __construct(
         private EntityManagerInterface $entityManager,
+        private ActionRepository $actionRepository,
+        private FormRepository $formRepository,
         private ActionModel $actionModel,
         private AuditLogModel $auditLogModel,
         private IpLookupHelper $ipLookupHelper,
@@ -105,12 +109,12 @@ final class ActionImportExportSubscriber implements EventSubscriberInterface
         ];
 
         foreach ($event->getEntityData() as $actionData) {
-            $action = $this->entityManager->getRepository(Action::class)->findOneBy(['uuid' => $actionData['uuid']]);
+            $action = $this->actionRepository->findOneBy(['uuid' => $actionData['uuid']]);
             $isNew  = !$action;
             $action ??= new Action();
 
             if (!empty($actionData['form'])) {
-                $form = $this->entityManager->getRepository(Form::class)->find($actionData['form']);
+                $form = $this->formRepository->find($actionData['form']);
                 if ($form instanceof Form) {
                     $action->setForm($form);
                     unset($actionData['form']);
@@ -160,7 +164,7 @@ final class ActionImportExportSubscriber implements EventSubscriberInterface
         }
 
         foreach ($summary['ids'] as $id) {
-            $action = $this->entityManager->getRepository(Action::class)->find($id);
+            $action = $this->actionRepository->find($id);
             if ($action) {
                 $this->entityManager->remove($action);
                 $this->logAction('undo_import', $id, ['deletedEntity' => Action::class], 'formAction');
@@ -188,7 +192,7 @@ final class ActionImportExportSubscriber implements EventSubscriberInterface
                 break;
             }
 
-            $existing = $this->entityManager->getRepository(Action::class)->findOneBy(['uuid' => $item['uuid']]);
+            $existing = $this->actionRepository->findOneBy(['uuid' => $item['uuid']]);
             if ($existing) {
                 $summary[EntityImportEvent::UPDATE]['names'][] = $existing->getName();
                 $summary[EntityImportEvent::UPDATE]['uuids'][] = $existing->getUuid();

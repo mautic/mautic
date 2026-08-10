@@ -8,7 +8,7 @@ use Mautic\UserBundle\Entity\User;
 /**
  * @extends CommonRepository<Client>
  */
-class ClientRepository extends CommonRepository
+final class ClientRepository extends CommonRepository
 {
     /**
      * @return array

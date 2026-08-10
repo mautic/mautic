@@ -11,8 +11,9 @@ use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionParameters;
 use Mautic\LeadBundle\Segment\Decorator\Date\Other\DateAnniversary;
 use Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(DateAnniversary::class)]
+#[CoversClass(DateAnniversary::class)]
 final class DateAnniversaryTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetOperator(): void

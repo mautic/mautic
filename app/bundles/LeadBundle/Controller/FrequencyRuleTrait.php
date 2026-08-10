@@ -12,6 +12,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Service\Attribute\Required;
 
 trait FrequencyRuleTrait
 {
@@ -26,7 +27,7 @@ trait FrequencyRuleTrait
 
     private \Mautic\LeadBundle\Model\DoNotContact $doNotContactModel;
 
-    private ?RequestStack $requestStack = null;
+    private RequestStack $requestStack;
 
     /**
      * @param array $viewParameters
@@ -155,13 +156,10 @@ trait FrequencyRuleTrait
     /**
      * @param int $currentChannelId
      */
-    protected function persistFrequencyRuleFormData(Lead $lead, array $formData, array $allChannels, array $leadChannels, $currentChannelId = null)
+    protected function persistFrequencyRuleFormData(Lead $lead, array $formData, array $allChannels, array $leadChannels, $currentChannelId = null): void
     {
         /** @var LeadModel $leadModel */
         $leadModel = $this->getModel('lead.lead');
-
-        $dncModel = $this->doNotContactModel;
-        \assert($dncModel instanceof \Mautic\LeadBundle\Model\DoNotContact);
 
         $request = $this->requestStack->getCurrentRequest();
         \assert(null !== $request);
@@ -169,9 +167,9 @@ trait FrequencyRuleTrait
         if (isset($request->request->all()['lead_contact_frequency_rules']['lead_channels'])) {
             foreach ($formData['lead_channels']['subscribed_channels'] as $contactChannel) {
                 if (!isset($leadChannels[$contactChannel])) {
-                    $contactable = $dncModel->isContactable($lead, $contactChannel);
+                    $contactable = $this->doNotContactModel->isContactable($lead, $contactChannel);
                     if (DoNotContact::UNSUBSCRIBED == $contactable || DoNotContact::MANUAL == $contactable) {
-                        $dncModel->removeDncForContact($lead->getId(), $contactChannel);
+                        $this->doNotContactModel->removeDncForContact($lead->getId(), $contactChannel);
                     }
                 }
             }
@@ -180,18 +178,18 @@ trait FrequencyRuleTrait
                 if ($currentChannelId) {
                     $channel = [$channel => $currentChannelId];
                 }
-                $dncModel->addDncForContact($lead->getId(), $channel, ($this->isPublicView) ? DoNotContact::UNSUBSCRIBED : DoNotContact::MANUAL, 'user');
+                $this->doNotContactModel->addDncForContact($lead->getId(), $channel, ($this->isPublicView) ? DoNotContact::UNSUBSCRIBED : DoNotContact::MANUAL, 'user');
             }
         }
         $leadModel->setFrequencyRules($lead, $formData, $this->leadLists);
     }
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireFrequencyRuleTrait(
         \Mautic\LeadBundle\Model\DoNotContact $doNotContactModel,
         RequestStack $requestStack,
     ): void {
         $this->doNotContactModel = $doNotContactModel;
-        $this->requestStack      = $requestStack;
+        $this->requestStack = $requestStack;
     }
 }

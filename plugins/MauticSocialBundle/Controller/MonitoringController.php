@@ -7,35 +7,35 @@ use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
+use MauticPlugin\MauticSocialBundle\Entity\PostCountRepository;
 use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
-use MauticPlugin\MauticSocialBundle\Model\PostCountModel;
 use Symfony\Component\Form\SubmitButton;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class MonitoringController extends FormController
+final class MonitoringController extends FormController
 {
     use EntityContactsTrait;
 
-    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
+    private PostCountRepository $postCountRepository;
+
+    private AuditLogModel $auditLogModel;
 
     private MonitoringModel $monitoringModel;
 
-    private PostCountModel $postCountModel;
-
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireMonitoringController(
         MonitoringModel $monitoringModel,
-        \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel,
-        PostCountModel $postCountModel,
+        AuditLogModel $auditLogModel,
+        PostCountRepository $postCountRepository,
     ): void {
         $this->monitoringModel = $monitoringModel;
         $this->auditLogModel = $auditLogModel;
-        $this->postCountModel = $postCountModel;
+        $this->postCountRepository = $postCountRepository;
     }
 
     /**
@@ -404,8 +404,6 @@ class MonitoringController extends FormController
 
         $session = $request->getSession();
 
-        $postCountRepo = $this->postCountModel->getRepository();
-
         $security         = $this->security;
         $monitoringEntity = $this->monitoringModel->getEntity($objectId);
 
@@ -454,7 +452,7 @@ class MonitoringController extends FormController
         $dateTo          = new \DateTime($dateRangeForm['date_to']->getData());
 
         $chart     = new LineChart(null, $dateFrom, $dateTo);
-        $leadStats = $postCountRepo->getLeadStatsPost(
+        $leadStats = $this->postCountRepository->getLeadStatsPost(
             $dateFrom,
             $dateTo,
             ['monitor_id' => $monitoringEntity->getId()]
@@ -494,10 +492,8 @@ class MonitoringController extends FormController
      * Deletes the entity.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, IpLookupHelper $ipLookupHelper, $objectId)
+    public function deleteAction(Request $request, IpLookupHelper $ipLookupHelper, $objectId): Response
     {
         if (!$this->security->isGranted('mauticSocial:monitoring:delete')) {
             $this->throwAccessDenied();
@@ -603,7 +599,7 @@ class MonitoringController extends FormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $this->monitoringModel->deleteEntities($deleteIds);
 
                 $flashes[] = [
@@ -628,15 +624,13 @@ class MonitoringController extends FormController
 
     /**
      * @param int $page
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
     public function contactsAction(
         Request $request,
         PageHelperFactoryInterface $pageHelperFactory,
         $objectId,
         $page = 1,
-    ) {
+    ): Response {
         return $this->generateContactsGrid(
             $request,
             $pageHelperFactory,

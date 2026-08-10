@@ -9,6 +9,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\PageBundle\Event\UrlTokenReplaceEvent;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -28,7 +29,7 @@ final class SegmentTrackingSubscriberFunctionalTest extends MauticMysqlTestCase
     {
         $this->configParams['append_segment_id_tracking_url'] = 'testFeatureFlagIsDisabled' !== $this->name();
         parent::setUp();
-        $this->dispatcher = $this->getContainer()->get('event_dispatcher');
+        $this->dispatcher = $this->getContainer()->get(EventDispatcherInterface::class);
     }
 
     public function testFeatureFlagIsDisabled(): void
@@ -49,7 +50,7 @@ final class SegmentTrackingSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->assertStringStartsWith(self::TEST_URL.'?'.self::SEGMENT_IDS_PARAM, $resultUrl, 'Segment IDs should be appended as query parameter');
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideUrlVariations')]
+    #[DataProvider('provideUrlVariations')]
     public function testUrlVariationsHandledCorrectly(
         string $testCase,
         string $url,
@@ -143,7 +144,7 @@ final class SegmentTrackingSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->assertNotContains((string) $segmentIds[0], $returnedIds, 'Removed segment ID should not be present');
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideSegmentCounts')]
+    #[DataProvider('provideSegmentCounts')]
     public function testSegmentIdsSortedAndFormattedCorrectly(int $segmentCount): void
     {
         $lead      = $this->createContactWithSegments($segmentCount);

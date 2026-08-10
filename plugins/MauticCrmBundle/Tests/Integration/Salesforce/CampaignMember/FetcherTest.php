@@ -10,6 +10,7 @@ use MauticPlugin\MauticCrmBundle\Integration\Salesforce\CampaignMember\Organizer
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\CampaignMember;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\Contact;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\Lead;
+use PHPUnit\Framework\Exception;
 
 final class FetcherTest extends \PHPUnit\Framework\TestCase
 {
@@ -171,7 +172,7 @@ final class FetcherTest extends \PHPUnit\Framework\TestCase
                     ];
                 }
 
-                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $fetcher = new Fetcher($repo, $organizer, '701f10000021UnkAAE');

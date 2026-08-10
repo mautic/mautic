@@ -255,7 +255,7 @@ class SmsRepository extends CommonRepository
             $q->andWhere($q->expr()->isNull('e.translationParent'));
         }
 
-        if (!empty($ignoreIds)) {
+        if ([] !== $ignoreIds) {
             $q->andWhere($q->expr()->notIn('e.id', ':smsIds'))
                 ->setParameter('smsIds', $ignoreIds);
         }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Twig\Extension;
 
+use Knp\Menu\ItemInterface;
 use Knp\Menu\MenuFactory;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\CoreBundle\Twig\Extension\MenuExtension;
@@ -12,7 +13,7 @@ final class MenuExtensionTest extends AbstractMauticTestCase
 {
     public function testParseMenuAttributes(): void
     {
-        $menuExtension = static::getContainer()->get(MenuExtension::class);
+        $menuExtension = self::getContainer()->get(MenuExtension::class);
         $this->assertInstanceOf(MenuExtension::class, $menuExtension);
 
         $menuAttributes = [
@@ -28,7 +29,7 @@ final class MenuExtensionTest extends AbstractMauticTestCase
 
     public function testBuildMenuClasses(): void
     {
-        $menuExtension = static::getContainer()->get(MenuExtension::class);
+        $menuExtension = self::getContainer()->get(MenuExtension::class);
         $this->assertInstanceOf(MenuExtension::class, $menuExtension);
 
         // create a menu and menu items to test with
@@ -43,11 +44,11 @@ final class MenuExtensionTest extends AbstractMauticTestCase
 
         $itemFirst  = $menu->getChild('First item');
         $itemSecond = $menu->getChild('Second item');
-        $this->assertInstanceOf(\Knp\Menu\ItemInterface::class, $itemFirst);
+        $this->assertInstanceOf(ItemInterface::class, $itemFirst);
 
         // test an item which has no class
         $this->assertSame([], $menuExtension->buildMenuClasses($itemFirst, $matcher, $options, $extraClasses));
-        $this->assertInstanceOf(\Knp\Menu\ItemInterface::class, $itemSecond);
+        $this->assertInstanceOf(ItemInterface::class, $itemSecond);
 
         // test an item with an inherrent class
         $this->assertArrayHasKey('class', $menuExtension->buildMenuClasses($itemSecond, $matcher, $options, $extraClasses));

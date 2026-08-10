@@ -8,19 +8,22 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\PageBundle\Form\Type\AbTestPropertiesType;
 use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Service\Attribute\Required;
 use Twig\Environment;
 
-class AjaxController extends CommonAjaxController
+final class AjaxController extends CommonAjaxController
 {
     use VariantAjaxControllerTrait;
 
     private PageModel $pageModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowirePageAjaxController(PageModel $pageModel): void
-    {
+    #[Required]
+    public function autowirePageAjaxController(
+        PageModel $pageModel,
+    ): void {
         $this->pageModel = $pageModel;
     }
 
@@ -29,8 +32,8 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($this->getAbTestForm(
             $request,
             $pageModel,
-            fn ($formType, $formOptions): \Symfony\Component\Form\FormInterface => $formFactory->create(AbTestPropertiesType::class, [], ['formType' => $formType, 'formTypeOptions' => $formOptions]),
-            fn (\Symfony\Component\Form\FormInterface $form): string => $this->renderView('@MauticPage/AbTest/form.html.twig', ['form' => $this->setFormTheme($form, $twig, ['@MauticPage/AbTest/form.html.twig', 'MauticPageBundle:FormTheme\Page'])]),
+            fn ($formType, $formOptions): FormInterface => $formFactory->create(AbTestPropertiesType::class, [], ['formType' => $formType, 'formTypeOptions' => $formOptions]),
+            fn (FormInterface $form): string => $this->renderView('@MauticPage/AbTest/form.html.twig', ['form' => $this->setFormTheme($form, $twig, ['@MauticPage/AbTest/form.html.twig', 'MauticPageBundle:FormTheme\Page'])]),
             'page_abtest_settings',
             'page'
         ));

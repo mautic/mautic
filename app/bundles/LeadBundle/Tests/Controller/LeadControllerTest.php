@@ -22,6 +22,7 @@ use Mautic\LeadBundle\Entity\ContactExportScheduler;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Form\Type\ContactGroupPointsType;
@@ -30,10 +31,12 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PointBundle\Entity\Group;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\TestDox;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class LeadControllerTest extends MauticMysqlTestCase
 {
@@ -260,7 +263,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $contactC = $this->createContact(self::CONTACT_C_EMAIL);
 
         /** @var LeadModel $contactModel */
-        $contactModel = static::getContainer()->get('mautic.lead.model.lead');
+        $contactModel = self::getContainer()->get(LeadModel::class);
 
         foreach ([$contactA, $contactB] as $contact) {
             $contactModel->setFieldValues($contact, ['preferred_locale' => 'en_GB'], true, false);
@@ -313,7 +316,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $contactG = $this->createContact('fifth@matching.email');
 
         /** @var LeadModel $contactModel */
-        $contactModel = static::getContainer()->get('mautic.lead.model.lead');
+        $contactModel = self::getContainer()->get(LeadModel::class);
 
         foreach ([$contactA, $contactB, $contactC, $contactE, $contactF, $contactG] as $contact) {
             $contactModel->setFieldValues($contact, ['preferred_locale' => 'en_GB'], true, false);
@@ -427,7 +430,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $this->assertInstanceOf(ContactExportScheduler::class, $contactExportScheduler);
         $data                   = $contactExportScheduler->getData();
         /** @var CoreParametersHelper $coreParametersHelper */
-        $coreParametersHelper = static::getContainer()->get('mautic.helper.core_parameters');
+        $coreParametersHelper = self::getContainer()->get(CoreParametersHelper::class);
 
         $this->assertSame([
             'start'  => 0,
@@ -531,12 +534,12 @@ final class LeadControllerTest extends MauticMysqlTestCase
             ->fetchAllAssociative();
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Ensure correct Preferred Timezone placeholder on add/edit contact page')]
+    #[TestDox('Ensure correct Preferred Timezone placeholder on add/edit contact page')]
     public function testEnsureCorrectPreferredTimeZonePlaceHolderOnContactPage(): void
     {
         $crawler             = $this->client->request('GET', '/s/contacts/new');
         $elementPlaceholder  = $crawler->filter('#lead_timezone')->filter('select')->attr('data-placeholder');
-        $expectedPlaceholder = static::getContainer()->get('translator')->trans('mautic.lead.field.timezone');
+        $expectedPlaceholder = self::getContainer()->get(TranslatorInterface::class)->trans('mautic.lead.field.timezone');
         $this->assertEquals($expectedPlaceholder, $elementPlaceholder);
 
         // Test that a locale option is present correctly.
@@ -556,9 +559,9 @@ final class LeadControllerTest extends MauticMysqlTestCase
     public function testAddContactsErrorMessage(): void
     {
         /** @var FieldModel $fieldModel */
-        $fieldModel     = self::getContainer()->get('mautic.lead.model.field');
+        $fieldModel     = self::getContainer()->get(FieldModel::class);
         $firstnameField = $fieldModel->getEntity(2);
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\LeadField::class, $firstnameField);
+        $this->assertInstanceOf(LeadField::class, $firstnameField);
         $firstnameField->setIsRequired(true);
         $fieldModel->getRepository()->saveEntity($firstnameField);
 
@@ -639,7 +642,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $email = $this->getMailerMessage();
         $this->assertInstanceOf(MauticMessage::class, $email);
 
-        $userHelper = static::getContainer()->get(UserHelper::class);
+        $userHelper = self::getContainer()->get(UserHelper::class);
         $user       = $userHelper->getUser();
 
         $this->assertSame('Ahoy contact@an.email', $email->getSubject());
@@ -689,7 +692,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $email = $this->getMailerMessage();
         $this->assertInstanceOf(MauticMessage::class, $email);
 
-        $userHelper = static::getContainer()->get(UserHelper::class);
+        $userHelper = self::getContainer()->get(UserHelper::class);
         $user       = $userHelper->getUser();
 
         $this->assertSame('Ahoy contact@an.email', $email->getSubject());
@@ -876,9 +879,9 @@ EMAIL;
     public function testContactCompanyEditShowsOldCompanyNameInAuditLog(): void
     {
         /** @var CompanyModel $companyModel */
-        $companyModel = static::getContainer()->get('mautic.lead.model.company');
+        $companyModel = self::getContainer()->get(CompanyModel::class);
         /** @var LeadModel $contactModel */
-        $contactModel = static::getContainer()->get('mautic.lead.model.lead');
+        $contactModel = self::getContainer()->get(LeadModel::class);
 
         // Create companies
         $company = (new Company())
@@ -919,7 +922,7 @@ EMAIL;
     public function testSetNullCompanyToContact(): void
     {
         /** @var LeadModel $contactModel */
-        $contactModel = static::getContainer()->get('mautic.lead.model.lead');
+        $contactModel = self::getContainer()->get(LeadModel::class);
 
         $company = new Company();
         $company->setName('Doe Corp');
@@ -1064,6 +1067,21 @@ EMAIL;
             's/contacts/view/1000',
         );
         $this->assertEquals(true, $this->client->getResponse()->isRedirect('/s/contacts/1'));
+    }
+
+    public function testContactViewReturnsToFormResultsWhenContextIsProvided(): void
+    {
+        $this->loadFixtures([LoadLeadData::class]);
+
+        $this->client->xmlHttpRequest(
+            Request::METHOD_GET,
+            '/s/contacts/view/1?returnTo=form_results&formId=12&formPage=2'
+        );
+
+        $response = json_decode((string) $this->client->getResponse()->getContent(), true);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('/s/forms/results/12/2', (string) $response['newContent']);
     }
 
     public function testContactGroupPointsEdit(): void

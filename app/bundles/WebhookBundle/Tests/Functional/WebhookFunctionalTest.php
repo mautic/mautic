@@ -17,6 +17,7 @@ use Mautic\WebhookBundle\Entity\WebhookQueue;
 use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
 use Mautic\WebhookBundle\Entity\WebhookRepository;
 use Mautic\WebhookBundle\Model\WebhookModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -121,7 +122,7 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
         yield 'Actual user' => [1, 1];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataNotificationToUser')]
+    #[DataProvider('dataNotificationToUser')]
     public function testWebhookFailureNotificationSent(?int $createdByUserId, ?int $expectedUserId): void
     {
         $this->mockFailedWebhookResponse(2);
@@ -191,7 +192,6 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
         $webhook = $this->webhhokRepository->find($webhook->getId());
         $this->assertInstanceOf(Webhook::class, $webhook);
         $this->assertNotInstanceOf(\DateTimeImmutable::class, $webhook->getMarkedUnhealthyAt());
-        $this->assertInstanceOf(Webhook::class, $webhook);
         $this->assertNotInstanceOf(\DateTimeImmutable::class, $webhook->getUnHealthySince());
         $this->assertNotInstanceOf(\DateTimeImmutable::class, $webhook->getLastNotificationSentAt());
 

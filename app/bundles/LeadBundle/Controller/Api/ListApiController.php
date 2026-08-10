@@ -26,7 +26,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<LeadList>
  */
-class ListApiController extends CommonApiController
+final class ListApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
@@ -47,7 +47,7 @@ class ListApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        ListModel $listModel,
+        private ListModel $listModel,
         private LeadModel $leadModel,
     ) {
         $this->model            = $listModel;
@@ -132,9 +132,7 @@ class ListApiController extends CommonApiController
      */
     public function getListsAction(): Response
     {
-        $listModel = $this->getModel('lead.list');
-        \assert($listModel instanceof ListModel);
-        $lists   = $listModel->getUserLists();
+        $lists   = $this->listModel->getUserLists();
         $view    = $this->view($lists, Response::HTTP_OK);
         $context = $view->getContext()->setGroups(['leadListList']);
         $view->setContext($context);
@@ -181,11 +179,9 @@ class ListApiController extends CommonApiController
      *
      * @param int $id segement ID
      *
-     * @return Response
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function addLeadsAction(Request $request, $id)
+    public function addLeadsAction(Request $request, $id): Response
     {
         $contactIds = $request->request->all()['ids'] ?? null;
         if (null === $contactIds) {

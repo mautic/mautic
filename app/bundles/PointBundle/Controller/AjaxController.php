@@ -5,20 +5,24 @@ namespace Mautic\PointBundle\Controller;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\PointBundle\Form\Type\PointActionType;
+use Mautic\PointBundle\Model\PointModel;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class AjaxController extends CommonAjaxController
+final class AjaxController extends CommonAjaxController
 {
-    private \Mautic\PointBundle\Model\PointModel $pointModel;
+    private PointModel $pointModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowirePointAjaxController(\Mautic\PointBundle\Model\PointModel $pointModel): void
-    {
+    #[Required]
+    public function autowirePointAjaxController(
+        PointModel $pointModel,
+    ): void {
         $this->pointModel = $pointModel;
     }
 
-    public function reorderTriggerEventsAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
+    public function reorderTriggerEventsAction(Request $request): JsonResponse
     {
         $dataArray   = ['success' => 0];
         $session     = $request->getSession();
@@ -36,7 +40,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function getActionFormAction(Request $request, FormFactoryInterface $formFactory): \Symfony\Component\HttpFoundation\JsonResponse
+    public function getActionFormAction(Request $request, FormFactoryInterface $formFactory): JsonResponse
     {
         $type      = InputHelper::clean($request->request->get('actionType'));
         $dataArray = [
