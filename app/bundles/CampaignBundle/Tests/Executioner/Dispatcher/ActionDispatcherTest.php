@@ -137,9 +137,6 @@ final class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $this->legacyDispatcher->expects($this->once())
-            ->method('dispatchExecutionEvents');
-
         $this->getEventDispatcher()->dispatchEvent($config, $event, $logs);
     }
 

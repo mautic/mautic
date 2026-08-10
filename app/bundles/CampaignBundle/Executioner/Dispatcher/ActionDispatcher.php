@@ -54,9 +54,6 @@ final readonly class ActionDispatcher
             if ($failed->count()) {
                 $this->dispatchFailedEvent($config, $failed);
             }
-
-            // Dispatch legacy ON_EVENT_EXECUTION event for BC
-            $this->legacyDispatcher->dispatchExecutionEvents($config, $success, $failed);
         }
 
         // Execute BC eventName or callback. Or support case where the listener has been converted to batchEventName but still wants to execute
