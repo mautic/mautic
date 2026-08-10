@@ -26,7 +26,7 @@ class AuditLogRepository extends CommonRepository
     {
         $this->_em->getConnection()->createQueryBuilder()
             ->update(MAUTIC_TABLE_PREFIX.'audit_log')
-            ->set('object_id', (int) $toLeadId)
+            ->set('object_id', (string) $toLeadId)
             ->where('bundle = :bundle')
             ->andWhere('object = :object')
             ->andWhere('object_id = '.(int) $fromLeadId)

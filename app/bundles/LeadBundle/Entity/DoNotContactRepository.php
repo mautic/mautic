@@ -35,7 +35,7 @@ class DoNotContactRepository extends CommonRepository
     {
         $this->_em->getConnection()->createQueryBuilder()
             ->update(MAUTIC_TABLE_PREFIX.'lead_donotcontact')
-            ->set('lead_id', (int) $toLeadId)
+            ->set('lead_id', (string) $toLeadId)
             ->where('lead_id = '.(int) $fromLeadId)
             ->executeStatement();
     }
