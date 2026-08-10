@@ -30,10 +30,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(security: "is_granted('notification:notifications:viewown')"),
         new Post(security: "is_granted('notification:notifications:create')"),
-        new Get(security: "is_granted('notification:notifications:viewown')"),
-        new Put(security: "is_granted('notification:notifications:editown')"),
-        new Patch(security: "is_granted('notification:notifications:editother')"),
-        new Delete(security: "is_granted('notification:notifications:deleteown')"),
+        new Get(security: "is_granted('notification:notifications:viewown', object)"),
+        new Put(security: "is_granted('notification:notifications:editown', object)"),
+        new Patch(security: "is_granted('notification:notifications:editother', object)"),
+        new Delete(security: "is_granted('notification:notifications:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['notification:read'],

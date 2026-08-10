@@ -30,10 +30,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(security: "is_granted('lead:leads:viewown')"),
         new Post(security: "is_granted('lead:leads:create')"),
-        new Get(security: "is_granted('lead:leads:viewown')"),
-        new Put(security: "is_granted('lead:leads:editown')"),
-        new Patch(security: "is_granted('lead:leads:editother')"),
-        new Delete(security: "is_granted('lead:leads:deleteown')"),
+        new Get(security: "is_granted('lead:leads:viewown', object)"),
+        new Put(security: "is_granted('lead:leads:editown', object)"),
+        new Patch(security: "is_granted('lead:leads:editother', object)"),
+        new Delete(security: "is_granted('lead:leads:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['leadfield:read'],

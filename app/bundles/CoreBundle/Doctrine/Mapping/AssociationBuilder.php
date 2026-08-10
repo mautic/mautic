@@ -35,4 +35,17 @@ class AssociationBuilder extends \Doctrine\ORM\Mapping\Builder\AssociationBuilde
 
         return $this;
     }
+
+    /**
+     * Mark this association as the parent for ownership/permission checks.
+     * Used by entities that implement getPermissionUser() to delegate to a parent entity.
+     *
+     * @return $this
+     */
+    public function isOwnershipParent()
+    {
+        $this->mapping['isOwnershipParent'] = true;
+
+        return $this;
+    }
 }

@@ -2354,13 +2354,38 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * @throws \Psr\Cache\InvalidArgumentException
      */
+    public function invalidatePendingCountCache(int $emailId): void
+    {
+        $this->cacheStorageHelper->delete(sprintf('%s|%s|%s', 'email', $emailId, 'pending'));
+    }
+
+    /**
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
+    public function invalidatePendingCountCacheForList(int $listId): void
+    {
+        foreach ($this->getRepository()->getSegmentEmailIdsByListId($listId) as $emailId) {
+            $this->invalidatePendingCountCache($emailId);
+        }
+    }
+
+    /**
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
     protected function setCachedCount(mixed $entity): void
     {
-        $queued  = $this->cacheStorageHelper->get(sprintf('%s|%s|%s', 'email', $entity->getId(), 'queued'));
-        $pending = $this->cacheStorageHelper->get(sprintf('%s|%s|%s', 'email', $entity->getId(), 'pending'));
+        $queued = $this->cacheStorageHelper->get(sprintf('%s|%s|%s', 'email', $entity->getId(), 'queued'));
 
         if (false !== $queued) {
             $entity->setQueuedCount($queued);
+        }
+
+        $pending = $this->cacheStorageHelper->get(sprintf('%s|%s|%s', 'email', $entity->getId(), 'pending'));
+
+        if (false === $pending && $entity instanceof Email && $entity->isSegmentEmail() && null !== $entity->getId()) {
+            $entity->setPendingCount($this->getPendingLeads($entity, null, true));
+
+            return;
         }
 
         if (false !== $pending) {

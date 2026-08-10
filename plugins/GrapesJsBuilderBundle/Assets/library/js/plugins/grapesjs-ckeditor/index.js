@@ -82,6 +82,7 @@ class Ck5ForGrapesJs {
       inlineMode: true,
       editorContainer: null,
       latestContent: null,
+      originalContent: null,
       display: undefined,
       latestClickEvent: null,
       badgableInfo: null,
@@ -209,6 +210,14 @@ class Ck5ForGrapesJs {
 
   set latestContent(value) {
     this._Ck5ForGrapesJsData.latestContent = value;
+  }
+
+  get originalContent() {
+    return this._Ck5ForGrapesJsData.originalContent;
+  }
+
+  set originalContent(value) {
+    this._Ck5ForGrapesJsData.originalContent = value;
   }
 
   get editorContainer() {

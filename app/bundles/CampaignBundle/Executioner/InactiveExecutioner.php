@@ -320,24 +320,56 @@ class InactiveExecutioner implements ExecutionerInterface
      */
     private function handleRedirectedEvent(Event $redirectEvent, Event $originalDecisionEvent): void
     {
-        $contacts = $this->inactiveContactFinder->getContacts(
-            $this->campaign->getId(), $originalDecisionEvent, $this->limiter, true);
+        try {
+            $contacts = $this->inactiveContactFinder->getContacts(
+                $this->campaign->getId(),
+                $originalDecisionEvent,
+                $this->limiter,
+                true
+            );
 
-        if (!$contacts->count()) {
-            return;
+            while ($contacts->count()) {
+                $batchMinContactId = max($contacts->getKeys()) + 1;
+
+                $this->progressBar->advance($contacts->count());
+                $this->counter->advanceEvaluated($contacts->count());
+
+                $contactIds = $contacts->getKeys();
+                $this->leadRepository->incrementCampaignRotationForContacts(
+                    $contactIds,
+                    $redirectEvent->getCampaign()->getId()
+                );
+
+                $this->executioner->recordLogsAsExecutedForEvent($originalDecisionEvent, $contacts, true);
+
+                $eventCollection = new ArrayCollection([$redirectEvent]);
+                $this->executioner->executeEventsForContacts($eventCollection, $contacts, $this->counter, true);
+
+                $this->inactiveContactFinder->clear($contacts);
+
+                if ($this->limiter->getContactId()) {
+                    break;
+                }
+
+                $this->processSignalService->throwExceptionIfSignalIsCaught();
+
+                $this->logger->debug(
+                    'CAMPAIGN: Fetching the next batch of inactive contacts for redirected decision ID #'
+                    .$originalDecisionEvent->getId().' starting with contact ID '.$batchMinContactId
+                );
+                $this->limiter->setBatchMinContactId($batchMinContactId);
+
+                $contacts = $this->inactiveContactFinder->getContacts(
+                    $this->campaign->getId(),
+                    $originalDecisionEvent,
+                    $this->limiter,
+                    true
+                );
+            }
+        } catch (NoContactsFoundException) {
+            $this->logger->debug(
+                'CAMPAIGN: No more contacts to process for redirected decision ID #'.$originalDecisionEvent->getId()
+            );
         }
-
-        $this->progressBar->advance($contacts->count());
-        $this->counter->advanceEvaluated($contacts->count());
-
-        $contactIds = $contacts->getKeys();
-
-        $this->leadRepository->incrementCampaignRotationForContacts(
-            $contactIds,
-            $redirectEvent->getCampaign()->getId()
-        );
-
-        $eventCollection = new ArrayCollection([$redirectEvent]);
-        $this->executioner->executeEventsForContacts($eventCollection, $contacts, $this->counter);
     }
 }

@@ -26,10 +26,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(uriTemplate: '/companies', security: "is_granted('lead:leads:viewown')"),
         new Post(uriTemplate: '/companies', security: "is_granted('lead:leads:create')"),
-        new Get(uriTemplate: '/companies/{id}', security: "is_granted('lead:leads:viewown')"),
-        new Put(uriTemplate: '/companies/{id}', security: "is_granted('lead:leads:editown')"),
-        new Patch(uriTemplate: '/companies/{id}', security: "is_granted('lead:leads:editother')"),
-        new Delete(uriTemplate: '/companies/{id}', security: "is_granted('lead:leads:deleteown')"),
+        new Get(uriTemplate: '/companies/{id}', security: "is_granted('lead:leads:viewown', object)"),
+        new Put(uriTemplate: '/companies/{id}', security: "is_granted('lead:leads:editown', object)"),
+        new Patch(uriTemplate: '/companies/{id}', security: "is_granted('lead:leads:editother', object)"),
+        new Delete(uriTemplate: '/companies/{id}', security: "is_granted('lead:leads:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['company:read'],

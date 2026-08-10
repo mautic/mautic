@@ -21,10 +21,10 @@ use Symfony\Component\Serializer\Attribute\Groups;
     operations: [
         new GetCollection(security: "is_granted('point:triggers:viewown')"),
         new Post(security: "is_granted('point:triggers:create')"),
-        new Get(security: "is_granted('point:triggers:viewown')"),
-        new Put(security: "is_granted('point:triggers:editown')"),
-        new Patch(security: "is_granted('point:triggers:editother')"),
-        new Delete(security: "is_granted('point:triggers:deleteown')"),
+        new Get(security: "is_granted('point:triggers:viewown', object)"),
+        new Put(security: "is_granted('point:triggers:editown', object)"),
+        new Patch(security: "is_granted('point:triggers:editother', object)"),
+        new Delete(security: "is_granted('point:triggers:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['trigger_event:read'],
@@ -124,6 +124,7 @@ class TriggerEvent implements UuidInterface
         $builder->createManyToOne('trigger', 'Trigger')
             ->inversedBy('events')
             ->addJoinColumn('trigger_id', 'id', false, false, 'CASCADE')
+            ->isOwnershipParent()
             ->build();
 
         $builder->createOneToMany('log', 'LeadTriggerLog')
@@ -329,5 +330,10 @@ class TriggerEvent implements UuidInterface
     public function getLog()
     {
         return $this->log;
+    }
+
+    public function getPermissionUser(): mixed
+    {
+        return $this->getTrigger()->getCreatedBy();
     }
 }

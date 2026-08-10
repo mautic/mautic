@@ -134,4 +134,9 @@ interface ThemeHelperInterface
     public function getCurrentTheme(string $template, string $specificFeature): string;
 
     public function toggleVisibility(string $themeName): void;
+
+    /**
+     * @param array<string, mixed> $params
+     */
+    public function renderThemeTemplate(string $template, array $params): string;
 }

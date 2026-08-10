@@ -36,10 +36,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(security: "is_granted('page:pages:viewown')"),
         new Post(security: "is_granted('page:pages:create')"),
-        new Get(security: "is_granted('page:pages:viewown')"),
-        new Put(security: "is_granted('page:pages:editown')"),
-        new Patch(security: "is_granted('page:pages:editother')"),
-        new Delete(security: "is_granted('page:pages:deleteown')"),
+        new Get(security: "is_granted('page:pages:viewown', object)"),
+        new Put(security: "is_granted('page:pages:editown', object)"),
+        new Patch(security: "is_granted('page:pages:editother', object)"),
+        new Delete(security: "is_granted('page:pages:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['page:read'],

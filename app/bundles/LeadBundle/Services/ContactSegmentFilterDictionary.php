@@ -103,9 +103,13 @@ class ContactSegmentFilterDictionary
             'field'               => 'id',
         ];
         $this->filters['lead_email_read_date']          = [
-            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
-            'foreign_table' => 'email_stats',
-            'field'         => 'date_read',
+            'type'                => ForeignFuncFilterQueryBuilder::getServiceId(),
+            'foreign_table'       => 'email_stats',
+            'foreign_table_field' => 'lead_id',
+            'table'               => 'leads',
+            'table_field'         => 'id',
+            'func'                => 'max',
+            'field'               => 'date_read',
         ];
         $this->filters['lead_email_sent_date']          = [
             'type'          => ForeignValueFilterQueryBuilder::getServiceId(),

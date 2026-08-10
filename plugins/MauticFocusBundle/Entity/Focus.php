@@ -24,11 +24,11 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 #[ApiResource(
     operations: [
         new GetCollection(uriTemplate: '/focus_items', security: "is_granted('focus:items:viewown')"),
-        new Get(uriTemplate: '/focus_items/{id}', security: "is_granted('focus:items:viewown')"),
+        new Get(uriTemplate: '/focus_items/{id}', security: "is_granted('focus:items:viewown', object)"),
         new Post(uriTemplate: '/focus_items', security: "is_granted('focus:items:create')"),
-        new Put(uriTemplate: '/focus_items/{id}', security: "is_granted('focus:items:editown')"),
-        new Patch(uriTemplate: '/focus_items/{id}', security: "is_granted('focus:items:editother')"),
-        new Delete(uriTemplate: '/focus_items/{id}', security: "is_granted('focus:items:deleteown')"),
+        new Put(uriTemplate: '/focus_items/{id}', security: "is_granted('focus:items:editown', object)"),
+        new Patch(uriTemplate: '/focus_items/{id}', security: "is_granted('focus:items:editother', object)"),
+        new Delete(uriTemplate: '/focus_items/{id}', security: "is_granted('focus:items:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['focus:read'],

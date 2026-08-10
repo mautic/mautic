@@ -40,10 +40,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(security: "is_granted('dynamiccontent:dynamiccontents:viewown')"),
         new Post(security: "is_granted('dynamiccontent:dynamiccontents:create')"),
-        new Get(security: "is_granted('dynamiccontent:dynamiccontents:viewown')"),
-        new Put(security: "is_granted('dynamiccontent:dynamiccontents:editown')"),
-        new Patch(security: "is_granted('dynamiccontent:dynamiccontents:editother')"),
-        new Delete(security: "is_granted('dynamiccontent:dynamiccontents:deleteown')"),
+        new Get(security: "is_granted('dynamiccontent:dynamiccontents:viewown', object)"),
+        new Put(security: "is_granted('dynamiccontent:dynamiccontents:editown', object)"),
+        new Patch(security: "is_granted('dynamiccontent:dynamiccontents:editother', object)"),
+        new Delete(security: "is_granted('dynamiccontent:dynamiccontents:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['dynamicContent:read'],

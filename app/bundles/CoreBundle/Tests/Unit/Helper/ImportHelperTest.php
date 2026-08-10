@@ -64,6 +64,52 @@ class ImportHelperTest extends TestCase
         parent::tearDown();
     }
 
+    /**
+     * A ZIP entry named `../escape.php` starts with `../`.
+     * normalizePath() silently drops the leading `../` (returns `escape.php`),
+     * so the validation check sees no `..` and passes.
+     * Extraction then uses the raw filename, writing the file outside var/tmp.
+     */
+    public function testReadZipFileWithLeadingPathTraversalThrowsRuntimeException(): void
+    {
+        $zipPath       = sys_get_temp_dir().'/traversal_leading_'.uniqid().'.zip';
+        $this->paths[] = $zipPath;
+
+        $zip = new \ZipArchive();
+        $zip->open($zipPath, \ZipArchive::CREATE);
+        $zip->addFromString('campaign.json', json_encode(['key' => 'value']));
+        $zip->addFromString('../escape.php', '<?php system($_GET["cmd"]);');
+        $zip->close();
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessageMatches('/[Uu]nsafe/');
+
+        $this->importHelper->readZipFile($zipPath);
+    }
+
+    /**
+     * A ZIP entry `assets/../../escape.php` has two `..` segments. normalizePath() correctly pops `assets` for the first `..`,
+     * but then the second `..` finds an empty stack and is silently dropped,
+     * turning the path into `escape.php` (no `..` remains, passes validation).
+     * The assets copy stage uses the raw filename as the destination, escaping media/files/.
+     */
+    public function testReadZipFileWithDoublePathTraversalInAssetsThrowsRuntimeException(): void
+    {
+        $zipPath       = sys_get_temp_dir().'/traversal_assets_'.uniqid().'.zip';
+        $this->paths[] = $zipPath;
+
+        $zip = new \ZipArchive();
+        $zip->open($zipPath, \ZipArchive::CREATE);
+        $zip->addFromString('campaign.json', json_encode(['key' => 'value']));
+        $zip->addFromString('assets/../../escape.php', '<?php echo "pwned";');
+        $zip->close();
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessageMatches('/[Uu]nsafe/');
+
+        $this->importHelper->readZipFile($zipPath);
+    }
+
     public function testReadFromZipWithAssets(): void
     {
         $jsonData = ['key' => 'value'];

@@ -72,8 +72,10 @@ final class AjaxController extends CommonAjaxController
         $projectOptions = '';
 
         foreach ($allProjects as $project) {
+            $value    = htmlspecialchars((string) $project['value'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+            $label    = htmlspecialchars((string) $project['label'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
             $selected = in_array($project['value'], $existingProjectIds) ? ' selected="selected"' : '';
-            $projectOptions .= '<option'.$selected.' value="'.$project['value'].'">'.$project['label'].'</option>';
+            $projectOptions .= "<option{$selected} value=\"{$value}\">{$label}</option>";
         }
 
         return $this->sendJsonResponse(['projects' => $projectOptions]);

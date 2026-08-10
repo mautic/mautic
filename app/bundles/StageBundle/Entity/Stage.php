@@ -26,10 +26,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(security: "is_granted('stage:stages:viewown')"),
         new Post(security: "is_granted('stage:stages:create')"),
-        new Get(security: "is_granted('stage:stages:viewown')"),
-        new Put(security: "is_granted('stage:stages:editown')"),
-        new Patch(security: "is_granted('stage:stages:editother')"),
-        new Delete(security: "is_granted('stage:stages:deleteown')"),
+        new Get(security: "is_granted('stage:stages:viewown', object)"),
+        new Put(security: "is_granted('stage:stages:editown', object)"),
+        new Patch(security: "is_granted('stage:stages:editother', object)"),
+        new Delete(security: "is_granted('stage:stages:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['stage:read'],

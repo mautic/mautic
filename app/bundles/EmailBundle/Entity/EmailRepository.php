@@ -828,6 +828,34 @@ class EmailRepository extends CommonRepository
             ->andWhere('lc.manually_removed = 1');
     }
 
+    /**
+     * @return int[]
+     */
+    public function getSegmentEmailIdsByListId(int $listId): array
+    {
+        $connection = $this->getEntityManager()->getConnection();
+
+        $includedIds = $connection->createQueryBuilder()
+            ->select('DISTINCT xref.email_id')
+            ->from(MAUTIC_TABLE_PREFIX.'email_list_xref', 'xref')
+            ->innerJoin('xref', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.id = xref.email_id')
+            ->where('xref.leadlist_id = :listId')
+            ->andWhere("e.email_type = 'list'")
+            ->setParameter('listId', $listId)
+            ->fetchFirstColumn();
+
+        $excludedIds = $connection->createQueryBuilder()
+            ->select('DISTINCT excl.email_id')
+            ->from(MAUTIC_TABLE_PREFIX.'email_list_excluded', 'excl')
+            ->innerJoin('excl', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.id = excl.email_id')
+            ->where('excl.leadlist_id = :listId')
+            ->andWhere("e.email_type = 'list'")
+            ->setParameter('listId', $listId)
+            ->fetchFirstColumn();
+
+        return array_values(array_unique(array_map('intval', [...$includedIds, ...$excludedIds])));
+    }
+
     private function getExcludedListQuery(int $emailId): ?QueryBuilder
     {
         $connection = $this->getEntityManager()

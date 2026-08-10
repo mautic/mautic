@@ -35,10 +35,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(uriTemplate: '/contacts', security: "is_granted('lead:leads:viewown')"),
         new Post(uriTemplate: '/contacts', security: "is_granted('lead:leads:create')"),
-        new Get(uriTemplate: '/contacts/{id}', security: "is_granted('lead:leads:viewown')"),
-        new Put(uriTemplate: '/contacts/{id}', security: "is_granted('lead:leads:editown')"),
-        new Patch(uriTemplate: '/contacts/{id}', security: "is_granted('lead:leads:editother')"),
-        new Delete(uriTemplate: '/contacts/{id}', security: "is_granted('lead:leads:deleteown')"),
+        new Get(uriTemplate: '/contacts/{id}', security: "is_granted('lead:leads:viewown', object)"),
+        new Put(uriTemplate: '/contacts/{id}', security: "is_granted('lead:leads:editown', object)"),
+        new Patch(uriTemplate: '/contacts/{id}', security: "is_granted('lead:leads:editother', object)"),
+        new Delete(uriTemplate: '/contacts/{id}', security: "is_granted('lead:leads:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['contact:read'],
