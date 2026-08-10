@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Security\Permissions;
 
+use Mautic\ApiBundle\Security\Permissions\ApiPermissions;
 use Mautic\AssetBundle\Security\Permissions\AssetPermissions;
 use Mautic\CampaignBundle\Security\Permissions\CampaignPermissions;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -61,6 +62,19 @@ final class CorePermissionsTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($assetPermissions, $this->corePermissions->getPermissionObject(AssetPermissions::class));
         $this->assertSame($campaignPermissions, $this->corePermissions->getPermissionObject(CampaignPermissions::class));
         $this->assertSame($focusPermissions, $this->corePermissions->getPermissionObject(FocusPermissions::class));
+    }
+
+    public function testGetPermissionObjectThrowsForUnregisteredPermissionClass(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Permission class not found for '.ApiPermissions::class.' in permissions classes');
+
+        $this->corePermissions->getPermissionObject(ApiPermissions::class);
+    }
+
+    public function testGetPermissionObjectReturnsFalseForUnregisteredPermissionClass(): void
+    {
+        $this->assertFalse($this->corePermissions->getPermissionObject(ApiPermissions::class, false));
     }
 
     /**

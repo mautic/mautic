@@ -6,6 +6,7 @@
 ## Removed code
 
 - Deprecated method `Mautic\LeadBundle\Model\LeadModel::isContactable()` removed. Use `Mautic\LeadBundle\Model\DoNotContact::isContactable()` instead.
+- Deprecated on-the-fly instantiation of permission objects in `Mautic\CoreBundle\Security\Permissions\CorePermissions` removed. Permission objects must be registered as services tagged with `mautic.permissions`; `getPermissionObject()` now throws `\InvalidArgumentException` (or returns `false` when `$throwException` is `false`) for a permission class that is not registered.
 
 ## Changed code
 

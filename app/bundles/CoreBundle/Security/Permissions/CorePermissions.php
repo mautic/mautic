@@ -84,17 +84,12 @@ class CorePermissions implements ResetInterface
 
         try {
             $permissionObject = $this->findPermissionObject($bundle);
-        } catch (\UnexpectedValueException $e) {
-            try {
-                $permissionObject = $this->instantiatePermissionObject($bundle); // @phpstan-ignore method.deprecated
-                $this->setPermissionObject($permissionObject);
-            } catch (\InvalidArgumentException $e) {
-                if ($throwException) {
-                    throw $e;
-                }
-
-                return false;
+        } catch (\UnexpectedValueException) {
+            if ($throwException) {
+                throw new \InvalidArgumentException("Permission class not found for {$bundle} in permissions classes");
             }
+
+            return false;
         }
 
         if ($permissionObject->isEnabled()) {
@@ -440,25 +435,6 @@ class CorePermissions implements ResetInterface
         }
 
         return $this->permissionClasses;
-    }
-
-    /**
-     * @deprecated To be removed in 4.0.
-     *
-     * It is recommended to define permission objects via DI with tag 'mautic.permissions'.
-     * This is fallback for keeping BC where the permission object is instantiated on the fly.
-     *
-     * @throws \InvalidArgumentException
-     */
-    private function instantiatePermissionObject(string $class): AbstractPermissions
-    {
-        if (empty($this->getPermissionClasses()[$class])) {
-            throw new \InvalidArgumentException("Permission class not found for {$class} in permissions classes");
-        }
-
-        $permissionClass = $this->getPermissionClasses()[$class];
-
-        return new $permissionClass($this->getParams());
     }
 
     /**
