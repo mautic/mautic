@@ -7,6 +7,7 @@ namespace Mautic\LeadBundle\Model;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Symfony\Component\HttpFoundation\Response;
 
 class BatchCompanyContactAssignmentModel
@@ -33,6 +34,7 @@ class BatchCompanyContactAssignmentModel
         private readonly CompanyModel $companyModel,
         private readonly LeadModel $leadModel,
         private readonly CorePermissions $security,
+        private readonly LeadRepository $leadRepository,
     ) {
     }
 
@@ -43,7 +45,7 @@ class BatchCompanyContactAssignmentModel
      */
     public function process(array $assignments): array
     {
-        $dedupedForProcessing = self::dedupeAssignments($assignments);
+        $dedupedForProcessing = $this->dedupeAssignments($assignments);
 
         /** @var array<string, array{contactId: int, companyId: int, status: int, message: string}> $outcomes */
         $outcomes = [];
@@ -54,15 +56,15 @@ class BatchCompanyContactAssignmentModel
         $pairsToAssign = [];
 
         foreach ($dedupedForProcessing as $pairKey => $entry) {
-            [$contactId, $companyId] = self::parsePair($entry);
+            [$contactId, $companyId] = $this->parsePair($entry);
 
             if ($contactId <= 0) {
-                $outcomes[$pairKey] = self::resultEntry($contactId, $companyId, Response::HTTP_NOT_FOUND, self::MESSAGE_CONTACT_NOT_FOUND);
+                $outcomes[$pairKey] = $this->resultEntry($contactId, $companyId, Response::HTTP_NOT_FOUND, self::MESSAGE_CONTACT_NOT_FOUND);
                 continue;
             }
 
             if ($companyId <= 0) {
-                $outcomes[$pairKey] = self::resultEntry($contactId, $companyId, Response::HTTP_NOT_FOUND, self::MESSAGE_COMPANY_NOT_FOUND);
+                $outcomes[$pairKey] = $this->resultEntry($contactId, $companyId, Response::HTTP_NOT_FOUND, self::MESSAGE_COMPANY_NOT_FOUND);
                 continue;
             }
 
@@ -87,12 +89,12 @@ class BatchCompanyContactAssignmentModel
 
             $contact = $contactsById[$contactId] ?? null;
             if (!$contact instanceof Lead) {
-                $outcomes[$pairKey] = self::resultEntry($contactId, $companyId, Response::HTTP_NOT_FOUND, self::MESSAGE_CONTACT_NOT_FOUND);
+                $outcomes[$pairKey] = $this->resultEntry($contactId, $companyId, Response::HTTP_NOT_FOUND, self::MESSAGE_CONTACT_NOT_FOUND);
                 continue;
             }
 
             if (!isset($companiesById[$companyId])) {
-                $outcomes[$pairKey] = self::resultEntry($contactId, $companyId, Response::HTTP_NOT_FOUND, self::MESSAGE_COMPANY_NOT_FOUND);
+                $outcomes[$pairKey] = $this->resultEntry($contactId, $companyId, Response::HTTP_NOT_FOUND, self::MESSAGE_COMPANY_NOT_FOUND);
                 continue;
             }
 
@@ -101,7 +103,7 @@ class BatchCompanyContactAssignmentModel
                 'lead:leads:editother',
                 $contact->getPermissionUser()
             )) {
-                $outcomes[$pairKey] = self::resultEntry($contactId, $companyId, Response::HTTP_FORBIDDEN, self::MESSAGE_ACCESS_DENIED);
+                $outcomes[$pairKey] = $this->resultEntry($contactId, $companyId, Response::HTTP_FORBIDDEN, self::MESSAGE_ACCESS_DENIED);
                 continue;
             }
 
@@ -130,7 +132,7 @@ class BatchCompanyContactAssignmentModel
             }
 
             foreach ($companyIdsForContact as $companyId) {
-                $outcomes[self::pairKey($contactId, $companyId)] = self::resultEntry($contactId, $companyId, $status, $message);
+                $outcomes[$this->pairKey($contactId, $companyId)] = $this->resultEntry($contactId, $companyId, $status, $message);
             }
         }
 
@@ -140,14 +142,14 @@ class BatchCompanyContactAssignmentModel
 
         foreach ($assignments as $entry) {
             if (!is_array($entry)) {
-                $results[] = self::resultEntry(0, 0, Response::HTTP_NOT_FOUND, self::MESSAGE_CONTACT_NOT_FOUND);
+                $results[] = $this->resultEntry(0, 0, Response::HTTP_NOT_FOUND, self::MESSAGE_CONTACT_NOT_FOUND);
                 ++$failed;
                 continue;
             }
 
-            [$contactId, $companyId] = self::parsePair($entry);
-            $pairKey                 = self::pairKey($contactId, $companyId);
-            $result                  = $outcomes[$pairKey] ?? self::resultEntry($contactId, $companyId, Response::HTTP_NOT_FOUND, self::MESSAGE_CONTACT_NOT_FOUND);
+            [$contactId, $companyId] = $this->parsePair($entry);
+            $pairKey                 = $this->pairKey($contactId, $companyId);
+            $result                  = $outcomes[$pairKey] ?? $this->resultEntry($contactId, $companyId, Response::HTTP_NOT_FOUND, self::MESSAGE_CONTACT_NOT_FOUND);
             $results[]               = $result;
 
             if (Response::HTTP_OK === $result['status']) {
@@ -172,7 +174,7 @@ class BatchCompanyContactAssignmentModel
      *
      * @return array<string, array{contactId: int, companyId: int}>
      */
-    private static function dedupeAssignments(array $assignments): array
+    private function dedupeAssignments(array $assignments): array
     {
         /** @var array<string, array{contactId: int, companyId: int}> $deduped */
         $deduped = [];
@@ -182,8 +184,8 @@ class BatchCompanyContactAssignmentModel
                 continue;
             }
 
-            [$contactId, $companyId] = self::parsePair($entry);
-            $key                     = self::pairKey($contactId, $companyId);
+            [$contactId, $companyId] = $this->parsePair($entry);
+            $key                     = $this->pairKey($contactId, $companyId);
 
             if (isset($deduped[$key])) {
                 continue;
@@ -200,7 +202,7 @@ class BatchCompanyContactAssignmentModel
      *
      * @return array{0: int, 1: int}
      */
-    private static function parsePair(array $entry): array
+    private function parsePair(array $entry): array
     {
         return [
             (int) ($entry['contactId'] ?? 0),
@@ -208,7 +210,7 @@ class BatchCompanyContactAssignmentModel
         ];
     }
 
-    private static function pairKey(int $contactId, int $companyId): string
+    private function pairKey(int $contactId, int $companyId): string
     {
         return $contactId.':'.$companyId;
     }
@@ -287,13 +289,13 @@ class BatchCompanyContactAssignmentModel
             );
         }
 
-        $this->leadModel->getRepository()->saveEntity($contact);
+        $this->leadRepository->saveEntity($contact);
     }
 
     /**
      * @return array{contactId: int, companyId: int, status: int, message: string}
      */
-    private static function resultEntry(int $contactId, int $companyId, int $status, string $message): array
+    private function resultEntry(int $contactId, int $companyId, int $status, string $message): array
     {
         return [
             'contactId' => $contactId,

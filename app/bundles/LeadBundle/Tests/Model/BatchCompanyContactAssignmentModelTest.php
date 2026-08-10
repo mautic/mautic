@@ -12,12 +12,11 @@ use Mautic\LeadBundle\Model\BatchCompanyContactAssignmentModel;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\UserBundle\Entity\User;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 
-class BatchCompanyContactAssignmentModelTest extends TestCase
+final class BatchCompanyContactAssignmentModelTest extends TestCase
 {
     /** @var CompanyModel&MockObject */
     private MockObject $companyModel;
@@ -28,18 +27,23 @@ class BatchCompanyContactAssignmentModelTest extends TestCase
     /** @var CorePermissions&MockObject */
     private MockObject $security;
 
+    /** @var LeadRepository&MockObject */
+    private MockObject $leadRepository;
+
     private BatchCompanyContactAssignmentModel $model;
 
     protected function setUp(): void
     {
-        $this->companyModel = $this->createMock(CompanyModel::class);
-        $this->leadModel    = $this->createMock(LeadModel::class);
-        $this->security     = $this->createMock(CorePermissions::class);
+        $this->companyModel    = $this->createMock(CompanyModel::class);
+        $this->leadModel         = $this->createMock(LeadModel::class);
+        $this->security          = $this->createMock(CorePermissions::class);
+        $this->leadRepository    = $this->createMock(LeadRepository::class);
 
         $this->model = new BatchCompanyContactAssignmentModel(
             $this->companyModel,
             $this->leadModel,
-            $this->security
+            $this->security,
+            $this->leadRepository,
         );
     }
 
@@ -52,11 +56,11 @@ class BatchCompanyContactAssignmentModelTest extends TestCase
             ['contactId' => 99, 'companyId' => 1],
         ]);
 
-        Assert::assertSame(1, $payload['summary']['total']);
-        Assert::assertSame(0, $payload['summary']['succeeded']);
-        Assert::assertSame(1, $payload['summary']['failed']);
-        Assert::assertSame(Response::HTTP_NOT_FOUND, $payload['results'][0]['status']);
-        Assert::assertSame('Contact not found', $payload['results'][0]['message']);
+        $this->assertSame(1, $payload['summary']['total']);
+        $this->assertSame(0, $payload['summary']['succeeded']);
+        $this->assertSame(1, $payload['summary']['failed']);
+        $this->assertSame(Response::HTTP_NOT_FOUND, $payload['results'][0]['status']);
+        $this->assertSame('Contact not found', $payload['results'][0]['message']);
     }
 
     public function testProcessReturns404ForMissingCompany(): void
@@ -70,9 +74,9 @@ class BatchCompanyContactAssignmentModelTest extends TestCase
             ['contactId' => 1, 'companyId' => 999],
         ]);
 
-        Assert::assertSame(Response::HTTP_NOT_FOUND, $payload['results'][0]['status']);
-        Assert::assertSame('Company not found', $payload['results'][0]['message']);
-        Assert::assertSame(1, $payload['summary']['failed']);
+        $this->assertSame(Response::HTTP_NOT_FOUND, $payload['results'][0]['status']);
+        $this->assertSame('Company not found', $payload['results'][0]['message']);
+        $this->assertSame(1, $payload['summary']['failed']);
     }
 
     public function testProcessReturns403WhenContactEditDenied(): void
@@ -90,8 +94,8 @@ class BatchCompanyContactAssignmentModelTest extends TestCase
             ['contactId' => 1, 'companyId' => 7],
         ]);
 
-        Assert::assertSame(Response::HTTP_FORBIDDEN, $payload['results'][0]['status']);
-        Assert::assertSame(1, $payload['summary']['failed']);
+        $this->assertSame(Response::HTTP_FORBIDDEN, $payload['results'][0]['status']);
+        $this->assertSame(1, $payload['summary']['failed']);
     }
 
     public function testProcessAssignsAndReturns200ForValidPair(): void
@@ -112,9 +116,9 @@ class BatchCompanyContactAssignmentModelTest extends TestCase
             ['contactId' => 1, 'companyId' => 7],
         ]);
 
-        Assert::assertSame(Response::HTTP_OK, $payload['results'][0]['status']);
-        Assert::assertSame(1, $payload['summary']['total']);
-        Assert::assertSame(1, $payload['summary']['succeeded']);
+        $this->assertSame(Response::HTTP_OK, $payload['results'][0]['status']);
+        $this->assertSame(1, $payload['summary']['total']);
+        $this->assertSame(1, $payload['summary']['succeeded']);
     }
 
     public function testProcessDuplicatePairsReturn200TwiceButModelCalledOnce(): void
@@ -136,12 +140,12 @@ class BatchCompanyContactAssignmentModelTest extends TestCase
             ['contactId' => 1, 'companyId' => 7],
         ]);
 
-        Assert::assertSame(2, $payload['summary']['total']);
-        Assert::assertCount(2, $payload['results']);
-        Assert::assertSame(Response::HTTP_OK, $payload['results'][0]['status']);
-        Assert::assertSame(Response::HTTP_OK, $payload['results'][1]['status']);
-        Assert::assertSame(2, $payload['summary']['succeeded']);
-        Assert::assertSame(0, $payload['summary']['failed']);
+        $this->assertSame(2, $payload['summary']['total']);
+        $this->assertCount(2, $payload['results']);
+        $this->assertSame(Response::HTTP_OK, $payload['results'][0]['status']);
+        $this->assertSame(Response::HTTP_OK, $payload['results'][1]['status']);
+        $this->assertSame(2, $payload['summary']['succeeded']);
+        $this->assertSame(0, $payload['summary']['failed']);
     }
 
     public function testProcessGroupsMultipleCompaniesPerContact(): void
@@ -155,14 +159,7 @@ class BatchCompanyContactAssignmentModelTest extends TestCase
         $this->security->method('hasEntityAccess')->willReturn(true);
         $this->companyModel->expects($this->once())
             ->method('addLeadToCompany')
-            ->with(
-                $this->callback(static function (array $companyIds): bool {
-                    sort($companyIds);
-
-                    return [7, 11] === $companyIds;
-                }),
-                $contact
-            )
+            ->with([7, 11], $contact)
             ->willReturn([7, 11]);
         $this->expectLeadRepositorySave($contact);
 
@@ -171,8 +168,8 @@ class BatchCompanyContactAssignmentModelTest extends TestCase
             ['contactId' => 5, 'companyId' => 11],
         ]);
 
-        Assert::assertSame(2, $payload['summary']['total']);
-        Assert::assertSame(2, $payload['summary']['succeeded']);
+        $this->assertSame(2, $payload['summary']['total']);
+        $this->assertSame(2, $payload['summary']['succeeded']);
     }
 
     public function testLogContactCompanyAssignmentsForAddedCompanies(): void
@@ -184,12 +181,12 @@ class BatchCompanyContactAssignmentModelTest extends TestCase
         $this->model->logContactCompanyAssignments($contact, [7], [7 => $company]);
 
         $logs = $contact->getCompanyChangeLog();
-        Assert::assertCount(1, $logs);
-        Assert::assertSame('api', $logs[0]->getType());
-        Assert::assertSame('API assignment', $logs[0]->getEventName());
-        Assert::assertNotSame('API batch assignment', $logs[0]->getEventName());
-        Assert::assertSame('Lead added to the company, Acme Inc', $logs[0]->getActionName());
-        Assert::assertSame(7, $logs[0]->getCompany());
+        $this->assertCount(1, $logs);
+        $this->assertSame('api', $logs[0]->getType());
+        $this->assertSame('API assignment', $logs[0]->getEventName());
+        $this->assertNotSame('API batch assignment', $logs[0]->getEventName());
+        $this->assertSame('Lead added to the company, Acme Inc', $logs[0]->getActionName());
+        $this->assertSame(7, $logs[0]->getCompany());
     }
 
     public function testLogContactCompanyAssignmentsDoesNotLogWhenNoCompaniesWereAdded(): void
@@ -197,11 +194,11 @@ class BatchCompanyContactAssignmentModelTest extends TestCase
         $contact = $this->createContact(1, 10);
         $company = $this->createCompany(7, 'Acme Inc');
 
-        $this->leadModel->expects($this->never())->method('getRepository');
+        $this->leadRepository->expects($this->never())->method('saveEntity');
 
         $this->model->logContactCompanyAssignments($contact, [], [7 => $company]);
 
-        Assert::assertCount(0, $contact->getCompanyChangeLog());
+        $this->assertCount(0, $contact->getCompanyChangeLog());
     }
 
     public function testLogContactCompanyAssignmentsThrowsWhenSaveFails(): void
@@ -209,12 +206,10 @@ class BatchCompanyContactAssignmentModelTest extends TestCase
         $contact = $this->createContact(1, 10);
         $company = $this->createCompany(7, 'Acme Inc');
 
-        $leadRepository = $this->createMock(LeadRepository::class);
-        $leadRepository->expects($this->once())
+        $this->leadRepository->expects($this->once())
             ->method('saveEntity')
             ->with($contact)
             ->willThrowException(new \RuntimeException('Logging failed'));
-        $this->leadModel->method('getRepository')->willReturn($leadRepository);
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Logging failed');
@@ -238,11 +233,11 @@ class BatchCompanyContactAssignmentModelTest extends TestCase
         ]);
 
         $logs = $contact->getCompanyChangeLog();
-        Assert::assertCount(1, $logs);
-        Assert::assertSame('api', $logs[0]->getType());
-        Assert::assertSame('API batch assignment', $logs[0]->getEventName());
-        Assert::assertSame('Lead added to the company, Acme Inc', $logs[0]->getActionName());
-        Assert::assertSame(7, $logs[0]->getCompany());
+        $this->assertCount(1, $logs);
+        $this->assertSame('api', $logs[0]->getType());
+        $this->assertSame('API batch assignment', $logs[0]->getEventName());
+        $this->assertSame('Lead added to the company, Acme Inc', $logs[0]->getActionName());
+        $this->assertSame(7, $logs[0]->getCompany());
     }
 
     public function testProcessDoesNotLogWhenNoCompaniesWereAdded(): void
@@ -254,13 +249,13 @@ class BatchCompanyContactAssignmentModelTest extends TestCase
         $this->companyModel->method('getEntities')->willReturn([$company]);
         $this->security->method('hasEntityAccess')->willReturn(true);
         $this->companyModel->method('addLeadToCompany')->willReturn([]);
-        $this->leadModel->expects($this->never())->method('getRepository');
+        $this->leadRepository->expects($this->never())->method('saveEntity');
 
         $this->model->process([
             ['contactId' => 1, 'companyId' => 7],
         ]);
 
-        Assert::assertCount(0, $contact->getCompanyChangeLog());
+        $this->assertCount(0, $contact->getCompanyChangeLog());
     }
 
     public function testProcessReturns200WhenLoggingFails(): void
@@ -273,27 +268,23 @@ class BatchCompanyContactAssignmentModelTest extends TestCase
         $this->security->method('hasEntityAccess')->willReturn(true);
         $this->companyModel->method('addLeadToCompany')->willReturn([7]);
 
-        $leadRepository = $this->createMock(LeadRepository::class);
-        $leadRepository->expects($this->once())
+        $this->leadRepository->expects($this->once())
             ->method('saveEntity')
             ->with($contact)
             ->willThrowException(new \RuntimeException('Logging failed'));
-        $this->leadModel->method('getRepository')->willReturn($leadRepository);
 
         $payload = $this->model->process([
             ['contactId' => 1, 'companyId' => 7],
         ]);
 
-        Assert::assertSame(Response::HTTP_OK, $payload['results'][0]['status']);
-        Assert::assertSame(1, $payload['summary']['succeeded']);
-        Assert::assertSame(0, $payload['summary']['failed']);
+        $this->assertSame(Response::HTTP_OK, $payload['results'][0]['status']);
+        $this->assertSame(1, $payload['summary']['succeeded']);
+        $this->assertSame(0, $payload['summary']['failed']);
     }
 
     private function expectLeadRepositorySave(Lead $contact): void
     {
-        $leadRepository = $this->createMock(LeadRepository::class);
-        $leadRepository->expects($this->once())->method('saveEntity')->with($contact);
-        $this->leadModel->method('getRepository')->willReturn($leadRepository);
+        $this->leadRepository->expects($this->once())->method('saveEntity')->with($contact);
     }
 
     private function createContact(int $id, int $ownerId): Lead
