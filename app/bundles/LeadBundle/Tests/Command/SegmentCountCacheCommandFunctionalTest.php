@@ -32,9 +32,9 @@ final class SegmentCountCacheCommandFunctionalTest extends MauticMysqlTestCase
 
         // Check segment cached contact count using the SegmentCountCacheHelper directly
         /** @var SegmentCountCacheHelper $segmentCountCacheHelper */
-        $segmentCountCacheHelper = static::getContainer()->get('mautic.helper.segment.count.cache');
+        $segmentCountCacheHelper = self::getContainer()->get(SegmentCountCacheHelper::class);
         $count                   = $segmentCountCacheHelper->getSegmentContactCount($segmentId);
-        self::assertEquals(5, $count, "Expected segment $segmentId to have 5 contacts");
+        $this->assertEquals(5, $count, "Expected segment {$segmentId} to have 5 contacts");
 
         // Delete 1 contact.
         $contact = $contacts[0];
@@ -46,9 +46,9 @@ final class SegmentCountCacheCommandFunctionalTest extends MauticMysqlTestCase
 
         // Check segment cached contact count using the SegmentCountCacheHelper directly
         /** @var SegmentCountCacheHelper $segmentCountCacheHelper */
-        $segmentCountCacheHelper = static::getContainer()->get('mautic.helper.segment.count.cache');
+        $segmentCountCacheHelper = self::getContainer()->get(SegmentCountCacheHelper::class);
         $count                   = $segmentCountCacheHelper->getSegmentContactCount($segmentId);
-        self::assertEquals(4, $count, "Expected segment $segmentId to have 4 contacts");
+        $this->assertEquals(4, $count, "Expected segment {$segmentId} to have 4 contacts");
     }
 
     /**

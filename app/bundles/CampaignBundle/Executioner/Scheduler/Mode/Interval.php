@@ -12,7 +12,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\LoggerInterface;
 
-class Interval implements ScheduleModeInterface
+final class Interval implements ScheduleModeInterface
 {
     public const LOG_DATE_FORMAT = 'Y-m-d H:i:s T';
 
@@ -41,7 +41,7 @@ class Interval implements ScheduleModeInterface
         } catch (\Exception $exception) {
             $this->logger->error('CAMPAIGN: Determining interval scheduled failed with "'.$exception->getMessage().'"');
 
-            throw new NotSchedulableException($exception->getMessage());
+            throw new NotSchedulableException($exception->getMessage(), $exception->getCode(), $exception);
         }
 
         if ($comparedToDateTime > $compareFromDateTime) {

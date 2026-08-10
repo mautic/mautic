@@ -55,7 +55,7 @@ final class RandomParameterNameTest extends TestCase
         ];
 
         foreach ($expectedValues as $expectedValue) {
-            self::assertSame($expectedValue, $generator->generateRandomParameterName());
+            $this->assertSame($expectedValue, $generator->generateRandomParameterName());
         }
     }
 }

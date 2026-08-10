@@ -126,8 +126,8 @@ final class DetermineWinnerSubscriberTest extends TestCase
         $abTestResults = $event->getAbTestResults();
 
         // Check for lowest bounce rates
-        self::assertSame([1], $abTestResults['winners']);
-        self::assertEquals($expectedData, $abTestResults['support']['data'][$translation]);
+        $this->assertSame([1], $abTestResults['winners']);
+        $this->assertEquals($expectedData, $abTestResults['support']['data'][$translation]);
     }
 
     public function testOnDetermineDwellTimeWinner(): void
@@ -158,7 +158,7 @@ final class DetermineWinnerSubscriberTest extends TestCase
             ],
         ];
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturn($translation);
 
@@ -166,7 +166,7 @@ final class DetermineWinnerSubscriberTest extends TestCase
             ->method('getRelatedEntityIds')
             ->willReturn($ids);
 
-        $parentMock->expects($this->any())
+        $parentMock
             ->method('getId')
             ->willReturn(1);
 

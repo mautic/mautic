@@ -5,7 +5,7 @@ namespace Mautic\CoreBundle\Helper;
 use MatthiasMullie\Minify;
 use Symfony\Component\Finder\Finder;
 
-class AssetGenerationHelper
+final readonly class AssetGenerationHelper
 {
     // Temporary array of libraries to load from node_modules before we switch
     // to Symfony Encore. This is the first step to load libraries from NPM.
@@ -63,11 +63,11 @@ class AssetGenerationHelper
         'jquery-ui-touch-punch/jquery.ui.touch-punch.js', // Needed for touch devices, and needs to be added after the jquery-ui components
     ];
 
-    private readonly string $version;
+    private string $version;
 
     public function __construct(
-        private readonly BundleHelper $bundleHelper,
-        private readonly PathsHelper $pathsHelper,
+        private BundleHelper $bundleHelper,
+        private PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper,
         AppVersion $appVersion,
     ) {
@@ -91,7 +91,7 @@ class AssetGenerationHelper
             $rootPath   = $this->pathsHelper->getSystemPath('assets_root');
             $assetsPath = $this->pathsHelper->getSystemPath('media');
 
-            $assetsFullPath = "$rootPath/$assetsPath";
+            $assetsFullPath = "{$rootPath}/{$assetsPath}";
             if ('prod' == $env) {
                 $loadAll = false; // by default, loading should not be required
 
@@ -104,7 +104,7 @@ class AssetGenerationHelper
                 ];
 
                 foreach ($prodFiles as $file) {
-                    if (!file_exists("$assetsFullPath/$file")) {
+                    if (!file_exists("{$assetsFullPath}/{$file}")) {
                         $loadAll = true; // it's missing so compile it
                         break;
                     }
@@ -115,7 +115,7 @@ class AssetGenerationHelper
                 if ('prod' == $env) {
                     ini_set('max_execution_time', '300');
 
-                    $inProgressFile = "$assetsFullPath/generation_in_progress.txt";
+                    $inProgressFile = "{$assetsFullPath}/generation_in_progress.txt";
 
                     if (!$forceRegeneration) {
                         while (file_exists($inProgressFile)) {
@@ -152,7 +152,7 @@ class AssetGenerationHelper
                         if (!isset($modifiedLast[$ft])) {
                             $modifiedLast[$ft] = [];
                         }
-                        $dir = "{$bundle['directory']}/Assets/$ft";
+                        $dir = "{$bundle['directory']}/Assets/{$ft}";
                         if (file_exists($dir)) {
                             $modifiedLast[$ft] = array_merge($modifiedLast[$ft], $this->findAssets($dir, $ft, $env, $assets));
                         }
@@ -164,8 +164,8 @@ class AssetGenerationHelper
                 if ('prod' == $env) {
                     $checkPaths = [
                         $assetsFullPath,
-                        "$assetsFullPath/css",
-                        "$assetsFullPath/js",
+                        "{$assetsFullPath}/css",
+                        "{$assetsFullPath}/js",
                     ];
                     array_walk($checkPaths, function (string $path): void {
                         if (!file_exists($path)) {
@@ -175,7 +175,7 @@ class AssetGenerationHelper
 
                     foreach ($assets as $type => $groups) {
                         foreach ($groups as $group => $files) {
-                            $assetFile = "$assetsFullPath/$type/$group.$type";
+                            $assetFile = "{$assetsFullPath}/{$type}/{$group}.{$type}";
 
                             // only refresh if a change has occurred
                             $modified = ($forceRegeneration || !file_exists($assetFile)) ? true : filemtime($assetFile) < $modifiedLast[$type][$group];
@@ -243,7 +243,7 @@ class AssetGenerationHelper
      *
      * @return array<string, false|int>
      */
-    protected function findAssets(string $dir, string $ext, string $env, array &$assets): array
+    private function findAssets(string $dir, string $ext, string $env, array &$assets): array
     {
         $rootPath    = str_replace('\\', '/', $this->pathsHelper->getSystemPath('assets_root').'/');
         $directories = new Finder();
@@ -327,7 +327,7 @@ class AssetGenerationHelper
     /**
      * Find asset overrides in the template.
      */
-    protected function findOverrides($env, &$assets): array
+    private function findOverrides($env, array &$assets): array
     {
         $rootPath      = $this->pathsHelper->getSystemPath('assets_root');
         $currentTheme  = $this->pathsHelper->getSystemPath('current_theme');
@@ -340,9 +340,9 @@ class AssetGenerationHelper
 
         foreach ($types as $ext) {
             foreach ($overrideFiles as $group => $of) {
-                if (file_exists("$rootPath/$currentTheme/$ext/$of.$ext")) {
-                    $fullPath = "$rootPath/$currentTheme/$ext/$of.$ext";
-                    $relPath  = "$currentTheme/$ext/$of.$ext";
+                if (file_exists("{$rootPath}/{$currentTheme}/{$ext}/{$of}.{$ext}")) {
+                    $fullPath = "{$rootPath}/{$currentTheme}/{$ext}/{$of}.{$ext}";
+                    $relPath  = "{$currentTheme}/{$ext}/{$of}.{$ext}";
 
                     $details = [
                         'fullPath' => $fullPath,

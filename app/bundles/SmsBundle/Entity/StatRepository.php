@@ -175,9 +175,6 @@ class StatRepository extends CommonRepository
             ->executeStatement();
     }
 
-    /**
-     * Delete a stat.
-     */
     public function deleteStat($id): void
     {
         $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'sms_message_stats', ['id' => (int) $id]);

@@ -26,12 +26,13 @@ final class CampaignRepositoryTest extends TestCase
         $this->connection->method('createQueryBuilder')->willReturnCallback(fn (): DbalQueryBuilder => new DbalQueryBuilder($this->connection));
 
         $translator = $this->createMock(TranslatorInterface::class);
-        $translator->method('trans')->willReturnCallback(fn ($id) => match ($id) {
+        $translator->method('trans')->willReturnCallback(fn (string $id): string => match ($id) {
             'mautic.campaign.campaign.searchcommand.isexpired' => 'is:expired',
             'mautic.campaign.campaign.searchcommand.ispending' => 'is:pending',
             default                                            => $id,
         });
-        $this->repository->setTranslator($translator);
+
+        $this->repository->autowireCommonRepository($translator);
     }
 
     public function testAddSearchCommandWhereClauseHandlesExpirationFilters(): void
@@ -43,11 +44,8 @@ final class CampaignRepositoryTest extends TestCase
 
         [$expr, $params] = $method->invoke($this->repository, $qb, $filter);
 
-        self::assertSame(
-            '(c.isPublished = :par1) AND (c.publishDown IS NOT NULL) AND (c.publishDown <> \'\') AND (c.publishDown < CURRENT_TIMESTAMP())',
-            (string) $expr
-        );
-        self::assertSame(['par1' => true], $params);
+        $this->assertSame('(c.isPublished = :par1) AND (c.publishDown IS NOT NULL) AND (c.publishDown <> \'\') AND (c.publishDown < CURRENT_TIMESTAMP())', (string) $expr);
+        $this->assertSame(['par1' => true], $params);
     }
 
     public function testAddSearchCommandWhereClauseHandlesPendingFilters(): void
@@ -59,17 +57,14 @@ final class CampaignRepositoryTest extends TestCase
 
         [$expr, $params] = $method->invoke($this->repository, $qb, $filter);
 
-        self::assertSame(
-            '(c.isPublished = :par1) AND (c.publishUp IS NOT NULL) AND (c.publishUp <> \'\') AND (c.publishUp > CURRENT_TIMESTAMP())',
-            (string) $expr
-        );
-        self::assertSame(['par1' => true], $params);
+        $this->assertSame('(c.isPublished = :par1) AND (c.publishUp IS NOT NULL) AND (c.publishUp <> \'\') AND (c.publishUp > CURRENT_TIMESTAMP())', (string) $expr);
+        $this->assertSame(['par1' => true], $params);
     }
 
     public function testGetSearchCommandsContainsExpirationFilters(): void
     {
         $commands = $this->repository->getSearchCommands();
-        self::assertContains('mautic.campaign.campaign.searchcommand.isexpired', $commands);
-        self::assertContains('mautic.campaign.campaign.searchcommand.ispending', $commands);
+        $this->assertContains('mautic.campaign.campaign.searchcommand.isexpired', $commands);
+        $this->assertContains('mautic.campaign.campaign.searchcommand.ispending', $commands);
     }
 }

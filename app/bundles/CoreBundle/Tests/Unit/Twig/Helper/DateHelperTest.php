@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Twig\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -51,7 +52,7 @@ final class DateHelperTest extends \PHPUnit\Framework\TestCase
 
         // Setup translator mock for humanized dates
         $this->translator->method('trans')
-            ->willReturnCallback(fn ($key, $parameters = []) => match ($key) {
+            ->willReturnCallback(fn (string $key, array $parameters = []): string => match ($key) {
                 'mautic.core.date.years.ago'   => $parameters['%count%'].' year(s) ago',
                 'mautic.core.date.months.ago'  => $parameters['%count%'].' month(s) ago',
                 'mautic.core.date.days.ago'    => $parameters['%count%'].' day(s) ago',
@@ -109,7 +110,7 @@ final class DateHelperTest extends \PHPUnit\Framework\TestCase
         $now = new \DateTime('now', new \DateTimeZone('UTC'));
 
         // Create a mock for DateTimeHelper
-        $dateTimeHelperMock = $this->createMock(\Mautic\CoreBundle\Helper\DateTimeHelper::class);
+        $dateTimeHelperMock = $this->createMock(DateTimeHelper::class);
         $dateTimeHelperMock->expects($this->once())
             ->method('getTextDate')
             ->willReturn('today');
@@ -170,7 +171,7 @@ final class DateHelperTest extends \PHPUnit\Framework\TestCase
         $this->setDefaultLocalTimezone('UTC');
 
         // Create a mock for DateTimeHelper to return 'today'
-        $dateTimeHelperMock = $this->createMock(\Mautic\CoreBundle\Helper\DateTimeHelper::class);
+        $dateTimeHelperMock = $this->createMock(DateTimeHelper::class);
         $dateTimeHelperMock->expects($this->once())
             ->method('getTextDate')
             ->willReturn('today');
@@ -189,7 +190,7 @@ final class DateHelperTest extends \PHPUnit\Framework\TestCase
         $this->setDefaultLocalTimezone('UTC');
 
         // Create a mock for DateTimeHelper to return false (not today/yesterday)
-        $dateTimeHelperMock = $this->createMock(\Mautic\CoreBundle\Helper\DateTimeHelper::class);
+        $dateTimeHelperMock = $this->createMock(DateTimeHelper::class);
         $dateTimeHelperMock->expects($this->once())
             ->method('getTextDate')
             ->willReturn(false);

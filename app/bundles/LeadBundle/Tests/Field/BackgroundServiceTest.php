@@ -53,7 +53,6 @@ final class BackgroundServiceTest extends \PHPUnit\Framework\TestCase
         $this->fieldModel                         = $this->createMock(FieldModel::class);
         $this->customFieldColumn                  = $this->createMock(CustomFieldColumn::class);
         $this->leadFieldSaver                     = $this->createMock(LeadFieldSaver::class);
-        $leadFieldDeleter                         = $this->createMock(LeadFieldDeleter::class);
         $this->fieldColumnBackgroundJobDispatcher = $this->createMock(FieldColumnBackgroundJobDispatcher::class);
         $this->customFieldNotification            = $this->createMock(CustomFieldNotification::class);
 
@@ -61,7 +60,7 @@ final class BackgroundServiceTest extends \PHPUnit\Framework\TestCase
             $this->fieldModel,
             $this->customFieldColumn,
             $this->leadFieldSaver,
-            $leadFieldDeleter,
+            $this->createStub(LeadFieldDeleter::class),
             $this->fieldColumnBackgroundJobDispatcher,
             $this->customFieldNotification
         );

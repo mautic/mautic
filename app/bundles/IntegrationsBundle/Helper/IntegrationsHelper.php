@@ -12,6 +12,7 @@ use Mautic\IntegrationsBundle\Integration\Interfaces\IntegrationInterface;
 use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\IntegrationRepository;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class IntegrationsHelper
@@ -23,14 +24,22 @@ class IntegrationsHelper
 
     private array $decryptedIntegrationConfigurations = [];
 
+    /**
+     * @param iterable<IntegrationInterface> $integrations
+     */
     public function __construct(
         private readonly IntegrationRepository $integrationRepository,
         private readonly EncryptionService $encryptionService,
         private readonly EventDispatcherInterface $eventDispatcher,
+        #[AutowireIterator('mautic.basic_integration')]
+        iterable $integrations = [],
     ) {
+        foreach ($integrations as $integration) {
+            $this->addIntegration($integration);
+        }
     }
 
-    public function addIntegration(IntegrationInterface $integration): void
+    private function addIntegration(IntegrationInterface $integration): void
     {
         $this->integrations[$integration->getName()] = $integration;
     }
@@ -43,7 +52,7 @@ class IntegrationsHelper
     public function getIntegration(string $integration)
     {
         if (!isset($this->integrations[$integration])) {
-            throw new IntegrationNotFoundException("$integration either doesn't exist or has not been tagged with mautic.basic_integration");
+            throw new IntegrationNotFoundException("{$integration} either doesn't exist or has not been tagged with mautic.basic_integration");
         }
 
         // Ensure the configuration is hydrated

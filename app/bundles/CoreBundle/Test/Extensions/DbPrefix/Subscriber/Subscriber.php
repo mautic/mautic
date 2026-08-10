@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Test\Extensions\DbPrefix\DbPrefix;
 abstract class Subscriber
 {
     public function __construct(
-        private DbPrefix $dbPrefix,
+        private readonly DbPrefix $dbPrefix,
     ) {
     }
 

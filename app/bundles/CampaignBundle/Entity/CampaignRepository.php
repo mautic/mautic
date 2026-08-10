@@ -6,6 +6,7 @@ use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Mautic\CampaignBundle\Entity\Result\CountResult;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
@@ -281,7 +282,7 @@ class CampaignRepository extends CommonRepository
             case $this->translator->trans('mautic.campaign.campaign.searchcommand.isexpired'):
             case $this->translator->trans('mautic.campaign.campaign.searchcommand.isexpired', [], null, 'en_US'):
                 $expr = $q->expr()->and(
-                    $q->expr()->eq('c.isPublished', ":$unique"),
+                    $q->expr()->eq('c.isPublished', ":{$unique}"),
                     $q->expr()->isNotNull('c.publishDown'),
                     $q->expr()->neq('c.publishDown', $q->expr()->literal('')),
                     $q->expr()->lt('c.publishDown', 'CURRENT_TIMESTAMP()')
@@ -291,7 +292,7 @@ class CampaignRepository extends CommonRepository
             case $this->translator->trans('mautic.campaign.campaign.searchcommand.ispending'):
             case $this->translator->trans('mautic.campaign.campaign.searchcommand.ispending', [], null, 'en_US'):
                 $expr = $q->expr()->and(
-                    $q->expr()->eq('c.isPublished', ":$unique"),
+                    $q->expr()->eq('c.isPublished', ":{$unique}"),
                     $q->expr()->isNotNull('c.publishUp'),
                     $q->expr()->neq('c.publishUp', $q->expr()->literal('')),
                     $q->expr()->gt('c.publishUp', 'CURRENT_TIMESTAMP()')
@@ -626,7 +627,7 @@ class CampaignRepository extends CommonRepository
             );
         $q->groupBy('c.id');
 
-        if (!empty($campaignIds)) {
+        if ([] !== $campaignIds) {
             $q->where($q->expr()->in('c.id', ':campaignIds'));
             $q->setParameter('campaignIds', $campaignIds, ArrayParameterType::INTEGER);
         }
@@ -667,7 +668,7 @@ class CampaignRepository extends CommonRepository
             ->setParameter('id', $id)
             ->andWhere('e.channelId IS NOT NULL')
             ->getQuery()
-            ->setHydrationMode(\Doctrine\ORM\Query::HYDRATE_ARRAY)
+            ->setHydrationMode(Query::HYDRATE_ARRAY)
             ->getResult();
 
         $return = [];

@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\StatsBundle\Aggregate\Collection\Stats;
 
-class WeekStat
+final class WeekStat
 {
     private int $count = 0;
 

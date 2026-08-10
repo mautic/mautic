@@ -67,12 +67,7 @@ final class FieldApiControllerTest extends TestCase
         $requestStack->method('getCurrentRequest')
             ->willReturn($request);
 
-        $fieldRepository = $this->createMock(LeadFieldRepository::class);
-        $fieldModel      = $this->createMock(FieldModel::class);
-        $fieldModel->method('getRepository')
-            ->willReturn($fieldRepository);
-        $modelFactory = $this->createMock(ModelFactory::class);
-        $controller   = new FieldApiController(
+        $controller = new FieldApiController(
             $this->createStub(CorePermissions::class),
             $this->createStub(Translator::class),
             $this->createStub(EntityResultHelper::class),
@@ -81,10 +76,11 @@ final class FieldApiControllerTest extends TestCase
             $this->createStub(AppVersion::class),
             $requestStack,
             $this->createStub(ManagerRegistry::class),
-            $modelFactory,
+            $this->createStub(ModelFactory::class),
             $this->createStub(EventDispatcherInterface::class),
             $this->createStub(CoreParametersHelper::class),
-            $fieldModel,
+            $this->createStub(FieldModel::class),
+            $this->createStub(LeadFieldRepository::class)
         );
 
         $controllerReflection = new \ReflectionClass(FieldApiController::class);

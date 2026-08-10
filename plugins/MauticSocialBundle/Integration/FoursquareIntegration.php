@@ -2,7 +2,7 @@
 
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
-class FoursquareIntegration extends SocialIntegration
+final class FoursquareIntegration extends SocialIntegration
 {
     public function getName(): string
     {
@@ -46,7 +46,7 @@ class FoursquareIntegration extends SocialIntegration
      */
     public function getApiUrl($endpoint, $m = 'foursquare'): string
     {
-        return "https://api.foursquare.com/v2/$endpoint?v=20140806&m={$m}";
+        return "https://api.foursquare.com/v2/{$endpoint}?v=20140806&m={$m}";
     }
 
     /**
@@ -81,6 +81,9 @@ class FoursquareIntegration extends SocialIntegration
         }
     }
 
+    /**
+     * @param array<string, mixed> $socialCache
+     */
     public function getPublicActivity($identifier, &$socialCache): void
     {
         if ($id = $this->getContactUserId($identifier, $socialCache)) {
@@ -214,7 +217,7 @@ class FoursquareIntegration extends SocialIntegration
         return parent::matchFieldName($field, $subfield);
     }
 
-    public function getAvailableLeadFields($settings = []): array
+    public function getAvailableLeadFields(array $settings = []): array
     {
         return [
             'profileHandle' => ['type' => 'string'],
@@ -243,13 +246,16 @@ class FoursquareIntegration extends SocialIntegration
     }
 
     /**
+     * @param array<string, mixed> $socialCache
+     *
      * @return bool
      */
-    private function getContactUserId(&$identifier, &$socialCache)
+    private function getContactUserId(array|string &$identifier, array &$socialCache)
     {
         if (!empty($socialCache['id'])) {
             return $socialCache['id'];
-        } elseif (empty($identifier)) {
+        }
+        if (empty($identifier)) {
             return false;
         }
 

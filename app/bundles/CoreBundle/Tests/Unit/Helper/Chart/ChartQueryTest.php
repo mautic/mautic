@@ -302,10 +302,7 @@ final class ChartQueryTest extends TestCase
     private function assertTimeDataWithoutSqlOrder(array $expectedResult, array $data): void
     {
         $this->createChartQuery();
-        self::assertSame(
-            $expectedResult,
-            $this->chartQuery->completeTimeData($data)
-        );
+        $this->assertSame($expectedResult, $this->chartQuery->completeTimeData($data));
     }
 
     public function testPrepareTimeDataQueryWithLeadEventLog(): void

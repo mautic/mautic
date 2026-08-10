@@ -18,9 +18,9 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
     public function testDownloadFileByFileNameAction(): void
     {
         /** @var FieldModel $fieldModel */
-        $fieldModel   = static::getContainer()->get('mautic.form.model.field');
+        $fieldModel   = self::getContainer()->get(FieldModel::class);
         /** @var FormUploader $formUploader */
-        $formUploader = static::getContainer()->get('mautic.form.helper.form_uploader');
+        $formUploader = self::getContainer()->get(FormUploader::class);
         $fileName     = 'image.png';
 
         $this->createFile($fileName);
@@ -118,8 +118,8 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('GET', "/s/forms/results/{$formId}/add-to-segment");
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('form', $response->getContent());
-        $this->assertStringContainsString('batch', $response->getContent());
+        $this->assertStringContainsString('form', (string) $response->getContent());
+        $this->assertStringContainsString('batch', (string) $response->getContent());
     }
 
     public function testEditButtonIsDisplayedOnFormResultsPage(): void

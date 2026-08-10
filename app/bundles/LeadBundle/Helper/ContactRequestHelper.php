@@ -118,7 +118,7 @@ class ContactRequestHelper
         } catch (ContactNotFoundException) {
         }
 
-        if (!empty($this->queryFields)) {
+        if ([] !== $this->queryFields) {
             /** @var Lead $foundContact */
             [$foundContact, $this->publiclyUpdatableFieldValues] = $this->leadModel->checkForDuplicateContact(
                 $this->queryFields,
@@ -133,7 +133,7 @@ class ContactRequestHelper
                 }
             }
 
-            if (is_null($this->trackedContact) or $foundContact->getId() !== $this->trackedContact->getId()) {
+            if (null === $this->trackedContact || $foundContact->getId() !== $this->trackedContact->getId()) {
                 // A contact was found by a publicly updatable field
                 if (!$foundContact->isNew()) {
                     return $foundContact;
@@ -174,7 +174,7 @@ class ContactRequestHelper
             $this->trackedContact->addIpAddress($ipAddress);
         }
 
-        if (!empty($this->publiclyUpdatableFieldValues)) {
+        if ([] !== $this->publiclyUpdatableFieldValues) {
             $this->leadModel->setFieldValues(
                 $this->trackedContact,
                 $this->publiclyUpdatableFieldValues,

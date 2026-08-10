@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Test\Extensions\SeparateProcess\SeparateProcess;
 abstract class Subscriber
 {
     public function __construct(
-        private SeparateProcess $separateProcess,
+        private readonly SeparateProcess $separateProcess,
     ) {
     }
 

@@ -6,7 +6,7 @@ use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\ListModel;
-use Mautic\StageBundle\Model\StageModel;
+use Mautic\StageBundle\Entity\StageRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -17,7 +17,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class DynamicContentFilterEntryType extends AbstractType
+final class DynamicContentFilterEntryType extends AbstractType
 {
     /**
      * @var mixed[]
@@ -46,8 +46,8 @@ class DynamicContentFilterEntryType extends AbstractType
 
     public function __construct(
         ListModel $listModel,
-        private readonly StageModel $stageModel,
         private readonly BuilderIntegrationsHelper $builderIntegrationsHelper,
+        private readonly StageRepository $stageRepository,
     ) {
         $this->fieldChoices = $listModel->getChoiceFields();
 
@@ -153,7 +153,7 @@ class DynamicContentFilterEntryType extends AbstractType
 
     private function getStageList(): array
     {
-        $stages = $this->stageModel->getRepository()->getSimpleList();
+        $stages = $this->stageRepository->getSimpleList();
 
         foreach ($stages as $stage) {
             $stages[$stage['value']] = $stage['label'];

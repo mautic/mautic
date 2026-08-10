@@ -42,14 +42,14 @@ final class CampaignSendSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->translator->method('trans')->willReturn('mautic.sms.campaign.failed.missing_entity');
 
         $event    = new Event();
-        $campaign = new class extends Campaign {
+        $campaign = new class() extends Campaign {
             public function getId(): int
             {
                 return 111;
             }
         };
         $contact = new Lead();
-        $leadLog = new class extends LeadEventLog {
+        $leadLog = new class() extends LeadEventLog {
             public function getId(): int
             {
                 return 456;
@@ -65,10 +65,10 @@ final class CampaignSendSubscriberTest extends \PHPUnit\Framework\TestCase
         $pendingEvent = new PendingEvent(new ActionAccessor([]), $event, new ArrayCollection([$leadLog->getId() => $leadLog]));
 
         $this->subscriber->onCampaignTriggerBatchAction($pendingEvent);
-        self::assertCount(0, $pendingEvent->getFailures());
-        self::assertCount(1, $pendingEvent->getSuccessful());
-        self::assertSame(1, $leadLog->getMetadata()['failed']);
-        self::assertSame('mautic.sms.campaign.failed.missing_entity', $leadLog->getMetadata()['reason']);
+        $this->assertCount(0, $pendingEvent->getFailures());
+        $this->assertCount(1, $pendingEvent->getSuccessful());
+        $this->assertSame(1, $leadLog->getMetadata()['failed']);
+        $this->assertSame('mautic.sms.campaign.failed.missing_entity', $leadLog->getMetadata()['reason']);
     }
 
     public function testSendUnpublishedSms(): void
@@ -76,14 +76,14 @@ final class CampaignSendSubscriberTest extends \PHPUnit\Framework\TestCase
         $sms      = new Sms();
         $event    = new Event();
         $contact  = new Lead();
-        $leadLog  = new class extends LeadEventLog {
+        $leadLog  = new class() extends LeadEventLog {
             public function getId(): int
             {
                 return 456;
             }
         };
 
-        $campaign  = new class extends Campaign {
+        $campaign  = new class() extends Campaign {
             public function getId(): int
             {
                 return 111;
@@ -103,19 +103,19 @@ final class CampaignSendSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->subscriber->onCampaignTriggerBatchAction($pendingEvent);
 
-        self::assertCount(0, $pendingEvent->getFailures());
-        self::assertCount(1, $pendingEvent->getSuccessful());
-        self::assertSame(1, $leadLog->getMetadata()['failed']);
-        self::assertSame('mautic.sms.campaign.failed.unpublished', $leadLog->getMetadata()['reason']);
+        $this->assertCount(0, $pendingEvent->getFailures());
+        $this->assertCount(1, $pendingEvent->getSuccessful());
+        $this->assertSame(1, $leadLog->getMetadata()['failed']);
+        $this->assertSame('mautic.sms.campaign.failed.unpublished', $leadLog->getMetadata()['reason']);
     }
 
     public function testOnCampaignTriggerBatchAction(): void
     {
         $sms = $this->createMock(Sms::class);
-        $sms->expects($this->any())
+        $sms
             ->method('getId')
             ->willReturn(1);
-        $sms->expects($this->any())
+        $sms
             ->method('isPublished')
             ->willReturn(true);
 
@@ -129,14 +129,14 @@ final class CampaignSendSubscriberTest extends \PHPUnit\Framework\TestCase
         $smsModel->method('getEntity')->willReturn($sms);
 
         $event     = new Event();
-        $campaign  = new class extends Campaign {
+        $campaign  = new class() extends Campaign {
             public function getId(): int
             {
                 return 111;
             }
         };
         $contact  = new Lead();
-        $leadLog  = new class extends LeadEventLog {
+        $leadLog  = new class() extends LeadEventLog {
             public function getId(): int
             {
                 return 456;

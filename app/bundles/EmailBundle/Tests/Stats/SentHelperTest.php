@@ -62,7 +62,7 @@ final class SentHelperTest extends TestCase
 
     public function testGenerateStatsDaily(): void
     {
-        $this->generatedColumnsProvider->expects($this->any())
+        $this->generatedColumnsProvider
             ->method('generatedColumnsAreSupported')
             ->willReturn(true);
 
@@ -108,7 +108,7 @@ final class SentHelperTest extends TestCase
 
     public function testGenerateStatsHourly(): void
     {
-        $this->generatedColumnsProvider->expects($this->any())
+        $this->generatedColumnsProvider
             ->method('generatedColumnsAreSupported')
             ->willReturn(true);
 

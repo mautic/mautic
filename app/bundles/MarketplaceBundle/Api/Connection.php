@@ -43,7 +43,7 @@ class Connection
         try {
             $response = $this->httpClient->send($request);
         } catch (GuzzleException $e) {
-            throw new ApiException($e->getMessage(), $e->getCode());
+            throw new ApiException($e->getMessage(), $e->getCode(), $e);
         }
 
         $body = (string) $response->getBody();

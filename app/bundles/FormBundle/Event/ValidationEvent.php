@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\FormBundle\Entity\Field;
 
-class ValidationEvent extends CommonEvent
+final class ValidationEvent extends CommonEvent
 {
     private bool $valid = true;
 

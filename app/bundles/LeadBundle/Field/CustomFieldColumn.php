@@ -108,7 +108,7 @@ class CustomFieldColumn
             $this->logger->warning($e->getMessage());
 
             if (1118 === $e->getCode() /* ER_TOO_BIG_ROWSIZE */) {
-                throw new CustomFieldLimitException('mautic.lead.field.max_column_error');
+                throw new CustomFieldLimitException('mautic.lead.field.max_column_error', $e->getCode(), $e);
             }
 
             throw $e;

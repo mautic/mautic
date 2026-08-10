@@ -26,21 +26,20 @@ final class DayStatTest extends TestCase
 
     public function testGetHour(): void
     {
-        $this->assertInstanceOf(HourStat::class, $this->hourStat);
-        $this->assertSame("$this->day $this->hour", $this->hourStat->getHour());
+        $this->assertSame("{$this->day} {$this->hour}", $this->hourStat->getHour());
         $this->assertSame(0, $this->hourStat->getCount());
 
         $this->hourStat = $this->dayStat->getHour($this->hour);
 
         $this->assertSame($this->hourStat, $this->dayStat->getHour($this->hour));
-        $this->assertSame("$this->day $this->hour", $this->hourStat->getHour());
+        $this->assertSame("{$this->day} {$this->hour}", $this->hourStat->getHour());
         $this->assertSame(0, $this->hourStat->getCount());
     }
 
     public function testGetStats(): void
     {
         $result = $this->dayStat->getStats();
-        $this->assertSame(["$this->day $this->hour" => $this->hourStat], $result);
+        $this->assertSame(["{$this->day} {$this->hour}" => $this->hourStat], $result);
     }
 
     public function testGetSum(): void

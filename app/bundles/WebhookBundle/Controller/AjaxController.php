@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class AjaxController extends CommonAjaxController
+final class AjaxController extends CommonAjaxController
 {
     public function sendHookTestAction(Request $request, Client $client, PathsHelper $pathsHelper): JsonResponse
     {
@@ -40,7 +40,7 @@ class AjaxController extends CommonAjaxController
 
         $selectedTypes = InputHelper::cleanArray($request->request->all()['types'] ?? []);
 
-        if (!$selectedTypes) {
+        if ([] === $selectedTypes) {
             throw new \InvalidArgumentException('mautic.webhook.label.no.events');
         }
 

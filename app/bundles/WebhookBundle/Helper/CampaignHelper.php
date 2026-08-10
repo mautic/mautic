@@ -4,15 +4,16 @@ namespace Mautic\WebhookBundle\Helper;
 
 use Doctrine\Common\Collections\Collection;
 use GuzzleHttp\Client;
+use GuzzleHttp\RequestOptions;
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
-use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\WebhookBundle\Event\WebhookRequestEvent;
 use Mautic\WebhookBundle\WebhookEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class CampaignHelper
+final class CampaignHelper
 {
     /**
      * Cached contact values in format [contact_id => [key1 => val1, key2 => val1]].
@@ -20,9 +21,9 @@ class CampaignHelper
     private array $contactsValues = [];
 
     public function __construct(
-        protected Client $client,
-        protected CompanyModel $companyModel,
+        private readonly Client $client,
         private readonly EventDispatcherInterface $dispatcher,
+        private readonly CompanyRepository $companyRepository,
     ) {
     }
 
@@ -81,8 +82,8 @@ class CampaignHelper
             case 'get':
                 $payload  = $url.(parse_url($url, PHP_URL_QUERY) ? '&' : '?').http_build_query($payload);
                 $response = $this->client->get($payload, [
-                    \GuzzleHttp\RequestOptions::HEADERS => $headers,
-                    \GuzzleHttp\RequestOptions::TIMEOUT => $timeout,
+                    RequestOptions::HEADERS => $headers,
+                    RequestOptions::TIMEOUT => $timeout,
                 ]);
                 break;
             case 'post':
@@ -90,20 +91,20 @@ class CampaignHelper
             case 'patch':
                 $headers  = array_change_key_case($headers);
                 $options  = [
-                    \GuzzleHttp\RequestOptions::HEADERS     => $headers,
-                    \GuzzleHttp\RequestOptions::TIMEOUT     => $timeout,
+                    RequestOptions::HEADERS     => $headers,
+                    RequestOptions::TIMEOUT     => $timeout,
                 ];
                 if (array_key_exists('content-type', $headers) && 'application/json' === strtolower($headers['content-type'])) {
-                    $options[\GuzzleHttp\RequestOptions::BODY] = json_encode($payload);
+                    $options[RequestOptions::BODY] = json_encode($payload);
                 } else {
-                    $options[\GuzzleHttp\RequestOptions::FORM_PARAMS] = $payload;
+                    $options[RequestOptions::FORM_PARAMS] = $payload;
                 }
                 $response = $this->client->request($method, $url, $options);
                 break;
             case 'delete':
                 $response = $this->client->delete($url, [
-                    \GuzzleHttp\RequestOptions::HEADERS => $headers,
-                    \GuzzleHttp\RequestOptions::TIMEOUT => $timeout,
+                    RequestOptions::HEADERS => $headers,
+                    RequestOptions::TIMEOUT => $timeout,
                 ]);
                 break;
             default:
@@ -140,7 +141,7 @@ class CampaignHelper
         if (empty($this->contactsValues[$contact->getId()])) {
             $this->contactsValues[$contact->getId()]              = $contact->getProfileFields();
             $this->contactsValues[$contact->getId()]['ipAddress'] = $this->ipAddressesToCsv($contact->getIpAddresses());
-            $this->contactsValues[$contact->getId()]['companies'] = $this->companyModel->getRepository()->getCompaniesByLeadId($contact->getId());
+            $this->contactsValues[$contact->getId()]['companies'] = $this->companyRepository->getCompaniesByLeadId($contact->getId());
         }
 
         return $this->contactsValues[$contact->getId()];

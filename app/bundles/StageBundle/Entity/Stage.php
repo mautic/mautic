@@ -135,14 +135,9 @@ class Stage extends FormEntity implements UuidInterface
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $metadata->addPropertyConstraint('name', new Assert\NotBlank([
-            'message' => 'mautic.core.name.required',
-        ]));
+        $metadata->addPropertyConstraint('name', new Assert\NotBlank(message: 'mautic.core.name.required'));
 
-        $metadata->addConstraint(new UniqueEntity([
-            'fields'  => ['weight'],
-            'message' => 'mautic.stage.weight.unique',
-        ]));
+        $metadata->addConstraint(new UniqueEntity(fields: ['weight'], message: 'mautic.stage.weight.unique'));
     }
 
     /**
@@ -279,7 +274,7 @@ class Stage extends FormEntity implements UuidInterface
     /**
      * @param \DateTime $publishDown
      */
-    public function setPublishDown($publishDown): Stage
+    public function setPublishDown($publishDown): self
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;

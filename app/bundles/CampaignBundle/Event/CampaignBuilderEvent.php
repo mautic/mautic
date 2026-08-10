@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Event\ComponentValidationTrait;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CampaignBuilderEvent extends Event
+final class CampaignBuilderEvent extends Event
 {
     use ComponentValidationTrait;
 
@@ -50,7 +50,7 @@ class CampaignBuilderEvent extends Event
     public function addDecision($key, array $decision): void
     {
         if (array_key_exists($key, $this->decisions)) {
-            throw new KeyAlreadyRegisteredException("The key, '$key' is already used by another contact action. Please use a different key.");
+            throw new KeyAlreadyRegisteredException("The key, '{$key}' is already used by another contact action. Please use a different key.");
         }
 
         // check for required keys and that given functions are callable
@@ -97,7 +97,7 @@ class CampaignBuilderEvent extends Event
     public function addCondition($key, array $event): void
     {
         if (array_key_exists($key, $this->conditions)) {
-            throw new KeyAlreadyRegisteredException("The key, '$key' is already used by another contact action. Please use a different key.");
+            throw new KeyAlreadyRegisteredException("The key, '{$key}' is already used by another contact action. Please use a different key.");
         }
 
         // check for required keys and that given functions are callable
@@ -147,7 +147,7 @@ class CampaignBuilderEvent extends Event
     public function addAction($key, array $action): void
     {
         if (array_key_exists($key, $this->actions)) {
-            throw new KeyAlreadyRegisteredException("The key, '$key' is already used by another action. Please use a different key.");
+            throw new KeyAlreadyRegisteredException("The key, '{$key}' is already used by another action. Please use a different key.");
         }
 
         // check for required keys and that given functions are callable
@@ -179,7 +179,7 @@ class CampaignBuilderEvent extends Event
      *
      * @return array
      */
-    protected function sort($property)
+    private function sort(string $property)
     {
         if (empty($this->sortCache[$property])) {
             uasort(

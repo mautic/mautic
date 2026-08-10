@@ -8,12 +8,13 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
 final class EventControllerFunctionalTest extends MauticMysqlTestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('fieldAndValueProvider')]
+    #[DataProvider('fieldAndValueProvider')]
     public function testCreateContactConditionOnStateField(string $field, string $value): void
     {
         // Fetch the campaign condition form.
@@ -44,7 +45,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $responseData = json_decode($response->getContent(), true);
-        Assert::assertSame(1, $responseData['success'], print_r(json_decode($response->getContent(), true), true));
+        $this->assertSame(1, $responseData['success'], print_r(json_decode($response->getContent(), true), true));
 
         $actualEventData = array_filter($responseData['event'], fn ($value): bool => in_array($value, [
             'name',
@@ -65,20 +66,18 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('condition', $responseData['eventType']);
         $this->assertSame('campaignEvent', $responseData['mauticContent']);
         $this->assertSame(1, $responseData['closeModal']);
-        Assert::assertTrue($responseData['formSubmitted'], $response->getContent());
+        $this->assertTrue($responseData['formSubmitted'], $response->getContent());
     }
 
     /**
-     * @return string[][]
+     * @return \Iterator<(int|string), array<string>>
      */
-    public static function fieldAndValueProvider(): array
+    public static function fieldAndValueProvider(): \Iterator
     {
-        return [
-            'country'  => ['country', 'India'],
-            'region'   => ['state', 'Arizona'],
-            'timezone' => ['timezone', 'Marigot'],
-            'locale'   => ['preferred_locale', 'af'],
-        ];
+        yield 'country' => ['country', 'India'];
+        yield 'region' => ['state', 'Arizona'];
+        yield 'timezone' => ['timezone', 'Marigot'];
+        yield 'locale' => ['preferred_locale', 'af'];
     }
 
     public function testActionAtSpecificTimeWorkflow(): void
@@ -266,7 +265,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $form         = $crawler->filterXPath('//form[@name="campaignevent"]')->form();
 
         // Assert the field email_type === "marketing"
-        Assert::assertSame('marketing', $form['campaignevent[properties][email_type]']->getValue(), 'The default email type should be "marketing"');
+        $this->assertSame('marketing', $form['campaignevent[properties][email_type]']->getValue(), 'The default email type should be "marketing"');
     }
 
     public function testEventsAreNotAccessibleWithXhr(): void
@@ -285,10 +284,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
 
         $response = $this->client->getResponse();
         $response = json_decode($response->getContent(), true);
-        Assert::assertSame(
-            'You do not have access to the requested area/action.',
-            $response['error']
-        );
+        $this->assertSame('You do not have access to the requested area/action.', $response['error']);
     }
 
     public function testEventsAreAccessible(): void
@@ -307,15 +303,9 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
 
         $response = $this->client->getResponse();
         $response = json_decode($response->getContent(), true);
-        Assert::assertSame(
-            $event1->getId(),
-            $response['eventId']
-        );
-        Assert::assertSame(
-            $event1->getName(),
-            $response['event']['name']
-        );
-        Assert::assertFalse($response['formSubmitted'], $this->client->getResponse()->getContent());
+        $this->assertSame($event1->getId(), $response['eventId']);
+        $this->assertSame($event1->getName(), $response['event']['name']);
+        $this->assertFalse($response['formSubmitted'], $this->client->getResponse()->getContent());
     }
 
     public function testEventsAreDeleted(): void
@@ -342,22 +332,19 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
 
         $response = $this->client->getResponse();
         $response = json_decode($response->getContent(), true);
-        Assert::assertSame(
-            1,
-            $response['success']
-        );
+        $this->assertSame(1, $response['success']);
 
         // Check that the deleted event is in the response
         $eventFound = false;
         foreach ($response['deletedEvents'] as $deletedEvent) {
             if (isset($deletedEvent['id']) && $deletedEvent['id'] === (string) $event1->getId()) {
                 $eventFound = true;
-                Assert::assertArrayHasKey('redirectEvent', $deletedEvent);
-                Assert::assertNull($deletedEvent['redirectEvent']);
+                $this->assertArrayHasKey('redirectEvent', $deletedEvent);
+                $this->assertNull($deletedEvent['redirectEvent']);
                 break;
             }
         }
-        Assert::assertTrue($eventFound, 'Deleted event not found in response');
+        $this->assertTrue($eventFound, 'Deleted event not found in response');
     }
 
     public function testEventsAreDeletedWithRedirectId(): void
@@ -382,19 +369,19 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
 
         $response = $this->client->getResponse();
         $response = json_decode($response->getContent(), true);
-        Assert::assertSame(1, $response['success']);
+        $this->assertSame(1, $response['success']);
 
         // Check that the deleted event with redirect ID is properly stored
         $eventFound = false;
         foreach ($response['deletedEvents'] as $deletedEvent) {
             if (isset($deletedEvent['id']) && $deletedEvent['id'] === (string) $event1->getId()) {
                 $eventFound = true;
-                Assert::assertArrayHasKey('redirectEvent', $deletedEvent);
-                Assert::assertNotNull($deletedEvent['redirectEvent'], 'redirectEvent should not be null');
+                $this->assertArrayHasKey('redirectEvent', $deletedEvent);
+                $this->assertNotNull($deletedEvent['redirectEvent'], 'redirectEvent should not be null');
                 break;
             }
         }
-        Assert::assertTrue($eventFound, 'Deleted event with redirect ID not found in response');
+        $this->assertTrue($eventFound, 'Deleted event with redirect ID not found in response');
     }
 
     public function testEventsAreUndeleted(): void
@@ -420,7 +407,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
 
         $deleteResponse = $this->client->getResponse();
         $deleteResponse = json_decode($deleteResponse->getContent(), true);
-        Assert::assertSame(1, $deleteResponse['success']);
+        $this->assertSame(1, $deleteResponse['success']);
 
         // Now undelete the event, passing the deletedEvents from the previous response
         $this->client->request(
@@ -438,7 +425,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
 
         $undeleteResponse = $this->client->getResponse();
         $undeleteResponse = json_decode($undeleteResponse->getContent(), true);
-        Assert::assertSame(1, $undeleteResponse['success']);
+        $this->assertSame(1, $undeleteResponse['success']);
 
         // Verify the event is no longer in the deletedEvents list
         $eventStillExists = false;
@@ -448,7 +435,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
                 break;
             }
         }
-        Assert::assertFalse($eventStillExists, 'Event should no longer be in the deletedEvents list');
+        $this->assertFalse($eventStillExists, 'Event should no longer be in the deletedEvents list');
     }
 
     public function testEventsAreDeletedWithRedirectIdInPostRequest(): void
@@ -475,19 +462,19 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
 
         $response = $this->client->getResponse();
         $response = json_decode($response->getContent(), true);
-        Assert::assertSame(1, $response['success']);
+        $this->assertSame(1, $response['success']);
 
         // Check that the deleted event with redirect ID is properly stored
         $eventFound = false;
         foreach ($response['deletedEvents'] as $deletedEvent) {
             if (isset($deletedEvent['id']) && $deletedEvent['id'] === (string) $event1->getId()) {
                 $eventFound = true;
-                Assert::assertArrayHasKey('redirectEvent', $deletedEvent);
-                Assert::assertNotNull($deletedEvent['redirectEvent'], 'redirectEvent should not be null');
+                $this->assertArrayHasKey('redirectEvent', $deletedEvent);
+                $this->assertNotNull($deletedEvent['redirectEvent'], 'redirectEvent should not be null');
                 break;
             }
         }
-        Assert::assertTrue($eventFound, 'Deleted event with redirect ID from POST data not found in response');
+        $this->assertTrue($eventFound, 'Deleted event with redirect ID from POST data not found in response');
     }
 
     private function createCampaign(): Campaign

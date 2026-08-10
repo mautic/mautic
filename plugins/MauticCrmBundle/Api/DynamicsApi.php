@@ -6,7 +6,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use Psr\Http\Message\ResponseInterface;
 
-class DynamicsApi extends CrmApi
+final class DynamicsApi extends CrmApi
 {
     private function getUrl(): string
     {
@@ -16,14 +16,13 @@ class DynamicsApi extends CrmApi
     }
 
     /**
-     * @param string $method
      * @param string $moduleobject
      *
      * @return array|ResponseInterface
      *
      * @throws ApiErrorException
      */
-    protected function request($operation, array $parameters = [], $method = 'GET', $moduleobject = 'contacts', $settings = [])
+    private function request(string $operation, array $parameters = [], string $method = 'GET', $moduleobject = 'contacts', array $settings = [])
     {
         if ('company' === $moduleobject) {
             $moduleobject = 'accounts';
@@ -103,8 +102,6 @@ class DynamicsApi extends CrmApi
     }
 
     /**
-     * gets leads.
-     *
      * @return mixed
      */
     public function getLeads(array $params)
@@ -113,8 +110,6 @@ class DynamicsApi extends CrmApi
     }
 
     /**
-     * gets companies.
-     *
      * @param string $id
      *
      * @return mixed
@@ -214,7 +209,7 @@ class DynamicsApi extends CrmApi
         preg_match('/boundary=(.*)$/', $contentType, $matches);
         $boundary = $matches[1];
         // split content by boundary and get rid of last -- element
-        $a_blocks = preg_split("/-+$boundary/", $input);
+        $a_blocks = preg_split("/-+{$boundary}/", $input);
         array_pop($a_blocks);
         // there is only one batchresponse
         $input                = array_pop($a_blocks);
@@ -228,7 +223,7 @@ class DynamicsApi extends CrmApi
         preg_match('/boundary=(.*)$/', $contentType, $matches);
         $boundary = $matches[1];
         // split content by boundary and get rid of last -- element
-        $a_blocks = preg_split("/-+$boundary/", $input);
+        $a_blocks = preg_split("/-+{$boundary}/", $input);
         array_pop($a_blocks);
         // loop data blocks
         foreach ($a_blocks as $block) {

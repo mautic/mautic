@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Portions modified from https://code.google.com/p/simple-php-oauth/.
  */
-class oAuthHelper
+final class oAuthHelper
 {
     private $clientId;
 
@@ -16,16 +16,16 @@ class oAuthHelper
 
     private $accessToken;
 
-    private string $accessTokenSecret;
+    private readonly string $accessTokenSecret;
 
     private $callback;
 
-    private $settings;
+    private array $settings;
 
     public function __construct(
         UnifiedIntegrationInterface $integration,
         private readonly ?Request $request = null,
-        $settings = [],
+        array $settings = [],
     ) {
         $clientId                = $integration->getClientIdKey();
         $clientSecret            = $integration->getClientSecretKey();
@@ -39,7 +39,7 @@ class oAuthHelper
         $this->settings          = $settings;
     }
 
-    public function getAuthorizationHeader($url, $parameters, $method): array
+    public function getAuthorizationHeader(string $url, $parameters, string $method): array
     {
         // Get standard OAuth headers
         $headers = $this->getOauthHeaders();
@@ -115,7 +115,7 @@ class oAuthHelper
      *
      * @param array<string, mixed> $params
      */
-    private function buildBaseString($baseURI, $method, array $params): string
+    private function buildBaseString(string $baseURI, string $method, array $params): string
     {
         $r = $this->normalizeParameters($params);
 
@@ -138,10 +138,11 @@ class oAuthHelper
     /**
      * @param array<string, mixed> $parameters
      * @param bool                 $encode
+     * @param array<int, string>   $normalized
      *
      * @return string|array<string,string>
      */
-    private function normalizeParameters(array $parameters, $encode = false, bool $returnarray = false, $normalized = [], int|string $key = '')
+    private function normalizeParameters(array $parameters, $encode = false, bool $returnarray = false, array $normalized = [], int|string $key = '')
     {
         // Sort by key
         ksort($parameters);

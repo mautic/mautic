@@ -509,7 +509,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
 
     public function isFailed(): bool
     {
-        $log = $this->getFailedLog();
+        $log = $this->failedLog;
 
         return !empty($log);
     }
@@ -534,7 +534,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         return $this->dateQueued;
     }
 
-    public function setDateQueued(?\DateTime $dateQueued): LeadEventLog
+    public function setDateQueued(?\DateTime $dateQueued): self
     {
         $this->dateQueued = $dateQueued;
 

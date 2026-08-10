@@ -16,7 +16,7 @@ final class TrackableModelFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->trackableModel = self::getContainer()->get('mautic.page.model.trackable');
+        $this->trackableModel = self::getContainer()->get(TrackableModel::class);
     }
 
     /**
@@ -42,13 +42,13 @@ final class TrackableModelFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($expectedTrackedUrls, $trackableUrls);
 
         foreach ($expectedUntrackedHtml as $untrackedHtml) {
-            $this->assertStringContainsString($untrackedHtml, $newContent);
+            $this->assertStringContainsString($untrackedHtml, (string) $newContent);
         }
 
-        if (empty($expectedTrackedUrls)) {
-            $this->assertStringNotContainsString('{trackable=', $newContent);
+        if ([] === $expectedTrackedUrls) {
+            $this->assertStringNotContainsString('{trackable=', (string) $newContent);
         } else {
-            $this->assertStringContainsString('{trackable=', $newContent);
+            $this->assertStringContainsString('{trackable=', (string) $newContent);
         }
     }
 

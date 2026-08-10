@@ -11,7 +11,6 @@ use Mautic\MarketplaceBundle\DTO\ConsoleOutput;
 use Mautic\MarketplaceBundle\DTO\PackageDetail;
 use Mautic\MarketplaceBundle\Exception\ApiException;
 use Mautic\MarketplaceBundle\Model\PackageModel;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 
 final class InstallCommandTest extends AbstractMauticTestCase
@@ -54,7 +53,7 @@ final class InstallCommandTest extends AbstractMauticTestCase
             $command
         );
 
-        Assert::assertSame(0, $result->getStatusCode());
+        $this->assertSame(0, $result->getStatusCode());
     }
 
     public function testInstallCommandWithDryRun(): void
@@ -75,8 +74,8 @@ final class InstallCommandTest extends AbstractMauticTestCase
             $command
         );
 
-        Assert::assertSame(0, $result->getStatusCode());
-        Assert::assertStringContainsString('dry-running this installation', $result->getDisplay());
+        $this->assertSame(0, $result->getStatusCode());
+        $this->assertStringContainsString('dry-running this installation', $result->getDisplay());
     }
 
     public function testInstallCommandWithNonExistingPackage(): void
@@ -157,8 +156,8 @@ final class InstallCommandTest extends AbstractMauticTestCase
             $command
         );
 
-        Assert::assertSame(1, $result->getStatusCode());
-        Assert::assertSame("Installing mautic/crash-package, this might take a while...\nError while installing this plugin.\nSomething went wrong during the installation\n", $result->getDisplay());
+        $this->assertSame(1, $result->getStatusCode());
+        $this->assertSame("Installing mautic/crash-package, this might take a while...\nError while installing this plugin.\nSomething went wrong during the installation\n", $result->getDisplay());
     }
 
     private function getPackageDetail(): PackageDetail

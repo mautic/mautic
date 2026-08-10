@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class ContactIdentificationEvent extends Event
+final class ContactIdentificationEvent extends Event
 {
     private ?Lead $identifiedContact = null;
 

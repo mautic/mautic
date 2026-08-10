@@ -21,30 +21,25 @@ final class SmsSubscriberTest extends TestCase
 
     private string $messageUrl = 'http://mautic.com';
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testOnTokenReplacementWithTrackableUrls(): void
     {
         $mockAuditLogModel = $this->createStub(AuditLogModel::class);
 
         $mockTrackableModel = $this->createMock(TrackableModel::class);
-        $mockTrackableModel->expects($this->any())->method('parseContentForTrackables')->willReturn([
+        $mockTrackableModel->method('parseContentForTrackables')->willReturn([
             $this->messageUrl,
             new Trackable(),
         ]);
-        $mockTrackableModel->expects($this->any())->method('generateTrackableUrl')->willReturn('custom');
+        $mockTrackableModel->method('generateTrackableUrl')->willReturn('custom');
 
         $mockPageTokenHelper = $this->createMock(TokenHelper::class);
-        $mockPageTokenHelper->expects($this->any())->method('findPageTokens')->willReturn([]);
+        $mockPageTokenHelper->method('findPageTokens')->willReturn([]);
 
         $mockAssetTokenHelper = $this->createMock(\Mautic\AssetBundle\Helper\TokenHelper::class);
-        $mockAssetTokenHelper->expects($this->any())->method('findAssetTokens')->willReturn([]);
+        $mockAssetTokenHelper->method('findAssetTokens')->willReturn([]);
 
         $mockSmsHelper = $this->createMock(SmsHelper::class);
-        $mockSmsHelper->expects($this->any())->method('getDisableTrackableUrls')->willReturn(false);
+        $mockSmsHelper->method('getDisableTrackableUrls')->willReturn(false);
 
         $lead                  = new Lead();
         $tokenReplacementEvent = new TokenReplacementEvent($this->messageText, $lead, ['channel' => [1 => 'sms']]);
@@ -65,20 +60,20 @@ final class SmsSubscriberTest extends TestCase
         $mockAuditLogModel = $this->createStub(AuditLogModel::class);
 
         $mockTrackableModel = $this->createMock(TrackableModel::class);
-        $mockTrackableModel->expects($this->any())->method('parseContentForTrackables')->willReturn([
+        $mockTrackableModel->method('parseContentForTrackables')->willReturn([
             $this->messageUrl,
             new Trackable(),
         ]);
-        $mockTrackableModel->expects($this->any())->method('generateTrackableUrl')->willReturn('custom');
+        $mockTrackableModel->method('generateTrackableUrl')->willReturn('custom');
 
         $mockPageTokenHelper = $this->createMock(TokenHelper::class);
-        $mockPageTokenHelper->expects($this->any())->method('findPageTokens')->willReturn([]);
+        $mockPageTokenHelper->method('findPageTokens')->willReturn([]);
 
         $mockAssetTokenHelper = $this->createMock(\Mautic\AssetBundle\Helper\TokenHelper::class);
-        $mockAssetTokenHelper->expects($this->any())->method('findAssetTokens')->willReturn([]);
+        $mockAssetTokenHelper->method('findAssetTokens')->willReturn([]);
 
         $mockSmsHelper = $this->createMock(SmsHelper::class);
-        $mockSmsHelper->expects($this->any())->method('getDisableTrackableUrls')->willReturn(true);
+        $mockSmsHelper->method('getDisableTrackableUrls')->willReturn(true);
 
         $lead                  = new Lead();
         $tokenReplacementEvent = new TokenReplacementEvent($this->messageText, $lead, ['channel' => ['sms', 1]]);

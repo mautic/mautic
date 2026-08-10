@@ -101,7 +101,7 @@ class OrderDAO
             return $this->changedObjects[$objectType];
         }
 
-        throw new UnexpectedValueException("There are no change objects for object type '$objectType'");
+        throw new UnexpectedValueException("There are no change objects for object type '{$objectType}'");
     }
 
     /**
@@ -290,7 +290,7 @@ class OrderDAO
 
     public function shouldSync(): bool
     {
-        return !empty($this->changedObjects);
+        return [] !== $this->changedObjects;
     }
 
     public function getObjectCount(): int

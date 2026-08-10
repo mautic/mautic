@@ -10,7 +10,6 @@ use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mime\Message;
 
@@ -48,10 +47,7 @@ final class EmailSendFunctionalTest extends MauticMysqlTestCase
 
         $response = $this->client->getResponse();
         self::assertResponseIsSuccessful($response->getContent());
-        Assert::assertSame(
-            '{"success":1,"percent":100,"progress":[2,2],"stats":{"sent":2,"failed":0,"failedRecipients":[]}}',
-            $response->getContent()
-        );
+        $this->assertSame('{"success":1,"percent":100,"progress":[2,2],"stats":{"sent":2,"failed":0,"failedRecipients":[]}}', $response->getContent());
 
         /** @var MauticMessage[] $messages */
         $messages = [
@@ -62,11 +58,11 @@ final class EmailSendFunctionalTest extends MauticMysqlTestCase
         foreach ($messages as $message) {
             $body = quoted_printable_decode($message->getBody()->bodyToString());
             preg_match('/<a href=\"([^\"]*)\">(.*)<\/a>/iU', $body, $match);
-            Assert::assertArrayHasKey(1, $match, $body);
+            $this->assertArrayHasKey(1, $match, $body);
             parse_str(parse_url($match[1], PHP_URL_QUERY), $queryParams);
             $clickThrough = \Mautic\CoreBundle\Helper\Serializer::decode(base64_decode($queryParams['ct']));
-            Assert::assertArrayHasKey($message->getTo()[0]->toString(), $leads);
-            Assert::assertSame($leads[$message->getTo()[0]->toString()]->getId(), (int) $clickThrough['lead']);
+            $this->assertArrayHasKey($message->getTo()[0]->toString(), $leads);
+            $this->assertSame($leads[$message->getTo()[0]->toString()]->getId(), (int) $clickThrough['lead']);
         }
 
         // Sort messages by to address as the order can differ
@@ -79,23 +75,23 @@ final class EmailSendFunctionalTest extends MauticMysqlTestCase
         $resubscribeUrlPattern = '/https?:\/\/[^\/]+\/email\/resubscribe\/([0-9a-z]{20})/';
 
         // First email:
-        Assert::assertStringContainsString('contact-flood-0@doe.com', $messages[0]->toString());
+        $this->assertStringContainsString('contact-flood-0@doe.com', $messages[0]->toString());
         preg_match($unsubscribeUrlPattern, $messages[0]->getHtmlBody(), $unsubscribeMatches1);
         preg_match($resubscribeUrlPattern, $messages[0]->getHtmlBody(), $resubscribeMatches1);
 
-        Assert::assertSame(20, strlen($unsubscribeMatches1[1]), $messages[0]->getHtmlBody());
-        Assert::assertSame($unsubscribeMatches1[1], $resubscribeMatches1[1], $messages[0]->getHtmlBody());
+        $this->assertSame(20, strlen($unsubscribeMatches1[1]), $messages[0]->getHtmlBody());
+        $this->assertSame($unsubscribeMatches1[1], $resubscribeMatches1[1], $messages[0]->getHtmlBody());
 
         // Second email:
-        Assert::assertStringContainsString('contact-flood-1@doe.com', $messages[1]->toString());
+        $this->assertStringContainsString('contact-flood-1@doe.com', $messages[1]->toString());
         preg_match($unsubscribeUrlPattern, $messages[1]->getHtmlBody(), $unsubscribeMatches2);
         preg_match($resubscribeUrlPattern, $messages[1]->getHtmlBody(), $resubscribeMatches2);
 
-        Assert::assertSame(20, strlen($unsubscribeMatches2[1]), $messages[1]->getHtmlBody());
-        Assert::assertSame($unsubscribeMatches2[1], $resubscribeMatches2[1], $messages[1]->getHtmlBody());
+        $this->assertSame(20, strlen($unsubscribeMatches2[1]), $messages[1]->getHtmlBody());
+        $this->assertSame($unsubscribeMatches2[1], $resubscribeMatches2[1], $messages[1]->getHtmlBody());
 
         // The email stat hashes cannot be the same in different emails:
-        Assert::assertNotSame($unsubscribeMatches1[1], $unsubscribeMatches2[1], $messages[0]->getHtmlBody());
+        $this->assertNotSame($unsubscribeMatches1[1], $unsubscribeMatches2[1], $messages[0]->getHtmlBody());
     }
 
     public function testEmailSendToBatchOneContactWithMalformedClickThrough(): void
@@ -104,7 +100,7 @@ final class EmailSendFunctionalTest extends MauticMysqlTestCase
 
         // malform click through parameter
         parse_str($urlParts['query'], $queryParams);
-        self::assertArrayHasKey('ct', $queryParams);
+        $this->assertArrayHasKey('ct', $queryParams);
         $queryParams['ct'] = substr($queryParams['ct'], 0, -5);
 
         $this->requestUrl($urlParts['path'], $queryParams);
@@ -116,7 +112,7 @@ final class EmailSendFunctionalTest extends MauticMysqlTestCase
         $urlParts = $this->sendEmailToContact('https://localhost/email-{contactfield=email}/link');
 
         parse_str($urlParts['query'], $queryParams);
-        self::assertArrayHasKey('ct', $queryParams);
+        $this->assertArrayHasKey('ct', $queryParams);
 
         $this->requestUrl($urlParts['path'], $queryParams);
         self::assertResponseRedirects('/email-contact-flood-0@doe.com/link');
@@ -208,18 +204,14 @@ final class EmailSendFunctionalTest extends MauticMysqlTestCase
 
         $response = $this->client->getResponse();
         self::assertResponseIsSuccessful($response->getContent());
-        Assert::assertSame(
-            '{"success":1,"percent":100,"progress":[1,1],"stats":{"sent":1,"failed":0,"failedRecipients":[]}}',
-            $response->getContent()
-        );
+        $this->assertSame('{"success":1,"percent":100,"progress":[1,1],"stats":{"sent":1,"failed":0,"failedRecipients":[]}}', $response->getContent());
 
         $rawMessage = self::getMailerMessagesByToAddress('contact-flood-0@doe.com')[0];
-        Assert::assertInstanceOf(Message::class, $rawMessage);
         $this->assertInstanceOf(Message::class, $rawMessage);
 
         $body = quoted_printable_decode($rawMessage->getBody()->bodyToString());
         preg_match('/<a href=\"([^\"]*)\">(.*)<\/a>/iU', $body, $match);
-        Assert::assertArrayHasKey(1, $match, $body);
+        $this->assertArrayHasKey(1, $match, $body);
 
         return parse_url($match[1]);
     }

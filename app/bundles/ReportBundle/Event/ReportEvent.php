@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\ReportBundle\Entity\Report;
 
-class ReportEvent extends CommonEvent
+final class ReportEvent extends CommonEvent
 {
     /**
      * @param bool $isNew

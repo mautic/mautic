@@ -9,7 +9,6 @@ use Mautic\CoreBundle\Test\Guzzle\ClientMockTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\MarketplaceBundle\Service\Allowlist;
 use Mautic\MarketplaceBundle\Service\Config;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 final class ListControllerTest extends MauticMysqlTestCase
@@ -33,26 +32,23 @@ final class ListControllerTest extends MauticMysqlTestCase
         );
 
         /** @var Allowlist $allowlist */
-        $allowlist = static::getContainer()->get('marketplace.service.allowlist');
+        $allowlist = self::getContainer()->get(Allowlist::class);
         $allowlist->clearCache();
 
         $crawler = $this->client->request('GET', 's/marketplace');
 
         self::assertResponseIsSuccessful($this->client->getResponse()->getContent());
 
-        Assert::assertSame(
-            [
-                'Mautic Saelos Bundle',
-                'Mautic Recaptcha Bundle',
-                'Mautic Ldap Auth Bundle',
-                'Mautic Referrals Bundle',
-                'Mautic Do Not Contact Extras Bundle',
-            ],
-            array_map(
-                fn (string $dirtyPackageName): string => trim($dirtyPackageName),
-                $crawler->filter('#marketplace-packages-table .package-name a')->extract(['_text'])
-            )
-        );
+        $this->assertSame([
+            'Mautic Saelos Bundle',
+            'Mautic Recaptcha Bundle',
+            'Mautic Ldap Auth Bundle',
+            'Mautic Referrals Bundle',
+            'Mautic Do Not Contact Extras Bundle',
+        ], array_map(
+            trim(...),
+            $crawler->filter('#marketplace-packages-table .package-name a')->extract(['_text'])
+        ));
     }
 
     public function testMarketplaceListTableWithAllowList(): void
@@ -67,22 +63,19 @@ final class ListControllerTest extends MauticMysqlTestCase
         );
 
         /** @var Allowlist $allowlist */
-        $allowlist = static::getContainer()->get('marketplace.service.allowlist');
+        $allowlist = self::getContainer()->get(Allowlist::class);
         $allowlist->clearCache();
 
         $crawler = $this->client->request('GET', 's/marketplace');
 
         self::assertResponseIsSuccessful();
 
-        Assert::assertSame(
-            [
-                'KocoCaptcha',
-                'Mautic Referrals Bundle',
-            ],
-            array_map(
-                fn (string $dirtyPackageName): string => trim($dirtyPackageName),
-                $crawler->filter('#marketplace-packages-table .package-name a')->extract(['_text'])
-            )
-        );
+        $this->assertSame([
+            'KocoCaptcha',
+            'Mautic Referrals Bundle',
+        ], array_map(
+            trim(...),
+            $crawler->filter('#marketplace-packages-table .package-name a')->extract(['_text'])
+        ));
     }
 }

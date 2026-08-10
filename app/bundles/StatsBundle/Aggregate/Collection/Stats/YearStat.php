@@ -2,7 +2,7 @@
 
 namespace Mautic\StatsBundle\Aggregate\Collection\Stats;
 
-class YearStat implements StatInterface
+final class YearStat implements StatInterface
 {
     /**
      * @var MonthStat[]
@@ -28,7 +28,7 @@ class YearStat implements StatInterface
      */
     public function getMonth($month)
     {
-        $key = (new \DateTime("{$this->year}-$month-01 00:00:00"))->format('Y-m');
+        $key = (new \DateTime("{$this->year}-{$month}-01 00:00:00"))->format('Y-m');
 
         if (!isset($this->stats[$key])) {
             $this->stats[$key] = new MonthStat($key);
@@ -45,10 +45,7 @@ class YearStat implements StatInterface
         return $this->stats;
     }
 
-    /**
-     * @return int
-     */
-    public function getSum(): int|float
+    public function getSum(): int
     {
         $sum = 0;
         foreach ($this->stats as $stat) {

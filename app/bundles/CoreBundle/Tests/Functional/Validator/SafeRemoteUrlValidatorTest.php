@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Functional\Validator;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Validator\SafeRemoteUrl;
 use Mautic\CoreBundle\Validator\SafeRemoteUrlValidator;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 final class SafeRemoteUrlValidatorTest extends MauticMysqlTestCase
 {
@@ -33,7 +34,7 @@ final class SafeRemoteUrlValidatorTest extends MauticMysqlTestCase
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessageMatches('/Expected argument of type "Mautic\\\\CoreBundle\\\\Validator\\\\SafeRemoteUrl"/');
 
-        $validator  = new SafeRemoteUrlValidator(self::getContainer()->get('mautic.helper.core_parameters'));
+        $validator  = new SafeRemoteUrlValidator(self::getContainer()->get(CoreParametersHelper::class));
         $validator->initialize($this->createStub(ExecutionContextInterface::class));
         $validator->validate('value', new Constraints\NotBlank());
     }
@@ -53,10 +54,10 @@ final class SafeRemoteUrlValidatorTest extends MauticMysqlTestCase
     #[DataProvider('dataTestWithValidateRemoteDomainsDisabled')]
     public function testWithValidateRemoteDomainsDisabled(mixed $value): void
     {
-        $validator = self::getContainer()->get('validator');
+        $validator = self::getContainer()->get(ValidatorInterface::class);
         $errors    = $validator->validate($value, new SafeRemoteUrl());
 
-        Assert::assertCount(0, $errors);
+        $this->assertCount(0, $errors);
     }
 
     /**
@@ -76,9 +77,9 @@ final class SafeRemoteUrlValidatorTest extends MauticMysqlTestCase
     #[DataProvider('dataTestWithValidateRemoteDomainsEnabled')]
     public function testWithValidateRemoteDomainsEnabled(mixed $value, bool $valid): void
     {
-        $validator = self::getContainer()->get('validator');
+        $validator = self::getContainer()->get(ValidatorInterface::class);
         $errors    = $validator->validate($value, new SafeRemoteUrl());
 
-        Assert::assertCount($valid ? 0 : 1, $errors);
+        $this->assertCount($valid ? 0 : 1, $errors);
     }
 }

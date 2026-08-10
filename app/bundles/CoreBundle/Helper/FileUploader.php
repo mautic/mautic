@@ -61,7 +61,7 @@ class FileUploader
                 throw new FileUploadException($this->translator->trans('mautic.core.fileuploader.upload_error'));
             }
         } catch (FilePathException $e) {
-            throw new FileUploadException($e->getMessage());
+            throw new FileUploadException($e->getMessage(), $e->getCode(), $e);
         }
     }
 
@@ -73,13 +73,13 @@ class FileUploader
     public function validateImage(File $file): void
     {
         // Check if the file is an image
-        if (!in_array($file->getMimeType(), $this->getAllowedImageMimeTypes())) {
-            throw new FileUploadException($this->translator->trans('mautic.core.fileuploader.unsupported_image', ['%types%' => implode(', ', $this->getAllowedImageExtensions())]));
+        if (!in_array($file->getMimeType(), $this->imageMimes)) {
+            throw new FileUploadException($this->translator->trans('mautic.core.fileuploader.unsupported_image', ['%types%' => implode(', ', $this->imageExtensions)]));
         }
         // Also check the file extension
         $extension = strtolower(pathinfo($file instanceof UploadedFile ? $file->getClientOriginalName() : $file->getFilename(), PATHINFO_EXTENSION));
-        if (!in_array($extension, $this->getAllowedImageExtensions())) {
-            throw new FileUploadException($this->translator->trans('mautic.core.fileuploader.unsupported_image', ['%types%' => implode(', ', $this->getAllowedImageExtensions())]));
+        if (!in_array($extension, $this->imageExtensions)) {
+            throw new FileUploadException($this->translator->trans('mautic.core.fileuploader.unsupported_image', ['%types%' => implode(', ', $this->imageExtensions)]));
         }
     }
 

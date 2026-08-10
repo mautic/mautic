@@ -121,9 +121,15 @@
                                 <div class="col-md-12">
                                     {{ form_label(form.customHtml) }}
                                     {{ form_widget(form.customHtml) }}
+                                </div>
+                            </div>
+                            {% if formContainsErrors(form.customHtml) %}
+                            <div class="row">
+                                <div class="col-md-12">
                                     {{ form_errors(form.customHtml) }}
                                 </div>
                             </div>
+                            {% endif %}
                             <br/>
                             <div class="row">
                                 <div class="col-md-12">

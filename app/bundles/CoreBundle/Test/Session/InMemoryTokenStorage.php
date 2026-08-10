@@ -14,7 +14,7 @@ use Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage;
  * The issue was mostly that the session was not started in the test environment.
  * And when started it was different in each request.
  */
-class InMemoryTokenStorage implements ClearableTokenStorageInterface
+final class InMemoryTokenStorage implements ClearableTokenStorageInterface
 {
     /**
      * @var array<string,string[]>
@@ -22,7 +22,7 @@ class InMemoryTokenStorage implements ClearableTokenStorageInterface
     private array $store = [];
 
     public function __construct(
-        private string $namespace = SessionTokenStorage::SESSION_NAMESPACE,
+        private readonly string $namespace = SessionTokenStorage::SESSION_NAMESPACE,
     ) {
         $this->store[$this->namespace] = [];
     }
@@ -33,7 +33,7 @@ class InMemoryTokenStorage implements ClearableTokenStorageInterface
             throw new TokenNotFoundException('The CSRF token with ID '.$tokenId.' does not exist.');
         }
 
-        return (string) $this->store[$this->namespace][$tokenId];
+        return $this->store[$this->namespace][$tokenId];
     }
 
     public function setToken(string $tokenId, #[\SensitiveParameter] string $token): void
@@ -52,7 +52,7 @@ class InMemoryTokenStorage implements ClearableTokenStorageInterface
             return null;
         }
 
-        $token = (string) $this->store[$this->namespace][$tokenId];
+        $token = $this->store[$this->namespace][$tokenId];
 
         unset($this->store[$this->namespace][$tokenId]);
 

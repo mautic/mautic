@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\ConfigBundle\Tests\Controller;
 
+use Mautic\ConfigBundle\Form\Helper\RestrictionHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -28,6 +30,17 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $this->configParams['subdomain_url'] = self::SUBDOMAIN_URL;
 
         parent::setUp();
+
+        if ('testRestrictedAssetFieldIsNotRenderedInConfigForm' === $this->name()) {
+            $translator        = self::getContainer()->get(TranslatorInterface::class);
+            $restrictionHelper = new RestrictionHelper(
+                $translator,
+                ['upload_dir'],
+                RestrictionHelper::MODE_REMOVE
+            );
+            self::getContainer()->set(RestrictionHelper::class, $restrictionHelper);
+            self::getContainer()->set('mautic.config.form.restriction_helper', $restrictionHelper);
+        }
 
         $this->prefix = MAUTIC_TABLE_PREFIX;
     }
@@ -64,34 +77,34 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
             $crawler->filterXPath("//div[@id='flashes']//span")->first()->text()
             :
             '';
-        Assert::assertStringNotContainsString('Could not save updated configuration:', $response, $message);
+        $this->assertStringNotContainsString('Could not save updated configuration:', (string) $response, $message);
 
         // Check values are escaped properly in the config file
         $configParameters = $this->getConfigParameters();
-        Assert::assertArrayHasKey('do_not_track_ips', $configParameters);
-        Assert::assertSame(
-            [
-                $this->escape('%ip1%'),
-                $this->escape('%ip2%'),
-                '%kernel.project_dir%',
-            ],
-            $configParameters['do_not_track_ips']
-        );
-        Assert::assertArrayHasKey('google_analytics', $configParameters);
-        Assert::assertSame($this->escape($googleAnalytics), $configParameters['google_analytics']);
+        $this->assertArrayHasKey('do_not_track_ips', $configParameters);
+        $this->assertSame([
+            $this->escape('%ip1%'),
+            $this->escape('%ip2%'),
+            '%kernel.project_dir%',
+        ], $configParameters['do_not_track_ips']);
+        $this->assertArrayHasKey('google_analytics', $configParameters);
+        $this->assertSame($this->escape($googleAnalytics), $configParameters['google_analytics']);
         // Check values are unescaped properly in the edit form
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
         $this->assertResponseIsSuccessful();
 
         $buttonCrawler = $crawler->selectButton('config[buttons][save]');
         $form          = $buttonCrawler->form();
-        Assert::assertSame($trackIps, $form['config[coreconfig][do_not_track_ips]']->getValue());
-        Assert::assertSame($googleAnalytics, $form['config[pageconfig][google_analytics]']->getValue());
+        $this->assertSame($trackIps, $form['config[coreconfig][do_not_track_ips]']->getValue());
+        $this->assertSame($googleAnalytics, $form['config[pageconfig][google_analytics]']->getValue());
     }
 
     private function getConfigPath(): string
     {
-        return static::getContainer()->get('kernel')->getLocalConfigFile();
+        /** @var \AppKernel $kernel */
+        $kernel = self::getContainer()->get(KernelInterface::class);
+
+        return $kernel->getLocalConfigFile();
     }
 
     /**
@@ -169,7 +182,7 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
         // Fetch available option for 404_page field
         $notFoundPageField = $form['config[coreconfig][404_page]'];
-        Assert::assertInstanceOf(ChoiceFormField::class, $notFoundPageField);
+        $this->assertInstanceOf(ChoiceFormField::class, $notFoundPageField);
         $availableOptions = $notFoundPageField->availableOptionValues();
 
         // page 2 should not be available in option list because it is unpublished
@@ -193,7 +206,7 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
         $buttonCrawler = $crawler->selectButton('config[buttons][save]');
         $form          = $buttonCrawler->form();
-        Assert::assertEquals($page3, $form['config[coreconfig][404_page]']->getValue());
+        $this->assertEquals($page3, $form['config[coreconfig][404_page]']->getValue());
         // re-create the Symfony client to make config changes applied
         $this->setUpSymfony($this->configParams);
 
@@ -235,10 +248,56 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $buttonCrawler = $crawler->selectButton('config[buttons][save]');
         $form          = $buttonCrawler->form();
 
-        Assert::assertSame($send_notification_to_author, $form['config[notification_config][campaign_send_notification_to_author]']->getValue());
-        Assert::assertSame($campaign_notification_email_addresses, $form['config[notification_config][campaign_notification_email_addresses]']->getValue());
-        Assert::assertSame($send_notification_to_author, $form['config[notification_config][webhook_send_notification_to_author]']->getValue());
-        Assert::assertSame($webhook_notification_email_addresses, $form['config[notification_config][webhook_notification_email_addresses]']->getValue());
+        $this->assertSame($send_notification_to_author, $form['config[notification_config][campaign_send_notification_to_author]']->getValue());
+        $this->assertSame($campaign_notification_email_addresses, $form['config[notification_config][campaign_notification_email_addresses]']->getValue());
+        $this->assertSame($send_notification_to_author, $form['config[notification_config][webhook_send_notification_to_author]']->getValue());
+        $this->assertSame($webhook_notification_email_addresses, $form['config[notification_config][webhook_notification_email_addresses]']->getValue());
+    }
+
+    public function testContactExportAdminNotificationsConfigDefaultsToEnabledAndCanBeDisabled(): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
+        $this->assertResponseIsSuccessful();
+
+        $buttonCrawler = $crawler->selectButton('config[buttons][save]');
+        $form          = $buttonCrawler->form();
+
+        $this->assertSame('1', $form['config[leadconfig][contact_export_notify_admins]']->getValue());
+
+        $form->setValues(
+            [
+                'config[coreconfig][site_url]'                     => 'https://mautic-community.local',
+                'config[leadconfig][contact_columns]'              => ['name', 'email', 'id'],
+                'config[companyconfig][company_columns]'           => ['companyname', 'companyemail', 'companywebsite', 'score', 'leadcount', 'id'],
+                'config[leadconfig][contact_export_notify_admins]' => '0',
+            ]
+        );
+
+        $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+
+        $configParameters = $this->getConfigParameters();
+        $this->assertArrayHasKey('contact_export_notify_admins', $configParameters);
+        $this->assertFalse((bool) $configParameters['contact_export_notify_admins']);
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
+        $this->assertResponseIsSuccessful();
+
+        $buttonCrawler = $crawler->selectButton('config[buttons][save]');
+        $form          = $buttonCrawler->form();
+
+        $this->assertSame('0', $form['config[leadconfig][contact_export_notify_admins]']->getValue());
+    }
+
+    public function testRestrictedAssetFieldIsNotRenderedInConfigForm(): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
+        $this->assertResponseIsSuccessful();
+
+        // Restricted explicitly in test setUp().
+        $this->assertCount(0, $crawler->filter('#config_assetconfig_upload_dir'));
+        $this->assertCount(1, $crawler->filter('#config_assetconfig_max_size'));
+        $this->assertCount(1, $crawler->filter('#config_assetconfig_allowed_extensions'));
     }
 
     public function testUserAndSystemLocale(): void
@@ -255,7 +314,7 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         );
         $this->client->submit($accountForm);
         $this->assertResponseIsSuccessful();
-        Assert::assertSame('en_US', $this->client->getRequest()->getSession()->get('_locale'));
+        $this->assertSame('en_US', $this->client->getRequest()->getSession()->get('_locale'));
 
         // 2. Change system locale in configuration - should not change _locale session
         $configCrawler    = $this->client->request(Request::METHOD_GET, '/s/config/edit');
@@ -269,7 +328,7 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         );
         $this->client->submit($configForm);
         $this->assertResponseIsSuccessful();
-        Assert::assertSame('en_US', $this->client->getRequest()->getSession()->get('_locale'));
+        $this->assertSame('en_US', $this->client->getRequest()->getSession()->get('_locale'));
 
         // 3. Change user locale to system default in account - should change _locale session to system default
         $accountCrawler    = $this->client->request(Request::METHOD_GET, '/s/account');
@@ -282,7 +341,7 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         );
         $this->client->submit($accountForm);
         $this->assertResponseIsSuccessful();
-        Assert::assertSame('en_US', $this->client->getRequest()->getSession()->get('_locale'));
+        $this->assertSame('en_US', $this->client->getRequest()->getSession()->get('_locale'));
 
         // 2. Change system locale in configuration to en_US - should change _locale session
         $configCrawler    = $this->client->request(Request::METHOD_GET, '/s/config/edit');
@@ -296,7 +355,7 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         );
         $this->client->submit($configForm);
         $this->assertResponseIsSuccessful();
-        Assert::assertSame('en_US', $this->client->getRequest()->getSession()->get('_locale'));
+        $this->assertSame('en_US', $this->client->getRequest()->getSession()->get('_locale'));
     }
 
     public function testSSOSettingEntityId(): void
@@ -308,7 +367,7 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         /** @var ChoiceFormField $entityIdField */
         $entityIdField    = $configForm['config[userconfig][saml_idp_entity_id]'];
         $availableOptions = $entityIdField->availableOptionValues();
-        Assert::assertCount(3, $availableOptions);
+        $this->assertCount(3, $availableOptions);
         $configForm->setValues(
             [
                 'config[userconfig][saml_idp_entity_id]'   => $availableOptions[1],
@@ -317,6 +376,6 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         );
         $this->client->submit($configForm);
         $this->assertResponseIsSuccessful();
-        Assert::assertEquals($availableOptions[1], $configForm['config[userconfig][saml_idp_entity_id]']->getValue());
+        $this->assertEquals($availableOptions[1], $configForm['config[userconfig][saml_idp_entity_id]']->getValue());
     }
 }

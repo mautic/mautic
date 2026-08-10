@@ -29,9 +29,7 @@ final class CampaignMapStatsControllerTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        $campaignModelMock             = $this->createMock(CampaignModel::class);
-        $this->mapController           = new CampaignMapStatsController($campaignModelMock);
+        $this->mapController           = new CampaignMapStatsController($this->createStub(CampaignModel::class));
     }
 
     /**
@@ -255,7 +253,7 @@ final class CampaignMapStatsControllerTest extends MauticMysqlTestCase
         // Add events to campaign
         $campaign->addEvent(0, $event);
 
-        if (!empty($leadsPayload)) {
+        if ([] !== $leadsPayload) {
             $this->emulateEmailCampaignStat($event, $email, $leadsPayload);
         }
 

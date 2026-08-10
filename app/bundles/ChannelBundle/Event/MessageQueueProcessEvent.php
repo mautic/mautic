@@ -5,7 +5,7 @@ namespace Mautic\ChannelBundle\Event;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Event\CommonEvent;
 
-class MessageQueueProcessEvent extends CommonEvent
+final class MessageQueueProcessEvent extends CommonEvent
 {
     public function __construct(MessageQueue $entity)
     {

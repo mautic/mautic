@@ -21,7 +21,7 @@ class MaxMindDoNotSellList implements DoNotSellListInterface
 
     public function loadList(): bool
     {
-        $listPath = $this->getListPath();
+        $listPath = $this->listPath;
 
         if (false == $listPath) {
             throw new BadConfigurationException('Please configure the path to the MaxMind Do Not Sell List.');

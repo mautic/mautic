@@ -23,15 +23,25 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Stage>
  */
-class StageApiController extends CommonApiController
+final class StageApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper)
-    {
-        $stageModel = $modelFactory->getModel('stage');
-        \assert($stageModel instanceof StageModel);
-
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        StageModel $stageModel,
+        private LeadModel $leadModel,
+    ) {
         $this->model            = $stageModel;
         $this->entityClass      = Stage::class;
         $this->entityNameOne    = 'stage';
@@ -47,11 +57,9 @@ class StageApiController extends CommonApiController
      * @param int $id        Stage ID
      * @param int $contactId Lead ID
      *
-     * @return Response
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function addContactAction($id, $contactId)
+    public function addContactAction($id, $contactId): Response
     {
         $stage = $this->model->getEntity($id);
 
@@ -69,9 +77,7 @@ class StageApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $leadModel = $this->getModel('lead');
-        \assert($leadModel instanceof LeadModel);
-        $leadModel->addToStages($contact, $stage)->saveEntity($contact);
+        $this->leadModel->addToStages($contact, $stage)->saveEntity($contact);
 
         return $this->handleView($this->view(['success' => 1], Response::HTTP_OK));
     }
@@ -82,11 +88,9 @@ class StageApiController extends CommonApiController
      * @param int $id        Stage ID
      * @param int $contactId Lead ID
      *
-     * @return Response
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function removeContactAction($id, $contactId)
+    public function removeContactAction($id, $contactId): Response
     {
         $stage = $this->model->getEntity($id);
 
@@ -104,9 +108,7 @@ class StageApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $leadModel = $this->getModel('lead');
-        \assert($leadModel instanceof LeadModel);
-        $leadModel->removeFromStages($contact, $stage)->saveEntity($contact);
+        $this->leadModel->removeFromStages($contact, $stage)->saveEntity($contact);
 
         return $this->handleView($this->view(['success' => 1], Response::HTTP_OK));
     }

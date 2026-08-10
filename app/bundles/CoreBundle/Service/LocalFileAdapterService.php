@@ -9,7 +9,7 @@ use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Flysystem\UnixVisibility\PortableVisibilityConverter;
 use League\Flysystem\Visibility;
 
-class LocalFileAdapterService extends LocalFilesystemAdapter
+final class LocalFileAdapterService extends LocalFilesystemAdapter
 {
     public function __construct(string $root)
     {

@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\FieldModel;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Field\InputFormField;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -17,15 +17,15 @@ final class FieldFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideFieldLength')]
+    #[DataProvider('provideFieldLength')]
     public function testNewFieldVarcharFieldLength(int $expectedLength, ?int $inputLength = null): void
     {
         /** @var FieldModel $fieldModel */
-        $fieldModel = static::getContainer()->get('mautic.lead.model.field');
+        $fieldModel = self::getContainer()->get(FieldModel::class);
         $field      = $this->createField('a', 'text', [], $inputLength);
         $fieldModel->saveEntity($field);
 
-        $tablePrefix = static::getContainer()->getParameter('mautic.db_table_prefix');
+        $tablePrefix = self::getContainer()->getParameter('mautic.db_table_prefix');
         $columns     = $this->connection->createSchemaManager()->listTableColumns("{$tablePrefix}leads");
         $this->assertEquals($expectedLength, $columns[$field->getAlias()]->getLength());
     }
@@ -33,11 +33,11 @@ final class FieldFunctionalTest extends MauticMysqlTestCase
     public function testNewMultiSelectField(): void
     {
         /** @var FieldModel $fieldModel */
-        $fieldModel = static::getContainer()->get('mautic.lead.model.field');
+        $fieldModel = self::getContainer()->get(FieldModel::class);
         $field      = $this->createField('s', 'select', ['properties' => ['list' => ['choice_a' => 'Choice A']]]);
         $fieldModel->saveEntity($field);
 
-        $tablePrefix = static::getContainer()->getParameter('mautic.db_table_prefix');
+        $tablePrefix = self::getContainer()->getParameter('mautic.db_table_prefix');
         $columns     = $this->connection->createSchemaManager()->listTableColumns("{$tablePrefix}leads");
         $this->assertArrayHasKey('field_s', $columns);
     }
@@ -58,15 +58,15 @@ final class FieldFunctionalTest extends MauticMysqlTestCase
         $text = strip_tags($this->client->getResponse()->getContent());
 
         self::assertResponseIsSuccessful();
-        Assert::assertStringNotContainsString('New Custom Field', $text);
-        Assert::assertStringNotContainsString('This form should not contain extra fields.', $text);
-        Assert::assertStringContainsString('Edit Custom Field - Best Date Ever', $text);
+        $this->assertStringNotContainsString('New Custom Field', $text);
+        $this->assertStringNotContainsString('This form should not contain extra fields.', $text);
+        $this->assertStringContainsString('Edit Custom Field - Best Date Ever', $text);
     }
 
     public function testFieldDeleteValidationUsedInSegment(): void
     {
         /** @var FieldModel $fieldModel */
-        $fieldModel       = static::getContainer()->get('mautic.lead.model.field');
+        $fieldModel       = self::getContainer()->get(FieldModel::class);
         $field_first      = $this->createField('First');
         $fieldModel->saveEntity($field_first);
 
@@ -103,16 +103,14 @@ final class FieldFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_POST,
             '/s/contacts/fields/delete/'.$field_first->getId(), [], [], $this->createAjaxHeaders());
 
-        Assert::assertStringContainsString('please go back and check mentioned resource(s) before deleting.',
-            strip_tags($this->client->getResponse()->getContent()));
+        $this->assertStringContainsString('please go back and check mentioned resource(s) before deleting.', strip_tags($this->client->getResponse()->getContent()));
 
         // Try deleting multiple fields.
         $parameters = 'ids=["'.$field_first->getId().'","'.$field_second->getId().'"]';
         $this->client->request(Request::METHOD_POST,
             '/s/contacts/fields/batchDelete?'.$parameters, [], [], $this->createAjaxHeaders());
 
-        Assert::assertStringContainsString('cannot be deleted because they are in use by other entities.',
-            strip_tags($this->client->getResponse()->getContent()));
+        $this->assertStringContainsString('cannot be deleted because they are in use by other entities.', strip_tags($this->client->getResponse()->getContent()));
     }
 
     public function testNewSelectField(): void
@@ -144,15 +142,15 @@ final class FieldFunctionalTest extends MauticMysqlTestCase
         $text = strip_tags($this->client->getResponse()->getContent());
 
         self::assertResponseIsSuccessful();
-        Assert::assertStringNotContainsString('New Custom Field', $text);
-        Assert::assertStringNotContainsString('This form should not contain extra fields.', $text);
-        Assert::assertStringContainsString('Edit Custom Field - Test select field', $text);
+        $this->assertStringNotContainsString('New Custom Field', $text);
+        $this->assertStringNotContainsString('This form should not contain extra fields.', $text);
+        $this->assertStringContainsString('Edit Custom Field - Test select field', $text);
     }
 
     /**
      * @param array<string, string> $properties
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataForCreatingNewBooleanField')]
+    #[DataProvider('dataForCreatingNewBooleanField')]
     public function testCreatingNewBooleanField(array $properties, string $expectedMessage): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/fields/new');
@@ -184,7 +182,7 @@ final class FieldFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $text = strip_tags($this->client->getResponse()->getContent());
-        Assert::assertStringNotContainsString($expectedMessage, $text);
+        $this->assertStringNotContainsString($expectedMessage, $text);
     }
 
     /**
@@ -219,12 +217,8 @@ final class FieldFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         // Check if the radio button with value 0 is checked and value 1 is not
-        Assert::assertNotNull(
-            $crawler->filter('#leadfield_default_template_boolean_0')->attr('checked')
-        );
-        Assert::assertNull(
-            $crawler->filter('#leadfield_default_template_boolean_1')->attr('checked')
-        );
+        $this->assertNotNull($crawler->filter('#leadfield_default_template_boolean_0')->attr('checked'));
+        $this->assertNull($crawler->filter('#leadfield_default_template_boolean_1')->attr('checked'));
     }
 
     public function testFieldsSearchByIds(): void
@@ -232,8 +226,8 @@ final class FieldFunctionalTest extends MauticMysqlTestCase
         $urlEncodedSearch = urlencode('ids:2,3');
         $this->client->request(Request::METHOD_GET, "/s/contacts/fields?search={$urlEncodedSearch}");
         $this->assertResponseIsSuccessful();
-        Assert::assertStringContainsString('First Name', $this->client->getResponse()->getContent());
-        Assert::assertStringContainsString('Last Name', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('First Name', (string) $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('Last Name', (string) $this->client->getResponse()->getContent());
     }
 
     /**
@@ -242,8 +236,8 @@ final class FieldFunctionalTest extends MauticMysqlTestCase
     private function createField(string $suffix, string $type = 'text', array $parameters = [], ?int $charLength = null): LeadField
     {
         $field = new LeadField();
-        $field->setName("Field $suffix");
-        $field->setAlias("field_$suffix");
+        $field->setName("Field {$suffix}");
+        $field->setAlias("field_{$suffix}");
         $field->setDateAdded(new \DateTime());
         $field->setDateAdded(new \DateTime());
         $field->setDateModified(new \DateTime());

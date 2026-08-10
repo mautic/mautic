@@ -10,13 +10,13 @@ use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ConfigSubscriber implements EventSubscriberInterface
+final readonly class ConfigSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly ConfigChangeLogger $configChangeLogger,
-        private readonly IpAddressRepository $ipAddressRepository,
-        private readonly CoreParametersHelper $coreParametersHelper,
-        private readonly AuditLogRepository $auditLogRepository,
+        private ConfigChangeLogger $configChangeLogger,
+        private IpAddressRepository $ipAddressRepository,
+        private CoreParametersHelper $coreParametersHelper,
+        private AuditLogRepository $auditLogRepository,
     ) {
     }
 

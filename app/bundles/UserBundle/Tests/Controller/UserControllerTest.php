@@ -34,7 +34,7 @@ final class UserControllerTest extends MauticMysqlTestCase
 
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
-        $this->assertStringNotContainsString('user[plainPassword][password]', $clientResponse->getContent());
-        $this->assertStringNotContainsString('user[plainPassword][confirm]', $clientResponse->getContent());
+        $this->assertStringNotContainsString('user[plainPassword][password]', (string) $clientResponse->getContent());
+        $this->assertStringNotContainsString('user[plainPassword][confirm]', (string) $clientResponse->getContent());
     }
 }

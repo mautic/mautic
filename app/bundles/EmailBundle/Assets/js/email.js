@@ -558,9 +558,7 @@ Mautic.toggleMailerIsOwnerWarningMessage = function(radioSelector) {
     }
 }
 
-Mautic.destroyCkEditorsInContainer = function (container, jQueryVariant) {
-    var mQuery = (typeof jQueryVariant != 'undefined') ? jQueryVariant : window.mQuery;
-
+Mautic.destroyCkEditorsInContainer = function (container) {
     if (typeof ckEditors === 'undefined' || ckEditors.size === 0) {
         return;
     }
@@ -579,7 +577,7 @@ Mautic.initRemoveEvents = function (elements, jQueryVariant) {
     var mQuery = (typeof jQueryVariant != 'undefined') ? jQueryVariant : window.mQuery;
     if (elements.hasClass('remove-selected')) {
         elements.off('click').on('click', function() {
-            Mautic.destroyCkEditorsInContainer(mQuery(this).closest('.panel'), mQuery);
+            Mautic.destroyCkEditorsInContainer(mQuery(this).closest('.panel'));
 
             mQuery(this).closest('.panel').animate(
                 {'opacity': 0},
@@ -599,7 +597,7 @@ Mautic.initRemoveEvents = function (elements, jQueryVariant) {
                 parentElement = $this.parents('.tab-pane.dynamic-content-filter');
             }
 
-            Mautic.destroyCkEditorsInContainer(parentElement, mQuery);
+            Mautic.destroyCkEditorsInContainer(parentElement);
 
             var tabLink      = mQuery('a[href="#' + parentElement.attr('id') + '"]').parent();
             var tabContainer = tabLink.parent();

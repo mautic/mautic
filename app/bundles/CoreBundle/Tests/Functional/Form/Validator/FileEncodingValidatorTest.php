@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Functional\Form\Validator;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -21,6 +20,6 @@ final class FileEncodingValidatorTest extends MauticMysqlTestCase
 
         $crawler = $this->client->submit($uploadForm);
 
-        Assert::assertStringContainsString('The file is not encoded correctly into UTF-8.', $crawler->html());
+        $this->assertStringContainsString('The file is not encoded correctly into UTF-8.', $crawler->html());
     }
 }

@@ -4,6 +4,7 @@ namespace Mautic\CoreBundle\IpLookup;
 
 use GuzzleHttp\RequestOptions;
 use Mautic\CoreBundle\Form\Type\IpLookupDownloadDataStoreButtonType;
+use Psr\Http\Client\ClientExceptionInterface;
 
 abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLookupFormInterface
 {
@@ -26,10 +27,8 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
 
     /**
      * Return the URL to manually download.
-     *
-     * @return string
      */
-    abstract public function getRemoteDateStoreDownloadUrl();
+    abstract public function getRemoteDateStoreDownloadUrl(): string;
 
     /**
      * @return string
@@ -65,8 +64,10 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
             $data = $this->client->get($package, [
                 RequestOptions::ALLOW_REDIRECTS => true,
             ]);
-        } catch (\Exception $exception) {
+        } catch (ClientExceptionInterface $exception) {
             $this->logger->error('Failed to fetch remote IP data: '.$exception->getMessage());
+
+            return false;
         }
 
         $tempTarget        = $this->cacheDir.'/'.basename($package);
@@ -133,6 +134,10 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
                 case 'zip' === $tempExt:
                     file_put_contents($tempTarget, $data->getBody());
 
+                    if ('' !== $localTargetExt) {
+                        $localTarget = dirname($localTarget);
+                    }
+
                     $zipper = new \ZipArchive();
 
                     $zipper->open($tempTarget);
@@ -141,13 +146,52 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
                     @unlink($tempTarget);
                     break;
             }
-        } catch (\Exception $exception) {
-            error_log($exception);
+        } catch (\Throwable $exception) {
+            $this->logger->error('Failed to fetch remote IP data: '.$exception->getMessage());
 
             $success = false;
         }
 
         return $success;
+    }
+
+    public static function cleanUrl(string $url): string
+    {
+        $urlParts = parse_url($url);
+
+        if (!is_array($urlParts) || !isset($urlParts['scheme'], $urlParts['host'])) {
+            return $url;
+        }
+
+        // Skip user:pass authentication.
+        $url = $urlParts['scheme'].'://'.$urlParts['host'];
+
+        if (isset($urlParts['port'])) {
+            $url .= ':'.$urlParts['port'];
+        }
+
+        if (isset($urlParts['path'])) {
+            $url .= $urlParts['path'];
+        }
+
+        if (isset($urlParts['query'])) {
+            $query = [];
+            parse_str($urlParts['query'], $query);
+
+            foreach (['user', 'username', 'pwd', 'pass', 'password'] as $sensitiveField) {
+                if (isset($query[$sensitiveField])) {
+                    unset($query[$sensitiveField]);
+                }
+            }
+
+            $url .= '?'.http_build_query($query);
+        }
+
+        if (!isset($urlParts['fragment'])) {
+            return $url;
+        }
+
+        return $url.('#'.$urlParts['fragment']);
     }
 
     /**
@@ -177,22 +221,16 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
     protected function sizeInByte($size)
     {
         $data = (int) substr($size, 0, -1);
-        switch (strtoupper(substr($size, -1))) {
-            case 'K':
-                return $data * 1024;
-            case 'M':
-                return $data * 1024 * 1024;
-            case 'G':
-                return $data * 1024 * 1024 * 1024;
-        }
+
+        return match (strtoupper(substr($size, -1))) {
+            'K' => $data * 1024,
+            'M' => $data * 1024 * 1024,
+            'G' => $data * 1024 * 1024 * 1024,
+            default => null,
+        };
     }
 
-    /**
-     * Get if the string ends with.
-     *
-     * @param string $haystack
-     */
-    private function endsWith($haystack, string $needle): bool
+    private function endsWith(string $haystack, string $needle): bool
     {
         return str_ends_with($haystack, $needle);
     }

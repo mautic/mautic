@@ -6,7 +6,6 @@ namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\DAO\Sync\Order;
 
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectMappingsDAO;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
 final class ObjectMappingsDAOTest extends TestCase
@@ -18,15 +17,15 @@ final class ObjectMappingsDAOTest extends TestCase
         $objectMappings->addNewObjectMapping((new ObjectMapping())->setIntegrationObjectName('foonew'));
         $objectMappings->addNewObjectMapping((new ObjectMapping())->setIntegrationObjectName('barnew'));
         $mappings = $objectMappings->getNewMappings();
-        Assert::assertCount(2, $mappings);
-        Assert::assertEquals('foonew', $mappings[0]->getIntegrationObjectName());
-        Assert::assertEquals('barnew', $mappings[1]->getIntegrationObjectName());
+        $this->assertCount(2, $mappings);
+        $this->assertEquals('foonew', $mappings[0]->getIntegrationObjectName());
+        $this->assertEquals('barnew', $mappings[1]->getIntegrationObjectName());
 
         $objectMappings->addUpdatedObjectMapping((new ObjectMapping())->setIntegrationObjectName('fooupdate'));
         $objectMappings->addUpdatedObjectMapping((new ObjectMapping())->setIntegrationObjectName('barupdate'));
         $mappings = $objectMappings->getUpdatedMappings();
-        Assert::assertCount(2, $mappings);
-        Assert::assertEquals('fooupdate', $mappings[0]->getIntegrationObjectName());
-        Assert::assertEquals('barupdate', $mappings[1]->getIntegrationObjectName());
+        $this->assertCount(2, $mappings);
+        $this->assertEquals('fooupdate', $mappings[0]->getIntegrationObjectName());
+        $this->assertEquals('barupdate', $mappings[1]->getIntegrationObjectName());
     }
 }

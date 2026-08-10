@@ -2,48 +2,33 @@
 
 namespace MauticPlugin\MauticFocusBundle\Controller;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
-use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Service\FlashBag;
-use Mautic\CoreBundle\Translation\Translator;
-use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class FocusController extends AbstractStandardFormController
+final class FocusController extends AbstractStandardFormController
 {
-    /**
-     * @phpstan-ignore-next-line
-     */
-    public function __construct(
-        private readonly CacheProviderTagAwareInterface $cacheProvider,
-        FormFactoryInterface $formFactory,
-        FormFieldHelper $fieldHelper,
-        ManagerRegistry $doctrine,
-        ModelFactory $modelFactory,
-        UserHelper $userHelper,
-        CoreParametersHelper $coreParametersHelper,
-        EventDispatcherInterface $dispatcher,
-        Translator $translator,
-        FlashBag $flashBag,
-        RequestStack $requestStack,
-        CorePermissions $security,
-    ) {
-        parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    private CacheProviderTagAwareInterface $cacheProvider;
+
+    private FocusModel $focusModel;
+
+    private TrackableModel $trackableModel;
+
+    #[Required]
+    public function autowireFocusController(
+        CacheProviderTagAwareInterface $cacheProvider,
+        FocusModel $focusModel,
+        TrackableModel $trackableModel,
+    ): void {
+        $this->cacheProvider = $cacheProvider;
+        $this->focusModel = $focusModel;
+        $this->trackableModel = $trackableModel;
     }
 
     protected function getTemplateBase(): string
@@ -66,10 +51,8 @@ class FocusController extends AbstractStandardFormController
 
     /**
      * Generates new form and processes post data.
-     *
-     * @return JsonResponse|Response
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request): Response
     {
         return parent::newStandard($request);
     }
@@ -79,20 +62,16 @@ class FocusController extends AbstractStandardFormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return JsonResponse|Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false): Response
     {
         return parent::editStandard($request, $objectId, $ignorePost);
     }
 
     /**
      * Displays details on a Focus.
-     *
-     * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(Request $request, $objectId): Response
     {
         return parent::viewStandard($request, $objectId, 'focus', 'focus');
     }
@@ -101,10 +80,8 @@ class FocusController extends AbstractStandardFormController
      * Clone an entity.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
-    public function cloneAction(Request $request, $objectId)
+    public function cloneAction(Request $request, $objectId): Response
     {
         return parent::cloneStandard($request, $objectId);
     }
@@ -113,20 +90,16 @@ class FocusController extends AbstractStandardFormController
      * Deletes the entity.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse|RedirectResponse
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         return parent::deleteStandard($request, $objectId);
     }
 
     /**
      * Deletes a group of entities.
-     *
-     * @return JsonResponse|RedirectResponse
      */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): Response
     {
         return parent::batchDeleteStandard($request);
     }
@@ -168,10 +141,7 @@ class FocusController extends AbstractStandardFormController
             } else {
                 // invalidate cache for entire focus item to keep AJAX loaded data consistent
                 $this->cacheProvider->invalidateTags(["focus.{$item->getId()}"]);
-
-                /** @var FocusModel $model */
-                $model = $this->getModel('focus');
-                $stats = $model->getStats(
+                $stats = $this->focusModel->getStats(
                     $item,
                     null,
                     $statsDateFrom,
@@ -179,9 +149,7 @@ class FocusController extends AbstractStandardFormController
                 );
 
                 if ('link' === $item->getType()) {
-                    $trackableModel = $this->getModel('page.trackable');
-                    \assert($trackableModel instanceof TrackableModel);
-                    $trackables = $trackableModel->getTrackableList('focus', $item->getId());
+                    $trackables = $this->trackableModel->getTrackableList('focus', $item->getId());
 
                     $cacheItem->set([$stats, $trackables]);
                     $cacheItem->expiresAfter($cacheTimeout * 60);
@@ -232,10 +200,7 @@ class FocusController extends AbstractStandardFormController
         return $args;
     }
 
-    /**
-     * @return array
-     */
-    protected function getEntityFormOptions()
+    protected function getEntityFormOptions(): array
     {
         $focus        = $this->getCurrentRequest()->request->all()['focus'] ?? [];
         $updateSelect = 'POST' === $this->getCurrentRequest()->getMethod()
@@ -245,6 +210,8 @@ class FocusController extends AbstractStandardFormController
         if ($updateSelect) {
             return ['update_select' => $updateSelect];
         }
+
+        return [];
     }
 
     /**
@@ -260,7 +227,7 @@ class FocusController extends AbstractStandardFormController
         return [
             'updateSelect' => $updateSelect,
             'id'           => $entity->getId(),
-            'name'         => $entity->$nameMethod(),
+            'name'         => $entity->{$nameMethod}(),
         ];
     }
 }

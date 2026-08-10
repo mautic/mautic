@@ -297,7 +297,7 @@ class EventExecutioner
             $campaignId = $log->getCampaign()->getId();
 
             if ($this->removedContactTracker->wasContactRemoved($campaignId, $contactId)) {
-                $this->logger->debug("CAMPAIGN: Contact ID# $contactId has been removed from campaign ID $campaignId");
+                $this->logger->debug("CAMPAIGN: Contact ID# {$contactId} has been removed from campaign ID {$campaignId}");
                 $logs->remove($key);
 
                 // Clear out removed contacts to prevent a memory leak

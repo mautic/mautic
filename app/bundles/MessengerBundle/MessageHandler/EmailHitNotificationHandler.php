@@ -13,12 +13,12 @@ use Symfony\Component\Messenger\Exception\RecoverableMessageHandlingException;
 use Symfony\Component\Messenger\Handler\Acknowledger;
 
 #[AsMessageHandler]
-class EmailHitNotificationHandler
+final readonly class EmailHitNotificationHandler
 {
-    private readonly bool $isSyncTransport;
+    private bool $isSyncTransport;
 
     public function __construct(
-        private readonly EmailModel $emailModel,
+        private EmailModel $emailModel,
         CoreParametersHelper $parametersHelper,
     ) {
         $this->isSyncTransport = str_starts_with($parametersHelper->get('messenger_dsn_hit'), 'sync://');
@@ -36,7 +36,7 @@ class EmailHitNotificationHandler
                 true
             );
         } catch (RetryableException $e) {
-            throw new RecoverableMessageHandlingException($e->getMessage());
+            throw new RecoverableMessageHandlingException($e->getMessage(), $e->getCode(), $e);
         }
     }
 }

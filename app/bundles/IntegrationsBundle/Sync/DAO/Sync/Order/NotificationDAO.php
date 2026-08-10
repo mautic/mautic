@@ -4,17 +4,14 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\DAO\Sync\Order;
 
-class NotificationDAO
+final readonly class NotificationDAO
 {
     public function __construct(
-        private readonly ObjectChangeDAO $objectChangeDAO,
-        private readonly string $message,
+        private ObjectChangeDAO $objectChangeDAO,
+        private string $message,
     ) {
     }
 
-    /**
-     * @return ObjectChangeDAO
-     */
     public function getMauticObject(): string
     {
         return $this->objectChangeDAO->getMappedObject();

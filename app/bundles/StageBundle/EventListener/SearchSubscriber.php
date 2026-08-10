@@ -12,12 +12,12 @@ use Mautic\CoreBundle\Service\GlobalSearch;
 use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class SearchSubscriber implements EventSubscriberInterface
+final readonly class SearchSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly StageModel $stageModel,
-        private readonly CorePermissions $security,
-        private readonly GlobalSearch $globalSearch,
+        private StageModel $stageModel,
+        private CorePermissions $security,
+        private GlobalSearch $globalSearch,
     ) {
     }
 
@@ -38,7 +38,7 @@ class SearchSubscriber implements EventSubscriberInterface
             '@MauticStage/SubscribedEvents/Search/global.html.twig'
         );
 
-        if (!empty($results)) {
+        if ([] !== $results) {
             $event->addResults('mautic.stage.actions.header.index', $results);
         }
     }

@@ -18,7 +18,6 @@ use Mautic\MarketplaceBundle\Controller\AjaxController;
 use Mautic\MarketplaceBundle\DTO\ConsoleOutput;
 use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
 use Mautic\MarketplaceBundle\Service\Config;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -49,15 +48,15 @@ final class AjaxControllerTest extends AbstractMauticTestCase
 
         $this->marketplaceConfig->method('marketplaceIsEnabled')->willReturn(true);
         $this->marketplaceConfig->method('isComposerEnabled')->willReturn(true);
-        $this->security->expects($this->any())
+        $this->security
             ->method('isGranted')
             ->with(MarketplacePermissions::CAN_INSTALL_PACKAGES)
             ->willReturn(true);
 
         $response = $controller->installPackageAction($request);
 
-        Assert::assertSame('{"success":true}', $response->getContent());
-        Assert::assertSame(200, $response->getStatusCode());
+        $this->assertSame('{"success":true}', $response->getContent());
+        $this->assertSame(200, $response->getStatusCode());
     }
 
     public function testRemovePackageAction(): void
@@ -67,15 +66,15 @@ final class AjaxControllerTest extends AbstractMauticTestCase
 
         $this->marketplaceConfig->method('marketplaceIsEnabled')->willReturn(true);
         $this->marketplaceConfig->method('isComposerEnabled')->willReturn(true);
-        $this->security->expects($this->any())
+        $this->security
             ->method('isGranted')
             ->with(MarketplacePermissions::CAN_REMOVE_PACKAGES)
             ->willReturn(true);
 
         $response = $controller->removePackageAction($request);
 
-        Assert::assertSame('{"success":true}', $response->getContent());
-        Assert::assertSame(200, $response->getStatusCode());
+        $this->assertSame('{"success":true}', $response->getContent());
+        $this->assertSame(200, $response->getStatusCode());
     }
 
     private function generateController(bool $isPackageInstalled): AjaxController
@@ -87,35 +86,28 @@ final class AjaxControllerTest extends AbstractMauticTestCase
 
         $cacheHelper = $this->createMock(CacheHelper::class);
         $cacheHelper->method('clearSymfonyCache')->willReturn(0);
-
-        $logger                  = $this->createMock(LoggerInterface::class);
-        $doctrine                = $this->createMock(ManagerRegistry::class);
-        $modelFactory            = $this->createMock(ModelFactory::class);
-        $userHelper              = $this->createMock(UserHelper::class);
-        $coreParametersHelper    = $this->createMock(CoreParametersHelper::class);
-        $dispatcher              = $this->createMock(EventDispatcherInterface::class);
-        $translator              = $this->createMock(Translator::class);
-        $flashBag                = $this->createMock(FlashBag::class);
         $this->requestStack      = $this->createMock(RequestStack::class);
         $this->security          = $this->createMock(CorePermissions::class);
         $this->marketplaceConfig = $this->createMock(Config::class);
 
         $controller = new AjaxController(
-            $composer,
-            $cacheHelper,
-            $logger,
-            $this->marketplaceConfig,
-            $doctrine,
-            $modelFactory,
-            $userHelper,
-            $coreParametersHelper,
-            $dispatcher,
-            $translator,
-            $flashBag,
+            $this->createStub(ManagerRegistry::class),
+            $this->createStub(ModelFactory::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(CoreParametersHelper::class),
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(Translator::class),
+            $this->createStub(FlashBag::class),
             $this->requestStack,
             $this->security
         );
-        $controller->setContainer(static::getContainer());
+        $controller->autowireMarketplaceAjaxController(
+            $composer,
+            $cacheHelper,
+            $this->createStub(LoggerInterface::class),
+            $this->marketplaceConfig
+        );
+        $controller->setContainer(self::getContainer());
 
         return $controller;
     }

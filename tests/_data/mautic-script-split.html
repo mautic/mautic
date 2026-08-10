@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Mautic script split</title>
+</head>
+<body>
+<div id="dwc-fallback" class="mautic-slot" data-slot-name="acceptance-test" hidden>DWC fallback content</div>
+<script>
+    var fixtureParams = new URLSearchParams(window.location.search);
+    var dwcFallback = document.getElementById('dwc-fallback');
+    if (fixtureParams.get('dwc') === '1') {
+        dwcFallback.hidden = false;
+        if (fixtureParams.get('form') === '1') {
+            dwcFallback.innerHTML = '<div id="mauticform_wrapper_acceptance" class="mauticform_wrapper">'
+                +'<form id="mauticform_acceptance" data-mautic-form="acceptance" action="#" method="post">'
+                +'<input name="mauticform[email]" type="email">'
+                +'<input name="mauticform[formId]" type="hidden" value="acceptance">'
+                +'</form></div>';
+        }
+    } else {
+        dwcFallback.remove();
+    }
+
+    window.mauticScriptErrors = [];
+    window.mauticStorageAccess = [];
+    window.mauticCookieAccess = [];
+    window.mauticNetworkRequests = [];
+    window.mauticPageEventDeliveries = [];
+    window.mauticLastNetworkActivity = Date.now();
+    window.mauticNetworkQuietPeriod = 500;
+
+    window.MauticTrackingObject = 'mt';
+    window.mt = function () {
+        window.mt.q.push(arguments);
+    };
+    window.mt.q = [];
+    window.mt('send', 'pageview');
+
+    function recordNetworkRequest(type, url) {
+        if (!url) {
+            return;
+        }
+
+        window.mauticNetworkRequests.push({type: type, url: new URL(url, window.location.href).href});
+        window.mauticLastNetworkActivity = Date.now();
+    }
+
+    window.addEventListener('error', function (event) {
+        window.mauticScriptErrors.push(event.message);
+    });
+    window.addEventListener('unhandledrejection', function (event) {
+        window.mauticScriptErrors.push(String(event.reason));
+    });
+    document.addEventListener('mauticPageEventDelivered', function (event) {
+        window.mauticPageEventDeliveries.push(event.detail);
+    });
+
+    ['getItem', 'setItem', 'removeItem'].forEach(function (method) {
+        var original = Storage.prototype[method];
+        Storage.prototype[method] = function () {
+            window.mauticStorageAccess.push({method: method, key: String(arguments[0])});
+
+            return original.apply(this, arguments);
+        };
+    });
+
+    var cookieDescriptor = Object.getOwnPropertyDescriptor(Document.prototype, 'cookie');
+    window.mauticCookieInstrumentationSupported = Boolean(cookieDescriptor && cookieDescriptor.configurable);
+    if (window.mauticCookieInstrumentationSupported) {
+        Object.defineProperty(document, 'cookie', {
+            configurable: true,
+            get: function () {
+                window.mauticCookieAccess.push({method: 'get'});
+
+                return cookieDescriptor.get.call(document);
+            },
+            set: function (value) {
+                window.mauticCookieAccess.push({method: 'set', value: String(value)});
+
+                cookieDescriptor.set.call(document, value);
+            }
+        });
+    }
+
+    var originalXhrOpen = XMLHttpRequest.prototype.open;
+    XMLHttpRequest.prototype.open = function (method, url) {
+        recordNetworkRequest('xhr', url);
+
+        return originalXhrOpen.apply(this, arguments);
+    };
+
+    var originalFetch = window.fetch;
+    window.fetch = function (input) {
+        recordNetworkRequest('fetch', typeof input === 'string' ? input : input.url);
+
+        return originalFetch.apply(this, arguments);
+    };
+
+    var originalSendBeacon = navigator.sendBeacon;
+    navigator.sendBeacon = function (url) {
+        recordNetworkRequest('beacon', url);
+
+        return originalSendBeacon.apply(this, arguments);
+    };
+
+    var originalAppendChild = Node.prototype.appendChild;
+    Node.prototype.appendChild = function (node) {
+        if (node && (node.src || node.href)) {
+            recordNetworkRequest(node.tagName ? node.tagName.toLowerCase() : 'element', node.src || node.href);
+        }
+
+        return originalAppendChild.apply(this, arguments);
+    };
+
+    var imageSrcDescriptor = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
+    window.mauticImageInstrumentationSupported = Boolean(imageSrcDescriptor && imageSrcDescriptor.configurable);
+    if (window.mauticImageInstrumentationSupported) {
+        Object.defineProperty(HTMLImageElement.prototype, 'src', {
+            configurable: true,
+            get: imageSrcDescriptor.get,
+            set: function (value) {
+                recordNetworkRequest('img', value);
+
+                imageSrcDescriptor.set.call(this, value);
+            }
+        });
+    }
+
+    var scriptUrls = fixtureParams.getAll('script');
+    function loadScript(index) {
+        if (index >= scriptUrls.length) {
+            window.mauticScriptFinished = true;
+
+            return;
+        }
+
+        var script = document.createElement('script');
+        script.src = scriptUrls[index];
+        script.onload = function () {
+            window.mauticScriptLoaded = true;
+            loadScript(index + 1);
+        };
+        script.onerror = function () {
+            window.mauticScriptErrors.push('Failed to load '+script.src);
+            window.mauticScriptFinished = true;
+        };
+        document.head.appendChild(script);
+    }
+    loadScript(0);
+</script>
+</body>
+</html>

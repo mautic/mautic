@@ -17,12 +17,12 @@ use Mautic\PageBundle\Helper\TrackingHelper;
 use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class CampaignSubscriber implements EventSubscriberInterface
+final readonly class CampaignSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly LeadModel $leadModel,
-        private readonly TrackingHelper $trackingHelper,
-        private readonly RealTimeExecutioner $realTimeExecutioner,
+        private LeadModel $leadModel,
+        private TrackingHelper $trackingHelper,
+        private RealTimeExecutioner $realTimeExecutioner,
     ) {
     }
 
@@ -67,7 +67,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         $event->addDecision('page.devicehit', $deviceHitTrigger);
 
         $trackingServices = $this->trackingHelper->getEnabledServices();
-        if (!empty($trackingServices)) {
+        if ([] !== $trackingServices) {
             $action = [
                 'label'                  => 'mautic.page.tracking.pixel.event.send',
                 'description'            => 'mautic.page.tracking.pixel.event.send_desc',

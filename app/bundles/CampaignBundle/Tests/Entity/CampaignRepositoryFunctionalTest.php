@@ -13,7 +13,6 @@ use Mautic\CampaignBundle\Entity\Result\CountResult;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 
 final class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
 {
@@ -23,7 +22,7 @@ final class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->repository = self::getContainer()->get('mautic.campaign.repository.campaign');
+        $this->repository = self::getContainer()->get(CampaignRepository::class);
     }
 
     public function testGetCountsForPendingContactsWithEmptyData(): void
@@ -34,11 +33,7 @@ final class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
             new ContactLimiter(100, null, null, null, [1, 2, 3])
         );
 
-        Assert::assertEquals(
-            new CountResult(0, 0, 0),
-            $result,
-            'There should not be any match as there are no campaign/lead records.'
-        );
+        $this->assertEquals(new CountResult(0, 0, 0), $result, 'There should not be any match as there are no campaign/lead records.');
     }
 
     public function testGetCountsForPendingContactsWithoutEventLogs(): void
@@ -58,11 +53,7 @@ final class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
             new ContactLimiter(100, null, null, null, [$leadOne->getId(), $leadTwo->getId(), $leadThree->getId()])
         );
 
-        Assert::assertEquals(
-            new CountResult(3, $leadOne->getId(), $leadThree->getId()),
-            $result,
-            'All three leads should match as none of them have any event logs.'
-        );
+        $this->assertEquals(new CountResult(3, $leadOne->getId(), $leadThree->getId()), $result, 'All three leads should match as none of them have any event logs.');
     }
 
     public function testGetCountsForPendingContactsWithEventLogs(): void
@@ -78,17 +69,18 @@ final class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
         $eventThree = $this->createEvent($campaign);
         $this->em->flush();
 
+        $this->assertInstanceOf(Event::class, $eventOne);
+        $this->assertInstanceOf(Event::class, $eventTwo);
+        $this->assertInstanceOf(Lead::class, $leadOne);
+        $this->assertInstanceOf(Lead::class, $leadTwo);
+
         $result = $this->repository->getCountsForPendingContacts(
             $campaign->getId(),
             [$eventOne->getId(), $eventTwo->getId(), $eventThree->getId()],
             new ContactLimiter(100, null, null, null, [$leadOne->getId(), $leadTwo->getId(), $leadThree->getId()])
         );
 
-        Assert::assertEquals(
-            new CountResult(1, $leadThree->getId(), $leadThree->getId()),
-            $result,
-            'Only lead three should match as it is the only one who does not have any event log.'
-        );
+        $this->assertEquals(new CountResult(1, $leadThree->getId(), $leadThree->getId()), $result, 'Only lead three should match as it is the only one who does not have any event log.');
     }
 
     public function testGetCountsForPendingContactsWithEventLogsWithNonMatchingRotations(): void
@@ -105,6 +97,12 @@ final class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
         $eventThree = $logThree->getEvent();
         $campaignLeadTwo->setRotation($logTwo->getRotation() + 1);
         $this->em->flush();
+        $this->assertInstanceOf(Event::class, $eventOne);
+        $this->assertInstanceOf(Event::class, $eventTwo);
+        $this->assertInstanceOf(Event::class, $eventThree);
+        $this->assertInstanceOf(Lead::class, $leadOne);
+        $this->assertInstanceOf(Lead::class, $leadTwo);
+        $this->assertInstanceOf(Lead::class, $leadThree);
 
         $result = $this->repository->getCountsForPendingContacts(
             $campaign->getId(),
@@ -112,11 +110,7 @@ final class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
             new ContactLimiter(100, null, null, null, [$leadOne->getId(), $leadTwo->getId(), $leadThree->getId()])
         );
 
-        Assert::assertEquals(
-            new CountResult(1, $leadTwo->getId(), $leadTwo->getId()),
-            $result,
-            'Only lead two should match as it is the only one who has a non-matching rotation.'
-        );
+        $this->assertEquals(new CountResult(1, $leadTwo->getId(), $leadTwo->getId()), $result, 'Only lead two should match as it is the only one who has a non-matching rotation.');
     }
 
     public function testGetCampaignPublishAndVersionData(): void
@@ -126,13 +120,13 @@ final class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
 
         $result = $this->repository->getCampaignPublishAndVersionData($campaign->getId());
 
-        Assert::assertIsArray($result);
-        Assert::assertArrayHasKey('is_published', $result);
-        Assert::assertArrayHasKey('version', $result);
-        Assert::assertEquals('1', $result['is_published']);
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('is_published', $result);
+        $this->assertArrayHasKey('version', $result);
+        $this->assertEquals('1', $result['is_published']);
         // Version should be a string representation of an integer
-        Assert::assertIsString($result['version']);
-        Assert::assertGreaterThanOrEqual('1', $result['version']);
+        $this->assertIsString($result['version']);
+        $this->assertGreaterThanOrEqual('1', $result['version']);
     }
 
     public function testGetCampaignPublishAndVersionDataWithNonExistentCampaign(): void
@@ -141,7 +135,7 @@ final class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
 
         $result = $this->repository->getCampaignPublishAndVersionData($nonExistentId);
 
-        Assert::assertSame([], $result);
+        $this->assertSame([], $result);
     }
 
     private function createLead(Campaign $campaign, ?CampaignLead &$campaignLead = null): Lead // @phpstan-ignore parameterByRef.unusedType

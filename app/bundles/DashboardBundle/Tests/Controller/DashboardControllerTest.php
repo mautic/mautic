@@ -38,11 +38,6 @@ final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
     private MockObject $translatorMock;
 
     /**
-     * @var MockObject&ModelFactory
-     */
-    private MockObject $modelFactoryMock;
-
-    /**
      * @var MockObject&DashboardModel
      */
     private MockObject $dashboardModelMock;
@@ -67,30 +62,23 @@ final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
         $this->dashboardModelMock = $this->createMock(DashboardModel::class);
         $this->routerMock         = $this->createMock(RouterInterface::class);
         $this->containerMock      = $this->createMock(Container::class);
-
-        $doctrine                 = $this->createMock(ManagerRegistry::class);
-        $this->modelFactoryMock   = $this->createMock(ModelFactory::class);
-        $userHelper               = $this->createMock(UserHelper::class);
-        $coreParametersHelper     = $this->createMock(CoreParametersHelper::class);
-        $dispatcher               = $this->createMock(EventDispatcherInterface::class);
         $this->translatorMock     = $this->createMock(Translator::class);
-        $flashBagMock             = $this->createMock(FlashBag::class);
-        $requestStack             = new RequestStack();
-        $securityMock             = $this->createMock(CorePermissions::class);
+        $requestStack             = new RequestStack([$this->requestMock]);
 
-        $requestStack->push($this->requestMock);
         $this->controller = new DashboardController(
-            $doctrine,
-            $this->modelFactoryMock,
-            $userHelper,
-            $coreParametersHelper,
-            $dispatcher,
+            $this->createStub(ManagerRegistry::class),
+            $this->createStub(ModelFactory::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(CoreParametersHelper::class),
+            $this->createStub(EventDispatcherInterface::class),
             $this->translatorMock,
-            $flashBagMock,
+            $this->createStub(FlashBag::class),
             $requestStack,
-            $securityMock
+            $this->createStub(CorePermissions::class)
         );
+
         $this->controller->setContainer($this->containerMock);
+        $this->controller->autowireDashboardController($this->dashboardModelMock);
     }
 
     public function testSaveWithGetWillCallAccessDenied(): void
@@ -140,14 +128,9 @@ final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
                 return $this->routerMock;
             });
 
-        $this->routerMock->expects($this->any())
+        $this->routerMock
             ->method('generate')
             ->willReturn('https://some.url');
-
-        $this->modelFactoryMock->expects($this->once())
-            ->method('getModel')
-            ->with('dashboard')
-            ->willReturn($this->dashboardModelMock);
 
         $this->dashboardModelMock->expects($this->once())
             ->method('saveSnapshot')
@@ -169,7 +152,7 @@ final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
         $this->requestMock->method('isXmlHttpRequest')
             ->willReturn(true);
 
-        $this->routerMock->expects($this->any())
+        $this->routerMock
             ->method('generate')
             ->willReturn('https://some.url');
 
@@ -180,14 +163,9 @@ final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->with('router')
             ->willReturn($this->routerMock);
 
-        $this->modelFactoryMock->expects($this->once())
-            ->method('getModel')
-            ->with('dashboard')
-            ->willReturn($this->dashboardModelMock);
-
         $this->dashboardModelMock->expects($this->once())
             ->method('saveSnapshot')
-            ->will($this->throwException(new IOException('some error message')));
+            ->willThrowException(new IOException('some error message'));
 
         $this->translatorMock->expects($this->once())
             ->method('trans')
@@ -222,7 +200,7 @@ final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->with((int) $widgetId)
             ->willReturn(null);
 
-        $this->containerMock->expects(self::never())
+        $this->containerMock->expects($this->never())
             ->method('get');
 
         $this->expectException(NotFoundHttpException::class);
@@ -254,6 +232,6 @@ final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
 
         $response = $this->controller->widgetAction($this->requestMock, $widgetService, $twig, $widgetId);
 
-        self::assertSame('{"success":1,"widgetId":"1","widgetHtml":"lfsadkdhf\u016fasfjds","widgetWidth":null,"widgetHeight":null}', $response->getContent());
+        $this->assertSame('{"success":1,"widgetId":"1","widgetHtml":"lfsadkdhf\u016fasfjds","widgetWidth":null,"widgetHeight":null}', $response->getContent());
     }
 }

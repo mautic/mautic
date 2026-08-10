@@ -30,8 +30,6 @@ class NotificationRepository extends CommonRepository
     }
 
     /**
-     * Clear notifications for a user.
-     *
      * @throws \Doctrine\DBAL\Exception\InvalidArgumentException
      */
     public function clearNotificationsForUser($userId, $id = null, $limit = null): void
@@ -58,7 +56,7 @@ class NotificationRepository extends CommonRepository
             if ($limit) {
                 // Doctrine API doesn't support updates with limits
                 $this->getEntityManager()->getConnection()->executeStatement(
-                    $qb->getSQL()." LIMIT $limit"
+                    $qb->getSQL()." LIMIT {$limit}"
                 );
             } else {
                 $qb->executeStatement();

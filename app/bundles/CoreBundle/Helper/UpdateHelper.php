@@ -4,6 +4,7 @@ namespace Mautic\CoreBundle\Helper;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\RequestOptions;
 use Mautic\CoreBundle\Helper\Update\Exception\CouldNotFetchLatestVersionException;
 use Mautic\CoreBundle\Helper\Update\Exception\LatestVersionSupportedException;
 use Mautic\CoreBundle\Helper\Update\Exception\UpdateCacheDataNeedsToBeRefreshedException;
@@ -177,7 +178,7 @@ class UpdateHelper
             $checkResults[] = new PreUpdateCheckResult(false, null, [new PreUpdateCheckError('mautic.core.update.check.error.release_data')]);
         }
 
-        if (!empty($checkResults)) {
+        if ([] !== $checkResults) {
             return $checkResults;
         }
 
@@ -225,9 +226,9 @@ class UpdateHelper
             );
 
             $options = [
-                \GuzzleHttp\RequestOptions::FORM_PARAMS     => $data,
-                \GuzzleHttp\RequestOptions::CONNECT_TIMEOUT => 10,
-                \GuzzleHttp\RequestOptions::HEADERS         => [
+                RequestOptions::FORM_PARAMS     => $data,
+                RequestOptions::CONNECT_TIMEOUT => 10,
+                RequestOptions::HEADERS         => [
                     'Accept' => '*/*',
                 ],
             ];
@@ -321,7 +322,8 @@ class UpdateHelper
     {
         if (function_exists('php_uname')) {
             return php_uname('s').' '.php_uname('r');
-        } elseif (defined('PHP_OS')) {
+        }
+        if (defined('PHP_OS')) {
             return PHP_OS;
         }
 

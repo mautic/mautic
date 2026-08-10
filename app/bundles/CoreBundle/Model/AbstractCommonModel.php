@@ -94,12 +94,11 @@ abstract class AbstractCommonModel implements MauticModelInterface
     public function getEntities(array $args = [])
     {
         // set the translator
-        $repo = $this->getRepository();
+        $repository = $this->getRepository();
 
-        $repo->setTranslator($this->translator);
-        $repo->setCurrentUser($this->userHelper->getUser());
+        $repository->setCurrentUser($this->userHelper->getUser());
 
-        return $repo->getEntities($args);
+        return $repository->getEntities($args);
     }
 
     /**
@@ -243,7 +242,7 @@ abstract class AbstractCommonModel implements MauticModelInterface
     }
 
     /**
-     * @phpstan-param class-string<T> $class
+     * @param class-string<T> $class
      *
      * @return CommonRepository<T>
      */
@@ -275,8 +274,8 @@ abstract class AbstractCommonModel implements MauticModelInterface
 
         $isGranted      = false;
         $permissionBase = $this->getPermissionBase();
-        if ($this->security->checkPermissionExists("$permissionBase:viewown")) {
-            $isGranted = $this->security->isGranted("$permissionBase:viewown");
+        if ($this->security->checkPermissionExists("{$permissionBase}:viewown")) {
+            $isGranted = $this->security->isGranted("{$permissionBase}:viewown");
         }
 
         return $isGranted;
@@ -290,8 +289,8 @@ abstract class AbstractCommonModel implements MauticModelInterface
 
         $isGranted      = false;
         $permissionBase = $this->getPermissionBase();
-        if ($this->security->checkPermissionExists("$permissionBase:viewother")) {
-            $isGranted = $this->security->isGranted(["$permissionBase:viewother"]);
+        if ($this->security->checkPermissionExists("{$permissionBase}:viewother")) {
+            $isGranted = $this->security->isGranted(["{$permissionBase}:viewother"]);
         }
 
         return $isGranted;

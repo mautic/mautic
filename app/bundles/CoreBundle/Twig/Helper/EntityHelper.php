@@ -8,7 +8,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class EntityHelper extends AbstractExtension
+final class EntityHelper extends AbstractExtension
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
@@ -21,8 +21,8 @@ class EntityHelper extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('getEntity', [$this, 'getEntity']),
-            new TwigFunction('getEntities', [$this, 'getEntities']),
+            new TwigFunction('getEntity', $this->getEntity(...)),
+            new TwigFunction('getEntities', $this->getEntities(...)),
         ];
     }
 
