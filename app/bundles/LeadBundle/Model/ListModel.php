@@ -611,7 +611,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         try {
             $newLeadsCount    = $this->leadSegmentService->getNewLeadListLeadsCount($leadList, $batchLimiters);
             $orphanLeadsCount = $this->leadSegmentService->getOrphanedLeadListLeadsCount($leadList);
-        } catch (FieldNotFoundException|SegmentNotFoundException|TableNotFoundException) {
+        } catch (TableNotFoundException) {
             return false;
         }
 
