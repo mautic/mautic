@@ -28,15 +28,6 @@ class CacheStorageHelper
     protected string $cacheDir;
 
     /**
-     * Semi BC support for pre 2.6.0.
-     *
-     * @deprecated 2.6.0 to be removed in 3.0
-     *
-     * @var array
-     */
-    protected $expirations = [];
-
-    /**
      * @param mixed  $cacheDir
      * @param mixed  $namespace
      * @param int    $defaultExpiration
@@ -93,18 +84,12 @@ class CacheStorageHelper
     }
 
     /**
-     * @param int $maxAge @deprecated 2.6.0 to be removed in 3.0; set expiration when using set()
-     *
      * @return bool|mixed
      *
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function get($name, $maxAge = null)
+    public function get($name)
     {
-        if (0 === $maxAge) {
-            return false;
-        }
-
         $cacheItem = $this->cacheAdaptor->getItem($name);
         if ($cacheItem->isHit()) {
             return $cacheItem->get();
@@ -175,14 +160,5 @@ class CacheStorageHelper
             default:
                 throw new \InvalidArgumentException('Cache adaptor not supported.');
         }
-    }
-
-    /**
-     * Kept since it was public prior to deprecation.
-     *
-     * @deprecated 2.6.0 to be removed in 3.0
-     */
-    public function touchDir(): void
-    {
     }
 }

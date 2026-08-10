@@ -14,7 +14,6 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\CopyRepository;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
-use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Helper\FromEmailHelper;
 use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
@@ -686,109 +685,6 @@ final class MailHelperTest extends TestCase
                 $this->assertEquals('{signature}', $body); // The {signature} token is replaced in a subscriber with the current user's signature. But this is a unit test, so the subscriber doesn't run.
             }
         }
-    }
-
-    #[DataProvider('provideEmails')]
-    public function testValidateEmails(string $email, bool $isValid): void
-    {
-        $helper = $this->mockEmptyMailHelper();
-        if (!$isValid) {
-            $this->expectException(InvalidEmailException::class);
-        }
-        $this->assertNull($helper::validateEmail($email)); /** @phpstan-ignore-line as it's testing a deprecated method */
-    }
-
-    public function testValidateValidEmails(): void
-    {
-        $helper    = $this->mockEmptyMailHelper();
-        $addresses = [
-            'john@doe.com',
-            'john@doe.email',
-            'john.doe@email.com',
-            'john+doe@email.com',
-            'john@doe.whatevertldtheycomewithinthefuture',
-        ];
-
-        foreach ($addresses as $address) {
-            // will throw InvalidEmailException if it will find the address invalid
-            $this->assertNull($helper::validateEmail($address)); /** @phpstan-ignore-line as it's testing a deprecated method */
-        }
-    }
-
-    /**
-     * @return \Iterator<(int|string), mixed>
-     */
-    public static function provideEmails(): \Iterator
-    {
-        yield ['john@doe.com', true];
-        yield ['john@doe.email', true];
-        yield ['john@doe.whatevertldtheycomewithinthefuture', true];
-        yield ['john.doe@email.com', true];
-        yield ['john+doe@email.com', true];
-        yield ['john@doe', false];
-        yield ['jo hn@doe.email', false];
-        yield ['jo^hn@doe.email', false];
-        yield ['jo\'hn@doe.email', false];
-        yield ['jo;hn@doe.email', false];
-        yield ['jo&hn@doe.email', false];
-        yield ['jo*hn@doe.email', false];
-        yield ['jo%hn@doe.email', false];
-    }
-
-    public function testValidateEmailWithoutTld(): void
-    {
-        $helper = $this->mockEmptyMailHelper();
-        $this->expectException(InvalidEmailException::class);
-        $helper::validateEmail('john@doe'); /** @phpstan-ignore-line as it's testing a deprecated method */
-    }
-
-    public function testValidateEmailWithSpaceInIt(): void
-    {
-        $helper = $this->mockEmptyMailHelper();
-        $this->expectException(InvalidEmailException::class);
-        $helper::validateEmail('jo hn@doe.email'); /** @phpstan-ignore-line as it's testing a deprecated method */
-    }
-
-    public function testValidateEmailWithCaretInIt(): void
-    {
-        $helper = $this->mockEmptyMailHelper();
-        $this->expectException(InvalidEmailException::class);
-        $helper::validateEmail('jo^hn@doe.email'); /** @phpstan-ignore-line as it's testing a deprecated method */
-    }
-
-    public function testValidateEmailWithApostropheInIt(): void
-    {
-        $helper = $this->mockEmptyMailHelper();
-        $this->expectException(InvalidEmailException::class);
-        $helper::validateEmail('jo\'hn@doe.email'); /** @phpstan-ignore-line as it's testing a deprecated method */
-    }
-
-    public function testValidateEmailWithSemicolonInIt(): void
-    {
-        $helper = $this->mockEmptyMailHelper();
-        $this->expectException(InvalidEmailException::class);
-        $helper::validateEmail('jo;hn@doe.email'); /** @phpstan-ignore-line as it's testing a deprecated method */
-    }
-
-    public function testValidateEmailWithAmpersandInIt(): void
-    {
-        $helper = $this->mockEmptyMailHelper();
-        $this->expectException(InvalidEmailException::class);
-        $helper::validateEmail('jo&hn@doe.email'); /** @phpstan-ignore-line as it's testing a deprecated method */
-    }
-
-    public function testValidateEmailWithStarInIt(): void
-    {
-        $helper = $this->mockEmptyMailHelper();
-        $this->expectException(InvalidEmailException::class);
-        $helper::validateEmail('jo*hn@doe.email'); /** @phpstan-ignore-line as it's testing a deprecated method */
-    }
-
-    public function testValidateEmailWithPercentInIt(): void
-    {
-        $helper = $this->mockEmptyMailHelper();
-        $this->expectException(InvalidEmailException::class);
-        $helper::validateEmail('jo%hn@doe.email'); /** @phpstan-ignore-line as it's testing a deprecated method */
     }
 
     public function testGlobalHeadersAreSet(): void

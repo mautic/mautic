@@ -876,8 +876,8 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
             ->method('get')
             ->willReturnMap(
                 [
-                    ['leadFields.Lead', null, $leadFields],
-                    ['leadFields.Contact', null, $contactFields],
+                    ['leadFields.Lead', $leadFields],
+                    ['leadFields.Contact', $contactFields],
                 ]
             );
 

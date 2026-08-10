@@ -3658,12 +3658,6 @@ parameters:
 			path: app/bundles/EmailBundle/Helper/MailHelper.php
 
 		-
-			message: '#^Method Mautic\\EmailBundle\\Helper\\MailHelper\:\:validateEmail\(\) has parameter \$address with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Helper/MailHelper.php
-
-		-
 			message: '#^Property Mautic\\EmailBundle\\Helper\\MailHelper\:\:\$lead \(array\|Mautic\\LeadBundle\\Entity\\Lead\) does not accept null\.$#'
 			identifier: assign.propertyType
 			count: 1

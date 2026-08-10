@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticCrmBundle\Tests\Api;
 
+use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCrmBundle\Api\HubspotApi;
 use MauticPlugin\MauticCrmBundle\Integration\HubspotIntegration;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
 
@@ -82,5 +84,33 @@ final class HubspotApiTest extends TestCase
         $api->getLeadFields();
 
         self::fail('ApiErrorException not thrown');
+    }
+
+    /**
+     * @return \Iterator<array{string, string}>
+     */
+    public static function provideInvalidEmails(): \Iterator
+    {
+        yield ['john@doe', 'Email address [john@doe] is invalid'];
+        yield ['jo hn@doe.email', 'Email address [jo hn@doe.email] is invalid'];
+        yield ['jo^hn@doe.email', 'Email address [jo^hn@doe.email] contains this invalid character: ^'];
+        yield ['jo\'hn@doe.email', 'Email address [jo\'hn@doe.email] contains this invalid character: \''];
+        yield ['jo&hn@doe.email', 'Email address [jo&hn@doe.email] contains this invalid character: &'];
+        yield ['jo*hn@doe.email', 'Email address [jo*hn@doe.email] contains this invalid character: *'];
+        yield ['jo%hn@doe.email', 'Email address [jo%hn@doe.email] contains this invalid character: %'];
+    }
+
+    #[DataProvider('provideInvalidEmails')]
+    public function testCreateLeadRejectsInvalidEmail(string $email, string $expectedMessage): void
+    {
+        $integration = $this->createMock(HubspotIntegration::class);
+        $integration->expects($this->never())
+            ->method('makeRequest');
+
+        $this->expectException(InvalidEmailException::class);
+        $this->expectExceptionMessage($expectedMessage);
+
+        $api = new HubspotApi($integration);
+        $api->createLead(['email' => $email], null);
     }
 }

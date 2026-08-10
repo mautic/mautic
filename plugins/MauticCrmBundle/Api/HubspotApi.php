@@ -2,7 +2,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Api;
 
-use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCrmBundle\Integration\HubspotIntegration;
 
@@ -78,7 +78,7 @@ final class HubspotApi extends CrmApi
         $email  = $data['email'];
         $result = [];
         // Check if the is a valid email
-        MailHelper::validateEmail($email);
+        $this->validateEmail($email);
         // Format data for request
         $formattedLeadData = $this->integration->formatLeadDataForCreateOrUpdate($data, $lead, $updateLink);
         if ($formattedLeadData) {
@@ -86,6 +86,23 @@ final class HubspotApi extends CrmApi
         }
 
         return $result;
+    }
+
+    /**
+     * Validates a given address to ensure RFC 2822, 3.6.2 specs.
+     *
+     * @throws InvalidEmailException
+     */
+    private function validateEmail(string $email): void
+    {
+        $invalidChar = strpbrk($email, '\'^&*%');
+        if (false !== $invalidChar) {
+            throw new InvalidEmailException($email, 'Email address ['.$email.'] contains this invalid character: '.substr($invalidChar, 0, 1));
+        }
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            throw new InvalidEmailException($email, 'Email address ['.$email.'] is invalid');
+        }
     }
 
     /**

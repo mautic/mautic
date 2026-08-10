@@ -204,17 +204,6 @@ class WidgetDetailEvent extends CommonEvent
         $this->widget->setTemplateData($templateData);
         $this->widget->setLoadTime(abs(microtime(true) - $this->startTime));
 
-        if ($this->usesLegacyCache()) {
-            // Store the template data to the cache
-            if (!$skipCache && $this->cacheDir && $this->widget->getCacheTimeout() > 0) {
-                $cache = new CacheStorageHelper(CacheStorageHelper::ADAPTOR_FILESYSTEM, $this->uniqueCacheDir, null, $this->cacheDir);
-                // must pass a DateTime object or a int of seconds to expire as 3rd attribute to set().
-                $expireTime = $this->widget->getCacheTimeout() * 60;
-
-                $cache->set($this->getUniqueWidgetId(), $templateData, (int) $expireTime);
-            }
-        }
-
         $cItem = $this->cacheProvider->getItem($this->getCacheKey());
         if ($this->widget->getCacheTimeout()) {
             $cItem->expiresAfter((int) $this->widget->getCacheTimeout() * 60);  // This is in minutes
@@ -291,8 +280,12 @@ class WidgetDetailEvent extends CommonEvent
         }
 
         if ($this->usesLegacyCache()) {
+            if (0 === $this->cacheTimeout) {
+                return false;
+            }
+
             $cache = new CacheStorageHelper(CacheStorageHelper::ADAPTOR_FILESYSTEM, $this->uniqueCacheDir, null, $this->cacheDir);
-            $data  = $cache->get($this->getUniqueWidgetId(), $this->cacheTimeout);
+            $data  = $cache->get($this->getUniqueWidgetId());
 
             if ($data) {
                 $this->widget->setCached(true);
@@ -338,14 +331,6 @@ class WidgetDetailEvent extends CommonEvent
     public function hasPermission(string $permission): bool
     {
         return $this->security->isGranted($permission);
-    }
-
-    /**
-     * Checks for cache type. This event should be created by factory thus not legacy approach.
-     */
-    private function usesLegacyCache(): bool
-    {
-        return null === $this->cacheProvider;
     }
 
     /**
