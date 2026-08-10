@@ -1298,7 +1298,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $response->getStatusCode());
         $content = json_decode($response->getContent(), true);
         $this->assertArrayHasKey('errors', $content);
-        $this->assertStringContainsString('MJML', $content['errors'][0]['message']);
+        $this->assertStringContainsString('MJML', (string) $content['errors'][0]['message']);
     }
 
     public function testSegmentEmailSendWithoutContinueSending(): void
