@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
 final class EmailDynamicContentVariationFunctionalTest extends MauticMysqlTestCase
@@ -44,11 +43,7 @@ final class EmailDynamicContentVariationFunctionalTest extends MauticMysqlTestCa
         $this->client->request(Request::METHOD_POST, $form->getUri(), $values);
         $response = $this->client->getResponse();
 
-        Assert::assertStringNotContainsString(
-            'This form should not contain extra fields.',
-            (string) $response->getContent(),
-            'Deleting a middle dynamic content variation must not trigger extra-fields validation.'
-        );
+        $this->assertStringNotContainsString('This form should not contain extra fields.', (string) $response->getContent(), 'Deleting a middle dynamic content variation must not trigger extra-fields validation.');
     }
 
     public function testSaveEmailWithSparseContactFilterIndexInsideVariation(): void
@@ -89,11 +84,7 @@ final class EmailDynamicContentVariationFunctionalTest extends MauticMysqlTestCa
         $this->client->request(Request::METHOD_POST, $form->getUri(), $values);
         $response = $this->client->getResponse();
 
-        Assert::assertStringNotContainsString(
-            'This form should not contain extra fields.',
-            (string) $response->getContent(),
-            'Deleting a contact filter inside a variation must not trigger extra-fields validation.'
-        );
+        $this->assertStringNotContainsString('This form should not contain extra fields.', (string) $response->getContent(), 'Deleting a contact filter inside a variation must not trigger extra-fields validation.');
     }
 
     public function testSaveEmailWithSparseVariationIndexOnJsCreatedDynamicContentBlock(): void
@@ -122,11 +113,7 @@ final class EmailDynamicContentVariationFunctionalTest extends MauticMysqlTestCa
         $this->client->request(Request::METHOD_POST, $form->getUri(), $values);
         $response = (string) $this->client->getResponse()->getContent();
 
-        Assert::assertStringNotContainsString(
-            'This form should not contain extra fields.',
-            $response,
-            'Sparse variation index on JS-created dynamic content block must save successfully.'
-        );
+        $this->assertStringNotContainsString('This form should not contain extra fields.', $response, 'Sparse variation index on JS-created dynamic content block must save successfully.');
     }
 
     public function testSaveEmailIgnoresStrayFilterKeyAtVariationLevel(): void
@@ -154,9 +141,6 @@ final class EmailDynamicContentVariationFunctionalTest extends MauticMysqlTestCa
 
         $this->client->request(Request::METHOD_POST, $form->getUri(), $values);
 
-        Assert::assertStringNotContainsString(
-            'This form should not contain extra fields.',
-            (string) $this->client->getResponse()->getContent()
-        );
+        $this->assertStringNotContainsString('This form should not contain extra fields.', (string) $this->client->getResponse()->getContent());
     }
 }

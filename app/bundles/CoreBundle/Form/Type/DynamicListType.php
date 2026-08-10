@@ -32,7 +32,7 @@ final class DynamicListType extends AbstractType
                 if (is_array($data)) {
                     $data = array_filter(
                         $data,
-                        static fn (mixed $key): bool => is_int($key) || (is_string($key) && ctype_digit((string) $key)),
+                        static fn (mixed $key): bool => is_int($key) || (is_string($key) && ctype_digit($key)),
                         ARRAY_FILTER_USE_KEY
                     );
                     $data = array_values($data);

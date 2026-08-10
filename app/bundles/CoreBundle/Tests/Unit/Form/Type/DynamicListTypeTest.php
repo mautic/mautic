@@ -114,7 +114,7 @@ final class DynamicListTypeTest extends \PHPUnit\Framework\TestCase
                 ['content' => 'third'],
             ]);
 
-        self::assertNotNull($listener);
+        $this->assertNotNull($listener);
         $listener($formEvent);
     }
 }
