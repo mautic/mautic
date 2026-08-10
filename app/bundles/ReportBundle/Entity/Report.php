@@ -23,7 +23,6 @@ use Mautic\ReportBundle\Scheduler\SchedulerInterface;
 use Mautic\ReportBundle\Scheduler\Validator as ReportAssert;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ApiResource(
     operations: [
@@ -133,6 +132,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
      * @var string|null
      */
     #[Groups(['report:read', 'report:write'])]
+    #[EmailAssert\MultipleEmailsValid]
     private $toAddress;
 
     /**
@@ -217,11 +217,6 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
         $builder->addNullableField('scheduleMonthFrequency', Types::STRING, 'schedule_month_frequency');
 
         static::addUuidField($builder);
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('toAddress', new EmailAssert\MultipleEmailsValid());
     }
 
     /**
