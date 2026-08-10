@@ -37,11 +37,11 @@ final class InstallCommandTest extends AbstractMauticTestCase
 
     public function testInstallCommand(): void
     {
-        $this->packageModel->method('getPackageDetail')
+        $this->packageModel->expects($this->once())->method('getPackageDetail')
             ->with($this->packageName)
             ->willReturn($this->getPackageDetail());
 
-        $this->composerHelper->method('install')
+        $this->composerHelper->expects($this->once())->method('install')
             ->with($this->packageName)
             ->willReturn(new ConsoleOutput(0, 'OK'));
 
@@ -58,11 +58,11 @@ final class InstallCommandTest extends AbstractMauticTestCase
 
     public function testInstallCommandWithDryRun(): void
     {
-        $this->packageModel->method('getPackageDetail')
+        $this->packageModel->expects($this->once())->method('getPackageDetail')
             ->with($this->packageName)
             ->willReturn($this->getPackageDetail());
 
-        $this->composerHelper->method('install')
+        $this->composerHelper->expects($this->once())->method('install')
             ->with($this->packageName)
             ->willReturn(new ConsoleOutput(0, 'OK'));
 
@@ -82,7 +82,7 @@ final class InstallCommandTest extends AbstractMauticTestCase
     {
         $packageName = 'mautic/non-existent-plugin';
 
-        $this->packageModel->method('getPackageDetail')
+        $this->packageModel->expects($this->once())->method('getPackageDetail')
             ->with($packageName)
             ->willThrowException(new ApiException('Package not found', 404));
 
@@ -101,7 +101,7 @@ final class InstallCommandTest extends AbstractMauticTestCase
     {
         $packageName = 'mautic/non-existent-plugin';
 
-        $this->packageModel->method('getPackageDetail')
+        $this->packageModel->expects($this->once())->method('getPackageDetail')
             ->with($packageName)
             ->willThrowException(new ApiException('Internal Server Error', 500));
 
@@ -122,7 +122,7 @@ final class InstallCommandTest extends AbstractMauticTestCase
         $packageDetail                    = $this->getPackageDetail();
         $packageDetail->packageBase->type = 'non-existent-type';
 
-        $this->packageModel->method('getPackageDetail')
+        $this->packageModel->expects($this->once())->method('getPackageDetail')
             ->with($packageName)
             ->willReturn($packageDetail);
 
@@ -141,11 +141,11 @@ final class InstallCommandTest extends AbstractMauticTestCase
     {
         $packageName = 'mautic/crash-package';
 
-        $this->composerHelper->method('install')
+        $this->composerHelper->expects($this->once())->method('install')
             ->with($packageName)
             ->willReturn(new ConsoleOutput(1, 'Something went wrong during the installation'));
 
-        $this->packageModel->method('getPackageDetail')
+        $this->packageModel->expects($this->once())->method('getPackageDetail')
             ->with($packageName)
             ->willReturn($this->getPackageDetail());
 

@@ -53,7 +53,7 @@ final class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
         $dateDecorator    = $this->createMock(DateDecorator::class);
         $timezoneResolver = $this->createStub(TimezoneResolver::class);
 
-        $dateDecorator->method('getOperator')
+        $dateDecorator->expects($this->once())->method('getOperator')
             ->with()
             ->willReturn('==<<'); // Test that value is really returned from Decorator
 
@@ -75,7 +75,7 @@ final class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
 
         $date = new DateTimeHelper('2018-03-02', null, 'local');
 
-        $timezoneResolver->method('getDefaultDate')
+        $timezoneResolver->expects($this->once())->method('getDefaultDate')
             ->with()
             ->willReturn($date);
 
@@ -97,7 +97,7 @@ final class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
 
         $date = new DateTimeHelper('2018-03-02', null, 'local');
 
-        $timezoneResolver->method('getDefaultDate')
+        $timezoneResolver->expects($this->once())->method('getDefaultDate')
             ->with()
             ->willReturn($date);
 
@@ -119,7 +119,7 @@ final class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
 
         $date = new DateTimeHelper('2018-03-02', null, 'local');
 
-        $timezoneResolver->method('getDefaultDate')
+        $timezoneResolver->expects($this->once())->method('getDefaultDate')
             ->with()
             ->willReturn($date);
 
@@ -141,7 +141,7 @@ final class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
 
         $date = new DateTimeHelper('2018-03-02', null, 'local');
 
-        $timezoneResolver->method('getDefaultDate')
+        $timezoneResolver->expects($this->once())->method('getDefaultDate')
             ->with()
             ->willReturn($date);
 
@@ -163,7 +163,7 @@ final class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
 
         $date = new DateTimeHelper('2018-03-02', null, 'local');
 
-        $timezoneResolver->method('getDefaultDate')
+        $timezoneResolver->expects($this->once())->method('getDefaultDate')
             ->with()
             ->willReturn($date);
 

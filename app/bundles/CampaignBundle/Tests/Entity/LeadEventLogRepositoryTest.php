@@ -30,7 +30,9 @@ final class LeadEventLogRepositoryTest extends TestCase
         $unitOfWorkMock->method('getEntityPersister')
             ->willReturn($entityPersisterMock);
 
-        $entityPersisterMock->method('load')
+        $entityPersisterMock
+            ->expects($this->once())
+            ->method('load')
             ->with(['lead' => 42, 'event' => 4242], null, null, [], null, 1, ['dateTriggered' => 'DESC'])
             ->willReturn($leadEventLog);
 

@@ -114,6 +114,7 @@ abstract class PageTestAbstract extends TestCase
             );
 
         $coreParametersHelper
+            ->expects($this->once())
             ->method('get')
             ->with($this->anything())
             ->willReturnCallback(function ($parameter) use ($transliterationEnabled, $validatePageHitRequiredData) {

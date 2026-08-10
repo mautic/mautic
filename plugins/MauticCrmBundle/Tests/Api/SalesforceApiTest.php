@@ -392,6 +392,7 @@ final class SalesforceApiTest extends \PHPUnit\Framework\TestCase
         $cache = $this->createMock(CacheInterface::class);
 
         $cache
+            ->expects($this->exactly(2))
             ->method('get')
             ->withAnyParameters()
             ->willReturn('2019-05-22 19:36:30');
@@ -416,7 +417,8 @@ final class SalesforceApiTest extends \PHPUnit\Framework\TestCase
             ->method('getCache')
             ->willReturn($cache);
 
-        $integration->method('getFieldsForQuery')
+        $integration->expects($this->atLeastOnce())
+            ->method('getFieldsForQuery')
             ->with('Lead')
             ->willReturn(['firstname', 'lastname', 'HasOptedOutOfEmail']);
 
@@ -451,6 +453,7 @@ final class SalesforceApiTest extends \PHPUnit\Framework\TestCase
         $cache = $this->createMock(CacheInterface::class);
 
         $cache
+            ->expects($this->exactly(2))
             ->method('get')
             ->withAnyParameters()
             ->willReturn('2019-05-22 19:36:30');
@@ -476,7 +479,8 @@ final class SalesforceApiTest extends \PHPUnit\Framework\TestCase
             ->method('getCache')
             ->willReturn($cache);
 
-        $integration->method('getFieldsForQuery')
+        $integration->expects($this->atLeastOnce())
+            ->method('getFieldsForQuery')
             ->with('Lead')
             ->willReturn(['firstname', 'lastname', 'extraField']);
 

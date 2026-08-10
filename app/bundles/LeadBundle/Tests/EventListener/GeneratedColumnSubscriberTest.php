@@ -64,7 +64,7 @@ final class GeneratedColumnSubscriberTest extends TestCase
             new Request()
         );
 
-        $this->translator->method('trans')
+        $this->translator->expects($this->once())->method('trans')
             ->with('mautic.email.segment.choice.generated_email_domain')
             ->willReturn('translated string');
 

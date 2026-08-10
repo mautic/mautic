@@ -325,6 +325,7 @@ final class FormUploaderTest extends \PHPUnit\Framework\TestCase
         $coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
 
         $fileUploaderMock
+            ->expects($this->once())
             ->method('delete')
             ->with($this->uploadDir.'/1');
 

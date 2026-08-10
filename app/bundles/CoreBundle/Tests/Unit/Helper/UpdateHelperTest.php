@@ -66,7 +66,7 @@ final class UpdateHelperTest extends TestCase
     protected function setUp(): void
     {
         $pathsHelper = $this->createMock(PathsHelper::class);
-        $pathsHelper->method('getSystemPath')
+        $pathsHelper->expects($this->once())->method('getSystemPath')
             ->with('cache')
             ->willReturn(__DIR__.'/resource/update/tmp');
 

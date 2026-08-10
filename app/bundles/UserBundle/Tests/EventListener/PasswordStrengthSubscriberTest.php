@@ -16,7 +16,7 @@ final class PasswordStrengthSubscriberTest extends TestCase
     public function testNoCheckPassportEvent(): void
     {
         $passport = $this->createMock(Passport::class);
-        $passport->method('hasBadge')
+        $passport->expects($this->once())->method('hasBadge')
             ->with(PasswordCredentials::class)
             ->willReturn(false);
         $passport->expects($this->never())
@@ -38,7 +38,7 @@ final class PasswordStrengthSubscriberTest extends TestCase
             ->willReturn($password);
 
         $passport = $this->createMock(Passport::class);
-        $passport->method('hasBadge')
+        $passport->expects($this->once())->method('hasBadge')
             ->with(PasswordCredentials::class)
             ->willReturn(true);
         $passport->expects($this->once())

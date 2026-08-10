@@ -202,7 +202,8 @@ final class LeadSubscriberTest extends TestCase
 
         $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, Lead::class);
 
-        $this->eventDispatcherInterfaceMock->expects($this->once())
+        $this->eventDispatcherInterfaceMock
+            ->expects($this->once())
             ->method('hasListeners')
             ->with(IntegrationEvents::INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES)
             ->willReturn(true);

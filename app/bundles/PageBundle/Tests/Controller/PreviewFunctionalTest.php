@@ -209,7 +209,7 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
         $this->loginUser($user);
         $security = $this->createMock(CorePermissions::class);
         $security->method('isAnonymous')->willReturn(false);
-        $security->method('hasEntityAccess')->with(
+        $security->expects($this->once())->method('hasEntityAccess')->with(
             'page:pages:viewown',
             'page:pages:viewother',
             $page->getCreatedBy()

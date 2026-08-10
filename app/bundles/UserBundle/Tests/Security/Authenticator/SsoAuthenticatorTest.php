@@ -60,7 +60,7 @@ final class SsoAuthenticatorTest extends TestCase
         $request->server->set('REQUEST_METHOD', $method);
 
         if ($expected) {
-            $httpUtils->method('checkRequestPath')
+            $httpUtils->expects($this->once())->method('checkRequestPath')
                 ->with($request, $path)
                 ->willReturn(true);
 

@@ -47,7 +47,7 @@ final class ReportModelTest extends \PHPUnit\Framework\TestCase
 
         $translatorMock = $this->createMock(Translator::class);
         // Make the translator return whatever string is passed to it instead of null
-        $translatorMock->method('trans')->withAnyParameters()->willReturnArgument(0);
+        $translatorMock->expects($this->once())->method('trans')->withAnyParameters()->willReturnArgument(0);
 
         $this->reportModel = new ReportModel(
             $this->createStub(CoreParametersHelper::class),

@@ -207,7 +207,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn([['alias' => 'companyname']]);
 
         $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $mockCoreParametersHelper->method('get')
+        $mockCoreParametersHelper->expects($this->once())->method('get')
             ->with('default_timezone')
             ->willReturn('UTC');
 
@@ -249,7 +249,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testOnCampaignTriggerConditionDNCFlag(?int $reason, array $channels, bool $expected, int $dncLead): void
     {
         $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $mockCoreParametersHelper->method('get')
+        $mockCoreParametersHelper->expects($this->once())->method('get')
             ->with('default_timezone')
             ->willReturn('UTC');
 
@@ -425,6 +425,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getId')
             ->willReturn(6);
         $leadEventLog
+            ->expects($this->once())
             ->method('setIsScheduled')
             ->with(false)
             ->willReturn($leadEventLog);

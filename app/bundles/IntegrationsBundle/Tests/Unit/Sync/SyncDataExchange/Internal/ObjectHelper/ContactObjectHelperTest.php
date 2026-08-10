@@ -66,7 +66,7 @@ final class ContactObjectHelperTest extends TestCase
                 ]
             );
 
-        $this->fieldsWithUniqueIdentifier->method('getFieldsWithUniqueIdentifier')
+        $this->fieldsWithUniqueIdentifier->expects($this->once())->method('getFieldsWithUniqueIdentifier')
             ->with(['object' => Contact::NAME])
             ->willReturn(
                 [

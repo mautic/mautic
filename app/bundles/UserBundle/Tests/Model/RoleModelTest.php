@@ -30,7 +30,7 @@ final class RoleModelTest extends TestCase
         ]);
 
         $mockTranslator = $this->createMock(Translator::class);
-        $mockTranslator->method('trans')
+        $mockTranslator->expects($this->once())->method('trans')
             ->with('mautic.user.role.clone.prefix', ['%name%' => 'Test Role'], 'messages')
             ->willReturn('Clone of Test Role');
 
@@ -54,7 +54,7 @@ final class RoleModelTest extends TestCase
         $sourceRole->setRawPermissions([]);
 
         $mockTranslator = $this->createMock(Translator::class);
-        $mockTranslator->method('trans')
+        $mockTranslator->expects($this->once())->method('trans')
             ->with('mautic.user.role.clone.prefix', ['%name%' => 'Admin Role'], 'messages')
             ->willReturn('Clone of Admin Role');
 

@@ -82,6 +82,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getId')
             ->willReturn(0);
         $leadEventLog
+            ->expects($this->once())
             ->method('setIsScheduled')
             ->with(false)
             ->willReturn($leadEventLog);
@@ -109,6 +110,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getId')
             ->willReturn(0);
         $leadEventLog
+            ->expects($this->once())
             ->method('setIsScheduled')
             ->with(false)
             ->willReturn($leadEventLog);

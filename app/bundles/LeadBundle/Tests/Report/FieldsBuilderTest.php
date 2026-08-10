@@ -167,7 +167,7 @@ final class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
             ],
         ];
         $leadModel = $this->createMock(LeadModel::class);
-        $leadModel->method('getTagList')
+        $leadModel->expects($this->once())->method('getTagList')
             ->with()
             ->willReturn($tagList);
 
