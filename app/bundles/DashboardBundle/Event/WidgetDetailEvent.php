@@ -292,7 +292,7 @@ class WidgetDetailEvent extends CommonEvent
 
         if ($this->usesLegacyCache()) {
             $cache = new CacheStorageHelper(CacheStorageHelper::ADAPTOR_FILESYSTEM, $this->uniqueCacheDir, null, $this->cacheDir);
-            $data  = $cache->get($this->getUniqueWidgetId(), $this->cacheTimeout);
+            $data  = $cache->get($this->getUniqueWidgetId());
 
             if ($data) {
                 $this->widget->setCached(true);

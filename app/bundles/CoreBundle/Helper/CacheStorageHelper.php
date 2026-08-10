@@ -93,18 +93,12 @@ class CacheStorageHelper
     }
 
     /**
-     * @param int $maxAge @deprecated 2.6.0 to be removed in 3.0; set expiration when using set()
-     *
      * @return bool|mixed
      *
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function get($name, $maxAge = null)
+    public function get($name)
     {
-        if (0 === $maxAge) {
-            return false;
-        }
-
         $cacheItem = $this->cacheAdaptor->getItem($name);
         if ($cacheItem->isHit()) {
             return $cacheItem->get();
