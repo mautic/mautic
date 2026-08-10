@@ -11,17 +11,23 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\Executioner\EventExecutioner;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\CoreBundle\Tests\Traits\LoggerTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\LeadEvents;
+use Monolog\Handler\HandlerInterface;
+use Monolog\Handler\TestHandler;
+use Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class EventExecutionerLockTest extends MauticMysqlTestCase
 {
-    use LoggerTrait {
-        setUp as loggerTraitSetup;
-    }
+    /**
+     * @var ?HandlerInterface[]
+     */
+    private ?array $originalHandlers = null;
 
+    private Logger $logger;
+
+    private TestHandler $testHandler;
     private const int ADD_POINTS = 10;
 
     private EventExecutioner $eventExecutioner;
@@ -32,10 +38,21 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->loggerTraitSetup();
-
         $this->eventExecutioner = self::getContainer()->get(EventExecutioner::class);
         $this->eventDispatcher  = self::getContainer()->get(EventDispatcherInterface::class);
+
+        $this->logger           = self::getContainer()->get('monolog.logger.mautic');
+        $this->originalHandlers = $this->logger->getHandlers();
+        $this->logger->setHandlers([$this->testHandler = new TestHandler()]);
+    }
+
+    protected function beforeTearDown(): void
+    {
+        $this->testHandler->clear();
+
+        if (null !== $this->originalHandlers) {
+            $this->logger->setHandlers($this->originalHandlers);
+        }
     }
 
     public function testLogsAreSkippedWhenAlreadyExecuted(): void
