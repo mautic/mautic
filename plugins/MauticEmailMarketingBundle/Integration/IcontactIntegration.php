@@ -50,7 +50,7 @@ final class IcontactIntegration extends EmailAbstractIntegration
     /**
      * Get account ID and client folder ID.
      */
-    public function authCallback($settings = [], $parameters = [])
+    public function authCallback(array $settings = [], $parameters = [])
     {
         $url = $this->getApiUrl();
 
@@ -89,7 +89,7 @@ final class IcontactIntegration extends EmailAbstractIntegration
      *
      * @return mixed|string
      */
-    public function makeRequest($url, $parameters = [], $method = 'GET', $settings = [])
+    public function makeRequest($url, $parameters = [], $method = 'GET', array $settings = [])
     {
         $settings['headers'] = [
             'Except:',

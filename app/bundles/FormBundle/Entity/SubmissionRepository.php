@@ -21,7 +21,7 @@ class SubmissionRepository extends CommonRepository
      * @param Submission $entity
      * @param bool       $flush
      */
-    public function saveEntity($entity, $flush = true): void
+    public function saveEntity(object $entity, $flush = true): void
     {
         parent::saveEntity($entity, $flush);
 

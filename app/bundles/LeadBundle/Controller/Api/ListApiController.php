@@ -72,7 +72,7 @@ final class ListApiController extends CommonApiController
      * Those fields were moved to 'properties' subarray. We have to ensure BC and remove them
      * from filter root array so Symfony forms would not fail with unknown field error.
      */
-    protected function prepareParametersForBinding(Request $request, $parameters, $entity, $action)
+    protected function prepareParametersForBinding(Request $request, array $parameters, object $entity, string $action): array
     {
         if (empty($parameters['filters']) || !is_array($parameters['filters'])) {
             return $parameters;

@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-use Mautic\CoreBundle\Entity\CommonRepository;
 use Rector\Config\RectorConfig;
-use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
 use Utils\Rector\UnserializeToSerializerDecodeRector;
 
 return RectorConfig::configure()
@@ -25,21 +23,6 @@ return RectorConfig::configure()
     )
     ->withPhpSets(php84: true)
     ->withCache(__DIR__.'/var/cache/rector')
-    ->withTypeGuardedClasses([
-        // common controllers
-        Mautic\CoreBundle\Controller\AbstractStandardFormController::class,
-        Mautic\CoreBundle\Controller\CommonController::class,
-        Mautic\CoreBundle\Controller\AbstractFormController::class,
-        Mautic\ApiBundle\Controller\CommonApiController::class,
-        Mautic\ApiBundle\Controller\FetchCommonApiController::class,
-        Mautic\PluginBundle\Integration\AbstractIntegration::class,
-        Mautic\LeadBundle\Controller\Api\CustomFieldsApiControllerTrait::class,
-        // other objects
-        CommonRepository::class,
-        Mautic\CoreBundle\Security\Permissions\AbstractPermissions::class,
-        MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration::class,
-        Mautic\PluginBundle\Integration\AbstractIntegration::class,
-    ])
     ->withRules([
         Rector\PHPUnit\CodeQuality\Rector\ClassMethod\AssertClassToThisAssertRector::class,
         Rector\TypeDeclarationDocblocks\Rector\Property\MergePhpstanDocTagIntoNativeRector::class,
@@ -57,22 +40,14 @@ return RectorConfig::configure()
         // handle later
         Rector\PHPUnit\PHPUnit120\Rector\Class_\AllowMockObjectsForDataProviderRector::class,
 
-        // this would escalate to runtime report, not what we want
-        Rector\Php84\Rector\Class_\DeprecatedAnnotationToDeprecatedAttributeRector::class,
-
         // @todo move to "twig" group
         Rector\Symfony\Symfony73\Rector\Class_\GetFiltersToAsTwigFilterAttributeRector::class,
         Rector\Symfony\Symfony73\Rector\Class_\GetFunctionsToAsTwigFunctionAttributeRector::class,
-
-        Rector\EarlyReturn\Rector\If_\ChangeIfElseValueAssignToEarlyReturnRector::class,
-        Rector\EarlyReturn\Rector\If_\RemoveAlwaysElseRector::class,
-        Rector\PHPUnit\PHPUnit60\Rector\ClassMethod\AddDoesNotPerformAssertionToNonAssertingTestRector::class,
+        Rector\Php84\Rector\Class_\DeprecatedAnnotationToDeprecatedAttributeRector::class,
 
         // handle next
         Rector\PHPUnit\PHPUnit120\Rector\Class_\AllowMockObjectsWithoutExpectationsAttributeRector::class,
 
-        Rector\EarlyReturn\Rector\Return_\PreparedValueToEarlyReturnRector::class,
-        Rector\EarlyReturn\Rector\StmtsAwareInterface\ReturnEarlyIfVariableRector::class,
         Rector\Symfony\CodeQuality\Rector\Class_\LoadValidatorMetadataToAttributeRector::class,
         Utils\Rector\ModelGetRepositoryToRepositoryServiceRector::class => [
             __DIR__.'/app/bundles/PageBundle/Form/Type/PreferenceCenterListType.php',
@@ -110,12 +85,6 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/EmailBundle/Entity/EmailDraft.php',
             __DIR__.'/app/bundles/EmailBundle/Helper/MailHelper.php',
             __DIR__.'/app/bundles/CoreBundle/Twig/Helper/DateHelper.php',
-        ],
-
-        // Avoiding breaking BC breaks with forced return types in public methods
-        ReturnTypeFromReturnNewRector::class => [
-            __DIR__.'/app/bundles/IntegrationsBundle/Sync/SyncProcess/Direction/Integration/ObjectChangeGenerator.php',
-            __DIR__.'/app/bundles/IntegrationsBundle/Sync/SyncProcess/Direction/Internal/ObjectChangeGenerator.php',
         ],
 
         Rector\DeadCode\Rector\Property\RemoveUnusedPrivatePropertyRector::class => [

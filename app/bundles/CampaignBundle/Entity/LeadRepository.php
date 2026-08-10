@@ -428,10 +428,7 @@ class LeadRepository extends CommonRepository
         return $contacts;
     }
 
-    /**
-     * @param int $campaignId
-     */
-    public function getCountsForOrphanedContactsBySegments($campaignId, ContactLimiter $limiter): CountResult
+    public function getCountsForOrphanedContactsBySegments(?int $campaignId, ContactLimiter $limiter): CountResult
     {
         $segments = $this->getCampaignSegments($campaignId);
 
@@ -454,7 +451,7 @@ class LeadRepository extends CommonRepository
         return new CountResult($result['the_count'], $result['min_id'], $result['max_id']);
     }
 
-    public function getOrphanedContacts($campaignId, ContactLimiter $limiter): array
+    public function getOrphanedContacts(?int $campaignId, ContactLimiter $limiter): array
     {
         $segments = $this->getCampaignSegments($campaignId);
 

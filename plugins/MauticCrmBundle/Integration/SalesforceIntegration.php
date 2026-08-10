@@ -195,11 +195,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * Get available company fields for choices in the config UI.
      *
-     * @param array $settings
-     *
      * @return array
      */
-    public function getFormCompanyFields($settings = [])
+    public function getFormCompanyFields(array $settings = [])
     {
         return $this->getFormFieldsByObject('company', $settings);
     }
@@ -1599,7 +1597,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     protected function getMauticContactsToUpdate(
-        &$checkEmailsInSF,
+        array &$checkEmailsInSF,
         $mauticLeadFieldString,
         &$sfObject,
         array &$trackedContacts,
@@ -1902,7 +1900,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      *
      * @return mixed
      */
-    protected function getPriorityFieldsForMautic($config, $object = null, $priorityObject = 'mautic')
+    protected function getPriorityFieldsForMautic(array $config, $object = null, $priorityObject = 'mautic')
     {
         $fields = parent::getPriorityFieldsForMautic($config, $object, $priorityObject);
 
@@ -1914,7 +1912,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      *
      * @return mixed
      */
-    protected function getPriorityFieldsForIntegration($config, $object = null, $priorityObject = 'mautic')
+    protected function getPriorityFieldsForIntegration(array $config, $object = null, $priorityObject = 'mautic')
     {
         $fields = parent::getPriorityFieldsForIntegration($config, $object, $priorityObject);
         unset($fields['Contact']['Id'], $fields['Lead']['Id']);
@@ -2350,7 +2348,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      *
      * @return array
      */
-    protected function cleanPriorityFields($fieldsToUpdate, $objects = null)
+    protected function cleanPriorityFields(array $fieldsToUpdate, $objects = null)
     {
         if (null === $objects) {
             $objects = ['Lead', 'Contact'];
@@ -2360,7 +2358,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             // Pass in the whole config
             $fields = $fieldsToUpdate;
         } else {
-            $fields = array_flip($fieldsToUpdate ?? []);
+            $fields = array_flip($fieldsToUpdate);
         }
 
         return $this->prepareFieldsForSync($fields, $fieldsToUpdate, $objects);

@@ -54,7 +54,7 @@ final class ObjectChangeGeneratorTest extends TestCase
             $integrationReportObject
         );
 
-        $this->assertEquals($integration, $objectChangeDAO->getIntegration());
+        $this->assertSame($integration, $objectChangeDAO->getIntegration());
 
         // object and object ID should be the integrations (from the integration's POV)
         $this->assertEquals($objectName, $objectChangeDAO->getObject());
@@ -103,7 +103,7 @@ final class ObjectChangeGeneratorTest extends TestCase
             $integrationReportObject
         );
 
-        $this->assertEquals($integration, $objectChangeDAO->getIntegration());
+        $this->assertSame($integration, $objectChangeDAO->getIntegration());
 
         // object and object ID should be the integrations (from the integration's POV)
         $this->assertEquals($objectName, $objectChangeDAO->getObject());

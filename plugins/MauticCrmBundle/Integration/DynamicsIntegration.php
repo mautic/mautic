@@ -195,11 +195,9 @@ final class DynamicsIntegration extends CrmAbstractIntegration
     /**
      * Get available company fields for choices in the config UI.
      *
-     * @param array $settings
-     *
      * @return array
      */
-    public function getFormCompanyFields($settings = [])
+    public function getFormCompanyFields(array $settings = [])
     {
         return $this->getFormFieldsByObject('accounts', $settings);
     }

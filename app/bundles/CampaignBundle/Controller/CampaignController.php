@@ -570,7 +570,7 @@ class CampaignController extends AbstractStandardFormController
      * @param Campaign $campaign
      * @param Campaign $oldCampaign
      */
-    protected function afterEntityClone($campaign, $oldCampaign)
+    protected function afterEntityClone($campaign, $oldCampaign): array
     {
         $tempId   = 'mautic_'.sha1(uniqid(mt_rand(), true));
         $objectId = $oldCampaign->getId();
@@ -1072,10 +1072,8 @@ class CampaignController extends AbstractStandardFormController
 
     /**
      * @param bool $isClone
-     *
-     * @return array
      */
-    protected function prepareCampaignEventsForEdit($entity, $objectId, $isClone = false)
+    protected function prepareCampaignEventsForEdit($entity, $objectId, $isClone = false): array
     {
         // load existing events into session
         $campaignEvents = [];

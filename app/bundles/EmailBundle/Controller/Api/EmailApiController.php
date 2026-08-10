@@ -42,7 +42,7 @@ final class EmailApiController extends CommonApiController
     /**
      * @var array<string, mixed>
      */
-    protected $extraGetEntitiesArguments = ['ignoreListJoin' => true];
+    protected array $extraGetEntitiesArguments = ['ignoreListJoin' => true];
 
     public function __construct(
         CorePermissions $security,

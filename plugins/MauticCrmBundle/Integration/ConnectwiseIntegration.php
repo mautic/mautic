@@ -100,7 +100,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return $this->router->generate('mautic_integration_auth_callback', ['integration' => $this->getName()]);
     }
 
-    public function authCallback($settings = [], $parameters = []): string|false
+    public function authCallback(array $settings = [], $parameters = []): string|false
     {
         $url   = $this->getApiUrl();
         $error = false;
@@ -132,15 +132,13 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     /**
      * Append ClientID into header to enable authentication.
      *
-     * @param string       $url
      * @param array<mixed> $parameters
-     * @param string       $method
      * @param array<mixed> $settings
      * @param string       $authType
      *
      * @return array<mixed>
      */
-    public function prepareRequest($url, $parameters, $method, $settings, $authType): array
+    public function prepareRequest(string $url, $parameters, string $method, array $settings, $authType): array
     {
         [$parameters,$headers] = parent::prepareRequest($url, $parameters, $method, $settings, $authType);
 
@@ -162,11 +160,9 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     /**
      * Get available company fields for choices in the config UI.
      *
-     * @param array $settings
-     *
      * @return array
      */
-    public function getFormCompanyFields($settings = [])
+    public function getFormCompanyFields(array $settings = [])
     {
         return $this->getFormFieldsByObject('company', $settings);
     }
@@ -765,7 +761,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      *
      * @return array
      */
-    protected function cleanPriorityFields($fieldsToUpdate, $objects = null)
+    protected function cleanPriorityFields(array $fieldsToUpdate, $objects = null)
     {
         if (null === $objects) {
             $objects = ['Leads', 'Contacts'];
@@ -785,7 +781,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      *
      * @return mixed
      */
-    protected function getPriorityFieldsForMautic($config, $object = null, $priorityObject = 'mautic')
+    protected function getPriorityFieldsForMautic(array $config, $object = null, $priorityObject = 'mautic')
     {
         if ('company' == $object) {
             $priority = parent::getPriorityFieldsForMautic($config, $object, 'mautic_company');

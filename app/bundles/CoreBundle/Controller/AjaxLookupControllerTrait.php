@@ -77,11 +77,9 @@ trait AjaxLookupControllerTrait
     /**
      * Get a model instance from the service container.
      *
-     * @param string $modelNameKey
-     *
      * @return AbstractCommonModel<object>
      */
-    abstract protected function getModel($modelNameKey): MauticModelInterface;
+    abstract protected function getModel(string $modelNameKey): MauticModelInterface;
 
     /**
      * Get's the content of error page.

@@ -224,7 +224,7 @@ final class SalesforceApiTest extends \PHPUnit\Framework\TestCase
         $integration->expects($this->once())
             ->method('makeRequest')
             ->willReturnCallback(
-                function ($url, $parameters = [], $method = 'GET', $settings = []): void {
+                function ($url, $parameters = [], $method = 'GET', array $settings = []): void {
                     $this->assertEquals(
                         [
                             'q' => 'select Id from Account where Name = \'Some\\\\thing E\\\'lse\' and BillingCountry =  \'Some\\\\Where E\\\'lse\' and BillingCity =  \'Some\\\\Where E\\\'lse\' and BillingState =  \'Some\\\\Where E\\\'lse\'',
@@ -269,7 +269,7 @@ final class SalesforceApiTest extends \PHPUnit\Framework\TestCase
         $integration->expects($this->once())
             ->method('makeRequest')
             ->willReturnCallback(
-                function ($url, $parameters = [], $method = 'GET', $settings = []): void {
+                function ($url, $parameters = [], $method = 'GET', array $settings = []): void {
                     $this->assertEquals(
                         [
                             'q' => 'select Id from Account where Name = \'Some\\\\thing\\\' E\\\'lse\' and BillingCountry =  \'Some\\\\Where\\\' E\\\'lse\' and BillingCity =  \'Some\\\\Where\\\' E\\\'lse\' and BillingState =  \'Some\\\\Where\\\' E\\\'lse\'',
@@ -318,7 +318,7 @@ final class SalesforceApiTest extends \PHPUnit\Framework\TestCase
         $integration->expects($this->once())
             ->method('makeRequest')
             ->willReturnCallback(
-                function ($url, $parameters = [], $method = 'GET', $settings = []): void {
+                function ($url, $parameters = [], $method = 'GET', array $settings = []): void {
                     $this->assertEquals(
                         [
                             'q' => 'select Id from Contact where email = \'con\\\\tact\\\'email@email.com\'',
@@ -365,7 +365,7 @@ final class SalesforceApiTest extends \PHPUnit\Framework\TestCase
         $integration->expects($this->once())
             ->method('makeRequest')
             ->willReturnCallback(
-                function ($url, $parameters = [], $method = 'GET', $settings = []): void {
+                function ($url, $parameters = [], $method = 'GET', array $settings = []): void {
                     $this->assertEquals(
                         [
                             'q' => 'select Id from Lead where email = \'con\\\\tact\\\'email@email.com\' and ConvertedContactId = NULL',
