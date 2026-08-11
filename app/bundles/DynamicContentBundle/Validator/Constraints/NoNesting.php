@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraint;
 /**
  * This constraint checks if the content does not include another DWC token.
  */
-#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
+#[\Attribute(\Attribute::TARGET_PROPERTY)]
 final class NoNesting extends Constraint
 {
     /**

@@ -24,7 +24,6 @@ use Mautic\FormBundle\Validator\Constraint\IsPostActionRedirectUrl;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ApiResource(
     operations: [
@@ -114,6 +113,7 @@ class Form extends FormEntity implements UuidInterface
     #[Assert\NotBlank(message: 'mautic.form.form.postactionproperty_message.notblank', groups: ['messageRequired'])]
     #[Assert\NotBlank(message: 'mautic.form.form.postactionproperty_redirect.notblank', groups: ['urlRequired'])]
     #[Assert\NotBlank(message: 'mautic.form.form.postactionproperty_hideform.notblank', groups: ['hideformRequired'])]
+    #[IsPostActionRedirectUrl(groups: ['urlRequired'])]
     private $postActionProperty;
 
     /**
@@ -311,11 +311,6 @@ class Form extends FormEntity implements UuidInterface
 
         static::addUuidField($builder);
         self::addProjectsField($builder, 'form_projects_xref', 'form_id');
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('postActionProperty', new IsPostActionRedirectUrl(groups: ['urlRequired']));
     }
 
     public static function determineValidationGroups(\Symfony\Component\Form\Form $form): array
