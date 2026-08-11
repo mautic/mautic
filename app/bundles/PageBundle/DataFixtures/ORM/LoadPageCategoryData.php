@@ -2,13 +2,13 @@
 
 namespace Mautic\PageBundle\DataFixtures\ORM;
 
-use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Entity\CategoryRepository;
 
-final class LoadPageCategoryData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadPageCategoryData extends Fixture implements OrderedFixtureInterface
 {
     public function __construct(
         private readonly CategoryRepository $categoryRepository,

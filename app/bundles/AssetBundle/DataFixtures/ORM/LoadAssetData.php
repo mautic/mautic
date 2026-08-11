@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\AssetBundle\DataFixtures\ORM;
 
-use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\AssetBundle\Entity\Asset;
 
-final class LoadAssetData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadAssetData extends Fixture implements OrderedFixtureInterface
 {
     public function load(ObjectManager $manager): void
     {

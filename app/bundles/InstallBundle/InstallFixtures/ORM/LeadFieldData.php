@@ -2,15 +2,15 @@
 
 namespace Mautic\InstallBundle\InstallFixtures\ORM;
 
+use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
-use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, FixtureGroupInterface
+final class LeadFieldData extends Fixture implements OrderedFixtureInterface, FixtureGroupInterface
 {
     public function __construct(
         private readonly TranslatorInterface $translator,

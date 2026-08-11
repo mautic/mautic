@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\DataFixtures\ORM;
 
-use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\CategoryBundle\Entity\CategoryRepository;
@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 
-final class LoadCategorizedLeadListData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadCategorizedLeadListData extends Fixture implements OrderedFixtureInterface
 {
     public function __construct(
         private readonly LeadListRepository $leadListRepository,
