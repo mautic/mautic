@@ -11,9 +11,7 @@ final class Version20240416112112 extends PreUpAssertionMigration
 {
     protected function preUpAssertions(): void
     {
-        $this->skipAssertion(function (Schema $schema) {
-            return $schema->getTable("{$this->prefix}campaigns")->hasColumn('version');
-        }, sprintf('Column %s already exists', 'version'));
+        $this->skipAssertion(fn (Schema $schema) => $schema->getTable("{$this->prefix}campaigns")->hasColumn('version'), sprintf('Column %s already exists', 'version'));
     }
 
     public function up(Schema $schema): void

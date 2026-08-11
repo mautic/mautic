@@ -16,9 +16,7 @@ final class Version20220429091934 extends PreUpAssertionMigration
 
     protected function preUpAssertions(): void
     {
-        $this->skipAssertion(function (Schema $schema) {
-            return $schema->hasTable("{$this->prefix}contact_export_scheduler");
-        }, sprintf('Table %s already exists', "{$this->prefix}contact_export_scheduler"));
+        $this->skipAssertion(fn (Schema $schema) => $schema->hasTable("{$this->prefix}contact_export_scheduler"), sprintf('Table %s already exists', "{$this->prefix}contact_export_scheduler"));
     }
 
     public function up(Schema $schema): void

@@ -318,8 +318,6 @@ final class ModelGetRepositoryToRepositoryServiceRector extends AbstractRector
      */
     private function replaceNode(Class_ $class, MethodCall $oldNode, Node $newNode): void
     {
-        $this->traverseNodesWithCallable($class, static function (Node $node) use ($oldNode, $newNode): ?Node {
-            return $node === $oldNode ? $newNode : null;
-        });
+        $this->traverseNodesWithCallable($class, static fn (Node $node): ?Node => $node === $oldNode ? $newNode : null);
     }
 }
