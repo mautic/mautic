@@ -252,7 +252,7 @@ $container->loadFromExtension('oneup_uploader', [
             'error_handler'   => 'mautic.asset.upload.error.handler',
             'frontend'        => 'custom',
             'custom_frontend' => [
-                'class' => 'Mautic\AssetBundle\Controller\UploadController',
+                'class' => Mautic\AssetBundle\Controller\UploadController::class,
                 'name'  => 'mautic',
             ],
             // 'max_size' => ($maxSize * 1000000),
