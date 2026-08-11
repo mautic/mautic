@@ -22,6 +22,46 @@
         &:hover { background-color: var(--field-hover); }
     }
 
+    // Restore stock typeahead dropdown look; toolbar `div { height: 48px; margin: 0; border-radius: unset }`
+    // would otherwise crush the menu to one row and strip spacing/radius.
+    .twitter-typeahead {
+      .tt-menu {
+        height: auto;
+        margin: 2px 0 0;
+        border-radius: $border-radius-base;
+        padding: 5px 0;
+        background-color: $dropdown-bg;
+        border: 1px solid $dropdown-border;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+        z-index: $zindex-dropdown;
+      }
+
+      .tt-dataset,
+      .tt-suggestion {
+        height: auto;
+        margin: 0;
+        border-radius: 0;
+      }
+
+      .tt-suggestion {
+        display: block;
+        padding: 3px 20px;
+        clear: both;
+        font-weight: normal;
+        line-height: $line-height-base;
+        color: $dropdown-link-color;
+        white-space: nowrap;
+
+        &:hover,
+        &.tt-cursor {
+          text-decoration: none;
+          outline: 0;
+          background-color: $dropdown-link-hover-bg;
+          color: $dropdown-link-hover-color;
+        }
+      }
+    }
+
     .search-scope-select {
       flex: 0 0 210px;
       inline-size: 210px;
