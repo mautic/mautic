@@ -28,7 +28,7 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->set(Mautic\ApiBundle\EventListener\PreAuthorizationEventListener::class);
 
-    $services->set('mautic.validator.oauthcallback', Mautic\ApiBundle\Form\Validator\Constraints\OAuthCallbackValidator::class)->tag('validator.constraint_validator');
+    $services->set(Mautic\ApiBundle\Form\Validator\Constraints\OAuthCallbackValidator::class)->tag('validator.constraint_validator');
     $services->set(Mautic\ApiBundle\Security\Voter\ApiPermissionVoter::class)->tag('security.voter');
 
     $services->alias(AuthorizeFormHandler::class, 'fos_oauth_server.authorize.form.handler.default');

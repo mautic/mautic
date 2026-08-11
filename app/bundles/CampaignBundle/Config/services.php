@@ -38,12 +38,12 @@ return function (ContainerConfigurator $configurator): void {
     $services->set(Mautic\CampaignBundle\Executioner\Scheduler\Mode\Interval::class);
     $services->set(Mautic\CampaignBundle\Executioner\Event\ConditionExecutioner::class);
     $services->set(Mautic\CampaignBundle\Executioner\Event\DecisionExecutioner::class);
-    $services->set('mautic.campaign.event_executioner', Mautic\CampaignBundle\Executioner\EventExecutioner::class);
+    $services->set(Mautic\CampaignBundle\Executioner\EventExecutioner::class);
     $services->set(Mautic\CampaignBundle\Executioner\Helper\DecisionHelper::class);
     $services->set(Mautic\CampaignBundle\Executioner\Helper\InactiveHelper::class);
     $services->set(Mautic\CampaignBundle\Helper\RemovedContactTracker::class);
     $services->set(Mautic\CampaignBundle\Executioner\Helper\NotificationHelper::class);
-    $services->set('mautic.campaign.legacy_event_dispatcher', Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher::class);
+    $services->set(Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher::class);
     $services->set(Mautic\CampaignBundle\Membership\Action\Adder::class);
     $services->set(Mautic\CampaignBundle\Membership\Action\Remover::class);
     $services->set(Mautic\CampaignBundle\Membership\EventDispatcher::class);

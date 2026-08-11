@@ -35,8 +35,8 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->set(Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop::class);
 
-    $services->set('mautic.validator.email', Mautic\EmailBundle\Helper\EmailValidator::class);
-    $services->set('mautic.email.fetcher', Mautic\EmailBundle\MonitoredEmail\Fetcher::class);
+    $services->set(Mautic\EmailBundle\Helper\EmailValidator::class);
+    $services->set(Mautic\EmailBundle\MonitoredEmail\Fetcher::class);
     $services->set(Mautic\EmailBundle\Helper\StatsCollectionHelper::class);
     $services->set('mautic.email.stats.helper_container', Mautic\EmailBundle\Stats\StatHelperContainer::class);
 
