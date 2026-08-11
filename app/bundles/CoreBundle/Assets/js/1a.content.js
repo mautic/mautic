@@ -1420,6 +1420,15 @@ Mautic.refreshSearchScopeChosen = function (scopeSelect) {
 };
 
 /**
+ * Whether a scope command is self-contained and needs no input value (e.g. is:published).
+ */
+Mautic.isSearchScopeCompleteCommand = function (command) {
+    command = command || '';
+
+    return command.indexOf(':') > 0;
+};
+
+/**
  * Compose a scoped list-search string from dropdown command + visible input value.
  */
 Mautic.composeScopedSearchValue = function (command, value) {
@@ -1431,7 +1440,7 @@ Mautic.composeScopedSearchValue = function (command, value) {
     }
 
     // Flag-style commands (is:published, is:mine, etc.) are complete on their own.
-    if (command.indexOf(':') > 0) {
+    if (Mautic.isSearchScopeCompleteCommand(command)) {
         return command;
     }
 
@@ -1480,6 +1489,37 @@ Mautic.parseScopedSearchValue = function (searchValue, scopeCommands) {
 };
 
 /**
+ * Apply the selected search scope immediately (used by the scope dropdown).
+ */
+Mautic.submitSearchScopeChange = function (scopeSelect, searchInput, searchId) {
+    const command = scopeSelect.val() || '';
+    const inputValue = searchInput.val().trim();
+    const scopedValue = Mautic.composeScopedSearchValue(command, inputValue);
+
+    if (!scopedValue && !Mautic.isSearchScopeCompleteCommand(command)) {
+        searchInput.trigger('focus');
+
+        return;
+    }
+
+    if (scopedValue === MauticVars.lastSearchStr) {
+        return;
+    }
+
+    MauticVars.lastSearchStr = scopedValue;
+
+    const scopeChangeEvent = mQuery.Event('keyup', {which: 13});
+    scopeChangeEvent.data = {livesearch: true, scopeChange: true};
+    Mautic.filterList(
+        scopeChangeEvent,
+        searchId,
+        searchInput.attr('data-action'),
+        searchInput.attr('data-target'),
+        'liveCache'
+    );
+};
+
+/**
  * Wire the optional field-scope dropdown to a livesearch input.
  */
 Mautic.activateSearchScope = function (searchEl) {
@@ -1503,30 +1543,7 @@ Mautic.activateSearchScope = function (searchEl) {
     Mautic.activateSearchScopeChosen(scopeSelect);
 
     scopeSelect.off('change.searchScope').on('change.searchScope', function () {
-        const command = scopeSelect.val();
-
-        if (command && command.indexOf(':') > 0) {
-            searchInput.val('');
-            searchInput.typeahead('val', '');
-        }
-
-        const scopedValue = Mautic.composeScopedSearchValue(command, searchInput.val().trim());
-        // Chosen may emit change during initialization; skip no-op reloads.
-        if (scopedValue === MauticVars.lastSearchStr) {
-            return;
-        }
-
-        MauticVars.lastSearchStr = scopedValue;
-
-        const scopeChangeEvent = mQuery.Event('keyup', {which: 13});
-        scopeChangeEvent.data = {livesearch: true, scopeChange: true};
-        Mautic.filterList(
-            scopeChangeEvent,
-            searchId,
-            searchInput.attr('data-action'),
-            searchInput.attr('data-target'),
-            'liveCache'
-        );
+        Mautic.submitSearchScopeChange(scopeSelect, searchInput, searchId);
     });
 };
 
