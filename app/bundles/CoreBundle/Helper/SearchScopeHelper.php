@@ -7,8 +7,9 @@ namespace Mautic\CoreBundle\Helper;
 /**
  * Splits and composes list-search strings for the filter-scope dropdown UI.
  *
- * When a scope is active the visible input holds only the user term; the full
- * search command (e.g. "firstname:John") is composed before the request is sent.
+ * Argument scopes keep only the user term in the visible input and compose
+ * "firstname:John" for the request. Flag scopes (is:published, …) may also
+ * carry optional free-text after the command ("is:unpublished Newsletter").
  */
 final class SearchScopeHelper
 {
@@ -35,6 +36,19 @@ final class SearchScopeHelper
                 return ['command' => $command, 'value' => ''];
             }
 
+            // Flag-style commands (is:published, …) combine with free-text via a space.
+            if (str_contains($command, ':')) {
+                $spaced = $command.' ';
+                if (str_starts_with($search, $spaced)) {
+                    return [
+                        'command' => $command,
+                        'value'   => substr($search, strlen($spaced)),
+                    ];
+                }
+
+                continue;
+            }
+
             $prefix = $command.':';
             if (str_starts_with($search, $prefix)) {
                 return [
@@ -55,8 +69,9 @@ final class SearchScopeHelper
             return $value;
         }
 
-        if ('' === $value && str_contains($command, ':')) {
-            return $command;
+        // Flag-style commands are complete alone; optional free-text searches the item name.
+        if (str_contains($command, ':')) {
+            return '' === $value ? $command : $command.' '.$value;
         }
 
         if ('' === $value) {

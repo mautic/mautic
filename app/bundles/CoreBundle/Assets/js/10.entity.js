@@ -173,13 +173,17 @@ Mautic.filterList = function (e, elId, route, target, liveCacheVar, action, over
                 scopeSelect.find('option[value=""]:not(:disabled)').first().prop('selected', true);
                 Mautic.refreshSearchScopeChosen(scopeSelect);
                 value = '';
+            } else if (scopeChange) {
+                // submitSearchScopeChange already composed the final search string
+                value = MauticVars.lastSearchStr || '';
             } else {
                 if (!Mautic.filterCommands || Mautic.filterCommands.length === 0) {
                     Mautic.initFilterCommands();
                 }
 
                 const filterCommands = Mautic.getActiveFilterCommands(value);
-                const scopedInputValue = Mautic.removeFilterCommands(value);
+                let scopedInputValue = Mautic.removeFilterCommands(value);
+                scopedInputValue = Mautic.normalizeSearchScopeInputValue(scopeSelect, scopedInputValue);
                 value = Mautic.composeScopedSearchValue(scopeSelect.val(), scopedInputValue);
 
                 if (filterCommands.length) {

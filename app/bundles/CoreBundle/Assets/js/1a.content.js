@@ -1334,9 +1334,15 @@ Mautic.applySearchScopeState = function (searchEl, searchString) {
     const scopeSelect = mQuery("select[data-livesearch-scope-for='" + searchId + "']");
     const initialSearch = (searchString || '').trim();
 
+    const setSearchInputValue = function (value) {
+        Mautic.suppressLiveSearch = true;
+        searchInput.val(value);
+        searchInput.typeahead('val', value);
+        Mautic.suppressLiveSearch = false;
+    };
+
     if (!scopeSelect.length) {
-        searchInput.val(initialSearch);
-        searchInput.typeahead('val', initialSearch);
+        setSearchInputValue(initialSearch);
 
         return;
     }
@@ -1355,16 +1361,17 @@ Mautic.applySearchScopeState = function (searchEl, searchString) {
         scopeSelect.find('option[value=""]:not(:disabled)').first().prop('selected', true);
     } else if (null === scopeSelect.val() && parsed.command !== '') {
         scopeSelect.find('option[value=""]:not(:disabled)').first().prop('selected', true);
-        searchInput.val(initialSearch);
-        searchInput.typeahead('val', initialSearch);
+        setSearchInputValue(initialSearch);
         Mautic.refreshSearchScopeChosen(scopeSelect);
 
         return;
     }
 
+    // Complete commands (is:published, …) keep an empty visible input — the scope
+    // dropdown holds the filter. Suppress livesearch so clearing the input does
+    // not immediately re-request an unfiltered list.
     const visibleValue = parsed.command ? parsed.value : initialSearch;
-    searchInput.val(visibleValue);
-    searchInput.typeahead('val', visibleValue);
+    setSearchInputValue(visibleValue);
     Mautic.refreshSearchScopeChosen(scopeSelect);
 };
 
@@ -1429,6 +1436,45 @@ Mautic.isSearchScopeCompleteCommand = function (command) {
 };
 
 /**
+ * True when the search input only mirrors a complete-scope option label/command.
+ */
+Mautic.isSearchScopeLabelInInput = function (scopeSelect, inputValue) {
+    inputValue = (inputValue || '').trim();
+    if (!inputValue) {
+        return false;
+    }
+
+    let matches = false;
+    mQuery(scopeSelect).find('option').each(function () {
+        const command = mQuery(this).val() || '';
+        if (!Mautic.isSearchScopeCompleteCommand(command)) {
+            return;
+        }
+
+        const label = mQuery.trim(mQuery(this).text().replace(/\u00a0/g, ' '));
+        if (inputValue === label || inputValue === command) {
+            matches = true;
+
+            return false;
+        }
+    });
+
+    return matches;
+};
+
+/**
+ * Drop complete-scope labels from the visible input before composing a search string.
+ */
+Mautic.normalizeSearchScopeInputValue = function (scopeSelect, inputValue) {
+    inputValue = (inputValue || '').trim();
+    if (scopeSelect && scopeSelect.length && Mautic.isSearchScopeLabelInInput(scopeSelect, inputValue)) {
+        return '';
+    }
+
+    return inputValue;
+};
+
+/**
  * Compose a scoped list-search string from dropdown command + visible input value.
  */
 Mautic.composeScopedSearchValue = function (command, value) {
@@ -1439,9 +1485,9 @@ Mautic.composeScopedSearchValue = function (command, value) {
         return value;
     }
 
-    // Flag-style commands (is:published, is:mine, etc.) are complete on their own.
+    // Flag-style commands are complete alone; optional free-text searches the item name.
     if (Mautic.isSearchScopeCompleteCommand(command)) {
-        return command;
+        return value ? (command + ' ' + value) : command;
     }
 
     if (!value) {
@@ -1476,6 +1522,19 @@ Mautic.parseScopedSearchValue = function (searchValue, scopeCommands) {
             return {command: command, value: ''};
         }
 
+        // Flag-style commands combine with free-text via a space.
+        if (Mautic.isSearchScopeCompleteCommand(command)) {
+            const spaced = command + ' ';
+            if (searchValue.indexOf(spaced) === 0) {
+                return {
+                    command: command,
+                    value: searchValue.substring(spaced.length)
+                };
+            }
+
+            continue;
+        }
+
         const prefix = command + ':';
         if (searchValue.indexOf(prefix) === 0) {
             return {
@@ -1493,10 +1552,11 @@ Mautic.parseScopedSearchValue = function (searchValue, scopeCommands) {
  */
 Mautic.submitSearchScopeChange = function (scopeSelect, searchInput, searchId) {
     const command = scopeSelect.val() || '';
-    const inputValue = searchInput.val().trim();
+    const inputValue = Mautic.normalizeSearchScopeInputValue(scopeSelect, searchInput.val());
     const scopedValue = Mautic.composeScopedSearchValue(command, inputValue);
 
-    if (!scopedValue && !Mautic.isSearchScopeCompleteCommand(command)) {
+    // Value-requiring scope without a term yet — wait for the user to type.
+    if (command && !Mautic.isSearchScopeCompleteCommand(command) && !inputValue) {
         searchInput.trigger('focus');
 
         return;
@@ -1663,6 +1723,10 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
     });
 
     mQuery(el).on('change keyup paste', {}, function (event) {
+        if (Mautic.suppressLiveSearch) {
+            return;
+        }
+
         // Prevent LiveSearch from re-triggering on navigation keys
         if (Mautic.Keyboard.isLiveSearchNavigation(event)) {
             return;

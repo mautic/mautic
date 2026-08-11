@@ -50,6 +50,29 @@ final class SearchScopeHelperTest extends TestCase
         $this->assertSame('is:published', SearchScopeHelper::compose('is:published', ''));
     }
 
+    public function testComposeCompleteCommandWithFreeText(): void
+    {
+        $this->assertSame('is:unpublished Newsletter', SearchScopeHelper::compose('is:unpublished', 'Newsletter'));
+    }
+
+    public function testParseCompleteCommandWithFreeText(): void
+    {
+        $this->assertSame(
+            ['command' => 'is:unpublished', 'value' => 'Newsletter'],
+            SearchScopeHelper::parse('is:unpublished Newsletter', ['', 'is:published', 'is:unpublished', 'name'])
+        );
+    }
+
+    public function testRoundTripCompleteCommandWithFreeText(): void
+    {
+        $scopes   = ['', 'is:published', 'is:unpublished', 'name'];
+        $composed = SearchScopeHelper::compose('is:unpublished', 'Newsletter');
+        $parsed   = SearchScopeHelper::parse($composed, $scopes);
+
+        $this->assertSame('is:unpublished', $parsed['command']);
+        $this->assertSame('Newsletter', $parsed['value']);
+    }
+
     public function testRoundTrip(): void
     {
         $composed = SearchScopeHelper::compose('email', 'test@example.com');
