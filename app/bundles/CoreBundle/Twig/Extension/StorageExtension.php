@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Twig\Extension;
 
-use Twig\Extension\AbstractExtension;
-use Twig\TwigFunction;
+use Twig\Attribute\AsTwigFunction;
 
 /**
  * The main goal of this function is to save Twig's context into memory
@@ -13,24 +12,17 @@ use Twig\TwigFunction;
  * This is a workaround as Twig doesn't support passing back variables
  * from child to parent templates.
  */
-final class StorageExtension extends AbstractExtension
+final class StorageExtension
 {
     /**
      * @var array<string,mixed>
      */
     private array $storage = [];
 
-    public function getFunctions(): array
-    {
-        return [
-            new TwigFunction('save', $this->save(...), ['needs_context' => true]),
-            new TwigFunction('restore', $this->restore(...), ['needs_context' => true]),
-        ];
-    }
-
     /**
      * @param mixed $context
      */
+    #[AsTwigFunction(name: 'save', needsContext: true)]
     public function save($context, string $name): void
     {
         $this->storage[$name] = $context;
@@ -39,6 +31,7 @@ final class StorageExtension extends AbstractExtension
     /**
      * @param mixed $context
      */
+    #[AsTwigFunction(name: 'restore', needsContext: true)]
     public function restore(&$context, string $name): void
     {
         $context = array_merge($context, $this->storage[$name]);

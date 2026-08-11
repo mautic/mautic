@@ -5,21 +5,13 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Twig\Extension;
 
 use Mautic\CoreBundle\Twig\Helper\ConfigHelper;
-use Twig\Extension\AbstractExtension;
-use Twig\TwigFunction;
+use Twig\Attribute\AsTwigFunction;
 
-final class ConfigExtension extends AbstractExtension
+final readonly class ConfigExtension
 {
     public function __construct(
-        private readonly ConfigHelper $configHelper,
+        private ConfigHelper $configHelper,
     ) {
-    }
-
-    public function getFunctions(): array
-    {
-        return [
-            new TwigFunction('configGetParameter', $this->get(...)),
-        ];
     }
 
     /**
@@ -27,6 +19,7 @@ final class ConfigExtension extends AbstractExtension
      *
      * @return mixed
      */
+    #[AsTwigFunction(name: 'configGetParameter')]
     public function get(string $name, $default = null)
     {
         return $this->configHelper->get($name, $default);
