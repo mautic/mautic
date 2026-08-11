@@ -8,7 +8,7 @@ $replaceRootPlaceholder = function (&$value) use ($projectRoot, &$replaceRootPla
         foreach ($value as &$v) {
             $replaceRootPlaceholder($v);
         }
-    } elseif (false !== strpos($value, '%kernel.project_dir%')) {
+    } elseif (str_contains($value, '%kernel.project_dir%')) {
         $value = str_replace('%kernel.project_dir%', $projectRoot, $value);
     }
 };

@@ -59,22 +59,19 @@ class AppKernel extends Kernel
 
     public function handle(Request $request, $type = HttpKernelInterface::MAIN_REQUEST, $catch = true): Response
     {
-        if (false !== strpos($request->getRequestUri(), 'installer') || !$this->isInstalled()) {
+        if (str_contains($request->getRequestUri(), 'installer') || !$this->isInstalled()) {
             defined('MAUTIC_INSTALLER') or define('MAUTIC_INSTALLER', 1);
         }
 
         if (defined('MAUTIC_INSTALLER')) {
             $uri = $request->getRequestUri();
-            if (false === strpos($uri, 'installer')) {
+            if (!str_contains($uri, 'installer')) {
                 $base   = $request->getBaseUrl();
                 $prefix = '';
                 // check to see if the .htaccess file exists or if not running under apache
                 if (false === stripos($request->server->get('SERVER_SOFTWARE', ''), 'apache')
                     || !file_exists($this->getProjectDir().'/.htaccess')
-                    && false === strpos(
-                        $base,
-                        'index'
-                    )
+                    && !str_contains($base, 'index')
                 ) {
                     $prefix .= '/index.php';
                 }
