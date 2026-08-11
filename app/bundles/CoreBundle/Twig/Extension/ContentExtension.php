@@ -5,23 +5,13 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Twig\Extension;
 
 use Mautic\CoreBundle\Twig\Helper\ContentHelper;
-use Twig\Extension\AbstractExtension;
-use Twig\TwigFunction;
+use Twig\Attribute\AsTwigFunction;
 
-final class ContentExtension extends AbstractExtension
+final readonly class ContentExtension
 {
     public function __construct(
-        private readonly ContentHelper $contentHelper,
+        private ContentHelper $contentHelper,
     ) {
-    }
-
-    public function getFunctions(): array
-    {
-        return [
-            new TwigFunction('customContent', $this->getCustomContent(...), ['is_safe' => ['all']]),
-            new TwigFunction('showScriptTags', $this->showScriptTags(...), ['is_safe' => ['all']]),
-            new TwigFunction('getSortedEditorFonts', $this->sortEditorFonts(...)),
-        ];
     }
 
     /**
@@ -31,6 +21,7 @@ final class ContentExtension extends AbstractExtension
      * @param array<string,mixed> $vars     twig vars
      * @param ?string             $viewName The main identifier for the content requested. Will be etracted from $vars if get_defined
      */
+    #[AsTwigFunction(name: 'customContent', isSafe: ['all'])]
     public function getCustomContent($context = null, array $vars = [], ?string $viewName = null): string
     {
         return $this->contentHelper->getCustomContent($context, $vars, $viewName);
@@ -40,6 +31,7 @@ final class ContentExtension extends AbstractExtension
      * Replaces HTML script tags with non HTML tags so the JS inside them won't
      * execute and will be readable.
      */
+    #[AsTwigFunction(name: 'showScriptTags', isSafe: ['all'])]
     public function showScriptTags(string $html): string
     {
         return $this->contentHelper->showScriptTags($html);
@@ -50,6 +42,7 @@ final class ContentExtension extends AbstractExtension
      *
      * @return array<mixed>
      */
+    #[AsTwigFunction(name: 'getSortedEditorFonts')]
     public function sortEditorFonts(array $fonts): array
     {
         usort($fonts, static function (array $fontA, array $fontB): int {

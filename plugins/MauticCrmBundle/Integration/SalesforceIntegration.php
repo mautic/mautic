@@ -9,7 +9,6 @@ use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Entity\Notification;
 use Mautic\CoreBundle\Entity\NotificationRepository;
 use Mautic\CoreBundle\Entity\Transformer\NotificationArrayTransformer;
-use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -914,8 +913,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $notificationTemplate = new Notification();
         $notificationTemplate->setType($type);
         $notificationTemplate->setIsRead(false);
-        $notificationTemplate->setHeader(EmojiHelper::toHtml(InputHelper::strict_html($header)));
-        $notificationTemplate->setMessage(EmojiHelper::toHtml(InputHelper::strict_html($message)));
+        $notificationTemplate->setHeader(InputHelper::strict_html($header));
+        $notificationTemplate->setMessage(InputHelper::strict_html($message));
         $notificationTemplate->setIconClass(null);
 
         $persistEntities = [];

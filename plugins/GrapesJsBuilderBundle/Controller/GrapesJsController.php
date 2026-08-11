@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MauticPlugin\GrapesJsBuilderBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
-use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\EmailBundle\Entity\Email;
@@ -161,9 +160,6 @@ class GrapesJsController extends CommonController
         } else {
             $logicalName = $themeHelper->checkForTwigTemplate($templateName.'.html.twig');
         }
-
-        // Replace short codes to emoji
-        $content = array_map(fn (string $text): string => EmojiHelper::toEmoji($text, 'short'), $content);
 
         $renderedTemplate =  $themeHelper->renderThemeTemplate(
             $logicalName,
