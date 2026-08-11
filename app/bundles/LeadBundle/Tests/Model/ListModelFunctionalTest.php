@@ -168,9 +168,9 @@ final class ListModelFunctionalTest extends MauticMysqlTestCase
             'lead' => $contact,
             'list' => $segment,
         ]);
-        self::assertNotNull($listLead);
-        self::assertFalse($listLead->wasManuallyAdded());
-        self::assertFalse($listLead->wasManuallyRemoved());
+        $this->assertInstanceOf(ListLead::class, $listLead);
+        $this->assertFalse($listLead->wasManuallyAdded());
+        $this->assertFalse($listLead->wasManuallyRemoved());
 
         $segmentModel->addLead($contact, $segment, true);
 
@@ -180,9 +180,9 @@ final class ListModelFunctionalTest extends MauticMysqlTestCase
             'list' => $segment,
         ]);
 
-        self::assertNotNull($listLead);
-        self::assertTrue($listLead->wasManuallyAdded());
-        self::assertFalse($listLead->wasManuallyRemoved());
+        $this->assertInstanceOf(ListLead::class, $listLead);
+        $this->assertTrue($listLead->wasManuallyAdded());
+        $this->assertFalse($listLead->wasManuallyRemoved());
     }
 
     private function createLeadList(User $user, string $name, bool $isGlobal): LeadList
