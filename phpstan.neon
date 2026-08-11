@@ -120,6 +120,10 @@ parameters:
 		-
 			identifier: class.extendsDeprecatedClass
 			path: app/bundles/IntegrationsBundle/Tests/Unit/AbstractIntegrationTest.php
+		# EmojiHelper is deprecated and removed in 8.0; its call sites are removed there too
+		-
+			identifier: staticMethod.deprecatedClass
+			message: '#Call to method (toHtml|toShort|toEmoji)\(\) of deprecated class Mautic\\CoreBundle\\Helper\\EmojiHelper#'
 		-
 			identifier: classConstant.deprecatedClass
 			paths:
