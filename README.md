@@ -375,6 +375,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/MrYamous"><img src="https://avatars.githubusercontent.com/u/32437818?v=4?s=100" width="100px;" alt="Matthieu Lempereur"/><br /><sub><b>Matthieu Lempereur</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=MrYamous" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/israeldatascience"><img src="https://avatars.githubusercontent.com/u/123495355?v=4?s=100" width="100px;" alt="Israel "/><br /><sub><b>Israel </b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=israeldatascience" title="Code">💻</a></td>
     </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://vedantmadane.github.io"><img src="https://avatars.githubusercontent.com/u/6527493?v=4?s=100" width="100px;" alt="Vedant Madane"/><br /><sub><b>Vedant Madane</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=VedantMadane" title="Code">💻</a></td>
+    </tr>
   </tbody>
 </table>
 
