@@ -1,19 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PageBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\EventListener\CommonStatsSubscriber;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PageBundle\Entity\Hit;
-use Mautic\PageBundle\Entity\Redirect;
-use Mautic\PageBundle\Entity\Trackable;
+use Mautic\PageBundle\Entity\RedirectRepository;
+use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Entity\VideoHit;
 
-class StatsSubscriber extends CommonStatsSubscriber
+final class StatsSubscriber extends CommonStatsSubscriber
 {
-    public function __construct(CorePermissions $security, EntityManager $entityManager)
-    {
+    public function __construct(
+        CorePermissions $security,
+        EntityManagerInterface $entityManager,
+        RedirectRepository $redirectRepository,
+        TrackableRepository $trackableRepository,
+    ) {
         parent::__construct($security, $entityManager);
         $this->addContactRestrictedRepositories(
             [
@@ -22,7 +28,7 @@ class StatsSubscriber extends CommonStatsSubscriber
             ]
         );
 
-        $this->repositories[] = $entityManager->getRepository(Redirect::class);
-        $this->repositories[] = $entityManager->getRepository(Trackable::class);
+        $this->repositories[] = $redirectRepository;
+        $this->repositories[] = $trackableRepository;
     }
 }

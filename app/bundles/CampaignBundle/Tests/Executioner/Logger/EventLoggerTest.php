@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Executioner\Logger;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -18,46 +20,28 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class EventLoggerTest extends TestCase
+final class EventLoggerTest extends TestCase
 {
     /**
-     * @var IpLookupHelper&MockObject
+     * @var MockObject&IpLookupHelper
      */
     private MockObject $ipLookupHelper;
 
     /**
-     * @var ContactTracker|MockObject
-     */
-    private MockObject $contactTracker;
-
-    /**
-     * @var LeadEventLogRepository|MockObject
+     * @var MockObject&LeadEventLogRepository
      */
     private MockObject $leadEventLogRepository;
 
     /**
-     * @var LeadRepository|MockObject
+     * @var MockObject&LeadRepository
      */
     private MockObject $leadRepository;
-
-    /**
-     * @var SummaryModel|MockObject
-     */
-    private MockObject $summaryModel;
-
-    /**
-     * @var CoreParametersHelper&MockObject
-     */
-    private MockObject $coreParametersHelper;
 
     protected function setUp(): void
     {
         $this->ipLookupHelper         = $this->createMock(IpLookupHelper::class);
-        $this->contactTracker         = $this->createMock(ContactTracker::class);
         $this->leadEventLogRepository = $this->createMock(LeadEventLogRepository::class);
         $this->leadRepository         = $this->createMock(LeadRepository::class);
-        $this->summaryModel           = $this->createMock(SummaryModel::class);
-        $this->coreParametersHelper   = $this->createMock(CoreParametersHelper::class);
     }
 
     public function testAllLogsAreReturnedWithFinalPersist(): void
@@ -81,7 +65,7 @@ class EventLoggerTest extends TestCase
 
         $persistedLogs = $logger->persistQueuedLogs();
 
-        $this->assertEquals($persistedLogs->count(), $logCollection->count());
+        $this->assertCount($persistedLogs->count(), $logCollection);
         $this->assertEquals($logCollection->getValues(), $persistedLogs->getValues());
     }
 
@@ -125,11 +109,11 @@ class EventLoggerTest extends TestCase
     {
         return new EventLogger(
             $this->ipLookupHelper,
-            $this->contactTracker,
+            $this->createStub(ContactTracker::class),
             $this->leadEventLogRepository,
             $this->leadRepository,
-            $this->summaryModel,
-            $this->coreParametersHelper
+            $this->createStub(SummaryModel::class),
+            $this->createStub(CoreParametersHelper::class)
         );
     }
 }

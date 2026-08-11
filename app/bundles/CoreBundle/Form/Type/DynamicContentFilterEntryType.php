@@ -6,7 +6,7 @@ use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\ListModel;
-use Mautic\StageBundle\Model\StageModel;
+use Mautic\StageBundle\Entity\StageRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -18,7 +18,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class DynamicContentFilterEntryType extends AbstractType
+final class DynamicContentFilterEntryType extends AbstractType
 {
     /**
      * @var mixed[]
@@ -28,27 +28,27 @@ class DynamicContentFilterEntryType extends AbstractType
     /**
      * @var mixed[]
      */
-    private array $countryChoices;
+    private readonly array $countryChoices;
 
     /**
      * @var mixed[]
      */
-    private array $regionChoices;
+    private readonly array $regionChoices;
 
     /**
      * @var mixed[]
      */
-    private array $timezoneChoices;
+    private readonly array $timezoneChoices;
 
     /**
      * @var mixed[]
      */
-    private array $localeChoices;
+    private readonly array $localeChoices;
 
     public function __construct(
         ListModel $listModel,
-        private StageModel $stageModel,
-        private BuilderIntegrationsHelper $builderIntegrationsHelper,
+        private readonly BuilderIntegrationsHelper $builderIntegrationsHelper,
+        private readonly StageRepository $stageRepository,
     ) {
         $this->fieldChoices = $listModel->getChoiceFields();
 
@@ -153,7 +153,7 @@ class DynamicContentFilterEntryType extends AbstractType
 
     private function getStageList(): array
     {
-        $stages = $this->stageModel->getRepository()->getSimpleList();
+        $stages = $this->stageRepository->getSimpleList();
 
         foreach ($stages as $stage) {
             $stages[$stage['value']] = $stage['label'];

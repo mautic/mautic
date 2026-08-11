@@ -15,12 +15,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class FilterOperatorProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|EventDispatcherInterface
+     * @var MockObject&EventDispatcherInterface
      */
     private MockObject $dispatcher;
 
     /**
-     * @var MockObject|TranslatorInterface
+     * @var MockObject&TranslatorInterface
      */
     private MockObject $translator;
 
@@ -43,7 +43,7 @@ final class FilterOperatorProviderTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                $this->callback(function (LeadListFiltersOperatorsEvent $event) {
+                $this->callback(function (LeadListFiltersOperatorsEvent $event): true {
                     // Emulate a subscriber.
                     $event->addOperator(
                         OperatorOptions::EQUAL_TO,

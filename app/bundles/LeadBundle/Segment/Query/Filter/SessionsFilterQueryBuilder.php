@@ -5,7 +5,7 @@ namespace Mautic\LeadBundle\Segment\Query\Filter;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
-class SessionsFilterQueryBuilder extends BaseFilterQueryBuilder
+final class SessionsFilterQueryBuilder extends BaseFilterQueryBuilder
 {
     public static function getServiceId(): string
     {
@@ -20,7 +20,7 @@ class SessionsFilterQueryBuilder extends BaseFilterQueryBuilder
         $expressionValueAlias = $this->generateRandomParameterName();
 
         $expressionOperator = $filter->getOperator();
-        $expression         = $queryBuilder->expr()->$expressionOperator('count(id)',
+        $expression         = $queryBuilder->expr()->{$expressionOperator}('count(id)',
             $filter->getParameterHolder($expressionValueAlias));
 
         $queryBuilder->setParameter($expressionValueAlias, (int) $filter->getParameterValue());
@@ -57,7 +57,7 @@ class SessionsFilterQueryBuilder extends BaseFilterQueryBuilder
             ->having($expression);
 
         $glue = $filter->getGlue().'Where';
-        $queryBuilder->$glue($queryBuilder->expr()->exists($sessionQueryBuilder->getSQL()));
+        $queryBuilder->{$glue}($queryBuilder->expr()->exists($sessionQueryBuilder->getSQL()));
 
         return $queryBuilder;
     }

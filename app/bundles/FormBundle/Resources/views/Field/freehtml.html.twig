@@ -22,7 +22,7 @@
           'name': inputName,
   }) %}
 {% endif %}
-{% if field.type not in ['checkboxgrp', 'radiogrp', 'textarea'] %}
+{% if field.type not in ['checkboxgrp', 'radiogrp', 'rating', 'textarea'] %}
   {% set inputAttributes = inputAttributes|merge({
           'value': field.defaultValue|default(''),
   }) %}

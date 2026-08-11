@@ -3,6 +3,18 @@
 	<!-- CSS-STYLE -->
 	<mj-style inline="inline"> p, li {margin:0 !important; padding:0; line-height: 1.4em;}
 	</mj-style>
+	<mj-attributes>
+	  <mj-all font-family="Ubuntu, Helvetica, Arial, sans-serif"></mj-all>
+	  <mj-text font-size="16px"></mj-text>
+	  <mj-button border-radius="3px" padding="10px 25px"></mj-button>
+	  <mj-section></mj-section>
+
+	  <mj-class name="t-body" font-size="16px"></mj-class>
+	  <mj-class name="t-btn" inner-padding="16px 32px"></mj-class>
+	  <mj-class name="t-btn-primary" background-color="#{{ getBrandPrimaryColor() }}" color="#{{ getTextOnBrandColor() }}" font-size="16px"></mj-class>
+	  <mj-class name="t-section"></mj-class>
+	  <mj-class name="t-surface-1" background-color="#ffffff"></mj-class>
+	</mj-attributes>
   </mj-head>
   <!-- BODY -->
   <mj-body background-color="#d0d0d0">
@@ -27,7 +39,7 @@
 		</mj-text>
 		<mj-spacer align="center">
 		</mj-spacer>
-		<mj-text font-size="16px" align="center">
+		<mj-text mj-class="t-body" align="center">
 		  <p>Design a standout email by strategically placing content blocks in key areas. Test different layouts to maximize reader engagement and conversion.
 		  </p>
 		  <p>
@@ -48,7 +60,7 @@
 		  <p>Showcase your best sellers here.
 		  </p>
 		</mj-text>
-		<mj-button href="https://" background-color="#{{ getBrandPrimaryColor() }}" color="#{{ getTextOnBrandColor() }}" inner-padding="16px 32px" border-radius="{{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px" font-size="16px">Button
+		<mj-button href="#" mj-class="t-btn t-btn-primary" border-radius="{{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px">Button
 		</mj-button>
 		<mj-spacer>
 		</mj-spacer>
@@ -60,7 +72,7 @@
 		  <p>Showcase your best sellers here.
 		  </p>
 		</mj-text>
-		<mj-button href="https://" background-color="#{{ getBrandPrimaryColor() }}" color="#{{ getTextOnBrandColor() }}" inner-padding="16px 32px" border-radius="{{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px" font-size="16px">Button
+		<mj-button href="#" mj-class="t-btn t-btn-primary" border-radius="{{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px">Button
 		</mj-button>
 		<mj-spacer>
 		</mj-spacer>
@@ -72,7 +84,7 @@
 		  <p>Showcase your best sellers here.
 		  </p>
 		</mj-text>
-		<mj-button href="https://" background-color="#{{ getBrandPrimaryColor() }}" color="#{{ getTextOnBrandColor() }}" inner-padding="16px 32px" border-radius="{{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px" font-size="16px">Button
+		<mj-button href="#" mj-class="t-btn t-btn-primary" border-radius="{{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px">Button
 		</mj-button>
 		<mj-spacer>
 		</mj-spacer>
@@ -80,7 +92,7 @@
 	</mj-section>
 	<mj-section background-color="#ffffff">
 	  <mj-column>
-		<mj-text font-size="16px" align="center">
+		<mj-text mj-class="t-body" align="center">
 		  <p>Design a standout email by strategically placing content blocks in key areas. Test different layouts to maximize reader engagement and conversion.
 		  </p>
 		  <p>
@@ -101,7 +113,7 @@
 		  <p>Showcase your best sellers here.
 		  </p>
 		</mj-text>
-		<mj-button href="https://" background-color="#{{ getBrandPrimaryColor() }}" color="#{{ getTextOnBrandColor() }}" inner-padding="16px 32px" border-radius="{{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px" font-size="16px">Button
+		<mj-button href="#" mj-class="t-btn t-btn-primary" border-radius="{{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px">Button
 		</mj-button>
 		<mj-spacer>
 		</mj-spacer>
@@ -113,7 +125,7 @@
 		  <p>Showcase your best sellers here.
 		  </p>
 		</mj-text>
-		<mj-button href="https://" background-color="#{{ getBrandPrimaryColor() }}" color="#{{ getTextOnBrandColor() }}" inner-padding="16px 32px" border-radius="{{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px" font-size="16px">Button
+		<mj-button href="#" mj-class="t-btn t-btn-primary" border-radius="{{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px">Button
 		</mj-button>
 		<mj-spacer>
 		</mj-spacer>
@@ -125,7 +137,7 @@
 		  <p>Showcase your best sellers here.
 		  </p>
 		</mj-text>
-		<mj-button href="https://" background-color="#{{ getBrandPrimaryColor() }}" color="#{{ getTextOnBrandColor() }}" inner-padding="16px 32px" border-radius="{{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px" font-size="16px">Button
+		<mj-button href="#" mj-class="t-btn t-btn-primary" border-radius="{{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px">Button
 		</mj-button>
 		<mj-spacer>
 		</mj-spacer>
@@ -139,7 +151,7 @@
 		</mj-image>
 		<mj-spacer>
 		</mj-spacer>
-		<mj-text font-family="Ubuntu, Helvetica, Arial, sans-serif" line-height="1.5" align="center" padding-top="0px" padding-bottom="0px" font-size="12px" color="#{{ getTextOnBrandColor() }}">
+		<mj-text line-height="1.5" align="center" padding-top="0px" padding-bottom="0px" font-size="12px" color="#{{ getTextOnBrandColor() }}">
 		  <p>{brand=name}
 			<br/>11111 Beautiful City, 1212 Nice Street
 			<br/>Brazil

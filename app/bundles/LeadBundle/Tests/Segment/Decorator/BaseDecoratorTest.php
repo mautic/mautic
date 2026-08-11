@@ -1,13 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Segment\Decorator;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterOperator;
 use Mautic\LeadBundle\Segment\Decorator\BaseDecorator;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(BaseDecorator::class)]
-class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
+#[CoversClass(BaseDecorator::class)]
+final class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetField(): void
     {
@@ -182,7 +185,7 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
             'filter' => '1',
         ]);
 
-        $this->assertSame(1.0, $baseDecorator->getParameterValue($contactSegmentFilterCrate));
+        $this->assertEqualsWithDelta(1.0, $baseDecorator->getParameterValue($contactSegmentFilterCrate), PHP_FLOAT_EPSILON);
     }
 
     public function testGetParameterValueLikeNoPercent(): void
@@ -355,13 +358,8 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $baseDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 
-    /**
-     * @return BaseDecorator
-     */
-    private function getDecorator()
+    private function getDecorator(): BaseDecorator
     {
-        $contactSegmentFilterOperator = $this->createMock(ContactSegmentFilterOperator::class);
-
-        return new BaseDecorator($contactSegmentFilterOperator);
+        return new BaseDecorator($this->createStub(ContactSegmentFilterOperator::class));
     }
 }

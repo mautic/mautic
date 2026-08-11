@@ -1,0 +1,25 @@
+@use 'sass:math';
+
+@function fade($color, $amount) {
+  @return rgba($color, math.div($amount, 100%));
+}
+
+@function mautic-luma-channel($channel) {
+  $channel: math.div($channel, 255);
+
+  @if $channel <= 0.03928 {
+    @return math.div($channel, 12.92);
+  }
+
+  @return math.pow(math.div($channel + 0.055, 1.055), 2.4);
+}
+
+@function mautic-contrast($color, $dark: #000, $light: #fff, $threshold: 43%) {
+  $luma: (mautic-luma-channel(red($color)) * 0.2126 + mautic-luma-channel(green($color)) * 0.7152 + mautic-luma-channel(blue($color)) * 0.0722) * 100%;
+
+  @if $luma > $threshold {
+    @return $dark;
+  }
+
+  @return $light;
+}

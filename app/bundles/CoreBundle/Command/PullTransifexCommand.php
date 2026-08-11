@@ -26,17 +26,26 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 #[AsCommand(
     name: PullTransifexCommand::NAME,
-    description: 'Fetches translations for Mautic from Transifex'
+    description: 'Fetches translations for Mautic from Transifex',
+    help: <<<'TXT'
+The <info>%command.name%</info> command is used to retrieve updated Mautic translations from Transifex and writes them to the filesystem.
+
+<info>php %command.full_name%</info>
+
+The command can optionally only pull files for a specific language with the --language option
+
+<info>php %command.full_name% --language=<language_code></info>
+TXT
 )]
-class PullTransifexCommand extends Command
+final class PullTransifexCommand extends Command
 {
     public const NAME = 'mautic:transifex:pull';
 
     public function __construct(
-        private TransifexFactory $transifexFactory,
-        private TranslatorInterface $translator,
-        private PathsHelper $pathsHelper,
-        private LanguageHelper $languageHelper,
+        private readonly TransifexFactory $transifexFactory,
+        private readonly TranslatorInterface $translator,
+        private readonly PathsHelper $pathsHelper,
+        private readonly LanguageHelper $languageHelper,
     ) {
         parent::__construct();
     }
@@ -46,17 +55,7 @@ class PullTransifexCommand extends Command
         $this
             ->addOption('language', null, InputOption::VALUE_OPTIONAL, 'Optional language to pull')
             ->addOption('bundle', null, InputOption::VALUE_OPTIONAL, 'Optional bundle to pull. Example value: WebhookBundle')
-            ->addOption('path', null, InputOption::VALUE_OPTIONAL, 'Optional path to a directory where to store the traslations.')
-            ->setHelp(<<<'EOT'
-The <info>%command.name%</info> command is used to retrieve updated Mautic translations from Transifex and writes them to the filesystem.
-
-<info>php %command.full_name%</info>
-
-The command can optionally only pull files for a specific language with the --language option
-
-<info>php %command.full_name% --language=<language_code></info>
-EOT
-            );
+            ->addOption('path', null, InputOption::VALUE_OPTIONAL, 'Optional path to a directory where to store the traslations.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -76,10 +75,8 @@ EOT
         }
 
         $statistics = $transifex->getConnector(Statistics::class);
-        \assert($statistics instanceof Statistics);
 
         $translations = $transifex->getConnector(Translations::class);
-        \assert($translations instanceof Translations);
 
         /** @var \SplQueue<Promise> $queue */
         $queue = new \SplQueue();

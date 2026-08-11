@@ -11,13 +11,20 @@ use Symfony\Component\HttpFoundation\Response;
 final class FileManagerControllerFunctionalTest extends MauticMysqlTestCase
 {
     private const ASSETS_ENDPOINT = '/s/grapesjsbuilder/media';
+
     private const UPLOAD_ENDPOINT = '/s/grapesjsbuilder/upload';
+
     private const DELETE_ENDPOINT = '/s/grapesjsbuilder/delete';
+
     private const IMAGE_COUNT     = 3;
+
     private const SVG_WIDTH       = 120;
+
     private const SVG_HEIGHT      = 80;
 
-    /** @var array<string> */
+    /**
+     * @var array<string>
+     */
     private array $tempFilePaths = [];
 
     protected function beforeTearDown(): void
@@ -33,7 +40,7 @@ final class FileManagerControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertUploadSuccessful($uploadedFiles);
 
         $newAssetCount = $this->getAssetCount();
-        $this->assertEquals($initialAssetCount + self::IMAGE_COUNT, $newAssetCount);
+        $this->assertSame($initialAssetCount + self::IMAGE_COUNT, $newAssetCount);
 
         $this->testPagination($newAssetCount);
         $this->testRecentlyAddedFilesAppearFirst($uploadedFiles);
@@ -41,7 +48,7 @@ final class FileManagerControllerFunctionalTest extends MauticMysqlTestCase
         $this->deleteUploadedFiles($uploadedFiles);
 
         $finalAssetCount = $this->getAssetCount();
-        $this->assertEquals($initialAssetCount, $finalAssetCount);
+        $this->assertSame($initialAssetCount, $finalAssetCount);
     }
 
     public function testUploadedSvgIsReturnedInMediaList(): void
@@ -148,7 +155,7 @@ final class FileManagerControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertNotEmpty($content['data']);
 
         $assetList         = $content['data'];
-        $uploadedFileNames = array_map([$this, 'getFileNameFromUrl'], $uploadedFiles);
+        $uploadedFileNames = array_map($this->getFileNameFromUrl(...), $uploadedFiles);
 
         // Check if the first 'IMAGE_COUNT' assets in the list are the recently uploaded files
         for ($i = 0; $i < self::IMAGE_COUNT; ++$i) {

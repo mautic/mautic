@@ -2,7 +2,6 @@
 
 namespace MauticPlugin\MauticCrmBundle\EventListener;
 
-use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\ListPreProcessListEvent;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
@@ -13,7 +12,7 @@ use MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class LeadListSubscriber implements EventSubscriberInterface
+final readonly class LeadListSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private IntegrationHelper $helper,
@@ -49,7 +48,7 @@ class LeadListSubscriber implements EventSubscriberInterface
                     if ('Salesforce' !== $integrationName) {
                         array_walk(
                             $integrationChoices,
-                            function (&$choice) use ($integrationName): void {
+                            function (array &$choice) use ($integrationName): void {
                                 $choice['value'] = $integrationName.'::'.$choice['value'];
                             }
                         );
@@ -64,7 +63,7 @@ class LeadListSubscriber implements EventSubscriberInterface
             }
         }
 
-        if (!empty($choices)) {
+        if ([] !== $choices) {
             $config = [
                 'label'      => $this->translator->trans('mautic.plugin.integration.campaign_members'),
                 'properties' => ['type' => 'select', 'list' => $choices],
@@ -84,12 +83,12 @@ class LeadListSubscriber implements EventSubscriberInterface
     /**
      * Add/remove contacts to a segment based on contacts found in Integration Campaigns.
      */
-    public function onLeadListProcessList(ListPreProcessListEvent $event)
+    public function onLeadListProcessList(ListPreProcessListEvent $event): void
     {
         // get Integration Campaign members
         $list    = $event->getList();
         $success = false;
-        $filters = ($list instanceof LeadList) ? $list->getFilters() : $list['filters'];
+        $filters = $list['filters'];
 
         foreach ($filters as $filter) {
             if ('integration_campaigns' == $filter['field']) {
@@ -116,6 +115,6 @@ class LeadListSubscriber implements EventSubscriberInterface
             }
         }
 
-        return $event->setResult($success);
+        $event->setResult($success);
     }
 }

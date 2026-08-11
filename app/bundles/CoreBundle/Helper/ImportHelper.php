@@ -7,7 +7,7 @@ namespace Mautic\CoreBundle\Helper;
 class ImportHelper
 {
     public function __construct(
-        private PathsHelper $pathsHelper,
+        private readonly PathsHelper $pathsHelper,
     ) {
     }
 
@@ -216,7 +216,7 @@ class ImportHelper
                 continue;
             }
             if ('..' === $segment) {
-                if (!empty($parts)) {
+                if ([] !== $parts) {
                     array_pop($parts);
                 } else {
                     // Cannot resolve upward — preserve so callers detect traversal.
@@ -231,7 +231,7 @@ class ImportHelper
     }
 
     /**
-     * @param array<string, string|array<mixed, mixed>> &$input
+     * @param array<string, string|array<mixed, mixed>> $input
      */
     public function recursiveRemoveEmailaddress(array &$input): void
     {

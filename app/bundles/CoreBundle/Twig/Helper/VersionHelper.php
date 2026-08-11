@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Twig\Helper;
 
 use Mautic\CoreBundle\Helper\AppVersion;
@@ -7,7 +9,7 @@ use Mautic\CoreBundle\Helper\AppVersion;
 /**
  * final class VersionHelper.
  */
-final class VersionHelper
+final readonly class VersionHelper
 {
     public function __construct(
         private AppVersion $appVersion,

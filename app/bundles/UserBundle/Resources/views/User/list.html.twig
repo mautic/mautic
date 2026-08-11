@@ -11,6 +11,19 @@
 {% block content %}
 	{% if isIndex %}
 	<div id="page-list-wrapper" class="panel panel-default">
+		{%- set pageButtons = [] %}
+		{% if permissions.create %}
+			{% set pageButtons = pageButtons|merge([{
+				'attr': {
+					'class': 'btn btn-ghost btn--icon-only btn-nospin',
+					'href': '#InviteUserModal',
+					'data-toggle': 'modal',
+				},
+				'iconClass': 'ri-team-line',
+				'tooltip': 'mautic.user.profile.invite',
+				'primary': true,
+			}]) %}
+		{% endif %}
 		{{- include('@MauticCore/Helper/list_toolbar.html.twig', {
 			'searchValue': searchValue,
 			'action': currentRoute,
@@ -20,6 +33,7 @@
 				},
 				'routeBase': 'user',
 				'langVar': 'user.user',
+				'customButtons': pageButtons,
 			},
 			'bulk_actions': {
 				'routeBase': 'user',
@@ -55,6 +69,35 @@
 	</div>
 	{% else %}
 		{{ block('listResults') }}
+	{% endif %}
+
+	{% if isIndex and permissions.create and inviteForm %}
+		{% set modalAttributes = {} %}
+		{% if app.request.query.get('open') == 'invite' %}
+			{% set modalAttributes = modalAttributes|merge({'data-auto-open': 'true'}) %}
+		{% endif %}
+
+		{% include '@MauticCore/Components/modal.html.twig' with {
+			id: 'InviteUserModal',
+			modalLabel: 'mautic.user.invite.title',
+			modalContent: include('@MauticUser/User/invite.html.twig', { form: inviteForm }),
+			type: 'expressive',
+			modalAttributes: modalAttributes,
+			buttons: [
+				{
+					'label': 'mautic.core.form.cancel'|trans,
+					'variant': 'secondary',
+					'attributes': {
+						'data-dismiss': 'modal'
+					}
+				},
+				{
+					'label': 'mautic.user.invite.send'|trans,
+					'variant': 'primary',
+					'onclick': "mQuery('#InviteUserModal').find('#invite-user-form button[type=submit]').trigger('click');"
+				}
+			]
+		} %}
 	{% endif %}
 {% endblock %}
 

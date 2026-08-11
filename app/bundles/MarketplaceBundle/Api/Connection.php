@@ -13,8 +13,8 @@ use Psr\Log\LoggerInterface;
 class Connection
 {
     public function __construct(
-        private ClientInterface $httpClient,
-        private LoggerInterface $logger,
+        private readonly ClientInterface $httpClient,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -43,7 +43,7 @@ class Connection
         try {
             $response = $this->httpClient->send($request);
         } catch (GuzzleException $e) {
-            throw new ApiException($e->getMessage(), $e->getCode());
+            throw new ApiException($e->getMessage(), $e->getCode(), $e);
         }
 
         $body = (string) $response->getBody();

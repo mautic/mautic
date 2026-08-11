@@ -1,12 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\AssetBundle\Tests\Controller;
 
 use Mautic\AssetBundle\Entity\Download;
 use Mautic\AssetBundle\Tests\Asset\AbstractAssetTestCase;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\HttpFoundation\Response;
 
-class PublicControllerFunctionalTest extends AbstractAssetTestCase
+final class PublicControllerFunctionalTest extends AbstractAssetTestCase
 {
     /**
      * Download action should return the file content.
@@ -23,7 +26,7 @@ class PublicControllerFunctionalTest extends AbstractAssetTestCase
         $this->assertResponseIsSuccessful();
         $this->assertSame($this->expectedMimeType, $response->headers->get('Content-Type'));
         $this->assertNotSame($this->expectedContentDisposition.$this->asset->getOriginalFileName(), $response->headers->get('Content-Disposition'));
-        $this->assertEquals($this->expectedPngContent, $content);
+        $this->assertSame($this->expectedPngContent, $content);
     }
 
     /**
@@ -40,7 +43,7 @@ class PublicControllerFunctionalTest extends AbstractAssetTestCase
 
         $this->assertResponseIsSuccessful();
         $this->assertStringStartsWith($this->expectedContentDisposition.$this->asset->getOriginalFileName(), $response->headers->get('Content-Disposition'));
-        $this->assertEquals($this->expectedPngContent, $content);
+        $this->assertSame($this->expectedPngContent, $content);
     }
 
     /**
@@ -59,7 +62,7 @@ class PublicControllerFunctionalTest extends AbstractAssetTestCase
 
         $this->assertResponseIsSuccessful();
         $this->assertStringStartsWith($this->expectedContentDisposition.$this->asset->getOriginalFileName(), $response->headers->get('Content-Disposition'));
-        $this->assertEquals($this->expectedPngContent, $content);
+        $this->assertSame($this->expectedPngContent, $content);
     }
 
     /**
@@ -80,12 +83,12 @@ class PublicControllerFunctionalTest extends AbstractAssetTestCase
         $this->assertResponseIsSuccessful();
         $this->assertSame($this->expectedMimeType, $response->headers->get('Content-Type'));
         $this->assertNotSame($this->expectedContentDisposition.$this->asset->getOriginalFileName(), $response->headers->get('Content-Disposition'));
-        $this->assertEquals($this->expectedPngContent, $content);
+        $this->assertSame($this->expectedPngContent, $content);
 
         $downloadRepo = $this->em->getRepository(Download::class);
 
         $download = $downloadRepo->findOneBy(['asset' => $this->asset]);
-        \assert($download instanceof Download);
+        $this->assertInstanceOf(Download::class, $download);
         $this->assertSame('test2', $download->getUtmSource());
         $this->assertSame('test3', $download->getUtmMedium());
         $this->assertSame('test4', $download->getUtmTerm());
@@ -133,7 +136,8 @@ class PublicControllerFunctionalTest extends AbstractAssetTestCase
     {
         $this->logoutUser();
         $asset                = $this->createAsset(['title' => 'Missing Local File Asset']);
-        $coreParametersHelper = static::getContainer()->get('mautic.helper.core_parameters');
+        /** @var CoreParametersHelper $coreParametersHelper */
+        $coreParametersHelper = self::getContainer()->get(CoreParametersHelper::class);
         $asset->setUploadDir($coreParametersHelper->get('upload_dir'));
         $this->em->flush();
 

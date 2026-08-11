@@ -24,12 +24,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class ConfigType extends AbstractType
+final class ConfigType extends AbstractType
 {
     public const MINIFY_EMAIL_HTML = 'minify_email_html';
 
     public function __construct(
-        private TranslatorInterface $translator,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -245,9 +245,7 @@ class ConfigType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]
@@ -266,11 +264,27 @@ class ConfigType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.email.required',
-                        ]
+                        message: 'mautic.core.email.required'
                     ),
-                    new EmailOrEmailTokenList(['allowMultiple' => false]),
+                    new EmailOrEmailTokenList(allowMultiple: false),
+                ],
+            ]
+        );
+
+        $builder->add(
+            'mailer_reply_to_email',
+            TextType::class,
+            [
+                'label'       => 'mautic.email.reply_to_email',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => [
+                    'class'    => 'form-control',
+                    'tooltip'  => 'mautic.email.reply_to_email.tooltip',
+                    'onchange' => 'Mautic.disableSendTestEmailButton(this)',
+                ],
+                'required'    => false,
+                'constraints' => [
+                    new Email(message: 'mautic.core.email.required', mode: Email::VALIDATION_MODE_HTML5),
                 ],
             ]
         );
@@ -289,32 +303,7 @@ class ConfigType extends AbstractType
                 'required'    => false,
                 'constraints' => [
                     new Email(
-                        [
-                            'message' => 'mautic.core.email.required',
-                            'mode'    => Email::VALIDATION_MODE_HTML5,
-                        ]
-                    ),
-                ],
-            ]
-        );
-
-        $builder->add(
-            'mailer_reply_to_email',
-            TextType::class,
-            [
-                'label'       => 'mautic.email.reply_to_email',
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => [
-                    'class'    => 'form-control',
-                    'tooltip'  => 'mautic.email.reply_to_email.tooltip',
-                    'onchange' => 'Mautic.disableSendTestEmailButton(this)',
-                ],
-                'required'    => false,
-                'constraints' => [
-                    new Email(
-                        [
-                            'message' => 'mautic.core.email.required',
-                        ]
+                        message: 'mautic.core.email.required'
                     ),
                 ],
             ]
@@ -372,7 +361,7 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.mailer.convert.embed.images.tooltip',
                 ],
-                'data'       => empty($options['data']['mailer_convert_embed_images']) ? false : true,
+                'data'       => !empty($options['data']['mailer_convert_embed_images']),
                 'required'   => false,
             ]
         );
@@ -387,7 +376,7 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.mailer.append.tracking.pixel.tooltip',
                 ],
-                'data'       => empty($options['data']['mailer_append_tracking_pixel']) ? false : true,
+                'data'       => !empty($options['data']['mailer_append_tracking_pixel']),
                 'required'   => false,
             ]
         );
@@ -402,7 +391,7 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.mailer.disable.trackable.urls.tooltip',
                 ],
-                'data'       => empty($options['data']['disable_trackable_urls']) ? false : true,
+                'data'       => !empty($options['data']['disable_trackable_urls']),
                 'required'   => false,
             ]
         );
@@ -473,7 +462,7 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.mailer.is.owner.tooltip',
                 ],
-                'data'       => empty($options['data']['mailer_is_owner']) ? false : true,
+                'data'       => !empty($options['data']['mailer_is_owner']),
                 'required'   => false,
             ]
         );
@@ -519,7 +508,7 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.show.contact.segments.tooltip',
                 ],
-                'data'       => empty($options['data']['show_contact_segments']) ? false : true,
+                'data'       => !empty($options['data']['show_contact_segments']),
                 'required'   => false,
             ]
         );
@@ -533,7 +522,7 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.show.preference.options.tooltip',
                 ],
-                'data'       => empty($options['data']['show_contact_preferences']) ? false : true,
+                'data'       => !empty($options['data']['show_contact_preferences']),
                 'required'   => false,
             ]
         );
@@ -547,7 +536,7 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.show.contact.frequency.tooltip',
                 ],
-                'data'       => empty($options['data']['show_contact_frequency']) ? false : true,
+                'data'       => !empty($options['data']['show_contact_frequency']),
                 'required'   => false,
             ]
         );
@@ -561,7 +550,7 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.show.contact.pause.dates.tooltip',
                 ],
-                'data'       => empty($options['data']['show_contact_pause_dates']) ? false : true,
+                'data'       => !empty($options['data']['show_contact_pause_dates']),
                 'required'   => false,
             ]
         );
@@ -575,7 +564,7 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.show.contact.categories.tooltip',
                 ],
-                'data'       => empty($options['data']['show_contact_categories']) ? false : true,
+                'data'       => !empty($options['data']['show_contact_categories']),
                 'required'   => false,
             ]
         );
@@ -589,7 +578,7 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.show.contact.preferred.channels',
                 ],
-                'data'       => empty($options['data']['show_contact_preferred_channels']) ? false : true,
+                'data'       => !empty($options['data']['show_contact_preferred_channels']),
                 'required'   => false,
             ]
         );

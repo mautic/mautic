@@ -61,13 +61,11 @@ final class SmsTranslationFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<string, array{string, bool, string}>
+     * @return \Iterator<string, array{string, bool, string}>
      */
-    public static function smsTimelineStatusProvider(): array
+    public static function smsTimelineStatusProvider(): \Iterator
     {
-        return [
-            'sent'      => ['sent', false, 'Text Message Sent'],
-            'failed'    => ['failed', true, 'Text Message Failed'],
-        ];
+        yield 'sent' => ['sent', false, 'Text Message Sent'];
+        yield 'failed' => ['failed', true, 'Text Message Failed'];
     }
 }

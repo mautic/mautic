@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -16,49 +18,37 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class SegmentSubscriberTest extends TestCase
+final class SegmentSubscriberTest extends TestCase
 {
     /**
-     * @var IpLookupHelper&MockObject
+     * @var MockObject&IpLookupHelper
      */
     private MockObject $ipLookupHelper;
 
     /**
-     * @var AuditLogModel&MockObject
+     * @var MockObject&AuditLogModel
      */
     private MockObject $auditLogModel;
 
     /**
-     * @var ListModel&MockObject
+     * @var MockObject&ListModel
      */
     private MockObject $listModel;
 
-    /**
-     * @var TranslatorInterface&MockObject
-     */
-    private MockObject $translator;
-
     private CoreParametersHelper&MockObject $coreParametersHelper;
 
-    private SegmentCountCacheHelper&MockObject $segmentCountCacheHelper;
+    private SegmentCountCacheHelper&\PHPUnit\Framework\MockObject\Stub $segmentCountCacheHelper;
 
-    /**
-     * @var SegmentUsedInCampaignsValidator&MockObject
-     */
-    private MockObject $segmentUsedInCampaignsValidator;
-
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->ipLookupHelper                  = $this->createMock(IpLookupHelper::class);
         $this->auditLogModel                   = $this->createMock(AuditLogModel::class);
         $this->listModel                       = $this->createMock(ListModel::class);
-        $this->segmentUsedInCampaignsValidator = $this->createMock(SegmentUsedInCampaignsValidator::class);
-        $this->translator                      = $this->createMock(TranslatorInterface::class);
         $this->coreParametersHelper            = $this->createMock(CoreParametersHelper::class);
-        $this->segmentCountCacheHelper         = $this->createMock(SegmentCountCacheHelper::class);
-        $this->coreParametersHelper->method('get')->willReturnCallback(fn () => false);
+        $this->segmentCountCacheHelper         = $this->createStub(SegmentCountCacheHelper::class);
+        $this->coreParametersHelper->method('get')->willReturnCallback(fn (): false => false);
     }
 
     public function testGetSubscribedEvents(): void
@@ -67,13 +57,13 @@ class SegmentSubscriberTest extends TestCase
             $this->ipLookupHelper,
             $this->auditLogModel,
             $this->listModel,
-            $this->segmentUsedInCampaignsValidator,
+            $this->createStub(SegmentUsedInCampaignsValidator::class),
             $this->coreParametersHelper,
             $this->segmentCountCacheHelper,
-            $this->translator
+            $this->createStub(TranslatorInterface::class)
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 LeadEvents::LIST_POST_SAVE     => ['onSegmentPostSave', 0],
                 LeadEvents::ON_LIST_DELETE     => ['onSegmentDelete', 0],
@@ -124,10 +114,10 @@ class SegmentSubscriberTest extends TestCase
             $this->ipLookupHelper,
             $this->auditLogModel,
             $this->listModel,
-            $this->segmentUsedInCampaignsValidator,
+            $this->createStub(SegmentUsedInCampaignsValidator::class),
             $this->coreParametersHelper,
             $this->segmentCountCacheHelper,
-            $this->translator
+            $this->createStub(TranslatorInterface::class)
         );
 
         $segment            = $this->createMock(LeadList::class);
@@ -159,10 +149,10 @@ class SegmentSubscriberTest extends TestCase
             $this->ipLookupHelper,
             $this->auditLogModel,
             $this->listModel,
-            $this->segmentUsedInCampaignsValidator,
+            $this->createStub(SegmentUsedInCampaignsValidator::class),
             $this->coreParametersHelper,
             $this->segmentCountCacheHelper,
-            $this->translator
+            $this->createStub(TranslatorInterface::class)
         );
 
         $segment            = $this->createMock(LeadList::class);
@@ -182,10 +172,8 @@ class SegmentSubscriberTest extends TestCase
 
     /**
      * Test create or update segment logging.
-     *
-     * @param bool $isNew
      */
-    private function onSegmentPostSaveMethodCall($isNew): void
+    private function onSegmentPostSaveMethodCall(bool $isNew): void
     {
         $segmentId = 1;
         $changes   = ['changes'];
@@ -214,10 +202,10 @@ class SegmentSubscriberTest extends TestCase
             $ipLookupHelper,
             $auditLogModel,
             $this->listModel,
-            $this->segmentUsedInCampaignsValidator,
+            $this->createStub(SegmentUsedInCampaignsValidator::class),
             $this->coreParametersHelper,
             $this->segmentCountCacheHelper,
-            $this->translator
+            $this->createStub(TranslatorInterface::class)
         );
 
         $segment = $this->createMock(LeadList::class);

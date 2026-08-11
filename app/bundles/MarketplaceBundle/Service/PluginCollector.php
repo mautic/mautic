@@ -9,7 +9,7 @@ use Mautic\MarketplaceBundle\Api\Connection;
 use Mautic\MarketplaceBundle\Collection\PackageCollection;
 use Mautic\MarketplaceBundle\DTO\AllowlistEntry;
 
-class PluginCollector
+final class PluginCollector
 {
     /**
      * @var AllowlistEntry[]
@@ -19,8 +19,8 @@ class PluginCollector
     private int $total = 0;
 
     public function __construct(
-        private Connection $connection,
-        private Allowlist $allowlist,
+        private readonly Connection $connection,
+        private readonly Allowlist $allowlist,
     ) {
     }
 
@@ -28,7 +28,7 @@ class PluginCollector
     {
         $allowlist = $this->allowlist->getAllowList();
 
-        if (!empty($allowlist)) {
+        if ($allowlist instanceof \Mautic\MarketplaceBundle\DTO\Allowlist) {
             $this->allowlistedPackages = $this->filterAllowlistedPackagesForCurrentMauticVersion($allowlist->entries);
             $payload                   = $this->getAllowlistedPackages($page, $limit);
         } else {
@@ -62,14 +62,7 @@ class PluginCollector
                 return false;
             }
 
-            if (
-                !empty($entry->maximumMauticVersion)
-                && !version_compare($mauticVersion, $entry->maximumMauticVersion, '<=')
-            ) {
-                return false;
-            }
-
-            return true;
+            return empty($entry->maximumMauticVersion) || version_compare($mauticVersion, $entry->maximumMauticVersion, '<=');
         });
     }
 

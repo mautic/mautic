@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Helper\Chart;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
@@ -13,7 +14,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
  */
 class ChartQuery extends AbstractChart
 {
-    private DateTimeHelper $dateTimeHelper;
+    private readonly DateTimeHelper $dateTimeHelper;
 
     private ?GeneratedColumnsProviderInterface $generatedColumnProvider = null;
 
@@ -106,7 +107,8 @@ class ChartQuery extends AbstractChart
                     $column = str_replace('t.', '', $column);
                     $valId  = str_replace('t.', '', $valId);
                     if (is_array($value)) {
-                        $query->andWhere($query->expr()->in('t.'.$column, $value));
+                        $query->andWhere($query->expr()->in('t.'.$column, ":{$valId}"));
+                        $query->setParameter($valId, array_map(strval(...), $value), ArrayParameterType::STRING);
                     } else {
                         $query->andWhere('t.'.$column.' = :'.$valId);
                         $query->setParameter($valId, $value);
@@ -295,7 +297,7 @@ class ChartQuery extends AbstractChart
     /**
      * Go through the raw data and add the missing times.
      */
-    public function completeTimeData($rawData, $countAverage = false): array
+    public function completeTimeData(array $rawData, $countAverage = false): array
     {
         $data          = [];
         $averageCounts = [];
@@ -413,19 +415,19 @@ class ChartQuery extends AbstractChart
     /**
      * Count occurences of a value in a column.
      *
-     * @param string $table        without prefix
-     * @param string $uniqueColumn name
-     * @param string $dateColumn   name
-     * @param array  $filters      will be added to where claues
-     * @param array  $options      for special behavior
+     * @param string  $table        without prefix
+     * @param string  $uniqueColumn name
+     * @param string  $dateColumn   name
+     * @param mixed[] $filters      will be added to where claues
+     * @param mixed[] $options      for special behavior
      *
-     * @return QueryBuilder $query
+     * @return QueryBuilder
      */
-    public function getCountQuery($table, $uniqueColumn, $dateColumn = null, $filters = [], $options = [], $tablePrefix = 't')
+    public function getCountQuery($table, $uniqueColumn, $dateColumn = null, $filters = [], array $options = [], $tablePrefix = 't')
     {
         $query = $this->connection->createQueryBuilder();
         $query->from($this->prepareTable($table), $tablePrefix);
-        $this->modifyCountQuery($query, $uniqueColumn, $dateColumn, $tablePrefix);
+        $this->modifyCountQuery($query, $uniqueColumn, $options, $tablePrefix);
         $this->applyFilters($query, $filters);
         $this->applyDateFilters($query, $dateColumn);
 
@@ -439,7 +441,7 @@ class ChartQuery extends AbstractChart
      * @param array  $options      for special behavior
      * @param string $tablePrefix
      */
-    public function modifyCountQuery(QueryBuilder &$query, $uniqueColumn, $options = [], $tablePrefix = 't')
+    public function modifyCountQuery(QueryBuilder &$query, $uniqueColumn, array $options = [], $tablePrefix = 't')
     {
         $query->select('COUNT('.$tablePrefix.'.'.$uniqueColumn.') AS count');
 
@@ -506,7 +508,7 @@ class ChartQuery extends AbstractChart
      * @param array  $filters     will be added to where claues
      * @param string $tablePrefix
      *
-     * @return QueryBuilder $query
+     * @return QueryBuilder
      */
     public function getCountDateDiffQuery($table, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $filters = [], $tablePrefix = 't')
     {
@@ -581,7 +583,7 @@ class ChartQuery extends AbstractChart
         $dbUnit                = $this->translateTimeUnit($this->unit);
         $columnName            = $tablePrefix.'.'.$column;
         $defaultTimezoneOffset = $this->dateTimeHelper->getLocalTimezoneOffset();
-        $columnName            = "CONVERT_TZ($columnName, '+00:00', '{$defaultTimezoneOffset}')";
+        $columnName            = "CONVERT_TZ({$columnName}, '+00:00', '{$defaultTimezoneOffset}')";
 
         return 'DATE_FORMAT('.$columnName.', \''.$dbUnit.'\')';
     }

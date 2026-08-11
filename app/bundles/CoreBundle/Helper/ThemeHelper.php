@@ -14,7 +14,9 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
+use Twig\Error\RuntimeError;
 use Twig\Extension\SandboxExtension;
+use Twig\RuntimeLoader\RuntimeLoaderInterface;
 
 class ThemeHelper implements ThemeHelperInterface
 {
@@ -42,11 +44,12 @@ class ThemeHelper implements ThemeHelperInterface
      */
     private array $themeHelpers = [];
 
-    private Filesystem $filesystem;
+    private readonly Filesystem $filesystem;
 
-    private Finder $finder;
+    private readonly Finder $finder;
 
     private bool $themesLoadedFromFilesystem = false;
+
     private ?Environment $sandboxEnv         = null;
 
     /**
@@ -104,13 +107,13 @@ class ThemeHelper implements ThemeHelperInterface
     private array $hiddenThemes = [];
 
     public function __construct(
-        private PathsHelper $pathsHelper,
-        private Environment $twig,
-        private TranslatorInterface $translator,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly PathsHelper $pathsHelper,
+        private readonly Environment $twig,
+        private readonly TranslatorInterface $translator,
+        private readonly CoreParametersHelper $coreParametersHelper,
         Filesystem $filesystem,
         Finder $finder,
-        private BuilderIntegrationsHelper $builderIntegrationsHelper,
+        private readonly BuilderIntegrationsHelper $builderIntegrationsHelper,
     ) {
         $this->filesystem                = clone $filesystem;
         $this->finder                    = clone $finder;
@@ -143,12 +146,7 @@ class ThemeHelper implements ThemeHelperInterface
         return new twigThemeHelper($this->pathsHelper, $themeName);
     }
 
-    /**
-     * @param string $newName
-     *
-     * @return string
-     */
-    private function getDirectoryName($newName)
+    private function getDirectoryName(string $newName): string
     {
         return InputHelper::filename(str_replace(' ', '-', $newName));
     }
@@ -174,7 +172,7 @@ class ThemeHelper implements ThemeHelperInterface
         $dirName = $this->getDirectoryName($newDirName ?? $newName);
 
         if ($this->filesystem->exists($root.$dirName)) {
-            throw new FileExistsException("$dirName already exists");
+            throw new FileExistsException("{$dirName} already exists");
         }
 
         $this->filesystem->mirror($root.$theme, $root.$dirName);
@@ -195,7 +193,7 @@ class ThemeHelper implements ThemeHelperInterface
         $dirName = $this->getDirectoryName($newName);
 
         if ($this->filesystem->exists($root.$dirName)) {
-            throw new FileExistsException("$dirName already exists");
+            throw new FileExistsException("{$dirName} already exists");
         }
 
         $this->filesystem->rename($root.$theme, $root.$dirName);
@@ -213,7 +211,7 @@ class ThemeHelper implements ThemeHelperInterface
             throw new FileNotFoundException($theme.' not found!');
         }
 
-        if (in_array($theme, $this->getDefaultThemes(), true)) {
+        if (in_array($theme, $this->defaultThemes, true)) {
             $this->addToHidden($theme);
 
             return;
@@ -331,7 +329,7 @@ class ThemeHelper implements ThemeHelperInterface
 
         $themeName = basename($zipFile, '.zip');
 
-        if (in_array($themeName, $this->getDefaultThemes())) {
+        if (in_array($themeName, $this->defaultThemes)) {
             throw new \Exception($this->translator->trans('mautic.core.theme.default.cannot.overwrite', ['%name%' => $themeName], 'validators'));
         }
 
@@ -431,6 +429,31 @@ class ThemeHelper implements ThemeHelperInterface
                     $this->sandboxEnv->addExtension($extension);
                 }
             }
+
+            $this->sandboxEnv->addRuntimeLoader(new class($this->twig) implements RuntimeLoaderInterface {
+                public function __construct(
+                    private readonly Environment $twig,
+                ) {
+                }
+
+                /**
+                 * @template TRuntime of object
+                 *
+                 * @param class-string<TRuntime> $class
+                 *
+                 * @return TRuntime|null
+                 */
+                public function load(string $class): ?object
+                {
+                    try {
+                        $runtime = $this->twig->getRuntime($class);
+                    } catch (RuntimeError) {
+                        return null;
+                    }
+
+                    return is_object($runtime) ? $runtime : null;
+                }
+            });
 
             $this->sandboxEnv->addExtension(new SandboxExtension(new ThemeSandboxPolicy(), true));
         }
@@ -625,7 +648,7 @@ class ThemeHelper implements ThemeHelperInterface
             return [];
         }
 
-        return $this->hiddenThemes = array_map(fn ($item) => trim($item), explode('|', $this->filesystem->readFile($hidden)));
+        return $this->hiddenThemes = array_map(trim(...), explode('|', $this->filesystem->readFile($hidden)));
     }
 
     /**
@@ -656,7 +679,7 @@ class ThemeHelper implements ThemeHelperInterface
      */
     public function toggleVisibility(string $themeName): void
     {
-        if (!in_array($themeName, $this->getDefaultThemes(), true)) {
+        if (!in_array($themeName, $this->defaultThemes, true)) {
             return;
         }
 
@@ -708,7 +731,7 @@ class ThemeHelper implements ThemeHelperInterface
         if (false !== $keyToRemove) {
             unset($hiddenThemes[$keyToRemove]);
 
-            if (empty($hiddenThemes)) {
+            if ([] === $hiddenThemes) {
                 $this->filesystem->remove($hidden);
             } else {
                 $this->filesystem->dumpFile($hidden, sprintf('|%s', implode('|', $hiddenThemes)));

@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Segment;
 
-class OperatorOptions
+final class OperatorOptions
 {
     public const EQUAL_TO              = '=';
 
@@ -57,6 +59,10 @@ class OperatorOptions
     public const ENDS_WITH             = 'endsWith';
 
     public const CONTAINS              = 'contains';
+
+    public const IN_LAST               = 'inLast';
+
+    public const IN_NEXT               = 'inNext';
 
     /**
      * @var array<string,array<string,string|bool>>
@@ -124,6 +130,16 @@ class OperatorOptions
             'negate_expr' => 'between',
             'hide'        => true,
         ],
+        self::IN_LAST => [
+            'label'       => 'mautic.lead.list.form.operator.inlast',
+            'expr'        => 'inLast',
+            'negate_expr' => 'inNext',
+        ],
+        self::IN_NEXT => [
+            'label'       => 'mautic.lead.list.form.operator.innext',
+            'expr'        => 'inNext',
+            'negate_expr' => 'inLast',
+        ],
         self::INCLUDING_ANY => [
             'label'       => 'mautic.lead.list.form.operator.in',
             'expr'        => 'in',
@@ -180,7 +196,7 @@ class OperatorOptions
     /**
      * @return array<string,array<string,string>>
      */
-    public static function getFilterExpressionFunctions()
+    public static function getFilterExpressionFunctions(): array
     {
         return self::$operatorOptions;
     }
@@ -188,7 +204,7 @@ class OperatorOptions
     /**
      * @return array<string,array<string,string>>
      */
-    public function getFilterExpressionFunctionsNonStatic()
+    public function getFilterExpressionFunctionsNonStatic(): array
     {
         return self::$operatorOptions;
     }

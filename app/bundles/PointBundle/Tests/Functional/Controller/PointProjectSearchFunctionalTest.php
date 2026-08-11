@@ -6,10 +6,11 @@ namespace Mautic\PointBundle\Tests\Functional\Controller;
 
 use Mautic\PointBundle\Entity\Point;
 use Mautic\ProjectBundle\Tests\Functional\AbstractProjectSearchTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class PointProjectSearchFunctionalTest extends AbstractProjectSearchTestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('searchDataProvider')]
+    #[DataProvider('searchDataProvider')]
     public function testProjectSearch(string $searchTerm, array $expectedEntities, array $unexpectedEntities): void
     {
         $projectOne   = $this->createProject('Project One');

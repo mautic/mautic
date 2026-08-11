@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -9,9 +11,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class YesNoButtonGroupType extends AbstractType
+final class YesNoButtonGroupType extends AbstractType
 {
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return ButtonGroupType::class;
     }
@@ -29,7 +31,7 @@ class YesNoButtonGroupType extends AbstractType
                     $options['no_label']  => $options['no_value'],
                     $options['yes_label'] => $options['yes_value'],
                 ],
-                'choice_value'      => function ($choiceKey) {
+                'choice_value'      => function ($choiceKey): string|int|null {
                     if (null === $choiceKey || '' === $choiceKey) {
                         return null;
                     }

@@ -9,7 +9,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class EmailOpenType extends AbstractType
+final class EmailOpenType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

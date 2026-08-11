@@ -30,12 +30,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\Session;
 
-class ConfigController extends AbstractFormController
+final class ConfigController extends AbstractFormController
 {
     /**
      * @var BasicIntegration|ConfigFormInterface
@@ -47,9 +45,6 @@ class ConfigController extends AbstractFormController
      */
     private $integrationConfiguration;
 
-    /**
-     * @return array|JsonResponse|RedirectResponse|Response
-     */
     public function editAction(
         Request $request,
         ConfigIntegrationsHelper $integrationsHelper,
@@ -58,10 +53,10 @@ class ConfigController extends AbstractFormController
         FormFactoryInterface $formFactory,
         FormExtension $formExtension,
         string $integration,
-    ) {
+    ): Response {
         // Check ACL
         if (!$this->security->isGranted('plugin:plugins:manage')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         try {
@@ -82,9 +77,8 @@ class ConfigController extends AbstractFormController
         }
 
         // Clear the session of previously stored fields in case it got stuck
-        /** @var Session $session */
         $session = $request->getSession();
-        $session->remove("$integration-fields");
+        $session->remove("{$integration}-fields");
 
         return $this->showForm($request, $form, $formExtension);
     }
@@ -120,7 +114,7 @@ class ConfigController extends AbstractFormController
             $integration   = $this->integrationObject->getName();
             $settings      = $this->integrationConfiguration->getFeatureSettings();
             $session       = $request->getSession();
-            $updatedFields = $session->get("$integration-fields", []);
+            $updatedFields = $session->get("{$integration}-fields", []);
 
             $fieldMerger = new FieldMergerHelper($this->integrationObject, $fieldMappings);
 
@@ -185,42 +179,41 @@ class ConfigController extends AbstractFormController
      */
     private function showForm(Request $request, FormInterface $form, FormExtension $formExtension): Response
     {
-        $integrationObject = $this->integrationObject;
-        $formView          = $form->createView();
+        $formView = $form->createView();
 
-        $showFeaturesTab = $integrationObject instanceof ConfigFormFeaturesInterface
-            || $integrationObject instanceof ConfigFormSyncInterface
-            || $integrationObject instanceof ConfigFormFeatureSettingsInterface;
+        $showFeaturesTab = $this->integrationObject instanceof ConfigFormFeaturesInterface
+            || $this->integrationObject instanceof ConfigFormSyncInterface
+            || $this->integrationObject instanceof ConfigFormFeatureSettingsInterface;
 
         $hasFeatureErrors = (
-            $integrationObject instanceof ConfigFormFeatureSettingsInterface
+            $this->integrationObject instanceof ConfigFormFeatureSettingsInterface
             && $formExtension->containsErrors($formView['featureSettings']['integration'])
         ) || (
             isset($formView['featureSettings']['sync']['integration'])
             && $formExtension->containsErrors($formView['featureSettings']['sync']['integration'])
         );
 
-        $hasAuthErrors = $integrationObject instanceof ConfigFormAuthInterface && $formExtension->containsErrors($formView['apiKeys']);
+        $hasAuthErrors = $this->integrationObject instanceof ConfigFormAuthInterface && $formExtension->containsErrors($formView['apiKeys']);
 
-        $useSyncFeatures = $integrationObject instanceof ConfigFormSyncInterface;
+        $useSyncFeatures = $this->integrationObject instanceof ConfigFormSyncInterface;
 
-        $useFeatureSettings = $integrationObject instanceof ConfigFormFeatureSettingsInterface;
+        $useFeatureSettings = $this->integrationObject instanceof ConfigFormFeatureSettingsInterface;
 
-        $useAuthorizationUrl = $integrationObject instanceof ConfigFormAuthorizeButtonInterface;
+        $useAuthorizationUrl = $this->integrationObject instanceof ConfigFormAuthorizeButtonInterface;
 
-        $callbackUrl = $integrationObject instanceof ConfigFormCallbackInterface ?
-            $integrationObject->getRedirectUri()
+        $callbackUrl = $this->integrationObject instanceof ConfigFormCallbackInterface ?
+            $this->integrationObject->getRedirectUri()
             : false;
 
-        $useConfigFormNotes = $integrationObject instanceof ConfigFormNotesInterface;
+        $useConfigFormNotes = $this->integrationObject instanceof ConfigFormNotesInterface;
 
-        $plugin  = $integrationObject->getIntegrationSettings()->getPlugin();
+        $plugin  = $this->integrationObject->getIntegrationSettings()->getPlugin();
         $version = $plugin?->getVersion();
 
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'integrationObject'   => $integrationObject,
+                    'integrationObject'   => $this->integrationObject,
                     'form'                => $formView,
                     'activeTab'           => $request->get('activeTab'),
                     'showFeaturesTab'     => $showFeaturesTab,
@@ -232,7 +225,7 @@ class ConfigController extends AbstractFormController
                     'callbackUrl'         => $callbackUrl,
                     'useConfigFormNotes'  => $useConfigFormNotes,
                 ],
-                'contentTemplate' => $integrationObject->getConfigFormContentTemplate()
+                'contentTemplate' => $this->integrationObject->getConfigFormContentTemplate()
                     ?: '@Integrations/Config/form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_plugin_index',

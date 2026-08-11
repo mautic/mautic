@@ -9,7 +9,7 @@ use Mautic\FormBundle\Model\FormModel;
 class PropertiesAccessor
 {
     public function __construct(
-        private FormModel $formModel,
+        private readonly FormModel $formModel,
     ) {
     }
 
@@ -23,7 +23,8 @@ class PropertiesAccessor
         $hasContactFieldMapped = !empty($field['mappedField']) && !empty($field['mappedObject']) && 'contact' === $field['mappedObject'];
         if ('country' === $field['type'] || ($hasContactFieldMapped && !empty($field['properties']['syncList']))) {
             return $this->formModel->getContactFieldPropertiesList((string) $field['mappedField']);
-        } elseif (!empty($field['properties'])) {
+        }
+        if (!empty($field['properties'])) {
             return $this->getOptionsListFromProperties($field['properties']);
         }
 
@@ -31,21 +32,32 @@ class PropertiesAccessor
     }
 
     /**
-     * @param string|mixed[] $options
+     * @param string|array<string, string>|list<string|array{label: string, alias: string}|array{label: string, value: string}|list<string>> $options
      *
-     * @return string[]
+     * @return array<string, string>
      */
     public function getChoices($options): array
     {
-        $choices = [];
+        if (is_string($options)) {
+            return $this->getChoicesFromList(explode('|', $options));
+        }
 
-        if (is_array($options) && !isset($options[0]['value'])) {
+        // A missing first numeric index means we already have an associative value=>label map.
+        if (!array_is_list($options)) {
             return array_flip($options);
         }
 
-        if (!is_array($options)) {
-            $options = explode('|', (string) $options);
-        }
+        return $this->getChoicesFromList($options);
+    }
+
+    /**
+     * @param list<string|array{label: string, alias: string}|array{label: string, value: string}|list<string>> $options
+     *
+     * @return array<string, string>
+     */
+    private function getChoicesFromList(array $options): array
+    {
+        $choices = [];
 
         foreach ($options as $option) {
             if (is_array($option)) {
@@ -75,7 +87,8 @@ class PropertiesAccessor
     {
         if (!empty($properties['list']['list'])) {
             return $properties['list']['list'];
-        } elseif (!empty($properties['optionlist']['list'])) {
+        }
+        if (!empty($properties['optionlist']['list'])) {
             return $properties['optionlist']['list'];
         }
 

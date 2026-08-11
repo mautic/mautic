@@ -4,30 +4,30 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\Command;
 
-use Mautic\CoreBundle\Test\IsolatedTestTrait;
 use Mautic\IntegrationsBundle\Command\SyncCommand;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncService\SyncServiceInterface;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class SyncCommandTest extends TestCase
+final class SyncCommandTest extends TestCase
 {
-    use IsolatedTestTrait;
-
     private const INTEGRATION_NAME = 'Test';
 
     /**
-     * @var SyncServiceInterface|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&SyncServiceInterface
      */
     private \PHPUnit\Framework\MockObject\MockObject $syncService;
 
     private CommandTester $commandTester;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -57,16 +57,16 @@ class SyncCommandTest extends TestCase
         $this->assertSame(1, $this->commandTester->execute([]));
     }
 
-    #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
-    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
     public function testExecuteWithSomeOptions(): void
     {
         $this->syncService->expects($this->once())
             ->method('processIntegrationSync')
-            ->with($this->callback(function (InputOptionsDAO $inputOptionsDAO) {
+            ->with($this->callback(function (InputOptionsDAO $inputOptionsDAO): true {
                 $this->assertSame(self::INTEGRATION_NAME, $inputOptionsDAO->getIntegration());
                 $this->assertSame(['123', '345'], $inputOptionsDAO->getMauticObjectIds()->getObjectIdsFor(Contact::NAME));
-                $this->assertNull($inputOptionsDAO->getIntegrationObjectIds());
+                $this->assertNotInstanceOf(ObjectIdsDAO::class, $inputOptionsDAO->getIntegrationObjectIds());
                 $this->assertTrue($inputOptionsDAO->pullIsEnabled());
                 $this->assertFalse($inputOptionsDAO->pushIsEnabled());
 
@@ -82,18 +82,18 @@ class SyncCommandTest extends TestCase
         $this->assertSame(0, $code);
     }
 
-    #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
-    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
     public function testExecuteWhenSyncThrowsException(): void
     {
         $this->syncService->expects($this->once())
             ->method('processIntegrationSync')
-            ->with($this->callback(function (InputOptionsDAO $inputOptionsDAO) {
+            ->with($this->callback(function (InputOptionsDAO $inputOptionsDAO): true {
                 $this->assertSame(self::INTEGRATION_NAME, $inputOptionsDAO->getIntegration());
 
                 return true;
             }))
-            ->will($this->throwException(new \Exception()));
+            ->willThrowException(new \Exception());
 
         $code = $this->commandTester->execute(['integration' => self::INTEGRATION_NAME]);
 

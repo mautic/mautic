@@ -9,13 +9,13 @@ use LightSaml\Store\Credential\CredentialStoreInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use RobRichards\XMLSecLibs\XMLSecurityKey;
 
-class CredentialsStore implements CredentialStoreInterface
+final class CredentialsStore implements CredentialStoreInterface
 {
     private ?X509Credential $credentials = null;
 
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper,
-        private string $entityId,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly string $entityId,
     ) {
     }
 

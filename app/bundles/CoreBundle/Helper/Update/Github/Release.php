@@ -5,23 +5,23 @@ namespace Mautic\CoreBundle\Helper\Update\Github;
 use Mautic\CoreBundle\Helper\Update\Exception\UpdatePackageNotFoundException;
 use Mautic\CoreBundle\Release\Metadata;
 
-class Release
+final class Release
 {
     /**
      * @var string
      */
     private $version;
 
-    private string $downloadUrl;
+    private readonly string $downloadUrl;
 
     /**
      * @var string
      */
     private $announcementUrl;
 
-    private string $stability;
+    private readonly string $stability;
 
-    private Metadata $metadata;
+    private readonly Metadata $metadata;
 
     /**
      * @throws UpdatePackageNotFoundException

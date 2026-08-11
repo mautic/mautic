@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Tests\Scheduler\Model;
 
 use Mautic\ReportBundle\Entity\Report;
@@ -9,7 +11,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class MessageScheduleTest extends \PHPUnit\Framework\TestCase
+final class MessageScheduleTest extends \PHPUnit\Framework\TestCase
 {
     private MockObject&Router $router;
 

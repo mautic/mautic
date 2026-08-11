@@ -14,26 +14,23 @@ class TransportChain
     /**
      * @var array<string, array{alias: string, integrationAlias: string, service: TransportInterface, published?: bool}>
      */
-    private array $transports;
+    private array $transports = [];
 
     /**
      * @param string $primaryTransport
      */
     public function __construct(
         private $primaryTransport,
-        private IntegrationHelper $integrationHelper,
+        private readonly IntegrationHelper $integrationHelper,
     ) {
-        $this->transports        = [];
     }
 
     /**
      * @param string $alias
      * @param string $translatableAlias
      * @param string $integrationAlias
-     *
-     * @return $this
      */
-    public function addTransport($alias, TransportInterface $transport, $translatableAlias, $integrationAlias)
+    public function addTransport($alias, TransportInterface $transport, $translatableAlias, $integrationAlias): static
     {
         $this->transports[$alias]['alias']            = $translatableAlias;
         $this->transports[$alias]['integrationAlias'] = $integrationAlias;
@@ -141,7 +138,7 @@ class TransportChain
      *
      * @return array<string, array{alias: string, integrationAlias: string, service: TransportInterface, published?: bool}>
      */
-    public function getTransports()
+    public function getTransports(): array
     {
         return $this->transports;
     }

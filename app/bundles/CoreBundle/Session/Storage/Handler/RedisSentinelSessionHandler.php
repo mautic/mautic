@@ -13,12 +13,12 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\AbstractSessionHand
 /**
  * @deprecated since Mautic 5.0, to be removed in 6.0 with no replacement.
  */
-class RedisSentinelSessionHandler extends AbstractSessionHandler
+final class RedisSentinelSessionHandler extends AbstractSessionHandler
 {
     /**
      * @var Client Redis client
      */
-    private Client $redis;
+    private readonly Client $redis;
 
     public function __construct(
         private array $redisConfiguration,
@@ -62,7 +62,7 @@ class RedisSentinelSessionHandler extends AbstractSessionHandler
         return false;
     }
 
-    public function updateTimestamp($sessionId, $data): bool
+    public function updateTimestamp(string $sessionId, string $data): bool
     {
         $expireTime = isset($this->redisConfiguration['session_expire_time']) ? (int) $this->redisConfiguration['session_expire_time'] : 1_209_600;
 

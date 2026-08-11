@@ -2,58 +2,64 @@
 
 namespace Mautic\NotificationBundle\Helper;
 
-use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 class NotificationHelper
 {
     public function __construct(
-        protected EntityManager $em,
+        protected LeadRepository $leadRepository,
         protected AssetsHelper $assetsHelper,
         protected CoreParametersHelper $coreParametersHelper,
         protected IntegrationHelper $integrationHelper,
-        protected Router $router,
+        protected RouterInterface $router,
         protected RequestStack $requestStack,
-        private \Mautic\LeadBundle\Model\DoNotContact $doNotContact,
+        private readonly DoNotContactModel $doNotContact,
     ) {
     }
 
     /**
      * @param string $notification
      *
-     * @return bool
+     * @return bool|DoNotContact
+     *
+     * @deprecated as unused. To be removed in 8.0
      */
     public function unsubscribe($notification)
     {
-        /** @var \Mautic\LeadBundle\Entity\LeadRepository $repo */
-        $repo = $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class);
+        $lead = $this->leadRepository->getLeadByEmail($notification);
 
-        $lead = $repo->getLeadByEmail($notification);
+        if (!is_array($lead) || !isset($lead['id'])) {
+            return false;
+        }
 
-        return $this->doNotContact->addDncForContact($lead->getId(), 'notification', DoNotContact::UNSUBSCRIBED);
+        return $this->doNotContact->addDncForContact((int) $lead['id'], 'notification', DoNotContact::UNSUBSCRIBED);
     }
 
-    public function getHeaderScript()
+    public function getHeaderScript(): ?string
     {
         if ($this->hasScript()) {
             return 'MauticJS.insertScript(\'https://cdn.onesignal.com/sdks/OneSignalSDK.js\');
                     var OneSignal = OneSignal || [];';
         }
+
+        return null;
     }
 
-    public function getScript()
+    public function getScript(): ?string
     {
         if ($this->hasScript()) {
             $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
 
             if (!$integration || false === $integration->getIntegrationSettings()->getIsPublished()) {
-                return;
+                return null;
             }
 
             $settings        = $integration->getIntegrationSettings();
@@ -154,6 +160,8 @@ JS;
 
             return $oneSignalInit;
         }
+
+        return null;
     }
 
     private function hasScript(): bool
@@ -179,15 +187,11 @@ JS;
         $supportedFeatures = $integration->getIntegrationSettings()->getSupportedFeatures();
 
         // disable on Landing pages
-        if (true === $landingPage && !in_array('landing_page_enabled', $supportedFeatures)) {
+        if ($landingPage && !in_array('landing_page_enabled', $supportedFeatures)) {
             return false;
         }
 
         // disable on Landing pages
-        if (false === $landingPage && !in_array('tracking_page_enabled', $supportedFeatures)) {
-            return false;
-        }
-
-        return true;
+        return $landingPage || in_array('tracking_page_enabled', $supportedFeatures);
     }
 }

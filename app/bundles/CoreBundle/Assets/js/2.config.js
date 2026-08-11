@@ -17,7 +17,7 @@ Mautic.downloadIpLookupDataStore = function() {
             mQuery('#iplookup_fetch_button_container').parent().removeClass('has-success').addClass('has-error');
             mQuery('#iplookup_fetch_button_container').next('.help-block').html(response.error);
         }
-    }, false, false, 'GET');
+    }, false, false, 'POST');
 };
 
 Mautic.getIpLookupFormConfig = function() {

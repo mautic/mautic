@@ -11,7 +11,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class LeadSubscriber implements EventSubscriberInterface
+final readonly class LeadSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private EmailReplyRepository $emailReplyRepository,
@@ -48,7 +48,7 @@ class LeadSubscriber implements EventSubscriberInterface
         );
     }
 
-    private function addEmailEvents(LeadTimelineEvent $event, $state): void
+    private function addEmailEvents(LeadTimelineEvent $event, string $state): void
     {
         // Set available event types
         $eventTypeKey  = 'email.'.$state;
@@ -88,7 +88,7 @@ class LeadSubscriber implements EventSubscriberInterface
                 } else {
                     $eventName = $label;
                 }
-                if ('failed' == $state or 'sent' == $state) { // this is to get the correct column for date dateSent
+                if ('failed' === $state || 'sent' === $state) { // this is to get the correct column for date dateSent
                     $dateSent = 'sent';
                 } else {
                     $dateSent = 'read';
@@ -108,7 +108,7 @@ class LeadSubscriber implements EventSubscriberInterface
                             'type' => $state,
                         ],
                         'contentTemplate' => '@MauticEmail/SubscribedEvents/Timeline/index.html.twig',
-                        'icon'            => ('read' == $state) ? 'ri-mail-open-line' : 'ri-mail-unread-line',
+                        'icon'            => ('read' === $state) ? 'ri-mail-open-line' : 'ri-mail-unread-line',
                         'contactId'       => $contactId,
                     ]
                 );

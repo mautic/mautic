@@ -8,7 +8,7 @@ use Mautic\IntegrationsBundle\Sync\DAO\Value\EncodedValueDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use Mautic\IntegrationsBundle\Sync\ValueNormalizer\ValueNormalizer;
 
-final class VariableExpresserHelper implements VariableExpresserHelperInterface
+final readonly class VariableExpresserHelper implements VariableExpresserHelperInterface
 {
     public const TRUE_BOOLEAN_VALUE  = 'true';
 
@@ -33,7 +33,7 @@ final class VariableExpresserHelper implements VariableExpresserHelperInterface
      */
     public function encodeVariable($var): EncodedValueDAO
     {
-        if (is_null($var)) {
+        if (null === $var) {
             return new EncodedValueDAO(EncodedValueDAO::STRING_TYPE, '');
         }
 
@@ -42,15 +42,11 @@ final class VariableExpresserHelper implements VariableExpresserHelperInterface
         }
 
         if (is_string($var)) {
-            return new EncodedValueDAO(EncodedValueDAO::STRING_TYPE, (string) $var);
+            return new EncodedValueDAO(EncodedValueDAO::STRING_TYPE, $var);
         }
 
         if (is_float($var)) {
             return new EncodedValueDAO(EncodedValueDAO::FLOAT_TYPE, (string) $var);
-        }
-
-        if (is_double($var)) {
-            return new EncodedValueDAO(EncodedValueDAO::DOUBLE_TYPE, (string) $var);
         }
 
         if ($var instanceof \DateTime) {
@@ -60,7 +56,7 @@ final class VariableExpresserHelper implements VariableExpresserHelperInterface
         if (is_bool($var)) {
             return new EncodedValueDAO(
                 EncodedValueDAO::BOOLEAN_TYPE,
-                true === $var ? self::TRUE_BOOLEAN_VALUE : self::FALSE_BOOLEAN_VALUE
+                $var ? self::TRUE_BOOLEAN_VALUE : self::FALSE_BOOLEAN_VALUE
             );
         }
 

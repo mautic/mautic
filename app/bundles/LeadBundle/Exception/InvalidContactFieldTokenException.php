@@ -6,6 +6,6 @@ namespace Mautic\LeadBundle\Exception;
 
 use Mautic\CoreBundle\Exception\InvalidValueException;
 
-class InvalidContactFieldTokenException extends InvalidValueException
+final class InvalidContactFieldTokenException extends InvalidValueException
 {
 }

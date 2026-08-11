@@ -9,27 +9,21 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 
-class CacheClearSubscriber implements CacheClearerInterface
+final readonly class CacheClearSubscriber implements CacheClearerInterface
 {
     /**
-     * @var CacheProvider
+     * @param CacheProvider $cacheProvider
      */
-    private AdapterInterface $cacheProvider;
-
-    private LoggerInterface $logger;
-
-    public function __construct(AdapterInterface $cacheProvider, LoggerInterface $logger)
-    {
-        $this->cacheProvider = $cacheProvider;
-        $this->logger        = $logger;
+    public function __construct(
+        private AdapterInterface $cacheProvider,
+        private LoggerInterface $logger,
+    ) {
     }
 
     /**
-     * @param string $cacheDir
-     *
      * @throws \Exception
      */
-    public function clear($cacheDir): void
+    public function clear(string $cacheDir): void
     {
         try {
             $reflect = new \ReflectionClass($this->cacheProvider->getCacheAdapter());

@@ -16,12 +16,12 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class FeatureSettingsType extends AbstractType
+final class FeatureSettingsType extends AbstractType
 {
     public function __construct(
-        protected RequestStack $requestStack,
-        protected CoreParametersHelper $coreParametersHelper,
-        protected LoggerInterface $logger,
+        private readonly RequestStack $requestStack,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -54,15 +54,11 @@ class FeatureSettingsType extends AbstractType
             ];
 
             try {
-                if (empty($fields)) {
-                    $fields = $integrationObject->getFormLeadFields($settings);
-                    $fields = $fields[0] ?? $fields;
-                }
+                $fields = $integrationObject->getFormLeadFields($settings);
+                $fields = $fields[0] ?? $fields;
 
-                if (isset($settings['feature_settings']['objects']) and in_array('company', $settings['feature_settings']['objects'])) {
-                    if (empty($integrationCompanyFields)) {
-                        $integrationCompanyFields = $integrationObject->getFormCompanyFields($settings);
-                    }
+                if (isset($settings['feature_settings']['objects']) && in_array('company', $settings['feature_settings']['objects'])) {
+                    $integrationCompanyFields = $integrationObject->getFormCompanyFields($settings);
                     if (isset($integrationCompanyFields['company'])) {
                         $integrationCompanyFields = $integrationCompanyFields['company'];
                     }

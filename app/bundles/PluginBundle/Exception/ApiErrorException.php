@@ -4,7 +4,7 @@ namespace Mautic\PluginBundle\Exception;
 
 use Mautic\LeadBundle\Entity\Lead;
 
-class ApiErrorException extends \Exception
+final class ApiErrorException extends \Exception
 {
     private $contactId;
 
@@ -31,28 +31,20 @@ class ApiErrorException extends \Exception
 
     /**
      * @param mixed $contactId
-     *
-     * @return ApiErrorException
      */
-    public function setContactId($contactId)
+    public function setContactId($contactId): static
     {
         $this->contactId = $contactId;
 
         return $this;
     }
 
-    /**
-     * @return Lead
-     */
-    public function getContact()
+    public function getContact(): ?Lead
     {
         return $this->contact;
     }
 
-    /**
-     * @return ApiErrorException
-     */
-    public function setContact(Lead $contact)
+    public function setContact(Lead $contact): static
     {
         $this->contact = $contact;
 
@@ -64,7 +56,7 @@ class ApiErrorException extends \Exception
         return $this->shortMessage;
     }
 
-    public function setShortMessage(string $shortMessage): ApiErrorException
+    public function setShortMessage(string $shortMessage): self
     {
         $this->shortMessage = $shortMessage;
 

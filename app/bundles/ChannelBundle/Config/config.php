@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'routes' => [
         'main' => [
@@ -56,19 +58,6 @@ return [
     'categories' => [
         'messages' => [
             'class' => Mautic\ChannelBundle\Entity\Message::class,
-        ],
-    ],
-
-    'services' => [
-        'helpers' => [
-            'mautic.channel.helper.channel_list' => [
-                'class'     => Mautic\ChannelBundle\Helper\ChannelListHelper::class,
-                'arguments' => [
-                    'event_dispatcher',
-                    'translator',
-                ],
-                'alias' => 'channel',
-            ],
         ],
     ],
 

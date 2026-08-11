@@ -11,15 +11,15 @@ use Mautic\PageBundle\Entity\Page;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
+final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|SubmissionRepository
+     * @var MockObject&SubmissionRepository
      */
     private MockObject $submissionRepository;
 
     /**
-     * @var MockObject|TranslatorInterface
+     * @var MockObject&TranslatorInterface
      */
     private MockObject $translator;
 
@@ -62,19 +62,19 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->translator->method('trans')
             ->willReturnOnConsecutiveCalls($transSubmissions, $transHits);
 
-        $parentMock->expects($this->any())
+        $parentMock
             ->method('isPublished')
             ->willReturn(true);
 
-        $childMock->expects($this->any())
+        $childMock
             ->method('isPublished')
             ->willReturn(true);
 
-        $parentMock->expects($this->any())
+        $parentMock
             ->method('getId')
             ->willReturn(1);
 
-        $childMock->expects($this->any())
+        $childMock
             ->method('getId')
             ->willReturn(2);
 

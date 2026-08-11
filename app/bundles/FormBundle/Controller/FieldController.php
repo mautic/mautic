@@ -26,15 +26,15 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
 
-class FieldController extends CommonFormController
+final class FieldController extends CommonFormController
 {
     public function __construct(
-        private FormModel $formModel,
-        private FieldModel $formFieldModel,
+        private readonly FormModel $formModel,
+        private readonly FieldModel $formFieldModel,
         FormFieldHelper $fieldHelper,
         FormFactoryInterface $formFactory,
-        private MappedObjectCollectorInterface $mappedObjectCollector,
-        private AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector,
+        private readonly MappedObjectCollectorInterface $mappedObjectCollector,
+        private readonly AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
@@ -48,23 +48,20 @@ class FieldController extends CommonFormController
         $this->fieldHelper                 = $fieldHelper;
         $this->formFactory                 = $formFactory;
 
-        // @phpstan-ignore-next-line FormController extends deprecated AbstractStandardFormController; fix requires class hierarchy refactoring
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**
      * Generates new form and processes post data.
-     *
-     * @return Response
      */
-    public function newAction(Request $request, Environment $twig)
+    public function newAction(Request $request, Environment $twig): JsonResponse|Response
     {
         $success = 0;
         $valid   = $cancelled   = false;
         $method  = $request->getMethod();
         $session = $request->getSession();
 
-        if ('POST' == $method) {
+        if ('POST' === $method) {
             $formField = $request->request->all()['formfield'] ?? [];
             $fieldType = $formField['type'];
             $formId    = $formField['formId'];
@@ -97,7 +94,7 @@ class FieldController extends CommonFormController
         }
 
         // Check for a submitted form and process it
-        if ('POST' == $method) {
+        if ('POST' === $method) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $success = 1;
@@ -119,9 +116,7 @@ class FieldController extends CommonFormController
 
                     // Generate or ensure a unique alias
                     $alias          = empty($formField['alias']) ? $formField['label'] : $formField['alias'];
-                    $formFieldModel = $this->getModel('form.field');
-                    \assert($formFieldModel instanceof FieldModel);
-                    $formField['alias'] = $formFieldModel->generateAlias($alias, $aliases);
+                    $formField['alias'] = $this->formFieldModel->generateAlias($alias, $aliases);
 
                     // Force required for captcha if not a honeypot
                     if ('captcha' == $formField['type']) {
@@ -190,8 +185,6 @@ class FieldController extends CommonFormController
             $passthroughVars['parent']    = $formField['parent'];
             $passthroughVars['fieldId']   = $keyId;
             $template                     = (!empty($customParams)) ? $customParams['template'] : '@MauticForm/Field/'.$fieldType.'.html.twig';
-            $leadFieldModel               = $this->getModel('lead.field');
-            \assert($leadFieldModel instanceof \Mautic\LeadBundle\Model\FieldModel);
             $passthroughVars['fieldHtml'] = $this->renderView(
                 '@MauticForm/Builder/_field_wrapper.html.twig',
                 [
@@ -229,10 +222,8 @@ class FieldController extends CommonFormController
      * Generates edit form and processes post data.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function editAction(Request $request, Environment $twig, $objectId)
+    public function editAction(Request $request, Environment $twig, $objectId): JsonResponse|Response
     {
         $session   = $request->getSession();
         $method    = $request->getMethod();
@@ -258,7 +249,7 @@ class FieldController extends CommonFormController
             $form = $this->getFieldForm($formId, $formField);
 
             // Check for a submitted form and process it
-            if ('POST' == $method) {
+            if ('POST' === $method) {
                 if (!$cancelled = $this->isFormCancelled($form)) {
                     if ($valid = $this->isFormValid($form)) {
                         $success = 1;
@@ -336,8 +327,6 @@ class FieldController extends CommonFormController
             $blank        = $entity->convertToArray();
             $formField    = array_merge($blank, $formField);
 
-            $leadFieldModel = $this->getModel('lead.field');
-            \assert($leadFieldModel instanceof \Mautic\LeadBundle\Model\FieldModel);
             $passthroughVars['fieldHtml'] = $this->renderView(
                 '@MauticForm/Builder/_field_wrapper.html.twig',
                 [
@@ -379,10 +368,8 @@ class FieldController extends CommonFormController
      * Deletes the entity.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): JsonResponse
     {
         $session = $request->getSession();
         $formId  = $request->query->get('formId');
@@ -393,10 +380,10 @@ class FieldController extends CommonFormController
         if (!$request->isXmlHttpRequest()
             || !$this->security->isGranted(['form:forms:editown', 'form:forms:editother', 'form:forms:create'], 'MATCH_ONE')
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
-        $formField = (array_key_exists($objectId, $fields)) ? $fields[$objectId] : null;
+        $formField = $fields[$objectId] ?? null;
 
         if ('POST' === $request->getMethod() && null !== $formField) {
             if ($formField['mappedObject'] && $formField['mappedField']) {
@@ -430,15 +417,9 @@ class FieldController extends CommonFormController
      */
     private function getFieldForm($formId, array $formField)
     {
-        // fire the form builder event
-        $formModel = $this->getModel('form.form');
-        \assert($formModel instanceof FormModel);
         $customComponents = $this->formModel->getCustomComponents();
         $customParams     = $customComponents['fields'][$formField['type']] ?? false;
-
-        $formFieldModel = $this->getModel('form.field');
-        \assert($formFieldModel instanceof FieldModel);
-        $form = $formFieldModel->createForm(
+        $form = $this->formFieldModel->createForm(
             $formField,
             $this->formFactory,
             (!empty($formField['id'])) ?

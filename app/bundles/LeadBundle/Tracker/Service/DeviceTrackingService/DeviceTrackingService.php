@@ -16,12 +16,12 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
     private ?LeadDevice $trackedDevice = null;
 
     public function __construct(
-        private CookieHelper $cookieHelper,
-        private EntityManagerInterface $entityManager,
-        private LeadDeviceRepository $leadDeviceRepository,
-        private RandomHelperInterface $randomHelper,
-        private RequestStack $requestStack,
-        private CorePermissions $security,
+        private readonly CookieHelper $cookieHelper,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly LeadDeviceRepository $leadDeviceRepository,
+        private readonly RandomHelperInterface $randomHelper,
+        private readonly RequestStack $requestStack,
+        private readonly CorePermissions $security,
     ) {
     }
 

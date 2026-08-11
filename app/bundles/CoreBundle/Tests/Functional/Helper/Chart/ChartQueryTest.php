@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\Stat\ChartQuery\SegmentContactsLineChartQuery;
 
-class ChartQueryTest extends MauticMysqlTestCase
+final class ChartQueryTest extends MauticMysqlTestCase
 {
     public function testSegmentContactsLineChartQuery(): void
     {

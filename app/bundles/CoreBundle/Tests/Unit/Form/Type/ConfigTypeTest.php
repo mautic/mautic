@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Form\Type;
 
 use Mautic\CoreBundle\Factory\IpLookupFactory;
@@ -10,28 +12,15 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Shortener\Shortener;
 use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Form\Type\PageListType;
-use Mautic\PageBundle\Model\PageModel;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Validation;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ConfigTypeTest extends TypeTestCase
+final class ConfigTypeTest extends TypeTestCase
 {
-    private \PHPUnit\Framework\MockObject\MockObject $formBuilder;
-
-    private $formType;
-
-    protected function setUp(): void
-    {
-        $this->formBuilder = $this->createMock(FormBuilderInterface::class);
-        $this->formType    = $this->getConfigFormType();
-        parent::setUp();
-    }
-
     public function testSubmitEmptyTrustedHosts(): void
     {
         $formData = [
@@ -126,22 +115,21 @@ class ConfigTypeTest extends TypeTestCase
         $this->assertTrue($form->isValid());
     }
 
-    private function getConfigFormType()
+    private function getConfigFormType(): ConfigType
     {
-        $translator                 = $this->createMock(TranslatorInterface::class);
         $languageHelper             = $this->createMock(LanguageHelper::class);
-        $ipLookupFactory            = $this->createMock(IpLookupFactory::class);
-        $shortener                  = $this->createMock(Shortener::class);
-        $coreParametersHelper       = $this->createMock(CoreParametersHelper::class);
 
-        $languageHelper->expects($this->any())
+        $languageHelper
                        ->method('fetchLanguages')
                        ->willReturn(['en' => ['name'=>'English']]);
 
-        return new ConfigType($translator, $languageHelper, $ipLookupFactory, null, $shortener, $coreParametersHelper);
+        return new ConfigType($this->createStub(TranslatorInterface::class), $languageHelper, $this->createStub(IpLookupFactory::class), null, $this->createStub(Shortener::class), $this->createStub(CoreParametersHelper::class));
     }
 
-    protected function getExtensions()
+    /**
+     * @return array<int, PreloadedExtension|ValidatorExtension>
+     */
+    protected function getExtensions(): array
     {
         $validator = Validation::createValidator();
 
@@ -152,16 +140,11 @@ class ConfigTypeTest extends TypeTestCase
         $configType = $this->getConfigFormType();
 
         $repoMock = $this->createMock(PageRepository::class);
-        $repoMock->expects($this->any())
+        $repoMock
                  ->method('getPageList')
                  ->willReturn([]);
 
-        $pageModelMock = $this->createMock(PageModel::class);
-        $pageModelMock->expects($this->any())
-                      ->method('getRepository')
-                      ->willReturn($repoMock);
-        $permsMock    = $this->createMock(CorePermissions::class);
-        $pageListType = new PageListType($pageModelMock, $permsMock);
+        $pageListType = new PageListType($this->createStub(CorePermissions::class), $repoMock);
 
         return [
             // register the type instances with the PreloadedExtension

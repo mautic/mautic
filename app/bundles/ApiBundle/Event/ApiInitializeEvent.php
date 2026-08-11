@@ -14,7 +14,7 @@ final class ApiInitializeEvent extends Event
      * @param ExclusionStrategyInterface[] $exclusionStrategies
      */
     public function __construct(
-        private string $entityClass,
+        private readonly string $entityClass,
         private array $serializerGroups,
         private array $exclusionStrategies,
     ) {

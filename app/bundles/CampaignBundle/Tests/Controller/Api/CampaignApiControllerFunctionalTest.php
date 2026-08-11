@@ -19,6 +19,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -26,7 +27,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     use UserEntityTrait;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->configParams['mailer_from_name']  = 'Mautic Admin';
         $this->configParams['mailer_from_email'] = 'admin@email.com';
@@ -234,67 +235,67 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseStatusCodeSame(201, $clientResponse->getContent());
         $response   = json_decode($clientResponse->getContent(), true);
         $campaignId = $response['campaign']['id'];
-        Assert::assertGreaterThan(0, $campaignId);
-        Assert::assertEquals($payload['name'], $response['campaign']['name']);
-        Assert::assertEquals($payload['description'], $response['campaign']['description']);
-        Assert::assertEquals($payload['events'][0]['name'], $response['campaign']['events'][0]['name']);
-        Assert::assertEquals($segment->getId(), $response['campaign']['lists'][0]['id']);
+        $this->assertGreaterThan(0, $campaignId);
+        $this->assertEquals($payload['name'], $response['campaign']['name']);
+        $this->assertEquals($payload['description'], $response['campaign']['description']);
+        $this->assertEquals($payload['events'][0]['name'], $response['campaign']['events'][0]['name']);
+        $this->assertEquals($segment->getId(), $response['campaign']['lists'][0]['id']);
 
         $commandTester = $this->testSymfonyCommand('mautic:campaigns:update', ['-i' => $campaignId]);
         $commandTester->assertCommandIsSuccessful();
-        Assert::assertStringContainsString('2 total contact(s) to be added', $commandTester->getDisplay());
-        Assert::assertStringContainsString('100%', $commandTester->getDisplay());
+        $this->assertStringContainsString('2 total contact(s) to be added', $commandTester->getDisplay());
+        $this->assertStringContainsString('100%', $commandTester->getDisplay());
 
         $commandTester = $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => $campaignId]);
         $commandTester->assertCommandIsSuccessful();
         // 2 events were executed for each of the 2 contacts (= 4). The third event is waiting for the decision interval.
-        Assert::assertStringContainsString('4 total events were executed', $commandTester->getDisplay());
+        $this->assertStringContainsString('4 total events were executed', $commandTester->getDisplay());
 
         $this->assertQueuedEmailCount(2);
 
         $email1 = $this->getMailerMessagesByToAddress('contact@one.email')[0];
-        \assert($email1 instanceof MauticMessage);
+        $this->assertInstanceOf(MauticMessage::class, $email1);
 
         // The email is has mailer is owner ON but this contact doesn't have any owner. So it uses default FROM and Reply-To.
-        Assert::assertSame('Ahoy contact@one.email', $email1->getSubject());
-        Assert::assertMatchesRegularExpression('#Your email is <b>contact@one\.email<\/b><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif\?ct=[^"]+" alt="" \/>#', $email1->getHtmlBody());
-        Assert::assertSame('Your email is contact@one.email', $email1->getTextBody());
-        Assert::assertCount(1, $email1->getFrom());
-        Assert::assertSame($this->configParams['mailer_from_name'], $email1->getFrom()[0]->getName());
-        Assert::assertSame($this->configParams['mailer_from_email'], $email1->getFrom()[0]->getAddress());
-        Assert::assertCount(1, $email1->getTo());
-        Assert::assertSame('', $email1->getTo()[0]->getName());
-        Assert::assertSame($entities['contact1']->getEmail(), $email1->getTo()[0]->getAddress());
-        Assert::assertCount(1, $email1->getReplyTo());
-        Assert::assertSame('', $email1->getReplyTo()[0]->getName());
-        Assert::assertSame($this->configParams['mailer_from_email'], $email1->getReplyTo()[0]->getAddress());
+        $this->assertSame('Ahoy contact@one.email', $email1->getSubject());
+        $this->assertMatchesRegularExpression('#Your email is <b>contact@one\.email<\/b><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif\?ct=[^"]+" alt="" \/>#', $email1->getHtmlBody());
+        $this->assertSame('Your email is contact@one.email', $email1->getTextBody());
+        $this->assertCount(1, $email1->getFrom());
+        $this->assertSame($this->configParams['mailer_from_name'], $email1->getFrom()[0]->getName());
+        $this->assertSame($this->configParams['mailer_from_email'], $email1->getFrom()[0]->getAddress());
+        $this->assertCount(1, $email1->getTo());
+        $this->assertSame('', $email1->getTo()[0]->getName());
+        $this->assertSame($entities['contact1']->getEmail(), $email1->getTo()[0]->getAddress());
+        $this->assertCount(1, $email1->getReplyTo());
+        $this->assertSame('', $email1->getReplyTo()[0]->getName());
+        $this->assertSame($this->configParams['mailer_from_email'], $email1->getReplyTo()[0]->getAddress());
 
         $email2 = $this->getMailerMessagesByToAddress('contact@two.email')[0];
-        \assert($email2 instanceof MauticMessage);
+        $this->assertInstanceOf(MauticMessage::class, $email2);
 
         // This contact does have an owner so it uses FROM and Rply-to from the owner.
-        Assert::assertSame('Ahoy contact@two.email', $email2->getSubject());
-        Assert::assertMatchesRegularExpression('#Your email is <b>contact@two\.email<\/b><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif\?ct=[^"]*" alt="" \/>#', $email2->getHtmlBody());
-        Assert::assertSame('Your email is contact@two.email', $email2->getTextBody());
-        Assert::assertCount(1, $email2->getFrom());
-        Assert::assertSame($user->getName(), $email2->getFrom()[0]->getName());
-        Assert::assertSame($user->getEmail(), $email2->getFrom()[0]->getAddress());
-        Assert::assertCount(1, $email2->getTo());
-        Assert::assertSame('', $email2->getTo()[0]->getName());
-        Assert::assertSame($entities['contact2']->getEmail(), $email2->getTo()[0]->getAddress());
-        Assert::assertCount(1, $email2->getReplyTo());
-        Assert::assertSame('', $email2->getReplyTo()[0]->getName());
-        Assert::assertSame($user->getEmail(), $email2->getReplyTo()[0]->getAddress());
+        $this->assertSame('Ahoy contact@two.email', $email2->getSubject());
+        $this->assertMatchesRegularExpression('#Your email is <b>contact@two\.email<\/b><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif\?ct=[^"]*" alt="" \/>#', $email2->getHtmlBody());
+        $this->assertSame('Your email is contact@two.email', $email2->getTextBody());
+        $this->assertCount(1, $email2->getFrom());
+        $this->assertSame($user->getName(), $email2->getFrom()[0]->getName());
+        $this->assertSame($user->getEmail(), $email2->getFrom()[0]->getAddress());
+        $this->assertCount(1, $email2->getTo());
+        $this->assertSame('', $email2->getTo()[0]->getName());
+        $this->assertSame($entities['contact2']->getEmail(), $email2->getTo()[0]->getAddress());
+        $this->assertCount(1, $email2->getReplyTo());
+        $this->assertSame('', $email2->getReplyTo()[0]->getName());
+        $this->assertSame($user->getEmail(), $email2->getReplyTo()[0]->getAddress());
 
         // Search for this campaign:
         $this->client->request(Request::METHOD_GET, "/api/campaigns?search=ids:{$response['campaign']['id']}");
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful($clientResponse->getContent());
         $response = json_decode($clientResponse->getContent(), true);
-        Assert::assertEquals($payload['name'], $response['campaigns'][$campaignId]['name'], $clientResponse->getContent());
-        Assert::assertEquals($payload['description'], $response['campaigns'][$campaignId]['description'], $clientResponse->getContent());
-        Assert::assertEquals($payload['events'][0]['name'], $response['campaigns'][$campaignId]['events'][0]['name'], $clientResponse->getContent());
-        Assert::assertEquals($segment->getId(), $response['campaigns'][$campaignId]['lists'][0]['id'], $clientResponse->getContent());
+        $this->assertEquals($payload['name'], $response['campaigns'][$campaignId]['name'], $clientResponse->getContent());
+        $this->assertEquals($payload['description'], $response['campaigns'][$campaignId]['description'], $clientResponse->getContent());
+        $this->assertEquals($payload['events'][0]['name'], $response['campaigns'][$campaignId]['events'][0]['name'], $clientResponse->getContent());
+        $this->assertEquals($segment->getId(), $response['campaigns'][$campaignId]['lists'][0]['id'], $clientResponse->getContent());
     }
 
     public function testExportCampaignAction(): void
@@ -458,7 +459,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
             Request::METHOD_POST,
             '/api/campaigns/import',
             [],
-            ['file'         => new \Symfony\Component\HttpFoundation\File\UploadedFile($zipPath, 'import.zip')],
+            ['file'         => new UploadedFile($zipPath, 'import.zip')],
             ['CONTENT_TYPE' => 'multipart/form-data']
         );
 
@@ -506,6 +507,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
     public function testImportCampaignNoFileUploaded(): void
     {
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
         // Attempt to import with no files
@@ -514,12 +516,13 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
-        $this->assertStringContainsString('No JSON content found, and exactly one ZIP file must be uploaded.', $response->getContent());
+        $this->assertStringContainsString('No JSON content found, and exactly one ZIP file must be uploaded.', (string) $response->getContent());
     }
 
     public function testEditCampaignAcceptsRoundTrippedIso8601PublishUp(): void
     {
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
         $campaign = new Campaign();
@@ -534,7 +537,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful($getResponse->getContent());
 
         $campaignData = json_decode($getResponse->getContent(), true)['campaign'];
-        Assert::assertIsString($campaignData['publishUp']);
+        $this->assertIsString($campaignData['publishUp']);
 
         $this->client->request(Request::METHOD_PATCH, sprintf('/api/campaigns/%d/edit', $campaign->getId()), [
             'publishUp' => $campaignData['publishUp'],
@@ -555,20 +558,21 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
     public function testImportCampaignInvalidFile(): void
     {
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
         // Create a temporary file
         $filePath = $this->createTemporaryFile('txt');
 
         // Upload the invalid file
-        $file = new \Symfony\Component\HttpFoundation\File\UploadedFile($filePath, 'test.txt', null, null, true);
+        $file = new UploadedFile($filePath, 'test.txt', null, null, true);
 
         $this->client->request(Request::METHOD_POST, '/api/campaigns/import', [], ['file' => $file]);
 
         $response = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
-        $this->assertStringContainsString('Unsupported file type. Only ZIP archives are supported.', $response->getContent());
+        $this->assertStringContainsString('Unsupported file type. Only ZIP archives are supported.', (string) $response->getContent());
 
         // Clean up
         unlink($filePath);
@@ -577,18 +581,19 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
     public function testImportCampaignUnsupportedFileType(): void
     {
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
         // Create a temporary file with a non-ZIP extension
         $filePath = $this->createTemporaryFile('txt');
-        $file     = new \Symfony\Component\HttpFoundation\File\UploadedFile($filePath, 'test.txt', null, null, true);
+        $file     = new UploadedFile($filePath, 'test.txt', null, null, true);
 
         $this->client->request(Request::METHOD_POST, '/api/campaigns/import', [], ['file' => $file]);
 
         $response = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
-        $this->assertStringContainsString('Unsupported file type. Only ZIP archives are supported.', $response->getContent());
+        $this->assertStringContainsString('Unsupported file type. Only ZIP archives are supported.', (string) $response->getContent());
 
         // Clean up
         unlink($filePath);
@@ -610,7 +615,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
             $this->fail('Failed to create test ZIP file.');
         }
 
-        $file = new \Symfony\Component\HttpFoundation\File\UploadedFile($zipPath, 'test.zip', null, null, true);
+        $file = new UploadedFile($zipPath, 'test.zip', null, null, true);
 
         try {
             $this->client->request(Request::METHOD_POST, '/api/campaigns/import', [], ['file' => $file]);
@@ -618,7 +623,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
             $response = $this->client->getResponse();
 
             $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
-            $this->assertStringContainsString('Invalid JSON', $response->getContent());
+            $this->assertStringContainsString('Invalid JSON', (string) $response->getContent());
         } finally {
             // Clean up - check if file exists before trying to delete
             if (file_exists($zipPath)) {

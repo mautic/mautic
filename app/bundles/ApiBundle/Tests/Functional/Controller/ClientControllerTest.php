@@ -6,13 +6,15 @@ namespace Mautic\ApiBundle\Tests\Functional\Controller;
 
 use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ClientControllerTest extends MauticMysqlTestCase
+final class ClientControllerTest extends MauticMysqlTestCase
 {
     private const TOTAL_COUNT = 6;
 
-    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
+    #[RunInSeparateProcess]
     public function testIndexActionForPager(): void
     {
         $this->createApiClients();
@@ -63,18 +65,18 @@ class ClientControllerTest extends MauticMysqlTestCase
         $content = $this->client->getResponse()->getContent();
         $this->assertResponseIsSuccessful();
 
-        $translator = static::getContainer()->get('translator');
+        $translator = self::getContainer()->get(TranslatorInterface::class);
 
         // Check for total item count in pagination
         $this->assertStringContainsString(
             $translator->trans('mautic.core.pagination.items', ['%count%' => self::TOTAL_COUNT]),
-            $content
+            (string) $content
         );
 
         // Check for total page count in pagination
         $this->assertStringContainsString(
             $translator->trans('mautic.core.pagination.pages', ['%count%' => $pageCount]),
-            $content
+            (string) $content
         );
     }
 }

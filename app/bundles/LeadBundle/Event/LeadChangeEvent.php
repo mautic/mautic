@@ -1,24 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class LeadChangeEvent extends Event
+final class LeadChangeEvent extends Event
 {
     public function __construct(
-        private Lead $oldLead,
+        private readonly Lead $oldLead,
         private $oldTrackingId,
-        private Lead $newLead,
+        private readonly Lead $newLead,
         private $newTrackingId,
     ) {
     }
 
-    /**
-     * @return Lead
-     */
-    public function getOldLead()
+    public function getOldLead(): Lead
     {
         return $this->oldLead;
     }
@@ -31,10 +30,7 @@ class LeadChangeEvent extends Event
         return $this->oldTrackingId;
     }
 
-    /**
-     * @return Lead
-     */
-    public function getNewLead()
+    public function getNewLead(): Lead
     {
         return $this->newLead;
     }

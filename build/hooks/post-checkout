@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
 echo "Removing cache to ensure clean state after git checkout..."
-
 rm -rf var/cache
+
+if [[ "${CODESPACES:-}" = "true" ]]; then
+    echo "Installing dependencies ..."
+    ddev composer install --no-interaction
+
+    echo "Executing migrations ..."
+    ddev exec bin/console doctrine:migrations:migrate -n
+fi

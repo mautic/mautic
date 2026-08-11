@@ -10,15 +10,15 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class SegmentFilterTypeaheadSubscriber implements EventSubscriberInterface
+final readonly class SegmentFilterTypeaheadSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private LeadModel $leadModel, private FieldModel $fieldModel, private CompanyModel $companyModel)
-    {
+    public function __construct(
+        private LeadModel $leadModel,
+        private FieldModel $fieldModel,
+        private CompanyModel $companyModel,
+    ) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public static function getSubscribedEvents(): array
     {
         return [
@@ -82,7 +82,7 @@ final class SegmentFilterTypeaheadSubscriber implements EventSubscriberInterface
         $field      = $this->fieldModel->getEntityByAlias($event->getFieldAlias());
 
         // Select field types that make sense to provide typeahead for.
-        $isLookup     = in_array($field->getType(), ['lookup']);
+        $isLookup     = 'lookup' == $field->getType();
         $shouldLookup = in_array($field->getAlias(), ['city', 'company', 'title']);
 
         if ($isLookup && $shouldLookup) {

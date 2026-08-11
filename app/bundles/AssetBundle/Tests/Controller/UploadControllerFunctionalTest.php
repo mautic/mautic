@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 final class UploadControllerFunctionalTest extends MauticMysqlTestCase
 {
     private string $assetPath;
+
     private string $tempId;
 
     /**
@@ -44,8 +45,8 @@ final class UploadControllerFunctionalTest extends MauticMysqlTestCase
         $this->upload($this->createUploadedFile($filePath, 'application/x-httpd-php'));
 
         $content = $this->client->getResponse()->getContent();
-        $this->assertStringContainsString('The file content does not match the file extension.', $content);
-        $this->assertStringContainsString('The extension of the file is \u0027png\u0027 while the content has mimetype \u0027application\/x-httpd-php\u0027.', $content);
+        $this->assertStringContainsString('The file content does not match the file extension.', (string) $content);
+        $this->assertStringContainsString('The extension of the file is \u0027png\u0027 while the content has mimetype \u0027application\/x-httpd-php\u0027.', (string) $content);
     }
 
     public function testUploadWithWrongFileMimetype(): void
@@ -56,8 +57,8 @@ final class UploadControllerFunctionalTest extends MauticMysqlTestCase
         $this->upload($this->createUploadedFile($filePath, 'image/png'));
 
         $content = $this->client->getResponse()->getContent();
-        $this->assertStringContainsString('The file content does not match the file extension.', $content);
-        $this->assertStringContainsString('The extension of the file is \u0027png\u0027 while the content has mimetype \u0027text\/x-php\u0027.', $content);
+        $this->assertStringContainsString('The file content does not match the file extension.', (string) $content);
+        $this->assertStringContainsString('The extension of the file is \u0027png\u0027 while the content has mimetype \u0027text\/x-php\u0027.', (string) $content);
     }
 
     public function testSuccessUploadWithPng(): void
@@ -68,7 +69,7 @@ final class UploadControllerFunctionalTest extends MauticMysqlTestCase
         $this->upload($this->createUploadedFile($filePath, 'image/png'));
 
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
-        $this->assertStringContainsString('state":1', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('state":1', (string) $this->client->getResponse()->getContent());
     }
 
     /**
@@ -95,7 +96,7 @@ final class UploadControllerFunctionalTest extends MauticMysqlTestCase
             'Upload failed as the file extension, %s, is not in the list of allowed extensions (%s).',
             $extension,
             $extensions
-        ), $content);
+        ), (string) $content);
     }
 
     private function createSourcePath(string $extension): string
