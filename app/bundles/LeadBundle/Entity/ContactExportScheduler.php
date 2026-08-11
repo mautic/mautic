@@ -9,7 +9,6 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Mapping\ClassMetadata as ValidatorClassMetadata;
 
 class ContactExportScheduler
 {
@@ -17,6 +16,7 @@ class ContactExportScheduler
 
     private ?User $user = null; // Created by
 
+    #[Assert\NotBlank()]
     private \DateTimeImmutable $scheduledDateTime;
 
     /**
@@ -47,16 +47,6 @@ class ContactExportScheduler
             ->columnName('scheduled_datetime')
             ->build();
         $builder->addNullableField('data', Types::ARRAY);
-    }
-
-    public static function loadValidatorMetadata(ValidatorClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint(
-            'scheduledDate',
-            new Assert\NotBlank(
-                message: 'mautic.lead.import.dir.notblank'
-            )
-        );
     }
 
     public function getId(): ?int
