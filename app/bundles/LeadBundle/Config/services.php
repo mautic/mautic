@@ -36,7 +36,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->set(Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeywordValidator::class)->tag('validator.constraint_validator');
     $services->set(Mautic\CoreBundle\Form\Validator\Constraints\FileEncodingValidator::class)->tag('validator.constraint_validator');
     $services->set(Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccessValidator::class)->tag('validator.constraint_validator', ['alias' => 'leadlist_access']);
-    $services->alias('mautic.validator.leadlistaccess', Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccessValidator::class);
     $services->set(Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAliasValidator::class)->tag('validator.constraint_validator', ['alias' => 'uniqueleadlist']);
     $services->set(Mautic\LeadBundle\Form\Validator\Constraints\SegmentInUseValidator::class)->tag('validator.constraint_validator', ['alias' => 'segment_in_use']);
     $services->set(Mautic\LeadBundle\Twig\Helper\AvatarHelper::class)->tag('twig.helper', ['alias' => 'lead_avatar']);
@@ -53,20 +52,15 @@ return function (ContainerConfigurator $configurator): void {
     $services->set(Mautic\LeadBundle\DataFixtures\ORM\LoadCategoryData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
     $services->set(Mautic\LeadBundle\DataFixtures\ORM\LoadCategorizedLeadListData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
     $services->set(Mautic\LeadBundle\EventListener\ContactExportSchedulerAuditLogSubscriber::class);
-    $services->alias('mautic.lead.export_scheduled_audit_log_subscriber', Mautic\LeadBundle\EventListener\ContactExportSchedulerAuditLogSubscriber::class);
     $services->set(Mautic\LeadBundle\EventListener\ContactExportSchedulerLoggerSubscriber::class);
-    $services->alias('mautic.lead.export_scheduled_logger_subscriber', Mautic\LeadBundle\EventListener\ContactExportSchedulerLoggerSubscriber::class);
     $services->set(Mautic\LeadBundle\EventListener\ContactScheduledExportSubscriber::class);
     $services->set(Mautic\LeadBundle\Form\Validator\Constraints\EmailAddressValidator::class)->tag('validator.constraint_validator');
-    $services->alias('mautic.validator.emailaddress', Mautic\LeadBundle\Form\Validator\Constraints\EmailAddressValidator::class);
     $services->set(Mautic\LeadBundle\Validator\CustomFieldValidator::class);
     $services->set(Mautic\LeadBundle\Validator\SegmentUsedInCampaignsValidator::class);
     $services->set(Mautic\LeadBundle\Validator\Constraints\SegmentUsedInCampaignsValidator::class)->tag('validator.constraint_validator');
     $services->set(Mautic\LeadBundle\Helper\LeadChangeEventDispatcher::class);
     $services->set(Mautic\LeadBundle\Deduplicate\ContactMerger::class);
-    $services->alias('mautic.lead.merger', Mautic\LeadBundle\Deduplicate\ContactMerger::class);
     $services->set(Mautic\LeadBundle\Deduplicate\ContactDeduper::class);
-    $services->alias('mautic.lead.deduper', Mautic\LeadBundle\Deduplicate\ContactDeduper::class);
     $services->set(Mautic\LeadBundle\Helper\PrimaryCompanyHelper::class);
     $services->set(Mautic\LeadBundle\Validator\Constraints\LengthValidator::class)->tag('validator.constraint_validator');
     $services->set(Mautic\LeadBundle\Segment\Stat\SegmentDependencies::class);
@@ -78,7 +72,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->set(Mautic\LeadBundle\Segment\ContactSegmentFilterFactory::class);
     $services->alias('mautic.lead.model.lead_segment_filter_factory', Mautic\LeadBundle\Segment\ContactSegmentFilterFactory::class);
     $services->set(Mautic\LeadBundle\Tracker\DeviceTracker::class);
-    $services->alias('mautic.tracker.device', Mautic\LeadBundle\Tracker\DeviceTracker::class);
     $services->set(Mautic\LeadBundle\Field\CustomFieldColumn::class);
     $services->set(Mautic\LeadBundle\Field\CustomFieldIndex::class);
     $services->set(Mautic\LeadBundle\Services\ContactSegmentFilterDictionary::class);
@@ -154,7 +147,5 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.lead.model.ipaddress', Mautic\LeadBundle\Model\IpAddressModel::class);
     $services->alias('mautic.lead.model.export_scheduler', Mautic\LeadBundle\Model\ContactExportSchedulerModel::class);
     $services->alias('mautic.lead.repository.list_lead', Mautic\LeadBundle\Entity\ListLeadRepository::class);
-    $services->alias('mautic.company.deduper', Mautic\LeadBundle\Deduplicate\CompanyDeduper::class);
-    $services->alias('mautic.tracker.contact', Mautic\LeadBundle\Tracker\ContactTracker::class);
     $services->get(Mautic\LeadBundle\Validator\Constraints\SegmentDateValidator::class)->tag('validator.constraint_validator');
 };

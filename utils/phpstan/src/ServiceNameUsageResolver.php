@@ -52,8 +52,27 @@ final class ServiceNameUsageResolver
             return false;
         }
 
+        if ($this->isTooGenericFormat($usedName)) {
+            return false;
+        }
+
         $pattern = str_replace(preg_quote('%s', '#'), '[a-zA-Z0-9_]+', preg_quote($usedName, '#'));
 
         return 1 === preg_match('#^'.$pattern.'$#', $serviceName);
+    }
+
+    /**
+     * A format naming the vendor prefix alone, e.g. the "mautic.%s.%s" of a translation key built out of an
+     * entity type, covers every service id of the same shape and would mark them all used. Such a format
+     * tells nothing about the very service asked for, so it covers no service id at all here.
+     */
+    private function isTooGenericFormat(string $usedName): bool
+    {
+        $literalSegments = array_filter(
+            explode('.', $usedName),
+            static fn (string $segment): bool => !str_contains($segment, '%s')
+        );
+
+        return count($literalSegments) < 2;
     }
 }

@@ -56,25 +56,18 @@ return function (ContainerConfigurator $configurator): void {
     $services->set(Mautic\CoreBundle\Helper\CoreParametersHelper::class)->tag('twig.helper');
 
     $services->alias('mautic.helper.core_parameters', Mautic\CoreBundle\Helper\CoreParametersHelper::class);
-    $services->alias('mautic.config', 'mautic.helper.core_parameters');
 
     $services->set(Mautic\CoreBundle\IpLookup\AbstractLookup::class)
         ->factory([service('mautic.ip_lookup.factory'), 'getService'])
         ->args([param('mautic.ip_lookup_service'), param('mautic.ip_lookup_auth'), param('mautic.ip_lookup_config'), service('mautic.http.client')]);
-    $services->alias('mautic.ip_lookup', Mautic\CoreBundle\IpLookup\AbstractLookup::class);
     $services->set(Symfony\Contracts\HttpClient\HttpClientInterface::class)
         ->factory(Symfony\Component\HttpClient\HttpClient::create(...));
-    $services->alias('mautic.native.connector', Symfony\Contracts\HttpClient\HttpClientInterface::class);
     $services->set(Mautic\CoreBundle\Loader\TranslationLoader::class)->tag('translation.loader', ['alias' => 'mautic']);
-    $services->alias('mautic.translation.loader', Mautic\CoreBundle\Loader\TranslationLoader::class);
     $services->set(Mautic\CoreBundle\Helper\ThemeHelper::class)
         ->call('setDefaultTheme', [param('mautic.theme')]);
-    $services->alias('mautic.helper.theme', Mautic\CoreBundle\Helper\ThemeHelper::class);
     $services->set(Mautic\CoreBundle\Menu\MenuRenderer::class)->tag('knp_menu.renderer', ['alias' => 'mautic']);
-    $services->alias('mautic.menu_renderer', Mautic\CoreBundle\Menu\MenuRenderer::class);
 
     $services->set(Mautic\CoreBundle\Menu\MenuHelper::class);
-    $services->alias('mautic.helper.menu', Mautic\CoreBundle\Menu\MenuHelper::class);
     $services->set(Mautic\CoreBundle\Menu\MenuBuilder::class);
     $services->alias('mautic.menu.builder', Mautic\CoreBundle\Menu\MenuBuilder::class);
 
@@ -100,13 +93,11 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.core.service.local_file_adapter', Mautic\CoreBundle\Service\LocalFileAdapterService::class);
     $services->set(Mautic\CoreBundle\Helper\MaxMindDoNotSellDownloadHelper::class)
         ->arg('$auth', param('mautic.ip_lookup_auth'));
-    $services->alias('mautic.helper.maxmind_do_not_sell_download', Mautic\CoreBundle\Helper\MaxMindDoNotSellDownloadHelper::class);
     $services->set(Mautic\CoreBundle\Cache\MiddlewareCacheWarmer::class)
         ->arg('$env', param('kernel.environment'))
         ->tag('kernel.cache_warmer');
     $services->set(Mautic\CoreBundle\Helper\CacheHelper::class)
         ->arg('$cacheDir', param('kernel.cache_dir'));
-    $services->alias('mautic.helper.cache', Mautic\CoreBundle\Helper\CacheHelper::class);
     $services->set(Mautic\CoreBundle\Factory\IpLookupFactory::class)
         ->arg('$lookupServices', param('mautic.ip_lookup_services'))
         ->arg('$cacheDir', param('kernel.cache_dir'));
@@ -120,7 +111,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->set(Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper::class)
         ->arg('$prefix', param('mautic.db_table_prefix'));
     $services->set(Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList::class);
-    $services->alias('mautic.maxmind.doNotSellList', Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList::class);
     $services->set(Mautic\CoreBundle\Form\Type\DynamicContentFilterEntryFiltersType::class)
         ->call('setConnection', [service('database_connection')]);
 
@@ -151,14 +141,12 @@ return function (ContainerConfigurator $configurator): void {
     $services->set(Mautic\CoreBundle\EventListener\ExceptionListener::class)
         ->arg('$controller', 'Mautic\CoreBundle\Controller\ExceptionController::showAction');
 
-    $services->alias('mautic.exception.listener', Mautic\CoreBundle\EventListener\ExceptionListener::class);
     $services->set(Mautic\CoreBundle\Helper\CookieHelper::class)
         ->arg('$path', param('mautic.cookie_path'))
         ->arg('$domain', param('mautic.cookie_domain'))
         ->arg('$secure', param('mautic.cookie_secure'))
         ->arg('$httponly', param('mautic.cookie_httponly'))
         ->tag('kernel.event_subscriber');
-    $services->alias('mautic.helper.cookie', Mautic\CoreBundle\Helper\CookieHelper::class);
 
     $services->set(Mautic\CoreBundle\Helper\EncryptionHelper::class)
         ->args([
@@ -168,11 +156,6 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->set(Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator::class)->tag('validator.constraint_validator');
 
-    $services->alias('mautic.helper.file_uploader', Mautic\CoreBundle\Helper\FileUploader::class);
-    $services->alias('mautic.helper.file_path_resolver', Mautic\CoreBundle\Helper\FilePathResolver::class);
-    $services->alias('mautic.helper.file_properties', Mautic\CoreBundle\Helper\FileProperties::class);
-    $services->alias('mautic.filesystem', Mautic\CoreBundle\Helper\Filesystem::class);
-
     /* @deprecated to be removed in Mautic 4. Use 'mautic.filesystem' instead. */
     $services->set('symfony.filesystem', Symfony\Component\Filesystem\Filesystem::class);
     $services->alias(Symfony\Component\Filesystem\Filesystem::class, 'symfony.filesystem');
@@ -180,12 +163,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->set('symfony.finder', Symfony\Component\Finder\Finder::class);
     $services->alias(Symfony\Component\Finder\Finder::class, 'symfony.finder');
 
-    $services->alias('mautic.helper.input_helper', Mautic\CoreBundle\Helper\InputHelper::class);
-    $services->alias('mautic.helper.trailing_slash', Mautic\CoreBundle\Helper\TrailingSlashHelper::class);
-    $services->alias('mautic.helper.url', Mautic\CoreBundle\Helper\UrlHelper::class);
-    $services->alias('mautic.helper.hash', Mautic\CoreBundle\Helper\HashHelper\HashHelper::class);
-    $services->alias('mautic.helper.random', Mautic\CoreBundle\Helper\RandomHelper\RandomHelper::class);
-    $services->alias('mautic.helper.phone_number', Mautic\CoreBundle\Helper\PhoneNumberHelper::class);
     $services->set(Mautic\CoreBundle\Loader\RouteLoader::class)
         ->tag('routing.loader');
 
@@ -206,11 +183,9 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->get(Mautic\CoreBundle\Helper\UpdateHelper::class)
         ->arg('$logger', \Symfony\Component\DependencyInjection\Loader\Configurator\service('monolog.logger.mautic'));
-    $services->alias('mautic.helper.update', Mautic\CoreBundle\Helper\UpdateHelper::class);
 
     $services->get(Mautic\CoreBundle\Helper\ComposerHelper::class)
         ->arg('$logger', \Symfony\Component\DependencyInjection\Loader\Configurator\service('monolog.logger.mautic'));
-    $services->alias('mautic.helper.composer', Mautic\CoreBundle\Helper\ComposerHelper::class);
 
     $services->get(Mautic\CoreBundle\Update\Step\DeleteCacheStep::class)->tag('mautic.update_step');
 
@@ -249,11 +224,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->set(Mautic\CoreBundle\DependencyInjection\EnvProcessor\MauticConstProcessor::class)
         ->tag('container.env_var_processor');
 
-    $services->alias('mautic.helper.user', Mautic\CoreBundle\Helper\UserHelper::class);
-    $services->alias('mautic.helper.ip_lookup', Mautic\CoreBundle\Helper\IpLookupHelper::class);
     $services->alias('mautic.helper.token_builder', Mautic\CoreBundle\Helper\BuilderTokenHelper::class);
-    $services->alias('mautic.helper.app_version', Mautic\CoreBundle\Helper\AppVersion::class);
-    $services->alias('mautic.helper.command', Mautic\CoreBundle\Helper\CommandHelper::class);
 
     // Explicitly register our Twig extension with high priority
     $services->set(Mautic\CoreBundle\Twig\Extension\OverrideIncludeExtension::class)
@@ -275,8 +246,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias(Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface::class, 'argument_resolver');
 
     $services->alias(Mautic\CoreBundle\Doctrine\Provider\VersionProviderInterface::class, Mautic\CoreBundle\Doctrine\Provider\VersionProvider::class);
-    $services->alias('mautic.model.factory', Mautic\CoreBundle\Factory\ModelFactory::class);
-    $services->alias('mautic.helper.language', Mautic\CoreBundle\Helper\LanguageHelper::class);
     $services->alias('mautic.helper.assetgeneration', Mautic\CoreBundle\Helper\AssetGenerationHelper::class);
     $services->alias('mautic.helper.update_checks', Mautic\CoreBundle\Helper\PreUpdateCheckHelper::class);
     $services->alias('mautic.update.step_provider', Mautic\CoreBundle\Update\StepProvider::class);

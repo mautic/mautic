@@ -69,8 +69,6 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->alias('mautic.user.model.role', Mautic\UserBundle\Model\RoleModel::class);
     $services->alias('mautic.user.model.user', Mautic\UserBundle\Model\UserModel::class);
-    $services->alias('mautic.user.repository', Mautic\UserBundle\Entity\UserRepository::class);
-    $services->alias('mautic.permission.repository', Mautic\UserBundle\Entity\PermissionRepository::class);
     $services->alias('mautic.user.model.password_strength_estimator', Mautic\UserBundle\Model\PasswordStrengthEstimatorModel::class);
     $services->get(Mautic\UserBundle\Form\Validator\Constraints\NotWeakValidator::class)->tag('validator.constraint_validator');
 
@@ -94,11 +92,9 @@ return function (ContainerConfigurator $configurator): void {
     $services->set(Doctrine\ORM\EntityManager::class)
         ->factory([service('doctrine'), 'getManagerForClass'])
         ->args([Mautic\UserBundle\Entity\User::class]);
-    $services->alias('mautic.user.manager', Doctrine\ORM\EntityManager::class);
     $services->set(Doctrine\ORM\EntityManager::class)
         ->factory([service('doctrine'), 'getManagerForClass'])
         ->args([Mautic\UserBundle\Entity\Permission::class]);
-    $services->alias('mautic.permission.manager', Doctrine\ORM\EntityManager::class);
     $services->set(LightSaml\Builder\EntityDescriptor\SimpleEntityDescriptorBuilder::class)
         ->factory(Mautic\UserBundle\Security\SAML\EntityDescriptorProviderFactory::build(...))
         ->args([param('lightsaml.own.entity_id'), service('router'), param('lightsaml.route.login_check'), service('lightsaml.own.credential_store')]);

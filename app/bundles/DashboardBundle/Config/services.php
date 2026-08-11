@@ -20,6 +20,5 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\DashboardBundle\\Entity\\', '../Entity/*Repository.php');
     $services->set(Mautic\DashboardBundle\Dashboard\Widget::class);
-    $services->alias('mautic.dashboard.widget', Mautic\DashboardBundle\Dashboard\Widget::class);
     $services->alias('mautic.dashboard.model.dashboard', Mautic\DashboardBundle\Model\DashboardModel::class);
 };

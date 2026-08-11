@@ -40,13 +40,19 @@ final class NoUnusedServiceAliasRuleTest extends RuleTestCase
         $this->analyse([
             $servicesFilePath,
             __DIR__.'/Fixture/AliasBundle/Config/config.php',
+            __DIR__.'/Fixture/AliasBundle/AliasDefinitionFactory.php',
             __DIR__.'/Fixture/AliasBundle/AliasHelperFetcher.php',
+            __DIR__.'/Fixture/AliasBundle/AliasLabelProvider.php',
             __DIR__.'/Fixture/AliasBundle/UsedAliasHelper.php',
             __DIR__.'/Fixture/AliasBundle/UnusedAliasHelper.php',
         ], [
             [
-                'Service alias "mautic.alias.legacy_unused_helper" is never used, remove it.',
+                'Service alias "mautic.alias.scheduler" is never used, remove it.',
                 22,
+            ],
+            [
+                'Service alias "mautic.alias.legacy_unused_helper" is never used, remove it.',
+                26,
             ],
         ]);
     }

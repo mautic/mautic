@@ -65,7 +65,7 @@ final class ServiceNameUsageCollector implements Collector
     private function matchServiceId(Node $node): ?string
     {
         if ($node instanceof String_) {
-            return str_contains($node->value, '%s') ? null : $node->value;
+            return str_contains($node->value, '%s') ? null : $this->trimReferencePrefix($node->value);
         }
 
         if (!$node instanceof InterpolatedString) {
@@ -77,6 +77,20 @@ final class ServiceNameUsageCollector implements Collector
             $serviceId .= $part instanceof InterpolatedStringPart ? $part->value : '%s';
         }
 
-        return $serviceId;
+        return $this->trimReferencePrefix($serviceId);
+    }
+
+    /**
+     * A service id written the Symfony reference way, e.g. the '@mautic.menu.builder' of a definition array,
+     * names the very same service as a plain 'mautic.menu.builder' does. The optional reference "@?" asks for
+     * it the same way, only without failing when it is gone.
+     */
+    private function trimReferencePrefix(string $serviceId): string
+    {
+        if (!str_starts_with($serviceId, '@')) {
+            return $serviceId;
+        }
+
+        return ltrim(substr($serviceId, 1), '?');
     }
 }

@@ -66,8 +66,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.email.model.send_email_to_user', Mautic\EmailBundle\Model\SendEmailToUser::class);
     $services->alias('mautic.email.model.send_email_to_contacts', Mautic\EmailBundle\Model\SendEmailToContact::class);
     $services->alias('mautic.email.model.transport_callback', Mautic\EmailBundle\Model\TransportCallback::class);
-    $services->alias('mautic.helper.mailbox', Mautic\EmailBundle\MonitoredEmail\Mailbox::class);
-    $services->alias('mautic.helper.mailer', Mautic\EmailBundle\Helper\MailHelper::class);
     $services->alias('mautic.email.stats.helper_container', Mautic\EmailBundle\Stats\StatHelperContainer::class);
 
     $services->get(Mautic\EmailBundle\EventListener\WebhookSubscriber::class)

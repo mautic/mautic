@@ -53,8 +53,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.campaign.model.event', Mautic\CampaignBundle\Model\EventModel::class);
     $services->alias('mautic.campaign.model.event_log', Mautic\CampaignBundle\Model\EventLogModel::class);
     $services->alias('mautic.campaign.model.summary', Mautic\CampaignBundle\Model\SummaryModel::class);
-    $services->alias('mautic.campaign.event_logger', Mautic\CampaignBundle\Executioner\Logger\EventLogger::class);
-    $services->alias('mautic.campaign.scheduler', Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler::class);
     $services->set(Mautic\CampaignBundle\Executioner\ScheduledExecutioner::class)->tag('kernel.reset', ['method' => 'reset']);
 
     if ('test' === ($_ENV['APP_ENV'] ?? $_SERVER['APP_ENV'] ?? 'prod')) {
