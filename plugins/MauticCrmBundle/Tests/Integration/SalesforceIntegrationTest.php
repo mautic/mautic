@@ -109,7 +109,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
     {
         parent::setUp();
 
-        defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
+        defined('MAUTIC_ENV') || define('MAUTIC_ENV', 'test');
     }
 
     /**
@@ -741,7 +741,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                 function () use ($spy): array {
                     // WARNING: this is using a PHPUnit undocumented workaround:
                     // https://github.com/sebastianbergmann/phpunit/issues/3888
-                    $spyParentProperties = self::getParentPrivateProperties($spy);
+                    $spyParentProperties = $this->getParentPrivateProperties($spy);
                     $invocations         = $spyParentProperties['invocations'];
 
                     if (count($invocations) > $this->getMaxInvocations('getIntegrationsEntityId')) {
@@ -784,9 +784,8 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         $this->em->method('getReference')
             ->willReturnCallback(
                 function () {
-                    switch (func_get_arg(0)) {
-                        case IntegrationEntity::class:
-                            return new IntegrationEntity();
+                    if (IntegrationEntity::class === func_get_arg(0)) {
+                        return new IntegrationEntity();
                     }
                 }
             );
@@ -1406,7 +1405,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
     /**
      * @return array<string, mixed>
      */
-    private static function getParentPrivateProperties(mixed $instance): array
+    private function getParentPrivateProperties(mixed $instance): array
     {
         $reflectionClass       = new \ReflectionClass($instance::class);
         $parentReflectionClass = $reflectionClass->getParentClass();

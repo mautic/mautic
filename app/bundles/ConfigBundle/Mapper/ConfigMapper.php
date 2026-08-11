@@ -7,15 +7,15 @@ use Mautic\ConfigBundle\Mapper\Helper\ConfigHelper;
 use Mautic\ConfigBundle\Mapper\Helper\RestrictionHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
-class ConfigMapper
+final readonly class ConfigMapper
 {
     /**
      * @var mixed[]
      */
-    private readonly array $restrictedParameters;
+    private array $restrictedParameters;
 
     public function __construct(
-        private readonly CoreParametersHelper $parametersHelper,
+        private CoreParametersHelper $parametersHelper,
         array $restrictedParameters = [],
     ) {
         $this->restrictedParameters = RestrictionHelper::prepareRestrictions($restrictedParameters);

@@ -15,7 +15,7 @@ use PHPUnit\Runner\Extension\Facade;
 use PHPUnit\Runner\Extension\ParameterCollection;
 use PHPUnit\TextUI\Configuration\Configuration;
 
-class SeparateProcess implements Extension
+final class SeparateProcess implements Extension
 {
     private bool $prepared          = false;
 

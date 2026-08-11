@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\DAO\Sync\Request;
 
-class ObjectDAO
+final class ObjectDAO
 {
     /**
      * @var string[]

@@ -79,7 +79,7 @@ $container->loadFromExtension('framework', [
     'form'            => null,
     'csrf_protection' => true,
     'validation'      => [
-        'enable_attributes' => false,
+        'enable_attributes' => true,
     ],
     'default_locale' => '%mautic.locale%',
     'translator'     => [

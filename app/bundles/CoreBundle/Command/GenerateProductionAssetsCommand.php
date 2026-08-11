@@ -29,7 +29,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 <info>php %command.full_name%</info>
 TXT
 )]
-class GenerateProductionAssetsCommand extends Command
+final class GenerateProductionAssetsCommand extends Command
 {
     public function __construct(
         private readonly AssetGenerationHelper $assetGenerationHelper,

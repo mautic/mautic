@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Form\Type;
 
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;

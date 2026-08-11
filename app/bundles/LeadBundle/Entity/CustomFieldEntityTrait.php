@@ -70,9 +70,9 @@ trait CustomFieldEntityTrait
     }
 
     /**
-     * @param mixed[] $fields
+     * @param array<string, mixed> $fields
      */
-    public function setFields($fields): void
+    public function setFields(array $fields): void
     {
         $this->fields = CustomFieldValueHelper::normalizeValues($fields);
     }

@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
     name: self::COMMAND_NAME,
     description: 'Update segment count cache for changed segments.'
 )]
-class SegmentCountCacheCommand extends Command
+final class SegmentCountCacheCommand extends Command
 {
     public const COMMAND_NAME = 'lead:list:count-cache-update';
 

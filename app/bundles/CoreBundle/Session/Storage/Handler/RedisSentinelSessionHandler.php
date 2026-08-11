@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\AbstractSessionHand
 /**
  * @deprecated since Mautic 5.0, to be removed in 6.0 with no replacement.
  */
-class RedisSentinelSessionHandler extends AbstractSessionHandler
+final class RedisSentinelSessionHandler extends AbstractSessionHandler
 {
     /**
      * @var Client Redis client

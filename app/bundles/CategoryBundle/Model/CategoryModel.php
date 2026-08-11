@@ -2,27 +2,20 @@
 
 namespace Mautic\CategoryBundle\Model;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CategoryBundle\CategoryEvents;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Entity\CategoryRepository;
 use Mautic\CategoryBundle\Event\CategoryEvent;
 use Mautic\CategoryBundle\Event\CategoryTypeEntityEvent;
 use Mautic\CategoryBundle\Form\Type\CategoryType;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Translation\Translator;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends FormModel<Category>
@@ -34,19 +27,17 @@ class CategoryModel extends FormModel implements AjaxLookupModelInterface
      */
     private array $categoriesByBundleCache = [];
 
-    public function __construct(
-        protected RequestStack $requestStack,
-        EntityManagerInterface $em,
-        CorePermissions $security,
-        EventDispatcherInterface $dispatcher,
-        UrlGeneratorInterface $router,
-        Translator $translator,
-        UserHelper $userHelper,
-        LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper,
-        private readonly CategoryRepository $categoryRepository,
-    ) {
-        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
+    protected RequestStack $requestStack;
+
+    private CategoryRepository $categoryRepository;
+
+    #[Required]
+    public function autowireCategoryModel(
+        RequestStack $requestStack,
+        CategoryRepository $categoryRepository,
+    ): void {
+        $this->requestStack       = $requestStack;
+        $this->categoryRepository = $categoryRepository;
     }
 
     // @phpstan-ignore-next-line method.childReturnType

@@ -8,10 +8,10 @@ use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class AssetExtension extends AbstractExtension
+final class AssetExtension extends AbstractExtension
 {
     public function __construct(
-        protected AssetsHelper $assetsHelper,
+        private readonly AssetsHelper $assetsHelper,
     ) {
     }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
@@ -134,6 +136,6 @@ class Tag implements UuidInterface
 
     private function validateTag(string $tag): string
     {
-        return InputHelper::string(trim((string) $tag));
+        return InputHelper::string(trim($tag));
     }
 }

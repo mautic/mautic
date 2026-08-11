@@ -141,10 +141,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     #[Groups(['contact:read', 'segment:read', 'campaign:read', 'email:read', 'sms:read'])]
     private $points = 0;
 
-    /**
-     * @var array
-     */
-    private $pointChanges = [];
+    private array $pointChanges = [];
 
     /**
      * @var int|null
@@ -532,7 +529,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $metadata->addConstraint(new UniqueCustomField(['object' => 'lead']));
+        $metadata->addConstraint(new UniqueCustomField(object: 'lead'));
     }
 
     public static function getDefaultIdentifierFields(): array
@@ -854,10 +851,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getPointChanges()
+    public function getPointChanges(): array
     {
         return $this->pointChanges;
     }

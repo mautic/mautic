@@ -4,6 +4,20 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Functional\DependencyInjection;
 
+use Mautic\AssetBundle\Controller\UploadController;
+use Mautic\CacheBundle\Cache\Adapter\MemcachedTagAwareAdapter;
+use Mautic\CacheBundle\Cache\Adapter\RedisAdapter;
+use Mautic\CacheBundle\Cache\Adapter\RedisTagAwareAdapter;
+use Mautic\CampaignBundle\Enum\RepublishBehavior;
+use Mautic\CategoryBundle\Controller\Api\CategoryApiController;
+use Mautic\CoreBundle\Form\Type\DynamicContentFilterEntryType;
+use Mautic\CoreBundle\Helper\BuilderTokenHelper;
+use Mautic\DynamicContentBundle\Form\Type\DynamicContentType;
+use Mautic\FormBundle\Enum\Token\RedirectUrlToken;
+use Mautic\LeadBundle\Controller\Api\FieldApiController;
+use Mautic\LeadBundle\EventListener\SearchSubscriber;
+use Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAlias;
+use Mautic\LeadBundle\Validator\Constraints\Length;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
@@ -18,9 +32,9 @@ abstract class AbstractContainerSmokeTestCase extends TestCase
      */
     private const SKIPPED_SERVICE_IDS = [
         // requires a database connection in the constructor
-        \Mautic\CoreBundle\Form\Type\DynamicContentFilterEntryType::class,
-        \Mautic\DynamicContentBundle\Form\Type\DynamicContentType::class,
-        \Mautic\LeadBundle\EventListener\SearchSubscriber::class,
+        DynamicContentFilterEntryType::class,
+        DynamicContentType::class,
+        SearchSubscriber::class,
         \MauticPlugin\MauticClearbitBundle\EventListener\LeadSubscriber::class,
         \MauticPlugin\MauticClearbitBundle\Helper\LookupHelper::class,
         \MauticPlugin\MauticFullContactBundle\EventListener\LeadSubscriber::class,
@@ -29,26 +43,26 @@ abstract class AbstractContainerSmokeTestCase extends TestCase
         'mautic.plugin.fullcontact.lookup_helper',
 
         // requires a running Redis/Memcached server or an optional package
-        \Mautic\CacheBundle\Cache\Adapter\MemcachedTagAwareAdapter::class,
-        \Mautic\CacheBundle\Cache\Adapter\RedisAdapter::class,
-        \Mautic\CacheBundle\Cache\Adapter\RedisTagAwareAdapter::class,
+        MemcachedTagAwareAdapter::class,
+        RedisAdapter::class,
+        RedisTagAwareAdapter::class,
         'mautic.cache.adapter.memcached',
         'mautic.cache.adapter.redis',
         'mautic.cache.adapter.redis_tag_aware',
         'doctrine.uuid_generator',
 
         // not a service at all, an enum or a validation constraint
-        \Mautic\CampaignBundle\Enum\RepublishBehavior::class,
-        \Mautic\FormBundle\Enum\Token\RedirectUrlToken::class,
-        \Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAlias::class,
-        \Mautic\LeadBundle\Validator\Constraints\Length::class,
+        RepublishBehavior::class,
+        RedirectUrlToken::class,
+        UniqueUserAlias::class,
+        Length::class,
 
         // broken wiring: missing class, wrong argument count or wrong argument type
-        \Mautic\AssetBundle\Controller\UploadController::class,
+        UploadController::class,
         'Mautic\CampaignBundle\Service\Campaign',
-        \Mautic\CategoryBundle\Controller\Api\CategoryApiController::class,
-        \Mautic\CoreBundle\Helper\BuilderTokenHelper::class,
-        \Mautic\LeadBundle\Controller\Api\FieldApiController::class,
+        CategoryApiController::class,
+        BuilderTokenHelper::class,
+        FieldApiController::class,
         'fos_oauth_server.controller.authorize',
         'mautic.helper.token_builder',
     ];

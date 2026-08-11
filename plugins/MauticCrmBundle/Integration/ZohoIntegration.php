@@ -19,7 +19,7 @@ use Symfony\Component\Form\FormBuilder;
 /**
  * @extends CrmAbstractIntegration<ZohoApi>
  */
-class ZohoIntegration extends CrmAbstractIntegration
+final class ZohoIntegration extends CrmAbstractIntegration
 {
     /**
      * Returns the name of the social integration that must match the name of the file.
@@ -789,7 +789,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         if ($key = array_search('mauticContactIsContactableByEmail', $leadFields)) {
             unset($leadFields[$key]);
         }
-        if (empty($leadFields)) {
+        if ([] === $leadFields) {
             return [0, 0, 0];
         }
 
@@ -807,7 +807,7 @@ class ZohoIntegration extends CrmAbstractIntegration
             $this->integrationEntityRepository->findLeadsToUpdate('Zoho', 'lead', $fields, 0, $params['start'], $params['end'], ['Contacts', 'Leads'])
         );
         $totalToCreate = $this->integrationEntityRepository->findLeadsToCreate('Zoho', $fields, 0, $params['start'], $params['end']);
-        $totalToCreate = is_array($totalToCreate) ? count($totalToCreate) : (int) $totalToCreate;
+        $totalToCreate = is_array($totalToCreate) ? count($totalToCreate) : $totalToCreate;
         $totalCount    = $totalToCreate + $totalToUpdate;
 
         if (defined('IN_MAUTIC_CONSOLE')) {
@@ -1031,7 +1031,7 @@ class ZohoIntegration extends CrmAbstractIntegration
 
         try {
             if ($this->isAuthorized()) {
-                if (!empty($existingPerson) && empty($integrationId)) {
+                if ([] !== $existingPerson && [] === $integrationId) {
                     $this->createIntegrationEntity($zObject, $existingPerson['id'], 'lead', $lead->getId());
 
                     $mapper
@@ -1039,7 +1039,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                         ->setContact($lead->getProfileFields())
                         ->map($lead->getId(), $existingPerson['id']);
                     $this->updateContactInZoho($mapper, $zObject, $counter, $errorCounter);
-                } elseif (!empty($existingPerson) && !empty($integrationId)) { // contact exists, then update
+                } elseif ([] !== $existingPerson && [] !== $integrationId) { // contact exists, then update
                     $mapper
                         ->setMappedFields($fieldsToUpdate[$zObject])
                         ->setContact($lead->getProfileFields())

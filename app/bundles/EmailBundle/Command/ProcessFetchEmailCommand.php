@@ -25,7 +25,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 <info>php %command.full_name%</info>
 TXT
 )]
-class ProcessFetchEmailCommand extends Command
+final class ProcessFetchEmailCommand extends Command
 {
     public function __construct(
         private readonly CoreParametersHelper $parametersHelper,
