@@ -377,6 +377,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://vedantmadane.github.io"><img src="https://avatars.githubusercontent.com/u/6527493?v=4?s=100" width="100px;" alt="Vedant Madane"/><br /><sub><b>Vedant Madane</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=VedantMadane" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/TechEnthusGH"><img src="https://avatars.githubusercontent.com/u/289884007?v=4?s=100" width="100px;" alt="TechEnthusGH"/><br /><sub><b>TechEnthusGH</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=TechEnthusGH" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
