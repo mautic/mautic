@@ -1039,7 +1039,8 @@ class LeadModel extends FormModel
     /**
      * Remove lead from Stage.
      *
-     * @param bool $manuallyRemoved
+     * @param array|Lead $lead
+     * @param bool       $manuallyRemoved
      */
     public function removeFromStages($lead, Stage $stage, $manuallyRemoved = true): static
     {
