@@ -23,8 +23,6 @@ class WidgetDetailEvent extends CommonEvent
 
     protected $uniqueId;
 
-    protected $cacheTimeout;
-
     protected float $startTime;
 
     protected $loadTime  = 0;
@@ -60,7 +58,7 @@ class WidgetDetailEvent extends CommonEvent
     }
 
     /**
-     * Return unique key, uses legacy methods for BC.
+     * Return unique cache key for the widget.
      */
     public function getCacheKey(): string
     {
@@ -85,14 +83,6 @@ class WidgetDetailEvent extends CommonEvent
         $cacheKey = (1 === count($cacheKey)) ? $this->getUniqueWidgetId() : substr(md5(implode('', $cacheKey)), 0, 16);
 
         return $this->cacheKeyPath.$cacheKey;
-    }
-
-    /**
-     * @param int|null $cacheTimeout
-     */
-    public function setCacheTimeout($cacheTimeout): void
-    {
-        $this->cacheTimeout = (int) $cacheTimeout;
     }
 
     /**
@@ -144,7 +134,6 @@ class WidgetDetailEvent extends CommonEvent
         $widget->setParams($params);
 
         $this->setType($widget->getType());
-        $this->setCacheTimeout($widget->getCacheTimeout());
     }
 
     /**
@@ -295,9 +284,6 @@ class WidgetDetailEvent extends CommonEvent
         return $this->security->isGranted($permission);
     }
 
-    /**
-     * Checks for cache type. This event should be created by factory thus not legacy approach.
-     */
     /**
      * We need to cast DateTime objects to strings to use them in the cache key.
      *
