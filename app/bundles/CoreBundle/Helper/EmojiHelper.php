@@ -6,6 +6,8 @@ namespace Mautic\CoreBundle\Helper;
  * Helper class for Emoji unicodes.
  *
  * Build from modified https://github.com/iamcal/php-emoji
+ *
+ * @deprecated since Mautic 7.2, to be removed in 8.0 with no replacement. Emoji are stored and rendered as UTF-8 (utf8mb4) directly, so no conversion is needed.
  */
 final class EmojiHelper
 {
