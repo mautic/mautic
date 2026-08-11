@@ -116,12 +116,6 @@ return function (ContainerConfigurator $configurator): void {
         ->arg('$env', param('kernel.environment'))
         ->tag('kernel.cache_warmer');
     $services->alias(Mautic\CoreBundle\Cache\MiddlewareCacheWarmer::class, 'mautic.cache.warmer.middleware');
-    $services->set('mautic.helper.cache_storage', Mautic\CoreBundle\Helper\CacheStorageHelper::class)
-        ->arg('$adaptor', 'db')
-        ->arg('$namespace', param('mautic.db_table_prefix'))
-        ->arg('$connection', service('doctrine.dbal.default_connection'))
-        ->arg('$cacheDir', param('kernel.cache_dir'));
-    $services->alias(Mautic\CoreBundle\Helper\CacheStorageHelper::class, 'mautic.helper.cache_storage');
     $services->set('mautic.helper.cache', Mautic\CoreBundle\Helper\CacheHelper::class)
         ->arg('$cacheDir', param('kernel.cache_dir'));
     $services->alias(Mautic\CoreBundle\Helper\CacheHelper::class, 'mautic.helper.cache');

@@ -4,8 +4,8 @@ namespace Mautic\SmsBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CacheBundle\Cache\CacheProviderInterface;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
-use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -55,7 +55,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         protected TrackableModel $pageTrackableModel,
         protected LeadModel $leadModel,
         protected TransportChain $transport,
-        private CacheStorageHelper $cacheStorageHelper,
+        private CacheProviderInterface $cacheProvider,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -172,9 +172,9 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         $entities = parent::getEntities($args);
 
         foreach ($entities as $entity) {
-            $pending = $this->cacheStorageHelper->get(sprintf('%s|%s|%s', 'sms', $entity->getId(), 'pending'));
+            $pending = $this->cacheProvider->getSimpleCache()->get(sprintf('%s|%s|%s', 'sms', $entity->getId(), 'pending'));
 
-            if (false !== $pending) {
+            if (null !== $pending) {
                 $entity->setPendingCount($pending);
             }
         }

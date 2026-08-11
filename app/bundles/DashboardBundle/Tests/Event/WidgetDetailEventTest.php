@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\DashboardBundle\Tests\Event;
 
+use Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\DashboardBundle\Entity\Widget;
@@ -34,7 +35,8 @@ final class WidgetDetailEventTest extends \PHPUnit\Framework\TestCase
         $this->widgetDetailEvent = new WidgetDetailEvent(
             $this->translator,
             $this->createStub(CorePermissions::class),
-            $this->widget
+            $this->widget,
+            $this->createStub(CacheProviderTagAwareInterface::class)
         );
     }
 

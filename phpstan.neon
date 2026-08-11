@@ -121,12 +121,6 @@ parameters:
 			identifier: class.extendsDeprecatedClass
 			path: app/bundles/IntegrationsBundle/Tests/Unit/AbstractIntegrationTest.php
 		-
-			identifier: classConstant.deprecatedClass
-			paths:
-				- app/bundles/EmailBundle/Tests/Model/EmailModelTest.php
-				- app/bundles/SmsBundle/Tests/Model/SmsModelTest.php
-				- app/bundles/IntegrationsBundle/Tests/Unit/AbstractIntegrationTest.php
-		-
 			message: '#Anonymous class implements deprecated interface Doctrine\\DBAL\\Logging\\SQLLogger#'
 			path: app/bundles/LeadBundle/Tests/Model/FieldModelTest.php
 

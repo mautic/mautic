@@ -25,7 +25,7 @@ use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Exception\NoObjectsToFet
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Helper\StateValidationHelper;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\CampaignMember;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\ResultsPaginator;
-use Psr\Cache\InvalidArgumentException;
+use Psr\SimpleCache\InvalidArgumentException;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -1364,15 +1364,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         $mixedFields           = $this->getIntegrationSettings()->getFeatureSettings();
 
-        // Get the last time the campaign was synced to prevent resyncing the entire SF campaign
+        // Get the last time the campaign was synced to prevent resyncing the entire SF campaign; null syncs all records
         $cacheKey     = $this->getName().'.CampaignSync.'.$campaignId;
         $lastSyncDate = $this->getCache()->get($cacheKey);
         $syncStarted  = new \DateTime()->format('c');
-
-        if (false === $lastSyncDate) {
-            // Sync all records
-            $lastSyncDate = null;
-        }
 
         // Consume in batches
         $paginator      = new ResultsPaginator($this->logger, $this->keys['instance_url']);
