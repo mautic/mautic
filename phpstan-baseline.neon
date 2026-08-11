@@ -12212,30 +12212,3 @@ parameters:
 			identifier: argument.type
 			count: 2
 			path: plugins/MauticSocialBundle/Security/Permissions/MauticSocialPermissions.php
-
-		-
-			message: '#^Parameter \#1 \$envKey of class Symfony\\Component\\Dotenv\\Dotenv constructor expects string, false given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/config/bootstrap.php
-
-		-
-			message: '''
-				#^Fetching deprecated class constant ARRAY of class Doctrine\\DBAL\\Types\\Types\:
-				Use \{@link Types\:\:JSON\} instead\.$#
-			'''
-			identifier: classConstant.deprecated
-			count: 1
-			path: app/config/config.php
-
-		-
-			message: '#^Ternary operator condition is always true\.$#'
-			identifier: ternary.alwaysTrue
-			count: 5
-			path: app/config/config_test.php
-
-		-
-			message: '#^Cannot unset offset ''simple_form'' on array\{pattern\: ''\^/\(s/\|elfinder…'', light_saml_sp\: array\{provider\: ''user_provider'', success_handler\: ''mautic\.security…'', failure_handler\: ''mautic\.security…'', user_creator\: ''mautic\.security…'', username_mapper\: ''mautic\.security…'', login_path\: ''%%env\(MAUTIC_SAML…'', check_path\: ''%%env\(MAUTIC_SAML…''\}, form_login\: array\{enable_csrf\: true, success_handler\: ''mautic\.security…'', failure_handler\: ''mautic\.security…'', login_path\: ''/s/login'', check_path\: ''/s/login_check''\}, logout\: array\{path\: ''/s/logout'', target\: ''/s/login''\}, remember_me\: array\{secret\: ''%%mautic\.rememberme…'', lifetime\: ''%%mautic\.rememberme…'', path\: ''%%mautic\.rememberme…'', domain\: ''%%mautic\.rememberme…'', samesite\: ''lax''\}, entry_point\: ''Mautic\\\\UserBundle\\\\Security\\\\EntryPoint\\\\MainEntryPoint'', mautic_sso\: array\{\}, fos_oauth\: true, \.\.\.\}\.$#'
-			identifier: unset.offset
-			count: 1
-			path: app/config/security.php
