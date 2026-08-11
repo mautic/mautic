@@ -29,15 +29,11 @@ return function (ContainerConfigurator $configurator): void {
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
     $services->set(Mautic\EmailBundle\DataFixtures\ORM\LoadEmailData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
     $services->set(Mautic\EmailBundle\DependencyInjection\EnvProcessor\MailerDsnEnvVarProcessor::class)->tag('container.env_var_processor');
-    $services->set(Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder::class);
 
     $services->set(Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe::class);
 
     $services->set(Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop::class);
 
-    $services->set(Mautic\EmailBundle\Helper\EmailValidator::class);
-    $services->set(Mautic\EmailBundle\MonitoredEmail\Fetcher::class);
-    $services->set(Mautic\EmailBundle\Helper\StatsCollectionHelper::class);
     $services->set('mautic.email.stats.helper_container', Mautic\EmailBundle\Stats\StatHelperContainer::class);
 
     $services->set(Mautic\EmailBundle\Stats\Helper\BouncedHelper::class)

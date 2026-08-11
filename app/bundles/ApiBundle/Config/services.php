@@ -24,9 +24,6 @@ return function (ContainerConfigurator $configurator): void {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('Mautic\\ApiBundle\\Entity\\oAuth2\\', '../Entity/oAuth2/*Repository.php');
-    $services->set(Mautic\ApiBundle\Helper\EntityResultHelper::class);
-
-    $services->set(Mautic\ApiBundle\EventListener\PreAuthorizationEventListener::class);
 
     $services->set(Mautic\ApiBundle\Form\Validator\Constraints\OAuthCallbackValidator::class)->tag('validator.constraint_validator');
     $services->set(Mautic\ApiBundle\Security\Voter\ApiPermissionVoter::class)->tag('security.voter');

@@ -267,6 +267,7 @@ rules:
 	- Utils\PHPStan\Rule\NoServiceJugglingRule
 	- Utils\PHPStan\Rule\NoUnusedServiceNameRule
 	- Utils\PHPStan\Rule\NoClassNameServiceAliasRule
+	- Utils\PHPStan\Rule\NoAlreadyLoadedServiceSetRule
 
 services:
 	- Utils\PHPStan\ServiceNameUsageResolver

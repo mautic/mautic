@@ -17,6 +17,5 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('MauticPlugin\\MauticOutlookBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
-    $services->set(MauticPlugin\MauticOutlookBundle\Integration\OutlookIntegration::class);
     $services->alias('mautic.integration.outlook', MauticPlugin\MauticOutlookBundle\Integration\OutlookIntegration::class);
 };

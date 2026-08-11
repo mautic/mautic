@@ -28,27 +28,6 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->set(Mautic\CampaignBundle\DataFixtures\ORM\CampaignData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
 
-    $services->set(Mautic\CampaignBundle\Executioner\ContactFinder\KickoffContactFinder::class);
-    $services->set(Mautic\CampaignBundle\Executioner\ContactFinder\ScheduledContactFinder::class);
-    $services->set(Mautic\CampaignBundle\Executioner\ContactFinder\InactiveContactFinder::class);
-    $services->set(Mautic\CampaignBundle\Executioner\Dispatcher\ActionDispatcher::class);
-    $services->set(Mautic\CampaignBundle\Executioner\Dispatcher\ConditionDispatcher::class);
-    $services->set(Mautic\CampaignBundle\Executioner\Dispatcher\DecisionDispatcher::class);
-    $services->set(Mautic\CampaignBundle\Executioner\Scheduler\Mode\DateTime::class);
-    $services->set(Mautic\CampaignBundle\Executioner\Scheduler\Mode\Interval::class);
-    $services->set(Mautic\CampaignBundle\Executioner\Event\ConditionExecutioner::class);
-    $services->set(Mautic\CampaignBundle\Executioner\Event\DecisionExecutioner::class);
-    $services->set(Mautic\CampaignBundle\Executioner\EventExecutioner::class);
-    $services->set(Mautic\CampaignBundle\Executioner\Helper\DecisionHelper::class);
-    $services->set(Mautic\CampaignBundle\Executioner\Helper\InactiveHelper::class);
-    $services->set(Mautic\CampaignBundle\Helper\RemovedContactTracker::class);
-    $services->set(Mautic\CampaignBundle\Executioner\Helper\NotificationHelper::class);
-    $services->set(Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher::class);
-    $services->set(Mautic\CampaignBundle\Membership\Action\Adder::class);
-    $services->set(Mautic\CampaignBundle\Membership\Action\Remover::class);
-    $services->set(Mautic\CampaignBundle\Membership\EventDispatcher::class);
-    $services->set(Mautic\CampaignBundle\Membership\MembershipManager::class);
-    $services->set(Mautic\CampaignBundle\Membership\MembershipBuilder::class);
     $services->alias('mautic.campaign.model.campaign', Mautic\CampaignBundle\Model\CampaignModel::class);
     $services->alias('mautic.campaign.model.event', Mautic\CampaignBundle\Model\EventModel::class);
     $services->alias('mautic.campaign.model.event_log', Mautic\CampaignBundle\Model\EventLogModel::class);

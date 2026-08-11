@@ -37,16 +37,6 @@ return function (ContainerConfigurator $configurator): void {
         ->call('setFormModel', [service('mautic.form.model.form')]);
     $services->set(Mautic\FormBundle\DataFixtures\ORM\LoadFormData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
     $services->set(Mautic\FormBundle\DataFixtures\ORM\LoadFormResultData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
-    $services->set(Mautic\FormBundle\Collector\ObjectCollector::class);
-    $services->set(Mautic\FormBundle\Collector\FieldCollector::class);
-    $services->set(Mautic\FormBundle\Collector\MappedObjectCollector::class);
-    $services->set(Mautic\FormBundle\Collector\AlreadyMappedFieldCollector::class);
-    $services->set(Mautic\FormBundle\Helper\FormFieldHelper::class);
-    $services->set(Mautic\FormBundle\Helper\FormUploader::class);
-    $services->set(Mautic\FormBundle\Helper\TokenHelper::class);
-
-    $services->set(Mautic\FormBundle\Helper\PropertiesAccessor::class);
-    $services->set(Mautic\FormBundle\Validator\UploadFieldValidator::class);
 
     $services->set(Mautic\FormBundle\Validator\Constraint\FileExtensionConstraintValidator::class)
         ->tag('validator.constraint_validator', ['alias' => 'file_extension_constraint_validator']);

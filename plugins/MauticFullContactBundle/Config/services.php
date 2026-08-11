@@ -24,6 +24,5 @@ return function (ContainerConfigurator $configurator): void {
         ->arg('$logger', service('monolog.logger.mautic'))
         ->arg('$router', service('router'));
     $services->alias('mautic.plugin.fullcontact.lookup_helper', MauticPlugin\MauticFullContactBundle\Helper\LookupHelper::class);
-    $services->set(MauticPlugin\MauticFullContactBundle\Integration\FullContactIntegration::class);
     $services->alias('mautic.integration.fullcontact', MauticPlugin\MauticFullContactBundle\Integration\FullContactIntegration::class);
 };
