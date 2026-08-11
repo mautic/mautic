@@ -1042,7 +1042,7 @@ class LeadModel extends FormModel
      * @param array|Lead $lead
      * @param bool       $manuallyRemoved
      */
-    public function removeFromStages($lead, Stage $stage, $manuallyRemoved = true): static
+    public function removeFromStages($lead, $stage, $manuallyRemoved = true): static
     {
         $origin = is_string($manuallyRemoved)
             ? $manuallyRemoved
