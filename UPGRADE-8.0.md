@@ -49,9 +49,5 @@
   - A cache miss now returns `null` instead of `false`, so `false === $value` checks must become `null === $value`.
   - Cached data moves from the `cache_items` database table to the adapter configured by the `cache_adapter` parameter (filesystem by default), so it is dropped by a cache clear. The `cache_items` table and `Mautic\CoreBundle\Entity\Cache` entity are kept, but are no longer written to by Mautic itself.
 - `Mautic\PluginBundle\Integration\AbstractIntegration::getCache()` returns `Psr\SimpleCache\CacheInterface` instead of `CacheStorageHelper`, and its 2nd constructor argument is now `Mautic\CacheBundle\Cache\CacheProviderInterface`. Keys stay namespaced per integration, so `$this->cache->set('leadFields', $fields)` in an integration keeps working unchanged.
-- `Mautic\DashboardBundle\Event\WidgetDetailEvent`: the legacy filesystem widget cache is gone. `setCacheDir()` was removed, the `$cacheProvider` constructor argument is now required, and `setTemplateData()` lost its 2nd `$skipCache` parameter. Widget data is cached only through `Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface`.
-- Legacy filesystem cache fallback in `Mautic\DashboardBundle\Event\WidgetDetailEvent` removed. Widget data is always cached through the tag-aware cache provider:
-    - The `$cacheProvider` constructor argument is now required and no longer nullable.
-    - Methods `setCacheDir()` and `setCacheTimeout()` removed. The cache lifetime comes from `Widget::getCacheTimeout()`.
-    - The second `$skipCache` argument of `setTemplateData()` removed.
+- `Mautic\DashboardBundle\Event\WidgetDetailEvent`: the legacy filesystem widget cache is gone. `setCacheDir()` and `setCacheTimeout()` were removed, the `$cacheProvider` constructor argument is now required, and `setTemplateData()` lost its 2nd `$skipCache` parameter. Widget data is cached only through `Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface`, with the lifetime taken from `Widget::getCacheTimeout()`.
 - `Mautic\DashboardBundle\Factory\WidgetDetailEventFactory` no longer takes `UserHelper`, `CoreParametersHelper` and `PathsHelper` constructor arguments.
