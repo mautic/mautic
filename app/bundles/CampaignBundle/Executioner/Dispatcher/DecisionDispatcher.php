@@ -15,7 +15,6 @@ final readonly class DecisionDispatcher
 {
     public function __construct(
         private EventDispatcherInterface $dispatcher,
-        private LegacyEventDispatcher $legacyDispatcher,
     ) {
     }
 
@@ -35,7 +34,6 @@ final readonly class DecisionDispatcher
         $event = new DecisionEvent($config, $log);
 
         $this->dispatcher->dispatch($event, CampaignEvents::ON_EVENT_DECISION_EVALUATION);
-        $this->legacyDispatcher->dispatchDecisionEvent($event);
 
         return $event;
     }

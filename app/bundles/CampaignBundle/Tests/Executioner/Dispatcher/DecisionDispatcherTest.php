@@ -11,7 +11,6 @@ use Mautic\CampaignBundle\Event\DecisionEvent;
 use Mautic\CampaignBundle\Event\DecisionResultsEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
 use Mautic\CampaignBundle\Executioner\Dispatcher\DecisionDispatcher;
-use Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher;
 use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -21,8 +20,6 @@ final class DecisionDispatcherTest extends TestCase
 {
     private MockObject&EventDispatcherInterface $dispatcher;
 
-    private MockObject&LegacyEventDispatcher $legacyDispatcher;
-
     private MockObject&DecisionAccessor $config;
 
     private DecisionDispatcher $decisionDispatcher;
@@ -30,10 +27,8 @@ final class DecisionDispatcherTest extends TestCase
     protected function setUp(): void
     {
         $this->dispatcher         = $this->createMock(EventDispatcherInterface::class);
-        /** @phpstan-ignore classConstant.deprecatedClass */
-        $this->legacyDispatcher   = $this->createMock(LegacyEventDispatcher::class);
         $this->config             = $this->createMock(DecisionAccessor::class);
-        $this->decisionDispatcher = new DecisionDispatcher($this->dispatcher, $this->legacyDispatcher);
+        $this->decisionDispatcher = new DecisionDispatcher($this->dispatcher);
     }
 
     public function testDecisionEventIsDispatched(): void
@@ -41,9 +36,6 @@ final class DecisionDispatcherTest extends TestCase
         $this->config->expects($this->once())
             ->method('getEventName')
             ->willReturn('something');
-
-        $this->legacyDispatcher->expects($this->never())
-            ->method('dispatchDecisionEvent');
 
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
@@ -56,9 +48,6 @@ final class DecisionDispatcherTest extends TestCase
     {
         $this->config->expects($this->never())
             ->method('getEventName');
-
-        $this->legacyDispatcher->expects($this->once())
-            ->method('dispatchDecisionEvent');
 
         $this->dispatcher->expects($this->once())
             ->method('dispatch')

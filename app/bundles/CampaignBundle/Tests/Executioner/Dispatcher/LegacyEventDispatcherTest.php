@@ -79,7 +79,7 @@ final class LegacyEventDispatcherTest extends TestCase
 
     public function testPrimayLegacyEventsAreProcessed(): void
     {
-        $this->config->expects($this->exactly(2))
+        $this->config->expects($this->once())
             ->method('getConfig')
             ->willReturn(['eventName' => 'something']);
 
@@ -97,7 +97,7 @@ final class LegacyEventDispatcherTest extends TestCase
 
         $this->contactTracker->expects($this->exactly(2))
             ->method('setSystemContact');
-        $matcher = $this->exactly(4);
+        $matcher = $this->exactly(3);
 
         $this->dispatcher->expects($matcher)
             ->method('dispatch')->willReturnCallback(function (object $event, string $eventName) use ($matcher): object {
@@ -106,14 +106,10 @@ final class LegacyEventDispatcherTest extends TestCase
                     $this->assertSame('something', $eventName);
                 }
                 if (2 === $matcher->numberOfInvocations()) {
-                    $this->assertInstanceOf(CampaignExecutionEvent::class, $event); // @phpstan-ignore classConstant.deprecatedClass
-                    $this->assertSame(CampaignEvents::ON_EVENT_EXECUTION, $eventName); // @phpstan-ignore-line classConstant.deprecated
-                }
-                if (3 === $matcher->numberOfInvocations()) {
                     $this->assertInstanceOf(ExecutedEvent::class, $event);
                     $this->assertSame(CampaignEvents::ON_EVENT_EXECUTED, $eventName);
                 }
-                if (4 === $matcher->numberOfInvocations()) {
+                if (3 === $matcher->numberOfInvocations()) {
                     $this->assertInstanceOf(ExecutedBatchEvent::class, $event);
                     $this->assertSame(CampaignEvents::ON_EVENT_EXECUTED_BATCH, $eventName);
                 }
@@ -126,7 +122,7 @@ final class LegacyEventDispatcherTest extends TestCase
 
     public function testPrimaryCallbackIsProcessed(): void
     {
-        $this->config->expects($this->exactly(2))
+        $this->config->expects($this->once())
             ->method('getConfig')
             ->willReturn(['callback' => [self::class, 'bogusCallback']]);
 
@@ -144,21 +140,15 @@ final class LegacyEventDispatcherTest extends TestCase
 
         $this->contactTracker->expects($this->exactly(2))
             ->method('setSystemContact');
-        // Legacy execution event should dispatch
-        $matcher = $this->exactly(3);
+        $matcher = $this->exactly(2);
 
-        // Legacy execution event should dispatch
         $this->dispatcher->expects($matcher)
             ->method('dispatch')->willReturnCallback(function (object $event, string $eventName) use ($matcher): object {
                 if (1 === $matcher->numberOfInvocations()) {
-                    $this->assertInstanceOf(CampaignExecutionEvent::class, $event); // @phpstan-ignore classConstant.deprecatedClass
-                    $this->assertSame(CampaignEvents::ON_EVENT_EXECUTION, $eventName); // @phpstan-ignore-line classConstant.deprecated
-                }
-                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertInstanceOf(ExecutedEvent::class, $event);
                     $this->assertSame(CampaignEvents::ON_EVENT_EXECUTED, $eventName);
                 }
-                if (3 === $matcher->numberOfInvocations()) {
+                if (2 === $matcher->numberOfInvocations()) {
                     $this->assertInstanceOf(ExecutedBatchEvent::class, $event);
                     $this->assertSame(CampaignEvents::ON_EVENT_EXECUTED_BATCH, $eventName);
                 }
@@ -171,7 +161,7 @@ final class LegacyEventDispatcherTest extends TestCase
 
     public function testArrayResultAppendedToMetadata(): void
     {
-        $this->config->expects($this->exactly(2))
+        $this->config->expects($this->once())
             ->method('getConfig')
             ->willReturn(['eventName' => 'something']);
 
@@ -192,7 +182,7 @@ final class LegacyEventDispatcherTest extends TestCase
         $this->contactTracker->expects($this->exactly(2))
             ->method('setSystemContact');
         // Legacy custom event should dispatch
-        $matcher = $this->exactly(4);
+        $matcher = $this->exactly(3);
 
         // Legacy custom event should dispatch
         $this->dispatcher->expects($matcher)
@@ -203,14 +193,10 @@ final class LegacyEventDispatcherTest extends TestCase
                     $event->setResult(['foo' => 'bar']);
                 }
                 if (2 === $matcher->numberOfInvocations()) {
-                    $this->assertInstanceOf(CampaignExecutionEvent::class, $event); // @phpstan-ignore classConstant.deprecatedClass
-                    $this->assertSame(CampaignEvents::ON_EVENT_EXECUTION, $eventName); // @phpstan-ignore-line classConstant.deprecated
-                }
-                if (3 === $matcher->numberOfInvocations()) {
                     $this->assertInstanceOf(ExecutedEvent::class, $event);
                     $this->assertSame(CampaignEvents::ON_EVENT_EXECUTED, $eventName);
                 }
-                if (4 === $matcher->numberOfInvocations()) {
+                if (3 === $matcher->numberOfInvocations()) {
                     $this->assertInstanceOf(ExecutedBatchEvent::class, $event);
                     $this->assertSame(CampaignEvents::ON_EVENT_EXECUTED_BATCH, $eventName);
                 }
@@ -225,7 +211,7 @@ final class LegacyEventDispatcherTest extends TestCase
 
     public function testFailedResultAsFalseIsProcessed(): void
     {
-        $this->config->expects($this->exactly(2))
+        $this->config->expects($this->once())
             ->method('getConfig')
             ->willReturn(['eventName' => 'something']);
 
@@ -247,7 +233,7 @@ final class LegacyEventDispatcherTest extends TestCase
         $this->contactTracker->expects($this->exactly(2))
             ->method('setSystemContact');
         // Legacy custom event should dispatch
-        $matcher = $this->exactly(3);
+        $matcher = $this->exactly(2);
 
         // Legacy custom event should dispatch
         $this->dispatcher->expects($matcher)
@@ -258,10 +244,6 @@ final class LegacyEventDispatcherTest extends TestCase
                     $event->setResult(false);
                 }
                 if (2 === $matcher->numberOfInvocations()) {
-                    $this->assertInstanceOf(CampaignExecutionEvent::class, $event); // @phpstan-ignore classConstant.deprecatedClass
-                    $this->assertSame(CampaignEvents::ON_EVENT_EXECUTION, $eventName); // @phpstan-ignore-line classConstant.deprecated
-                }
-                if (3 === $matcher->numberOfInvocations()) {
                     $this->assertInstanceOf(FailedEvent::class, $event);
                     $this->assertSame(CampaignEvents::ON_EVENT_FAILED, $eventName);
                 }
@@ -277,7 +259,7 @@ final class LegacyEventDispatcherTest extends TestCase
 
     public function testFailedResultAsArrayIsProcessed(): void
     {
-        $this->config->expects($this->exactly(2))
+        $this->config->expects($this->once())
             ->method('getConfig')
             ->willReturn(['eventName' => 'something']);
 
@@ -297,7 +279,7 @@ final class LegacyEventDispatcherTest extends TestCase
         $this->contactTracker->expects($this->exactly(2))
             ->method('setSystemContact');
         // Legacy custom event should dispatch
-        $matcher = $this->exactly(3);
+        $matcher = $this->exactly(2);
 
         // Legacy custom event should dispatch
         $this->dispatcher->expects($matcher)
@@ -308,10 +290,6 @@ final class LegacyEventDispatcherTest extends TestCase
                     $event->setResult(['result' => false, 'foo' => 'bar']);
                 }
                 if (2 === $matcher->numberOfInvocations()) {
-                    $this->assertInstanceOf(CampaignExecutionEvent::class, $event); // @phpstan-ignore classConstant.deprecatedClass
-                    $this->assertSame(CampaignEvents::ON_EVENT_EXECUTION, $eventName); // @phpstan-ignore-line classConstant.deprecated
-                }
-                if (3 === $matcher->numberOfInvocations()) {
                     $this->assertInstanceOf(FailedEvent::class, $event);
                     $this->assertSame(CampaignEvents::ON_EVENT_FAILED, $eventName);
                 }
@@ -327,7 +305,7 @@ final class LegacyEventDispatcherTest extends TestCase
 
     public function testPassWithErrorIsHandled(): void
     {
-        $this->config->expects($this->exactly(2))
+        $this->config->expects($this->once())
             ->method('getConfig')
             ->willReturn(['eventName' => 'something']);
 
@@ -367,7 +345,7 @@ final class LegacyEventDispatcherTest extends TestCase
 
     public function testLogIsPassed(): void
     {
-        $this->config->expects($this->exactly(2))
+        $this->config->expects($this->once())
             ->method('getConfig')
             ->willReturn(['eventName' => 'something']);
 

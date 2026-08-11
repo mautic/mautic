@@ -5,9 +5,7 @@ namespace Mautic\CampaignBundle\Executioner\Dispatcher;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
-use Mautic\CampaignBundle\Event\CampaignDecisionEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
-use Mautic\CampaignBundle\Event\DecisionEvent;
 use Mautic\CampaignBundle\Event\EventArrayTrait;
 use Mautic\CampaignBundle\Event\ExecutedBatchEvent;
 use Mautic\CampaignBundle\Event\ExecutedEvent;
@@ -71,8 +69,6 @@ class LegacyEventDispatcher
 
             // If the new batch event was handled, the $log was already processed so only process legacy logs if false
             if (!$wasBatchProcessed) {
-                $this->dispatchExecutionEvent($config, $log, $result);
-
                 if (!is_bool($result)) {
                     $log->appendToMetadata($result);
                 }
@@ -103,45 +99,6 @@ class LegacyEventDispatcher
         }
 
         $this->contactTracker->setSystemContact();
-    }
-
-    /**
-     * Execute the new ON_EVENT_FAILED and ON_EVENT_EXECUTED events for logs processed by BC code.
-     */
-    public function dispatchExecutionEvents(AbstractEventAccessor $config, ArrayCollection $success, ArrayCollection $failures): void
-    {
-        foreach ($success as $log) {
-            $this->dispatchExecutionEvent($config, $log, true);
-        }
-
-        foreach ($failures as $log) {
-            $this->dispatchExecutionEvent($config, $log, false);
-        }
-    }
-
-    public function dispatchDecisionEvent(DecisionEvent $decisionEvent): void
-    {
-        if ($this->dispatcher->hasListeners(CampaignEvents::ON_EVENT_DECISION_TRIGGER)) {
-            $log   = $decisionEvent->getLog();
-            $event = $log->getEvent();
-
-            $legacyDecisionEvent = $this->dispatcher->dispatch(
-                new CampaignDecisionEvent(
-                    $log->getLead(),
-                    $event->getType(),
-                    $decisionEvent->getEventConfig()->getConfig(),
-                    $this->getLegacyEventsArray($log),
-                    $this->getLegacyEventsConfigArray($event, $decisionEvent->getEventConfig()),
-                    0 === $event->getOrder(),
-                    [$log]
-                ),
-                CampaignEvents::ON_EVENT_DECISION_TRIGGER
-            );
-
-            if ($legacyDecisionEvent->wasDecisionTriggered()) {
-                $decisionEvent->setAsApplicable();
-            }
-        }
     }
 
     private function dispatchEventName(?string $eventName, array $settings, LeadEventLog $log): CampaignExecutionEvent
@@ -210,27 +167,6 @@ class LegacyEventDispatcher
         } catch (\ReflectionException) {
             return false;
         }
-    }
-
-    private function dispatchExecutionEvent(AbstractEventAccessor $config, LeadEventLog $log, mixed $result): void
-    {
-        $eventArray = $this->getEventArray($log->getEvent());
-
-        $this->dispatcher->dispatch(
-            new CampaignExecutionEvent(
-                [
-                    'eventSettings'   => $config->getConfig(),
-                    'eventDetails'    => null, // @todo fix when procesing decisions,
-                    'event'           => $eventArray,
-                    'lead'            => $log->getLead(),
-                    'systemTriggered' => $log->getSystemTriggered(),
-                    'config'          => $eventArray['properties'],
-                ],
-                $result,
-                $log
-            ),
-            CampaignEvents::ON_EVENT_EXECUTION
-        );
     }
 
     private function dispatchExecutedEvent(AbstractEventAccessor $config, LeadEventLog $log): void

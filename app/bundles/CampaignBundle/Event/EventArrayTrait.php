@@ -1,10 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Event;
 
 use Mautic\CampaignBundle\Entity\Event;
-use Mautic\CampaignBundle\Entity\LeadEventLog;
-use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 
 /**
  * Trait EventArrayTrait.
@@ -61,27 +61,5 @@ trait EventArrayTrait
         $this->eventArray[$eventId] = $eventArray;
 
         return $this->eventArray[$eventId];
-    }
-
-    protected function getLegacyEventsArray(LeadEventLog $log): array
-    {
-        $event = $log->getEvent();
-
-        return [
-            $event->getCampaign()->getId() => [
-                $this->getEventArray($event),
-            ],
-        ];
-    }
-
-    protected function getLegacyEventsConfigArray(Event $event, AbstractEventAccessor $config): array
-    {
-        return [
-            $event->getEventType() => [
-                $event->getType() => [
-                    $config->getConfig(),
-                ],
-            ],
-        ];
     }
 }
