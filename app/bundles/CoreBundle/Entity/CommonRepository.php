@@ -1806,6 +1806,10 @@ class CommonRepository extends ServiceEntityRepository
     private function convertOrmPropertiesToColumns(array &$filters, array $properties): void
     {
         foreach ($filters as &$f) {
+            if ($this->convertGroupedOrmPropertiesToColumns($f, $properties)) {
+                continue;
+            }
+
             $key   = (isset($f['col'])) ? 'col' : 'column';
             $col   = $f[$key];
             $alias = '';
@@ -1820,6 +1824,26 @@ class CommonRepository extends ServiceEntityRepository
 
             $f[$key] = (!empty($alias)) ? $alias.'.'.$col : $col;
         }
+    }
+
+    /**
+     * @param array<string, mixed> $filter
+     * @param array<int, string>   $properties
+     */
+    private function convertGroupedOrmPropertiesToColumns(array &$filter, array $properties): bool
+    {
+        if (!isset($filter['group']) || !is_array($filter['group'])) {
+            return false;
+        }
+
+        foreach ($filter['group'] as &$groupFilters) {
+            if (is_array($groupFilters)) {
+                $this->convertOrmPropertiesToColumns($groupFilters, $properties);
+            }
+        }
+        unset($groupFilters);
+
+        return true;
     }
 
     /**
