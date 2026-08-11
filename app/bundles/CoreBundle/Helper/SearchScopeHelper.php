@@ -142,7 +142,7 @@ final class SearchScopeHelper
     {
         preg_match_all('/"[^"]*"|\S+/', $value, $matches);
 
-        return $matches[0] ?? [];
+        return $matches[0];
     }
 
     private static function tokenLooksLikeCommand(string $token): bool
