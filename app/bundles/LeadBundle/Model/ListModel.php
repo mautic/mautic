@@ -710,12 +710,14 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 $dispatchEvents[] = $listId;
             }
 
-            if (!$isAlreadyCounted) {
-                if ($this->coreParametersHelper->get('update_segment_contact_count_in_background', false)) {
-                    $this->segmentCountCacheHelper->invalidateSegmentContactCount($listId);
-                } else {
-                    $this->segmentCountCacheHelper->incrementSegmentContactCount($listId);
-                }
+            if ($isAlreadyCounted) {
+                continue;
+            }
+
+            if ($this->coreParametersHelper->get('update_segment_contact_count_in_background', false)) {
+                $this->segmentCountCacheHelper->invalidateSegmentContactCount($listId);
+            } else {
+                $this->segmentCountCacheHelper->incrementSegmentContactCount($listId);
             }
         }
 

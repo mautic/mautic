@@ -150,7 +150,7 @@ final class ListModelFunctionalTest extends MauticMysqlTestCase
     public function testManuallyAddContactWhoWasAutomaticallyAddedToSegmentBefore(): void
     {
         /** @var ListModel $segmentModel */
-        $segmentModel = static::getContainer()->get('mautic.lead.model.list');
+        $segmentModel = static::getContainer()->get(ListModel::class);
 
         /** @var LeadRepository $contactRepository */
         $contactRepository = $this->em->getRepository(Lead::class);
