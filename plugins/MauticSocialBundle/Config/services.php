@@ -19,8 +19,6 @@ return function (ContainerConfigurator $configurator): void {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('MauticPlugin\\MauticSocialBundle\\Entity\\', '../Entity/*Repository.php');
-    $services->set(MauticPlugin\MauticSocialBundle\Helper\CampaignEventHelper::class);
-    $services->set(MauticPlugin\MauticSocialBundle\Helper\TwitterCommandHelper::class);
     $services->set('mautic.integration.facebook', MauticPlugin\MauticSocialBundle\Integration\FacebookIntegration::class);
     $services->set('mautic.integration.foursquare', MauticPlugin\MauticSocialBundle\Integration\FoursquareIntegration::class);
     $services->set('mautic.integration.instagram', MauticPlugin\MauticSocialBundle\Integration\InstagramIntegration::class);

@@ -19,5 +19,4 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\StatsBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
-    $services->set(Mautic\StatsBundle\Aggregate\Collector::class);
 };

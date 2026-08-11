@@ -67,8 +67,6 @@ return function (ContainerConfigurator $configurator): void {
         ->call('setDefaultTheme', [param('mautic.theme')]);
     $services->set(Mautic\CoreBundle\Menu\MenuRenderer::class)->tag('knp_menu.renderer', ['alias' => 'mautic']);
 
-    $services->set(Mautic\CoreBundle\Menu\MenuHelper::class);
-    $services->set(Mautic\CoreBundle\Menu\MenuBuilder::class);
     $services->alias('mautic.menu.builder', Mautic\CoreBundle\Menu\MenuBuilder::class);
 
     $services->set(Mautic\CoreBundle\Twig\Helper\DateHelper::class)
@@ -110,7 +108,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias(Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper::class, 'mautic.schema.helper.index');
     $services->set(Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper::class)
         ->arg('$prefix', param('mautic.db_table_prefix'));
-    $services->set(Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList::class);
     $services->set(Mautic\CoreBundle\Form\Type\DynamicContentFilterEntryFiltersType::class)
         ->call('setConnection', [service('database_connection')]);
 

@@ -84,8 +84,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('LightSaml\\SpBundle\\Controller\\', '%kernel.project_dir%/vendor/javer/sp-bundle/src/LightSaml/SpBundle/Controller/*.php')
         ->tag('controller.service_arguments');
 
-    $services->set(Mautic\UserBundle\EventListener\LogoutListener::class);
-
     $services->set(Mautic\UserBundle\Security\SAML\User\UserMapper::class)
         ->arg('$attributes', ['email' => param('mautic.saml_idp_email_attribute'), 'username' => param('mautic.saml_idp_username_attribute'), 'firstname' => param('mautic.saml_idp_firstname_attribute'), 'lastname' => param('mautic.saml_idp_lastname_attribute')]);
     $services->alias('mautic.security.saml.username_mapper', Mautic\UserBundle\Security\SAML\User\UserMapper::class);
