@@ -2122,10 +2122,10 @@ Mautic.activateTypeahead = function (el, options) {
 
     var noRrecordMessage = (options.noRrecordMessage) ? options.noRrecordMessage : mQuery(el).data('no-record-message');
     var theName = el.replace(/[^a-z0-9\s]/gi, '').replace(/[-\s]/g, '_');
-    var bloodhoundSource = (typeof theBloodhound != 'undefined') ? theBloodhound.ttAdapter() : substringMatcher(lookupOptions, lookupKeys);
-    var lastFullQuery = '';
+    const bloodhoundSource = (typeof theBloodhound != 'undefined') ? theBloodhound.ttAdapter() : substringMatcher(lookupOptions, lookupKeys);
+    let lastFullQuery = '';
 
-    var datasetSource = bloodhoundSource;
+    let datasetSource = bloodhoundSource;
     if (options.multiple) {
         // Stock typeahead has no real multi-token mode — match/replace only the
         // current token after the last space so "pepa nam" can still suggest "name:".
