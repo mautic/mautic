@@ -7,7 +7,6 @@
 ## Removed code
 
 - Deprecated method `Mautic\LeadBundle\Model\LeadModel::isContactable()` removed. Use `Mautic\LeadBundle\Model\DoNotContact::isContactable()` instead.
-<<<<<<< HEAD
 - Deprecated method `Mautic\CampaignBundle\EventCollector\Builder\ConnectionBuilder::addDeprecatedAnchorRestrictions()` removed. With it, the campaign event keys `associatedActions`, `associatedDecisions` and `anchorRestrictions` are no longer read. Use the `connectionRestrictions` key instead:
 
 ```diff
@@ -28,6 +27,7 @@
 - Deprecated class `Mautic\CoreBundle\Helper\EmojiMap\UnicodeToShortEmojiMap` removed with no replacement.
 - Class `Mautic\CoreBundle\Helper\EmojiHelper` removed with no replacement. All emoji conversion calls were dropped; emoji are stored and rendered as UTF-8 (`utf8mb4`) directly.
 - Emoji sprite stylesheet `app/bundles/CoreBundle/Assets/css/libraries/emoji/` (`_emoji.scss` + `emoji.png`) removed together with its `@import` in `_libraries.scss`. It styled the `span.emoji-sizer`/`.emoji-outer`/`.emoji-inner` markup that `EmojiHelper::toHtml()` used to emit, which is no longer produced. Custom themes relying on those classes must ship their own CSS.
+<<<<<<< HEAD
 <<<<<<< HEAD
 - Deprecated class `Mautic\CoreBundle\Helper\CacheStorageHelper` removed together with the `mautic.helper.cache_storage` service. Use the CacheBundle instead: inject `Mautic\CacheBundle\Cache\CacheProviderInterface` and call `getSimpleCache()` for the PSR-16 API the helper mimicked.
 
@@ -54,10 +54,15 @@
 - `Mautic\DashboardBundle\Event\WidgetDetailEvent`: the legacy filesystem widget cache is gone. `setCacheDir()` was removed, the `$cacheProvider` constructor argument is now required, and `setTemplateData()` lost its 2nd `$skipCache` parameter. Widget data is cached only through `Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface`.
 =======
 =======
+=======
+>>>>>>> 7cfc9d56a2 (rebase)
 - Legacy filesystem cache fallback in `Mautic\DashboardBundle\Event\WidgetDetailEvent` removed. Widget data is always cached through the tag-aware cache provider:
     - The `$cacheProvider` constructor argument is now required and no longer nullable.
     - Methods `setCacheDir()` and `setCacheTimeout()` removed. The cache lifetime comes from `Widget::getCacheTimeout()`.
     - The second `$skipCache` argument of `setTemplateData()` removed.
 - `Mautic\DashboardBundle\Factory\WidgetDetailEventFactory` no longer takes `UserHelper`, `CoreParametersHelper` and `PathsHelper` constructor arguments.
+<<<<<<< HEAD
 >>>>>>> 03592dfff7 ([removal] Remove legacy filesystem cache fallback from WidgetDetailEvent)
 >>>>>>> 7e52bcc4c8 ([removal] Remove legacy filesystem cache fallback from WidgetDetailEvent)
+=======
+>>>>>>> 7cfc9d56a2 (rebase)
