@@ -23,11 +23,6 @@ class WidgetDetailEvent extends CommonEvent
 
     protected $uniqueId;
 
-<<<<<<< HEAD
-    protected $cacheTimeout;
-
-=======
->>>>>>> 7e52bcc4c8 ([removal] Remove legacy filesystem cache fallback from WidgetDetailEvent)
     protected float $startTime;
 
     protected $loadTime  = 0;
@@ -91,17 +86,6 @@ class WidgetDetailEvent extends CommonEvent
     }
 
     /**
-<<<<<<< HEAD
-     * @param int|null $cacheTimeout
-     */
-    public function setCacheTimeout($cacheTimeout): void
-    {
-        $this->cacheTimeout = (int) $cacheTimeout;
-    }
-
-    /**
-=======
->>>>>>> 7e52bcc4c8 ([removal] Remove legacy filesystem cache fallback from WidgetDetailEvent)
      * Set the widget type.
      *
      * @param string $type
@@ -301,12 +285,6 @@ class WidgetDetailEvent extends CommonEvent
     }
 
     /**
-<<<<<<< HEAD
-     * Checks for cache type. This event should be created by factory thus not legacy approach.
-     */
-    /**
-=======
->>>>>>> 7e52bcc4c8 ([removal] Remove legacy filesystem cache fallback from WidgetDetailEvent)
      * We need to cast DateTime objects to strings to use them in the cache key.
      *
      * @param mixed|null $value
