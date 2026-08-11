@@ -2,7 +2,7 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Mautic\CoreBundle\Helper\CacheStorageHelper;
+use Mautic\CacheBundle\Cache\CacheProviderInterface;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\MonitoredEmailEvent;
 use Mautic\EmailBundle\Event\ParseEmailEvent;
@@ -29,7 +29,7 @@ final readonly class ProcessReplySubscriber implements EventSubscriberInterface
 
     public function __construct(
         private Reply $replier,
-        private CacheStorageHelper $cache,
+        private CacheProviderInterface $cache,
     ) {
     }
 
@@ -40,7 +40,7 @@ final readonly class ProcessReplySubscriber implements EventSubscriberInterface
 
     public function onEmailPreFetch(ParseEmailEvent $event): void
     {
-        if (!$lastFetchedUID = $this->cache->get(self::CACHE_KEY)) {
+        if (!$lastFetchedUID = $this->cache->getSimpleCache()->get(self::CACHE_KEY)) {
             return;
         }
 
@@ -62,7 +62,7 @@ final readonly class ProcessReplySubscriber implements EventSubscriberInterface
                 }
 
                 // Store the last UID
-                $this->cache->set(self::CACHE_KEY, $message->id);
+                $this->cache->getSimpleCache()->set(self::CACHE_KEY, $message->id);
             }
         }
     }

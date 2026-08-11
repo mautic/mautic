@@ -7,9 +7,9 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Handler\CurlHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\RequestOptions;
+use Mautic\CacheBundle\Cache\CacheProviderInterface;
 use Mautic\CoreBundle\Entity\CommonEntity;
 use Mautic\CoreBundle\Entity\FormEntity;
-use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
@@ -39,6 +39,9 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
+use Psr\SimpleCache\CacheInterface;
+use Symfony\Component\Cache\Adapter\ProxyAdapter;
+use Symfony\Component\Cache\Psr16Cache;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
@@ -71,7 +74,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     protected array $keys = [];
 
-    protected ?CacheStorageHelper $cache;
+    protected CacheInterface $cache;
 
     protected ?Request $request;
 
@@ -117,7 +120,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     public function __construct(
         protected EventDispatcherInterface $dispatcher,
-        CacheStorageHelper $cacheStorageHelper,
+        CacheProviderInterface $cacheProvider,
         protected EntityManagerInterface $em,
         protected RequestStack $requestStack,
         protected RouterInterface $router,
@@ -133,7 +136,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         protected DoNotContactModel $doNotContact,
         protected FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
     ) {
-        $this->cache                  = $cacheStorageHelper->getCache($this->getName());
+        // the integration name namespaces the cache keys so that integrations cannot overwrite each other
+        $this->cache                  = new Psr16Cache(new ProxyAdapter($cacheProvider, (string) $this->getName()));
         $this->request                = (!defined('IN_MAUTIC_CONSOLE')) ? $requestStack->getCurrentRequest() : null;
 
         $this->setClientFactory(fn (array $options): Client => new Client([
@@ -148,10 +152,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         $this->commandParameters = $params;
     }
 
-    /**
-     * @return CacheStorageHelper
-     */
-    public function getCache()
+    public function getCache(): CacheInterface
     {
         return $this->cache;
     }

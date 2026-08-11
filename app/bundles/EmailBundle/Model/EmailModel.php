@@ -8,12 +8,12 @@ use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\ApiBundle\Model\ApiEntityLockTrait;
 use Mautic\ApiBundle\Model\ApiLockAwareInterface;
+use Mautic\CacheBundle\Cache\CacheProviderInterface;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Helper\ArrayHelper;
-use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -115,7 +115,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         protected SendEmailToContact $sendModel,
         private DeviceTracker $deviceTracker,
         private RedirectRepository $redirectRepository,
-        private CacheStorageHelper $cacheStorageHelper,
+        private CacheProviderInterface $cacheProvider,
         private ContactTracker $contactTracker,
         private DNC $doNotContact,
         private StatsCollectionHelper $statsCollectionHelper,
@@ -1033,7 +1033,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
                 $toStore = count($total);
             }
 
-            $this->cacheStorageHelper->set(sprintf('%s|%s|%s', 'email', $email->getId(), 'pending'), $toStore);
+            $this->cacheProvider->getSimpleCache()->set(sprintf('%s|%s|%s', 'email', $email->getId(), 'pending'), $toStore);
         }
 
         return $total;
@@ -1050,7 +1050,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         }
 
         $queued = $this->messageQueueModel->getQueuedChannelCount('email', $ids);
-        $this->cacheStorageHelper->set(sprintf('%s|%s|%s', 'email', $email->getId(), 'queued'), $queued);
+        $this->cacheProvider->getSimpleCache()->set(sprintf('%s|%s|%s', 'email', $email->getId(), 'queued'), $queued);
 
         return $queued;
     }
@@ -2392,15 +2392,15 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     }
 
     /**
-     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws \Psr\SimpleCache\InvalidArgumentException
      */
     public function invalidatePendingCountCache(int $emailId): void
     {
-        $this->cacheStorageHelper->delete(sprintf('%s|%s|%s', 'email', $emailId, 'pending'));
+        $this->cacheProvider->getSimpleCache()->delete(sprintf('%s|%s|%s', 'email', $emailId, 'pending'));
     }
 
     /**
-     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws \Psr\SimpleCache\InvalidArgumentException
      */
     public function invalidatePendingCountCacheForList(int $listId): void
     {
@@ -2410,25 +2410,25 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     }
 
     /**
-     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws \Psr\SimpleCache\InvalidArgumentException
      */
     protected function setCachedCount(mixed $entity): void
     {
-        $queued = $this->cacheStorageHelper->get(sprintf('%s|%s|%s', 'email', $entity->getId(), 'queued'));
+        $queued = $this->cacheProvider->getSimpleCache()->get(sprintf('%s|%s|%s', 'email', $entity->getId(), 'queued'));
 
-        if (false !== $queued) {
+        if (null !== $queued) {
             $entity->setQueuedCount($queued);
         }
 
-        $pending = $this->cacheStorageHelper->get(sprintf('%s|%s|%s', 'email', $entity->getId(), 'pending'));
+        $pending = $this->cacheProvider->getSimpleCache()->get(sprintf('%s|%s|%s', 'email', $entity->getId(), 'pending'));
 
-        if (false === $pending && $entity instanceof Email && $entity->isSegmentEmail() && null !== $entity->getId()) {
+        if (null === $pending && $entity instanceof Email && $entity->isSegmentEmail() && null !== $entity->getId()) {
             $entity->setPendingCount($this->getPendingLeads($entity, null, true));
 
             return;
         }
 
-        if (false !== $pending) {
+        if (null !== $pending) {
             $entity->setPendingCount($pending);
         }
     }

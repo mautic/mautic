@@ -4,7 +4,6 @@ namespace Mautic\DashboardBundle\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface;
-use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\Filesystem;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -256,11 +255,6 @@ class DashboardModel extends FormModel
      */
     public function clearDashboardCache(): void
     {
-        $cacheDir     = $this->coreParametersHelper->get('cached_data_dir', $this->pathsHelper->getSystemPath('cache', true));
-        $cacheStorage = new CacheStorageHelper(CacheStorageHelper::ADAPTOR_FILESYSTEM, $this->userHelper->getUser()->getId(), null, $cacheDir);
-
-        $cacheStorage->clear();
-
         $this->cacheProvider->invalidateTags([WidgetDetailEvent::DASHBOARD_CACHE_TAG]);
     }
 

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\SmsBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Mautic\CoreBundle\Helper\CacheStorageHelper;
+use Mautic\CacheBundle\Cache\CacheProviderInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -76,7 +76,7 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
             $this->pageTrackableModel,
             $this->leadModel,
             $this->transport,
-            $this->createStub(CacheStorageHelper::class),
+            $this->createStub(CacheProviderInterface::class),
             $this->entityManger,
             $this->security,
             $this->dispatcher,
@@ -162,7 +162,7 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
                 $this->pageTrackableModel,
                 $this->leadModel,
                 $this->transport,
-                $this->createStub(CacheStorageHelper::class),
+                $this->createStub(CacheProviderInterface::class),
                 $this->entityManger,
                 $this->security,
                 $this->dispatcher,
