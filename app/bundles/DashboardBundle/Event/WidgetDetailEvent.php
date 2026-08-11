@@ -4,7 +4,6 @@ namespace Mautic\DashboardBundle\Event;
 
 use Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface;
 use Mautic\CoreBundle\Event\CommonEvent;
-use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Exception\CouldNotFormatDateTimeException;
@@ -24,12 +23,6 @@ class WidgetDetailEvent extends CommonEvent
 
     protected $uniqueId;
 
-    protected $cacheDir;
-
-    protected $uniqueCacheDir;
-
-    protected $cacheTimeout;
-
     protected float $startTime;
 
     protected $loadTime  = 0;
@@ -42,7 +35,7 @@ class WidgetDetailEvent extends CommonEvent
         private readonly TranslatorInterface $translator,
         private readonly CorePermissions $security,
         protected Widget $widget,
-        private readonly ?CacheProviderTagAwareInterface $cacheProvider = null,
+        private readonly CacheProviderTagAwareInterface $cacheProvider,
     ) {
         $this->startTime = microtime(true);
         $this->setWidget($widget);
@@ -65,7 +58,7 @@ class WidgetDetailEvent extends CommonEvent
     }
 
     /**
-     * Return unique key, uses legacy methods for BC.
+     * Return unique cache key for the widget.
      */
     public function getCacheKey(): string
     {
@@ -90,24 +83,6 @@ class WidgetDetailEvent extends CommonEvent
         $cacheKey = (1 === count($cacheKey)) ? $this->getUniqueWidgetId() : substr(md5(implode('', $cacheKey)), 0, 16);
 
         return $this->cacheKeyPath.$cacheKey;
-    }
-
-    /**
-     * @param string     $cacheDir
-     * @param mixed|null $uniqueCacheDir
-     */
-    public function setCacheDir($cacheDir, $uniqueCacheDir = null): void
-    {
-        $this->cacheDir       = $cacheDir;
-        $this->uniqueCacheDir = $uniqueCacheDir;
-    }
-
-    /**
-     * @param int|null $cacheTimeout
-     */
-    public function setCacheTimeout($cacheTimeout): void
-    {
-        $this->cacheTimeout = (int) $cacheTimeout;
     }
 
     /**
@@ -159,7 +134,6 @@ class WidgetDetailEvent extends CommonEvent
         $widget->setParams($params);
 
         $this->setType($widget->getType());
-        $this->setCacheTimeout($widget->getCacheTimeout());
     }
 
     /**
@@ -194,26 +168,13 @@ class WidgetDetailEvent extends CommonEvent
     /**
      * Set the widget template data.
      *
-     * @param bool|null $skipCache
-     *
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function setTemplateData(array $templateData, $skipCache = false): void
+    public function setTemplateData(array $templateData): void
     {
         $this->templateData = $templateData;
         $this->widget->setTemplateData($templateData);
         $this->widget->setLoadTime(abs(microtime(true) - $this->startTime));
-
-        if ($this->usesLegacyCache()) {
-            // Store the template data to the cache
-            if (!$skipCache && $this->cacheDir && $this->widget->getCacheTimeout() > 0) {
-                $cache = new CacheStorageHelper(CacheStorageHelper::ADAPTOR_FILESYSTEM, $this->uniqueCacheDir, null, $this->cacheDir);
-                // must pass a DateTime object or a int of seconds to expire as 3rd attribute to set().
-                $expireTime = $this->widget->getCacheTimeout() * 60;
-
-                $cache->set($this->getUniqueWidgetId(), $templateData, (int) $expireTime);
-            }
-        }
 
         $cItem = $this->cacheProvider->getItem($this->getCacheKey());
         if ($this->widget->getCacheTimeout()) {
@@ -286,23 +247,6 @@ class WidgetDetailEvent extends CommonEvent
      */
     public function isCached(): bool
     {
-        if (!$this->cacheDir && $this->usesLegacyCache()) {
-            return false;
-        }
-
-        if ($this->usesLegacyCache()) {
-            $cache = new CacheStorageHelper(CacheStorageHelper::ADAPTOR_FILESYSTEM, $this->uniqueCacheDir, null, $this->cacheDir);
-            $data  = $cache->get($this->getUniqueWidgetId(), $this->cacheTimeout);
-
-            if ($data) {
-                $this->widget->setCached(true);
-                $this->setTemplateData($data, true);
-
-                return true;
-            }
-
-            return false;
-        }
         $cachedItem = $this->cacheProvider->getItem($this->getCacheKey());
         if (!$cachedItem->isHit()) {
             return false;
@@ -338,14 +282,6 @@ class WidgetDetailEvent extends CommonEvent
     public function hasPermission(string $permission): bool
     {
         return $this->security->isGranted($permission);
-    }
-
-    /**
-     * Checks for cache type. This event should be created by factory thus not legacy approach.
-     */
-    private function usesLegacyCache(): bool
-    {
-        return null === $this->cacheProvider;
     }
 
     /**

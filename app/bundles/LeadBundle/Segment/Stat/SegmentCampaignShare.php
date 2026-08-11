@@ -3,13 +3,13 @@
 namespace Mautic\LeadBundle\Segment\Stat;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CacheBundle\Cache\CacheProviderInterface;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
-use Mautic\CoreBundle\Helper\CacheStorageHelper;
 
 final readonly class SegmentCampaignShare
 {
     public function __construct(
-        private CacheStorageHelper $cacheStorageHelper,
+        private CacheProviderInterface $cacheProvider,
         private EntityManagerInterface $entityManager,
         private CampaignRepository $campaignRepository,
     ) {
@@ -24,7 +24,7 @@ final readonly class SegmentCampaignShare
     {
         $campaigns = $this->campaignRepository->getCampaignsSegmentShare($segmentId, $campaignIds);
         foreach ($campaigns as $campaign) {
-            $this->cacheStorageHelper->set($this->getCachedKey($segmentId, $campaign['id']), $campaign['segmentCampaignShare']);
+            $this->cacheProvider->getSimpleCache()->set($this->getCachedKey($segmentId, $campaign['id']), $campaign['segmentCampaignShare']);
         }
 
         return $campaigns;
@@ -47,7 +47,7 @@ final readonly class SegmentCampaignShare
 
         foreach ($campaigns as &$campaign) {
             // just load from cache If exists
-            if ($share  = $this->cacheStorageHelper->get($this->getCachedKey($segmentId, $campaign['id']))) {
+            if ($share  = $this->cacheProvider->getSimpleCache()->get($this->getCachedKey($segmentId, $campaign['id']))) {
                 $campaign['share'] = $share;
             }
         }

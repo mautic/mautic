@@ -79,6 +79,11 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
     ];
 
     /**
+     * @var array<string, array<string, array<string, mixed>>>
+     */
+    private array $cachedLeadFields = [];
+
+    /**
      * @var list<string>
      */
     private array $sfMockResetMethods = [
@@ -872,17 +877,10 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
             ],
         ];
 
-        $this->cache
-            ->method('get')
-            ->willReturnMap(
-                [
-                    ['leadFields.Lead', null, $leadFields],
-                    ['leadFields.Contact', null, $contactFields],
-                ]
-            );
-
-        $this->cache->method('getCache')
-            ->willReturn($this->cache);
+        $this->cachedLeadFields = [
+            'leadFields.Lead'    => $leadFields,
+            'leadFields.Contact' => $contactFields,
+        ];
     }
 
     /**
@@ -970,6 +968,10 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
             ])
             ->onlyMethods($this->sfMockMethods)
             ->getMock();
+
+        foreach ($this->cachedLeadFields as $key => $fields) {
+            $sf->getCache()->set($key, $fields);
+        }
 
         $this->autowireIntegrationRepositories($sf);
 

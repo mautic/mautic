@@ -2146,54 +2146,6 @@ parameters:
 			path: app/bundles/CoreBundle/Helper/BundleHelper.php
 
 		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\CacheStorageHelper\:\:delete\(\) has parameter \$name with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Helper/CacheStorageHelper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\CacheStorageHelper\:\:get\(\) has parameter \$name with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Helper/CacheStorageHelper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\CacheStorageHelper\:\:getCache\(\) has parameter \$defaultExpiration with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Helper/CacheStorageHelper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\CacheStorageHelper\:\:getCache\(\) has parameter \$namespace with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Helper/CacheStorageHelper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\CacheStorageHelper\:\:has\(\) has parameter \$name with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Helper/CacheStorageHelper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\CacheStorageHelper\:\:set\(\) has parameter \$data with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Helper/CacheStorageHelper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\CacheStorageHelper\:\:set\(\) has parameter \$expiration with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Helper/CacheStorageHelper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\CacheStorageHelper\:\:set\(\) has parameter \$name with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Helper/CacheStorageHelper.php
-
-		-
 			message: '#^Method Mautic\\CoreBundle\\Helper\\Chart\\ChartInterface\:\:render\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1

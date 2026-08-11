@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\PluginBundle\Tests\Integration;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Helper\CacheStorageHelper;
+use Mautic\CacheBundle\Cache\CacheProviderInterface;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
@@ -22,6 +22,8 @@ use Mautic\UserBundle\Entity\UserRepository;
 use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Psr16Cache;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -36,7 +38,7 @@ abstract class AbstractIntegrationTestCase extends TestCase
     protected MockObject $dispatcher;
 
     /**
-     * @var MockObject&CacheStorageHelper
+     * @var MockObject&CacheProviderInterface
      */
     protected MockObject $cache;
 
@@ -135,7 +137,13 @@ abstract class AbstractIntegrationTestCase extends TestCase
         parent::setUp();
 
         $this->dispatcher                 = $this->createMock(EventDispatcherInterface::class);
-        $this->cache                      = $this->createMock(CacheStorageHelper::class);
+        $cacheAdapter                     = new ArrayAdapter();
+        $this->cache                      = $this->createMock(CacheProviderInterface::class);
+        $this->cache->method('getItem')->willReturnCallback($cacheAdapter->getItem(...));
+        $this->cache->method('hasItem')->willReturnCallback($cacheAdapter->hasItem(...));
+        $this->cache->method('save')->willReturnCallback($cacheAdapter->save(...));
+        $this->cache->method('deleteItem')->willReturnCallback($cacheAdapter->deleteItem(...));
+        $this->cache->method('getSimpleCache')->willReturn(new Psr16Cache($cacheAdapter));
         $this->em                         = $this->createMock(EntityManager::class);
         $this->session                    = $this->createMock(Session::class);
         $this->request                    = $this->createMock(RequestStack::class);

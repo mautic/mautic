@@ -7,12 +7,12 @@ namespace Mautic\EmailBundle\Tests\Model;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
+use Mautic\CacheBundle\Cache\CacheProviderInterface;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\ChannelBundle\Entity\MessageQueueRepository;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Entity\IpAddress;
-use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
@@ -269,7 +269,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->sendToContactModel,
             $this->deviceTrackerMock,
             $this->redirectRepositoryMock,
-            $this->createStub(CacheStorageHelper::class),
+            $this->createStub(CacheProviderInterface::class),
             $this->createStub(ContactTracker::class),
             $this->doNotContact,
             $this->createStub(StatsCollectionHelper::class),
@@ -614,7 +614,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $sendToContactModelMock,
             $this->deviceTrackerMock,
             $this->redirectRepositoryMock,
-            $this->createStub(CacheStorageHelper::class),
+            $this->createStub(CacheProviderInterface::class),
             $this->createStub(ContactTracker::class),
             $this->doNotContact,
             $this->createStub(StatsCollectionHelper::class),
@@ -759,7 +759,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->sendToContactModel,
             $this->deviceTrackerMock,
             $this->redirectRepositoryMock,
-            $this->createStub(CacheStorageHelper::class),
+            $this->createStub(CacheProviderInterface::class),
             $this->createStub(ContactTracker::class),
             $this->doNotContact,
             $this->createStub(StatsCollectionHelper::class),
