@@ -150,7 +150,7 @@ final class ListModelFunctionalTest extends MauticMysqlTestCase
     public function testManuallyAddContactWhoWasAutomaticallyAddedToSegmentBefore(): void
     {
         /** @var ListModel $segmentModel */
-        $segmentModel = static::getContainer()->get(ListModel::class);
+        $segmentModel = self::getContainer()->get(ListModel::class);
 
         /** @var LeadRepository $contactRepository */
         $contactRepository = $this->em->getRepository(Lead::class);
@@ -168,9 +168,9 @@ final class ListModelFunctionalTest extends MauticMysqlTestCase
             'lead' => $contact,
             'list' => $segment,
         ]);
-        Assert::assertNotNull($listLead);
-        Assert::assertFalse($listLead->wasManuallyAdded());
-        Assert::assertFalse($listLead->wasManuallyRemoved());
+        self::assertNotNull($listLead);
+        self::assertFalse($listLead->wasManuallyAdded());
+        self::assertFalse($listLead->wasManuallyRemoved());
 
         $segmentModel->addLead($contact, $segment, true);
 
@@ -180,9 +180,9 @@ final class ListModelFunctionalTest extends MauticMysqlTestCase
             'list' => $segment,
         ]);
 
-        Assert::assertNotNull($listLead);
-        Assert::assertTrue($listLead->wasManuallyAdded());
-        Assert::assertFalse($listLead->wasManuallyRemoved());
+        self::assertNotNull($listLead);
+        self::assertTrue($listLead->wasManuallyAdded());
+        self::assertFalse($listLead->wasManuallyRemoved());
     }
 
     private function createLeadList(User $user, string $name, bool $isGlobal): LeadList
