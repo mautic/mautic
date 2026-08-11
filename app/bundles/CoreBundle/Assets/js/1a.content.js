@@ -1337,7 +1337,10 @@ Mautic.applySearchScopeState = function (searchEl, searchString) {
     const setSearchInputValue = function (value) {
         Mautic.suppressLiveSearch = true;
         searchInput.val(value);
-        searchInput.typeahead('val', value);
+        // Only sync typeahead when it is already initialized (bundle OnLoad runs later).
+        if (searchInput.parent('.twitter-typeahead').length) {
+            searchInput.typeahead('val', value);
+        }
         Mautic.suppressLiveSearch = false;
     };
 
@@ -1485,7 +1488,7 @@ Mautic.composeScopedSearchValue = function (command, value) {
         return value;
     }
 
-    // Flag-style commands are complete alone; optional free-text searches the item name.
+    // Flag-style commands are complete alone; optional free-text / extra commands follow.
     if (Mautic.isSearchScopeCompleteCommand(command)) {
         return value ? (command + ' ' + value) : command;
     }
@@ -1494,7 +1497,61 @@ Mautic.composeScopedSearchValue = function (command, value) {
         return '';
     }
 
-    return command + ':' + value;
+    const parts = Mautic.splitSearchScopeTermAndExtra(value);
+    if (!parts.term) {
+        // Input is only extra commands (e.g. "ids:5") — do not wrap as name:ids:5.
+        return parts.extra;
+    }
+
+    let composed = command + ':' + parts.term;
+    if (parts.extra) {
+        composed += ' ' + parts.extra;
+    }
+
+    return composed;
+};
+
+/**
+ * Split visible input into the scope term and trailing search commands.
+ * Example: "pepa ids:5" → {term: "pepa", extra: "ids:5"}.
+ */
+Mautic.splitSearchScopeTermAndExtra = function (value) {
+    value = (value || '').trim();
+    if (!value) {
+        return {term: '', extra: ''};
+    }
+
+    if (value.indexOf(':') === -1) {
+        return {term: value, extra: ''};
+    }
+
+    const tokens = value.match(/"[^"]*"|\S+/g) || [];
+    const termTokens = [];
+    const extraTokens = [];
+    let inExtra = false;
+
+    tokens.forEach(function (token) {
+        if (!inExtra && Mautic.searchScopeTokenLooksLikeCommand(token)) {
+            inExtra = true;
+        }
+
+        if (inExtra) {
+            extraTokens.push(token);
+        } else {
+            termTokens.push(token);
+        }
+    });
+
+    return {
+        term: termTokens.join(' '),
+        extra: extraTokens.join(' ')
+    };
+};
+
+Mautic.searchScopeTokenLooksLikeCommand = function (token) {
+    token = (token || '').replace(/^"|"$/g, '');
+
+    return /^!?[\w.-]+:/u.test(token);
 };
 
 /**
@@ -2065,10 +2122,31 @@ Mautic.activateTypeahead = function (el, options) {
 
     var noRrecordMessage = (options.noRrecordMessage) ? options.noRrecordMessage : mQuery(el).data('no-record-message');
     var theName = el.replace(/[^a-z0-9\s]/gi, '').replace(/[-\s]/g, '_');
+    var bloodhoundSource = (typeof theBloodhound != 'undefined') ? theBloodhound.ttAdapter() : substringMatcher(lookupOptions, lookupKeys);
+    var lastFullQuery = '';
+
+    var datasetSource = bloodhoundSource;
+    if (options.multiple) {
+        // Stock typeahead has no real multi-token mode — match/replace only the
+        // current token after the last space so "pepa nam" can still suggest "name:".
+        datasetSource = function (query, sync, async) {
+            lastFullQuery = mQuery(el).val() || query || '';
+            const tokenQuery = Mautic.getTypeaheadCurrentToken(lastFullQuery);
+
+            if (tokenQuery.length < options.minLength) {
+                sync([]);
+
+                return;
+            }
+
+            return bloodhoundSource(tokenQuery, sync, async);
+        };
+    }
+
     var dataset = {
         name: theName,
         displayKey: options.displayKey,
-        source: (typeof theBloodhound != 'undefined') ? theBloodhound.ttAdapter() : substringMatcher(lookupOptions, lookupKeys)
+        source: datasetSource
     };
 
     if (noRrecordMessage) {
@@ -2079,7 +2157,7 @@ Mautic.activateTypeahead = function (el, options) {
 
     var theTypeahead = mQuery(el).typeahead(
         {
-            hint: true,
+            hint: !options.multiple,
             highlight: true,
             minLength: options.minLength,
             multiple: options.multiple
@@ -2095,7 +2173,53 @@ Mautic.activateTypeahead = function (el, options) {
         }
     });
 
+    if (options.multiple) {
+        mQuery(el).on('typeahead:selected.typeaheadMultiple typeahead:autocompleted.typeaheadMultiple', function (event, datum) {
+            const suggestion = (datum && datum[options.displayKey] !== undefined) ? datum[options.displayKey] : datum;
+            const fullQuery = lastFullQuery || mQuery(el).val() || '';
+            const replaced = Mautic.replaceTypeaheadCurrentToken(fullQuery, suggestion);
+            mQuery(el).typeahead('val', replaced);
+            lastFullQuery = replaced;
+        });
+    }
+
     return theTypeahead;
+};
+
+/**
+ * Current token used for multi-token search typeahead (text after the last space).
+ */
+Mautic.getTypeaheadCurrentToken = function (value) {
+    value = value || '';
+    if (/\s$/.test(value)) {
+        return '';
+    }
+
+    const parts = value.split(/\s+/);
+
+    return parts[parts.length - 1] || '';
+};
+
+/**
+ * Replace the current (last) token in a multi-token search string.
+ */
+Mautic.replaceTypeaheadCurrentToken = function (value, suggestion) {
+    suggestion = suggestion || '';
+    value = value || '';
+
+    if (!value || /\s$/.test(value)) {
+        return value + suggestion;
+    }
+
+    const parts = value.split(/(\s+)/);
+    for (let i = parts.length - 1; i >= 0; i--) {
+        if (parts[i].trim() !== '') {
+            parts[i] = suggestion;
+            break;
+        }
+    }
+
+    return parts.join('');
 };
 
 /**

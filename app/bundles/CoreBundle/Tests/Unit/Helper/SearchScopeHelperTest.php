@@ -73,6 +73,44 @@ final class SearchScopeHelperTest extends TestCase
         $this->assertSame('Newsletter', $parsed['value']);
     }
 
+    public function testComposeScopedSearchWithExtraCommands(): void
+    {
+        $this->assertSame('name:pepa ids:5', SearchScopeHelper::compose('name', 'pepa ids:5'));
+        $this->assertSame('name:pepa ids:5 category:news', SearchScopeHelper::compose('name', 'pepa ids:5 category:news'));
+    }
+
+    public function testComposeArgumentScopeWithOnlyExtraCommands(): void
+    {
+        $this->assertSame('ids:5', SearchScopeHelper::compose('name', 'ids:5'));
+    }
+
+    public function testSplitTermAndExtraCommands(): void
+    {
+        $this->assertSame(
+            ['term' => 'pepa', 'extra' => 'ids:5'],
+            SearchScopeHelper::splitTermAndExtraCommands('pepa ids:5')
+        );
+        $this->assertSame(
+            ['term' => 'pepa kolac', 'extra' => ''],
+            SearchScopeHelper::splitTermAndExtraCommands('pepa kolac')
+        );
+        $this->assertSame(
+            ['term' => '', 'extra' => 'ids:5'],
+            SearchScopeHelper::splitTermAndExtraCommands('ids:5')
+        );
+    }
+
+    public function testRoundTripScopedSearchWithExtraCommands(): void
+    {
+        $scopes   = ['', 'name', 'ids', 'is:published'];
+        $composed = SearchScopeHelper::compose('name', 'pepa ids:5');
+        $parsed   = SearchScopeHelper::parse($composed, $scopes);
+
+        $this->assertSame('name:pepa ids:5', $composed);
+        $this->assertSame('name', $parsed['command']);
+        $this->assertSame('pepa ids:5', $parsed['value']);
+    }
+
     public function testRoundTrip(): void
     {
         $composed = SearchScopeHelper::compose('email', 'test@example.com');

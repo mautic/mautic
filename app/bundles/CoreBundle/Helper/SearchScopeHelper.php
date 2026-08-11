@@ -8,8 +8,10 @@ namespace Mautic\CoreBundle\Helper;
  * Splits and composes list-search strings for the filter-scope dropdown UI.
  *
  * Argument scopes keep only the user term in the visible input and compose
- * "firstname:John" for the request. Flag scopes (is:published, …) may also
- * carry optional free-text after the command ("is:unpublished Newsletter").
+ * "firstname:John" for the request. Extra commands typed in the input
+ * (e.g. "pepa ids:5") are appended: "name:pepa ids:5". Flag scopes
+ * (is:published, …) may also carry optional free-text / extra commands
+ * after the command ("is:unpublished Newsletter ids:5").
  */
 final class SearchScopeHelper
 {
@@ -69,7 +71,7 @@ final class SearchScopeHelper
             return $value;
         }
 
-        // Flag-style commands are complete alone; optional free-text searches the item name.
+        // Flag-style commands are complete alone; optional free-text / extra commands follow.
         if (str_contains($command, ':')) {
             return '' === $value ? $command : $command.' '.$value;
         }
@@ -78,7 +80,77 @@ final class SearchScopeHelper
             return '';
         }
 
-        return $command.':'.$value;
+        $parts = self::splitTermAndExtraCommands($value);
+        if ('' === $parts['term']) {
+            // Input is only extra commands (e.g. "ids:5") — do not wrap as name:ids:5.
+            return $parts['extra'];
+        }
+
+        $composed = $command.':'.$parts['term'];
+        if ('' !== $parts['extra']) {
+            $composed .= ' '.$parts['extra'];
+        }
+
+        return $composed;
+    }
+
+    /**
+     * Split a visible search-input value into the scope term and trailing commands.
+     *
+     * Example: "pepa ids:5 category:news" → term "pepa", extra "ids:5 category:news".
+     *
+     * @return array{term: string, extra: string}
+     */
+    public static function splitTermAndExtraCommands(string $value): array
+    {
+        $value = trim($value);
+        if ('' === $value) {
+            return ['term' => '', 'extra' => ''];
+        }
+
+        if (!str_contains($value, ':')) {
+            return ['term' => $value, 'extra' => ''];
+        }
+
+        $tokens      = self::tokenizeRespectingQuotes($value);
+        $termTokens  = [];
+        $extraTokens = [];
+        $inExtra     = false;
+
+        foreach ($tokens as $token) {
+            if (!$inExtra && self::tokenLooksLikeCommand($token)) {
+                $inExtra = true;
+            }
+
+            if ($inExtra) {
+                $extraTokens[] = $token;
+            } else {
+                $termTokens[] = $token;
+            }
+        }
+
+        return [
+            'term'  => implode(' ', $termTokens),
+            'extra' => implode(' ', $extraTokens),
+        ];
+    }
+
+    /**
+     * @return list<string>
+     */
+    private static function tokenizeRespectingQuotes(string $value): array
+    {
+        preg_match_all('/"[^"]*"|\S+/', $value, $matches);
+
+        return $matches[0] ?? [];
+    }
+
+    private static function tokenLooksLikeCommand(string $token): bool
+    {
+        // Strip surrounding quotes for the check; commands are never quoted as a whole.
+        $token = trim($token, '"');
+
+        return 1 === preg_match('/^!?[\p{L}\d_.-]+:/u', $token);
     }
 
     /**
