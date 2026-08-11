@@ -15,6 +15,9 @@ use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
+use Mautic\LeadBundle\Entity\LeadListRepository;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Form\Type\AddToCompanyActionType;
@@ -65,9 +68,9 @@ final class CampaignSubscriber implements EventSubscriberInterface
         private readonly DoNotContact $doNotContact,
         private readonly PointGroupModel $groupModel,
         private readonly FilterOperatorProvider $filterOperatorProvider,
-        private readonly \Mautic\LeadBundle\Entity\LeadListRepository $leadListRepository,
-        private readonly \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
-        private readonly \Mautic\LeadBundle\Entity\LeadFieldRepository $leadFieldRepository,
+        private readonly LeadListRepository $leadListRepository,
+        private readonly LeadRepository $leadRepository,
+        private readonly LeadFieldRepository $leadFieldRepository,
     ) {
     }
 

@@ -51,6 +51,7 @@ final class FieldType extends AbstractType
         private readonly Translator $translator,
         private readonly IdentifierFields $identifierFields,
         private readonly IndexHelper $indexHelper,
+        private readonly FormFieldHelper $formFieldHelper,
     ) {
     }
 
@@ -98,14 +99,12 @@ final class FieldType extends AbstractType
         $type        = $options['data']->getType();
         $isIndex     = $options['data']->isIsIndex();
         $default     = (empty($type)) ? 'text' : $type;
-        $fieldHelper = new FormFieldHelper();
-        $fieldHelper->setTranslator($this->translator);
 
         $builder->add(
             'type',
             ChoiceType::class,
             [
-                'choices'     => $fieldHelper->getChoiceList(),
+                'choices'     => $this->formFieldHelper->getChoiceList(),
                 'expanded'    => false,
                 'multiple'    => false,
                 'label'       => 'mautic.lead.field.type',
@@ -484,7 +483,7 @@ final class FieldType extends AbstractType
             function (FormEvent $event) use ($formModifier, $disableDefaultValue, $setupOrderField): void {
                 $data          = $event->getData();
                 $cleaningRules = $formModifier($event);
-                $masks         = !empty($cleaningRules) ? $cleaningRules : 'clean';
+                $masks         = [] !== $cleaningRules ? $cleaningRules : 'clean';
                 // clean the data
                 $data = InputHelper::_($data, $masks);
 

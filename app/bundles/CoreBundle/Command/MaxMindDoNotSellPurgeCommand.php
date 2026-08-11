@@ -32,7 +32,7 @@ Performs a dry-run which will not actually purge any data, but will produce a li
 Set the number of records to return in a batch when processing the Do Not Sell List. This option is ignored if IPs are passed as an argument.
 TXT
 )]
-class MaxMindDoNotSellPurgeCommand extends Command
+final class MaxMindDoNotSellPurgeCommand extends Command
 {
     public function __construct(
         private readonly EntityManagerInterface $em,

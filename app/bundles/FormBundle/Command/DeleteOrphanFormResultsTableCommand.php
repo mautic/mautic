@@ -19,7 +19,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
     name: DeleteOrphanFormResultsTableCommand::COMMAND_NAME,
     description: 'Deletes form results table for already deleted forms'
 )]
-class DeleteOrphanFormResultsTableCommand extends Command
+final class DeleteOrphanFormResultsTableCommand extends Command
 {
     public const COMMAND_NAME = 'mautic:forms:delete-results-table';
 

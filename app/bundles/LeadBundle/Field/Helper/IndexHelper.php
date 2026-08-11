@@ -13,7 +13,7 @@ use Mautic\LeadBundle\Entity\Lead;
  *
  * @see Lead
  */
-class IndexHelper
+final class IndexHelper
 {
     public const MAX_COUNT_ALLOWED = 64;
 

@@ -17,7 +17,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
     name: ListCommand::NAME,
     description: 'Lists plugins that are available at Packagist.org'
 )]
-class ListCommand extends Command
+final class ListCommand extends Command
 {
     public const NAME = 'mautic:marketplace:list';
 

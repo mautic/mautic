@@ -216,7 +216,7 @@ class ImportHelper
                 continue;
             }
             if ('..' === $segment) {
-                if (!empty($parts)) {
+                if ([] !== $parts) {
                     array_pop($parts);
                 } else {
                     // Cannot resolve upward — preserve so callers detect traversal.

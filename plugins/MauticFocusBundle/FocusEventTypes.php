@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticFocusBundle;
 
-class FocusEventTypes
+final class FocusEventTypes
 {
     /**
      * The focus.on_open event type is used for event dispatched when an focus is opened.

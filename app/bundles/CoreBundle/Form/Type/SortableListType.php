@@ -22,7 +22,7 @@ final class SortableListType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $constraints = ($options['option_required']) ? [
-            new Count(minMessage: 'mautic.form.lists.count', min: 1),
+            new Count(min: 1, minMessage: 'mautic.form.lists.count'),
         ] : [];
 
         if ($options['constraint_callback'] instanceof Callback) {

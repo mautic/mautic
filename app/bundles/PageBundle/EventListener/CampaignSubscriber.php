@@ -68,7 +68,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         $event->addDecision('page.devicehit', $deviceHitTrigger);
 
         $trackingServices = $this->trackingHelper->getEnabledServices();
-        if (!empty($trackingServices)) {
+        if ([] !== $trackingServices) {
             $action = [
                 'label'                  => 'mautic.page.tracking.pixel.event.send',
                 'description'            => 'mautic.page.tracking.pixel.event.send_desc',

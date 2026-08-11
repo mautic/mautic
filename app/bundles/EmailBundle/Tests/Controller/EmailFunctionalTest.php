@@ -96,7 +96,6 @@ final class EmailFunctionalTest extends MauticMysqlTestCase
             $listOne->getId(),
             $listFour->getId(),
         ], $email->getLists());
-        $this->assertInstanceOf(Email::class, $email);
         $this->assertEmailLists([
             $listTwo->getId(),
             $listThree->getId(),

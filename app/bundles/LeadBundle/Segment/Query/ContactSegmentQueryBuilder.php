@@ -20,7 +20,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 /**
  * Responsible for building queries for segments.
  */
-class ContactSegmentQueryBuilder
+final class ContactSegmentQueryBuilder
 {
     use LeadBatchLimiterTrait;
 

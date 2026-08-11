@@ -96,8 +96,6 @@ final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
         $email = new Email();
 
         $grapeJsBuilderModel = new GrapesJsBuilderModel(
-            $requestStack,
-            $emailModel,
             $entityManager,
             $this->createStub(CorePermissions::class),
             $this->createStub(EventDispatcherInterface::class),
@@ -106,8 +104,12 @@ final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(CoreParametersHelper::class),
-            $grapesJsBuilderRepository, // $grapesJsBuilderRepository
-            $emailRepository, // $emailRepository
+        );
+        $grapeJsBuilderModel->autowireGrapesJsBuilderModel(
+            $requestStack,
+            $emailModel,
+            $grapesJsBuilderRepository,
+            $emailRepository,
         );
 
         $grapeJsBuilderModel->addOrEditEntity($email);
@@ -201,8 +203,6 @@ final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
         $email = new Email();
 
         $grapeJsBuilderModel = new GrapesJsBuilderModel(
-            $requestStack,
-            $emailModel,
             $entityManager,
             $this->createStub(CorePermissions::class),
             $this->createStub(EventDispatcherInterface::class),
@@ -211,8 +211,12 @@ final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(CoreParametersHelper::class),
-            $grapesJsBuilderRepository, // $grapesJsBuilderRepository
-            $emailRepository, // $emailRepository
+        );
+        $grapeJsBuilderModel->autowireGrapesJsBuilderModel(
+            $requestStack,
+            $emailModel,
+            $grapesJsBuilderRepository,
+            $emailRepository,
         );
 
         $grapeJsBuilderModel->addOrEditEntity($email);

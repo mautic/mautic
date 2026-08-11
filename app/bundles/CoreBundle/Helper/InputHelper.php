@@ -5,7 +5,7 @@ namespace Mautic\CoreBundle\Helper;
 use GuzzleHttp\Psr7\Query;
 use Joomla\Filter\InputFilter;
 
-class InputHelper
+final class InputHelper
 {
     /**
      * String filter.
@@ -205,7 +205,7 @@ class InputHelper
 
         $delimiter = '~';
 
-        if (!empty($allowedCharacters)) {
+        if ([] !== $allowedCharacters) {
             $regex = $delimiter.'[^0-9a-z'.preg_quote(implode('', $allowedCharacters), $delimiter).']+'.$delimiter.'i';
         } else {
             $regex = $delimiter.'[^0-9a-z]+'.$delimiter.'i';
@@ -307,7 +307,7 @@ class InputHelper
             // should be caught by FILTER_VALIDATE_URL if the host has invalid characters
             (!empty($parts['host']) ? $parts['host'] : '').
             // type cast to int
-            (!empty($parts['port']) ? ':'.(int) $parts['port'] : '').
+            (!empty($parts['port']) ? ':'.$parts['port'] : '').
             // strip tags that could be embedded in a path
             (!empty($parts['path']) ? strip_tags($parts['path']) : '').
             // cleaned through the parse_str (urldecode) and http_build_query (urlencode) above

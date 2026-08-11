@@ -20,7 +20,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Category>
  */
-class CategoryApiController extends CommonApiController
+final class CategoryApiController extends CommonApiController
 {
     public function __construct(
         CorePermissions $security,

@@ -14,7 +14,9 @@ use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Redirect;
+use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Entity\Trackable;
+use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -35,8 +37,8 @@ final class BuilderSubscriber implements EventSubscriberInterface
         private readonly TranslatorInterface $translator,
         private readonly MailHashHelper $mailHash,
         private readonly FromEmailHelper $fromEmailHelper,
-        private readonly \Mautic\PageBundle\Entity\TrackableRepository $trackableRepository,
-        private readonly \Mautic\PageBundle\Entity\RedirectRepository $redirectRepository,
+        private readonly TrackableRepository $trackableRepository,
+        private readonly RedirectRepository $redirectRepository,
     ) {
     }
 

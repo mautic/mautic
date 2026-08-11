@@ -8,10 +8,10 @@ use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class DateExtension extends AbstractExtension
+final class DateExtension extends AbstractExtension
 {
     public function __construct(
-        protected DateHelper $dateHelper,
+        private readonly DateHelper $dateHelper,
     ) {
     }
 
@@ -65,10 +65,8 @@ class DateExtension extends AbstractExtension
      * Returns date and time concat eg 2014-08-02 5:00am.
      *
      * @param \DateTime|string $datetime
-     *
-     * @return string
      */
-    public function toFullConcat($datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s')
+    public function toFullConcat($datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s'): string
     {
         return $this->dateHelper->toFullConcat($datetime, $timezone, $fromFormat);
     }
@@ -77,10 +75,8 @@ class DateExtension extends AbstractExtension
      * Returns date only e.g. 2014-08-09.
      *
      * @param \DateTime|string $datetime
-     *
-     * @return string
      */
-    public function toDate($datetime, string $timezone = 'local', string $fromFormat = 'Y-m-d H:i:s')
+    public function toDate($datetime, string $timezone = 'local', string $fromFormat = 'Y-m-d H:i:s'): string
     {
         return $this->dateHelper->toDate($datetime, $timezone, $fromFormat);
     }

@@ -2,7 +2,7 @@
 
 namespace Mautic\EmailBundle\Helper;
 
-class UrlMatcher
+final class UrlMatcher
 {
     /**
      * @param array<array-key, string> $urlsToCheckAgainst

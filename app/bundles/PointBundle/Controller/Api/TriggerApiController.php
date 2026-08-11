@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Entity\TriggerEvent;
+use Mautic\PointBundle\Entity\TriggerRepository;
 use Mautic\PointBundle\Model\TriggerEventModel;
 use Mautic\PointBundle\Model\TriggerModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -24,7 +25,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Trigger>
  */
-class TriggerApiController extends CommonApiController
+final class TriggerApiController extends CommonApiController
 {
     /**
      * @var TriggerModel|null
@@ -45,7 +46,7 @@ class TriggerApiController extends CommonApiController
         CoreParametersHelper $coreParametersHelper,
         TriggerModel $triggerModel,
         private readonly TriggerEventModel $triggerEventModel,
-        private readonly \Mautic\PointBundle\Entity\TriggerRepository $triggerRepository,
+        private readonly TriggerRepository $triggerRepository,
     ) {
         $this->model            = $triggerModel;
         $this->entityClass      = Trigger::class;
