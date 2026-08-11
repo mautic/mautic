@@ -30,16 +30,6 @@ final class OperatorOptions
 
     public const string NOT_BETWEEN           = '!between';
 
-    /**
-     * @deprecated Use OperatorOptions::INCLUDING_ANY
-     */
-    public const string IN                    = 'in';
-
-    /**
-     * @deprecated Use OperatorOptions::EXCLUDING_ANY
-     */
-    public const string NOT_IN                = '!in';
-
     public const string INCLUDING_ANY         = 'in';
 
     public const string EXCLUDING_ANY         = '!in';
