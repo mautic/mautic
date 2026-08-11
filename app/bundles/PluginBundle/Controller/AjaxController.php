@@ -48,7 +48,7 @@ final class AjaxController extends CommonAjaxController
 
         $dataArray = ['success' => 0];
 
-        if (!empty($integration) && $settings !== []) {
+        if (!empty($integration) && [] !== $settings) {
             /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integrationObject */
             $integrationObject = $helper->getIntegrationObject($integration);
 

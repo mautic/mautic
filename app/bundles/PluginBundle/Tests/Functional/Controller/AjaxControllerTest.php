@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
 final class AjaxControllerTest extends MauticMysqlTestCase
