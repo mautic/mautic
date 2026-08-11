@@ -583,12 +583,6 @@ parameters:
 			path: app/bundles/CampaignBundle/Entity/LeadRepository.php
 
 		-
-			message: '#^Method Mautic\\CampaignBundle\\Entity\\LeadRepository\:\:getOrphanedContacts\(\) has parameter \$campaignId with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CampaignBundle/Entity/LeadRepository.php
-
-		-
 			message: '#^Method Mautic\\CampaignBundle\\Entity\\LeadRepository\:\:updateLead\(\) has parameter \$fromLeadId with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -1547,12 +1541,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\CoreBundle\\Entity\\CommonRepository\:\:buildWhereClauseFromArray\(\) has parameter \$expr with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Entity/CommonRepository.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Entity\\CommonRepository\:\:createFromArray\(\) has parameter \$data with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/CoreBundle/Entity/CommonRepository.php
@@ -2815,18 +2803,6 @@ parameters:
 			path: app/bundles/DashboardBundle/Entity/Widget.php
 
 		-
-			message: '#^Property Mautic\\DashboardBundle\\Event\\WidgetDetailEvent\:\:\$cacheDir has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/DashboardBundle/Event/WidgetDetailEvent.php
-
-		-
-			message: '#^Property Mautic\\DashboardBundle\\Event\\WidgetDetailEvent\:\:\$cacheTimeout has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/DashboardBundle/Event/WidgetDetailEvent.php
-
-		-
 			message: '#^Property Mautic\\DashboardBundle\\Event\\WidgetDetailEvent\:\:\$errorMessage has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -2852,12 +2828,6 @@ parameters:
 
 		-
 			message: '#^Property Mautic\\DashboardBundle\\Event\\WidgetDetailEvent\:\:\$type has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/DashboardBundle/Event/WidgetDetailEvent.php
-
-		-
-			message: '#^Property Mautic\\DashboardBundle\\Event\\WidgetDetailEvent\:\:\$uniqueCacheDir has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
 			path: app/bundles/DashboardBundle/Event/WidgetDetailEvent.php
@@ -8203,12 +8173,6 @@ parameters:
 			path: app/bundles/PluginBundle/Helper/IntegrationHelper.php
 
 		-
-			message: '#^Method Mautic\\PluginBundle\\Helper\\IntegrationHelper\:\:clearIntegrationCache\(\) has parameter \$lead with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PluginBundle/Helper/IntegrationHelper.php
-
-		-
 			message: '#^Method Mautic\\PluginBundle\\Helper\\IntegrationHelper\:\:getIconPath\(\) has parameter \$integration with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -8383,19 +8347,7 @@ parameters:
 			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
 
 		-
-			message: '#^Method Mautic\\PluginBundle\\Integration\\AbstractIntegration\:\:formatMatchedFields\(\) has parameter \$fields with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
-
-		-
 			message: '#^Method Mautic\\PluginBundle\\Integration\\AbstractIntegration\:\:getBearerToken\(\) has parameter \$inAuthorization with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
-
-		-
-			message: '#^Method Mautic\\PluginBundle\\Integration\\AbstractIntegration\:\:getCompoundMauticFields\(\) has parameter \$lead with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
@@ -8491,12 +8443,6 @@ parameters:
 			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
 
 		-
-			message: '#^Method Mautic\\PluginBundle\\Integration\\AbstractIntegration\:\:mergeApiKeys\(\) has parameter \$mergeKeys with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
-
-		-
 			message: '#^Method Mautic\\PluginBundle\\Integration\\AbstractIntegration\:\:mergeApiKeys\(\) has parameter \$withKeys with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -8545,25 +8491,7 @@ parameters:
 			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
 
 		-
-			message: '#^Method Mautic\\PluginBundle\\Integration\\AbstractIntegration\:\:prepareRequest\(\) has parameter \$method with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
-
-		-
 			message: '#^Method Mautic\\PluginBundle\\Integration\\AbstractIntegration\:\:prepareRequest\(\) has parameter \$parameters with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
-
-		-
-			message: '#^Method Mautic\\PluginBundle\\Integration\\AbstractIntegration\:\:prepareRequest\(\) has parameter \$settings with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
-
-		-
-			message: '#^Method Mautic\\PluginBundle\\Integration\\AbstractIntegration\:\:prepareRequest\(\) has parameter \$url with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
@@ -9628,6 +9556,12 @@ parameters:
 			path: app/bundles/WebhookBundle/Security/Permissions/WebhookPermissions.php
 
 		-
+			message: '#^Cannot unset offset ''simple_form'' on array\{pattern\: ''\^/\(s/\|elfinder…'', light_saml_sp\: array\{provider\: ''user_provider'', success_handler\: ''mautic\.security…'', failure_handler\: ''mautic\.security…'', user_creator\: ''mautic\.security…'', username_mapper\: ''mautic\.security…'', login_path\: ''%%env\(MAUTIC_SAML…'', check_path\: ''%%env\(MAUTIC_SAML…''\}, form_login\: array\{enable_csrf\: true, success_handler\: ''mautic\.security…'', failure_handler\: ''mautic\.security…'', login_path\: ''/s/login'', check_path\: ''/s/login_check''\}, logout\: array\{path\: ''/s/logout'', target\: ''/s/login''\}, remember_me\: array\{secret\: ''%%mautic\.rememberme…'', lifetime\: ''%%mautic\.rememberme…'', path\: ''%%mautic\.rememberme…'', domain\: ''%%mautic\.rememberme…'', samesite\: ''lax''\}, entry_point\: ''Mautic\\\\UserBundle\\\\Security\\\\EntryPoint\\\\MainEntryPoint'', mautic_sso\: array\{\}, fos_oauth\: true, \.\.\.\}\.$#'
+			identifier: unset.offset
+			count: 1
+			path: app/config/security.php
+
+		-
 			message: '#^Method MauticPlugin\\GrapesJsBuilderBundle\\Helper\\FileManager\:\:getFullUrl\(\) has parameter \$fileName with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -10084,12 +10018,6 @@ parameters:
 			path: plugins/MauticCrmBundle/Integration/ConnectwiseIntegration.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\ConnectwiseIntegration\:\:cleanPriorityFields\(\) has parameter \$fieldsToUpdate with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/ConnectwiseIntegration.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\ConnectwiseIntegration\:\:createActivity\(\) has parameter \$cwContactId with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -10133,12 +10061,6 @@ parameters:
 
 		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\ConnectwiseIntegration\:\:getMappedFields\(\) has parameter \$lead with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/ConnectwiseIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\ConnectwiseIntegration\:\:getPriorityFieldsForMautic\(\) has parameter \$config with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/ConnectwiseIntegration.php
@@ -10240,32 +10162,8 @@ parameters:
 			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\CrmAbstractIntegration\:\:cleanPriorityFields\(\) has parameter \$fieldsToUpdate with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\CrmAbstractIntegration\:\:getBlankFieldsToUpdate\(\) has no return type specified\.$#'
 			identifier: missingType.return
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\CrmAbstractIntegration\:\:getBlankFieldsToUpdate\(\) has parameter \$config with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\CrmAbstractIntegration\:\:getBlankFieldsToUpdate\(\) has parameter \$fields with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\CrmAbstractIntegration\:\:getBlankFieldsToUpdate\(\) has parameter \$objectFields with no type specified\.$#'
-			identifier: missingType.parameter
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
 
@@ -10278,24 +10176,6 @@ parameters:
 		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\CrmAbstractIntegration\:\:getBlankFieldsToUpdateInMautic\(\) has no return type specified\.$#'
 			identifier: missingType.return
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\CrmAbstractIntegration\:\:getBlankFieldsToUpdateInMautic\(\) has parameter \$integrationData with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\CrmAbstractIntegration\:\:getBlankFieldsToUpdateInMautic\(\) has parameter \$leadFieldValues with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\CrmAbstractIntegration\:\:getBlankFieldsToUpdateInMautic\(\) has parameter \$matchedFields with no type specified\.$#'
-			identifier: missingType.parameter
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
 
@@ -10331,12 +10211,6 @@ parameters:
 
 		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\CrmAbstractIntegration\:\:getFormFieldsByObject\(\) has parameter \$object with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\CrmAbstractIntegration\:\:getFormFieldsByObject\(\) has parameter \$settings with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
@@ -10384,19 +10258,7 @@ parameters:
 			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\CrmAbstractIntegration\:\:getPriorityFieldsForIntegration\(\) has parameter \$config with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\CrmAbstractIntegration\:\:getPriorityFieldsForIntegration\(\) has parameter \$entityObject with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\CrmAbstractIntegration\:\:getPriorityFieldsForMautic\(\) has parameter \$config with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
@@ -10505,12 +10367,6 @@ parameters:
 
 		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\HubspotIntegration\:\:amendLeadDataBeforePush\(\) has parameter \$mappedData with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/HubspotIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\HubspotIntegration\:\:cleanPriorityFields\(\) has parameter \$fieldsToUpdate with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/HubspotIntegration.php
@@ -10655,12 +10511,6 @@ parameters:
 
 		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SalesforceIntegration\:\:checkLeadIsContact\(\) has parameter \$leadFields with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SalesforceIntegration\:\:cleanPriorityFields\(\) has parameter \$fieldsToUpdate with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
@@ -10816,12 +10666,6 @@ parameters:
 			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SalesforceIntegration\:\:getMauticContactsToUpdate\(\) has parameter \$checkEmailsInSF with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SalesforceIntegration\:\:getMauticContactsToUpdate\(\) has parameter \$fromDate with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -10942,19 +10786,7 @@ parameters:
 			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SalesforceIntegration\:\:getPriorityFieldsForIntegration\(\) has parameter \$config with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SalesforceIntegration\:\:getPriorityFieldsForIntegration\(\) has parameter \$object with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SalesforceIntegration\:\:getPriorityFieldsForMautic\(\) has parameter \$config with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
@@ -11164,12 +10996,6 @@ parameters:
 			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SugarcrmIntegration\:\:cleanPriorityFields\(\) has parameter \$fieldsToUpdate with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SugarcrmIntegration\:\:convertLeadFieldKey\(\) has parameter \$field with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -11254,12 +11080,6 @@ parameters:
 			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SugarcrmIntegration\:\:getPriorityFieldsForMautic\(\) has parameter \$config with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SugarcrmIntegration\:\:getPriorityFieldsForMautic\(\) has parameter \$object with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -11284,25 +11104,7 @@ parameters:
 			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SugarcrmIntegration\:\:prepareRequest\(\) has parameter \$method with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SugarcrmIntegration\:\:prepareRequest\(\) has parameter \$parameters with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SugarcrmIntegration\:\:prepareRequest\(\) has parameter \$settings with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SugarcrmIntegration\:\:prepareRequest\(\) has parameter \$url with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
@@ -11348,36 +11150,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/VtigerIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\ZohoIntegration\:\:cleanPriorityFields\(\) has parameter \$fieldsToUpdate with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/ZohoIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\ZohoIntegration\:\:getBlankFieldsToUpdate\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/ZohoIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\ZohoIntegration\:\:getBlankFieldsToUpdate\(\) has parameter \$config with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/ZohoIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\ZohoIntegration\:\:getBlankFieldsToUpdate\(\) has parameter \$fields with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/ZohoIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\ZohoIntegration\:\:getBlankFieldsToUpdate\(\) has parameter \$objectFields with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/ZohoIntegration.php
 
 		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\ZohoIntegration\:\:getBlankFieldsToUpdate\(\) has parameter \$sfRecord with no type specified\.$#'
@@ -12172,25 +11944,7 @@ parameters:
 			path: plugins/MauticSocialBundle/Integration/TwitterIntegration.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticSocialBundle\\Integration\\TwitterIntegration\:\:prepareRequest\(\) has parameter \$method with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticSocialBundle/Integration/TwitterIntegration.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticSocialBundle\\Integration\\TwitterIntegration\:\:prepareRequest\(\) has parameter \$parameters with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticSocialBundle/Integration/TwitterIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticSocialBundle\\Integration\\TwitterIntegration\:\:prepareRequest\(\) has parameter \$settings with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticSocialBundle/Integration/TwitterIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticSocialBundle\\Integration\\TwitterIntegration\:\:prepareRequest\(\) has parameter \$url with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: plugins/MauticSocialBundle/Integration/TwitterIntegration.php
