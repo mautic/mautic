@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\StageBundle\Form\Type;
 
 use Mautic\StageBundle\Model\StageModel;
@@ -11,7 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class StageActionListType extends AbstractType
+final class StageActionListType extends AbstractType
 {
     public function __construct(
         private readonly StageModel $model,
@@ -35,7 +37,7 @@ class StageActionListType extends AbstractType
         ]);
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return ChoiceType::class;
     }

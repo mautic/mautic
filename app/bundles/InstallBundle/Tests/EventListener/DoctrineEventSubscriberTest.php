@@ -17,11 +17,6 @@ use PHPUnit\Framework\TestCase;
 
 final class DoctrineEventSubscriberTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testSubscriberWillAddCorrectIndexes(): void
     {
         $idColumn   = new Column('id', new BigIntType());

@@ -25,7 +25,7 @@ final class DetailControllerTest extends MauticMysqlTestCase
         );
 
         /** @var Allowlist $allowlist */
-        $allowlist = static::getContainer()->get('marketplace.service.allowlist');
+        $allowlist = self::getContainer()->get(Allowlist::class);
         $allowlist->clearCache();
 
         $this->client->request('GET', "s/marketplace/detail/{$requestedPackage}");

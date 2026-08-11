@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CampaignBundle\Form\Type\CampaignListType;
@@ -13,10 +15,10 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class CampaignEventLeadCampaignsType extends AbstractType
+final class CampaignEventLeadCampaignsType extends AbstractType
 {
     public function __construct(
-        protected ListModel $listModel,
+        private readonly ListModel $listModel,
     ) {
     }
 

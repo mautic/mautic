@@ -14,7 +14,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<Tag>
  */
-class TagEntityType extends AbstractType
+final class TagEntityType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

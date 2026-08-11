@@ -23,8 +23,10 @@ class SummaryModel extends AbstractCommonModel
     private SummaryRepository $summaryRepository;
 
     #[Required]
-    public function autowireSummaryModel(SummaryRepository $summaryRepository, LeadEventLogRepository $leadEventLogRepository): void
-    {
+    public function autowireSummaryModel(
+        SummaryRepository $summaryRepository,
+        LeadEventLogRepository $leadEventLogRepository,
+    ): void {
         $this->summaryRepository = $summaryRepository;
         $this->leadEventLogRepository = $leadEventLogRepository;
     }

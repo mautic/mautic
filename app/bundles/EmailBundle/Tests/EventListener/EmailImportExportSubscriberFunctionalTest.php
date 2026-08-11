@@ -16,7 +16,7 @@ final class EmailImportExportSubscriberFunctionalTest extends MauticMysqlTestCas
     protected function setUp(): void
     {
         parent::setUp();
-        $this->dispatcher = static::getContainer()->get('event_dispatcher');
+        $this->dispatcher = self::getContainer()->get(EventDispatcherInterface::class);
     }
 
     public function testExportEmailWithNullParentReferences(): void

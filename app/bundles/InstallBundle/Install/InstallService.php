@@ -6,7 +6,7 @@ namespace Mautic\InstallBundle\Install;
 
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Doctrine\Loader\FixturesLoaderInterface;
@@ -22,11 +22,12 @@ use Mautic\InstallBundle\Exception\DatabaseVersionTooOldException;
 use Mautic\InstallBundle\Helper\SchemaHelper;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -45,12 +46,13 @@ class InstallService
         private readonly Configurator $configurator,
         private readonly CacheHelper $cacheHelper,
         protected PathsHelper $pathsHelper,
-        private readonly EntityManager $entityManager,
+        private readonly EntityManagerInterface $entityManager,
         private readonly TranslatorInterface $translator,
         private readonly KernelInterface $kernel,
         private readonly ValidatorInterface $validator,
-        private readonly UserPasswordHasher $hasher,
+        private readonly UserPasswordHasherInterface $hasher,
         private readonly FixturesLoaderInterface $fixturesLoader,
+        private readonly UserRepository $userRepository,
     ) {
     }
 
@@ -74,7 +76,7 @@ class InstallService
         $params = $this->configurator->getParameters();
 
         // Check to ensure the installer is in the right place
-        if ((empty($params)
+        if (([] === $params
                 || !isset($params['db_driver'])
                 || empty($params['db_driver'])) && $index > 1) {
             return $this->configurator->getStep(self::DOCTRINE_STEP)[0];
@@ -136,7 +138,7 @@ class InstallService
      */
     private function translateMessages(array $messages): array
     {
-        if (empty($messages)) {
+        if ([] === $messages) {
             return $messages;
         }
 
@@ -244,7 +246,7 @@ class InstallService
     {
         $messages = $this->validateDatabaseParams($dbParams);
 
-        if (!empty($messages)) {
+        if ([] !== $messages) {
             return $messages;
         }
 
@@ -257,7 +259,7 @@ class InstallService
 
             if ($schemaHelper->createDatabase()) {
                 $messages = $this->saveConfiguration($dbParams, $step, true);
-                if (empty($messages)) {
+                if ([] === $messages) {
                     return $messages;
                 }
             }
@@ -370,8 +372,7 @@ class InstallService
     {
         // ensure the username and email are unique
         try {
-            /** @var User $existingUser */
-            $existingUser = $this->entityManager->getRepository(User::class)->find(1);
+            $existingUser = $this->userRepository->find(1);
         } catch (\Exception) {
             $existingUser = null;
         }
@@ -401,7 +402,7 @@ class InstallService
             }
         }
 
-        if (!empty($messages)) {
+        if ([] !== $messages) {
             return $messages;
         }
 
@@ -423,7 +424,7 @@ class InstallService
             }
         }
 
-        if (!empty($messages)) {
+        if ([] !== $messages) {
             return $messages;
         }
 

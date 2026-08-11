@@ -22,9 +22,10 @@ final class ThemeControllerTest extends MauticMysqlTestCase
         $this->configParams['legacy_builder_enabled'] = true;
         parent::setUp();
 
-        $this->pathsHelper = $this->getContainer()->get('mautic.helper.paths');
+        $this->pathsHelper = $this->getContainer()->get(PathsHelper::class);
         $this->assertInstanceOf(PathsHelper::class, $this->pathsHelper);
-        $this->filesystem  = $this->getContainer()->get('mautic.filesystem');
+
+        $this->filesystem  = $this->getContainer()->get(Filesystem::class);
         $this->assertInstanceOf(Filesystem::class, $this->filesystem);
 
         $themePath = $this->pathsHelper->getThemesPath();

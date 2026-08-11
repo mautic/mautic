@@ -192,7 +192,7 @@ trait CustomFieldsApiControllerTrait
                 $parameters,
                 function ($value): bool {
                     if (is_numeric($value)) {
-                        return 0 !== (int) $value;
+                        return 0.0 !== (float) $value;
                     }
 
                     return true;

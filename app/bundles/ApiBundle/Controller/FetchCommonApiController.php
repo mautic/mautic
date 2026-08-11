@@ -312,7 +312,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
             $this->customSelectRequested = true;
         }
 
-        if (!empty($args)) {
+        if ([] !== $args) {
             $args['id'] = $id;
             $entity     = $this->model->getEntity($args);
         } else {
@@ -685,7 +685,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
             $context = $apiSerializationContextEvent->getContext();
         }
 
-        if (!empty($this->serializerGroups)) {
+        if ([] !== $this->serializerGroups) {
             $context->setGroups($this->serializerGroups);
         }
 

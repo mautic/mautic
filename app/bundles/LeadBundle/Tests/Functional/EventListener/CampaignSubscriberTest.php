@@ -148,7 +148,6 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
         $campaignExecutionEvent = new CampaignExecutionEvent($eventProperties, false);
 
         $this->campaignSubscriber->onCampaignTriggerCondition($campaignExecutionEvent);
-        $this->assertInstanceOf(CampaignExecutionEvent::class, $campaignExecutionEvent); // @phpstan-ignore classConstant.deprecatedClass
         $this->assertSame($expected, $campaignExecutionEvent->getResult());
     }
 
@@ -205,7 +204,7 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
         $field->setAlias($fieldDetails['alias']);
 
         /** @var FieldModel $fieldModel */
-        $fieldModel = $this->getContainer()->get('mautic.lead.model.field');
+        $fieldModel = $this->getContainer()->get(FieldModel::class);
         $fieldModel->saveEntity($field);
     }
 

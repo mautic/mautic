@@ -2,7 +2,6 @@
 
 namespace Mautic\SmsBundle\Helper;
 
-use Doctrine\ORM\EntityManager;
 use libphonenumber\PhoneNumberFormat;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PhoneNumberHelper;
@@ -18,7 +17,7 @@ use Mautic\SmsBundle\Model\SmsModel;
 class SmsHelper
 {
     public function __construct(
-        protected EntityManager $em,
+        protected LeadRepository $leadRepository,
         protected LeadModel $leadModel,
         protected PhoneNumberHelper $phoneNumberHelper,
         protected SmsModel $smsModel,
@@ -32,9 +31,6 @@ class SmsHelper
     {
         $number = $this->phoneNumberHelper->format($number, PhoneNumberFormat::E164);
 
-        /** @var LeadRepository $repo */
-        $repo = $this->em->getRepository(Lead::class);
-
         $args = [
             'filter' => [
                 'force' => [
@@ -47,7 +43,7 @@ class SmsHelper
             ],
         ];
 
-        $leads = $repo->getEntities($args);
+        $leads = $this->leadRepository->getEntities($args);
 
         if (!empty($leads)) {
             $lead = array_shift($leads);
@@ -55,7 +51,7 @@ class SmsHelper
             // Try to find the lead based on the given phone number
             $args['filter']['force'][0]['column'] = 'phone';
 
-            $leads = $repo->getEntities($args);
+            $leads = $this->leadRepository->getEntities($args);
 
             if (!empty($leads)) {
                 $lead = array_shift($leads);

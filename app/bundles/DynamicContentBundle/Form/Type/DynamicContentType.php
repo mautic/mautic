@@ -4,7 +4,7 @@ namespace Mautic\DynamicContentBundle\Form\Type;
 
 use DeviceDetector\Parser\Device\AbstractDeviceParser as DeviceParser;
 use DeviceDetector\Parser\OperatingSystem;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\DynamicContentBundle\DynamicContent\TypeList;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\EmailBundle\Form\Type\EmailUtmTagsType;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -40,7 +41,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<DynamicContent>
  */
-class DynamicContentType extends AbstractType
+final class DynamicContentType extends AbstractType
 {
     /**
      * @var mixed[]
@@ -85,12 +86,13 @@ class DynamicContentType extends AbstractType
      * @throws \InvalidArgumentException
      */
     public function __construct(
-        private readonly EntityManager $em,
+        private readonly EntityManagerInterface $em,
         ListModel $listModel,
         private readonly TranslatorInterface $translator,
-        private readonly LeadModel $leadModel,
+        LeadModel $leadModel,
         private TypeList $typeList,
         private readonly RelativeDate $relativeDate,
+        private readonly LeadRepository $leadRepository,
     ) {
         $this->fieldChoices    = $listModel->getChoiceFields();
         $this->timezoneChoices = FormFieldHelper::getTimezonesChoices();
@@ -343,7 +345,7 @@ class DynamicContentType extends AbstractType
     {
         unset($this->fieldChoices['company']);
 
-        $customFields = $this->leadModel->getRepository()->getCustomFieldList('lead');
+        $customFields = $this->leadRepository->getCustomFieldList('lead');
 
         $this->fieldChoices['lead'] = array_filter(
             $this->fieldChoices['lead'],

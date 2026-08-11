@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticSocialBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\EventListener\CommonStatsSubscriber;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use MauticPlugin\MauticSocialBundle\Entity\TweetStatRepository;
@@ -11,7 +13,7 @@ final class StatsSubscriber extends CommonStatsSubscriber
 {
     public function __construct(
         CorePermissions $security,
-        EntityManager $entityManager,
+        EntityManagerInterface $entityManager,
         TweetStatRepository $tweetStatRepository,
     ) {
         parent::__construct($security, $entityManager);

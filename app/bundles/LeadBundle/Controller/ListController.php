@@ -14,16 +14,14 @@ use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Security\Permissions\LeadPermissions;
 use Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare;
 use Mautic\LeadBundle\Segment\Stat\SegmentDependencies;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Service\Attribute\Required;
 
@@ -32,7 +30,7 @@ final class ListController extends FormController
     use EntityContactsTrait;
     use QuickFilterSearchTrait;
 
-    private \Mautic\LeadBundle\Entity\LeadListRepository $leadListRepository;
+    private LeadListRepository $leadListRepository;
 
     private ListModel $listModel;
 
@@ -42,7 +40,7 @@ final class ListController extends FormController
     public function autowireListController(
         LeadModel $leadModel,
         ListModel $listModel,
-        \Mautic\LeadBundle\Entity\LeadListRepository $leadListRepository,
+        LeadListRepository $leadListRepository,
     ): void {
         $this->leadModel = $leadModel;
         $this->listModel = $listModel;
@@ -53,10 +51,7 @@ final class ListController extends FormController
 
     public const SEGMENT_CONTACT_FIELDS = ['id', 'company', 'city', 'state', 'country'];
 
-    /**
-     * @var array
-     */
-    protected $listFilters = [];
+    private array $listFilters = [];
 
     /**
      * Generate's default list view.
@@ -152,7 +147,7 @@ final class ListController extends FormController
         $session->set('mautic.segment.page', $page);
 
         $listIds    = array_keys($items->getIterator()->getArrayCopy());
-        $leadCounts = (!empty($listIds)) ? $this->listModel->getSegmentContactCountFromCache($listIds) : [];
+        $leadCounts = ([] !== $listIds) ? $this->listModel->getSegmentContactCountFromCache($listIds) : [];
 
         $parameters = [
             'items'                          => $items,
@@ -493,10 +488,8 @@ final class ListController extends FormController
 
     /**
      * Delete a list.
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         $page      = $request->getSession()->get('mautic.segment.page', 1);
         $returnUrl = $this->generateUrl('mautic_segment_index', ['page' => $page]);
@@ -902,7 +895,7 @@ final class ListController extends FormController
             $filter['string'] = $this->stripQuickFilterTokensFromSearch((string) ($filter['string'] ?? ''), $searchFilterTerms);
             $session->set('mautic.lead.list.filter', $filter['string']);
 
-            if (!empty($catAliases)) {
+            if ([] !== $catAliases) {
                 $joinCategories    = true;
                 $filter['force'][] = ['column' => 'cat.alias', 'expr' => 'in', 'value' => array_values(array_unique($catAliases))];
             }
@@ -925,10 +918,8 @@ final class ListController extends FormController
 
     public function getViewArguments(array $args, $action): array
     {
-        switch ($action) {
-            case 'index':
-                $args['viewParameters']['filters'] = $this->listFilters;
-                break;
+        if ('index' === $action) {
+            $args['viewParameters']['filters'] = $this->listFilters;
         }
 
         return $args;
@@ -937,13 +928,10 @@ final class ListController extends FormController
     /**
      * @param int $objectId
      * @param int $page
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
-    public function contactsAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $objectId, $page = 1)
+    public function contactsAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $objectId, $page = 1): Response
     {
         $session = $request->getSession();
-        \assert($session instanceof SessionInterface);
         $session->set('mautic.segment.contact.page', $page);
 
         $manuallyRemoved = 0;
@@ -957,7 +945,7 @@ final class ListController extends FormController
             $filters = [];
         }
 
-        if (!empty($filters)) {
+        if ([] !== $filters) {
             if (in_array('manually_added', $filters['includeEvents'])) {
                 $listFilters = array_merge($listFilters, ['manually_added' => 1]);
             }

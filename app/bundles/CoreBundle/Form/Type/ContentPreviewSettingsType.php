@@ -18,7 +18,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * Preview settings form used for pages and emails in detail view page.
  */
-class ContentPreviewSettingsType extends AbstractType
+final class ContentPreviewSettingsType extends AbstractType
 {
     public const TYPE_EMAIL = 'email';
 

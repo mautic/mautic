@@ -2,41 +2,44 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
-use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
-use Mautic\CoreBundle\Helper\CacheStorageHelper;
-use Mautic\CoreBundle\Helper\EncryptionHelper;
-use Mautic\CoreBundle\Helper\PathsHelper;
-use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
-use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact;
-use Mautic\LeadBundle\Model\FieldModel;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
-use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Exception\ApiErrorException;
-use Mautic\PluginBundle\Model\IntegrationEntityModel;
 use Mautic\UserBundle\Model\UserModel;
 use MauticPlugin\MauticCrmBundle\Api\SugarcrmApi;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends CrmAbstractIntegration<SugarcrmApi>
  */
-class SugarcrmIntegration extends CrmAbstractIntegration
+final class SugarcrmIntegration extends CrmAbstractIntegration
 {
+    private CompanyRepository $companyRepository;
+
+    private DoNotContact $doNotContactModel;
+
+    private UserModel $userModel;
+
+    #[Required]
+    public function autowireSugarcrmIntegration(
+        CompanyRepository $companyRepository,
+        DoNotContact $doNotContactModel,
+        UserModel $userModel,
+    ): void {
+        $this->companyRepository = $companyRepository;
+        $this->doNotContactModel = $doNotContactModel;
+        $this->userModel = $userModel;
+    }
+
     /**
      * @var string[]
      */
@@ -52,45 +55,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     private array $sugarDncKeys = ['email_opt_out', 'invalid_email'];
 
     private $authorizationError;
-
-    public function __construct(
-        EventDispatcherInterface $eventDispatcher,
-        CacheStorageHelper $cacheStorageHelper,
-        EntityManager $entityManager,
-        RequestStack $requestStack,
-        RouterInterface $router,
-        TranslatorInterface $translator,
-        LoggerInterface $logger,
-        EncryptionHelper $encryptionHelper,
-        LeadModel $leadModel,
-        CompanyModel $companyModel,
-        PathsHelper $pathsHelper,
-        NotificationModel $notificationModel,
-        FieldModel $fieldModel,
-        IntegrationEntityModel $integrationEntityModel,
-        FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
-        protected DoNotContact $doNotContactModel,
-        private readonly UserModel $userModel,
-    ) {
-        parent::__construct(
-            $eventDispatcher,
-            $cacheStorageHelper,
-            $entityManager,
-            $requestStack,
-            $router,
-            $translator,
-            $logger,
-            $encryptionHelper,
-            $leadModel,
-            $companyModel,
-            $pathsHelper,
-            $notificationModel,
-            $fieldModel,
-            $integrationEntityModel,
-            $doNotContactModel,
-            $fieldsWithUniqueIdentifier
-        );
-    }
 
     /**
      * Returns the name of the social integration that must match the name of the file.
@@ -220,9 +184,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     /**
      * Get available fields for choices in the config UI.
      *
-     * @param array $settings
+     * @param array<string, mixed> $settings
      */
-    public function getFormLeadFields($settings = []): array
+    public function getFormLeadFields(array $settings = []): array
     {
         if (!$this->isAuthorized()) {
             return [];
@@ -465,8 +429,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             $sugarObjects = $config['objects'];
         }
 
-        /** @var IntegrationEntityRepository $integrationEntityRepo */
-        $integrationEntityRepo = $this->em->getRepository(IntegrationEntity::class);
         $startDate             = new \DateTime($query['start']);
         $endDate               = new \DateTime($query['end']);
         $limit                 = 100;
@@ -476,7 +438,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 if ($this->isAuthorized()) {
                     // Get first batch
                     $start    = 0;
-                    $sugarIds = $integrationEntityRepo->getIntegrationsEntityId(
+                    $sugarIds = $this->integrationEntityRepository->getIntegrationsEntityId(
                         'Sugarcrm',
                         $object,
                         'lead',
@@ -488,7 +450,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         $limit
                     );
 
-                    while (!empty($sugarIds)) {
+                    while ([] !== $sugarIds) {
                         $executed += count($sugarIds);
 
                         // Extract a list of lead Ids
@@ -520,13 +482,13 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                             }
                         }
 
-                        if (!empty($sugarLeadData)) {
+                        if ([] !== $sugarLeadData) {
                             $apiHelper->createLeadActivity($sugarLeadData, $object);
                         }
 
                         // Get the next batch
                         $start += $limit;
-                        $sugarIds = $integrationEntityRepo->getIntegrationsEntityId(
+                        $sugarIds = $this->integrationEntityRepository->getIntegrationsEntityId(
                             'Sugarcrm',
                             $object,
                             'lead',
@@ -565,7 +527,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
         try {
             if ($this->isAuthorized()) {
-                if ('Activity' !== $object and 'company' !== $object) {
+                if ('Activity' !== $object && 'company' !== $object) {
                     $result           = $this->getApiHelper()->getLeads($query, $object);
                     $params['offset'] = $result['next_offset'];
                     $executed += $this->amendLeadDataBeforeMauticPopulate($result, $object);
@@ -705,10 +667,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         $count  = 0;
         $entity = null;
 
-        /** @var IntegrationEntityRepository $integrationEntityRepo */
-        $integrationEntityRepo = $this->em->getRepository(IntegrationEntity::class);
-        $companyRepo           = $this->em->getRepository(Company::class);
-
         $sugarRejectedLeads = [];
         if (isset($data['entry_list'])) {
             $SUGAR_VERSION     = '6';
@@ -740,7 +698,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                     }
                 }
             }
-            if (!empty($assignedUserIds)) {
+            if ([] !== $assignedUserIds) {
                 $assignedUserIds            = array_unique($assignedUserIds);
                 $onwerEmailByAssignedUserId = $this->getApiHelper()->getEmailBySugarUserId(['ids' => $assignedUserIds]);
             }
@@ -762,7 +720,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                     }
                 }
             }
-            if (!empty($checkEmailsInSugar)) {
+            if ([] !== $checkEmailsInSugar) {
                 $sugarLeads = $this->getApiHelper()->getLeads(['checkemail_contacts' => $checkEmailsInSugar, 'offset' => 0, 'max_results' => 1000], 'Contacts');
                 if (isset($sugarLeads[$RECORDS_LIST_NAME])) {
                     foreach ($sugarLeads[$RECORDS_LIST_NAME] as $record) {
@@ -821,8 +779,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                     continue; // Lead email is already in Sugar Contacts. Do not carry on
                 }
 
-                if (!empty($dataObject)) {
-                    if ('Leads' == $object or 'Contacts' == $object) {
+                if ([] !== $dataObject) {
+                    if ('Leads' == $object || 'Contacts' == $object) {
                         if (isset($dataObject['assigned_user_id__'.$object])) {
                             $auid = $dataObject['assigned_user_id__'.$object];
                             if (isset($onwerEmailByAssignedUserId[$auid])) {
@@ -835,7 +793,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         $company               = null;
                         $this->fetchDncToMautic($entity, $data);
                         if ($entity && isset($dataObject['account_id'.$newName]) && '' !== trim($dataObject['account_id'.$newName])) {
-                            $integrationCompanyEntity = $integrationEntityRepo->findOneBy(
+                            $integrationCompanyEntity = $this->integrationEntityRepository->findOneBy(
                                 [
                                     'integration'         => 'Sugarcrm',
                                     'integrationEntity'   => 'Accounts',
@@ -845,10 +803,10 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                             );
                             if (isset($integrationCompanyEntity)) {
                                 $companyId = $integrationCompanyEntity->getInternalEntityId();
-                                $company   = $companyRepo->find($companyId);
+                                $company   = $this->companyRepository->find($companyId);
 
                                 $this->companyModel->addLeadToCompany($company, $entity);
-                                $companyRepo->detachEntity($company);
+                                $this->companyRepository->detachEntity($company);
                                 $this->em->detach($entity);
                             }
                         }
@@ -867,7 +825,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                     }
 
                     if ($entity) {
-                        $integrationId = $integrationEntityRepo->getIntegrationsEntityId(
+                        $integrationId = $this->integrationEntityRepository->getIntegrationsEntityId(
                             'Sugarcrm',
                             $object,
                             $mauticObjectReference,
@@ -885,7 +843,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                             $integrationEntity->setInternalEntityId($entity->getId());
                             $integrationEntities[] = $integrationEntity;
                         } else {
-                            $integrationEntity = $integrationEntityRepo->getEntity($integrationId[0]['id']);
+                            $integrationEntity = $this->integrationEntityRepository->getEntity($integrationId[0]['id']);
                             $integrationEntity->setLastSyncDate(new \DateTime());
                             $integrationEntities[] = $integrationEntity;
                         }
@@ -899,7 +857,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                     ++$count;
                 }
 
-                $this->em->getRepository(IntegrationEntity::class)->saveEntities($integrationEntities);
+                $this->integrationEntityRepository->saveEntities($integrationEntities);
                 $this->integrationEntityModel->getRepository()->detachEntities($integrationEntities);
             }
             unset($data);
@@ -1037,19 +995,17 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         $object = 'Leads'; // Sugar objects, default is Leads
 
         // Check if lead has alredy been synched
-        /** @var IntegrationEntityRepository $integrationEntityRepo */
-        $integrationEntityRepo = $this->em->getRepository(IntegrationEntity::class);
         // Check if it is a sugar CRM alredy synched lead
-        $integrationId = $integrationEntityRepo->getIntegrationsEntityId('Sugarcrm', $object, 'lead', $lead->getId());
-        if (empty($integrationId)) {
+        $integrationId = $this->integrationEntityRepository->getIntegrationsEntityId('Sugarcrm', $object, 'lead', $lead->getId());
+        if ([] === $integrationId) {
             // Check if it is a sugar CRM alredy synched lead
-            $integrationId = $integrationEntityRepo->getIntegrationsEntityId('Sugarcrm', 'Contacts', 'lead', $lead->getId());
-            if (!empty($integrationId)) {
+            $integrationId = $this->integrationEntityRepository->getIntegrationsEntityId('Sugarcrm', 'Contacts', 'lead', $lead->getId());
+            if ([] !== $integrationId) {
                 $object = 'Contacts';
             }
         }
-        if (!empty($integrationId)) {
-            $integrationEntity = $integrationEntityRepo->getEntity($integrationId[0]['id']);
+        if ([] !== $integrationId) {
+            $integrationEntity = $this->integrationEntityRepository->getEntity($integrationId[0]['id']);
             $lastSyncDate      = $integrationEntity->getLastSyncDate();
             $addedSyncDate     = $integrationEntity->getDateAdded();
             if ($addedSyncDate > $lastSyncDate) {
@@ -1081,8 +1037,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             return false;
         }
 
-        if (!empty($integrationId)) {
-            $integrationEntity = $integrationEntityRepo->findOneBy(
+        if ([] !== $integrationId) {
+            $integrationEntity = $this->integrationEntityRepository->findOneBy(
                 [
                     'integration'       => 'Sugarcrm',
                     'integrationEntity' => $object,
@@ -1103,7 +1059,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 }
                 $createdLeadData = $this->getApiHelper()->createLead($mappedData[$object], $lead);
                 if (isset($createdLeadData['id'])) {
-                    if (empty($integrationId)) {
+                    if ([] === $integrationId) {
                         $integrationEntity = new IntegrationEntity();
                         $integrationEntity->setDateAdded(new \DateTime());
                         $integrationEntity->setLastSyncDate(new \DateTime());
@@ -1113,11 +1069,11 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         $integrationEntity->setInternalEntity('lead');
                         $integrationEntity->setInternalEntityId($lead->getId());
                     } else {
-                        $integrationEntity = $integrationEntityRepo->getEntity($integrationId[0]['id']);
+                        $integrationEntity = $this->integrationEntityRepository->getEntity($integrationId[0]['id']);
                     }
                     $integrationEntity->setLastSyncDate(new \DateTime());
                     $this->em->persist($integrationEntity);
-                    $this->em->flush($integrationEntity);
+                    $this->em->flush();
                 }
 
                 return true;
@@ -1169,7 +1125,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         [$fromDate, $toDate]     = $this->getSyncTimeframeDates($params);
         $limit                   = $params['limit'];
         $config                  = $this->mergeConfigToFeatureSettings();
-        $integrationEntityRepo   = $this->em->getRepository(IntegrationEntity::class);
         $mauticData              = $leadsToUpdate              = $fields              = [];
         $fieldsToUpdateInSugar   = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 0) : [];
         $leadFields              = $config['leadFields'];
@@ -1203,7 +1158,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             $availableFields = $this->getAvailableLeadFields(['feature_settings' => ['objects' => ['Leads', 'Contacts']]]);
 
             // update lead/contact records
-            $leadsToUpdate = $integrationEntityRepo->findLeadsToUpdate($this->getName(), 'lead', $fields, $limit, $fromDate, $toDate, ['Contacts', 'Leads']);
+            $leadsToUpdate = $this->integrationEntityRepository->findLeadsToUpdate($this->getName(), 'lead', $fields, $limit, $fromDate, $toDate, ['Contacts', 'Leads']);
         }
         $checkEmailsInSugar = [];
         $deletedSugarLeads  = [];
@@ -1222,7 +1177,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
         // create lead records
         if (null === $limit || $limit && !empty($fields)) {
-            $leadsToCreate = $integrationEntityRepo->findLeadsToCreate('Sugarcrm', $fields, $limit, $fromDate, $toDate);
+            $leadsToCreate = $this->integrationEntityRepository->findLeadsToCreate('Sugarcrm', $fields, $limit, $fromDate, $toDate);
             foreach ($leadsToCreate as $lead) {
                 if (isset($lead['email'])) {
                     $lead                                                       = $this->getCompoundMauticFields($lead);
@@ -1247,7 +1202,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         }
         // If there are any deleted, mark it as so to prevent them from being queried over and over or recreated
         if ([] !== $deletedSugarLeads) {
-            $integrationEntityRepo->markAsDeleted($deletedSugarLeads, $this->getName(), 'lead');
+            $this->integrationEntityRepository->markAsDeleted($deletedSugarLeads, $this->getName(), 'lead');
         }
 
         // Create any left over
@@ -1273,7 +1228,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         }
         /** @var SugarcrmApi $apiHelper */
         $apiHelper = $this->getApiHelper();
-        if (!empty($mauticData)) {
+        if ([] !== $mauticData) {
             $result = $apiHelper->syncLeadsToSugar($mauticData);
         }
 
@@ -1295,7 +1250,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         $dncEntries   = $this->doNotContactModel->getDncRepo()->getEntriesByLeadAndChannel($leadEntity, 'email');
         $sugarDncKeys = array_combine(array_values($this->sugarDncKeys), $this->sugarDncKeys);
         foreach ($dncEntries as $dncEntry) {
-            if (empty($sugarDncKeys)) {
+            if ([] === $sugarDncKeys) {
                 continue;
             }
             // If DNC exists set to 1
@@ -1360,7 +1315,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      *               We therefore assume that they've been deleted in CRM and will mark them as deleted in the pushLeads function (~line 1320).
      *               The second element contains Ids of records that were explicitly marked as deleted in CRM. ATM, nothing is done with this data.
      */
-    public function getObjectDataToUpdate($checkEmailsInSugar, &$mauticData, $availableFields, $contactSugarFields, $leadSugarFields, $object = 'Leads'): array
+    public function getObjectDataToUpdate($checkEmailsInSugar, array &$mauticData, $availableFields, $contactSugarFields, $leadSugarFields, $object = 'Leads'): array
     {
         $config     = $this->mergeConfigToFeatureSettings([]);
         $queryParam = ('Leads' == $object) ? 'checkemail' : 'checkemail_contacts';
@@ -1453,20 +1408,15 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         return [$checkEmailsInSugar, $deletedSugarLeads];
     }
 
-    /**
-     * @return array
-     */
-    public function getSugarLeadId($lead)
+    public function getSugarLeadId($lead): array
     {
-        /** @var IntegrationEntityRepository $integrationEntityRepo */
-        $integrationEntityRepo = $this->em->getRepository(IntegrationEntity::class);
         // try searching for lead as this has been changed before in updated done to the plugin
-        $result = $integrationEntityRepo->getIntegrationsEntityId('Sugarcrm', null, 'lead', $lead->getId());
+        $result = $this->integrationEntityRepository->getIntegrationsEntityId('Sugarcrm', null, 'lead', $lead->getId());
 
         return $result;
     }
 
-    protected function getOwnerEmail(array $lead)
+    private function getOwnerEmail(array $lead)
     {
         if (isset($lead['owner_id']) && !empty($lead['owner_id'])) {
             /** @var \Mautic\UserBundle\Entity\User $user */
@@ -1478,7 +1428,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         return null;
     }
 
-    protected function buildCompositeBody(array &$mauticData, array $availableFields, $fieldsToUpdateInSugarUpdate, $object, array $lead, $onwerAssignedUserIdByEmail = null, $objectId = null): void
+    private function buildCompositeBody(array &$mauticData, array $availableFields, $fieldsToUpdateInSugarUpdate, string $object, array $lead, $onwerAssignedUserIdByEmail = null, $objectId = null): void
     {
         $body = [];
         if (isset($lead['email']) && !empty($lead['email'])) {
@@ -1500,7 +1450,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 }
             }
 
-            if (!empty($body)) {
+            if ([] !== $body) {
                 $id = $lead['internal_entity_id'].'-'.$object.(!empty($lead['id']) ? '-'.$lead['id'] : '');
 
                 $body[] = ['name' => 'reference_id', 'value' => $id];
@@ -1523,7 +1473,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     /**
      * @param array $response
      */
-    protected function processCompositeResponse($response): array
+    private function processCompositeResponse($response): array
     {
         $created         = 0;
         $errored         = 0;
@@ -1605,7 +1555,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             }
 
             if ([] !== $persistEntities) {
-                $this->em->getRepository(IntegrationEntity::class)->saveEntities($persistEntities);
+                $this->integrationEntityRepository->saveEntities($persistEntities);
                 $this->integrationEntityModel->getRepository()->detachEntities($persistEntities);
                 unset($persistEntities);
             }
@@ -1700,7 +1650,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
         $contactFields = $this->cleanSugarData($config, array_keys($config['leadFields']), 'Contacts');
         $leadFields    = $this->cleanSugarData($config, array_keys($config['leadFields']), 'Leads');
-        if (!empty($contactFields)) {
+        if ([] !== $contactFields) {
             foreach ($fields['Contacts'] as $key => $field) {
                 if ($field['required']) {
                     $required[$key] = $field;
@@ -1711,7 +1661,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             ];
             $fieldMappings['Contacts']['create'] = $contactFields;
         }
-        if (!empty($leadFields)) {
+        if ([] !== $leadFields) {
             foreach ($fields['Leads'] as $key => $field) {
                 if ($field['required']) {
                     $required[$key] = $field;

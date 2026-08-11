@@ -42,7 +42,7 @@ final class DashboardSubscriber extends MainDashboardSubscriber
         private readonly RouterInterface $router,
         private readonly CorePermissions $security,
         private readonly EventDispatcherInterface $dispatcher,
-        protected ModelFactory $modelFactory,
+        private readonly ModelFactory $modelFactory,
     ) {
     }
 

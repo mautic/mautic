@@ -125,7 +125,7 @@ final class SegmentFilterFunctionalTest extends MauticMysqlTestCase
     private function buildSegment(LeadList $segment, int $expectedCountInSegment): void
     {
         /** @var ContactSegmentService $contactSegmentService */
-        $contactSegmentService = static::getContainer()->get('mautic.lead.model.lead_segment_service');
+        $contactSegmentService = self::getContainer()->get(ContactSegmentService::class);
 
         $this->testSymfonyCommand('mautic:segments:update', [
             '-i'    => $segment->getId(),

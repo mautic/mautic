@@ -20,7 +20,6 @@ use Mautic\PageBundle\Event\PageEditSubmitEvent;
 use Mautic\PageBundle\Exception\InvalidRenderedHtmlException;
 use Mautic\PageBundle\Helper\PageConfig;
 use Mautic\PageBundle\Model\PageModel;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -34,8 +33,9 @@ final class PageController extends FormController
     private PageModel $pageModel;
 
     #[Required]
-    public function autowirePageController(PageModel $pageModel): void
-    {
+    public function autowirePageController(
+        PageModel $pageModel,
+    ): void {
         $this->pageModel = $pageModel;
     }
 
@@ -479,8 +479,6 @@ final class PageController extends FormController
 
     /**
      * Generates edit form and processes post data.
-     *
-     * @return JsonResponse|Response
      */
     public function editAction(
         Request $request,
@@ -489,7 +487,7 @@ final class PageController extends FormController
         ThemeHelper $themeHelper,
         int $objectId,
         bool $ignorePost = false,
-    ) {
+    ): Response {
         $entity     = $model->getEntity($objectId);
         $session    = $request->getSession();
         $page       = $request->getSession()->get('mautic.page.page', 1);
@@ -713,10 +711,8 @@ final class PageController extends FormController
 
     /**
      * Deletes the entity.
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, PageModel $model, $objectId)
+    public function deleteAction(Request $request, PageModel $model, $objectId): Response
     {
         $page      = $request->getSession()->get('mautic.page.page', 1);
         $returnUrl = $this->generateUrl('mautic_page_index', ['page' => $page]);
@@ -815,7 +811,7 @@ final class PageController extends FormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $this->pageModel->deleteEntities($deleteIds);
 
                 $flashes[] = [
@@ -917,10 +913,8 @@ final class PageController extends FormController
 
     /**
      * Make the variant the main.
-     *
-     * @return Response
      */
-    public function winnerAction(Request $request, PageModel $model, $objectId)
+    public function winnerAction(Request $request, PageModel $model, $objectId): Response
     {
         // todo - add confirmation to button click
         $page      = $request->getSession()->get('mautic.page.page', 1);

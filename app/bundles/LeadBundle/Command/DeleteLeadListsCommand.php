@@ -18,7 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
     name: self::COMMAND_NAME,
     description: 'Hard-delete segment(s) and all its references.'
 )]
-class DeleteLeadListsCommand extends Command
+final class DeleteLeadListsCommand extends Command
 {
     public const COMMAND_NAME = 'mautic:segment:delete';
 

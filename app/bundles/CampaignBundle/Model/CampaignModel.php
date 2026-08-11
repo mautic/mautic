@@ -3,7 +3,7 @@
 namespace Mautic\CampaignBundle\Model;
 
 use Doctrine\DBAL\Exception;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\PersistentCollection;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -32,6 +32,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -57,7 +58,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         private readonly MembershipBuilder $membershipBuilder,
         private readonly ContactTracker $contactTracker,
         private readonly GeneratedColumnsProviderInterface $generatedColumnsProvider,
-        EntityManager $em,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,
@@ -70,6 +71,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         private readonly LeadRepository $leadRepository,
         private readonly LeadEventLogRepository $leadEventLogRepository,
         private readonly StatRepository $statRepository,
+        private readonly FormRepository $formRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -543,10 +545,9 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
             case null:
                 $choices['forms'] = [];
                 $viewOther        = $this->security->isGranted('form:forms:viewother');
-                $repo             = $this->formModel->getRepository();
-                $repo->setCurrentUser($this->userHelper->getUser());
+                $this->formRepository->setCurrentUser($this->userHelper->getUser());
 
-                $forms = $repo->getFormList('', 0, 0, $viewOther);
+                $forms = $this->formRepository->getFormList('', 0, 0, $viewOther);
 
                 foreach ($forms as $form) {
                     $choices['forms'][$form['id']] = $form['name'];
@@ -940,7 +941,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
      */
     private function handleDeletedEventsWithRedirect(array $deletedEvents): void
     {
-        if (empty($deletedEvents)) {
+        if ([] === $deletedEvents) {
             return;
         }
 

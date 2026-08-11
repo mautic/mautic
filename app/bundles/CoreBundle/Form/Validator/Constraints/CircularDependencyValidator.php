@@ -12,7 +12,7 @@ use Symfony\Component\Validator\ConstraintValidator;
  * Throws an exception if the field alias is equal some segment filter keyword.
  * It would cause odd behavior with segment filters otherwise.
  */
-class CircularDependencyValidator extends ConstraintValidator
+final class CircularDependencyValidator extends ConstraintValidator
 {
     public function __construct(
         private readonly ListModel $model,

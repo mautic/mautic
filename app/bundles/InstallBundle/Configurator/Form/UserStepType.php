@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @extends AbstractType<mixed>
  */
-class UserStepType extends AbstractType
+final class UserStepType extends AbstractType
 {
     public function __construct(
         private readonly RequestStack $requestStack,
@@ -119,9 +119,7 @@ class UserStepType extends AbstractType
                         message: 'mautic.core.value.required'
                     ),
                     new Assert\Length(min: 6, minMessage: 'mautic.install.password.minlength'),
-                    new NotWeak([
-                        'message' => 'mautic.user.user.password.weak',
-                    ]),
+                    new NotWeak(message: 'mautic.user.user.password.weak'),
                 ],
             ]
         );

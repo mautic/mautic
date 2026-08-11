@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use DeviceDetector\DeviceDetector;
-use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -33,7 +32,7 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $this->deviceDetectorFactory = $this->createMock(DeviceDetectorFactoryInterface::class);
         $this->deviceDetector        = $this->createMock(DeviceDetector::class);
 
-        defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
+        defined('MAUTIC_ENV') || define('MAUTIC_ENV', 'test');
     }
 
     public function testDeviceDetectorBotsDetectionTrue(): void
@@ -198,11 +197,6 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
             ->with('findOneByIpAddress')
             ->willReturn(null);
 
-        $mockEm = $this->createMock(EntityManager::class);
-        $mockEm
-            ->method('getRepository')
-            ->willReturn($mockRepository);
-
         if (null === $mockCoreParametersHelper) {
             $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
             $mockCoreParametersHelper
@@ -216,7 +210,7 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
                 fn (): \PHPUnit\Framework\MockObject\MockObject => $this->deviceDetector
             );
 
-        $helper = new IpLookupHelper($requestStack, $mockEm, $mockCoreParametersHelper, $this->deviceDetectorFactory);
+        $helper = new IpLookupHelper($requestStack, $mockRepository, $mockCoreParametersHelper, $this->deviceDetectorFactory);
         $helper->reset();
 
         return $helper;

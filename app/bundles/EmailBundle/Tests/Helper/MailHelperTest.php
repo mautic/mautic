@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Entity\CopyRepository;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
@@ -135,13 +136,13 @@ final class MailHelperTest extends TestCase
 
     protected function setUp(): void
     {
-        defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
+        defined('MAUTIC_ENV') || define('MAUTIC_ENV', 'test');
 
         // Some local environments do not have ext-imap loaded, but Mailbox uses these
         // constants in method signatures and class loading fails without them.
-        defined('SORTARRIVAL') or define('SORTARRIVAL', 0);
-        defined('SE_UID') or define('SE_UID', 1);
-        defined('FT_PEEK') or define('FT_PEEK', 2);
+        defined('SORTARRIVAL') || define('SORTARRIVAL', 0);
+        defined('SE_UID') || define('SE_UID', 1);
+        defined('FT_PEEK') || define('FT_PEEK', 2);
 
         $this->contactRepository    = $this->createMock(LeadRepository::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
@@ -456,7 +457,8 @@ final class MailHelperTest extends TestCase
             $this->createStub(TrackableModel::class),
             $this->createStub(RedirectModel::class),
             $this->sMimeHelper,
-            $this->emailStatModel
+            $this->emailStatModel,
+            $this->createStub(CopyRepository::class),
         );
 
         $email = new Email();
@@ -1414,6 +1416,7 @@ final class MailHelperTest extends TestCase
             $this->createStub(RedirectModel::class),
             $this->sMimeHelper,
             $this->emailStatModel,
+            $this->createStub(CopyRepository::class),
         );
     }
 
@@ -1457,7 +1460,8 @@ final class MailHelperTest extends TestCase
             $this->trackableModel,
             $this->redirectModel,
             $this->sMimeHelper,
-            $this->emailStatModel
+            $this->emailStatModel,
+            $this->createStub(CopyRepository::class),
         );
         $mailer->addTo($this->contacts[0]['email']);
         $mailer->setIdHash();
@@ -1536,7 +1540,8 @@ final class MailHelperTest extends TestCase
             $this->trackableModel,
             $this->redirectModel,
             $this->sMimeHelper,
-            $this->emailStatModel
+            $this->emailStatModel,
+            $this->createStub(CopyRepository::class),
         );
         $mailer->addTo($this->contacts[0]['email']);
 

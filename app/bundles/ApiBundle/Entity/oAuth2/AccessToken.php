@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ApiBundle\Entity\oAuth2;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -14,6 +16,7 @@ class AccessToken extends BaseAccessToken
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('oauth2_accesstokens')
+            ->setCustomRepositoryClass(AccessTokenRepository::class)
             ->addIndex(['token'], 'oauth2_access_token_search');
 
         $builder->createField('id', 'integer')

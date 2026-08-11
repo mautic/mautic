@@ -6,11 +6,13 @@ namespace Mautic\ReportBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\RoleModel;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class ReportApiControllerTest extends MauticMysqlTestCase
@@ -130,7 +132,7 @@ final class ReportApiControllerTest extends MauticMysqlTestCase
         // Set new permissions
         $role->setIsAdmin(false);
         /** @var RoleModel $roleModel */
-        $roleModel = static::getContainer()->get('mautic.user.model.role');
+        $roleModel = self::getContainer()->get(RoleModel::class);
         $this->assertInstanceOf(RoleModel::class, $roleModel);
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);
@@ -146,7 +148,7 @@ final class ReportApiControllerTest extends MauticMysqlTestCase
         $user->setLastName('Doe');
         $user->setUsername('john.doe');
         $user->setEmail('john.doe@email.com');
-        $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash($password));
         $user->setRole($role);
@@ -187,7 +189,7 @@ final class ReportApiControllerTest extends MauticMysqlTestCase
             $report->setCreatedByUser($createBy);
         }
 
-        $this->getContainer()->get('mautic.report.model.report')->saveEntity($report);
+        $this->getContainer()->get(ReportModel::class)->saveEntity($report);
 
         return $report;
     }

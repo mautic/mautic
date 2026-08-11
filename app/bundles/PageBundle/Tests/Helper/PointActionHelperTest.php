@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\PageBundle\Tests\Helper;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\HitRepository;
@@ -15,11 +14,6 @@ use PHPUnit\Framework\TestCase;
 
 final class PointActionHelperTest extends TestCase
 {
-    /**
-     * @var MockObject&EntityManagerInterface
-     */
-    private MockObject $entityManager;
-
     /**
      * @var MockObject&HitRepository
      */
@@ -32,12 +26,10 @@ final class PointActionHelperTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->hitRepository = $this->createMock(HitRepository::class);
         $this->eventDetails  = $this->createMock(Hit::class);
 
         $this->eventDetails->method('getLead')->willReturn($this->createStub(Lead::class));
-        $this->entityManager->method('getRepository')->willReturn($this->hitRepository);
     }
 
     /**
@@ -56,14 +48,14 @@ final class PointActionHelperTest extends TestCase
         ]);
         $this->hitRepository->expects($this->never())->method('getLatestHit');
 
-        $pointActionHelper = new PointActionHelper($this->entityManager);
+        $pointActionHelper = new PointActionHelper($this->hitRepository);
         $result            = $pointActionHelper->validateUrlHit($this->eventDetails, $action);
 
         $this->assertSame($expectedResult, $result);
     }
 
     /**
-     * @return \Iterator<string, array<int, mixed>>
+     * @return \Iterator<string, array{array<string, mixed>, bool}>
      */
     public static function urlHitsActionDataProvider(): \Iterator
     {
@@ -86,6 +78,47 @@ final class PointActionHelperTest extends TestCase
             ],
             true,
         ];
+
+        yield 'plain_text_matches_substring' => [
+            [
+                'id'         => 5,
+                'type'       => 'url.hit',
+                'name'       => 'Plain text URL match',
+                'properties' => [
+                    'page_url'               => 'example.com/pp',
+                    'page_hits'              => 1,
+                    'accumulative_time_unit' => 'H',
+                    'accumulative_time'      => 0,
+                    'returns_within_unit'    => 'H',
+                    'returns_within'         => 0,
+                    'returns_after_unit'     => 'H',
+                    'returns_after'          => 0,
+                ],
+                'points' => 5,
+            ],
+            true,
+        ];
+
+        yield 'legacy_wildcard_still_matches' => [
+            [
+                'id'         => 6,
+                'type'       => 'url.hit',
+                'name'       => 'Legacy wildcard URL match',
+                'properties' => [
+                    'page_url'               => '*example.com/ppk*',
+                    'page_hits'              => 1,
+                    'accumulative_time_unit' => 'H',
+                    'accumulative_time'      => 0,
+                    'returns_within_unit'    => 'H',
+                    'returns_within'         => 0,
+                    'returns_after_unit'     => 'H',
+                    'returns_after'          => 0,
+                ],
+                'points' => 5,
+            ],
+            true,
+        ];
+
         yield 'url_does_not_match' => [
             [
                 'id'         => 3,
@@ -128,14 +161,14 @@ final class PointActionHelperTest extends TestCase
         $latestHit->setTimestamp($threeHoursAgoTimestamp);
         $this->hitRepository->method('getLatestHit')->willReturn($latestHit);
 
-        $pointActionHelper = new PointActionHelper($this->entityManager);
+        $pointActionHelper = new PointActionHelper($this->hitRepository);
         $result            = $pointActionHelper->validateUrlHit($this->eventDetails, $action);
 
         $this->assertSame($expectedResult, $result);
     }
 
     /**
-     * @return \Iterator<string, array<int, mixed>>
+     * @return \Iterator<string, array{array<string, mixed>, bool}>
      */
     public static function returnWithinActionDataProvider(): \Iterator
     {

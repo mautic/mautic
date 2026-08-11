@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\IpLookup;
 
-class TelizeLookup extends AbstractRemoteDataLookup
+final class TelizeLookup extends AbstractRemoteDataLookup
 {
     public string $offset         = '';
 

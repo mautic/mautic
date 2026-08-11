@@ -14,7 +14,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class ContactType extends AbstractType
+final class ContactType extends AbstractType
 {
     /**
      * @param FormBuilderInterface<array<mixed>|null> $builder

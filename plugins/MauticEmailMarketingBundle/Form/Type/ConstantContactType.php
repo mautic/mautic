@@ -19,13 +19,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class ConstantContactType extends AbstractType
+final class ConstantContactType extends AbstractType
 {
     public function __construct(
         private readonly IntegrationHelper $integrationHelper,
         private readonly PluginModel $pluginModel,
-        protected RequestStack $requestStack,
-        protected CoreParametersHelper $coreParametersHelper,
+        private readonly RequestStack $requestStack,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

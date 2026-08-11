@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\EventListener\CommonStatsSubscriber;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Entity\EmailReply;
@@ -13,7 +15,7 @@ final class StatsSubscriber extends CommonStatsSubscriber
 {
     public function __construct(
         CorePermissions $security,
-        EntityManager $entityManager,
+        EntityManagerInterface $entityManager,
         StatDeviceRepository $statDeviceRepository,
         StatRepository $statRepository,
     ) {

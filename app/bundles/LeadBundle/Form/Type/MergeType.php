@@ -12,7 +12,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<mixed>
  */
-class MergeType extends AbstractType
+final class MergeType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

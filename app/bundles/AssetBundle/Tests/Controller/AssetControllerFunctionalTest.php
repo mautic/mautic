@@ -18,6 +18,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 {
@@ -328,7 +329,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $container = $this->getContainer();
 
         // Get CSRF token
-        $csrfToken = $container->get('security.csrf.token_manager')->getToken('mautic_ajax_post')->getValue();
+        $csrfToken = $container->get(CsrfTokenManagerInterface::class)->getToken('mautic_ajax_post')->getValue();
 
         // Create a temporary file
         $tempFile = tempnam(sys_get_temp_dir(), 'test_');
@@ -411,7 +412,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         // Set new permissions
         $role->setIsAdmin(false);
         /** @var RoleModel $roleModel */
-        $roleModel = static::getContainer()->get('mautic.user.model.role');
+        $roleModel = self::getContainer()->get(RoleModel::class);
         $this->assertInstanceOf(RoleModel::class, $roleModel);
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);

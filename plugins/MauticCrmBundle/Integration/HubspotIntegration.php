@@ -2,34 +2,18 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
-use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\ArrayHelper;
-use Mautic\CoreBundle\Helper\CacheStorageHelper;
-use Mautic\CoreBundle\Helper\EncryptionHelper;
-use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\StagesChangeLog;
-use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
-use Mautic\LeadBundle\Model\CompanyModel;
-use Mautic\LeadBundle\Model\DoNotContact;
-use Mautic\LeadBundle\Model\FieldModel;
-use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\PluginBundle\Entity\IntegrationEntity;
-use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
-use Mautic\PluginBundle\Model\IntegrationEntityModel;
 use Mautic\StageBundle\Entity\Stage;
+use Mautic\StageBundle\Entity\StageRepository;
 use MauticPlugin\MauticCrmBundle\Api\HubspotApi;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Routing\RouterInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @method HubspotApi getApiHelper()
@@ -38,46 +22,20 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class HubspotIntegration extends CrmAbstractIntegration
 {
-    public const ACCESS_KEY = 'accessKey';
+    private StageRepository $stageRepository;
 
-    public function __construct(
-        EventDispatcherInterface $eventDispatcher,
-        CacheStorageHelper $cacheStorageHelper,
-        EntityManager $entityManager,
-        RequestStack $requestStack,
-        RouterInterface $router,
-        TranslatorInterface $translator,
-        LoggerInterface $logger,
-        EncryptionHelper $encryptionHelper,
-        LeadModel $leadModel,
-        CompanyModel $companyModel,
-        PathsHelper $pathsHelper,
-        NotificationModel $notificationModel,
-        FieldModel $fieldModel,
-        IntegrationEntityModel $integrationEntityModel,
-        DoNotContact $doNotContact,
-        FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
-        protected UserHelper $userHelper,
-    ) {
-        parent::__construct(
-            $eventDispatcher,
-            $cacheStorageHelper,
-            $entityManager,
-            $requestStack,
-            $router,
-            $translator,
-            $logger,
-            $encryptionHelper,
-            $leadModel,
-            $companyModel,
-            $pathsHelper,
-            $notificationModel,
-            $fieldModel,
-            $integrationEntityModel,
-            $doNotContact,
-            $fieldsWithUniqueIdentifier
-        );
+    protected UserHelper $userHelper;
+
+    #[Required]
+    public function autowireHubspotIntegration(
+        StageRepository $stageRepository,
+        UserHelper $userHelper,
+    ): void {
+        $this->stageRepository = $stageRepository;
+        $this->userHelper = $userHelper;
     }
+
+    public const ACCESS_KEY = 'accessKey';
 
     public function getName(): string
     {
@@ -164,11 +122,11 @@ class HubspotIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $settings
+     * @param array<string, mixed> $settings
      *
      * @return array|mixed
      */
-    public function getFormLeadFields($settings = [])
+    public function getFormLeadFields(array $settings = [])
     {
         return $this->getFormFieldsByObject('contacts', $settings);
     }
@@ -176,7 +134,7 @@ class HubspotIntegration extends CrmAbstractIntegration
     /**
      * @return mixed[]
      */
-    public function getAvailableLeadFields($settings = []): array
+    public function getAvailableLeadFields(array $settings = []): array
     {
         if ($fields = parent::getAvailableLeadFields()) {
             return $fields;
@@ -194,7 +152,7 @@ class HubspotIntegration extends CrmAbstractIntegration
 
         try {
             if ($this->isAuthorized()) {
-                if (!empty($hubspotObjects) and is_array($hubspotObjects)) {
+                if (!empty($hubspotObjects) && is_array($hubspotObjects)) {
                     foreach ($hubspotObjects as $object) {
                         // Check the cache first
                         $settings['cache_suffix'] = $cacheSuffix = '.'.$object;
@@ -456,7 +414,7 @@ class HubspotIntegration extends CrmAbstractIntegration
                         }
                     }
                 }
-                if (isset($data['hasMore']) and $data['hasMore']) {
+                if (isset($data['hasMore']) && $data['hasMore']) {
                     $params['offset'] = $data['offset'];
                     if ($params['offset'] < strtotime($params['start'])) {
                         $this->getCompanies($params, $id, $executed);
@@ -505,7 +463,7 @@ class HubspotIntegration extends CrmAbstractIntegration
 
         if ($lead = parent::getMauticLead($data, false, $socialCache, $identifiers, $object)) {
             if (isset($stageName)) {
-                $stage = $this->em->getRepository(Stage::class)->getStageByName($stageName);
+                $stage = $this->stageRepository->getStageByName($stageName);
 
                 if (empty($stage)) {
                     $stage = new Stage();
@@ -603,10 +561,8 @@ class HubspotIntegration extends CrmAbstractIntegration
             $leadData = $this->getApiHelper()->createLead($mappedData, $lead);
 
             if (!empty($leadData['vid'])) {
-                /** @var IntegrationEntityRepository $integrationEntityRepo */
-                $integrationEntityRepo = $this->em->getRepository(IntegrationEntity::class);
-                $integrationId         = $integrationEntityRepo->getIntegrationsEntityId($this->getName(), $object, 'lead', $lead->getId());
-                $integrationEntity     = (empty($integrationId)) ?
+                $integrationId     = $this->integrationEntityRepository->getIntegrationsEntityId($this->getName(), $object, 'lead', $lead->getId());
+                $integrationEntity = ([] === $integrationId) ?
                     $this->createIntegrationEntity(
                         $object,
                         $leadData['vid'],
@@ -614,10 +570,10 @@ class HubspotIntegration extends CrmAbstractIntegration
                         $lead->getId(),
                         [],
                         false
-                    ) : $integrationEntityRepo->getEntity($integrationId[0]['id']);
+                    ) : $this->integrationEntityRepository->getEntity($integrationId[0]['id']);
 
                 $integrationEntity->setLastSyncDate($this->getLastSyncDate());
-                $this->getIntegrationEntityRepository()->saveEntity($integrationEntity);
+                $this->integrationEntityRepository->saveEntity($integrationEntity);
                 $this->em->detach($integrationEntity);
             }
 

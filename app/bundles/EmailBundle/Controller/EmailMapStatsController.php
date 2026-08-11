@@ -29,7 +29,7 @@ final class EmailMapStatsController extends AbstractController
     public const LEGEND_TEXT = 'Total: %total (%withCountry with country)';
 
     public function __construct(
-        protected EmailModel $model,
+        private readonly EmailModel $model,
     ) {
     }
 
