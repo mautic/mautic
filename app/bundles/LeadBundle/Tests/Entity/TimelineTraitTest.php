@@ -4,16 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Entity;
 
-use ArrayObject;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
-use Mautic\LeadBundle\Entity\TimelineTrait;
 use Mautic\LeadBundle\Entity\UtmTagRepository;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(TimelineTrait::class)]
 final class TimelineTraitTest extends TestCase
 {
     private UtmTagRepository&MockObject $repository;
