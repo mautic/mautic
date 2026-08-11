@@ -427,7 +427,6 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getEngagements')
             ->willReturn($this->createPageHitTimeline('https://example.com/hello'));
 
-        // @phpstan-ignore new.deprecated
         $event = new CampaignExecutionEvent($this->createPageHitEventArgs($lead, $pageUrlFilter), true);
         $this->subscriber->onCampaignTriggerCondition($event);
         $this->assertTrue($event->getResult());
