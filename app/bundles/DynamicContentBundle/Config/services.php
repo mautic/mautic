@@ -22,8 +22,6 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\DynamicContentBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
-    $services->set('mautic.helper.dynamicContent', Mautic\DynamicContentBundle\Helper\DynamicContentHelper::class);
-    $services->alias(Mautic\DynamicContentBundle\Helper\DynamicContentHelper::class, 'mautic.helper.dynamicContent');
+    $services->set(Mautic\DynamicContentBundle\Helper\DynamicContentHelper::class);
     $services->alias('mautic.dynamicContent.model.dynamicContent', Mautic\DynamicContentBundle\Model\DynamicContentModel::class);
-    $services->alias('mautic.dynamicContent.repository.stat', Mautic\DynamicContentBundle\Entity\StatRepository::class);
 };

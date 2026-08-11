@@ -11,13 +11,20 @@ use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use Utils\PHPStan\Collector\ServiceAliasCollector;
 use Utils\PHPStan\Collector\ServiceNameUsageCollector;
-use Utils\PHPStan\Collector\ServiceTypeUsageCollector;
+use Utils\PHPStan\ServiceNameUsageResolver;
 
 /**
- * Reports the service aliases of Config/services.php nothing refers to.
+ * Reports the service id aliases of Config/services.php nothing refers to,
+ * e.g. $services->alias('mautic.some.helper', SomeHelper::class) no service('mautic.some.helper') asks for.
  *
- * A service id alias is used by an id string, e.g. service('mautic.some.helper'), a class name alias is used
- * by a type hint, as that is what autowiring wires it by.
+ * A class name alias, e.g. $services->alias(SomeHelper::class, 'mautic.some.helper'), is left alone on purpose.
+ * It is not a mere lookup shortcut: it replaces the definition the PSR-4 $services->load() registers under the
+ * very same class name id, so dropping it brings that autowired definition back to life - a second service of
+ * the same class, tagged again by autoconfigure(), or a container that no longer compiles.
+ *
+ * A model id, e.g. "mautic.lead.model.list", is left alone as well. ModelFactory builds it at runtime out of
+ * a model key that travels as data - a getModelName() return, a "model" form option, a "model" ajax parameter
+ * of a Twig template or a JS file - so there is no way to tell such an id is unused.
  *
  * Only PHP is analysed, so an alias used by a Twig template, a YAML or an XML file alone looks unused here.
  *
@@ -25,6 +32,20 @@ use Utils\PHPStan\Collector\ServiceTypeUsageCollector;
  */
 final class NoUnusedServiceAliasRule implements Rule
 {
+    /**
+     * The "mautic.%s.model.%s" format ModelFactory builds a model container id by.
+     *
+     * @see \Mautic\CoreBundle\Factory\ModelFactory::getModel()
+     *
+     * @var string
+     */
+    private const MODEL_ID_PATTERN = '#^mautic\.[a-zA-Z0-9_]+\.model\.[a-zA-Z0-9_]+$#';
+
+    public function __construct(
+        private ServiceNameUsageResolver $serviceNameUsageResolver,
+    ) {
+    }
+
     public function getNodeType(): string
     {
         return CollectedDataNode::class;
@@ -37,23 +58,25 @@ final class NoUnusedServiceAliasRule implements Rule
      */
     public function processNode(Node $node, Scope $scope): array
     {
-        $usedTypeNames = $this->resolveUsedTypeNames($node);
-
         $ruleErrors = [];
 
-        /** @var array<string, list<array{string, string, int, int}>> $aliasesByFilePath */
+        /** @var array<string, list<array{string, int, int}>> $aliasesByFilePath */
         $aliasesByFilePath = $node->get(ServiceAliasCollector::class);
 
         /** @var array<string, list<array{string, int}>> $usagesByFilePath */
         $usagesByFilePath = $node->get(ServiceNameUsageCollector::class);
 
         foreach ($aliasesByFilePath as $filePath => $aliases) {
-            foreach ($aliases as [$aliasName, , $startLine, $endLine]) {
-                if (isset($usedTypeNames[ltrim($aliasName, '\\')])) {
+            foreach ($aliases as [$aliasName, $startLine, $endLine]) {
+                if (str_contains($aliasName, '\\')) {
                     continue;
                 }
 
-                if ($this->isUsedName($aliasName, $usagesByFilePath, $filePath, $startLine, $endLine)) {
+                if (1 === preg_match(self::MODEL_ID_PATTERN, $aliasName)) {
+                    continue;
+                }
+
+                if ($this->serviceNameUsageResolver->isUsedName($aliasName, $usagesByFilePath, $filePath, $startLine, $endLine)) {
                     continue;
                 }
 
@@ -69,68 +92,5 @@ final class NoUnusedServiceAliasRule implements Rule
         }
 
         return $ruleErrors;
-    }
-
-    /**
-     * @param array<string, list<array{string, int}>> $usagesByFilePath
-     */
-    private function isUsedName(string $aliasName, array $usagesByFilePath, string $aliasFilePath, int $startLine, int $endLine): bool
-    {
-        foreach ($usagesByFilePath as $filePath => $usages) {
-            foreach ($usages as [$usedName, $line]) {
-                if (!$this->isMatchingName($usedName, $aliasName)) {
-                    continue;
-                }
-
-                // the alias() call names the alias itself, that is no usage of it
-                if ($filePath === $aliasFilePath && $line >= $startLine && $line <= $endLine) {
-                    continue;
-                }
-
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * A used name is either the alias name itself or the sprintf() format an id is built by at runtime,
-     * e.g. "mautic.%s.model.%s" of ModelFactory covers "mautic.lead.model.lead".
-     */
-    private function isMatchingName(string $usedName, string $aliasName): bool
-    {
-        if ($usedName === $aliasName) {
-            return true;
-        }
-
-        if (!str_contains($usedName, '%s')) {
-            return false;
-        }
-
-        $pattern = str_replace(preg_quote('%s', '#'), '[a-z0-9_]+', preg_quote($usedName, '#'));
-
-        return 1 === preg_match('#^'.$pattern.'$#', $aliasName);
-    }
-
-    /**
-     * @return array<string, true>
-     */
-    private function resolveUsedTypeNames(CollectedDataNode $collectedDataNode): array
-    {
-        $usedTypeNames = [];
-
-        /** @var array<string, list<list<string>>> $typeUsagesByFilePath */
-        $typeUsagesByFilePath = $collectedDataNode->get(ServiceTypeUsageCollector::class);
-
-        foreach ($typeUsagesByFilePath as $typeUsages) {
-            foreach ($typeUsages as $typeNames) {
-                foreach ($typeNames as $typeName) {
-                    $usedTypeNames[ltrim($typeName, '\\')] = true;
-                }
-            }
-        }
-
-        return $usedTypeNames;
     }
 }

@@ -25,8 +25,4 @@ return function (ContainerConfigurator $configurator): void {
 
     // @deprecated Remove all aliases in Mautic 6. Use FQCN instead.
     $services->alias('mautic.config.model.sysinfo', Mautic\ConfigBundle\Model\SysinfoModel::class);
-    $services->alias('mautic.config.mapper', Mautic\ConfigBundle\Mapper\ConfigMapper::class);
-    $services->alias('mautic.config.config_change_logger', Mautic\ConfigBundle\Service\ConfigChangeLogger::class);
-    $services->alias('mautic.config.form.escape_transformer', Mautic\ConfigBundle\Form\Type\EscapeTransformer::class);
-    $services->alias('mautic.config.form.restriction_helper', Mautic\ConfigBundle\Form\Helper\RestrictionHelper::class);
 };

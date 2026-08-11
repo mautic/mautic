@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
@@ -17,9 +16,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('Mautic\\MarketplaceBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
-    $services->set('marketplace.permissions', Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions::class)->tag('mautic.permissions');
-
-    $services->alias(Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions::class, 'marketplace.permissions');
+    $services->set(Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions::class)->tag('mautic.permissions');
 
     $services->set(Mautic\MarketplaceBundle\Api\Connection::class)
         ->arg('$httpClient', \Symfony\Component\DependencyInjection\Loader\Configurator\service('mautic.http.client'));
@@ -33,6 +30,4 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->set(Mautic\MarketplaceBundle\Service\Allowlist::class)
         ->arg('$httpClient', \Symfony\Component\DependencyInjection\Loader\Configurator\service('mautic.http.client'));
-
-    $services->alias('marketplace.model.package', Mautic\MarketplaceBundle\Model\PackageModel::class);
 };
