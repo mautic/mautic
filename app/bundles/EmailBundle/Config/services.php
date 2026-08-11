@@ -48,9 +48,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->set(Mautic\EmailBundle\Stats\Helper\UnsubscribedHelper::class)
         ->tag('mautic.email_stat_helper');
 
-    $services->set(Mautic\EmailBundle\Validator\MultipleEmailsValidValidator::class)->tag('validator.constraint_validator');
-    $services->set(Mautic\EmailBundle\Validator\EmailOrEmailTokenListValidator::class)->tag('validator.constraint_validator');
-
     $services->alias(Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface::class, Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProvider::class);
     $services->set(Mautic\EmailBundle\Mailer\Transport\TransportFactory::class)->decorate('mailer.transport_factory');
 

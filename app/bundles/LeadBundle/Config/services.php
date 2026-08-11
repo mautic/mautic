@@ -33,8 +33,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('Mautic\\LeadBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
     $services->set(Mautic\LeadBundle\EventListener\SerializerSubscriber::class)->tag('jms_serializer.event_subscriber', ['event' => JMS\Serializer\EventDispatcher\Events::POST_SERIALIZE]);
-    $services->set(Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeywordValidator::class)->tag('validator.constraint_validator');
-    $services->set(Mautic\CoreBundle\Form\Validator\Constraints\FileEncodingValidator::class)->tag('validator.constraint_validator');
     $services->set(Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccessValidator::class)->tag('validator.constraint_validator', ['alias' => 'leadlist_access']);
     $services->set(Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAliasValidator::class)->tag('validator.constraint_validator', ['alias' => 'uniqueleadlist']);
     $services->set(Mautic\LeadBundle\Form\Validator\Constraints\SegmentInUseValidator::class)->tag('validator.constraint_validator', ['alias' => 'segment_in_use']);
@@ -46,9 +44,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->set(Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadTagData::class);
     $services->set(Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadPageHitData::class);
     $services->set(Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadSegmentsData::class);
-    $services->set(Mautic\LeadBundle\Form\Validator\Constraints\EmailAddressValidator::class)->tag('validator.constraint_validator');
-    $services->set(Mautic\LeadBundle\Validator\Constraints\SegmentUsedInCampaignsValidator::class)->tag('validator.constraint_validator');
-    $services->set(Mautic\LeadBundle\Validator\Constraints\LengthValidator::class)->tag('validator.constraint_validator');
     $services->set(Mautic\LeadBundle\Segment\Stat\SegmentDependencies::class);
 
     $services->set(Mautic\LeadBundle\Segment\Stat\SegmentChartQueryFactory::class);
@@ -100,5 +95,4 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.lead.model.ipaddress', Mautic\LeadBundle\Model\IpAddressModel::class);
     $services->alias('mautic.lead.model.export_scheduler', Mautic\LeadBundle\Model\ContactExportSchedulerModel::class);
     $services->alias('mautic.lead.repository.list_lead', Mautic\LeadBundle\Entity\ListLeadRepository::class);
-    $services->get(Mautic\LeadBundle\Validator\Constraints\SegmentDateValidator::class)->tag('validator.constraint_validator');
 };
