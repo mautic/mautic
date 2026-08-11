@@ -975,9 +975,8 @@ class LeadModel extends FormModel
     /**
      * Add lead to Stage.
      *
-     * @param array|Lead  $lead
-     * @param array|Stage $stage
-     * @param bool        $manuallyAdded
+     * @param array|Lead $lead
+     * @param bool       $manuallyAdded
      */
     public function addToStages($lead, Stage $stage, $manuallyAdded = true): static
     {
