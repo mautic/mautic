@@ -22,7 +22,7 @@ final class FieldChangeRepositoryTest extends TestCase
         parent::setUp();
 
         $this->repository = $this->configureRepository(FieldChange::class);
-        $this->connection->method('createQueryBuilder')->willReturnCallback(fn (): QueryBuilder => new QueryBuilder($this->connection));
+        $this->connection->expects($this->once())->method('createQueryBuilder')->willReturnCallback(fn (): QueryBuilder => new QueryBuilder($this->connection));
     }
 
     public function testWhereQueryPartForFindingChangesForSingleObject(): void

@@ -44,11 +44,11 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
 
         /** @var MockObject&EmailModel $emailModel */
         $emailModel = $this->createMock(EmailModel::class);
-        $emailModel->method('isUpdatingTranslationChildren')->willReturn(false);
+        $emailModel->expects($this->once())->method('isUpdatingTranslationChildren')->willReturn(false);
 
         /** @var MockObject&GrapesJsBuilderRepository $grapesRepository */
         $grapesRepository = $this->createMock(GrapesJsBuilderRepository::class);
-        $grapesRepository->method('findOneBy')->willReturn(null);
+        $grapesRepository->expects($this->once())->method('findOneBy')->willReturn(null);
         $grapesRepository->expects($this->once())
             ->method('saveEntity')
             ->with(self::callback(static fn ($entity): bool => $entity instanceof GrapesJsBuilder && '<mjml/>' === $entity->getCustomMjml()));
@@ -87,7 +87,7 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
 
         /** @var MockObject&EmailModel $emailModel */
         $emailModel = $this->createMock(EmailModel::class);
-        $emailModel->method('isUpdatingTranslationChildren')->willReturn(true);
+        $emailModel->expects($this->once())->method('isUpdatingTranslationChildren')->willReturn(true);
 
         /** @var MockObject&EntityManager $entityManager */
         $entityManager = $this->createMock(EntityManager::class);

@@ -50,11 +50,11 @@ final class IntegrationSyncSettingsObjectFieldTypeTest extends \PHPUnit\Framewor
             ],
         ];
 
-        $field->method('showAsRequired')->willReturn(true);
-        $field->method('getName')->willReturn('Integration Field A');
-        $field->method('isBidirectionalSyncEnabled')->willReturn(false);
-        $field->method('isToIntegrationSyncEnabled')->willReturn(true);
-        $field->method('isToMauticSyncEnabled')->willReturn(true);
+        $field->expects($this->once())->method('showAsRequired')->willReturn(true);
+        $field->expects($this->exactly(2))->method('getName')->willReturn('Integration Field A');
+        $field->expects($this->once())->method('isBidirectionalSyncEnabled')->willReturn(false);
+        $field->expects($this->once())->method('isToIntegrationSyncEnabled')->willReturn(true);
+        $field->expects($this->once())->method('isToMauticSyncEnabled')->willReturn(true);
         $matcher = $this->exactly(2);
 
         $this->formBuilder->expects($matcher)

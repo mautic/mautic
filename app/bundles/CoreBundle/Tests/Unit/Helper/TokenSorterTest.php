@@ -15,7 +15,7 @@ final class TokenSorterTest extends TestCase
     protected function setUp(): void
     {
         $translator = $this->createMock(TranslatorInterface::class);
-        $translator->method('trans')
+        $translator->expects($this->exactly(2))->method('trans')
             ->willReturnCallback(fn (string $key): string => match ($key) {
                 'mautic.page.token.thispage' => 'This page',
                 'mautic.email.email'         => 'Email',

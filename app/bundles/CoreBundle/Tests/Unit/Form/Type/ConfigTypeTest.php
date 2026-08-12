@@ -141,7 +141,7 @@ final class ConfigTypeTest extends TypeTestCase
         $configType = $this->getConfigFormType();
 
         $repoMock = $this->createMock(PageRepository::class);
-        $repoMock
+        $repoMock->expects($this->exactly(2))
                  ->method('getPageList')
                  ->willReturn([]);
 

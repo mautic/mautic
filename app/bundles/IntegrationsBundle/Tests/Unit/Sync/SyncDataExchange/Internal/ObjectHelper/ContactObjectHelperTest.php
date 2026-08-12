@@ -93,7 +93,7 @@ final class ContactObjectHelperTest extends TestCase
                 $property->setValue($lead, $idMap[$lead->getEmail()]);
             });
 
-        $this->repository->expects($this->exactly(2))
+        $this->repository
             ->method('detachEntity');
 
         // Test that two objects with the same unique identifier are merged into one
@@ -143,7 +143,7 @@ final class ContactObjectHelperTest extends TestCase
                 $property->setValue($lead, $idMap[$lead->getEmail() ?? '']);
             });
 
-        $this->repository->expects($this->exactly(3))
+        $this->repository
             ->method('detachEntity');
 
         // Test that two objects with the same unique identifier are merged into one
@@ -203,10 +203,10 @@ final class ContactObjectHelperTest extends TestCase
         $objectChangeDaoA->addField($companyField);
 
         $contact1 = $this->createPartialMock(Lead::class, ['getId', 'addUpdatedField']);
-        $contact1->method('getId')
+        $contact1->expects($this->exactly(2))->method('getId')
             ->willReturn(0);
         $contact2 = $this->createPartialMock(Lead::class, ['getId']);
-        $contact2->method('getId')
+        $contact2->expects($this->exactly(2))->method('getId')
             ->willReturn(1);
         $this->model->expects($this->once())
             ->method('getEntities')
@@ -257,7 +257,7 @@ final class ContactObjectHelperTest extends TestCase
         ];
 
         $contact1 = $this->createMock(Lead::class);
-        $contact1->method('getId')
+        $contact1->expects($this->exactly(3))->method('getId')
             ->willReturn(1);
 
         $this->model->expects($this->once())
@@ -280,7 +280,7 @@ final class ContactObjectHelperTest extends TestCase
         ];
 
         $contact1 = $this->createMock(Lead::class);
-        $contact1->method('getId')
+        $contact1->expects($this->exactly(3))->method('getId')
             ->willReturn(1);
 
         $this->model->expects($this->once())
@@ -303,7 +303,7 @@ final class ContactObjectHelperTest extends TestCase
         ];
 
         $contact1 = $this->createMock(Lead::class);
-        $contact1->method('getId')
+        $contact1->expects($this->exactly(3))->method('getId')
             ->willReturn(1);
 
         $this->model->expects($this->once())

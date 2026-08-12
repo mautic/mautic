@@ -65,7 +65,7 @@ final class RelationsHelperTest extends TestCase
             ->method('getRelations')
             ->willReturn($relationsObject);
 
-        $this->mappingManual
+        $this->mappingManual->expects($this->exactly(2))
             ->method('getMappedInternalObjectsNames')
             ->willReturn(['company']);
 
@@ -119,7 +119,7 @@ final class RelationsHelperTest extends TestCase
             ->method('getObject')
             ->willReturn($objectDao);
 
-        $this->mappingManual
+        $this->mappingManual->expects($this->exactly(2))
             ->method('getMappedInternalObjectsNames')
             ->willReturn(['company']);
 

@@ -25,7 +25,7 @@ final class FileLogHandlerTest extends TestCase
 
     public function testPropertiesAreSetFromCoreParametersHelperWhenDebugModeEnabled(): void
     {
-        $this->coreParametersHelper->method('get')
+        $this->coreParametersHelper->expects($this->exactly(4))->method('get')
             ->willReturnCallback(
                 function ($key) {
                     switch ($key) {
@@ -55,7 +55,7 @@ final class FileLogHandlerTest extends TestCase
 
     public function testPropertiesAreSetFromCoreParametersHelperWhenDebugModeDisabled(): void
     {
-        $this->coreParametersHelper->method('get')
+        $this->coreParametersHelper->expects($this->exactly(4))->method('get')
             ->willReturnCallback(
                 function ($key) {
                     switch ($key) {

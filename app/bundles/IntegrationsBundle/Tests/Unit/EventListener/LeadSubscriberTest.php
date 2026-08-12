@@ -168,7 +168,7 @@ final class LeadSubscriberTest extends TestCase
 
         $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, Lead::class);
 
-        $this->eventDispatcherInterfaceMock
+        $this->eventDispatcherInterfaceMock->expects($this->once())
             ->method('hasListeners')
             ->with(IntegrationEvents::INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES)
             ->willReturn(true);
@@ -202,7 +202,7 @@ final class LeadSubscriberTest extends TestCase
 
         $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, Lead::class);
 
-        $this->eventDispatcherInterfaceMock
+        $this->eventDispatcherInterfaceMock->expects($this->once())
             ->method('hasListeners')
             ->with(IntegrationEvents::INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES)
             ->willReturn(true);
@@ -236,7 +236,7 @@ final class LeadSubscriberTest extends TestCase
 
         $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, Lead::class);
 
-        $this->eventDispatcherInterfaceMock
+        $this->eventDispatcherInterfaceMock->expects($this->once())
             ->method('hasListeners')
             ->with(IntegrationEvents::INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES)
             ->willReturn(true);
@@ -340,7 +340,7 @@ final class LeadSubscriberTest extends TestCase
 
         $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, Company::class);
 
-        $this->eventDispatcherInterfaceMock
+        $this->eventDispatcherInterfaceMock->expects($this->once())
             ->method('hasListeners')
             ->with(IntegrationEvents::INTEGRATION_BEFORE_COMPANY_FIELD_CHANGES)
             ->willReturn(true);
@@ -378,7 +378,7 @@ final class LeadSubscriberTest extends TestCase
 
         $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, Company::class);
 
-        $this->eventDispatcherInterfaceMock
+        $this->eventDispatcherInterfaceMock->expects($this->once())
             ->method('hasListeners')
             ->with(IntegrationEvents::INTEGRATION_BEFORE_COMPANY_FIELD_CHANGES)
             ->willReturn(true);
@@ -415,7 +415,7 @@ final class LeadSubscriberTest extends TestCase
         $integrationName     = 'testIntegration';
         $enabledIntegrations = [$integrationName];
 
-        $this->syncIntegrationsHelper
+        $this->syncIntegrationsHelper->expects($this->once())
             ->method('getEnabledIntegrations')
             ->willReturn($enabledIntegrations);
 

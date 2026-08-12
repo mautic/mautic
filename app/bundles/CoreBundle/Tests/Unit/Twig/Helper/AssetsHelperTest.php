@@ -29,7 +29,7 @@ final class AssetsHelperTest extends TestCase
 
     public function testAssetContext(): void
     {
-        $this->pathsHelper->method('getSystemPath')
+        $this->pathsHelper->expects($this->once())->method('getSystemPath')
             ->willReturn('');
 
         $this->assetHelper->addStylesheet('/app.css');

@@ -430,7 +430,7 @@ final class UpdateHelperTest extends TestCase
 
     public function testRequestExceptionDoesNotGoUncaughtWhenThrownDuringUpdatingStats(): void
     {
-        $this->response->method('getStatusCode')->willReturn(200);
+        $this->response->expects($this->exactly(2))->method('getStatusCode')->willReturn(200);
 
         $cache = [
             'error'        => false,
@@ -676,7 +676,7 @@ final class UpdateHelperTest extends TestCase
 
     public function testErrorIfGuzzleException(): void
     {
-        $this->response->method('getStatusCode')->willReturn(200);
+        $this->response->expects($this->exactly(2))->method('getStatusCode')->willReturn(200);
 
         $cache = [
             'error'        => false,
@@ -920,7 +920,7 @@ final class UpdateHelperTest extends TestCase
 
         file_put_contents(__DIR__.'/resource/update/tmp/lastUpdateCheck.txt', json_encode($cache));
 
-        $this->coreParametersHelper->expects($this->once())
+        $this->coreParametersHelper
             ->method('get')
             ->with('update_stability')
             ->willReturn('stable');

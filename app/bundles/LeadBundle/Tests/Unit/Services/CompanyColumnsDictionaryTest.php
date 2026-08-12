@@ -25,7 +25,7 @@ final class CompanyColumnsDictionaryTest extends TestCase
         $translator                 = $this->createMock(TranslatorInterface::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
 
-        $translator->method('trans')->willReturnArgument(0);
+        $translator->expects($this->exactly(6))->method('trans')->willReturnArgument(0);
 
         $fieldList->expects($this->once())
             ->method('getFieldList')

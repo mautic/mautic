@@ -97,13 +97,13 @@ final class WebhookControllerTest extends TestCase
         );
 
         $parameterBag = $this->createMock(ParameterBagInterface::class);
-        $parameterBag->method('get')
+        $parameterBag->expects($this->once())->method('get')
             ->with('kernel.environment')
             ->willReturn('test');
 
         $container = $this->createMock(ContainerInterface::class);
-        $container->method('has')->with('parameter_bag')->willReturn(true);
-        $container->method('get')->with('parameter_bag')->willReturn($parameterBag);
+        $container->expects($this->once())->method('has')->with('parameter_bag')->willReturn(true);
+        $container->expects($this->once())->method('get')->with('parameter_bag')->willReturn($parameterBag);
 
         $controller->setContainer($container);
 
@@ -123,7 +123,7 @@ final class WebhookControllerTest extends TestCase
             });
 
         $pathsHelper = $this->createMock(PathsHelper::class);
-        $pathsHelper->method('getSystemPath')->willReturn(realpath(dirname(__DIR__, 4)));
+        $pathsHelper->expects($this->once())->method('getSystemPath')->willReturn(realpath(dirname(__DIR__, 4)));
 
         // Send test action.
         $testResponse = $controller->sendHookTestAction($request, $client, $pathsHelper);
@@ -135,19 +135,19 @@ final class WebhookControllerTest extends TestCase
 
         // Now send the lead update event.
         $lead = $this->createMock(Lead::class);
-        $lead->method('isAnonymous')->willReturn(false);
-        $lead->method('getChanges')
+        $lead->expects($this->once())->method('isAnonymous')->willReturn(false);
+        $lead->expects($this->once())->method('getChanges')
             ->with(true)
             ->willReturn($changes);
 
         $event = new LeadEvent($lead, $isNew);
 
         $guzzleBody = $this->createMock(StreamInterface::class);
-        $guzzleBody->method('getContents')->willReturn('whatever');
+        $guzzleBody->expects($this->once())->method('getContents')->willReturn('whatever');
 
         $clientResponse = $this->createMock(GuzzleResponse::class);
-        $clientResponse->method('getStatusCode')->willReturn(Response::HTTP_OK);
-        $clientResponse->method('getBody')->willReturn($guzzleBody);
+        $clientResponse->expects($this->once())->method('getStatusCode')->willReturn(Response::HTTP_OK);
+        $clientResponse->expects($this->once())->method('getBody')->willReturn($guzzleBody);
 
         $client = $this->createMock(Client::class);
         $client->expects($this->once())
@@ -172,16 +172,16 @@ final class WebhookControllerTest extends TestCase
         $webhook = $this->createMock(Webhook::class);
         $webhook->method('getId')
             ->willReturn($webhookId);
-        $webhook->method('getMarkedUnhealthyAt')
+        $webhook->expects($this->once())->method('getMarkedUnhealthyAt')
             ->willReturn(null);
-        $webhook->method('getWebhookUrl')
+        $webhook->expects($this->once())->method('getWebhookUrl')
             ->willReturn($url);
-        $webhook->method('getSecret')
+        $webhook->expects($this->exactly(2))->method('getSecret')
             ->willReturn($secret);
 
         $webhookEvent = $this->createMock(Event::class);
-        $webhookEvent->method('getWebhook')->willReturn($webhook);
-        $webhookEvent->method('getEventType')->willReturn($eventUnderTest);
+        $webhookEvent->expects($this->once())->method('getWebhook')->willReturn($webhook);
+        $webhookEvent->expects($this->once())->method('getEventType')->willReturn($eventUnderTest);
 
         $webhookEventRepository = $this->createMock(EventRepository::class);
         $webhookEventRepository->expects($this->once())
@@ -204,7 +204,7 @@ final class WebhookControllerTest extends TestCase
         $em = $this->createStub(EntityManager::class);
 
         $serializer = $this->createMock(SerializerInterface::class);
-        $serializer->method('serialize')
+        $serializer->expects($this->once())->method('serialize')
             ->willReturnCallback(function (array $data, string $type) use ($contactPayload): string {
                 $this->assertArrayHasKey('contact', $data);
                 $this->assertSame('json', $type);

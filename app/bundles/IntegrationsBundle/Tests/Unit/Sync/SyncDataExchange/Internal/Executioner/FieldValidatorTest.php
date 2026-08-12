@@ -36,7 +36,7 @@ final class FieldValidatorTest extends TestCase
 
     public function testValidateFields(): void
     {
-        $this->leadFieldRepository->method('getFieldSchemaData')
+        $this->leadFieldRepository->expects($this->once())->method('getFieldSchemaData')
             ->willReturn([
                 'company' => [
                     'alias'             => 'company',

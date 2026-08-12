@@ -48,7 +48,7 @@ final class AbstractFormControllerTest extends \PHPUnit\Framework\TestCase
     {
         $this->prepareRequestStack(['company' => null]);
 
-        $this->formMock->method('getName')
+        $this->formMock->expects($this->once())->method('getName')
             ->willReturn('company');
         $isFormCancelled = $this->invokeIsFormCancelled($this->formMock);
         $this->assertFalse($isFormCancelled);
@@ -61,7 +61,7 @@ final class AbstractFormControllerTest extends \PHPUnit\Framework\TestCase
     {
         $this->prepareRequestStack(['company_merge' => ['buttons' => ['cancel' => null]]]);
 
-        $this->formMock->method('getName')
+        $this->formMock->expects($this->once())->method('getName')
             ->willReturn('company_merge');
         $isFormCancelled = $this->invokeIsFormCancelled($this->formMock);
         $this->assertTrue($isFormCancelled);
@@ -74,7 +74,7 @@ final class AbstractFormControllerTest extends \PHPUnit\Framework\TestCase
     {
         $this->prepareRequestStack(['company_merge' => ['buttons' => ['submit' => null]]]);
 
-        $this->formMock->method('getName')
+        $this->formMock->expects($this->once())->method('getName')
             ->willReturn('company_merge');
         $isFormCancelled = $this->invokeIsFormCancelled($this->formMock);
         $this->assertFalse($isFormCancelled);

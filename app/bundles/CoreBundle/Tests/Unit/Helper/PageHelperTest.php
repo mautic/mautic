@@ -24,7 +24,7 @@ final class PageHelperTest extends \PHPUnit\Framework\TestCase
         $requestStack               = $this->createMock(RequestStack::class);
         $this->pageHelper           = new PageHelper($requestStack, $this->createStub(CoreParametersHelper::class), 'mautic.test', 0);
 
-        $requestStack->method('getSession')->willReturn($this->session);
+        $requestStack->expects($this->once())->method('getSession')->willReturn($this->session);
     }
 
     #[DataProvider('PageProvider')]

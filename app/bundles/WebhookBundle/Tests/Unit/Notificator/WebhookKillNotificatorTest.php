@@ -87,13 +87,13 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
         $eventDispatcher             = $this->createMock(EventDispatcherInterface::class);
 
         $webhookNotificationEventMock =  $this->createMock(WebhookNotificationEvent::class);
-        $webhookNotificationEventMock->method('canSend')->willReturn(true);
+        $webhookNotificationEventMock->expects($this->once())->method('canSend')->willReturn(true);
 
         $twig->expects($this->once())
             ->method('render')
             ->willReturn($this->details);
 
-        $eventDispatcher->method('dispatch')
+        $eventDispatcher->expects($this->once())->method('dispatch')
             ->willReturn(
                 $webhookNotificationEventMock
             );
@@ -213,7 +213,7 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
 
     private function mockCommonMethods(int $sentToAuthor, ?string $emailToSend = null): void
     {
-        $this->coreParamHelperMock
+        $this->coreParamHelperMock->expects($this->exactly(2))
             ->method('get')
             ->willReturnOnConsecutiveCalls('from_name', $sentToAuthor, $emailToSend);
 

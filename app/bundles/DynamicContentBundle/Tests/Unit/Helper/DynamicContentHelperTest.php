@@ -112,17 +112,17 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
         $slot->setFilters([['field' => 'unicorn', 'type' => 'text', 'operator' => '=', 'filter' => 'magic']]);
         $slot->setContent('<p>test</p>');
 
-        $this->mockModel->method('getEntities')
+        $this->mockModel->expects($this->once())->method('getEntities')
             ->willReturn([$slot]);
 
-        $this->mockModel->method('getTranslatedEntity')
+        $this->mockModel->expects($this->once())->method('getTranslatedEntity')
             ->willReturn([$slot, $slot]);
 
-        $this->leadModel->method('getEntity')
+        $this->leadModel->expects($this->once())->method('getEntity')
             ->with(123)
             ->willReturn($contact);
 
-        $this->mockDispatcher->method('hasListeners')->willReturn(true);
+        $this->mockDispatcher->expects($this->once())->method('hasListeners')->willReturn(true);
         $matcher = $this->exactly(2);
         $this->mockDispatcher->expects($matcher)
             ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher, $contact, $slot): object {
@@ -165,7 +165,7 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
         $slot->setFilters([['field' => 'unicorn', 'type' => 'text', 'operator' => '=', 'filter' => 'magic']]);
         $slot->setContent('<p>test</p>');
 
-        $this->mockModel->method('getEntities')
+        $this->mockModel->expects($this->once())->method('getEntities')
             ->willReturn([$slot]);
 
         $this->mockModel->method('getTranslatedEntity')
@@ -175,7 +175,7 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
             ->with(123)
             ->willReturn($contact);
 
-        $this->mockDispatcher->method('hasListeners')->willReturn(true);
+        $this->mockDispatcher->expects($this->once())->method('hasListeners')->willReturn(true);
         $matcher = $this->once();
         $this->mockDispatcher->expects($matcher)
             ->method('dispatch')
@@ -215,10 +215,10 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
         $slot->setFilters([['field' => 'email', 'type' => 'email', 'operator' => '=', 'filter' => 'ma@ka.t']]);
         $slot->setContent('<p>test</p>');
 
-        $this->mockModel->method('getEntities')
+        $this->mockModel->expects($this->once())->method('getEntities')
             ->willReturn([$slot]);
 
-        $this->mockModel->method('getTranslatedEntity')
+        $this->mockModel->expects($this->once())->method('getTranslatedEntity')
             ->willReturn([$slot, $slot]);
 
         $this->leadModel->method('getEntity')
@@ -259,7 +259,7 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
         $slot->setFilters([['field' => 'email', 'type' => 'email', 'operator' => '=', 'filter' => 'uni@co.rn']]);
         $slot->setContent('<p>test</p>');
 
-        $this->mockModel->method('getEntities')
+        $this->mockModel->expects($this->once())->method('getEntities')
             ->willReturn([$slot]);
 
         $this->mockModel->method('getTranslatedEntity')
