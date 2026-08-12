@@ -22,11 +22,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class FieldHelperTest extends TestCase
 {
     /**
-     * @var MockObject&FieldModel
-     */
-    private MockObject $fieldModel;
-
-    /**
      * @var MockObject&FieldList
      */
     private MockObject $fieldListProvider;
@@ -50,7 +45,6 @@ final class FieldHelperTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->fieldModel              = $this->createMock(FieldModel::class);
         $this->fieldListProvider       = $this->createMock(FieldList::class);
         $channelListHelper             = $this->createMock(ChannelListHelper::class);
         $this->objectProvider          = $this->createMock(ObjectProvider::class);
@@ -65,7 +59,7 @@ final class FieldHelperTest extends TestCase
         $this->fieldsWithUniqueIdentifier = $this->createMock(FieldsWithUniqueIdentifier::class);
 
         $this->fieldHelper = new FieldHelper(
-            $this->fieldModel,
+            $this->createStub(FieldModel::class),
             $this->fieldListProvider,
             $this->fieldsWithUniqueIdentifier,
             $this->createStub(VariableExpresserHelperInterface::class),
