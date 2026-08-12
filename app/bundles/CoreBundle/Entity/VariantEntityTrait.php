@@ -20,10 +20,8 @@ trait VariantEntityTrait
     private $variantChildren;
 
     /**
-     * @var VariantEntityInterface|null
-     *
-     * @phpstan-var T|null
-     **/
+     * @var T|null
+     */
     #[Groups(['email:read', 'email:write', 'download:read'])]
     private $variantParent;
 
@@ -94,9 +92,6 @@ trait VariantEntityTrait
         $this->getVariantChildren()->removeElement($child);
     }
 
-    /**
-     * Get variantChildren.
-     */
     public function getVariantChildren(): ArrayCollection|Collection
     {
         return $this->variantChildren;
@@ -118,17 +113,12 @@ trait VariantEntityTrait
         return $this->variantParent;
     }
 
-    /**
-     * Remove variant parent.
-     */
     public function removeVariantParent(): void
     {
         $this->setVariantParent();
     }
 
     /**
-     * Set variantSettings.
-     *
      * @param array<mixed> $variantSettings
      */
     public function setVariantSettings(array $variantSettings): static
@@ -149,8 +139,6 @@ trait VariantEntityTrait
     }
 
     /**
-     * Get variantSettings.
-     *
      * @return array<mixed>
      */
     public function getVariantSettings(): array
@@ -186,7 +174,7 @@ trait VariantEntityTrait
             return null !== $parent;
         }
 
-        return !empty($parent) || count($children);
+        return $parent instanceof VariantEntityInterface || count($children);
     }
 
     public function isParent(): bool
@@ -202,9 +190,6 @@ trait VariantEntityTrait
         return $this->getVariantChildren()->count();
     }
 
-    /**
-     * Clear variants.
-     */
     public function clearVariants(): void
     {
         $this->variantChildren = new ArrayCollection();
@@ -220,7 +205,7 @@ trait VariantEntityTrait
     public function getVariants(): array
     {
         $parent = $this->getVariantParent();
-        if (empty($parent)) {
+        if (!$parent instanceof VariantEntityInterface) {
             $parent = $this;
         }
 
@@ -331,7 +316,7 @@ trait VariantEntityTrait
         }
 
         $endDate = clone $startDate;
-        $endDate->modify("+$delayHours hours");
+        $endDate->modify("+{$delayHours} hours");
 
         return $endDate;
     }
@@ -344,7 +329,7 @@ trait VariantEntityTrait
     protected function getAccumulativeVariantCount(string $getter): mixed
     {
         [$parent, $children]     = $this->getVariants();
-        $count                   = $parent->$getter();
+        $count                   = $parent->{$getter}();
 
         if ($checkTranslations = method_exists($parent, 'getAccumulativeTranslationCount')) {
             // Append translations for this variant if applicable
@@ -352,7 +337,7 @@ trait VariantEntityTrait
         }
 
         foreach ($children as $variant) {
-            $count += $variant->$getter();
+            $count += $variant->{$getter}();
 
             if ($checkTranslations) {
                 // Append translations for this variant if applicable

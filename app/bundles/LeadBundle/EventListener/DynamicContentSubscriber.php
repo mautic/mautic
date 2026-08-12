@@ -13,8 +13,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class DynamicContentSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private LeadListRepository $segmentRepository)
-    {
+    public function __construct(
+        private LeadListRepository $segmentRepository,
+    ) {
     }
 
     public static function getSubscribedEvents(): array
@@ -45,7 +46,7 @@ final readonly class DynamicContentSubscriber implements EventSubscriberInterfac
      */
     private function isContactSegmentRelationshipValid(Lead $contact, string $operator, ?array $segmentIds = null): bool
     {
-        $contactId = (int) $contact->getId();
+        $contactId = $contact->getId();
 
         return match ($operator) {
             OperatorOptions::EMPTY         => $this->segmentRepository->isNotContactInAnySegment($contactId), // Contact is not in any segment

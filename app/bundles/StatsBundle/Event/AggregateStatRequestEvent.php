@@ -6,7 +6,7 @@ use Mautic\StatsBundle\Aggregate\Collection\StatCollection;
 use Mautic\StatsBundle\Event\Options\FetchOptions;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class AggregateStatRequestEvent extends Event
+final class AggregateStatRequestEvent extends Event
 {
     private readonly StatCollection $statCollection;
 

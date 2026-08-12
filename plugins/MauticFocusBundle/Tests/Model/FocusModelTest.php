@@ -13,7 +13,10 @@ use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Model\TrackableModel;
+use MauticPlugin\MauticFocusBundle\Entity\FocusRepository;
+use MauticPlugin\MauticFocusBundle\Entity\StatRepository;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Rule\InvokedCount;
 use PHPUnit\Framework\MockObject\Rule\InvokedCount as InvokedCountMatcher;
@@ -36,7 +39,7 @@ final class FocusModelTest extends TestCase
         parent::setUp();
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('focusTypeProvider')]
+    #[DataProvider('focusTypeProvider')]
     public function testGetContentWithForm(string $type, InvokedCount $count): void
     {
         $this->formModel->expects($this->once())->method('getPages')->willReturn(['', '']);
@@ -56,7 +59,9 @@ final class FocusModelTest extends TestCase
             $this->createStub(Translator::class),
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
-            $this->createStub(CoreParametersHelper::class)
+            $this->createStub(CoreParametersHelper::class),
+            $this->createStub(FocusRepository::class), // $focusRepository
+            $this->createStub(StatRepository::class), // $statRepository
         );
         $focus = [
             'form' => 'xxx',

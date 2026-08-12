@@ -15,11 +15,11 @@ class EmailSendEvent extends CommonEvent
      */
     private $email;
 
-    private string $content = '';
+    private string $content;
 
-    private string $plainText = '';
+    private string $plainText;
 
-    private string $subject = '';
+    private string $subject;
 
     /**
      * @var string|null
@@ -45,9 +45,9 @@ class EmailSendEvent extends CommonEvent
 
     private array $textHeaders = [];
 
-    private bool $fatal = false;
+    private bool $fatal;
 
-    private bool $skip = false;
+    private bool $skip;
 
     /**
      * @var array<string>
@@ -55,12 +55,11 @@ class EmailSendEvent extends CommonEvent
     private array $errors = [];
 
     /**
-     * @param array $args
-     * @param bool  $isDynamicContentParsing
+     * @param bool $isDynamicContentParsing
      */
     public function __construct(
         private readonly ?MailHelper $helper = null,
-        $args = [],
+        array $args = [],
         private $isDynamicContentParsing = false,
     ) {
         $this->content     = $args['content'] ?? '';
@@ -279,7 +278,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function shouldAppendClickthrough(): bool
     {
-        return !$this->isInternalSend() && null === $this->getEmail();
+        return !$this->internalSend && null === $this->getEmail();
     }
 
     /**

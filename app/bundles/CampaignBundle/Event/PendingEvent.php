@@ -41,7 +41,7 @@ class PendingEvent extends AbstractLogCollectionEvent
     }
 
     /**
-     * @return LeadEventLog[]|ArrayCollection
+     * @return ArrayCollection<int, LeadEventLog>
      */
     public function getPending()
     {
@@ -212,7 +212,7 @@ class PendingEvent extends AbstractLogCollectionEvent
     }
 
     /**
-     * @return LeadEventLog[]|ArrayCollection
+     * @return ArrayCollection<int, LeadEventLog>
      */
     public function getFailures(): ArrayCollection
     {
@@ -220,7 +220,7 @@ class PendingEvent extends AbstractLogCollectionEvent
     }
 
     /**
-     * @return LeadEventLog[]|ArrayCollection
+     * @return ArrayCollection<int, LeadEventLog>
      */
     public function getSuccessful(): ArrayCollection
     {

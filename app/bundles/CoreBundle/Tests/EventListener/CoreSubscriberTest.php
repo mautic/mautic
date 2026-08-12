@@ -13,14 +13,11 @@ final class CoreSubscriberTest extends TestCase
 {
     public function testGetSubscribedEvents(): void
     {
-        self::assertSame(
-            [
-                CoreEvents::BUILD_MENU            => ['onBuildMenu', 9999],
-                CoreEvents::BUILD_ROUTE           => ['onBuildRoute', 0],
-                CoreEvents::FETCH_ICONS           => ['onFetchIcons', 9999],
-                SecurityEvents::INTERACTIVE_LOGIN => ['onSecurityInteractiveLogin', 0],
-            ],
-            CoreSubscriber::getSubscribedEvents()
-        );
+        $this->assertSame([
+            CoreEvents::BUILD_MENU            => ['onBuildMenu', 9999],
+            CoreEvents::BUILD_ROUTE           => ['onBuildRoute', 0],
+            CoreEvents::FETCH_ICONS           => ['onFetchIcons', 9999],
+            SecurityEvents::INTERACTIVE_LOGIN => ['onSecurityInteractiveLogin', 0],
+        ], CoreSubscriber::getSubscribedEvents());
     }
 }

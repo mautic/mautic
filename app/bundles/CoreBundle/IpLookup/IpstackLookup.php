@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\IpLookup;
 
-class IpstackLookup extends AbstractRemoteDataLookup
+final class IpstackLookup extends AbstractRemoteDataLookup
 {
     public string $country_code = '';
 
@@ -24,7 +24,7 @@ class IpstackLookup extends AbstractRemoteDataLookup
         return 'http://api.ipstack.com/'.$this->ip.'?access_key='.$this->auth.'&output=json&legacy=1';
     }
 
-    protected function parseResponse($response)
+    protected function parseResponse($response): void
     {
         $data = json_decode($response);
 
@@ -45,7 +45,7 @@ class IpstackLookup extends AbstractRemoteDataLookup
                         break;
                 }
 
-                $this->$key = $value;
+                $this->{$key} = $value;
             }
         }
     }

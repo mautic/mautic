@@ -11,7 +11,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class LookupType extends AbstractType
+final class LookupType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

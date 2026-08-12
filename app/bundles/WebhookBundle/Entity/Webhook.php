@@ -81,7 +81,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
 
     /**
      * @var Category|null
-     **/
+     */
     #[Groups(['webhook:read', 'webhook:write'])]
     private $category;
 
@@ -96,10 +96,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
      */
     private $logs;
 
-    /**
-     * @var array
-     */
-    private $removedEvents = [];
+    private array $removedEvents = [];
 
     /**
      * @var mixed[]
@@ -110,11 +107,9 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     /**
      * Holds a simplified array of events, just an array of event types.
      * It's used for API serializaiton.
-     *
-     * @var array
      */
     #[Groups(['webhook:read', 'webhook:write'])]
-    private $triggers = [];
+    private array $triggers = [];
 
     /**
      * ASC or DESC order for fetching order of the events when queue mode is on.
@@ -198,27 +193,21 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         $metadata->addPropertyConstraint(
             'name',
             new NotBlank(
-                [
-                    'message' => 'mautic.core.name.required',
-                ]
+                message: 'mautic.core.name.required'
             )
         );
 
         $metadata->addPropertyConstraint(
             'webhookUrl',
             new Assert\Url(
-                [
-                    'message' => 'mautic.core.valid_url_required',
-                ]
+                message: 'mautic.core.valid_url_required'
             )
         );
 
         $metadata->addPropertyConstraint(
             'webhookUrl',
             new NotBlank(
-                [
-                    'message' => 'mautic.core.valid_url_required',
-                ]
+                message: 'mautic.core.valid_url_required'
             )
         );
 
@@ -531,10 +520,10 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     /**
      * @param string $prop
      */
-    protected function isChanged($prop, $val)
+    protected function isChanged($prop, $val): void
     {
         $getter  = 'get'.ucfirst($prop);
-        $current = $this->$getter();
+        $current = $this->{$getter}();
         if ('category' == $prop) {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
@@ -555,7 +544,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         return $this->markedUnhealthyAt;
     }
 
-    public function setMarkedUnhealthyAt(?\DateTimeImmutable $markedUnhealthyAt): Webhook
+    public function setMarkedUnhealthyAt(?\DateTimeImmutable $markedUnhealthyAt): self
     {
         $this->isChanged('markedUnhealthyAt', $markedUnhealthyAt);
         $this->markedUnhealthyAt = $markedUnhealthyAt;

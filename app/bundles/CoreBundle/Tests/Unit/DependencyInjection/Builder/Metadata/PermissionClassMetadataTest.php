@@ -29,7 +29,7 @@ final class PermissionClassMetadataTest extends TestCase
         $permissionClassMetadata = new PermissionClassMetadata($metadata);
         $permissionClassMetadata->build();
 
-        $this->assertTrue(isset($metadata->toArray()['permissionClasses'][SystemPermissions::class]));
+        $this->assertArrayHasKey(SystemPermissions::class, $metadata->toArray()['permissionClasses']);
         $this->assertCount(1, $metadata->toArray()['permissionClasses']);
     }
 
@@ -50,6 +50,6 @@ final class PermissionClassMetadataTest extends TestCase
         $permissionClassMetadata = new PermissionClassMetadata($metadata);
         $permissionClassMetadata->build();
 
-        $this->assertTrue(isset($metadata->toArray()['permissionClasses'][AssetPermissions::class]));
+        $this->assertArrayHasKey(AssetPermissions::class, $metadata->toArray()['permissionClasses']);
     }
 }

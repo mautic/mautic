@@ -6,27 +6,29 @@ namespace Mautic\LeadBundle\Field\Command;
 
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AsCommand(
+    name: 'mautic:fields:modify',
+    description: 'Change the sizes of the fields'
+)]
 final class ModifyCustomFieldCommand extends Command
 {
-    public function __construct(private readonly FieldModel $fieldModel, private readonly TranslatorInterface $translator)
-    {
+    public function __construct(
+        private readonly FieldModel $fieldModel,
+        private readonly TranslatorInterface $translator,
+    ) {
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure(): void
     {
         $this
-            ->setName('mautic:fields:modify')
-            ->setDescription('Change the sizes of the fields')
             ->addArgument(
                 'csv-path',
                 InputArgument::REQUIRED,
@@ -34,9 +36,6 @@ final class ModifyCustomFieldCommand extends Command
             );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $csvPath = $input->getArgument('csv-path');
@@ -65,7 +64,7 @@ final class ModifyCustomFieldCommand extends Command
             $fieldsNeedsToBeUpdated[$field['alias']] = $field;
         }
 
-        if (empty($fieldsNeedsToBeUpdated)) {
+        if ([] === $fieldsNeedsToBeUpdated) {
             $output->writeln('<info>No custom field(s) to update!!!</info>');
 
             return Command::SUCCESS;
@@ -160,6 +159,6 @@ final class ModifyCustomFieldCommand extends Command
             'isIndexed'         => $this->translator->trans('mautic.lead.field.analyse.header.indexed'),
         ];
 
-        return array_map(fn ($val): false|string => array_search($val, $headers), $row);
+        return array_map(fn (string $val): false|string => array_search($val, $headers), $row);
     }
 }

@@ -6,11 +6,13 @@ namespace Mautic\ReportBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\RoleModel;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class ReportApiControllerTest extends MauticMysqlTestCase
@@ -52,6 +54,40 @@ final class ReportApiControllerTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
     }
 
+    public function testGetReportsListUsesBaseOwnFilterAndSupportsSelect(): void
+    {
+        $password = $this->getUserPlainPassword();
+        $role     = $this->createRole();
+        $user     = $this->createUser($role, $password);
+
+        $this->setPermission($user, ['report:reports' => ['viewown']]);
+
+        $ownedReport = $this->createReportData($user->getId(), 'Owned report');
+        $otherReport = $this->createReportData(0, 'Other report');
+
+        $this->clientServer = [];
+        $this->setUpSymfony($this->configParams);
+        $this->loginUser($user);
+        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUserIdentifier());
+        $this->client->setServerParameter('PHP_AUTH_PW', $password);
+
+        $this->client->request('GET', '/api/reports', [
+            'select' => ['id'],
+        ]);
+
+        $response = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
+
+        $payload = json_decode($response->getContent(), true);
+        $this->assertSame(1, $payload['total']);
+        $reportIds = array_map(
+            static fn (array $report): int => $report['id'],
+            $payload['reports']
+        );
+        $this->assertSame([$ownedReport->getId()], $reportIds);
+        $this->assertNotContains($otherReport->getId(), $reportIds);
+    }
+
     /**
      * @param array<array<string>> $permissions
      */
@@ -65,7 +101,7 @@ final class ReportApiControllerTest extends MauticMysqlTestCase
         }
         $report   = $this->createReportData($createByIdUser);
 
-        if ($permissions) {
+        if ([] !== $permissions) {
             $this->setPermission($user, $permissions);
         }
         // Disable the default logging in via username and password.
@@ -95,7 +131,8 @@ final class ReportApiControllerTest extends MauticMysqlTestCase
 
         // Set new permissions
         $role->setIsAdmin(false);
-        $roleModel = static::getContainer()->get('mautic.user.model.role');
+        /** @var RoleModel $roleModel */
+        $roleModel = self::getContainer()->get(RoleModel::class);
         $this->assertInstanceOf(RoleModel::class, $roleModel);
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);
@@ -111,7 +148,7 @@ final class ReportApiControllerTest extends MauticMysqlTestCase
         $user->setLastName('Doe');
         $user->setUsername('john.doe');
         $user->setEmail('john.doe@email.com');
-        $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash($password));
         $user->setRole($role);
@@ -134,10 +171,10 @@ final class ReportApiControllerTest extends MauticMysqlTestCase
         return $role;
     }
 
-    private function createReportData(int $createBy = 0): Report
+    private function createReportData(int $createBy = 0, string $name = 'Contact report'): Report
     {
         $report = new Report();
-        $report->setName('Contact report');
+        $report->setName($name);
         $report->setDescription('<b>This is allowed HTML</b>');
         $report->setSource('leads');
         $coulmns = [
@@ -152,8 +189,13 @@ final class ReportApiControllerTest extends MauticMysqlTestCase
             $report->setCreatedByUser($createBy);
         }
 
-        $this->getContainer()->get('mautic.report.model.report')->saveEntity($report);
+        $this->getContainer()->get(ReportModel::class)->saveEntity($report);
 
         return $report;
+    }
+
+    private function getUserPlainPassword(): string
+    {
+        return 'Maut1cR0cks!';
     }
 }

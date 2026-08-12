@@ -97,13 +97,11 @@ class ChannelListHelper
     }
 
     /**
-     * Setup channels.
-     *
-     * Done this way to avoid a circular dependency error with LeadModel
+     * Done this way to avoid a circular dependency error with LeadModel.
      */
     private function setupChannels(): void
     {
-        if (!empty($this->channels)) {
+        if ([] !== $this->channels) {
             return;
         }
 

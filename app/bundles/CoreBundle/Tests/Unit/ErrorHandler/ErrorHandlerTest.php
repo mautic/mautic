@@ -6,6 +6,7 @@ namespace Mautic\CoreBundle\Tests\Unit\ErrorHandler;
 
 use Mautic\CoreBundle\ErrorHandler\ErrorHandler;
 use PHPUnit\Framework\TestCase;
+use Twig\Error\LoaderError;
 
 final class ErrorHandlerTest extends TestCase
 {
@@ -56,15 +57,15 @@ final class ErrorHandlerTest extends TestCase
 
         $content = $handler->handleException(new \RuntimeException('boom'), true);
 
-        self::assertIsString($content);
+        $this->assertIsString($content);
         // With the buggy relative paths, Twig's FilesystemLoader would have
         // thrown a LoaderError before any template was rendered, and the
         // catch block in generateResponse would have returned that message.
-        self::assertStringContainsString('<!DOCTYPE html>', $content);
-        self::assertStringContainsString('<div class="container">', $content);
-        self::assertStringContainsString('<div class="alert alert-danger">', $content);
-        self::assertStringContainsString('<div id="previous"></div>', $content);
-        self::assertStringNotContainsString(\Twig\Error\LoaderError::class, $content);
-        self::assertStringNotContainsString('directory does not exist', $content);
+        $this->assertStringContainsString('<!DOCTYPE html>', $content);
+        $this->assertStringContainsString('<div class="container">', $content);
+        $this->assertStringContainsString('<div class="alert alert-danger">', $content);
+        $this->assertStringContainsString('<div id="previous"></div>', $content);
+        $this->assertStringNotContainsString(LoaderError::class, $content);
+        $this->assertStringNotContainsString('directory does not exist', $content);
     }
 }

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MauticPlugin\MauticSocialBundle\Tests\Functional;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
 
 final class SocialCommandsTest extends MauticMysqlTestCase
 {
@@ -13,23 +12,23 @@ final class SocialCommandsTest extends MauticMysqlTestCase
     {
         $commandTester = $this->testSymfonyCommand('mautic:social:monitoring');
 
-        Assert::assertSame(0, $commandTester->getStatusCode());
-        Assert::assertSame("No published monitors found. Make sure the id you supplied is published\n", $commandTester->getDisplay());
+        $this->assertSame(0, $commandTester->getStatusCode());
+        $this->assertSame("No published monitors found. Make sure the id you supplied is published\n", $commandTester->getDisplay());
     }
 
     public function testTwitterHashtagsCommand(): void
     {
         $commandTester = $this->testSymfonyCommand('social:monitor:twitter:hashtags');
 
-        Assert::assertSame(1, $commandTester->getStatusCode());
-        Assert::assertSame("Twitter plugin not published!\n", $commandTester->getDisplay());
+        $this->assertSame(1, $commandTester->getStatusCode());
+        $this->assertSame("Twitter plugin not published!\n", $commandTester->getDisplay());
     }
 
     public function testTwitterMentionsCommand(): void
     {
         $commandTester = $this->testSymfonyCommand('social:monitor:twitter:mentions');
 
-        Assert::assertSame(1, $commandTester->getStatusCode());
-        Assert::assertSame("Twitter plugin not published!\n", $commandTester->getDisplay());
+        $this->assertSame(1, $commandTester->getStatusCode());
+        $this->assertSame("Twitter plugin not published!\n", $commandTester->getDisplay());
     }
 }

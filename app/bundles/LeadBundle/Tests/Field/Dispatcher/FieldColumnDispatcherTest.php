@@ -6,7 +6,6 @@ namespace Mautic\LeadBundle\Tests\Field\Dispatcher;
 
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Field\Dispatcher\FieldColumnDispatcher;
-use Mautic\LeadBundle\Field\Event\AddColumnBackgroundEvent;
 use Mautic\LeadBundle\Field\Event\AddColumnEvent;
 use Mautic\LeadBundle\Field\Event\DeleteColumnEvent;
 use Mautic\LeadBundle\Field\Event\UpdateColumnEvent;
@@ -85,9 +84,7 @@ final class FieldColumnDispatcherTest extends \PHPUnit\Framework\TestCase
             ->expects($this->once())
             ->method('dispatch')
             ->with(
-                $this->callback(
-                    /* @var AddColumnBackgroundEvent $event */
-                    fn ($event): bool => $event instanceof UpdateColumnEvent),
+                $this->isInstanceOf(UpdateColumnEvent::class),
                 'mautic.lead_field_pre_update_column'
             );
 
@@ -116,7 +113,7 @@ final class FieldColumnDispatcherTest extends \PHPUnit\Framework\TestCase
         $dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                $this->callback(fn ($event): bool => $event instanceof DeleteColumnEvent),
+                $this->isInstanceOf(DeleteColumnEvent::class),
                 'mautic.lead_field_pre_delete_column',
             );
 

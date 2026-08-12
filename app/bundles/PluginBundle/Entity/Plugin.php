@@ -108,8 +108,6 @@ class Plugin extends CommonEntity implements CacheInvalidateInterface
     }
 
     /**
-     * Get id.
-     *
      * @return int|null
      */
     public function getId()
@@ -118,8 +116,6 @@ class Plugin extends CommonEntity implements CacheInvalidateInterface
     }
 
     /**
-     * Set name.
-     *
      * @param string $name
      */
     public function setName($name): static
@@ -130,8 +126,6 @@ class Plugin extends CommonEntity implements CacheInvalidateInterface
     }
 
     /**
-     * Get name.
-     *
      * @return string|null
      */
     public function getName()

@@ -45,7 +45,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
 
     /**
      * @var \DateTimeInterface|null
-     **/
+     */
     private $dateTriggered;
 
     /**
@@ -100,10 +100,8 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
 
     /**
      * Subscribers can fail log with custom reschedule interval.
-     *
-     * @var \DateInterval|null
      */
-    private $rescheduleInterval;
+    private ?\DateInterval $rescheduleInterval = null;
 
     private ?\DateTime $dateQueued = null;
 
@@ -287,11 +285,6 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         return $this->event;
     }
 
-    /***
-     * @param $event
-     *
-     * @return $this
-     */
     public function setEvent(Event $event): static
     {
         $this->event = $event;
@@ -516,7 +509,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
 
     public function isFailed(): bool
     {
-        $log = $this->getFailedLog();
+        $log = $this->failedLog;
 
         return !empty($log);
     }
@@ -541,7 +534,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         return $this->dateQueued;
     }
 
-    public function setDateQueued(?\DateTime $dateQueued): LeadEventLog
+    public function setDateQueued(?\DateTime $dateQueued): self
     {
         $this->dateQueued = $dateQueued;
 

@@ -11,12 +11,26 @@ use Mautic\CampaignBundle\Entity\SummaryRepository;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends AbstractCommonModel<Summary>
  */
 class SummaryModel extends AbstractCommonModel
 {
+    private LeadEventLogRepository $leadEventLogRepository;
+
+    private SummaryRepository $summaryRepository;
+
+    #[Required]
+    public function autowireSummaryModel(
+        SummaryRepository $summaryRepository,
+        LeadEventLogRepository $leadEventLogRepository,
+    ): void {
+        $this->summaryRepository = $summaryRepository;
+        $this->leadEventLogRepository = $leadEventLogRepository;
+    }
+
     private array $logData = [];
 
     /**
@@ -60,7 +74,7 @@ class SummaryModel extends AbstractCommonModel
 
     public function getRepository(): SummaryRepository
     {
-        return $this->em->getRepository(Summary::class);
+        return $this->summaryRepository;
     }
 
     public function getPermissionBase(): string
@@ -78,13 +92,13 @@ class SummaryModel extends AbstractCommonModel
         $start = null;
 
         if (!$rebuild) {
-            $start = $this->getRepository()->getOldestTriggeredDate();
+            $start = $this->summaryRepository->getOldestTriggeredDate();
         }
 
         // Start with the current hour.
         $start ??= new \DateTime('+1 hour');
         $start->setTimestamp($start->getTimestamp() - ($start->getTimestamp() % 3600));
-        $end = $this->getCampaignLeadEventLogRepository()->getOldestTriggeredDate();
+        $end = $this->leadEventLogRepository->getOldestTriggeredDate();
 
         if (!$end) {
             $output->writeln('There are no records in the campaign lead event log table. Nothing to summarize.');
@@ -116,7 +130,7 @@ class SummaryModel extends AbstractCommonModel
                 $dateFromFormatted = $dateFrom->format('Y-m-d H:i:s');
                 $dateToFormatted   = $dateTo->format('Y-m-d H:i:s');
                 $output->write("\t".$dateFromFormatted.' - '.$dateToFormatted);
-                $this->getRepository()->summarize($dateFrom, $dateTo);
+                $this->summaryRepository->summarize($dateFrom, $dateTo);
                 $progressBar->advance($hoursPerBatch);
                 $dateTo = $dateTo->sub($interval);
             } while ($end < $dateFrom);
@@ -131,7 +145,7 @@ class SummaryModel extends AbstractCommonModel
 
     public function getCampaignLeadEventLogRepository(): LeadEventLogRepository
     {
-        return $this->em->getRepository(LeadEventLog::class);
+        return $this->leadEventLogRepository;
     }
 
     /**
@@ -144,7 +158,7 @@ class SummaryModel extends AbstractCommonModel
             $dateTo     = $log['dateTo'];
             $campaignId = $log['campaignId'];
             $eventId    = $log['eventId'];
-            $this->getRepository()->summarize($dateFrom, $dateTo, $campaignId, $eventId);
+            $this->summaryRepository->summarize($dateFrom, $dateTo, $campaignId, $eventId);
         }
     }
 

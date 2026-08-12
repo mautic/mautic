@@ -71,7 +71,7 @@ final class ReportTypeTest extends \PHPUnit\Framework\TestCase
 
         $this->reportModel->expects($this->exactly(2))
             ->method('getColumnList')
-            ->with($this->equalTo('assets')) // This is the confirmation that the source was selected properly.
+            ->with('assets') // This is the confirmation that the source was selected properly.
             ->willReturn($columnList);
 
         $this->reportModel->method('getGraphList')

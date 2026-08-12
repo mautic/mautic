@@ -23,12 +23,12 @@ final class MaxmindLookupTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject&Client
      */
-    protected MockObject $mockHttp;
+    private MockObject $mockHttp;
 
     /**
      * @var MockObject&CoreParametersHelper
      */
-    protected MockObject $mockCoreParamsHelper;
+    private MockObject $mockCoreParamsHelper;
 
     protected function setUp(): void
     {
@@ -204,7 +204,9 @@ RESPONSE);
         $this->checkDetails($details);
     }
 
-    /** @param array<string, string> $details */
+    /**
+     * @param array<string, string> $details
+     */
     private function checkDetails(array $details): void
     {
         $this->assertEquals('Los Angeles', $details['city']);

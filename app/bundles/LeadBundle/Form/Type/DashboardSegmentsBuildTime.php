@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\LeadBundle\Model\ListModel;
@@ -10,7 +12,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class DashboardSegmentsBuildTime extends AbstractType
+final class DashboardSegmentsBuildTime extends AbstractType
 {
     public function __construct(
         private readonly ListModel $segmentModel,

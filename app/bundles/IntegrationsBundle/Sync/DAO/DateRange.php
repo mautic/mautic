@@ -4,26 +4,20 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\DAO;
 
-class DateRange
+final readonly class DateRange
 {
     public function __construct(
-        private readonly ?\DateTimeInterface $fromDate,
-        private readonly ?\DateTimeInterface $toDate,
+        private ?\DateTimeInterface $fromDate,
+        private ?\DateTimeInterface $toDate,
     ) {
     }
 
-    /**
-     * Get the value of fromDate.
-     */
-    public function getFromDate()
+    public function getFromDate(): ?\DateTimeInterface
     {
         return $this->fromDate;
     }
 
-    /**
-     * Get the value of toDate.
-     */
-    public function getToDate()
+    public function getToDate(): ?\DateTimeInterface
     {
         return $this->toDate;
     }

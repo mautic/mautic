@@ -6,6 +6,7 @@ namespace Mautic\CampaignBundle\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Event\CampaignEvent;
 use Mautic\CampaignBundle\Model\CampaignModel;
@@ -37,6 +38,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
         private CampaignModel $campaignModel,
         private UserModel $userModel,
         private EntityManagerInterface $entityManager,
+        private CampaignRepository $campaignRepository,
         private EventDispatcherInterface $dispatcher,
         private LoggerInterface $logger,
         private AuditLogModel $auditLogModel,
@@ -63,8 +65,8 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
         $campaignId   = $event->getEntityId();
         $campaignData = $this->fetchCampaignData($campaignId);
 
-        if (!$campaignData) {
-            $this->logger->warning("Campaign data not found for ID: $campaignId");
+        if ([] === $campaignData) {
+            $this->logger->warning("Campaign data not found for ID: {$campaignId}");
 
             return;
         }
@@ -91,7 +93,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
         $userName = $this->getUserName($userId);
 
         $entityData = $event->getEntityData();
-        if (!$entityData) {
+        if ([] === $entityData) {
             $this->logger->warning('No entity data provided for import.');
             $event->setStatus(EntityImportEvent::ERRORS, ['message' => 'No entity data provided.']);
 
@@ -109,7 +111,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
     {
         $campaign = $this->campaignModel->getEntity($campaignId);
         if (!$campaign) {
-            $this->logger->warning("Campaign not found for ID: $campaignId");
+            $this->logger->warning("Campaign not found for ID: {$campaignId}");
 
             return [];
         }
@@ -181,7 +183,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
         $allowedTags = ['p', 'b', 'strong', 'i', 'em', 'u', 'ul', 'ol', 'li', 'br', 'span', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
 
         foreach ($entityData[Campaign::ENTITY_NAME] as $campaignData) {
-            $object = $this->entityManager->getRepository(Campaign::class)->findOneBy(['uuid' => $campaignData['uuid']]);
+            $object = $this->campaignRepository->findOneBy(['uuid' => $campaignData['uuid']]);
             $isNew  = !$object;
 
             $object ??= new Campaign();
@@ -336,7 +338,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
 
         $user = $this->userModel->getEntity($userId);
         if (!$user) {
-            $this->logger->warning("User ID $userId not found. Campaigns will not have a created_by_user field set.");
+            $this->logger->warning("User ID {$userId} not found. Campaigns will not have a created_by_user field set.");
 
             return '';
         }
@@ -410,7 +412,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
     private function persistUpdatedCanvasSettings(array &$data, array $campaignIdMap): void
     {
         foreach ($data[Campaign::ENTITY_NAME] as $campaignData) {
-            $campaign = $this->entityManager->getRepository(Campaign::class)->find($campaignIdMap[$campaignData['id']] ?? null);
+            $campaign = $this->campaignRepository->find($campaignIdMap[$campaignData['id']] ?? null);
 
             if ($campaign) {
                 $campaign->setCanvasSettings($campaignData['canvas_settings'] ?? '');
@@ -533,7 +535,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
         }
 
         $eventDependencies = $this->getSubDependencies($dependencies, Event::ENTITY_NAME);
-        if (empty($eventDependencies)) {
+        if ([] === $eventDependencies) {
             return;
         }
 
@@ -559,7 +561,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
         }
 
         $emailDependencies = $this->getSubDependencies($dependencies, Email::ENTITY_NAME);
-        if (empty($emailDependencies)) {
+        if ([] === $emailDependencies) {
             return;
         }
 
@@ -589,7 +591,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
         }
 
         $formDependencies = $this->getSubDependencies($dependencies, Form::ENTITY_NAME);
-        if (empty($formDependencies)) {
+        if ([] === $formDependencies) {
             return;
         }
 
@@ -631,16 +633,16 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
     {
         // Define the possible locations where the channel ID may be stored
         $propertyPaths = [
-            "properties.$channelKey",
+            "properties.{$channelKey}",
             "properties.{$channelKey}s",
-            "properties.properties.$channelKey",
+            "properties.properties.{$channelKey}",
             "properties.properties.{$channelKey}s",
         ];
 
         foreach ($propertyPaths as $path) {
             $existingValue = $this->getNestedValue($event, $path);
 
-            if (!is_null($existingValue)) {
+            if (null !== $existingValue) {
                 if (is_array($existingValue)) {
                     // If the existing value is an array, replace it with a single-element array
                     $this->setNestedValue($event, $path, [$channelId]);
@@ -745,7 +747,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
     /**
      * Set a nested array value using dot notation.
      *
-     * @param array<string, mixed> &$array
+     * @param array<string, mixed> $array
      */
     private function setNestedValue(array &$array, string $path, mixed $value): void
     {
@@ -790,7 +792,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
             return;
         }
         foreach ($summary['ids'] as $id) {
-            $entity = $this->entityManager->getRepository(Campaign::class)->find($id);
+            $entity = $this->campaignRepository->find($id);
 
             if ($entity) {
                 $this->entityManager->remove($entity);

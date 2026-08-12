@@ -26,7 +26,7 @@ trait FieldsTypeTrait
         $fieldObject,
         $limit,
         $start,
-    ) {
+    ): void {
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
             function (FormEvent $event) use ($options, $integrationFields, $mauticFields, $fieldObject, $limit, $start): void {
@@ -141,7 +141,7 @@ trait FieldsTypeTrait
                             'mapped'       => false,
                         ]
                     );
-                    if (isset($options['enable_data_priority']) and $options['enable_data_priority']) {
+                    if (isset($options['enable_data_priority']) && $options['enable_data_priority']) {
                         $updateName = 'update_mautic';
 
                         if ($fieldObject) {
@@ -230,7 +230,7 @@ trait FieldsTypeTrait
         );
     }
 
-    protected function configureFieldOptions(OptionsResolver $resolver, $object)
+    protected function configureFieldOptions(OptionsResolver $resolver, $object): void
     {
         $resolver->setRequired(['integration_fields', 'mautic_fields', 'integration', 'integration_object', 'page']);
         $resolver->setDefined([('lead' === $object) ? 'update_mautic' : 'update_mautic_company']);
@@ -256,7 +256,7 @@ trait FieldsTypeTrait
         );
     }
 
-    protected function buildFieldView(FormView $view, array $options)
+    protected function buildFieldView(FormView $view, array $options): void
     {
         $view->vars['specialInstructions'] = $options['special_instructions'];
         $view->vars['alertType']           = $options['alert_type'];

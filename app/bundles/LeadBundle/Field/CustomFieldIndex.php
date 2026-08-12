@@ -123,7 +123,7 @@ class CustomFieldIndex
         $modifySchema = $this->indexSchemaHelper->setName($leadField->getCustomFieldObject());
 
         $indexColumns = $this->getUniqueIdentifierIndexColumns($leadField->getObject());
-        if (!$indexColumns) {
+        if ([] === $indexColumns) {
             $this->dropIndexForUniqueIdentifiers($leadField);
 
             return;

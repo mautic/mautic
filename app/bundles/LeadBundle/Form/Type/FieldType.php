@@ -3,7 +3,6 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Doctrine\Common\Collections\Order;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
@@ -37,7 +36,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 /**
  * @extends AbstractType<LeadField>
  */
-class FieldType extends AbstractType
+final class FieldType extends AbstractType
 {
     /**
      * @var string[]
@@ -48,10 +47,11 @@ class FieldType extends AbstractType
     ];
 
     public function __construct(
-        private readonly EntityManagerInterface $em,
+        private readonly LeadFieldRepository $leadFieldRepository,
         private readonly Translator $translator,
         private readonly IdentifierFields $identifierFields,
         private readonly IndexHelper $indexHelper,
+        private readonly FormFieldHelper $formFieldHelper,
     ) {
     }
 
@@ -99,14 +99,12 @@ class FieldType extends AbstractType
         $type        = $options['data']->getType();
         $isIndex     = $options['data']->isIsIndex();
         $default     = (empty($type)) ? 'text' : $type;
-        $fieldHelper = new FormFieldHelper();
-        $fieldHelper->setTranslator($this->translator);
 
         $builder->add(
             'type',
             ChoiceType::class,
             [
-                'choices'     => $fieldHelper->getChoiceList(),
+                'choices'     => $this->formFieldHelper->getChoiceList(),
                 'expanded'    => false,
                 'multiple'    => false,
                 'label'       => 'mautic.lead.field.type',
@@ -226,7 +224,7 @@ class FieldType extends AbstractType
                 'required'    => false,
                 'disabled'    => $disableDefaultValue,
                 'constraints' => [
-                    new Assert\Callback([$this, 'validateDefaultValue']),
+                    new Assert\Callback($this->validateDefaultValue(...)),
                 ],
             ]
         );
@@ -245,7 +243,7 @@ class FieldType extends AbstractType
             switch ($type) {
                 case 'select':
                 case 'lookup':
-                    $constraints = new Assert\Callback([$this, 'validateDefaultValue']);
+                    $constraints = new Assert\Callback($this->validateDefaultValue(...));
                     // no break
                 case 'multiselect':
                     $cleaningRules['defaultValue'] = 'raw';
@@ -375,7 +373,7 @@ class FieldType extends AbstractType
                                             $validator  = $context->getValidator();
                                             $violations = $validator->validate(
                                                 $object,
-                                                new Assert\Regex(['pattern' => '/(2[0-3]|[01][0-9]):([0-5][0-9])/'])
+                                                new Assert\Regex(pattern: '/(2[0-3]|[01][0-9]):([0-5][0-9])/')
                                             );
 
                                             if (count($violations) > 0) {
@@ -406,7 +404,7 @@ class FieldType extends AbstractType
                 case 'tel':
                 case 'url':
                 case 'email':
-                    $constraints = new Assert\Callback([$this, 'validateDefaultValue']);
+                    $constraints = new Assert\Callback($this->validateDefaultValue(...));
                     // no break
                 case 'number':
                     $form->add(
@@ -435,9 +433,6 @@ class FieldType extends AbstractType
         };
 
         $setupOrderField = function (FormInterface $form, ?string $object = null, ?string $group = null) use ($builder, $disabled): void {
-            /** @var LeadFieldRepository $leadFieldRepository */
-            $leadFieldRepository = $this->em->getRepository(LeadField::class);
-
             $options = [
                 'label'         => 'mautic.core.order.field',
                 'class'         => LeadField::class,
@@ -463,7 +458,7 @@ class FieldType extends AbstractType
             }
 
             // get order list
-            $transformer = new FieldToOrderTransformer($leadFieldRepository);
+            $transformer = new FieldToOrderTransformer($this->leadFieldRepository);
             $form->add(
                 $builder->create(
                     'order',
@@ -488,7 +483,7 @@ class FieldType extends AbstractType
             function (FormEvent $event) use ($formModifier, $disableDefaultValue, $setupOrderField): void {
                 $data          = $event->getData();
                 $cleaningRules = $formModifier($event);
-                $masks         = !empty($cleaningRules) ? $cleaningRules : 'clean';
+                $masks         = [] !== $cleaningRules ? $cleaningRules : 'clean';
                 // clean the data
                 $data = InputHelper::_($data, $masks);
 
@@ -587,7 +582,7 @@ class FieldType extends AbstractType
         $constraints = [];
 
         if (false === $options['data']->isIsindex() && false === $this->indexHelper->isNewIndexAllowed()) {
-            $constraints[] = new IsFalse(['message' => 'mautic.lead.field.form.index_count.error']);
+            $constraints[] = new IsFalse(message: 'mautic.lead.field.form.index_count.error');
         }
 
         $builder->add(
@@ -734,8 +729,8 @@ class FieldType extends AbstractType
                      }',
                 ],
                 'constraints' => [
-                    new Assert\NotBlank(['groups' => 'indexableFieldWithLimits']),
-                    new Assert\Range(['min' => 1, 'max' => SchemaDefinition::MAX_VARCHAR_LENGTH, 'groups' => 'indexableFieldWithLimits']),
+                    new Assert\NotBlank(groups: ['indexableFieldWithLimits']),
+                    new Assert\Range(min: 1, max: SchemaDefinition::MAX_VARCHAR_LENGTH, groups: ['indexableFieldWithLimits']),
                 ],
             ]
         );

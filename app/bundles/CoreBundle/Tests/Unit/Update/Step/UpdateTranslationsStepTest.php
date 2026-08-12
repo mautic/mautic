@@ -71,7 +71,7 @@ final class UpdateTranslationsStepTest extends AbstractStepTestCase
             ->method('error')
             ->with('UPDATE ERROR: there was an error');
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturn('');
 
@@ -98,7 +98,7 @@ final class UpdateTranslationsStepTest extends AbstractStepTestCase
             ->with('es_MX')
             ->willReturn(['error' => false]);
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturn('');
 

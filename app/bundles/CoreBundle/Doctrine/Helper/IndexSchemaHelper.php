@@ -62,7 +62,7 @@ class IndexSchemaHelper
     public function setName($name): static
     {
         if (!$this->sm->tablesExist([$this->prefix.$name])) {
-            throw new SchemaException("Table $name does not exist!");
+            throw new SchemaException("Table {$name} does not exist!");
         }
 
         $this->table = $this->sm->introspectTable($this->prefix.$name);
@@ -85,7 +85,7 @@ class IndexSchemaHelper
     {
         $textColumns = $this->getTextColumns($columns);
 
-        if (empty($textColumns)) {
+        if ([] === $textColumns) {
             return $this;
         }
 
@@ -121,9 +121,6 @@ class IndexSchemaHelper
         return $this;
     }
 
-    /**
-     * Execute changes.
-     */
     public function executeChanges(): void
     {
         $platform = $this->db->getDatabasePlatform();

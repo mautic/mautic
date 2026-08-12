@@ -32,7 +32,7 @@ final class PathsHelperTest extends TestCase
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->coreParametersHelper->method('get')
             ->willReturnCallback(
-                fn (string $key) => match ($key) {
+                fn (string $key): string => match ($key) {
                     'image_path' => 'media/images',
                     'tmp_path'   => __DIR__.'/resource/paths/tmp',
                     default      => '',
@@ -105,7 +105,7 @@ final class PathsHelperTest extends TestCase
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->coreParametersHelper->method('get')
             ->willReturnCallback(
-                fn (string $key) => match ($key) {
+                fn (string $key): string => match ($key) {
                     'import_campaigns_dir' => $campaignImportPath,
                     'image_path'           => 'media/images',
                     'tmp_path'             => __DIR__.'/resource/paths/tmp',
@@ -129,7 +129,7 @@ final class PathsHelperTest extends TestCase
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $coreParametersHelper->method('get')
             ->willReturnCallback(
-                fn (string $key) => match ($key) {
+                fn (string $key): string => match ($key) {
                     'tmp_path' => $tempPath,
                     default    => '',
                 }
@@ -164,7 +164,7 @@ final class PathsHelperTest extends TestCase
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $coreParametersHelper->method('get')
             ->willReturnCallback(
-                fn (string $key) => match ($key) {
+                fn (string $key): string => match ($key) {
                     'dashboard_import_dir' => $dashboardDir,
                     default                => '',
                 }

@@ -40,7 +40,7 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $event      = new ImportValidateEvent('contacts', $formMock);
         $subscriber = new ImportContactSubscriber(
-            new class extends FieldList {
+            new class() extends FieldList {
                 public function __construct()
                 {
                 }
@@ -57,8 +57,8 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $subscriber->onValidateImport($event);
 
-        Assert::assertSame(['tagLabel'], $event->getTags());
-        Assert::assertSame(['name' => 'Bud'], $event->getMatchedFields());
+        $this->assertSame(['tagLabel'], $event->getTags());
+        $this->assertSame(['name' => 'Bud'], $event->getMatchedFields());
     }
 
     /**
@@ -77,7 +77,7 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $event      = new ImportValidateEvent('contacts', $formMock);
         $subscriber = new ImportContactSubscriber(
-            new class extends FieldList {
+            new class() extends FieldList {
                 public function __construct()
                 {
                 }
@@ -94,7 +94,7 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $subscriber->onValidateImport($event);
 
-        Assert::assertSame(['name' => 'Bud'], $event->getMatchedFields());
+        $this->assertSame(['name' => 'Bud'], $event->getMatchedFields());
     }
 
     public function testOnImportInitForUknownObject(): void
@@ -107,14 +107,14 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
         );
         $event = new ImportInitEvent('unicorn');
         $subscriber->onImportInit($event);
-        Assert::assertFalse($event->objectSupported);
+        $this->assertFalse($event->objectSupported);
     }
 
     public function testOnImportInitForContactsObjectWithoutPermissions(): void
     {
         $subscriber = new ImportContactSubscriber(
             $this->getFieldListFake(),
-            new class extends CorePermissions {
+            new class() extends CorePermissions {
                 public function __construct()
                 {
                 }
@@ -141,7 +141,7 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $subscriber = new ImportContactSubscriber(
             $this->getFieldListFake(),
-            new class extends CorePermissions {
+            new class() extends CorePermissions {
                 public function __construct()
                 {
                 }
@@ -161,11 +161,11 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
         );
         $event = new ImportInitEvent('contacts');
         $subscriber->onImportInit($event);
-        Assert::assertTrue($event->objectSupported);
-        Assert::assertSame('lead', $event->objectSingular);
-        Assert::assertSame('mautic.lead.leads', $event->objectName);
-        Assert::assertSame('#mautic_contact_index', $event->activeLink);
-        Assert::assertSame('mautic_contact_index', $event->indexRoute);
+        $this->assertTrue($event->objectSupported);
+        $this->assertSame('lead', $event->objectSingular);
+        $this->assertSame('mautic.lead.leads', $event->objectName);
+        $this->assertSame('#mautic_contact_index', $event->activeLink);
+        $this->assertSame('mautic_contact_index', $event->indexRoute);
     }
 
     public function testOnFieldMappingForUnknownObject(): void
@@ -178,13 +178,13 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
         );
         $event = new ImportMappingEvent('unicorn');
         $subscriber->onFieldMapping($event);
-        Assert::assertFalse($event->objectSupported);
+        $this->assertFalse($event->objectSupported);
     }
 
     public function testOnFieldMapping(): void
     {
         $subscriber = new ImportContactSubscriber(
-            new class extends FieldList {
+            new class() extends FieldList {
                 public function __construct()
                 {
                 }
@@ -205,32 +205,29 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
         );
         $event = new ImportMappingEvent('contacts');
         $subscriber->onFieldMapping($event);
-        Assert::assertTrue($event->objectSupported);
-        Assert::assertSame(
-            [
-                'mautic.lead.contact' => [
-                    'id' => 'mautic.lead.import.label.id',
-                    'some fields',
-                ],
-                'mautic.lead.company' => [
-                    'some fields',
-                ],
-                'mautic.lead.special_fields' => [
-                    'dateAdded'      => 'mautic.lead.import.label.dateAdded',
-                    'createdByUser'  => 'mautic.lead.import.label.createdByUser',
-                    'dateModified'   => 'mautic.lead.import.label.dateModified',
-                    'modifiedByUser' => 'mautic.lead.import.label.modifiedByUser',
-                    'lastActive'     => 'mautic.lead.import.label.lastActive',
-                    'dateIdentified' => 'mautic.lead.import.label.dateIdentified',
-                    'ip'             => 'mautic.lead.import.label.ip',
-                    'stage'          => 'mautic.lead.import.label.stage',
-                    'doNotEmail'     => 'mautic.lead.import.label.doNotEmail',
-                    'ownerusername'  => 'mautic.lead.import.label.ownerusername',
-                    'tags'           => 'mautic.lead.import.label.tags',
-                ],
+        $this->assertTrue($event->objectSupported);
+        $this->assertSame([
+            'mautic.lead.contact' => [
+                'id' => 'mautic.lead.import.label.id',
+                'some fields',
             ],
-            $event->fields
-        );
+            'mautic.lead.company' => [
+                'some fields',
+            ],
+            'mautic.lead.special_fields' => [
+                'dateAdded'      => 'mautic.lead.import.label.dateAdded',
+                'createdByUser'  => 'mautic.lead.import.label.createdByUser',
+                'dateModified'   => 'mautic.lead.import.label.dateModified',
+                'modifiedByUser' => 'mautic.lead.import.label.modifiedByUser',
+                'lastActive'     => 'mautic.lead.import.label.lastActive',
+                'dateIdentified' => 'mautic.lead.import.label.dateIdentified',
+                'ip'             => 'mautic.lead.import.label.ip',
+                'stage'          => 'mautic.lead.import.label.stage',
+                'doNotEmail'     => 'mautic.lead.import.label.doNotEmail',
+                'ownerusername'  => 'mautic.lead.import.label.ownerusername',
+                'tags'           => 'mautic.lead.import.label.tags',
+            ],
+        ], $event->fields);
     }
 
     public function testOnImportProcessForUnknownObject(): void
@@ -254,7 +251,7 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
         $subscriber = new ImportContactSubscriber(
             $this->getFieldListFake(),
             $this->getCorePermissionsFake(),
-            new class extends LeadModel {
+            new class() extends LeadModel {
                 public function __construct()
                 {
                 }
@@ -270,12 +267,12 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
         $import->setObject('lead');
         $event = new ImportProcessEvent($import, new LeadEventLog(), []);
         $subscriber->onImportProcess($event);
-        Assert::assertTrue($event->wasMerged());
+        $this->assertTrue($event->wasMerged());
     }
 
     private function getFieldListFake(): FieldList
     {
-        return new class extends FieldList {
+        return new class() extends FieldList {
             public function __construct()
             {
             }
@@ -284,7 +281,7 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private function getCorePermissionsFake(): CorePermissions
     {
-        return new class extends CorePermissions {
+        return new class() extends CorePermissions {
             public function __construct()
             {
             }
@@ -293,7 +290,7 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private function getLeadModelFake(): LeadModel
     {
-        return new class extends LeadModel {
+        return new class() extends LeadModel {
             public function __construct()
             {
             }
@@ -302,7 +299,7 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private function getTranslatorFake(): TranslatorInterface
     {
-        return new class extends Translator {
+        return new class() extends Translator {
             public function __construct()
             {
             }

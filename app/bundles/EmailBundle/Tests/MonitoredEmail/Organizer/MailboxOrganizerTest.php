@@ -8,13 +8,17 @@ use Mautic\EmailBundle\Event\ParseEmailEvent;
 use Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\TestDox;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(MailboxOrganizer::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(ParseEmailEvent::class)]
+#[CoversClass(MailboxOrganizer::class)]
+#[CoversClass(ParseEmailEvent::class)]
 final class MailboxOrganizerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var array<string, array<string, int|string>> */
-    protected array $mailboxes = [
+    /**
+     * @var array<string, array<string, int|string>>
+     */
+    private array $mailboxes = [
         'EmailBundle_bounces' => [
             'address'           => 'bounces@test.com',
             'host'              => 'mail.test.com',
@@ -50,7 +54,7 @@ final class MailboxOrganizerTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Multiple mailboxes with the same imap path should be converted to a single container')]
+    #[TestDox('Multiple mailboxes with the same imap path should be converted to a single container')]
     public function testMailboxesAreConvertedIntoASingleContainer(): void
     {
         $configs   = $this->getConfigs($this->mailboxes);
@@ -65,7 +69,7 @@ final class MailboxOrganizerTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayHasKey($key, $containers);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Multiple mailboxes with multiple imap paths are converted to a multiple container')]
+    #[TestDox('Multiple mailboxes with multiple imap paths are converted to a multiple container')]
     public function testMailboxesWithDifferentPathsAreConvertedIntoMultipleContainers(): void
     {
         $mailboxes = [
@@ -114,7 +118,7 @@ final class MailboxOrganizerTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(3, $containers);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Different criteria should be handled by the single container')]
+    #[TestDox('Different criteria should be handled by the single container')]
     public function testMailboxesWithDifferentCriteriaAreAddedToContainer(): void
     {
         $configs = $this->getConfigs($this->mailboxes);
@@ -141,7 +145,7 @@ final class MailboxOrganizerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('All getters return appropriate values')]
+    #[TestDox('All getters return appropriate values')]
     public function testMailboxesWithDifferentCriteriaWithUnseenFlagMarksContainer(): void
     {
         $configs = $this->getConfigs($this->mailboxes);

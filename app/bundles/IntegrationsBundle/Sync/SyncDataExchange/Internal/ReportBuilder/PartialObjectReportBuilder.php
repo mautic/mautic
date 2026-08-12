@@ -105,8 +105,9 @@ class PartialObjectReportBuilder
         }
 
         if (!array_key_exists($objectId, $this->reportObjects[$object])) {
-            /* @var ReportObjectDAO $reportObjectDAO */
-            $this->reportObjects[$object][$objectId] = $reportObjectDAO = new ReportObjectDAO($object, $objectId);
+            $reportObjectDAO = new ReportObjectDAO($object, $objectId);
+            $this->reportObjects[$object][$objectId] = $reportObjectDAO;
+
             $this->syncReport->addObject($reportObjectDAO);
             $reportObjectDAO->setChangeDateTime($modifiedDateTime);
         }
@@ -144,7 +145,7 @@ class PartialObjectReportBuilder
                 }
             }
 
-            if ($missingFields) {
+            if ([] !== $missingFields) {
                 $this->objectsWithMissingFields[$syncObject->getObjectId()] = $missingFields;
             }
         }

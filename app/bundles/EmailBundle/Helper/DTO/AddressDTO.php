@@ -10,10 +10,12 @@ use Symfony\Component\Mime\Address;
 
 final class AddressDTO
 {
-    private ?string $name = null;
+    private ?string $name;
 
-    public function __construct(private readonly string $email, ?string $name = null)
-    {
+    public function __construct(
+        private readonly string $email,
+        ?string $name = null,
+    ) {
         $this->setName($name);
     }
 
@@ -53,7 +55,7 @@ final class AddressDTO
      */
     public function getNameTokenValue(?array $contact = null): string
     {
-        return $this->getTokenValue($this->getName(), $contact);
+        return $this->getTokenValue($this->name, $contact);
     }
 
     /**
@@ -63,7 +65,7 @@ final class AddressDTO
      */
     public function getEmailTokenValue(?array $contact = null): string
     {
-        return $this->getTokenValue($this->getEmail(), $contact);
+        return $this->getTokenValue($this->email, $contact);
     }
 
     /**

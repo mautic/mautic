@@ -91,7 +91,6 @@ final class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assetTokenHelper          = $this->createMock(AssetTokenHelper::class);
         $this->formTokenHelper           = $this->createMock(FormTokenHelper::class);
         $this->focusTokenHelper          = $this->createMock(FocusTokenHelper::class);
-        $auditLogModel                   = $this->createMock(AuditLogModel::class);
         $this->contactTracker            = $this->createMock(ContactTracker::class);
         $this->dynamicContentHelper      = $this->createMock(DynamicContentHelper::class);
         $this->dynamicContentModel       = $this->createMock(DynamicContentModel::class);
@@ -105,7 +104,7 @@ final class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->assetTokenHelper,
             $this->formTokenHelper,
             $this->focusTokenHelper,
-            $auditLogModel,
+            $this->createStub(AuditLogModel::class),
             $this->dynamicContentHelper,
             $this->dynamicContentModel,
             $this->security,

@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCategoryData;
 use Mautic\LeadBundle\Entity\Lead;
@@ -18,11 +19,12 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
-use PHPUnit\Framework\Assert;
+use Mautic\UserBundle\Model\RoleModel;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
@@ -42,7 +44,8 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 
     private function setUpMailer(): void
     {
-        $mailHelper = static::getContainer()->get('mautic.helper.mailer');
+        /** @var MailHelper $mailHelper */
+        $mailHelper = self::getContainer()->get(MailHelper::class);
         $transport  = new SmtpTransport();
         $mailer     = new Mailer($transport);
         ReflectionHelper::setValue($mailHelper, 'mailer', $mailer);
@@ -54,7 +57,8 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
     protected function beforeTearDown(): void
     {
         // Clear owners cache (to leave a clean environment for future tests):
-        $mailHelper = static::getContainer()->get('mautic.helper.mailer');
+        /** @var MailHelper $mailHelper */
+        $mailHelper = self::getContainer()->get(MailHelper::class);
         ReflectionHelper::setValue($mailHelper, 'leadOwners', []);
     }
 
@@ -144,17 +148,17 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        Assert::assertArrayHasKey('email', $response);
+        $this->assertArrayHasKey('email', $response);
 
         $response = $response['email'];
 
         self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
-        Assert::assertSame($payload['name'], $response['name']);
-        Assert::assertSame($payload['subject'], $response['subject']);
-        Assert::assertSame($payload['customHtml'], $response['customHtml']);
-        Assert::assertSame($payload['lists'][0], $response['lists'][0]['id']);
-        Assert::assertSame('API segment', $response['lists'][0]['name']);
-        Assert::assertSame($payload['dynamicContent'], $response['dynamicContent']);
+        $this->assertSame($payload['name'], $response['name']);
+        $this->assertSame($payload['subject'], $response['subject']);
+        $this->assertSame($payload['customHtml'], $response['customHtml']);
+        $this->assertSame($payload['lists'][0], $response['lists'][0]['id']);
+        $this->assertSame('API segment', $response['lists'][0]['name']);
+        $this->assertSame($payload['dynamicContent'], $response['dynamicContent']);
     }
 
     public function testSingleEmailWorkflow(): void
@@ -312,7 +316,7 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
     public function testCreateEmailWithoutPublishPermissionWillBeIgnored(array $permissions, ?bool $expectedIsPublished, ?string $expectedPublishUp, ?string $expectedPublishDown): void
     {
         $user = $this->getUser('sales');
-        Assert::assertNotNull($user);
+        $this->assertInstanceOf(User::class, $user);
 
         $this->setPermission($user->getRole(), ['email:emails' => $permissions]);
         $this->loginUser($user);
@@ -333,9 +337,9 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
 
         $createdEmail = json_decode($this->client->getResponse()->getContent(), true)['email'];
-        Assert::assertSame($expectedIsPublished, $createdEmail['isPublished']);
-        Assert::assertSame($expectedPublishUp, $createdEmail['publishUp']);
-        Assert::assertSame($expectedPublishDown, $createdEmail['publishDown']);
+        $this->assertSame($expectedIsPublished, $createdEmail['isPublished']);
+        $this->assertSame($expectedPublishUp, $createdEmail['publishUp']);
+        $this->assertSame($expectedPublishDown, $createdEmail['publishDown']);
     }
 
     /**
@@ -372,12 +376,14 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $owner = $this->getUser($creatorUsername);
         $email = $this->createEmail('Email C', 'Email C Subject', 'template', 'empty', 'Test html');
         $email->setIsPublished(false);
+        $this->assertInstanceOf(User::class, $owner);
         $email->setCreatedBy($owner->getId());
         $this->em->flush();
 
         $emailId = $email->getId();
 
         $user = $this->getUser('sales');
+        $this->assertInstanceOf(User::class, $user);
         $this->setPermission($user->getRole(), ['email:emails' => $permissions]);
         $this->loginUser($user);
         $this->client->setServerParameter('PHP_AUTH_USER', $user->getUserIdentifier());
@@ -394,9 +400,9 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $editedEmail = json_decode($this->client->getResponse()->getContent(), true)['email'];
-        Assert::assertSame($expectedIsPublished, $editedEmail['isPublished']);
-        Assert::assertSame($expectedPublishUp, $editedEmail['publishUp']);
-        Assert::assertSame($expectedPublishDown, $editedEmail['publishDown']);
+        $this->assertSame($expectedIsPublished, $editedEmail['isPublished']);
+        $this->assertSame($expectedPublishUp, $editedEmail['publishUp']);
+        $this->assertSame($expectedPublishDown, $editedEmail['publishDown']);
     }
 
     /**
@@ -470,8 +476,8 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', '/api/emails/new', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
-        Assert::assertTrue(isset($response['email']['sendToDnc']), print_r($response, true));
-        Assert::assertFalse($response['email']['sendToDnc']); // it will not change as sales user does not have permission to change sendToDnc
+        $this->assertArrayHasKey('sendToDnc', $response['email'], print_r($response, true));
+        $this->assertFalse($response['email']['sendToDnc']); // it will not change as sales user does not have permission to change sendToDnc
     }
 
     public function testReplyAction(): void
@@ -479,7 +485,7 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $trackingHash = 'tracking_hash_123';
 
         /** @var StatRepository $statRepository */
-        $statRepository = static::getContainer()->get('mautic.email.repository.stat');
+        $statRepository = self::getContainer()->get(StatRepository::class);
 
         // Create a test email stat.
         $stat = new Stat();
@@ -534,7 +540,7 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $user->setSignature('Best regards, |FROM_NAME|');
         $user->setRole($role);
 
-        $hasher = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
 
         $user->setPassword($hasher->hash('password'));
@@ -821,12 +827,8 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
     private function getUser(string $userName): ?User
     {
         $repository = $this->em->getRepository(User::class);
-        $user       = $repository->findOneBy(['username' => $userName]);
-        if (!$user instanceof User) {
-            return null;
-        }
 
-        return $user;
+        return $repository->findOneBy(['username' => $userName]);
     }
 
     /**
@@ -834,7 +836,8 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
      */
     private function setPermission(Role $role, array $permissions): void
     {
-        $roleModel = $this->getContainer()->get('mautic.user.model.role');
+        /** @var RoleModel $roleModel */
+        $roleModel = $this->getContainer()->get(RoleModel::class);
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);
         $this->em->flush();

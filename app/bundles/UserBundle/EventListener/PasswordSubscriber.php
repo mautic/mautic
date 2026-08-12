@@ -13,8 +13,9 @@ use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 
 final readonly class PasswordSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private PasswordStrengthEstimatorModel $passwordStrengthEstimatorModel)
-    {
+    public function __construct(
+        private PasswordStrengthEstimatorModel $passwordStrengthEstimatorModel,
+    ) {
     }
 
     public static function getSubscribedEvents(): array

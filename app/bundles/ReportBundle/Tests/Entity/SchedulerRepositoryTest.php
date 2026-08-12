@@ -30,7 +30,7 @@ final class SchedulerRepositoryTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return QueryBuilder|MockObject
+     * @return QueryBuilder&MockObject
      */
     private function getQueryBuilderMock(): MockObject
     {

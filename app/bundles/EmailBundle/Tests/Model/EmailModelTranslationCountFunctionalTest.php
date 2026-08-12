@@ -30,7 +30,8 @@ final class EmailModelTranslationCountFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('10 total events(s) to be processed in batches', $commandResult->getDisplay());
         $this->em->clear();
 
-        $emailModel = static::getContainer()->get('mautic.email.model.email');
+        /** @var EmailModel $emailModel */
+        $emailModel = self::getContainer()->get(EmailModel::class);
         $this->assertInstanceOf(EmailModel::class, $emailModel);
 
         // Re-fetch the email to get the updated stats
@@ -62,7 +63,8 @@ final class EmailModelTranslationCountFunctionalTest extends MauticMysqlTestCase
      */
     private function createContacts(): array
     {
-        $contactModel = static::getContainer()->get('mautic.lead.model.lead');
+        /** @var LeadModel $contactModel */
+        $contactModel = self::getContainer()->get(LeadModel::class);
         $this->assertInstanceOf(LeadModel::class, $contactModel);
 
         $contacts = [];

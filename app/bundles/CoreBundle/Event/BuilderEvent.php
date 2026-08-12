@@ -73,7 +73,7 @@ class BuilderEvent extends Event
     public function addAbTestWinnerCriteria($key, array $criteria): void
     {
         if (array_key_exists($key, $this->abTestWinnerCriteria)) {
-            throw new InvalidArgumentException("The key, '$key' is already used by another criteria. Please use a different key.");
+            throw new InvalidArgumentException("The key, '{$key}' is already used by another criteria. Please use a different key.");
         }
 
         // check for required keys
@@ -91,7 +91,7 @@ class BuilderEvent extends Event
     {
         foreach ($keys as $k) {
             if (!array_key_exists($k, $criteria)) {
-                throw new InvalidArgumentException("The key, '$k' is missing.");
+                throw new InvalidArgumentException("The key, '{$k}' is missing.");
             }
         }
     }
@@ -203,7 +203,7 @@ class BuilderEvent extends Event
             // Do a search against the token
             $found = array_filter(
                 array_keys($tokens),
-                fn ($k): bool => 0 === stripos($k, $filter)
+                fn (int|string $k): bool => 0 === stripos($k, $filter)
             );
 
             $tokens = array_intersect_key($tokens, array_flip($found));
@@ -243,10 +243,8 @@ class BuilderEvent extends Event
      * Get tokens from a BuilderTokenHelper.
      *
      * @deprecated use BuilderTokenHelper::getFormattedTokens
-     *
-     * @return array|void
      */
-    public function getTokensFromHelper(BuilderTokenHelper $tokenHelper, $tokens, $labelColumn = 'name', $valueColumn = 'id')
+    public function getTokensFromHelper(BuilderTokenHelper $tokenHelper, $tokens, $labelColumn = 'name', $valueColumn = 'id'): ?array
     {
         return $tokenHelper->getTokens(
             $tokens,

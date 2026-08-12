@@ -6,6 +6,7 @@ namespace Mautic\AssetBundle\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\AssetBundle\Entity\Asset;
+use Mautic\AssetBundle\Entity\AssetRepository;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportAnalyzeEvent;
@@ -24,6 +25,7 @@ final class AssetImportExportSubscriber implements EventSubscriberInterface
     public function __construct(
         private AssetModel $assetModel,
         private EntityManagerInterface $entityManager,
+        private AssetRepository $assetRepository,
         private AuditLogModel $auditLogModel,
         private IpLookupHelper $ipLookupHelper,
         private DenormalizerInterface $serializer,
@@ -96,7 +98,7 @@ final class AssetImportExportSubscriber implements EventSubscriberInterface
         ];
 
         foreach ($event->getEntityData() as $element) {
-            $object = $this->entityManager->getRepository(Asset::class)->findOneBy(['uuid' => $element['uuid']]);
+            $object = $this->assetRepository->findOneBy(['uuid' => $element['uuid']]);
             $isNew  = !$object;
 
             $object ??= new Asset();
@@ -139,7 +141,7 @@ final class AssetImportExportSubscriber implements EventSubscriberInterface
             return;
         }
         foreach ($summary['ids'] as $id) {
-            $entity = $this->entityManager->getRepository(Asset::class)->find($id);
+            $entity = $this->assetRepository->find($id);
 
             if ($entity) {
                 $this->entityManager->remove($entity);

@@ -17,16 +17,16 @@ use Mautic\LeadBundle\Validator\SegmentUsedInCampaignsValidator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class SegmentSubscriber implements EventSubscriberInterface
+final readonly class SegmentSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly IpLookupHelper $ipLookupHelper,
-        private readonly AuditLogModel $auditLogModel,
-        private readonly ListModel $listModel,
-        private readonly SegmentUsedInCampaignsValidator $segmentUsedInCampaignsValidator,
-        private readonly CoreParametersHelper $coreParametersHelper,
-        private readonly SegmentCountCacheHelper $segmentCountCacheHelper,
-        private readonly TranslatorInterface $translator,
+        private IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel,
+        private ListModel $listModel,
+        private SegmentUsedInCampaignsValidator $segmentUsedInCampaignsValidator,
+        private CoreParametersHelper $coreParametersHelper,
+        private SegmentCountCacheHelper $segmentCountCacheHelper,
+        private TranslatorInterface $translator,
     ) {
     }
 

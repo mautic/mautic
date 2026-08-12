@@ -6,6 +6,7 @@ namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\RequestOptions;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\PreUpdateCheckHelper;
@@ -114,11 +115,11 @@ final class UpdateHelperTest extends TestCase
             ->willReturn($this->response);
 
         $result = $this->helper->fetchPackage('update.zip');
-        $this->assertTrue(isset($result['error']));
+        $this->assertArrayHasKey('error', $result);
         $this->assertFalse($result['error']);
 
         $updatePackage = __DIR__.'/resource/update/tmp/update.zip';
-        $this->assertTrue(file_exists($updatePackage));
+        $this->assertFileExists($updatePackage);
         @unlink($updatePackage);
     }
 
@@ -136,7 +137,7 @@ final class UpdateHelperTest extends TestCase
             ->willReturn($this->response);
 
         $result = $this->helper->fetchPackage('update.zip');
-        $this->assertTrue(isset($result['error']));
+        $this->assertArrayHasKey('error', $result);
         $this->assertTrue($result['error']);
         $this->assertEquals('mautic.core.updater.error.fetching.package', $result['message']);
     }
@@ -306,11 +307,11 @@ final class UpdateHelperTest extends TestCase
                 $statsUrl,
                 $this->callback(
                     function (array $options): true {
-                        $this->assertArrayHasKey(\GuzzleHttp\RequestOptions::FORM_PARAMS, $options);
-                        $this->assertArrayHasKey(\GuzzleHttp\RequestOptions::CONNECT_TIMEOUT, $options);
-                        $this->assertArrayHasKey(\GuzzleHttp\RequestOptions::HEADERS, $options);
+                        $this->assertArrayHasKey(RequestOptions::FORM_PARAMS, $options);
+                        $this->assertArrayHasKey(RequestOptions::CONNECT_TIMEOUT, $options);
+                        $this->assertArrayHasKey(RequestOptions::HEADERS, $options);
                         // We need to send an Accept header to the stats server or we'll get 500 errors
-                        $this->assertEquals(['Accept' => '*/*'], $options[\GuzzleHttp\RequestOptions::HEADERS]);
+                        $this->assertEquals(['Accept' => '*/*'], $options[RequestOptions::HEADERS]);
 
                         return true;
                     }
@@ -414,7 +415,7 @@ final class UpdateHelperTest extends TestCase
             ->method('request')
             ->with('POST', $statsUrl, $this->anything())
             ->willReturnCallback(
-                function (string $method, string $url, array $options): void {
+                function (string $method, string $url, array $options): never {
                     $request = $this->createMock(RequestInterface::class);
 
                     throw new \Exception('something bad happened');
@@ -483,7 +484,7 @@ final class UpdateHelperTest extends TestCase
             ->method('request')
             ->with('POST', $statsUrl, $this->anything())
             ->willReturnCallback(
-                function (string $method, string $url, array $options): void {
+                function (string $method, string $url, array $options): never {
                     $request = $this->createMock(RequestInterface::class);
 
                     throw new RequestException('something bad happened', $request, $this->response);
@@ -550,7 +551,7 @@ final class UpdateHelperTest extends TestCase
             ->method('request')
             ->with('POST', $statsUrl, $this->anything())
             ->willReturnCallback(
-                function (string $method, string $url, array $options): void {
+                function (string $method, string $url, array $options): never {
                     $request = $this->createMock(RequestInterface::class);
 
                     throw new RequestException('something bad happened', $request);
@@ -839,7 +840,7 @@ final class UpdateHelperTest extends TestCase
         $errors  = [];
 
         foreach ($results as $result) {
-            if (!empty($result->errors)) {
+            if ([] !== $result->errors) {
                 $errors = array_merge($errors, array_map(fn (PreUpdateCheckError $error): string => $error->key, $result->errors));
             }
         }
@@ -864,7 +865,7 @@ final class UpdateHelperTest extends TestCase
         $errors  = [];
 
         foreach ($results as $result) {
-            if (!empty($result->errors)) {
+            if ([] !== $result->errors) {
                 $errors = array_merge($errors, array_map(fn (PreUpdateCheckError $error): string => $error->key, $result->errors));
             }
         }
@@ -874,7 +875,7 @@ final class UpdateHelperTest extends TestCase
 
     private function getFailingPreUpdateTest(): AbstractPreUpdateCheck
     {
-        return new class extends AbstractPreUpdateCheck {
+        return new class() extends AbstractPreUpdateCheck {
             public function runCheck(): PreUpdateCheckResult
             {
                 return new PreUpdateCheckResult(false, null, [new PreUpdateCheckError('Dummy')]);
@@ -884,7 +885,7 @@ final class UpdateHelperTest extends TestCase
 
     private function getPassingPreUpdateTest(): AbstractPreUpdateCheck
     {
-        return new class extends AbstractPreUpdateCheck {
+        return new class() extends AbstractPreUpdateCheck {
             public function runCheck(): PreUpdateCheckResult
             {
                 return new PreUpdateCheckResult(true, null);

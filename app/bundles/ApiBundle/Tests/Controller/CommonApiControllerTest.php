@@ -83,7 +83,9 @@ final class CommonApiControllerTest extends CampaignTestAbstract
         $this->assertEquals($where, $result);
     }
 
-    /** @param array<int, mixed> $args */
+    /**
+     * @param array<int, mixed> $args
+     */
     protected function getResultFromProtectedMethod(string $method, array $args): mixed
     {
         $controller = new CommonApiController(
@@ -302,7 +304,7 @@ final class CommonApiControllerTest extends CampaignTestAbstract
         $users = [];
         foreach ([3, 5, 4] as $userId) {
             $user = $this->createMock(User::class);
-            $user->expects($this->any())
+            $user
                 ->method('getId')
                 ->willReturn($userId);
             $users[] = $user;

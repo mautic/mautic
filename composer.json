@@ -30,18 +30,19 @@
     "codeception/module-asserts": "^3.0",
     "codeception/module-db": "^3.1",
     "codeception/module-webdriver": "^4.0",
-    "friendsofphp/php-cs-fixer": "^3.14",
+    "friendsofphp/php-cs-fixer": "^v3.95.11",
     "http-interop/http-factory-guzzle": "^1.0",
     "liip/functional-test-bundle": "^4.3",
     "liip/test-fixtures-bundle": "^3.5",
     "mautic/transifex": "^5.0",
     "phpstan/extension-installer": "^1.4",
-    "phpstan/phpstan": "^2.0",
-    "phpstan/phpstan-deprecation-rules": "^2.0",
-    "phpstan/phpstan-doctrine": "^2.0",
-    "phpstan/phpstan-phpunit": "^2.0",
-    "phpstan/phpstan-symfony": "^2.0",
-    "phpunit/phpunit": "^10.5.62",
+    "phpstan/phpstan": "^2.2.6",
+    "phpstan/phpstan-deprecation-rules": "^2.0.4",
+    "phpstan/phpstan-doctrine": "^2.0.28",
+    "phpstan/phpstan-phpunit": "^2.0.18",
+    "phpstan/phpstan-symfony": "^2.0.20",
+    "phpunit/phpunit": "^11.5",
+    "rector/type-perfect": "^2.1.4",
     "rector/rector": "dev-main",
     "symfony/browser-kit": "~7.4.0",
     "symfony/dom-crawler": "~7.4.0",
@@ -49,7 +50,8 @@
     "symfony/phpunit-bridge": "~7.4.0",
     "symfony/var-dumper": "~7.4.0",
     "symfony/web-profiler-bundle": "~7.4.0",
-    "symplify/easy-coding-standard": "^12.0.13",
+    "symplify/easy-coding-standard": "^13.2.17",
+    "symplify/phpstan-rules": "^14.10",
     "tomasvotruba/type-coverage": "^2.2.1"
   },
   "replace": {
@@ -113,7 +115,10 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "MauticRector\\": "rector/"
+      "Utils\\Rector\\": "utils/rector/src/",
+      "Utils\\Rector\\Tests\\": "utils/rector/tests/",
+      "Utils\\PHPStan\\": "utils/phpstan/src/",
+      "Utils\\PHPStan\\Tests\\": "utils/phpstan/tests/"
     }
   },
   "repositories": [
@@ -149,6 +154,7 @@
       "@githooks",
       "@npm-ci",
       "@npx-patch-package",
+      "@gjs-build-safe",
       "@generate-assets",
       "@motd"
     ],
@@ -156,22 +162,24 @@
       "@githooks",
       "@npm-ci",
       "@npx-patch-package",
+      "@gjs-build-safe",
       "@generate-assets",
       "@motd"
     ],
     "test": "bin/phpunit -d memory_limit=2G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist",
     "e2e-test": "APP_ENV=test bin/codecept run acceptance",
     "phpstan": "[ ! -f var/cache/test/AppKernelTestDebugContainer.xml ] && (echo 'Building test cache ...'; APP_ENV=test APP_DEBUG=1 bin/console > /dev/null 2>&1);  php -d memory_limit=5G bin/phpstan analyse --ansi",
+    "phpstan-baseline": "composer phpstan -- --generate-baseline phpstan-baseline.neon",
     "cs": "bin/php-cs-fixer fix --config=.php-cs-fixer.php -v --dry-run --diff",
-    "fixcs": "bin/php-cs-fixer fix -v",
-    "rector-code": "bin/rector process --ansi",
-    "rector-tests": "bin/rector process --config=rector-tests.php --ansi",
-    "rector": [
-      "@rector-code",
-      "@rector-tests"
+    "fixcs": [
+        "bin/php-cs-fixer fix -v",
+        "bin/ecs --fix"
     ],
+    "rector": "bin/rector process --ansi",
     "npm-ci": "npm ci --prefer-offline --no-audit",
     "npx-patch-package": "npx patch-package",
+    "gjs-build": "npm ci --prefix plugins/GrapesJsBuilderBundle --prefer-offline --no-audit && npm run build --prefix plugins/GrapesJsBuilderBundle",
+    "gjs-build-safe": "@php build/gjs_build.php",
     "asset-map:clean": "php -r 'if (is_dir(\"assets/build\")) { $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(\"assets/build\", FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST); foreach ($it as $file) { $file->isDir() ? rmdir($file->getPathname()) : unlink($file->getPathname()); } rmdir(\"assets/build\"); }'",
     "sass:build": [
       "@asset-map:clean",

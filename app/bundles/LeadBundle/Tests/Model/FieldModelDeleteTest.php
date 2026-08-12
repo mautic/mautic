@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Model\FieldModel;
-use PHPUnit\Framework\Assert;
 
 final class FieldModelDeleteTest extends MauticMysqlTestCase
 {
@@ -23,7 +22,7 @@ final class FieldModelDeleteTest extends MauticMysqlTestCase
     public function testBatchDeleteFields(): void
     {
         /** @var FieldModel $fieldModel */
-        $fieldModel = self::getContainer()->get('mautic.lead.model.field');
+        $fieldModel = self::getContainer()->get(FieldModel::class);
 
         $leadField = new LeadField();
         $leadField->setName('Test Lead Field')
@@ -44,22 +43,22 @@ final class FieldModelDeleteTest extends MauticMysqlTestCase
         $leadFieldRepository = $this->em->getRepository(LeadField::class);
         $this->assertInstanceOf(LeadFieldRepository::class, $leadFieldRepository);
 
-        Assert::assertCount(1, $leadFieldRepository->findBy(['alias' => 'test_lead_field']));
-        Assert::assertTrue($this->columnExists('leads', 'test_lead_field'));
-        Assert::assertCount(1, $leadFieldRepository->findBy(['alias' => 'test_company_field']));
-        Assert::assertTrue($this->columnExists('companies', 'test_company_field'));
+        $this->assertCount(1, $leadFieldRepository->findBy(['alias' => 'test_lead_field']));
+        $this->assertTrue($this->columnExists('leads', 'test_lead_field'));
+        $this->assertCount(1, $leadFieldRepository->findBy(['alias' => 'test_company_field']));
+        $this->assertTrue($this->columnExists('companies', 'test_company_field'));
 
         $fieldModel->deleteEntities([$leadField->getId(), $companyField->getId()]);
 
-        Assert::assertCount(0, $leadFieldRepository->findBy(['alias' => 'test_lead_field']));
-        Assert::assertFalse($this->columnExists('leads', 'test_lead_field'));
-        Assert::assertCount(0, $leadFieldRepository->findBy(['alias' => 'test_company_field']));
-        Assert::assertFalse($this->columnExists('companies', 'test_company_field'));
+        $this->assertCount(0, $leadFieldRepository->findBy(['alias' => 'test_lead_field']));
+        $this->assertFalse($this->columnExists('leads', 'test_lead_field'));
+        $this->assertCount(0, $leadFieldRepository->findBy(['alias' => 'test_company_field']));
+        $this->assertFalse($this->columnExists('companies', 'test_company_field'));
     }
 
     private function columnExists(string $table, string $column): bool
     {
-        $prefix = static::getContainer()->getParameter('mautic.db_table_prefix');
+        $prefix = self::getContainer()->getParameter('mautic.db_table_prefix');
 
         return (bool) $this->connection->createQueryBuilder()
             ->select('1')

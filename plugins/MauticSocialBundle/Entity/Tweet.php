@@ -92,7 +92,7 @@ class Tweet extends FormEntity
 
     /**
      * @var Category|null
-     **/
+     */
     private $category;
 
     /**
@@ -186,9 +186,7 @@ class Tweet extends FormEntity
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('text', new Assert\Length(
-            [
-                'max' => 280,
-            ]
+            max: 280
         ));
     }
 
@@ -326,7 +324,7 @@ class Tweet extends FormEntity
      */
     public function sentCountUp(): static
     {
-        $this->setSentCount($this->getSentCount() + 1);
+        $this->setSentCount($this->sentCount + 1);
 
         return $this;
     }

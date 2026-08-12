@@ -37,10 +37,10 @@ final class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
         // timeline twig from erroring on a missing href key. The DownloadRepository
         // LEFT JOINs assets, so a.title resolves to NULL once asset_id is NULL;
         // the subscriber falls back to a localized "Deleted asset" placeholder.
-        self::assertIsString($event['eventLabel']);
-        self::assertNotEmpty($event['eventLabel']);
-        self::assertNull($event['extra']['asset']);
-        self::assertNull($event['extra']['assetDownloadUrl']);
+        $this->assertIsString($event['eventLabel']);
+        $this->assertNotEmpty($event['eventLabel']);
+        $this->assertNull($event['extra']['asset']);
+        $this->assertNull($event['extra']['assetDownloadUrl']);
     }
 
     /**
@@ -54,11 +54,11 @@ final class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
 
         $event = $this->getFirstAssetDownloadEvent($leadId);
 
-        self::assertIsArray($event['eventLabel']);
-        self::assertArrayHasKey('href', $event['eventLabel']);
-        self::assertSame('Live asset', $event['eventLabel']['label']);
-        self::assertInstanceOf(Asset::class, $event['extra']['asset']);
-        self::assertNotNull($event['extra']['assetDownloadUrl']);
+        $this->assertIsArray($event['eventLabel']);
+        $this->assertArrayHasKey('href', $event['eventLabel']);
+        $this->assertSame('Live asset', $event['eventLabel']['label']);
+        $this->assertInstanceOf(Asset::class, $event['extra']['asset']);
+        $this->assertNotNull($event['extra']['assetDownloadUrl']);
     }
 
     /**
@@ -90,7 +90,7 @@ final class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($download);
         $this->em->flush();
 
-        return [(int) $lead->getId(), (int) $download->getId()];
+        return [$lead->getId(), $download->getId()];
     }
 
     /**
@@ -99,7 +99,7 @@ final class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
     private function getFirstAssetDownloadEvent(int $leadId): array
     {
         /** @var LeadModel $leadModel */
-        $leadModel = static::getContainer()->get('mautic.lead.model.lead');
+        $leadModel = self::getContainer()->get(LeadModel::class);
         $payload   = $leadModel->getEngagements($leadModel->getEntity($leadId), []);
 
         // LeadTimelineEvent::getEvents() flattens events across all types into
@@ -108,7 +108,7 @@ final class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
             $payload['events'],
             static fn (array $event): bool => 'asset.download' === ($event['event'] ?? null),
         ));
-        self::assertCount(1, $assetDownloadEvents);
+        $this->assertCount(1, $assetDownloadEvents);
 
         return $assetDownloadEvents[0];
     }

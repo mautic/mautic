@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Model;
 
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\ORM\EntityManagerInterface;
@@ -16,7 +17,6 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
@@ -494,6 +494,7 @@ class FieldModel extends FormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly LeadRepository $leadRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -545,12 +546,12 @@ class FieldModel extends FormModel
     {
         $forceFilter = [
             [
-                'column' => $this->getRepository()->getTableAlias().'.object',
+                'column' => $this->leadFieldRepository->getTableAlias().'.object',
                 'expr'   => 'like',
                 'value'  => 'lead',
             ],
             [
-                'column' => $this->getRepository()->getTableAlias().'.dateAdded',
+                'column' => $this->leadFieldRepository->getTableAlias().'.dateAdded',
                 'expr'   => 'isNotNull',
             ],
         ];
@@ -605,7 +606,7 @@ class FieldModel extends FormModel
      *
      * @throws AbortColumnCreateException
      * @throws AbortColumnUpdateException
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      * @throws DriverException
      * @throws SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
@@ -628,7 +629,7 @@ class FieldModel extends FormModel
                 $this->customFieldColumn->createLeadColumn($entity);
             } catch (CustomFieldLimitException $e) {
                 // Convert to original Exception not to cause BC
-                throw new \Doctrine\DBAL\Exception($this->translator->trans($e->getMessage()));
+                throw new Exception($this->translator->trans($e->getMessage()), $e->getCode(), $e);
             }
         } else {
             $this->leadFieldSaver->saveLeadFieldEntity($entity, false);
@@ -646,7 +647,7 @@ class FieldModel extends FormModel
      * @param bool  $unlock
      *
      * @throws AbortColumnCreateException
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      * @throws DriverException
      * @throws SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
@@ -662,7 +663,7 @@ class FieldModel extends FormModel
      * @param LeadField $entity
      *
      * @throws AbortColumnUpdateException
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      * @throws DriverException
      * @throws SchemaException
      * @throws DeleteEntityDependencyException
@@ -722,9 +723,6 @@ class FieldModel extends FormModel
         return $this->leadListModel->getFieldSegments($field);
     }
 
-    /**
-     * Filter used field ids.
-     */
     public function filterUsedFieldIds(array $ids): array
     {
         return array_filter($ids, fn ($id): bool => false === $this->isUsedField($this->getEntity($id)));
@@ -739,7 +737,7 @@ class FieldModel extends FormModel
             throw new MethodNotAllowedHttpException(['LeadEntity']);
         }
 
-        $fields = $this->getRepository()->findBy([], ['order' => 'ASC']);
+        $fields = $this->leadFieldRepository->findBy([], ['order' => 'ASC']);
         $count  = 1;
         $order  = $entity->getOrder();
         $id     = $entity->getId();
@@ -771,7 +769,7 @@ class FieldModel extends FormModel
      */
     public function reorderFieldsByList(array $list, $start = 1): void
     {
-        $fields = $this->getRepository()->findBy([], ['order' => 'ASC']);
+        $fields = $this->leadFieldRepository->findBy([], ['order' => 'ASC']);
         foreach ($fields as $field) {
             if (in_array($field->getId(), $list)) {
                 $order = ((int) array_search($field->getId(), $list) + $start);
@@ -793,10 +791,7 @@ class FieldModel extends FormModel
      */
     public function getLookupResults($type, $filter = '', $limit = 10)
     {
-        /** @var LeadRepository $contactRepository */
-        $contactRepository = $this->em->getRepository(Lead::class);
-
-        return $contactRepository->getValueList($type, $filter, $limit);
+        return $this->leadRepository->getValueList($type, $filter, $limit);
     }
 
     /**
@@ -822,7 +817,7 @@ class FieldModel extends FormModel
      */
     public function setFieldProperties(LeadField $entity, array $properties)
     {
-        if (!empty($properties) && is_array($properties)) {
+        if ([] !== $properties && is_array($properties)) {
             $properties = InputHelper::clean($properties);
         } else {
             $properties = [];
@@ -893,13 +888,9 @@ class FieldModel extends FormModel
     /**
      * @deprecated Use FieldList::getFieldList method instead
      *
-     * @param bool|true $byGroup
-     * @param bool|true $alphabetical
-     * @param array     $filters
-     *
      * @return mixed[]
      */
-    public function getFieldList($byGroup = true, $alphabetical = true, $filters = ['isPublished' => true, 'object' => 'lead']): array
+    public function getFieldList(bool $byGroup = true, bool $alphabetical = true, array $filters = ['isPublished' => true, 'object' => 'lead']): array
     {
         return $this->fieldList->getFieldList($byGroup, $alphabetical, $filters);
     }
@@ -1027,7 +1018,7 @@ class FieldModel extends FormModel
 
     public function getEntityByAlias($alias, $categoryAlias = null, $lang = null)
     {
-        return $this->getRepository()->findOneByAlias($alias);
+        return $this->leadFieldRepository->findOneByAlias($alias);
     }
 
     /**
@@ -1076,7 +1067,7 @@ class FieldModel extends FormModel
         $originalAlias = $alias;
         $i             = 1;
 
-        while ($this->getRepository()->findOneByAlias($alias)) {
+        while ($this->leadFieldRepository->findOneByAlias($alias)) {
             $alias = $originalAlias.'_'.$i;
             ++$i;
         }

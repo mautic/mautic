@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\StageBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -12,7 +14,7 @@ class LeadStageLog
 
     /**
      * @var Stage
-     **/
+     */
     private $stage;
 
     /**
@@ -27,7 +29,7 @@ class LeadStageLog
 
     /**
      * @var \DateTimeInterface
-     **/
+     */
     private $dateFired;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void

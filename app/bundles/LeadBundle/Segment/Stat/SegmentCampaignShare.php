@@ -2,28 +2,27 @@
 
 namespace Mautic\LeadBundle\Segment\Stat;
 
-use Doctrine\ORM\EntityManager;
-use Mautic\CampaignBundle\Model\CampaignModel;
+use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 
-class SegmentCampaignShare
+final readonly class SegmentCampaignShare
 {
     public function __construct(
-        private readonly CampaignModel $campaignModel,
-        private readonly CacheStorageHelper $cacheStorageHelper,
-        private readonly EntityManager $entityManager,
+        private CacheStorageHelper $cacheStorageHelper,
+        private EntityManagerInterface $entityManager,
+        private CampaignRepository $campaignRepository,
     ) {
     }
 
     /**
-     * @param int   $segmentId
-     * @param array $campaignIds
+     * @param mixed[] $campaignIds
      *
-     * @return array
+     * @return mixed[]
      */
-    public function getCampaignsSegmentShare($segmentId, $campaignIds = [])
+    public function getCampaignsSegmentShare(int $segmentId, array $campaignIds = []): array
     {
-        $campaigns = $this->campaignModel->getRepository()->getCampaignsSegmentShare($segmentId, $campaignIds);
+        $campaigns = $this->campaignRepository->getCampaignsSegmentShare($segmentId, $campaignIds);
         foreach ($campaigns as $campaign) {
             $this->cacheStorageHelper->set($this->getCachedKey($segmentId, $campaign['id']), $campaign['segmentCampaignShare']);
         }
@@ -41,7 +40,7 @@ class SegmentCampaignShare
         $q = $this->entityManager->getConnection()->createQueryBuilder();
         $q->select('c.id, c.name, null as share')
             ->from(MAUTIC_TABLE_PREFIX.'campaigns', 'c')
-            ->where($this->campaignModel->getRepository()->getPublishedByDateExpression($q))
+            ->where($this->campaignRepository->getPublishedByDateExpression($q))
             ->orderBy('c.id', 'DESC');
 
         $campaigns = $q->executeQuery()->fetchAllAssociative();

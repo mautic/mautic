@@ -11,11 +11,12 @@ use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Services\PeakInteractionTimer;
 use Mautic\PageBundle\Entity\HitRepository;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\CacheItem;
 
-class TestablePeakInteractionTimer extends PeakInteractionTimer
+final class TestablePeakInteractionTimer extends PeakInteractionTimer
 {
     private \DateTime $testTime;
 
@@ -62,7 +63,9 @@ final class PeakInteractionTimerTest extends TestCase
 
     private int $peakInteractionTimerBestDefaultHourEnd   = 12;
 
-    /** @var int[] */
+    /**
+     * @var int[]
+     */
     private array $peakInteractionTimerBestDefaultDays        = [2, 1, 4];
 
     private string $peakInteractionTimerFetchInteractionsFrom = '-60 days';
@@ -108,7 +111,7 @@ final class PeakInteractionTimerTest extends TestCase
             ->willReturn(true);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('defaultDateTimeWithTimezoneProvider')]
+    #[DataProvider('defaultDateTimeWithTimezoneProvider')]
     public function testGetDefaultOptimalTime(string $currentDate, string $expectedDate, ?string $contactTimezone = null): void
     {
         $contactTimezone = $contactTimezone ?: $this->defaultTimezone;
@@ -154,7 +157,7 @@ final class PeakInteractionTimerTest extends TestCase
         yield ['2024-03-12 11:00:00', '2024-03-12 11:00:00', null];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('defaultDateTimeAndDayWithTimezoneProvider')]
+    #[DataProvider('defaultDateTimeAndDayWithTimezoneProvider')]
     public function testGetDefaultOptimalTimeAndDay(string $currentDate, string $expectedDate, ?string $contactTimezone = null): void
     {
         $contactTimezone = $contactTimezone ?: $this->defaultTimezone;
@@ -213,7 +216,7 @@ final class PeakInteractionTimerTest extends TestCase
      * @param array<int, array<string, string|\DateTime|null>>          $pageHits
      * @param array<int, array<string, string|\DateTime>>               $formSubmissions
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('getOptimalTimeDataProvider')]
+    #[DataProvider('getOptimalTimeDataProvider')]
     public function testGetOptimalTime(string $currentDate, string $expectedDate, array $emailReads, array $pageHits, array $formSubmissions): void
     {
         $contactMock = $this->createStub(Lead::class);
@@ -247,33 +250,33 @@ final class PeakInteractionTimerTest extends TestCase
     public static function getOptimalTimeDataProvider(): iterable
     {
         $emailReads = [
-            PeakInteractionTimerTest::getEmailReadData('2023-09-02 13:20:17', '2023-09-02 11:45:32'),
-            PeakInteractionTimerTest::getEmailReadData('2023-09-05 14:02:45', '2023-09-05 10:38:09'),
-            PeakInteractionTimerTest::getEmailReadData('2023-09-08 15:40:15', '2023-09-08 10:18:22'),
-            PeakInteractionTimerTest::getEmailReadData('2023-09-11 17:52:18', '2023-09-11 09:33:47'),
-            PeakInteractionTimerTest::getEmailReadData('2023-09-14 14:20:17', '2023-09-14 08:45:32'),
-            PeakInteractionTimerTest::getEmailReadData('2023-09-17 14:02:45', '2023-09-17 11:38:09'),
-            PeakInteractionTimerTest::getEmailReadData('2023-09-20 15:40:15', '2023-09-20 09:18:22'),
-            PeakInteractionTimerTest::getEmailReadData('2023-09-23 13:52:18', '2023-09-23 08:33:47'),
-            PeakInteractionTimerTest::getEmailReadData('2023-09-26 14:20:17', '2023-09-26 10:45:32'),
-            PeakInteractionTimerTest::getEmailReadData('2023-09-29 14:02:45', '2023-09-29 11:38:09'),
+            self::getEmailReadData('2023-09-02 13:20:17', '2023-09-02 11:45:32'),
+            self::getEmailReadData('2023-09-05 14:02:45', '2023-09-05 10:38:09'),
+            self::getEmailReadData('2023-09-08 15:40:15', '2023-09-08 10:18:22'),
+            self::getEmailReadData('2023-09-11 17:52:18', '2023-09-11 09:33:47'),
+            self::getEmailReadData('2023-09-14 14:20:17', '2023-09-14 08:45:32'),
+            self::getEmailReadData('2023-09-17 14:02:45', '2023-09-17 11:38:09'),
+            self::getEmailReadData('2023-09-20 15:40:15', '2023-09-20 09:18:22'),
+            self::getEmailReadData('2023-09-23 13:52:18', '2023-09-23 08:33:47'),
+            self::getEmailReadData('2023-09-26 14:20:17', '2023-09-26 10:45:32'),
+            self::getEmailReadData('2023-09-29 14:02:45', '2023-09-29 11:38:09'),
         ];
 
         $pageHits = [
-            PeakInteractionTimerTest::getPageHitData('2023-09-02 13:36:32'),
-            PeakInteractionTimerTest::getPageHitData('2023-09-05 14:12:39'),
-            PeakInteractionTimerTest::getPageHitData('2023-09-08 15:28:50'),
-            PeakInteractionTimerTest::getPageHitData('2023-09-11 17:40:11'),
-            PeakInteractionTimerTest::getPageHitData('2023-09-14 14:20:23'),
-            PeakInteractionTimerTest::getPageHitData('2023-09-17 14:45:45'),
-            PeakInteractionTimerTest::getPageHitData('2023-09-20 15:10:59'),
-            PeakInteractionTimerTest::getPageHitData('2023-09-23 13:55:30'),
-            PeakInteractionTimerTest::getPageHitData('2023-09-26 14:30:17'),
-            PeakInteractionTimerTest::getPageHitData('2023-09-29 18:10:58'),
+            self::getPageHitData('2023-09-02 13:36:32'),
+            self::getPageHitData('2023-09-05 14:12:39'),
+            self::getPageHitData('2023-09-08 15:28:50'),
+            self::getPageHitData('2023-09-11 17:40:11'),
+            self::getPageHitData('2023-09-14 14:20:23'),
+            self::getPageHitData('2023-09-17 14:45:45'),
+            self::getPageHitData('2023-09-20 15:10:59'),
+            self::getPageHitData('2023-09-23 13:55:30'),
+            self::getPageHitData('2023-09-26 14:30:17'),
+            self::getPageHitData('2023-09-29 18:10:58'),
         ];
 
         $formSubmissions = [
-            PeakInteractionTimerTest::getFormSubmissionData('2023-09-05 14:13:22'),
+            self::getFormSubmissionData('2023-09-05 14:13:22'),
         ];
 
         // Previously defined interactions should result in the following preferences:
@@ -291,16 +294,16 @@ final class PeakInteractionTimerTest extends TestCase
         // Add multiple page hits within 1 hour
         // Activity within an hour should be counted as 1 interaction and not change the optimal time (13 - 16)
         yield ['2023-10-01 16:02:22', '2023-10-02 13:00:00', $emailReads, array_merge($pageHits, [
-            PeakInteractionTimerTest::getPageHitData('2023-09-29 18:11:58'),
-            PeakInteractionTimerTest::getPageHitData('2023-09-29 18:12:02'),
-            PeakInteractionTimerTest::getPageHitData('2023-09-29 18:12:12'),
-            PeakInteractionTimerTest::getPageHitData('2023-09-29 18:14:18'),
-            PeakInteractionTimerTest::getPageHitData('2023-09-29 18:16:35'),
-            PeakInteractionTimerTest::getPageHitData('2023-09-29 18:18:55'),
-            PeakInteractionTimerTest::getPageHitData('2023-09-29 18:30:55'),
-            PeakInteractionTimerTest::getPageHitData('2023-09-29 18:45:12'),
-            PeakInteractionTimerTest::getPageHitData('2023-09-29 18:48:12'),
-            PeakInteractionTimerTest::getPageHitData('2023-09-29 18:55:12'),
+            self::getPageHitData('2023-09-29 18:11:58'),
+            self::getPageHitData('2023-09-29 18:12:02'),
+            self::getPageHitData('2023-09-29 18:12:12'),
+            self::getPageHitData('2023-09-29 18:14:18'),
+            self::getPageHitData('2023-09-29 18:16:35'),
+            self::getPageHitData('2023-09-29 18:18:55'),
+            self::getPageHitData('2023-09-29 18:30:55'),
+            self::getPageHitData('2023-09-29 18:45:12'),
+            self::getPageHitData('2023-09-29 18:48:12'),
+            self::getPageHitData('2023-09-29 18:55:12'),
         ]), $formSubmissions];
     }
 
@@ -309,7 +312,7 @@ final class PeakInteractionTimerTest extends TestCase
      * @param array<int, array<string, string|\DateTime|null>>          $pageHits
      * @param array<int, array<string, string|\DateTime>>               $formSubmissions
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('getOptimalTimeAndDayDataProvider')]
+    #[DataProvider('getOptimalTimeAndDayDataProvider')]
     public function testGetOptimalTimeAndDay(string $currentDate, string $expectedDate, array $emailReads, array $pageHits, array $formSubmissions): void
     {
         $contactMock = $this->createStub(Lead::class);
@@ -343,33 +346,33 @@ final class PeakInteractionTimerTest extends TestCase
     public static function getOptimalTimeAndDayDataProvider(): iterable
     {
         $emailReads = [
-            PeakInteractionTimerTest::getEmailReadData('2023-09-02 13:20:17', '2023-09-02 11:45:32'),
-            PeakInteractionTimerTest::getEmailReadData('2023-09-05 14:02:45', '2023-09-05 10:38:09'),
-            PeakInteractionTimerTest::getEmailReadData('2023-09-08 15:40:15', '2023-09-08 10:18:22'),
-            PeakInteractionTimerTest::getEmailReadData('2023-09-11 17:52:18', '2023-09-11 09:33:47'),
-            PeakInteractionTimerTest::getEmailReadData('2023-09-14 14:20:17', '2023-09-14 08:45:32'),
-            PeakInteractionTimerTest::getEmailReadData('2023-09-17 14:02:45', '2023-09-17 11:38:09'),
-            PeakInteractionTimerTest::getEmailReadData('2023-09-20 15:40:15', '2023-09-20 09:18:22'),
-            PeakInteractionTimerTest::getEmailReadData('2023-09-23 13:52:18', '2023-09-23 08:33:47'),
-            PeakInteractionTimerTest::getEmailReadData('2023-09-26 14:20:17', '2023-09-26 10:45:32'),
-            PeakInteractionTimerTest::getEmailReadData('2023-09-29 14:02:45', '2023-09-29 11:38:09'),
+            self::getEmailReadData('2023-09-02 13:20:17', '2023-09-02 11:45:32'),
+            self::getEmailReadData('2023-09-05 14:02:45', '2023-09-05 10:38:09'),
+            self::getEmailReadData('2023-09-08 15:40:15', '2023-09-08 10:18:22'),
+            self::getEmailReadData('2023-09-11 17:52:18', '2023-09-11 09:33:47'),
+            self::getEmailReadData('2023-09-14 14:20:17', '2023-09-14 08:45:32'),
+            self::getEmailReadData('2023-09-17 14:02:45', '2023-09-17 11:38:09'),
+            self::getEmailReadData('2023-09-20 15:40:15', '2023-09-20 09:18:22'),
+            self::getEmailReadData('2023-09-23 13:52:18', '2023-09-23 08:33:47'),
+            self::getEmailReadData('2023-09-26 14:20:17', '2023-09-26 10:45:32'),
+            self::getEmailReadData('2023-09-29 14:02:45', '2023-09-29 11:38:09'),
         ];
 
         $pageHits = [
-            PeakInteractionTimerTest::getPageHitData('2023-09-02 13:36:32'),
-            PeakInteractionTimerTest::getPageHitData('2023-09-05 14:12:39'),
-            PeakInteractionTimerTest::getPageHitData('2023-09-08 15:28:50'),
-            PeakInteractionTimerTest::getPageHitData('2023-09-11 17:40:11'),
-            PeakInteractionTimerTest::getPageHitData('2023-09-14 14:20:23'),
-            PeakInteractionTimerTest::getPageHitData('2023-09-17 14:45:45'),
-            PeakInteractionTimerTest::getPageHitData('2023-09-20 15:10:59'),
-            PeakInteractionTimerTest::getPageHitData('2023-09-23 13:55:30'),
-            PeakInteractionTimerTest::getPageHitData('2023-09-26 14:30:17'),
-            PeakInteractionTimerTest::getPageHitData('2023-09-29 18:10:58'),
+            self::getPageHitData('2023-09-02 13:36:32'),
+            self::getPageHitData('2023-09-05 14:12:39'),
+            self::getPageHitData('2023-09-08 15:28:50'),
+            self::getPageHitData('2023-09-11 17:40:11'),
+            self::getPageHitData('2023-09-14 14:20:23'),
+            self::getPageHitData('2023-09-17 14:45:45'),
+            self::getPageHitData('2023-09-20 15:10:59'),
+            self::getPageHitData('2023-09-23 13:55:30'),
+            self::getPageHitData('2023-09-26 14:30:17'),
+            self::getPageHitData('2023-09-29 18:10:58'),
         ];
 
         $formSubmissions = [
-            PeakInteractionTimerTest::getFormSubmissionData('2023-09-17 14:46:41'),
+            self::getFormSubmissionData('2023-09-17 14:46:41'),
         ];
 
         // Previously defined interactions should result in the following preferences:

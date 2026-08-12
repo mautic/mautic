@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ChannelBundle\PreferenceBuilder;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 
-class ChannelPreferences
+final class ChannelPreferences
 {
     /**
      * @var ArrayCollection[]
@@ -68,7 +70,7 @@ class ChannelPreferences
     /**
      * @param int $priority
      *
-     * @return ArrayCollection|LeadEventLog[]
+     * @return ArrayCollection<int, LeadEventLog>
      */
     public function getLogsByPriority($priority)
     {

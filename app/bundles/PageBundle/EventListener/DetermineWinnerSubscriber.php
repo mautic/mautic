@@ -8,11 +8,11 @@ use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DetermineWinnerSubscriber implements EventSubscriberInterface
+final readonly class DetermineWinnerSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly HitRepository $hitRepository,
-        private readonly TranslatorInterface $translator,
+        private HitRepository $hitRepository,
+        private TranslatorInterface $translator,
     ) {
     }
 
@@ -38,7 +38,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
         if (null != $startDate && !empty($pageIds)) {
             // get their bounce rates
             $counts = $this->hitRepository->getBounces($pageIds, $startDate, true);
-            if ($counts) {
+            if ([] !== $counts) {
                 // Group by translation
                 $combined = [
                     $parent->getId() => $counts[$parent->getId()],
@@ -124,7 +124,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
             $counts  = $this->hitRepository->getDwellTimesForPages($pageIds, ['fromDate' => $startDate]);
             $support = [];
 
-            if ($counts) {
+            if ([] !== $counts) {
                 // in order to get a fair grade, we have to compare the averages here since a page that is only shown
                 // 25% of the time will have a significantly lower sum than a page shown 75% of the time
                 $avgs              = [];

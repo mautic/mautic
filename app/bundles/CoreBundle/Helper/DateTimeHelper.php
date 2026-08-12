@@ -19,7 +19,7 @@ class DateTimeHelper
 
     private string $format;
 
-    private ?string $timezone = null;
+    private ?string $timezone;
 
     private \DateTimeZone $utc;
 
@@ -35,7 +35,7 @@ class DateTimeHelper
      * @param string|null               $fromFormat Format the string is in
      * @param string|null               $timezone   Timezone the string is in
      */
-    public function __construct($string = '', $fromFormat = self::FORMAT_DB, $timezone = 'UTC')
+    public function __construct($string = '', ?string $fromFormat = self::FORMAT_DB, ?string $timezone = 'UTC')
     {
         $this->setDefaultTimezone();
         $this->setDateTime($string, $fromFormat, $timezone);
@@ -235,6 +235,8 @@ class DateTimeHelper
             return $dt;
         }
         $this->datetime->add($interval);
+
+        return $this->datetime;
     }
 
     /**
@@ -255,6 +257,8 @@ class DateTimeHelper
             return $dt;
         }
         $this->datetime->sub($interval);
+
+        return $this->datetime;
     }
 
     /**
@@ -307,6 +311,8 @@ class DateTimeHelper
             return $dt;
         }
         $this->datetime->modify($string);
+
+        return $this->datetime;
     }
 
     /**
@@ -362,7 +368,7 @@ class DateTimeHelper
 
         if (!in_array($unit, $possibleUnits, true)) {
             $possibleUnitsString = implode(', ', $possibleUnits);
-            throw new \InvalidArgumentException("Unit '$unit' is not supported. Use one of these: $possibleUnitsString");
+            throw new \InvalidArgumentException("Unit '{$unit}' is not supported. Use one of these: {$possibleUnitsString}");
         }
     }
 

@@ -187,21 +187,13 @@ final class PublicControllerTest extends TestCase
         $pageEntityA->method('getVariantSettings')
             ->willReturn(['weight' => '50']);
 
-        $cookieHelper = $this->createMock(CookieHelper::class);
-
-        /** @var Packages&MockObject $packagesMock */
-        $packagesMock = $this->createMock(Packages::class);
-
-        /** @var CoreParametersHelper&MockObject $coreParametersHelper */
-        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-
-        $assetHelper = new AssetsHelper($packagesMock);
+        $assetHelper = new AssetsHelper($this->createStub(Packages::class));
 
         $mauticSecurity = $this->createMock(CorePermissions::class);
         $mauticSecurity->method('hasEntityAccess')
             ->willReturn(false);
 
-        $analyticsHelper = new AnalyticsHelper($coreParametersHelper);
+        $analyticsHelper = new AnalyticsHelper($this->createStub(CoreParametersHelper::class));
 
         $pageModel = $this->createMock(PageModel::class);
         $pageModel->method('getHitQuery')
@@ -216,7 +208,7 @@ final class PublicControllerTest extends TestCase
 
         $this->request->attributes->set('ignore_mismatch', true);
         $themeHelper = $this->createMock(ThemeHelper::class);
-        $themeHelper->expects(self::never())
+        $themeHelper->expects($this->never())
             ->method('checkForTwigTemplate');
 
         $controller = new PublicController(
@@ -235,7 +227,7 @@ final class PublicControllerTest extends TestCase
         $response = $controller->indexAction(
             $this->request,
             $this->contactRequestHelper,
-            $cookieHelper,
+            $this->createStub(CookieHelper::class),
             $analyticsHelper,
             $assetHelper,
             $themeHelper,
@@ -285,7 +277,7 @@ final class PublicControllerTest extends TestCase
             throw new InvalidDecodedStringException($clickTrough);
         };
 
-        $this->contactRequestHelper->expects(self::exactly(2))
+        $this->contactRequestHelper->expects($this->exactly(2))
             ->method('getContactFromQuery')
             ->willReturnCallback($getContactFromRequestCallback);
 
@@ -325,7 +317,7 @@ final class PublicControllerTest extends TestCase
             $redirectId
         );
 
-        self::assertSame('https://someurl.test/', $response->getTargetUrl());
+        $this->assertSame('https://someurl.test/', $response->getTargetUrl());
     }
 
     #[DataProvider('provideRedirectUrls')]
@@ -364,7 +356,7 @@ final class PublicControllerTest extends TestCase
             throw new InvalidDecodedStringException($clickThrough);
         };
 
-        $this->contactRequestHelper->expects(self::exactly(2))
+        $this->contactRequestHelper->expects($this->exactly(2))
             ->method('getContactFromQuery')
             ->willReturnCallback($getContactFromRequestCallback);
 
@@ -404,8 +396,8 @@ final class PublicControllerTest extends TestCase
             $this->pageModel,
             $redirectId
         );
-        self::assertSame($targetUrl, $response->getTargetUrl());
-        self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
+        $this->assertSame($targetUrl, $response->getTargetUrl());
+        $this->assertSame(Response::HTTP_FOUND, $response->getStatusCode());
     }
 
     public static function provideRedirectUrls(): \Generator
@@ -503,7 +495,7 @@ final class PublicControllerTest extends TestCase
     public function testTrackingActionWithInvalidCt(): void
     {
         $this->pageModel->expects($this->once())->method('hitPage')->willReturnCallback(
-            function (): void {
+            function (): never {
                 throw new InvalidDecodedStringException();
             }
         );

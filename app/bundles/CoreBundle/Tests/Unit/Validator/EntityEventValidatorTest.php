@@ -7,7 +7,6 @@ namespace Mautic\CoreBundle\Tests\Unit\Validator;
 use Mautic\CoreBundle\Event\EntityValidateEvent;
 use Mautic\CoreBundle\Validator\EntityEvent;
 use Mautic\CoreBundle\Validator\EntityEventValidator;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -20,6 +19,9 @@ final class EntityEventValidatorTest extends TestCase
 {
     private EventDispatcherInterface $dispatcher;
 
+    /**
+     * @var \PHPUnit\Framework\MockObject\Stub&ExecutionContextInterface
+     */
     private \PHPUnit\Framework\MockObject\Stub $context;
 
     private ConstraintValidatorInterface $validator;
@@ -57,13 +59,13 @@ final class EntityEventValidatorTest extends TestCase
         $this->dispatcher->addListener(EntityValidateEvent::class, function (EntityValidateEvent $event) use (&$dispatched, $entity, $constraint): void {
             $dispatched = true;
 
-            Assert::assertSame($entity, $event->getEntity());
-            Assert::assertSame($constraint, $event->getConstraint());
-            Assert::assertSame($this->context, $event->getContext());
+            $this->assertSame($entity, $event->getEntity());
+            $this->assertSame($constraint, $event->getConstraint());
+            $this->assertSame($this->context, $event->getContext());
         });
 
         $this->validator->validate($entity, $constraint);
 
-        Assert::assertTrue($dispatched);
+        $this->assertTrue($dispatched);
     }
 }

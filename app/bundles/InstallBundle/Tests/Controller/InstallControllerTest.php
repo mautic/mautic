@@ -46,35 +46,26 @@ final class InstallControllerTest extends \PHPUnit\Framework\TestCase
         $sessionMock                = $this->createMock(Session::class);
         $containerMock              = $this->createMock(Container::class);
         $this->routerMock           = $this->createMock(Router::class);
-        $flashBagMock               = $this->createMock(FlashBagInterface::class);
-
-        $configurator         = $this->createMock(Configurator::class);
         $this->installer      = $this->createMock(InstallService::class);
-        $doctrine             = $this->createMock(ManagerRegistry::class);
-        $modelFactory         = $this->createMock(ModelFactory::class);
-        $userHelper           = $this->createMock(UserHelper::class);
-        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $dispatcher           = $this->createMock(EventDispatcherInterface::class);
-        $translatorMock       = $this->createMock(Translator::class);
-        $flashBag             = $this->createMock(FlashBag::class);
         $requestStack         = new RequestStack();
-        $security             = $this->createMock(CorePermissions::class);
 
         $this->controller = new InstallController(
-            $configurator,
-            $this->installer,
-            $doctrine,
-            $modelFactory,
-            $userHelper,
-            $coreParametersHelper,
-            $dispatcher,
-            $translatorMock,
-            $flashBag,
+            $this->createStub(ManagerRegistry::class),
+            $this->createStub(ModelFactory::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(CoreParametersHelper::class),
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(Translator::class),
+            $this->createStub(FlashBag::class),
             $requestStack,
-            $security
+            $this->createStub(CorePermissions::class)
+        );
+        $this->controller->autowireInstallController(
+            $this->createStub(Configurator::class),
+            $this->installer
         );
         $this->controller->setContainer($containerMock);
-        $sessionMock->method('getFlashBag')->willReturn($flashBagMock);
+        $sessionMock->method('getFlashBag')->willReturn($this->createStub(FlashBagInterface::class));
 
         $containerMock->method('get')
             ->with('router')

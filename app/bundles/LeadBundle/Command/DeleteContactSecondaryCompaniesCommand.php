@@ -16,35 +16,26 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AsCommand(
     name: DeleteContactSecondaryCompaniesCommand::NAME,
-    description: "Deletes all contact\'s secondary companies."
-)]
-class DeleteContactSecondaryCompaniesCommand extends Command
-{
-    public const NAME                    = 'mautic:contact:delete:secondary-companies';
-
-    public function __construct(private readonly LoggerInterface $logger, private readonly TranslatorInterface $translator, private readonly CoreParametersHelper $coreParametersHelper, private readonly CompanyLeadRepository $companyLeadsRepository)
-    {
-        parent::__construct();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function configure(): void
-    {
-        $this
-            ->setHelp(
-                <<<'EOT'
+    description: "Deletes all contact\'s secondary companies.",
+    help: <<<'TXT'
 The <info>%command.name%</info> command deletes non-primary companies of every contact.
 
 <info>php %command.full_name%</info>
-EOT
-            );
+TXT
+)]
+final class DeleteContactSecondaryCompaniesCommand extends Command
+{
+    public const NAME                    = 'mautic:contact:delete:secondary-companies';
+
+    public function __construct(
+        private readonly LoggerInterface $logger,
+        private readonly TranslatorInterface $translator,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly CompanyLeadRepository $companyLeadsRepository,
+    ) {
+        parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $allowMultiple = $this->coreParametersHelper->get('contact_allow_multiple_companies');

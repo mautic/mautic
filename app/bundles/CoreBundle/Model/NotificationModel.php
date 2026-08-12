@@ -2,23 +2,16 @@
 
 namespace Mautic\CoreBundle\Model;
 
-use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\Notification;
 use Mautic\CoreBundle\Entity\NotificationRepository;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UpdateHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\UserBundle\Entity\User;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends FormModel<Notification>
@@ -30,28 +23,30 @@ class NotificationModel extends FormModel
      */
     protected $disableUpdates;
 
-    public function __construct(
-        protected PathsHelper $pathsHelper,
-        protected UpdateHelper $updateHelper,
-        CoreParametersHelper $coreParametersHelper,
-        EntityManager $em,
-        CorePermissions $security,
-        EventDispatcherInterface $dispatcher,
-        UrlGeneratorInterface $router,
-        Translator $translator,
-        UserHelper $userHelper,
-        LoggerInterface $mauticLogger,
-        private readonly RequestStack $requestStack,
-    ) {
-        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
+    protected PathsHelper $pathsHelper;
+
+    protected UpdateHelper $updateHelper;
+
+    private RequestStack $requestStack;
+
+    private NotificationRepository $notificationRepository;
+
+    #[Required]
+    public function autowireNotificationModel(
+        PathsHelper $pathsHelper,
+        UpdateHelper $updateHelper,
+        RequestStack $requestStack,
+        NotificationRepository $notificationRepository,
+    ): void {
+        $this->pathsHelper             = $pathsHelper;
+        $this->updateHelper            = $updateHelper;
+        $this->requestStack            = $requestStack;
+        $this->notificationRepository  = $notificationRepository;
     }
 
-    private function getSession(): Session
+    private function getSession(): SessionInterface
     {
-        $session = $this->requestStack->getSession();
-        \assert($session instanceof Session);
-
-        return $session;
+        return $this->requestStack->getSession();
     }
 
     /**
@@ -62,12 +57,9 @@ class NotificationModel extends FormModel
         $this->disableUpdates = $disableUpdates;
     }
 
-    /**
-     * @return NotificationRepository
-     */
-    public function getRepository()
+    public function getRepository(): NotificationRepository
     {
-        return $this->em->getRepository(Notification::class);
+        return $this->notificationRepository;
     }
 
     /**
@@ -132,18 +124,18 @@ class NotificationModel extends FormModel
      */
     public function markAllRead(): void
     {
-        $this->getRepository()->markAllReadForUser($this->userHelper->getUser()->getId());
+        $this->notificationRepository->markAllReadForUser($this->userHelper->getUser()->getId());
     }
 
     /**
      * Clears a notification for a user.
      *
-     * @param $id    Notification to clear; will clear all if empty
-     * @param $limit Maximum number of notifications to clear if $id is empty
+     * @param int  $id    Notification to clear; will clear all if empty
+     * @param ?int $limit Maximum number of notifications to clear if $id is empty
      */
     public function clearNotification($id, $limit = null): void
     {
-        $this->getRepository()->clearNotificationsForUser($this->userHelper->getUser()->getId(), $id, $limit);
+        $this->notificationRepository->clearNotificationsForUser($this->userHelper->getUser()->getId(), $id, $limit);
     }
 
     /**
@@ -161,7 +153,7 @@ class NotificationModel extends FormModel
         $showNewIndicator = false;
         $userId           = ($this->userHelper->getUser()) ? $this->userHelper->getUser()->getId() : 0;
 
-        $notifications = $this->getRepository()->getNotifications($userId, $afterId, $includeRead, null, $limit);
+        $notifications = $this->notificationRepository->getNotifications($userId, $afterId, $includeRead, null, $limit);
 
         // determine if the new message indicator should be shown
         foreach ($notifications as $n) {
@@ -216,6 +208,6 @@ class NotificationModel extends FormModel
 
     private function isDuplicate(int $userId, string $deduplicate, ?\DateTime $from = null): bool
     {
-        return $this->getRepository()->isDuplicate($userId, $deduplicate, $from ?? new \DateTime('-1 day'));
+        return $this->notificationRepository->isDuplicate($userId, $deduplicate, $from ?? new \DateTime('-1 day'));
     }
 }

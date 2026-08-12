@@ -8,11 +8,16 @@ use Mautic\CoreBundle\Helper\ExitCode;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Psr\Cache\InvalidArgumentException;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class SegmentCountCacheCommand extends Command
+#[AsCommand(
+    name: self::COMMAND_NAME,
+    description: 'Update segment count cache for changed segments.'
+)]
+final class SegmentCountCacheCommand extends Command
 {
     public const COMMAND_NAME = 'lead:list:count-cache-update';
 
@@ -21,15 +26,6 @@ class SegmentCountCacheCommand extends Command
         private readonly SegmentCountCacheHelper $segmentCountCacheHelper,
     ) {
         parent::__construct();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function configure(): void
-    {
-        $this->setName(self::COMMAND_NAME)
-            ->setDescription('Update segment count cache for changed segments.');
     }
 
     /**

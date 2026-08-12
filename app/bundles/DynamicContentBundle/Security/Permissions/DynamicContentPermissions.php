@@ -5,7 +5,7 @@ namespace Mautic\DynamicContentBundle\Security\Permissions;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class DynamicContentPermissions extends AbstractPermissions
+final class DynamicContentPermissions extends AbstractPermissions
 {
     /**
      * @param mixed[] $params

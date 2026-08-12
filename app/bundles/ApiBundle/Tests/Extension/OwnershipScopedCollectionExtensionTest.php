@@ -125,7 +125,7 @@ final class OwnershipScopedCollectionExtensionTest extends TestCase
 
     public function testNoFilterAppliedWhenOperationHasNoSecurityExpression(): void
     {
-        $this->security->expects(self::never())->method('isGranted');
+        $this->security->expects($this->never())->method('isGranted');
 
         $queryBuilder = $this->createQueryBuilderExpectingNoCalls();
 
@@ -139,7 +139,7 @@ final class OwnershipScopedCollectionExtensionTest extends TestCase
 
     public function testNoFilterAppliedWhenSecurityExpressionHasNoOwnPermission(): void
     {
-        $this->security->expects(self::never())->method('isGranted');
+        $this->security->expects($this->never())->method('isGranted');
 
         $queryBuilder = $this->createQueryBuilderExpectingNoCalls();
 
@@ -153,7 +153,7 @@ final class OwnershipScopedCollectionExtensionTest extends TestCase
 
     public function testNoFilterAppliedWhenOperationIsNull(): void
     {
-        $this->security->expects(self::never())->method('isGranted');
+        $this->security->expects($this->never())->method('isGranted');
 
         $queryBuilder = $this->createQueryBuilderExpectingNoCalls();
 
@@ -192,8 +192,8 @@ final class OwnershipScopedCollectionExtensionTest extends TestCase
     private function createQueryBuilderExpectingNoCalls(): QueryBuilder&MockObject
     {
         $queryBuilder = $this->createMock(QueryBuilder::class);
-        $queryBuilder->expects(self::never())->method('andWhere');
-        $queryBuilder->expects(self::never())->method('setParameter');
+        $queryBuilder->expects($this->never())->method('andWhere');
+        $queryBuilder->expects($this->never())->method('setParameter');
 
         return $queryBuilder;
     }
@@ -209,8 +209,9 @@ final class OwnershipScopedCollectionExtensionTest extends TestCase
     private function createUserWithId(int $id): UserInterface
     {
         return new class($id) implements UserInterface {
-            public function __construct(private readonly int $id)
-            {
+            public function __construct(
+                private readonly int $id,
+            ) {
             }
 
             public function getId(): int

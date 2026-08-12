@@ -17,8 +17,10 @@ final class EmailStatus
 
     private ?string $status = null;
 
-    public function __construct(private readonly Email $email, private readonly string $publishStatus)
-    {
+    public function __construct(
+        private readonly Email $email,
+        private readonly string $publishStatus,
+    ) {
         if ($email->isEnableAbTest()) {
             [$this->parent, $this->children] = $this->email->getVariants();
 

@@ -6,6 +6,7 @@ namespace Mautic\AssetBundle\Tests\Controller;
 
 use Mautic\AssetBundle\Entity\Download;
 use Mautic\AssetBundle\Tests\Asset\AbstractAssetTestCase;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\HttpFoundation\Response;
 
 final class PublicControllerFunctionalTest extends AbstractAssetTestCase
@@ -135,7 +136,8 @@ final class PublicControllerFunctionalTest extends AbstractAssetTestCase
     {
         $this->logoutUser();
         $asset                = $this->createAsset(['title' => 'Missing Local File Asset']);
-        $coreParametersHelper = static::getContainer()->get('mautic.helper.core_parameters');
+        /** @var CoreParametersHelper $coreParametersHelper */
+        $coreParametersHelper = self::getContainer()->get(CoreParametersHelper::class);
         $asset->setUploadDir($coreParametersHelper->get('upload_dir'));
         $this->em->flush();
 

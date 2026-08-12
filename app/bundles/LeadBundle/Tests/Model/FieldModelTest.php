@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Field\CustomFieldColumn;
 use Mautic\LeadBundle\Field\Dispatcher\FieldSaveDispatcher;
 use Mautic\LeadBundle\Field\FieldList;
@@ -21,7 +22,7 @@ use Mautic\LeadBundle\Field\LeadFieldDeleter;
 use Mautic\LeadBundle\Field\LeadFieldSaver;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\ListModel;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -33,11 +34,11 @@ final class FieldModelTest extends MauticMysqlTestCase
     /**
      * @param array<string, mixed[]> $filters
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataForGetFieldsProperties')]
+    #[DataProvider('dataForGetFieldsProperties')]
     public function testGetFieldsProperties(array $filters, int $expectedCount): void
     {
         /** @var FieldModel $fieldModel */
-        $fieldModel = self::getContainer()->get('mautic.lead.model.field');
+        $fieldModel = self::getContainer()->get(FieldModel::class);
 
         // Create an unpublished lead field.
         $field = new LeadField();
@@ -98,7 +99,8 @@ final class FieldModelTest extends MauticMysqlTestCase
 
     public function testSingleContactFieldIsCreatedAndDeleted(): void
     {
-        $fieldModel = static::getContainer()->get('mautic.lead.model.field');
+        /** @var FieldModel $fieldModel */
+        $fieldModel = self::getContainer()->get(FieldModel::class);
 
         $field = new LeadField();
         $field->setName('Test Field')
@@ -114,7 +116,8 @@ final class FieldModelTest extends MauticMysqlTestCase
 
     public function testSingleCompanyFieldIsCreatedAndDeleted(): void
     {
-        $fieldModel = static::getContainer()->get('mautic.lead.model.field');
+        /** @var FieldModel $fieldModel */
+        $fieldModel = self::getContainer()->get(FieldModel::class);
 
         $field = new LeadField();
         $field->setName('Test Field')
@@ -130,7 +133,8 @@ final class FieldModelTest extends MauticMysqlTestCase
 
     public function testMultipleFieldsAreCreatedAndDeleted(): void
     {
-        $fieldModel = static::getContainer()->get('mautic.lead.model.field');
+        /** @var FieldModel $fieldModel */
+        $fieldModel = self::getContainer()->get(FieldModel::class);
 
         $leadField = new LeadField();
         $leadField->setName('Test Field')
@@ -209,6 +213,7 @@ final class FieldModelTest extends MauticMysqlTestCase
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(CoreParametersHelper::class),
+            $this->createStub(LeadRepository::class), // $leadRepository
         );
 
         $result = $fieldModel->generateUniqueFieldAlias('alias');
@@ -249,6 +254,7 @@ final class FieldModelTest extends MauticMysqlTestCase
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(CoreParametersHelper::class),
+            $this->createStub(LeadRepository::class), // $leadRepository
         );
         $this->assertTrue($model->isUsedField($leadField));
     }
@@ -256,9 +262,10 @@ final class FieldModelTest extends MauticMysqlTestCase
     public function testUniqueIdentifierIndexToggleForContacts(): void
     {
         // Log queries so we can detect if alter queries were executed
-        /**  $stack */
-        $stack                    = new class implements SQLLogger { /** @phpstan-ignore-line SQLLogger is deprecated */
-            /** @var array<mixed> */
+        $stack = new class() implements SQLLogger {
+            /**
+             * @var array<mixed>
+             */
             private array $indexQueries = [];
 
             public function startQuery($sql, ?array $params = null, ?array $types = null): void
@@ -292,14 +299,15 @@ final class FieldModelTest extends MauticMysqlTestCase
         };
 
         $this->connection->getConfiguration()->setSQLLogger($stack); /** @phpstan-ignore-line SQLLogger is deprecated */
-        $fieldModel = $this->getContainer()->get('mautic.lead.model.field');
+        /** @var FieldModel $fieldModel */
+        $fieldModel = $this->getContainer()->get(FieldModel::class);
 
         // Ensure the index exists
         $emailField = $fieldModel->getEntityByAlias('email');
         $fieldModel->saveEntity($emailField);
         $columns = $this->getUniqueIdentifierIndexColumns('leads');
-        Assert::assertCount(1, $columns);
-        Assert::assertEquals('email', $columns[0]['COLUMN_NAME']);
+        $this->assertCount(1, $columns);
+        $this->assertEquals('email', $columns[0]['COLUMN_NAME']);
         $stack->resetQueries();
 
         // Test updating the index
@@ -311,14 +319,14 @@ final class FieldModelTest extends MauticMysqlTestCase
             ->setIsUniqueIdentifier(true);
         $fieldModel->saveEntity($ui1Field);
         $columns = $this->getUniqueIdentifierIndexColumns('leads');
-        Assert::assertCount(2, $columns);
-        Assert::assertEquals('email', $columns[0]['COLUMN_NAME']);
-        Assert::assertEquals('ui1', $columns[1]['COLUMN_NAME']);
+        $this->assertCount(2, $columns);
+        $this->assertEquals('email', $columns[0]['COLUMN_NAME']);
+        $this->assertEquals('ui1', $columns[1]['COLUMN_NAME']);
         $alteredIndexes = $stack->getIndexQueries();
-        Assert::assertCount(3, $alteredIndexes);
-        Assert::assertEquals(sprintf('DROP INDEX %1$sunique_identifier_search ON %1$sleads', MAUTIC_TABLE_PREFIX), $alteredIndexes[0]);
-        Assert::assertEquals(sprintf('CREATE INDEX %1$sunique_identifier_search ON %1$sleads (email, ui1)', MAUTIC_TABLE_PREFIX), $alteredIndexes[1]);
-        Assert::assertEquals(sprintf('CREATE INDEX %1$sui1_search ON %1$sleads (ui1)', MAUTIC_TABLE_PREFIX), $alteredIndexes[2]);
+        $this->assertCount(3, $alteredIndexes);
+        $this->assertEquals(sprintf('DROP INDEX %1$sunique_identifier_search ON %1$sleads', MAUTIC_TABLE_PREFIX), $alteredIndexes[0]);
+        $this->assertEquals(sprintf('CREATE INDEX %1$sunique_identifier_search ON %1$sleads (email, ui1)', MAUTIC_TABLE_PREFIX), $alteredIndexes[1]);
+        $this->assertEquals(sprintf('CREATE INDEX %1$sui1_search ON %1$sleads (ui1)', MAUTIC_TABLE_PREFIX), $alteredIndexes[2]);
         $stack->resetQueries();
 
         // Test only the first 3 columns are used for the index
@@ -336,27 +344,24 @@ final class FieldModelTest extends MauticMysqlTestCase
             ->setIsUniqueIdentifier(true);
         $fieldModel->saveEntities([$ui2Field, $ui3Field]);
         $columns = $this->getUniqueIdentifierIndexColumns('leads');
-        Assert::assertCount(3, $columns);
-        Assert::assertEquals('email', $columns[0]['COLUMN_NAME']);
-        Assert::assertEquals('ui1', $columns[1]['COLUMN_NAME']);
-        Assert::assertEquals('ui2', $columns[2]['COLUMN_NAME']);
+        $this->assertCount(3, $columns);
+        $this->assertEquals('email', $columns[0]['COLUMN_NAME']);
+        $this->assertEquals('ui1', $columns[1]['COLUMN_NAME']);
+        $this->assertEquals('ui2', $columns[2]['COLUMN_NAME']);
         $alteredIndexes = $stack->getIndexQueries();
-        Assert::assertCount(4, $alteredIndexes);
-        Assert::assertEquals(sprintf('DROP INDEX %1$sunique_identifier_search ON %1$sleads', MAUTIC_TABLE_PREFIX), $alteredIndexes[0]);
-        Assert::assertEquals(
-            sprintf('CREATE INDEX %1$sunique_identifier_search ON %1$sleads (email, ui1, ui2)', MAUTIC_TABLE_PREFIX),
-            $alteredIndexes[1]
-        );
-        Assert::assertEquals(sprintf('CREATE INDEX %1$sui2_search ON %1$sleads (ui2)', MAUTIC_TABLE_PREFIX), $alteredIndexes[2]);
-        Assert::assertEquals(sprintf('CREATE INDEX %1$sui3_search ON %1$sleads (ui3)', MAUTIC_TABLE_PREFIX), $alteredIndexes[3]);
+        $this->assertCount(4, $alteredIndexes);
+        $this->assertEquals(sprintf('DROP INDEX %1$sunique_identifier_search ON %1$sleads', MAUTIC_TABLE_PREFIX), $alteredIndexes[0]);
+        $this->assertEquals(sprintf('CREATE INDEX %1$sunique_identifier_search ON %1$sleads (email, ui1, ui2)', MAUTIC_TABLE_PREFIX), $alteredIndexes[1]);
+        $this->assertEquals(sprintf('CREATE INDEX %1$sui2_search ON %1$sleads (ui2)', MAUTIC_TABLE_PREFIX), $alteredIndexes[2]);
+        $this->assertEquals(sprintf('CREATE INDEX %1$sui3_search ON %1$sleads (ui3)', MAUTIC_TABLE_PREFIX), $alteredIndexes[3]);
         $stack->resetQueries();
 
         // Test that the index was not touched if only the label was updated
         $ui1Field->setLabel('UI1 Patched Again');
         $fieldModel->saveEntity($ui1Field);
         $columns = $this->getUniqueIdentifierIndexColumns('leads');
-        Assert::assertCount(3, $columns);
-        Assert::assertCount(0, $stack->getIndexQueries());
+        $this->assertCount(3, $columns);
+        $this->assertCount(0, $stack->getIndexQueries());
 
         // Cleanup
         $fieldModel->deleteEntities([$ui1Field->getId(), $ui2Field->getId(), $ui3Field->getId()]);
@@ -370,7 +375,7 @@ final class FieldModelTest extends MauticMysqlTestCase
         $stmt = $this->connection->executeQuery(
             "SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '{$this->connection->getDatabase()}' AND TABLE_NAME = '"
             .MAUTIC_TABLE_PREFIX
-            ."$table' AND COLUMN_NAME = '$column'"
+            ."{$table}' AND COLUMN_NAME = '{$column}'"
         );
 
         return $stmt->fetchAllAssociative();

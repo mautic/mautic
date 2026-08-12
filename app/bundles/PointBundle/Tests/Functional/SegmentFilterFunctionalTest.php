@@ -73,9 +73,9 @@ final class SegmentFilterFunctionalTest extends MauticMysqlTestCase
         $response = json_decode($clientResponse->getContent(), true);
         $this->assertSame(1, (int) $response['total']);
         $contactIds = array_column($response['contacts'], 'id');
-        $this->assertContains((int) $contactA->getId(), $contactIds);
-        $this->assertNotContains((int) $contactB->getId(), $contactIds);
-        $this->assertNotContains((int) $contactC->getId(), $contactIds);
+        $this->assertContains($contactA->getId(), $contactIds);
+        $this->assertNotContains($contactB->getId(), $contactIds);
+        $this->assertNotContains($contactC->getId(), $contactIds);
     }
 
     private function createContact(

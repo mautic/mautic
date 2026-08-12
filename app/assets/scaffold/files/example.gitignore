@@ -32,6 +32,8 @@
 !/var/cache/.gitkeep
 
 /var/phpstan-cache/*
+phpstan.dist.neon
+phpstan.neon.dist
 
 /app/logs/*
 !/app/logs/.gitkeep

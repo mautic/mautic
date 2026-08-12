@@ -16,8 +16,10 @@ final class EntityImportAnalyzeEvent extends Event
     /**
      * @param array<string, mixed> $data
      */
-    public function __construct(private readonly string $entityName, private readonly array $data)
-    {
+    public function __construct(
+        private readonly string $entityName,
+        private readonly array $data,
+    ) {
     }
 
     /**

@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependency;
 use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -51,7 +52,7 @@ final class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
         $this->mockListModel->expects($this->never())
             ->method('getEntity');
 
-        $this->validator->validate([], new CircularDependency([]));
+        $this->validator->validate([], new CircularDependency());
     }
 
     /**
@@ -98,26 +99,26 @@ final class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
         ];
 
         $mockEntity1 = $this->createMock(LeadList::class);
-        $mockEntity1->expects($this->any())
+        $mockEntity1
             ->method('getId')
             ->willReturn(1);
-        $mockEntity1->expects($this->any())
+        $mockEntity1
             ->method('getFilters')
             ->willReturn($filters);
 
         $mockEntity2 = $this->createMock(LeadList::class);
-        $mockEntity2->expects($this->any())
+        $mockEntity2
             ->method('getId')
             ->willReturn(2);
-        $mockEntity2->expects($this->any())
+        $mockEntity2
             ->method('getFilters')
             ->willReturn($filters2);
 
         $mockEntity3 = $this->createMock(LeadList::class);
-        $mockEntity3->expects($this->any())
+        $mockEntity3
             ->method('getId')
             ->willReturn(3);
-        $mockEntity3->expects($this->any())
+        $mockEntity3
             ->method('getFilters')
             ->willReturn($filters3);
 
@@ -127,14 +128,14 @@ final class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
             3 => $mockEntity3,
         ];
 
-        $this->mockListModel->expects($this->any())
+        $this->mockListModel
             ->method('getEntity')
             ->willReturnCallback(fn ($id): LeadList&\PHPUnit\Framework\MockObject\MockObject => $entities[$id]);
 
         if (!empty($expectedMessage)) {
             $this->context->expects($this->once())
                 ->method('addViolation')
-                ->with($this->equalTo($expectedMessage));
+                ->with($expectedMessage);
         } else {
             $this->context->expects($this->never())
                 ->method('addViolation');
@@ -150,110 +151,108 @@ final class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
      *
      * @param array<int, array<string, mixed>> $filters
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('validateDataProvider')]
+    #[DataProvider('validateDataProvider')]
     public function testValidateOnInvalid(?string $message, int $currentSegmentId, array $filters): void
     {
         $this->configureValidator($message, $currentSegmentId)
-            ->validate($filters, new CircularDependency(['message' => 'mautic.core.segment.circular_dependency_exists']));
+            ->validate($filters, new CircularDependency(message: 'mautic.core.segment.circular_dependency_exists'));
     }
 
-    /** @return array<int, array{0: ?string, 1: int, 2: array<int, array<string, mixed>>}> */
-    public static function validateDataProvider(): array
+    /**
+     * @return \Iterator<int, array{(string|null), int, array<int, array<string, mixed>>}>
+     */
+    public static function validateDataProvider(): \Iterator
     {
-        $constraint = new CircularDependency(['message' => 'mautic.core.segment.circular_dependency_exists']);
-
-        return [
-            // Segment 1 is dependent on Segment 2 which is dependent on segment 1 - circular
+        $constraint = new CircularDependency(message: 'mautic.core.segment.circular_dependency_exists');
+        // Segment 1 is dependent on Segment 2 which is dependent on segment 1 - circular
+        yield [
+            $constraint->message,
+            2, // current segment id
             [
-                $constraint->message,
-                2, // current segment id
                 [
-                    [
-                        'glue'     => 'and',
-                        'field'    => 'leadlist',
-                        'object'   => 'lead',
-                        'type'     => 'leadlist',
-                        'filter'   => [1], // Keeping filter in the root to test also for BC segments.
-                        'display'  => null,
-                        'operator' => 'in',
-                    ],
+                    'glue'     => 'and',
+                    'field'    => 'leadlist',
+                    'object'   => 'lead',
+                    'type'     => 'leadlist',
+                    'filter'   => [1], // Keeping filter in the root to test also for BC segments.
+                    'display'  => null,
+                    'operator' => 'in',
                 ],
             ],
-            // Segment 2 is dependent on Segment 1 which is dependent on segment 2 - circular
+        ];
+        // Segment 2 is dependent on Segment 1 which is dependent on segment 2 - circular
+        yield [
+            $constraint->message,
+            1, // current segment id
             [
-                $constraint->message,
-                1, // current segment id
                 [
-                    [
-                        'glue'       => 'and',
-                        'field'      => 'leadlist',
-                        'object'     => 'lead',
-                        'type'       => 'leadlist',
-                        'properties' => ['filter' => [2]],
-                        'display'    => null,
-                        'operator'   => 'in',
-                    ],
+                    'glue'       => 'and',
+                    'field'      => 'leadlist',
+                    'object'     => 'lead',
+                    'type'       => 'leadlist',
+                    'properties' => ['filter' => [2]],
+                    'display'    => null,
+                    'operator'   => 'in',
                 ],
             ],
-            // Test when there are no validation errors
-            // The segment in the filter (3) is NOT dependent on any
+        ];
+        // Test when there are no validation errors
+        // The segment in the filter (3) is NOT dependent on any
+        yield [
+            null,
+            1, // current segment id
             [
-                null,
-                1, // current segment id
                 [
-                    [
-                        'glue'       => 'and',
-                        'field'      => 'leadlist',
-                        'object'     => 'lead',
-                        'type'       => 'leadlist',
-                        'properties' => ['filter' => [3]],
-                        'display'    => null,
-                        'operator'   => 'in',
-                    ],
+                    'glue'       => 'and',
+                    'field'      => 'leadlist',
+                    'object'     => 'lead',
+                    'type'       => 'leadlist',
+                    'properties' => ['filter' => [3]],
+                    'display'    => null,
+                    'operator'   => 'in',
                 ],
             ],
-            // Test when no lead list filters
+        ];
+        // Test when no lead list filters
+        yield [
+            null,
+            1, // current segment id
             [
-                null,
-                1, // current segment id
                 [
-                    [
-                        'glue'     => 'and',
-                        'field'    => 'first_name',
-                        'object'   => 'lead',
-                        'type'     => 'text',
-                        'filter'   => 'Doe', // Keeping filter in the root to test also for BC segments.
-                        'display'  => null,
-                        'operator' => '=',
-                    ],
+                    'glue'     => 'and',
+                    'field'    => 'first_name',
+                    'object'   => 'lead',
+                    'type'     => 'text',
+                    'filter'   => 'Doe', // Keeping filter in the root to test also for BC segments.
+                    'display'  => null,
+                    'operator' => '=',
                 ],
             ],
-            // Test multiple lead list filters. Fails because 2 is dependent on 1
+        ];
+        // Test multiple lead list filters. Fails because 2 is dependent on 1
+        yield [
+            $constraint->message,
+            2, // current segment id
             [
-                $constraint->message,
-                2, // current segment id
                 [
-                    [
-                        'glue'       => 'and',
-                        'field'      => 'leadlist',
-                        'object'     => 'lead',
-                        'type'       => 'leadlist',
-                        'properties' => ['filter' => [1]],
-                        'display'    => null,
-                        'operator'   => 'in',
-                    ],
-                    [
-                        'glue'       => 'and',
-                        'field'      => 'leadlist',
-                        'object'     => 'lead',
-                        'type'       => 'leadlist',
-                        'properties' => ['filter' => [3]],
-                        'display'    => null,
-                        'operator'   => 'in',
-                    ],
+                    'glue'       => 'and',
+                    'field'      => 'leadlist',
+                    'object'     => 'lead',
+                    'type'       => 'leadlist',
+                    'properties' => ['filter' => [1]],
+                    'display'    => null,
+                    'operator'   => 'in',
+                ],
+                [
+                    'glue'       => 'and',
+                    'field'      => 'leadlist',
+                    'object'     => 'lead',
+                    'type'       => 'leadlist',
+                    'properties' => ['filter' => [3]],
+                    'display'    => null,
+                    'operator'   => 'in',
                 ],
             ],
-            // @TODO: MUST ADD TEST CASES ONCE WE FIX DEEP CIRCULAR (1 depends on 2 which depends on 3 which depends on 1) TO AN ARBITRARY DEPTH
         ];
     }
 }

@@ -107,8 +107,6 @@ class ReportGeneratorEvent extends AbstractReportEvent
     }
 
     /**
-     * Add category left join.
-     *
      * @param string $prefix
      * @param string $categoryPrefix
      */
@@ -122,8 +120,6 @@ class ReportGeneratorEvent extends AbstractReportEvent
     }
 
     /**
-     * Add lead left join.
-     *
      * @param string $prefix
      * @param string $leadPrefix
      */
@@ -226,9 +222,6 @@ class ReportGeneratorEvent extends AbstractReportEvent
         return $this;
     }
 
-    /**
-     * Add company left join.
-     */
     public function addCompanyLeftJoin(QueryBuilder $queryBuilder, string $companyPrefix = self::COMPANY_PREFIX, string $contactPrefix = self::CONTACT_PREFIX): void
     {
         if ($this->usesColumnWithPrefix($companyPrefix) || $this->usesColumnWithPrefix(self::COMPANY_LEAD_PREFIX)) {
@@ -243,13 +236,9 @@ class ReportGeneratorEvent extends AbstractReportEvent
     /**
      * Apply date filters to the query.
      *
-     * @param string $dateColumn
-     * @param string $tablePrefix
-     * @param bool   $dateOnly
-     *
      * @throws \Exception
      */
-    public function applyDateFilters(QueryBuilder $queryBuilder, $dateColumn, $tablePrefix = 't', $dateOnly = false): ReportGeneratorEvent
+    public function applyDateFilters(QueryBuilder $queryBuilder, string $dateColumn, string $tablePrefix = 't', bool $dateOnly = false): self
     {
         $this->setDateRangeQueryFilters(
             $queryBuilder, $tablePrefix, $dateOnly, $dateColumn,
@@ -260,7 +249,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
         return $this;
     }
 
-    public function applyDateFiltersWithoutNullValues(QueryBuilder $queryBuilder, string $dateColumn, string $tablePrefix = 't', bool $dateOnly = false): ReportGeneratorEvent
+    public function applyDateFiltersWithoutNullValues(QueryBuilder $queryBuilder, string $dateColumn, string $tablePrefix = 't', bool $dateOnly = false): self
     {
         $this->setDateRangeQueryFilters(
             $queryBuilder, $tablePrefix, $dateOnly, $dateColumn,

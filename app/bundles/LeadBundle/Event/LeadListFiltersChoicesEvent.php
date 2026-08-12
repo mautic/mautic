@@ -8,16 +8,16 @@ use Mautic\CoreBundle\Event\AbstractCustomRequestEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
+final class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
 {
     /**
      * @param mixed[] $choices
      * @param mixed[] $operators Please refer to ListModel.php, inside getChoiceFields method, for default operators availabled.
      */
     public function __construct(
-        protected $choices,
-        protected $operators,
-        protected TranslatorInterface $translator,
+        private $choices,
+        private $operators,
+        private readonly TranslatorInterface $translator,
         ?Request $request = null,
         private readonly string $search = '',
     ) {

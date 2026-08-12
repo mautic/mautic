@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\ReportBundle\Entity\Report;
-use PHPUnit\Framework\Assert;
+use Mautic\ReportBundle\Model\ReportModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -50,9 +50,10 @@ final class ReportModelTest extends MauticMysqlTestCase
         $request = new Request();
         $request->setSession($session);
         /** @var RequestStack $requestStack */
-        $requestStack = self::getContainer()->get('request_stack');
+        $requestStack = self::getContainer()->get(RequestStack::class);
         $requestStack->push($request);
-        $reportModel = self::getContainer()->get('mautic.report.model.report');
+        /** @var ReportModel $reportModel */
+        $reportModel = self::getContainer()->get(ReportModel::class);
 
         $aDayAgoBeginningOfTheDay = (clone $aDayAgo)->setTime(0, 0, 0);
 
@@ -61,8 +62,8 @@ final class ReportModelTest extends MauticMysqlTestCase
             'dateTo'   => clone $aDayAgoBeginningOfTheDay,
         ]);
 
-        Assert::assertSame(1, $reportData['totalResults']);
-        Assert::assertCount(1, $reportData['data']);
+        $this->assertSame(1, $reportData['totalResults']);
+        $this->assertCount(1, $reportData['data']);
     }
 
     private function makeSubmission(Form $form, IpAddress $ipAddress, \DateTime $dateSubmitted): Submission

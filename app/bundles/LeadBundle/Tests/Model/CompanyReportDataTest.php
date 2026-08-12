@@ -9,8 +9,9 @@ use Mautic\FormBundle\Entity\Field;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(CompanyReportData::class)]
+#[CoversClass(CompanyReportData::class)]
 final class CompanyReportDataTest extends \PHPUnit\Framework\TestCase
 {
     /**
@@ -24,7 +25,7 @@ final class CompanyReportDataTest extends \PHPUnit\Framework\TestCase
 
         $this->translator->method('trans')
             ->willReturnCallback(
-                fn ($key) => $key
+                fn (string $key): string => $key
             );
     }
 
@@ -125,7 +126,7 @@ final class CompanyReportDataTest extends \PHPUnit\Framework\TestCase
             ->method('getEntities')
             ->willReturn([$field]);
 
-        $eventMock->expects($this->any())
+        $eventMock
             ->method('hasColumn')
             ->willReturn(false);
 

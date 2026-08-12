@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -308,9 +310,9 @@ class LeadDevice
     }
 
     /**
-     * @param array $deviceOs
+     * @param array<string, mixed>|null $deviceOs
      */
-    public function setDeviceOs($deviceOs): void
+    public function setDeviceOs(?array $deviceOs): void
     {
         if (isset($deviceOs['name'])) {
             $this->deviceOsName = $deviceOs['name'];

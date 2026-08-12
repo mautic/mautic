@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PageBundle\Model;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -18,11 +20,9 @@ class Tracking404Model
     }
 
     /**
-     * @param Page|Redirect $entity
-     *
      * @throws \Exception
      */
-    public function hitPage($entity, Request $request): void
+    public function hitPage(Redirect|Page|null $entity, Request $request): void
     {
         $this->pageModel->hitPage($entity, $request, 404);
     }

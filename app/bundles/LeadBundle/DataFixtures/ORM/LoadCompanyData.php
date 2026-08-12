@@ -7,12 +7,12 @@ use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\LeadBundle\Entity\Company;
-use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 
-class LoadCompanyData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadCompanyData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
-        private readonly CompanyModel $companyModel,
+        private readonly CompanyRepository $companyRepository,
     ) {
     }
 
@@ -26,16 +26,13 @@ class LoadCompanyData extends AbstractFixture implements OrderedFixtureInterface
             foreach ($l as $col => $val) {
                 $company->addUpdatedField($col, $val);
             }
-            $this->companyModel->getRepository()->saveEntity($company);
+            $this->companyRepository->saveEntity($company);
 
             $this->setReference('company-'.$count, $company);
         }
     }
 
-    /**
-     * @return int
-     */
-    public function getOrder()
+    public function getOrder(): int
     {
         return 4;
     }

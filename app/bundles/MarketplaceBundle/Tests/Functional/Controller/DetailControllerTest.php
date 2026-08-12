@@ -8,14 +8,14 @@ use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\Test\Guzzle\ClientMockTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\MarketplaceBundle\Service\Allowlist;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 final class DetailControllerTest extends MauticMysqlTestCase
 {
     use ClientMockTrait;
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataProvider')]
+    #[DataProvider('dataProvider')]
     public function testMarketplaceDetailPage(string $requestedPackage, int $responseCode, string $foundPackageName, string $foundPackageDesc, string $latestVersion = ''): void
     {
         $handlerStack = $this->getClientMockHandler();
@@ -25,7 +25,7 @@ final class DetailControllerTest extends MauticMysqlTestCase
         );
 
         /** @var Allowlist $allowlist */
-        $allowlist = static::getContainer()->get('marketplace.service.allowlist');
+        $allowlist = self::getContainer()->get(Allowlist::class);
         $allowlist->clearCache();
 
         $this->client->request('GET', "s/marketplace/detail/{$requestedPackage}");
@@ -33,9 +33,9 @@ final class DetailControllerTest extends MauticMysqlTestCase
         $responseContent = $this->client->getResponse()->getContent();
 
         self::assertResponseStatusCodeSame($responseCode);
-        Assert::assertStringContainsString($foundPackageDesc, $responseContent);
-        Assert::assertStringContainsString($foundPackageName, $responseContent);
-        Assert::assertStringContainsString($latestVersion, $responseContent);
+        $this->assertStringContainsString($foundPackageDesc, (string) $responseContent);
+        $this->assertStringContainsString($foundPackageName, (string) $responseContent);
+        $this->assertStringContainsString($latestVersion, (string) $responseContent);
     }
 
     /**

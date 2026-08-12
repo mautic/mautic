@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -88,17 +90,12 @@ class PointsChangeLog
         $builder->addDateAdded();
     }
 
-    /**
-     * Get id.
-     */
     public function getId(): int
     {
         return (int) $this->id;
     }
 
     /**
-     * Set type.
-     *
      * @param string $type
      */
     public function setType($type): static
@@ -109,8 +106,6 @@ class PointsChangeLog
     }
 
     /**
-     * Get type.
-     *
      * @return string
      */
     public function getType()
@@ -119,8 +114,6 @@ class PointsChangeLog
     }
 
     /**
-     * Set eventName.
-     *
      * @param string $eventName
      */
     public function setEventName($eventName): static
@@ -131,8 +124,6 @@ class PointsChangeLog
     }
 
     /**
-     * Get eventName.
-     *
      * @return string
      */
     public function getEventName()
@@ -141,8 +132,6 @@ class PointsChangeLog
     }
 
     /**
-     * Set actionName.
-     *
      * @param string $actionName
      */
     public function setActionName($actionName): static
@@ -153,8 +142,6 @@ class PointsChangeLog
     }
 
     /**
-     * Get actionName.
-     *
      * @return string
      */
     public function getActionName()
@@ -163,8 +150,6 @@ class PointsChangeLog
     }
 
     /**
-     * Set delta.
-     *
      * @param int $delta
      */
     public function setDelta($delta): static
@@ -175,8 +160,6 @@ class PointsChangeLog
     }
 
     /**
-     * Get delta.
-     *
      * @return int
      */
     public function getDelta()
@@ -185,8 +168,6 @@ class PointsChangeLog
     }
 
     /**
-     * Set dateAdded.
-     *
      * @param \DateTime $dateAdded
      */
     public function setDateAdded($dateAdded): static
@@ -197,8 +178,6 @@ class PointsChangeLog
     }
 
     /**
-     * Get dateAdded.
-     *
      * @return \DateTimeInterface
      */
     public function getDateAdded()
@@ -206,9 +185,6 @@ class PointsChangeLog
         return $this->dateAdded;
     }
 
-    /**
-     * Set lead.
-     */
     public function setLead(Lead $lead): static
     {
         $this->lead = $lead;
@@ -217,8 +193,6 @@ class PointsChangeLog
     }
 
     /**
-     * Get lead.
-     *
      * @return Lead
      */
     public function getLead()

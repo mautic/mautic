@@ -90,7 +90,7 @@ class Form extends FormEntity implements UuidInterface
 
     /**
      * @var Category|null
-     **/
+     */
     #[Groups(['form:read', 'form:write', 'campaign:read', 'email:read'])]
     private $category;
 
@@ -175,7 +175,7 @@ class Form extends FormEntity implements UuidInterface
      * @var bool|null
      */
     #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
-    private $noIndex;
+    private $noIndex = true;
 
     /**
      * @var int|null
@@ -211,7 +211,6 @@ class Form extends FormEntity implements UuidInterface
         $this->fields      = new ArrayCollection();
         $this->actions     = new ArrayCollection();
         $this->submissions = new ArrayCollection();
-        $this->noIndex     = true;
         $this->initializeProjects();
     }
 
@@ -311,33 +310,17 @@ class Form extends FormEntity implements UuidInterface
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $metadata->addPropertyConstraint('name', new Assert\NotBlank([
-            'message' => 'mautic.core.name.required',
-            'groups'  => ['form'],
-        ]));
+        $metadata->addPropertyConstraint('name', new Assert\NotBlank(message: 'mautic.core.name.required', groups: ['form']));
 
-        $metadata->addPropertyConstraint('postActionProperty', new Assert\NotBlank([
-            'message' => 'mautic.form.form.postactionproperty_message.notblank',
-            'groups'  => ['messageRequired'],
-        ]));
+        $metadata->addPropertyConstraint('postActionProperty', new Assert\NotBlank(message: 'mautic.form.form.postactionproperty_message.notblank', groups: ['messageRequired']));
 
-        $metadata->addPropertyConstraint('postActionProperty', new Assert\NotBlank([
-            'message' => 'mautic.form.form.postactionproperty_redirect.notblank',
-            'groups'  => ['urlRequired'],
-        ]));
+        $metadata->addPropertyConstraint('postActionProperty', new Assert\NotBlank(message: 'mautic.form.form.postactionproperty_redirect.notblank', groups: ['urlRequired']));
 
         $metadata->addPropertyConstraint('postActionProperty', new IsPostActionRedirectUrl(groups: ['urlRequired']));
 
-        $metadata->addPropertyConstraint('postActionProperty', new Assert\NotBlank([
-            'message' => 'mautic.form.form.postactionproperty_hideform.notblank',
-            'groups'  => ['hideformRequired'],
-        ]));
+        $metadata->addPropertyConstraint('postActionProperty', new Assert\NotBlank(message: 'mautic.form.form.postactionproperty_hideform.notblank', groups: ['hideformRequired']));
 
-        $metadata->addPropertyConstraint('progressiveProfilingLimit', new Assert\GreaterThan([
-            'value'   => 0,
-            'message' => 'mautic.form.form.progressive_profiling_limit.error',
-            'groups'  => ['progressiveProfilingLimit'],
-        ]));
+        $metadata->addPropertyConstraint('progressiveProfilingLimit', new Assert\GreaterThan(value: 0, message: 'mautic.form.form.progressive_profiling_limit.error', groups: ['progressiveProfilingLimit']));
     }
 
     public static function determineValidationGroups(\Symfony\Component\Form\Form $form): array
@@ -400,7 +383,7 @@ class Form extends FormEntity implements UuidInterface
         self::addProjectsInLoadApiMetadata($metadata, 'form');
     }
 
-    protected function isChanged($prop, $val)
+    protected function isChanged($prop, $val): void
     {
         if ('actions' == $prop || 'fields' == $prop) {
             // changes are already computed so just add them
@@ -520,7 +503,7 @@ class Form extends FormEntity implements UuidInterface
 
     public function getPostActionProperty(): ?string
     {
-        if ('return' === $this->getPostAction()) {
+        if ('return' === $this->postAction) {
             return null;
         }
 
@@ -605,7 +588,7 @@ class Form extends FormEntity implements UuidInterface
     public function getFieldAliases(): array
     {
         $aliases = [];
-        $fields  = $this->getFields();
+        $fields  = $this->fields;
 
         if ($fields) {
             foreach ($fields as $field) {
@@ -630,7 +613,7 @@ class Form extends FormEntity implements UuidInterface
                     'mappedObject' => $field->getMappedObject(),
                     'mappedField'  => $field->getMappedField(),
                 ],
-                $this->getFields()->getValues(),
+                $this->fields->getValues(),
             ),
             fn (array $elem): bool => isset($elem['mappedObject']) && isset($elem['mappedField']),
         );
@@ -646,7 +629,7 @@ class Form extends FormEntity implements UuidInterface
         return array_values(
             array_filter(
                 array_unique(
-                    $this->getFields()->map(
+                    $this->fields->map(
                         fn (Field $field): ?string => $field->getMappedObject(),
                     )->toArray(),
                 ),
@@ -686,7 +669,7 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return Collection|Submission[]
+     * @return Collection<int, Submission>
      */
     public function getSubmissions(): Collection
     {
@@ -788,7 +771,7 @@ class Form extends FormEntity implements UuidInterface
      */
     public function isInKioskMode()
     {
-        return $this->getInKioskMode();
+        return $this->inKioskMode;
     }
 
     /**
@@ -909,8 +892,8 @@ class Form extends FormEntity implements UuidInterface
         }
 
         // Progressive profiling must be turned off in the kiosk mode
-        if (false === $this->getInKioskMode()) {
-            if ('' != $this->getProgressiveProfilingLimit()) {
+        if (false === $this->inKioskMode) {
+            if ('' != $this->progressiveProfilingLimit) {
                 $this->usesProgressiveProfiling = true;
 
                 return $this->usesProgressiveProfiling;

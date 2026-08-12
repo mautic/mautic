@@ -40,15 +40,13 @@ final class AbstractIntegrationTest extends TestCase
 JSON;
 
         $json = $integrationDouble->parseCallbackResponse($jsonString);
-        self::assertArrayHasKey('webinars', $json);
+        $this->assertArrayHasKey('webinars', $json);
     }
 
-    /** @phpstan-ignore return.deprecatedClass */
     private function buildAbstractIntegrationDouble(): AbstractIntegration
     {
         // creating a double since we can't instantiate
         // we also need to expose some things for better unit test coverage
-        // @phpstan-ignore new.deprecated, class.extendsDeprecatedClass, classConstant.deprecatedClass
         return new class($this->createStub(EventDispatcherInterface::class), $this->createStub(CacheStorageHelper::class), $this->createStub(EntityManager::class), $this->createStub(RequestStack::class), $this->createStub(Router::class), $this->createStub(TranslatorInterface::class), $this->createStub(Logger::class), $this->createStub(EncryptionHelper::class), $this->createStub(LeadModel::class), $this->createStub(CompanyModel::class), $this->createStub(PathsHelper::class), $this->createStub(NotificationModel::class), $this->createStub(FieldModel::class), $this->createStub(IntegrationEntityModel::class), $this->createStub(DoNotContactModel::class), $this->createStub(FieldsWithUniqueIdentifier::class)) extends AbstractIntegration {
             public function getName(): string
             {

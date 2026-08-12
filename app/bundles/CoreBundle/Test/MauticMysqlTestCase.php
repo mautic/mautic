@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Test;
 
 use Doctrine\DBAL\Exception as DBALException;
+use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
 use Mautic\InstallBundle\InstallFixtures\ORM\RoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
@@ -136,10 +137,9 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     protected function resetAutoincrement(array $tables): void
     {
         $prefix     = $this->getTablePrefix();
-        $connection = $this->connection;
 
         foreach ($tables as $table) {
-            $connection->executeStatement(sprintf('ALTER TABLE `%s%s` AUTO_INCREMENT=1', $prefix, $table));
+            $this->connection->executeStatement(sprintf('ALTER TABLE `%s%s` AUTO_INCREMENT=1', $prefix, $table));
         }
     }
 
@@ -384,7 +384,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
     private function clearCache(): void
     {
-        $cacheProvider = static::getContainer()->get('mautic.cache.provider');
+        $cacheProvider = static::getContainer()->get(CacheProvider::class);
         $this->assertInstanceOf(CacheItemPoolInterface::class, $cacheProvider);
         $cacheProvider->clear();
     }

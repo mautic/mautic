@@ -5,9 +5,9 @@ namespace Mautic\CoreBundle\Test\DoctrineExtensions;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
-class TablePrefix
+final class TablePrefix
 {
-    protected string $prefix;
+    private readonly string $prefix;
 
     /**
      * @param string $prefix
@@ -32,7 +32,7 @@ class TablePrefix
         }
     }
 
-    private function addPrefixToIndexes($prefix, array &$table, string $key): void
+    private function addPrefixToIndexes(string $prefix, array &$table, string $key): void
     {
         if (!isset($table[$key])) {
             return;

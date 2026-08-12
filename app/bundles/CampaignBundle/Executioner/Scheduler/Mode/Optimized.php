@@ -8,17 +8,19 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Services\PeakInteractionTimer;
 
-class Optimized implements ScheduleModeInterface
+final readonly class Optimized implements ScheduleModeInterface
 {
     public const OPTIMIZED_TIME         = 0;
 
     public const OPTIMIZED_DAY_AND_TIME = 1;
 
-    /** @var string[] */
+    /**
+     * @var string[]
+     */
     public const AVAILABLE_FOR_EVENTS = ['email.send', 'message.send', 'plugin.leadpush', 'campaign.sendwebhook'];
 
     public function __construct(
-        private readonly PeakInteractionTimer $peakInteractionTimer,
+        private PeakInteractionTimer $peakInteractionTimer,
     ) {
     }
 

@@ -102,7 +102,7 @@ final class EmailRepositoryUpCountSentTest extends \PHPUnit\Framework\TestCase
         $this->connection
             ->expects($this->exactly(3))
             ->method('executeStatement')
-            ->will($this->throwException(new DBALException()));
+            ->willThrowException(new DBALException());
 
         $this->expectException(DBALException::class);
         $this->repo->upCountSent(45);

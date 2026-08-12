@@ -10,6 +10,7 @@ use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
 
@@ -43,7 +44,7 @@ final class LeadEmailReadDateSegmentFunctionalTest extends MauticMysqlTestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('emailReadDateOperatorProvider')]
+    #[DataProvider('emailReadDateOperatorProvider')]
     public function testEmailReadDateFilterUsesMostRecentReadDate(
         string $operator,
         bool $expectRecentOnly,
@@ -58,9 +59,9 @@ final class LeadEmailReadDateSegmentFunctionalTest extends MauticMysqlTestCase
 
         $memberLeadIds = $this->getSegmentMemberLeadIds($segment);
 
-        $this->assertMembership((int) $recentOnly->getId(), $memberLeadIds, $expectRecentOnly);
-        $this->assertMembership((int) $oldOnly->getId(), $memberLeadIds, $expectOldOnly);
-        $this->assertMembership((int) $both->getId(), $memberLeadIds, $expectBoth);
+        $this->assertMembership($recentOnly->getId(), $memberLeadIds, $expectRecentOnly);
+        $this->assertMembership($oldOnly->getId(), $memberLeadIds, $expectOldOnly);
+        $this->assertMembership($both->getId(), $memberLeadIds, $expectBoth);
     }
 
     /**

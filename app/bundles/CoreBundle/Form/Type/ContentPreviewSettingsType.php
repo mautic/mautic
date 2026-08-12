@@ -18,7 +18,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * Preview settings form used for pages and emails in detail view page.
  */
-class ContentPreviewSettingsType extends AbstractType
+final class ContentPreviewSettingsType extends AbstractType
 {
     public const TYPE_EMAIL = 'email';
 
@@ -28,8 +28,11 @@ class ContentPreviewSettingsType extends AbstractType
 
     private const CHOICE_TYPE_VARIANT     = 'variant';
 
-    public function __construct(private readonly TranslatorInterface $translator, private readonly CorePermissions $security, private readonly UserHelper $userHelper)
-    {
+    public function __construct(
+        private readonly TranslatorInterface $translator,
+        private readonly CorePermissions $security,
+        private readonly UserHelper $userHelper,
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -98,7 +101,7 @@ class ContentPreviewSettingsType extends AbstractType
             return;
         }
 
-        /** @var Email|Page */
+        /** @var Email|Page $child */
         $child = $variants['parent'];
 
         $variantChoices = [

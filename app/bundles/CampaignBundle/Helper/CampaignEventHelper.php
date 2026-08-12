@@ -4,7 +4,7 @@ namespace Mautic\CampaignBundle\Helper;
 
 use Mautic\CampaignBundle\Event\CampaignLeadChangeEvent;
 
-class CampaignEventHelper
+final class CampaignEventHelper
 {
     /**
      * Determine if this campaign applies.
@@ -26,6 +26,6 @@ class CampaignEventHelper
         // check against the selected action (was lead removed or added)
         $func = 'was'.ucfirst($action);
 
-        return method_exists($eventDetails, $func) && $eventDetails->$func();
+        return method_exists($eventDetails, $func) && $eventDetails->{$func}();
     }
 }

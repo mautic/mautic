@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Executioner\Result;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\LeadBundle\Entity\Lead;
 
-class EvaluatedContacts
+final readonly class EvaluatedContacts
 {
-    private readonly ArrayCollection $passed;
+    private ArrayCollection $passed;
 
-    private readonly ArrayCollection $failed;
+    private ArrayCollection $failed;
 
     public function __construct(?ArrayCollection $passed = null, ?ArrayCollection $failed = null)
     {
@@ -28,7 +30,7 @@ class EvaluatedContacts
     }
 
     /**
-     * @return ArrayCollection|Lead[]
+     * @return ArrayCollection<int, Lead>
      */
     public function getPassed(): ArrayCollection
     {
@@ -36,7 +38,7 @@ class EvaluatedContacts
     }
 
     /**
-     * @return ArrayCollection|Lead[]
+     * @return ArrayCollection<int, Lead>
      */
     public function getFailed(): ArrayCollection
     {

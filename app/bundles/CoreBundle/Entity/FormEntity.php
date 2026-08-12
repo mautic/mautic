@@ -234,7 +234,7 @@ class FormEntity extends CommonEntity
     {
         if ($checkPublishStatus && method_exists($this, 'getPublishUp')) {
             $status = $this->getPublishStatus();
-            if ('published' == $status) {
+            if ('published' === $status) {
                 // check to see if there is a category to check
                 if ($checkCategoryStatus && method_exists($this, 'getCategory')) {
                     $category = $this->getCategory();
@@ -247,12 +247,10 @@ class FormEntity extends CommonEntity
             return 'published' === $status;
         }
 
-        return $this->getIsPublished();
+        return $this->isPublished;
     }
 
     /**
-     * Set dateAdded.
-     *
      * @param \DateTime $dateAdded
      */
     public function setDateAdded($dateAdded): static
@@ -263,8 +261,6 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * Get dateAdded.
-     *
      * @return \DateTimeInterface|null
      */
     public function getDateAdded()
@@ -273,8 +269,6 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * Set dateModified.
-     *
      * @param \DateTime $dateModified
      */
     public function setDateModified($dateModified): static
@@ -286,8 +280,6 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * Get dateModified.
-     *
      * @return \DateTimeInterface|null
      */
     public function getDateModified()
@@ -296,8 +288,6 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * Set checkedOut.
-     *
      * @param \DateTime $checkedOut
      */
     public function setCheckedOut($checkedOut): static
@@ -308,8 +298,6 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * Get checkedOut.
-     *
      * @return \DateTimeInterface|null
      */
     public function getCheckedOut()
@@ -335,8 +323,6 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * Get createdBy.
-     *
      * @return int|null
      */
     public function getCreatedBy()
@@ -345,8 +331,6 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * Set modifiedBy.
-     *
      * @param User|int|null $modifiedBy
      */
     public function setModifiedBy($modifiedBy = null): static
@@ -365,8 +349,6 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * Get modifiedBy.
-     *
      * @return int|null
      */
     public function getModifiedBy()
@@ -375,8 +357,6 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * Set checkedOutBy.
-     *
      * @param User $checkedOutBy
      */
     public function setCheckedOutBy($checkedOutBy = null): static
@@ -395,8 +375,6 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * Get checkedOutBy.
-     *
      * @return int|null
      */
     public function getCheckedOutBy()
@@ -405,8 +383,6 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * Set isPublished.
-     *
      * @param bool $isPublished
      */
     public function setIsPublished($isPublished): static
@@ -419,8 +395,6 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * Get isPublished.
-     *
      * @return bool
      */
     public function getIsPublished()
@@ -431,11 +405,11 @@ class FormEntity extends CommonEntity
     /**
      * Check the publish status of an entity based on publish up and down datetimes.
      *
-     * @return string early|expired|published|unpublished
+     * @return "early"|"expired"|"published"|"unpublished"
      *
      * @throws \BadMethodCallException
      */
-    public function getPublishStatus()
+    public function getPublishStatus(): string
     {
         $dt      = new DateTimeHelper();
         $current = $dt->getLocalDateTime();

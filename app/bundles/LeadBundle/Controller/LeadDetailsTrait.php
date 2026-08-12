@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Controller;
 
+use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -9,15 +10,13 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Service\Attribute\Required;
 
 trait LeadDetailsTrait
 {
-    private ?RequestStack $requestStack = null;
+    private RequestStack $requestStack;
 
-    /**
-     * @param int $page
-     */
-    protected function getAllEngagements(array $leads, ?array $filters = null, ?array $orderBy = null, $page = 1, $limit = 25): array
+    protected function getAllEngagements(array $leads, ?array $filters = null, ?array $orderBy = null, int $page = 1, $limit = 25): array
     {
         $session = $this->requestStack->getCurrentRequest()->getSession();
 
@@ -120,7 +119,7 @@ trait LeadDetailsTrait
         return $filters;
     }
 
-    private function cmp($a, $b): int
+    private function cmp(array $a, array $b): int
     {
         return $b['timestamp'] <=> $a['timestamp'];
     }
@@ -160,8 +159,6 @@ trait LeadDetailsTrait
      */
     protected function getEngagementData(Lead $lead, ?\DateTime $fromDate = null, ?\DateTime $toDate = null): array
     {
-        $translator = $this->translator;
-
         if (null == $fromDate) {
             $fromDate = new \DateTime('first day of this month 00:00:00');
             $fromDate->modify('-6 months');
@@ -176,10 +173,10 @@ trait LeadDetailsTrait
         /** @var LeadModel $model */
         $model       = $this->getModel('lead');
         $engagements = $model->getEngagementCount($lead, $fromDate, $toDate, 'm', $chartQuery);
-        $lineChart->setDataset($translator->trans('mautic.lead.graph.line.all_engagements'), $engagements['byUnit']);
+        $lineChart->setDataset($this->translator->trans('mautic.lead.graph.line.all_engagements'), $engagements['byUnit']);
 
         $pointStats = $chartQuery->fetchSumTimeData('lead_points_change_log', 'date_added', ['lead_id' => $lead->getId()], 'delta');
-        $lineChart->setDataset($translator->trans('mautic.lead.graph.line.points'), $pointStats);
+        $lineChart->setDataset($this->translator->trans('mautic.lead.graph.line.points'), $pointStats);
 
         return $lineChart->render();
     }
@@ -251,11 +248,7 @@ trait LeadDetailsTrait
         ];
     }
 
-    /**
-     * @param int $page
-     * @param int $limit
-     */
-    protected function getEngagements(Lead $lead, ?array $filters = null, ?array $orderBy = null, $page = 1, $limit = 25): array
+    protected function getEngagements(Lead $lead, ?array $filters = null, ?array $orderBy = null, int $page = 1, int $limit = 25): array
     {
         $session = $this->requestStack->getCurrentRequest()->getSession();
 
@@ -356,7 +349,6 @@ trait LeadDetailsTrait
     protected function getCompanyEngagementsForGraph($contacts): array
     {
         $graphData  = $this->getCompanyEngagementData($contacts);
-        $translator = $this->translator;
 
         $fromDate = new \DateTime('first day of this month 00:00:00');
         $fromDate->modify('-6 months');
@@ -365,9 +357,9 @@ trait LeadDetailsTrait
 
         $lineChart  = new LineChart(null, $fromDate, $toDate);
 
-        $lineChart->setDataset($translator->trans('mautic.lead.graph.line.all_engagements'), $graphData['engagements']);
+        $lineChart->setDataset($this->translator->trans('mautic.lead.graph.line.all_engagements'), $graphData['engagements']);
 
-        $lineChart->setDataset($translator->trans('mautic.lead.graph.line.points'), $graphData['points']);
+        $lineChart->setDataset($this->translator->trans('mautic.lead.graph.line.points'), $graphData['points']);
 
         return $lineChart->render();
     }
@@ -376,7 +368,7 @@ trait LeadDetailsTrait
     {
         // Upcoming events from Campaign Bundle
         /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository */
-        $leadEventLogRepository = $this->doctrine->getManager()->getRepository(\Mautic\CampaignBundle\Entity\LeadEventLog::class);
+        $leadEventLogRepository = $this->doctrine->getManager()->getRepository(LeadEventLog::class);
 
         return $leadEventLogRepository->getUpcomingEvents(
             [
@@ -386,9 +378,10 @@ trait LeadDetailsTrait
         );
     }
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function setRequestStackLeadDetailsTrait(?RequestStack $requestStack): void
-    {
+    #[Required]
+    public function setRequestStackLeadDetailsTrait(
+        RequestStack $requestStack,
+    ): void {
         $this->requestStack = $requestStack;
     }
 }

@@ -23,8 +23,11 @@ final class SendWinnerService
 
     private bool $tryAgain = false;
 
-    public function __construct(private readonly EmailModel $emailModel, private readonly AbTestResultService $abTestResultService, private readonly AbTestSettingsService $abTestSettingsService)
-    {
+    public function __construct(
+        private readonly EmailModel $emailModel,
+        private readonly AbTestResultService $abTestResultService,
+        private readonly AbTestSettingsService $abTestSettingsService,
+    ) {
     }
 
     /**
@@ -44,7 +47,7 @@ final class SendWinnerService
             $emails = [$emailEntity];
         }
 
-        if (empty($emails)) {
+        if ([] === $emails) {
             $this->addOutputMessage('No emails to send');
 
             return;
@@ -86,7 +89,7 @@ final class SendWinnerService
 
         $abTestSettings = $this->abTestSettingsService->getAbTestSettings($email);
 
-        if (true === $this->isAllowedToSendWinner($email, $abTestSettings)) {
+        if ($this->isAllowedToSendWinner($email, $abTestSettings)) {
             $winner = $this->getWinner($email, $abTestSettings['winnerCriteria']);
 
             if (null === $winner) {
