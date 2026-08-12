@@ -19,16 +19,9 @@ module.exports = new Reporter({
         continue;
       }
       const file = path.basename(filePath);
-      const builderMatch = file.match(/^builder(?:\.[a-f0-9]+)?\.(css|js)$/);
-      if (builderMatch) {
-        manifest[`builder.${builderMatch[1]}`] = file;
-        distDir = path.dirname(filePath);
-        continue;
-      }
-
-      const previewMatch = file.match(/^mjml-preview(?:\.[a-f0-9]+)?\.js$/);
-      if (previewMatch) {
-        manifest['mjml-preview.js'] = file;
+      const match = file.match(/^builder(?:\.[a-f0-9]+)?\.(css|js)$/);
+      if (match) {
+        manifest[`builder.${match[1]}`] = file;
         distDir = path.dirname(filePath);
       }
     }

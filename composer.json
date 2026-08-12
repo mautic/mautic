@@ -23,7 +23,8 @@
   "require": {
     "composer/installers": "^2.3",
     "cweagans/composer-patches": "^1.7.3",
-    "mautic/core-lib": "^7.0"
+    "mautic/core-lib": "^7.0",
+    "shyim/mjml-php": "^0.1"
   },
   "require-dev": {
     "codeception/codeception": "^5.1",

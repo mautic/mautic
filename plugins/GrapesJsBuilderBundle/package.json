@@ -15,8 +15,8 @@
     "errorRecovery": true
   },
   "scripts": {
-    "build": "parcel build Assets/library/js/builder.js Assets/library/js/mjml-preview.js --dist-dir Assets/library/js/dist --public-url ./ --no-source-maps --reporter ./scripts/manifest-reporter.js",
-    "build-dev": "NODE_ENV=development parcel build Assets/library/js/builder.js Assets/library/js/mjml-preview.js --dist-dir Assets/library/js/dist --public-url ./ --no-optimize --reporter ./scripts/manifest-reporter.js",
+    "build": "parcel build Assets/library/js/builder.js --dist-dir Assets/library/js/dist --public-url ./ --no-source-maps --reporter ./scripts/manifest-reporter.js",
+    "build-dev": "NODE_ENV=development parcel build Assets/library/js/builder.js --dist-dir Assets/library/js/dist --public-url ./ --no-optimize --reporter ./scripts/manifest-reporter.js",
     "remove-build": "rm -rf ./Assets/library/js/dist/* && rm -rf .parcel-cache/*",
     "rebuild": "npm run remove-build && npm run build",
     "rebuild-dev": "npm run remove-build && npm run build-dev",
