@@ -147,9 +147,7 @@ return function (ContainerConfigurator $configurator): void {
             service('mautic.cipher.openssl'),
         ]);
 
-    /* @deprecated to be removed in Mautic 4. Use 'mautic.filesystem' instead. */
-    $services->set('symfony.filesystem', Symfony\Component\Filesystem\Filesystem::class);
-    $services->alias(Symfony\Component\Filesystem\Filesystem::class, 'symfony.filesystem');
+    $services->set(Symfony\Component\Filesystem\Filesystem::class);
 
     $services->set('symfony.finder', Symfony\Component\Finder\Finder::class);
     $services->alias(Symfony\Component\Finder\Finder::class, 'symfony.finder');
