@@ -6,7 +6,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class MaxMindDoNotSellDownloadHelper
+final class MaxMindDoNotSellDownloadHelper
 {
     /**
      * @var string
@@ -100,7 +100,7 @@ class MaxMindDoNotSellDownloadHelper
         return $this->getAuthPart(0);
     }
 
-    protected function getPassword(): string
+    private function getPassword(): string
     {
         return $this->getAuthPart(1);
     }

@@ -6,12 +6,12 @@ use Mautic\StatsBundle\Aggregate\Collection\DAO\StatDAO;
 use Mautic\StatsBundle\Aggregate\Collection\DAO\StatsDAO;
 use Mautic\StatsBundle\Aggregate\Helper\CalculatorHelper;
 
-class Calculator
+final readonly class Calculator
 {
     public function __construct(
-        private readonly StatsDAO $statsDAO,
-        private readonly ?\DateTimeInterface $fromDateTime = null,
-        private readonly ?\DateTimeInterface $toDateTime = null,
+        private StatsDAO $statsDAO,
+        private ?\DateTimeInterface $fromDateTime = null,
+        private ?\DateTimeInterface $toDateTime = null,
     ) {
     }
 

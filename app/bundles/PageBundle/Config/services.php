@@ -20,6 +20,12 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\PageBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
+    $services->set('mautic.page.fixture.page_category', Mautic\PageBundle\DataFixtures\ORM\LoadPageCategoryData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
+    $services->alias(Mautic\PageBundle\DataFixtures\ORM\LoadPageCategoryData::class, 'mautic.page.fixture.page_category');
+    $services->set('mautic.page.fixture.page', Mautic\PageBundle\DataFixtures\ORM\LoadPageData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
+    $services->alias(Mautic\PageBundle\DataFixtures\ORM\LoadPageData::class, 'mautic.page.fixture.page');
+    $services->set('mautic.page.fixture.page_hit', Mautic\PageBundle\DataFixtures\ORM\LoadPageHitData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
+    $services->alias(Mautic\PageBundle\DataFixtures\ORM\LoadPageHitData::class, 'mautic.page.fixture.page_hit');
     $services->set('mautic.page.segment_tracking_subscriber', Mautic\PageBundle\EventListener\SegmentTrackingSubscriber::class);
     $services->set('mautic.page.helper.token', Mautic\PageBundle\Helper\TokenHelper::class);
     $services->set('mautic.page.helper.tracking', Mautic\PageBundle\Helper\TrackingHelper::class);

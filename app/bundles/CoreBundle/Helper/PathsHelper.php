@@ -37,8 +37,13 @@ class PathsHelper
 
     private readonly string $importCampaignDir;
 
-    public function __construct(UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, string $cacheDir, string $logsDir, string $rootDir)
-    {
+    public function __construct(
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        string $cacheDir,
+        string $logsDir,
+        string $rootDir,
+    ) {
         $root                         = $rootDir.'/app'; // Do not rename the variable, used in paths_helper.php
         $projectRoot                  = $this->getVendorRootPath();
         $this->user                   = $userHelper->getUser();

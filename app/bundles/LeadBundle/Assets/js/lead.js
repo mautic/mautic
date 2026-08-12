@@ -506,16 +506,16 @@ Mautic.reorderSegmentFilters = function() {
             $element.attr('id', prefix + '_filters_'+counter+'_'+suffix);
 
             // Destroy the chosen and recreate
-            if ($element.is('select') && suffix === 'properties_filter') {
+            if ($element.is('select') && suffix.includes("_filter")) {
                 Mautic.destroyChosen($element);
                 Mautic.activateChosenSelect($element);
             }
 
             Mautic.segmentFilter().showCopyBasedOnGlue($filter);
 
-            if (mQuery(this).is(':radio') && id.includes("_dateTypeMode_")) {
-                if (mQuery(this).closest('label').hasClass('active')) {
-                    mQuery(this).click();
+            if ($element.is(':radio') && id.includes("_dateTypeMode_")) {
+                if ($element.closest('label').hasClass('active')) {
+                    $element.click();
                 }
             }
         });
@@ -778,7 +778,7 @@ Mautic.segmentFilter = function() {
     }
 
     const _cloneFilter = function($origin) {
-        $origin.find('.properties-form .choice-wrapper select').chosen('destroy');
+        $origin.find('.properties-form select').chosen('destroy');
         _setSelectedOptions($origin);
         const $clone = $origin.clone(false);
 

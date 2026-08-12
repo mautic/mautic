@@ -5,7 +5,7 @@ namespace Mautic\LeadBundle\Segment\Query\Filter;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
-class SessionsFilterQueryBuilder extends BaseFilterQueryBuilder
+final class SessionsFilterQueryBuilder extends BaseFilterQueryBuilder
 {
     public static function getServiceId(): string
     {

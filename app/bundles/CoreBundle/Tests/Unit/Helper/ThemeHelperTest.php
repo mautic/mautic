@@ -259,10 +259,7 @@ final class ThemeHelperTest extends TestCase
                 }
             },
             new class() extends Filesystem {
-                /**
-                 * @param string $files
-                 */
-                public function exists($files): bool
+                public function exists(string|iterable $files): bool
                 {
                     return '/path/to/themes/new-theme-name' !== $files;
                 }
@@ -300,7 +297,7 @@ final class ThemeHelperTest extends TestCase
                 {
                 }
 
-                public function in($dirs): static
+                public function in(string|array $dirs): static
                 {
                     $this->dirs = [
                         new SplFileInfo('origin-template-dir', 'origin-template-dir', 'origin-template-dir'),
@@ -347,10 +344,7 @@ final class ThemeHelperTest extends TestCase
                 }
             },
             new class() extends Filesystem {
-                /**
-                 * @param string $files
-                 */
-                public function exists($files): bool
+                public function exists(string|iterable $files): bool
                 {
                     return '/path/to/themes/requested-theme-dir' !== $files;
                 }
@@ -388,7 +382,7 @@ final class ThemeHelperTest extends TestCase
                 {
                 }
 
-                public function in($dirs): static
+                public function in(string|array $dirs): static
                 {
                     $this->dirs = [
                         new SplFileInfo('origin-template-dir', 'origin-template-dir', 'origin-template-dir'),

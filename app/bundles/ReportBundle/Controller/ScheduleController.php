@@ -14,8 +14,9 @@ final class ScheduleController extends CommonAjaxController
     private ReportModel $reportModel;
 
     #[Required]
-    public function autowireScheduleController(ReportModel $reportModel): void
-    {
+    public function autowireScheduleController(
+        ReportModel $reportModel,
+    ): void {
         $this->reportModel = $reportModel;
     }
 

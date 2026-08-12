@@ -2,23 +2,16 @@
 
 namespace Mautic\CoreBundle\Model;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Entity\Notification;
 use Mautic\CoreBundle\Entity\NotificationRepository;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UpdateHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\UserBundle\Entity\User;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends FormModel<Notification>
@@ -30,21 +23,25 @@ class NotificationModel extends FormModel
      */
     protected $disableUpdates;
 
-    public function __construct(
-        protected PathsHelper $pathsHelper,
-        protected UpdateHelper $updateHelper,
-        CoreParametersHelper $coreParametersHelper,
-        EntityManagerInterface $em,
-        CorePermissions $security,
-        EventDispatcherInterface $dispatcher,
-        UrlGeneratorInterface $router,
-        Translator $translator,
-        UserHelper $userHelper,
-        LoggerInterface $mauticLogger,
-        private readonly RequestStack $requestStack,
-        private readonly NotificationRepository $notificationRepository,
-    ) {
-        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
+    protected PathsHelper $pathsHelper;
+
+    protected UpdateHelper $updateHelper;
+
+    private RequestStack $requestStack;
+
+    private NotificationRepository $notificationRepository;
+
+    #[Required]
+    public function autowireNotificationModel(
+        PathsHelper $pathsHelper,
+        UpdateHelper $updateHelper,
+        RequestStack $requestStack,
+        NotificationRepository $notificationRepository,
+    ): void {
+        $this->pathsHelper             = $pathsHelper;
+        $this->updateHelper            = $updateHelper;
+        $this->requestStack            = $requestStack;
+        $this->notificationRepository  = $notificationRepository;
     }
 
     private function getSession(): SessionInterface

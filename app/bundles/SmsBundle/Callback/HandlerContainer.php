@@ -5,7 +5,7 @@ namespace Mautic\SmsBundle\Callback;
 use Mautic\SmsBundle\Exception\CallbackHandlerNotFound;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-class HandlerContainer
+final class HandlerContainer
 {
     /**
      * @var CallbackInterface[]

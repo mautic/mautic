@@ -91,10 +91,6 @@ final class AjaxControllerTest extends AbstractMauticTestCase
         $this->marketplaceConfig = $this->createMock(Config::class);
 
         $controller = new AjaxController(
-            $composer,
-            $cacheHelper,
-            $this->createStub(LoggerInterface::class),
-            $this->marketplaceConfig,
             $this->createStub(ManagerRegistry::class),
             $this->createStub(ModelFactory::class),
             $this->createStub(UserHelper::class),
@@ -105,7 +101,13 @@ final class AjaxControllerTest extends AbstractMauticTestCase
             $this->requestStack,
             $this->security
         );
-        $controller->setContainer(static::getContainer());
+        $controller->autowireMarketplaceAjaxController(
+            $composer,
+            $cacheHelper,
+            $this->createStub(LoggerInterface::class),
+            $this->marketplaceConfig
+        );
+        $controller->setContainer(self::getContainer());
 
         return $controller;
     }

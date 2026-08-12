@@ -15,17 +15,20 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\CustomFieldEntityInterface;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Event\ContactExportEvent;
@@ -53,6 +56,7 @@ use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PointBundle\Model\PointGroupModel;
 use Mautic\StageBundle\Model\StageModel;
+use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormError;
@@ -69,11 +73,11 @@ final class LeadController extends FormController
     use LeadDetailsTrait;
     use FrequencyRuleTrait;
 
-    private \Mautic\UserBundle\Entity\UserRepository $userRepository;
+    private UserRepository $userRepository;
 
-    private \Mautic\LeadBundle\Entity\LeadListRepository $leadListRepository;
+    private LeadListRepository $leadListRepository;
 
-    private \Mautic\LeadBundle\Entity\CompanyRepository $companyRepository;
+    private CompanyRepository $companyRepository;
 
     private LeadRepository $leadRepository;
 
@@ -97,7 +101,7 @@ final class LeadController extends FormController
 
     private DoNotContactRepository $doNotContactRepository;
 
-    private \Mautic\EmailBundle\Entity\EmailRepository $emailRepository;
+    private EmailRepository $emailRepository;
 
     #[Required]
     public function autowireLeadController(
@@ -111,11 +115,11 @@ final class LeadController extends FormController
         FieldModel $leadFieldModel,
         UserModel $userModel,
         LeadRepository $leadRepository,
-        \Mautic\LeadBundle\Entity\CompanyRepository $companyRepository,
-        \Mautic\LeadBundle\Entity\LeadListRepository $leadListRepository,
-        \Mautic\UserBundle\Entity\UserRepository $userRepository,
+        CompanyRepository $companyRepository,
+        LeadListRepository $leadListRepository,
+        UserRepository $userRepository,
         DoNotContactRepository $doNotContactRepository,
-        \Mautic\EmailBundle\Entity\EmailRepository $emailRepository,
+        EmailRepository $emailRepository,
     ): void {
         $this->leadModel = $leadModel;
         $this->stageModel = $stageModel;
@@ -427,6 +431,19 @@ final class LeadController extends FormController
 
         $this->leadRepository->refetchEntity($lead);
 
+        $returnUrl = null;
+        if ('form_results' === $request->query->get('returnTo')) {
+            $formId   = (int) $request->query->get('formId');
+            $formPage = max(1, (int) $request->query->get('formPage', 1));
+
+            if ($formId > 0) {
+                $returnUrl = $this->generateUrl('mautic_form_results', [
+                    'objectId' => $formId,
+                    'page'     => $formPage,
+                ]);
+            }
+        }
+
         // set some permissions
         $permissions = $this->security->isGranted(
             [
@@ -503,6 +520,7 @@ final class LeadController extends FormController
                     'doNotContactSms'        => end($dncSms),
                     'pointGroups'            => $pointGroupModel->getEntities(),
                     'enableExportPermission' => $this->security->isAdmin() || $this->security->isGranted('lead:export:enable', 'MATCH_ONE'),
+                    'returnUrl'              => $returnUrl,
                     // 'leadNotes'         => $this->forward(
                     //    'Mautic\LeadBundle\Controller\NoteController::indexAction',
                     //    [
@@ -583,7 +601,7 @@ final class LeadController extends FormController
                     // Save here as we need the entity with an ID for the company code bellow.
                     $this->leadRepository->saveEntity($lead);
 
-                    if (!empty($companies)) {
+                    if ([] !== $companies) {
                         $this->leadModel->modifyCompanies($lead, $companies);
                     }
 
@@ -1156,10 +1174,8 @@ final class LeadController extends FormController
 
     /**
      * Deletes the entity.
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         $page      = $request->getSession()->get('mautic.lead.page', 1);
         $returnUrl = $this->generateUrl('mautic_contact_index', ['page' => $page]);
@@ -1266,7 +1282,7 @@ final class LeadController extends FormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $this->leadModel->deleteEntities($deleteIds);
 
                 $flashes[] = [
@@ -2462,13 +2478,7 @@ final class LeadController extends FormController
 
         return $this->delegateView(
             [
-                'viewParameters' => array_merge(
-                    [
-                        'fields' => $fields,
-                        'form'   => $form->createView(),
-                        'lead'   => $lead,
-                    ],
-                ),
+                'viewParameters' => ['fields' => $fields, 'form' => $form->createView(), 'lead' => $lead],
                 'contentTemplate' => '@MauticLead/Lead/group_points.html.twig',
             ]
         );

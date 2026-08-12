@@ -5,7 +5,7 @@ namespace Mautic\CoreBundle\Helper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class TrackingPixelHelper
+final class TrackingPixelHelper
 {
     public static function sendResponse(Request $request): void
     {

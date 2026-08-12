@@ -1,17 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticCrmBundle\Integration\Salesforce;
 
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Exception\NoObjectsToFetchException;
 
-class QueryBuilder
+final class QueryBuilder
 {
     /**
      * @throws NoObjectsToFetchException
      */
     public static function getLeadQuery(array $fields, array $ids): string
     {
-        if (empty($ids)) {
+        if ([] === $ids) {
             throw new NoObjectsToFetchException();
         }
 
@@ -26,7 +28,7 @@ class QueryBuilder
      */
     public static function getContactQuery(array $fields, array $ids): string
     {
-        if (empty($ids)) {
+        if ([] === $ids) {
             throw new NoObjectsToFetchException();
         }
 

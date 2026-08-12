@@ -6,7 +6,7 @@ use Mautic\EmailBundle\Stats\Exception\InvalidStatHelperException;
 use Mautic\EmailBundle\Stats\Helper\StatHelperInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-class StatHelperContainer
+final class StatHelperContainer
 {
     /**
      * @var array<string, StatHelperInterface>

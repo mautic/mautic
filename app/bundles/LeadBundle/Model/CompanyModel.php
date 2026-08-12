@@ -305,7 +305,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             }
         }
 
-        if (!empty($searchForCompanies)) {
+        if ([] !== $searchForCompanies) {
             $companyEntities = $this->getEntities([
                 'filter' => [
                     'force' => [
@@ -362,7 +362,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             }
         }
 
-        if (!empty($persistCompany)) {
+        if ([] !== $persistCompany) {
             $this->companyLeadRepository->saveEntities($persistCompany);
         }
 
@@ -378,7 +378,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             }
         }
 
-        if (!empty($dispatchEvents) && $this->dispatcher->hasListeners(LeadEvents::LEAD_COMPANY_CHANGE)) {
+        if ([] !== $dispatchEvents && $this->dispatcher->hasListeners(LeadEvents::LEAD_COMPANY_CHANGE)) {
             foreach ($dispatchEvents as $companyId) {
                 $event = new LeadChangeCompanyEvent($lead, $companyLeadAdd[$companyId]);
                 $this->dispatcher->dispatch($event, LeadEvents::LEAD_COMPANY_CHANGE);
@@ -411,7 +411,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                 $l                    = (int) $l;
                 $searchForCompanies[] = $l;
             }
-            if (!empty($searchForCompanies)) {
+            if ([] !== $searchForCompanies) {
                 $companyEntities = $this->getEntities(
                     [
                         'filter' => [
@@ -477,7 +477,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             unset($companyLead);
         }
 
-        if (!empty($deleteCompanyLead)) {
+        if ([] !== $deleteCompanyLead) {
             $this->companyLeadRepository->deleteEntities($deleteCompanyLead);
         }
 
@@ -490,7 +490,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         // Clear CompanyLead entities from Doctrine memory
         $this->companyLeadRepository->detachEntities($deleteCompanyLead);
 
-        if (!empty($dispatchEvents) && $this->dispatcher->hasListeners(LeadEvents::LEAD_COMPANY_CHANGE)) {
+        if ([] !== $dispatchEvents && $this->dispatcher->hasListeners(LeadEvents::LEAD_COMPANY_CHANGE)) {
             foreach ($dispatchEvents as $companyId) {
                 $event = new LeadChangeCompanyEvent($lead, $companyLeadRemove[$companyId], false);
                 $this->dispatcher->dispatch($event, LeadEvents::LEAD_COMPANY_CHANGE);
@@ -557,15 +557,12 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     /**
      * Get list of entities for autopopulate fields.
      *
-     * @param string                   $type
      * @param string|array<int,string> $filter
-     * @param int                      $limit
-     * @param int                      $start
      * @param array<string, mixed>     $options
      *
      * @return array<mixed>
      */
-    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0, array $options = []): array
+    public function getLookupResults(string $type, string|array $filter = '', int $limit = 10, int $start = 0, array $options = []): array
     {
         $results = [];
         switch ($type) {
@@ -803,7 +800,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             return null;
         }
 
-        $company = !empty($duplicateCompanies) ? $duplicateCompanies[0] : new Company();
+        $company = $duplicateCompanies[0] ?? new Company();
 
         if (!$company->isNew() && !$this->existDataForUpdate($fields, $data)) {
             return $company;
@@ -820,7 +817,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
 
         if (!$granted) {
-            throw new \Exception($this->translator->trans('mautic.lead.import.error.unauthorized', ['%username%' => $this->userHelper->getUser()->getUsername()]));
+            throw new \Exception($this->translator->trans('mautic.lead.import.error.unauthorized', ['%username%' => $this->userHelper->getUser()->getUserIdentifier()]));
         }
 
         if (!empty($fields['dateAdded']) && !empty($data[$fields['dateAdded']])) {

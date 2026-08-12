@@ -23,6 +23,8 @@ return function (ContainerConfigurator $configurator): void {
         'Segment/IntegrationCampaign',
         'Segment/Query',
         'Segment/Stat',
+        'Form/Validator/Constraints/UniqueCustomField.php',
+        'Validator/Constraints/SegmentDate.php',
     ];
 
     $services->load('Mautic\\LeadBundle\\', '../')
@@ -30,6 +32,32 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\LeadBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
+    $services->set('mautic.lead.serializer.subscriber', Mautic\LeadBundle\EventListener\SerializerSubscriber::class)->tag('jms_serializer.event_subscriber', ['event' => JMS\Serializer\EventDispatcher\Events::POST_SERIALIZE]);
+    $services->alias(Mautic\LeadBundle\EventListener\SerializerSubscriber::class, 'mautic.lead.serializer.subscriber');
+    $services->set(Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeywordValidator::class)->tag('validator.constraint_validator');
+    $services->set(Mautic\CoreBundle\Form\Validator\Constraints\FileEncodingValidator::class)->tag('validator.constraint_validator');
+    $services->set('mautic.validator.leadlistaccess', Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccessValidator::class)->tag('validator.constraint_validator', ['alias' => 'leadlist_access']);
+    $services->alias(Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccessValidator::class, 'mautic.validator.leadlistaccess');
+    $services->set('mautic.lead.constraint.alias', Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAliasValidator::class)->tag('validator.constraint_validator', ['alias' => 'uniqueleadlist']);
+    $services->alias(Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAliasValidator::class, 'mautic.lead.constraint.alias');
+    $services->set('mautic.lead_list.constraint.in_use', Mautic\LeadBundle\Form\Validator\Constraints\SegmentInUseValidator::class)->tag('validator.constraint_validator', ['alias' => 'segment_in_use']);
+    $services->alias(Mautic\LeadBundle\Form\Validator\Constraints\SegmentInUseValidator::class, 'mautic.lead_list.constraint.in_use');
+    $services->set('mautic.helper.twig.avatar', Mautic\LeadBundle\Twig\Helper\AvatarHelper::class)->tag('twig.helper', ['alias' => 'lead_avatar']);
+    $services->alias(Mautic\LeadBundle\Twig\Helper\AvatarHelper::class, 'mautic.helper.twig.avatar');
+    $services->set('mautic.helper.twig.default_avatar', Mautic\LeadBundle\Twig\Helper\DefaultAvatarHelper::class)->tag('twig.helper', ['alias' => 'default_avatar']);
+    $services->alias(Mautic\LeadBundle\Twig\Helper\DefaultAvatarHelper::class, 'mautic.helper.twig.default_avatar');
+    $services->set('mautic.helper.twig.dnc_reason', Mautic\LeadBundle\Twig\Helper\DncReasonHelper::class)->tag('twig.helper', ['alias' => 'lead_dnc_reason']);
+    $services->alias(Mautic\LeadBundle\Twig\Helper\DncReasonHelper::class, 'mautic.helper.twig.dnc_reason');
+    $services->set('mautic.lead.fixture.test.click', Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadClickData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
+    $services->alias(Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadClickData::class, 'mautic.lead.fixture.test.click');
+    $services->set('mautic.lead.fixture.test.dnc', Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadDncData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
+    $services->alias(Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadDncData::class, 'mautic.lead.fixture.test.dnc');
+    $services->set('mautic.lead.fixture.test.tag', Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadTagData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
+    $services->alias(Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadTagData::class, 'mautic.lead.fixture.test.tag');
+    $services->set('mautic.lead.fixture.test.page_hit', Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadPageHitData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
+    $services->alias(Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadPageHitData::class, 'mautic.lead.fixture.test.page_hit');
+    $services->set('mautic.lead.fixture.test.segment', Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadSegmentsData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
+    $services->alias(Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadSegmentsData::class, 'mautic.lead.fixture.test.segment');
     $services->set('mautic.lead.fixture.company', Mautic\LeadBundle\DataFixtures\ORM\LoadCompanyData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
     $services->alias(Mautic\LeadBundle\DataFixtures\ORM\LoadCompanyData::class, 'mautic.lead.fixture.company');
     $services->set('mautic.lead.fixture.contact', Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);

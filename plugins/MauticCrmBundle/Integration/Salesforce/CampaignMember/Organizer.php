@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticCrmBundle\Integration\Salesforce\CampaignMember;
 
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\Contact;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\Lead;
 
-class Organizer
+final class Organizer
 {
     /**
      * @var array<string, Lead>

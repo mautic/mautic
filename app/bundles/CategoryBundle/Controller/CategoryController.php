@@ -2,41 +2,31 @@
 
 namespace Mautic\CategoryBundle\Controller;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CategoryBundle\CategoryEvents;
 use Mautic\CategoryBundle\Event\CategoryTypesEvent;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
-use Mautic\CoreBundle\Factory\ModelFactory;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
-use Mautic\CoreBundle\Translation\Translator;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
 final class CategoryController extends AbstractFormController
 {
-    public function __construct(
-        private readonly FormFactoryInterface $formFactory,
-        ManagerRegistry $doctrine,
-        ModelFactory $modelFactory,
-        UserHelper $userHelper,
-        CoreParametersHelper $coreParametersHelper,
-        EventDispatcherInterface $dispatcher,
-        Translator $translator,
-        FlashBag $flashBag,
-        RequestStack $requestStack,
-        CorePermissions $security,
-        private readonly CategoryModel $categoryModel,
-    ) {
-        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    private FormFactoryInterface $formFactory;
+
+    private CategoryModel $categoryModel;
+
+    #[Required]
+    public function autowireCategoryController(
+        FormFactoryInterface $formFactory,
+        CategoryModel $categoryModel,
+    ): void {
+        $this->formFactory   = $formFactory;
+        $this->categoryModel = $categoryModel;
     }
 
     /**
@@ -434,10 +424,8 @@ final class CategoryController extends AbstractFormController
 
     /**
      * Deletes the entity.
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, ?string $bundle, $objectId)
+    public function deleteAction(Request $request, ?string $bundle, $objectId): Response
     {
         $session    = $request->getSession();
         $page       = $session->get('mautic.category.page', 1);
@@ -555,7 +543,7 @@ final class CategoryController extends AbstractFormController
                 }
             }
 
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $flashes[] = [
                     'type'    => 'notice',
                     'msg'     => 'mautic.category.notice.batch_deleted',

@@ -731,7 +731,7 @@ class ThemeHelper implements ThemeHelperInterface
         if (false !== $keyToRemove) {
             unset($hiddenThemes[$keyToRemove]);
 
-            if (empty($hiddenThemes)) {
+            if ([] === $hiddenThemes) {
                 $this->filesystem->remove($hidden);
             } else {
                 $this->filesystem->dumpFile($hidden, sprintf('|%s', implode('|', $hiddenThemes)));

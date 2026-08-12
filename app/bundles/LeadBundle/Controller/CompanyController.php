@@ -9,10 +9,12 @@ use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\CustomFieldEntityInterface;
 use Mautic\LeadBundle\Field\CustomFieldFindReplace;
 use Mautic\LeadBundle\Field\DTO\CustomFieldFindReplaceCriteria;
 use Mautic\LeadBundle\Form\Type\CompanyMergeType;
+use Mautic\LeadBundle\Form\Type\OwnerType;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -26,7 +28,9 @@ final class CompanyController extends FormController
 {
     use LeadDetailsTrait;
 
-    private \Mautic\LeadBundle\Entity\CompanyRepository $companyRepository;
+    private CompanyRepository $companyRepository;
+
+    private \Mautic\UserBundle\Entity\UserRepository $userRepository;
 
     private FieldModel $fieldModel;
 
@@ -39,12 +43,54 @@ final class CompanyController extends FormController
         LeadModel $leadModel,
         CompanyModel $companyModel,
         FieldModel $fieldModel,
-        \Mautic\LeadBundle\Entity\CompanyRepository $companyRepository,
+        CompanyRepository $companyRepository,
+        \Mautic\UserBundle\Entity\UserRepository $userRepository,
     ): void {
         $this->leadModel = $leadModel;
         $this->companyModel = $companyModel;
         $this->fieldModel = $fieldModel;
         $this->companyRepository = $companyRepository;
+        $this->userRepository = $userRepository;
+    }
+
+    public function batchOwnersAction(Request $request): JsonResponse|Response
+    {
+        if (!$this->security->isGranted('user:users:view')) {
+            $this->throwAccessDenied();
+        }
+
+        if ($request->isMethod('POST')) {
+            $data = $request->request->all()['lead_batch_owner'] ?? [];
+            $ids  = json_decode($data['ids'] ?? '', true);
+            $companies = is_array($ids) ? $this->companyModel->getEntities([
+                'filter' => ['force' => [['column' => 'comp.id', 'expr' => 'in', 'value' => $ids]]],
+                'ignore_paginator' => true,
+            ]) : [];
+            $count = 0;
+            foreach ($companies as $company) {
+                if ($this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $company->getPermissionUser())) {
+                    $company->setOwner($this->userRepository->find((int) ($data['addowner'] ?? 0)));
+                    ++$count;
+                }
+            }
+            $this->companyModel->saveEntities($companies);
+            $this->addFlashMessage('mautic.company.batch_companies_affected', ['%count%' => $count]);
+
+            return new JsonResponse(['closeModal' => true, 'flashes' => $this->getFlashContent()]);
+        }
+
+        $users = $this->userRepository->getUserList('', 0);
+        $items = [];
+        foreach ($users as $user) {
+            $items[$user['firstName'].' '.$user['lastName'].' ('.$user['id'].')'] = $user['id'];
+        }
+        $route = $this->generateUrl('mautic_company_action', ['objectAction' => 'batchOwners']);
+
+        return $this->delegateView([
+            'viewParameters' => ['form' => $this->createForm(OwnerType::class, [], ['items' => $items, 'action' => $route])->createView()],
+            'contentTemplate' => '@MauticLead/Batch/form.html.twig',
+            'passthroughVars' => ['activeLink' => '#mautic_company_index', 'mauticContent' => 'companyBatch', 'route' => $route],
+        ]);
     }
 
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, CompanyColumnsDictionary $companyColumnsDictionary, int $page = 1): Response
@@ -116,7 +162,7 @@ final class CompanyController extends FormController
 
         $tmpl  = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
         $companyIds = array_keys($companies);
-        $leadCounts = (!empty($companyIds)) ? $this->companyRepository->getLeadCount($companyIds) : [];
+        $leadCounts = ([] !== $companyIds) ? $this->companyRepository->getLeadCount($companyIds) : [];
 
         return $this->delegateView(
             [
@@ -330,10 +376,8 @@ final class CompanyController extends FormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false): Response
     {
         $entity = $this->companyModel->getEntity($objectId);
 
@@ -694,10 +738,8 @@ final class CompanyController extends FormController
      * Deletes the entity.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         $page      = $request->getSession()->get('mautic.company.page', 1);
         $returnUrl = $this->generateUrl('mautic_company_index', ['page' => $page]);
@@ -793,7 +835,7 @@ final class CompanyController extends FormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $this->companyModel->deleteEntities($deleteIds);
                 $deleted  = count($entities);
                 $this->addFlashMessage(

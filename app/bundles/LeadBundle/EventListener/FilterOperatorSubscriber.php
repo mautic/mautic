@@ -22,6 +22,41 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
 {
     use SegmentFilterIconTrait;
 
+    private array $behaviorOperators = [
+        'datetime' => [
+            OperatorOptions::EQUAL_TO,
+            OperatorOptions::NOT_EQUAL_TO,
+            OperatorOptions::GREATER_THAN,
+            OperatorOptions::LESS_THAN,
+            OperatorOptions::GREATER_THAN_OR_EQUAL,
+            OperatorOptions::LESS_THAN_OR_EQUAL,
+        ],
+        'number' => [
+            OperatorOptions::EQUAL_TO,
+            OperatorOptions::GREATER_THAN,
+            OperatorOptions::LESS_THAN,
+            OperatorOptions::GREATER_THAN_OR_EQUAL,
+            OperatorOptions::LESS_THAN_OR_EQUAL,
+        ],
+        'text' => [
+            OperatorOptions::EQUAL_TO,
+            OperatorOptions::NOT_EQUAL_TO,
+            OperatorOptions::LIKE,
+            OperatorOptions::NOT_LIKE,
+            OperatorOptions::REGEXP,
+            OperatorOptions::NOT_REGEXP,
+            OperatorOptions::STARTS_WITH,
+            OperatorOptions::ENDS_WITH,
+            OperatorOptions::CONTAINS,
+        ],
+        'lead_email_received' => [
+            OperatorOptions::INCLUDING_ANY,
+            OperatorOptions::EXCLUDING_ANY,
+            OperatorOptions::INCLUDING_ALL,
+            OperatorOptions::EXCLUDING_ALL,
+        ],
+    ];
+
     public function __construct(
         private OperatorOptions $operatorOptions,
         private LeadFieldRepository $leadFieldRepository,
@@ -114,25 +149,25 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
             'date_added' => [
                 'label'      => $this->translator->trans('mautic.core.date.added'),
                 'properties' => ['type' => 'datetime'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('default'),
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('date'),
                 'object'     => 'lead',
             ],
             'date_identified' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.date_identified'),
                 'properties' => ['type' => 'datetime'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('default'),
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('date'),
                 'object'     => 'lead',
             ],
             'last_active' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.last_active'),
                 'properties' => ['type' => 'datetime'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('default'),
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('date'),
                 'object'     => 'lead',
             ],
             'date_modified' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.date_modified'),
                 'properties' => ['type' => 'datetime'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('default'),
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('date'),
                 'object'     => 'lead',
             ],
             'owner_id' => [
@@ -344,12 +379,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                     'type' => 'lead_email_received',
                     'list' => $this->fieldChoicesProvider->getChoicesForField('select', 'lead_email_received'),
                 ],
-                'operators' => $this->typeOperatorProvider->getOperatorsIncluding([
-                    OperatorOptions::INCLUDING_ANY,
-                    OperatorOptions::EXCLUDING_ANY,
-                    OperatorOptions::INCLUDING_ALL,
-                    OperatorOptions::EXCLUDING_ALL,
-                ]),
+                'operators' => $this->getBehaviorOperators('lead_email_received'),
             ],
             'lead_email_sent' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_sent'),
@@ -358,91 +388,43 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                     'type' => 'lead_email_received',
                     'list' => $this->fieldChoicesProvider->getChoicesForField('select', 'lead_email_sent'),
                 ],
-                'operators'  => $this->typeOperatorProvider->getOperatorsIncluding([
-                    OperatorOptions::INCLUDING_ANY,
-                    OperatorOptions::EXCLUDING_ANY,
-                    OperatorOptions::INCLUDING_ALL,
-                    OperatorOptions::EXCLUDING_ALL,
-                ]),
+                'operators' => $this->getBehaviorOperators('lead_email_received'),
             ],
             'lead_email_sent_date' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_sent_date'),
                 'object'     => 'lead',
                 'properties' => ['type' => 'datetime'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsIncluding([
-                    OperatorOptions::EQUAL_TO,
-                    OperatorOptions::NOT_EQUAL_TO,
-                    OperatorOptions::GREATER_THAN,
-                    OperatorOptions::LESS_THAN,
-                    OperatorOptions::GREATER_THAN_OR_EQUAL,
-                    OperatorOptions::LESS_THAN_OR_EQUAL,
-                ]),
+                'operators'  => $this->getBehaviorOperators('datetime'),
             ],
             'lead_email_read_date' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_read_date'),
                 'properties' => ['type' => 'datetime'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsIncluding([
-                    OperatorOptions::EQUAL_TO,
-                    OperatorOptions::NOT_EQUAL_TO,
-                    OperatorOptions::GREATER_THAN,
-                    OperatorOptions::LESS_THAN,
-                    OperatorOptions::GREATER_THAN_OR_EQUAL,
-                    OperatorOptions::LESS_THAN_OR_EQUAL,
-                ]),
-                'object' => 'lead',
+                'operators'  => $this->getBehaviorOperators('datetime'),
+                'object'     => 'lead',
             ],
             'lead_email_read_count' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_read_count'),
                 'object'     => 'lead',
                 'properties' => ['type' => 'number'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsIncluding([
-                    OperatorOptions::EQUAL_TO,
-                    OperatorOptions::GREATER_THAN,
-                    OperatorOptions::LESS_THAN,
-                    OperatorOptions::GREATER_THAN_OR_EQUAL,
-                    OperatorOptions::LESS_THAN_OR_EQUAL,
-                ]),
+                'operators'  => $this->getBehaviorOperators('number'),
             ],
             'hit_url' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.visited_url'),
                 'properties' => ['type' => 'text'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsIncluding([
-                    OperatorOptions::EQUAL_TO,
-                    OperatorOptions::NOT_EQUAL_TO,
-                    OperatorOptions::LIKE,
-                    OperatorOptions::NOT_LIKE,
-                    OperatorOptions::REGEXP,
-                    OperatorOptions::NOT_REGEXP,
-                    OperatorOptions::STARTS_WITH,
-                    OperatorOptions::ENDS_WITH,
-                    OperatorOptions::CONTAINS,
-                ]),
-                'object' => 'lead',
+                'object'     => 'lead',
+                'operators'  => $this->getBehaviorOperators('text'),
             ],
             'hit_url_date' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.visited_url_date'),
                 'properties' => ['type' => 'datetime'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsIncluding([
-                    OperatorOptions::EQUAL_TO,
-                    OperatorOptions::NOT_EQUAL_TO,
-                    OperatorOptions::GREATER_THAN,
-                    OperatorOptions::LESS_THAN,
-                    OperatorOptions::GREATER_THAN_OR_EQUAL,
-                    OperatorOptions::LESS_THAN_OR_EQUAL,
-                ]),
-                'object' => 'lead',
+                'object'     => 'lead',
+                'operators'  => $this->getBehaviorOperators('datetime'),
             ],
             'hit_url_count' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.visited_url_count'),
                 'properties' => ['type' => 'number'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsIncluding([
-                    OperatorOptions::EQUAL_TO,
-                    OperatorOptions::GREATER_THAN,
-                    OperatorOptions::LESS_THAN,
-                    OperatorOptions::GREATER_THAN_OR_EQUAL,
-                    OperatorOptions::LESS_THAN_OR_EQUAL,
-                ]),
-                'object' => 'lead',
+                'object'     => 'lead',
+                'operators'  => $this->getBehaviorOperators('number'),
             ],
             // Clicked any link from any email
             'email_id' => [ // kept as email_id for BC
@@ -451,22 +433,15 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                     'type' => 'boolean',
                     'list' => $this->fieldChoicesProvider->getChoicesForField('boolean', 'email_id'),
                 ],
-                'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
                 'object'    => 'lead',
+                'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
             ],
             // Clicked any link from any email relative to time
             'email_clicked_link_date' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.email_clicked_link_date'),
                 'properties' => ['type' => 'datetime'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsIncluding([
-                    OperatorOptions::EQUAL_TO,
-                    OperatorOptions::NOT_EQUAL_TO,
-                    OperatorOptions::GREATER_THAN,
-                    OperatorOptions::LESS_THAN,
-                    OperatorOptions::GREATER_THAN_OR_EQUAL,
-                    OperatorOptions::LESS_THAN_OR_EQUAL,
-                ]),
-                'object' => 'lead',
+                'object'     => 'lead',
+                'operators'  => $this->getBehaviorOperators('datetime'),
             ],
             // Clicked any link from any sms
             'sms_clicked_link' => [
@@ -475,82 +450,39 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                     'type' => 'boolean',
                     'list' => $this->fieldChoicesProvider->getChoicesForField('boolean', 'sms_clicked_link'),
                 ],
-                'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
                 'object'    => 'lead',
+                'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
             ],
             // Clicked any link from any sms relative to time
             'sms_clicked_link_date' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.sms_clicked_link_date'),
                 'properties' => ['type' => 'datetime'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsIncluding([
-                    OperatorOptions::EQUAL_TO,
-                    OperatorOptions::NOT_EQUAL_TO,
-                    OperatorOptions::GREATER_THAN,
-                    OperatorOptions::LESS_THAN,
-                    OperatorOptions::GREATER_THAN_OR_EQUAL,
-                    OperatorOptions::LESS_THAN_OR_EQUAL,
-                ]),
-                'object' => 'lead',
+                'object'     => 'lead',
+                'operators'  => $this->getBehaviorOperators('datetime'),
             ],
             'sessions' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.session'),
                 'properties' => ['type' => 'number'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsIncluding([
-                    OperatorOptions::EQUAL_TO,
-                    OperatorOptions::GREATER_THAN,
-                    OperatorOptions::LESS_THAN,
-                    OperatorOptions::GREATER_THAN_OR_EQUAL,
-                    OperatorOptions::LESS_THAN_OR_EQUAL,
-                ]),
-                'object' => 'lead',
+                'operators'  => $this->getBehaviorOperators('number'),
+                'object'     => 'lead',
             ],
             'referer' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.referer'),
                 'properties' => ['type' => 'text'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsIncluding([
-                    OperatorOptions::EQUAL_TO,
-                    OperatorOptions::NOT_EQUAL_TO,
-                    OperatorOptions::LIKE,
-                    OperatorOptions::NOT_LIKE,
-                    OperatorOptions::REGEXP,
-                    OperatorOptions::NOT_REGEXP,
-                    OperatorOptions::STARTS_WITH,
-                    OperatorOptions::ENDS_WITH,
-                    OperatorOptions::CONTAINS,
-                ]),
-                'object' => 'lead',
+                'operators'  => $this->getBehaviorOperators('text'),
+                'object'     => 'lead',
             ],
             'url_title' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.url_title'),
                 'properties' => ['type' => 'text'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsIncluding([
-                    OperatorOptions::EQUAL_TO,
-                    OperatorOptions::NOT_EQUAL_TO,
-                    OperatorOptions::LIKE,
-                    OperatorOptions::NOT_LIKE,
-                    OperatorOptions::REGEXP,
-                    OperatorOptions::NOT_REGEXP,
-                    OperatorOptions::STARTS_WITH,
-                    OperatorOptions::ENDS_WITH,
-                    OperatorOptions::CONTAINS,
-                ]),
-                'object' => 'lead',
+                'operators'  => $this->getBehaviorOperators('text'),
+                'object'     => 'lead',
             ],
             'source' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.source'),
                 'properties' => ['type' => 'text'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsIncluding([
-                    OperatorOptions::EQUAL_TO,
-                    OperatorOptions::NOT_EQUAL_TO,
-                    OperatorOptions::LIKE,
-                    OperatorOptions::NOT_LIKE,
-                    OperatorOptions::REGEXP,
-                    OperatorOptions::NOT_REGEXP,
-                    OperatorOptions::STARTS_WITH,
-                    OperatorOptions::ENDS_WITH,
-                    OperatorOptions::CONTAINS,
-                ]),
-                'object' => 'lead',
+                'operators'  => $this->getBehaviorOperators('text'),
+                'object'     => 'lead',
             ],
             'source_id' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.source.id'),
@@ -621,6 +553,19 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
         }
 
         $event->setChoices($choices);
+    }
+
+    /**
+     * @return mixed[]
+     */
+    private function getBehaviorOperators(string $fieldType): array
+    {
+        if ('segment' === $this->typeOperatorProvider->getContext()) {
+            $this->behaviorOperators['datetime'][] = OperatorOptions::IN_LAST;
+            $this->behaviorOperators['datetime'][] = OperatorOptions::IN_NEXT;
+        }
+
+        return $this->typeOperatorProvider->getOperatorsIncluding($this->behaviorOperators[$fieldType]);
     }
 
     public function onGenerateSegmentFiltersNormalizeOperatorLabels(LeadListFiltersChoicesEvent $event): void

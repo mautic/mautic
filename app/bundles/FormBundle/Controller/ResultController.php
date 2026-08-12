@@ -386,10 +386,7 @@ final class ResultController extends CommonFormController
         );
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
-     */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): Response
     {
         return $this->batchDeleteStandard($request);
     }
@@ -429,11 +426,9 @@ final class ResultController extends CommonFormController
 
     public function getPostActionRedirectArguments(array $args, $action): array
     {
-        switch ($action) {
-            case 'batchDelete':
-                $formId                             = $this->getFormIdFromRequest();
-                $args['viewParameters']['objectId'] = $formId;
-                break;
+        if ('batchDelete' === $action) {
+            $formId                             = $this->getFormIdFromRequest();
+            $args['viewParameters']['objectId'] = $formId;
         }
 
         return $args;
