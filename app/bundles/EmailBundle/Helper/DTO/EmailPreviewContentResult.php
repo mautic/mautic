@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Helper\DTO;
 
-final class EmailPreviewContentResult
+final readonly class EmailPreviewContentResult
 {
     public function __construct(
         private string $content,

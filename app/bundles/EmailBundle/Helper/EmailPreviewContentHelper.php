@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Helper\DTO\EmailPreviewContentResult;
 
-final class EmailPreviewContentHelper
+final readonly class EmailPreviewContentHelper
 {
     public function __construct(
         private ThemeHelper $themeHelper,
@@ -20,7 +20,7 @@ final class EmailPreviewContentHelper
         if (!$contentProvided) {
             $content = (string) ($email->getCustomHtml() ?? '');
         } else {
-            $content = (string) ($content ?? '');
+            $content ??= '';
         }
 
         if ('' !== trim($content)) {

@@ -24,8 +24,8 @@ final class MjmlContentHelper
 
         try {
             $result = Mjml::render($content, new MjmlOptions(
-                beautify: true,
                 validationLevel: ValidationLevel::Soft,
+                beautify: true,
             ));
 
             $html = trim($result->html);

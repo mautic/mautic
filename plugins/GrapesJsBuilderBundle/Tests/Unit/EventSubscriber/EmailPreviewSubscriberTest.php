@@ -10,7 +10,7 @@ use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class EmailPreviewSubscriberTest extends TestCase
+final class EmailPreviewSubscriberTest extends TestCase
 {
     private Config&MockObject $config;
 
@@ -34,8 +34,8 @@ class EmailPreviewSubscriberTest extends TestCase
 
         $this->subscriber->convertPublicMjmlPreview($event);
 
-        self::assertStringNotContainsString('<mjml>', $event->getContent(true));
-        self::assertStringContainsString('Preview', $event->getContent(true));
+        $this->assertStringNotContainsString('<mjml>', $event->getContent(true));
+        $this->assertStringContainsString('Preview', $event->getContent(true));
     }
 
     public function testDoesNotConvertWhenNotPublicPreview(): void
@@ -47,7 +47,7 @@ class EmailPreviewSubscriberTest extends TestCase
 
         $this->subscriber->convertPublicMjmlPreview($event);
 
-        self::assertSame($mjml, $event->getContent(true));
+        $this->assertSame($mjml, $event->getContent(true));
     }
 
     public function testDoesNotConvertHtmlContent(): void
@@ -62,7 +62,7 @@ class EmailPreviewSubscriberTest extends TestCase
 
         $this->subscriber->convertPublicMjmlPreview($event);
 
-        self::assertSame($html, $event->getContent(true));
+        $this->assertSame($html, $event->getContent(true));
     }
 
     public function testDoesNotConvertWhenPluginIsUnpublished(): void
@@ -77,6 +77,6 @@ class EmailPreviewSubscriberTest extends TestCase
 
         $this->subscriber->convertPublicMjmlPreview($event);
 
-        self::assertSame($mjml, $event->getContent(true));
+        $this->assertSame($mjml, $event->getContent(true));
     }
 }

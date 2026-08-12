@@ -10,7 +10,7 @@ use Mautic\EmailBundle\Helper\EmailPreviewContentHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class EmailPreviewContentHelperTest extends TestCase
+final class EmailPreviewContentHelperTest extends TestCase
 {
     private ThemeHelper&MockObject $themeHelper;
 
@@ -29,8 +29,8 @@ class EmailPreviewContentHelperTest extends TestCase
 
         $result = $this->helper->resolve($email);
 
-        self::assertSame('<html><body>Custom</body></html>', $result->getContent());
-        self::assertFalse($result->isRenderedFromTheme());
+        $this->assertSame('<html><body>Custom</body></html>', $result->getContent());
+        $this->assertFalse($result->isRenderedFromTheme());
     }
 
     public function testResolveRendersThemeWhenCustomHtmlIsEmpty(): void
@@ -39,27 +39,25 @@ class EmailPreviewContentHelperTest extends TestCase
         $email->setTemplate('_1-2-1-2-column');
         $email->setContent([]);
 
-        $this->themeHelper->expects(self::once())
+        $this->themeHelper->expects($this->once())
             ->method('checkForTwigTemplate')
             ->with('@themes/_1-2-1-2-column/html/email.html.twig')
             ->willReturn('@themes/_1-2-1-2-column/html/email.html.twig');
 
-        $this->themeHelper->expects(self::once())
+        $this->themeHelper->expects($this->once())
             ->method('renderThemeTemplate')
             ->with(
                 '@themes/_1-2-1-2-column/html/email.html.twig',
-                self::callback(static function (array $parameters): bool {
-                    return true === $parameters['inBrowser']
-                        && [] === $parameters['content']
-                        && '_1-2-1-2-column' === $parameters['template'];
-                })
+                self::callback(static fn (array $parameters): bool => true === $parameters['inBrowser']
+                    && [] === $parameters['content']
+                    && '_1-2-1-2-column' === $parameters['template'])
             )
             ->willReturn('<mjml><mj-body><mj-text>Theme</mj-text></mj-body></mjml>');
 
         $result = $this->helper->resolve($email);
 
-        self::assertStringContainsString('<mjml>', $result->getContent());
-        self::assertTrue($result->isRenderedFromTheme());
+        $this->assertStringContainsString('<mjml>', $result->getContent());
+        $this->assertTrue($result->isRenderedFromTheme());
     }
 
     public function testResolveDoesNotRenderThemeForCodeMode(): void
@@ -67,12 +65,12 @@ class EmailPreviewContentHelperTest extends TestCase
         $email = new Email();
         $email->setTemplate('mautic_code_mode');
 
-        $this->themeHelper->expects(self::never())->method('renderThemeTemplate');
+        $this->themeHelper->expects($this->never())->method('renderThemeTemplate');
 
         $result = $this->helper->resolve($email);
 
-        self::assertSame('', $result->getContent());
-        self::assertFalse($result->isRenderedFromTheme());
+        $this->assertSame('', $result->getContent());
+        $this->assertFalse($result->isRenderedFromTheme());
     }
 
     public function testResolveUsesOverrideContentForDraftPreview(): void
@@ -82,8 +80,8 @@ class EmailPreviewContentHelperTest extends TestCase
 
         $result = $this->helper->resolve($email, '<html><body>Draft</body></html>', true);
 
-        self::assertSame('<html><body>Draft</body></html>', $result->getContent());
-        self::assertFalse($result->isRenderedFromTheme());
+        $this->assertSame('<html><body>Draft</body></html>', $result->getContent());
+        $this->assertFalse($result->isRenderedFromTheme());
     }
 
     public function testResolveRendersThemeWhenDraftOverrideIsNull(): void
@@ -93,17 +91,17 @@ class EmailPreviewContentHelperTest extends TestCase
         $email->setCustomHtml('<html><body>Published</body></html>');
         $email->setContent([]);
 
-        $this->themeHelper->expects(self::once())
+        $this->themeHelper->expects($this->once())
             ->method('checkForTwigTemplate')
             ->willReturn('@themes/_1-2-1-2-column/html/email.html.twig');
 
-        $this->themeHelper->expects(self::once())
+        $this->themeHelper->expects($this->once())
             ->method('renderThemeTemplate')
             ->willReturn('<mjml><mj-body><mj-text>Draft theme</mj-text></mj-body></mjml>');
 
         $result = $this->helper->resolve($email, null, true);
 
-        self::assertStringContainsString('Draft theme', $result->getContent());
-        self::assertTrue($result->isRenderedFromTheme());
+        $this->assertStringContainsString('Draft theme', $result->getContent());
+        $this->assertTrue($result->isRenderedFromTheme());
     }
 }

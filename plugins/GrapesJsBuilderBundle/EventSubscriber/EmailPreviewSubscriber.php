@@ -13,7 +13,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class EmailPreviewSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private Config $config,
+        private readonly Config $config,
     ) {
     }
 
