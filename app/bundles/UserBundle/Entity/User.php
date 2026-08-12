@@ -23,7 +23,6 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ApiResource(
     shortName: 'User',
@@ -74,6 +73,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     #[Groups(['user:write'])]
     #[Assert\NotBlank(message: 'mautic.user.user.password.notblank', groups: ['CheckPasswordNotBlank'])]
     #[Assert\Length(min: 6, minMessage: 'mautic.user.user.password.minlength', groups: ['CheckPassword'])]
+    #[NotWeak(message: 'mautic.user.user.password.weak', groups: ['CheckPassword'])]
     private $plainPassword;
 
     /**
@@ -237,11 +237,6 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         $builder->createField('signature', 'text')
             ->nullable()
             ->build();
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('plainPassword', new NotWeak(message: 'mautic.user.user.password.weak', groups: ['CheckPassword']));
     }
 
     public static function determineValidationGroups(Form $form): array
