@@ -114,10 +114,14 @@ jobs:
         export DB_PORT="${{ job.services.database.ports[3306] }}"
         export SAML_PORT="${{ job.services.saml.ports[8080] }}"
 
+        # The "Container smoke tests" and "Static analysis rule tests" suites need no database,
+        # they run in the separate "no-database-tests" job below.
+        SUITES="Project Test Suite,Plugin tests,Middleware tests"
+
         if [[ "$COVERAGE" == "true" ]]; then
-          php -d zend.assertions=1 -d pcov.enabled=1 bin/phpunit -d memory_limit=3G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --coverage-clover=coverage.xml --log-junit=junit.xml
+          php -d zend.assertions=1 -d pcov.enabled=1 bin/phpunit -d memory_limit=3G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --testsuite "$SUITES" --coverage-clover=coverage.xml --log-junit=junit.xml
         else
-          php -d zend.assertions=1 bin/phpunit -d memory_limit=2G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist
+          php -d zend.assertions=1 bin/phpunit -d memory_limit=2G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --testsuite "$SUITES"
         fi
 
     - name: Upload coverage report
@@ -151,6 +155,27 @@ jobs:
       with:
         name: logs-${{ matrix.php-versions }}-${{ env.DB_LOG_NAME }}
         path: ./var/logs/*
+
+  no-database-tests:
+    runs-on: ubuntu-latest
+
+    name: PHPUnit without database
+
+    steps:
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+    - name: Setup PHP, with composer and extensions
+      uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+      with:
+        php-version: '8.4'
+        extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
+        coverage: none
+
+    - name: Install dependencies
+      uses: "ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda" # 4.0.0
+
+    - name: Run tests
+      run: bin/phpunit --configuration app/phpunit.xml.dist --testsuite "Container smoke tests,Static analysis rule tests"
 
   e2e-tests:
     runs-on: ubuntu-latest
