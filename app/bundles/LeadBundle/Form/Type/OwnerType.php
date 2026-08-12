@@ -14,6 +14,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 final class OwnerType extends AbstractType
 {
+    public const NO_OWNER_VALUE = '__none__';
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
@@ -23,7 +25,7 @@ final class OwnerType extends AbstractType
                 'label'             => 'mautic.lead.batch.set',
                 'multiple'          => false,
                 'choices'           => array_merge(
-                    [$options['remove_label'] => '__none__'],
+                    [$options['remove_label'] => self::NO_OWNER_VALUE],
                     $options['items']
                 ),
                 'required'          => false,

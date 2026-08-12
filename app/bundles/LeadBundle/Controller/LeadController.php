@@ -1929,7 +1929,7 @@ final class LeadController extends FormController
                 if ($this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
                     ++$count;
 
-                    if ('__none__' === ($data['addowner'] ?? null)) {
+                    if (OwnerType::NO_OWNER_VALUE === ($data['addowner'] ?? null)) {
                         $lead->setOwner(null);
                     } elseif (!empty($data['addowner'])) {
                         $user      = $this->userModel->getEntity((int) $data['addowner']);
