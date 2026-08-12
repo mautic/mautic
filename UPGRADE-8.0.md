@@ -61,3 +61,4 @@
 - Deprecated constants `Mautic\LeadBundle\Segment\OperatorOptions::IN` and `::NOT_IN` removed. Use `OperatorOptions::INCLUDING_ANY` and `OperatorOptions::EXCLUDING_ANY` instead — they carry the identical values `in` and `!in`.
 - Deprecated method `Mautic\CoreBundle\Entity\UuidTrait::isValidUuid()` removed. Use `Mautic\CoreBundle\Helper\UuidHelper::isValidUuid()` instead — calling static trait methods directly is deprecated in PHP 8.4+.
 - Deprecated service alias `mautic.config.model.sysinfo` removed. Use the FQCN service id `Mautic\ConfigBundle\Model\SysinfoModel` instead.
+- Deprecated methods `Mautic\CoreBundle\Event\BuilderEvent::addTokensFromHelper()` and `::getTokensFromHelper()` removed. Build the tokens with `Mautic\CoreBundle\Helper\BuilderTokenHelper` yourself and pass them to `BuilderEvent::addTokens()`.

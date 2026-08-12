@@ -2,7 +2,6 @@
 
 namespace Mautic\CoreBundle\Event;
 
-use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -200,48 +199,6 @@ class BuilderEvent extends Event
         );
 
         return array_intersect_key($tokens, array_flip($found));
-    }
-
-    /**
-     * Add tokens from a BuilderTokenHelper.
-     *
-     * @deprecated use BuilderTokenHelper::getFormattedTokens and $this->addTokens
-     *
-     * @param string $labelColumn
-     * @param string $valueColumn
-     * @param bool   $convertToLinks If true, the tokens will be converted to links
-     */
-    public function addTokensFromHelper(
-        BuilderTokenHelper $tokenHelper,
-        $tokens,
-        $labelColumn = 'name',
-        $valueColumn = 'id',
-        $convertToLinks = false,
-    ): void {
-        $tokens = $this->getTokensFromHelper($tokenHelper, $tokens, $labelColumn, $valueColumn);
-        if (null == $tokens) {
-            $tokens = [];
-        }
-
-        $this->addTokens(
-            $tokens,
-            $convertToLinks
-        );
-    }
-
-    /**
-     * Get tokens from a BuilderTokenHelper.
-     *
-     * @deprecated use BuilderTokenHelper::getFormattedTokens
-     */
-    public function getTokensFromHelper(BuilderTokenHelper $tokenHelper, $tokens, $labelColumn = 'name', $valueColumn = 'id'): ?array
-    {
-        return $tokenHelper->getTokens(
-            $tokens,
-            'label' === $this->tokenFilterTarget ? $this->tokenFilterText : '',
-            $labelColumn,
-            $valueColumn
-        );
     }
 
     /**

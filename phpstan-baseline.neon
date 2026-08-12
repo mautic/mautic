@@ -1780,12 +1780,6 @@ parameters:
 			path: app/bundles/CoreBundle/Event/BuilderEvent.php
 
 		-
-			message: '#^Method Mautic\\CoreBundle\\Event\\BuilderEvent\:\:addTokensFromHelper\(\) has parameter \$tokens with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Event/BuilderEvent.php
-
-		-
 			message: '#^Method Mautic\\CoreBundle\\Event\\BuilderEvent\:\:getRequested\(\) has parameter \$type with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -1793,24 +1787,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\CoreBundle\\Event\\BuilderEvent\:\:getTokens\(\) has parameter \$withBC with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Event/BuilderEvent.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Event\\BuilderEvent\:\:getTokensFromHelper\(\) has parameter \$labelColumn with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Event/BuilderEvent.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Event\\BuilderEvent\:\:getTokensFromHelper\(\) has parameter \$tokens with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Event/BuilderEvent.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Event\\BuilderEvent\:\:getTokensFromHelper\(\) has parameter \$valueColumn with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/CoreBundle/Event/BuilderEvent.php
@@ -3521,12 +3497,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\EmailBundle\\Helper\\MailHelper\:\:setTo\(\) has parameter \$name with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Helper/MailHelper.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Helper\\MailHelper\:\:validateEmail\(\) has parameter \$address with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/EmailBundle/Helper/MailHelper.php
