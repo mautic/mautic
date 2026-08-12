@@ -29,7 +29,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         prepareDbalFieldsForSave as defaultPrepareDbalFieldsForSave;
     }
     use ExpressionHelperTrait;
-    use OperatorListTrait;
 
     private const string EXISTS_EXPRESSION     = 'EXISTS';
 

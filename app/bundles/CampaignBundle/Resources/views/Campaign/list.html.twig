@@ -175,9 +175,17 @@
                           {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {
                               'item': item,
                               'model': 'campaign',
-                              'onclick': item.onclickMethod,
-                              'attributes': item.dataAttributes,
-                              'transKeys': item.translationKeysDataAttributes,
+                              'onclick': 'Mautic.confirmationCampaignPublishStatus(mQuery(this));',
+                              'attributes': {
+                                  'data-toggle': 'confirmation',
+                                  'data-confirm-callback': 'confirmCallbackCampaignPublishStatus',
+                                  'data-cancel-callback': 'dismissConfirmation',
+                              },
+                              'transKeys': {
+                                  'data-message': 'mautic.campaign.form.confirmation.message',
+                                  'data-confirm-text': 'mautic.campaign.form.confirmation.confirm_text',
+                                  'data-cancel-text': 'mautic.campaign.form.confirmation.cancel_text',
+                              },
                           }) }}
                             <a href="{{ path('mautic_campaign_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
                                 {{- item.name -}}

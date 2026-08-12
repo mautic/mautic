@@ -87,19 +87,12 @@ abstract class AbstractFormFieldHelper
     /**
      * Format a string into an array.
      *
-     * @param mixed $list                      List to parse
-     * @param bool  $removeEmpty               @deprecated Kept for BC with method signature
-     * @param bool  $deprecatedIgnoreNumerical @deprecated Flag was introduced to support boolean choice lists; use parseBooleanList instead
+     * @param mixed $list List to parse
      *
      * @return array
      */
-    public static function parseList($list, $removeEmpty = true, $deprecatedIgnoreNumerical = false)
+    public static function parseList($list)
     {
-        if ($deprecatedIgnoreNumerical) {
-            // BC support for support
-            return static::parseBooleanList($list);
-        }
-
         return static::parseChoiceList(
             self::parseListsWithParsers(
                 $list,

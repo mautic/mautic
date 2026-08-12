@@ -691,42 +691,6 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     }
 
     /**
-     * @deprecated use CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE to change template params instead
-     */
-    public function getOnclickMethod(): string
-    {
-        return 'Mautic.confirmationCampaignPublishStatus(mQuery(this));';
-    }
-
-    /**
-     * @deprecated use CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE to change template params instead
-     *
-     * @return array<string, string>
-     */
-    public function getDataAttributes(): array
-    {
-        return [
-            'data-toggle'           => 'confirmation',
-            'data-confirm-callback' => 'confirmCallbackCampaignPublishStatus',
-            'data-cancel-callback'  => 'dismissConfirmation',
-        ];
-    }
-
-    /**
-     * @deprecated use CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE to change template params instead
-     *
-     * @return array<string, string>
-     */
-    public function getTranslationKeysDataAttributes(): array
-    {
-        return [
-            'data-message'      => 'mautic.campaign.form.confirmation.message',
-            'data-confirm-text' => 'mautic.campaign.form.confirmation.confirm_text',
-            'data-cancel-text'  => 'mautic.campaign.form.confirmation.cancel_text',
-        ];
-    }
-
-    /**
      * Re-index collection by event ID to work around Doctrine's indexBy mapping issue.
      *
      * @see https://github.com/doctrine/doctrine2/issues/4693

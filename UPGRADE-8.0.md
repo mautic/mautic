@@ -91,3 +91,14 @@
 - Deprecated method `Mautic\CampaignBundle\Entity\CampaignRepository::getCampaignLeadCount()` removed with no replacement. It had no callers left.
 - Deprecated constant `Mautic\CoreBundle\Command\ModeratedCommand::MODE_LOCK` (`file_lock`) removed, together with the branch that silently rewrote that mode to `flock`. `--lock_mode=file_lock` now fails with `Unknown locking method specified.` — use `--lock_mode=flock`. The `pid`, `flock` and `redis` modes are unchanged.
 - Deprecated method `Mautic\CoreBundle\Controller\CommonController::accessDenied()` removed. Use `throwAccessDenied()` (throws `AccessDeniedHttpException`) or `getAccessDeniedFlash()` instead. Note the removed method always threw as well — its `array` return value was unreachable — so `Mautic\LeadBundle\Controller\NoteController::newAction()` and `::editAction()` lost `array` from their return types.
+- Deprecated parameters `$removeEmpty` and `$deprecatedIgnoreNumerical` removed from `Mautic\CoreBundle\Helper\AbstractFormFieldHelper::parseList()`, which now takes the list only. `$removeEmpty` was never read; pass the list to `parseBooleanList()` directly in place of `$deprecatedIgnoreNumerical = true`:
+
+```diff
+-$choices = FormFieldHelper::parseList($list, true, true);
++$choices = FormFieldHelper::parseBooleanList($list);
+```
+
+- Deprecated route `mautic_receive_sms` (`/sms/receive`) removed. It was a Twilio-specific alias that forwarded to `ReplyController::callbackAction()` with `transport` hardcoded to `twilio`. Point the callback URL configured in Twilio at `/sms/twilio/callback` (route `mautic_sms_callback`) instead.
+- Deprecated parameter `$formType` removed from `Mautic\FormBundle\Entity\FormRepository::getFormList()`, together with the `f.formType` filter it applied. With it, the `form_type` option of `Mautic\FormBundle\Form\Type\FormListType` is gone — nothing passed it, so the returned form list is unchanged.
+- Deprecated methods `Mautic\CampaignBundle\Entity\Campaign::getOnclickMethod()`, `::getDataAttributes()` and `::getTranslationKeysDataAttributes()` removed. They returned hardcoded publish-status confirmation attributes for the campaign list template, which now passes those values inline. Use the `CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE` event to change template params instead.
+- `Mautic\LeadBundle\Model\LeadModel` and `Mautic\LeadBundle\Entity\LeadRepository` no longer use `OperatorListTrait`, so `getFilterExpressionFunctions()`, `getOperatorsForFieldType()` and `getOperatorChoiceList()` are no longer available on them. Use `Mautic\LeadBundle\Provider\TypeOperatorProvider` instead. The trait itself is unchanged.

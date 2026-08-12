@@ -48,7 +48,6 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\MergeRecordRepository;
-use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Entity\PointsChangeLogRepository;
 use Mautic\LeadBundle\Entity\StagesChangeLog;
@@ -95,7 +94,6 @@ use Symfony\Contracts\Service\Attribute\Required;
 class LeadModel extends FormModel
 {
     use DefaultValueTrait;
-    use OperatorListTrait;
     use RequestTrait;
 
     public const CHANNEL_FEATURE = 'contact_preference';
