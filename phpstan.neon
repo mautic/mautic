@@ -251,6 +251,7 @@ rules:
 	- Utils\PHPStan\Rule\NoGetModelWithStringInControllerRule
 	- Utils\PHPStan\Rule\NoRequiredMethodWithConstructorInControllerRule
 	- Utils\PHPStan\Rule\CommandMustHaveAsCommandAttributeRule
+	- Utils\PHPStan\Rule\KernelTestMustHaveDatabaseGroupRule
 	- Utils\PHPStan\Rule\ConstraintMustHaveAttributeRule
 	- Utils\PHPStan\Rule\NoNullableServiceInConstructorRule
 	- Utils\PHPStan\Rule\NoGetRepositoryWithEntityInRepositoryRule

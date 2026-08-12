@@ -31,6 +31,7 @@ return RectorConfig::configure()
         Rector\TypeDeclarationDocblocks\Rector\ClassMethod\NarrowArrayCollectionUnionReturnDocblockRector::class,
         UnserializeToSerializerDecodeRector::class,
         Utils\Rector\AddExpectsOnceToMockMethodCallRector::class,
+        Utils\Rector\AddDatabaseGroupToKernelTestRector::class,
 
         // DI
         Utils\Rector\ModelGetRepositoryToRepositoryServiceRector::class,
@@ -50,7 +51,7 @@ return RectorConfig::configure()
         // applied in a follow-up pull request
         Utils\Rector\AddExpectsOnceToMockMethodCallRector::class,
 
-        Rector\Symfony\CodeQuality\Rector\Class_\LoadValidatorMetadataToAttributeRector::class,
+        // Rector\Symfony\CodeQuality\Rector\Class_\LoadValidatorMetadataToAttributeRector::class,
         Utils\Rector\ModelGetRepositoryToRepositoryServiceRector::class => [
             __DIR__.'/app/bundles/PageBundle/Form/Type/PreferenceCenterListType.php',
         ],
