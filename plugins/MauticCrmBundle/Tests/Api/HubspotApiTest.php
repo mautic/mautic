@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticCrmBundle\Tests\Api;
 
+use Mautic\EmailBundle\Exception\InvalidEmailException;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCrmBundle\Api\HubspotApi;
 use MauticPlugin\MauticCrmBundle\Integration\HubspotIntegration;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
 
@@ -82,5 +85,57 @@ final class HubspotApiTest extends TestCase
         $api->getLeadFields();
 
         self::fail('ApiErrorException not thrown');
+    }
+
+    #[DataProvider('provideInvalidEmails')]
+    public function testCreateLeadRejectsInvalidEmail(string $email): void
+    {
+        $integration = $this->createMock(HubspotIntegration::class);
+        $integration->expects($this->never())->method('formatLeadDataForCreateOrUpdate');
+
+        $this->expectException(InvalidEmailException::class);
+
+        $api = new HubspotApi($integration);
+        $api->createLead(['email' => $email], new Lead());
+    }
+
+    /**
+     * @return \Iterator<array{string}>
+     */
+    public static function provideInvalidEmails(): \Iterator
+    {
+        yield ['john@doe'];
+        yield ['jo hn@doe.email'];
+        yield ['jo^hn@doe.email'];
+        yield ["jo'hn@doe.email"];
+        yield ['jo;hn@doe.email'];
+        yield ['jo&hn@doe.email'];
+        yield ['jo*hn@doe.email'];
+        yield ['jo%hn@doe.email'];
+    }
+
+    #[DataProvider('provideValidEmails')]
+    public function testCreateLeadAcceptsValidEmail(string $email): void
+    {
+        $integration = $this->createMock(HubspotIntegration::class);
+        $integration->expects($this->once())
+            ->method('formatLeadDataForCreateOrUpdate')
+            ->willReturn([]);
+
+        $api = new HubspotApi($integration);
+
+        $this->assertSame([], $api->createLead(['email' => $email], new Lead()));
+    }
+
+    /**
+     * @return \Iterator<array{string}>
+     */
+    public static function provideValidEmails(): \Iterator
+    {
+        yield ['john@doe.com'];
+        yield ['john@doe.email'];
+        yield ['john.doe@email.com'];
+        yield ['john+doe@email.com'];
+        yield ['john@doe.whatevertldtheycomewithinthefuture'];
     }
 }
