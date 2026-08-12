@@ -65,8 +65,14 @@ final class VisitUrlWithTimeSpentBugTest extends MauticMysqlTestCase
         ];
 
         $factory = new class($this->em) {
-            public function __construct(private \Doctrine\ORM\EntityManager $em) {}
-            public function getEntityManager() { return $this->em; }
+            public function __construct(private \Doctrine\ORM\EntityManager $em)
+            {
+            }
+
+            public function getEntityManager()
+            {
+                return $this->em;
+            }
         };
 
         // Evaluate using the REVISIT hit — should return TRUE (accumulative time met)
