@@ -67,6 +67,7 @@ final class VisitUrlWithTimeSpentBugTest extends MauticMysqlTestCase
         ];
 
         /** @var MauticFactory&MockObject $factory */
+        /** @phpstan-ignore-next-line */
         $factory = $this->createMock(MauticFactory::class);
         $factory->method('getEntityManager')->willReturn($this->em);
 
