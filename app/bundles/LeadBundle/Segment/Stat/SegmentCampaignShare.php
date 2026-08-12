@@ -40,7 +40,7 @@ final readonly class SegmentCampaignShare
         $q = $this->entityManager->getConnection()->createQueryBuilder();
         $q->select('c.id, c.name, null as share')
             ->from(MAUTIC_TABLE_PREFIX.'campaigns', 'c')
-            ->where($this->campaignRepository->getPublishedByDateExpression($q))
+            ->where($this->campaignRepository->getPublishedByDateDbalExpression($q))
             ->orderBy('c.id', 'DESC');
 
         $campaigns = $q->executeQuery()->fetchAllAssociative();
