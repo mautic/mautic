@@ -73,3 +73,4 @@
 ```
 
   Mind two behaviour differences: `EmailValidator` accepts an apostrophe in the local part (the removed static rejected it), and it dispatches `EmailEvents::ON_EMAIL_VALIDATION`, so validation plugins now run. The HubSpot integration, the only caller in core, was converted accordingly.
+- Deprecated method `Mautic\CoreBundle\Controller\CommonController::accessDenied()` removed. Use `throwAccessDenied()` (throws `AccessDeniedHttpException`) or `getAccessDeniedFlash()` instead. Note the removed method always threw as well — its `array` return value was unreachable — so `Mautic\LeadBundle\Controller\NoteController::newAction()` and `::editAction()` lost `array` from their return types.

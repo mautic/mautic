@@ -165,14 +165,14 @@ final class NoteController extends FormController
     /**
      * Generate's new note and processes post data.
      */
-    public function newAction(Request $request, $leadId): Response|JsonResponse|array
+    public function newAction(Request $request, $leadId): Response|JsonResponse
     {
         $lead = $this->checkLeadAccess($leadId, 'view');
         if ($lead instanceof Response) {
             return $lead;
         }
         if (!$this->security->isGranted('lead:notes:create')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         // retrieve the entity
@@ -251,7 +251,7 @@ final class NoteController extends FormController
     /**
      * Generate's edit form and processes post data.
      */
-    public function editAction(Request $request, $leadId, $objectId): Response|JsonResponse|array
+    public function editAction(Request $request, $leadId, $objectId): Response|JsonResponse
     {
         $lead = $this->checkLeadAccess($leadId, 'view');
         if ($lead instanceof Response) {
@@ -262,7 +262,7 @@ final class NoteController extends FormController
         $valid      = false;
 
         if (null === $note || !$this->security->hasEntityAccess('lead:notes:editown', 'lead:notes:editother', $note->getCreatedBy())) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $action = $this->generateUrl(
