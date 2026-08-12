@@ -62,3 +62,4 @@
 - Deprecated method `Mautic\CoreBundle\Entity\UuidTrait::isValidUuid()` removed. Use `Mautic\CoreBundle\Helper\UuidHelper::isValidUuid()` instead — calling static trait methods directly is deprecated in PHP 8.4+.
 - Deprecated service alias `mautic.config.model.sysinfo` removed. Use the FQCN service id `Mautic\ConfigBundle\Model\SysinfoModel` instead.
 - Deprecated constant `Mautic\EmailBundle\EmailEvents::ON_CAMPAIGN_TRIGGER_ACTION` (`mautic.email.on_campaign_trigger_action`) removed. Nothing dispatched it any more — both `email.send` campaign actions run through `EmailEvents::ON_CAMPAIGN_BATCH_ACTION`. Listen to that event instead.
+- Deprecated constant `Mautic\StageBundle\StageEvents::ON_CAMPAIGN_TRIGGER_ACTION` (`mautic.stage.on_campaign_trigger_action`) removed. The `stage.change` campaign action runs through `StageEvents::ON_CAMPAIGN_BATCH_ACTION`. Listen to that event instead.

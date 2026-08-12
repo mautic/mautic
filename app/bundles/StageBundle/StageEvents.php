@@ -57,14 +57,4 @@ final class StageEvents
      * The event listener receives a Mautic\CampaignBundle\Event\PendingEvent
      */
     public const string ON_CAMPAIGN_BATCH_ACTION = 'mautic.stage.on_campaign_batch_action';
-
-    /**
-     * @deprecated; use ON_CAMPAIGN_BATCH_ACTION instead
-     *
-     * The mautic.stage.on_campaign_trigger_action event is fired when the campaign action triggers.
-     *
-     * The event listener receives a
-     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
-     */
-    public const string ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.stage.on_campaign_trigger_action';
 }
