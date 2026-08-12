@@ -116,6 +116,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     #[Groups(['email:read', 'email:write', 'download:read'])]
     #[NotBlank(message: 'mautic.core.subject.required')]
     #[Length(max: self::MAX_NAME_SUBJECT_LENGTH, maxMessage: 'mautic.email.subject.length')]
+    #[TextOnlyDynamicContent]
     private $subject;
 
     /**
@@ -135,6 +136,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      * @var string|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[EmailOrEmailTokenList(allowMultiple: false)]
     private $fromAddress;
 
     /**
@@ -478,13 +480,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $metadata->addPropertyConstraint(
-            'fromAddress',
-            new EmailOrEmailTokenList(allowMultiple: false),
-        );
-
-        $metadata->addPropertyConstraint('subject', new TextOnlyDynamicContent());
-
         $metadata->addConstraint(new Callback(
             function (Email $email, ExecutionContextInterface $context): void {
                 if ($email->isVariant()) {
