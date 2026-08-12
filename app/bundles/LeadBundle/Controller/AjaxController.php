@@ -18,7 +18,6 @@ use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
-use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\ListTypeaheadEvent;
 use Mautic\LeadBundle\Form\Type\FieldType;
 use Mautic\LeadBundle\Form\Type\FilterPropertiesType;
@@ -606,49 +605,6 @@ final class AjaxController extends CommonAjaxController
             $data = [
                 'success' => 1,
                 'tags'    => $tagOptions,
-            ];
-        } else {
-            $data = ['success' => 0];
-        }
-
-        return $this->sendJsonResponse($data);
-    }
-
-    /**
-     * @deprecated since Mautic 7.2, will be removed in 8.0 with no replacement.
-     */
-    public function addLeadUtmTagsAction(Request $request, LeadModel $leadModel): JsonResponse
-    {
-        $utmTags = $request->request->get('utmtags');
-        $utmTags = json_decode($utmTags, true);
-
-        if (is_array($utmTags)) {
-            $newUtmTags = [];
-            foreach ($utmTags as $utmTag) {
-                if (!is_numeric($utmTag)) {
-                    // New tag
-                    $utmTagEntity = new UtmTag();
-                    $utmTagEntity->setUtmContent(InputHelper::clean($utmTag));
-                    $newUtmTags[] = $utmTagEntity;
-                }
-            }
-
-            if ([] !== $newUtmTags) {
-                $leadModel->getUtmTagRepository()->saveEntities($newUtmTags);
-            }
-
-            // Get an updated list of tags
-            $allUtmTags    = $leadModel->getUtmTagRepository()->getSimpleList(null, [], 'utmtag');
-            $utmTagOptions = '';
-
-            foreach ($allUtmTags as $utmTag) {
-                $selected = (in_array($utmTag['value'], $utmTags) || in_array($utmTag['label'], $utmTags)) ? ' selected="selected"' : '';
-                $utmTagOptions .= '<option'.$selected.' value="'.$utmTag['value'].'">'.$utmTag['label'].'</option>';
-            }
-
-            $data = [
-                'success' => 1,
-                'tags'    => $utmTagOptions,
             ];
         } else {
             $data = ['success' => 0];
