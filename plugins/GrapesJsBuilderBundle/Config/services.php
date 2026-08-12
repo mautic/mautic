@@ -31,7 +31,4 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.integration.grapesjsbuilder', MauticPlugin\GrapesJsBuilderBundle\Integration\GrapesJsBuilderIntegration::class);
     // Provides the form types to use for the configuration UI
     // Tells Mautic what themes it should support when enabled
-
-    $services->get(MauticPlugin\GrapesJsBuilderBundle\InstallFixtures\ORM\GrapesJsData::class)
-        ->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
 };

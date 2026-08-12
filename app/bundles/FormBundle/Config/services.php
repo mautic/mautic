@@ -35,8 +35,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->set(Mautic\FormBundle\Form\Type\SubmitActionRepostType::class)
         ->call('setFieldModel', [service('mautic.form.model.field')])
         ->call('setFormModel', [service('mautic.form.model.form')]);
-    $services->set(Mautic\FormBundle\DataFixtures\ORM\LoadFormData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
-    $services->set(Mautic\FormBundle\DataFixtures\ORM\LoadFormResultData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
 
     $services->set(Mautic\FormBundle\Validator\Constraint\FileExtensionConstraintValidator::class)
         ->tag('validator.constraint_validator', ['alias' => 'file_extension_constraint_validator']);

@@ -11,13 +11,9 @@ final class Version20231206152313 extends PreUpAssertionMigration
 {
     protected function preUpAssertions(): void
     {
-        $this->skipAssertion(function (Schema $schema) {
-            return $schema->getTable($this->getTableName())->hasIndex($this->getSentIndexName());
-        }, sprintf('Index %s already exists', $this->getSentIndexName()));
+        $this->skipAssertion(fn (Schema $schema) => $schema->getTable($this->getTableName())->hasIndex($this->getSentIndexName()), sprintf('Index %s already exists', $this->getSentIndexName()));
 
-        $this->skipAssertion(function (Schema $schema) {
-            return $schema->getTable($this->getTableName())->hasIndex($this->getIsReadIndexName());
-        }, sprintf('Index %s already exists', $this->getIsReadIndexName()));
+        $this->skipAssertion(fn (Schema $schema) => $schema->getTable($this->getTableName())->hasIndex($this->getIsReadIndexName()), sprintf('Index %s already exists', $this->getIsReadIndexName()));
     }
 
     public function up(Schema $schema): void

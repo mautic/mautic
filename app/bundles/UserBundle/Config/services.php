@@ -97,8 +97,6 @@ return function (ContainerConfigurator $configurator): void {
         ->factory(Mautic\UserBundle\Security\SAML\EntityDescriptorProviderFactory::build(...))
         ->args([param('lightsaml.own.entity_id'), service('router'), param('lightsaml.route.login_check'), service('lightsaml.own.credential_store')]);
     $services->alias('mautic.security.saml.entity_descriptor_provider', LightSaml\Builder\EntityDescriptor\SimpleEntityDescriptorBuilder::class);
-    $services->set(Mautic\UserBundle\DataFixtures\ORM\LoadRoleData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
-    $services->set(Mautic\UserBundle\DataFixtures\ORM\LoadUserData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
     $services->set(Mautic\UserBundle\Security\SAML\Store\CredentialsStore::class)
         ->arg('$entityId', param('mautic.saml_idp_entity_id'))
         ->tag('lightsaml.own_credential_store');

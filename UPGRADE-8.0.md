@@ -59,3 +59,5 @@
 - `Mautic\DashboardBundle\Factory\WidgetDetailEventFactory` no longer takes `UserHelper`, `CoreParametersHelper` and `PathsHelper` constructor arguments.
 - Deprecated class `Mautic\CoreBundle\Session\Storage\Handler\RedisSentinelSessionHandler` removed with no replacement. It was deprecated since Mautic 5.0, slated for removal in 6.0, and had no references left in the codebase.
 - Deprecated constants `Mautic\LeadBundle\Segment\OperatorOptions::IN` and `::NOT_IN` removed. Use `OperatorOptions::INCLUDING_ANY` and `OperatorOptions::EXCLUDING_ANY` instead — they carry the identical values `in` and `!in`.
+- Deprecated method `Mautic\CoreBundle\Entity\UuidTrait::isValidUuid()` removed. Use `Mautic\CoreBundle\Helper\UuidHelper::isValidUuid()` instead — calling static trait methods directly is deprecated in PHP 8.4+.
+- Deprecated service alias `mautic.config.model.sysinfo` removed. Use the FQCN service id `Mautic\ConfigBundle\Model\SysinfoModel` instead.

@@ -2,13 +2,13 @@
 
 namespace Mautic\LeadBundle\DataFixtures\ORM;
 
-use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
 
-final class LoadLeadListData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadLeadListData extends Fixture implements OrderedFixtureInterface
 {
     public function __construct(
         private readonly ListModel $segmentModel,

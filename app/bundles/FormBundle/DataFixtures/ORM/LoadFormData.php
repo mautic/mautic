@@ -2,7 +2,7 @@
 
 namespace Mautic\FormBundle\DataFixtures\ORM;
 
-use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\CoreBundle\Doctrine\Common\DataFixtures\Event\PreExecuteEvent;
@@ -17,7 +17,7 @@ use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-final class LoadFormData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadFormData extends Fixture implements OrderedFixtureInterface
 {
     public const string FORM_PREFIX = 'form-';
 

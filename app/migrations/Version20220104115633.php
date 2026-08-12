@@ -13,9 +13,7 @@ final class Version20220104115633 extends PreUpAssertionMigration
 {
     protected function preUpAssertions(): void
     {
-        $this->skipAssertion(function (Schema $schema) {
-            return $schema->getTable($this->getPrefixedTableName(LeadList::TABLE_NAME))->hasColumn('deleted');
-        }, 'Deleted column already added in '.LeadList::TABLE_NAME);
+        $this->skipAssertion(fn (Schema $schema) => $schema->getTable($this->getPrefixedTableName(LeadList::TABLE_NAME))->hasColumn('deleted'), 'Deleted column already added in '.LeadList::TABLE_NAME);
     }
 
     public function up(Schema $schema): void

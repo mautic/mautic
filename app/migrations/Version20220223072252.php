@@ -14,9 +14,7 @@ final class Version20220223072252 extends PreUpAssertionMigration
 
     protected function preUpAssertions(): void
     {
-        $this->skipAssertion(function (Schema $schema) {
-            return $schema->getTable($this->getPrefixedTableName(self::TABLE))->getColumn('channel_id')->getType() instanceof StringType;
-        }, 'Column already in Varchar type');
+        $this->skipAssertion(fn (Schema $schema) => $schema->getTable($this->getPrefixedTableName(self::TABLE))->getColumn('channel_id')->getType() instanceof StringType, 'Column already in Varchar type');
     }
 
     public function up(Schema $schema): void
