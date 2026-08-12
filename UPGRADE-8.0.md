@@ -68,3 +68,11 @@
 - Deprecated method `Mautic\CoreBundle\Helper\AbstractFormFieldHelper::setTranslator()` removed. The translator is autowired via the `#[Required] autowireFormFieldHelper()` method, so there is nothing to pass manually.
 - Deprecated method `Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler::reschedule()` removed. Use `EventScheduler::rescheduleLogs()` instead, which takes an `ArrayCollection` of logs.
 - Deprecated method `Mautic\CoreBundle\Model\VariantModelTrait::convertVariant()` removed. Use `Mautic\CoreBundle\Model\VariantConverterService` instead.
+- Deprecated method `Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns::getForOriginalDateColumnAndUnit()` removed. Use `getGeneratedColumnForDateColumn()` instead — it takes the table name as its first argument and matches on it, while the removed method ignored the table and returned the last matching column of any table:
+
+```diff
+-$generatedColumn = $generatedColumns->getForOriginalDateColumnAndUnit('date_added', 'd');
++$generatedColumn = $generatedColumns->getGeneratedColumnForDateColumn('page_hits', 'date_added', 'd');
+```
+
+  `Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumnsInterface` declares `getGeneratedColumnForDateColumn()` in place of the removed method.

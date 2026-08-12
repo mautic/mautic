@@ -36,40 +36,6 @@ final class GeneratedColumnsTest extends TestCase
         }
     }
 
-    public function testGetForOriginalDateColumnAndUnitDoesNotRespectTableName(): void
-    {
-        $generatedColumn1 = new GeneratedColumn('page_hits', 'generated_added_date', 'DATE', 'not important');
-        $generatedColumn1->setOriginalDateColumn('date_added', 'd');
-        $this->generatedColumns->add($generatedColumn1);
-
-        $generatedColumn2 = new GeneratedColumn('downloads', 'generated_added_date', 'DATE', 'not important');
-        $generatedColumn2->setOriginalDateColumn('date_added', 'd');
-        $this->generatedColumns->add($generatedColumn2);
-
-        $this->assertSame($generatedColumn2, $this->generatedColumns->getForOriginalDateColumnAndUnit('date_added', 'd')); // @phpstan-ignore method.deprecated
-    }
-
-    #[DataProvider('dataGetForOriginalDateColumnAndUnitUnexpectedValue')]
-    public function testGetForOriginalDateColumnAndUnitUnexpectedValueIsThrown(string $column, string $unit): void
-    {
-        $generatedColumn = new GeneratedColumn('page_hits', 'generated_added_date', 'DATE', 'not important');
-        $generatedColumn->setOriginalDateColumn('date_added', 'd');
-        $this->generatedColumns->add($generatedColumn);
-
-        $this->expectException(\UnexpectedValueException::class);
-        $this->generatedColumns->getForOriginalDateColumnAndUnit($column, $unit);  // @phpstan-ignore method.deprecated
-    }
-
-    /**
-     * @return iterable<string[]>
-     */
-    public static function dataGetForOriginalDateColumnAndUnitUnexpectedValue(): iterable
-    {
-        yield ['date_added', 'Y'];
-        yield ['date_updated', 'd'];
-        yield ['non-existent', 'i'];
-    }
-
     public function testGetGeneratedColumnForDateColumnRespectsTableName(): void
     {
         $generatedColumn1 = new GeneratedColumn('page_hits', 'generated_added_date', 'DATE', 'not important');

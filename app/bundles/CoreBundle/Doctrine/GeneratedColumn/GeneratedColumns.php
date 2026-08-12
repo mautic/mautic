@@ -45,19 +45,8 @@ final class GeneratedColumns implements GeneratedColumnsInterface
     }
 
     /**
-     * @deprecated use self::getGeneratedColumnForDateColumn() instead
+     * @throws \UnexpectedValueException
      */
-    public function getForOriginalDateColumnAndUnit(string $originalDateColumn, string $unit): GeneratedColumnInterface
-    {
-        foreach (array_reverse($this->generatedColumns) as $generatedColumn) {
-            if ($generatedColumn->getOriginalDateColumn() === $originalDateColumn && $generatedColumn->getTimeUnit() === $unit) {
-                return $generatedColumn;
-            }
-        }
-
-        throw new \UnexpectedValueException("Generated column for original date column {$originalDateColumn} with unit {$unit} does not exist.");
-    }
-
     public function getGeneratedColumnForDateColumn(string $table, string $column, string $unit): GeneratedColumn
     {
         if (isset($this->dateColumnIndex[$table][$column][$unit])) {
