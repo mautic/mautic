@@ -93,13 +93,13 @@ final class WebhookModelTest extends TestCase
 
     public function testGetEventsOrderbyDirWhenNotSetInWebhook(): void
     {
-        $this->parametersHelperMock->method('get')->willReturn('DESC');
+        $this->parametersHelperMock->expects($this->exactly(9))->method('get')->willReturn('DESC');
         $this->assertEquals('DESC', $this->initModel()->getEventsOrderbyDir());
     }
 
     public function testGetEventsOrderbyDirWhenWebhookNotProvided(): void
     {
-        $this->parametersHelperMock->method('get')->willReturn('DESC');
+        $this->parametersHelperMock->expects($this->exactly(9))->method('get')->willReturn('DESC');
         $this->assertEquals('DESC', $this->initModel()->getEventsOrderbyDir());
     }
 
@@ -118,12 +118,12 @@ final class WebhookModelTest extends TestCase
         $webhook   = new Webhook();
         $event     = new Event();
         $event->setEventType('leads');
-        $queueMock->method('getPayload')->willReturn('{"the": "payload"}');
-        $queueMock->method('getEvent')->willReturn($event);
-        $queueMock->method('getDateAdded')->willReturn(new \DateTime('2018-04-10T15:04:57+00:00'));
-        $queueMock->method('getId')->willReturn('12');
+        $queueMock->expects($this->once())->method('getPayload')->willReturn('{"the": "payload"}');
+        $queueMock->expects($this->once())->method('getEvent')->willReturn($event);
+        $queueMock->expects($this->once())->method('getDateAdded')->willReturn(new \DateTime('2018-04-10T15:04:57+00:00'));
+        $queueMock->expects($this->exactly(2))->method('getId')->willReturn('12');
 
-        $this->parametersHelperMock->method('get')
+        $this->parametersHelperMock->expects($this->exactly(9))->method('get')
             ->willReturnCallback(function ($param): string|int|null {
                 if ('queue_mode' === $param) {
                     return WebhookModel::COMMAND_PROCESS;
@@ -165,7 +165,7 @@ final class WebhookModelTest extends TestCase
         $queue->setEvent($event);
         $queue->setDateAdded(new \DateTime('2018-04-10T15:04:57+00:00'));
 
-        $this->parametersHelperMock->method('get')
+        $this->parametersHelperMock->expects($this->exactly(9))->method('get')
             ->willReturnCallback(function ($param): ?string {
                 if ('queue_mode' === $param) {
                     return WebhookModel::IMMEDIATE_PROCESS;
@@ -209,7 +209,7 @@ final class WebhookModelTest extends TestCase
         $queue->setEvent($event);
         $queue->setDateAdded(new \DateTime('2021-04-01T16:00:00+00:00'));
 
-        $this->webhookQueueRepository
+        $this->webhookQueueRepository->expects($this->exactly(2))
             ->method('deleteQueuesById')
             ->with([1]);
 
@@ -221,7 +221,7 @@ final class WebhookModelTest extends TestCase
                 ],
             ],
         ];
-        $this->httpClientMock
+        $this->httpClientMock->expects($this->once())
             ->method('post')
             ->with('test-webhook.com', $responsePayload)
             ->willReturn(new Response(200, [], 'Success'));
@@ -240,7 +240,7 @@ final class WebhookModelTest extends TestCase
 
         $webhook->setEventsOrderbyDir('ASC');
 
-        $this->webhookQueueRepository->method('getTableAlias')->willReturn('w');
+        $this->webhookQueueRepository->expects($this->exactly(6))->method('getTableAlias')->willReturn('w');
 
         $webhookRetryTime = new \DateTimeImmutable()
             ->format(DateTimeHelper::FORMAT_DB);
@@ -310,7 +310,7 @@ final class WebhookModelTest extends TestCase
 
         $webhook->setEventsOrderbyDir('ASC');
 
-        $this->webhookQueueRepository->method('getTableAlias')->willReturn('w');
+        $this->webhookQueueRepository->expects($this->exactly(8))->method('getTableAlias')->willReturn('w');
         $webhookRetryTime = new \DateTimeImmutable()
             ->format(DateTimeHelper::FORMAT_DB);
         $expected = [

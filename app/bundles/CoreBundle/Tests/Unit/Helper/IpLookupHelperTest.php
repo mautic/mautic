@@ -39,7 +39,7 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
     {
         $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.52']);
 
-        $this->deviceDetector
+        $this->deviceDetector->expects($this->once())
             ->method('isBot')
             ->willReturn(true);
 
@@ -51,7 +51,7 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
     {
         $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.53']);
 
-        $this->deviceDetector
+        $this->deviceDetector->expects($this->once())
             ->method('isBot')
             ->willReturn(false);
 

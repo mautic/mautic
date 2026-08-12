@@ -35,7 +35,7 @@ final class SyncDateHelperTest extends TestCase
     {
         $objectLastSyncDate = new \DateTimeImmutable('2018-10-08 00:00:00');
 
-        $this->syncDateHelper->method('getLastSyncDateForObject')
+        $this->syncDateHelper->expects($this->once())->method('getLastSyncDateForObject')
             ->willReturn($objectLastSyncDate);
 
         $this->assertEquals($objectLastSyncDate, $this->syncDateHelper->getSyncFromDateTime('Test', 'Object'));

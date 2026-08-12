@@ -71,7 +71,7 @@ final class ModeratedCommandTest extends TestCase
             ->with('cache')
             ->willReturn('/does/not/exist');
 
-        $this->input->method('getOption')
+        $this->input->expects($this->exactly(4))->method('getOption')
             ->willReturnCallback(
                 fn (string $name): ?string => match ($name) {
                     'lock_mode' => ModeratedCommand::MODE_FLOCK,
@@ -87,7 +87,7 @@ final class ModeratedCommandTest extends TestCase
         $this->pathsHelper->expects($this->never())
             ->method('getSystemPath');
 
-        $this->input->method('getOption')
+        $this->input->expects($this->once())->method('getOption')
             ->willReturnCallback(
                 fn (string $name): string|true|null => match ($name) {
                     'lock_mode'      => ModeratedCommand::MODE_FLOCK,
@@ -104,7 +104,7 @@ final class ModeratedCommandTest extends TestCase
         $this->pathsHelper->expects($this->never())
             ->method('getSystemPath');
 
-        $this->input->method('getOption')
+        $this->input->expects($this->exactly(2))->method('getOption')
             ->willReturnCallback(
                 fn (string $name): bool|string|null => match ($name) {
                     'lock_mode'      => ModeratedCommand::MODE_FLOCK,
@@ -130,7 +130,7 @@ final class ModeratedCommandTest extends TestCase
             ->with('cache')
             ->willReturn($cacheDir);
 
-        $this->input->method('getOption')
+        $this->input->expects($this->exactly(4))->method('getOption')
             ->willReturnCallback(
                 fn (string $name): string|false|null => match ($name) {
                     'lock_mode'      => ModeratedCommand::MODE_PID,
@@ -176,7 +176,7 @@ final class ModeratedCommandTest extends TestCase
             ->with('cache')
             ->willReturn($cacheDir);
 
-        $this->input->method('getOption')
+        $this->input->expects($this->exactly(4))->method('getOption')
             ->willReturnCallback(
                 fn (string $name): string|false|null => match ($name) {
                     'lock_mode'      => ModeratedCommand::MODE_FLOCK,
@@ -227,7 +227,7 @@ final class ModeratedCommandTest extends TestCase
             ->method('get')
             ->willReturn(['dsn' => '']);
 
-        $this->input->method('getOption')
+        $this->input->expects($this->exactly(4))->method('getOption')
             ->willReturnCallback(
                 fn (string $name): string|false|null => match ($name) {
                     'lock_mode'      => ModeratedCommand::MODE_REDIS,

@@ -30,7 +30,7 @@ final class ObjectChangeGeneratorTest extends TestCase
 
     public function testFieldIsAddedToObjectChange(): void
     {
-        $this->valueHelper->method('getValueForIntegration')
+        $this->valueHelper->expects($this->exactly(2))->method('getValueForIntegration')
             ->willReturnCallback(
                 fn (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection): NormalizedValueDAO => $normalizedValueDAO
             );
@@ -79,7 +79,7 @@ final class ObjectChangeGeneratorTest extends TestCase
 
     public function testFieldIsNotAddedToObjectChangeIfNotFound(): void
     {
-        $this->valueHelper->method('getValueForIntegration')
+        $this->valueHelper->expects($this->once())->method('getValueForIntegration')
             ->willReturnCallback(
                 fn (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection): NormalizedValueDAO => $normalizedValueDAO
             );

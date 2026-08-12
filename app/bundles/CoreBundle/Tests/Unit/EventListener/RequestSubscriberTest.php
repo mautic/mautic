@@ -47,7 +47,7 @@ final class RequestSubscriberTest extends \PHPUnit\Framework\TestCase
                 HttpKernelInterface::MAIN_REQUEST,
             ])->getMock();
 
-        $this->event->method('getRequest')->willReturn($this->request);
+        $this->event->expects($this->once())->method('getRequest')->willReturn($this->request);
 
         $this->subscriber = new RequestSubscriber(
             $csrfTokenManagerMock,

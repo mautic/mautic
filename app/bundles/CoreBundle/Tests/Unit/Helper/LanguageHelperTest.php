@@ -120,7 +120,7 @@ final class LanguageHelperTest extends TestCase
         $langFile  = $this->tmpPath.'/../languageList.txt';
         file_put_contents($langFile, json_encode($languages));
 
-        $this->coreParametersHelper->method('get')
+        $this->coreParametersHelper->expects($this->once())->method('get')
             ->with('translations_fetch_url')
             ->willReturn('https://languages.test/');
 

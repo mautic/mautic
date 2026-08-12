@@ -52,7 +52,7 @@ final class InjectCustomContentSubscriberTest extends TestCase
     public function testInjectViewCustomContentExitsWhenPluginNotPublished(): void
     {
         $requestStack = new RequestStack([new Request()]);
-        $this->config->method('isPublished')->willReturn(false);
+        $this->config->expects($this->once())->method('isPublished')->willReturn(false);
 
         $subscriber = new InjectCustomContentSubscriber($this->config, $this->createStub(GrapesJsBuilderModel::class), $this->twig, $requestStack, $this->router, $this->grapesJsBuilderRepository);
         $event      = new CustomContentEvent('view', 'email.settings.advanced', ['email' => new Email()]);
@@ -73,9 +73,9 @@ final class InjectCustomContentSubscriberTest extends TestCase
 
         $requestStack = new RequestStack([$request]);
 
-        $this->grapesJsBuilderRepository->method('findOneBy')->willReturn(null);
+        $this->grapesJsBuilderRepository->expects($this->once())->method('findOneBy')->willReturn(null);
 
-        $this->config->method('isPublished')->willReturn(true);
+        $this->config->expects($this->once())->method('isPublished')->willReturn(true);
 
         $this->twig->expects($this->once())
             ->method('render')
@@ -95,11 +95,11 @@ final class InjectCustomContentSubscriberTest extends TestCase
         $requestStack = new RequestStack([new Request([], [], [], [], [], ['REQUEST_METHOD' => 'GET'])]);
 
         $grapesJsBuilder = $this->createMock(GrapesJsBuilder::class);
-        $grapesJsBuilder->method('getCustomMjml')->willReturn('<mjml>stored</mjml>');
+        $grapesJsBuilder->expects($this->once())->method('getCustomMjml')->willReturn('<mjml>stored</mjml>');
 
-        $this->grapesJsBuilderRepository->method('findOneBy')->willReturn($grapesJsBuilder);
+        $this->grapesJsBuilderRepository->expects($this->once())->method('findOneBy')->willReturn($grapesJsBuilder);
 
-        $this->config->method('isPublished')->willReturn(true);
+        $this->config->expects($this->once())->method('isPublished')->willReturn(true);
 
         $this->twig->expects($this->once())
             ->method('render')
@@ -118,7 +118,7 @@ final class InjectCustomContentSubscriberTest extends TestCase
     {
         $requestStack = new RequestStack([new Request()]);
 
-        $this->config->method('isPublished')->willReturn(true);
+        $this->config->expects($this->once())->method('isPublished')->willReturn(true);
 
         $this->router->expects($this->exactly(3))
             ->method('generate')

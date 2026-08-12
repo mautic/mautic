@@ -38,7 +38,7 @@ final class RemoveDeletedFilesStepTest extends AbstractStepTestCase
 
     public function testNothingDoneIfDeletedFileListDoesNotExist(): void
     {
-        $this->pathsHelper->method('getRootPath')
+        $this->pathsHelper->expects($this->once())->method('getRootPath')
             ->willReturn(__DIR__);
 
         $step = $this->getStep();
@@ -56,12 +56,12 @@ final class RemoveDeletedFilesStepTest extends AbstractStepTestCase
 
         $this->assertFileExists($resourcePath.'/delete_me.txt');
 
-        $this->pathsHelper->method('getRootPath')
+        $this->pathsHelper->expects($this->once())->method('getRootPath')
             ->willReturn($resourcePath);
 
         $step = $this->getStep();
 
-        $this->translator
+        $this->translator->expects($this->once())
             ->method('trans')
             ->willReturn('');
 
@@ -78,12 +78,12 @@ final class RemoveDeletedFilesStepTest extends AbstractStepTestCase
 
         $this->assertFileDoesNotExist($resourcePath.'/delete_me.txt');
 
-        $this->pathsHelper->method('getRootPath')
+        $this->pathsHelper->expects($this->once())->method('getRootPath')
             ->willReturn($resourcePath);
 
         $step = $this->getStep();
 
-        $this->translator
+        $this->translator->expects($this->once())
             ->method('trans')
             ->willReturn('');
 

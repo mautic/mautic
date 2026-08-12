@@ -82,8 +82,8 @@ final class PointModelTest extends TestCase
         $pointDelta      = 7;
         $pointGroup      = null;
         $ip              = $this->createStub(IpAddress::class);
-        $this->security->method('isAnonymous')->willReturn(true);
-        $this->ipLookupHelper->method('getIpAddress')->willReturn($ip);
+        $this->security->expects($this->once())->method('isAnonymous')->willReturn(true);
+        $this->ipLookupHelper->expects($this->once())->method('getIpAddress')->willReturn($ip);
 
         $lead = $this->createMock(Lead::class);
         $lead->expects($this->once())
@@ -117,13 +117,13 @@ final class PointModelTest extends TestCase
             ->willReturn(true);
 
         $point = $this->createMock(Point::class);
-        $point->method('getRepeatable')->willReturn(true);
-        $point->method('getType')->willReturn($type);
+        $point->expects($this->exactly(2))->method('getRepeatable')->willReturn(true);
+        $point->expects($this->exactly(4))->method('getType')->willReturn($type);
         $point->method('getId')->willReturn($pointId);
         $point->method('getName')->willReturn($pointName);
-        $point->method('getProperties')->willReturn($pointProperties);
+        $point->expects($this->once())->method('getProperties')->willReturn($pointProperties);
         $point->method('getDelta')->willReturn($pointDelta);
-        $point->method('getGroup')->willReturn($pointGroup);
+        $point->expects($this->once())->method('getGroup')->willReturn($pointGroup);
 
         $this->pointRepositoryMock->expects($this->once())
             ->method('getPublishedByType')

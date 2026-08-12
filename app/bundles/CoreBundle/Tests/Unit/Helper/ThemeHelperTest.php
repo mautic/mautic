@@ -92,7 +92,7 @@ final class ThemeHelperTest extends TestCase
     {
         $this->expectException(FileNotFoundException::class);
 
-        $this->pathsHelper->method('getSystemPath')
+        $this->pathsHelper->expects($this->once())->method('getSystemPath')
             ->with('themes', true)
             ->willReturn(__DIR__.'/resource/themes');
 
@@ -112,7 +112,7 @@ final class ThemeHelperTest extends TestCase
     {
         $this->expectException(FileNotFoundException::class);
 
-        $this->pathsHelper->method('getSystemPath')
+        $this->pathsHelper->expects($this->once())->method('getSystemPath')
             ->with('themes', true)
             ->willReturn(__DIR__.'/resource/themes');
 
@@ -132,7 +132,7 @@ final class ThemeHelperTest extends TestCase
     {
         $this->expectException(FileNotFoundException::class);
 
-        $this->pathsHelper->method('getSystemPath')
+        $this->pathsHelper->expects($this->once())->method('getSystemPath')
             ->with('themes', true)
             ->willReturn(__DIR__.'/resource/themes');
 
@@ -153,7 +153,7 @@ final class ThemeHelperTest extends TestCase
         $fs = new Filesystem();
         $fs->copy(__DIR__.'/resource/themes/good.zip', __DIR__.'/resource/themes/good-tmp.zip');
 
-        $this->pathsHelper->method('getSystemPath')
+        $this->pathsHelper->expects($this->once())->method('getSystemPath')
             ->with('themes', true)
             ->willReturn(__DIR__.'/resource/themes');
 
@@ -177,7 +177,7 @@ final class ThemeHelperTest extends TestCase
                 true, // default themes twig exists
             );
 
-        $this->pathsHelper->method('getSystemPath')
+        $this->pathsHelper->expects($this->exactly(46))->method('getSystemPath')
             ->willReturnCallback(
                 function ($path, $absolute) {
                     switch ($path) {
@@ -212,7 +212,7 @@ final class ThemeHelperTest extends TestCase
                 true
             );
 
-        $this->pathsHelper->method('getSystemPath')
+        $this->pathsHelper->expects($this->exactly(46))->method('getSystemPath')
             ->willReturnCallback(
                 function ($path, $absolute) {
                     switch ($path) {
@@ -404,10 +404,10 @@ final class ThemeHelperTest extends TestCase
 
     public function testLegacyThemesAreReturnedForFeatureIfNoCustomBuilderIsEnabled(): void
     {
-        $this->builderIntegrationsHelper->method('getBuilder')
+        $this->builderIntegrationsHelper->expects($this->exactly(6))->method('getBuilder')
             ->willThrowException(new IntegrationNotFoundException());
 
-        $this->pathsHelper->method('getSystemPath')
+        $this->pathsHelper->expects($this->exactly(4))->method('getSystemPath')
             ->willReturn(__DIR__.'/resource/themes');
 
         $themes = $this->themeHelper->getInstalledThemes('email');
@@ -423,7 +423,7 @@ final class ThemeHelperTest extends TestCase
     public function testCustomThemesAreReturnedForFeatureIfCustomBuilderIsEnabled(): void
     {
         $mockBuilder = $this->createMock(BuilderInterface::class);
-        $mockBuilder->method('getName')
+        $mockBuilder->expects($this->exactly(6))->method('getName')
             ->willReturn('custom');
 
         $integration = new Integration();
@@ -434,7 +434,7 @@ final class ThemeHelperTest extends TestCase
         $this->builderIntegrationsHelper->method('getBuilder')
             ->willReturn($mockBuilder);
 
-        $this->pathsHelper->method('getSystemPath')
+        $this->pathsHelper->expects($this->exactly(4))->method('getSystemPath')
             ->willReturn(__DIR__.'/resource/themes');
 
         $themes = $this->themeHelper->getInstalledThemes('page');
@@ -449,7 +449,7 @@ final class ThemeHelperTest extends TestCase
 
     public function testAllThemesAreReturned(): void
     {
-        $this->pathsHelper->method('getSystemPath')
+        $this->pathsHelper->expects($this->exactly(5))->method('getSystemPath')
             ->willReturn(__DIR__.'/resource/themes');
 
         $themes = $this->themeHelper->getInstalledThemes();
@@ -463,7 +463,7 @@ final class ThemeHelperTest extends TestCase
 
     public function testExtendedThemeDetailsAreReturned(): void
     {
-        $this->pathsHelper->method('getSystemPath')
+        $this->pathsHelper->expects($this->exactly(5))->method('getSystemPath')
             ->willReturn(__DIR__.'/resource/themes');
 
         $themes = $this->themeHelper->getInstalledThemes('all', true);
@@ -474,7 +474,7 @@ final class ThemeHelperTest extends TestCase
 
     public function testExtendedThemeDetailsWithoutDirectoriesAreReturned(): void
     {
-        $this->pathsHelper->method('getSystemPath')
+        $this->pathsHelper->expects($this->once())->method('getSystemPath')
             ->willReturn(__DIR__.'/resource/themes');
 
         $themes = $this->themeHelper->getInstalledThemes('all', true, false, false);
@@ -485,7 +485,7 @@ final class ThemeHelperTest extends TestCase
 
     public function testCachedThemesReturnAsExpected(): void
     {
-        $this->builderIntegrationsHelper->method('getBuilder')
+        $this->builderIntegrationsHelper->expects($this->exactly(6))->method('getBuilder')
             ->willThrowException(new IntegrationNotFoundException());
         $matcher = $this->exactly(2);
 
@@ -528,7 +528,7 @@ final class ThemeHelperTest extends TestCase
 
     public function testGetCurrentThemeWillReturnCodeModeIfTheThemeIsCodeMode(): void
     {
-        $this->pathsHelper->method('getSystemPath')
+        $this->pathsHelper->expects($this->once())->method('getSystemPath')
             ->willReturn(__DIR__.'/resource/themes');
 
         $this->assertTrue($this->themeHelper->exists('theme-legacy-email'));
@@ -536,7 +536,7 @@ final class ThemeHelperTest extends TestCase
 
     public function testExistsReturnsFalseIfThemeDoesNotExist(): void
     {
-        $this->pathsHelper->method('getSystemPath')
+        $this->pathsHelper->expects($this->once())->method('getSystemPath')
             ->willReturn(__DIR__.'/resource/themes');
 
         $this->assertFalse($this->themeHelper->exists('theme-legacy-email-foo'));
@@ -544,14 +544,14 @@ final class ThemeHelperTest extends TestCase
 
     public function testDefaultThemeNotShouldNotGetRemoved(): void
     {
-        $this->pathsHelper->method('getSystemPath')
+        $this->pathsHelper->expects($this->exactly(7))->method('getSystemPath')
             ->willReturn(__DIR__.'/resource/themes');
 
         $filesystem = $this->createMock(Filesystem::class);
         $filesystem->expects($this->exactly(5))
             ->method('exists')->willReturn(true);
 
-        $filesystem->method('readFile')->willReturn('{"name": "Test Theme"}');
+        $filesystem->expects($this->exactly(4))->method('readFile')->willReturn('{"name": "Test Theme"}');
 
         $themeHelper = new ThemeHelper(
             $this->pathsHelper,
@@ -570,7 +570,7 @@ final class ThemeHelperTest extends TestCase
 
     public function testDeleteThemeThrowsExceptionIfThemeDoesNotExist(): void
     {
-        $this->pathsHelper->method('getSystemPath')
+        $this->pathsHelper->expects($this->exactly(6))->method('getSystemPath')
             ->willReturn(__DIR__.'/resource/themes');
 
         $this->expectException(FileNotFoundException::class);

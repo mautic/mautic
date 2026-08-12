@@ -67,7 +67,7 @@ final class MaxMindDoNotSellListTest extends \PHPUnit\Framework\TestCase
      */
     public function testListPathNotConfigured(): void
     {
-        $this->coreParamsHelperMock->method('get')
+        $this->coreParamsHelperMock->expects($this->once())->method('get')
             ->with('maxmind_do_not_sell_list_path')
             ->willReturn('');
 
@@ -82,7 +82,7 @@ final class MaxMindDoNotSellListTest extends \PHPUnit\Framework\TestCase
      */
     public function testListFileNotDownloaded(): void
     {
-        $this->coreParamsHelperMock->method('get')
+        $this->coreParamsHelperMock->expects($this->once())->method('get')
             ->with('maxmind_do_not_sell_list_path')
             ->willReturn('path_to_missing_file.json');
 
@@ -97,7 +97,7 @@ final class MaxMindDoNotSellListTest extends \PHPUnit\Framework\TestCase
      */
     public function testFileWithBadData(): void
     {
-        $this->coreParamsHelperMock->method('get')
+        $this->coreParamsHelperMock->expects($this->once())->method('get')
             ->with('maxmind_do_not_sell_list_path')
             ->willReturn($this->badFilePath);
 
@@ -113,7 +113,7 @@ final class MaxMindDoNotSellListTest extends \PHPUnit\Framework\TestCase
      */
     public function testSuccessfulFileLoad(): void
     {
-        $this->coreParamsHelperMock->method('get')
+        $this->coreParamsHelperMock->expects($this->once())->method('get')
             ->with('maxmind_do_not_sell_list_path')
             ->willReturn($this->goodFilePath);
 

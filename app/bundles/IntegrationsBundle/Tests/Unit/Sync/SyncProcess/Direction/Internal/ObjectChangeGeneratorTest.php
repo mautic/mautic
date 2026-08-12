@@ -49,7 +49,7 @@ final class ObjectChangeGeneratorTest extends TestCase
 
     public function testFieldsAreAddedToObjectChangeAndIntegrationFirstNameWins(): void
     {
-        $this->valueHelper->method('getValueForMautic')
+        $this->valueHelper->expects($this->exactly(2))->method('getValueForMautic')
             ->willReturnCallback(
                 fn (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection): NormalizedValueDAO => $normalizedValueDAO
             );
@@ -106,7 +106,7 @@ final class ObjectChangeGeneratorTest extends TestCase
 
     public function testFieldsAreAddedToObjectChangeAndInternalFirstNameWins(): void
     {
-        $this->valueHelper->method('getValueForMautic')
+        $this->valueHelper->expects($this->exactly(2))->method('getValueForMautic')
             ->willReturnCallback(
                 fn (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection): NormalizedValueDAO => $normalizedValueDAO
             );
@@ -175,7 +175,7 @@ final class ObjectChangeGeneratorTest extends TestCase
     {
         $exceptionMessage = 'exceptionMessage';
 
-        $this->valueHelper->method('getValueForMautic')
+        $this->valueHelper->expects($this->exactly(2))->method('getValueForMautic')
             ->willThrowException(new RequiredValueException($exceptionMessage));
 
         $integrationName  = 'Test';
@@ -240,7 +240,7 @@ final class ObjectChangeGeneratorTest extends TestCase
     {
         $exceptionMessage = 'exceptionMessage';
 
-        $this->valueHelper->method('getValueForMautic')
+        $this->valueHelper->expects($this->exactly(2))->method('getValueForMautic')
             ->willThrowException(new RequiredValueException($exceptionMessage));
 
         $integrationName = 'Test';
@@ -305,7 +305,7 @@ final class ObjectChangeGeneratorTest extends TestCase
     {
         $exceptionMessage = 'exceptionMessage';
 
-        $this->valueHelper->method('getValueForMautic')
+        $this->valueHelper->expects($this->once())->method('getValueForMautic')
             ->willThrowException(new RequiredValueException($exceptionMessage));
 
         $integrationName = 'Test';

@@ -335,20 +335,20 @@ HTML;
                 ]
             );
 
-        $this->pageTokenHelper
+        $this->pageTokenHelper->expects($this->once())
             ->method('findPageTokens')
             ->willReturn([]);
-        $this->assetTokenHelper
+        $this->assetTokenHelper->expects($this->once())
             ->method('findAssetTokens')
             ->willReturn([]);
-        $this->formTokenHelper
+        $this->formTokenHelper->expects($this->once())
             ->method('findFormTokens')
             ->willReturn([]);
-        $this->focusTokenHelper
+        $this->focusTokenHelper->expects($this->once())
             ->method('findFocusTokens')
             ->willReturn([]);
 
-        $this->trackableModel
+        $this->trackableModel->expects($this->once())
             ->method('parseContentForTrackables')
             ->willReturn([
                 $content,

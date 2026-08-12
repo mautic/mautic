@@ -73,12 +73,12 @@ final class FieldHelperTest extends TestCase
         $objectName = Contact::NAME;
         $syncFields = ['email' => 'Email'];
 
-        $this->mauticSyncFieldsLoadEvent->method('getObjectName')
+        $this->mauticSyncFieldsLoadEvent->expects($this->once())->method('getObjectName')
             ->willReturn($objectName);
-        $this->mauticSyncFieldsLoadEvent->method('getFields')
+        $this->mauticSyncFieldsLoadEvent->expects($this->once())->method('getFields')
             ->willReturn($syncFields);
 
-        $this->fieldModel->method('getFieldList')
+        $this->fieldModel->expects($this->once())->method('getFieldList')
             ->willReturn($syncFields);
 
         $fields = $this->fieldHelper->getSyncFields($objectName);
@@ -99,12 +99,12 @@ final class FieldHelperTest extends TestCase
         $objectName = Contact::NAME;
         $syncFields = ['email' => 'Email'];
 
-        $this->mauticSyncFieldsLoadEvent->method('getObjectName')
+        $this->mauticSyncFieldsLoadEvent->expects($this->once())->method('getObjectName')
             ->willReturn($objectName);
-        $this->mauticSyncFieldsLoadEvent->method('getFields')
+        $this->mauticSyncFieldsLoadEvent->expects($this->once())->method('getFields')
             ->willReturn($syncFields);
 
-        $this->fieldModel->method('getFieldList')
+        $this->fieldModel->expects($this->once())->method('getFieldList')
             ->willReturn($syncFields);
 
         $fields = $this->fieldHelper->getSyncFields($objectName);

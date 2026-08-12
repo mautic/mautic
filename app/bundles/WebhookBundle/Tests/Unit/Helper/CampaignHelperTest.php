@@ -42,7 +42,7 @@ final class CampaignHelperTest extends \PHPUnit\Framework\TestCase
             ->onlyMethods(['getCompaniesByLeadId'])
             ->getMock();
 
-        $companyRepository->method('getCompaniesByLeadId')->willReturn([new Company()]);
+        $companyRepository->expects($this->once())->method('getCompaniesByLeadId')->willReturn([new Company()]);
 
         $this->campaignHelper = new CampaignHelper($this->client, $this->createStub(EventDispatcherInterface::class), $companyRepository);
 

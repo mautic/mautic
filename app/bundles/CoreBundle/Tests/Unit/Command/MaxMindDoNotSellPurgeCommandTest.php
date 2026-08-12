@@ -99,14 +99,14 @@ final class MaxMindDoNotSellPurgeCommandTest extends TestCase
     {
         $mockStatement = $this->createMock(Statement::class);
         $resultMock    = $this->createMock(Result::class);
-        $mockStatement->method('executeQuery')->withAnyParameters()->willReturn($resultMock);
-        $resultMock->method('fetchAllAssociative')->withAnyParameters()->willReturn($dataToReturn);
+        $mockStatement->expects($this->once())->method('executeQuery')->withAnyParameters()->willReturn($resultMock);
+        $resultMock->expects($this->once())->method('fetchAllAssociative')->withAnyParameters()->willReturn($dataToReturn);
 
         $mockConnection = $this->createMock(Connection::class);
-        $mockConnection->method('prepare')->withAnyParameters()->willReturn($mockStatement);
+        $mockConnection->expects($this->once())->method('prepare')->withAnyParameters()->willReturn($mockStatement);
 
         $mockEntityManager = $this->createMock(EntityManager::class);
-        $mockEntityManager->method('getConnection')->willReturn($mockConnection);
+        $mockEntityManager->expects($this->once())->method('getConnection')->willReturn($mockConnection);
 
         return $mockEntityManager;
     }

@@ -56,7 +56,7 @@ final class FormModelTest extends TestCase
             ->method('getUser')
             ->willReturn(new User());
 
-        $this->entityManagerMock
+        $this->entityManagerMock->expects($this->once())
             ->method('getRepository')
             ->willReturn($this->createStub(FormRepository::class));
 

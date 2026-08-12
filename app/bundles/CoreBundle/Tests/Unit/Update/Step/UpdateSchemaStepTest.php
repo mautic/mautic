@@ -102,10 +102,10 @@ final class UpdateSchemaStepTest extends AbstractStepTestCase
     {
         $this->expectException(UpdateFailedException::class);
 
-        $this->migrateCommand->method('run')
+        $this->migrateCommand->expects($this->once())->method('run')
             ->willReturn(1);
 
-        $this->eventDispatcher->method('dispatch')
+        $this->eventDispatcher->expects($this->exactly(2))->method('dispatch')
             ->willReturnCallback(
                 function (ConsoleEvent $event, string $eventName): ConsoleEvent {
                     if ($event instanceof ConsoleCommandEvent) {
@@ -116,7 +116,7 @@ final class UpdateSchemaStepTest extends AbstractStepTestCase
                 }
             );
 
-        $this->translator
+        $this->translator->expects($this->exactly(2))
             ->method('trans')
             ->willReturn('');
 
@@ -125,10 +125,10 @@ final class UpdateSchemaStepTest extends AbstractStepTestCase
 
     public function testExceptionNotThrownIfMigrationsWereSuccessful(): void
     {
-        $this->migrateCommand->method('run')
+        $this->migrateCommand->expects($this->once())->method('run')
             ->willReturn(0);
 
-        $this->eventDispatcher->method('dispatch')
+        $this->eventDispatcher->expects($this->exactly(2))->method('dispatch')
             ->willReturnCallback(
                 function (ConsoleEvent $event, string $eventName): ConsoleEvent {
                     if ($event instanceof ConsoleCommandEvent) {

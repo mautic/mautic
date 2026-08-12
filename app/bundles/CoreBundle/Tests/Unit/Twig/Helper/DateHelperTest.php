@@ -195,7 +195,7 @@ final class DateHelperTest extends \PHPUnit\Framework\TestCase
             ->method('getTextDate')
             ->willReturn(false);
         // Mock toLocalString() which is called by format() when getTextDate returns false
-        $dateTimeHelperMock->method('toLocalString')
+        $dateTimeHelperMock->expects($this->once())->method('toLocalString')
             ->willReturn('December 31, 2023');
 
         // Inject the mock DateTimeHelper into DateHelper

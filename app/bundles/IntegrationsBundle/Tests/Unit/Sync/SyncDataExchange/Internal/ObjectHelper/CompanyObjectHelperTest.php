@@ -66,7 +66,7 @@ final class CompanyObjectHelperTest extends TestCase
                 $property->setValue($company, $idMap[$company->getEmail()]);
             });
 
-        $this->repository->expects($this->exactly(2))
+        $this->repository
             ->method('detachEntity');
 
         // Test that two objects with the same unique identifier are merged into one
@@ -114,7 +114,7 @@ final class CompanyObjectHelperTest extends TestCase
                 $property->setValue($company, $idMap[$company->getEmail() ?? '']);
             });
 
-        $this->repository->expects($this->exactly(3))
+        $this->repository
             ->method('detachEntity');
 
         // Test that two objects with the same unique identifier are merged into one
@@ -162,10 +162,10 @@ final class CompanyObjectHelperTest extends TestCase
         ];
 
         $company1 = $this->createMock(Company::class);
-        $company1->method('getId')
+        $company1->expects($this->exactly(2))->method('getId')
             ->willReturn(0);
         $company2 = $this->createMock(Company::class);
-        $company2->method('getId')
+        $company2->expects($this->exactly(2))->method('getId')
             ->willReturn(1);
         $this->model->expects($this->once())
             ->method('getEntities')

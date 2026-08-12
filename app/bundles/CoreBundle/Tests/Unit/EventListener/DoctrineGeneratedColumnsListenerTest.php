@@ -47,8 +47,8 @@ final class DoctrineGeneratedColumnsListenerTest extends \PHPUnit\Framework\Test
 
         $generatedColumns->add($generatedColumn);
 
-        $generatedColumnsProvider->method('getGeneratedColumns')->willReturn($generatedColumns);
-        $this->event->method('getSchema')->willReturn($this->schema);
+        $generatedColumnsProvider->expects($this->once())->method('getGeneratedColumns')->willReturn($generatedColumns);
+        $this->event->expects($this->once())->method('getSchema')->willReturn($this->schema);
     }
 
     public function testPostGenerateSchemaWhenTableDoesNotExist(): void
