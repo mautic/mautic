@@ -61,3 +61,4 @@
 - Deprecated constants `Mautic\LeadBundle\Segment\OperatorOptions::IN` and `::NOT_IN` removed. Use `OperatorOptions::INCLUDING_ANY` and `OperatorOptions::EXCLUDING_ANY` instead — they carry the identical values `in` and `!in`.
 - Deprecated method `Mautic\CoreBundle\Entity\UuidTrait::isValidUuid()` removed. Use `Mautic\CoreBundle\Helper\UuidHelper::isValidUuid()` instead — calling static trait methods directly is deprecated in PHP 8.4+.
 - Deprecated service alias `mautic.config.model.sysinfo` removed. Use the FQCN service id `Mautic\ConfigBundle\Model\SysinfoModel` instead.
+- Deprecated constant `Mautic\EmailBundle\EmailEvents::ON_CAMPAIGN_TRIGGER_ACTION` (`mautic.email.on_campaign_trigger_action`) removed. Nothing dispatched it any more — both `email.send` campaign actions run through `EmailEvents::ON_CAMPAIGN_BATCH_ACTION`. Listen to that event instead.
