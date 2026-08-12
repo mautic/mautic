@@ -63,3 +63,4 @@
 - Deprecated service alias `mautic.config.model.sysinfo` removed. Use the FQCN service id `Mautic\ConfigBundle\Model\SysinfoModel` instead.
 - Deprecated constant `Mautic\EmailBundle\EmailEvents::ON_CAMPAIGN_TRIGGER_ACTION` (`mautic.email.on_campaign_trigger_action`) removed. Nothing dispatched it any more — both `email.send` campaign actions run through `EmailEvents::ON_CAMPAIGN_BATCH_ACTION`. Listen to that event instead.
 - Deprecated constant `Mautic\StageBundle\StageEvents::ON_CAMPAIGN_TRIGGER_ACTION` (`mautic.stage.on_campaign_trigger_action`) removed. The `stage.change` campaign action runs through `StageEvents::ON_CAMPAIGN_BATCH_ACTION`. Listen to that event instead.
+- Deprecated method `Mautic\CampaignBundle\Entity\CampaignRepository::fetchEmailIdsById()` removed. Use `Mautic\CampaignBundle\Entity\EventRepository::getCampaignEmailEvents()` instead — mind that it returns campaign event rows, not a flat list of email ids.
