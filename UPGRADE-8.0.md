@@ -67,3 +67,4 @@
 - Deprecated interface `Mautic\CoreBundle\Entity\PublishStatusIconAttributesInterface` removed with no replacement. Nothing implemented it. Use the `CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE` event to change template params instead.
 - Deprecated method `Mautic\CoreBundle\Helper\AbstractFormFieldHelper::setTranslator()` removed. The translator is autowired via the `#[Required] autowireFormFieldHelper()` method, so there is nothing to pass manually.
 - Deprecated method `Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler::reschedule()` removed. Use `EventScheduler::rescheduleLogs()` instead, which takes an `ArrayCollection` of logs.
+- Deprecated method `Mautic\CoreBundle\Model\VariantModelTrait::convertVariant()` removed. Use `Mautic\CoreBundle\Model\VariantConverterService` instead.
