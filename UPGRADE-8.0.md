@@ -83,3 +83,4 @@
 +<a href="https://mautic.org" data-mautic-disable-tracking="true">Do not track me</a>
 ```
 - Deprecated constant `Mautic\StageBundle\StageEvents::ON_CAMPAIGN_TRIGGER_ACTION` (`mautic.stage.on_campaign_trigger_action`) removed. The `stage.change` campaign action runs through `StageEvents::ON_CAMPAIGN_BATCH_ACTION`. Listen to that event instead.
+- Deprecated method `Mautic\CampaignBundle\Entity\CampaignRepository::fetchEmailIdsById()` removed. Use `Mautic\CampaignBundle\Entity\EventRepository::getCampaignEmailEvents()` instead — mind that it returns campaign event rows, not a flat list of email ids.
