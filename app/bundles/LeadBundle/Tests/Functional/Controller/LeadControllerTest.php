@@ -338,7 +338,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $this->em->clear();
         $updatedContact = $this->em->getRepository(Lead::class)->find($contact->getId());
         $this->assertInstanceOf(Lead::class, $updatedContact);
-        $this->assertNull($updatedContact->getOwner());
+        $this->assertNotInstanceOf(User::class, $updatedContact->getOwner());
     }
 
     private function createAndLoginUser(): User

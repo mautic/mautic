@@ -555,6 +555,23 @@ final class LeadControllerTest extends MauticMysqlTestCase
 
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
         $this->assertCount(1, $crawler->filter('button[name="lead[buttons][save_and_new]"]'));
+
+        $email = 'quick-add-save-and-new@example.com';
+        $form  = $crawler->selectButton('Save & New')->form([
+            'lead' => [
+                'firstname' => 'Quick Add',
+                'email'     => $email,
+            ],
+        ]);
+
+        $this->client->submit($form, [], $this->createAjaxHeaders());
+
+        self::assertResponseIsSuccessful();
+        $response = json_decode((string) $this->client->getResponse()->getContent(), true, flags: JSON_THROW_ON_ERROR);
+        $this->assertArrayHasKey('newContent', $response, json_encode($response, JSON_THROW_ON_ERROR));
+        $this->assertStringContainsString('lead[buttons][save_and_new]', (string) $response['newContent']);
+        $this->assertArrayNotHasKey('closeModal', $response);
+        $this->assertInstanceOf(Lead::class, $this->em->getRepository(Lead::class)->findOneBy(['email' => $email]));
     }
 
     public function testAddContactsErrorMessage(): void

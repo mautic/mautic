@@ -18,16 +18,18 @@ final class OwnerType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $choices = $options['items'];
+        if (null !== $options['remove_label']) {
+            $choices = array_merge([$options['remove_label'] => self::NO_OWNER_VALUE], $choices);
+        }
+
         $builder->add(
             'addowner',
             ChoiceType::class,
             [
                 'label'             => 'mautic.lead.batch.set',
                 'multiple'          => false,
-                'choices'           => array_merge(
-                    [$options['remove_label'] => self::NO_OWNER_VALUE],
-                    $options['items']
-                ),
+                'choices'           => $choices,
                 'required'          => false,
                 'label_attr'        => ['class' => 'control-label'],
                 'attr'              => ['class' => 'form-control'],
@@ -56,12 +58,9 @@ final class OwnerType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setRequired(
-            [
-                'items',
-                'remove_label',
-            ]
-        );
+        $resolver->setRequired('items');
+        $resolver->setDefault('remove_label', null);
+        $resolver->setAllowedTypes('remove_label', ['null', 'string']);
     }
 
     public function getBlockPrefix(): string
