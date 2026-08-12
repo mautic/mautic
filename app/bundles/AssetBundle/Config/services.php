@@ -25,7 +25,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('Mautic\\AssetBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
 
-    $services->set(Mautic\AssetBundle\DataFixtures\ORM\LoadAssetData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
     $services->set(Mautic\AssetBundle\Security\Permissions\AssetPermissions::class)->tag('mautic.permissions');
     $services->alias('mautic.asset.upload.error.handler', Mautic\AssetBundle\ErrorHandler\DropzoneErrorHandler::class);
     $services->alias('mautic.asset.model.asset', Mautic\AssetBundle\Model\AssetModel::class);

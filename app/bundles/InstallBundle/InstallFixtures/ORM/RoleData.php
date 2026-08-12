@@ -2,14 +2,14 @@
 
 namespace Mautic\InstallBundle\InstallFixtures\ORM;
 
+use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
-use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\UserBundle\Entity\Role;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class RoleData extends AbstractFixture implements OrderedFixtureInterface, FixtureGroupInterface
+final class RoleData extends Fixture implements OrderedFixtureInterface, FixtureGroupInterface
 {
     public function __construct(
         private readonly TranslatorInterface $translator,

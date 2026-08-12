@@ -2,7 +2,7 @@
 
 namespace Mautic\PageBundle\DataFixtures\ORM;
 
-use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\CoreBundle\Helper\CsvHelper;
@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\PageRepository;
 
-final class LoadPageData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadPageData extends Fixture implements OrderedFixtureInterface
 {
     public function __construct(
         private readonly PageRepository $pageRepository,

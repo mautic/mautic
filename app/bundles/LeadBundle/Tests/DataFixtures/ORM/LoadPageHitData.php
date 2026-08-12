@@ -2,12 +2,12 @@
 
 namespace Mautic\LeadBundle\Tests\DataFixtures\ORM;
 
-use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\PageBundle\Entity\Hit;
 
-final class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadPageHitData extends Fixture implements OrderedFixtureInterface
 {
     public function load(ObjectManager $manager): void
     {
