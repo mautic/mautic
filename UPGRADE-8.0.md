@@ -62,3 +62,4 @@
 - Deprecated method `Mautic\CoreBundle\Entity\UuidTrait::isValidUuid()` removed. Use `Mautic\CoreBundle\Helper\UuidHelper::isValidUuid()` instead — calling static trait methods directly is deprecated in PHP 8.4+.
 - Deprecated service alias `mautic.config.model.sysinfo` removed. Use the FQCN service id `Mautic\ConfigBundle\Model\SysinfoModel` instead.
 - Deprecated methods `Mautic\CoreBundle\Event\BuilderEvent::addTokensFromHelper()` and `::getTokensFromHelper()` removed. Build the tokens with `Mautic\CoreBundle\Helper\BuilderTokenHelper` yourself and pass them to `BuilderEvent::addTokens()`.
+- `Mautic\LeadBundle\Entity\LeadListRepository` no longer uses `OperatorListTrait`, so `getFilterExpressionFunctions()`, `getOperatorsForFieldType()` and `getOperatorChoiceList()` are no longer available on the repository. Use `Mautic\LeadBundle\Provider\TypeOperatorProvider` instead. The trait itself is unchanged.
