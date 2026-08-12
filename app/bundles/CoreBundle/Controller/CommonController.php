@@ -532,27 +532,6 @@ class CommonController extends AbstractController implements MauticController
     }
 
     /**
-     * Generates access denied message.
-     *
-     * @deprecated Use getAccessDeniedFlash or throwAccessDenied
-     *
-     * @param bool   $batch Flag if a batch action is being performed
-     * @param string $msg   Message that is logged
-     *
-     * @return array{type: string, msg: string}
-     *
-     * @throws AccessDeniedHttpException
-     */
-    public function accessDenied($batch = false, string $msg = 'mautic.core.url.error.401'): array
-    {
-        if ($this->security->isAnonymous() || !$batch) {
-            $this->throwAccessDenied($msg);
-        }
-
-        return $this->getAccessDeniedFlash();
-    }
-
-    /**
      * Generate 404 not found message.
      *
      * @return Response

@@ -190,16 +190,6 @@ final class EmailEvents
     public const string ON_SENT_EMAIL_TO_USER = 'mautic.email.on_sent_email_to_user';
 
     /**
-     * @deprecated 2.13.0; to be removed in 3.0. Listen to ON_CAMPAIGN_BATCH_ACTION instead.
-     *
-     * The mautic.email.on_campaign_trigger_action event is fired when the campaign action triggers.
-     *
-     * The event listener receives a
-     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
-     */
-    public const string ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.email.on_campaign_trigger_action';
-
-    /**
      * The mautic.email.on_transport_webhook event is fired when an email transport service sends Mautic a webhook request.
      *
      * The event listener receives a

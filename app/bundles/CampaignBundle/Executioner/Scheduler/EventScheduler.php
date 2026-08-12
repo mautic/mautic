@@ -82,21 +82,6 @@ class EventScheduler
     }
 
     /**
-     * @deprecated use rescheduleLogs() instead
-     */
-    public function reschedule(LeadEventLog $log, \DateTimeInterface $toBeExecutedOn): void
-    {
-        $log->setTriggerDate($toBeExecutedOn, 'Event rescheduled');
-        $log->setDateQueued(null);
-        $this->eventLogger->persistLog($log);
-
-        $event  = $log->getEvent();
-        $config = $this->collector->getEventConfig($event);
-
-        $this->dispatchScheduledEvent($config, $log, true);
-    }
-
-    /**
      * @param ArrayCollection|LeadEventLog[] $logs
      */
     public function rescheduleLogs(ArrayCollection $logs, \DateTimeInterface $toBeExecutedOn): void

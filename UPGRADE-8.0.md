@@ -63,3 +63,31 @@
 - Deprecated service alias `mautic.config.model.sysinfo` removed. Use the FQCN service id `Mautic\ConfigBundle\Model\SysinfoModel` instead.
 - Deprecated method `Mautic\NotificationBundle\Helper\NotificationHelper::unsubscribe()` removed with no replacement; it was unused. With it, the `LeadRepository` and `DoNotContact` constructor arguments of `NotificationHelper` were removed as well.
 - Deprecated service id `symfony.filesystem` removed. `Symfony\Component\Filesystem\Filesystem` is now registered under its class name, so autowired and FQCN-based usages are unaffected; only container lookups by the `symfony.filesystem` string need updating.
+- Deprecated action `Mautic\LeadBundle\Controller\AjaxController::addLeadUtmTagsAction()` (ajax action `lead:addLeadUtmTags`) removed with no replacement. Its only caller, the unused JavaScript function `Mautic.createLeadUtmTag()`, was removed as well.
+- Deprecated interface `Mautic\CoreBundle\Entity\PublishStatusIconAttributesInterface` removed with no replacement. Nothing implemented it. Use the `CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE` event to change template params instead.
+- Deprecated method `Mautic\CoreBundle\Helper\AbstractFormFieldHelper::setTranslator()` removed. The translator is autowired via the `#[Required] autowireFormFieldHelper()` method, so there is nothing to pass manually.
+- Deprecated method `Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler::reschedule()` removed. Use `EventScheduler::rescheduleLogs()` instead, which takes an `ArrayCollection` of logs.
+- Deprecated method `Mautic\CoreBundle\Model\VariantModelTrait::convertVariant()` removed. Use `Mautic\CoreBundle\Model\VariantConverterService` instead.
+- Deprecated method `Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns::getForOriginalDateColumnAndUnit()` removed. Use `getGeneratedColumnForDateColumn()` instead — it takes the table name as its first argument and matches on it, while the removed method ignored the table and returned the last matching column of any table:
+
+```diff
+-$generatedColumn = $generatedColumns->getForOriginalDateColumnAndUnit('date_added', 'd');
++$generatedColumn = $generatedColumns->getGeneratedColumnForDateColumn('page_hits', 'date_added', 'd');
+```
+
+  `Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumnsInterface` declares `getGeneratedColumnForDateColumn()` in place of the removed method.
+- Support for the legacy `mautic:disable-tracking` HTML attribute in email and page content is removed. Use `data-mautic-disable-tracking="true"` instead:
+
+```diff
+-<a href="https://mautic.org" mautic:disable-tracking>Do not track me</a>
++<a href="https://mautic.org" data-mautic-disable-tracking="true">Do not track me</a>
+```
+- Deprecated constant `Mautic\StageBundle\StageEvents::ON_CAMPAIGN_TRIGGER_ACTION` (`mautic.stage.on_campaign_trigger_action`) removed. The `stage.change` campaign action runs through `StageEvents::ON_CAMPAIGN_BATCH_ACTION`. Listen to that event instead.
+- Deprecated method `Mautic\CampaignBundle\Entity\CampaignRepository::fetchEmailIdsById()` removed. Use `Mautic\CampaignBundle\Entity\EventRepository::getCampaignEmailEvents()` instead — mind that it returns campaign event rows, not a flat list of email ids.
+- Deprecated method `Mautic\LeadBundle\Field\Dispatcher\FieldDeleteDispatcher::dispatchPreDeleteEvent()` removed. Call `dispatchEvent(LeadEvents::FIELD_PRE_DELETE, $entity)` instead. With it, `FieldDeleteDispatcher` no longer takes `Mautic\LeadBundle\Field\BackgroundSettings` as a constructor argument; the background-processing guard already lives in `LeadFieldDeleter` and `FieldColumnDispatcher`.
+- Deprecated constant `Mautic\EmailBundle\EmailEvents::ON_CAMPAIGN_TRIGGER_ACTION` (`mautic.email.on_campaign_trigger_action`) removed. Nothing dispatched it any more — both `email.send` campaign actions run through `EmailEvents::ON_CAMPAIGN_BATCH_ACTION`. Listen to that event instead.
+- Deprecated methods `Mautic\CoreBundle\Event\BuilderEvent::addTokensFromHelper()` and `::getTokensFromHelper()` removed. Build the tokens with `Mautic\CoreBundle\Helper\BuilderTokenHelper` yourself and pass them to `BuilderEvent::addTokens()`.
+- `Mautic\LeadBundle\Entity\LeadListRepository` no longer uses `OperatorListTrait`, so `getFilterExpressionFunctions()`, `getOperatorsForFieldType()` and `getOperatorChoiceList()` are no longer available on the repository. Use `Mautic\LeadBundle\Provider\TypeOperatorProvider` instead. The trait itself is unchanged.
+- Deprecated method `Mautic\CampaignBundle\Entity\CampaignRepository::getCampaignLeadCount()` removed with no replacement. It had no callers left.
+- Deprecated constant `Mautic\CoreBundle\Command\ModeratedCommand::MODE_LOCK` (`file_lock`) removed, together with the branch that silently rewrote that mode to `flock`. `--lock_mode=file_lock` now fails with `Unknown locking method specified.` — use `--lock_mode=flock`. The `pid`, `flock` and `redis` modes are unchanged.
+- Deprecated method `Mautic\CoreBundle\Controller\CommonController::accessDenied()` removed. Use `throwAccessDenied()` (throws `AccessDeniedHttpException`) or `getAccessDeniedFlash()` instead. Note the removed method always threw as well — its `array` return value was unreachable — so `Mautic\LeadBundle\Controller\NoteController::newAction()` and `::editAction()` lost `array` from their return types.

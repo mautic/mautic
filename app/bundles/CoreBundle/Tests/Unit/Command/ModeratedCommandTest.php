@@ -74,7 +74,7 @@ final class ModeratedCommandTest extends TestCase
         $this->input->method('getOption')
             ->willReturnCallback(
                 fn (string $name): ?string => match ($name) {
-                    'lock_mode' => 'file_lock',
+                    'lock_mode' => ModeratedCommand::MODE_FLOCK,
                     default     => null,
                 }
             );

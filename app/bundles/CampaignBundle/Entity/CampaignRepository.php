@@ -5,8 +5,6 @@ namespace Mautic\CampaignBundle\Entity;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Exception;
-use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Mautic\CampaignBundle\Entity\Result\CountResult;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
@@ -456,79 +454,6 @@ class CampaignRepository extends CommonRepository
     }
 
     /**
-     * Get a count of leads that belong to the campaign.
-     *
-     * @param int   $campaignId
-     * @param int   $leadId        Optional lead ID to check if lead is part of campaign
-     * @param array $pendingEvents List of specific events to rule out
-     *
-     * @throws \Doctrine\DBAL\Cache\CacheException
-     *
-     * @deprecated
-     */
-    public function getCampaignLeadCount($campaignId, $leadId = null, $pendingEvents = [], ?\DateTimeInterface $dateFrom = null, ?\DateTimeInterface $dateTo = null): int
-    {
-        $q = $this->getReplicaConnection()->createQueryBuilder();
-
-        $q->select('count(cl.lead_id) as lead_count')
-            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
-            ->where(
-                $q->expr()->and(
-                    $q->expr()->eq('cl.campaign_id', (int) $campaignId),
-                    $q->expr()->eq('cl.manually_removed', ':false')
-                )
-            )
-            ->setParameter('false', false, Types::BOOLEAN);
-
-        if ($leadId) {
-            $q->andWhere(
-                $q->expr()->eq('cl.lead_id', (int) $leadId)
-            );
-        }
-
-        if ($dateFrom && $dateTo) {
-            $q->andWhere('cl.date_added BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
-                ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
-                ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
-        }
-
-        if (count($pendingEvents) > 0) {
-            $sq = $this->getReplicaConnection()->createQueryBuilder();
-            $sq->select('null')
-                ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'e')
-                ->where(
-                    $sq->expr()->and(
-                        $sq->expr()->eq('cl.lead_id', 'e.lead_id'),
-                        $sq->expr()->in('e.event_id', $pendingEvents)
-                    )
-                );
-
-            if ($dateFrom && $dateTo) {
-                $sq->andWhere('cl.date_triggered BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
-                    ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
-                    ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
-            }
-
-            $q->andWhere(
-                sprintf('NOT EXISTS (%s)', $sq->getSQL())
-            );
-        }
-
-        if ($this->getReplicaConnection()->getConfiguration()->getResultCache()) {
-            $results = $this->getReplicaConnection()->executeCacheQuery(
-                $q->getSQL(),
-                $q->getParameters(),
-                $q->getParameterTypes(),
-                new QueryCacheProfile(600)
-            )->fetchAllAssociative();
-        } else {
-            $results = $q->executeQuery()->fetchAllAssociative();
-        }
-
-        return (int) $results[0]['lead_count'];
-    }
-
-    /**
      * Returns true if the campaign has at least one lead.
      */
     public function hasCampaignLeads(int $campaignId, int $cacheTTL = 0): bool
@@ -633,51 +558,6 @@ class CampaignRepository extends CommonRepository
         }
 
         return $q->executeQuery()->fetchAllAssociative();
-    }
-
-    /**
-     * Searches for emails assigned to campaign and returns associative array of email ids in format:.
-     *
-     *  array (size=1)
-     *      0 =>
-     *          array (size=2)
-     *              'channelId' => int 18
-     *
-     * or empty array if nothing found.
-     *
-     * @param int $id
-     *
-     * @deprecated The method is deprecated and will be removed in Mautic 8.x.
-     * Use the `\Mautic\CampaignBundle\Entity\EventRepository::getCampaignEmailEvents()` method instead.
-     * @see EventRepository::getCampaignEmailEvents
-     */
-    #[\Deprecated('The method is deprecated and will be removed in Mautic 8.x. Use the `\Mautic\CampaignBundle\Entity\EventRepository::getCampaignEmailEvents()` method instead.')]
-    public function fetchEmailIdsById($id): array
-    {
-        $emails = $this->getEntityManager()
-            ->createQueryBuilder()
-            ->select('e.channelId')
-            ->from(Campaign::class, $this->getTableAlias(), $this->getTableAlias().'.id')
-            ->leftJoin(
-                $this->getTableAlias().'.events',
-                'e',
-                Expr\Join::WITH,
-                "e.channel = '".Event::CHANNEL_EMAIL."'"
-            )
-            ->where($this->getTableAlias().'.id = :id')
-            ->setParameter('id', $id)
-            ->andWhere('e.channelId IS NOT NULL')
-            ->getQuery()
-            ->setHydrationMode(Query::HYDRATE_ARRAY)
-            ->getResult();
-
-        $return = [];
-        foreach ($emails as $email) {
-            // Every channelId represents e-mail ID
-            $return[] = $email['channelId']; // mautic_campaign_events.channel_id
-        }
-
-        return $return;
     }
 
     /**
