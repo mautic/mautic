@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Form\Type;
 
+use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Form\Type\LeadFieldsType;
-use Mautic\LeadBundle\Model\FieldModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 final class LeadFieldsTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject&FieldModel
+     * @var MockObject&FieldList
      */
-    private MockObject $fieldModel;
+    private MockObject $fieldList;
 
     private LeadFieldsType $form;
 
@@ -22,8 +22,8 @@ final class LeadFieldsTypeTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->fieldModel = $this->createMock(FieldModel::class);
-        $this->form       = new LeadFieldsType($this->fieldModel);
+        $this->fieldList = $this->createMock(FieldList::class);
+        $this->form       = new LeadFieldsType($this->fieldList);
     }
 
     public function testTransform(): void
@@ -31,7 +31,7 @@ final class LeadFieldsTypeTest extends \PHPUnit\Framework\TestCase
         /** @var MockObject|OptionsResolver $optionsResolver */
         $optionsResolver = $this->createMock(OptionsResolver::class);
 
-        $this->fieldModel->expects($this->exactly(2))
+        $this->fieldList->expects($this->exactly(2))
             ->method('getFieldList')
             ->willReturnOnConsecutiveCalls(
                 [

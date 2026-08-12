@@ -16,6 +16,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface;
+use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -32,6 +33,7 @@ class FieldHelper
 
     public function __construct(
         private readonly FieldModel $fieldModel,
+        private readonly FieldList $fieldListProvider,
         private readonly FieldsWithUniqueIdentifier $fieldWithUniqueIdentifier,
         private readonly VariableExpresserHelperInterface $variableExpresserHelper,
         private readonly ChannelListHelper $channelListHelper,
@@ -94,7 +96,7 @@ class FieldHelper
             return $this->syncFields[$objectName];
         }
 
-        $this->syncFields[$objectName] = $this->fieldModel->getFieldList(
+        $this->syncFields[$objectName] = $this->fieldListProvider->getFieldList(
             false,
             true,
             [
@@ -140,7 +142,7 @@ class FieldHelper
             return $this->requiredFieldList[$object];
         }
 
-        $requiredFields = $this->fieldModel->getFieldList(
+        $requiredFields = $this->fieldListProvider->getFieldList(
             false,
             false,
             [

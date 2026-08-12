@@ -17,7 +17,6 @@ use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Field\CustomFieldColumn;
 use Mautic\LeadBundle\Field\Dispatcher\FieldSaveDispatcher;
-use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Field\LeadFieldDeleter;
 use Mautic\LeadBundle\Field\LeadFieldSaver;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -202,7 +201,6 @@ final class FieldModelTest extends MauticMysqlTestCase
             $this->createStub(CustomFieldColumn::class),
             $this->createStub(FieldSaveDispatcher::class),
             $repoMock,
-            $this->createStub(FieldList::class),
             $this->createStub(LeadFieldSaver::class),
             $this->createStub(LeadFieldDeleter::class),
             $this->createStub(EntityManagerInterface::class),
@@ -229,7 +227,6 @@ final class FieldModelTest extends MauticMysqlTestCase
         $customFieldColumn          = $this->createStub(CustomFieldColumn::class);
         $fieldSaveDispatcher        = $this->createStub(FieldSaveDispatcher::class);
         $leadFieldRepository        = $this->createStub(LeadFieldRepository::class);
-        $fieldList                  = $this->createStub(FieldList::class);
         $leadFieldSaver             = $this->createStub(LeadFieldSaver::class);
         $leadFieldDeleter           = $this->createStub(LeadFieldDeleter::class);
         $leadListModel->expects($this->once())
@@ -243,7 +240,6 @@ final class FieldModelTest extends MauticMysqlTestCase
             $customFieldColumn,
             $fieldSaveDispatcher,
             $leadFieldRepository,
-            $fieldList,
             $leadFieldSaver,
             $leadFieldDeleter,
             $this->createStub(EntityManagerInterface::class),

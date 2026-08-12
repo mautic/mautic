@@ -48,6 +48,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\MergeRecordRepository;
+use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Entity\PointsChangeLogRepository;
 use Mautic\LeadBundle\Entity\StagesChangeLog;
@@ -63,6 +64,7 @@ use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Event\SaveBatchLeadsEvent;
 use Mautic\LeadBundle\Exception\ImportFailedException;
+use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Form\Type\LeadType;
 use Mautic\LeadBundle\Helper\CustomFieldValueHelper;
@@ -94,6 +96,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 class LeadModel extends FormModel
 {
     use DefaultValueTrait;
+    use OperatorListTrait;
     use RequestTrait;
 
     public const CHANNEL_FEATURE = 'contact_preference';
@@ -165,6 +168,7 @@ class LeadModel extends FormModel
         private readonly CompanyLeadRepository $companyLeadRepository,
         private readonly StatRepository $statRepository,
         private readonly CompanyRepository $companyRepository,
+        private readonly FieldList $fieldList,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -187,7 +191,7 @@ class LeadModel extends FormModel
             $this->repoSetup = true;
 
             // set the point trigger model in order to get the color code for the lead
-            $fields = $this->leadFieldModel->getFieldList(true, false);
+            $fields = $this->fieldList->getFieldList(true, false);
 
             $socialFields = (!empty($fields['social'])) ? array_keys($fields['social']) : [];
             $this->leadRepository->setAvailableSocialFields($socialFields);
@@ -890,7 +894,7 @@ class LeadModel extends FormModel
                 $filter['isPubliclyUpdatable'] = true;
             }
 
-            $this->availableLeadFields = $this->leadFieldModel->getFieldList(
+            $this->availableLeadFields = $this->fieldList->getFieldList(
                 false,
                 false,
                 $filter

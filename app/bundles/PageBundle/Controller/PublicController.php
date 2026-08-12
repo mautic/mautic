@@ -371,7 +371,6 @@ final class PublicController extends AbstractFormController
                     'content'  => $content,
                     'page'     => $page,
                     'template' => $template,
-                    'public'   => true, // @deprecated Remove in 2.0
                 ]
             );
         } else {

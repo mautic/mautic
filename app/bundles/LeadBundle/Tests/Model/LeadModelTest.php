@@ -38,6 +38,7 @@ use Mautic\LeadBundle\Entity\UtmTagRepository;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\SaveBatchLeadsEvent;
 use Mautic\LeadBundle\Exception\ImportFailedException;
+use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -73,6 +74,11 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
      * @var MockObject&FieldModel
      */
     private MockObject $fieldModelMock;
+
+    /**
+     * @var MockObject&FieldList
+     */
+    private MockObject $fieldListMock;
 
     /**
      * @var MockObject&FieldsWithUniqueIdentifier
@@ -144,6 +150,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $this->requestStack             = new RequestStack([new Request()]);
         $this->fieldModelMock                   = $this->createMock(FieldModel::class);
+        $this->fieldListMock                    = $this->createMock(FieldList::class);
         $this->fieldsWithUniqueIdentifier       = $this->createMock(FieldsWithUniqueIdentifier::class);
         $this->companyModelMock                 = $this->createMock(CompanyModel::class);
         $this->channelListHelperMock            = new ChannelListHelper($this->createStub(EventDispatcherInterface::class), $this->createStub(Translator::class));
@@ -199,6 +206,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
             $this->companyLeadRepositoryMock,
             $this->createStub(StatRepository::class),
             $this->createStub(CompanyRepository::class),
+            $this->fieldListMock,
         );
 
         $this->setSecurity($this->leadModel);
@@ -289,7 +297,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
 
     public function testCheckForDuplicateContact(): void
     {
-        $this->fieldModelMock->expects($this->once())
+        $this->fieldListMock->expects($this->once())
             ->method('getFieldList')
             ->with(false, false, ['isPublished' => true, 'object' => 'lead'])
             ->willReturn(['email' => 'Email', 'firstname' => 'First Name']);
@@ -320,7 +328,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
 
     public function testCheckForDuplicateContactForOnlyPubliclyUpdatable(): void
     {
-        $this->fieldModelMock->expects($this->once())
+        $this->fieldListMock->expects($this->once())
             ->method('getFieldList')
             ->with(false, false, ['isPublished' => true, 'object' => 'lead', 'isPubliclyUpdatable' => true])
             ->willReturn(['email' => 'Email']);
@@ -397,6 +405,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
     {
         $mockLeadModel = $this->createMockLeadModelStub(['saveEntity', 'checkForDuplicateContact', 'modifyTags']);
         ReflectionHelper::setValue($mockLeadModel, 'leadFieldModel', $this->fieldModelMock);
+        ReflectionHelper::setValue($mockLeadModel, 'fieldList', $this->fieldListMock);
         $this->setupMockLeadModelForImport($mockLeadModel);
 
         $mockLeadModel->expects($this->once())->method('checkForDuplicateContact')->willReturn(new Lead());
@@ -416,6 +425,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $mockLeadModel = $this->createMockLeadModelStub(['saveEntity', 'getEntity']);
         ReflectionHelper::setValue($mockLeadModel, 'leadFieldModel', $this->fieldModelMock);
+        ReflectionHelper::setValue($mockLeadModel, 'fieldList', $this->fieldListMock);
         $this->setupMockLeadModelForImport($mockLeadModel);
 
         $mockLeadModel->expects($this->once())->method('getEntity')->willReturn($lead);
@@ -517,7 +527,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
             ->method('getFieldListWithProperties')
             ->willReturn([]);
 
-        $this->fieldModelMock->expects($this->once())
+        $this->fieldListMock->expects($this->once())
             ->method('getFieldList')
             ->willReturn([]);
 
@@ -542,7 +552,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
         $this->userHelperMock->method('getUser')
             ->willReturn(new User());
 
-        $this->fieldModelMock->method('getFieldList')
+        $this->fieldListMock->method('getFieldList')
             ->willReturn([$fields]);
 
         $this->fieldModelMock->expects($this->atLeastOnce())
@@ -654,7 +664,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
         $action = 'post_batch_save';
 
         // Lead Model that provides access to dispatchBatchEvent
-        $leadModel = new class($this->requestStack, $this->createStub(IpLookupHelper::class), $this->createStub(PathsHelper::class), $this->createStub(IntegrationHelper::class), $this->fieldModelMock, $this->fieldsWithUniqueIdentifier, $this->createStub(ListModel::class), $this->createStub(FormFactory::class), $this->companyModelMock, $this->createStub(CategoryModel::class), $this->channelListHelperMock, $this->coreParametersHelperMock, $this->emailValidatorMock, $this->createStub(UserProvider::class), $this->createStub(ContactTracker::class), $this->createStub(DeviceTracker::class), $this->createStub(IpAddressModel::class), $this->entityManagerMock, $this->createStub(CorePermissions::class), $this->dispatcherMock, $this->createStub(UrlGeneratorInterface::class), $this->translator, $this->userHelperMock, $this->createStub(LoggerInterface::class), $this->leadRepositoryMock, $this->createStub(TagRepository::class), $this->createStub(PointsChangeLogRepository::class), $this->createStub(UtmTagRepository::class), $this->createStub(LeadDeviceRepository::class), $this->createStub(LeadEventLogRepository::class), $this->createStub(FrequencyRuleRepository::class), $this->stagesChangeLogRepositoryMock, $this->createStub(LeadCategoryRepository::class), $this->createStub(MergeRecordRepository::class), $this->createStub(LeadListRepository::class), $this->createStub(GroupContactScoreRepository::class), $this->stageRepositoryMock, $this->createStub(UserRepository::class), $this->companyLeadRepositoryMock, $this->createStub(StatRepository::class), $this->createStub(CompanyRepository::class)) extends LeadModel {
+        $leadModel = new class($this->requestStack, $this->createStub(IpLookupHelper::class), $this->createStub(PathsHelper::class), $this->createStub(IntegrationHelper::class), $this->fieldModelMock, $this->fieldsWithUniqueIdentifier, $this->createStub(ListModel::class), $this->createStub(FormFactory::class), $this->companyModelMock, $this->createStub(CategoryModel::class), $this->channelListHelperMock, $this->coreParametersHelperMock, $this->emailValidatorMock, $this->createStub(UserProvider::class), $this->createStub(ContactTracker::class), $this->createStub(DeviceTracker::class), $this->createStub(IpAddressModel::class), $this->entityManagerMock, $this->createStub(CorePermissions::class), $this->dispatcherMock, $this->createStub(UrlGeneratorInterface::class), $this->translator, $this->userHelperMock, $this->createStub(LoggerInterface::class), $this->leadRepositoryMock, $this->createStub(TagRepository::class), $this->createStub(PointsChangeLogRepository::class), $this->createStub(UtmTagRepository::class), $this->createStub(LeadDeviceRepository::class), $this->createStub(LeadEventLogRepository::class), $this->createStub(FrequencyRuleRepository::class), $this->stagesChangeLogRepositoryMock, $this->createStub(LeadCategoryRepository::class), $this->createStub(MergeRecordRepository::class), $this->createStub(LeadListRepository::class), $this->createStub(GroupContactScoreRepository::class), $this->stageRepositoryMock, $this->createStub(UserRepository::class), $this->companyLeadRepositoryMock, $this->createStub(StatRepository::class), $this->createStub(CompanyRepository::class), $this->fieldListMock) extends LeadModel {
             /**
              * @param array<mixed> $leads
              */
@@ -775,6 +785,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->leadRepositoryMock);
 
         ReflectionHelper::setValue($mockLeadModel, 'leadFieldModel', $this->fieldModelMock);
+        ReflectionHelper::setValue($mockLeadModel, 'fieldList', $this->fieldListMock);
         ReflectionHelper::setValue($mockLeadModel, 'fieldsWithUniqueIdentifier', $this->fieldsWithUniqueIdentifier);
 
         return $mockLeadModel;
@@ -809,7 +820,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
         $this->userHelperMock->method('getUser')
             ->willReturn(new User());
 
-        $this->fieldModelMock->method('getFieldList')
+        $this->fieldListMock->method('getFieldList')
             ->willReturn([]);
 
         $this->fieldModelMock->expects($this->atLeastOnce())
@@ -879,6 +890,6 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
     private function setupFieldModelForIpLookupTest(): void
     {
         $this->fieldModelMock->method('getFieldListWithProperties')->willReturn([]);
-        $this->fieldModelMock->method('getFieldList')->willReturn([]);
+        $this->fieldListMock->method('getFieldList')->willReturn([]);
     }
 }

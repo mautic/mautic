@@ -2,17 +2,14 @@
 
 namespace Mautic\LeadBundle\Deduplicate;
 
+use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
-use Mautic\LeadBundle\Model\FieldModel;
 
 trait DeduperTrait
 {
     private $object = 'lead';
 
-    /**
-     * @var FieldModel
-     */
-    private $fieldModel;
+    private FieldList $fieldList;
 
     private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier;
 
@@ -46,7 +43,7 @@ trait DeduperTrait
     private function getAvailableFields()
     {
         if (null === $this->availableFields) {
-            $this->availableFields = $this->fieldModel->getFieldList(
+            $this->availableFields = $this->fieldList->getFieldList(
                 false,
                 false,
                 [
