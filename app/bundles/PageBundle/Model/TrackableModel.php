@@ -662,16 +662,6 @@ class TrackableModel extends AbstractCommonModel
 
         // Reset content replacement arrays
         $this->contentReplacements = [
-            // PHPSTAN reported duplicate keys in this array. I can't determine which is the right one.
-            // I'm leaving the second one to keep current behaviour but leaving the first one commented
-            // out as it may be the one we want.
-            // 'first_pass'  => [
-            //     // Remove internal attributes
-            //     // Editor may convert to HTML4
-            //     'mautic:disable-tracking=""' => '',
-            //     // HTML5
-            //     'mautic:disable-tracking'    => '',
-            // ],
             'first_pass'  => [],
             'second_pass' => [],
         ];
@@ -731,13 +721,6 @@ class TrackableModel extends AbstractCommonModel
         /** @var \DOMElement $link */
         foreach ($this->extractHrefs($links) as $link) {
             $url = $link->getAttribute('href');
-
-            // Check for a do not track
-            // @deprecated since 7.x — Will be removed in 8.0. Use data-mautic-disable-tracking.
-            if ($link->hasAttribute('mautic:disable-tracking')) {
-                $this->doNotTrack[$url] = $url;
-                continue;
-            }
 
             // Check for a do not track in proper HTML format
             if ($link->hasAttribute('data-mautic-disable-tracking') && 'true' === $link->getAttribute('data-mautic-disable-tracking')) {

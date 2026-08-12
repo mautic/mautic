@@ -76,3 +76,9 @@
 ```
 
   `Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumnsInterface` declares `getGeneratedColumnForDateColumn()` in place of the removed method.
+- Support for the legacy `mautic:disable-tracking` HTML attribute in email and page content is removed. Use `data-mautic-disable-tracking="true"` instead:
+
+```diff
+-<a href="https://mautic.org" mautic:disable-tracking>Do not track me</a>
++<a href="https://mautic.org" data-mautic-disable-tracking="true">Do not track me</a>
+```

@@ -77,37 +77,6 @@ HTML,
             [],
         ];
 
-        yield 'Deprecated attribute' => [
-            <<<HTML
-<a href="https://mautic.org">Mautic</a>
-<a href="https://deprecated.com" mautic:disable-tracking>Deprecated</a>
-HTML,
-            ['https://mautic.org'],
-            ['<a href="https://deprecated.com" mautic:disable-tracking>Deprecated</a>'],
-        ];
-
-        yield 'Both attributes on same link' => [
-            <<<HTML
-<a href="https://mautic.org">Mautic</a>
-<a href="https://google.com" data-mautic-disable-tracking="true" mautic:disable-tracking>Google</a>
-HTML,
-            ['https://mautic.org'],
-            ['<a href="https://google.com" data-mautic-disable-tracking="true" mautic:disable-tracking>Google</a>'],
-        ];
-
-        yield 'Both attributes on different links' => [
-            <<<HTML
-<a href="https://mautic.org">Mautic</a>
-<a href="https://google.com" data-mautic-disable-tracking="true">Google</a>
-<a href="https://deprecated.com" mautic:disable-tracking>Deprecated</a>
-HTML,
-            ['https://mautic.org'],
-            [
-                '<a href="https://google.com" data-mautic-disable-tracking="true">Google</a>',
-                '<a href="https://deprecated.com" mautic:disable-tracking>Deprecated</a>',
-            ],
-        ];
-
         yield 'No tracking disabled' => [
             <<<HTML
 <a href="https://mautic.org">Mautic</a>
