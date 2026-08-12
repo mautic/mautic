@@ -82,3 +82,4 @@
 -<a href="https://mautic.org" mautic:disable-tracking>Do not track me</a>
 +<a href="https://mautic.org" data-mautic-disable-tracking="true">Do not track me</a>
 ```
+- Deprecated constant `Mautic\StageBundle\StageEvents::ON_CAMPAIGN_TRIGGER_ACTION` (`mautic.stage.on_campaign_trigger_action`) removed. The `stage.change` campaign action runs through `StageEvents::ON_CAMPAIGN_BATCH_ACTION`. Listen to that event instead.
