@@ -7,7 +7,9 @@ namespace Mautic\CoreBundle\Tests\Functional\Command;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Command\EntityExportCommand;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class EntityExportCommandTest extends MauticMysqlTestCase
 {
     protected function setUp(): void

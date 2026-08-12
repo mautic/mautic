@@ -10,7 +10,9 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class ListControllerTest extends MauticMysqlTestCase
 {
     use ControllerTrait;

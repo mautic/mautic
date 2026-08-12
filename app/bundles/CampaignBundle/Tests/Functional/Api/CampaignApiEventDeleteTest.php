@@ -8,7 +8,9 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadList;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class CampaignApiEventDeleteTest extends MauticMysqlTestCase
 {
     public function testEventAndSourceDeleteViaPutReproducesApiBug(): void

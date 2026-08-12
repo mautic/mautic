@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Mautic\ReportBundle\Tests\Command;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class ExportSchedulerCommandTest extends MauticMysqlTestCase
 {
     public function testCommand(): void

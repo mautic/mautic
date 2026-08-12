@@ -8,7 +8,9 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\WebhookQueue;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class WebhookQueueFunctionalTest extends MauticMysqlTestCase
 {
     public function testPayloadCompressed(): void

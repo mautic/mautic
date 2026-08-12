@@ -8,8 +8,10 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\UserEntityTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Event\UrlTokenReplaceEvent;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+#[Group('database')]
 final class OwnerSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     use UserEntityTrait;

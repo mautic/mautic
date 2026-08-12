@@ -12,8 +12,10 @@ use Mautic\EmailBundle\EventListener\BroadcastSubscriber;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Console\Output\BufferedOutput;
 
+#[Group('database')]
 final class BroadcastSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;

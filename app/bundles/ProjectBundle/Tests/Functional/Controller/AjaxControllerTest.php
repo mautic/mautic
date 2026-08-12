@@ -9,7 +9,9 @@ use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Model\ProjectModel;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class AjaxControllerTest extends MauticMysqlTestCase
 {
     public function testCreatingProjectViaMultiselectInput(): void

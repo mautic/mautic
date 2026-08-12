@@ -10,6 +10,7 @@ use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\GroupContactScore;
 use Mautic\PointBundle\Entity\GroupContactScoreRepository;
 
+#[\PHPUnit\Framework\Attributes\Group('database')]
 final class GroupScoreRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;

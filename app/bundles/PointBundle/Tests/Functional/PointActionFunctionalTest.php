@@ -13,6 +13,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\Point;
 
+#[\PHPUnit\Framework\Attributes\Group('database')]
 final class PointActionFunctionalTest extends MauticMysqlTestCase
 {
     public function testPointActionReadEmail(): void

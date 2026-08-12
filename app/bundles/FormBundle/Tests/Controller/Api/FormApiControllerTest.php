@@ -7,8 +7,10 @@ namespace Mautic\FormBundle\Tests\Controller\Api;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Form;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Response;
 
+#[Group('database')]
 final class FormApiControllerTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;

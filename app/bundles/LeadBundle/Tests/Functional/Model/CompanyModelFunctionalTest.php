@@ -10,7 +10,9 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class CompanyModelFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;

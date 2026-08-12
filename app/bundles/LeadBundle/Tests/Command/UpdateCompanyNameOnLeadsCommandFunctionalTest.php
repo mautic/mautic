@@ -11,7 +11,9 @@ use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Tests\TestEntityCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class UpdateCompanyNameOnLeadsCommandFunctionalTest extends MauticMysqlTestCase
 {
     use TestEntityCreationTrait;

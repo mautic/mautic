@@ -9,7 +9,9 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class UserControllerFunctionalTest extends MauticMysqlTestCase
 {
     protected function setUp(): void

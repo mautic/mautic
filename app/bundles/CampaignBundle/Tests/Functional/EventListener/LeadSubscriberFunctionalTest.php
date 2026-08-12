@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 
+#[PHPUnit\Framework\Attributes\Group('database')]
 final class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     public function testCampaignLeadMerge(): void

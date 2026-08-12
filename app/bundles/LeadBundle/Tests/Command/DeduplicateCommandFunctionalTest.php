@@ -10,7 +10,9 @@ use Mautic\LeadBundle\Command\DeduplicateCommand;
 use Mautic\LeadBundle\Deduplicate\ContactDeduper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class DeduplicateCommandFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;

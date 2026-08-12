@@ -12,11 +12,13 @@ use Doctrine\DBAL\Schema\Table;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Test\EnvLoader;
 use Mautic\InstallBundle\Helper\SchemaHelper;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @template T of AbstractPlatform
  */
+#[Group('database')]
 final class InstallSchemaTest extends TestCase
 {
     private Connection $connection;

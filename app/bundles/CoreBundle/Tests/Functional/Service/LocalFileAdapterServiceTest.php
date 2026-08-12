@@ -9,9 +9,11 @@ use FM\ElfinderBundle\Loader\ElFinderLoader;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('database')]
 final class LocalFileAdapterServiceTest extends MauticMysqlTestCase
 {
     private ?string $folderName = null;

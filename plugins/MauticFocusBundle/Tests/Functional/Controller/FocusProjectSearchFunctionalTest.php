@@ -7,7 +7,9 @@ namespace MauticPlugin\MauticFocusBundle\Tests\Functional\Controller;
 use Mautic\ProjectBundle\Tests\Functional\AbstractProjectSearchTestCase;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class FocusProjectSearchFunctionalTest extends AbstractProjectSearchTestCase
 {
     #[DataProvider('searchDataProvider')]

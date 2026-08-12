@@ -12,7 +12,9 @@ use Mautic\PageBundle\Entity\Page;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Model\SmsModel;
 use Mautic\SmsBundle\Tests\SmsTestHelperTrait;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class SmsSubscriberTokenTest extends MauticMysqlTestCase
 {
     use SmsTestHelperTrait;

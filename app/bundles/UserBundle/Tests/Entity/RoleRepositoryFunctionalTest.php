@@ -8,7 +8,9 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Tests\Traits\CreateEntityTrait;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class RoleRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     use CreateEntityTrait;

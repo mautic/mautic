@@ -22,10 +22,12 @@ use Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadTagData;
 use Mautic\PageBundle\DataFixtures\ORM\LoadPageCategoryData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * These tests cover same tests like \Mautic\LeadBundle\Tests\Model\ListModelFunctionalTest.
  */
+#[Group('database')]
 final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
 {
     private ReferenceRepository $fixtures;

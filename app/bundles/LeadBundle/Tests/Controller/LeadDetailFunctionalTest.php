@@ -8,8 +8,10 @@ use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[Group('database')]
 final class LeadDetailFunctionalTest extends MauticMysqlTestCase
 {
     public function testCustomFieldOrderIsRespected(): void

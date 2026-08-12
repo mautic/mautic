@@ -15,7 +15,9 @@ use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\PointBundle\EventListener\LeadSubscriber;
 use Mautic\PointBundle\Model\PointModel;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class LeadSubscriberTest extends MauticMysqlTestCase
 {
     private PointModel $model;

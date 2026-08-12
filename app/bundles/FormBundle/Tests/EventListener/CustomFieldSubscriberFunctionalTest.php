@@ -6,9 +6,11 @@ namespace Mautic\FormBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Collector\FieldCollector;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+#[Group('database')]
 final class CustomFieldSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     private const string CUSTOM_FIELD_ALIAS = 'test_select_field';

@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\PageBundle\Event\UrlTokenReplaceEvent;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -17,6 +18,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  *
  * Tests the VWO segment tracking feature that appends segment IDs to tracking URLs.
  */
+#[Group('database')]
 final class SegmentTrackingSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     private const string TEST_URL = 'https://example.com/page';

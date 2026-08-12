@@ -11,7 +11,9 @@ use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class DeleteContactSecondaryCompaniesCommandTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;

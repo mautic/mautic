@@ -7,12 +7,14 @@ namespace Mautic\ApiBundle\Tests\Functional\Serializer;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\ProjectBundle\Entity\Project;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Functional test to verify that PUT operations update existing entities
  * instead of creating new ones. This tests the PutProcessor fix end-to-end.
  */
+#[Group('database')]
 final class PutOperationTest extends MauticMysqlTestCase
 {
     /**

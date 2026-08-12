@@ -7,9 +7,11 @@ namespace Mautic\CoreBundle\Tests\Functional\EventListener;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[Group('database')]
 final class MaintenanceSubscriberTest extends MauticMysqlTestCase
 {
     public function testMaintenanceDataCleanUp(): void

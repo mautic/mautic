@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Test;
 
+use PHPUnit\Framework\Attributes\Group;
+
+#[Group('database')]
 final class FunctionalWarmupTest extends MauticMysqlTestCase
 {
     public function testWarmup(): void

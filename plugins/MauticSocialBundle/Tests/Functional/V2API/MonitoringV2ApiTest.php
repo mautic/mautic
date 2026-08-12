@@ -6,8 +6,10 @@ namespace MauticPlugin\MauticSocialBundle\Tests\Functional\V2API;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Response;
 
+#[Group('database')]
 final class MonitoringV2ApiTest extends MauticMysqlTestCase
 {
     private function createMonitoring(

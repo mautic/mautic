@@ -8,12 +8,14 @@ use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\Download;
 use Mautic\LeadBundle\Tests\Functional\ApiPlatform\OwnershipScopedApiAuthorizationTestBase;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Tests that Download entity correctly uses getPermissionUser() to resolve ownership
  * through its parent Asset entity, since Download doesn't have a direct createdBy field.
  */
+#[Group('database')]
 final class DownloadOwnershipApiV2AuthorizationRegressionTest extends OwnershipScopedApiAuthorizationTestBase
 {
     public function testViewOwnItemCannotReadForeignDownloadOnApiV2(): void

@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Functional\Form\Validator;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('database')]
 final class FileEncodingValidatorTest extends MauticMysqlTestCase
 {
     public function testFileNONUTF8(): void

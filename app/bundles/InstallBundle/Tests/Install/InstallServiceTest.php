@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\InstallBundle\Install\InstallService;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
@@ -21,6 +22,11 @@ use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Reads the real app/config/local.php, which only exists once the functional tests have run,
+ * so this test stays in the job that runs them.
+ */
+#[Group('database')]
 final class InstallServiceTest extends \PHPUnit\Framework\TestCase
 {
     /**

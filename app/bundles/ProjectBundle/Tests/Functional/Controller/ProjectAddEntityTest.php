@@ -11,8 +11,10 @@ use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Model\ProjectModel;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 
+#[Group('database')]
 final class ProjectAddEntityTest extends MauticMysqlTestCase
 {
     private Project $testProject;

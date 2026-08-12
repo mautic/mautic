@@ -8,7 +8,9 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\LeadBundle\EventListener\SegmentLogReportSubscriber;
 use Mautic\ReportBundle\Entity\Report;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class SegmentLogReportSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;

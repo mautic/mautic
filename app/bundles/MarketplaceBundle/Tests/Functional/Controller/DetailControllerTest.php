@@ -9,8 +9,10 @@ use Mautic\CoreBundle\Test\Guzzle\ClientMockTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\MarketplaceBundle\Service\Allowlist;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
+#[Group('database')]
 final class DetailControllerTest extends MauticMysqlTestCase
 {
     use ClientMockTrait;

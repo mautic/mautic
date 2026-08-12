@@ -9,8 +9,10 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\ProjectBundle\Entity\Project;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Model\StageModel;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('database')]
 final class StageControllerFunctionalTest extends MauticMysqlTestCase
 {
     private const string COUNT_SQL_PREFIX    = 'SELECT COUNT(*) FROM ';

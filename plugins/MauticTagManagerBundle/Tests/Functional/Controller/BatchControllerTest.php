@@ -10,7 +10,9 @@ use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\TagModel;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class BatchControllerTest extends MauticMysqlTestCase
 {
     private TagRepository $tagRepository;

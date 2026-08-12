@@ -7,7 +7,9 @@ namespace Mautic\CoreBundle\Tests\Functional\Helper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class ChartQueryFunctionalTest extends MauticMysqlTestCase
 {
     public function testGetCountQueryWithUniqueOptionsExecutesAgainstDatabase(): void

@@ -7,8 +7,10 @@ namespace Mautic\CampaignBundle\Tests\Functional\Controller;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DomCrawler\Crawler;
 
+#[Group('database')]
 final class CampaignEventStatsTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;

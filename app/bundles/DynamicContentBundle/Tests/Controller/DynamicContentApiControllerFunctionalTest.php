@@ -10,6 +10,7 @@ use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Entity\DynamicContentLeadData;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,6 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 #[PreserveGlobalState(false)]
 #[RunTestsInSeparateProcesses]
+#[Group('database')]
 final class DynamicContentApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testDwcGetEndpointForNoSlotNorContact(): void

@@ -8,7 +8,9 @@ use Mautic\CoreBundle\Entity\Notification;
 use Mautic\CoreBundle\Entity\NotificationRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class NotificationRepositoryTest extends MauticMysqlTestCase
 {
     public function testIsDuplicate(): void

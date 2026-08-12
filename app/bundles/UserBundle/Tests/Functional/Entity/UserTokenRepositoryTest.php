@@ -8,7 +8,9 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserToken;
 use Mautic\UserBundle\Entity\UserTokenRepository;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class UserTokenRepositoryTest extends MauticMysqlTestCase
 {
     private UserTokenRepository $repository;

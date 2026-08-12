@@ -9,11 +9,13 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Validator\SafeRemoteUrl;
 use Mautic\CoreBundle\Validator\SafeRemoteUrlValidator;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+#[Group('database')]
 final class SafeRemoteUrlValidatorTest extends MauticMysqlTestCase
 {
     protected function setUp(): void

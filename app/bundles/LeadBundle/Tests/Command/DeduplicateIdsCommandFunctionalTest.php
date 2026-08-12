@@ -7,7 +7,9 @@ namespace Mautic\LeadBundle\Tests\Command;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Command\DeduplicateIdsCommand;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class DeduplicateIdsCommandFunctionalTest extends MauticMysqlTestCase
 {
     public function testDeduplicateCommandWithContactIdsParam(): void

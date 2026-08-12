@@ -9,9 +9,11 @@ use Doctrine\ORM\ORMException;
 use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Company;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('database')]
 final class CompanyTest extends MauticMysqlTestCase
 {
     public function testChangingPropertiesHydratesFieldChanges(): void

@@ -7,7 +7,9 @@ namespace Mautic\CampaignBundle\Tests\Controller;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\ProjectBundle\Tests\Functional\AbstractProjectSearchTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class CampaignProjectSearchFunctionalTest extends AbstractProjectSearchTestCase
 {
     #[DataProvider('searchDataProvider')]

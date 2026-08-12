@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Functional\EventListener;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('database')]
 final class EditorFontsSubscriberTest extends MauticMysqlTestCase
 {
     protected function setUp(): void

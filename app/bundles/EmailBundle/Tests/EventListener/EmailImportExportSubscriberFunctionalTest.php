@@ -7,8 +7,10 @@ namespace Mautic\EmailBundle\Tests\EventListener;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+#[Group('database')]
 final class EmailImportExportSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     private EventDispatcherInterface $dispatcher;

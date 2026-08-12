@@ -6,9 +6,11 @@ namespace Mautic\CoreBundle\Tests\Translation;
 
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\CoreBundle\Translation\Translator;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[Group('database')]
 final class TranslatorTest extends AbstractMauticTestCase
 {
     public function testMissingPluralOptions(): void

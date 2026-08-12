@@ -9,7 +9,9 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class CompanyLeadRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     public function testGetCompaniesByLeadIds(): void

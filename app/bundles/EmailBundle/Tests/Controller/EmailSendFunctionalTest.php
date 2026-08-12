@@ -10,9 +10,11 @@ use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mime\Message;
 
+#[Group('database')]
 final class EmailSendFunctionalTest extends MauticMysqlTestCase
 {
     protected function setUp(): void

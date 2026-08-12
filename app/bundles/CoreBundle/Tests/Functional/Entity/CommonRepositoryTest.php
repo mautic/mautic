@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Functional\Entity;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestDox;
 
+#[Group('database')]
 final class CommonRepositoryTest extends MauticMysqlTestCase
 {
     #[TestDox('Test that is:mine does not throw an exception due to bad DQL')]

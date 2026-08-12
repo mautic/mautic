@@ -6,8 +6,10 @@ namespace Mautic\DynamicContentBundle\Tests\Functional;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('database')]
 final class DynamicContentCloneTest extends MauticMysqlTestCase
 {
     public function testCloneActionForDynamicContent(): void

@@ -6,10 +6,12 @@ namespace Mautic\NotificationBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\NotificationBundle\Tests\NotificationTrait;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+#[Group('database')]
 final class NotificationControllerTest extends MauticMysqlTestCase
 {
     use NotificationTrait;

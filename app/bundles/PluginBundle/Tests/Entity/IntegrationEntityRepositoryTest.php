@@ -8,10 +8,12 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * IntegrationRepository.
  */
+#[Group('database')]
 final class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
 {
     public const string INTEGRATION        = 'someIntegration';

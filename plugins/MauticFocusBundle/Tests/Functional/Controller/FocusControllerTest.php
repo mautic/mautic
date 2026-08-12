@@ -7,7 +7,9 @@ namespace MauticPlugin\MauticFocusBundle\Tests\Functional\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\ProjectBundle\Entity\Project;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class FocusControllerTest extends MauticMysqlTestCase
 {
     public function testFocusWithProject(): void

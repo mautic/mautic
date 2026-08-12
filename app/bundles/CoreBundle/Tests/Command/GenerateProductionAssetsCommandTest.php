@@ -7,7 +7,9 @@ namespace Mautic\CoreBundle\Tests\Command;
 use Mautic\CoreBundle\Helper\Filesystem;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class GenerateProductionAssetsCommandTest extends MauticMysqlTestCase
 {
     private const string CKEDITOR_FILE_NAME      = 'ckeditor.js';

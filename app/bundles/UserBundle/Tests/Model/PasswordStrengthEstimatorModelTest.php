@@ -8,10 +8,12 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Form\Validator\Constraints\NotWeak;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+#[Group('database')]
 final class PasswordStrengthEstimatorModelTest extends MauticMysqlTestCase
 {
     private PasswordHasherFactoryInterface $passwordHasher;

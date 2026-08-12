@@ -8,8 +8,10 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\IntegrationsBundle\Command\CleanupCommand;
 use Mautic\IntegrationsBundle\Entity\FieldChange;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Console\Command\Command;
 
+#[Group('database')]
 final class CleanupCommandTest extends MauticMysqlTestCase
 {
     public function testOrphanFieldChangeRecordDeleted(): void

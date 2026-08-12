@@ -7,9 +7,11 @@ namespace Mautic\PageBundle\Tests\Functional\Model;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\Page;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('database')]
 final class PageHitCookieTest extends MauticMysqlTestCase
 {
     private HitRepository $hitRepository;

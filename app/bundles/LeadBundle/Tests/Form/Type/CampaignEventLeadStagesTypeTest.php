@@ -7,9 +7,11 @@ namespace Mautic\LeadBundle\Tests\Form\Type;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadStagesType;
 use Mautic\StageBundle\Form\Type\StageListType;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormBuilderInterface;
 
+#[Group('database')]
 final class CampaignEventLeadStagesTypeTest extends AbstractMauticTestCase
 {
     private CampaignEventLeadStagesType $campaignEventLeadStagesType;

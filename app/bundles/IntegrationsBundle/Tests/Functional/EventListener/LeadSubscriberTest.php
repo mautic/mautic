@@ -10,8 +10,10 @@ use Mautic\IntegrationsBundle\Helper\SyncIntegrationsHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
+#[Group('database')]
 final class LeadSubscriberTest extends MauticMysqlTestCase
 {
     private EventDispatcherInterface $dispatcher;

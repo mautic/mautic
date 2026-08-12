@@ -8,8 +8,10 @@ use Mautic\CoreBundle\Helper\ComposerHelper;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\MarketplaceBundle\Command\RemoveCommand;
 use Mautic\MarketplaceBundle\DTO\ConsoleOutput;
+use PHPUnit\Framework\Attributes\Group;
 use Psr\Log\LoggerInterface;
 
+#[Group('database')]
 final class RemoveCommandTest extends AbstractMauticTestCase
 {
     private string $packageName;

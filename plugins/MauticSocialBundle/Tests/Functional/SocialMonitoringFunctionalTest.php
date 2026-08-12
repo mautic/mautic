@@ -7,7 +7,9 @@ namespace MauticPlugin\MauticSocialBundle\Tests\Functional;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class SocialMonitoringFunctionalTest extends MauticMysqlTestCase
 {
     public function testHideSocialMonitoring(): void

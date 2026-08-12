@@ -11,7 +11,9 @@ use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Model\SmsModel;
 use Mautic\SmsBundle\Sms\TransportChain;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class SmsModelFunctionalTest extends MauticMysqlTestCase
 {
     use CreateEntitiesTrait;

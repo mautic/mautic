@@ -7,8 +7,10 @@ namespace Mautic\SmsBundle\Tests\Functional;
 use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\SmsBundle\Entity\Sms;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('database')]
 final class SmsControllerFunctionalTest extends MauticMysqlTestCase
 {
     use CreateEntitiesTrait;

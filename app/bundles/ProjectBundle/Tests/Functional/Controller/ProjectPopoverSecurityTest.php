@@ -9,7 +9,9 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Model\ProjectModel;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class ProjectPopoverSecurityTest extends MauticMysqlTestCase
 {
     public function testProjectPopoverEscapesProjectNameAndDescription(): void

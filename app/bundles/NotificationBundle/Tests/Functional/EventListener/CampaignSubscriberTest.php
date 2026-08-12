@@ -22,10 +22,12 @@ use Mautic\NotificationBundle\Model\NotificationModel;
 use Mautic\NotificationBundle\Tests\NotificationTrait;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\Group;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[Group('database')]
 final class CampaignSubscriberTest extends MauticMysqlTestCase
 {
     use NotificationTrait;

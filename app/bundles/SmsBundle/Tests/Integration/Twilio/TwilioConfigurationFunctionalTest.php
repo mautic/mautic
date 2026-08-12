@@ -8,7 +8,9 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\SmsBundle\Integration\TwilioIntegration;
 use Mautic\SmsBundle\Tests\SmsTestHelperTrait;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class TwilioConfigurationFunctionalTest extends MauticMysqlTestCase
 {
     use SmsTestHelperTrait;

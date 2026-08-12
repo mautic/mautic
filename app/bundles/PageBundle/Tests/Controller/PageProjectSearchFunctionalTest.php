@@ -7,7 +7,9 @@ namespace Mautic\PageBundle\Tests\Controller;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\ProjectBundle\Tests\Functional\AbstractProjectSearchTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class PageProjectSearchFunctionalTest extends AbstractProjectSearchTestCase
 {
     #[DataProvider('searchDataProvider')]

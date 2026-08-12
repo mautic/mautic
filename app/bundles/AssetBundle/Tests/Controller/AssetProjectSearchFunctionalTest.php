@@ -7,7 +7,9 @@ namespace Mautic\AssetBundle\Tests\Controller;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\ProjectBundle\Tests\Functional\AbstractProjectSearchTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class AssetProjectSearchFunctionalTest extends AbstractProjectSearchTestCase
 {
     #[DataProvider('searchDataProvider')]

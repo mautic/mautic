@@ -18,10 +18,12 @@ use Mautic\StatsBundle\Aggregate\Collection\StatCollection;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests email unsubscribe statistics generation with various filters and permissions.
  */
+#[Group('database')]
 final class UnsubscribedHelperTest extends MauticMysqlTestCase
 {
     private UnsubscribedHelper $unsubscribedHelper;

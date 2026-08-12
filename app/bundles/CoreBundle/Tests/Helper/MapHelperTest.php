@@ -7,7 +7,9 @@ namespace Mautic\CoreBundle\Tests\Helper;
 use Mautic\CampaignBundle\Controller\CampaignMapStatsController;
 use Mautic\CoreBundle\Helper\MapHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class MapHelperTest extends MauticMysqlTestCase
 {
     /**

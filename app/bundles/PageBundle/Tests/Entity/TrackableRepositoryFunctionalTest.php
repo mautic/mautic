@@ -12,7 +12,9 @@ use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Model\TrackableModel;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class TrackableRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     private TrackableModel $model;

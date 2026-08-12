@@ -9,8 +9,10 @@ use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\EmailBundle\Entity\Email;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[Group('database')]
 final class CampaignSubscriberActionEmailToContactFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;

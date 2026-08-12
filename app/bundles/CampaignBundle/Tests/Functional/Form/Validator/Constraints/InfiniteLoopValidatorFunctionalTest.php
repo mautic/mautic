@@ -7,8 +7,10 @@ namespace Mautic\CampaignBundle\Tests\Functional\Form\Validator\Constraints;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadList;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DomCrawler\Crawler;
 
+#[Group('database')]
 final class InfiniteLoopValidatorFunctionalTest extends MauticMysqlTestCase
 {
     #[DataProvider('delayDataProvider')]

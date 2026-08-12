@@ -7,8 +7,10 @@ namespace Mautic\SmsBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\ProjectBundle\Entity\Project;
 use Mautic\SmsBundle\Entity\Sms;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('database')]
 final class SMSControllerFunctionalTest extends MauticMysqlTestCase
 {
     private const string EDIT_SMS_PATH       = '/s/sms/edit/';

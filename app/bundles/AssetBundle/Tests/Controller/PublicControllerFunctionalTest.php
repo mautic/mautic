@@ -7,8 +7,10 @@ namespace Mautic\AssetBundle\Tests\Controller;
 use Mautic\AssetBundle\Entity\Download;
 use Mautic\AssetBundle\Tests\Asset\AbstractAssetTestCase;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Response;
 
+#[Group('database')]
 final class PublicControllerFunctionalTest extends AbstractAssetTestCase
 {
     /**

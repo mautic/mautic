@@ -10,10 +10,12 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\ListLead;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * @see https://github.com/mautic/mautic/issues/16026
  */
+#[Group('database')]
 final class CampaignRestartFromSegmentTest extends MauticMysqlTestCase
 {
     use CampaignEntitiesTrait;

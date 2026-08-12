@@ -9,7 +9,9 @@ use Mautic\AssetBundle\Entity\Download;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     /**

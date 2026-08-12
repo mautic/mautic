@@ -7,9 +7,11 @@ namespace Mautic\PointBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PointBundle\Entity\PointInsight;
 use Mautic\PointBundle\Model\InsightModel;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+#[Group('database')]
 final class InsightControllerTest extends MauticMysqlTestCase
 {
     public function testInsightIndexActionWithoutPage(): void

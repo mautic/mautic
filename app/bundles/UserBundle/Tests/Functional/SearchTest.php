@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Mautic\UserBundle\Tests\Functional;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Response;
 
+#[Group('database')]
 final class SearchTest extends MauticMysqlTestCase
 {
     public function testSearchingUsersByName(): void

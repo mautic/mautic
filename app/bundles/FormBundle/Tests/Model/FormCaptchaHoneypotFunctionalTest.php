@@ -7,9 +7,11 @@ namespace Mautic\FormBundle\Tests\Model;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Model\FormModel;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+#[Group('database')]
 final class FormCaptchaHoneypotFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;

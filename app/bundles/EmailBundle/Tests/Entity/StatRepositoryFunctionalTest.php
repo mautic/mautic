@@ -8,7 +8,9 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class StatRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     private StatRepository $statRepository;

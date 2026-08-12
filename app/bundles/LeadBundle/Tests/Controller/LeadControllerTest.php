@@ -38,6 +38,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[\PHPUnit\Framework\Attributes\Group('database')]
 final class LeadControllerTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;

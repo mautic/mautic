@@ -7,7 +7,9 @@ namespace Mautic\CoreBundle\Tests\Command;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class UnusedIpDeleteCommandFunctionalTest extends MauticMysqlTestCase
 {
     /**

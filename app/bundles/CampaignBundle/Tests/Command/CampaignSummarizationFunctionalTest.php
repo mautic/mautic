@@ -12,7 +12,9 @@ use Mautic\CampaignBundle\Entity\Summary;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class CampaignSummarizationFunctionalTest extends MauticMysqlTestCase
 {
     protected function setUp(): void

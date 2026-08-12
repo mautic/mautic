@@ -10,8 +10,10 @@ use Mautic\PageBundle\Entity\Hit;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('database')]
 final class FocusAjaxControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testViewsCount(): void

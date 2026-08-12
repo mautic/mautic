@@ -13,7 +13,9 @@ use Mautic\WebhookBundle\Entity\Log;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Model\WebhookModel;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class WebhookModelProcessFailureTest extends MauticMysqlTestCase
 {
     private WebhookModel $webhookModel;

@@ -6,8 +6,10 @@ namespace Mautic\MessengerBundle\Tests\Form\Type;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('database')]
 final class ConfigTypeTest extends MauticMysqlTestCase
 {
     private const string MULTIPLIER_FIELD = 'config[messengerconfig][messenger_retry_strategy_multiplier]';

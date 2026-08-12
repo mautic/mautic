@@ -7,7 +7,9 @@ namespace Mautic\CoreBundle\Tests\Unit\Helper\Update\PreUpdateChecks;
 use Mautic\CoreBundle\Helper\Update\PreUpdateChecks\CheckPhpVersion;
 use Mautic\CoreBundle\Release\Metadata;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class CheckPhpVersionTest extends MauticMysqlTestCase
 {
     public function testPhpVersionOk(): void

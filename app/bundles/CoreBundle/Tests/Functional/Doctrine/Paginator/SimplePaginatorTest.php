@@ -8,8 +8,10 @@ use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bridge\Doctrine\Middleware\Debug\DebugDataHolder;
 
+#[Group('database')]
 final class SimplePaginatorTest extends MauticMysqlTestCase
 {
     /**

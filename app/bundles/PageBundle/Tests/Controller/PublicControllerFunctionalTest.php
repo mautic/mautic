@@ -10,8 +10,10 @@ use Mautic\PageBundle\Entity\Page;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('database')]
 final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testTrackingImageAction(): void

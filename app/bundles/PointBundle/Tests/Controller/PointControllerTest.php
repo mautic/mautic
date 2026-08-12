@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Mautic\PointBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+#[Group('database')]
 final class PointControllerTest extends MauticMysqlTestCase
 {
     public function testIndexActionWithoutPage(): void

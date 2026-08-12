@@ -6,9 +6,11 @@ namespace Mautic\FormBundle\Tests\Twig;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Field;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DomCrawler\Crawler;
 use Twig\Environment;
 
+#[Group('database')]
 final class FieldTemplateTest extends MauticMysqlTestCase
 {
     private const string FIELD_LABEL         = 'Test Field';

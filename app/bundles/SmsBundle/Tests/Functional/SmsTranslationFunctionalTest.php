@@ -10,8 +10,10 @@ use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Entity\Stat;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('database')]
 final class SmsTranslationFunctionalTest extends MauticMysqlTestCase
 {
     #[DataProvider('smsTimelineStatusProvider')]

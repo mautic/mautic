@@ -6,8 +6,10 @@ namespace Mautic\ConfigBundle\Tests\Controller;
 
 use Mautic\ConfigBundle\Model\SysinfoModel;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('database')]
 final class SysinfoControllerTest extends MauticMysqlTestCase
 {
     public function testDbInfoIsShown(): void

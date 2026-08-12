@@ -12,12 +12,14 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Model\LeadModel;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * This test ensures that the pending query will work even if a contact was deleted between batches.
  * After the refactoring from NOT EXISTS to NOT IN the single deleted contact could cause the
  * pending query to find no contacts due to null value in the lead_id column.
  */
+#[Group('database')]
 final class PendingQueryFunctionalTest extends MauticMysqlTestCase
 {
     public function testDelayedSends(): void

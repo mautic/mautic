@@ -7,7 +7,9 @@ namespace Mautic\PageBundle\Tests\Model;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PageBundle\Model\TrackableModel;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class TrackableModelFunctionalTest extends MauticMysqlTestCase
 {
     private TrackableModel $trackableModel;

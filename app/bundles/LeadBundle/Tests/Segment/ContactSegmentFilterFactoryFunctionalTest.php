@@ -9,6 +9,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\ListLead;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
 
@@ -17,6 +18,7 @@ use Symfony\Component\Console\Tester\ApplicationTester;
  *
  * @see \Mautic\LeadBundle\Segment\ContactSegmentFilterFactory
  */
+#[Group('database')]
 final class ContactSegmentFilterFactoryFunctionalTest extends MauticMysqlTestCase
 {
     /**

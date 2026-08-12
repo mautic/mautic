@@ -6,7 +6,9 @@ namespace Mautic\LeadBundle\Tests\Functional\ApiPlatform;
 
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class CompanyOwnershipApiV2AuthorizationRegressionTest extends OwnershipScopedApiAuthorizationTestBase
 {
     public function testViewOwnCollectionCannotSeeForeignCompanyOnApiV2(): void

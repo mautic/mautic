@@ -6,7 +6,9 @@ namespace Mautic\CoreBundle\Tests\Unit\Twig\Extension;
 
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\CoreBundle\Twig\Extension\AssetExtension;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class AssetExtensionTest extends AbstractMauticTestCase
 {
     public function testGetCountryFlag(): void

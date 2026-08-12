@@ -7,9 +7,11 @@ namespace Mautic\LeadBundle\Tests\Form\Type;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Copy;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('database')]
 final class EmailTypeFunctionalTest extends MauticMysqlTestCase
 {
     /**

@@ -6,8 +6,10 @@ namespace Mautic\ProjectBundle\Tests\Functional\Validator;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\ProjectBundle\Entity\Project;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('database')]
 final class UniqueNameValidatorFunctionalTest extends MauticMysqlTestCase
 {
     public function testDuplicateProjectName(): void

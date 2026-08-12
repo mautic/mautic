@@ -8,8 +8,10 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use MauticPlugin\MauticSocialBundle\Entity\Tweet;
 use MauticPlugin\MauticSocialBundle\Entity\TweetRepository;
 use MauticPlugin\MauticSocialBundle\Model\TweetModel;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('database')]
 final class TweetControllerTest extends MauticMysqlTestCase
 {
     private TweetRepository $tweetsRepo;

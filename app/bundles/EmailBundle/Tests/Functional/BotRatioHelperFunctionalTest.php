@@ -7,8 +7,10 @@ namespace Mautic\EmailBundle\Tests\Functional;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Stat;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('database')]
 final class BotRatioHelperFunctionalTest extends MauticMysqlTestCase
 {
     private const string DO_NOT_TRACK_IP = '218.30.65.10';

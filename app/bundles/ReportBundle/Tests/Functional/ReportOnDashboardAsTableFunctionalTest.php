@@ -9,8 +9,10 @@ use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DomCrawler\Crawler;
 
+#[Group('database')]
 final class ReportOnDashboardAsTableFunctionalTest extends MauticMysqlTestCase
 {
     public function testReportOnDashboardAsTable(): void

@@ -7,7 +7,9 @@ namespace Mautic\DynamicContentBundle\Tests\Controller;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\ProjectBundle\Tests\Functional\AbstractProjectSearchTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class DynamicContentProjectSearchFunctionalTest extends AbstractProjectSearchTestCase
 {
     #[DataProvider('searchDataProvider')]

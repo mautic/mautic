@@ -14,8 +14,10 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Traits\LoggerTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\LeadEvents;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+#[Group('database')]
 final class EventExecutionerLockTest extends MauticMysqlTestCase
 {
     use LoggerTrait {

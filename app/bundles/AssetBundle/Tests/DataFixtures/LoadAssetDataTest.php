@@ -7,7 +7,9 @@ namespace Mautic\AssetBundle\Tests\DataFixtures;
 use Mautic\AssetBundle\DataFixtures\ORM\LoadAssetData;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class LoadAssetDataTest extends MauticMysqlTestCase
 {
     public function testLoadFixtures(): void

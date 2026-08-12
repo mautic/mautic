@@ -11,7 +11,9 @@ use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class AssertCustomMjmlTest extends MauticMysqlTestCase
 {
     protected function setUp(): void

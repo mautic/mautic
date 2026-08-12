@@ -7,7 +7,9 @@ namespace Mautic\LeadBundle\Tests\Segment\Query\Filter;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\LeadBundle\Model\ListModel;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class SegmentReferenceFilterQueryBuilderGlueTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;

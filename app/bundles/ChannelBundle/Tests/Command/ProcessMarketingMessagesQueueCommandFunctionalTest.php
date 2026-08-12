@@ -11,7 +11,9 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class ProcessMarketingMessagesQueueCommandFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;

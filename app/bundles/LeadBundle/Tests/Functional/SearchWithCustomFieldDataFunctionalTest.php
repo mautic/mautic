@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Functional;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[Group('database')]
 final class SearchWithCustomFieldDataFunctionalTest extends AbstractSearchTestCase
 {
     protected $useCleanupRollback = false;

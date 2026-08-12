@@ -16,7 +16,9 @@ use Mautic\LeadBundle\Entity\Tag;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\ReportBundle\Entity\Report;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class TagDependenciesTest extends MauticMysqlTestCase
 {
     public function testTagUsageInCampaigns(): void

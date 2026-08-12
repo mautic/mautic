@@ -9,8 +9,10 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\NotificationBundle\Entity\Notification;
 use Mautic\NotificationBundle\Entity\Stat;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('database')]
 final class MobileNotificationTranslationFunctionalTest extends MauticMysqlTestCase
 {
     public function testNotificationCanBeCreatedWithTranslationParent(): void

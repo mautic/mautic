@@ -7,7 +7,9 @@ namespace Mautic\LeadBundle\Tests\Command;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadList;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class SegmentStatCommandTest extends MauticMysqlTestCase
 {
     /**

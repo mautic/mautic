@@ -9,8 +9,10 @@ use Mautic\CoreBundle\Command\PullTransifexCommand;
 use Mautic\CoreBundle\Helper\Filesystem;
 use Mautic\CoreBundle\Test\Guzzle\ClientMockTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
+#[Group('database')]
 final class PullTransifexCommandFunctionalTest extends MauticMysqlTestCase
 {
     use ClientMockTrait;

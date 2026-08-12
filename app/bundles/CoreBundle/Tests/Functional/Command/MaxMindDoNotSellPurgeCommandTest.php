@@ -7,7 +7,9 @@ namespace Mautic\CoreBundle\Tests\Functional\Command;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class MaxMindDoNotSellPurgeCommandTest extends MauticMysqlTestCase
 {
     protected function setUp(): void

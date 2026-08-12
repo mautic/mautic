@@ -12,7 +12,9 @@ use Mautic\StageBundle\Entity\LeadStageLog;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\EventListener\LeadSubscriber;
 use Mautic\StageBundle\Model\StageModel;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class LeadSubscriberTest extends MauticMysqlTestCase
 {
     private StageModel $model;

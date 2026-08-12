@@ -7,9 +7,11 @@ namespace Mautic\PointBundle\Tests\Controller\Api;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PointBundle\Entity\PointInsight;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[Group('database')]
 final class PointInsightApiControllerTest extends MauticMysqlTestCase
 {
     private const string UPDATED_NAME = 'Updated Point Insight';

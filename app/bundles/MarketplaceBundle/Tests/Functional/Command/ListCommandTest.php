@@ -10,8 +10,10 @@ use Mautic\MarketplaceBundle\Command\ListCommand;
 use Mautic\MarketplaceBundle\DTO\Allowlist as DTOAllowlist;
 use Mautic\MarketplaceBundle\Service\Allowlist;
 use Mautic\MarketplaceBundle\Service\PluginCollector;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Exception;
 
+#[Group('database')]
 final class ListCommandTest extends AbstractMauticTestCase
 {
     public function testCommand(): void

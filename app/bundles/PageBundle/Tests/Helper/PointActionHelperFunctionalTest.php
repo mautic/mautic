@@ -9,7 +9,9 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Helper\PointActionHelper;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class PointActionHelperFunctionalTest extends MauticMysqlTestCase
 {
     private PointActionHelper $pointActionHelper;

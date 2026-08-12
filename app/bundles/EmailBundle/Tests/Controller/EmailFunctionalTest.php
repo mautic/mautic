@@ -12,9 +12,11 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Entity\Page;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('database')]
 final class EmailFunctionalTest extends MauticMysqlTestCase
 {
     public const string SAVE_AND_CLOSE = 'Save & Close';

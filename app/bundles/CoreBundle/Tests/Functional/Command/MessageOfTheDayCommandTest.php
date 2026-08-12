@@ -7,11 +7,13 @@ namespace Mautic\CoreBundle\Tests\Functional\Command;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Attributes\After;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
+#[Group('database')]
 final class MessageOfTheDayCommandTest extends MauticMysqlTestCase
 {
     private string $cachePath;

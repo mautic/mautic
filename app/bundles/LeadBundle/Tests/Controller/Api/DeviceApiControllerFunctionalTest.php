@@ -6,9 +6,11 @@ namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+#[Group('database')]
 final class DeviceApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testPutEditWithInexistingIdSoItShouldCreate(): void

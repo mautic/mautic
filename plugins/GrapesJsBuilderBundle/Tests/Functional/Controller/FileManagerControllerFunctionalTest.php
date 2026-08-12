@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace MauticPlugin\GrapesJsBuilderBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Response;
 
+#[Group('database')]
 final class FileManagerControllerFunctionalTest extends MauticMysqlTestCase
 {
     private const string ASSETS_ENDPOINT = '/s/grapesjsbuilder/media';

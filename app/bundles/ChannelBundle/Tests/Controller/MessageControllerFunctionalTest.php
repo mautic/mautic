@@ -7,7 +7,9 @@ namespace Mautic\ChannelBundle\Tests\Controller;
 use Mautic\ChannelBundle\Entity\Message;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\ProjectBundle\Entity\Project;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class MessageControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testFormWithProject(): void

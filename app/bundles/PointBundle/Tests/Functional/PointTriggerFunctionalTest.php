@@ -12,6 +12,7 @@ use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Model\PointGroupModel;
 use Mautic\PointBundle\Model\TriggerModel;
 
+#[\PHPUnit\Framework\Attributes\Group('database')]
 final class PointTriggerFunctionalTest extends MauticMysqlTestCase
 {
     use TriggerTrait;

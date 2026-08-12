@@ -9,7 +9,9 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\Stat\ChartQuery\SegmentContactsLineChartQuery;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class ChartQueryTest extends MauticMysqlTestCase
 {
     public function testSegmentContactsLineChartQuery(): void

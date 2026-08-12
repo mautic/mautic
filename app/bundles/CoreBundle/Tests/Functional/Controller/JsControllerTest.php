@@ -6,6 +6,7 @@ namespace Mautic\CoreBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[PreserveGlobalState(false)]
 #[RunTestsInSeparateProcesses]
+#[Group('database')]
 final class JsControllerTest extends MauticMysqlTestCase
 {
     protected function setUp(): void

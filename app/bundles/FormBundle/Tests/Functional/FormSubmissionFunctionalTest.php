@@ -14,8 +14,10 @@ use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\Tests\Model\FormSubmissionTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Page;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('database')]
 final class FormSubmissionFunctionalTest extends MauticMysqlTestCase
 {
     use FormSubmissionTrait;

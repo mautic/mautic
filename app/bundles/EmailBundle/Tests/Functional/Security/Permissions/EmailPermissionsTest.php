@@ -6,8 +6,10 @@ namespace Mautic\EmailBundle\Tests\Functional\Security\Permissions;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\Role;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('database')]
 final class EmailPermissionsTest extends MauticMysqlTestCase
 {
     public function testEmailSendToDncPermissionIsAvailable(): void

@@ -7,6 +7,7 @@ namespace MauticPlugin\MauticFocusBundle\Tests\Functional\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\Redirect;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +16,7 @@ use Twig\Environment;
 use Twig\Extension\EscaperExtension;
 use Twig\Runtime\EscaperRuntime;
 
+#[Group('database')]
 final class PublicControllerTest extends MauticMysqlTestCase
 {
     #[PreserveGlobalState(false)]

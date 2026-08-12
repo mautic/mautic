@@ -6,10 +6,12 @@ namespace Mautic\Middleware\Tests;
 
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\Middleware\HSTSMiddleware;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\ExpectationFailedException as PHPUnitException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+#[Group('database')]
 final class HSTSMiddlewareTest extends AbstractMauticTestCase
 {
     public const HSTS_KEY = 'strict-transport-security';

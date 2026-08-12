@@ -8,7 +8,9 @@ use Knp\Menu\ItemInterface;
 use Knp\Menu\MenuFactory;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\CoreBundle\Twig\Extension\MenuExtension;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class MenuExtensionTest extends AbstractMauticTestCase
 {
     public function testParseMenuAttributes(): void

@@ -6,8 +6,10 @@ namespace Mautic\UserBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Tests\Traits\CreateEntityTrait;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('database')]
 final class ProfileControllerTest extends MauticMysqlTestCase
 {
     use CreateEntityTrait;

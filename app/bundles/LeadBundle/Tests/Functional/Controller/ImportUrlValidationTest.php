@@ -11,9 +11,11 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\ImportModel;
 use Mautic\UserBundle\Security\UserTokenSetter;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('database')]
 final class ImportUrlValidationTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;

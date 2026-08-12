@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Mautic\ChannelBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('database')]
 final class MessageControllerTest extends MauticMysqlTestCase
 {
     public function testMMUiWorkflow(): void

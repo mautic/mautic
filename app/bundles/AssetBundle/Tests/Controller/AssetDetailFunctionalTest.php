@@ -6,7 +6,9 @@ namespace Mautic\AssetBundle\Tests\Controller;
 
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class AssetDetailFunctionalTest extends MauticMysqlTestCase
 {
     public function testLeadViewPreventsXSS(): void

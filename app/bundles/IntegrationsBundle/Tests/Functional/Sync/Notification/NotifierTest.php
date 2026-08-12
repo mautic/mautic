@@ -15,7 +15,9 @@ use Mautic\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples
 use Mautic\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples\Sync\SyncDataExchange\ExampleSyncDataExchange;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class NotifierTest extends MauticMysqlTestCase
 {
     public function testNotifications(): void

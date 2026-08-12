@@ -7,7 +7,9 @@ namespace Mautic\SmsBundle\Tests\Controller;
 use Mautic\ProjectBundle\Tests\Functional\AbstractProjectSearchTestCase;
 use Mautic\SmsBundle\Entity\Sms;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class SmsProjectSearchFunctionalTest extends AbstractProjectSearchTestCase
 {
     #[DataProvider('searchDataProvider')]

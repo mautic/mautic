@@ -15,8 +15,10 @@ use Mautic\SmsBundle\Sms\BulkTransportInterface;
 use Mautic\SmsBundle\Sms\MMSTransportInterface;
 use Mautic\SmsBundle\Sms\TransportChain;
 use Mautic\SmsBundle\Sms\TransportInterface;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 
+#[Group('database')]
 final class TransportChainTest extends MauticMysqlTestCase
 {
     private TransportChain $transportChain;

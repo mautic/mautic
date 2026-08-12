@@ -12,9 +12,11 @@ use Mautic\ReportBundle\Entity\Report;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use MauticPlugin\MauticFocusBundle\EventListener\ReportSubscriber;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('database')]
 final class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     public function testGenerateFocusItemReportWithAllAvailableColumns(): void

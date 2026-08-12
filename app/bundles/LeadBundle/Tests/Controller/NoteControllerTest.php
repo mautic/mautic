@@ -10,11 +10,13 @@ use Mautic\LeadBundle\Entity\LeadNote;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\RoleModel;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
+#[Group('database')]
 final class NoteControllerTest extends MauticMysqlTestCase
 {
     protected function beforeBeginTransaction(): void

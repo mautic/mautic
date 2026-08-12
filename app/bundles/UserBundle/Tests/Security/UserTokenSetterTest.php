@@ -9,9 +9,11 @@ use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
 use Mautic\UserBundle\Security\UserTokenSetter;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
+#[Group('database')]
 final class UserTokenSetterTest extends AbstractMauticTestCase
 {
     public function testSetUserMakesTheUserAvailableToUserHelper(): void

@@ -6,9 +6,11 @@ namespace Mautic\UserBundle\Tests\Security;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Tests\Traits\CreateEntityTrait;
+use PHPUnit\Framework\Attributes\Group;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('database')]
 final class UserLoginTest extends MauticMysqlTestCase
 {
     use CreateEntityTrait;

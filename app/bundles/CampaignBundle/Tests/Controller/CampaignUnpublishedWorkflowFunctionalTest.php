@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Controller;
 
 use Mautic\CampaignBundle\Tests\Campaign\AbstractCampaignTestCase;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[Group('database')]
 final class CampaignUnpublishedWorkflowFunctionalTest extends AbstractCampaignTestCase
 {
     public function testCreateCampaignPageShouldNotContainConformation(): void

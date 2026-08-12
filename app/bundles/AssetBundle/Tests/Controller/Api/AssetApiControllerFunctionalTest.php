@@ -6,7 +6,9 @@ namespace Mautic\AssetBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     protected function setUp(): void

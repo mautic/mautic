@@ -10,7 +10,9 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class SegmentFilterFunctionalTest extends MauticMysqlTestCase
 {
     /**

@@ -6,7 +6,9 @@ namespace Mautic\LeadBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Company;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class CompanyListColumnConfigurationFunctionalTest extends MauticMysqlTestCase
 {
     protected function setUp(): void

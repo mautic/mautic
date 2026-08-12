@@ -9,8 +9,10 @@ use Mautic\CoreBundle\Test\Guzzle\ClientMockTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\MarketplaceBundle\Service\Allowlist;
 use Mautic\MarketplaceBundle\Service\Config;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
+#[Group('database')]
 final class ListControllerTest extends MauticMysqlTestCase
 {
     use ClientMockTrait;

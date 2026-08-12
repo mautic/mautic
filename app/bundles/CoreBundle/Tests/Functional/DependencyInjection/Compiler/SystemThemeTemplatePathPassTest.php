@@ -7,10 +7,12 @@ namespace Mautic\CoreBundle\Tests\Functional\DependencyInjection\Compiler;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('database')]
 final class SystemThemeTemplatePathPassTest extends MauticMysqlTestCase
 {
     protected function setUp(): void

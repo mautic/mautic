@@ -6,9 +6,11 @@ namespace Mautic\EmailBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\KernelInterface;
 
+#[Group('database')]
 final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testValuesAreEscapedProperly(): void

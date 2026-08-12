@@ -14,7 +14,9 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadCategory;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     private EmailRepository $emailRepository;

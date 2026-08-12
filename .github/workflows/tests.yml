@@ -114,14 +114,14 @@ jobs:
         export DB_PORT="${{ job.services.database.ports[3306] }}"
         export SAML_PORT="${{ job.services.saml.ports[8080] }}"
 
-        # The "Container smoke tests" and "Static analysis rule tests" suites need no database,
-        # they run in the separate "no-database-tests" job below.
+        # Everything that needs no database runs in the "no-database-tests" job below: the two
+        # suites left out here, and every test outside the "database" group.
         SUITES="Project Test Suite,Plugin tests,Middleware tests"
 
         if [[ "$COVERAGE" == "true" ]]; then
-          php -d zend.assertions=1 -d pcov.enabled=1 bin/phpunit -d memory_limit=3G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --testsuite "$SUITES" --coverage-clover=coverage.xml --log-junit=junit.xml
+          php -d zend.assertions=1 -d pcov.enabled=1 bin/phpunit -d memory_limit=3G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --testsuite "$SUITES" --group database --coverage-clover=coverage.xml --log-junit=junit.xml
         else
-          php -d zend.assertions=1 bin/phpunit -d memory_limit=2G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --testsuite "$SUITES"
+          php -d zend.assertions=1 bin/phpunit -d memory_limit=2G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --testsuite "$SUITES" --group database
         fi
 
     - name: Upload coverage report
@@ -175,7 +175,9 @@ jobs:
       uses: "ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda" # 4.0.0
 
     - name: Run tests
-      run: bin/phpunit --configuration app/phpunit.xml.dist --testsuite "Container smoke tests,Static analysis rule tests"
+      run: |
+        bin/phpunit --configuration app/phpunit.xml.dist --testsuite "Container smoke tests,Static analysis rule tests"
+        bin/phpunit --configuration app/phpunit.xml.dist --testsuite "Project Test Suite,Plugin tests,Middleware tests" --exclude-group database
 
   e2e-tests:
     runs-on: ubuntu-latest

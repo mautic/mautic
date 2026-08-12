@@ -9,12 +9,14 @@ use Doctrine\Common\Cache\CacheProvider;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Tests that enable debug and profiler to test performance optimizations.
  * These tests are slower as debug and profiler are enabled. Add tests here only if you need profiler.
  */
+#[Group('database')]
 final class LeadApiControllerProfilerTest extends MauticMysqlTestCase
 {
     /**

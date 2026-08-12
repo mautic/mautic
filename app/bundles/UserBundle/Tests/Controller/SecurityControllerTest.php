@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Mautic\UserBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[Group('database')]
 final class SecurityControllerTest extends MauticMysqlTestCase
 {
     protected function setUp(): void

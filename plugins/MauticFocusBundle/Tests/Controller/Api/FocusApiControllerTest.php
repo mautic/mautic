@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace MauticPlugin\MauticFocusBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+#[Group('database')]
 final class FocusApiControllerTest extends MauticMysqlTestCase
 {
     /**

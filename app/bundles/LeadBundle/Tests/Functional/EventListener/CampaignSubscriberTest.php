@@ -14,7 +14,9 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\EventListener\CampaignSubscriber;
 use Mautic\LeadBundle\Model\FieldModel;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class CampaignSubscriberTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;

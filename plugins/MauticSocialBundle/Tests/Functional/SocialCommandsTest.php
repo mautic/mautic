@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace MauticPlugin\MauticSocialBundle\Tests\Functional;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class SocialCommandsTest extends MauticMysqlTestCase
 {
     public function testSocialMonitoringCommand(): void

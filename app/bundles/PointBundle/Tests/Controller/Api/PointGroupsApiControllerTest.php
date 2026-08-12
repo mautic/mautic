@@ -12,6 +12,7 @@ use Mautic\PointBundle\Entity\Group;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[\PHPUnit\Framework\Attributes\Group('database')]
 final class PointGroupsApiControllerTest extends MauticMysqlTestCase
 {
     public function testPointGroupCRUDActions(): void

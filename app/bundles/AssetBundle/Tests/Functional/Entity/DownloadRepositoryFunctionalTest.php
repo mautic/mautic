@@ -9,7 +9,9 @@ use Mautic\AssetBundle\Entity\DownloadRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\PageBundle\Entity\Page;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class DownloadRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     private DownloadRepository $downloadRepository;

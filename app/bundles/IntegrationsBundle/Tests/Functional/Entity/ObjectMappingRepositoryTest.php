@@ -8,7 +8,9 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use Mautic\IntegrationsBundle\Entity\ObjectMappingRepository;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class ObjectMappingRepositoryTest extends MauticMysqlTestCase
 {
     private const string INTEGRATION             = 'integration';

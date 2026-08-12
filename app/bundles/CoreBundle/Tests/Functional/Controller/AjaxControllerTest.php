@@ -40,6 +40,7 @@ use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[\PHPUnit\Framework\Attributes\Group('database')]
 final class AjaxControllerTest extends MauticMysqlTestCase
 {
     use ClientMockTrait;

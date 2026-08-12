@@ -9,9 +9,11 @@ use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
 use MauticPlugin\MauticClearbitBundle\Integration\Support\ConfigSupport;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\Routing\RouterInterface;
 
+#[Group('database')]
 final class ConfigControllerTest extends MauticMysqlTestCase
 {
     private const string API_KEY = 'test_api_key_123';

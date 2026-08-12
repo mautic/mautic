@@ -8,7 +8,9 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class LeadDeviceRepositoryTest extends MauticMysqlTestCase
 {
     public function testFindExistingDevice(): void

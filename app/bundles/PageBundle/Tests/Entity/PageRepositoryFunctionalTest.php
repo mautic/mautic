@@ -7,7 +7,9 @@ namespace Mautic\PageBundle\Tests\Entity;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Model\PageModel;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class PageRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     public function testResetVariants(): void

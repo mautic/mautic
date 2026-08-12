@@ -12,7 +12,9 @@ use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class FrequencyRuleRepositoryTest extends MauticMysqlTestCase
 {
     private FrequencyRuleRepository $frequencyRuleRepository;

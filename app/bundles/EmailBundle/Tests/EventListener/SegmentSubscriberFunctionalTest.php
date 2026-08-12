@@ -6,8 +6,10 @@ namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\LeadEvents;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+#[Group('database')]
 final class SegmentSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     public function testLeadListChangeEventHasListeners(): void

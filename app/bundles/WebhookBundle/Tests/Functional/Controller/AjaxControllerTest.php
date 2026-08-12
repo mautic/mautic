@@ -6,9 +6,11 @@ namespace Mautic\WebhookBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+#[Group('database')]
 final class AjaxControllerTest extends MauticMysqlTestCase
 {
     public function testSendHookTestWithMissingUrl(): void

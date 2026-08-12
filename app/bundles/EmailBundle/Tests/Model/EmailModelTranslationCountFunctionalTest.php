@@ -12,7 +12,9 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class EmailModelTranslationCountFunctionalTest extends MauticMysqlTestCase
 {
     private const int CONTACT_COUNT = 10;

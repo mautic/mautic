@@ -8,8 +8,10 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Response;
 
+#[Group('database')]
 final class ProjectEntityLookupLimitTest extends MauticMysqlTestCase
 {
     private const string LOOKUP_CHOICE_LIST_URL = '/s/ajax?action=project:getLookupChoiceList';

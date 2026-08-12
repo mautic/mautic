@@ -14,7 +14,9 @@ use Mautic\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples
 use Mautic\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples\Sync\SyncDataExchange\ExampleSyncDataExchange;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\PluginBundle\Entity\Integration;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class SyncServiceTest extends MauticMysqlTestCase
 {
     protected function setUp(): void

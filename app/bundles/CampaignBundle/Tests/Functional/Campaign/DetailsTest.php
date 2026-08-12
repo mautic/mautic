@@ -6,7 +6,9 @@ namespace Mautic\CampaignBundle\Tests\Functional\Campaign;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class DetailsTest extends MauticMysqlTestCase
 {
     public function testDetailsPageLoadCorrectly(): void

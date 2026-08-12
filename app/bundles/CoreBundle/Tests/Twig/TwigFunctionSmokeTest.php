@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Twig;
 
 use Mautic\CoreBundle\Form\Type\TelType;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Twig\Environment;
 
@@ -14,6 +15,7 @@ use Twig\Environment;
  *
  * @see TwigCallableRegistrationTest for the same check on a standalone Twig environment
  */
+#[Group('database')]
 final class TwigFunctionSmokeTest extends KernelTestCase
 {
     /**

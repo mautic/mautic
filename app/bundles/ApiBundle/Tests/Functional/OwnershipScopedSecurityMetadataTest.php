@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Contract test: every ownership-scoped item operation in every API v2 resource
@@ -20,6 +21,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
  * grant access to any user holding the `own` permission bit — regardless of
  * whether they actually own that specific entity.
  */
+#[Group('database')]
 final class OwnershipScopedSecurityMetadataTest extends MauticMysqlTestCase
 {
     public function testAllOwnershipScopedItemOperationsPassObjectToSecurityExpression(): void

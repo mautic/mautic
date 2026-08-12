@@ -6,6 +6,7 @@ namespace Mautic\UserBundle\Tests\Functional\ApiPlatform;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests that the User API endpoints properly handle password as write-only field.
@@ -18,6 +19,7 @@ use Mautic\UserBundle\Entity\User;
  * This ensures that password hashes are never exposed through the API,
  * which is critical for security.
  */
+#[Group('database')]
 final class UserApiTest extends MauticMysqlTestCase
 {
     protected function beforeBeginTransaction(): void

@@ -19,8 +19,10 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Console\Command\Command;
 
+#[Group('database')]
 final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;

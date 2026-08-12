@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
+#[Group('database')]
 final class FileControllerTest extends MauticMysqlTestCase
 {
     private ?string $uploadedFilePath = null;

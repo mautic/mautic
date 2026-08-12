@@ -7,10 +7,12 @@ namespace MauticPlugin\MauticFocusBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('database')]
 final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
 {
     #[PreserveGlobalState(false)]

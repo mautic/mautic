@@ -14,7 +14,9 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\UserBundle\Model\UserModel;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class CompanyObjectHelperTest extends MauticMysqlTestCase
 {
     public function testUpdateEmpty(): void

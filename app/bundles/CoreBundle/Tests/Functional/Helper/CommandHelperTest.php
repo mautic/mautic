@@ -6,7 +6,9 @@ namespace Mautic\CoreBundle\Tests\Functional\Helper;
 
 use Mautic\CoreBundle\Helper\CommandHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class CommandHelperTest extends MauticMysqlTestCase
 {
     private CommandHelper $commandHelper;

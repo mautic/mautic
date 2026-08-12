@@ -20,9 +20,11 @@ use Mautic\ReportBundle\Entity\Report;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('database')]
 final class TagControllerTest extends MauticMysqlTestCase
 {
     private const string MERGE_ROUTE_BASE = '/s/tags/merge/';

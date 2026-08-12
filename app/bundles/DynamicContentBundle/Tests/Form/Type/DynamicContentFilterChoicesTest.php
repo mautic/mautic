@@ -6,6 +6,7 @@ namespace Mautic\DynamicContentBundle\Tests\Form\Type;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -13,6 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
  * controller with locale, timezone and region filter values to prove the form
  * actually accepts those choices and persists them.
  */
+#[Group('database')]
 final class DynamicContentFilterChoicesTest extends MauticMysqlTestCase
 {
     private const string LOCALE_VALUE   = 'en_US';

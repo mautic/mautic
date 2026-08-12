@@ -11,7 +11,9 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\Page;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class HitRepositoryTest extends MauticMysqlTestCase
 {
     private HitRepository $hitRepository;

@@ -7,9 +7,11 @@ namespace Mautic\PointBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PointBundle\Model\TriggerModel;
 use Mautic\PointBundle\Tests\Functional\TriggerTrait;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+#[Group('database')]
 final class TriggerControllerTest extends MauticMysqlTestCase
 {
     use TriggerTrait;

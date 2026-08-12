@@ -7,7 +7,9 @@ namespace Mautic\PointBundle\Tests\Functional\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\ProjectBundle\Entity\Project;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class TriggerControllerTest extends MauticMysqlTestCase
 {
     public function testPointTriggerWithProject(): void

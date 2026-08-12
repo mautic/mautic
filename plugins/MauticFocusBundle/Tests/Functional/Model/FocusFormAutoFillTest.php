@@ -11,7 +11,9 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class FocusFormAutoFillTest extends MauticMysqlTestCase
 {
     protected function setUp(): void

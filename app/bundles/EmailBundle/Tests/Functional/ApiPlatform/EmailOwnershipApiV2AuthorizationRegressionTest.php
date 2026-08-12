@@ -7,7 +7,9 @@ namespace Mautic\EmailBundle\Tests\Functional\ApiPlatform;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Tests\Functional\ApiPlatform\OwnershipScopedApiAuthorizationTestBase;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class EmailOwnershipApiV2AuthorizationRegressionTest extends OwnershipScopedApiAuthorizationTestBase
 {
     public function testViewOwnCollectionCannotSeeForeignEmailOnApiV2(): void

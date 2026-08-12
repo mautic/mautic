@@ -19,10 +19,12 @@ use Mautic\UserBundle\Entity\UserRepository;
 use MauticPlugin\MauticTagManagerBundle\Entity\Tag;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
+#[Group('database')]
 final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 {
     protected function beforeBeginTransaction(): void

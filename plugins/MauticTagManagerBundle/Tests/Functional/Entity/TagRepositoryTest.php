@@ -7,7 +7,9 @@ namespace MauticPlugin\MauticTagManagerBundle\Tests\Functional\Entity;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Tag;
 use MauticPlugin\MauticTagManagerBundle\Entity\TagRepository;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class TagRepositoryTest extends MauticMysqlTestCase
 {
     private TagRepository $tagRepository;

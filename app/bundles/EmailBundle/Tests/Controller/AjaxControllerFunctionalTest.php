@@ -19,12 +19,14 @@ use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mime\Email as EmailMime;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[Group('database')]
 final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 {
     #[DataProvider('provideSendToDncStatus')]

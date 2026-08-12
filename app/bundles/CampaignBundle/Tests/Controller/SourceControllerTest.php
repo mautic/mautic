@@ -7,7 +7,9 @@ namespace Mautic\CampaignBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('database')]
 final class SourceControllerTest extends MauticMysqlTestCase
 {
     private const string ACCESS_DENIED      = 'You do not have access to the requested area\/action';

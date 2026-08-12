@@ -6,8 +6,10 @@ namespace Mautic\PageBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('database')]
 final class TrackingConfigTest extends MauticMysqlTestCase
 {
     public function testTrackingScriptOptionsAreRendered(): void
