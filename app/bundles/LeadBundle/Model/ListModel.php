@@ -609,16 +609,11 @@ class ListModel extends FormModel implements GlobalSearchInterface
         unset($batchLimiters['maxId'], $batchLimiters['dateTime']);
 
         try {
-            $newLeadsCount    = $this->leadSegmentService->getNewLeadListLeadsCount($leadList, $batchLimiters);
-            $orphanLeadsCount = $this->leadSegmentService->getOrphanedLeadListLeadsCount($leadList);
+            return !$this->leadSegmentService->hasNewLeadListLeads($leadList, $batchLimiters)
+                && !$this->leadSegmentService->hasOrphanedLeadListLeads($leadList);
         } catch (TableNotFoundException) {
             return false;
         }
-
-        $segmentId = $leadList->getId();
-
-        return 0 === (int) ($newLeadsCount[$segmentId]['count'] ?? 0)
-            && 0 === (int) ($orphanLeadsCount[$segmentId]['count'] ?? 0);
     }
 
     private function refreshSegmentContactCount(int $segmentId): void
