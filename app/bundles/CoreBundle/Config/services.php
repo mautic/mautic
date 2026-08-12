@@ -52,8 +52,6 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\CoreBundle\\Entity\\', '../Entity/*Repository.php');
 
-    $services->set(Mautic\CoreBundle\Helper\CoreParametersHelper::class)->tag('twig.helper');
-
     $services->alias('mautic.helper.core_parameters', Mautic\CoreBundle\Helper\CoreParametersHelper::class);
 
     $services->set(Mautic\CoreBundle\IpLookup\AbstractLookup::class)
@@ -141,16 +139,13 @@ return function (ContainerConfigurator $configurator): void {
         ->arg('$path', param('mautic.cookie_path'))
         ->arg('$domain', param('mautic.cookie_domain'))
         ->arg('$secure', param('mautic.cookie_secure'))
-        ->arg('$httponly', param('mautic.cookie_httponly'))
-        ->tag('kernel.event_subscriber');
+        ->arg('$httponly', param('mautic.cookie_httponly'));
 
     $services->set(Mautic\CoreBundle\Helper\EncryptionHelper::class)
         ->args([
             service('mautic.helper.core_parameters'),
             service('mautic.cipher.openssl'),
         ]);
-
-    $services->set(Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator::class)->tag('validator.constraint_validator');
 
     /* @deprecated to be removed in Mautic 4. Use 'mautic.filesystem' instead. */
     $services->set('symfony.filesystem', Symfony\Component\Filesystem\Filesystem::class);
@@ -233,8 +228,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->set('mautic.http.client', GuzzleHttp\Client::class)->autowire();
     $services->set(Mautic\CoreBundle\Doctrine\MigrationFactoryDecorator::class)->autowire();
 
-    $services->set(StringExtension::class)
-        ->tag('twig.extension');
+    $services->set(StringExtension::class);
 
     $services->alias(GuzzleHttp\Client::class, 'mautic.http.client');
     $services->alias(Psr\Http\Client\ClientInterface::class, 'mautic.http.client');

@@ -24,7 +24,6 @@ return function (ContainerConfigurator $configurator): void {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('Mautic\\ReportBundle\\Entity\\', '../Entity/*Repository.php');
-    $services->set(Mautic\ReportBundle\Scheduler\Validator\ScheduleIsValidValidator::class)->tag('validator.constraint_validator');
     $services->set('mautic.report.model.scheduler_builder', Mautic\ReportBundle\Scheduler\Builder\SchedulerBuilder::class);
     $services->set('mautic.report.model.scheduler_template_factory', Mautic\ReportBundle\Scheduler\Factory\SchedulerTemplateFactory::class);
     $services->set('mautic.report.model.scheduler_date_builder', Mautic\ReportBundle\Scheduler\Date\DateBuilder::class);

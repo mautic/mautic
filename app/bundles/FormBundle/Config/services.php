@@ -39,9 +39,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->set(Mautic\FormBundle\Validator\Constraint\FileExtensionConstraintValidator::class)
         ->tag('validator.constraint_validator', ['alias' => 'file_extension_constraint_validator']);
 
-    $services->set(Mautic\FormBundle\Command\DeleteOrphanSubmissionRecordsFromFormResultsTableCommand::class)->tag('console.command');
-    $services->set(Mautic\FormBundle\Command\DeleteOrphanFormResultsTableCommand::class)->tag('console.command');
-
     $services->alias('mautic.form.model.action', Mautic\FormBundle\Model\ActionModel::class);
     $services->alias('mautic.form.model.field', Mautic\FormBundle\Model\FieldModel::class);
     $services->alias('mautic.form.model.form', Mautic\FormBundle\Model\FormModel::class);
