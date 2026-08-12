@@ -26,8 +26,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('Mautic\\CampaignBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
 
-    $services->set(Mautic\CampaignBundle\DataFixtures\ORM\CampaignData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
-
     $services->alias('mautic.campaign.model.campaign', Mautic\CampaignBundle\Model\CampaignModel::class);
     $services->alias('mautic.campaign.model.event', Mautic\CampaignBundle\Model\EventModel::class);
     $services->alias('mautic.campaign.model.event_log', Mautic\CampaignBundle\Model\EventLogModel::class);

@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace MauticPlugin\GrapesJsBuilderBundle\InstallFixtures\ORM;
 
+use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
-use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
 
-final class GrapesJsData extends AbstractFixture implements OrderedFixtureInterface, FixtureGroupInterface
+final class GrapesJsData extends Fixture implements OrderedFixtureInterface, FixtureGroupInterface
 {
     public function __construct(
         private readonly CoreParametersHelper $coreParametersHelper,

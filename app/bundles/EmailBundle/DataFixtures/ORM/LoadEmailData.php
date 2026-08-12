@@ -2,7 +2,7 @@
 
 namespace Mautic\EmailBundle\DataFixtures\ORM;
 
-use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\CoreBundle\Helper\CsvHelper;
@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 
-final class LoadEmailData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadEmailData extends Fixture implements OrderedFixtureInterface
 {
     public function __construct(
         private readonly EmailRepository $emailRepository,

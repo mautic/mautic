@@ -2,14 +2,14 @@
 
 namespace Mautic\LeadBundle\DataFixtures\ORM;
 
-use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 
-final class LoadCompanyData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadCompanyData extends Fixture implements OrderedFixtureInterface
 {
     public function __construct(
         private readonly CompanyRepository $companyRepository,
