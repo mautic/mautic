@@ -25,6 +25,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -54,10 +55,7 @@ class CommonRepository extends ServiceEntityRepository
      */
     protected $currentUser;
 
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
+    protected TranslatorInterface $translator;
 
     /**
      * This eliminates chance for parameter name collision.
@@ -966,8 +964,10 @@ class CommonRepository extends ServiceEntityRepository
         $this->currentUser = $user;
     }
 
-    public function setTranslator(TranslatorInterface $translator): void
-    {
+    #[Required]
+    public function autowireCommonRepository(
+        TranslatorInterface $translator,
+    ): void {
         $this->translator = $translator;
     }
 
@@ -1613,94 +1613,92 @@ class CommonRepository extends ServiceEntityRepository
         $justColumn  = ['isNull', 'isNotNull', 'isEmpty', 'isNotEmpty'];
         $andOr       = ['andX', 'orX'];
 
-        if ($clauses && is_array($clauses)) {
-            foreach ($clauses as $clause) {
-                if (!empty($clause['internal']) && 'formula' === $clause['expr']) {
-                    $whereClause = array_key_exists('value', $clause) ? $clause['value'] : $clause['val'];
+        foreach ($clauses as $clause) {
+            if (!empty($clause['internal']) && 'formula' === $clause['expr']) {
+                $whereClause = array_key_exists('value', $clause) ? $clause['value'] : $clause['val'];
+                if ($expr) {
+                    $expr->add($whereClause);
+                } else {
+                    $query->andWhere($whereClause);
+                }
+
+                continue;
+            }
+
+            if (in_array($clause['expr'], $andOr)) {
+                $composite = $query->expr()->{$clause['expr']}();
+                $this->buildWhereClauseFromArray($query, $clause['val'], $composite);
+
+                if (null === $expr) {
+                    $query->andWhere($composite);
+                } else {
+                    $expr->add($composite);
+                }
+            } else {
+                $clause = $this->validateWhereClause($clause);
+                $column = (!str_contains($clause['col'], '.')) ? $this->getTableAlias().'.'.$clause['col'] : $clause['col'];
+
+                $whereClause = null;
+                switch ($clause['expr']) {
+                    case 'between':
+                    case 'notBetween':
+                        if (is_array($clause['val']) && 2 === count($clause['val'])) {
+                            $not   = 'notBetween' === $clause['expr'] ? ' NOT' : '';
+                            $param = $this->generateRandomParameterName();
+                            $query->setParameter($param, $clause['val'][0]);
+                            $param2 = $this->generateRandomParameterName();
+                            $query->setParameter($param2, $clause['val'][1]);
+
+                            $whereClause = $column.$not.' BETWEEN :'.$param.' AND :'.$param2;
+                        }
+                        break;
+                    case 'isEmpty':
+                    case 'isNotEmpty':
+                        if ('isEmpty' === $clause['expr']) {
+                            $whereClause = $query->expr()->orX(
+                                $query->expr()->eq($column, $query->expr()->literal('')),
+                                $query->expr()->isNull($column)
+                            );
+                        } else {
+                            $whereClause = $query->expr()->andX(
+                                $query->expr()->neq($column, $query->expr()->literal('')),
+                                $query->expr()->isNotNull($column)
+                            );
+                        }
+                        break;
+                    case 'in':
+                    case 'notIn':
+                        $parsed = CsvHelper::strGetCsv(html_entity_decode($clause['val']), ',', '"');
+
+                        $param = $this->generateRandomParameterName();
+                        $arg   = count($parsed) > 1 ? $parsed : array_shift($parsed);
+
+                        if (is_array($arg)) {
+                            $whereClause = $query->expr()->{$clause['expr']}($column, ':'.$param);
+                            $query->setParameter($param, $arg, ArrayParameterType::STRING);
+                        } else {
+                            $expression  = 'in' === $clause['expr'] ? 'eq' : 'neq';
+                            $whereClause = $query->expr()->{$expression}($column, ':'.$param);
+                            $query->setParameter($param, $arg);
+                        }
+                        break;
+                    default:
+                        if (method_exists($query->expr(), $clause['expr'])) {
+                            if (in_array($clause['expr'], $columnValue)) {
+                                $param       = $this->generateRandomParameterName();
+                                $whereClause = $query->expr()->{$clause['expr']}($column, ':'.$param);
+                                $query->setParameter($param, $clause['val']);
+                            } elseif (in_array($clause['expr'], $justColumn)) {
+                                $whereClause = $query->expr()->{$clause['expr']}($column);
+                            }
+                        }
+                }
+
+                if ($whereClause) {
                     if ($expr) {
                         $expr->add($whereClause);
                     } else {
                         $query->andWhere($whereClause);
-                    }
-
-                    continue;
-                }
-
-                if (in_array($clause['expr'], $andOr)) {
-                    $composite = $query->expr()->{$clause['expr']}();
-                    $this->buildWhereClauseFromArray($query, $clause['val'], $composite);
-
-                    if (null === $expr) {
-                        $query->andWhere($composite);
-                    } else {
-                        $expr->add($composite);
-                    }
-                } else {
-                    $clause = $this->validateWhereClause($clause);
-                    $column = (!str_contains($clause['col'], '.')) ? $this->getTableAlias().'.'.$clause['col'] : $clause['col'];
-
-                    $whereClause = null;
-                    switch ($clause['expr']) {
-                        case 'between':
-                        case 'notBetween':
-                            if (is_array($clause['val']) && 2 === count($clause['val'])) {
-                                $not   = 'notBetween' === $clause['expr'] ? ' NOT' : '';
-                                $param = $this->generateRandomParameterName();
-                                $query->setParameter($param, $clause['val'][0]);
-                                $param2 = $this->generateRandomParameterName();
-                                $query->setParameter($param2, $clause['val'][1]);
-
-                                $whereClause = $column.$not.' BETWEEN :'.$param.' AND :'.$param2;
-                            }
-                            break;
-                        case 'isEmpty':
-                        case 'isNotEmpty':
-                            if ('isEmpty' === $clause['expr']) {
-                                $whereClause = $query->expr()->orX(
-                                    $query->expr()->eq($column, $query->expr()->literal('')),
-                                    $query->expr()->isNull($column)
-                                );
-                            } else {
-                                $whereClause = $query->expr()->andX(
-                                    $query->expr()->neq($column, $query->expr()->literal('')),
-                                    $query->expr()->isNotNull($column)
-                                );
-                            }
-                            break;
-                        case 'in':
-                        case 'notIn':
-                            $parsed = CsvHelper::strGetCsv(html_entity_decode($clause['val']), ',', '"');
-
-                            $param = $this->generateRandomParameterName();
-                            $arg   = count($parsed) > 1 ? $parsed : array_shift($parsed);
-
-                            if (is_array($arg)) {
-                                $whereClause = $query->expr()->{$clause['expr']}($column, ':'.$param);
-                                $query->setParameter($param, $arg, ArrayParameterType::STRING);
-                            } else {
-                                $expression  = 'in' === $clause['expr'] ? 'eq' : 'neq';
-                                $whereClause = $query->expr()->{$expression}($column, ':'.$param);
-                                $query->setParameter($param, $arg);
-                            }
-                            break;
-                        default:
-                            if (method_exists($query->expr(), $clause['expr'])) {
-                                if (in_array($clause['expr'], $columnValue)) {
-                                    $param       = $this->generateRandomParameterName();
-                                    $whereClause = $query->expr()->{$clause['expr']}($column, ':'.$param);
-                                    $query->setParameter($param, $clause['val']);
-                                } elseif (in_array($clause['expr'], $justColumn)) {
-                                    $whereClause = $query->expr()->{$clause['expr']}($column);
-                                }
-                            }
-                    }
-
-                    if ($whereClause) {
-                        if ($expr) {
-                            $expr->add($whereClause);
-                        } else {
-                            $query->andWhere($whereClause);
-                        }
                     }
                 }
             }
@@ -1765,8 +1763,8 @@ class CommonRepository extends ServiceEntityRepository
                 }
             } elseif ($this->translator->trans($c) == $command || $this->translator->trans($c, [], null, 'en_US') == $command) {
                 return true;
-            } elseif ($this->translator->trans($c) == "{$command}:{$subcommand}"
-                || $this->translator->trans($c, [], null, 'en_US') == "{$command}:{$subcommand}"
+            } elseif ($this->translator->trans($c) === "{$command}:{$subcommand}"
+                || $this->translator->trans($c, [], null, 'en_US') === "{$command}:{$subcommand}"
             ) {
                 $command    = "{$command}:{$subcommand}";
                 $subcommand = '';
@@ -1787,7 +1785,7 @@ class CommonRepository extends ServiceEntityRepository
         foreach ($parseFilters as $f) { /** @phpstan-ignore-line we are iterating over StdClass. We should refactor this into a collection of DTO objects in M6 */
             [$expr, $params] = $this->getSearchFilterExpression($qb, $f);
 
-            if (!empty($params)) {
+            if ([] !== $params) {
                 $parameters = array_merge($parameters, $params);
             }
 
@@ -1844,6 +1842,10 @@ class CommonRepository extends ServiceEntityRepository
     private function convertOrmPropertiesToColumns(array &$filters, array $properties): void
     {
         foreach ($filters as &$f) {
+            if ($this->convertGroupedOrmPropertiesToColumns($f, $properties)) {
+                continue;
+            }
+
             $key   = (isset($f['col'])) ? 'col' : 'column';
             $col   = $f[$key];
             $alias = '';
@@ -1858,6 +1860,26 @@ class CommonRepository extends ServiceEntityRepository
 
             $f[$key] = (!empty($alias)) ? $alias.'.'.$col : $col;
         }
+    }
+
+    /**
+     * @param array<string, mixed> $filter
+     * @param array<int, string>   $properties
+     */
+    private function convertGroupedOrmPropertiesToColumns(array &$filter, array $properties): bool
+    {
+        if (!isset($filter['group']) || !is_array($filter['group'])) {
+            return false;
+        }
+
+        foreach ($filter['group'] as &$groupFilters) {
+            if (is_array($groupFilters)) {
+                $this->convertOrmPropertiesToColumns($groupFilters, $properties);
+            }
+        }
+        unset($groupFilters);
+
+        return true;
     }
 
     /**

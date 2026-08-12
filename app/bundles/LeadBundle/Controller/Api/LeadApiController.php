@@ -29,6 +29,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\NoteModel;
 use Mautic\StageBundle\Model\StageModel;
+use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -116,6 +117,47 @@ final class LeadApiController extends CommonApiController
     protected function getTotalCountTtl(): ?int
     {
         return $this->coreParametersHelper->get('contact_api_count_cache_ttl', 5);
+    }
+
+    /**
+     * For contacts, "own" follows the permission user semantics:
+     * owner if set, otherwise the creator.
+     *
+     * @return array<int, array{
+     *     column?: string,
+     *     expr?: string,
+     *     value?: int|null,
+     *     group?: array<int, array<int, array{
+     *         column: string,
+     *         expr: string,
+     *         value?: int|null,
+     *     }>>,
+     * }>
+     */
+    protected function getOwnEntityListFilters(string $tableAlias, User $user): array
+    {
+        return [[
+            'group' => [
+                [
+                    [
+                        'column' => $tableAlias.'.owner_id',
+                        'expr'   => 'eq',
+                        'value'  => $user->getId(),
+                    ],
+                ],
+                [
+                    [
+                        'column' => $tableAlias.'.owner_id',
+                        'expr'   => 'isNull',
+                    ],
+                    [
+                        'column' => $tableAlias.'.created_by',
+                        'expr'   => 'eq',
+                        'value'  => $user->getId(),
+                    ],
+                ],
+            ],
+        ]];
     }
 
     /**
@@ -404,10 +446,8 @@ final class LeadApiController extends CommonApiController
 
     /**
      * Adds a DNC to the contact.
-     *
-     * @return Response
      */
-    public function addDncAction(Request $request, $id, $channel)
+    public function addDncAction(Request $request, $id, $channel): Response
     {
         $entity = $this->model->getEntity((int) $id);
 
@@ -476,10 +516,8 @@ final class LeadApiController extends CommonApiController
      * @param int              $id
      * @param string           $method
      * @param array<mixed>|int $data
-     *
-     * @return Response
      */
-    protected function applyUtmTagsAction($id, $method, $data)
+    protected function applyUtmTagsAction($id, $method, $data): Response
     {
         $entity = $this->model->getEntity((int) $id);
 

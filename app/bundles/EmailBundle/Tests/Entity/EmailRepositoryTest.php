@@ -33,7 +33,7 @@ final class EmailRepositoryTest extends TestCase
             'mautic.email.email.searchcommand.ispending' => 'is:pending',
             default                                      => $id,
         });
-        $this->repo->setTranslator($translator);
+        $this->repo->autowireCommonRepository($translator);
     }
 
     /**
