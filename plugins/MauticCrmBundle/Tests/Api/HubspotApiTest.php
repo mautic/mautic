@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MauticPlugin\MauticCrmBundle\Tests\Api;
 
 use Mautic\EmailBundle\Exception\InvalidEmailException;
+use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCrmBundle\Api\HubspotApi;
@@ -12,9 +13,19 @@ use MauticPlugin\MauticCrmBundle\Integration\HubspotIntegration;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class HubspotApiTest extends TestCase
 {
+    private function createEmailValidator(): EmailValidator
+    {
+        $dispatcher = $this->createStub(EventDispatcherInterface::class);
+        $dispatcher->method('dispatch')->willReturnArgument(0);
+
+        return new EmailValidator($this->createStub(TranslatorInterface::class), $dispatcher);
+    }
+
     #[TestDox('Test Hubspot api when the api-key is invalid')]
     public function testHubspotWhenKeyIsInvalid(): void
     {
@@ -49,7 +60,7 @@ final class HubspotApiTest extends TestCase
         $this->expectExceptionMessage($message);
         $this->expectExceptionCode($code);
 
-        $api = new HubspotApi($integration);
+        $api = new HubspotApi($integration, $this->createEmailValidator());
         $api->getLeadFields();
 
         self::fail('ApiErrorException not thrown');
@@ -81,7 +92,7 @@ final class HubspotApiTest extends TestCase
         $this->expectExceptionMessage($message);
         $this->expectExceptionCode(0);
 
-        $api = new HubspotApi($integration);
+        $api = new HubspotApi($integration, $this->createEmailValidator());
         $api->getLeadFields();
 
         self::fail('ApiErrorException not thrown');
@@ -95,7 +106,7 @@ final class HubspotApiTest extends TestCase
 
         $this->expectException(InvalidEmailException::class);
 
-        $api = new HubspotApi($integration);
+        $api = new HubspotApi($integration, $this->createEmailValidator());
         $api->createLead(['email' => $email], new Lead());
     }
 
@@ -107,7 +118,6 @@ final class HubspotApiTest extends TestCase
         yield ['john@doe'];
         yield ['jo hn@doe.email'];
         yield ['jo^hn@doe.email'];
-        yield ["jo'hn@doe.email"];
         yield ['jo;hn@doe.email'];
         yield ['jo&hn@doe.email'];
         yield ['jo*hn@doe.email'];
@@ -122,7 +132,7 @@ final class HubspotApiTest extends TestCase
             ->method('formatLeadDataForCreateOrUpdate')
             ->willReturn([]);
 
-        $api = new HubspotApi($integration);
+        $api = new HubspotApi($integration, $this->createEmailValidator());
 
         $this->assertSame([], $api->createLead(['email' => $email], new Lead()));
     }
@@ -136,6 +146,7 @@ final class HubspotApiTest extends TestCase
         yield ['john@doe.email'];
         yield ['john.doe@email.com'];
         yield ['john+doe@email.com'];
+        yield ["jo'hn@doe.email"];
         yield ['john@doe.whatevertldtheycomewithinthefuture'];
     }
 }
