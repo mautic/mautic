@@ -31,36 +31,16 @@ final class ServicePass implements CompilerPassInterface
             if (!empty($bundle['config']['services'])) {
                 $config = $bundle['config']['services'];
                 foreach ($config as $type => $services) {
-                    switch ($type) {
-                        case 'events':
-                            $defaultTag = 'kernel.event_subscriber';
-                            break;
-                        case 'forms':
-                            $defaultTag = 'form.type';
-                            break;
-                        case 'helpers':
-                            $defaultTag = 'twig.helper';
-                            break;
-                        case 'menus':
-                            $defaultTag = 'knp_menu.menu';
-                            break;
-                        case 'models':
-                            $defaultTag = 'mautic.model';
-                            @trigger_error('Setting "models" in config is deprecated. Convert to using autowiring.', E_USER_DEPRECATED);
-                            break;
-                        case 'permissions':
-                            $defaultTag = 'mautic.permissions';
-                            break;
-                        case 'integrations':
-                            $defaultTag = 'mautic.integration';
-                            break;
-                        case 'controllers':
-                            $defaultTag = 'controller.service_arguments';
-                            break;
-                        default:
-                            $defaultTag = false;
-                            break;
-                    }
+                    $defaultTag = match ($type) {
+                        'events' => 'kernel.event_subscriber',
+                        'forms' => 'form.type',
+                        'helpers' => 'twig.helper',
+                        'menus' => 'knp_menu.menu',
+                        'permissions' => 'mautic.permissions',
+                        'integrations' => 'mautic.integration',
+                        'controllers' => 'controller.service_arguments',
+                        default => false,
+                    };
 
                     foreach ($services as $name => $details) {
                         if (isset($serviceNames[$name])) {
