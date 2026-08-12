@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\PageBundle\Tests\Functional\PointAction;
 
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Helper\PointActionHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Reproduces https://github.com/mautic/mautic/issues/12336.
@@ -64,16 +66,9 @@ final class VisitUrlWithTimeSpentBugTest extends MauticMysqlTestCase
             ],
         ];
 
-        $factory = new class($this->em) {
-            public function __construct(private \Doctrine\ORM\EntityManager $em)
-            {
-            }
-
-            public function getEntityManager()
-            {
-                return $this->em;
-            }
-        };
+        /** @var MauticFactory&MockObject $factory */
+        $factory = $this->createMock(MauticFactory::class);
+        $factory->method('getEntityManager')->willReturn($this->em);
 
         // Evaluate using the REVISIT hit — should return TRUE (accumulative time met)
         $eventDetails = $revisitHit;
