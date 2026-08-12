@@ -35,9 +35,7 @@ final class Version20220208032455 extends PreUpAssertionMigration
             $fields       = $formField['fields'];
             $deleteFields = array_diff($columns, $fields);
 
-            $dropColumns   = array_map(function (string $column) {
-                return sprintf('DROP COLUMN %s', $column);
-            }, $deleteFields);
+            $dropColumns   = array_map(fn (string $column) => sprintf('DROP COLUMN %s', $column), $deleteFields);
 
             if ($dropColumns) {
                 $this->addSql(sprintf('ALTER TABLE %s %s', $tableName, implode(', ', $dropColumns)));

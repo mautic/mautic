@@ -11,19 +11,13 @@ final class Version20240226114528 extends PreUpAssertionMigration
 {
     protected function preUpAssertions(): void
     {
-        $this->skipAssertion(function (Schema $schema) {
-            return $schema->hasTable($this->getTableName());
-        }, sprintf('Table %s already exists', $this->getTableName()));
+        $this->skipAssertion(fn (Schema $schema) => $schema->hasTable($this->getTableName()), sprintf('Table %s already exists', $this->getTableName()));
 
-        $this->skipAssertion(function (Schema $schema) {
-            return $schema->getTable($this->getTableName())
-                ->hasForeignKey($this->getForeignKeyName('email_id'));
-        }, sprintf('Foreign key %s already exists', $this->getForeignKeyName('email_id')));
+        $this->skipAssertion(fn (Schema $schema) => $schema->getTable($this->getTableName())
+                ->hasForeignKey($this->getForeignKeyName('email_id')), sprintf('Foreign key %s already exists', $this->getForeignKeyName('email_id')));
 
-        $this->skipAssertion(function (Schema $schema) {
-            return $schema->getTable($this->getTableName())
-                ->hasForeignKey($this->getForeignKeyName('leadlist_id'));
-        }, sprintf('Foreign key %s already exists', $this->getForeignKeyName('leadlist_id')));
+        $this->skipAssertion(fn (Schema $schema) => $schema->getTable($this->getTableName())
+                ->hasForeignKey($this->getForeignKeyName('leadlist_id')), sprintf('Foreign key %s already exists', $this->getForeignKeyName('leadlist_id')));
     }
 
     public function up(Schema $schema): void

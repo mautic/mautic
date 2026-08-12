@@ -11,9 +11,7 @@ final class Version20210819201726 extends PreUpAssertionMigration
 {
     public function preUpAssertions(): void
     {
-        $this->skipAssertion(function (Schema $schema) {
-            return $schema->getTable("{$this->prefix}permissions")->hasColumn('uuid');
-        }, sprintf('Column %s already exists', 'uuid'));
+        $this->skipAssertion(fn (Schema $schema) => $schema->getTable("{$this->prefix}permissions")->hasColumn('uuid'), sprintf('Column %s already exists', 'uuid'));
     }
 
     public function up(Schema $schema): void

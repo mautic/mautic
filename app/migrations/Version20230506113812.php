@@ -11,9 +11,7 @@ final class Version20230506113812 extends PreUpAssertionMigration
 {
     public function preUpAssertions(): void
     {
-        $this->skipAssertion(function (Schema $schema) {
-            return $schema->getTable($this->getTableName())->hasIndex($this->getIndexName());
-        }, sprintf('The index "%s" has already been added to the table "%s".', $this->getIndexName(), $this->getTableName()));
+        $this->skipAssertion(fn (Schema $schema) => $schema->getTable($this->getTableName())->hasIndex($this->getIndexName()), sprintf('The index "%s" has already been added to the table "%s".', $this->getIndexName(), $this->getTableName()));
     }
 
     public function up(Schema $schema): void

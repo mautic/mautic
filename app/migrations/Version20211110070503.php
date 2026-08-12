@@ -12,9 +12,7 @@ final class Version20211110070503 extends PreUpAssertionMigration
 {
     public function preUpAssertions(): void
     {
-        $this->skipAssertion(function (Schema $schema) {
-            return $schema->getTable("{$this->prefix}campaigns")->getColumn('allow_restart')->getType() instanceof BooleanType;
-        }, 'Column already in BOOLEAN type');
+        $this->skipAssertion(fn (Schema $schema) => $schema->getTable("{$this->prefix}campaigns")->getColumn('allow_restart')->getType() instanceof BooleanType, 'Column already in BOOLEAN type');
     }
 
     public function up(Schema $schema): void
