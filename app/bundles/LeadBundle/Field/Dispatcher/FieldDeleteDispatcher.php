@@ -8,8 +8,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Event\LeadFieldEvent;
 use Mautic\LeadBundle\Exception\NoListenerException;
-use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
-use Mautic\LeadBundle\Field\Settings\BackgroundSettings;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -18,23 +16,7 @@ class FieldDeleteDispatcher
     public function __construct(
         private readonly EventDispatcherInterface $dispatcher,
         private readonly EntityManagerInterface $entityManager,
-        private readonly BackgroundSettings $backgroundSettings,
     ) {
-    }
-
-    /**
-     * @deprecated Use regular call of `$this->dispatchEvent(LeadEvents::FIELD_PRE_DELETE, $entity)` instead
-     *
-     * @throws NoListenerException
-     * @throws AbortColumnUpdateException
-     */
-    public function dispatchPreDeleteEvent(LeadField $entity): LeadFieldEvent
-    {
-        if ($this->backgroundSettings->shouldProcessColumnChangeInBackground()) {
-            throw new AbortColumnUpdateException('Column change will be processed in background job');
-        }
-
-        return $this->dispatchEvent(LeadEvents::FIELD_PRE_DELETE, $entity);
     }
 
     /**
