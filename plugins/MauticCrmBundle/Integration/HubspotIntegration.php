@@ -4,6 +4,7 @@ namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\StagesChangeLog;
@@ -26,16 +27,25 @@ class HubspotIntegration extends CrmAbstractIntegration
 
     protected UserHelper $userHelper;
 
+    private EmailValidator $emailValidator;
+
     #[Required]
     public function autowireHubspotIntegration(
         StageRepository $stageRepository,
         UserHelper $userHelper,
+        EmailValidator $emailValidator,
     ): void {
         $this->stageRepository = $stageRepository;
         $this->userHelper = $userHelper;
+        $this->emailValidator = $emailValidator;
     }
 
     public const ACCESS_KEY = 'accessKey';
+
+    public function getEmailValidator(): EmailValidator
+    {
+        return $this->emailValidator;
+    }
 
     public function getName(): string
     {

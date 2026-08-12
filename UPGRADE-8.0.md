@@ -65,3 +65,11 @@
 - `Mautic\LeadBundle\Entity\LeadListRepository` no longer uses `OperatorListTrait`, so `getFilterExpressionFunctions()`, `getOperatorsForFieldType()` and `getOperatorChoiceList()` are no longer available on the repository. Use `Mautic\LeadBundle\Provider\TypeOperatorProvider` instead. The trait itself is unchanged.
 - Deprecated method `Mautic\CampaignBundle\Entity\CampaignRepository::getCampaignLeadCount()` removed with no replacement. It had no callers left.
 - Deprecated constant `Mautic\CoreBundle\Command\ModeratedCommand::MODE_LOCK` (`file_lock`) removed, together with the branch that silently rewrote that mode to `flock`. `--lock_mode=file_lock` now fails with `Unknown locking method specified.` — use `--lock_mode=flock`. The `pid`, `flock` and `redis` modes are unchanged.
+- Deprecated static method `Mautic\EmailBundle\Helper\MailHelper::validateEmail()` removed. Use the `Mautic\EmailBundle\Helper\EmailValidator` service instead:
+
+```diff
+-MailHelper::validateEmail($email);
++$this->emailValidator->validate($email);
+```
+
+  Mind two behaviour differences: `EmailValidator` accepts an apostrophe in the local part (the removed static rejected it), and it dispatches `EmailEvents::ON_EMAIL_VALIDATION`, so validation plugins now run. The HubSpot integration, the only caller in core, was converted accordingly.
