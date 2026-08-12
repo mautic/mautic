@@ -496,7 +496,8 @@ New line',
     private function getFormRepostAction(): Action
     {
         $onSubmitActionConfig = [
-            'post_url'             => 'https://example.com',
+            // Use an unreachable local address to avoid real HTTP calls in unit tests.
+            'post_url'             => 'http://127.0.0.1:1',
             'failure_email'        => '',
             'authorization_header' => '',
         ];
