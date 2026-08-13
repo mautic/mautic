@@ -106,7 +106,6 @@
 - Deprecated method `Mautic\LeadBundle\Model\FieldModel::getFieldList()` removed. Use `Mautic\LeadBundle\Field\FieldList::getFieldList()` instead — the removed method only proxied to it. `FieldModel` no longer takes `FieldList` as a constructor argument, and the classes that used the proxy take `FieldList` instead of (or next to) `FieldModel`: `Mautic\LeadBundle\Deduplicate\ContactDeduper`, `Mautic\LeadBundle\Deduplicate\CompanyDeduper` (both via `DeduperTrait`, whose `$fieldModel` property is now `$fieldList`), `Mautic\LeadBundle\Form\Type\LeadFieldsType`, `Mautic\LeadBundle\Services\ContactColumnsDictionary`, `Mautic\LeadBundle\Model\LeadModel` and `Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper`.
 - Deprecated constructor argument `$operators` removed from `Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent`; the event now starts with an empty operator list. Subscribe to `LeadEvents::LIST_FILTERS_OPERATORS_ON_GENERATE` and call `addOperator()` instead of passing operators in.
 - Deprecated template parameter `public` removed from the legacy Mautic 1 page rendering in `Mautic\PageBundle\Controller\PublicController`. Themes still reading `{{ public }}` in `page.html.twig` must drop it.
-<<<<<<< HEAD
 - Deprecated public method `getFilterExpressionFunctions()` removed from `Mautic\LeadBundle\Entity\OperatorListTrait` (and its override in `Mautic\LeadBundle\Provider\TypeOperatorProvider`). The trait now resolves its operator list through a protected `getFilterOperators()` seam, so behavior is unchanged: `TypeOperatorProvider` still returns the event-driven `FilterOperatorProvider::getAllOperators()` set, while other consumers keep the static `OperatorOptions` set. Code that called `getFilterExpressionFunctions()` on a trait consumer must use `Mautic\LeadBundle\Provider\TypeOperatorProvider` (e.g. `getOperatorsForFieldType()`) or `Mautic\LeadBundle\Segment\OperatorOptions::getFilterExpressionFunctions()` directly.
 - Deprecated method `Mautic\EmailBundle\Helper\MailHelper::validateEmail()` removed. Use `Mautic\EmailBundle\Helper\EmailValidator` instead. Its only caller, `MauticPlugin\MauticCrmBundle\Api\HubspotApi::createLead()`, now validates the address itself, as the API helpers are not built through the container and cannot be given the validator service.
 - Deprecated parameters `$shortenUrl` and `$utmTags` removed from `Mautic\PageBundle\Model\RedirectModel::generateRedirectUrl()`, which now takes the redirect and the clickthrough only. Call the public `shortenUrl()` and `applyUtmTags()` methods on the returned URL instead:
@@ -119,14 +118,6 @@
 
 - Deprecated support for `:`-prefixed parameter keys removed from `Mautic\LeadBundle\Segment\Query\QueryBuilder::setParameter()`. Pass the key without the colon — `setParameter('foo', $bar)`, not `setParameter(':foo', $bar)`. The `:foo` placeholder in the query string itself is unchanged.
 - Deprecated `models` key in bundle `Config/config.php` `services` removed. Services listed under it are no longer registered with the `mautic.model` tag; register models by their class name and let autowiring resolve them.
-=======
 - Deprecated method `Mautic\FormBundle\Entity\Form::setFormType()` removed with no replacement. Form types are no longer used; the `form_type` column and its getter are unchanged.
-<<<<<<< HEAD
->>>>>>> fce9013757 ([removal] remove deprecated Form::setFormType())
-=======
 - Deprecated method `Mautic\FormBundle\Entity\Form::isStandalone()` removed with no replacement. All forms can now be used in campaigns, so the standalone/campaign distinction no longer exists.
-<<<<<<< HEAD
->>>>>>> 0e257adbfa ([removal] remove deprecated Form::isStandalone())
-=======
 - Deprecated class `Mautic\CampaignBundle\Event\CampaignScheduledEvent` removed. Its only subclass `Mautic\CampaignBundle\Event\ScheduledEvent` absorbed all of its properties and getters, so the dispatched event keeps the same public API. Code type-hinting or `instanceof`-checking `CampaignScheduledEvent` must target `ScheduledEvent` instead.
->>>>>>> 0e2f01c4fc ([removal] merge deprecated CampaignScheduledEvent into ScheduledEvent)
