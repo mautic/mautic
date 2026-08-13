@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Event;
 
+use Mautic\CampaignBundle\Entity\Event as CampaignEvent;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -11,34 +12,33 @@ use Symfony\Contracts\EventDispatcher\Event;
 final class ScheduledEvent extends Event
 {
     use ContextTrait;
-    use EventArrayTrait;
+
+    /**
+     * @var array<int|string, array<string, mixed>>
+     */
+    private array $eventArray = [];
 
     /**
      * @var \Mautic\LeadBundle\Entity\Lead
      */
-    protected $lead;
+    private $lead;
 
     /**
-     * @var array
+     * @var CampaignEvent|null
      */
-    protected $event;
+    private $event;
 
-    /**
-     * @var array|null
-     */
-    protected $eventDetails;
-
-    protected bool $systemTriggered;
+    private bool $systemTriggered = true;
 
     /**
      * @var \DateTimeInterface
      */
-    protected $dateScheduled;
+    private $dateScheduled;
 
     /**
      * @var array
      */
-    protected $eventSettings;
+    private $eventSettings;
 
     /**
      * @param bool $isReschedule
@@ -49,10 +49,8 @@ final class ScheduledEvent extends Event
         private $isReschedule = false,
     ) {
         $this->eventSettings   = $eventConfig->getConfig();
-        $this->eventDetails    = null;
         $this->event           = $eventLog->getEvent();
         $this->lead            = $eventLog->getLead();
-        $this->systemTriggered = true;
         $this->dateScheduled   = $eventLog->getTriggerDate();
     }
 
@@ -87,7 +85,7 @@ final class ScheduledEvent extends Event
      */
     public function getEvent()
     {
-        return ($this->event instanceof \Mautic\CampaignBundle\Entity\Event) ? $this->getEventArray($this->event) : $this->event;
+        return ($this->event instanceof CampaignEvent) ? $this->getEventArray($this->event) : $this->event;
     }
 
     /**
@@ -98,18 +96,12 @@ final class ScheduledEvent extends Event
         return $this->getEvent()['properties'];
     }
 
-    /**
-     * @return array|null
-     */
-    public function getEventDetails()
+    public function getEventDetails(): null
     {
-        return $this->eventDetails;
+        return null;
     }
 
-    /**
-     * @return bool
-     */
-    public function getSystemTriggered()
+    public function getSystemTriggered(): bool
     {
         return $this->systemTriggered;
     }
@@ -128,5 +120,50 @@ final class ScheduledEvent extends Event
     public function getEventSettings()
     {
         return $this->eventSettings;
+    }
+
+    /**
+     * Used to convert entities to the old array format; tried to minimize the need for this except where needed.
+     *
+     * @return array<string, mixed>
+     */
+    private function getEventArray(CampaignEvent $event): array
+    {
+        $eventId = $event->getId() ?? '';
+        if (isset($this->eventArray[$eventId])) {
+            return $this->eventArray[$eventId];
+        }
+
+        $eventArray = $event->convertToArray();
+        $campaign   = $event->getCampaign();
+
+        $eventArray['campaign'] = [
+            'id'        => $campaign->getId(),
+            'name'      => $campaign->getName(),
+            'createdBy' => $campaign->getCreatedBy(),
+        ];
+
+        $eventArray['parent'] = null;
+        if ($parent = $event->getParent()) {
+            $eventArray['parent']             = $parent->convertToArray();
+            $eventArray['parent']['campaign'] = $eventArray['campaign'];
+        }
+
+        $eventArray['children'] = [];
+        if ($children = $event->getChildren()) {
+            /** @var CampaignEvent $child */
+            foreach ($children as $child) {
+                $childArray             = $child->convertToArray();
+                $childArray['parent']   =&$eventArray;
+                $childArray['campaign'] =&$eventArray['campaign'];
+                unset($childArray['children']);
+
+                $eventArray['children'] = $childArray;
+            }
+        }
+
+        $this->eventArray[$eventId] = $eventArray;
+
+        return $this->eventArray[$eventId];
     }
 }
