@@ -35,8 +35,9 @@ final class FilterTraitTest extends TypeTestCase
 
     public function testLeadlistFilterWithIncludingAllOperatorDoesNotCrashOnSubmit(): void
     {
-        $form = $this->factory->create(FilterTraitLeadlistStubFormType::class, null, [
-            'lists' => ['Segment A' => '1', 'Segment B' => '2'],
+        $form = $this->factory->create(FilterTraitStubFormType::class, null, [
+            'lists'  => ['Segment A' => '1', 'Segment B' => '2'],
+            'fields' => [],
         ]);
 
         $form->submit([
@@ -53,7 +54,8 @@ final class FilterTraitTest extends TypeTestCase
 
     public function testMultiselectFilterWithExcludingAllOperatorDoesNotCrashOnSubmit(): void
     {
-        $form = $this->factory->create(FilterTraitMultiselectStubFormType::class, null, [
+        $form = $this->factory->create(FilterTraitStubFormType::class, null, [
+            'lists'  => [],
             'fields' => [
                 'lead' => [
                     'custom_multiselect' => [
@@ -79,15 +81,31 @@ final class FilterTraitTest extends TypeTestCase
 }
 
 /**
+ * Minimal stand-in for the real FilterTrait consumers (e.g. DwcEntryFiltersType, FilterType):
+ * wires FilterTrait::buildFiltersForm() up to PRE_SET_DATA/PRE_SUBMIT exactly as they do, without
+ * needing their heavier constructor dependencies. The field type under test ('leadlist' vs
+ * 'multiselect') is driven entirely by the submitted data, not by this stub, so a single stub
+ * type covers both scenarios.
+ *
  * @extends AbstractType<mixed>
  */
-final class FilterTraitLeadlistStubFormType extends AbstractType
+final class FilterTraitStubFormType extends AbstractType
 {
     use FilterTrait;
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $translator = self::createStubTranslator();
+        $translator = new class() implements TranslatorInterface {
+            public function trans(?string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string
+            {
+                return $id ?? '';
+            }
+
+            public function getLocale(): string
+            {
+                return 'en';
+            }
+        };
 
         $formModifier = function (FormEvent $event, string $eventName) use ($translator): void {
             $this->buildFiltersForm($eventName, $event, $translator);
@@ -111,71 +129,5 @@ final class FilterTraitLeadlistStubFormType extends AbstractType
             'lists'  => [],
             'fields' => [],
         ]);
-    }
-
-    private static function createStubTranslator(): TranslatorInterface
-    {
-        return new class() implements TranslatorInterface {
-            public function trans(?string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string
-            {
-                return $id ?? '';
-            }
-
-            public function getLocale(): string
-            {
-                return 'en';
-            }
-        };
-    }
-}
-
-/**
- * @extends AbstractType<mixed>
- */
-final class FilterTraitMultiselectStubFormType extends AbstractType
-{
-    use FilterTrait;
-
-    public function buildForm(FormBuilderInterface $builder, array $options): void
-    {
-        $translator = self::createStubTranslator();
-
-        $formModifier = function (FormEvent $event, string $eventName) use ($translator): void {
-            $this->buildFiltersForm($eventName, $event, $translator);
-        };
-
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($formModifier): void {
-            $formModifier($event, FormEvents::PRE_SET_DATA);
-        });
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) use ($formModifier): void {
-            $formModifier($event, FormEvents::PRE_SUBMIT);
-        });
-
-        $builder->add('field', HiddenType::class);
-        $builder->add('object', HiddenType::class);
-        $builder->add('type', HiddenType::class);
-    }
-
-    public function configureOptions(OptionsResolver $resolver): void
-    {
-        $resolver->setDefaults([
-            'lists'  => [],
-            'fields' => [],
-        ]);
-    }
-
-    private static function createStubTranslator(): TranslatorInterface
-    {
-        return new class() implements TranslatorInterface {
-            public function trans(?string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string
-            {
-                return $id ?? '';
-            }
-
-            public function getLocale(): string
-            {
-                return 'en';
-            }
-        };
     }
 }
