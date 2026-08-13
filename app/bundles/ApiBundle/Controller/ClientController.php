@@ -2,9 +2,7 @@
 
 namespace Mautic\ApiBundle\Controller;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Helper\ClientSearchScopeProvider;
-
 use Mautic\ApiBundle\Model\ClientModel;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
