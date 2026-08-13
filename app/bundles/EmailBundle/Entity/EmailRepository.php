@@ -833,7 +833,7 @@ class EmailRepository extends CommonRepository
     private function getPublishedBroadcastsQuery(?int $id = null): Query
     {
         $qb   = $this->createQueryBuilder($this->getTableAlias());
-        $expr = $this->getPublishedByDateExpression($qb, null, true, true, false);
+        $expr = $this->getPublishedByDateOrmExpression($qb, null, true, true, false);
 
         $expr->add(
             $qb->expr()->eq($this->getTableAlias().'.emailType', $qb->expr()->literal('list'))
@@ -947,7 +947,7 @@ class EmailRepository extends CommonRepository
     public function getPublishedEmailsWithVariant(): array
     {
         $qb   = $this->getEntityManager()->createQueryBuilder();
-        $expr = $this->getPublishedByDateExpression($qb, $this->getTableAlias());
+        $expr = $this->getPublishedByDateOrmExpression($qb, $this->getTableAlias());
 
         $qb->select($this->getTableAlias())
             ->from(Email::class, $this->getTableAlias())
