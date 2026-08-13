@@ -9,12 +9,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 final class ReportPermissions extends AbstractPermissions
 {
-    /**
-     * @param mixed[] $params
-     */
-    public function __construct(array $params)
+    public function __construct()
     {
-        parent::__construct($params);
         $this->addExtendedPermissions('reports');
         $this->addCustomPermission('export', ['enable' => 1024]);
     }

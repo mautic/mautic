@@ -26,4 +26,5 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.page.model.redirect', Mautic\PageBundle\Model\RedirectModel::class);
     $services->alias('mautic.page.model.trackable', Mautic\PageBundle\Model\TrackableModel::class);
     $services->alias('mautic.page.model.video', Mautic\PageBundle\Model\VideoModel::class);
+    $services->set(Mautic\PageBundle\Security\Permissions\PagePermissions::class);
 };

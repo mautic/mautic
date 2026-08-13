@@ -20,4 +20,5 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\CategoryBundle\\Entity\\', '../Entity/*Repository.php');
     $services->alias('mautic.category.model.category', Mautic\CategoryBundle\Model\CategoryModel::class);
+    $services->set(Mautic\CategoryBundle\Security\Permissions\CategoryPermissions::class);
 };

@@ -17,13 +17,8 @@ final class StagePermissions extends AbstractPermissions
 
     public const string PERMISSION_PUBLISH = 'stage:stages:publish';
 
-    /**
-     * @param mixed[] $params
-     */
-    public function __construct(array $params)
+    public function __construct()
     {
-        parent::__construct($params);
-
         $this->addStandardPermissions('stages');
         $this->addStandardPermissions('categories');
     }

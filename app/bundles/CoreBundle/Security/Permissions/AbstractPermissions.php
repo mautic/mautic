@@ -2,8 +2,10 @@
 
 namespace Mautic\CoreBundle\Security\Permissions;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\UserBundle\Form\Type\PermissionListType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 abstract class AbstractPermissions
 {
@@ -12,18 +14,21 @@ abstract class AbstractPermissions
      */
     protected $permissions = [];
 
+    /**
+     * @param mixed[] $params
+     *
+     * @deprecated since Mautic 8.0, the parameters are injected by setCoreParametersHelper(); to be removed in Mautic 9.0
+     */
     public function __construct(
-        protected array $params,
+        protected array $params = [],
     ) {
     }
 
-    /**
-     * This method is called before the permissions object is used.
-     * Define permissions with `addExtendedPermissions` here instead of constructor.
-     */
-    public function definePermissions(): void
-    {
-        // Override this method in the final class
+    #[Required]
+    public function autowireAbstractPermissions(
+        CoreParametersHelper $coreParametersHelper,
+    ): void {
+        $this->params = $coreParametersHelper->all();
     }
 
     /**

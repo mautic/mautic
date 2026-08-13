@@ -8,13 +8,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 final class EmailPermissions extends AbstractPermissions
 {
-    /**
-     * @param mixed[] $params
-     */
-    public function __construct(array $params)
+    public function __construct()
     {
-        parent::__construct($params);
-
         $this->addStandardPermissions('categories');
         $this->addExtendedPermissions('emails');
         $this->permissions['emails']['sendtodnc'] = 1;

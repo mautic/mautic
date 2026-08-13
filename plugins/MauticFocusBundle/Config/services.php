@@ -22,4 +22,5 @@ return function (ContainerConfigurator $configurator): void {
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
 
     $services->alias('mautic.focus.model.focus', MauticPlugin\MauticFocusBundle\Model\FocusModel::class);
+    $services->set(MauticPlugin\MauticFocusBundle\Security\Permissions\FocusPermissions::class);
 };

@@ -44,10 +44,10 @@ final class CorePermissionsTest extends \PHPUnit\Framework\TestCase
 
     public function testSettingPermissionObject(): void
     {
-        $this->coreParametersHelper->expects($this->exactly(4))->method('all')
+        $this->coreParametersHelper->expects($this->exactly(6))->method('all')
             ->willReturn(['parameter_a' => 'value_a']);
 
-        $assetPermissions = new AssetPermissions($this->coreParametersHelper);
+        $assetPermissions = new AssetPermissions();
         $this->corePermissions->setPermissionObject($assetPermissions);
         $permissionObjects = $this->corePermissions->getPermissionObjects();
 

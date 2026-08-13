@@ -35,4 +35,5 @@ return function (ContainerConfigurator $configurator): void {
         ->call('setIntegrationHelper', [service('mautic.helper.integration')]);
     $services->set(CampaignSubscriber::class)
         ->call('setIntegrationHelper', [service('mautic.helper.integration')]);
+    $services->set(Mautic\PluginBundle\Security\Permissions\PluginPermissions::class);
 };
