@@ -27,7 +27,6 @@ use Mautic\LeadBundle\Field\Dispatcher\FieldSaveDispatcher;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
 use Mautic\LeadBundle\Field\Exception\CustomFieldLimitException;
-use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Field\LeadFieldDeleter;
 use Mautic\LeadBundle\Field\LeadFieldSaver;
 use Mautic\LeadBundle\Form\Type\FieldType;
@@ -482,7 +481,6 @@ class FieldModel extends FormModel
         private readonly CustomFieldColumn $customFieldColumn,
         private readonly FieldSaveDispatcher $fieldSaveDispatcher,
         private readonly LeadFieldRepository $leadFieldRepository,
-        private readonly FieldList $fieldList,
         private readonly LeadFieldSaver $leadFieldSaver,
         private readonly LeadFieldDeleter $leadFieldDeleter,
         EntityManagerInterface $em,
@@ -882,16 +880,6 @@ class FieldModel extends FormModel
         } catch (NoListenerException) {
             return $event;
         }
-    }
-
-    /**
-     * @deprecated Use FieldList::getFieldList method instead
-     *
-     * @return mixed[]
-     */
-    public function getFieldList(bool $byGroup = true, bool $alphabetical = true, array $filters = ['isPublished' => true, 'object' => 'lead']): array
-    {
-        return $this->fieldList->getFieldList($byGroup, $alphabetical, $filters);
     }
 
     /**

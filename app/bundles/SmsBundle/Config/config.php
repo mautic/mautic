@@ -23,14 +23,6 @@ return [
                 'path'       => '/sms/{transport}/callback',
                 'controller' => 'Mautic\SmsBundle\Controller\ReplyController::callbackAction',
             ],
-            /* @deprecated as this was Twilio specific */
-            'mautic_receive_sms' => [
-                'path'       => '/sms/receive',
-                'controller' => 'Mautic\SmsBundle\Controller\ReplyController::callbackAction',
-                'defaults'   => [
-                    'transport' => 'twilio',
-                ],
-            ],
         ],
         'api' => [
             'mautic_api_smsesstandard' => [

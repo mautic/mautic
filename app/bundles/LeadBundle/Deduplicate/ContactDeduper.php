@@ -7,20 +7,20 @@ namespace Mautic\LeadBundle\Deduplicate;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
-use Mautic\LeadBundle\Model\FieldModel;
 
 final class ContactDeduper
 {
     use DeduperTrait;
 
     public function __construct(
-        FieldModel $fieldModel,
+        FieldList $fieldList,
         FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
         private ContactMerger $contactMerger,
         private LeadRepository $leadRepository,
     ) {
-        $this->fieldModel                 = $fieldModel;
+        $this->fieldList                  = $fieldList;
         $this->fieldsWithUniqueIdentifier = $fieldsWithUniqueIdentifier;
     }
 
