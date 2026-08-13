@@ -6,8 +6,10 @@ namespace Mautic\CampaignBundle\Tests\Functional\Campaign;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('non-parallel')]
 final class DetailsTest extends MauticMysqlTestCase
 {
     public function testDetailsPageLoadCorrectly(): void

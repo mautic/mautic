@@ -12,7 +12,9 @@ use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('non-parallel')]
 final class EventSchedulerExtendTriggerDateFunctionalTest extends MauticMysqlTestCase
 {
     private function createPublishAuditLog(Campaign $campaign, \DateTime $dateAdded, bool $isPublished): void

@@ -6,9 +6,11 @@ namespace Mautic\ReportBundle\Tests\Functional;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\ReportBundle\Entity\Report;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('non-parallel')]
 abstract class AbstractReportSubscriberTestCase extends MauticMysqlTestCase
 {
     protected $useCleanupRollback   = false;

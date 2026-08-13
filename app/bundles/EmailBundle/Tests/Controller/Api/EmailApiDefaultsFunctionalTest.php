@@ -9,6 +9,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -16,6 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
  * Functional tests proving that persisted email defaults from config are applied
  * when creating emails via the API (EMAIL_PRE_SAVE subscriber).
  */
+#[Group('non-parallel')]
 final class EmailApiDefaultsFunctionalTest extends MauticMysqlTestCase
 {
     /**
