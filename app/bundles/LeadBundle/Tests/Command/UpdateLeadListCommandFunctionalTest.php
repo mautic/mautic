@@ -356,7 +356,99 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
 
         $this->assertNotInstanceOf(\DateTimeInterface::class, $baseSegment->getLastBuiltDate());
         $this->assertTrue($baseSegment->needsRebuild());
-        $this->assertEquals($longTimeAgo, $dependentSegment->getLastBuiltDate());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $dependentSegment->getLastBuiltDate());
+        $this->assertTrue($dependentSegment->needsRebuild());
+    }
+
+    public function testMaxContactsDependentSegmentNotMarkedCompleteWhenSingleRunLeavesBasePartial(): void
+    {
+        foreach (['one@example.com', 'two@example.com', 'three@example.com'] as $email) {
+            $contact = new Lead();
+            $contact->setEmail($email);
+            $this->em->persist($contact);
+        }
+
+        $baseSegment = new LeadList();
+        $baseSegment->setName('Base segment with pending contacts');
+        $baseSegment->setPublicName('Base segment with pending contacts');
+        $baseSegment->setAlias('base-segment-pending-'.uniqid());
+        $baseSegment->setFilters([
+            [
+                'glue'     => 'and',
+                'field'    => 'email',
+                'object'   => 'lead',
+                'type'     => 'email',
+                'filter'   => 'example.com',
+                'display'  => null,
+                'operator' => 'like',
+            ],
+        ]);
+
+        $this->em->persist($baseSegment);
+        $this->em->flush();
+        $baseSegmentId = $baseSegment->getId();
+
+        $dependentSegment = new LeadList();
+        $dependentSegment->setName('Dependent segment with pending base');
+        $dependentSegment->setPublicName('Dependent segment with pending base');
+        $dependentSegment->setAlias('dependent-segment-pending-'.uniqid());
+        $dependentSegment->setFilters([
+            [
+                'glue'     => 'and',
+                'field'    => 'leadlist',
+                'object'   => 'lead',
+                'type'     => 'leadlist',
+                'filter'   => [$baseSegmentId],
+                'display'  => null,
+                'operator' => 'in',
+            ],
+        ]);
+
+        $this->em->persist($dependentSegment);
+        $this->em->flush();
+        $dependentSegmentId = $dependentSegment->getId();
+        $this->em->clear();
+
+        // Full build first: both segments become complete.
+        $output = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, [
+            '--list-id' => $dependentSegmentId,
+        ]);
+        $this->assertSame(Command::SUCCESS, $output->getStatusCode());
+
+        $this->em->clear();
+        /** @var LeadList $baseSegment */
+        $baseSegment = $this->em->find(LeadList::class, $baseSegmentId);
+        /** @var LeadList $dependentSegment */
+        $dependentSegment = $this->em->find(LeadList::class, $dependentSegmentId);
+        $this->assertFalse($baseSegment->needsRebuild(), 'Base segment should be complete after a full build');
+        $this->assertFalse($dependentSegment->needsRebuild(), 'Dependent segment should be complete after a full build');
+
+        // New matching contacts leave the previously complete base with pending work.
+        foreach (['four@example.com', 'five@example.com'] as $email) {
+            $contact = new Lead();
+            $contact->setEmail($email);
+            $this->em->persist($contact);
+        }
+        $this->em->flush();
+        $this->em->clear();
+
+        // One capped run on the dependent segment: the base is rebuilt first but
+        // stays incomplete, so the dependent must not be marked complete either.
+        $output = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, [
+            '--list-id'      => $dependentSegmentId,
+            '--max-contacts' => 1,
+        ]);
+        $this->assertSame(Command::SUCCESS, $output->getStatusCode());
+
+        $this->em->clear();
+        /** @var LeadList $baseSegment */
+        $baseSegment = $this->em->find(LeadList::class, $baseSegmentId);
+        /** @var LeadList $dependentSegment */
+        $dependentSegment = $this->em->find(LeadList::class, $dependentSegmentId);
+
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $baseSegment->getLastBuiltDate());
+        $this->assertTrue($baseSegment->needsRebuild());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $dependentSegment->getLastBuiltDate());
         $this->assertTrue($dependentSegment->needsRebuild());
     }
 

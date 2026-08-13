@@ -253,9 +253,7 @@ final class UpdateLeadListsCommand extends ModeratedCommand
         // (including runs capped by --max-contacts that still drain the queue).
         if ($segment->getLastBuiltDate() !== $lastBuiltDateBefore) {
             if (!$this->areSegmentFilterDependenciesComplete($segment)) {
-                $segment->setLastBuiltDate(
-                    null === $lastBuiltDateBefore ? null : \DateTime::createFromInterface($lastBuiltDateBefore)
-                );
+                $segment->setLastBuiltDate(null);
             } else {
                 $segment->setLastBuiltTime($rebuildTime);
             }
