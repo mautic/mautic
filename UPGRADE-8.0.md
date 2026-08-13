@@ -106,3 +106,13 @@
 - Deprecated method `Mautic\LeadBundle\Model\FieldModel::getFieldList()` removed. Use `Mautic\LeadBundle\Field\FieldList::getFieldList()` instead — the removed method only proxied to it. `FieldModel` no longer takes `FieldList` as a constructor argument, and the classes that used the proxy take `FieldList` instead of (or next to) `FieldModel`: `Mautic\LeadBundle\Deduplicate\ContactDeduper`, `Mautic\LeadBundle\Deduplicate\CompanyDeduper` (both via `DeduperTrait`, whose `$fieldModel` property is now `$fieldList`), `Mautic\LeadBundle\Form\Type\LeadFieldsType`, `Mautic\LeadBundle\Services\ContactColumnsDictionary`, `Mautic\LeadBundle\Model\LeadModel` and `Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper`.
 - Deprecated constructor argument `$operators` removed from `Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent`; the event now starts with an empty operator list. Subscribe to `LeadEvents::LIST_FILTERS_OPERATORS_ON_GENERATE` and call `addOperator()` instead of passing operators in.
 - Deprecated template parameter `public` removed from the legacy Mautic 1 page rendering in `Mautic\PageBundle\Controller\PublicController`. Themes still reading `{{ public }}` in `page.html.twig` must drop it.
+- Deprecated parameters `$shortenUrl` and `$utmTags` removed from `Mautic\PageBundle\Model\RedirectModel::generateRedirectUrl()`, which now takes the redirect and the clickthrough only. Call the public `shortenUrl()` and `applyUtmTags()` methods on the returned URL instead:
+
+```diff
+-$url = $redirectModel->generateRedirectUrl($redirect, $clickthrough, true, $utmTags);
++$url = $redirectModel->applyUtmTags($redirectModel->generateRedirectUrl($redirect, $clickthrough), $utmTags);
++$url = $redirectModel->shortenUrl($url);
+```
+
+- Deprecated support for `:`-prefixed parameter keys removed from `Mautic\LeadBundle\Segment\Query\QueryBuilder::setParameter()`. Pass the key without the colon — `setParameter('foo', $bar)`, not `setParameter(':foo', $bar)`. The `:foo` placeholder in the query string itself is unchanged.
+- Deprecated `models` key in bundle `Config/config.php` `services` removed. Services listed under it are no longer registered with the `mautic.model` tag; register models by their class name and let autowiring resolve them.

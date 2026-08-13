@@ -46,27 +46,13 @@ class RedirectModel extends FormModel
      * Generate a Mautic redirect/passthrough URL.
      *
      * @param array $clickthrough
-     * @param bool  $shortenUrl
-     * @param array $utmTags
      *
      * @return string
      */
     public function generateRedirectUrl(
         Redirect $redirect,
         $clickthrough = [],
-        $shortenUrl = false,
-        $utmTags = [],
     ) {
-        if (func_num_args() > 2) {
-            $deprecation = '$shortenUrl is deprecated. Please use \Mautic\PageBundle\Model\RedirectModel::shortenUrl.';
-            trigger_error($deprecation, E_USER_DEPRECATED);
-        }
-
-        if (func_num_args() > 3) {
-            $deprecation = '$utmTags is deprecated. Please use \Mautic\PageBundle\Model\RedirectModel::applyUtmTags.';
-            trigger_error($deprecation, E_USER_DEPRECATED);
-        }
-
         if ($this->dispatcher->hasListeners(PageEvents::ON_REDIRECT_GENERATE)) {
             $event = new RedirectGenerationEvent($redirect, $clickthrough);
             $this->dispatcher->dispatch($event, PageEvents::ON_REDIRECT_GENERATE);
@@ -74,22 +60,12 @@ class RedirectModel extends FormModel
             $clickthrough = $event->getClickthrough();
         }
 
-        $url = $this->buildUrl(
+        return $this->buildUrl(
             'mautic_url_redirect',
             ['redirectId' => $redirect->getRedirectId()],
             true,
             $clickthrough
         );
-
-        if ([] !== $utmTags) {
-            $url = $this->applyUtmTags($url, $utmTags);
-        }
-
-        if ($shortenUrl) {
-            return $this->shortenUrl($url);
-        }
-
-        return $url;
     }
 
     /**
