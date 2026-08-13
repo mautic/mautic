@@ -1612,8 +1612,23 @@ Mautic.submitSearchScopeChange = function (scopeSelect, searchInput, searchId) {
     const inputValue = Mautic.normalizeSearchScopeInputValue(scopeSelect, searchInput.val());
     const scopedValue = Mautic.composeScopedSearchValue(command, inputValue);
 
-    // Value-requiring scope without a term yet — wait for the user to type.
+    // Value-requiring scope without a term yet — wait for the user to type,
+    // but still clear an active complete-command filter (e.g. is:unpublished).
     if (command && !Mautic.isSearchScopeCompleteCommand(command) && !inputValue) {
+        if ((MauticVars.lastSearchStr || '').trim() !== scopedValue) {
+            MauticVars.lastSearchStr = scopedValue;
+
+            const scopeChangeEvent = mQuery.Event('keyup', {which: 13});
+            scopeChangeEvent.data = {livesearch: true, scopeChange: true};
+            Mautic.filterList(
+                scopeChangeEvent,
+                searchId,
+                searchInput.attr('data-action'),
+                searchInput.attr('data-target'),
+                'liveCache'
+            );
+        }
+
         searchInput.trigger('focus');
 
         return;
