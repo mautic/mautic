@@ -595,6 +595,8 @@ class ListModel extends FormModel implements GlobalSearchInterface
 
         if ($knownComplete || $this->isSegmentRebuildComplete($leadList, $batchLimiters)) {
             $leadList->setLastBuiltDateToCurrentDatetime();
+        } elseif (null !== $leadList->getLastBuiltDate()) {
+            $leadList->setLastBuiltDate(null);
         }
 
         return $leadsProcessed;
