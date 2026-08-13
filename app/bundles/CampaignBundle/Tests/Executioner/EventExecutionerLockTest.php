@@ -8,7 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
-use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\Executioner\EventExecutioner;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Traits\LoggerTrait;
@@ -124,17 +124,17 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
 
     private function makeEventExecutionFail(): callable
     {
-        $listener = function (CampaignExecutionEvent $event): void { // @phpstan-ignore parameter.deprecatedClass
-            $event->setResult(false);
+        $listener = function (PendingEvent $event): void {
+            $event->failAll('Forced failure for test.');
             $event->stopPropagation();
         };
-        $this->eventDispatcher->addListener(LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION, $listener, 9999); // @phpstan-ignore classConstant.deprecated
+        $this->eventDispatcher->addListener(LeadEvents::ON_CAMPAIGN_BATCH_ACTION, $listener, 9999);
 
         return $listener;
     }
 
     private function makeEventExecutionPass(callable $listener): void
     {
-        $this->eventDispatcher->removeListener(LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION, $listener); // @phpstan-ignore classConstant.deprecated
+        $this->eventDispatcher->removeListener(LeadEvents::ON_CAMPAIGN_BATCH_ACTION, $listener);
     }
 }

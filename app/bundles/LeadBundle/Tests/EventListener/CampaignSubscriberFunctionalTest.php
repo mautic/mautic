@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -11,6 +12,8 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CampaignBundle\Event\PendingEvent;
+use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Lead;
@@ -1044,18 +1047,12 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $lead = new Lead();
         $log  = new LeadEventLog();
         $log->setEvent($campaignEvent);
+        $log->setLead($lead);
 
-        $args = [
-            'lead'            => $lead,
-            'event'           => $campaignEvent,
-            'eventDetails'    => null,
-            'systemTriggered' => false,
-            'eventSettings'   => [],
-        ];
-
-        $event           = new CampaignExecutionEvent($args, false, $log);
+        $eventAccessor   = new ActionAccessor([]);
+        $event           = new PendingEvent($eventAccessor, $campaignEvent, new ArrayCollection([$log]));
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
-        $eventDispatcher->dispatch($event, 'mautic.lead.on_campaign_trigger_action');
+        $eventDispatcher->dispatch($event, LeadEvents::ON_CAMPAIGN_BATCH_ACTION);
 
         $leadManipulator = $lead->getManipulator();
         $this->assertInstanceOf(LeadManipulator::class, $leadManipulator);
