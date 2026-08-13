@@ -10,8 +10,10 @@ use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Page;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('non-parallel')]
 final class PublicControllerPreferenceCenterFallbackFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
