@@ -827,16 +827,6 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @deprecated since Mautic 7.1, will be removed in 8.0. All forms can now be used in campaigns.
-     */
-    public function isStandalone(): bool
-    {
-        trigger_deprecation('mautic/mautic', '7.1', 'Form::isStandalone() is deprecated and will be removed in 8.0.');
-
-        return 'campaign' != $this->formType;
-    }
-
-    /**
      * Generate a form name for HTML attributes.
      *
      * @param string[] $allowedCharacters

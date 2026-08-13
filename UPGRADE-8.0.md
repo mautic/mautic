@@ -121,4 +121,8 @@
 - Deprecated `models` key in bundle `Config/config.php` `services` removed. Services listed under it are no longer registered with the `mautic.model` tag; register models by their class name and let autowiring resolve them.
 =======
 - Deprecated method `Mautic\FormBundle\Entity\Form::setFormType()` removed with no replacement. Form types are no longer used; the `form_type` column and its getter are unchanged.
+<<<<<<< HEAD
 >>>>>>> fce9013757 ([removal] remove deprecated Form::setFormType())
+=======
+- Deprecated method `Mautic\FormBundle\Entity\Form::isStandalone()` removed with no replacement. All forms can now be used in campaigns, so the standalone/campaign distinction no longer exists.
+>>>>>>> 0e257adbfa ([removal] remove deprecated Form::isStandalone())
