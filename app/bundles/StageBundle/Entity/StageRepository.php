@@ -54,7 +54,7 @@ class StageRepository extends CommonRepository
             ->setParameter('type', $type);
 
         // make sure the published up and down dates are good
-        $expr = $this->getPublishedByDateExpression($q);
+        $expr = $this->getPublishedByDateOrmExpression($q);
 
         $q->where($expr);
 
