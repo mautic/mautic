@@ -126,17 +126,11 @@ trait OperatorListTrait
     ];
 
     /**
-     * @deprecated to be removed in Mautic 3. Use FilterOperatorProvider::getAllOperators() instead.
-     *
-     * @param string|null $operator
-     *
-     * @return array<string,array<string,string>>|array<string,string>
+     * @return array<string,array<string,string>>
      */
-    public function getFilterExpressionFunctions($operator = null)
+    protected function getFilterOperators(): array
     {
-        $operatorOption = OperatorOptions::getFilterExpressionFunctions();
-
-        return (null === $operator) ? $operatorOption : $operatorOption[$operator];
+        return OperatorOptions::getFilterExpressionFunctions();
     }
 
     /**
@@ -183,7 +177,7 @@ trait OperatorListTrait
     {
         static $operatorChoices = [];
         if (empty($operatorChoices)) {
-            $operatorList    = $this->getFilterExpressionFunctions();
+            $operatorList    = $this->getFilterOperators();
             $operatorChoices = [];
             foreach ($operatorList as $operator => $def) {
                 if (empty($def['hide']) || in_array($operator, $overrideHiddenOperators)) {

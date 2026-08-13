@@ -108,16 +108,10 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
     }
 
     /**
-     * Overwriting deprecated method from OperatorListTrait.
-     *
-     * @param string $operator
-     *
      * @return array<string,mixed[]>
      */
-    public function getFilterExpressionFunctions($operator = null)
+    protected function getFilterOperators(): array
     {
-        $operatorOptions = $this->filterOperatorProvider->getAllOperators();
-
-        return (null === $operator) ? $operatorOptions : $operatorOptions[$operator];
+        return $this->filterOperatorProvider->getAllOperators();
     }
 }

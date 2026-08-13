@@ -21,7 +21,7 @@ final class LeadListFiltersOperatorsEvent extends CommonEvent
 
     /**
      * Add a new operator for list filters
-     * Please refer to OperatorListTrait.php, inside getFilterExpressionFunctions method, for examples of operators.
+     * Please refer to OperatorOptions::getFilterExpressionFunctions() for examples of operators.
      *
      * @see OperatorListTrait
      *
