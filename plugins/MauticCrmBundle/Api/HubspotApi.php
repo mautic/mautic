@@ -2,8 +2,9 @@
 
 namespace MauticPlugin\MauticCrmBundle\Api;
 
-use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\PluginBundle\Exception\ApiErrorException;
+use MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration;
 use MauticPlugin\MauticCrmBundle\Integration\HubspotIntegration;
 
 /**
@@ -14,6 +15,13 @@ final class HubspotApi extends CrmApi
     private array $requestSettings = [
         'encode_parameters' => 'json',
     ];
+
+    public function __construct(
+        CrmAbstractIntegration $integration,
+        private readonly EmailValidator $emailValidator,
+    ) {
+        parent::__construct($integration);
+    }
 
     private function request($operation, $parameters = [], $method = 'GET', $object = 'contacts')
     {
@@ -78,7 +86,7 @@ final class HubspotApi extends CrmApi
         $email  = $data['email'];
         $result = [];
         // Check if the is a valid email
-        MailHelper::validateEmail($email);
+        $this->emailValidator->validate($email);
         // Format data for request
         $formattedLeadData = $this->integration->formatLeadDataForCreateOrUpdate($data, $lead, $updateLink);
         if ($formattedLeadData) {

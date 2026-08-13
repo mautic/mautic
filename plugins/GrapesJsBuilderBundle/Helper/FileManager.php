@@ -93,51 +93,6 @@ final readonly class FileManager
     }
 
     /**
-     * @deprecated since Mautic 5.2, to be removed in 6.0. Use FileManager::getMediaFiles instead
-     */
-    public function getImages(): array
-    {
-        $files      = [];
-        $uploadDir  = $this->getUploadDir();
-
-        $fileSystem = new Filesystem();
-
-        if (!$fileSystem->exists($uploadDir)) {
-            try {
-                $fileSystem->mkdir($uploadDir);
-            } catch (IOException) {
-                return $files;
-            }
-        }
-
-        $finder = new Finder();
-        $finder->files()->in($uploadDir);
-
-        foreach ($finder as $file) {
-            // exclude certain folders from grapesjs file manager
-            if (in_array($file->getRelativePath(), $this->coreParametersHelper->get('image_path_exclude'))) {
-                continue;
-            }
-
-            $filePath = $this->getCompleteFilePath($file->getRelativePathname());
-            if ($size = @getimagesize($filePath)) {
-                $files[] = [
-                    'src'    => $this->getFullUrl($file->getRelativePathname()),
-                    'width'  => $size[0],
-                    'type'   => 'image',
-                    'height' => $size[1],
-                ];
-            } elseif ('svg' === strtolower($file->getExtension())) {
-                $files[] = $this->getSvgFileInfo($filePath, $file->getRelativePathname());
-            } else {
-                $files[] = $this->getFullUrl($file->getRelativePathname());
-            }
-        }
-
-        return $files;
-    }
-
-    /**
      * @return array<string, mixed>
      */
     public function getMediaFiles(int $page, int $limit): array

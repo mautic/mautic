@@ -39,12 +39,6 @@ class QueryBuilder extends BaseQueryBuilder
 
     public function setParameter($key, $value, $type = null)
     {
-        if (str_starts_with($key, ':')) {
-            // For consistency sake, remove the :
-            $key = substr($key, 1);
-            @\trigger_error('Using query key with ":" is deprecated. Use key without ":" instead.', \E_USER_DEPRECATED);
-        }
-
         if (is_bool($value)) {
             $value = (int) $value;
         }

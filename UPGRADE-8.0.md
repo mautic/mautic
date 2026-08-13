@@ -91,6 +91,7 @@
 - Deprecated method `Mautic\CampaignBundle\Entity\CampaignRepository::getCampaignLeadCount()` removed with no replacement. It had no callers left.
 - Deprecated constant `Mautic\CoreBundle\Command\ModeratedCommand::MODE_LOCK` (`file_lock`) removed, together with the branch that silently rewrote that mode to `flock`. `--lock_mode=file_lock` now fails with `Unknown locking method specified.` — use `--lock_mode=flock`. The `pid`, `flock` and `redis` modes are unchanged.
 - Deprecated method `Mautic\CoreBundle\Controller\CommonController::accessDenied()` removed. Use `throwAccessDenied()` (throws `AccessDeniedHttpException`) or `getAccessDeniedFlash()` instead. Note the removed method always threw as well — its `array` return value was unreachable — so `Mautic\LeadBundle\Controller\NoteController::newAction()` and `::editAction()` lost `array` from their return types.
+- Deprecated GrapesJS asset endpoint removed: route `grapesjsbuilder_assets` (`/grapesjsbuilder/assets`), `MauticPlugin\GrapesJsBuilderBundle\Controller\FileManagerController::assetsAction()` and `MauticPlugin\GrapesJsBuilderBundle\Helper\FileManager::getImages()`. Use `grapesjsbuilder_media` (`/grapesjsbuilder/media`), `getMediaAction()` and `getMediaFiles()` instead — the builder JS has been requesting the paginated media endpoint since 5.2. With it, the `data-assets` attribute of the `#grapesjsbuilder_assets` element and the `dataAssets` template parameter are gone.
 - Deprecated parameters `$removeEmpty` and `$deprecatedIgnoreNumerical` removed from `Mautic\CoreBundle\Helper\AbstractFormFieldHelper::parseList()`, which now takes the list only. `$removeEmpty` was never read; pass the list to `parseBooleanList()` directly in place of `$deprecatedIgnoreNumerical = true`:
 
 ```diff
@@ -106,3 +107,14 @@
 - Deprecated constructor argument `$operators` removed from `Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent`; the event now starts with an empty operator list. Subscribe to `LeadEvents::LIST_FILTERS_OPERATORS_ON_GENERATE` and call `addOperator()` instead of passing operators in.
 - Deprecated template parameter `public` removed from the legacy Mautic 1 page rendering in `Mautic\PageBundle\Controller\PublicController`. Themes still reading `{{ public }}` in `page.html.twig` must drop it.
 - Deprecated public method `getFilterExpressionFunctions()` removed from `Mautic\LeadBundle\Entity\OperatorListTrait` (and its override in `Mautic\LeadBundle\Provider\TypeOperatorProvider`). The trait now resolves its operator list through a protected `getFilterOperators()` seam, so behavior is unchanged: `TypeOperatorProvider` still returns the event-driven `FilterOperatorProvider::getAllOperators()` set, while other consumers keep the static `OperatorOptions` set. Code that called `getFilterExpressionFunctions()` on a trait consumer must use `Mautic\LeadBundle\Provider\TypeOperatorProvider` (e.g. `getOperatorsForFieldType()`) or `Mautic\LeadBundle\Segment\OperatorOptions::getFilterExpressionFunctions()` directly.
+- Deprecated method `Mautic\EmailBundle\Helper\MailHelper::validateEmail()` removed. Use `Mautic\EmailBundle\Helper\EmailValidator` instead. Its only caller, `MauticPlugin\MauticCrmBundle\Api\HubspotApi::createLead()`, now validates the address itself, as the API helpers are not built through the container and cannot be given the validator service.
+- Deprecated parameters `$shortenUrl` and `$utmTags` removed from `Mautic\PageBundle\Model\RedirectModel::generateRedirectUrl()`, which now takes the redirect and the clickthrough only. Call the public `shortenUrl()` and `applyUtmTags()` methods on the returned URL instead:
+
+```diff
+-$url = $redirectModel->generateRedirectUrl($redirect, $clickthrough, true, $utmTags);
++$url = $redirectModel->applyUtmTags($redirectModel->generateRedirectUrl($redirect, $clickthrough), $utmTags);
++$url = $redirectModel->shortenUrl($url);
+```
+
+- Deprecated support for `:`-prefixed parameter keys removed from `Mautic\LeadBundle\Segment\Query\QueryBuilder::setParameter()`. Pass the key without the colon — `setParameter('foo', $bar)`, not `setParameter(':foo', $bar)`. The `:foo` placeholder in the query string itself is unchanged.
+- Deprecated `models` key in bundle `Config/config.php` `services` removed. Services listed under it are no longer registered with the `mautic.model` tag; register models by their class name and let autowiring resolve them.
