@@ -180,7 +180,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
 
         /** @var LeadList $segment */
         $segment = $this->em->find(LeadList::class, $segmentId);
-        $this->assertNull($segment->getLastBuiltDate());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $segment->getLastBuiltDate());
         $this->assertTrue($segment->needsRebuild());
 
         /** @var LeadListRepository $leadListRepository */
@@ -267,7 +267,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
         /** @var LeadList $segment */
         $segment = $this->em->find(LeadList::class, $segmentId);
-        $this->assertNull($segment->getLastBuiltDate());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $segment->getLastBuiltDate());
         $this->assertTrue($segment->needsRebuild());
         $this->assertSame(2, $leadListRepository->getLeadCount([$segmentId]));
         $this->assertSame(2, $segmentCountCacheHelper->getSegmentContactCount($segmentId));
@@ -354,7 +354,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         /** @var LeadList $dependentSegment */
         $dependentSegment = $this->em->find(LeadList::class, $dependentSegmentId);
 
-        $this->assertNull($baseSegment->getLastBuiltDate());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $baseSegment->getLastBuiltDate());
         $this->assertTrue($baseSegment->needsRebuild());
         $this->assertEquals($longTimeAgo, $dependentSegment->getLastBuiltDate());
         $this->assertTrue($dependentSegment->needsRebuild());
@@ -430,7 +430,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $leadListRepository = $this->em->getRepository(LeadList::class);
 
         $this->assertSame(4, $leadListRepository->getLeadCount([$segmentId]));
-        $this->assertNull($segment->getLastBuiltDate());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $segment->getLastBuiltDate());
         $this->assertTrue(
             $segment->needsRebuild(),
             'Segment should keep showing as building while capped runs still have contacts to process'
@@ -525,7 +525,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $leadListRepository = $this->em->getRepository(LeadList::class);
 
         $this->assertSame(4, $leadListRepository->getLeadCount([$baseSegmentId]));
-        $this->assertNull($baseSegment->getLastBuiltDate());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $baseSegment->getLastBuiltDate());
         $this->assertTrue(
             $baseSegment->needsRebuild(),
             'Base segment should appear incomplete to dependent segment guards after a partial capped rebuild'
@@ -541,7 +541,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         /** @var LeadList $dependentSegment */
         $dependentSegment = $this->em->find(LeadList::class, $dependentSegmentId);
 
-        $this->assertNull($dependentSegment->getLastBuiltDate());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $dependentSegment->getLastBuiltDate());
         $this->assertTrue(
             $dependentSegment->needsRebuild(),
             'Dependent segment should keep showing as building while capped rebuild work remains'
