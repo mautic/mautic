@@ -53,7 +53,6 @@ final class PublicController extends AbstractFormController
         CookieHelper $cookieHelper,
         AnalyticsHelper $analyticsHelper,
         AssetsHelper $assetsHelper,
-        ThemeHelper $themeHelper,
         Tracking404Model $tracking404Model,
         RouterInterface $router,
         DeviceTrackingServiceInterface $deviceTrackingService,
@@ -245,40 +244,13 @@ final class PublicController extends AbstractFormController
             // Generate contents
             $analytics = $analyticsHelper->getCode();
 
-            $BCcontent = $entity->getContent();
-            $content   = $entity->getCustomHtml();
-            // This condition remains so the Mautic v1 themes would display the content
-            if (empty($content) && !empty($BCcontent)) {
-                /**
-                 * @deprecated  BC support to be removed in 3.0
-                 */
-                $template = $entity->getTemplate();
-                // all the checks pass so display the content
-                $content = $entity->getContent();
+            $content = $entity->getCustomHtml();
 
-                // Add the GA code to the template assets
-                if (!empty($analytics)) {
-                    $assetsHelper->addCustomDeclaration($analytics);
-                }
-
-                $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
-
-                $content = $themeHelper->renderThemeTemplate(
-                    $logicalName,
-                    [
-                        'content'  => $content,
-                        'page'     => $entity,
-                        'template' => $template,
-                        'public'   => true,
-                    ]
-                );
-            } else {
-                if (!empty($analytics)) {
-                    $content = str_replace('</head>', $analytics."\n</head>", $content);
-                }
-                if ($entity->getNoIndex()) {
-                    $content = str_replace('</head>', "<meta name=\"robots\" content=\"noindex\">\n</head>", $content);
-                }
+            if (!empty($analytics)) {
+                $content = str_replace('</head>', $analytics."\n</head>", $content);
+            }
+            if ($entity->getNoIndex()) {
+                $content = str_replace('</head>', "<meta name=\"robots\" content=\"noindex\">\n</head>", $content);
             }
 
             $assetsHelper->addScript(
