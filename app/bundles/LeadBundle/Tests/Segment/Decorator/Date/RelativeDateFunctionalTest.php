@@ -17,7 +17,9 @@ use Mautic\LeadBundle\Segment\ContactSegmentService;
 use Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadSegmentsData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('non-parallel')]
 final class RelativeDateFunctionalTest extends MauticMysqlTestCase
 {
     private ReferenceRepository $fixtures;

@@ -14,6 +14,7 @@ use Mautic\ReportBundle\Entity\Report;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
+#[\PHPUnit\Framework\Attributes\Group('non-parallel')]
 final class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
