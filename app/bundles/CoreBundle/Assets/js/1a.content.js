@@ -1346,6 +1346,7 @@ Mautic.applySearchScopeState = function (searchEl, searchString) {
 
     if (!scopeSelect.length) {
         setSearchInputValue(initialSearch);
+        Mautic.updateLiveSearchButton(searchId, initialSearch);
 
         return;
     }
@@ -1376,6 +1377,7 @@ Mautic.applySearchScopeState = function (searchEl, searchString) {
     const visibleValue = parsed.command ? parsed.value : initialSearch;
     setSearchInputValue(visibleValue);
     Mautic.refreshSearchScopeChosen(scopeSelect);
+    Mautic.updateLiveSearchButton(searchId, initialSearch);
 };
 
 /**
@@ -1605,6 +1607,59 @@ Mautic.parseScopedSearchValue = function (searchValue, scopeCommands) {
 };
 
 /**
+ * Compose the effective list-search string from scope dropdown + visible input.
+ */
+Mautic.getLiveSearchFilterValue = function (elId) {
+    const el = mQuery('#' + elId);
+    if (!el.length) {
+        return '';
+    }
+
+    const scopeSelect = mQuery("select[data-livesearch-scope-for='" + elId + "']");
+    let value = el.val().trim();
+
+    if (!scopeSelect.length) {
+        return value;
+    }
+
+    if (!Mautic.filterCommands || Mautic.filterCommands.length === 0) {
+        Mautic.initFilterCommands();
+    }
+
+    const filterCommands = Mautic.getActiveFilterCommands(value);
+    let scopedInputValue = Mautic.removeFilterCommands(value);
+    scopedInputValue = Mautic.normalizeSearchScopeInputValue(scopeSelect, scopedInputValue);
+    value = Mautic.composeScopedSearchValue(scopeSelect.val(), scopedInputValue);
+
+    if (filterCommands.length) {
+        value = (value + ' ' + filterCommands.join(' ')).trim();
+    }
+
+    return value;
+};
+
+/**
+ * Toggle the livesearch button between search and clear (eraser) icons.
+ */
+Mautic.updateLiveSearchButton = function (elId, filterValue) {
+    const btn = mQuery("button[data-livesearch-parent='" + elId + "']");
+    if (!btn.length) {
+        return;
+    }
+
+    filterValue = (filterValue || '').trim();
+    const icon = btn.children('i').first();
+
+    if (filterValue) {
+        btn.attr('data-livesearch-action', 'clear');
+        icon.removeClass('ri-search-line').addClass('ri-eraser-line');
+    } else {
+        btn.attr('data-livesearch-action', 'search');
+        icon.removeClass('ri-eraser-line').addClass('ri-search-line');
+    }
+};
+
+/**
  * Apply the selected search scope immediately (used by the scope dropdown).
  */
 Mautic.submitSearchScopeChange = function (scopeSelect, searchInput, searchId) {
@@ -1627,6 +1682,7 @@ Mautic.submitSearchScopeChange = function (scopeSelect, searchInput, searchId) {
                 searchInput.attr('data-target'),
                 'liveCache'
             );
+            Mautic.updateLiveSearchButton(searchId, scopedValue);
         }
 
         searchInput.trigger('focus');
@@ -1649,6 +1705,7 @@ Mautic.submitSearchScopeChange = function (scopeSelect, searchInput, searchId) {
         searchInput.attr('data-target'),
         'liveCache'
     );
+    Mautic.updateLiveSearchButton(searchId, scopedValue);
 };
 
 /**
@@ -1899,13 +1956,7 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
             );
         });
 
-        if (mQuery(el).val()) {
-            mQuery(btn).attr('data-livesearch-action', 'clear');
-            mQuery(btn + ' i').removeClass('ri-search-line').addClass('ri-eraser-line');
-        } else {
-            mQuery(btn).attr('data-livesearch-action', 'search');
-            mQuery(btn + ' i').removeClass('ri-eraser-line').addClass('ri-search-line');
-        }
+        Mautic.updateLiveSearchButton(mQuery(el).attr('id'), Mautic.getLiveSearchFilterValue(mQuery(el).attr('id')));
     }
 
     if (Mautic.isGlobalSearchInput(el)) {
@@ -2464,6 +2515,10 @@ Mautic.resetFilters = function () {
         if (typeof mQuery !== 'undefined') {
             Mautic.refreshSearchScopeChosen(scopeSelect);
         }
+    }
+
+    if (typeof mQuery !== 'undefined') {
+        Mautic.updateLiveSearchButton('list-search', '');
     }
 
     const activeFilters = document.querySelectorAll('.label.active');

@@ -244,15 +244,7 @@ Mautic.filterList = function (e, elId, route, target, liveCacheVar, action, over
                     response.overlayTarget = overlayTarget;
 
                     //update the buttons class and action
-                    if (mQuery(btn).length) {
-                        if (action == 'clear') {
-                            mQuery(btn).attr('data-livesearch-action', 'search');
-                            mQuery(btn).children('i').first().removeClass('ri-eraser-line').addClass('ri-search-line');
-                        } else {
-                            mQuery(btn).attr('data-livesearch-action', 'clear');
-                            mQuery(btn).children('i').first().removeClass('ri-search-line').addClass('ri-eraser-line');
-                        }
-                    }
+                    Mautic.updateLiveSearchButton(elId, value);
 
                     if (inModal) {
                         Mautic.processModalContent(response);
@@ -266,15 +258,7 @@ Mautic.filterList = function (e, elId, route, target, liveCacheVar, action, over
                     Mautic.processAjaxError(request, textStatus, errorThrown);
 
                     //update the buttons class and action
-                    if (mQuery(btn).length) {
-                        if (action == 'clear') {
-                            mQuery(btn).attr('data-livesearch-action', 'search');
-                            mQuery(btn).children('i').first().removeClass('ri-eraser-line').addClass('ri-search-line');
-                        } else {
-                            mQuery(btn).attr('data-livesearch-action', 'clear');
-                            mQuery(btn).children('i').first().removeClass('ri-search-line').addClass('ri-eraser-line');
-                        }
-                    }
+                    Mautic.updateLiveSearchButton(elId, value);
                 },
                 complete: function() {
                     delete Mautic.liveSearchXhr;

@@ -17,19 +17,21 @@
     {% set parsedScope = {'command': '', 'value': searchValue} %}
     {% set displaySearchValue = searchValue %}
 {% endif %}
+{% set hasActiveSearch = searchValue|default('')|trim is not empty %}
 
 {% include '@MauticCore/Helper/button.html.twig' with {
     buttons: [
         {
             label: 'mautic.core.search.clear',
             variant: 'ghost',
-            icon: 'ri-search-line ri-fw',
+            icon: hasActiveSearch ? 'ri-eraser-line ri-fw' : 'ri-search-line ri-fw',
             icon_only: true,
             size: 'lg',
             attributes: {
                 'type': 'button',
                 'id': 'btn-filter',
                 'data-livesearch-parent': id,
+                'data-livesearch-action': hasActiveSearch ? 'clear' : 'search',
                 'class': 'input-group-btn btn-search'
             }
         }
