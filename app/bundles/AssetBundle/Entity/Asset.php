@@ -66,7 +66,7 @@ class Asset extends FormEntity implements UuidInterface
     private ?string $description = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
-    private string $storageLocation = 'local';
+    private ?string $storageLocation = 'local';
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
     private ?string $path = null;
@@ -149,7 +149,7 @@ class Asset extends FormEntity implements UuidInterface
     private ?string $downloadUrl = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
-    private bool $disallow = true;
+    private ?bool $disallow = true;
 
     public function __construct()
     {
@@ -358,11 +358,7 @@ class Asset extends FormEntity implements UuidInterface
 
     public function getStorageLocation(): string
     {
-        if (null === $this->storageLocation) {
-            $this->storageLocation = 'local';
-        }
-
-        return $this->storageLocation;
+        return $this->storageLocation ?? 'local';
     }
 
     public function setPath(?string $path): self
@@ -575,7 +571,7 @@ class Asset extends FormEntity implements UuidInterface
         // set the mime and extension column values
         $this->setExtension($fileInfo['extension']);
         $this->setMime($fileInfo['mime']);
-        $this->setSize($fileInfo['size']);
+        $this->setSize(is_numeric($fileInfo['size']) ? (int) $fileInfo['size'] : null);
     }
 
     /**
@@ -936,7 +932,7 @@ class Asset extends FormEntity implements UuidInterface
         return $this->tempName;
     }
 
-    public function getSize(bool $humanReadable = true, bool $forceUpdate = false, $inUnit = ''): string|int|null
+    public function getSize(bool $humanReadable = true, bool $forceUpdate = false, string $inUnit = ''): string|int|null
     {
         if (empty($this->size) || $forceUpdate) {
             // Try to fetch it
@@ -947,14 +943,14 @@ class Asset extends FormEntity implements UuidInterface
 
                 curl_exec($ch);
 
-                $this->setSize(round(curl_getinfo($ch, CURLINFO_CONTENT_LENGTH_DOWNLOAD)));
+                $this->setSize((int) round(curl_getinfo($ch, CURLINFO_CONTENT_LENGTH_DOWNLOAD)));
             }
 
             if (null === $this->loadFile()) {
                 return 0;
             }
 
-            $this->setSize(round($this->loadFile()->getSize()));
+            $this->setSize((int) round($this->loadFile()->getSize()));
         }
 
         return ($humanReadable) ? static::convertBytesToHumanReadable($this->size, $inUnit) : $this->size;
