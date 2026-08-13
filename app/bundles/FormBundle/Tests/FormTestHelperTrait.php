@@ -83,15 +83,18 @@ trait FormTestHelperTrait
     {
         $conn = $this->em->getConnection();
 
-        $sql  = "SELECT Table_name  from information_schema.tables where Table_name like '%form_results%' and table_schema in (SELECT DATABASE())";
+        // Alias explicitly and read a single column: MySQL and MariaDB return
+        // information_schema column names in different cases, so relying on the raw
+        // "Table_name" key is engine-dependent (it is absent on MySQL).
+        $sql  = "SELECT table_name AS name FROM information_schema.tables WHERE table_name LIKE '%form_results%' AND table_schema IN (SELECT DATABASE())";
         $stmt = $conn->prepare($sql);
 
-        $tables = $stmt->executeQuery()->fetchAllAssociative();
+        $tableNames = $stmt->executeQuery()->fetchFirstColumn();
 
         $sm = $conn->createSchemaManager();
 
-        foreach ($tables as $table) {
-            $sm->dropTable($table['Table_name']);
+        foreach ($tableNames as $tableName) {
+            $sm->dropTable($tableName);
         }
     }
 }
