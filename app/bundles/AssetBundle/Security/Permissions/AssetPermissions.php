@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\AssetBundle\Security\Permissions;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
