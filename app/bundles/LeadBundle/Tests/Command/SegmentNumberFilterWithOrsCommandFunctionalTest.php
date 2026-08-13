@@ -8,7 +8,9 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('non-parallel')]
 final class SegmentNumberFilterWithOrsCommandFunctionalTest extends MauticMysqlTestCase
 {
     public function testSegmentNuberFilterWithOrsCommand(): void

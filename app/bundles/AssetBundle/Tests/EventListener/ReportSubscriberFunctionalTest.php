@@ -9,7 +9,9 @@ use Mautic\AssetBundle\Entity\Download;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\ReportBundle\Tests\Functional\AbstractReportSubscriberTestCase;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('non-parallel')]
 final class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestCase
 {
     public function testAssetDownloadReportWithDncListColumn(): void
