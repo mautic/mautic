@@ -6,12 +6,14 @@ namespace Mautic\ConfigBundle\Tests\Controller;
 
 use Mautic\ConfigBundle\Form\Helper\RestrictionHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[Group('non-parallel')]
 final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 {
     private const string SUBDOMAIN_URL = 'subdomain_url.com';
