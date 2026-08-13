@@ -198,20 +198,16 @@ class AssetRepository extends CommonRepository
         return (int) $result[0]['total_size'];
     }
 
-    /**
-     * @param int        $increaseBy
-     * @param bool|false $unique
-     */
-    public function upDownloadCount($id, $increaseBy = 1, $unique = false): void
+    public function upDownloadCount(int $id, int $increaseBy = 1, bool $unique = false): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
         $q->update(MAUTIC_TABLE_PREFIX.'assets')
-            ->set('download_count', 'download_count + '.(int) $increaseBy)
-            ->where('id = '.(int) $id);
+            ->set('download_count', 'download_count + '.$increaseBy)
+            ->where('id = '.$id);
 
         if ($unique) {
-            $q->set('unique_download_count', 'unique_download_count + '.(int) $increaseBy);
+            $q->set('unique_download_count', 'unique_download_count + '.$increaseBy);
         }
 
         $q->executeStatement();

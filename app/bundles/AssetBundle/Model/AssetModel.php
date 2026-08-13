@@ -2,6 +2,7 @@
 
 namespace Mautic\AssetBundle\Model;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\PersistentCollection;
 use Mautic\AssetBundle\AssetEvents;
@@ -92,15 +93,13 @@ class AssetModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param array $systemEntry
-     *
      * @throws \Doctrine\ORM\ORMException
      * @throws \Exception
      */
-    public function trackDownload(Asset $asset, $request = null, int $code = 200, $systemEntry = []): void
+    public function trackDownload(Asset $asset, ?Request $request = null, int $code = 200, array $systemEntry = []): void
     {
         // Don't skew results with in-house downloads
-        if (empty($systemEntry) && !$this->security->isAnonymous()) {
+        if ([] === $systemEntry && !$this->security->isAnonymous()) {
             return;
         }
 
@@ -130,7 +129,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         $ipAddress = $this->ipLookupHelper->getIpAddress();
 
         // Download triggered by lead
-        if (empty($systemEntry)) {
+        if ([] === $systemEntry) {
             // check for any clickthrough info
             $clickthrough = $request->get('ct', false);
             if (!empty($clickthrough)) {
@@ -241,7 +240,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
 
         $download->setTrackingId($trackingId);
 
-        if (empty($systemEntry)) {
+        if ([] === $systemEntry) {
             $download->setAsset($asset);
 
             $this->assetRepository->upDownloadCount($asset->getId(), 1, $isUnique);
@@ -276,13 +275,10 @@ class AssetModel extends FormModel implements GlobalSearchInterface
 
     /**
      * Increase the download count.
-     *
-     * @param int        $increaseBy
-     * @param bool|false $unique
      */
-    public function upDownloadCount($asset, $increaseBy = 1, $unique = false): void
+    public function upDownloadCount(Asset|int $asset, int $increaseBy = 1, bool $unique = false): void
     {
-        $id = ($asset instanceof Asset) ? $asset->getId() : (int) $asset;
+        $id = ($asset instanceof Asset) ? $asset->getId() : $asset;
 
         $this->assetRepository->upDownloadCount($id, $increaseBy, $unique);
     }
@@ -377,7 +373,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
      *
      * @return array
      */
-    public function getLookupResults($type, $filter = '', $limit = 10)
+    public function getLookupResults(string $type, string $filter = '', int $limit = 10)
     {
         $results = [];
         switch ($type) {
@@ -434,7 +430,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
      *
      * @return float
      */
-    public function getMaxUploadSize($unit = 'M', $humanReadable = false)
+    public function getMaxUploadSize(string $unit = 'M', $humanReadable = false)
     {
         $maxAssetSize  = $this->maxAssetSize;
         $maxAssetSize  = (-1 == $maxAssetSize || 0 === $maxAssetSize) ? PHP_INT_MAX : FileHelper::convertMegabytesToBytes($maxAssetSize);
@@ -452,7 +448,10 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         return $number;
     }
 
-    public function getTotalFilesize($assets): int|string
+    /**
+     * @param Collection<Asset>|Asset[] $assets
+     */
+    public function getTotalFilesize(Collection|array $assets): int|string
     {
         $firstAsset = is_array($assets) ? reset($assets) : false;
         if ($assets instanceof PersistentCollection || is_object($firstAsset)) {
