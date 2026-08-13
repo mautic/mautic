@@ -163,48 +163,6 @@ parameters:
 			path: app/bundles/ApiBundle/Serializer/Exclusion/FieldInclusionStrategy.php
 
 		-
-			message: '#^Call to an undefined method Symfony\\Component\\HttpFoundation\\File\\File\:\:getClientOriginalName\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/bundles/AssetBundle/Entity/Asset.php
-
-		-
-			message: '#^Parameter \#1 \$prefix of function uniqid expects string, int\<0, max\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/AssetBundle/Entity/Asset.php
-
-		-
-			message: '#^Parameter \#2 \$value of method Doctrine\\DBAL\\Query\\QueryBuilder\:\:set\(\) expects string, int given\.$#'
-			identifier: argument.type
-			count: 2
-			path: app/bundles/AssetBundle/Entity/DownloadRepository.php
-
-		-
-			message: '#^Parameter \#2 \$maxUploadSizeMB of method Mautic\\CoreBundle\\Validator\\FileUploadValidator\:\:checkFileSize\(\) expects string, float given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/AssetBundle/EventListener/UploadSubscriber.php
-
-		-
-			message: '#^Parameter \#2 \$dateFrom of class Mautic\\CoreBundle\\Helper\\Chart\\ChartQuery constructor expects DateTime, string\|null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/AssetBundle/Model/AssetModel.php
-
-		-
-			message: '#^Parameter \#3 \$dateTo of class Mautic\\CoreBundle\\Helper\\Chart\\ChartQuery constructor expects DateTime, string\|null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/AssetBundle/Model/AssetModel.php
-
-		-
-			message: '#^Parameter \#1 \$permissionNames of method Mautic\\CoreBundle\\Security\\Permissions\\AbstractPermissions\:\:addStandardPermissions\(\) expects array, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/AssetBundle/Security/Permissions/AssetPermissions.php
-
-		-
 			message: '#^Parameter \#1 \$batchLimit of class Mautic\\CampaignBundle\\Executioner\\ContactFinder\\Limiter\\ContactLimiter constructor expects int, null given\.$#'
 			identifier: argument.type
 			count: 1

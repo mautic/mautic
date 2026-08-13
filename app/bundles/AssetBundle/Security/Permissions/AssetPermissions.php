@@ -15,8 +15,8 @@ final class AssetPermissions extends AbstractPermissions
 
     public function definePermissions(): void
     {
-        $this->addExtendedPermissions('assets');
-        $this->addStandardPermissions('categories');
+        $this->addExtendedPermissions(['assets']);
+        $this->addStandardPermissions(['categories']);
     }
 
     public function getName(): string

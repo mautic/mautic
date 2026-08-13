@@ -229,7 +229,7 @@ class DownloadRepository extends CommonRepository
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'asset_downloads')
-            ->set('lead_id', $leadId)
+            ->set('lead_id', (string) $leadId)
             ->set('tracking_id', ':newTrackingId')
             ->where(
                 $q->expr()->eq('tracking_id', ':oldTrackingId')
@@ -248,7 +248,7 @@ class DownloadRepository extends CommonRepository
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'asset_downloads')
-            ->set('lead_id', $toLeadId)
+            ->set('lead_id', (string) $toLeadId)
             ->where('lead_id = '.$fromLeadId)
             ->executeStatement();
     }

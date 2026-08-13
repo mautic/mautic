@@ -513,9 +513,8 @@ class AssetModel extends FormModel implements GlobalSearchInterface
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      * @param mixed[]   $filters
-     * @param bool      $canViewOthers
      */
-    public function getUniqueVsRepetitivePieChartData($dateFrom, $dateTo, $filters = [], $canViewOthers = true): array
+    public function getUniqueVsRepetitivePieChartData($dateFrom, $dateTo, array $filters = [], bool $canViewOthers = true): array
     {
         $chart   = new PieChart();
         $query   = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -556,14 +555,8 @@ class AssetModel extends FormModel implements GlobalSearchInterface
 
     /**
      * Get a list of popular (by downloads) assets.
-     *
-     * @param int    $limit
-     * @param string $dateFrom
-     * @param string $dateTo
-     * @param array  $filters
-     * @param bool   $canViewOthers
      */
-    public function getPopularAssets($limit = 10, $dateFrom = null, $dateTo = null, $filters = [], $canViewOthers = true): array
+    public function getPopularAssets(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, array $filters = [], bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS download_count, a.id, a.title')
@@ -578,7 +571,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
                 ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
-        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom ?? new \DateTime('-30 days'), $dateTo ?? new \DateTime());
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_download');
 
@@ -588,10 +581,9 @@ class AssetModel extends FormModel implements GlobalSearchInterface
     /**
      * Get a list of assets in a date range.
      *
-     * @param int   $limit
      * @param array $filters
      */
-    public function getAssetList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], array $options = []): array
+    public function getAssetList(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], array $options = []): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('t.id, t.title as name, t.date_added, t.date_modified')

@@ -508,11 +508,11 @@ class Asset extends FormEntity implements UuidInterface
     {
         if (null !== $this->getFile()) {
             // set the asset title as original file name if title is missing
-            if (null === $this->title) {
+            if (null === $this->title && $this->file instanceof \Symfony\Component\HttpFoundation\File\UploadedFile) {
                 $this->setTitle($this->file->getClientOriginalName());
             }
 
-            $filename  = sha1(uniqid(mt_rand(), true));
+            $filename  = sha1(uniqid((string) mt_rand(), true));
             $extension = $this->getFile()->guessExtension();
 
             if (empty($extension)) {
