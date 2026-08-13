@@ -8,7 +8,9 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Command\DeduplicateIdsCommand;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('non-parallel')]
 final class DeduplicateIdsCommandFunctionalTest extends MauticMysqlTestCase
 {
     public function testDeduplicateCommandWithContactIdsParam(): void
