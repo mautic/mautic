@@ -7,19 +7,14 @@ use Mautic\CoreBundle\Event\CommonEvent;
 final class LeadListFiltersOperatorsEvent extends CommonEvent
 {
     /**
-     * @deprecated to be removed in Mautic 3
-     *
-     * @param array $operators @deprecated to be removed in Mautic 3. Subscribe operators instead.
+     * @var array<string, mixed[]>
      */
-    public function __construct(
-        private $operators,
-    ) {
-    }
+    private array $operators = [];
 
     /**
-     * @return array
+     * @return array<string, mixed[]>
      */
-    public function getOperators()
+    public function getOperators(): array
     {
         return $this->operators;
     }

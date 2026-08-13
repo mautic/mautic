@@ -41,7 +41,7 @@ final class FormListType extends AbstractType
 
                 $choices = [];
 
-                $forms = $this->formRepository->getFormList('', 0, 0, $viewOther, $options['form_type']);
+                $forms = $this->formRepository->getFormList('', 0, 0, $viewOther);
                 foreach ($forms as $form) {
                     $choices[$form['name'].' ('.$form['id'].')'] = $form['id'];
                 }
@@ -51,13 +51,10 @@ final class FormListType extends AbstractType
 
                 return $choices;
             },
-            'expanded'          => false,
-            'multiple'          => true,
-            'placeholder'       => false,
-            'form_type'         => null,
+            'expanded'    => false,
+            'multiple'    => true,
+            'placeholder' => false,
         ]);
-
-        $resolver->setDefined(['form_type']);
     }
 
     public function getParent(): string

@@ -64,7 +64,7 @@ final class FilterOperatorSubscriberTest extends TestCase
 
     public function testOnListOperatorsGenerate(): void
     {
-        $event = new LeadListFiltersOperatorsEvent([]);
+        $event = new LeadListFiltersOperatorsEvent();
 
         $this->subscriber->onListOperatorsGenerate($event);
 

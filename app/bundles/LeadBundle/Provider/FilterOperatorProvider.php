@@ -28,7 +28,7 @@ final class FilterOperatorProvider implements FilterOperatorProviderInterface
     public function getAllOperators(): array
     {
         if ([] === $this->cachedOperators) {
-            $event = new LeadListFiltersOperatorsEvent([]);
+            $event = new LeadListFiltersOperatorsEvent();
 
             $this->dispatcher->dispatch($event, LeadEvents::LIST_FILTERS_OPERATORS_ON_GENERATE);
 
