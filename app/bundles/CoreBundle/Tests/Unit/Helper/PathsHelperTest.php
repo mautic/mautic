@@ -45,7 +45,18 @@ final class PathsHelperTest extends TestCase
 
     public function testGetLocalConfigFile(): void
     {
-        $this->assertSame(__DIR__.'/resource/paths/config/local.php', realpath($this->helper->getLocalConfigurationFile()));
+        // Under paratest each worker sets MAUTIC_LOCAL_CONFIG_FILE to isolate its
+        // config/local.php; neutralize it here so this test asserts the default resolution.
+        $previous = getenv('MAUTIC_LOCAL_CONFIG_FILE');
+        putenv('MAUTIC_LOCAL_CONFIG_FILE');
+
+        try {
+            $this->assertSame(__DIR__.'/resource/paths/config/local.php', realpath($this->helper->getLocalConfigurationFile()));
+        } finally {
+            if (false !== $previous) {
+                putenv('MAUTIC_LOCAL_CONFIG_FILE='.$previous);
+            }
+        }
     }
 
     public function testGetCachePath(): void
