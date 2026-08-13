@@ -117,7 +117,7 @@ jobs:
         if [[ "$COVERAGE" == "true" ]]; then
           php -d zend.assertions=1 -d pcov.enabled=1 vendor/bin/phpunit -d memory_limit=3G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --coverage-clover=coverage.xml --log-junit=junit.xml
         else
-          php -d zend.assertions=1 vendor/bin/phpunit -d memory_limit=2G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist
+          php -d zend.assertions=1 bin/paratest -p"$(nproc)" --runner=WrapperRunner --bootstrap app/paratest_bootstrap.php --configuration app/phpunit.xml.dist --passthru-php="'-d' 'zend.assertions=1' '-d' 'memory_limit=2G'"
         fi
 
     - name: Upload coverage report
