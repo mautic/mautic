@@ -18,7 +18,7 @@ final class HubspotApi extends CrmApi
 
     public function __construct(
         CrmAbstractIntegration $integration,
-        private EmailValidator $emailValidator,
+        private readonly EmailValidator $emailValidator,
     ) {
         parent::__construct($integration);
     }
