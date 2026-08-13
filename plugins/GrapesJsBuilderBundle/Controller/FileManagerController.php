@@ -42,16 +42,6 @@ final class FileManagerController extends AjaxController
         return $this->sendJsonResponse(['success'=> true]);
     }
 
-    /**
-     * @deprecated since Mautic 5.2, to be removed in 6.0. Use FileManagerController::getMediaAction instead
-     */
-    public function assetsAction(FileManager $fileManager): JsonResponse
-    {
-        return $this->sendJsonResponse([
-            'data' => $fileManager->getImages(),
-        ]);
-    }
-
     public function getMediaAction(Request $request, FileManager $fileManager): JsonResponse
     {
         $page  = $request->query->getInt('page', self::DEFAULT_PAGE);

@@ -120,10 +120,9 @@ final class InjectCustomContentSubscriberTest extends TestCase
 
         $this->config->expects($this->once())->method('isPublished')->willReturn(true);
 
-        $this->router->expects($this->exactly(3))
+        $this->router->expects($this->exactly(2))
             ->method('generate')
             ->willReturnMap([
-                ['grapesjsbuilder_assets', [], 0, 'https://example.test/assets'],
                 ['grapesjsbuilder_upload', [], 0, 'https://example.test/upload'],
                 ['grapesjsbuilder_delete', [], 0, 'https://example.test/delete'],
             ]);
@@ -133,7 +132,6 @@ final class InjectCustomContentSubscriberTest extends TestCase
             ->with(
                 '@GrapesJsBuilder/Setting/vars.html.twig',
                 [
-                    'dataAssets' => 'https://example.test/assets',
                     'dataUpload' => 'https://example.test/upload',
                     'dataDelete' => 'https://example.test/delete',
                 ]

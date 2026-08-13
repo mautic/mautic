@@ -17,11 +17,6 @@ return [
                 'path'       => '/grapesjsbuilder/delete',
                 'controller' => 'MauticPlugin\GrapesJsBuilderBundle\Controller\FileManagerController::deleteAction',
             ],
-            /** @depreacated since Mautic 5.2, to be removed in 6.0. Use grapesjsbuilder_media instead */
-            'grapesjsbuilder_assets' => [
-                'path'       => '/grapesjsbuilder/assets',
-                'controller' => 'MauticPlugin\GrapesJsBuilderBundle\Controller\FileManagerController::assetsAction',
-            ],
             'grapesjsbuilder_media' => [
                 'path'       => '/grapesjsbuilder/media',
                 'controller' => 'MauticPlugin\GrapesJsBuilderBundle\Controller\FileManagerController::getMediaAction',
