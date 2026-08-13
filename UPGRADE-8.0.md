@@ -118,3 +118,6 @@
 
 - Deprecated support for `:`-prefixed parameter keys removed from `Mautic\LeadBundle\Segment\Query\QueryBuilder::setParameter()`. Pass the key without the colon — `setParameter('foo', $bar)`, not `setParameter(':foo', $bar)`. The `:foo` placeholder in the query string itself is unchanged.
 - Deprecated `models` key in bundle `Config/config.php` `services` removed. Services listed under it are no longer registered with the `mautic.model` tag; register models by their class name and let autowiring resolve them.
+- Deprecated method `Mautic\FormBundle\Entity\Form::setFormType()` removed with no replacement. Form types are no longer used; the `form_type` column and its getter are unchanged.
+- Deprecated method `Mautic\FormBundle\Entity\Form::isStandalone()` removed with no replacement. All forms can now be used in campaigns, so the standalone/campaign distinction no longer exists.
+- Deprecated class `Mautic\CampaignBundle\Event\CampaignScheduledEvent` removed. Its only subclass `Mautic\CampaignBundle\Event\ScheduledEvent` absorbed all of its properties and getters, so the dispatched event keeps the same public API. Code type-hinting or `instanceof`-checking `CampaignScheduledEvent` must target `ScheduledEvent` instead.
