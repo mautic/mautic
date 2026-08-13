@@ -6,10 +6,20 @@ class UrlMatcher
 {
     public static function hasMatch(array $urlsToCheckAgainst, $urlToFind): bool
     {
-        $urlToFind = self::sanitizeUrl($urlToFind);
+        $urlToFind = self::sanitizeUrl((string) $urlToFind);
 
         foreach ($urlsToCheckAgainst as $url) {
+            $url = (string) $url;
+
+            if ('' === $url) {
+                continue;
+            }
+
             $url = self::sanitizeUrl($url);
+
+            if (self::isLegacyWildcardPattern($url) && fnmatch($url, $urlToFind, FNM_CASEFOLD)) {
+                return true;
+            }
 
             if (preg_match('/'.preg_quote($url, '/').'/i', $urlToFind)) {
                 return true;
@@ -17,6 +27,11 @@ class UrlMatcher
         }
 
         return false;
+    }
+
+    public static function normalizeUrl(string $url): string
+    {
+        return self::sanitizeUrl($url);
     }
 
     /**
@@ -39,5 +54,10 @@ class UrlMatcher
         }
 
         return $url;
+    }
+
+    private static function isLegacyWildcardPattern(string $url): bool
+    {
+        return false !== strpbrk($url, '*?[');
     }
 }

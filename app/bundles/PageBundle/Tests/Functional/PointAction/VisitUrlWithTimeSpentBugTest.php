@@ -13,90 +13,98 @@ use Mautic\PageBundle\Helper\PointActionHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 
 /**
- * Reproduces https://github.com/mautic/mautic/issues/12336.
- *
- * When a "Visits URL" point action has accumulative_time set,
- * the contact must REVISIT the page for the points to be applied.
- * The dwell time from a previous visit is not evaluated automatically
- * when the time threshold is crossed.
+ * @see https://github.com/mautic/mautic/issues/12336
  */
 final class VisitUrlWithTimeSpentBugTest extends MauticMysqlTestCase
 {
-    public function testAccumulativeTimeOnlyTriggersOnRevisit(): void
+    public function testAccumulativeTimeTriggersOnRevisit(): void
     {
         $page    = $this->createPage('Test Page', 'test-page');
         $testUrl = 'https://example.com/test-page';
 
-        $contact1 = $this->createContact('bug-visitor@example.test');
-        $contact2 = $this->createContact('bug-nonvisitor@example.test');
+        $contact = $this->createContact('bug-visitor@example.test');
 
-        // Simulate contact1 visiting the page 5 minutes ago and leaving now
-        $this->createHit($page, $contact1, $testUrl, strtotime('-5 minutes'), time());
+        $this->createHit($page, $contact, $testUrl, strtotime('-5 minutes'), time());
+        $revisitHit = $this->createHit($page, $contact, $testUrl, time());
         $this->em->flush();
 
-        // Now contact1 visits the page a SECOND time
-        $revisitHit = $this->createHit($page, $contact1, $testUrl, time());
+        $action = $this->createAccumulativeTimeAction($testUrl, 60);
+
+        $this->assertTrue(
+            $this->validateAction($revisitHit, $action),
+            'accumulative_time should trigger on revisit when dwell time exceeds threshold'
+        );
+    }
+
+    public function testAccumulativeTimeTriggersWhenVisitingDifferentPage(): void
+    {
+        $page       = $this->createPage('Test Page', 'test-page');
+        $trackedUrl = '5211new.ddev.site/sssss';
+        $otherUrl   = '5211new.ddev.site/other-page';
+
+        $contact = $this->createContact('cross-page-visitor@example.test');
+
+        $this->createHit($page, $contact, $trackedUrl, strtotime('-5 minutes'), time());
+        $otherPageHit = $this->createHit($page, $contact, $otherUrl, time());
         $this->em->flush();
 
-        // Contact2 has never visited this page
-        $this->createHit($page, $contact2, $testUrl, time());
+        $action = $this->createAccumulativeTimeAction($trackedUrl, 60);
+
+        $this->assertTrue(
+            $this->validateAction($otherPageHit, $action),
+            'accumulative_time should trigger on any page hit once dwell time threshold is met'
+        );
+    }
+
+    public function testAccumulativeTimeMatchesTrackedUrlWithoutProtocol(): void
+    {
+        $page        = $this->createPage('Test Page', 'test-page');
+        $trackedUrl  = '5211new.ddev.site/sssss';
+        $configured  = 'https://5211new.ddev.site/sssss';
+
+        $contact = $this->createContact('protocol-mismatch@example.test');
+
+        $this->createHit($page, $contact, $trackedUrl, strtotime('-5 minutes'), time());
+        $otherPageHit = $this->createHit($page, $contact, '5211new.ddev.site/other-page', time());
         $this->em->flush();
 
-        // The dwell time for contact1 on this URL should be ~300s (> 60s threshold)
-        $hitRepo    = $this->em->getRepository(Hit::class);
-        $dwellStats = $hitRepo->getDwellTimesForUrl($testUrl, ['leadId' => $contact1->getId()]);
+        $action = $this->createAccumulativeTimeAction($configured, 60);
 
-        $this->assertArrayHasKey('sum', $dwellStats);
-        $this->assertGreaterThan(60, $dwellStats['sum'], 'Contact1 should have >60s accumulative dwell time on the page');
+        $this->assertTrue(
+            $this->validateAction($otherPageHit, $action),
+            'configured URL with protocol should match tracked hits stored without protocol'
+        );
+    }
 
-        // Points before: should be 0
-        $this->assertSame(0, $contact1->getPoints());
-        $this->assertSame(0, $contact2->getPoints());
+    /**
+     * @param array<string, mixed> $action
+     */
+    private function validateAction(Hit $eventDetails, array $action): bool
+    {
+        /** @var MauticFactory&MockObject $factory */
+        /** @phpstan-ignore-next-line */
+        $factory = $this->createMock(MauticFactory::class);
+        $factory->method('getEntityManager')->willReturn($this->em);
 
-        // Create the point action and evaluate it via the helper
-        $action = [
+        return PointActionHelper::validateUrlHit($factory, $eventDetails, $action);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function createAccumulativeTimeAction(string $pageUrl, int $accumulativeTimeSeconds): array
+    {
+        return [
             'type'       => 'url.hit',
             'properties' => [
-                'page_url'           => $testUrl,
-                'accumulative_time'  => 60,
+                'page_url'           => $pageUrl,
+                'accumulative_time'  => $accumulativeTimeSeconds,
                 'page_hits'          => null,
                 'returns_within'     => null,
                 'returns_after'      => null,
                 'first_time'         => false,
             ],
         ];
-
-        /** @var MauticFactory&MockObject $factory */
-        /** @phpstan-ignore-next-line */
-        $factory = $this->createMock(MauticFactory::class);
-        $factory->method('getEntityManager')->willReturn($this->em);
-
-        // Evaluate using the REVISIT hit — should return TRUE (accumulative time met)
-        $eventDetails = $revisitHit;
-        $result       = PointActionHelper::validateUrlHit($factory, $eventDetails, $action);
-        $this->assertTrue($result, 'BUG #12336: accumulative_time should trigger on revisit when dwell time exceeds threshold');
-
-        // Now delete all hits and re-add only the FIRST hit (with dateLeft) — simulate that
-        // the contact visited once and left, but never came back. Show that there's no
-        // mechanism to trigger the point action at this point.
-        $this->em->getConnection()->executeStatement(
-            'DELETE FROM test_page_hits WHERE lead_id = :lead',
-            ['lead' => $contact1->getId()]
-        );
-
-        $this->createHit($page, $contact1, $testUrl, strtotime('-5 minutes'), time());
-        $this->em->flush();
-
-        $dwellStats2 = $hitRepo->getDwellTimesForUrl($testUrl, ['leadId' => $contact1->getId()]);
-        $this->assertGreaterThan(60, $dwellStats2['sum'] ?? 0, 'Contact1 still has >60s dwell time');
-
-        // The point action handler only fires on page hits to matching URLs.
-        // When contact1 left the page (dateLeft was set), no new hit was created on this URL.
-        // The point action is never evaluated — the dwell time threshold was crossed silently.
-        $this->em->clear();
-        $contact1After = $this->em->getRepository(Lead::class)->find($contact1->getId());
-        $this->assertInstanceOf(Lead::class, $contact1After);
-        $this->assertSame(0, $contact1After->getPoints(), 'BUG CONFIRMED: points NOT awarded without revisit — dwell time threshold was crossed but no page hit triggered the evaluation');
     }
 
     private function createPage(string $name, string $alias): Page

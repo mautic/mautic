@@ -81,12 +81,12 @@ class UrlMatcherTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(UrlMatcher::hasMatch($urls, 'https://google.com'));
     }
 
-    public function testFTPSchemeMatch(): void
+    public function testLegacyWildcardPatternMatches(): void
     {
         $urls = [
-            'ftp://google.com',
+            '*google.com/hello*',
         ];
 
-        $this->assertTrue(UrlMatcher::hasMatch($urls, 'ftp://google.com'));
+        $this->assertTrue(UrlMatcher::hasMatch($urls, 'https://google.com/hello/world'));
     }
 }

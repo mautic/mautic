@@ -101,6 +101,44 @@ class PointActionHelperTest extends TestCase
                 ],
                 true,
             ],
+            'plain_text_matches_substring' => [
+                [
+                    'id'         => 5,
+                    'type'       => 'url.hit',
+                    'name'       => 'Plain text URL match',
+                    'properties' => [
+                        'page_url'               => 'example.com/pp',
+                        'page_hits'              => 1,
+                        'accumulative_time_unit' => 'H',
+                        'accumulative_time'      => 0,
+                        'returns_within_unit'    => 'H',
+                        'returns_within'         => 0,
+                        'returns_after_unit'     => 'H',
+                        'returns_after'          => 0,
+                    ],
+                    'points' => 5,
+                ],
+                true,
+            ],
+            'legacy_wildcard_still_matches' => [
+                [
+                    'id'         => 6,
+                    'type'       => 'url.hit',
+                    'name'       => 'Legacy wildcard URL match',
+                    'properties' => [
+                        'page_url'               => '*example.com/ppk*',
+                        'page_hits'              => 1,
+                        'accumulative_time_unit' => 'H',
+                        'accumulative_time'      => 0,
+                        'returns_within_unit'    => 'H',
+                        'returns_within'         => 0,
+                        'returns_after_unit'     => 'H',
+                        'returns_after'          => 0,
+                    ],
+                    'points' => 5,
+                ],
+                true,
+            ],
             'url_does_not_match' => [
                 [
                     'id'         => 3,
@@ -214,5 +252,71 @@ class PointActionHelperTest extends TestCase
                 false,
             ],
         ];
+    }
+
+    public function testAccumulativeTimeUsesNormalizedSqlLikePattern(): void
+    {
+        $this->lead->method('getId')->willReturn(42);
+        $this->eventDetails->method('getUrl')->willReturn('5211new.ddev.site/other-page');
+
+        $this->hitRepository->expects($this->once())
+            ->method('getDwellTimesForUrl')
+            ->with(
+                '%5211new.ddev.site/sssss%',
+                ['leadId' => 42]
+            )
+            ->willReturn([
+                'sum'     => 300,
+                'min'     => 300,
+                'max'     => 300,
+                'average' => 300,
+                'count'   => 1,
+            ]);
+
+        $action = [
+            'type'       => 'url.hit',
+            'properties' => [
+                'page_url'          => 'https://5211new.ddev.site/sssss',
+                'accumulative_time' => 60,
+                'page_hits'         => null,
+                'returns_within'    => null,
+                'returns_after'     => null,
+            ],
+        ];
+
+        $result = PointActionHelper::validateUrlHit($this->factory, $this->eventDetails, $action);
+
+        $this->assertTrue($result);
+    }
+
+    public function testAccumulativeTimeTriggersOnDifferentPageVisit(): void
+    {
+        $this->lead->method('getId')->willReturn(7);
+        $this->eventDetails->method('getUrl')->willReturn('5211new.ddev.site/tttt');
+
+        $this->hitRepository->method('getDwellTimesForUrl')
+            ->with('%5211new.ddev.site/sssss%', ['leadId' => 7])
+            ->willReturn([
+                'sum'     => 120,
+                'min'     => 120,
+                'max'     => 120,
+                'average' => 120,
+                'count'   => 1,
+            ]);
+
+        $action = [
+            'type'       => 'url.hit',
+            'properties' => [
+                'page_url'          => '5211new.ddev.site/sssss',
+                'accumulative_time' => 60,
+                'page_hits'         => null,
+                'returns_within'    => null,
+                'returns_after'     => null,
+            ],
+        ];
+
+        $result = PointActionHelper::validateUrlHit($this->factory, $this->eventDetails, $action);
+
+        $this->assertTrue($result);
     }
 }
