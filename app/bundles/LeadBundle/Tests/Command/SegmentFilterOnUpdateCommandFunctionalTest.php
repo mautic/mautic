@@ -9,7 +9,10 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\ListLeadRepository;
+use Mautic\LeadBundle\Entity\ListLead;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('non-parallel')]
 final class SegmentFilterOnUpdateCommandFunctionalTest extends MauticMysqlTestCase
 {
     public function testSegmentFilterOnUpdateCommand(): void

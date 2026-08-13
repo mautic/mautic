@@ -15,11 +15,13 @@ use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 #[CoversClass(FieldApiController::class)]
 #[CoversClass(CreateCustomFieldCommand::class)]
+#[Group('non-parallel')]
 final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;

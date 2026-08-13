@@ -7,8 +7,10 @@ namespace Mautic\LeadBundle\Tests\Functional\ApiPlatform;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('non-parallel')]
 final class CompanyOwnershipApiV2AuthorizationRegressionTest extends OwnershipScopedApiAuthorizationTestBase
 {
     public function testViewOwnCollectionCannotSeeForeignCompanyOnApiV2(): void

@@ -15,7 +15,9 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\EventListener\CampaignSubscriber;
 use Mautic\LeadBundle\Model\FieldModel;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('non-parallel')]
 final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;

@@ -7,8 +7,10 @@ namespace Mautic\LeadBundle\Tests\Functional;
 use Doctrine\DBAL\Types\Types;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('non-parallel')]
 final class DncSearchFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;

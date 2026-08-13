@@ -9,7 +9,9 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Entity\ListLeadRepository;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('non-parallel')]
 final class ListLeadRepositoryTest extends MauticMysqlTestCase
 {
     private ListLeadRepository $listLeadRepository;

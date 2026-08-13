@@ -6,7 +6,9 @@ namespace Mautic\CampaignBundle\Tests\Command;
 
 use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('non-parallel')]
 final class ValidateEventCommandTest extends AbstractCampaignCommand
 {
     public function testEventsAreExecutedForInactiveEventWithSingleContact(): void
