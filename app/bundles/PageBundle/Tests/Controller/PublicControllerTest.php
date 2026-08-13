@@ -11,7 +11,6 @@ use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
-use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
@@ -207,9 +206,6 @@ final class PublicControllerTest extends TestCase
             ->willReturn(new Lead());
 
         $this->request->attributes->set('ignore_mismatch', true);
-        $themeHelper = $this->createMock(ThemeHelper::class);
-        $themeHelper->expects($this->never())
-            ->method('checkForTwigTemplate');
 
         $controller = new PublicController(
             $this->createStub(ManagerRegistry::class),
@@ -230,7 +226,6 @@ final class PublicControllerTest extends TestCase
             $this->createStub(CookieHelper::class),
             $analyticsHelper,
             $assetHelper,
-            $themeHelper,
             $this->createStub(Tracking404Model::class),
             $this->router,
             $this->createStub(DeviceTrackingServiceInterface::class),
