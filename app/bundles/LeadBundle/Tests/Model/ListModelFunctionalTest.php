@@ -141,6 +141,58 @@ final class ListModelFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(0, (int) end($data['datasets'][2]['data'])); // Total for today.
     }
 
+    /**
+     * Manually removing a lead that was manually added must keep the lead_lists_leads row
+     * (with manually_removed = 1) instead of deleting it outright. Otherwise a later segment
+     * rebuild could silently re-add the lead if/when they start matching the segment's filters,
+     * silently overriding the user's explicit removal.
+     */
+    public function testManuallyRemovingManuallyAddedLeadPersistsMembershipRecord(): void
+    {
+        /** @var ListModel $segmentModel */
+        $segmentModel = self::getContainer()->get(ListModel::class);
+
+        /** @var LeadRepository $contactRepository */
+        $contactRepository = $this->em->getRepository(Lead::class);
+
+        $segment = new LeadList();
+        $segment->setName('Segment Manual Removal');
+
+        $segmentModel->saveEntity($segment);
+
+        $contact = new Lead();
+        $contactRepository->saveEntities([$contact]);
+
+        // Manually add the contact to the segment (i.e. not because it matched a filter).
+        $segmentModel->addLead($contact, $segment, true);
+
+        $this->assertSame(
+            ['manually_added' => '1', 'manually_removed' => '0'],
+            $this->fetchListLeadRow($contact->getId(), $segment->getId()),
+            'Sanity check: the contact should be recorded as a current, manually-added member.'
+        );
+
+        // Manually remove the contact from the segment.
+        $segmentModel->removeLead($contact, $segment, true);
+
+        $this->assertSame(
+            ['manually_added' => '1', 'manually_removed' => '1'],
+            $this->fetchListLeadRow($contact->getId(), $segment->getId()),
+            'A manually removed lead\'s membership row must be kept and flagged manually_removed = 1, not deleted, so a future segment rebuild cannot silently re-add the lead.'
+        );
+    }
+
+    /**
+     * @return array<string, string>|false
+     */
+    private function fetchListLeadRow(int $leadId, int $segmentId)
+    {
+        return $this->connection->fetchAssociative(
+            'SELECT manually_added, manually_removed FROM '.MAUTIC_TABLE_PREFIX.'lead_lists_leads WHERE lead_id = :leadId AND leadlist_id = :segmentId',
+            ['leadId' => $leadId, 'segmentId' => $segmentId]
+        );
+    }
+
     private function createLeadList(User $user, string $name, bool $isGlobal): LeadList
     {
         $leadList = new LeadList();
