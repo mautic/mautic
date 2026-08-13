@@ -125,8 +125,10 @@ Mautic.filterList = function (e, elId, route, target, liveCacheVar, action, over
 
     if (el.length && (e.data.livesearch || mQuery(e.target).prop('tagName') == 'BUTTON' || mQuery(e.target).parent().prop('tagName') == 'BUTTON')) {
         const scopeChange = e.data && e.data.scopeChange;
-        let value = el.val().trim();
+        const inputBeforeClear = el.val().trim();
+        let value = inputBeforeClear;
         const scopeSelect = mQuery("select[data-livesearch-scope-for='" + elId + "']");
+        const isClearButton = mQuery(e.target).prop('tagName') === 'BUTTON' || mQuery(e.target).parent().prop('tagName') === 'BUTTON';
         //should the content be cleared?
         if (!value && !scopeChange) {
             //force action since we have no content
@@ -135,11 +137,6 @@ Mautic.filterList = function (e, elId, route, target, liveCacheVar, action, over
             el.val('');
             el.typeahead('val', '');
             value = '';
-
-            if (scopeSelect.length) {
-                scopeSelect.find('option[value=""]:not(:disabled)').first().prop('selected', true);
-                Mautic.refreshSearchScopeChosen(scopeSelect);
-            }
         }
 
         //make the request
@@ -170,9 +167,20 @@ Mautic.filterList = function (e, elId, route, target, liveCacheVar, action, over
 
         if (scopeSelect.length) {
             if (action === 'clear' && !scopeChange) {
-                scopeSelect.find('option[value=""]:not(:disabled)').first().prop('selected', true);
-                Mautic.refreshSearchScopeChosen(scopeSelect);
-                value = '';
+                const command = scopeSelect.val() || '';
+                const fullScopeClear = isClearButton && !inputBeforeClear && command;
+
+                if (fullScopeClear) {
+                    scopeSelect.find('option[value=""]:not(:disabled)').first().prop('selected', true);
+                    Mautic.refreshSearchScopeChosen(scopeSelect);
+                    value = '';
+                } else if (command) {
+                    value = Mautic.composeScopedSearchValue(command, '');
+                } else {
+                    value = '';
+                }
+
+                MauticVars.lastSearchStr = value;
             } else if (scopeChange) {
                 // submitSearchScopeChange already composed the final search string
                 value = MauticVars.lastSearchStr || '';
