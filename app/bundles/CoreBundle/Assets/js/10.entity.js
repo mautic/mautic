@@ -167,17 +167,13 @@ Mautic.filterList = function (e, elId, route, target, liveCacheVar, action, over
 
         if (scopeSelect.length) {
             if (action === 'clear' && !scopeChange) {
-                const command = scopeSelect.val() || '';
-                const fullScopeClear = isClearButton && !inputBeforeClear && command;
-
-                if (fullScopeClear) {
+                if (isClearButton) {
                     scopeSelect.find('option[value=""]:not(:disabled)').first().prop('selected', true);
                     Mautic.refreshSearchScopeChosen(scopeSelect);
                     value = '';
-                } else if (command) {
-                    value = Mautic.composeScopedSearchValue(command, '');
                 } else {
-                    value = '';
+                    const command = scopeSelect.val() || '';
+                    value = command ? Mautic.composeScopedSearchValue(command, '') : '';
                 }
 
                 MauticVars.lastSearchStr = value;
