@@ -92,7 +92,7 @@ trait FilterTrait
                 }
 
                 $customOptions['choices']                   = $options['lists'];
-                $customOptions['multiple']                  = in_array($data['operator'], ['in', '!in']);
+                $customOptions['multiple']                  = in_array($data['operator'], ['in', '!in', 'in_all', '!in_all']);
                 $customOptions['choice_translation_domain'] = false;
                 $type                                       = ChoiceType::class;
                 break;
@@ -259,7 +259,7 @@ trait FilterTrait
                     ]
                 );
 
-                if (in_array($operator, ['in', '!in'])) {
+                if (in_array($operator, ['in', '!in', 'in_all', '!in_all'])) {
                     $customOptions['multiple'] = true;
                     if (!isset($data['filter'])) {
                         $data['filter'] = [];
