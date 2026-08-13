@@ -6,10 +6,39 @@ namespace Mautic\CampaignBundle\Event;
 
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
+use Symfony\Contracts\EventDispatcher\Event;
 
-final class ScheduledEvent extends CampaignScheduledEvent
+final class ScheduledEvent extends Event
 {
     use ContextTrait;
+    use EventArrayTrait;
+
+    /**
+     * @var \Mautic\LeadBundle\Entity\Lead
+     */
+    protected $lead;
+
+    /**
+     * @var array
+     */
+    protected $event;
+
+    /**
+     * @var array|null
+     */
+    protected $eventDetails;
+
+    protected bool $systemTriggered;
+
+    /**
+     * @var \DateTimeInterface
+     */
+    protected $dateScheduled;
+
+    /**
+     * @var array
+     */
+    protected $eventSettings;
 
     /**
      * @param bool $isReschedule
@@ -19,18 +48,12 @@ final class ScheduledEvent extends CampaignScheduledEvent
         private LeadEventLog $eventLog,
         private $isReschedule = false,
     ) {
-        // @deprecated support for pre 2.13.0; to be removed in 3.0
-        parent::__construct(
-            [
-                'eventSettings'   => $eventConfig->getConfig(),
-                'eventDetails'    => null,
-                'event'           => $eventLog->getEvent(),
-                'lead'            => $eventLog->getLead(),
-                'systemTriggered' => true,
-                'dateScheduled'   => $eventLog->getTriggerDate(),
-            ],
-            $eventLog
-        );
+        $this->eventSettings   = $eventConfig->getConfig();
+        $this->eventDetails    = null;
+        $this->event           = $eventLog->getEvent();
+        $this->lead            = $eventLog->getLead();
+        $this->systemTriggered = true;
+        $this->dateScheduled   = $eventLog->getTriggerDate();
     }
 
     public function getEventConfig(): AbstractEventAccessor
@@ -49,5 +72,61 @@ final class ScheduledEvent extends CampaignScheduledEvent
     public function isReschedule()
     {
         return $this->isReschedule;
+    }
+
+    /**
+     * @return \Mautic\LeadBundle\Entity\Lead
+     */
+    public function getLead()
+    {
+        return $this->lead;
+    }
+
+    /**
+     * @return array
+     */
+    public function getEvent()
+    {
+        return ($this->event instanceof \Mautic\CampaignBundle\Entity\Event) ? $this->getEventArray($this->event) : $this->event;
+    }
+
+    /**
+     * @return array
+     */
+    public function getConfig()
+    {
+        return $this->getEvent()['properties'];
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getEventDetails()
+    {
+        return $this->eventDetails;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getSystemTriggered()
+    {
+        return $this->systemTriggered;
+    }
+
+    /**
+     * @return \DateTimeInterface
+     */
+    public function getDateScheduled()
+    {
+        return $this->dateScheduled;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getEventSettings()
+    {
+        return $this->eventSettings;
     }
 }

@@ -125,4 +125,8 @@
 >>>>>>> fce9013757 ([removal] remove deprecated Form::setFormType())
 =======
 - Deprecated method `Mautic\FormBundle\Entity\Form::isStandalone()` removed with no replacement. All forms can now be used in campaigns, so the standalone/campaign distinction no longer exists.
+<<<<<<< HEAD
 >>>>>>> 0e257adbfa ([removal] remove deprecated Form::isStandalone())
+=======
+- Deprecated class `Mautic\CampaignBundle\Event\CampaignScheduledEvent` removed. Its only subclass `Mautic\CampaignBundle\Event\ScheduledEvent` absorbed all of its properties and getters, so the dispatched event keeps the same public API. Code type-hinting or `instanceof`-checking `CampaignScheduledEvent` must target `ScheduledEvent` instead.
+>>>>>>> 0e2f01c4fc ([removal] merge deprecated CampaignScheduledEvent into ScheduledEvent)
