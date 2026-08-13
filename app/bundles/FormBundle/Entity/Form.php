@@ -777,19 +777,6 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @deprecated since Mautic 7.1, will be removed in 8.0. Form types are no longer used.
-     *
-     * @param mixed $formType
-     */
-    public function setFormType($formType): static
-    {
-        trigger_deprecation('mautic/mautic', '7.1', 'Form::setFormType() is deprecated and will be removed in 8.0.');
-        $this->formType = $formType;
-
-        return $this;
-    }
-
-    /**
      * @param bool|null $noIndex
      */
     public function setNoIndex($noIndex): void
