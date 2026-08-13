@@ -10,7 +10,9 @@ use Mautic\PluginBundle\Entity\IntegrationRepository;
 use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Entity\PluginRepository;
 use MauticPlugin\GrapesJsBuilderBundle\InstallFixtures\ORM\GrapesJsData;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('non-parallel')]
 final class GrapeJsDataTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;

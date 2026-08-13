@@ -21,10 +21,12 @@ use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Security\UserTokenSetter;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[Group('non-parallel')]
 final class ImportControllerFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
