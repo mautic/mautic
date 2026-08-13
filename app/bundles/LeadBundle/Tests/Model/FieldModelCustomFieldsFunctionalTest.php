@@ -7,7 +7,9 @@ namespace Mautic\LeadBundle\Tests\Model;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('non-parallel')]
 final class FieldModelCustomFieldsFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;

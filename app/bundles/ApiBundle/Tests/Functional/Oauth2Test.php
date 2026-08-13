@@ -9,6 +9,7 @@ use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,6 +22,7 @@ use Symfony\Component\HttpFoundation\Response;
 #[PreserveGlobalState(false)]
 #[RunTestsInSeparateProcesses]
 #[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[Group('non-parallel')]
 final class Oauth2Test extends MauticMysqlTestCase
 {
     protected function setUp(): void

@@ -10,10 +10,12 @@ use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Helper\ImportHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 #[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[Group('non-parallel')]
 final class CampaignImportControllerTest extends MauticMysqlTestCase
 {
     protected function setUp(): void

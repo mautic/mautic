@@ -11,7 +11,9 @@ use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('non-parallel')]
 final class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     public function testCampaignLeadMerge(): void
