@@ -427,16 +427,6 @@ final class LeadEvents
     public const string FILTER_CHOICE_FIELDS = 'mautic.filter_choice_fields';
 
     /**
-     * @deprecated Listen to ON_CAMPAIGN_BATCH_ACTION instead.
-     *
-     * The mautic.lead.on_campaign_trigger_action event is fired when the campaign action triggers.
-     *
-     * The event listener receives a
-     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
-     */
-    public const string ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.lead.on_campaign_trigger_action';
-
-    /**
      * The mautic.lead.on_campaign_batch_action event is dispatched when the campaign action triggers.
      *
      * The event listener receives a

@@ -33,8 +33,6 @@ final readonly class CampaignActionDeleteContactSubscriber implements EventSubsc
             [
                 'label'                  => 'mautic.lead.lead.events.delete',
                 'description'            => 'mautic.lead.lead.events.delete_descr',
-                // Kept for BC in case plugins are listening to the shared trigger
-                'eventName'              => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION,
                 'batchEventName'         => LeadEvents::ON_CAMPAIGN_ACTION_DELETE_CONTACT,
                 'connectionRestrictions' => [
                     'target' => [

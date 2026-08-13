@@ -119,6 +119,32 @@
 
 - Deprecated support for `:`-prefixed parameter keys removed from `Mautic\LeadBundle\Segment\Query\QueryBuilder::setParameter()`. Pass the key without the colon — `setParameter('foo', $bar)`, not `setParameter(':foo', $bar)`. The `:foo` placeholder in the query string itself is unchanged.
 - Deprecated `models` key in bundle `Config/config.php` `services` removed. Services listed under it are no longer registered with the `mautic.model` tag; register models by their class name and let autowiring resolve them.
+<<<<<<< HEAD
 - Deprecated method `Mautic\FormBundle\Entity\Form::setFormType()` removed with no replacement. Form types are no longer used; the `form_type` column and its getter are unchanged.
 - Deprecated method `Mautic\FormBundle\Entity\Form::isStandalone()` removed with no replacement. All forms can now be used in campaigns, so the standalone/campaign distinction no longer exists.
 - Deprecated class `Mautic\CampaignBundle\Event\CampaignScheduledEvent` removed. Its only subclass `Mautic\CampaignBundle\Event\ScheduledEvent` absorbed all of its properties and getters, so the dispatched event keeps the same public API. Code type-hinting or `instanceof`-checking `CampaignScheduledEvent` must target `ScheduledEvent` instead.
+=======
+- Deprecated constant `Mautic\LeadBundle\LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION` (`mautic.lead.on_campaign_trigger_action`) removed. The eight built-in lead campaign actions (change points, change segments, modify tags, add to company, change company score, change owner, update contact, update primary company) and the internal set-manipulator listener now run on the batch event `LeadEvents::ON_CAMPAIGN_BATCH_ACTION` with a `Mautic\CampaignBundle\Event\PendingEvent` instead of the per-contact, also-deprecated `CampaignExecutionEvent`. Plugins that registered an action with `'eventName' => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION`, or added a listener on that event, must switch to `'batchEventName' => LeadEvents::ON_CAMPAIGN_BATCH_ACTION` and a `PendingEvent` listener — iterate `getPending()` and call `pass()`/`fail()` per log:
+
+```diff
+-'eventName' => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION,
++'batchEventName' => LeadEvents::ON_CAMPAIGN_BATCH_ACTION,
+```
+
+```diff
+-public function onAction(CampaignExecutionEvent $event): void
+-{
+-    $lead = $event->getLead();
+-    // ...
+-    $event->setResult(true);
+-}
++public function onAction(PendingEvent $event): void
++{
++    foreach ($event->getPending() as $log) {
++        $lead = $log->getLead();
++        // ...
++        $event->pass($log);
++    }
++}
+```
+>>>>>>> 7e1aa6a30c ([removal] remove deprecated LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION)

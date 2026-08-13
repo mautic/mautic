@@ -77,7 +77,8 @@ final class CampaignSubscriber implements EventSubscriberInterface
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD      => ['onCampaignBuild', 0],
-            LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION => [
+            LeadEvents::ON_CAMPAIGN_BATCH_ACTION => [
+                ['onCampaignTriggerActionUpdateLead', 0],
                 ['onCampaignTriggerActionChangePoints', 0],
                 ['onCampaignTriggerActionChangeLists', 1],
                 ['onCampaignTriggerActionUpdateTags', 3],
@@ -86,9 +87,6 @@ final class CampaignSubscriber implements EventSubscriberInterface
                 ['onCampaignTriggerActionChangeOwner', 7],
                 ['onCampaignTriggerActionUpdateCompany', 8],
                 ['onCampaignTriggerActionSetManipulator', 100],
-            ],
-            LeadEvents::ON_CAMPAIGN_BATCH_ACTION => [
-                ['onCampaignTriggerActionUpdateLead', 0],
             ],
             LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION => [
                 ['onCampaignTriggerCondition', 0],
@@ -106,7 +104,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
             'label'       => 'mautic.lead.lead.events.changepoints',
             'description' => 'mautic.lead.lead.events.changepoints_descr',
             'formType'    => PointActionType::class,
-            'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+            'batchEventName' => LeadEvents::ON_CAMPAIGN_BATCH_ACTION,
         ];
         $event->addAction('lead.changepoints', $action);
 
@@ -114,7 +112,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
             'label'       => 'mautic.lead.lead.events.changelist',
             'description' => 'mautic.lead.lead.events.changelist_descr',
             'formType'    => ListActionType::class,
-            'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+            'batchEventName' => LeadEvents::ON_CAMPAIGN_BATCH_ACTION,
         ];
         $event->addAction('lead.changelist', $action);
 
@@ -132,7 +130,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
             'description' => 'mautic.lead.lead.events.updatecompany_descr',
             'formType'    => UpdateCompanyActionType::class,
             'formTheme'   => '@MauticLead/FormTheme/ActionUpdateCompany/_updatecompany_action_widget.html.twig',
-            'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+            'batchEventName' => LeadEvents::ON_CAMPAIGN_BATCH_ACTION,
         ];
         $event->addAction('lead.updatecompany', $action);
 
@@ -140,7 +138,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
             'label'       => 'mautic.lead.lead.events.changetags',
             'description' => 'mautic.lead.lead.events.changetags_descr',
             'formType'    => ModifyLeadTagsType::class,
-            'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+            'batchEventName' => LeadEvents::ON_CAMPAIGN_BATCH_ACTION,
         ];
         $event->addAction('lead.changetags', $action);
 
@@ -148,7 +146,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
             'label'       => 'mautic.lead.lead.events.addtocompany',
             'description' => 'mautic.lead.lead.events.addtocompany_descr',
             'formType'    => AddToCompanyActionType::class,
-            'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+            'batchEventName' => LeadEvents::ON_CAMPAIGN_BATCH_ACTION,
         ];
         $event->addAction('lead.addtocompany', $action);
 
@@ -156,7 +154,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
             'label'       => 'mautic.lead.lead.events.changeowner',
             'description' => 'mautic.lead.lead.events.changeowner_descr',
             'formType'    => ChangeOwnerType::class,
-            'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+            'batchEventName' => LeadEvents::ON_CAMPAIGN_BATCH_ACTION,
         ];
         $event->addAction(self::ACTION_LEAD_CHANGE_OWNER, $action);
 
@@ -164,7 +162,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
             'label'       => 'mautic.lead.lead.events.changecompanyscore',
             'description' => 'mautic.lead.lead.events.changecompanyscore_descr',
             'formType'    => CompanyChangeScoreActionType::class,
-            'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+            'batchEventName' => LeadEvents::ON_CAMPAIGN_BATCH_ACTION,
         ];
         $event->addAction('lead.scorecontactscompanies', $action);
 
@@ -269,72 +267,74 @@ final class CampaignSubscriber implements EventSubscriberInterface
         $event->addCondition('lead.points', $trigger);
     }
 
-    public function onCampaignTriggerActionChangePoints(CampaignExecutionEvent $event): void
+    public function onCampaignTriggerActionChangePoints(PendingEvent $event): void
     {
         if (!$event->checkContext('lead.changepoints')) {
             return;
         }
 
-        $lead              = $event->getLead();
-        $points            = $event->getConfig()['points'];
-        $somethingHappened = false;
+        $campaignEvent       = $event->getEvent();
+        $config              = $campaignEvent->getProperties();
+        $points              = $config['points'];
+        $pointGroupId        = $config['group'] ?? null;
+        $pointGroup          = $pointGroupId ? $this->groupModel->getEntity($pointGroupId) : null;
+        $pointsLogActionName = "{$campaignEvent->getId()}: {$campaignEvent->getName()}";
+        $pointsLogEventName  = "{$campaignEvent->getCampaign()->getId()}: {$campaignEvent->getCampaign()->getName()}";
 
-        if (null !== $lead && !empty($points)) {
-            $pointsLogActionName      = "{$event->getEvent()['id']}: {$event->getEvent()['name']}";
-            $pointsLogEventName       = "{$event->getEvent()['campaign']['id']}: {$event->getEvent()['campaign']['name']}";
-            $pointGroupId             = $event->getConfig()['group'] ?? null;
-            $pointGroup               = $pointGroupId ? $this->groupModel->getEntity($pointGroupId) : null;
+        foreach ($event->getPending() as $log) {
+            $lead = $log->getLead();
 
-            if ($pointGroup instanceof \Mautic\PointBundle\Entity\Group) {
-                $this->groupModel->adjustPoints($lead, $pointGroup, $points);
-            } else {
-                $lead->adjustPoints($points);
+            if (null !== $lead && !empty($points)) {
+                if ($pointGroup instanceof \Mautic\PointBundle\Entity\Group) {
+                    $this->groupModel->adjustPoints($lead, $pointGroup, $points);
+                } else {
+                    $lead->adjustPoints($points);
+                }
+
+                // add a lead point change log
+                $pointsChangeLog = new PointsChangeLog();
+                $pointsChangeLog->setDelta($points);
+                $pointsChangeLog->setLead($lead);
+                $pointsChangeLog->setType('campaign');
+                $pointsChangeLog->setEventName($pointsLogEventName);
+                $pointsChangeLog->setActionName($pointsLogActionName);
+                $pointsChangeLog->setIpAddress($this->ipLookupHelper->getIpAddress());
+                $pointsChangeLog->setDateAdded(new \DateTime());
+                if ($pointGroup) {
+                    $pointsChangeLog->setGroup($pointGroup);
+                }
+                $lead->addPointsChangeLog($pointsChangeLog);
+
+                $this->leadModel->saveEntity($lead);
             }
 
-            // add a lead point change log
-            $log = new PointsChangeLog();
-            $log->setDelta($points);
-            $log->setLead($lead);
-            $log->setType('campaign');
-            $log->setEventName($pointsLogEventName);
-            $log->setActionName($pointsLogActionName);
-            $log->setIpAddress($this->ipLookupHelper->getIpAddress());
-            $log->setDateAdded(new \DateTime());
-            if ($pointGroup) {
-                $log->setGroup($pointGroup);
-            }
-            $lead->addPointsChangeLog($log);
-
-            $this->leadModel->saveEntity($lead);
-            $somethingHappened = true;
+            $event->pass($log);
         }
-
-        $event->setResult($somethingHappened);
     }
 
-    public function onCampaignTriggerActionChangeLists(CampaignExecutionEvent $event): void
+    public function onCampaignTriggerActionChangeLists(PendingEvent $event): void
     {
         if (!$event->checkContext('lead.changelist')) {
             return;
         }
 
-        $addTo      = $event->getConfig()['addToLists'];
-        $removeFrom = $event->getConfig()['removeFromLists'];
+        $config     = $event->getEvent()->getProperties();
+        $addTo      = $config['addToLists'];
+        $removeFrom = $config['removeFromLists'];
 
-        $lead              = $event->getLead();
-        $somethingHappened = false;
+        foreach ($event->getPending() as $log) {
+            $lead = $log->getLead();
 
-        if (!empty($addTo)) {
-            $this->leadModel->addToLists($lead, $addTo);
-            $somethingHappened = true;
+            if (!empty($addTo)) {
+                $this->leadModel->addToLists($lead, $addTo);
+            }
+
+            if (!empty($removeFrom)) {
+                $this->leadModel->removeFromLists($lead, $removeFrom);
+            }
+
+            $event->pass($log);
         }
-
-        if (!empty($removeFrom)) {
-            $this->leadModel->removeFromLists($lead, $removeFrom);
-            $somethingHappened = true;
-        }
-
-        $event->setResult($somethingHappened);
     }
 
     public function onCampaignTriggerActionUpdateLead(PendingEvent $event): void
@@ -390,113 +390,123 @@ final class CampaignSubscriber implements EventSubscriberInterface
         $event->pass($log);
     }
 
-    public function onCampaignTriggerActionChangeOwner(CampaignExecutionEvent $event): void
+    public function onCampaignTriggerActionChangeOwner(PendingEvent $event): void
     {
         if (!$event->checkContext(self::ACTION_LEAD_CHANGE_OWNER)) {
             return;
         }
 
-        $lead = $event->getLead();
-        $data = $event->getConfig();
+        $data = $event->getEvent()->getProperties();
         if (empty($data['owner'])) {
+            $event->passAll();
+
             return;
         }
 
-        $this->leadModel->updateLeadOwner($lead, $data['owner']);
-
-        $event->setResult(true);
+        foreach ($event->getPending() as $log) {
+            $this->leadModel->updateLeadOwner($log->getLead(), $data['owner']);
+            $event->pass($log);
+        }
     }
 
-    public function onCampaignTriggerActionUpdateTags(CampaignExecutionEvent $event): void
+    public function onCampaignTriggerActionUpdateTags(PendingEvent $event): void
     {
         if (!$event->checkContext('lead.changetags')) {
             return;
         }
 
-        $config = $event->getConfig();
-        $lead   = $event->getLead();
-
+        $config     = $event->getEvent()->getProperties();
         $addTags    = (!empty($config['add_tags'])) ? $config['add_tags'] : [];
         $removeTags = (!empty($config['remove_tags'])) ? $config['remove_tags'] : [];
 
-        $this->leadModel->modifyTags($lead, $addTags, $removeTags);
-
-        $event->setResult(true);
+        foreach ($event->getPending() as $log) {
+            $this->leadModel->modifyTags($log->getLead(), $addTags, $removeTags);
+            $event->pass($log);
+        }
     }
 
-    public function onCampaignTriggerActionAddToCompany(CampaignExecutionEvent $event): void
+    public function onCampaignTriggerActionAddToCompany(PendingEvent $event): void
     {
         if (!$event->checkContext('lead.addtocompany')) {
             return;
         }
 
-        $company = $event->getConfig()['company'];
-        $lead    = $event->getLead();
+        $company = $event->getEvent()->getProperties()['company'];
 
-        if (!empty($company)) {
-            $this->leadModel->addToCompany($lead, $company);
+        foreach ($event->getPending() as $log) {
+            if (!empty($company)) {
+                $this->leadModel->addToCompany($log->getLead(), $company);
+            }
+
+            $event->pass($log);
         }
     }
 
-    public function onCampaignTriggerActionChangeCompanyScore(CampaignExecutionEvent $event): void
+    public function onCampaignTriggerActionChangeCompanyScore(PendingEvent $event): void
     {
         if (!$event->checkContext('lead.scorecontactscompanies')) {
             return;
         }
 
-        $score = $event->getConfig()['score'];
-        $lead  = $event->getLead();
+        $score = $event->getEvent()->getProperties()['score'];
 
-        if (!$this->leadModel->scoreContactsCompany($lead, $score)) {
-            $event->setFailed('mautic.lead.no_company');
+        foreach ($event->getPending() as $log) {
+            if (!$this->leadModel->scoreContactsCompany($log->getLead(), $score)) {
+                $event->fail($log, 'mautic.lead.no_company');
 
-            return;
+                continue;
+            }
+
+            $event->pass($log);
         }
-
-        $event->setResult(true);
     }
 
-    public function onCampaignTriggerActionUpdateCompany(CampaignExecutionEvent $event): void
+    public function onCampaignTriggerActionUpdateCompany(PendingEvent $event): void
     {
         if (!$event->checkContext('lead.updatecompany')) {
             return;
         }
 
-        $lead    = $event->getLead();
-        $company = $lead->getPrimaryCompany();
-        $config  = $event->getConfig();
+        $config = $event->getEvent()->getProperties();
 
-        if (empty($company['id'])) {
-            return;
+        foreach ($event->getPending() as $log) {
+            $lead    = $log->getLead();
+            $company = $lead->getPrimaryCompany();
+
+            if (empty($company['id'])) {
+                $event->pass($log);
+
+                continue;
+            }
+
+            $primaryCompany = $this->companyModel->getEntity($company['id']);
+
+            if (isset($config['companyname']) && $primaryCompany->getName() != $config['companyname']) {
+                [$company, $leadAdded, $companyEntity] = IdentifyCompanyHelper::identifyLeadsCompany($config, $lead, $this->companyModel);
+                $companyChangeLog                      = null;
+                if ($leadAdded) {
+                    $companyChangeLog = $lead->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
+                } elseif ($companyEntity instanceof Company) {
+                    $this->companyModel->setFieldValues($companyEntity, $config);
+                    $this->companyModel->saveEntity($companyEntity);
+                }
+
+                if (!empty($company)) {
+                    // Save after the lead in for new leads created
+                    $this->companyModel->addLeadToCompany($companyEntity, $lead);
+                    $this->leadModel->setPrimaryCompany($companyEntity->getId(), $lead->getId());
+                }
+
+                if (null !== $companyChangeLog) {
+                    $this->companyModel->getCompanyLeadRepository()->detachEntity($companyChangeLog);
+                }
+            } else {
+                $this->companyModel->setFieldValues($primaryCompany, $config, false);
+                $this->companyModel->saveEntity($primaryCompany);
+            }
+
+            $event->pass($log);
         }
-
-        $primaryCompany =  $this->companyModel->getEntity($company['id']);
-
-        if (isset($config['companyname']) && $primaryCompany->getName() != $config['companyname']) {
-            [$company, $leadAdded, $companyEntity] = IdentifyCompanyHelper::identifyLeadsCompany($config, $lead, $this->companyModel);
-            $companyChangeLog                      = null;
-            if ($leadAdded) {
-                $companyChangeLog = $lead->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
-            } elseif ($companyEntity instanceof Company) {
-                $this->companyModel->setFieldValues($companyEntity, $config);
-                $this->companyModel->saveEntity($companyEntity);
-            }
-
-            if (!empty($company)) {
-                // Save after the lead in for new leads created
-                $this->companyModel->addLeadToCompany($companyEntity, $lead);
-                $this->leadModel->setPrimaryCompany($companyEntity->getId(), $lead->getId());
-            }
-
-            if (null !== $companyChangeLog) {
-                $this->companyModel->getCompanyLeadRepository()->detachEntity($companyChangeLog);
-            }
-        } else {
-            $this->companyModel->setFieldValues($primaryCompany, $config, false);
-            $this->companyModel->saveEntity($primaryCompany);
-        }
-
-        $event->setResult(true);
     }
 
     public function onCampaignTriggerCondition(CampaignExecutionEvent $event): void
@@ -761,25 +771,29 @@ final class CampaignSubscriber implements EventSubscriberInterface
         return $now > $objEffectiveDate;
     }
 
-    public function onCampaignTriggerActionSetManipulator(CampaignExecutionEvent $event): void
+    public function onCampaignTriggerActionSetManipulator(PendingEvent $event): void
     {
-        $lead = $event->getLead();
+        // Cross-cutting listener: runs first (priority 100) and only mutates the leads.
+        // It intentionally does not pass()/fail() any log, leaving that to the matching action handler.
+        $campaignEvent = $event->getEvent();
+        $campaign      = $campaignEvent->getCampaign();
 
-        if (!$lead instanceof Lead) {
-            return;
+        foreach ($event->getPending() as $log) {
+            $lead = $log->getLead();
+
+            if (!$lead instanceof Lead) {
+                continue;
+            }
+
+            $lead->setManipulator(
+                new LeadManipulator(
+                    'campaign',
+                    'trigger-action',
+                    $campaignEvent->getId(),
+                    sprintf('%s (%s)', $campaignEvent->getName(), $campaign->getName())
+                )
+            );
         }
-
-        $campaign      = $event->getLogEntry()->getCampaign();
-        $campaignEvent = $event->getLogEntry()->getEvent();
-
-        $lead->setManipulator(
-            new LeadManipulator(
-                'campaign',
-                'trigger-action',
-                $campaignEvent->getId(),
-                sprintf('%s (%s)', $campaignEvent->getName(), $campaign->getName())
-            )
-        );
     }
 
     /**
