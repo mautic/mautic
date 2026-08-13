@@ -8,7 +8,9 @@ use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\LeadBundle\Model\LeadModel;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('non-parallel')]
 final class SetFrequencyRulesFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;

@@ -7,7 +7,9 @@ namespace Mautic\LeadBundle\Tests\Controller;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\ProjectBundle\Tests\Functional\AbstractProjectSearchTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('non-parallel')]
 final class LeadListProjectSearchFunctionalTest extends AbstractProjectSearchTestCase
 {
     #[DataProvider('searchDataProvider')]

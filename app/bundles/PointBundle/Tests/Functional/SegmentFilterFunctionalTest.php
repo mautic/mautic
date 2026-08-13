@@ -13,6 +13,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\HttpFoundation\Request;
 
+#[\PHPUnit\Framework\Attributes\Group('non-parallel')]
 final class SegmentFilterFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;

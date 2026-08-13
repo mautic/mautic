@@ -11,12 +11,14 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
 
 /**
  * @see https://github.com/mautic/mautic/issues/16166
  */
+#[Group('non-parallel')]
 final class LeadEmailReadDateSegmentFunctionalTest extends MauticMysqlTestCase
 {
     /**
