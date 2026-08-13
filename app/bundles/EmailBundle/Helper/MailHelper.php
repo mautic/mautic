@@ -17,7 +17,6 @@ use Mautic\EmailBundle\Entity\CopyRepository;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
-use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Form\Type\ConfigType;
 use Mautic\EmailBundle\Helper\DTO\AddressDTO;
 use Mautic\EmailBundle\Helper\Exception\OwnerNotFoundException;
@@ -1921,24 +1920,6 @@ class MailHelper
             'utmTags'     => (!empty($this->email)) ? $this->email->getUtmTags() : [],
             'includeDnc'  => !empty($this->email) && $this->email->getSendToDnc(),
         ];
-    }
-
-    /**
-     * Validates a given address to ensure RFC 2822, 3.6.2 specs.
-     *
-     * @deprecated 2.11.0 to be removed in 3.0; use Mautic\EmailBundle\Helper\EmailValidator
-     *
-     * @throws InvalidEmailException
-     */
-    public static function validateEmail($address): void
-    {
-        $invalidChar = strpbrk($address, '\'^&*%');
-        if (false !== $invalidChar) {
-            throw new InvalidEmailException('Email address ['.$address.'] contains this invalid character: '.substr($invalidChar, 0, 1));
-        }
-        if (!filter_var($address, FILTER_VALIDATE_EMAIL)) {
-            throw new InvalidEmailException('Email address ['.$address.'] is invalid');
-        }
     }
 
     private function setDefaultFrom(AddressDTO $systemFrom): void
