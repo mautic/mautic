@@ -9,9 +9,9 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Entity\ProjectRepository;
 use Mautic\ProjectBundle\Model\ProjectModel;
-use Mautic\ProjectBundle\Service\ProjectEntityLoaderService;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Model\RoleModel;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
@@ -110,25 +110,38 @@ final class ProjectControllerTest extends MauticMysqlTestCase
         $this->assertStringContainsString($project->getName(), (string) $clientResponseContent, 'The return must contain project');
     }
 
-    public function testViewActionUsesTheOnlyEditableEntityType(): void
+    public function testViewActionOpensTheOnlyEditableEntityTypeDirectly(): void
     {
         $project = $this->projectRepository->findOneBy([]);
 
-        /** @var ProjectEntityLoaderService $entityLoader */
-        $entityLoader = self::getContainer()->get(ProjectEntityLoaderService::class);
-        $editableTypes = $entityLoader->getEntityTypesWithEditPermissions();
+        $this->createAndLoginUser([
+            'project:project' => ['view'],
+            'asset:assets'    => ['viewown', 'editown'],
+        ]);
 
         $this->client->request('GET', '/s/projects/view/'.$project->getId());
         $content = (string) $this->client->getResponse()->getContent();
 
         $this->assertResponseIsSuccessful();
-        if (1 === count($editableTypes)) {
-            $editableType = array_key_first($editableTypes);
-            $this->assertStringContainsString('/s/projects/addEntity/', $content);
-            $this->assertStringContainsString('entityType='.$editableType, $content);
-        } else {
-            $this->assertStringContainsString('/s/projects/selectEntityType/', $content);
-        }
+        $this->assertStringContainsString('/s/projects/addEntity/', $content);
+        $this->assertStringContainsString('entityType=asset', $content);
+    }
+
+    public function testViewActionOpensEntityTypeSelectorWhenSeveralEntityTypesAreEditable(): void
+    {
+        $project = $this->projectRepository->findOneBy([]);
+
+        $this->createAndLoginUser([
+            'project:project' => ['view'],
+            'asset:assets'    => ['viewown', 'editown'],
+            'email:emails'    => ['viewown', 'editown'],
+        ]);
+
+        $this->client->request('GET', '/s/projects/view/'.$project->getId());
+        $content = (string) $this->client->getResponse()->getContent();
+
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('/s/projects/selectEntityType/', $content);
     }
 
     public function testViewActionNotFound(): void
@@ -207,10 +220,16 @@ final class ProjectControllerTest extends MauticMysqlTestCase
         $this->assertResponseStatusCodeSame(403, (string) $this->client->getResponse()->getStatusCode());
     }
 
-    private function createAndLoginUser(): User
+    /**
+     * @param array<string, array<int, string>> $permissions
+     */
+    private function createAndLoginUser(array $permissions = []): User
     {
         // Create non-admin role
         $role = $this->createRole();
+        /** @var RoleModel $roleModel */
+        $roleModel = self::getContainer()->get(RoleModel::class);
+        $roleModel->setRolePermissions($role, $permissions);
         // Create non-admin user
         $user = $this->createUser($role);
 
