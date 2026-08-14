@@ -2,7 +2,7 @@
 
 namespace Mautic\PluginBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\PluginBundle\Event\PluginIntegrationAuthRedirectEvent;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\PluginEvents;
@@ -11,8 +11,13 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-final class AuthController extends FormController
+final class AuthController extends AbstractStandardFormController
 {
+    protected function getModelName(): string
+    {
+        return '';
+    }
+
     /**
      * @param string $integration
      */

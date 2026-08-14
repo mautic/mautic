@@ -3,7 +3,7 @@
 namespace Mautic\FormBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -26,8 +26,13 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
 
-final class FieldController extends CommonFormController
+final class FieldController extends AbstractStandardFormController
 {
+    protected function getModelName(): string
+    {
+        return 'form.field';
+    }
+
     public function __construct(
         private readonly FormModel $formModel,
         private readonly FieldModel $formFieldModel,

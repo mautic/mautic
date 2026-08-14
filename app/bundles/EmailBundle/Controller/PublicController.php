@@ -2,7 +2,7 @@
 
 namespace Mautic\EmailBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
@@ -40,9 +40,14 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 
-final class PublicController extends CommonFormController
+final class PublicController extends AbstractStandardFormController
 {
     use FrequencyRuleTrait;
+
+    protected function getModelName(): string
+    {
+        return '';
+    }
 
     private LeadRepository $leadRepository;
 

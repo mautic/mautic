@@ -3,7 +3,7 @@
 namespace Mautic\FormBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
@@ -33,7 +33,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
-class FormController extends CommonFormController
+class FormController extends AbstractStandardFormController
 {
     public function __construct(
         FormFactoryInterface $formFactory,

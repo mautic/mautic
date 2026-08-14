@@ -2,7 +2,7 @@
 
 namespace Mautic\NotificationBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class MobileNotificationController extends FormController
+final class MobileNotificationController extends AbstractStandardFormController
 {
     use EntityContactsTrait;
 
@@ -30,6 +30,11 @@ final class MobileNotificationController extends FormController
     ): void {
         $this->auditLogModel = $auditLogModel;
         $this->notificationModel = $notificationModel;
+    }
+
+    protected function getModelName(): string
+    {
+        return 'notification.notification';
     }
 
     /**

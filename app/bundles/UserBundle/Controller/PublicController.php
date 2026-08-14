@@ -2,7 +2,7 @@
 
 namespace Mautic\UserBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Form\Type\PasswordResetConfirmType;
@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class PublicController extends FormController
+final class PublicController extends AbstractStandardFormController
 {
     private UserRepository $userRepository;
 
@@ -29,6 +29,11 @@ final class PublicController extends FormController
     ): void {
         $this->userModel = $userModel;
         $this->userRepository = $userRepository;
+    }
+
+    protected function getModelName(): string
+    {
+        return '';
     }
 
     /**

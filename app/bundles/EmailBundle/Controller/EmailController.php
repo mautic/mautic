@@ -3,7 +3,7 @@
 namespace Mautic\EmailBundle\Controller;
 
 use Mautic\AssetBundle\Model\AssetModel;
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Controller\QuickFilterSearchTrait;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
@@ -36,7 +36,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class EmailController extends FormController
+final class EmailController extends AbstractStandardFormController
 {
     use FormErrorMessagesTrait;
     use EntityContactsTrait;

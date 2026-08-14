@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Controller;
 
 use Doctrine\ORM\EntityNotFoundException;
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Controller\QuickFilterSearchTrait;
 use Mautic\CoreBundle\Exception\DeleteEntitiesDependencyException;
 use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
@@ -25,7 +25,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class ListController extends FormController
+final class ListController extends AbstractStandardFormController
 {
     use EntityContactsTrait;
     use QuickFilterSearchTrait;

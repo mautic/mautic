@@ -3,7 +3,7 @@
 namespace Mautic\AssetBundle\Controller;
 
 use Mautic\AssetBundle\Model\AssetModel;
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FileHelper;
@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class AssetController extends FormController
+final class AssetController extends AbstractStandardFormController
 {
     private AuditLogModel $auditLogModel;
 

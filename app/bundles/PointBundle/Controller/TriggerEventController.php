@@ -2,7 +2,7 @@
 
 namespace Mautic\PointBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\PointBundle\Form\Type\TriggerEventType;
 use Mautic\PointBundle\Model\TriggerModel;
@@ -11,8 +11,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class TriggerEventController extends CommonFormController
+final class TriggerEventController extends AbstractStandardFormController
 {
+    protected function getModelName(): string
+    {
+        return 'point.triggerevent';
+    }
+
     private TriggerModel $triggerModel;
 
     #[Required]

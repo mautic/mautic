@@ -2,7 +2,7 @@
 
 namespace Mautic\FormBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Form\Type\ActionType;
 use Mautic\FormBundle\Model\FormModel;
@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class ActionController extends CommonFormController
+final class ActionController extends AbstractStandardFormController
 {
     private FormModel $formModel;
 
@@ -20,6 +20,11 @@ final class ActionController extends CommonFormController
         FormModel $formModel,
     ): void {
         $this->formModel = $formModel;
+    }
+
+    protected function getModelName(): string
+    {
+        return 'form.action';
     }
 
     /**

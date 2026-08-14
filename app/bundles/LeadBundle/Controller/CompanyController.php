@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\FindReplaceType;
 use Mautic\CoreBundle\Helper\ExportHelper;
@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class CompanyController extends FormController
+final class CompanyController extends AbstractStandardFormController
 {
     use LeadDetailsTrait;
 
@@ -46,6 +46,11 @@ final class CompanyController extends FormController
         $this->companyModel = $companyModel;
         $this->fieldModel = $fieldModel;
         $this->companyRepository = $companyRepository;
+    }
+
+    protected function getModelName(): string
+    {
+        return 'lead.company';
     }
 
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, CompanyColumnsDictionary $companyColumnsDictionary, int $page = 1): Response

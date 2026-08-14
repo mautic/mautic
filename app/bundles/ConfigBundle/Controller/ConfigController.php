@@ -8,7 +8,7 @@ use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\ConfigBundle\Form\Type\ConfigType;
 use Mautic\ConfigBundle\Mapper\ConfigMapper;
 use Mautic\CoreBundle\Configurator\Configurator;
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class ConfigController extends FormController
+final class ConfigController extends AbstractStandardFormController
 {
     private TokenStorageInterface $tokenStorage;
 
@@ -30,6 +30,11 @@ final class ConfigController extends FormController
         TokenStorageInterface $tokenStorage,
     ): void {
         $this->tokenStorage = $tokenStorage;
+    }
+
+    protected function getModelName(): string
+    {
+        return '';
     }
 
     /**

@@ -6,7 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Form\Type\FindReplaceType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ExportHelper;
@@ -68,7 +68,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class LeadController extends FormController
+final class LeadController extends AbstractStandardFormController
 {
     use LeadDetailsTrait;
     use FrequencyRuleTrait;
@@ -136,6 +136,11 @@ final class LeadController extends FormController
         $this->userRepository = $userRepository;
         $this->doNotContactRepository = $doNotContactRepository;
         $this->emailRepository = $emailRepository;
+    }
+
+    protected function getModelName(): string
+    {
+        return 'lead.lead';
     }
 
     /**

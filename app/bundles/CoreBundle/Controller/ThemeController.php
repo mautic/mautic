@@ -15,8 +15,13 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-final class ThemeController extends FormController
+final class ThemeController extends AbstractStandardFormController
 {
+    protected function getModelName(): string
+    {
+        return '';
+    }
+
     public function indexAction(Request $request, ThemeHelperInterface $themeHelper, BuilderIntegrationsHelper $builderIntegrationsHelper, PathsHelper $pathsHelper): Response
     {
         // set some permissions

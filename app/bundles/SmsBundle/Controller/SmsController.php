@@ -3,7 +3,7 @@
 namespace Mautic\SmsBundle\Controller;
 
 use Doctrine\Common\Collections\Collection;
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class SmsController extends FormController
+final class SmsController extends AbstractStandardFormController
 {
     use EntityContactsTrait;
 

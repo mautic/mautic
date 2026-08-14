@@ -4,15 +4,20 @@ namespace Mautic\CampaignBundle\Controller;
 
 use Mautic\CampaignBundle\Form\Type\CampaignLeadSourceType;
 use Mautic\CampaignBundle\Model\CampaignModel;
-use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class SourceController extends CommonFormController
+class SourceController extends AbstractStandardFormController
 {
+    protected function getModelName(): string
+    {
+        return '';
+    }
+
     private CampaignModel $campaignModel;
 
     #[Required]

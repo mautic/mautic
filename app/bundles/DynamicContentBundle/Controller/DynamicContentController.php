@@ -2,7 +2,7 @@
 
 namespace Mautic\DynamicContentBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
@@ -13,8 +13,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class DynamicContentController extends FormController
+final class DynamicContentController extends AbstractStandardFormController
 {
+    protected function getModelName(): string
+    {
+        return 'dynamicContent.dynamicContent';
+    }
+
     private TrackableModel $trackableModel;
 
     private PageModel $pageModel;

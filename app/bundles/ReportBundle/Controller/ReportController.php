@@ -2,7 +2,7 @@
 
 namespace Mautic\ReportBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\EventListener\ReportSubscriber;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class ReportController extends FormController
+final class ReportController extends AbstractStandardFormController
 {
     private ReportModel $reportModel;
 
@@ -30,6 +30,11 @@ final class ReportController extends FormController
         ReportModel $reportModel,
     ): void {
         $this->reportModel = $reportModel;
+    }
+
+    protected function getModelName(): string
+    {
+        return 'report.report';
     }
 
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response

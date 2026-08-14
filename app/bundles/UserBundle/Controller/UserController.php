@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\UserBundle\Controller;
 
 use JMS\Serializer\SerializerInterface;
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -28,7 +28,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class UserController extends FormController
+final class UserController extends AbstractStandardFormController
 {
     private RoleRepository $roleRepository;
 
@@ -50,6 +50,11 @@ final class UserController extends FormController
         $this->auditLogModel = $auditLogModel;
         $this->auditLogRepository = $auditLogRepository;
         $this->roleRepository = $roleRepository;
+    }
+
+    protected function getModelName(): string
+    {
+        return 'user.user';
     }
 
     /**

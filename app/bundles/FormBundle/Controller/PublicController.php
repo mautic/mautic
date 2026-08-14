@@ -2,7 +2,7 @@
 
 namespace Mautic\FormBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
@@ -26,8 +26,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class PublicController extends CommonFormController
+final class PublicController extends AbstractStandardFormController
 {
+    protected function getModelName(): string
+    {
+        return '';
+    }
+
     private CompanyRepository $companyRepository;
 
     private FieldRepository $fieldRepository;

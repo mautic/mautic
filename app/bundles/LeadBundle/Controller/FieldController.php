@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Exception\DeleteEntitiesDependencyException;
 use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Exception\SchemaException;
@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class FieldController extends FormController
+final class FieldController extends AbstractStandardFormController
 {
     private FieldModel $fieldModel;
 
@@ -26,6 +26,11 @@ final class FieldController extends FormController
         FieldModel $fieldModel,
     ): void {
         $this->fieldModel = $fieldModel;
+    }
+
+    protected function getModelName(): string
+    {
+        return 'lead.field';
     }
 
     /**
