@@ -27,7 +27,6 @@ use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\PageBundle\Tests\PageTestAbstract;
-use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -85,9 +84,6 @@ final class PageModelDateLeftTest extends PageTestAbstract
         $pageModel->hitPage($page, $request, '200', $contact, ['page_url' => 'https://example.com/landing']);
     }
 
-    /**
-     * @return PageModel&MockObject
-     */
     private function createPageModelForHitPage(HitRepository $hitRepository): PageModel
     {
         $messageBus = new class() implements MessageBusInterface {
@@ -102,7 +98,7 @@ final class PageModelDateLeftTest extends PageTestAbstract
             ->method('setCookie')
             ->with(
                 $this->identicalTo('mautic_referer_id'),
-                $this->identicalTo('99'),
+                $this->identicalTo(99),
                 $this->anything(),
                 $this->anything(),
                 $this->anything(),
