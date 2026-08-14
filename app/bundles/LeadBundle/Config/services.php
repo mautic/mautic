@@ -95,4 +95,5 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.lead.model.ipaddress', Mautic\LeadBundle\Model\IpAddressModel::class);
     $services->alias('mautic.lead.model.export_scheduler', Mautic\LeadBundle\Model\ContactExportSchedulerModel::class);
     $services->alias('mautic.lead.repository.list_lead', Mautic\LeadBundle\Entity\ListLeadRepository::class);
+    $services->set(Mautic\LeadBundle\Security\Permissions\LeadPermissions::class);
 };

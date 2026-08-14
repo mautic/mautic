@@ -46,4 +46,5 @@ return function (ContainerConfigurator $configurator): void {
             service('.inner'),
             service('doctrine.orm.entity_manager'),
         ]);
+    $services->set(Mautic\ApiBundle\Security\Permissions\ApiPermissions::class);
 };

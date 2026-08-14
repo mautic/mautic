@@ -7,12 +7,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 final class MauticSocialPermissions extends AbstractPermissions
 {
-    /**
-     * @param mixed[] $params
-     */
-    public function __construct(array $params)
+    public function __construct()
     {
-        parent::__construct($params);
         $this->addStandardPermissions('categories');
         $this->addStandardPermissions('monitoring');
         $this->addExtendedPermissions('tweets');
