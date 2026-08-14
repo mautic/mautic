@@ -176,27 +176,15 @@ return function (ContainerConfigurator $configurator): void {
     $services->get(Mautic\CoreBundle\Helper\ComposerHelper::class)
         ->arg('$logger', \Symfony\Component\DependencyInjection\Loader\Configurator\service('monolog.logger.mautic'));
 
-    $services->get(Mautic\CoreBundle\Update\Step\DeleteCacheStep::class)->tag('mautic.update_step');
-
-    $services->get(Mautic\CoreBundle\Update\Step\FinalizeUpdateStep::class)->tag('mautic.update_step');
-
-    $services->get(Mautic\CoreBundle\Update\Step\InstallNewFilesStep::class)->tag('mautic.update_step');
-
     $services->get(Mautic\CoreBundle\Update\Step\RemoveDeletedFilesStep::class)
-        ->arg('$logger', \Symfony\Component\DependencyInjection\Loader\Configurator\service('monolog.logger.mautic'))
-        ->tag('mautic.update_step');
-
-    $services->get(Mautic\CoreBundle\Update\Step\UpdateSchemaStep::class)->tag('mautic.update_step');
+        ->arg('$logger', \Symfony\Component\DependencyInjection\Loader\Configurator\service('monolog.logger.mautic'));
 
     $services->get(Mautic\CoreBundle\Update\Step\UpdateTranslationsStep::class)
-        ->arg('$logger', \Symfony\Component\DependencyInjection\Loader\Configurator\service('monolog.logger.mautic'))
-        ->tag('mautic.update_step');
+        ->arg('$logger', \Symfony\Component\DependencyInjection\Loader\Configurator\service('monolog.logger.mautic'));
 
-    $services->get(Mautic\CoreBundle\Update\Step\PreUpdateChecksStep::class)->tag('mautic.update_step');
+    $services->set(Mautic\CoreBundle\Helper\Update\PreUpdateChecks\CheckPhpVersion::class);
 
-    $services->set(Mautic\CoreBundle\Helper\Update\PreUpdateChecks\CheckPhpVersion::class)->tag('mautic.update_check');
-
-    $services->set(Mautic\CoreBundle\Helper\Update\PreUpdateChecks\CheckDatabaseDriverAndVersion::class)->tag('mautic.update_check');
+    $services->set(Mautic\CoreBundle\Helper\Update\PreUpdateChecks\CheckDatabaseDriverAndVersion::class);
 
     $services->get(Mautic\CoreBundle\Monolog\LogProcessor::class)->tag('monolog.processor');
 
