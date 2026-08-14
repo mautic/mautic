@@ -155,7 +155,9 @@ class Ck5ForGrapesJs {
         'style',
         this.frameDoc.querySelector('head'),
         {
-          innerHTML: `p{margin-top:0px !important; margin-bottom: 0px !important;} .ck.ck-sticky-panel__content{ border-bottom-width: 1px !important; } ` +
+          // Keep zero margins only inside lists so top-level <p> spacing shows in the canvas
+          // (Enter vs Shift+Enter). See https://github.com/mautic/mautic/issues/17047
+          innerHTML: `li p{margin-top:0px !important; margin-bottom: 0px !important;} .ck.ck-sticky-panel__content{ border-bottom-width: 1px !important; } ` +
             `.ck-button.token-tip-active { background-color: #fff9c4 !important; border: 1px solid #ffd54f !important; margin: 5px !important; padding: 5px 10px !important; cursor: default !important; pointer-events: none !important; width: calc(100% - 10px) !important; min-height: auto !important; display: block !important; box-shadow: none !important; } ` +
             `.ck-button.token-tip-active .ck-button__label { color: #333 !important; font-weight: normal !important; white-space: normal !important; text-align: left !important; font-size: 13px !important; } ` +
             `.ck-button.token-tip-active.ck-on, .ck-button.token-tip-active.ck-on:not(.ck-disabled):hover { background: #fff9c4 !important; border: 1px solid #ffd54f !important; box-shadow: none !important; } ` +

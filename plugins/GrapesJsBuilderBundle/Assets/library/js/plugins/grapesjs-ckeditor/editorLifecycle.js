@@ -274,9 +274,12 @@ export const editorLifecycleMixin = {
       return;
     }
 
+    // Zero margins only for paragraphs inside list items so canvas <p> spacing matches
+    // preview/send. Keep inline-block on top-level editable paragraphs for editor layout.
+    // See https://github.com/mautic/mautic/issues/17047
     this.inlineStyles = createHtmlElem('style', head, {
       innerHTML:
-        `.ck-editor__editable>p {display: inline-block; margin-top: 0px !important; margin-bottom: 0px !important;}`,
+        `.ck-editor__editable>p {display: inline-block;} li p{margin-top:0px !important; margin-bottom:0px !important;}`,
     });
   },
 
