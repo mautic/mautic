@@ -1034,7 +1034,7 @@ class Asset extends FormEntity implements UuidInterface
         return 'remote' === $this->storageLocation;
     }
 
-    public function getDisallow(): bool
+    public function getDisallow(): ?bool
     {
         return $this->disallow;
     }
