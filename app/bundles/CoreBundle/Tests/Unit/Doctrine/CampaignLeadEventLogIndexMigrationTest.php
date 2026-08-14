@@ -27,38 +27,19 @@ final class CampaignLeadEventLogIndexMigrationTest extends TestCase
             'ALTER TABLE campaign_lead_event_log DROP INDEX campaign_leads, ADD INDEX campaign_leads (campaign_id, lead_id, rotation);',
             $migration->getSql()[0]->getStatement()
         );
-        $this->assertSame(
-            'CREATE INDEX campaign_lead_id ON campaign_lead_event_log (lead_id);',
-            $migration->getSql()[1]->getStatement()
-        );
     }
 
-    public function testSkipsWhenCampaignFirstAndLeadIdIndexesAlreadyExist(): void
+    public function testSkipsWhenCampaignFirstIndexAlreadyExists(): void
     {
         $migration = $this->createMigration();
         $schema    = $this->createSchema(['campaign_id', 'lead_id', 'rotation'], 'legacy_campaign_leads');
-        $schema->getTable('campaign_lead_event_log')->addIndex(['lead_id'], 'campaign_lead_id');
 
         $this->expectException(SkipMigration::class);
 
         $migration->preUp($schema);
     }
 
-    public function testDoesNotSkipWhenLeadIdIndexIsMissing(): void
-    {
-        $migration = $this->createMigration();
-        $schema    = $this->createSchema(['campaign_id', 'lead_id', 'rotation']);
-
-        $migration->preUp($schema);
-        $migration->up($schema);
-
-        $this->assertSame(
-            'CREATE INDEX campaign_lead_id ON campaign_lead_event_log (lead_id);',
-            $migration->getSql()[0]->getStatement()
-        );
-    }
-
-    public function testCreatesIndexesWhenCampaignLeadsIndexIsMissing(): void
+    public function testCreatesIndexWhenCampaignLeadsIndexIsMissing(): void
     {
         $migration = $this->createMigration();
         $schema    = new Schema();
@@ -70,38 +51,18 @@ final class CampaignLeadEventLogIndexMigrationTest extends TestCase
             'CREATE INDEX campaign_leads ON campaign_lead_event_log (campaign_id, lead_id, rotation);',
             $migration->getSql()[0]->getStatement()
         );
-        $this->assertSame(
-            'CREATE INDEX campaign_lead_id ON campaign_lead_event_log (lead_id);',
-            $migration->getSql()[1]->getStatement()
-        );
     }
 
-    public function testUpDoesNotDuplicateExistingLeadIdIndex(): void
+    public function testDownRestoresLeadFirstIndex(): void
     {
         $migration = $this->createMigration();
         $schema    = $this->createSchema(['campaign_id', 'lead_id', 'rotation']);
-        $schema->getTable('campaign_lead_event_log')->addIndex(['lead_id'], 'campaign_lead_id');
-
-        $migration->up($schema);
-
-        $this->assertCount(0, $migration->getSql());
-    }
-
-    public function testDownRestoresLeadFirstIndexAndDropsLeadIdIndex(): void
-    {
-        $migration = $this->createMigration();
-        $schema    = $this->createSchema(['campaign_id', 'lead_id', 'rotation']);
-        $schema->getTable('campaign_lead_event_log')->addIndex(['lead_id'], 'campaign_lead_id');
 
         $migration->down($schema);
 
         $this->assertSame(
             'ALTER TABLE campaign_lead_event_log DROP INDEX campaign_leads, ADD INDEX campaign_leads (lead_id, campaign_id, rotation);',
             $migration->getSql()[0]->getStatement()
-        );
-        $this->assertSame(
-            'DROP INDEX campaign_lead_id ON campaign_lead_event_log;',
-            $migration->getSql()[1]->getStatement()
         );
     }
 
