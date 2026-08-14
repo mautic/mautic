@@ -52,7 +52,7 @@ class PageTestAbstract extends TestCase
     /**
      * @return PageModel
      */
-    protected function getPageModel($transliterationEnabled = true)
+    protected function getPageModel($transliterationEnabled = true, ?HitRepository $hitRepository = null)
     {
         $cookieHelper = $this
             ->getMockBuilder(CookieHelper::class)
@@ -113,7 +113,7 @@ class PageTestAbstract extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $hitRepository = $this->createMock(HitRepository::class);
+        $hitRepository = $hitRepository ?? $this->createMock(HitRepository::class);
         $userHelper    = $this->createMock(UserHelper::class);
 
         $messageBus = $this

@@ -560,17 +560,17 @@ class PageModel extends FormModel
             // Queue is consuming this hit outside of the lead's active request so this must be set in order for listeners to know who the request belongs to
             $this->contactTracker->setSystemContact($lead);
         }
-        $trackingId = $hit->getTrackingId();
-        if (!$trackingNewlyGenerated) {
-            $lastHit = $request->cookies->get('mautic_referer_id');
-            if (!empty($lastHit)) {
-                // this is not a new session so update the last hit if applicable with the date/time the user left
-                $this->getHitRepository()->updateHitDateLeft($lastHit);
-            }
+
+        // Update previous hit's date_left if cookie exists (when user navigates to another page).
+        // Do not gate this on $trackingNewlyGenerated — device tracking may be (re)created on each
+        // request while mautic_referer_id still points at the previous hit.
+        $lastHit = $request->cookies->get('mautic_referer_id');
+        if (!empty($lastHit) && is_numeric($lastHit)) {
+            $this->getHitRepository()->updateHitDateLeft((int) $lastHit);
         }
 
-        // Check if this is a unique page hit
-        $isUnique = $this->getHitRepository()->isUniquePageHit($page, $trackingId, $lead);
+        $trackingId = $hit->getTrackingId();
+        $isUnique   = $this->getHitRepository()->isUniquePageHit($page, $trackingId, $lead);
 
         if ($page instanceof Page) {
             $hit->setPageLanguage($page->getLanguage());
