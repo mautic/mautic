@@ -826,6 +826,26 @@ final class ListController extends AbstractStandardFormController
         return $this->listModel->getPermissionBase();
     }
 
+    protected function getRouteBase(): ?string
+    {
+        return null;
+    }
+
+    protected function getTemplateBase(): ?string
+    {
+        return null;
+    }
+
+    protected function getTranslationBase(): ?string
+    {
+        return null;
+    }
+
+    protected function getJsLoadMethodPrefix(): ?string
+    {
+        return null;
+    }
+
     protected function getListModel(): ListModel
     {
         return $this->listModel;

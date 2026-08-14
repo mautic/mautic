@@ -3,7 +3,7 @@
 namespace Mautic\FormBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Mautic\CoreBundle\Controller\AbstractStandardFormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
@@ -33,11 +33,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
-class FormController extends AbstractStandardFormController
+class FormController extends AbstractFormController
 {
     public function __construct(
-        FormFactoryInterface $formFactory,
-        FormFieldHelper $fieldHelper,
+        private readonly FormFactoryInterface $formFactory,
+        private readonly FormFieldHelper $fieldHelper,
         private readonly AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector,
         private readonly MappedObjectCollector $mappedObjectCollector,
         ManagerRegistry $doctrine,
@@ -55,7 +55,7 @@ class FormController extends AbstractStandardFormController
         private readonly SubmissionRepository $submissionRepository,
         private readonly FormRepository $formRepository,
     ) {
-        parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
@@ -1165,11 +1165,6 @@ class FormController extends AbstractStandardFormController
                 ]
             )
         );
-    }
-
-    public function getModelName(): string
-    {
-        return 'form';
     }
 
     protected function getDefaultOrderDirection(): string

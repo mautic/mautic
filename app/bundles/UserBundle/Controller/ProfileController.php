@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Controller;
 
-use Mautic\CoreBundle\Controller\AbstractStandardFormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class ProfileController extends AbstractStandardFormController
+final class ProfileController extends AbstractFormController
 {
     private UserModel $userModel;
 
@@ -25,11 +25,6 @@ final class ProfileController extends AbstractStandardFormController
         UserModel $userModel,
     ): void {
         $this->userModel = $userModel;
-    }
-
-    protected function getModelName(): string
-    {
-        return '';
     }
 
     /**

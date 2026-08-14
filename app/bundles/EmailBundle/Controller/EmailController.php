@@ -3,7 +3,7 @@
 namespace Mautic\EmailBundle\Controller;
 
 use Mautic\AssetBundle\Model\AssetModel;
-use Mautic\CoreBundle\Controller\AbstractStandardFormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Controller\QuickFilterSearchTrait;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
@@ -30,13 +30,14 @@ use Mautic\LeadBundle\Helper\FakeContactHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\PageBundle\Exception\InvalidRenderedHtmlException;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class EmailController extends AbstractStandardFormController
+final class EmailController extends AbstractFormController
 {
     use FormErrorMessagesTrait;
     use EntityContactsTrait;
@@ -50,13 +51,17 @@ final class EmailController extends AbstractStandardFormController
 
     private AuditLogModel $auditLogModel;
 
+    private FormFactoryInterface $formFactory;
+
     #[Required]
     public function autowireEmailController(
+        FormFactoryInterface $formFactory,
         ListModel $listModel,
         AuditLogModel $auditLogModel,
         EmailModel $emailModel,
         LeadRepository $leadRepository,
     ): void {
+        $this->formFactory = $formFactory;
         $this->listModel = $listModel;
         $this->auditLogModel = $auditLogModel;
         $this->emailModel = $emailModel;
@@ -1849,11 +1854,6 @@ final class EmailController extends AbstractStandardFormController
             'email',
             'email_id'
         );
-    }
-
-    public function getModelName(): string
-    {
-        return 'email';
     }
 
     protected function getDefaultOrderDirection(): string

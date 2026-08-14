@@ -8,33 +8,33 @@ use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\ConfigBundle\Form\Type\ConfigType;
 use Mautic\ConfigBundle\Mapper\ConfigMapper;
 use Mautic\CoreBundle\Configurator\Configurator;
-use Mautic\CoreBundle\Controller\AbstractStandardFormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class ConfigController extends AbstractStandardFormController
+final class ConfigController extends AbstractFormController
 {
     private TokenStorageInterface $tokenStorage;
 
+    private FormFactoryInterface $formFactory;
+
     #[Required]
     public function autowireConfigController(
+        FormFactoryInterface $formFactory,
         TokenStorageInterface $tokenStorage,
     ): void {
+        $this->formFactory = $formFactory;
         $this->tokenStorage = $tokenStorage;
-    }
-
-    protected function getModelName(): string
-    {
-        return '';
     }
 
     /**

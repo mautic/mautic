@@ -6,7 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
-use Mautic\CoreBundle\Controller\AbstractStandardFormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Form\Type\FindReplaceType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ExportHelper;
@@ -60,6 +60,7 @@ use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -68,7 +69,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class LeadController extends AbstractStandardFormController
+final class LeadController extends AbstractFormController
 {
     use LeadDetailsTrait;
     use FrequencyRuleTrait;
@@ -103,8 +104,11 @@ final class LeadController extends AbstractStandardFormController
 
     private EmailRepository $emailRepository;
 
+    private FormFactoryInterface $formFactory;
+
     #[Required]
     public function autowireLeadController(
+        FormFactoryInterface $formFactory,
         LeadModel $leadModel,
         ListModel $leadListModel,
         StageModel $stageModel,
@@ -121,6 +125,7 @@ final class LeadController extends AbstractStandardFormController
         DoNotContactRepository $doNotContactRepository,
         EmailRepository $emailRepository,
     ): void {
+        $this->formFactory = $formFactory;
         $this->leadModel = $leadModel;
         $this->stageModel = $stageModel;
         $this->leadListModel = $leadListModel;
@@ -136,11 +141,6 @@ final class LeadController extends AbstractStandardFormController
         $this->userRepository = $userRepository;
         $this->doNotContactRepository = $doNotContactRepository;
         $this->emailRepository = $emailRepository;
-    }
-
-    protected function getModelName(): string
-    {
-        return 'lead.lead';
     }
 
     /**

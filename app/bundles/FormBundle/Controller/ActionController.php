@@ -2,29 +2,29 @@
 
 namespace Mautic\FormBundle\Controller;
 
-use Mautic\CoreBundle\Controller\AbstractStandardFormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Form\Type\ActionType;
 use Mautic\FormBundle\Model\FormModel;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class ActionController extends AbstractStandardFormController
+final class ActionController extends AbstractFormController
 {
     private FormModel $formModel;
 
+    private FormFactoryInterface $formFactory;
+
     #[Required]
     public function autowireActionController(
+        FormFactoryInterface $formFactory,
         FormModel $formModel,
     ): void {
+        $this->formFactory = $formFactory;
         $this->formModel = $formModel;
-    }
-
-    protected function getModelName(): string
-    {
-        return 'form.action';
     }
 
     /**

@@ -4,26 +4,26 @@ namespace Mautic\CampaignBundle\Controller;
 
 use Mautic\CampaignBundle\Form\Type\CampaignLeadSourceType;
 use Mautic\CampaignBundle\Model\CampaignModel;
-use Mautic\CoreBundle\Controller\AbstractStandardFormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class SourceController extends AbstractStandardFormController
+class SourceController extends AbstractFormController
 {
-    protected function getModelName(): string
-    {
-        return '';
-    }
-
     private CampaignModel $campaignModel;
+
+    private FormFactoryInterface $formFactory;
 
     #[Required]
     public function autowireSourceController(
+        FormFactoryInterface $formFactory,
         CampaignModel $campaignModel,
     ): void {
+        $this->formFactory = $formFactory;
         $this->campaignModel = $campaignModel;
     }
 

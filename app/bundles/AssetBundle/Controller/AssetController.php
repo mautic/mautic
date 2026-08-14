@@ -3,26 +3,31 @@
 namespace Mautic\AssetBundle\Controller;
 
 use Mautic\AssetBundle\Model\AssetModel;
-use Mautic\CoreBundle\Controller\AbstractStandardFormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FileHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Oneup\UploaderBundle\Templating\Helper\UploaderHelper;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class AssetController extends AbstractStandardFormController
+final class AssetController extends AbstractFormController
 {
     private AuditLogModel $auditLogModel;
 
+    private FormFactoryInterface $formFactory;
+
     #[Required]
     public function autowireAssetController(
+        FormFactoryInterface $formFactory,
         AuditLogModel $auditLogModel,
     ): void {
+        $this->formFactory = $formFactory;
         $this->auditLogModel = $auditLogModel;
     }
 
@@ -735,11 +740,6 @@ final class AssetController extends AbstractStandardFormController
                 'route'         => $this->generateUrl('mautic_asset_index', ['page' => $request->getSession()->get('mautic.asset.page', 1)]),
             ],
         ]);
-    }
-
-    public function getModelName(): string
-    {
-        return 'asset';
     }
 
     protected function getDefaultOrderDirection(): string

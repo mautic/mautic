@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Controller;
 
-use Mautic\CoreBundle\Controller\AbstractStandardFormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\LeadNote;
 use Mautic\LeadBundle\Model\NoteModel;
@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class NoteController extends AbstractStandardFormController
+final class NoteController extends AbstractFormController
 {
     use LeadAccessTrait;
 
@@ -22,11 +22,6 @@ final class NoteController extends AbstractStandardFormController
         NoteModel $noteModel,
     ): void {
         $this->noteModel = $noteModel;
-    }
-
-    protected function getModelName(): string
-    {
-        return 'lead.note';
     }
 
     /**

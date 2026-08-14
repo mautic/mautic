@@ -23,10 +23,7 @@ final class WebhookController extends AbstractStandardFormController
         return 'mautic_webhook';
     }
 
-    /**
-     * @return mixed
-     */
-    protected function getSessionBase($objectId = null)
+    protected function getSessionBase($objectId = null): string
     {
         return 'mautic.mautic_webhook';
     }

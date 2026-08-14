@@ -2,7 +2,7 @@
 
 namespace Mautic\PageBundle\Controller;
 
-use Mautic\CoreBundle\Controller\AbstractStandardFormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
@@ -18,21 +18,26 @@ use Mautic\PageBundle\Event\PageEditSubmitEvent;
 use Mautic\PageBundle\Exception\InvalidRenderedHtmlException;
 use Mautic\PageBundle\Helper\PageConfig;
 use Mautic\PageBundle\Model\PageModel;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class PageController extends AbstractStandardFormController
+final class PageController extends AbstractFormController
 {
     use FormErrorMessagesTrait;
 
     private PageModel $pageModel;
 
+    private FormFactoryInterface $formFactory;
+
     #[Required]
     public function autowirePageController(
+        FormFactoryInterface $formFactory,
         PageModel $pageModel,
     ): void {
+        $this->formFactory = $formFactory;
         $this->pageModel = $pageModel;
     }
 
@@ -1167,11 +1172,6 @@ final class PageController extends AbstractStandardFormController
         ];
 
         return $submissionModel->exportResultsForPage($format, $activePage, $args);
-    }
-
-    public function getModelName(): string
-    {
-        return 'page';
     }
 
     protected function getDefaultOrderDirection(): string

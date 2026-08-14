@@ -3,11 +3,11 @@
 namespace Mautic\ConfigBundle\Controller;
 
 use Mautic\ConfigBundle\Model\SysinfoModel;
-use Mautic\CoreBundle\Controller\AbstractStandardFormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class SysinfoController extends AbstractStandardFormController
+final class SysinfoController extends AbstractFormController
 {
     private SysinfoModel $sysinfoModel;
 
@@ -16,11 +16,6 @@ final class SysinfoController extends AbstractStandardFormController
         SysinfoModel $sysinfoModel,
     ): void {
         $this->sysinfoModel = $sysinfoModel;
-    }
-
-    protected function getModelName(): string
-    {
-        return '';
     }
 
     public function indexAction(): Response

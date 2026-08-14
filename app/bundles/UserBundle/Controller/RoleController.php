@@ -2,7 +2,7 @@
 
 namespace Mautic\UserBundle\Controller;
 
-use Mautic\CoreBundle\Controller\AbstractStandardFormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\UserBundle\Entity;
 use Mautic\UserBundle\Entity\PermissionRepository;
@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class RoleController extends AbstractStandardFormController
+final class RoleController extends AbstractFormController
 {
     private const string PERMISSION_VIEW = 'user:roles:view';
 
@@ -37,11 +37,6 @@ final class RoleController extends AbstractStandardFormController
         RoleModel $roleModel,
     ): void {
         $this->roleModel = $roleModel;
-    }
-
-    protected function getModelName(): string
-    {
-        return 'user.role';
     }
 
     /**

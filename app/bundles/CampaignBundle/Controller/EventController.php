@@ -7,21 +7,17 @@ use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Form\Type\EventType;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
-use Mautic\CoreBundle\Controller\AbstractStandardFormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class EventController extends AbstractStandardFormController
+final class EventController extends AbstractFormController
 {
-    protected function getModelName(): string
-    {
-        return 'campaign.event';
-    }
-
     /**
      * @var string[]
      */
@@ -39,13 +35,17 @@ final class EventController extends AbstractStandardFormController
 
     private EventModel $eventModel;
 
+    private FormFactoryInterface $formFactory;
+
     #[Required]
     public function autowireEventController(
+        FormFactoryInterface $formFactory,
         EventCollector $eventCollector,
         DateHelper $dateHelper,
         CampaignModel $campaignModel,
         EventModel $eventModel,
     ): void {
+        $this->formFactory = $formFactory;
         $this->eventCollector = $eventCollector;
         $this->dateHelper = $dateHelper;
         $this->campaignModel = $campaignModel;

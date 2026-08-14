@@ -3,7 +3,7 @@
 namespace Mautic\FormBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Mautic\CoreBundle\Controller\AbstractStandardFormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -26,18 +26,13 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
 
-final class FieldController extends AbstractStandardFormController
+final class FieldController extends AbstractFormController
 {
-    protected function getModelName(): string
-    {
-        return 'form.field';
-    }
-
     public function __construct(
         private readonly FormModel $formModel,
         private readonly FieldModel $formFieldModel,
-        FormFieldHelper $fieldHelper,
-        FormFactoryInterface $formFactory,
+        private readonly FormFieldHelper $fieldHelper,
+        private readonly FormFactoryInterface $formFactory,
         private readonly MappedObjectCollectorInterface $mappedObjectCollector,
         private readonly AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector,
         ManagerRegistry $doctrine,
@@ -50,10 +45,7 @@ final class FieldController extends AbstractStandardFormController
         RequestStack $requestStack,
         CorePermissions $security,
     ) {
-        $this->fieldHelper                 = $fieldHelper;
-        $this->formFactory                 = $formFactory;
-
-        parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**

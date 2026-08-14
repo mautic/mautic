@@ -2,28 +2,28 @@
 
 namespace Mautic\PointBundle\Controller;
 
-use Mautic\CoreBundle\Controller\AbstractStandardFormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\PointBundle\Form\Type\TriggerEventType;
 use Mautic\PointBundle\Model\TriggerModel;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class TriggerEventController extends AbstractStandardFormController
+final class TriggerEventController extends AbstractFormController
 {
-    protected function getModelName(): string
-    {
-        return 'point.triggerevent';
-    }
-
     private TriggerModel $triggerModel;
+
+    private FormFactoryInterface $formFactory;
 
     #[Required]
     public function autowireTriggerEventController(
+        FormFactoryInterface $formFactory,
         TriggerModel $triggerModel,
     ): void {
+        $this->formFactory = $formFactory;
         $this->triggerModel = $triggerModel;
     }
 

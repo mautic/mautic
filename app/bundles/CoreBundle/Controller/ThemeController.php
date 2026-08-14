@@ -12,14 +12,20 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-final class ThemeController extends AbstractStandardFormController
+final class ThemeController extends AbstractFormController
 {
-    protected function getModelName(): string
-    {
-        return '';
+    private FormFactoryInterface $formFactory;
+
+    #[Required]
+    public function autowireThemeController(
+        FormFactoryInterface $formFactory,
+    ): void {
+        $this->formFactory = $formFactory;
     }
 
     public function indexAction(Request $request, ThemeHelperInterface $themeHelper, BuilderIntegrationsHelper $builderIntegrationsHelper, PathsHelper $pathsHelper): Response

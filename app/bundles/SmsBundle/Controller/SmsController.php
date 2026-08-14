@@ -3,7 +3,7 @@
 namespace Mautic\SmsBundle\Controller;
 
 use Doctrine\Common\Collections\Collection;
-use Mautic\CoreBundle\Controller\AbstractStandardFormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -12,13 +12,14 @@ use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Model\SmsModel;
 use Mautic\SmsBundle\Sms\TransportChain;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class SmsController extends AbstractStandardFormController
+final class SmsController extends AbstractFormController
 {
     use EntityContactsTrait;
 
@@ -26,11 +27,15 @@ final class SmsController extends AbstractStandardFormController
 
     private SmsModel $smsModel;
 
+    private FormFactoryInterface $formFactory;
+
     #[Required]
     public function autowireSmsController(
+        FormFactoryInterface $formFactory,
         SmsModel $smsModel,
         AuditLogModel $auditLogModel,
     ): void {
+        $this->formFactory = $formFactory;
         $this->smsModel = $smsModel;
         $this->auditLogModel = $auditLogModel;
     }
@@ -739,11 +744,6 @@ final class SmsController extends AbstractStandardFormController
             'sms',
             'sms_id'
         );
-    }
-
-    protected function getModelName(): string
-    {
-        return 'sms';
     }
 
     protected function getDefaultOrderDirection(): string

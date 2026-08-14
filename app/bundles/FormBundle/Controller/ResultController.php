@@ -2,16 +2,8 @@
 
 namespace Mautic\FormBundle\Controller;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
-use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Service\FlashBag;
-use Mautic\CoreBundle\Translation\Translator;
-use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
@@ -19,35 +11,31 @@ use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\FormBundle\Model\SubmissionResultLoader;
 use Mautic\LeadBundle\Form\Type\BatchType;
 use Mautic\LeadBundle\Model\ListModel;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 final class ResultController extends AbstractStandardFormController
 {
-    public function __construct(
-        FormFactoryInterface $formFactory,
-        FormFieldHelper $fieldHelper,
-        ManagerRegistry $doctrine,
-        ModelFactory $modelFactory,
-        UserHelper $userHelper,
-        CoreParametersHelper $coreParametersHelper,
-        EventDispatcherInterface $dispatcher,
-        Translator $translator,
-        FlashBag $flashBag,
-        RequestStack $requestStack,
-        CorePermissions $security,
-        private readonly FormModel $formModel,
-        private readonly SubmissionResultLoader $submissionResultLoader,
-        private readonly SubmissionModel $submissionModel,
-    ) {
-        parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    private FormModel $formModel;
+
+    private SubmissionResultLoader $submissionResultLoader;
+
+    private SubmissionModel $submissionModel;
+
+    #[Required]
+    public function autowireResultController(
+        FormModel $formModel,
+        SubmissionResultLoader $submissionResultLoader,
+        SubmissionModel $submissionModel,
+    ): void {
+        $this->formModel = $formModel;
+        $this->submissionResultLoader = $submissionResultLoader;
+        $this->submissionModel = $submissionModel;
     }
 
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFacotry, int $objectId, int $page = 1): Response
@@ -385,15 +373,17 @@ final class ResultController extends AbstractStandardFormController
         return 'form.submission';
     }
 
+    protected function getRouteBase(): ?string
+    {
+        return null;
+    }
+
     protected function getPermissionBase(): string
     {
         return 'form:forms';
     }
 
-    /**
-     * @return mixed
-     */
-    protected function getSessionBase($objectId = null)
+    protected function getSessionBase($objectId = null): string
     {
         return 'mautic.formresult';
     }

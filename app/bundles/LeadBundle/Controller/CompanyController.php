@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Controller;
 
-use Mautic\CoreBundle\Controller\AbstractStandardFormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\FindReplaceType;
 use Mautic\CoreBundle\Helper\ExportHelper;
@@ -18,12 +18,13 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Services\CompanyColumnsDictionary;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class CompanyController extends AbstractStandardFormController
+final class CompanyController extends AbstractFormController
 {
     use LeadDetailsTrait;
 
@@ -35,22 +36,21 @@ final class CompanyController extends AbstractStandardFormController
 
     private LeadModel $leadModel;
 
+    private FormFactoryInterface $formFactory;
+
     #[Required]
     public function autowireCompanyController(
+        FormFactoryInterface $formFactory,
         LeadModel $leadModel,
         CompanyModel $companyModel,
         FieldModel $fieldModel,
         CompanyRepository $companyRepository,
     ): void {
+        $this->formFactory = $formFactory;
         $this->leadModel = $leadModel;
         $this->companyModel = $companyModel;
         $this->fieldModel = $fieldModel;
         $this->companyRepository = $companyRepository;
-    }
-
-    protected function getModelName(): string
-    {
-        return 'lead.company';
     }
 
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, CompanyColumnsDictionary $companyColumnsDictionary, int $page = 1): Response

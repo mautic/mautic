@@ -688,6 +688,16 @@ final class ImportController extends AbstractStandardFormController
         return 'lead.import';
     }
 
+    protected function getTranslationBase(): ?string
+    {
+        return null;
+    }
+
+    protected function getJsLoadMethodPrefix(): ?string
+    {
+        return null;
+    }
+
     protected function getSessionBase($objectId = null): string
     {
         $initEvent = $this->dispatchImportOnInit();

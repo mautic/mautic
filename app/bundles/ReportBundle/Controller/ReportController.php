@@ -2,7 +2,7 @@
 
 namespace Mautic\ReportBundle\Controller;
 
-use Mautic\CoreBundle\Controller\AbstractStandardFormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\EventListener\ReportSubscriber;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
@@ -14,6 +14,7 @@ use Mautic\ReportBundle\Form\Type\DynamicFiltersType;
 use Mautic\ReportBundle\Model\ExportResponse;
 use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\ReportBundle\Scheduler\Model\FileHandler;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,20 +22,19 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class ReportController extends AbstractStandardFormController
+final class ReportController extends AbstractFormController
 {
     private ReportModel $reportModel;
 
+    private FormFactoryInterface $formFactory;
+
     #[Required]
     public function autowireReportController(
+        FormFactoryInterface $formFactory,
         ReportModel $reportModel,
     ): void {
+        $this->formFactory = $formFactory;
         $this->reportModel = $reportModel;
-    }
-
-    protected function getModelName(): string
-    {
-        return 'report.report';
     }
 
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
