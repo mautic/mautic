@@ -4,7 +4,7 @@ namespace Mautic\WebhookBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event as Events;
-use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\WebhookBundle\Form\Type\CampaignEventSendWebhookType;
 use Mautic\WebhookBundle\Helper\CampaignHelper;
 use Mautic\WebhookBundle\WebhookEvents;
@@ -20,19 +20,25 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CampaignEvents::CAMPAIGN_ON_BUILD         => ['onCampaignBuild', 0],
-            WebhookEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignTriggerAction', 0],
+            CampaignEvents::CAMPAIGN_ON_BUILD       => ['onCampaignBuild', 0],
+            WebhookEvents::ON_CAMPAIGN_BATCH_ACTION => ['onCampaignTriggerAction', 0],
         ];
     }
 
-    public function onCampaignTriggerAction(CampaignExecutionEvent $event): void
+    public function onCampaignTriggerAction(PendingEvent $event): void
     {
-        if ($event->checkContext('campaign.sendwebhook')) {
+        if (!$event->checkContext('campaign.sendwebhook')) {
+            return;
+        }
+
+        $config = $event->getEvent()->getProperties();
+
+        foreach ($event->getPending() as $log) {
             try {
-                $this->campaignHelper->fireWebhook($event->getConfig(), $event->getLead());
-                $event->setResult(true);
+                $this->campaignHelper->fireWebhook($config, $log->getLead());
+                $event->pass($log);
             } catch (\Exception $e) {
-                $event->setFailed($e->getMessage());
+                $event->fail($log, $e->getMessage());
             }
         }
     }
@@ -47,7 +53,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
             'description'        => 'mautic.webhook.event.sendwebhook_desc',
             'formType'           => CampaignEventSendWebhookType::class,
             'formTypeCleanMasks' => 'clean',
-            'eventName'          => WebhookEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+            'batchEventName'     => WebhookEvents::ON_CAMPAIGN_BATCH_ACTION,
         ];
         $event->addAction('campaign.sendwebhook', $sendWebhookAction);
     }
