@@ -114,8 +114,8 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
             },
         ];
 
-        // When --max-contacts caps a run that still leaves contacts to process,
-        // last built date stays unchanged so the UI keeps showing "Building".
+        // When --max-contacts caps a run but all matching contacts are still processed,
+        // the rebuild completes and last built date is updated.
         // Also testing the timing option = 1.
         yield [
             fn (): array => ['--max-contacts' => 1, '--timing' => 1],
