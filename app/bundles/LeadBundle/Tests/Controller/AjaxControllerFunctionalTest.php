@@ -524,6 +524,8 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertCount(4, $foundNames);
 
+        // Results are ordered by last_active DESC; sort to verify all expected contacts are present.
+        sort($foundNames);
         foreach ($foundNames as $key => $name) {
             $this->assertSame('User '.($key + 1), $name);
         }
@@ -607,6 +609,8 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $foundNames = array_column($data, 'value');
 
         $this->assertCount(2, $foundNames);
+        // Results are ordered by last_active DESC; sort to verify all expected contacts are present.
+        sort($foundNames);
         $this->assertSame('User 3', $foundNames[0]);
         $this->assertSame('User 4', $foundNames[1]);
     }
