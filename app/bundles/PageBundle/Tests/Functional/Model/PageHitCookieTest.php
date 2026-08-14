@@ -78,6 +78,10 @@ final class PageHitCookieTest extends MauticMysqlTestCase
             [$hitId]
         );
 
-        return false === $dateLeft ? null : (string) $dateLeft;
+        if (false === $dateLeft || null === $dateLeft) {
+            return null;
+        }
+
+        return (string) $dateLeft;
     }
 }
