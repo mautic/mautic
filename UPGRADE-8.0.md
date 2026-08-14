@@ -6,6 +6,7 @@
 
 ## Removed code
 
+- Deprecated form type removed from `Mautic\FormBundle\Entity\Form`. Form types were no longer used, so the `$formType` property, the `getFormType()` method, the `form_type` ORM mapping and the `formType` API field are gone. The `form_type` database column is dropped by a migration. The `formType`/`form_type` key is no longer read from or written to the API, and is dropped from form export payloads.
 - Deprecated Mautic v1 theme fallback removed from `Mautic\PageBundle\Controller\PublicController::indexAction()`. Public pages are now rendered solely from `Page::getCustomHtml()`; the legacy path that rendered `Page::getContent()` through a `@themes/<template>/html/page.html.twig` theme template (used when `customHtml` was empty) is gone. The unused `ThemeHelper` argument was dropped from `indexAction()`.
 - Deprecated method `Mautic\LeadBundle\Model\LeadModel::isContactable()` removed. Use `Mautic\LeadBundle\Model\DoNotContact::isContactable()` instead.
 - Deprecated method `Mautic\CampaignBundle\EventCollector\Builder\ConnectionBuilder::addDeprecatedAnchorRestrictions()` removed. With it, the campaign event keys `associatedActions`, `associatedDecisions` and `anchorRestrictions` are no longer read. Use the `connectionRestrictions` key instead:

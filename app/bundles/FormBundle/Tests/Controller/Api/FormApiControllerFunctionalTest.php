@@ -107,7 +107,6 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $formId = $response['form']['id'];
         $this->assertGreaterThan(0, $formId);
         $this->assertEquals($payload['name'], $response['form']['name']);
-        $this->assertEquals($payload['formType'], $response['form']['formType']);
         $this->assertEquals($payload['isPublished'], $response['form']['isPublished']);
         $this->assertEquals($payload['description'], $response['form']['description']);
         $this->assertIsArray($response['form']['fields']);
@@ -129,7 +128,6 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
         $this->assertSame($formId, $responsePatch['form']['id'], 'ID of the created form does not match with the edited one.');
         $this->assertEquals($expectedResponse['newName'], $responsePatch['form']['name']);
-        $this->assertEquals($payload['formType'], $responsePatch['form']['formType']);
         $this->assertEquals($payload['isPublished'], $responsePatch['form']['isPublished']);
         $this->assertEquals($payload['description'], $responsePatch['form']['description']);
         $this->assertIsArray($responsePatch['form']['fields']);
@@ -280,7 +278,6 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertGreaterThan(0, $formId);
         $this->assertEquals($payload['name'], $response['form']['name']);
         $this->assertEquals($payload['description'], $response['form']['description']);
-        $this->assertEquals($payload['formType'], $response['form']['formType']);
         $this->assertNotEmpty($response['form']['cachedHtml']);
         $this->assertCount($fieldCount, $response['form']['fields']);
         $this->assertEquals($payload['fields'][0]['label'], $response['form']['fields'][0]['label']);
@@ -353,7 +350,6 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals('API form renamed', $response['form']['name']);
         $this->assertEquals($payload['description'], $response['form']['description']);
         $this->assertCount($fieldCount, $response['form']['fields']);
-        $this->assertEquals($payload['formType'], $response['form']['formType']);
         $this->assertNotEmpty($response['form']['cachedHtml']);
 
         // Edit PUT:
@@ -368,7 +364,6 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['name'], $response['form']['name']);
         $this->assertEquals('Form created via API test renamed', $response['form']['description']);
         $this->assertCount($fieldCount, $response['form']['fields']);
-        $this->assertEquals($payload['formType'], $response['form']['formType']);
         $this->assertNotEmpty($response['form']['cachedHtml']);
 
         // Get:
@@ -381,7 +376,6 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['name'], $response['form']['name']);
         $this->assertEquals($payload['description'], $response['form']['description']);
         $this->assertCount($fieldCount, $response['form']['fields']);
-        $this->assertEquals($payload['formType'], $response['form']['formType']);
         $this->assertNotEmpty($response['form']['cachedHtml']);
 
         // Submit the form:
@@ -450,7 +444,6 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['name'], $response['form']['name']);
         $this->assertEquals($payload['description'], $response['form']['description']);
         $this->assertCount($fieldCount, $response['form']['fields']);
-        $this->assertEquals($payload['formType'], $response['form']['formType']);
         $this->assertNotEmpty($response['form']['cachedHtml']);
 
         // Get (ensure that the form is gone):
@@ -519,7 +512,6 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $formId = $response['form']['id'];
         $this->assertGreaterThan(0, $formId);
         $this->assertEquals($payload['name'], $response['form']['name']);
-        $this->assertEquals($payload['formType'], $response['form']['formType']);
         $this->assertEquals($payload['isPublished'], $response['form']['isPublished']);
         $this->assertEquals($payload['description'], $response['form']['description']);
         $this->assertIsArray($response['form']['fields']);

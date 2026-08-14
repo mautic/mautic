@@ -168,14 +168,6 @@ class Form extends FormEntity implements UuidInterface
     public int $submission_count = 0;
 
     /**
-     * @var string|null
-     *
-     * @deprecated since Mautic 7.1, will be removed in 8.0. Form types are no longer used.
-     */
-    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
-    private $formType = 'standalone';
-
-    /**
      * @var bool|null
      */
     #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
@@ -300,8 +292,6 @@ class Form extends FormEntity implements UuidInterface
             ->columnName('submission_count')
             ->build();
 
-        $builder->addNullableField('formType', 'string', 'form_type');
-
         $builder->createField('noIndex', 'boolean')
             ->columnName('no_index')
             ->nullable()
@@ -360,7 +350,6 @@ class Form extends FormEntity implements UuidInterface
                     'template',
                     'inKioskMode',
                     'renderStyle',
-                    'formType',
                     'postAction',
                     'postActionProperty',
                     'noIndex',
@@ -762,18 +751,6 @@ class Form extends FormEntity implements UuidInterface
     public function isInKioskMode()
     {
         return $this->inKioskMode;
-    }
-
-    /**
-     * @deprecated since Mautic 7.1, will be removed in 8.0. Form types are no longer used.
-     *
-     * @return string|null
-     */
-    public function getFormType()
-    {
-        trigger_deprecation('mautic/mautic', '7.1', 'Form::getFormType() is deprecated and will be removed in 8.0.');
-
-        return $this->formType;
     }
 
     /**
