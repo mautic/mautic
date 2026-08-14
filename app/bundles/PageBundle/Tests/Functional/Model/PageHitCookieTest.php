@@ -36,7 +36,6 @@ final class PageHitCookieTest extends MauticMysqlTestCase
         $this->em->persist($page);
         $this->em->flush();
 
-        $this->logoutUser();
         $this->client->request(Request::METHOD_GET, '/test-page-cookie');
         $this->assertResponseIsSuccessful();
 
@@ -51,25 +50,34 @@ final class PageHitCookieTest extends MauticMysqlTestCase
         $hits = $this->hitRepository->findBy(['page' => $page->getId()], ['dateHit' => 'ASC']);
         $this->assertCount(1, $hits);
         $firstHit = $hits[0];
-        $this->assertNull($firstHit->getDateLeft(), 'First hit should not have date_left set yet');
+        $this->assertNull($this->fetchDateLeftFromDb((int) $firstHit->getId()), 'First hit should not have date_left set yet');
         $this->assertEquals((int) $cookieValue, $firstHit->getId(), 'Cookie should contain the first hit ID');
 
         $this->client->request(Request::METHOD_GET, '/test-page-cookie');
         $this->assertResponseIsSuccessful();
 
-        $this->em->refresh($firstHit);
-
-        $this->assertNotNull($firstHit->getDateLeft(), 'First hit should have date_left updated after second hit');
-        $this->assertInstanceOf(\DateTimeInterface::class, $firstHit->getDateLeft(), 'date_left should be a DateTime object');
+        $firstHitDateLeft = $this->fetchDateLeftFromDb((int) $firstHit->getId());
+        $this->assertNotNull($firstHitDateLeft, 'First hit should have date_left updated after second hit');
+        $this->assertNotSame('', $firstHitDateLeft);
 
         $allHits = $this->hitRepository->findBy(['page' => $page->getId()], ['dateHit' => 'ASC']);
         $this->assertCount(2, $allHits, 'Should have two hits after second page visit');
         $secondHit = $allHits[1];
-        $this->assertNull($secondHit->getDateLeft(), 'Second hit should not have date_left set yet');
+        $this->assertNull($this->fetchDateLeftFromDb((int) $secondHit->getId()), 'Second hit should not have date_left set yet');
 
         $cookie      = $cookieJar->get('mautic_referer_id');
         $cookieValue = $cookie?->getValue();
         $this->assertNotNull($cookieValue, 'Cookie value should not be null after second hit');
         $this->assertEquals((int) $cookieValue, $secondHit->getId(), 'Cookie should contain the second hit ID');
+    }
+
+    private function fetchDateLeftFromDb(int $hitId): ?string
+    {
+        $dateLeft = $this->connection->fetchOne(
+            'SELECT date_left FROM '.MAUTIC_TABLE_PREFIX.'page_hits WHERE id = ?',
+            [$hitId]
+        );
+
+        return false === $dateLeft ? null : (string) $dateLeft;
     }
 }
