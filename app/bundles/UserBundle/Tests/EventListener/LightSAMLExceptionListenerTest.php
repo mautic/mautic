@@ -36,7 +36,7 @@ final class LightSAMLExceptionListenerTest extends MauticMysqlTestCase
 
         // creating a saml response which will return above status
         $lightSAMLResponse = $this->createMock(LightSamlResponse::class);
-        $lightSAMLResponse->expects($this->any())->method('getStatus')->willReturn($status);
+        $lightSAMLResponse->method('getStatus')->willReturn($status);
 
         // creating inbound context which will return lightsaml response
         $inboundContext = $this->createMock(MessageContext::class);

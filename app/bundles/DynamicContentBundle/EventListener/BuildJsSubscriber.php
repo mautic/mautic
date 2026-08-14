@@ -4,6 +4,7 @@ namespace Mautic\DynamicContentBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\BuildJsEvent;
+use Mautic\CoreBundle\Event\BuildJsScope;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -11,13 +12,13 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class BuildJsSubscriber implements EventSubscriberInterface
+final readonly class BuildJsSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly AssetsHelper $assetsHelper,
-        private readonly TranslatorInterface $translator,
-        private readonly RequestStack $requestStack,
-        private readonly RouterInterface $router,
+        private AssetsHelper $assetsHelper,
+        private TranslatorInterface $translator,
+        private RequestStack $requestStack,
+        private RouterInterface $router,
     ) {
     }
 
@@ -29,9 +30,7 @@ class BuildJsSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Adds the MauticJS definition and core
-     * JS functions for use in Bundles. This
-     * must retain top priority of 1000.
+     * Adds DWC helpers after page-event setup and before page-event delivery.
      */
     public function onBuildJs(BuildJsEvent $event): void
     {
@@ -69,44 +68,83 @@ MauticJS.replaceDynamicContent = function (params) {
                     var dwcContent = response.content;
                     node.innerHTML = dwcContent;
 
-                    if (response.id && response.sid) {
-                        MauticJS.setTrackedContact(response);
-                    }
-
-                    // form load library
-                    if (dwcContent.search("mauticform_wrapper") > 0) {
-                        // if doesn't exist
-                        if (typeof MauticSDK == 'undefined') {
-                            MauticJS.insertScript('{$this->assetsHelper->getUrl('media/js/mautic-form.js', null, null, true)}');
-                            
-                            // check initialize form library
-                            var fileInterval = setInterval(function() {
-                                if (typeof MauticSDK != 'undefined') {
-                                    MauticSDK.onLoad(); 
-                                    clearInterval(fileInterval); // clear interval
-                                 }
-                             }, 100); // check every 100ms
-                        } else {
-                            MauticSDK.onLoad();
-                         }
-                    }
-
-                    var m;
-                    var regEx = /<script[^>]+src="?([^"\s]+)"?\s/g;                    
-                    
-                    while (m = regEx.exec(dwcContent)) {
-                        if ((m[1]).search("/focus/") > 0) {
-                            MauticJS.insertScript(m[1]);
-                        }
-                    }
+                    MauticJS.onDynamicContentResponse(response);
+                    MauticJS.enhanceDynamicContent(dwcContent);
                 }
             });
         });
     }
 };
 
+// Tracking overrides this hook before PageBundle drains the pre-delivery queue.
+MauticJS.onDynamicContentResponse = function() {};
+
+MauticJS.enhanceDynamicContent = function(dwcContent) {
+    // form load library
+    MauticJS.initializeForms(dwcContent);
+
+    var m;
+    var regEx = /<script[^>]+src="?([^"\s]+)"?\s/g;
+
+    while (m = regEx.exec(dwcContent)) {
+        if ((m[1]).search("/focus/") > 0) {
+            MauticJS.insertScript(m[1]);
+        }
+    }
+};
+
+MauticJS.initializeForms = function(content) {
+    if (content.search("mauticform_wrapper") !== -1) {
+        // if doesn't exist
+        if (typeof MauticSDK == 'undefined') {
+            if (typeof MauticSDKLoaded == 'undefined') {
+                window.MauticSDKLoaded = true;
+                MauticJS.insertScript('{$this->assetsHelper->getUrl('media/js/mautic-form.js', null, null, true)}');
+
+                // check initialize form library
+                var fileInterval = setInterval(function() {
+                    if (typeof MauticSDK != 'undefined') {
+                        MauticSDK.onLoad();
+                        clearInterval(fileInterval); // clear interval
+                     }
+                 }, 100); // check every 100ms
+            }
+        } else {
+            MauticSDK.onLoad();
+         }
+    }
+};
+
+MauticJS.documentReady(function() {
+    var fallbackForms = document.querySelectorAll('.mautic-slot form[data-mautic-form], [data-slot="dwc"] form[data-mautic-form]');
+    var initializationRequested = false;
+    MauticJS.iterateCollection(fallbackForms)(function(form) {
+        var formId = form.getAttribute('data-mautic-form');
+        if (!initializationRequested && !document.getElementById('mauticform_' + formId + '_messenger')) {
+            initializationRequested = true;
+            MauticJS.initializeForms('mauticform_wrapper');
+        }
+    });
+});
+
 MauticJS.beforeFirstEventDelivery(MauticJS.replaceDynamicContent);
 JS;
-        $event->appendJs($js, 'Mautic Dynamic Content');
+        $event->appendJsForScope($js, BuildJsScope::ESSENTIAL, 'Mautic Dynamic Content');
+
+        $js = <<<'JS_WRAP'
+        (function(window) {
+        var MauticJS = window.MauticJS;
+        if (!MauticJS || MauticJS.runtimeReady !== true) {
+            return;
+        }
+        
+        MauticJS.onDynamicContentResponse = function(response) {
+            if (response.id && response.sid) {
+                MauticJS.setTrackedContact(response);
+            }
+        };
+        })(window);
+        JS_WRAP;
+        $event->appendJsForScope($js, BuildJsScope::TRACKING, 'Mautic Dynamic Content Tracking');
     }
 }

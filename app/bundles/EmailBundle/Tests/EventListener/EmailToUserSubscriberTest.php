@@ -67,7 +67,7 @@ final class EmailToUserSubscriberTest extends \PHPUnit\Framework\TestCase
         $mockSendEmailToUser->expects($this->once())
             ->method('sendEmailToUsers')
             ->with($this->config, $lead)
-            ->will($this->throwException(new EmailCouldNotBeSentException()));
+            ->willThrowException(new EmailCouldNotBeSentException());
 
         $triggerEvent = new TriggerEvent();
         $triggerEvent->setProperties($this->config);

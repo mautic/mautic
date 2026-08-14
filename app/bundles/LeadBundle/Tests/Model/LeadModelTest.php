@@ -16,15 +16,26 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
+use Mautic\LeadBundle\Entity\CompanyRepository;
+use Mautic\LeadBundle\Entity\DoNotContactRepository;
+use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadCategoryRepository;
+use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Entity\LeadEventLog;
+use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
-use Mautic\LeadBundle\Entity\StagesChangeLog;
+use Mautic\LeadBundle\Entity\MergeRecordRepository;
+use Mautic\LeadBundle\Entity\PointsChangeLogRepository;
 use Mautic\LeadBundle\Entity\StagesChangeLogRepository;
+use Mautic\LeadBundle\Entity\TagRepository;
+use Mautic\LeadBundle\Entity\UtmTagRepository;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\SaveBatchLeadsEvent;
 use Mautic\LeadBundle\Exception\ImportFailedException;
@@ -39,10 +50,13 @@ use Mautic\LeadBundle\Tests\Fixtures\Model\LeadModelStub;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\PointBundle\Entity\GroupContactScoreRepository;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Entity\StageRepository;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Security\Provider\UserProvider;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -50,6 +64,7 @@ use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 
 final class LeadModelTest extends \PHPUnit\Framework\TestCase
 {
@@ -93,6 +108,16 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
     private MockObject $companyLeadRepositoryMock;
 
     /**
+     * @var MockObject&StagesChangeLogRepository
+     */
+    private MockObject $stagesChangeLogRepositoryMock;
+
+    /**
+     * @var MockObject&StageRepository
+     */
+    private MockObject $stageRepositoryMock;
+
+    /**
      * @var MockObject&UserHelper
      */
     private MockObject $userHelperMock;
@@ -118,8 +143,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->requestStack             = new RequestStack();
-        $this->requestStack->push(new Request());
+        $this->requestStack             = new RequestStack([new Request()]);
         $this->fieldModelMock                   = $this->createMock(FieldModel::class);
         $this->fieldsWithUniqueIdentifier       = $this->createMock(FieldsWithUniqueIdentifier::class);
         $this->companyModelMock                 = $this->createMock(CompanyModel::class);
@@ -128,6 +152,8 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
         $this->emailValidatorMock               = $this->createMock(EmailValidator::class);
         $this->leadRepositoryMock               = $this->createMock(LeadRepository::class);
         $this->companyLeadRepositoryMock        = $this->createMock(CompanyLeadRepository::class);
+        $this->stagesChangeLogRepositoryMock    = $this->createMock(StagesChangeLogRepository::class);
+        $this->stageRepositoryMock              = $this->createMock(StageRepository::class);
         $this->userHelperMock                   = $this->createMock(UserHelper::class);
         $this->dispatcherMock                   = $this->createMock(EventDispatcherInterface::class);
         $this->entityManagerMock                = $this->createMock(EntityManager::class);
@@ -157,6 +183,24 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
             $this->translator,
             $this->userHelperMock,
             $this->createStub(LoggerInterface::class),
+            $this->leadRepositoryMock,
+            $this->createStub(TagRepository::class), // $tagRepository
+            $this->createStub(PointsChangeLogRepository::class), // $pointsChangeLogRepository
+            $this->createStub(UtmTagRepository::class), // $utmTagRepository
+            $this->createStub(LeadDeviceRepository::class), // $leadDeviceRepository
+            $this->createStub(LeadEventLogRepository::class), // $leadEventLogRepository
+            $this->createStub(FrequencyRuleRepository::class), // $frequencyRuleRepository
+            $this->stagesChangeLogRepositoryMock,
+            $this->createStub(LeadCategoryRepository::class), // $leadCategoryRepository
+            $this->createStub(MergeRecordRepository::class), // $mergeRecordRepository
+            $this->createStub(LeadListRepository::class), // $leadListRepository
+            $this->createStub(GroupContactScoreRepository::class), // $groupContactScoreRepository
+            $this->stageRepositoryMock,
+            $this->createStub(UserRepository::class), // $userRepository
+            $this->companyLeadRepositoryMock,
+            $this->createStub(DoNotContactRepository::class), // $doNotContactRepository
+            $this->createStub(StatRepository::class), // $statRepository
+            $this->createStub(CompanyRepository::class), // $companyRepository
         );
 
         $this->setSecurity($this->leadModel);
@@ -211,7 +255,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $this->setupFieldModelForIpLookupTest();
         $this->companyLeadRepositoryMock->method('getEntitiesByLead')->willReturn([]);
-        $this->companyModelMock->expects($this->any())
+        $this->companyModelMock
             ->method('fetchCompanyFields')
             ->willReturn([]);
 
@@ -242,7 +286,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
         $this->leadModel->saveEntity($entity);
 
         $this->assertSame($companyFromEntity, $entity->getCompany());
-        $this->assertFalse(isset($entity->getUpdatedFields()['company']));
+        $this->assertArrayNotHasKey('company', $entity->getUpdatedFields());
     }
 
     public function testCheckForDuplicateContact(): void
@@ -324,7 +368,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
         try {
             $mockLeadModel->import([], [], null, null, null, true, $leadEventLog);
         } catch (\Exception) {
-            $this->assertNull($leadEventLog->getLead());
+            $this->assertNotInstanceOf(Lead::class, $leadEventLog->getLead());
         }
     }
 
@@ -388,37 +432,20 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
         $lead->setId(1);
         $lead->setFields(['all' => 'sth']);
         $stageMock = $this->createMock(Stage::class);
-        $stageMock->expects($this->any())
+        $stageMock
             ->method('getId')
             ->willReturn(1);
         $data = ['stage' => $stageMock];
 
-        $stagesChangeLogRepo = $this->createMock(StagesChangeLogRepository::class);
-        $stagesChangeLogRepo->expects($this->once())
+        $this->stagesChangeLogRepositoryMock->expects($this->once())
             ->method('getCurrentLeadStage')
             ->with($lead->getId())
             ->willReturn(null);
 
-        $stageRepositoryMock = $this->createMock(StageRepository::class);
-        $stageRepositoryMock->expects($this->once())
+        $this->stageRepositoryMock->expects($this->once())
             ->method('findByIdOrName')
             ->with(1)
             ->willReturn($stageMock);
-        $matcher = $this->exactly(2);
-
-        $this->entityManagerMock->expects($matcher)
-            ->method('getRepository')->willReturnCallback(function (...$parameters) use ($matcher, $stagesChangeLogRepo, $stageRepositoryMock) {
-                if (1 === $matcher->numberOfInvocations()) {
-                    $this->assertSame(StagesChangeLog::class, $parameters[0]);
-
-                    return $stagesChangeLogRepo;
-                }
-                if (2 === $matcher->numberOfInvocations()) {
-                    $this->assertSame(Stage::class, $parameters[0]);
-
-                    return $stageRepositoryMock;
-                }
-            });
 
         $this->translator->expects($this->once())
             ->method('trans')
@@ -433,32 +460,15 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
         $lead->setId(1);
         $data = ['stage' => 'not found'];
 
-        $stagesChangeLogRepo = $this->createMock(StagesChangeLogRepository::class);
-        $stagesChangeLogRepo->expects($this->once())
+        $this->stagesChangeLogRepositoryMock->expects($this->once())
             ->method('getCurrentLeadStage')
             ->with($lead->getId())
             ->willReturn(null);
 
-        $stageRepositoryMock = $this->createMock(StageRepository::class);
-        $stageRepositoryMock->expects($this->once())
+        $this->stageRepositoryMock->expects($this->once())
             ->method('findByIdOrName')
             ->with($data['stage'])
             ->willReturn(null);
-        $matcher = $this->exactly(2);
-
-        $this->entityManagerMock->expects($matcher)
-            ->method('getRepository')->willReturnCallback(function (...$parameters) use ($matcher, $stagesChangeLogRepo, $stageRepositoryMock) {
-                if (1 === $matcher->numberOfInvocations()) {
-                    $this->assertSame(StagesChangeLog::class, $parameters[0]);
-
-                    return $stagesChangeLogRepo;
-                }
-                if (2 === $matcher->numberOfInvocations()) {
-                    $this->assertSame(Stage::class, $parameters[0]);
-
-                    return $stageRepositoryMock;
-                }
-            });
 
         $this->translator->expects($this->once())
             ->method('trans')
@@ -555,7 +565,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
 
     private function mockGetLeadRepository(): void
     {
-        $this->entityManagerMock->expects($this->any())
+        $this->entityManagerMock
             ->method('getRepository')
             ->willReturnMap(
                 [
@@ -617,7 +627,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
      */
     private function getFieldPaginatorFake(): Paginator
     {
-        return new class extends Paginator {
+        return new class() extends Paginator {
             public function __construct()
             {
             }
@@ -646,11 +656,11 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
         $action = 'post_batch_save';
 
         // Lead Model that provides access to dispatchBatchEvent
-        $leadModel = new class($this->requestStack, $this->createStub(IpLookupHelper::class), $this->createStub(PathsHelper::class), $this->createStub(IntegrationHelper::class), $this->fieldModelMock, $this->fieldsWithUniqueIdentifier, $this->createStub(ListModel::class), $this->createStub(FormFactory::class), $this->companyModelMock, $this->createStub(CategoryModel::class), $this->channelListHelperMock, $this->coreParametersHelperMock, $this->emailValidatorMock, $this->createStub(UserProvider::class), $this->createStub(ContactTracker::class), $this->createStub(DeviceTracker::class), $this->createStub(IpAddressModel::class), $this->entityManagerMock, $this->createStub(CorePermissions::class), $this->dispatcherMock, $this->createStub(UrlGeneratorInterface::class), $this->translator, $this->userHelperMock, $this->createStub(LoggerInterface::class)) extends LeadModel {
+        $leadModel = new class($this->requestStack, $this->createStub(IpLookupHelper::class), $this->createStub(PathsHelper::class), $this->createStub(IntegrationHelper::class), $this->fieldModelMock, $this->fieldsWithUniqueIdentifier, $this->createStub(ListModel::class), $this->createStub(FormFactory::class), $this->companyModelMock, $this->createStub(CategoryModel::class), $this->channelListHelperMock, $this->coreParametersHelperMock, $this->emailValidatorMock, $this->createStub(UserProvider::class), $this->createStub(ContactTracker::class), $this->createStub(DeviceTracker::class), $this->createStub(IpAddressModel::class), $this->entityManagerMock, $this->createStub(CorePermissions::class), $this->dispatcherMock, $this->createStub(UrlGeneratorInterface::class), $this->translator, $this->userHelperMock, $this->createStub(LoggerInterface::class), $this->leadRepositoryMock, $this->createStub(TagRepository::class), $this->createStub(PointsChangeLogRepository::class), $this->createStub(UtmTagRepository::class), $this->createStub(LeadDeviceRepository::class), $this->createStub(LeadEventLogRepository::class), $this->createStub(FrequencyRuleRepository::class), $this->stagesChangeLogRepositoryMock, $this->createStub(LeadCategoryRepository::class), $this->createStub(MergeRecordRepository::class), $this->createStub(LeadListRepository::class), $this->createStub(GroupContactScoreRepository::class), $this->stageRepositoryMock, $this->createStub(UserRepository::class), $this->companyLeadRepositoryMock, $this->createStub(DoNotContactRepository::class), $this->createStub(StatRepository::class), $this->createStub(CompanyRepository::class)) extends LeadModel {
             /**
              * @param array<mixed> $leads
              */
-            public function dispatchBatchEventForTest(string $action, array $leads): ?\Symfony\Contracts\EventDispatcher\Event
+            public function dispatchBatchEventForTest(string $action, array $leads): ?Event
             {
                 return $this->dispatchBatchEvent($action, $leads);
             }
@@ -775,7 +785,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
     /**
      * Test that email validation is triggered for invalid values like 0, "0".
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('emailValidationDuringImportProvider')]
+    #[DataProvider('emailValidationDuringImportProvider')]
     public function testEmailValidationDuringImport(
         mixed $emailValue,
         bool $shouldValidate,

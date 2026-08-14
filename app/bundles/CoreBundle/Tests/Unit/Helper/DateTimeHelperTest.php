@@ -6,22 +6,25 @@ namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Loader\ParameterLoader;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestDox;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(DateTimeHelper::class)]
+#[CoversClass(DateTimeHelper::class)]
 final class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
 {
-    #[\PHPUnit\Framework\Attributes\TestDox('The guessTimezoneFromOffset returns correct values')]
+    #[TestDox('The guessTimezoneFromOffset returns correct values')]
     public function testGuessTimezoneFromOffset(): void
     {
         $helper   = new DateTimeHelper();
         $timezone = $helper->guessTimezoneFromOffset();
-        $this->assertEquals('Europe/London', $timezone);
+        $this->assertSame('Europe/London', $timezone);
         $timezone = $helper->guessTimezoneFromOffset(3600);
-        $this->assertEquals('Europe/Paris', $timezone);
+        $this->assertSame('Europe/Paris', $timezone);
         $timezone = $helper->guessTimezoneFromOffset(-2 * 3600);
-        $this->assertEquals('America/Goose_Bay', $timezone); // Is it really in timezone -2
+        $this->assertSame('America/Goose_Bay', $timezone); // Is it really in timezone -2
         $timezone = $helper->guessTimezoneFromOffset(-5 * 3600);
-        $this->assertEquals('America/New_York', $timezone);
+        $this->assertSame('America/New_York', $timezone);
     }
 
     public function testBuildIntervalWithBadUnit(): void
@@ -242,12 +245,11 @@ final class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($originalDate, $originalDateTime->format(DateTimeHelper::FORMAT_DB));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('setTimeIfMissingDataProvider')]
+    #[DataProvider('setTimeIfMissingDataProvider')]
     public function testSetTimeIfMissing(string $input, string $defaultTime, string $timezone, string $expectedOutput, string $expectedTimezone): void
     {
         $result = DateTimeHelper::setTimeIfMissing($input, $defaultTime, $timezone);
 
-        $this->assertInstanceOf(\DateTimeImmutable::class, $result);
         $this->assertSame($expectedOutput, $result->format('Y-m-d H:i:s'));
         $this->assertSame($expectedTimezone, $result->getTimezone()->getName());
     }

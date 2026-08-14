@@ -3,7 +3,9 @@
 namespace Mautic\CoreBundle\Doctrine\Helper;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\SchemaConfig;
 use Mautic\CoreBundle\Exception\SchemaException;
 
 /**
@@ -12,9 +14,9 @@ use Mautic\CoreBundle\Exception\SchemaException;
 class TableSchemaHelper
 {
     /**
-     * @var \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
+     * @var AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
-    protected \Doctrine\DBAL\Schema\AbstractSchemaManager $sm;
+    protected AbstractSchemaManager $sm;
 
     /**
      * @var Schema
@@ -43,11 +45,9 @@ class TableSchemaHelper
     }
 
     /**
-     * Get the SchemaManager.
-     *
-     * @return \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
+     * @return AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
-    public function getSchemaManager(): \Doctrine\DBAL\Schema\AbstractSchemaManager
+    public function getSchemaManager(): AbstractSchemaManager
     {
         return $this->sm;
     }
@@ -139,7 +139,7 @@ class TableSchemaHelper
         if (!empty($options)) {
             foreach ($options as $option => $value) {
                 $func = ('uniqueIndex' == $option ? 'add' : 'set').ucfirst($option);
-                $newTable->$func($value);
+                $newTable->{$func}($value);
             }
         }
 
@@ -158,9 +158,6 @@ class TableSchemaHelper
         return $this;
     }
 
-    /**
-     * Executes the changes.
-     */
     public function executeChanges(): void
     {
         $platform = $this->db->getDatabasePlatform();
@@ -192,7 +189,7 @@ class TableSchemaHelper
     {
         if ($this->sm->tablesExist([$this->prefix.$table])) {
             if ($throwException) {
-                throw new SchemaException($this->prefix."$table already exists");
+                throw new SchemaException($this->prefix."{$table} already exists");
             }
 
             return true;
@@ -209,7 +206,7 @@ class TableSchemaHelper
 
         if ($this->db instanceof \Doctrine\DBAL\Connections\PrimaryReadReplicaConnection) {
             $params       = $this->db->getParams();
-            $schemaConfig = new \Doctrine\DBAL\Schema\SchemaConfig();
+            $schemaConfig = new SchemaConfig();
             $schemaConfig->setName($params['master']['dbname']);
             $this->schema = new Schema([], [], $schemaConfig);
         } else {

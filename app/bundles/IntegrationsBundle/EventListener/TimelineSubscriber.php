@@ -10,11 +10,11 @@ use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class TimelineSubscriber implements EventSubscriberInterface
+final readonly class TimelineSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly LeadEventLogRepository $eventLogRepository,
-        private readonly TranslatorInterface $translator,
+        private LeadEventLogRepository $eventLogRepository,
+        private TranslatorInterface $translator,
     ) {
     }
 

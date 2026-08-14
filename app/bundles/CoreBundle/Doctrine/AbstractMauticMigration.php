@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Doctrine;
 
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Exception\AbortMigration;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class AbstractMauticMigration extends AbstractMigration
@@ -54,7 +54,7 @@ abstract class AbstractMauticMigration extends AbstractMigration
         $function = $platform.'Up';
 
         if (method_exists($this, $function)) {
-            $this->$function($schema);
+            $this->{$function}($schema);
         }
     }
 
@@ -63,10 +63,14 @@ abstract class AbstractMauticMigration extends AbstractMigration
         // Not supported
     }
 
-    public function setContainer(?ContainerInterface $container = null): void
+    public function setContainer(ContainerInterface $container): void
     {
         $this->container = $container;
-        $this->prefix    = (string) $container->get(CoreParametersHelper::class)->get('db_table_prefix', '');
+    }
+
+    public function setPrefix(string $prefix): void
+    {
+        $this->prefix = $prefix;
     }
 
     /**
@@ -198,8 +202,8 @@ abstract class AbstractMauticMigration extends AbstractMigration
 
     protected function getColumnTypeSignedOrUnsigned(Schema $schema, string $tableName, string $columnName): string
     {
-        $pagesTable  = $schema->getTable($this->getPrefixedTableName($tableName));
-        $idColumn    = $pagesTable->getColumn($columnName);
+        $table       = $schema->getTable($this->getPrefixedTableName($tableName));
+        $idColumn    = $table->getColumn($columnName);
         $idDataType  = self::COLUMN_TYPE_SIGNED;
 
         if (true === $idColumn->getUnsigned()) {
@@ -207,5 +211,12 @@ abstract class AbstractMauticMigration extends AbstractMigration
         }
 
         return $idDataType;
+    }
+
+    protected function getColumnType(Schema $schema, string $tableName, string $columnName): string
+    {
+        $table = $schema->getTable($this->getPrefixedTableName($tableName));
+
+        return Type::getTypeRegistry()->lookupName($table->getColumn($columnName)->getType());
     }
 }

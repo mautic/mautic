@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\SmsBundle\EventListener;
 
 use Mautic\ChannelBundle\ChannelEvents;
@@ -7,14 +9,15 @@ use Mautic\ChannelBundle\Event\ChannelEvent;
 use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\ReportBundle\Model\ReportModel;
+use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Form\Type\SmsListType;
 use Mautic\SmsBundle\Sms\TransportChain;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ChannelSubscriber implements EventSubscriberInterface
+final readonly class ChannelSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly TransportChain $transportChain,
+        private TransportChain $transportChain,
     ) {
     }
 
@@ -39,7 +42,7 @@ class ChannelSubscriber implements EventSubscriberInterface
                             'form.submit',
                         ],
                         'lookupFormType' => SmsListType::class,
-                        'repository'     => \Mautic\SmsBundle\Entity\Sms::class,
+                        'repository'     => Sms::class,
                     ],
                     LeadModel::CHANNEL_FEATURE   => [],
                     ReportModel::CHANNEL_FEATURE => [

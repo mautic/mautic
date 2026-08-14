@@ -10,7 +10,6 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 
 final class LeadEventLogRepositoryTest extends MauticMysqlTestCase
 {
@@ -20,7 +19,7 @@ final class LeadEventLogRepositoryTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->repository = $this->em->getRepository(LeadEventLog::class);
+        $this->repository = self::getContainer()->get(LeadEventLogRepository::class);
     }
 
     public function testThatRemoveEventLogsByCampaignIdMethodRemovesLogs(): void
@@ -32,9 +31,9 @@ final class LeadEventLogRepositoryTest extends MauticMysqlTestCase
         $this->createEventLog($campaign, $event);
         $this->em->flush();
 
-        Assert::assertCount(3, $this->repository->findAll());
+        $this->assertCount(3, $this->repository->findAll());
         $this->repository->removeEventLogsByCampaignId($campaign->getId());
-        Assert::assertCount(0, $this->repository->findAll());
+        $this->assertCount(0, $this->repository->findAll());
     }
 
     public function testMarkEventLogsQueued(): void
@@ -46,19 +45,19 @@ final class LeadEventLogRepositoryTest extends MauticMysqlTestCase
         $log3     = $this->createEventLog($campaign, $event);
         $this->em->flush();
 
-        Assert::assertCount(3, $this->repository->findAll());
-        Assert::assertEmpty($log1->getDateQueued());
-        Assert::assertEmpty($log2->getDateQueued());
-        Assert::assertEmpty($log3->getDateQueued());
+        $this->assertCount(3, $this->repository->findAll());
+        $this->assertNotInstanceOf(\DateTime::class, $log1->getDateQueued());
+        $this->assertNotInstanceOf(\DateTime::class, $log2->getDateQueued());
+        $this->assertNotInstanceOf(\DateTime::class, $log3->getDateQueued());
 
         $this->repository->markEventLogsQueued([(string) $log1->getId(), (string) $log3->getId()]);
         $this->em->refresh($log1);
         $this->em->refresh($log2);
         $this->em->refresh($log3);
 
-        Assert::assertNotEmpty($log1->getDateQueued());
-        Assert::assertEmpty($log2->getDateQueued());
-        Assert::assertNotEmpty($log3->getDateQueued());
+        $this->assertInstanceOf(\DateTime::class, $log1->getDateQueued());
+        $this->assertNotInstanceOf(\DateTime::class, $log2->getDateQueued());
+        $this->assertInstanceOf(\DateTime::class, $log3->getDateQueued());
     }
 
     private function createLead(): Lead

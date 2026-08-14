@@ -9,6 +9,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Field\CustomFieldIndex;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Monolog\Logger;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 
 final class CustomFieldIndexTest extends \PHPUnit\Framework\TestCase
@@ -24,16 +25,15 @@ final class CustomFieldIndexTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->indexSchemaHelperMock          = $this->createMock(IndexSchemaHelper::class);
-        $loggerMock                           = $this->createMock(Logger::class);
         $this->fieldsWithUniqueIdentifierMock = $this->createMock(FieldsWithUniqueIdentifier::class);
-        $this->customFieldIndex               = new CustomFieldIndex($this->indexSchemaHelperMock, $loggerMock, $this->fieldsWithUniqueIdentifierMock);
+        $this->customFieldIndex               = new CustomFieldIndex($this->indexSchemaHelperMock, $this->createStub(Logger::class), $this->fieldsWithUniqueIdentifierMock);
         $this->leadFieldMock                  = $this->createMock(LeadField::class);
     }
 
     /**
      * Test getting unique identifier if object is lead or company.
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('getHasMatchingUniqueIdentifierIndexProvider')]
+    #[DataProvider('getHasMatchingUniqueIdentifierIndexProvider')]
     public function testHasMatchingUniqueIdentifierIndex(string $object, string $field, string $fieldKey): void
     {
         $this->leadFieldMock->expects($this->once())

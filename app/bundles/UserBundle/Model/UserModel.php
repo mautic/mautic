@@ -2,7 +2,7 @@
 
 namespace Mautic\UserBundle\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
@@ -10,10 +10,12 @@ use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\UserBundle\Entity\PermissionRepository;
 use Mautic\UserBundle\Entity\Role;
+use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserInvite;
-use Mautic\UserBundle\Entity\UserInviteRepositoryInterface;
+use Mautic\UserBundle\Entity\UserInviteRepository;
 use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Entity\UserToken;
 use Mautic\UserBundle\Enum\UserTokenAuthorizator;
@@ -25,6 +27,7 @@ use Mautic\UserBundle\UserEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -43,7 +46,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
     public function __construct(
         protected MailHelper $mailHelper,
         private readonly UserTokenServiceInterface $userTokenService,
-        EntityManager $em,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,
@@ -52,13 +55,18 @@ class UserModel extends FormModel implements GlobalSearchInterface
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
         private readonly Environment $twig,
+        private readonly UserRepository $userRepository,
+        private readonly PermissionRepository $permissionRepository,
+        private readonly RoleRepository $roleRepository,
+        private readonly UserInviteRepository $userInviteRepository,
+        private readonly UserPasswordHasherInterface $userPasswordHasher,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): UserRepository
     {
-        return $this->em->getRepository(User::class);
+        return $this->userRepository;
     }
 
     public function getPermissionBase(): string
@@ -90,7 +98,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
      */
     public function getUserList($search = '', $limit = 10, $start = 0, $permissionLimiter = [])
     {
-        return $this->getRepository()->getUserList($search, $limit, $start, $permissionLimiter);
+        return $this->userRepository->getUserList($search, $limit, $start, $permissionLimiter);
     }
 
     /**
@@ -99,7 +107,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
      * @param string     $submittedPassword
      * @param bool|false $validate
      */
-    public function checkNewPassword(User $entity, UserPasswordHasherInterface $hasher, $submittedPassword, $validate = false): ?string
+    public function checkNewPassword(User $entity, $submittedPassword, $validate = false): ?string
     {
         if ($validate) {
             if (strlen($submittedPassword) < 6) {
@@ -109,13 +117,13 @@ class UserModel extends FormModel implements GlobalSearchInterface
 
         if (!empty($submittedPassword)) {
             // hash the clear password submitted via the form
-            return $hasher->hashPassword($entity, $submittedPassword);
+            return $this->userPasswordHasher->hashPassword($entity, $submittedPassword);
         }
 
         return $entity->getPassword();
     }
 
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof User) {
             throw new MethodNotAllowedHttpException(['User'], $this->translator->trans('mautic.user.entity.must.be.user', [], 'validators'));
@@ -138,7 +146,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
         if ($entity) {
             // add user's permissions
             $entity->setActivePermissions(
-                $this->em->getRepository(\Mautic\UserBundle\Entity\Permission::class)->getPermissionsByRole($entity->getRole())
+                $this->permissionRepository->getPermissionsByRole($entity->getRole())
             );
         }
 
@@ -150,9 +158,9 @@ class UserModel extends FormModel implements GlobalSearchInterface
      */
     public function getSystemAdministrator()
     {
-        $adminRole = $this->em->getRepository(Role::class)->findOneBy(['isAdmin' => true]);
+        $adminRole = $this->roleRepository->findOneBy(['isAdmin' => true]);
 
-        return $this->getRepository()->findOneBy(
+        return $this->userRepository->findOneBy(
             [
                 'role'        => $adminRole,
                 'isPublished' => true,
@@ -213,9 +221,9 @@ class UserModel extends FormModel implements GlobalSearchInterface
         $results = [];
 
         return match ($type) {
-            'role'     => $this->em->getRepository(Role::class)->getRoleList($filter, $limit),
-            'user'     => $this->em->getRepository(User::class)->getUserList($filter, $limit),
-            'position' => $this->em->getRepository(User::class)->getPositionList($filter, $limit),
+            'role'     => $this->roleRepository->getRoleList($filter, $limit),
+            'user'     => $this->userRepository->getUserList($filter, $limit),
+            'position' => $this->userRepository->getPositionList($filter, $limit),
             default    => $results,
         };
     }
@@ -225,9 +233,9 @@ class UserModel extends FormModel implements GlobalSearchInterface
      *
      * @param string $newPassword
      */
-    public function resetPassword(User $user, UserPasswordHasherInterface $hasher, $newPassword): void
+    public function resetPassword(User $user, $newPassword): void
     {
-        $hashedPassword = $this->checkNewPassword($user, $hasher, $newPassword);
+        $hashedPassword = $this->checkNewPassword($user, $newPassword);
 
         $user->setPassword($hashedPassword);
         $this->saveEntity($user);
@@ -376,7 +384,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
 
         $user->setPreferences($preferences);
 
-        $this->getRepository()->saveEntity($user);
+        $this->userRepository->saveEntity($user);
     }
 
     /**
@@ -397,12 +405,12 @@ class UserModel extends FormModel implements GlobalSearchInterface
      */
     public function getOwnerListChoices(): array
     {
-        return $this->getRepository()->getOwnerListChoices();
+        return $this->userRepository->getOwnerListChoices();
     }
 
     public function hasUserWithEmail(string $email): bool
     {
-        return null !== $this->getRepository()->findOneBy(['email' => $email]);
+        return null !== $this->userRepository->findOneBy(['email' => $email]);
     }
 
     public function createInvite(string $email, Role $role): UserInvite
@@ -413,7 +421,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
             ->setTokenSelector($inviteToken['selector'])
             ->setTokenVerifierHash(password_hash($inviteToken['verifier'], PASSWORD_DEFAULT))
             ->setExpiration((new \DateTime())->add(new \DateInterval('PT48H')));
-        $this->getUserInviteRepository()->revokeOutstandingInvites($email);
+        $this->userInviteRepository->revokeOutstandingInvites($email);
         $this->em->persist($invite);
         $this->em->flush();
 
@@ -441,7 +449,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
             return null;
         }
 
-        $invite = $this->getUserInviteRepository()->findOneByTokenSelector($inviteToken['selector']);
+        $invite = $this->userInviteRepository->findOneByTokenSelector($inviteToken['selector']);
         if (null === $invite) {
             $this->logInvalidInvite('token selector was not found', null, $inviteToken['selector']);
 
@@ -507,14 +515,6 @@ class UserModel extends FormModel implements GlobalSearchInterface
             'selector' => $selector,
             'verifier' => $verifier,
         ];
-    }
-
-    private function getUserInviteRepository(): UserInviteRepositoryInterface
-    {
-        $repository = $this->em->getRepository(UserInvite::class);
-        \assert($repository instanceof UserInviteRepositoryInterface);
-
-        return $repository;
     }
 
     private function logInvalidInvite(string $reason, ?UserInvite $invite = null, ?string $selector = null): void

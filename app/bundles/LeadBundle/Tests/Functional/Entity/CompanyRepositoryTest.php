@@ -13,7 +13,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Model\CompanyModel;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\Mailer;
 
@@ -31,7 +30,7 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
     {
         // Clear owners cache (to leave a clean environment for future tests):
         /** @var MailHelper $mailHelper */
-        $mailHelper = static::getContainer()->get('mautic.helper.mailer');
+        $mailHelper = self::getContainer()->get(MailHelper::class);
         ReflectionHelper::setValue($mailHelper, 'leadOwners', []);
     }
 
@@ -48,13 +47,13 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
         $this->sendEmailViaApi($emailId);
         $testEmail = function () use ($suffix): void {
             $message = $this->transport->sentMessage;
-            Assert::assertSame($message->getSubject(), 'Subject'.$suffix);
-            Assert::assertSame($message->getTo()[0]->getAddress(), 'JohnDoe'.$suffix.'@email.com');
-            Assert::assertSame($message->getTo()[0]->getName(), 'John'.$suffix);
+            $this->assertSame($message->getSubject(), 'Subject'.$suffix);
+            $this->assertSame($message->getTo()[0]->getAddress(), 'JohnDoe'.$suffix.'@email.com');
+            $this->assertSame($message->getTo()[0]->getName(), 'John'.$suffix);
             $messageBody = $message->getBody()->toString();
-            Assert::assertStringContainsString('JohnDoe'.$suffix.'@email.com', $messageBody);
-            Assert::assertStringContainsString('XYZ Co.'.$suffix, $messageBody);
-            Assert::assertStringContainsString('Second Street'.$suffix, $messageBody);
+            $this->assertStringContainsString('JohnDoe'.$suffix.'@email.com', $messageBody);
+            $this->assertStringContainsString('XYZ Co.'.$suffix, $messageBody);
+            $this->assertStringContainsString('Second Street'.$suffix, $messageBody);
         };
         $testEmail();
     }
@@ -62,7 +61,7 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
     private function createCompany(string $name, string $address1 = ''): Company
     {
         /** @var CompanyModel $model */
-        $model   = static::getContainer()->get('mautic.lead.model.company');
+        $model   = self::getContainer()->get(CompanyModel::class);
         $company = new Company();
         $company->setIsPublished(true)->setName($name)->setAddress1($address1);
         $model->saveEntity($company);
@@ -160,7 +159,7 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
     private function setUpMailer(): void
     {
         /** @var MailHelper $mailHelper */
-        $mailHelper = static::getContainer()->get('mautic.helper.mailer');
+        $mailHelper = self::getContainer()->get(MailHelper::class);
         $transport  = new SmtpTransport();
         $mailer     = new Mailer($transport);
         ReflectionHelper::setValue($mailHelper, 'mailer', $mailer);
@@ -173,14 +172,10 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
         $this->client->request('POST', "/api/emails/{$emailId}/send");
         $clientResponse = $this->client->getResponse();
         self::assertResponseIsSuccessful();
-        Assert::assertSame(
-            json_decode($clientResponse->getContent(), true, 512, JSON_THROW_ON_ERROR),
-            [
-                'success'          => 1,
-                'sentCount'        => 1,
-                'failedRecipients' => 0,
-            ],
-            $clientResponse->getContent()
-        );
+        $this->assertSame(json_decode($clientResponse->getContent(), true, 512, JSON_THROW_ON_ERROR), [
+            'success'          => 1,
+            'sentCount'        => 1,
+            'failedRecipients' => 0,
+        ], $clientResponse->getContent());
     }
 }

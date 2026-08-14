@@ -9,10 +9,10 @@ use Mautic\CoreBundle\Form\Type\ConfigType;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ConfigSubscriber implements EventSubscriberInterface
+final readonly class ConfigSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly LanguageHelper $languageHelper,
+        private LanguageHelper $languageHelper,
     ) {
     }
 

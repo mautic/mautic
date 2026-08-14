@@ -26,7 +26,7 @@ class WebhookBuilderEvent extends Event
     public function addEvent($key, array $event): void
     {
         if (array_key_exists($key, $this->events)) {
-            throw new InvalidArgumentException("The key, '$key' is already used by another webhook event. Please use a different key.");
+            throw new InvalidArgumentException("The key, '{$key}' is already used by another webhook event. Please use a different key.");
         }
 
         $event['label']       = $this->translator->trans($event['label']);

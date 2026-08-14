@@ -503,7 +503,7 @@ class StatRepository extends CommonRepository
             )->setParameter('fromDate', $dt->toUtcString());
         }
 
-        $timeToReadParser = function (&$stat): void {
+        $timeToReadParser = function (array &$stat): void {
             $dateSent = new DateTimeHelper($stat['dateSent']);
             if (!empty($stat['dateSent']) && !empty($stat['dateRead'])) {
                 $stat['timeToRead'] = $dateSent->getDiff($stat['dateRead']);
@@ -625,9 +625,6 @@ class StatRepository extends CommonRepository
             ->executeStatement();
     }
 
-    /**
-     * Delete a stat.
-     */
     public function deleteStat($id): void
     {
         $this->getEntityManager()->getConnection()->delete(MAUTIC_TABLE_PREFIX.'email_stats', ['id' => (int) $id]);

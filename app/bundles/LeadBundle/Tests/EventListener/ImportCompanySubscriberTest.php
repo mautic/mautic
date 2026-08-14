@@ -33,14 +33,14 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
         );
         $event = new ImportInitEvent('unicorn');
         $subscriber->onImportInit($event);
-        Assert::assertFalse($event->objectSupported);
+        $this->assertFalse($event->objectSupported);
     }
 
     public function testOnImportInitForContactsObjectWithoutPermissions(): void
     {
         $subscriber = new ImportCompanySubscriber(
             $this->getFieldListFake(),
-            new class extends CorePermissions {
+            new class() extends CorePermissions {
                 public function __construct()
                 {
                 }
@@ -67,7 +67,7 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $subscriber = new ImportCompanySubscriber(
             $this->getFieldListFake(),
-            new class extends CorePermissions {
+            new class() extends CorePermissions {
                 public function __construct()
                 {
                 }
@@ -87,11 +87,11 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
         );
         $event = new ImportInitEvent('companies');
         $subscriber->onImportInit($event);
-        Assert::assertTrue($event->objectSupported);
-        Assert::assertSame('company', $event->objectSingular);
-        Assert::assertSame('mautic.lead.lead.companies', $event->objectName);
-        Assert::assertSame('#mautic_company_index', $event->activeLink);
-        Assert::assertSame('mautic_company_index', $event->indexRoute);
+        $this->assertTrue($event->objectSupported);
+        $this->assertSame('company', $event->objectSingular);
+        $this->assertSame('mautic.lead.lead.companies', $event->objectName);
+        $this->assertSame('#mautic_company_index', $event->activeLink);
+        $this->assertSame('mautic_company_index', $event->indexRoute);
     }
 
     public function testOnFieldMappingForUnknownObject(): void
@@ -104,13 +104,13 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
         );
         $event = new ImportMappingEvent('unicorn');
         $subscriber->onFieldMapping($event);
-        Assert::assertFalse($event->objectSupported);
+        $this->assertFalse($event->objectSupported);
     }
 
     public function testOnFieldMapping(): void
     {
         $subscriber = new ImportCompanySubscriber(
-            new class extends FieldList {
+            new class() extends FieldList {
                 public function __construct()
                 {
                 }
@@ -131,21 +131,18 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
         );
         $event = new ImportMappingEvent('companies');
         $subscriber->onFieldMapping($event);
-        Assert::assertTrue($event->objectSupported);
-        Assert::assertSame(
-            [
-                'mautic.lead.company' => [
-                    'some fields',
-                ],
-                'mautic.lead.special_fields' => [
-                    'dateAdded'      => 'mautic.lead.import.label.dateAdded',
-                    'createdByUser'  => 'mautic.lead.import.label.createdByUser',
-                    'dateModified'   => 'mautic.lead.import.label.dateModified',
-                    'modifiedByUser' => 'mautic.lead.import.label.modifiedByUser',
-                ],
+        $this->assertTrue($event->objectSupported);
+        $this->assertSame([
+            'mautic.lead.company' => [
+                'some fields',
             ],
-            $event->fields
-        );
+            'mautic.lead.special_fields' => [
+                'dateAdded'      => 'mautic.lead.import.label.dateAdded',
+                'createdByUser'  => 'mautic.lead.import.label.createdByUser',
+                'dateModified'   => 'mautic.lead.import.label.dateModified',
+                'modifiedByUser' => 'mautic.lead.import.label.modifiedByUser',
+            ],
+        ], $event->fields);
     }
 
     public function testOnImportProcessForUnknownObject(): void
@@ -169,7 +166,7 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
         $subscriber = new ImportCompanySubscriber(
             $this->getFieldListFake(),
             $this->getCorePermissionsFake(),
-            new class extends CompanyModel {
+            new class() extends CompanyModel {
                 public function __construct()
                 {
                 }
@@ -185,7 +182,7 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
         $import->setObject('company');
         $event = new ImportProcessEvent($import, new LeadEventLog(), []);
         $subscriber->onImportProcess($event);
-        Assert::assertTrue($event->wasMerged());
+        $this->assertTrue($event->wasMerged());
     }
 
     public function testImportCompanySubscriberDoesHaveTranslatorInitialized(): void
@@ -226,7 +223,7 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn($formMock);
         $formMock->expects($this->once())
             ->method('getData')
-            ->willReturnOnConsecutiveCalls($matchedFields);
+            ->willReturn($matchedFields);
         $translatorInterfaceMock->expects($this->once())
             ->method('trans')
             ->with(
@@ -243,7 +240,7 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
 
     private function getFieldListFake(): FieldList
     {
-        return new class extends FieldList {
+        return new class() extends FieldList {
             public function __construct()
             {
             }
@@ -252,7 +249,7 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
 
     private function getCorePermissionsFake(): CorePermissions
     {
-        return new class extends CorePermissions {
+        return new class() extends CorePermissions {
             public function __construct()
             {
             }
@@ -261,7 +258,7 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
 
     private function getCompanyModelFake(): CompanyModel
     {
-        return new class extends CompanyModel {
+        return new class() extends CompanyModel {
             public function __construct()
             {
             }
@@ -270,7 +267,7 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
 
     private function getTranslatorFake(): TranslatorInterface
     {
-        return new class extends Translator {
+        return new class() extends Translator {
             public function __construct()
             {
             }

@@ -10,13 +10,14 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\PointBundle\Entity\Group;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class PointGroupsApiControllerTest extends MauticMysqlTestCase
 {
     public function testPointGroupCRUDActions(): void
     {
         /** @var Translator $translator */
-        $translator = static::getContainer()->get('translator');
+        $translator = self::getContainer()->get(TranslatorInterface::class);
 
         // Create a new point group
         $this->client->request('POST', '/api/points/groups/new', [
@@ -88,7 +89,7 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
     public function testContactGroupPointsActions(): void
     {
         /** @var Translator $translator */
-        $translator = static::getContainer()->get('translator');
+        $translator = self::getContainer()->get(TranslatorInterface::class);
 
         // Arrange
         $contact     = $this->createContact('test@example.com');
@@ -158,7 +159,7 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
 
     private function adjustPointsAndAssert(Lead $contact, Group $pointGroup, string $operator, int $value, int $expectedScore): void
     {
-        $this->client->request('POST', "/api/contacts/{$contact->getId()}/points/groups/{$pointGroup->getId()}/$operator/{$value}");
+        $this->client->request('POST', "/api/contacts/{$contact->getId()}/points/groups/{$pointGroup->getId()}/{$operator}/{$value}");
         $adjustResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $responseData = json_decode($adjustResponse->getContent(), true);

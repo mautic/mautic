@@ -6,7 +6,6 @@ namespace Mautic\CoreBundle\Tests\Unit\Twig\Helper;
 
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\Packages;
@@ -36,28 +35,28 @@ final class AssetsHelperTest extends TestCase
         $this->assetHelper->addStylesheet('/app.css');
         $head = $this->assetHelper->getHeadDeclarations();
 
-        Assert::assertStringContainsString('app.css', $head);
+        $this->assertStringContainsString('app.css', $head);
 
         $head = $this->assetHelper->setContext(AssetsHelper::CONTEXT_BUILDER)
             ->getHeadDeclarations();
-        Assert::assertStringNotContainsString('app.css', $head);
+        $this->assertStringNotContainsString('app.css', $head);
 
         $version = $this->setVersion($this->assetHelper);
 
         $head = $this->assetHelper->setContext(AssetsHelper::CONTEXT_BUILDER)
             ->getHeadDeclarations();
-        Assert::assertStringNotContainsString('app.css?v'.$version, $head);
+        $this->assertStringNotContainsString('app.css?v'.$version, $head);
     }
 
     public function testGetUrlWithAbsolutePath(): void
     {
-        Assert::assertSame('http://some.absolute/path', $this->assetHelper->getUrl('http://some.absolute/path'));
-        Assert::assertSame('https://some.absolute/path', $this->assetHelper->getUrl('https://some.absolute/path'));
+        $this->assertSame('http://some.absolute/path', $this->assetHelper->getUrl('http://some.absolute/path'));
+        $this->assertSame('https://some.absolute/path', $this->assetHelper->getUrl('https://some.absolute/path'));
 
         $this->setVersion($this->assetHelper);
 
-        Assert::assertSame('http://some.absolute/path', $this->assetHelper->getUrl('http://some.absolute/path'));
-        Assert::assertSame('https://some.absolute/path', $this->assetHelper->getUrl('https://some.absolute/path'));
+        $this->assertSame('http://some.absolute/path', $this->assetHelper->getUrl('http://some.absolute/path'));
+        $this->assertSame('https://some.absolute/path', $this->assetHelper->getUrl('https://some.absolute/path'));
     }
 
     public function testGetUrlWithRelativePath(): void
@@ -67,11 +66,11 @@ final class AssetsHelperTest extends TestCase
 
         $this->assetHelper->setPathsHelper($this->pathsHelper);
 
-        Assert::assertSame('http://some.mautic/some/path', $this->assetHelper->getUrl('some/path'));
+        $this->assertSame('http://some.mautic/some/path', $this->assetHelper->getUrl('some/path'));
 
         $version = $this->setVersion($this->assetHelper);
 
-        Assert::assertSame('http://some.mautic/some/path?v'.$version, $this->assetHelper->getUrl('some/path'));
+        $this->assertSame('http://some.mautic/some/path?v'.$version, $this->assetHelper->getUrl('some/path'));
     }
 
     public function testGetUrlWithRelativePathWhenMauticInSubFolder(): void
@@ -81,11 +80,11 @@ final class AssetsHelperTest extends TestCase
 
         $this->assetHelper->setPathsHelper($this->pathsHelper);
 
-        Assert::assertSame('http://some.mautic/m/some/path', $this->assetHelper->getUrl('some/path'));
+        $this->assertSame('http://some.mautic/m/some/path', $this->assetHelper->getUrl('some/path'));
 
         $version = $this->setVersion($this->assetHelper);
 
-        Assert::assertSame('http://some.mautic/m/some/path?v'.$version, $this->assetHelper->getUrl('some/path'));
+        $this->assertSame('http://some.mautic/m/some/path?v'.$version, $this->assetHelper->getUrl('some/path'));
     }
 
     public function testGetUrlWithRelativePathWithDevIndex(): void
@@ -95,11 +94,11 @@ final class AssetsHelperTest extends TestCase
 
         $this->assetHelper->setPathsHelper($this->pathsHelper);
 
-        Assert::assertSame('http://some.mautic/some/path', $this->assetHelper->getUrl('some/path'));
+        $this->assertSame('http://some.mautic/some/path', $this->assetHelper->getUrl('some/path'));
 
         $version = $this->setVersion($this->assetHelper);
 
-        Assert::assertSame('http://some.mautic/some/path?v'.$version, $this->assetHelper->getUrl('some/path'));
+        $this->assertSame('http://some.mautic/some/path?v'.$version, $this->assetHelper->getUrl('some/path'));
     }
 
     public function testGetUrlWithVersionAndExistingQueryPart(): void
@@ -111,9 +110,9 @@ final class AssetsHelperTest extends TestCase
 
         $version = $this->setVersion($this->assetHelper);
 
-        Assert::assertSame('/path?some&amp;v'.$version, $this->assetHelper->getUrl('/path?some'));
-        Assert::assertSame('/path?some=65&amp;v'.$version, $this->assetHelper->getUrl('/path?some=65'));
-        Assert::assertSame('/path?v'.$version, $this->assetHelper->getUrl('/path?v'.$version));
+        $this->assertSame('/path?some&amp;v'.$version, $this->assetHelper->getUrl('/path?some'));
+        $this->assertSame('/path?some=65&amp;v'.$version, $this->assetHelper->getUrl('/path?some=65'));
+        $this->assertSame('/path?v'.$version, $this->assetHelper->getUrl('/path?v'.$version));
     }
 
     public function testGetCKEditorScripts(): void
@@ -126,12 +125,9 @@ final class AssetsHelperTest extends TestCase
         $reflectionObject = new \ReflectionObject($this->assetHelper);
         $method           = $reflectionObject->getMethod('getCKEditorScripts');
         $ckEditorScripts  = $method->invokeArgs($this->assetHelper, []);
-        Assert::assertEquals(
-            [
-                "media/libraries/ckeditor/ckeditor.js?v{$version}",
-            ],
-            $ckEditorScripts
-        );
+        $this->assertEquals([
+            "media/libraries/ckeditor/ckeditor.js?v{$version}",
+        ], $ckEditorScripts);
     }
 
     /**

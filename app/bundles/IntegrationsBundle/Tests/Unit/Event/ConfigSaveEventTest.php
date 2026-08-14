@@ -20,7 +20,7 @@ final class ConfigSaveEventTest extends TestCase
             ->method('getName')
             ->willReturn($name);
 
-        self::assertSame($integration, $event->getIntegrationConfiguration());
-        self::assertSame($name, $event->getIntegration());
+        $this->assertSame($integration, $event->getIntegrationConfiguration());
+        $this->assertSame($name, $event->getIntegration());
     }
 }

@@ -54,7 +54,7 @@ class StageRepository extends CommonRepository
             ->setParameter('type', $type);
 
         // make sure the published up and down dates are good
-        $expr = $this->getPublishedByDateExpression($q);
+        $expr = $this->getPublishedByDateOrmExpression($q);
 
         $q->where($expr);
 
@@ -124,22 +124,15 @@ class StageRepository extends CommonRepository
     /**
      * Get a list of lists.
      *
-     * @param bool   $user
-     * @param string $id
+     * @param bool|object $user
+     * @param string      $id
      *
-     * @return array
+     * @return array<int, array<string, mixed>>
      */
-    public function getStages($user = false, $id = '')
+    public function getStages($user = false, $id = ''): array
     {
-        static $stages = [];
-
         if (is_object($user)) {
             $user = $user->getId();
-        }
-
-        $key = (int) $user.$id;
-        if (isset($stages[$key])) {
-            return $stages[$key];
         }
 
         $q = $this->_em->createQueryBuilder()
@@ -162,11 +155,7 @@ class StageRepository extends CommonRepository
 
         $q->orderBy('s.name');
 
-        $results = $q->getQuery()->getArrayResult();
-
-        $stages[$key] = $results;
-
-        return $results;
+        return $q->getQuery()->getArrayResult();
     }
 
     /**

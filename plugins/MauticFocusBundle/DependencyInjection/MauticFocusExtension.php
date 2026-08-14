@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 
-class MauticFocusExtension extends Extension
+final class MauticFocusExtension extends Extension
 {
     /**
      * @param mixed[] $configs

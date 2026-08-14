@@ -218,10 +218,7 @@ class Event implements ChannelInterface, UuidInterface
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private $channelId;
 
-    /**
-     * @var array
-     */
-    private $changes = [];
+    private array $changes = [];
 
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private ?\DateTimeInterface $deleted = null;
@@ -229,7 +226,7 @@ class Event implements ChannelInterface, UuidInterface
     private int $failedCount = 0;
 
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
-    private ?Event $redirectEvent;
+    private ?Event $redirectEvent = null;
 
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private ?\DateTime $dateLinked = null;
@@ -245,7 +242,6 @@ class Event implements ChannelInterface, UuidInterface
     {
         $this->log               = new ArrayCollection();
         $this->children          = new ArrayCollection();
-        $this->redirectEvent     = null;
         $this->redirectingEvents = new ArrayCollection();
 
         if ($dateAdded) {
@@ -528,7 +524,7 @@ class Event implements ChannelInterface, UuidInterface
     private function isChanged(string $prop, $val): bool
     {
         $getter  = 'get'.ucfirst($prop);
-        $current = $this->$getter();
+        $current = $this->{$getter}();
         if ('category' === $prop || 'parent' === $prop) {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
@@ -537,8 +533,8 @@ class Event implements ChannelInterface, UuidInterface
 
                 return true;
             }
-        } elseif ($this->$prop != $val) {
-            $this->changes[$prop] = [$this->$prop, $val];
+        } elseif ($this->{$prop} != $val) {
+            $this->changes[$prop] = [$this->{$prop}, $val];
 
             return true;
         }
@@ -546,10 +542,7 @@ class Event implements ChannelInterface, UuidInterface
         return false;
     }
 
-    /**
-     * @return array
-     */
-    public function getChanges()
+    public function getChanges(): array
     {
         return $this->changes;
     }
@@ -716,7 +709,7 @@ class Event implements ChannelInterface, UuidInterface
             ->andWhere(Criteria::expr()->eq('rotation', $rotation))
             ->setMaxResults(1);
 
-        $log = $this->getLog()->matching($criteria);
+        $log = $this->log->matching($criteria);
 
         if (count($log)) {
             return $log->first();
@@ -728,7 +721,7 @@ class Event implements ChannelInterface, UuidInterface
     /**
      * Add children.
      */
-    public function addChild(Event $children): static
+    public function addChild(self $children): static
     {
         $this->children[] = $children;
 
@@ -738,7 +731,7 @@ class Event implements ChannelInterface, UuidInterface
     /**
      * Remove children.
      */
-    public function removeChild(Event $children): void
+    public function removeChild(self $children): void
     {
         $this->children->removeElement($children);
     }
@@ -797,7 +790,7 @@ class Event implements ChannelInterface, UuidInterface
         return $this->getChildren()->matching($criteria);
     }
 
-    public function setParent(?Event $parent = null): static
+    public function setParent(?self $parent = null): static
     {
         $isChanged = $this->isChanged('parent', $parent);
         if ($isChanged) {
@@ -918,7 +911,7 @@ class Event implements ChannelInterface, UuidInterface
         return $this->triggerWindow;
     }
 
-    public function setTriggerWindow(?int $triggerWindow): Event
+    public function setTriggerWindow(?int $triggerWindow): self
     {
         $this->triggerWindow = $triggerWindow;
 
@@ -1122,7 +1115,7 @@ class Event implements ChannelInterface, UuidInterface
         return $this;
     }
 
-    public function setDeleted(mixed $deleted = 'now'): Event
+    public function setDeleted(mixed $deleted = 'now'): self
     {
         if (is_array($deleted) && array_key_exists('date', $deleted)) {
             $deleted = new \DateTime($deleted['date']);
@@ -1143,7 +1136,7 @@ class Event implements ChannelInterface, UuidInterface
 
     public function isDeleted(): bool
     {
-        return !is_null($this->deleted);
+        return null !== $this->deleted;
     }
 
     public function getFailedCount(): int
@@ -1175,7 +1168,7 @@ class Event implements ChannelInterface, UuidInterface
         $this->dateLinked = $dateLinked;
     }
 
-    public function setRedirectEvent(?Event $redirectEvent = null): Event
+    public function setRedirectEvent(?self $redirectEvent = null): self
     {
         $this->isChanged('redirectEvent', $redirectEvent);
         $this->redirectEvent = $redirectEvent;
@@ -1183,7 +1176,7 @@ class Event implements ChannelInterface, UuidInterface
         return $this;
     }
 
-    public function getRedirectEvent(): ?Event
+    public function getRedirectEvent(): ?self
     {
         return $this->redirectEvent;
     }
@@ -1204,6 +1197,6 @@ class Event implements ChannelInterface, UuidInterface
 
     public function getPermissionUser(): mixed
     {
-        return $this->getCampaign()->getCreatedBy();
+        return $this->campaign->getCreatedBy();
     }
 }

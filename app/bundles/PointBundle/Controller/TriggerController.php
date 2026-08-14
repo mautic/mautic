@@ -8,12 +8,25 @@ use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Model\TriggerEventModel;
 use Mautic\PointBundle\Model\TriggerModel;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class TriggerController extends FormController
+final class TriggerController extends FormController
 {
+    private TriggerEventModel $triggerEventModel;
+
+    private TriggerModel $triggerModel;
+
+    #[Required]
+    public function autowireTriggerController(
+        TriggerEventModel $triggerEventModel,
+        TriggerModel $triggerModel,
+    ): void {
+        $this->triggerEventModel = $triggerEventModel;
+        $this->triggerModel      = $triggerModel;
+    }
+
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
     {
         // set some permissions
@@ -39,7 +52,7 @@ class TriggerController extends FormController
         $filter     = ['string' => $search, 'force' => []];
         $orderBy    = $request->getSession()->get('mautic.point.trigger.orderby', 't.name');
         $orderByDir = $request->getSession()->get('mautic.point.trigger.orderbydir', 'ASC');
-        $triggers   = $this->getModel('point.trigger')->getEntities(
+        $triggers   = $this->triggerModel->getEntities(
             [
                 'start'      => $start,
                 'limit'      => $limit,
@@ -95,7 +108,7 @@ class TriggerController extends FormController
      */
     public function viewAction(Request $request, $objectId): Response
     {
-        $entity = $this->getModel('point.trigger')->getEntity($objectId);
+        $entity = $this->triggerModel->getEntity($objectId);
 
         // set the page we came from
         $page = $request->getSession()->get('mautic.point.trigger.page', 1);
@@ -128,7 +141,8 @@ class TriggerController extends FormController
                     ],
                 ],
             ]);
-        } elseif (!$permissions['point:triggers:view']) {
+        }
+        if (!$permissions['point:triggers:view']) {
             $this->throwAccessDenied();
         }
 
@@ -157,12 +171,9 @@ class TriggerController extends FormController
      */
     public function newAction(Request $request, ?Trigger $entity = null, array $triggerEvents = []): Response
     {
-        /** @var TriggerModel $model */
-        $model = $this->getModel('point.trigger');
-
         if (!$entity instanceof Trigger) {
             /** @var Trigger $entity */
-            $entity = $model->getEntity();
+            $entity = $this->triggerModel->getEntity();
         }
 
         $session   = $request->getSession();
@@ -177,14 +188,14 @@ class TriggerController extends FormController
 
         // set added/updated events
         $addEvents     = $session->get('mautic.point.'.$sessionId.'.triggerevents.modified', []);
-        if (!empty($triggerEvents)) {
+        if ([] !== $triggerEvents) {
             $addEvents += $triggerEvents;
             $session->set('mautic.point.'.$sessionId.'.triggerevents.modified', $triggerEvents);
         }
         $deletedEvents = $session->get('mautic.point.'.$sessionId.'.triggerevents.deleted', []);
 
         $action = $this->generateUrl('mautic_pointtrigger_action', ['objectAction' => 'new']);
-        $form   = $model->createForm($entity, $this->formFactory, $action);
+        $form   = $this->triggerModel->createForm($entity, $this->formFactory, $action);
         $form->get('sessionId')->setData($sessionId);
 
         // Check for a submitted form and process it
@@ -196,16 +207,16 @@ class TriggerController extends FormController
                     $events = array_diff_key($addEvents, array_flip($deletedEvents));
 
                     // make sure that at least one action is selected
-                    if (empty($events)) {
+                    if ([] === $events) {
                         // set the error
                         $form->addError(new FormError(
                             $this->translator->trans('mautic.core.value.required', [], 'validators')
                         ));
                         $valid = false;
                     } else {
-                        $model->setEvents($entity, $events);
+                        $this->triggerModel->setEvents($entity, $events);
 
-                        $model->saveEntity($entity);
+                        $this->triggerModel->saveEntity($entity);
 
                         $this->addFlashMessage('mautic.core.notice.created', [
                             '%name%'      => $entity->getName(),
@@ -245,7 +256,7 @@ class TriggerController extends FormController
                     ],
                 ]);
             }
-        } elseif (!empty($triggerEvents)) {
+        } elseif ([] !== $triggerEvents) {
             // The clone part, no need to clear session here.
             $addEvents     = $triggerEvents;
             $deletedEvents = [];
@@ -256,7 +267,7 @@ class TriggerController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'events'        => $model->getEventGroups(),
+                'events'        => $this->triggerModel->getEventGroups(),
                 'triggerEvents' => $addEvents,
                 'deletedEvents' => $deletedEvents,
                 'tmpl'          => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
@@ -281,14 +292,10 @@ class TriggerController extends FormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return JsonResponse|Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false): Response
     {
-        /** @var TriggerModel $model */
-        $model      = $this->getModel('point.trigger');
-        $entity     = $model->getEntity($objectId);
+        $entity     = $this->triggerModel->getEntity($objectId);
         $session    = $request->getSession();
         $cleanSlate = true;
 
@@ -321,15 +328,16 @@ class TriggerController extends FormController
                     ],
                 ])
             );
-        } elseif (!$this->security->isGranted('point:triggers:edit')) {
+        }
+        if (!$this->security->isGranted('point:triggers:edit')) {
             $this->throwAccessDenied();
-        } elseif ($model->isLocked($entity)) {
+        } elseif ($this->triggerModel->isLocked($entity)) {
             // deny access if the entity is locked
             return $this->isLocked($postActionVars, $entity, 'point.trigger');
         }
 
         $action = $this->generateUrl('mautic_pointtrigger_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $form   = $model->createForm($entity, $this->formFactory, $action);
+        $form   = $this->triggerModel->createForm($entity, $this->formFactory, $action);
         $form->get('sessionId')->setData($objectId);
 
         // /Check for a submitted form and process it
@@ -343,23 +351,21 @@ class TriggerController extends FormController
 
                 if ($valid = $this->isFormValid($form)) {
                     // make sure that at least one field is selected
-                    if (empty($events)) {
+                    if ([] === $events) {
                         // set the error
                         $form->addError(new FormError(
                             $this->translator->trans('mautic.core.value.required', [], 'validators')
                         ));
                         $valid = false;
                     } else {
-                        $model->setEvents($entity, $events);
+                        $this->triggerModel->setEvents($entity, $events);
 
                         // form is valid so process the data
-                        $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
+                        $this->triggerModel->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                         // delete entities
                         if (count($deletedEvents)) {
-                            $triggerEventModel = $this->getModel('point.triggerevent');
-                            \assert($triggerEventModel instanceof TriggerEventModel);
-                            $triggerEventModel->deleteEntities($deletedEvents);
+                            $this->triggerEventModel->deleteEntities($deletedEvents);
                         }
 
                         $session->set('mautic.point.'.$objectId.'.triggerevents.modified', $events);
@@ -377,7 +383,7 @@ class TriggerController extends FormController
                 }
             } else {
                 // unlock the entity
-                $model->unlockEntity($entity);
+                $this->triggerModel->unlockEntity($entity);
             }
 
             if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
@@ -395,7 +401,9 @@ class TriggerController extends FormController
                         'contentTemplate' => $template,
                     ])
                 );
-            } elseif ($form->get('buttons')->get('apply')->isClicked()) {
+            }
+
+            if ($this->isButtonClicked($form, 'apply')) {
                 // do not clear session, just reload view with updated session
                 $cleanSlate = false;
             }
@@ -403,7 +411,7 @@ class TriggerController extends FormController
             $cleanSlate = true;
 
             // lock the entity
-            $model->lockEntity($entity);
+            $this->triggerModel->lockEntity($entity);
         }
 
         $triggerEvents   = [];
@@ -426,7 +434,7 @@ class TriggerController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'events'        => $model->getEventGroups(),
+                'events'        => $this->triggerModel->getEventGroups(),
                 'triggerEvents' => $triggerEvents,
                 'deletedEvents' => $deletedEvents,
                 'tmpl'          => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
@@ -453,10 +461,8 @@ class TriggerController extends FormController
      */
     public function cloneAction(Request $request, $objectId): Response
     {
-        /** @var TriggerModel $model */
-        $model  = $this->getModel('point.trigger');
         /** @var Trigger $entity */
-        $entity = $model->getEntity($objectId);
+        $entity = $this->triggerModel->getEntity($objectId);
 
         $triggerEvents = [];
 
@@ -484,10 +490,8 @@ class TriggerController extends FormController
 
     /**
      * Deletes the entity.
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         $page      = $request->getSession()->get('mautic.point.trigger.page', 1);
         $returnUrl = $this->generateUrl('mautic_pointtrigger_index', ['page' => $page]);
@@ -504,9 +508,7 @@ class TriggerController extends FormController
         ];
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            $model = $this->getModel('point.trigger');
-            \assert($model instanceof TriggerModel);
-            $entity = $model->getEntity($objectId);
+            $entity = $this->triggerModel->getEntity($objectId);
 
             if (null === $entity) {
                 $flashes[] = [
@@ -516,11 +518,11 @@ class TriggerController extends FormController
                 ];
             } elseif (!$this->security->isGranted('point:triggers:delete')) {
                 $this->throwAccessDenied();
-            } elseif ($model->isLocked($entity)) {
+            } elseif ($this->triggerModel->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'point.trigger');
             }
 
-            $model->deleteEntity($entity);
+            $this->triggerModel->deleteEntity($entity);
 
             $identifier = $this->translator->trans($entity->getName());
             $flashes[]  = [
@@ -560,14 +562,12 @@ class TriggerController extends FormController
         ];
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            $model = $this->getModel('point.trigger');
-            \assert($model instanceof TriggerModel);
             $ids       = json_decode($request->query->get('ids', '{}'));
             $deleteIds = [];
 
             // Loop over the IDs to perform access checks pre-delete
             foreach ($ids as $objectId) {
-                $entity = $model->getEntity($objectId);
+                $entity = $this->triggerModel->getEntity($objectId);
 
                 if (null === $entity) {
                     $flashes[] = [
@@ -577,7 +577,7 @@ class TriggerController extends FormController
                     ];
                 } elseif (!$this->security->isGranted('point:triggers:delete')) {
                     $flashes[] = $this->getAccessDeniedFlash();
-                } elseif ($model->isLocked($entity)) {
+                } elseif ($this->triggerModel->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'point.trigger', true);
                 } else {
                     $deleteIds[] = $objectId;
@@ -585,8 +585,8 @@ class TriggerController extends FormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
-                $entities = $model->deleteEntities($deleteIds);
+            if ([] !== $deleteIds) {
+                $entities = $this->triggerModel->deleteEntities($deleteIds);
 
                 $flashes[] = [
                     'type'    => 'notice',

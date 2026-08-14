@@ -32,7 +32,7 @@ class MaintenanceEvent extends Event
     {
         $this->daysOld = (int) $daysOld;
         $this->dryRun  = (bool) $dryRun;
-        $this->date    = new \DateTime("$daysOld days ago", new \DateTimeZone('UTC'));
+        $this->date    = new \DateTime("{$daysOld} days ago", new \DateTimeZone('UTC'));
         $this->gdpr    = (bool) $gdpr;
     }
 
@@ -67,7 +67,7 @@ class MaintenanceEvent extends Event
                 if (is_array($value)) {
                     $value = implode(', ', $value);
                 }
-                $sql = str_replace(":$paramKey", (string) $value, $sql);
+                $sql = str_replace(":{$paramKey}", (string) $value, $sql);
             }
             $this->debug[$key] = $sql;
         }

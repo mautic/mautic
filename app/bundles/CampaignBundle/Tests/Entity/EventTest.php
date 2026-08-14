@@ -18,7 +18,7 @@ final class EventTest extends TestCase
         $event = new Event();
         $event->setName(self::TEST_NAME);
         $event->setTriggerHour('');
-        $this->assertNull($event->getTriggerHour());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $event->getTriggerHour());
     }
 
     public function testSetTriggerHourWhenArray(): void

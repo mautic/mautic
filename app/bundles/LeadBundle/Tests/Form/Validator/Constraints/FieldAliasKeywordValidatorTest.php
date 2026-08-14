@@ -32,8 +32,6 @@ final class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        $fieldAliasHelperlMock                = $this->createMock(FieldAliasHelper::class);
         $listModelMock                        = $this->createMock(ListModel::class);
         $this->executionContextMock           = $this->createMock(ExecutionContextInterface::class);
         $entityManagerMock                    = $this->createMock(EntityManager::class);
@@ -73,7 +71,7 @@ final class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
 
         $this->validator = new FieldAliasKeywordValidator(
             $listModelMock,
-            $fieldAliasHelperlMock,
+            $this->createStub(FieldAliasHelper::class),
             $entityManagerMock,
             $translatorMock,
             $contactSegmentFilterDictionary

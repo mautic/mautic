@@ -2,25 +2,23 @@
 
 namespace Mautic\SmsBundle\Broadcast;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Entity\ContactLimiterTrait;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\SmsBundle\Entity\Sms;
-use Mautic\SmsBundle\Model\SmsModel;
+use Mautic\SmsBundle\Entity\SmsRepository;
 
-class BroadcastQuery
+final class BroadcastQuery
 {
     use ContactLimiterTrait;
 
-    /**
-     * @var \Doctrine\DBAL\Query\QueryBuilder
-     */
-    private $query;
+    private QueryBuilder $query;
 
     public function __construct(
-        private EntityManager $entityManager,
-        private SmsModel $smsModel,
+        private EntityManagerInterface $entityManager,
+        private readonly SmsRepository $smsRepository,
     ) {
     }
 
@@ -44,12 +42,9 @@ class BroadcastQuery
         return $query->executeQuery()->fetchOne();
     }
 
-    /**
-     * @return \Doctrine\DBAL\Query\QueryBuilder
-     */
-    private function getBasicQuery(Sms $sms)
+    public function getBasicQuery(Sms $sms): QueryBuilder
     {
-        $this->query = $this->smsModel->getRepository()->getSegmentsContactsQuery($sms->getId());
+        $this->query = $this->smsRepository->getSegmentsContactsQuery($sms->getId());
         $this->query->andWhere(
             $this->query->expr()->or(
                 $this->query->expr()->or(

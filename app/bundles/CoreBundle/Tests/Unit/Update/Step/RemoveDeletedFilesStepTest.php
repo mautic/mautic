@@ -61,7 +61,7 @@ final class RemoveDeletedFilesStepTest extends AbstractStepTestCase
 
         $step = $this->getStep();
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturn('');
 
@@ -83,7 +83,7 @@ final class RemoveDeletedFilesStepTest extends AbstractStepTestCase
 
         $step = $this->getStep();
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturn('');
 

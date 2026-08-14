@@ -318,18 +318,6 @@
                                   </td>
                                   <td>{{ email.readCount }}</td>
                               </tr>
-                              {% if emailType == 'list' and email.lists|length > 0 %}
-                              <tr>
-                                  <td width="20%">
-                                      <span class="fw-b">{{ 'mautic.lead.lead.lists'|trans }}</span>
-                                  </td>
-                                  <td>
-                                      {% for list in email.lists %}
-                                          <a href="{{ path('mautic_segment_action', {'objectAction': 'view', 'objectId': list.id}) }}" data-toggle="ajax">{{ list.name|purify }}</a>{% if not loop.last %}, {% endif %}
-                                      {% endfor %}
-                                  </td>
-                              </tr>
-                              {% endif %}
                               </tbody>
                           </table>
                       </div>
@@ -502,25 +490,20 @@
 
       <!-- right section -->
       <div class="col-md-3 bdr-l height-auto">
-          {{ customContent('right.section.start', _context) }}
-
           <!-- email preview -->
-          <div class="pa-16">
-              <iframe
-                  id="content_preview_frame"
-                  src="{{ previewUrl|e }}"
-                  sandbox="allow-popups allow-popups-to-escape-sandbox"
-                  title="{{ 'mautic.email.preview.iframe_title'|trans }}"
-                  style="width: 100%; min-height: 1000px; border: 0; zoom: 0.35; overflow: hidden;">
-              </iframe>
-          </div>
-          <!--/ email preview -->
-          <!-- preview URL -->
           <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
               <div class="panel-heading">
                   <div class="panel-title">{{ 'mautic.email.preview.url'|trans }}</div>
               </div>
               <div class="panel-body pt-xs">
+                  <iframe
+                      id="content_preview_frame"
+                      class="mb-md"
+                      src="{{ previewUrl|e }}"
+                      sandbox="allow-popups allow-popups-to-escape-sandbox"
+                      title="{{ 'mautic.email.preview.iframe_title'|trans }}"
+                      style="width: 100%; height: 600px; border: 0; zoom: 0.35; overflow: hidden;">
+                  </iframe>
                   {% if previewSettingsForm.translation is defined %}
                   <div class="row">
                       <div class="form-group col-xs-12 ">
@@ -580,6 +563,40 @@
                   </div>
               </div>
           </div>
+          <!--/ email preview -->
+
+          {% if emailType == 'list' and email.lists|length > 0 %}
+              <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0" id="email-segments-used">
+                  <div class="panel-heading">
+                      <div class="panel-title">{{ 'mautic.email.segments.used'|trans }}</div>
+                  </div>
+                  <div class="panel-body pt-xs d-flex fw-wrap gap-xs">
+                      {% set segmentTagColors = ['gray', 'red', 'magenta', 'purple', 'blue', 'cyan', 'teal', 'green'] %}
+                      {% for segment in email.lists %}
+                          {% set canViewSegment = securityHasEntityAccess(
+                              permissions['lead:lists:viewown'],
+                              permissions['lead:lists:viewother'],
+                              segment.createdBy
+                          ) %}
+                          {% set segmentTag = {
+                              label: segment.name,
+                              color: cycle(segmentTagColors, loop.index0)
+                          } %}
+                          {% if canViewSegment %}
+                              {% set segmentTag = segmentTag|merge({
+                                  attributes: {
+                                      href: path('mautic_segment_action', {'objectAction': 'view', 'objectId': segment.id}),
+                                      'data-toggle': 'ajax'
+                                  }
+                              }) %}
+                          {% endif %}
+                          {% include '@MauticCore/Helper/_tag.html.twig' with {tags: [segmentTag]} %}
+                      {% endfor %}
+                  </div>
+              </div>
+          {% endif %}
+
+          {{ customContent('right.section.start', _context) }}
 
           <!-- Draft preview URL -->
           {% if draftPreviewUrl is defined and draftPreviewUrl is not empty %}

@@ -7,7 +7,7 @@ use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-class ParameterLoader
+final class ParameterLoader
 {
     private readonly string $configBaseDir;
 
@@ -18,17 +18,28 @@ class ParameterLoader
     /**
      * @var array<string, mixed>
      */
-    private array $localParameters = [];
+    private array $localParameters;
 
     /**
      * @var array<string, mixed>
      */
     private static array $defaultParameters = [];
 
+    /**
+     * Keys this loader has itself populated into the environment during this process, tracked so
+     * a later call (e.g. re-booting the kernel between tests within the same PHP process) can
+     * still refresh values it previously set. Without this, that protection would incorrectly
+     * extend to values that were never set by this method, e.g. a value from a .env/.env.local
+     * file loaded once during the application's real bootstrap.
+     *
+     * @var array<string, true>
+     */
+    private static array $selfPopulatedEnvKeys = [];
+
     public function __construct(
         private readonly string $rootPath = __DIR__.'/../../../',
     ) {
-        $this->configBaseDir = static::getLocalConfigBaseDir($this->rootPath);
+        $this->configBaseDir = self::getLocalConfigBaseDir($this->rootPath);
 
         $this->loadDefaultParameters();
         $this->loadLocalParameters();
@@ -76,8 +87,26 @@ class ParameterLoader
             if (null === $value) {
                 $envVariables->set($key, '');
             }
+
+            // Do not let a value derived from local.php override a value that has already been
+            // set in the environment - unless we are the ones who set it. This protects a value
+            // that came from a real system/OS environment variable or from a .env/.env.local file
+            // loaded earlier during the application's bootstrap. Dotenv::populate() only skips
+            // values that are *not* tracked in $_ENV['SYMFONY_DOTENV_VARS'], so a value loaded
+            // from a .env file (which *is* tracked there) would otherwise still be silently
+            // overwritten below, even though a plain system environment variable of the same name
+            // would not be. Keying the guard off our own tracking (rather than only off
+            // SYMFONY_DOTENV_VARS) also keeps a later call in the same process - e.g. a kernel
+            // reboot between tests - free to refresh values it previously computed itself.
+            if (!isset(self::$selfPopulatedEnvKeys[$key]) && isset($_ENV[$key])) {
+                $envVariables->remove($key);
+            }
         }
         $dotenv->populate($envVariables->all());
+
+        foreach ($envVariables->all() as $key => $value) {
+            self::$selfPopulatedEnvKeys[$key] = true;
+        }
     }
 
     public static function getLocalConfigFile(string $root, bool $updateDefaultParameters = true): string
@@ -204,7 +233,8 @@ class ParameterLoader
 
         if (Path::isBasePath($rootDir, $localConfigFile)) {
             return $rootDir;
-        } elseif (Path::isBasePath($projectDir, $localConfigFile)) {
+        }
+        if (Path::isBasePath($projectDir, $localConfigFile)) {
             return $projectDir;
         }
 

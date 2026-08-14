@@ -85,7 +85,7 @@ class CompanyLeadRepository extends CommonRepository
     {
         $ids = array_filter($ids);
 
-        if (!$ids) {
+        if ([] === $ids) {
             return [];
         }
 
@@ -170,7 +170,7 @@ class CompanyLeadRepository extends CommonRepository
 
         $result = $q->executeQuery()->fetchAllAssociative();
 
-        return !empty($result) ? $result[0] : [];
+        return $result[0] ?? [];
     }
 
     /**

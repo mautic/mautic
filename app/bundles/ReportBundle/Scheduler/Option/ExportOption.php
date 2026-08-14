@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Scheduler\Option;
 
 class ExportOption
@@ -11,7 +13,7 @@ class ExportOption
      */
     public function __construct($reportId)
     {
-        if (!is_null($reportId) && !is_numeric($reportId)) {
+        if (null !== $reportId && !is_numeric($reportId)) {
             throw new \InvalidArgumentException();
         }
 

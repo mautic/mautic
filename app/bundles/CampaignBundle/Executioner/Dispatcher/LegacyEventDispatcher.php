@@ -212,7 +212,7 @@ class LegacyEventDispatcher
         }
     }
 
-    private function dispatchExecutionEvent(AbstractEventAccessor $config, LeadEventLog $log, $result): void
+    private function dispatchExecutionEvent(AbstractEventAccessor $config, LeadEventLog $log, mixed $result): void
     {
         $eventArray = $this->getEventArray($log->getEvent());
 
@@ -256,7 +256,7 @@ class LegacyEventDispatcher
         );
     }
 
-    private function isFailed($result): bool
+    private function isFailed(mixed $result): bool
     {
         return
             false === $result

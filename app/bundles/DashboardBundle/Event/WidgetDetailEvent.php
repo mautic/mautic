@@ -73,7 +73,7 @@ class WidgetDetailEvent extends CommonEvent
             $this->getUniqueWidgetId(),
         ];
 
-        $params = $this->getWidget()->getParams();
+        $params = $this->widget->getParams();
 
         foreach (['dateTo', 'dateFrom'] as $dateParameter) {
             if (isset($params[$dateParameter])) {
@@ -93,8 +93,6 @@ class WidgetDetailEvent extends CommonEvent
     }
 
     /**
-     * Set the cache dir.
-     *
      * @param string     $cacheDir
      * @param mixed|null $uniqueCacheDir
      */
@@ -105,8 +103,6 @@ class WidgetDetailEvent extends CommonEvent
     }
 
     /**
-     * Set the cache timeout.
-     *
      * @param int|null $cacheTimeout
      */
     public function setCacheTimeout($cacheTimeout): void
@@ -251,8 +247,6 @@ class WidgetDetailEvent extends CommonEvent
     }
 
     /**
-     * Get an error message.
-     *
      * @return string
      */
     public function getErrorMessage()
@@ -271,18 +265,18 @@ class WidgetDetailEvent extends CommonEvent
             return $this->uniqueId;
         }
 
-        $params = $this->getWidget()->getParams();
+        $params = $this->widget->getParams();
         // Unset dateFrom and dateTo since they constantly change
         unset($params['dateFrom'], $params['dateTo']);
 
         $uniqueSettings = [
             'params' => $params,
-            'width'  => $this->getWidget()->getWidth(),
-            'height' => $this->getWidget()->getHeight(),
+            'width'  => $this->widget->getWidth(),
+            'height' => $this->widget->getHeight(),
             'locale' => $this->translator->getLocale(),
         ];
 
-        return $this->uniqueId = $this->getType().'_'.substr(md5(json_encode($uniqueSettings)), 0, 16);
+        return $this->uniqueId = $this->type.'_'.substr(md5(json_encode($uniqueSettings)), 0, 16);
     }
 
     /**
@@ -351,7 +345,7 @@ class WidgetDetailEvent extends CommonEvent
      */
     private function usesLegacyCache(): bool
     {
-        return is_null($this->cacheProvider);
+        return null === $this->cacheProvider;
     }
 
     /**

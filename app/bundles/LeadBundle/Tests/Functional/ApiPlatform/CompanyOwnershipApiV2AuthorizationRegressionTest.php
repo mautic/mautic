@@ -59,9 +59,9 @@ final class CompanyOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         $companies = $data['member'];
-        self::assertCount(1, $companies, 'Expected exactly 1 company');
-        self::assertSame($ownerCompany->getId(), $companies[0]['id']);
-        self::assertSame('Owner Company', $companies[0]['name']);
+        $this->assertCount(1, $companies, 'Expected exactly 1 company');
+        $this->assertSame($ownerCompany->getId(), $companies[0]['id']);
+        $this->assertSame('Owner Company', $companies[0]['name']);
     }
 
     public function testViewOwnCollectionReportsOwnedTotalAcrossPagesOnApiV2(): void
@@ -120,14 +120,14 @@ final class CompanyOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
 
         $page1Data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
-        self::assertArrayHasKey('member', $page1Data);
-        self::assertArrayHasKey('totalItems', $page1Data);
-        self::assertSame(4, $page1Data['totalItems'], 'Should report totalItems 4 owned companies');
-        self::assertCount(4, $page1Data['member'], 'Should return all 4 owned companies on single page');
+        $this->assertArrayHasKey('member', $page1Data);
+        $this->assertArrayHasKey('totalItems', $page1Data);
+        $this->assertSame(4, $page1Data['totalItems'], 'Should report totalItems 4 owned companies');
+        $this->assertCount(4, $page1Data['member'], 'Should return all 4 owned companies on single page');
 
         // Verify all items belong to restricted user
         foreach ($page1Data['member'] as $company) {
-            self::assertStringStartsWith('Restricted Company', $company['name']);
+            $this->assertStringStartsWith('Restricted Company', $company['name']);
         }
     }
 
@@ -179,12 +179,8 @@ final class CompanyOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         self::assertResponseIsSuccessful();
         $data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
-        self::assertCount(
-            1,
-            $data['member'],
-            'New owner should see the reassigned company (owner field takes precedence over createdBy)'
-        );
-        self::assertSame($company->getId(), $data['member'][0]['id']);
+        $this->assertCount(1, $data['member'], 'New owner should see the reassigned company (owner field takes precedence over createdBy)');
+        $this->assertSame($company->getId(), $data['member'][0]['id']);
 
         // Test 2: originalOwner (creator but no longer owner) should NOT see the company
         $originalOwner = $this->em->getRepository(User::class)->findOneBy(['username' => 'original.owner']);
@@ -199,10 +195,6 @@ final class CompanyOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         self::assertResponseIsSuccessful();
         $data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
-        self::assertCount(
-            0,
-            $data['member'],
-            'Original creator should NOT see the company after reassignment (owner field takes precedence)'
-        );
+        $this->assertCount(0, $data['member'], 'Original creator should NOT see the company after reassignment (owner field takes precedence)');
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Tests\Security\SAML\Store;
 
+use Composer\Autoload\ClassLoader;
 use LightSaml\Credential\X509Credential;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\UserBundle\Security\SAML\Store\CredentialsStore;
@@ -22,7 +23,7 @@ final class CredentialsStoreTest extends TestCase
     protected function setUp(): void
     {
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->cacheDir             = dirname((new \ReflectionClass(\Composer\Autoload\ClassLoader::class))->getFileName(), 3);
+        $this->cacheDir             = dirname((new \ReflectionClass(ClassLoader::class))->getFileName(), 3);
     }
 
     public function testEmptyArrayReturnedIfEntityIdsDoNotMatch(): void

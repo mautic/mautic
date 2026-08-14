@@ -46,7 +46,7 @@ final readonly class SegmentTrackingSubscriber implements EventSubscriberInterfa
         }
 
         $segmentIds = $this->leadListRepository->getContactSegmentIds((string) $contactId);
-        if ($segmentIds) {
+        if ([] !== $segmentIds) {
             $this->appendSegmentIdsToUrl($event, $segmentIds);
         }
     }

@@ -93,18 +93,17 @@ final class PluginAuthenticatorTest extends TestCase
         );
 
         $authenticateResult = $authenticateResult->authenticate($request);
-        $this->assertInstanceOf(SelfValidatingPassport::class, $authenticateResult);
-        self::assertCount(2, $authenticateResult->getBadges());
+        $this->assertCount(2, $authenticateResult->getBadges());
 
         $userBadge = $authenticateResult->getBadge(UserBadge::class);
         $this->assertInstanceOf(UserBadge::class, $userBadge);
-        self::assertSame($userIdentifier, $userBadge->getUserIdentifier());
-        self::assertSame($authenticatedUser, $userBadge->getUser());
+        $this->assertSame($userIdentifier, $userBadge->getUserIdentifier());
+        $this->assertSame($authenticatedUser, $userBadge->getUser());
 
         $pluginBadge = $authenticateResult->getBadge(PluginBadge::class);
         $this->assertInstanceOf(PluginBadge::class, $pluginBadge);
-        self::assertSame($returnedPluginToken, $pluginBadge->getPreAuthenticatedToken());
-        self::assertSame($authenticatedIntegration, $pluginBadge->getAuthenticatingService());
+        $this->assertSame($returnedPluginToken, $pluginBadge->getPreAuthenticatedToken());
+        $this->assertSame($authenticatedIntegration, $pluginBadge->getAuthenticatingService());
     }
 
     public function testAuthenticateByPreAuthenticationSameToken(): void
@@ -168,17 +167,17 @@ final class PluginAuthenticatorTest extends TestCase
         );
 
         $authenticateResult = $pluginAuthenticator->authenticate($request);
-        self::assertCount(2, $authenticateResult->getBadges());
+        $this->assertCount(2, $authenticateResult->getBadges());
 
         $userBadge = $authenticateResult->getBadge(UserBadge::class);
-        \PHPUnit\Framework\Assert::assertInstanceOf(UserBadge::class, $userBadge);
-        self::assertSame($userIdentifier, $userBadge->getUserIdentifier());
-        self::assertSame($authenticatedUser, $userBadge->getUser());
+        $this->assertInstanceOf(UserBadge::class, $userBadge);
+        $this->assertSame($userIdentifier, $userBadge->getUserIdentifier());
+        $this->assertSame($authenticatedUser, $userBadge->getUser());
 
         $pluginBadge = $authenticateResult->getBadge(PluginBadge::class);
-        \PHPUnit\Framework\Assert::assertInstanceOf(PluginBadge::class, $pluginBadge);
-        self::assertEquals(new PluginToken($firewallName, $integration, $authenticatedUser), $pluginBadge->getPreAuthenticatedToken());
-        self::assertSame($authenticatedIntegration, $pluginBadge->getAuthenticatingService());
+        $this->assertInstanceOf(PluginBadge::class, $pluginBadge);
+        $this->assertEquals(new PluginToken($firewallName, $integration, $authenticatedUser), $pluginBadge->getPreAuthenticatedToken());
+        $this->assertSame($authenticatedIntegration, $pluginBadge->getAuthenticatingService());
     }
 
     public function testCreateTokenHasToken(): void
@@ -190,11 +189,11 @@ final class PluginAuthenticatorTest extends TestCase
         $pluginResponse        = new Response();
 
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $dispatcher->expects(self::never())->method('hasListeners');
-        $dispatcher->expects(self::never())->method('dispatch');
+        $dispatcher->expects($this->never())->method('hasListeners');
+        $dispatcher->expects($this->never())->method('dispatch');
 
         $integrationHelper = $this->createMock(IntegrationHelper::class);
-        $integrationHelper->expects(self::never())->method('getIntegrationObjects');
+        $integrationHelper->expects($this->never())->method('getIntegrationObjects');
 
         $userProvider = $this->createStub(UserProviderInterface::class);
 
@@ -237,7 +236,7 @@ final class PluginAuthenticatorTest extends TestCase
             $firewallName
         );
 
-        self::assertEquals($pluginToken, $pluginAuthenticator->createToken($passport, $firewallName));
+        $this->assertEquals($pluginToken, $pluginAuthenticator->createToken($passport, $firewallName));
     }
 
     public function testHappyPathAuthenticationSuccess(): void
@@ -279,7 +278,7 @@ final class PluginAuthenticatorTest extends TestCase
             $firewallName
         );
 
-        self::assertSame($response, $pluginAuthenticator->onAuthenticationSuccess($request, $token, $firewallName));
+        $this->assertSame($response, $pluginAuthenticator->onAuthenticationSuccess($request, $token, $firewallName));
     }
 
     public function testHappyPathAuthenticationFailure(): void
@@ -306,6 +305,6 @@ final class PluginAuthenticatorTest extends TestCase
             $firewallName
         );
 
-        self::assertSame($response, $pluginAuthenticator->onAuthenticationFailure($request, $exception));
+        $this->assertSame($response, $pluginAuthenticator->onAuthenticationFailure($request, $exception));
     }
 }

@@ -20,12 +20,12 @@ final class UnusedIpDeleteCommandFunctionalTest extends MauticMysqlTestCase
         $ipAddressRepo = $this->em->getRepository(IpAddress::class);
         $ipAddressRepo->saveEntity(new IpAddress('127.0.0.1'));
         $count = $ipAddressRepo->count(['ipAddress' => '127.0.0.1']);
-        self::assertSame(1, $count);
+        $this->assertSame(1, $count);
 
         // Delete unused IP address.
         $this->testSymfonyCommand('mautic:unusedip:delete');
 
         $count = $ipAddressRepo->count(['ipAddress' => '127.0.0.1']);
-        self::assertSame(0, $count);
+        $this->assertSame(0, $count);
     }
 }

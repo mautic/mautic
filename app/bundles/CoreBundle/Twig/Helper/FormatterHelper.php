@@ -77,7 +77,7 @@ final readonly class FormatterHelper
                 $string = strval((int) $val);
                 break;
             case 'float':
-                $string = number_format((float) $val, FormatterHelper::FLOAT_PRECISION);
+                $string = number_format((float) $val, self::FLOAT_PRECISION);
                 break;
             case 'html':
                 $string = InputHelper::strict_html($val);
@@ -132,7 +132,7 @@ final readonly class FormatterHelper
     {
         $pairs = [];
         foreach ($array as $key => $value) {
-            $pairs[] = "$key: $value";
+            $pairs[] = "{$key}: {$value}";
         }
 
         return implode($delimeter, $pairs);

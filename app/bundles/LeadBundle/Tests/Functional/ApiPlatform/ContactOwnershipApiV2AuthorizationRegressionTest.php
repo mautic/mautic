@@ -6,11 +6,12 @@ namespace Mautic\LeadBundle\Tests\Functional\ApiPlatform;
 
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Response;
 
 final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipScopedApiAuthorizationTestBase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('endpointProvider')]
+    #[DataProvider('endpointProvider')]
     public function testViewOwnCannotReadForeignContactOnApiEndpoints(string $endpointTemplate): void
     {
         $owner    = $this->createUserWithPermissions(
@@ -49,7 +50,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->client->setServerParameter('PHP_AUTH_USER', $attacker->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
 
-        $endpoint = sprintf($endpointTemplate, (int) $foreignContact->getId());
+        $endpoint = sprintf($endpointTemplate, $foreignContact->getId());
         $this->client->request('GET', $endpoint);
 
         self::assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
@@ -115,33 +116,33 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         self::assertResponseIsSuccessful();
 
         $legacyCollection = json_decode($this->client->getResponse()->getContent(), true);
-        self::assertIsArray($legacyCollection);
-        self::assertArrayHasKey('contacts', $legacyCollection);
-        self::assertIsArray($legacyCollection['contacts']);
+        $this->assertIsArray($legacyCollection);
+        $this->assertArrayHasKey('contacts', $legacyCollection);
+        $this->assertIsArray($legacyCollection['contacts']);
 
         $legacyIds = array_map(
             static fn (array $contact): int => (int) $contact['id'],
             array_values($legacyCollection['contacts'])
         );
 
-        self::assertContains((int) $ownContact->getId(), $legacyIds);
-        self::assertNotContains((int) $foreignContact->getId(), $legacyIds);
+        $this->assertContains($ownContact->getId(), $legacyIds);
+        $this->assertNotContains($foreignContact->getId(), $legacyIds);
 
         $this->client->request('GET', '/api/v2/contacts?page=1');
         self::assertResponseIsSuccessful();
 
         $v2Collection = json_decode($this->client->getResponse()->getContent(), true);
-        self::assertIsArray($v2Collection);
-        self::assertArrayHasKey('member', $v2Collection);
-        self::assertIsArray($v2Collection['member']);
+        $this->assertIsArray($v2Collection);
+        $this->assertArrayHasKey('member', $v2Collection);
+        $this->assertIsArray($v2Collection['member']);
 
         $v2Ids = array_map(
             static fn (array $contact): int => (int) $contact['id'],
             $v2Collection['member']
         );
 
-        self::assertContains((int) $ownContact->getId(), $v2Ids);
-        self::assertNotContains((int) $foreignContact->getId(), $v2Ids);
+        $this->assertContains($ownContact->getId(), $v2Ids);
+        $this->assertNotContains($foreignContact->getId(), $v2Ids);
     }
 
     public function testViewOwnCollectionReportsOwnedTotalAcrossPagesOnApiV2(): void
@@ -167,7 +168,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
 
         $ownedContactIds = [];
         for ($i = 1; $i <= 4; ++$i) {
-            $ownedContactIds[] = (int) $this->createContactOwnedBy($viewer, sprintf('owned.%d@example.test', $i))->getId();
+            $ownedContactIds[] = $this->createContactOwnedBy($viewer, sprintf('owned.%d@example.test', $i))->getId();
         }
 
         for ($i = 1; $i <= 12; ++$i) {
@@ -182,11 +183,11 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         self::assertResponseIsSuccessful();
 
         $firstPage = json_decode($this->client->getResponse()->getContent(), true);
-        self::assertIsArray($firstPage);
-        self::assertArrayHasKey('member', $firstPage);
-        self::assertArrayHasKey('totalItems', $firstPage);
-        self::assertIsArray($firstPage['member']);
-        self::assertSame(4, (int) $firstPage['totalItems']);
+        $this->assertIsArray($firstPage);
+        $this->assertArrayHasKey('member', $firstPage);
+        $this->assertArrayHasKey('totalItems', $firstPage);
+        $this->assertIsArray($firstPage['member']);
+        $this->assertSame(4, (int) $firstPage['totalItems']);
 
         $firstPageIds = array_map(
             static fn (array $contact): int => (int) $contact['id'],
@@ -194,18 +195,18 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         );
 
         foreach ($firstPageIds as $id) {
-            self::assertContains($id, $ownedContactIds);
+            $this->assertContains($id, $ownedContactIds);
         }
 
         $this->client->request('GET', '/api/v2/contacts?page=2&itemsPerPage=2');
         self::assertResponseIsSuccessful();
 
         $secondPage = json_decode($this->client->getResponse()->getContent(), true);
-        self::assertIsArray($secondPage);
-        self::assertArrayHasKey('member', $secondPage);
-        self::assertArrayHasKey('totalItems', $secondPage);
-        self::assertIsArray($secondPage['member']);
-        self::assertSame(4, (int) $secondPage['totalItems']);
+        $this->assertIsArray($secondPage);
+        $this->assertArrayHasKey('member', $secondPage);
+        $this->assertArrayHasKey('totalItems', $secondPage);
+        $this->assertIsArray($secondPage['member']);
+        $this->assertSame(4, (int) $secondPage['totalItems']);
 
         $secondPageIds = array_map(
             static fn (array $contact): int => (int) $contact['id'],
@@ -213,7 +214,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         );
 
         foreach ($secondPageIds as $id) {
-            self::assertContains($id, $ownedContactIds);
+            $this->assertContains($id, $ownedContactIds);
         }
     }
 
@@ -266,34 +267,34 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         self::assertResponseIsSuccessful();
 
         $legacyCollection = json_decode($this->client->getResponse()->getContent(), true);
-        self::assertIsArray($legacyCollection);
-        self::assertArrayHasKey('contacts', $legacyCollection);
-        self::assertIsArray($legacyCollection['contacts']);
+        $this->assertIsArray($legacyCollection);
+        $this->assertArrayHasKey('contacts', $legacyCollection);
+        $this->assertIsArray($legacyCollection['contacts']);
 
         $legacyIds = array_map(
             static fn (array $contact): int => (int) $contact['id'],
             array_values($legacyCollection['contacts'])
         );
 
-        self::assertContains((int) $ownContact->getId(), $legacyIds);
-        self::assertContains((int) $foreignContact->getId(), $legacyIds);
+        $this->assertContains($ownContact->getId(), $legacyIds);
+        $this->assertContains($foreignContact->getId(), $legacyIds);
 
         $this->client->request('GET', '/api/v2/contacts?page=1&itemsPerPage=10');
         self::assertResponseIsSuccessful();
 
         $collection = json_decode($this->client->getResponse()->getContent(), true);
-        self::assertIsArray($collection);
-        self::assertArrayHasKey('totalItems', $collection);
-        self::assertArrayHasKey('member', $collection);
-        self::assertSame(2, (int) $collection['totalItems'], 'Expected own and foreign contacts');
+        $this->assertIsArray($collection);
+        $this->assertArrayHasKey('totalItems', $collection);
+        $this->assertArrayHasKey('member', $collection);
+        $this->assertSame(2, (int) $collection['totalItems'], 'Expected own and foreign contacts');
 
         $v2Ids = array_map(
             static fn (array $contact): int => (int) $contact['id'],
             $collection['member']
         );
 
-        self::assertContains((int) $ownContact->getId(), $v2Ids);
-        self::assertContains((int) $foreignContact->getId(), $v2Ids);
+        $this->assertContains($ownContact->getId(), $v2Ids);
+        $this->assertContains($foreignContact->getId(), $v2Ids);
     }
 
     public function testViewOwnCollectionRespectsOwnerFieldAfterReassignmentOnApiV2(): void
@@ -346,12 +347,8 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         self::assertResponseIsSuccessful();
         $data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
-        self::assertCount(
-            1,
-            $data['member'],
-            'New owner should see the reassigned contact (owner field takes precedence over createdBy)'
-        );
-        self::assertSame($contact->getId(), $data['member'][0]['id']);
+        $this->assertCount(1, $data['member'], 'New owner should see the reassigned contact (owner field takes precedence over createdBy)');
+        $this->assertSame($contact->getId(), $data['member'][0]['id']);
 
         // Test 2: originalOwner (creator but no longer owner) should NOT see the contact
         $originalOwner = $this->em->getRepository(User::class)->findOneBy(['username' => 'original.contact.owner']);
@@ -366,11 +363,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         self::assertResponseIsSuccessful();
         $data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
-        self::assertCount(
-            0,
-            $data['member'],
-            'Original creator should NOT see the contact after reassignment (owner field takes precedence)'
-        );
+        $this->assertCount(0, $data['member'], 'Original creator should NOT see the contact after reassignment (owner field takes precedence)');
     }
 
     private function createContactOwnedBy(User $owner, string $email): Lead

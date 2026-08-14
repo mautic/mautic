@@ -21,7 +21,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class EventType extends AbstractType
+final class EventType extends AbstractType
 {
     use PropertiesTrait;
 
@@ -327,7 +327,8 @@ class EventType extends AbstractType
 
         if (is_array($data[$name]) && array_key_exists('date', $data[$name])) {
             return $this->parseTimeValue($data[$name]['date']);
-        } elseif (is_string($data[$name])) {
+        }
+        if (is_string($data[$name])) {
             return $this->parseTimeValue($data[$name]);
         }
 

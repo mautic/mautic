@@ -141,10 +141,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     #[Groups(['contact:read', 'segment:read', 'campaign:read', 'email:read', 'sms:read'])]
     private $points = 0;
 
-    /**
-     * @var array
-     */
-    private $pointChanges = [];
+    private array $pointChanges = [];
 
     /**
      * @var int|null
@@ -307,7 +304,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->addLifecycleEvent('checkDateAdded', 'prePersist')
             ->addIndex(['date_added'], 'lead_date_added')
             ->addIndex(['date_modified'], 'lead_date_modified')
-            ->addIndex(['date_identified'], 'date_identified');
+            ->addIndex(['date_identified'], 'date_identified')
+            ->addIndex(['last_active'], 'last_active');
 
         $builder->addBigIntIdField();
 
@@ -531,7 +529,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $metadata->addConstraint(new UniqueCustomField(['object' => 'lead']));
+        $metadata->addConstraint(new UniqueCustomField(object: 'lead'));
     }
 
     public static function getDefaultIdentifierFields(): array
@@ -549,10 +547,10 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      * @param mixed      $val
      * @param mixed|null $oldValue
      */
-    protected function isChanged($prop, $val, $oldValue = null)
+    protected function isChanged($prop, $val, $oldValue = null): void
     {
         $getter  = 'get'.ucfirst($prop);
-        $current = $oldValue ?? $this->$getter();
+        $current = $oldValue ?? $this->{$getter}();
         if ('owner' == $prop) {
             if ($current && !$val) {
                 $this->changes['owner'] = [$current->getId(), $val];
@@ -663,7 +661,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      */
     public function getPermissionUser()
     {
-        return $this->getOwner() ?? $this->getCreatedBy();
+        return $this->owner ?? $this->getCreatedBy();
     }
 
     public function addIpAddress(IpAddress $ipAddress): self
@@ -703,8 +701,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      */
     public function getName($lastFirst = false)
     {
-        $firstName = $this->getFirstname();
-        $lastName  = $this->getLastname();
+        $firstName = $this->firstname;
+        $lastName  = $this->lastname;
 
         $fullName = '';
         if ($lastFirst && $firstName && $lastName) {
@@ -747,13 +745,17 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     {
         if ($name = $this->getName($lastFirst)) {
             return $name;
-        } elseif ($this->getCompany()) {
-            return $this->getCompany();
-        } elseif ($this->getEmail()) {
-            return $this->getEmail();
-        } elseif ($socialIdentity = $this->getFirstSocialIdentity()) {
+        }
+        if ($this->company) {
+            return $this->company;
+        }
+        if ($this->email) {
+            return $this->email;
+        }
+        if ($socialIdentity = $this->getFirstSocialIdentity()) {
             return $socialIdentity;
-        } elseif (count($ips = $this->getIpAddresses())) {
+        }
+        if (count($ips = $this->ipAddresses)) {
             return $ips->first()->getIpAddress();
         }
 
@@ -767,8 +769,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      */
     public function getSecondaryIdentifier()
     {
-        if ($this->getCompany()) {
-            return $this->getCompany();
+        if ($this->company) {
+            return $this->company;
         }
 
         return '';
@@ -781,16 +783,16 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     {
         $location = '';
 
-        if ($this->getCity()) {
-            $location .= $this->getCity().', ';
+        if ($this->city) {
+            $location .= $this->city.', ';
         }
 
-        if ($this->getState()) {
-            $location .= $this->getState().', ';
+        if ($this->state) {
+            $location .= $this->state.', ';
         }
 
-        if ($this->getCountry()) {
-            $location .= $this->getCountry().', ';
+        if ($this->country) {
+            $location .= $this->country.', ';
         }
 
         return rtrim($location, ', ');
@@ -849,10 +851,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getPointChanges()
+    public function getPointChanges(): array
     {
         return $this->pointChanges;
     }
@@ -876,13 +875,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      */
     public function getPoints()
     {
-        if (null !== $this->actualPoints) {
-            return $this->actualPoints;
-        } elseif (null !== $this->updatedPoints) {
-            return $this->updatedPoints;
-        }
-
-        return $this->points;
+        return ($this->actualPoints ?? $this->updatedPoints) ?? $this->points;
     }
 
     /**
@@ -1172,10 +1165,10 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     public function isAnonymous(): bool
     {
         return !($this->getName()
-            || $this->getFirstname()
-            || $this->getLastname()
-            || $this->getCompany()
-            || $this->getEmail()
+            || $this->firstname
+            || $this->lastname
+            || $this->company
+            || $this->email
             || $this->getFirstSocialIdentity()
         );
     }
@@ -1579,7 +1572,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      */
     public function getLeadPhoneNumber()
     {
-        return $this->getMobile() ?: $this->getPhone();
+        return $this->mobile ?: $this->phone;
     }
 
     /**
@@ -1761,8 +1754,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     public function getChannelRules()
     {
         if (null === $this->channelRules) {
-            $frequencyRules = $this->getFrequencyRules()->toArray();
-            $dnc            = $this->getDoNotContact();
+            $frequencyRules = $this->frequencyRules->toArray();
+            $dnc            = $this->doNotContact;
             $dncChannels    = [];
             /** @var DoNotContact $record */
             foreach ($dnc as $record) {
@@ -1916,7 +1909,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $this->groupScores = $groupScores;
     }
 
-    public function addGroupScore(GroupContactScore $groupContactScore): Lead
+    public function addGroupScore(GroupContactScore $groupContactScore): self
     {
         $this->groupScores[] = $groupContactScore;
 

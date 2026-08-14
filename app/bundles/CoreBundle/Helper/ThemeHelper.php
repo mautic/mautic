@@ -172,7 +172,7 @@ class ThemeHelper implements ThemeHelperInterface
         $dirName = $this->getDirectoryName($newDirName ?? $newName);
 
         if ($this->filesystem->exists($root.$dirName)) {
-            throw new FileExistsException("$dirName already exists");
+            throw new FileExistsException("{$dirName} already exists");
         }
 
         $this->filesystem->mirror($root.$theme, $root.$dirName);
@@ -193,7 +193,7 @@ class ThemeHelper implements ThemeHelperInterface
         $dirName = $this->getDirectoryName($newName);
 
         if ($this->filesystem->exists($root.$dirName)) {
-            throw new FileExistsException("$dirName already exists");
+            throw new FileExistsException("{$dirName} already exists");
         }
 
         $this->filesystem->rename($root.$theme, $root.$dirName);
@@ -211,7 +211,7 @@ class ThemeHelper implements ThemeHelperInterface
             throw new FileNotFoundException($theme.' not found!');
         }
 
-        if (in_array($theme, $this->getDefaultThemes(), true)) {
+        if (in_array($theme, $this->defaultThemes, true)) {
             $this->addToHidden($theme);
 
             return;
@@ -329,7 +329,7 @@ class ThemeHelper implements ThemeHelperInterface
 
         $themeName = basename($zipFile, '.zip');
 
-        if (in_array($themeName, $this->getDefaultThemes())) {
+        if (in_array($themeName, $this->defaultThemes)) {
             throw new \Exception($this->translator->trans('mautic.core.theme.default.cannot.overwrite', ['%name%' => $themeName], 'validators'));
         }
 
@@ -679,7 +679,7 @@ class ThemeHelper implements ThemeHelperInterface
      */
     public function toggleVisibility(string $themeName): void
     {
-        if (!in_array($themeName, $this->getDefaultThemes(), true)) {
+        if (!in_array($themeName, $this->defaultThemes, true)) {
             return;
         }
 
@@ -731,7 +731,7 @@ class ThemeHelper implements ThemeHelperInterface
         if (false !== $keyToRemove) {
             unset($hiddenThemes[$keyToRemove]);
 
-            if (empty($hiddenThemes)) {
+            if ([] === $hiddenThemes) {
                 $this->filesystem->remove($hidden);
             } else {
                 $this->filesystem->dumpFile($hidden, sprintf('|%s', implode('|', $hiddenThemes)));

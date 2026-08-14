@@ -21,7 +21,7 @@ final class MaxmindDownloadLookupTest extends TestCase
 
         $lookup = new MaxmindDownloadLookup($auth, logger: $logger);
 
-        self::assertSame('', $lookup->getRemoteDateStoreDownloadUrl());
+        $this->assertSame('', $lookup->getRemoteDateStoreDownloadUrl());
     }
 
     public static function provideMissingOrWrongAuth(): \Generator
@@ -41,7 +41,7 @@ final class MaxmindDownloadLookupTest extends TestCase
 
         $lookup = new MaxmindDownloadLookup($auth, logger: $logger);
 
-        self::assertSame('https://'.$auth.'@download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz', $lookup->getRemoteDateStoreDownloadUrl());
+        $this->assertSame('https://'.$auth.'@download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz', $lookup->getRemoteDateStoreDownloadUrl());
     }
 
     public static function provideProperAuth(): \Generator

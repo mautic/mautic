@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Controller;
 
 use Doctrine\ORM\EntityNotFoundException;
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\QuickFilterSearchTrait;
 use Mautic\CoreBundle\Exception\DeleteEntitiesDependencyException;
 use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
@@ -13,30 +14,44 @@ use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Security\Permissions\LeadPermissions;
 use Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare;
 use Mautic\LeadBundle\Segment\Stat\SegmentDependencies;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class ListController extends FormController
+final class ListController extends FormController
 {
     use EntityContactsTrait;
+    use QuickFilterSearchTrait;
+
+    private LeadListRepository $leadListRepository;
+
+    private ListModel $listModel;
+
+    private LeadModel $leadModel;
+
+    #[Required]
+    public function autowireListController(
+        LeadModel $leadModel,
+        ListModel $listModel,
+        LeadListRepository $leadListRepository,
+    ): void {
+        $this->leadModel = $leadModel;
+        $this->listModel = $listModel;
+        $this->leadListRepository = $leadListRepository;
+    }
 
     public const ROUTE_SEGMENT_CONTACTS = 'mautic_segment_contacts';
 
     public const SEGMENT_CONTACT_FIELDS = ['id', 'company', 'city', 'state', 'country'];
 
-    /**
-     * @var array
-     */
-    protected $listFilters = [];
+    private array $listFilters = [];
 
     /**
      * Generate's default list view.
@@ -47,8 +62,6 @@ class ListController extends FormController
      */
     public function indexAction(Request $request, $page = 1): Response
     {
-        /** @var ListModel $model */
-        $model   = $this->getModel('lead.list');
         $session = $request->getSession();
 
         // set some permissions
@@ -91,7 +104,7 @@ class ListController extends FormController
         ];
 
         $tmpl       = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
-        $tableAlias = $model->getRepository()->getTableAlias();
+        $tableAlias = $this->leadListRepository->getTableAlias();
 
         if (!$permissions[LeadPermissions::LISTS_VIEW_OTHER]) {
             $filter['where'][] = [
@@ -134,7 +147,7 @@ class ListController extends FormController
         $session->set('mautic.segment.page', $page);
 
         $listIds    = array_keys($items->getIterator()->getArrayCopy());
-        $leadCounts = (!empty($listIds)) ? $model->getSegmentContactCountFromCache($listIds) : [];
+        $leadCounts = ([] !== $listIds) ? $this->listModel->getSegmentContactCountFromCache($listIds) : [];
 
         $parameters = [
             'items'                          => $items,
@@ -237,10 +250,8 @@ class ListController extends FormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return Response
      */
-    public function editAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $listModel, AuditLogModel $auditLogModel, $objectId, $ignorePost = false, bool $isNew = false)
+    public function editAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $listModel, AuditLogModel $auditLogModel, $objectId, $ignorePost = false, bool $isNew = false): Response
     {
         $postActionVars = $this->getPostActionVars($request, $objectId);
 
@@ -285,7 +296,7 @@ class ListController extends FormController
      */
     private function getSegment(int $segmentId, string $ownPermission, string $otherPermission): LeadList
     {
-        $segment = $this->getModel('lead.list')->getEntity($segmentId);
+        $segment = $this->listModel->getEntity($segmentId);
 
         // Check if exists
         if (!$segment instanceof LeadList) {
@@ -345,7 +356,8 @@ class ListController extends FormController
                         'mauticContent' => 'leadlist',
                     ],
                 ]));
-            } elseif ($valid) {
+            }
+            if ($valid) {
                 return $this->editAction($request, $segmentDependencies, $segmentCampaignShare, $segmentModel, $auditLogModel, $segment->getId(), true);
             }
         }
@@ -394,7 +406,7 @@ class ListController extends FormController
                         ]),
                     ]);
 
-                    if ($form->get('buttons')->get('apply')->isClicked()) {
+                    if ($this->isButtonClicked($form, 'apply')) {
                         $contentTemplate                     = '@MauticLead/List/form.html.twig';
                         $postActionVars['contentTemplate']   = $contentTemplate;
                         $postActionVars['forwardController'] = false;
@@ -476,10 +488,8 @@ class ListController extends FormController
 
     /**
      * Delete a list.
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         $page      = $request->getSession()->get('mautic.segment.page', 1);
         $returnUrl = $this->generateUrl('mautic_segment_index', ['page' => $page]);
@@ -497,9 +507,7 @@ class ListController extends FormController
         ];
 
         if ('POST' === $request->getMethod()) {
-            /** @var ListModel $model */
-            $model = $this->getModel('lead.list');
-            $list  = $model->getEntity($objectId);
+            $list  = $this->listModel->getEntity($objectId);
 
             if (null === $list) {
                 $flashes[] = [
@@ -512,11 +520,11 @@ class ListController extends FormController
             )
             ) {
                 $this->throwAccessDenied();
-            } elseif ($model->isLocked($list)) {
+            } elseif ($this->listModel->isLocked($list)) {
                 return $this->isLocked($postActionVars, $list, 'lead.list');
             } else {
                 try {
-                    $model->deleteEntity($list);
+                    $this->listModel->deleteEntity($list);
                     $flashes[] = [
                         'type'    => 'notice',
                         'msg'     => 'mautic.core.notice.deleted',
@@ -587,7 +595,7 @@ class ListController extends FormController
                 }
             }
 
-            if ($deleteIds) {
+            if ([] !== $deleteIds) {
                 try {
                     $deletedEntities = $model->deleteEntities($deleteIds);
                 } catch (DeleteEntitiesDependencyException $e) {
@@ -604,7 +612,7 @@ class ListController extends FormController
                     }
                 }
 
-                if ($deletedEntities) {
+                if ([] !== $deletedEntities) {
                     $flashes[] = [
                         'type'    => 'notice',
                         'msg'     => 'mautic.lead.list.notice.batch_deleted',
@@ -623,18 +631,12 @@ class ListController extends FormController
         );
     }
 
-    /**
-     * @return Response
-     */
-    public function removeLeadAction(Request $request, $objectId)
+    public function removeLeadAction(Request $request, $objectId): Response
     {
         return $this->changeList($request, $objectId, 'remove');
     }
 
-    /**
-     * @return Response
-     */
-    public function addLeadAction(Request $request, $objectId)
+    public function addLeadAction(Request $request, $objectId): Response
     {
         return $this->changeList($request, $objectId, 'add');
     }
@@ -660,13 +662,9 @@ class ListController extends FormController
 
         $leadId = $request->get('leadId');
         if (!empty($leadId) && 'POST' === $request->getMethod()) {
-            /** @var ListModel $model */
-            $model = $this->getModel('lead.list');
             /** @var LeadList $list */
-            $list = $model->getEntity($listId);
-            /** @var LeadModel $leadModel */
-            $leadModel = $this->getModel('lead');
-            $lead      = $leadModel->getEntity($leadId);
+            $list = $this->listModel->getEntity($listId);
+            $lead      = $this->leadModel->getEntity($leadId);
 
             if (null === $lead) {
                 $flashes[] = [
@@ -688,11 +686,11 @@ class ListController extends FormController
                 LeadPermissions::LISTS_VIEW_OWN, LeadPermissions::LISTS_VIEW_OTHER, $list->getCreatedBy()
             )) {
                 $this->throwAccessDenied();
-            } elseif ($model->isLocked($lead)) {
+            } elseif ($this->listModel->isLocked($lead)) {
                 return $this->isLocked($postActionVars, $lead, 'lead');
             } else {
                 $function = ('remove' == $action) ? 'removeLead' : 'addLead';
-                $model->$function($lead, $list, true);
+                $this->listModel->{$function}($lead, $list, true);
 
                 $identifier = $this->translator->trans($lead->getPrimaryIdentifier());
                 $flashes[]  = [
@@ -758,7 +756,8 @@ class ListController extends FormController
                     ],
                 ],
             ]);
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             LeadPermissions::LISTS_VIEW_OWN,
             LeadPermissions::LISTS_VIEW_OTHER,
             $list->getCreatedBy()
@@ -797,7 +796,7 @@ class ListController extends FormController
                 'campaignStats'      => $segmentCampaignShare->getCampaignList($list->getId()),
                 'stats'              => $segmentContactsLineChartData,
                 'list'               => $list,
-                'segmentCount'       => $listModel->getRepository()->getLeadCount($list->getId()),
+                'segmentCount'       => $this->leadListRepository->getLeadCount($list->getId()),
                 'activeSegmentCount' => $listModel->getActiveSegmentContactCount($list->getId()),
                 'permissions'        => $this->security->isGranted($permissions, 'RETURN_ARRAY'),
                 'security'           => $this->security,
@@ -824,15 +823,12 @@ class ListController extends FormController
      */
     protected function getPermissionBase(): string
     {
-        return $this->getModel('lead.list')->getPermissionBase();
+        return $this->listModel->getPermissionBase();
     }
 
     protected function getListModel(): ListModel
     {
-        /** @var ListModel $model */
-        $model = $this->getModel('lead.list');
-
-        return $model;
+        return $this->listModel;
     }
 
     protected function getModelName(): string
@@ -847,7 +843,7 @@ class ListController extends FormController
         $currentFilters = $session->get('mautic.lead.list.list_filters', []);
         $updatedFilters = $request->get('filters', false);
 
-        $sourceLists = $this->getListModel()->getSourceLists();
+        $sourceLists = $this->listModel->getSourceLists();
         $listFilters = [
             'filters' => [
                 'placeholder' => $this->translator->trans('mautic.lead.list.filter.placeholder'),
@@ -884,20 +880,24 @@ class ListController extends FormController
 
         $joinCategories = false;
         if (!empty($currentFilters)) {
-            $catIds = [];
+            $catAliases = $searchFilterTerms = [];
             foreach ($currentFilters as $type => $typeFilters) {
                 $listFilters['filters']['groups']['mautic.lead.list.source.segment.'.$type]['values'] = $typeFilters;
 
                 foreach ($typeFilters as $fltr) {
                     if ('category' == $type) {
-                        $catIds[] = (int) $fltr;
+                        $catAliases[]        = $fltr;
+                        $searchFilterTerms[] = 'category:'.$fltr;
                     } // else for other group filters
                 }
             }
 
-            if (!empty($catIds)) {
+            $filter['string'] = $this->stripQuickFilterTokensFromSearch((string) ($filter['string'] ?? ''), $searchFilterTerms);
+            $session->set('mautic.lead.list.filter', $filter['string']);
+
+            if ([] !== $catAliases) {
                 $joinCategories    = true;
-                $filter['force'][] = ['column' => 'cat.id', 'expr' => 'in', 'value' => $catIds];
+                $filter['force'][] = ['column' => 'cat.alias', 'expr' => 'in', 'value' => array_values(array_unique($catAliases))];
             }
         }
 
@@ -918,10 +918,8 @@ class ListController extends FormController
 
     public function getViewArguments(array $args, $action): array
     {
-        switch ($action) {
-            case 'index':
-                $args['viewParameters']['filters'] = $this->listFilters;
-                break;
+        if ('index' === $action) {
+            $args['viewParameters']['filters'] = $this->listFilters;
         }
 
         return $args;
@@ -930,13 +928,10 @@ class ListController extends FormController
     /**
      * @param int $objectId
      * @param int $page
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
-    public function contactsAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $objectId, $page = 1)
+    public function contactsAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $objectId, $page = 1): Response
     {
         $session = $request->getSession();
-        \assert($session instanceof SessionInterface);
         $session->set('mautic.segment.contact.page', $page);
 
         $manuallyRemoved = 0;
@@ -950,7 +945,7 @@ class ListController extends FormController
             $filters = [];
         }
 
-        if (!empty($filters)) {
+        if ([] !== $filters) {
             if (in_array('manually_added', $filters['includeEvents'])) {
                 $listFilters = array_merge($listFilters, ['manually_added' => 1]);
             }

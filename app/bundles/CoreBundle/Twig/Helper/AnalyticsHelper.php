@@ -24,7 +24,7 @@ final readonly class AnalyticsHelper
     public function addCode($content): string
     {
         // Add analytics
-        $analytics = $this->getCode();
+        $analytics = $this->code;
 
         // Check for html doc
         if (!str_contains($content, '<html')) {

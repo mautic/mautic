@@ -29,7 +29,7 @@ final class AllowlistEntry
     /**
      * @param array<string,mixed> $array
      */
-    public static function fromArray(array $array): AllowlistEntry
+    public static function fromArray(array $array): self
     {
         return new self(
             $array['package'],

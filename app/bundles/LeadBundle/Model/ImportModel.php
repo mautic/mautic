@@ -28,6 +28,7 @@ use Mautic\LeadBundle\Exception\ImportDelayedException;
 use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Helper\Progress;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\UserBundle\Entity\User;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -55,6 +56,8 @@ class ImportModel extends FormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         private readonly ProcessSignalService $processSignalService,
+        private readonly ImportRepository $importRepository,
+        private readonly LeadEventLogRepository $leadEventLogRepository,
     ) {
         $this->leadEventLogRepo  = $leadModel->getEventLogRepository();
 
@@ -66,7 +69,7 @@ class ImportModel extends FormModel
      */
     public function getImportToProcess(): ?Import
     {
-        $result = $this->getRepository()->getImportsWithStatuses([Import::QUEUED, Import::DELAYED], 1);
+        $result = $this->importRepository->getImportsWithStatuses([Import::QUEUED, Import::DELAYED], 1);
 
         if (isset($result[0]) && $result[0] instanceof Import) {
             return $result[0];
@@ -81,7 +84,7 @@ class ImportModel extends FormModel
     public function checkParallelImportLimit(): bool
     {
         $parallelImportLimit = $this->getParallelImportLimit();
-        $importsInProgress   = $this->getRepository()->countImportsInProgress();
+        $importsInProgress   = $this->importRepository->countImportsInProgress();
 
         return $importsInProgress < $parallelImportLimit;
     }
@@ -115,13 +118,13 @@ class ImportModel extends FormModel
      * Check if there are some IN_PROGRESS imports which got stuck for a while.
      * Set those as failed.
      */
-    public function setGhostImportsAsFailed()
+    public function setGhostImportsAsFailed(): void
     {
         $ghostDelay = 2;
-        $imports    = $this->getRepository()->getGhostImports($ghostDelay, 5);
+        $imports    = $this->importRepository->getGhostImports($ghostDelay, 5);
 
         if (empty($imports)) {
-            return null;
+            return;
         }
 
         foreach ($imports as $import) {
@@ -140,7 +143,7 @@ class ImportModel extends FormModel
                     $this->translator->trans('mautic.lead.import.failed', ['%reason%' =>  $import->getStatusInfo()]),
                     'ri-download-line',
                     null,
-                    $this->em->getReference(\Mautic\UserBundle\Entity\User::class, $import->getCreatedBy())
+                    $this->em->getReference(User::class, $import->getCreatedBy())
                 );
             }
         }
@@ -242,7 +245,7 @@ class ImportModel extends FormModel
                 $this->generateLink($import, $this->translator->trans('mautic.lead.import.completed')),
                 'ri-download-line',
                 null,
-                $this->em->getReference(\Mautic\UserBundle\Entity\User::class, $import->getCreatedBy())
+                $this->em->getReference(User::class, $import->getCreatedBy())
             );
         }
     }
@@ -373,7 +376,7 @@ class ImportModel extends FormModel
 
             // Save Import entity once per batch so the user could see the progress
             if (0 === $batchSize && $import->isBackgroundProcess()) {
-                $isPublished = $this->getRepository()->getValue($import->getId(), 'is_published');
+                $isPublished = $this->importRepository->getValue($import->getId(), 'is_published');
 
                 if (!$isPublished) {
                     $import->setStatus($import::STOPPED);
@@ -401,7 +404,7 @@ class ImportModel extends FormModel
             }
         }
 
-        $isPublished = (bool) $this->getRepository()->getValue($import->getId(), 'is_published');
+        $isPublished = (bool) $this->importRepository->getValue($import->getId(), 'is_published');
         if ($isPublished && $import->getLastLineImported() < $import->getLineCount()) {
             $import->setStatus($import::DELAYED);
             $this->saveEntity($import);
@@ -454,7 +457,7 @@ class ImportModel extends FormModel
      */
     public function isEmptyCsvRow($row): bool
     {
-        if (!is_array($row) || empty($row)) {
+        if (!is_array($row) || [] === $row) {
             return true;
         }
 
@@ -504,9 +507,8 @@ class ImportModel extends FormModel
      *
      * @param string $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string $dateFormat
-     * @param array  $filter
      */
-    public function getImportedRowsLineChartData($unit, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo, $dateFormat = null, $filter = []): array
+    public function getImportedRowsLineChartData($unit, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo, $dateFormat = null, array $filter = []): array
     {
         $filter['object'] = 'import';
         $filter['bundle'] = 'lead';
@@ -542,17 +544,17 @@ class ImportModel extends FormModel
             return null;
         }
 
-        return $this->getEventLogRepository()->getFailedRows($importId, ['select' => 'properties,id'], $object);
+        return $this->leadEventLogRepository->getFailedRows($importId, ['select' => 'properties,id'], $object);
     }
 
     public function getRepository(): ImportRepository
     {
-        return $this->em->getRepository(Import::class);
+        return $this->importRepository;
     }
 
     public function getEventLogRepository(): LeadEventLogRepository
     {
-        return $this->em->getRepository(LeadEventLog::class);
+        return $this->leadEventLogRepository;
     }
 
     public function getPermissionBase(): string
@@ -636,7 +638,7 @@ class ImportModel extends FormModel
      *
      * @param string $msg
      */
-    protected function logDebug($msg, ?Import $import = null)
+    protected function logDebug($msg, ?Import $import = null): void
     {
         if (MAUTIC_ENV === 'dev') {
             $importId = $import ? '('.$import->getId().')' : '';

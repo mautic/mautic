@@ -13,6 +13,7 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -67,7 +68,7 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
         $this->assertFalse($event->wasOperatorHandled());
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataOnEmptyOperatorIfEmpty')]
+    #[DataProvider('dataOnEmptyOperatorIfEmpty')]
     public function testOnEmptyOperatorIfEmpty(bool $doesColumnSupportEmptyValue, string $expectedExpression): void
     {
         $event = new SegmentOperatorQueryBuilderEvent(
@@ -91,11 +92,7 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
         $this->queryBuilder->expects($this->once())
             ->method('addLogic')
             ->with(
-                $this->callback(function (CompositeExpression $expression) use ($expectedExpression): true {
-                    $this->assertSame($expectedExpression, (string) $expression);
-
-                    return true;
-                }),
+                $expectedExpression,
                 CompositeExpression::TYPE_AND
             );
 
@@ -147,7 +144,7 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
         $this->assertFalse($event->wasOperatorHandled());
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataOnNotEmptyOperatorIfEmpty')]
+    #[DataProvider('dataOnNotEmptyOperatorIfEmpty')]
     public function testOnNotEmptyOperatorIfEmpty(bool $doesColumnSupportEmptyValue, string $expectedExpression): void
     {
         $event = new SegmentOperatorQueryBuilderEvent(
@@ -170,14 +167,10 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
 
         $this->queryBuilder->expects($this->once())
             ->method('addLogic')
-            ->with(
-                $this->callback(function (CompositeExpression $expression) use ($expectedExpression): true {
-                    $this->assertSame($expectedExpression, (string) $expression);
-
-                    return true;
-                }),
-                CompositeExpression::TYPE_AND
-            );
+            ->willReturnCallback(function (CompositeExpression $expression, $glue) use ($expectedExpression): void {
+                $this->assertSame($expectedExpression, (string) $expression);
+                $this->assertSame(CompositeExpression::TYPE_AND, $glue);
+            });
 
         $this->expressionBuilder->expects($this->once())
             ->method('isNotNull')

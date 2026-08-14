@@ -158,8 +158,8 @@ final class TokenPersistenceTest extends TestCase
         $this->assertFalse($this->tokenPersistence->hasToken());
 
         $apiKeys = $integration->getApiKeys();
-        $this->assertFalse(isset($apiKeys['access_token']));
-        $this->assertFalse(isset($apiKeys['expires_in']));
+        $this->assertArrayNotHasKey('access_token', $apiKeys);
+        $this->assertArrayNotHasKey('expires_in', $apiKeys);
 
         $newToken = $this->tokenPersistence->restoreToken($token);
         $this->assertTrue($newToken->isExpired());

@@ -54,7 +54,8 @@ trait LeadAccessTrait
             }
 
             return $this->notFound('mautic.contact.error.notfound');
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             'lead:leads:'.$action.'own',
             'lead:leads:'.$action.'other',
             $lead->getPermissionUser()

@@ -12,7 +12,6 @@ use Mautic\EmailBundle\EventListener\BroadcastSubscriber;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\Console\Output\BufferedOutput;
 
 final class BroadcastSubscriberFunctionalTest extends MauticMysqlTestCase
@@ -67,20 +66,20 @@ final class BroadcastSubscriberFunctionalTest extends MauticMysqlTestCase
         $event->setMaxThreads(1);
 
         $subscriber = self::getContainer()->get(BroadcastSubscriber::class);
-        self::assertInstanceOf(BroadcastSubscriber::class, $subscriber);
+        $this->assertInstanceOf(BroadcastSubscriber::class, $subscriber);
 
         $subscriber->onBroadcast($event);
         $results = $event->getResults();
-        Assert::assertNotEmpty($results);
+        $this->assertNotEmpty($results);
 
         $abResult      = $this->getResultForEmailName($results, 'AB Parent Functional');
         $regularResult = $this->getResultForEmailName($results, 'Regular Broadcast Functional');
 
-        Assert::assertNotNull($abResult, print_r(array_keys($results), true));
-        Assert::assertNotNull($regularResult);
+        $this->assertNotNull($abResult, print_r(array_keys($results), true));
+        $this->assertNotNull($regularResult);
 
-        Assert::assertSame(2, (int) $abResult['success'] + (int) $abResult['failed']);
-        Assert::assertSame(4, (int) $regularResult['success'] + (int) $regularResult['failed']);
+        $this->assertSame(2, (int) $abResult['success'] + (int) $abResult['failed']);
+        $this->assertSame(4, (int) $regularResult['success'] + (int) $regularResult['failed']);
     }
 
     private function createListEmail(string $name, LeadList $segment): Email

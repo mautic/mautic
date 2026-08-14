@@ -9,10 +9,10 @@ use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class SegmentSubscriber implements EventSubscriberInterface
+final readonly class SegmentSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly EmailModel $emailModel,
+        private EmailModel $emailModel,
     ) {
     }
 

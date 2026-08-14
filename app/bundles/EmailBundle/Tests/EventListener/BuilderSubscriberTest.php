@@ -14,8 +14,11 @@ use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\PageBundle\Entity\RedirectRepository;
+use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -36,19 +39,19 @@ final class BuilderSubscriberTest extends TestCase
     {
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->emailModel           = $this->createMock(EmailModel::class);
-        $trackableModel             = $this->createMock(TrackableModel::class);
-        $redirectModel              = $this->createMock(RedirectModel::class);
         $this->translator           = $this->createMock(TranslatorInterface::class);
         $this->leadRepository       = $this->createMock(LeadRepository::class);
         $fromEmailHelper            = new FromEmailHelper($this->coreParametersHelper, $this->leadRepository);
         $this->builderSubscriber    = new BuilderSubscriber(
             $this->coreParametersHelper,
             $this->emailModel,
-            $trackableModel,
-            $redirectModel,
+            $this->createStub(TrackableModel::class),
+            $this->createStub(RedirectModel::class),
             $this->translator,
             new MailHashHelper($this->coreParametersHelper),
-            $fromEmailHelper
+            $fromEmailHelper,
+            $this->createStub(TrackableRepository::class),
+            $this->createStub(RedirectRepository::class)
         );
 
         parent::setUp();
@@ -92,7 +95,7 @@ final class BuilderSubscriberTest extends TestCase
         $this->assertSame('Owner Signature', $event->getTokens()['{signature}']);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('fixEmailAccessibilityContent')]
+    #[DataProvider('fixEmailAccessibilityContent')]
     public function testFixEmailAccessibility(string $content, string $expectedContent, ?string $emailLocale): void
     {
         $this->emailModel->method('buildUrl')->willReturn('https://some.url');
@@ -280,11 +283,11 @@ final class BuilderSubscriberTest extends TestCase
 
         $emailHash = hash_hmac('sha256', 'lukas.sykora@acquia.com', 'secret');
         $this->emailModel->method('buildUrl')
-            ->willReturnCallback(fn ($route): ?string => match ($route) {
+            ->willReturnCallback(fn (string $route): string => match ($route) {
                 'mautic_email_unsubscribe' => '/email/unsubscribe/hash/lukas.sykora@acquia.com/'.$emailHash,
                 'mautic_email_webview'     => '/email/webview/'.$emailHash,
                 'mautic_email_preview'     => '/email/preview/111',
-                default                    => null,
+                default                    => '',
             });
 
         $this->translator->method('trans')

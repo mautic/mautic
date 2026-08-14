@@ -35,7 +35,7 @@ export default class DynamicContentCommands {
     }
 
     // empty the listeners, these are created when reopening
-    // otherwise the listeners are compounded and we get multiple CKEditors 
+    // otherwise the listeners are compounded and we get multiple CKEditors
     // for 1 textarea
     if (
       Mautic.internalDynamicContentItemCreateListeners &&

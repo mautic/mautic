@@ -16,9 +16,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AsCommand(
     name: DeleteContactSecondaryCompaniesCommand::NAME,
-    description: "Deletes all contact\'s secondary companies."
+    description: "Deletes all contact\'s secondary companies.",
+    help: <<<'TXT'
+The <info>%command.name%</info> command deletes non-primary companies of every contact.
+
+<info>php %command.full_name%</info>
+TXT
 )]
-class DeleteContactSecondaryCompaniesCommand extends Command
+final class DeleteContactSecondaryCompaniesCommand extends Command
 {
     public const NAME                    = 'mautic:contact:delete:secondary-companies';
 
@@ -29,18 +34,6 @@ class DeleteContactSecondaryCompaniesCommand extends Command
         private readonly CompanyLeadRepository $companyLeadsRepository,
     ) {
         parent::__construct();
-    }
-
-    protected function configure(): void
-    {
-        $this
-            ->setHelp(
-                <<<'EOT'
-The <info>%command.name%</info> command deletes non-primary companies of every contact.
-
-<info>php %command.full_name%</info>
-EOT
-            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

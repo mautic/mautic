@@ -6,6 +6,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\LeadBatchLimiterTrait;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
+use Psr\Log\LoggerInterface;
 
 class ContactSegmentService
 {
@@ -14,7 +15,7 @@ class ContactSegmentService
     public function __construct(
         private ContactSegmentFilterFactory $contactSegmentFilterFactory,
         private ContactSegmentQueryBuilder $contactSegmentQueryBuilder,
-        private \Psr\Log\LoggerInterface $logger,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -107,6 +108,34 @@ class ContactSegmentService
         $result = $this->timedFetchAll($queryBuilder, $segment->getId());
 
         return [$segment->getId() => $result];
+    }
+
+    /**
+     * @param array<string, mixed> $batchLimiters
+     *
+     * @throws Exception\SegmentQueryException
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function hasNewLeadListLeads(LeadList $segment, array $batchLimiters): bool
+    {
+        $segmentId = $segment->getId();
+        $result    = $this->getNewLeadListLeads($segment, $batchLimiters, 1);
+
+        return !empty($result[$segmentId]);
+    }
+
+    /**
+     * @param array<string, mixed> $batchLimiters
+     *
+     * @throws Exception\SegmentQueryException
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function hasOrphanedLeadListLeads(LeadList $segment, array $batchLimiters = []): bool
+    {
+        $segmentId = $segment->getId();
+        $result    = $this->getOrphanedLeadListLeads($segment, $batchLimiters, 1);
+
+        return !empty($result[$segmentId]);
     }
 
     /**
@@ -274,7 +303,7 @@ class ContactSegmentService
      *
      * @return string
      */
-    private function formatPeriod($inputSeconds)
+    private function formatPeriod(float $inputSeconds)
     {
         $now = \DateTime::createFromFormat('U.u', number_format($inputSeconds, 6, '.', ''));
 

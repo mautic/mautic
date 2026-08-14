@@ -70,6 +70,6 @@ trait RepositoryConfiguratorTrait
         $this->entityManager->method('getConnection')->willReturn($this->connection);
         $this->connection->method('getExpressionBuilder')->willReturnCallback(fn (): ExpressionBuilder => new ExpressionBuilder($this->connection));
         $this->connection->method('executeQuery')->willReturn($this->result);
-        $this->connection->method('quote')->willReturnCallback(fn ($value): string => "'$value'");
+        $this->connection->method('quote')->willReturnCallback(fn ($value): string => "'{$value}'");
     }
 }

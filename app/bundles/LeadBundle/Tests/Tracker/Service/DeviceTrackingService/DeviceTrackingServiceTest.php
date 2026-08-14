@@ -194,13 +194,13 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
         $this->leadDeviceRepositoryMock->expects($this->never())
             ->method('getByTrackingId');
 
-        $this->assertNull($this->getDeviceTrackingService()->getTrackedDevice());
+        $this->assertNotInstanceOf(LeadDevice::class, $this->getDeviceTrackingService()->getTrackedDevice());
     }
 
     public function testGetTrackedDeviceNoRequest(): void
     {
         $deviceTrackingService = $this->getDeviceTrackingService();
-        $this->assertNull($deviceTrackingService->getTrackedDevice());
+        $this->assertNotInstanceOf(LeadDevice::class, $deviceTrackingService->getTrackedDevice());
     }
 
     /**

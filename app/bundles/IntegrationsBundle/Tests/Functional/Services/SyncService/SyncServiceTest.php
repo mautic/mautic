@@ -46,7 +46,7 @@ final class SyncServiceTest extends MauticMysqlTestCase
         $syncIntegrationsHelper->addIntegration($exampleIntegration);
 
         /** @var SyncService $syncService */
-        $syncService = $this->getContainer()->get('mautic.integrations.sync.service');
+        $syncService = $this->getContainer()->get(SyncService::class);
 
         $syncService->processIntegrationSync(ExampleIntegration::NAME);
         $payload = $dataExchange->getOrderPayload();

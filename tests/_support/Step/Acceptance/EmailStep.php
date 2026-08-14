@@ -4,7 +4,7 @@ namespace Step\Acceptance;
 
 use Page\Acceptance\EmailsPage;
 
-class EmailStep extends \AcceptanceTester
+final class EmailStep extends \AcceptanceTester
 {
     /**
      * Create segment email with the given name.
@@ -22,6 +22,7 @@ class EmailStep extends \AcceptanceTester
         $I->waitForElementClickable(EmailsPage::CONTACT_SEGMENT_OPTION);
         $I->click(EmailsPage::CONTACT_SEGMENT_OPTION);
         $I->click(EmailsPage::SAVE_AND_CLOSE);
+        $I->waitForText($name, self::TIMEOUT, 'h1.page-header-title');
     }
 
     /**
@@ -37,6 +38,7 @@ class EmailStep extends \AcceptanceTester
         $I->click(EmailsPage::SELECT_TRIGGERED_EMAIL);
         $I->fillField(EmailsPage::SUBJECT_FIELD, $name);
         $I->click(EmailsPage::SAVE_AND_CLOSE);
+        $I->waitForText($name, self::TIMEOUT, 'h1.page-header-title');
     }
 
     /**

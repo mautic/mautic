@@ -5,12 +5,10 @@ declare(strict_types=1);
 namespace Mautic\PointBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class InsightController extends AbstractStandardFormController
+final class InsightController extends AbstractStandardFormController
 {
     protected function getTemplateBase(): string
     {
@@ -32,10 +30,8 @@ class InsightController extends AbstractStandardFormController
 
     /**
      * Generates new form and processes post data.
-     *
-     * @return JsonResponse|Response
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request): Response
     {
         return parent::newStandard($request);
     }
@@ -45,10 +41,8 @@ class InsightController extends AbstractStandardFormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return JsonResponse|Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false): Response
     {
         return parent::editStandard($request, $objectId, $ignorePost);
     }
@@ -57,10 +51,8 @@ class InsightController extends AbstractStandardFormController
      * Clones an existing Point Insight.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse|Response
      */
-    public function cloneAction(Request $request, $objectId)
+    public function cloneAction(Request $request, $objectId): Response
     {
         return parent::cloneStandard($request, $objectId);
     }
@@ -69,20 +61,16 @@ class InsightController extends AbstractStandardFormController
      * Deletes a Point Insight.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse|RedirectResponse
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         return parent::deleteStandard($request, $objectId);
     }
 
     /**
      * Deletes a group of entities.
-     *
-     * @return JsonResponse|RedirectResponse
      */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): Response
     {
         return parent::batchDeleteStandard($request);
     }
