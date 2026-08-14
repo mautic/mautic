@@ -613,7 +613,8 @@ class ListModel extends FormModel implements GlobalSearchInterface
         try {
             return !$this->leadSegmentService->hasNewLeadListLeads($leadList, $batchLimiters)
                 && !$this->leadSegmentService->hasOrphanedLeadListLeads($leadList);
-        } catch (TableNotFoundException) {
+        } catch (FieldNotFoundException|SegmentNotFoundException|TableNotFoundException) {
+            // Same filter/query errors as rebuildListLeads(), but keep the segment in Building.
             return false;
         }
     }
