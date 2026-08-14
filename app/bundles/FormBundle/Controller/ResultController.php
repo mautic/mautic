@@ -3,7 +3,7 @@
 namespace Mautic\FormBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -29,7 +29,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-final class ResultController extends CommonFormController
+final class ResultController extends AbstractStandardFormController
 {
     public function __construct(
         FormFactoryInterface $formFactory,
@@ -47,17 +47,6 @@ final class ResultController extends CommonFormController
         private readonly SubmissionResultLoader $submissionResultLoader,
         private readonly SubmissionModel $submissionModel,
     ) {
-        $this->setStandardParameters(
-            'form.submission', // model name
-            'form:forms', // permission base
-            'mautic_form', // route base
-            'mautic.formresult', // session base
-            'mautic.form.result', // lang string base
-            '@MauticForm/Result', // template base
-            'mautic_form', // activeLink
-            'formresult' // mauticContent
-        );
-
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
@@ -394,6 +383,34 @@ final class ResultController extends CommonFormController
     protected function getModelName(): string
     {
         return 'form.submission';
+    }
+
+    protected function getPermissionBase(): string
+    {
+        return 'form:forms';
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getSessionBase($objectId = null)
+    {
+        return 'mautic.formresult';
+    }
+
+    protected function getTranslationBase(): string
+    {
+        return 'mautic.form.result';
+    }
+
+    protected function getTemplateBase(): string
+    {
+        return '@MauticForm/Result';
+    }
+
+    protected function getJsLoadMethodPrefix(): string
+    {
+        return 'formresult';
     }
 
     protected function getIndexRoute(): string
