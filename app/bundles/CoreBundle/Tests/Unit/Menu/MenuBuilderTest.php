@@ -10,29 +10,38 @@ use Knp\Menu\Matcher\MatcherInterface;
 use Knp\Menu\MenuFactory;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MenuEvent;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Menu\MenuBuilder;
 use Mautic\CoreBundle\Menu\MenuHelper;
-use PHPUnit\Framework\Assert;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 final class MenuBuilderTest extends TestCase
 {
     private FactoryInterface $factory;
 
-    private MatcherInterface&MockObject $matcher;
+    private MatcherInterface&Stub $matcher;
 
     private EventDispatcherInterface&MockObject $dispatcher;
 
-    private MenuHelper&MockObject $menuHelper;
+    private MenuHelper $menuHelper;
 
     protected function setUp(): void
     {
         $this->factory    = new MenuFactory();
-        $this->matcher    = $this->createMock(MatcherInterface::class);
+        $this->matcher    = $this->createStub(MatcherInterface::class);
         $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $this->menuHelper = $this->createMock(MenuHelper::class);
+        $this->menuHelper = new MenuHelper(
+            $this->createStub(CorePermissions::class),
+            $this->createStub(RequestStack::class),
+            $this->createStub(CoreParametersHelper::class),
+            $this->createStub(IntegrationHelper::class)
+        );
     }
 
     public function testMainMenuKeepsUriOnlyItems(): void
@@ -40,10 +49,10 @@ final class MenuBuilderTest extends TestCase
         $menuName = uniqid('uriOnlyItems', false);
 
         $this->dispatcher
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('dispatch')
             ->willReturnCallback(function (MenuEvent $event, string $eventName): MenuEvent {
-                Assert::assertSame(CoreEvents::BUILD_MENU, $eventName);
+                $this->assertSame(CoreEvents::BUILD_MENU, $eventName);
 
                 $event->addMenuItems([
                     'mautic.contribute.menu.index' => [
@@ -60,10 +69,10 @@ final class MenuBuilderTest extends TestCase
 
         $menu = $builder->__call($menuName, []);
 
-        Assert::assertInstanceOf(ItemInterface::class, $menu);
+        $this->assertInstanceOf(ItemInterface::class, $menu);
         $menuItem = $menu->getChild('mautic.contribute.menu.index');
 
-        Assert::assertInstanceOf(ItemInterface::class, $menuItem);
-        Assert::assertSame('https://mautic.org', $menuItem->getUri());
+        $this->assertInstanceOf(ItemInterface::class, $menuItem);
+        $this->assertSame('https://mautic.org', $menuItem->getUri());
     }
 }
