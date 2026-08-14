@@ -443,6 +443,14 @@ class PageModel extends FormModel
             return;
         }
 
+        // Update previous hit's date_left synchronously while the incoming request still
+        // carries mautic_referer_id. Do not rely on messenger/processPageHit for this —
+        // if the hit queue is delayed or stuck, dwell time would otherwise stay NULL.
+        $lastHit = $request->cookies->get('mautic_referer_id');
+        if (!empty($lastHit) && is_numeric($lastHit)) {
+            $this->getHitRepository()->updateHitDateLeft((int) $lastHit);
+        }
+
         // save hit to the cookie to use to update the exit time
         if ($hit) {
             $this->cookieHelper->setCookie(
