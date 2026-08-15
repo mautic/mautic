@@ -193,7 +193,6 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         $sendTo  = is_array($sendTo) ? $sendTo : [$sendTo];
 
         $sentCount       = [];
-        $stats           = [];
         $results         = [];
         $contacts        = []; // Shall we reset the passed contacts param here?
         $fetchContacts   = [];

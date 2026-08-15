@@ -525,7 +525,6 @@ final class PublicController extends CommonFormController
         $css               = InputHelper::string((string) $request->get('css'));
         $form              = $this->formModel->getEntity($objectId);
         $customStylesheets = (!empty($css)) ? explode(',', $css) : [];
-        $template          = null;
 
         if (null === $form || !$form->isPublished()) {
             return $this->notFound();
