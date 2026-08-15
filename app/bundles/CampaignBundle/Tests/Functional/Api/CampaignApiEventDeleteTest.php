@@ -8,6 +8,7 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadList;
+use Symfony\Component\HttpFoundation\Request;
 
 final class CampaignApiEventDeleteTest extends MauticMysqlTestCase
 {
@@ -44,11 +45,11 @@ final class CampaignApiEventDeleteTest extends MauticMysqlTestCase
         $this->em->persist($campaign);
         $this->em->flush();
         $this->assertGreaterThan(0, $campaign->getId(), 'Campaign should be saved with an ID');
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/campaigns');
+        $this->client->request(Request::METHOD_GET, '/api/campaigns');
         $this->assertResponseIsSuccessful();
 
         // Step 1: GET the campaign (like API Library test does)
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, "/api/campaigns/{$campaign->getId()}");
+        $this->client->request(Request::METHOD_GET, "/api/campaigns/{$campaign->getId()}");
         $this->assertResponseIsSuccessful();
 
         $data   = json_decode($this->client->getResponse()->getContent(), true);
@@ -64,7 +65,7 @@ final class CampaignApiEventDeleteTest extends MauticMysqlTestCase
             'lists'  => [['id' => $segment->getId()]],
         ];
 
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_PUT, "/api/campaigns/{$campaign->getId()}/edit", $payload);
+        $this->client->request(Request::METHOD_PUT, "/api/campaigns/{$campaign->getId()}/edit", $payload);
         $this->assertResponseIsSuccessful();
     }
 }

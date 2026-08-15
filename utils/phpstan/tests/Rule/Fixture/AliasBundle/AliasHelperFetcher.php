@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Utils\PHPStan\Tests\Rule\Fixture\AliasBundle;
 
+use Psr\Container\ContainerInterface;
+
 final class AliasHelperFetcher
 {
     public function __construct(
-        private \Psr\Container\ContainerInterface $container,
+        private ContainerInterface $container,
     ) {
     }
 

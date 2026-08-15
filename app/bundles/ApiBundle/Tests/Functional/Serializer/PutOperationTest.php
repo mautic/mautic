@@ -7,6 +7,7 @@ namespace Mautic\ApiBundle\Tests\Functional\Serializer;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\ProjectBundle\Entity\Project;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -31,7 +32,7 @@ final class PutOperationTest extends MauticMysqlTestCase
         $projectId = $project->getId();
 
         // Make a GET request to retrieve the project
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/v2/projects/'.$projectId);
+        $this->client->request(Request::METHOD_GET, '/api/v2/projects/'.$projectId);
 
         $this->assertResponseIsSuccessful();
 
@@ -62,7 +63,7 @@ final class PutOperationTest extends MauticMysqlTestCase
 
         // Update the page via PUT request
         $this->client->request(
-            \Symfony\Component\HttpFoundation\Request::METHOD_PUT,
+            Request::METHOD_PUT,
             '/api/v2/pages/'.$originalId,
             [],
             [],
@@ -107,7 +108,7 @@ final class PutOperationTest extends MauticMysqlTestCase
 
         // Update the project via PUT request
         $this->client->request(
-            \Symfony\Component\HttpFoundation\Request::METHOD_PUT,
+            Request::METHOD_PUT,
             '/api/v2/projects/'.$originalId,
             [],
             [],
@@ -147,7 +148,7 @@ final class PutOperationTest extends MauticMysqlTestCase
         $nonExistentId = 99999;
 
         $this->client->request(
-            \Symfony\Component\HttpFoundation\Request::METHOD_PUT,
+            Request::METHOD_PUT,
             '/api/v2/projects/'.$nonExistentId,
             [],
             [],
@@ -170,7 +171,7 @@ final class PutOperationTest extends MauticMysqlTestCase
     public function testPostOperationCreatesNewProject(): void
     {
         $this->client->request(
-            \Symfony\Component\HttpFoundation\Request::METHOD_POST,
+            Request::METHOD_POST,
             '/api/v2/projects',
             [],
             [],
@@ -219,7 +220,7 @@ final class PutOperationTest extends MauticMysqlTestCase
         // Update the project via PUT request with only name (no description)
         // According to HTTP PUT semantics, this should clear the description
         $this->client->request(
-            \Symfony\Component\HttpFoundation\Request::METHOD_PUT,
+            Request::METHOD_PUT,
             '/api/v2/projects/'.$originalId,
             [],
             [],

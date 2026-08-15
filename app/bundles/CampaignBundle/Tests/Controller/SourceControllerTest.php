@@ -7,6 +7,7 @@ namespace Mautic\CampaignBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
+use Symfony\Component\HttpFoundation\Request;
 
 final class SourceControllerTest extends MauticMysqlTestCase
 {
@@ -27,7 +28,7 @@ final class SourceControllerTest extends MauticMysqlTestCase
 
     public function testNewActionWithNonAjaxRequest(): void
     {
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, self::NEW_FORMS_URL);
+        $this->client->request(Request::METHOD_GET, self::NEW_FORMS_URL);
         $response = $this->client->getResponse();
         $this->assertStringContainsString(self::ACCESS_DENIED, (string) $response->getContent());
     }

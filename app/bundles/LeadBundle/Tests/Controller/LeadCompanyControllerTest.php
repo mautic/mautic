@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Symfony\Component\HttpFoundation\Request;
 
 final class LeadCompanyControllerTest extends MauticMysqlTestCase
 {
@@ -16,7 +17,7 @@ final class LeadCompanyControllerTest extends MauticMysqlTestCase
 
     public function testSimpleCompanyFeature(): void
     {
-        $crawler     = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, 's/contacts/new/');
+        $crawler     = $this->client->request(Request::METHOD_GET, 's/contacts/new/');
         $multiple    = $crawler->filterXPath('//*[@id="lead_companies"]')->attr('multiple');
         $this->assertNull($multiple);
     }

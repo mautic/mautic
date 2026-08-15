@@ -13,13 +13,14 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\Integration;
 use MauticPlugin\MauticClearbitBundle\EventListener\ButtonSubscriber;
 use MauticPlugin\MauticClearbitBundle\Integration\ClearbitIntegration;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class ButtonSubscriberTest extends TestCase
 {
     private MockObject&IntegrationsHelper $integrationsHelper;

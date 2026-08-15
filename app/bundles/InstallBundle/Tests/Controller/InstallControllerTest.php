@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -91,6 +92,6 @@ final class InstallControllerTest extends \PHPUnit\Framework\TestCase
             $this->createStub(PathsHelper::class),
             InstallService::CHECK_STEP
         );
-        $this->assertSame(\Symfony\Component\HttpFoundation\Response::HTTP_FOUND, $response->getStatusCode(), (string) $response->getContent());
+        $this->assertSame(Response::HTTP_FOUND, $response->getStatusCode(), (string) $response->getContent());
     }
 }

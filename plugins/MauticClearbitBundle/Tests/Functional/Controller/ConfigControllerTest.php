@@ -10,6 +10,7 @@ use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
 use MauticPlugin\MauticClearbitBundle\Integration\Support\ConfigSupport;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
 
 final class ConfigControllerTest extends MauticMysqlTestCase
@@ -68,7 +69,7 @@ final class ConfigControllerTest extends MauticMysqlTestCase
     {
         $this->saveConfigForm();
 
-        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, $this->configRoute);
+        $crawler = $this->client->request(Request::METHOD_GET, $this->configRoute);
         $this->assertResponseIsSuccessful();
         $this->assertSame(self::API_KEY, $crawler->filter('#integration_config_apiKeys_apikey')->attr('value'));
         $this->assertNotNull($crawler->filter('#integration_config_isPublished_1')->attr('checked'));
@@ -77,7 +78,7 @@ final class ConfigControllerTest extends MauticMysqlTestCase
 
     private function saveConfigForm(): void
     {
-        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, $this->configRoute);
+        $crawler = $this->client->request(Request::METHOD_GET, $this->configRoute);
         $this->assertResponseIsSuccessful();
 
         $form = $crawler->selectButton('Save & Close')->form();

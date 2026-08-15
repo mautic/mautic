@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 final class CampaignEventSubscriberFunctionalTest extends MauticMysqlTestCase
 {
@@ -86,7 +87,7 @@ final class CampaignEventSubscriberFunctionalTest extends MauticMysqlTestCase
             ];
         }
 
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/contacts/batch/new', $contacts);
+        $this->client->request(Request::METHOD_POST, '/api/contacts/batch/new', $contacts);
         $response = json_decode($this->client->getResponse()->getContent(), true);
         $contacts = $response['contacts'];
         $this->assertCount(150, $contacts);

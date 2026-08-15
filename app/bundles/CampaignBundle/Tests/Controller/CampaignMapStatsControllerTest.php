@@ -20,6 +20,7 @@ use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 final class CampaignMapStatsControllerTest extends MauticMysqlTestCase
@@ -118,7 +119,7 @@ final class CampaignMapStatsControllerTest extends MauticMysqlTestCase
         $this->em->persist($campaign);
         $this->em->flush();
 
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, "s/campaign-map-stats/{$campaign->getId()}/2023-07-20/2023-07-25");
+        $this->client->request(Request::METHOD_GET, "s/campaign-map-stats/{$campaign->getId()}/2023-07-20/2023-07-25");
         $clientResponse = $this->client->getResponse();
         $crawler        = new Crawler($clientResponse->getContent(), $this->client->getInternalRequest()->getUri());
 
@@ -173,7 +174,7 @@ final class CampaignMapStatsControllerTest extends MauticMysqlTestCase
         ];
         $campaign = $this->createCampaignWithEmail($leadsPayload);
 
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, "s/campaign-map-stats/{$campaign->getId()}/2023-07-20/2023-07-25");
+        $this->client->request(Request::METHOD_GET, "s/campaign-map-stats/{$campaign->getId()}/2023-07-20/2023-07-25");
         $clientResponse = $this->client->getResponse();
         $crawler        = new Crawler($clientResponse->getContent(), $this->client->getInternalRequest()->getUri());
 

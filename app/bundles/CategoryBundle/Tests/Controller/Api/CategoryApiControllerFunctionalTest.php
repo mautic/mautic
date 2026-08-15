@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadCategory;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\HttpFoundation\Request;
 
 final class CategoryApiControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -30,7 +31,7 @@ final class CategoryApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // Test the correct endpoint /api/v2/categories
         $this->client->request(
-            \Symfony\Component\HttpFoundation\Request::METHOD_GET,
+            Request::METHOD_GET,
             '/api/v2/categories',
             [],
             [],
@@ -97,7 +98,7 @@ final class CategoryApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertGreaterThanOrEqual(1, count($allLeadCategories), 'LeadCategory should be in database');
 
         $this->client->request(
-            \Symfony\Component\HttpFoundation\Request::METHOD_GET,
+            Request::METHOD_GET,
             '/api/v2/contactcategories',
             [],
             [],
@@ -145,7 +146,7 @@ final class CategoryApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // Filter by contact bundle
         $this->client->request(
-            \Symfony\Component\HttpFoundation\Request::METHOD_GET,
+            Request::METHOD_GET,
             '/api/v2/categories?bundle=contact',
             [],
             [],

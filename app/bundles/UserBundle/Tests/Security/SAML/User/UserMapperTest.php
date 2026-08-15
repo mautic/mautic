@@ -9,10 +9,11 @@ use LightSaml\Model\Assertion\Attribute;
 use LightSaml\Model\Assertion\AttributeStatement;
 use LightSaml\Model\Protocol\Response;
 use Mautic\UserBundle\Security\SAML\User\UserMapper;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class UserMapperTest extends TestCase
 {
     private UserMapper $mapper;

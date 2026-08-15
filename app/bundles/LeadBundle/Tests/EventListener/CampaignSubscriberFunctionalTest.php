@@ -32,6 +32,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
@@ -543,7 +544,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
     private function createStages(): array
     {
         foreach ($this->stages as $key => $stage) {
-            $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/stages/new', $stage);
+            $this->client->request(Request::METHOD_POST, '/api/stages/new', $stage);
             $clientResponse = $this->client->getResponse();
             $response       = json_decode($clientResponse->getContent(), true);
 
@@ -561,7 +562,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
     private function addStageToContacts(array $contacts, int $stageId): void
     {
         foreach ($contacts as $contact) {
-            $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, "/api/stages/{$stageId}/contact/{$contact->getId()}/add");
+            $this->client->request(Request::METHOD_POST, "/api/stages/{$stageId}/contact/{$contact->getId()}/add");
             $clientResponse = $this->client->getResponse();
 
             $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());

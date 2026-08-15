@@ -8,6 +8,7 @@ use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class CampaignEventDetailsTimelineFunctionalTest extends MauticMysqlTestCase
@@ -84,7 +85,7 @@ final class CampaignEventDetailsTimelineFunctionalTest extends MauticMysqlTestCa
         $this->assertInstanceOf(TranslatorInterface::class, $translator);
         $operator = $translator->trans('mautic.lead.list.form.operator.in');
 
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, sprintf('/s/contacts/view/%s', $lead1->getId()));
+        $this->client->request(Request::METHOD_GET, sprintf('/s/contacts/view/%s', $lead1->getId()));
         $this->assertStringContainsString(
             $translator->trans('mautic.campaign.event.condition.details', [
                 '%path%'            => 'yes',
@@ -96,7 +97,7 @@ final class CampaignEventDetailsTimelineFunctionalTest extends MauticMysqlTestCa
             (string) $this->client->getResponse()->getContent()
         );
 
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, sprintf('/s/contacts/view/%s', $lead2->getId()));
+        $this->client->request(Request::METHOD_GET, sprintf('/s/contacts/view/%s', $lead2->getId()));
         $this->assertStringContainsString(
             $translator->trans('mautic.campaign.event.condition.details', [
                 '%path%'            => 'no',
