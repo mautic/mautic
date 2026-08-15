@@ -32,7 +32,7 @@ class ContainerGetService
 
     public function viaContainerGetter(): void
     {
-        $this->getContainer()->get('translator');
+        $this->container->get('translator');
     }
 
     // a runtime service name has nothing to inject

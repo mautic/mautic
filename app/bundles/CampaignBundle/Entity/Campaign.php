@@ -652,7 +652,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
 
     public function allowRestart(): bool
     {
-        return $this->getAllowRestart();
+        return $this->allowRestart;
     }
 
     /**
