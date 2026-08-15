@@ -401,8 +401,6 @@ final class MonitoringController extends FormController
         }
 
         $session = $request->getSession();
-
-        $security         = $this->security;
         $monitoringEntity = $this->monitoringModel->getEntity($objectId);
 
         // set the asset we came from
@@ -465,7 +463,7 @@ final class MonitoringController extends FormController
                     'logs'             => $logs,
                     'isEmbedded'       => $request->get('isEmbedded') ?: false,
                     'tmpl'             => $tmpl,
-                    'security'         => $security,
+                    'security'         => $this->security,
                     'leadStats'        => $chart->render(),
                     'monitorLeads'     => $this->forward(
                         'MauticPlugin\MauticSocialBundle\Controller\MonitoringController::contactsAction',

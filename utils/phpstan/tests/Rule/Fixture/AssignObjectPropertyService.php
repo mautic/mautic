@@ -10,6 +10,5 @@ final class AssignObjectPropertyService
 
     public function run(): void
     {
-        $repository = $this->repository;
     }
 }

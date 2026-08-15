@@ -48,15 +48,13 @@ final class ScheduleController extends CommonAjaxController
         /** @var \Mautic\ReportBundle\Entity\Report $report */
         $report = $this->reportModel->getEntity($reportId);
 
-        $security = $this->security;
-
         if (empty($report)) {
             $this->addFlashMessage('mautic.report.notfound', ['%id%' => $reportId], FlashBag::LEVEL_ERROR, 'messages');
 
             return $this->flushFlash();
         }
 
-        if (!$security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $report->getCreatedBy())) {
+        if (!$this->security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $report->getCreatedBy())) {
             $this->addFlashMessage('mautic.core.error.accessdenied', [], FlashBag::LEVEL_ERROR);
 
             return $this->flushFlash();

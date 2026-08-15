@@ -23,16 +23,13 @@ final readonly class AnalyticsHelper
      */
     public function addCode($content): string
     {
-        // Add analytics
-        $analytics = $this->code;
-
         // Check for html doc
         if (!str_contains($content, '<html')) {
-            $content = "<html>\n<head>{$analytics}</head>\n<body>{$content}</body>\n</html>";
+            $content = "<html>\n<head>{$this->code}</head>\n<body>{$content}</body>\n</html>";
         } elseif (!str_contains($content, '<head>')) {
-            $content = str_replace('<html>', "<html>\n<head>\n{$analytics}\n</head>", $content);
-        } elseif (!empty($analytics)) {
-            $content = str_replace('</head>', $analytics."\n</head>", $content);
+            $content = str_replace('<html>', "<html>\n<head>\n{$this->code}\n</head>", $content);
+        } elseif (!empty($this->code)) {
+            $content = str_replace('</head>', $this->code."\n</head>", $content);
         }
 
         return $content;

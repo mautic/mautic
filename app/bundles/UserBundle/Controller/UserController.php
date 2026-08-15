@@ -464,8 +464,6 @@ final class UserController extends FormController
         if (!$this->security->isGranted('user:users:delete')) {
             $this->throwAccessDenied();
         }
-
-        $currentUser    = $this->user;
         $page           = $request->getSession()->get('mautic.user.page', 1);
         $returnUrl      = $this->generateUrl('mautic_user_index', ['page' => $page]);
         $success        = 0;
@@ -483,7 +481,7 @@ final class UserController extends FormController
         ];
         if ('POST' === $request->getMethod()) {
             // ensure the user logged in is not getting deleted
-            if ((int) $currentUser->getId() !== (int) $objectId) {
+            if ((int) $this->user->getId() !== (int) $objectId) {
                 $entity = $this->userModel->getEntity($objectId);
 
                 if (null === $entity) {
@@ -548,8 +546,6 @@ final class UserController extends FormController
         $action = $this->generateUrl('mautic_user_action', ['objectAction' => 'contact', 'objectId' => $objectId]);
         $form   = $this->createForm(ContactType::class, [], ['action' => $action]);
 
-        $currentUser = $this->user;
-
         if ('POST' === $request->getMethod()) {
             $contact   = $request->request->all()['contact'] ?? [];
             $formUrl   = $contact['returnUrl'] ?? '';
@@ -561,7 +557,7 @@ final class UserController extends FormController
                     $subject = InputHelper::clean($form->get('msg_subject')->getData());
                     $body    = InputHelper::clean($form->get('msg_body')->getData());
 
-                    $mailer->setFrom($currentUser->getEmail(), $currentUser->getName());
+                    $mailer->setFrom($this->user->getEmail(), $this->user->getName());
                     $mailer->setSubject($subject);
                     $mailer->setTo($user->getEmail(), $user->getName());
                     $mailer->setBody($body);
@@ -580,7 +576,7 @@ final class UserController extends FormController
                     }
 
                     $details = $serializer->serialize([
-                        'from'    => $currentUser->getName(),
+                        'from'    => $this->user->getName(),
                         'to'      => $user->getName(),
                         'subject' => $subject,
                         'message' => $body,

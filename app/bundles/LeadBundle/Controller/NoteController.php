@@ -202,11 +202,9 @@ final class NoteController extends FormController
                 $closeModal = true;
             }
         }
-
-        $security    = $this->security;
         $permissions = [
-            'edit'   => $security->hasEntityAccess('lead:notes:editown', 'lead:notes:editother', $note->getCreatedBy()),
-            'delete' => $security->hasEntityAccess('lead:notes:deleteown', 'lead:notes:deleteother', $note->getCreatedBy()),
+            'edit'   => $this->security->hasEntityAccess('lead:notes:editown', 'lead:notes:editother', $note->getCreatedBy()),
+            'delete' => $this->security->hasEntityAccess('lead:notes:deleteown', 'lead:notes:deleteother', $note->getCreatedBy()),
         ];
 
         if ($closeModal) {
@@ -287,11 +285,9 @@ final class NoteController extends FormController
                 $closeModal = true;
             }
         }
-
-        $security    = $this->security;
         $permissions = [
-            'edit'   => $security->hasEntityAccess('lead:notes:editown', 'lead:notes:editother', $note->getCreatedBy()),
-            'delete' => $security->hasEntityAccess('lead:notes:deleteown', 'lead:notes:deleteother', $note->getCreatedBy()),
+            'edit'   => $this->security->hasEntityAccess('lead:notes:editown', 'lead:notes:editother', $note->getCreatedBy()),
+            'delete' => $this->security->hasEntityAccess('lead:notes:deleteown', 'lead:notes:deleteother', $note->getCreatedBy()),
         ];
 
         if ($closeModal) {

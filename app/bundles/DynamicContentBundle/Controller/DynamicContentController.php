@@ -342,7 +342,6 @@ final class DynamicContentController extends FormController
      */
     public function viewAction(Request $request, $objectId): Response
     {
-        $security = $this->security;
         $entity   = $this->dynamicContentModel->getEntity($objectId);
 
         // set the page we came from
@@ -371,7 +370,7 @@ final class DynamicContentController extends FormController
                 ]
             );
         }
-        if (!$security->hasEntityAccess(
+        if (!$this->security->hasEntityAccess(
             'dynamiccontent:dynamiccontents:viewown',
             'dynamiccontent:dynamiccontents:viewother',
             $entity->getCreatedBy()

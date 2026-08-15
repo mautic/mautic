@@ -55,8 +55,6 @@ final class DetailController extends CommonController
             return $this->notFound($e->getMessage());
         }
 
-        $security = $this->security;
-
         return $this->delegateView(
             [
                 'returnUrl'      => $this->routeProvider->buildListRoute(),
@@ -64,7 +62,7 @@ final class DetailController extends CommonController
                     'packageDetail'     => $packageDetail,
                     'isInstalled'       => $isInstalled,
                     'isComposerEnabled' => $this->config->isComposerEnabled(),
-                    'security'          => $security,
+                    'security'          => $this->security,
                 ],
                 'contentTemplate' => '@Marketplace/Package/detail.html.twig',
                 'passthroughVars' => [

@@ -30,6 +30,5 @@ final class PropertyToPropertyAssignService
 
     public function useLocalVariable(): void
     {
-        $repository = $this->someRepository;
     }
 }

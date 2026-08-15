@@ -906,10 +906,8 @@ class Field implements UuidInterface
 
     public function hasChoices(): bool
     {
-        $properties = $this->properties;
-
         return 'checkboxgrp' === $this->type
-            || (array_key_exists('multiple', $properties) && 1 === $properties['multiple']);
+            || (array_key_exists('multiple', $this->properties) && 1 === $this->properties['multiple']);
     }
 
     /**

@@ -538,15 +538,14 @@ class Import extends FormEntity
      */
     public function getRunTime()
     {
-        $startTime = $this->dateStarted;
         $endTime   = $this->dateEnded;
 
         if (!$endTime && self::IN_PROGRESS === $this->status) {
             $endTime = $this->getDateModified();
         }
 
-        if ($startTime instanceof \DateTimeInterface && $endTime instanceof \DateTimeInterface) {
-            return $endTime->diff($startTime);
+        if ($this->dateStarted instanceof \DateTimeInterface && $endTime instanceof \DateTimeInterface) {
+            return $endTime->diff($this->dateStarted);
         }
 
         return null;
@@ -559,15 +558,14 @@ class Import extends FormEntity
      */
     public function getRunTimeSeconds(): int|float
     {
-        $startTime = $this->dateStarted;
         $endTime   = $this->dateEnded;
 
         if (!$endTime && self::IN_PROGRESS === $this->status) {
             $endTime = $this->getDateModified();
         }
 
-        if ($startTime instanceof \DateTime && $endTime instanceof \DateTime) {
-            return $endTime->format('U') - $startTime->format('U');
+        if ($this->dateStarted instanceof \DateTime && $endTime instanceof \DateTime) {
+            return $endTime->format('U') - $this->dateStarted->format('U');
         }
 
         return 0;

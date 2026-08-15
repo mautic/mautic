@@ -150,8 +150,6 @@ final class SmsController extends FormController
      */
     public function viewAction(Request $request, $objectId): Response
     {
-        $security = $this->security;
-
         /** @var Sms $sms */
         $sms = $this->smsModel->getEntity($objectId);
         // set the page we came from
@@ -217,7 +215,7 @@ final class SmsController extends FormController
                 'trackables'  => $trackableLinks,
                 'logs'        => $logs,
                 'isEmbedded'  => $request->get('isEmbedded') ?: false,
-                'permissions' => $security->isGranted([
+                'permissions' => $this->security->isGranted([
                     'sms:smses:viewown',
                     'sms:smses:viewother',
                     'sms:smses:create',
@@ -228,7 +226,7 @@ final class SmsController extends FormController
                     'sms:smses:publishown',
                     'sms:smses:publishother',
                 ], 'RETURN_ARRAY'),
-                'security'    => $security,
+                'security'    => $this->security,
                 'entityViews' => $entityViews,
                 'contacts'    => $this->forward(
                     'Mautic\SmsBundle\Controller\SmsController::contactsAction',
@@ -705,9 +703,8 @@ final class SmsController extends FormController
     public function previewAction($objectId): Response
     {
         $sms      = $this->smsModel->getEntity($objectId);
-        $security = $this->security;
 
-        if (null !== $sms && $security->hasEntityAccess('sms:smses:viewown', 'sms:smses:viewother')) {
+        if (null !== $sms && $this->security->hasEntityAccess('sms:smses:viewown', 'sms:smses:viewother')) {
             return $this->delegateView([
                 'viewParameters' => [
                     'sms' => $sms,

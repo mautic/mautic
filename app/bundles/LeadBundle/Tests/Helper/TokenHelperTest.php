@@ -268,8 +268,7 @@ final class TokenHelperTest extends \PHPUnit\Framework\TestCase
     #[DataProvider('dataLabelProvider')]
     public function testLabelFormatForSelect(string $token, string|int $result): void
     {
-        $lead         = $this->lead;
-        $tokenList    = TokenHelper::findLeadTokens($token, $lead);
+        $tokenList    = TokenHelper::findLeadTokens($token, $this->lead);
         $this->assertEquals($result, $tokenList[$token]);
     }
 

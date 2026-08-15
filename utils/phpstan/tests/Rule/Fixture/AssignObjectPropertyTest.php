@@ -12,11 +12,9 @@ final class AssignObjectPropertyTest
 
     public function testObjectProperty(): void
     {
-        $repository = $this->repositoryMock;
     }
 
     public function testScalarProperty(): void
     {
-        $tableName = $this->tableName;
     }
 }

@@ -289,8 +289,6 @@ final class EmailController extends FormController
      */
     public function viewAction(Request $request, EmailModel $model, EmailConfig $emailConfig, AbTestSettingsService $abTestSettingsService, AbTestResultService $abTestResultService, $objectId): Response
     {
-        $security = $this->security;
-
         /** @var Email $email */
         $email   = $model->getEntity($objectId);
         $session = $request->getSession();
@@ -442,7 +440,7 @@ final class EmailController extends FormController
                     'clickCountsSorting' => $clickCountsSorting,
                     'variants'           => $variants,
                     'translations'       => $translations,
-                    'permissions'        => $security->isGranted(
+                    'permissions'        => $this->security->isGranted(
                         [
                             'email:emails:viewown',
                             'email:emails:viewother',
@@ -459,7 +457,7 @@ final class EmailController extends FormController
                         'RETURN_ARRAY'
                     ),
                     'abTestResults'   => $abTestResults,
-                    'security'        => $security,
+                    'security'        => $this->security,
                     'draftPreviewUrl' => $draftPreviewUrl,
                     'previewUrl'      => $this->generateUrl(
                         'mautic_email_preview',
@@ -1732,13 +1730,12 @@ final class EmailController extends FormController
 
         // Get the quick add form
         $action = $this->generateUrl('mautic_email_action', ['objectAction' => 'sendExample', 'objectId' => $objectId]);
-        $user   = $this->user;
 
         // We have to add prefix to example emails
         $subject = sprintf('%s %s', self::EXAMPLE_EMAIL_SUBJECT_PREFIX, $entity->getSubject());
         $entity->setSubject($subject);
 
-        $form = $this->createForm(ExampleSendType::class, ['emails' => ['list' => [$user->getEmail()]]], ['action' => $action]);
+        $form = $this->createForm(ExampleSendType::class, ['emails' => ['list' => [$this->user->getEmail()]]], ['action' => $action]);
 
         if ('POST' === $request->getMethod()) {
             $isCancelled = $this->isFormCancelled($form);
@@ -1754,7 +1751,7 @@ final class EmailController extends FormController
 
                 if ($previewForContactId
                     && (!$security->isAdmin()
-                        || !$security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $user->getId())
+                        || !$security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $this->user->getId())
                     )
                 ) {
                     // disallow displaying contact information

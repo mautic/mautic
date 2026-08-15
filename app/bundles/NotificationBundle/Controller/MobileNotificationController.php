@@ -156,8 +156,6 @@ final class MobileNotificationController extends FormController
      */
     public function viewAction(Request $request, $objectId): Response
     {
-        $security = $this->security;
-
         $notification = $this->notificationModel->getEntity($objectId);
 
         // set the page we came from
@@ -219,7 +217,7 @@ final class MobileNotificationController extends FormController
                 'notification' => $notification,
                 'trackables'   => $trackableLinks,
                 'logs'         => $logs,
-                'permissions'  => $security->isGranted([
+                'permissions'  => $this->security->isGranted([
                     'notification:mobile_notifications:viewown',
                     'notification:mobile_notifications:viewother',
                     'notification:mobile_notifications:create',
@@ -230,7 +228,7 @@ final class MobileNotificationController extends FormController
                     'notification:mobile_notifications:publishown',
                     'notification:mobile_notifications:publishother',
                 ], 'RETURN_ARRAY'),
-                'security'    => $security,
+                'security'    => $this->security,
                 'entityViews' => $entityViews,
                 'contacts'    => $this->forward(
                     'Mautic\NotificationBundle\Controller\MobileNotificationController::contactsAction',
