@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Helper\HashHelper;
 
-/**
- * Interface HashHelperInterface.
- */
 interface HashHelperInterface
 {
     /**

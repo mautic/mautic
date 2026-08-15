@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Builder;
 
-/**
- * Interface ReportBuilderInterface.
- */
 interface ReportBuilderInterface
 {
     /**

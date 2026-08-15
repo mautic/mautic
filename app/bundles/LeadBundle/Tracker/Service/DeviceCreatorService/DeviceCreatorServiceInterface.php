@@ -8,9 +8,6 @@ use DeviceDetector\DeviceDetector;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 
-/**
- * Interface DeviceCreatorServiceInterface.
- */
 interface DeviceCreatorServiceInterface
 {
     /**
