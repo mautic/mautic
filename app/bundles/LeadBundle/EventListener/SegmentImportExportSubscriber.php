@@ -27,15 +27,15 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
     use ImportExportTrait;
 
     public function __construct(
-        private ListModel $leadListModel,
-        private EntityManagerInterface $entityManager,
-        private LeadListRepository $leadListRepository,
-        private AuditLogModel $auditLogModel,
-        private PluginModel $pluginModel,
-        private EventDispatcherInterface $dispatcher,
-        private FieldModel $fieldModel,
-        private IpLookupHelper $ipLookupHelper,
-        private DenormalizerInterface $serializer,
+        private readonly ListModel $leadListModel,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly LeadListRepository $leadListRepository,
+        private readonly AuditLogModel $auditLogModel,
+        private readonly PluginModel $pluginModel,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly FieldModel $fieldModel,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly DenormalizerInterface $serializer,
     ) {
     }
 

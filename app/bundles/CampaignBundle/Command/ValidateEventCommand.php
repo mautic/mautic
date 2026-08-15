@@ -21,9 +21,9 @@ final class ValidateEventCommand extends Command
     use WriteCountTrait;
 
     public function __construct(
-        private InactiveExecutioner $inactiveExecution,
-        private TranslatorInterface $translator,
-        private FormatterHelper $formatterHelper,
+        private readonly InactiveExecutioner $inactiveExecution,
+        private readonly TranslatorInterface $translator,
+        private readonly FormatterHelper $formatterHelper,
     ) {
         parent::__construct();
     }

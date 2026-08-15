@@ -31,17 +31,17 @@ final class DynamicContentSubscriber implements EventSubscriberInterface
     use MatchFilterForLeadTrait;
 
     public function __construct(
-        private TrackableModel $trackableModel,
-        private PageTokenHelper $pageTokenHelper,
-        private AssetTokenHelper $assetTokenHelper,
-        private FormTokenHelper $formTokenHelper,
-        private FocusTokenHelper $focusTokenHelper,
-        private AuditLogModel $auditLogModel,
-        private DynamicContentHelper $dynamicContentHelper,
-        private DynamicContentModel $dynamicContentModel,
-        private CorePermissions $security,
-        private ContactTracker $contactTracker,
-        private CompanyModel $companyModel,
+        private readonly TrackableModel $trackableModel,
+        private readonly PageTokenHelper $pageTokenHelper,
+        private readonly AssetTokenHelper $assetTokenHelper,
+        private readonly FormTokenHelper $formTokenHelper,
+        private readonly FocusTokenHelper $focusTokenHelper,
+        private readonly AuditLogModel $auditLogModel,
+        private readonly DynamicContentHelper $dynamicContentHelper,
+        private readonly DynamicContentModel $dynamicContentModel,
+        private readonly CorePermissions $security,
+        private readonly ContactTracker $contactTracker,
+        private readonly CompanyModel $companyModel,
     ) {
     }
 

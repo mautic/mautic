@@ -41,7 +41,7 @@ final class NoUnusedServiceNameRule implements Rule
     private const MODEL_ID_PATTERN = '#^mautic\.[a-zA-Z0-9_]+\.model\.[a-zA-Z0-9_]+$#';
 
     public function __construct(
-        private ServiceNameUsageResolver $serviceNameUsageResolver,
+        private readonly ServiceNameUsageResolver $serviceNameUsageResolver,
     ) {
     }
 

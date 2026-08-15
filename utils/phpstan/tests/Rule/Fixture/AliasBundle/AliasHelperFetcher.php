@@ -9,7 +9,7 @@ use Psr\Container\ContainerInterface;
 final class AliasHelperFetcher
 {
     public function __construct(
-        private ContainerInterface $container,
+        private readonly ContainerInterface $container,
     ) {
     }
 

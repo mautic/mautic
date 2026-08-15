@@ -12,12 +12,12 @@ final class PageHitNotification
     use MessageRequestTrait;
 
     public function __construct(
-        private int $hitId,
-        private Request $request,
-        private bool $isNew,
-        private bool $isRedirect,
-        private ?int $pageId = null,
-        private ?int $leadId = null,
+        private readonly int $hitId,
+        private readonly Request $request,
+        private readonly bool $isNew,
+        private readonly bool $isRedirect,
+        private readonly ?int $pageId = null,
+        private readonly ?int $leadId = null,
         ?\DateTimeInterface $eventTime = null,
     ) {
         $this->setEventTime($eventTime ?? new \DateTimeImmutable());

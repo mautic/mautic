@@ -25,10 +25,10 @@ class LegacyEventDispatcher
     use EventArrayTrait;
 
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
-        private EventScheduler $scheduler,
-        private LoggerInterface $logger,
-        private ContactTracker $contactTracker,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly EventScheduler $scheduler,
+        private readonly LoggerInterface $logger,
+        private readonly ContactTracker $contactTracker,
     ) {
     }
 

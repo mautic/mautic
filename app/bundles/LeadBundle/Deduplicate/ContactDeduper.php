@@ -17,8 +17,8 @@ final class ContactDeduper
     public function __construct(
         FieldList $fieldList,
         FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
-        private ContactMerger $contactMerger,
-        private LeadRepository $leadRepository,
+        private readonly ContactMerger $contactMerger,
+        private readonly LeadRepository $leadRepository,
     ) {
         $this->fieldList                  = $fieldList;
         $this->fieldsWithUniqueIdentifier = $fieldsWithUniqueIdentifier;

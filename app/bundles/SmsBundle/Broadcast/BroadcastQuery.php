@@ -17,7 +17,7 @@ final class BroadcastQuery
     private QueryBuilder $query;
 
     public function __construct(
-        private EntityManagerInterface $entityManager,
+        private readonly EntityManagerInterface $entityManager,
         private readonly SmsRepository $smsRepository,
     ) {
     }

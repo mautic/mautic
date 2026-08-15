@@ -30,10 +30,10 @@ final class ContactSegmentQueryBuilder
     private array $dependencyMap = [];
 
     public function __construct(
-        private EntityManagerInterface $entityManager,
-        private RandomParameterName $randomParameterName,
-        private EventDispatcherInterface $dispatcher,
-        private LeadListRepository $leadListRepository,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly RandomParameterName $randomParameterName,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly LeadListRepository $leadListRepository,
     ) {
     }
 

@@ -47,8 +47,8 @@ final class ListApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        private ListModel $listModel,
-        private LeadModel $leadModel,
+        private readonly ListModel $listModel,
+        private readonly LeadModel $leadModel,
     ) {
         $this->model            = $listModel;
         $this->entityClass      = LeadList::class;

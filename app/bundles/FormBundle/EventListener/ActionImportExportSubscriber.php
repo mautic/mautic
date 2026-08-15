@@ -28,14 +28,14 @@ final class ActionImportExportSubscriber implements EventSubscriberInterface
     use ImportExportTrait;
 
     public function __construct(
-        private EntityManagerInterface $entityManager,
-        private ActionRepository $actionRepository,
-        private FormRepository $formRepository,
-        private ActionModel $actionModel,
-        private AuditLogModel $auditLogModel,
-        private IpLookupHelper $ipLookupHelper,
-        private EventDispatcherInterface $dispatcher,
-        private DenormalizerInterface $serializer,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly ActionRepository $actionRepository,
+        private readonly FormRepository $formRepository,
+        private readonly ActionModel $actionModel,
+        private readonly AuditLogModel $auditLogModel,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly DenormalizerInterface $serializer,
     ) {
     }
 

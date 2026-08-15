@@ -35,14 +35,14 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
     use ImportExportTrait;
 
     public function __construct(
-        private CampaignModel $campaignModel,
-        private UserModel $userModel,
-        private EntityManagerInterface $entityManager,
-        private CampaignRepository $campaignRepository,
-        private EventDispatcherInterface $dispatcher,
-        private LoggerInterface $logger,
-        private AuditLogModel $auditLogModel,
-        private IpLookupHelper $ipLookupHelper,
+        private readonly CampaignModel $campaignModel,
+        private readonly UserModel $userModel,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly CampaignRepository $campaignRepository,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly LoggerInterface $logger,
+        private readonly AuditLogModel $auditLogModel,
+        private readonly IpLookupHelper $ipLookupHelper,
     ) {
     }
 

@@ -11,7 +11,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ContainerGetService
 {
     public function __construct(
-        private ContainerInterface $container,
+        private readonly ContainerInterface $container,
     ) {
     }
 

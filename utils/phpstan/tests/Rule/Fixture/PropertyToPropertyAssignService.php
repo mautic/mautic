@@ -6,7 +6,7 @@ namespace Utils\PHPStan\Tests\Rule\Fixture;
 
 final class PropertyToPropertyAssignService
 {
-    private \stdClass $repository;
+    private readonly \stdClass $repository;
 
     private int $count = 0;
 

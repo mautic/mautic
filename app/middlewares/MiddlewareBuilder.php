@@ -6,11 +6,11 @@ use Mautic\CoreBundle\Cache\MiddlewareCacheWarmer;
 
 final class MiddlewareBuilder
 {
-    private \AppKernel $app;
+    private readonly \AppKernel $app;
 
-    private string $cacheFile;
+    private readonly string $cacheFile;
 
-    private \SplPriorityQueue $specs;
+    private readonly \SplPriorityQueue $specs;
 
     public function __construct(\AppKernel $app)
     {

@@ -23,12 +23,12 @@ final class GroupImportExportSubscriber implements EventSubscriberInterface
     use ImportExportTrait;
 
     public function __construct(
-        private PointGroupModel $pointGroupModel,
-        private EntityManagerInterface $entityManager,
-        private GroupRepository $groupRepository,
-        private AuditLogModel $auditLogModel,
-        private IpLookupHelper $ipLookupHelper,
-        private DenormalizerInterface $serializer,
+        private readonly PointGroupModel $pointGroupModel,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly GroupRepository $groupRepository,
+        private readonly AuditLogModel $auditLogModel,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly DenormalizerInterface $serializer,
     ) {
     }
 

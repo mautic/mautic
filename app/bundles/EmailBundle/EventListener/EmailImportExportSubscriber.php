@@ -29,15 +29,15 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
     use ImportExportTrait;
 
     public function __construct(
-        private EmailModel $emailModel,
-        private EntityManagerInterface $entityManager,
-        private EmailRepository $emailRepository,
-        private FormRepository $formRepository,
-        private PageRepository $pageRepository,
-        private EventDispatcherInterface $dispatcher,
-        private AuditLogModel $auditLogModel,
-        private IpLookupHelper $ipLookupHelper,
-        private DenormalizerInterface $serializer,
+        private readonly EmailModel $emailModel,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly EmailRepository $emailRepository,
+        private readonly FormRepository $formRepository,
+        private readonly PageRepository $pageRepository,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly AuditLogModel $auditLogModel,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly DenormalizerInterface $serializer,
     ) {
     }
 

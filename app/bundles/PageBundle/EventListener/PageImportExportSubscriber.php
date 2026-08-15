@@ -23,12 +23,12 @@ final class PageImportExportSubscriber implements EventSubscriberInterface
     use ImportExportTrait;
 
     public function __construct(
-        private PageModel $pageModel,
-        private EntityManagerInterface $entityManager,
-        private PageRepository $pageRepository,
-        private AuditLogModel $auditLogModel,
-        private IpLookupHelper $ipLookupHelper,
-        private DenormalizerInterface $serializer,
+        private readonly PageModel $pageModel,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly PageRepository $pageRepository,
+        private readonly AuditLogModel $auditLogModel,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly DenormalizerInterface $serializer,
     ) {
     }
 

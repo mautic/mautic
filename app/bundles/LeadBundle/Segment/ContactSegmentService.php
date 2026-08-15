@@ -13,9 +13,9 @@ class ContactSegmentService
     use LeadBatchLimiterTrait;
 
     public function __construct(
-        private ContactSegmentFilterFactory $contactSegmentFilterFactory,
-        private ContactSegmentQueryBuilder $contactSegmentQueryBuilder,
-        private LoggerInterface $logger,
+        private readonly ContactSegmentFilterFactory $contactSegmentFilterFactory,
+        private readonly ContactSegmentQueryBuilder $contactSegmentQueryBuilder,
+        private readonly LoggerInterface $logger,
     ) {
     }
 

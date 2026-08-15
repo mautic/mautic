@@ -23,12 +23,12 @@ final class AssetImportExportSubscriber implements EventSubscriberInterface
     use ImportExportTrait;
 
     public function __construct(
-        private AssetModel $assetModel,
-        private EntityManagerInterface $entityManager,
-        private AssetRepository $assetRepository,
-        private AuditLogModel $auditLogModel,
-        private IpLookupHelper $ipLookupHelper,
-        private DenormalizerInterface $serializer,
+        private readonly AssetModel $assetModel,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly AssetRepository $assetRepository,
+        private readonly AuditLogModel $auditLogModel,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly DenormalizerInterface $serializer,
     ) {
     }
 

@@ -43,8 +43,8 @@ final class BatchTransport extends AbstractTransport implements TokenTransportIn
     private ?MauticMessage $message = null;
 
     public function __construct(
-        private bool $validate = false,
-        private int $maxRecipients = 4,
+        private readonly bool $validate = false,
+        private readonly int $maxRecipients = 4,
         private int $numberToFail = 1,
     ) {
         $this->transports['main'] = $this;

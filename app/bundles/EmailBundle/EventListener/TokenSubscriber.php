@@ -17,9 +17,9 @@ class TokenSubscriber implements EventSubscriberInterface
     use MatchFilterForLeadTrait;
 
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
-        private PrimaryCompanyHelper $primaryCompanyHelper,
-        private LeadListRepository $segmentRepository,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly PrimaryCompanyHelper $primaryCompanyHelper,
+        private readonly LeadListRepository $segmentRepository,
     ) {
     }
 

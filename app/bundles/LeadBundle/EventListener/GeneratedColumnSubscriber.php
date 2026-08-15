@@ -19,8 +19,8 @@ final class GeneratedColumnSubscriber implements EventSubscriberInterface
     use SegmentFilterIconTrait;
 
     public function __construct(
-        private ListModel $segmentModel,
-        private TranslatorInterface $translator,
+        private readonly ListModel $segmentModel,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 

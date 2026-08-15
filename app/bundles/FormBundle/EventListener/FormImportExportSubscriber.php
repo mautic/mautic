@@ -26,13 +26,13 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
     use ImportExportTrait;
 
     public function __construct(
-        private EntityManagerInterface $entityManager,
-        private FormRepository $formRepository,
-        private FormModel $formModel,
-        private AuditLogModel $auditLogModel,
-        private IpLookupHelper $ipLookupHelper,
-        private EventDispatcherInterface $dispatcher,
-        private DenormalizerInterface $serializer,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly FormRepository $formRepository,
+        private readonly FormModel $formModel,
+        private readonly AuditLogModel $auditLogModel,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly DenormalizerInterface $serializer,
     ) {
     }
 

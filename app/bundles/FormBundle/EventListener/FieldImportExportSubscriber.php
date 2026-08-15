@@ -29,15 +29,15 @@ final class FieldImportExportSubscriber implements EventSubscriberInterface
     use ImportExportTrait;
 
     public function __construct(
-        private EntityManagerInterface $entityManager,
-        private FieldRepository $fieldRepository,
-        private FormRepository $formRepository,
-        private AuditLogModel $auditLogModel,
-        private IpLookupHelper $ipLookupHelper,
-        private FieldModel $fieldModel,
-        private LeadFieldModel $leadFieldModel,
-        private EventDispatcherInterface $dispatcher,
-        private DenormalizerInterface $serializer,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly FieldRepository $fieldRepository,
+        private readonly FormRepository $formRepository,
+        private readonly AuditLogModel $auditLogModel,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly FieldModel $fieldModel,
+        private readonly LeadFieldModel $leadFieldModel,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly DenormalizerInterface $serializer,
     ) {
     }
 

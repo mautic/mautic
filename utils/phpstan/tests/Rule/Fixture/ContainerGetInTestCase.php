@@ -11,7 +11,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ContainerGetInTestCase
 {
     public function __construct(
-        private ContainerInterface $container,
+        private readonly ContainerInterface $container,
     ) {
     }
 

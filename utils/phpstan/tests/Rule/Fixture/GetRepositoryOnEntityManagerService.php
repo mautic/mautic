@@ -9,7 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 class GetRepositoryOnEntityManagerService
 {
     public function __construct(
-        private EntityManagerInterface $entityManager,
+        private readonly EntityManagerInterface $entityManager,
     ) {
     }
 

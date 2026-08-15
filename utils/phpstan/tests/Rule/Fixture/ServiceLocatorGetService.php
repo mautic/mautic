@@ -10,7 +10,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 class ServiceLocatorGetService
 {
     public function __construct(
-        private ServiceLocator $locator,
+        private readonly ServiceLocator $locator,
     ) {
     }
 

@@ -12,8 +12,8 @@ final class EmailHitNotification
     use MessageRequestTrait;
 
     public function __construct(
-        private string $statId,
-        private Request $request,
+        private readonly string $statId,
+        private readonly Request $request,
         ?\DateTimeInterface $eventTime = null,
     ) {
         $this->setEventTime($eventTime ?? new \DateTimeImmutable());

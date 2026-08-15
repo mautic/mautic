@@ -30,10 +30,10 @@ final class LeadType extends AbstractType
     use EntityFieldsBuildFormTrait;
 
     public function __construct(
-        private TranslatorInterface $translator,
-        private CompanyModel $companyModel,
-        private EntityManagerInterface $entityManager,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly TranslatorInterface $translator,
+        private readonly CompanyModel $companyModel,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

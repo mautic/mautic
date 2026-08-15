@@ -55,7 +55,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         protected TrackableModel $pageTrackableModel,
         protected LeadModel $leadModel,
         protected TransportChain $transport,
-        private CacheProviderInterface $cacheProvider,
+        private readonly CacheProviderInterface $cacheProvider,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,

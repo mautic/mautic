@@ -52,7 +52,7 @@ final class LeadApiController extends CommonApiController
      */
     protected $model;
 
-    private DoNotContactModel $doNotContactModel;
+    private readonly DoNotContactModel $doNotContactModel;
 
     public function __construct(
         CorePermissions $security,
@@ -62,21 +62,21 @@ final class LeadApiController extends CommonApiController
         FormFactoryInterface $formFactory,
         DoNotContactModel $doNotContactModel,
         AppVersion $appVersion,
-        private ContactMerger $contactMerger,
-        private UserHelper $userHelper,
-        private IpLookupHelper $ipLookupHelper,
+        private readonly ContactMerger $contactMerger,
+        private readonly UserHelper $userHelper,
+        private readonly IpLookupHelper $ipLookupHelper,
         RequestStack $requestStack,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        private CampaignModel $campaignModel,
-        private FieldModel $leadFieldModel,
+        private readonly CampaignModel $campaignModel,
+        private readonly FieldModel $leadFieldModel,
         LeadModel $leadModel,
-        private StageModel $stageModel,
-        private UserModel $userModel,
-        private DeviceModel $deviceModel,
-        private NoteModel $noteModel,
+        private readonly StageModel $stageModel,
+        private readonly UserModel $userModel,
+        private readonly DeviceModel $deviceModel,
+        private readonly NoteModel $noteModel,
     ) {
         $this->doNotContactModel = $doNotContactModel;
 

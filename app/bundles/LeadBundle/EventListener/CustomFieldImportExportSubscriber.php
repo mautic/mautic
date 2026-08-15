@@ -23,12 +23,12 @@ final class CustomFieldImportExportSubscriber implements EventSubscriberInterfac
     use ImportExportTrait;
 
     public function __construct(
-        private FieldModel $fieldModel,
-        private EntityManagerInterface $entityManager,
-        private LeadFieldRepository $leadFieldRepository,
-        private AuditLogModel $auditLogModel,
-        private IpLookupHelper $ipLookupHelper,
-        private DenormalizerInterface $serializer,
+        private readonly FieldModel $fieldModel,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly LeadFieldRepository $leadFieldRepository,
+        private readonly AuditLogModel $auditLogModel,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly DenormalizerInterface $serializer,
     ) {
     }
 

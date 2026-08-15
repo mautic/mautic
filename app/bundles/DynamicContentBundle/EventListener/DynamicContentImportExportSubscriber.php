@@ -23,12 +23,12 @@ final class DynamicContentImportExportSubscriber implements EventSubscriberInter
     use ImportExportTrait;
 
     public function __construct(
-        private DynamicContentModel $dynamicContentModel,
-        private EntityManagerInterface $entityManager,
-        private DynamicContentRepository $dynamicContentRepository,
-        private AuditLogModel $auditLogModel,
-        private IpLookupHelper $ipLookupHelper,
-        private DenormalizerInterface $serializer,
+        private readonly DynamicContentModel $dynamicContentModel,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly DynamicContentRepository $dynamicContentRepository,
+        private readonly AuditLogModel $auditLogModel,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly DenormalizerInterface $serializer,
     ) {
     }
 
