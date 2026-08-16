@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Loader\ParameterLoader;
 class PathsHelper
 {
     /**
-     * @var array<string, string>
+     * @var array{themes: string, images: string, translations: string, assets: string, media: string, bundles: string, plugins: string, root: string}
      */
     private readonly array $paths;
 

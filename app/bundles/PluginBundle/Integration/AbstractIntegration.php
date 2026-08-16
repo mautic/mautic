@@ -1129,12 +1129,6 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     public function extractAuthKeys($data, $tokenOverride = null)
     {
-        // check to see if an entity exists
-        $entity = $this->settings;
-        if (null == $entity) {
-            $entity = new Integration();
-            $entity->setName($this->getName());
-        }
         // Prepare the keys for extraction such as renaming, setting expiry, etc
         $data = $this->prepareResponseForExtraction($data);
 
@@ -1143,7 +1137,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         if (is_array($data) && isset($data[$authTokenKey])) {
             $keys      = $this->mergeApiKeys($data, null, true);
             $encrypted = $this->encryptApiKeys($keys);
-            $entity->setApiKeys($encrypted);
+            $this->settings->setApiKeys($encrypted);
 
             if ($this->requestStack->getCurrentRequest()?->hasSession()) {
                 $this->requestStack->getSession()->set($this->getName().'_tokenResponse', $data);
@@ -1167,10 +1161,10 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         }
 
         // save the data
-        $this->em->persist($entity);
+        $this->em->persist($this->settings);
         $this->em->flush();
 
-        $this->setIntegrationSettings($entity);
+        $this->setIntegrationSettings($this->settings);
 
         return $error;
     }

@@ -92,8 +92,13 @@ parameters:
 		- '#Call to an undefined method PHPUnit\\Framework\\MockObject\\MockObject#'
 		- '#expects (.*?) PHPUnit\\Framework\\MockObject\\MockObject given#'
 
-		# on purposelater
-		#- '#Call to method PHPUnit\\Framework\\Assert::assertInstanceOf\(\) with (.*?) and (.*?) will always evaluate to#'
+		# include magic
+		-
+			path: app/bundles/CoreBundle/Helper/PathsHelper.php
+			message: '#Offset (.*?) does not exist on array{}#'
+		-
+			path: app/bundles/CoreBundle/Helper/PathsHelper.php
+			message: '#Property Mautic\\CoreBundle\\Helper\\PathsHelper::\$paths (.*?) does not accept array#'
 
 		# can't figure out what the right type should be for FormBuilderInterface
 		- '#buildForm\(\) expects Symfony\\Component\\Form\\FormBuilderInterface<array<mixed>\|null>, Symfony\\Component\\Form\\FormBuilderInterface<array<mixed>\|null> given#'
@@ -107,7 +112,7 @@ parameters:
 			message: '#Call to an undefined method Mautic\\IntegrationsBundle\\Auth\\Provider\\AuthCredentialsInterface::#'
 			path: app/bundles/IntegrationsBundle/Auth/Provider/Oauth2ThreeLegged/HttpFactory.php
 
-        # deprecation
+		# deprecation
 		-
 			identifier: return.deprecatedClass
 			message: '#Return type of method (Mautic|MauticPlugin)\\(.*?)\\EventListener\\CampaignSubscriber::(.*?) has typehint with deprecated class Mautic\\CampaignBundle\\Event\\CampaignExecutionEvent#'
