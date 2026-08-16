@@ -27,7 +27,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends FormModel<Tag>
  */
-class TagModel extends FormModel
+final class TagModel extends FormModel
 {
     private ReportRepository $reportRepository;
 
