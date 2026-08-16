@@ -409,7 +409,6 @@ final class EventController extends CommonFormController
     {
         $campaignId     = $request->query->get('campaignId');
         $this->setCampaignElements($request->request);
-        $modifiedEvents = $this->modifiedEvents;
         $deletedEvents  = $this->deletedEvents;
 
         // ajax only for form fields
@@ -425,7 +424,7 @@ final class EventController extends CommonFormController
             $this->throwAccessDenied();
         }
 
-        $event = $modifiedEvents[$objectId] ?? null;
+        $event = $this->modifiedEvents[$objectId] ?? null;
 
         if ('POST' === $request->getMethod() && null !== $event) {
             $events = $this->eventCollector->getEventsArray();
@@ -476,7 +475,6 @@ final class EventController extends CommonFormController
         $campaignId     = $request->query->get('campaignId');
         $session        = $request->getSession();
         $this->setCampaignElements($request->request);
-        $modifiedEvents = $this->modifiedEvents;
         $campaign       = $this->campaignModel->getEntity($campaignId);
 
         // ajax only for form fields
@@ -492,7 +490,7 @@ final class EventController extends CommonFormController
             $this->throwAccessDenied();
         }
 
-        $event = $modifiedEvents[$objectId] ?? null;
+        $event = $this->modifiedEvents[$objectId] ?? null;
 
         if ('POST' === $request->getMethod() && null !== $event) {
             $keyId          = 'new'.hash('sha1', uniqid((string) mt_rand()));

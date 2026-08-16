@@ -128,15 +128,19 @@ class ListModel extends FormModel implements GlobalSearchInterface
         $alias = $this->cleanAlias($alias, '', 0, '-');
 
         // make sure alias is not already taken
+<<<<<<< HEAD
         $repo      = $this->getRepository();
+=======
+>>>>>>> bba3ffabf5 ([php] remove just variable assigns)
         $testAlias = $alias;
-        $existing  = $repo->getLists(null, $testAlias, $entity->getId(), false);
+
+        $existing  = $this->leadListRepository->getLists(null, $testAlias, $entity->getId(), false);
         $count     = count($existing);
         $aliasTag  = $count;
 
         while ($count) {
             $testAlias = $alias.$aliasTag;
-            $existing  = $repo->getLists(null, $testAlias, $entity->getId(), false);
+            $existing  = $this->leadListRepository->getLists(null, $testAlias, $entity->getId(), false);
             $count     = count($existing);
             ++$aliasTag;
         }
@@ -151,7 +155,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         }
 
         $event = $this->dispatchEvent('pre_save', $entity, $isNew);
-        $repo->saveEntity($entity);
+        $this->leadListRepository->saveEntity($entity);
         $this->dispatchEvent('post_save', $entity, $isNew, $event);
     }
 
