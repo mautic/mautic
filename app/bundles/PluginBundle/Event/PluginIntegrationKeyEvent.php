@@ -6,7 +6,7 @@ namespace Mautic\PluginBundle\Event;
 
 use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
-final class PluginIntegrationKeyEvent extends AbstractPluginIntegrationEvent
+class PluginIntegrationKeyEvent extends AbstractPluginIntegrationEvent
 {
     public function __construct(
         UnifiedIntegrationInterface $integration,

@@ -7,7 +7,7 @@ use Doctrine\Common\Collections\Order;
 /**
  * @extends CommonRepository<Notification>
  */
-final class NotificationRepository extends CommonRepository
+class NotificationRepository extends CommonRepository
 {
     public function getTableAlias(): string
     {
