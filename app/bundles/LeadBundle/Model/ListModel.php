@@ -128,10 +128,6 @@ class ListModel extends FormModel implements GlobalSearchInterface
         $alias = $this->cleanAlias($alias, '', 0, '-');
 
         // make sure alias is not already taken
-<<<<<<< HEAD
-        $repo      = $this->getRepository();
-=======
->>>>>>> bba3ffabf5 ([php] remove just variable assigns)
         $testAlias = $alias;
 
         $existing  = $this->leadListRepository->getLists(null, $testAlias, $entity->getId(), false);
