@@ -1985,7 +1985,7 @@ class UnitOfWork implements PropertyChangedListener
 
         $associationMappings = array_filter(
             $class->associationMappings,
-            function ($assoc) { return $assoc['isCascadeRefresh']; }
+            fn ($assoc) => $assoc['isCascadeRefresh']
         );
 
         foreach ($associationMappings as $assoc) {
@@ -2026,7 +2026,7 @@ class UnitOfWork implements PropertyChangedListener
 
         $associationMappings = array_filter(
             $class->associationMappings,
-            function ($assoc) { return $assoc['isCascadeDetach']; }
+            fn ($assoc) => $assoc['isCascadeDetach']
         );
 
         foreach ($associationMappings as $assoc) {
@@ -2068,7 +2068,7 @@ class UnitOfWork implements PropertyChangedListener
 
         $associationMappings = array_filter(
             $class->associationMappings,
-            function ($assoc) { return $assoc['isCascadeMerge']; }
+            fn ($assoc) => $assoc['isCascadeMerge']
         );
 
         foreach ($associationMappings as $assoc) {
@@ -2104,7 +2104,7 @@ class UnitOfWork implements PropertyChangedListener
 
         $associationMappings = array_filter(
             $class->associationMappings,
-            function ($assoc) { return $assoc['isCascadePersist']; }
+            fn ($assoc) => $assoc['isCascadePersist']
         );
 
         foreach ($associationMappings as $assoc) {
@@ -2154,7 +2154,7 @@ class UnitOfWork implements PropertyChangedListener
 
         $associationMappings = array_filter(
             $class->associationMappings,
-            function ($assoc) { return $assoc['isCascadeRemove']; }
+            fn ($assoc) => $assoc['isCascadeRemove']
         );
 
         $entitiesToCascade = [];
@@ -2852,7 +2852,7 @@ class UnitOfWork implements PropertyChangedListener
      */
     public function size()
     {
-        $countArray = array_map(function ($item) { return count($item); }, $this->identityMap);
+        $countArray = array_map(fn ($item) => count($item), $this->identityMap);
 
         return array_sum($countArray);
     }
