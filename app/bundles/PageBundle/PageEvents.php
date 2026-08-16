@@ -90,12 +90,12 @@ final class PageEvents
     public const string ON_CAMPAIGN_TRIGGER_DECISION = 'mautic.page.on_campaign_trigger_decision';
 
     /**
-     * The mautic.page.on_campaign_trigger_action event is fired when the campaign action fired.
+     * The mautic.page.on_campaign_batch_action event is fired when the campaign action fired.
      *
      * The event listener receives a
-     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
+     * Mautic\CampaignBundle\Event\PendingEvent
      */
-    public const string ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.page.on_campaign_trigger_action';
+    public const string ON_CAMPAIGN_BATCH_ACTION = 'mautic.page.on_campaign_batch_action';
 
     /**
      * The mautic.page.on_redirect_generate event is fired when generating a redirect.

@@ -4,7 +4,7 @@ namespace Mautic\PluginBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
-use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\PluginBundle\Form\Type\IntegrationsListType;
 use Mautic\PluginBundle\PluginEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -16,8 +16,8 @@ final class CampaignSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CampaignEvents::CAMPAIGN_ON_BUILD        => ['onCampaignBuild', 0],
-            PluginEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignTriggerAction', 0],
+            CampaignEvents::CAMPAIGN_ON_BUILD      => ['onCampaignBuild', 0],
+            PluginEvents::ON_CAMPAIGN_BATCH_ACTION => ['onCampaignTriggerAction', 0],
         ];
     }
 
@@ -27,32 +27,32 @@ final class CampaignSubscriber implements EventSubscriberInterface
             'label'       => 'mautic.plugin.actions.push_lead',
             'description' => 'mautic.plugin.actions.tooltip',
             'formType'    => IntegrationsListType::class,
-            'formTheme'   => '@MauticPlugin/FormTheme/Integration/layout.html.twig',
-            'eventName'   => PluginEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+            'formTheme'      => '@MauticPlugin/FormTheme/Integration/layout.html.twig',
+            'batchEventName' => PluginEvents::ON_CAMPAIGN_BATCH_ACTION,
         ];
 
         $event->addAction('plugin.leadpush', $action);
     }
 
-    public function onCampaignTriggerAction(CampaignExecutionEvent $event): void
+    public function onCampaignTriggerAction(PendingEvent $event): void
     {
-        $config                  = $event->getConfig();
-        $config['campaignEvent'] = $event->getEvent();
-        $config['leadEventLog']  = $event->getLogEntry();
-        $lead                    = $event->getLead();
-        $errors                  = [];
-        $success                 = $this->pushToIntegration($config, $lead, $errors);
+        $campaignEvent = $event->getEvent();
 
-        if (count($errors)) {
-            $log = $event->getLogEntry();
-            $log->appendToMetadata(
-                [
-                    'failed' => 1,
-                    'reason' => implode('<br />', $errors),
-                ]
-            );
+        foreach ($event->getPending() as $log) {
+            $config                  = $campaignEvent->getProperties();
+            $config['campaignEvent'] = $campaignEvent;
+            $config['leadEventLog']  = $log;
+            $lead                    = $log->getLead();
+            $errors                  = [];
+            $success                 = $this->pushToIntegration($config, $lead, $errors);
+
+            if ($success) {
+                $event->pass($log);
+
+                continue;
+            }
+
+            $event->fail($log, $errors ? implode('<br />', $errors) : 'Integration push failed.');
         }
-
-        $event->setResult($success);
     }
 }

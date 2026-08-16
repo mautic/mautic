@@ -24,7 +24,6 @@ final readonly class ActionDispatcher
         private EventDispatcherInterface $dispatcher,
         private LoggerInterface $logger,
         private EventScheduler $scheduler,
-        private LegacyEventDispatcher $legacyDispatcher,
     ) {
     }
 
@@ -38,7 +37,6 @@ final readonly class ActionDispatcher
             $pendingEvent = new PendingEvent($config, $event, $logs);
         }
 
-        // this if statement can be removed when legacy dispatcher is removed
         if ($customEvent = $config->getBatchEventName()) {
             $this->dispatcher->dispatch($pendingEvent, $customEvent);
 
@@ -55,10 +53,6 @@ final readonly class ActionDispatcher
                 $this->dispatchFailedEvent($config, $failed);
             }
         }
-
-        // Execute BC eventName or callback. Or support case where the listener has been converted to batchEventName but still wants to execute
-        // eventName for BC support for plugins that could be listening to it's own custom event.
-        $this->legacyDispatcher->dispatchCustomEvent($config, $logs, $customEvent, $pendingEvent);
 
         return $pendingEvent;
     }

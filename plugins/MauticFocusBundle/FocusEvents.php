@@ -45,12 +45,12 @@ final class FocusEvents
     public const string TOKEN_REPLACEMENT = 'mautic.focus_token_replacement';
 
     /**
-     * The mautic.focus.on_campaign_trigger_action event is fired when the campaign action triggers.
+     * The mautic.focus.on_campaign_batch_action event is fired when the campaign action triggers.
      *
      * The event listener receives a
-     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
+     * Mautic\CampaignBundle\Event\PendingEvent
      */
-    public const string ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.focus.on_campaign_trigger_action';
+    public const string ON_CAMPAIGN_BATCH_ACTION = 'mautic.focus.on_campaign_batch_action';
 
     /**
      * The mautic.focus.on_open event is dispatched when an focus is opened.
