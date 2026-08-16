@@ -189,7 +189,7 @@ class WidgetDetailEvent extends CommonEvent
     /**
      * Get the widget template data.
      *
-     * @return array<mixed> $templateData
+     * @return array<mixed>
      */
     public function getTemplateData()
     {
