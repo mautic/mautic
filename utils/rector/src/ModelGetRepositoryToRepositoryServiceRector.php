@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Utils\Rector;
 
+use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Model\AbstractCommonModel;
 use PhpParser\Modifiers;
 use PhpParser\Node;
 use PhpParser\Node\Attribute;
@@ -56,7 +58,7 @@ final class ModelGetRepositoryToRepositoryServiceRector extends AbstractRector
      */
     private const TEST_CASE = 'PHPUnit\Framework\TestCase';
 
-    private const ABSTRACT_COMMON_MODEL = \Mautic\CoreBundle\Model\AbstractCommonModel::class;
+    private const ABSTRACT_COMMON_MODEL = AbstractCommonModel::class;
 
     /**
      * Generic repository bases - a model that does not override getRepository() resolves to one of these,
@@ -64,7 +66,7 @@ final class ModelGetRepositoryToRepositoryServiceRector extends AbstractRector
      */
     private const GENERIC_REPOSITORIES = [
         'Doctrine\ORM\EntityRepository',
-        \Mautic\CoreBundle\Entity\CommonRepository::class,
+        CommonRepository::class,
     ];
 
     public function __construct(
