@@ -15,7 +15,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class LeadSubscriber implements EventSubscriberInterface
+final class LeadSubscriber implements EventSubscriberInterface
 {
     use ChannelTrait;
 
