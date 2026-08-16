@@ -110,7 +110,7 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
     /**
      * @return array<string,mixed[]>
      */
-    protected function getFilterOperators(): array
+    private function getFilterOperators(): array
     {
         return $this->filterOperatorProvider->getAllOperators();
     }
