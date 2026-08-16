@@ -43,7 +43,7 @@ final class NoNullableServiceInConstructorRule implements Rule
     /**
      * @var string[]
      */
-    private const SKIPPED_EXACT_CLASSES = ['Mautic\\CoreBundle\\IpLookup\\AbstractLookup'];
+    private const SKIPPED_EXACT_CLASSES = [\Mautic\CoreBundle\IpLookup\AbstractLookup::class];
 
     public function __construct(
         private readonly ReflectionProvider $reflectionProvider,

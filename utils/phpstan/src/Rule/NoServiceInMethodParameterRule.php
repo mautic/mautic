@@ -67,7 +67,7 @@ final class NoServiceInMethodParameterRule implements Rule
      */
     private const SKIPPED_TYPES = [
         'Symfony\\Component\\DependencyInjection\\ContainerBuilder',
-        'Mautic\\CoreBundle\\Translation\\Translator',
+        \Mautic\CoreBundle\Translation\Translator::class,
     ];
 
     /**
@@ -76,7 +76,7 @@ final class NoServiceInMethodParameterRule implements Rule
      *
      * @var array<string, string>
      */
-    private const SKIPPED_PARENT_CLASS_METHODS = ['Mautic\\CoreBundle\\Model\\FormModel' => 'createform'];
+    private const SKIPPED_PARENT_CLASS_METHODS = [\Mautic\CoreBundle\Model\FormModel::class => 'createform'];
 
     /**
      * A test case has no container to inject from - it fetches services itself and hands them to its own data
@@ -97,7 +97,7 @@ final class NoServiceInMethodParameterRule implements Rule
     private const SKIPPED_CLASS_TYPES = [
         'Symfony\\Contracts\\EventDispatcher\\Event',
         'Symfony\\Component\\EventDispatcher\\Event',
-        'Mautic\\CoreBundle\\Entity\\CommonEntity',
+        \Mautic\CoreBundle\Entity\CommonEntity::class,
         'Twig\\Extension\\AbstractExtension',
         'FOS\\OAuthServerBundle\\Controller\\AuthorizeController',
     ];
