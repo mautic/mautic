@@ -886,7 +886,7 @@ final class SubmissionModel extends CommonFormModel
      *
      * @throws ValidationException
      */
-    protected function executeFormActions(SubmissionEvent $event): void
+    private function executeFormActions(SubmissionEvent $event): void
     {
         $actions          = $event->getSubmission()->getForm()->getActions();
         $customComponents = $this->formModel->getCustomComponents();
@@ -903,7 +903,7 @@ final class SubmissionModel extends CommonFormModel
      *
      * @throws ORMException
      */
-    protected function createLeadFromSubmit(Form $form, array $leadFieldMatches, $leadFields, ?Company $companyEntity = null): Lead
+    private function createLeadFromSubmit(Form $form, array $leadFieldMatches, $leadFields, ?Company $companyEntity = null): Lead
     {
         // set the mapped data
         $inKioskMode   = $form->isInKioskMode();
@@ -1174,7 +1174,7 @@ final class SubmissionModel extends CommonFormModel
     /**
      * @return bool|string True if valid; otherwise string with invalid reason
      */
-    protected function validateFieldValue(Field $field, $value)
+    private function validateFieldValue(Field $field, $value)
     {
         $standardValidation = $this->fieldHelper->validateFieldValue($field->getType(), $value, $field);
         if ([] !== $standardValidation) {
