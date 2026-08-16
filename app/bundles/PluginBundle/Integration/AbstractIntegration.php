@@ -1130,7 +1130,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     public function extractAuthKeys($data, $tokenOverride = null)
     {
         // check to see if an entity exists
-        $entity = $this->getIntegrationSettings();
+        $entity = $this->settings;
         if (null == $entity) {
             $entity = new Integration();
             $entity->setName($this->getName());
@@ -1950,7 +1950,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             }
 
             $errorMessage = $e->getMessage();
-            $errorHeader  = $this->getTranslator()->trans(
+            $errorHeader  = $this->translator->trans(
                 'mautic.integration.error',
                 [
                     '%name%' => $this->getName(),
@@ -1962,7 +1962,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                 $contactId   = $contact->getId();
                 $contactName = $contact->getPrimaryIdentifier();
             } elseif ($contactId = $e->getContactId()) {
-                $contactName = $this->getTranslator()->trans('mautic.integration.error.generic_contact_name', ['%id%' => $contactId]);
+                $contactName = $this->translator->trans('mautic.integration.error.generic_contact_name', ['%id%' => $contactId]);
             }
 
             $this->lastIntegrationError = $errorHeader.': '.$errorMessage;
@@ -1983,7 +1983,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             $messageHash = md5($errorMessage);
             if (!array_key_exists($messageHash, $this->notifications)) {
                 foreach ($this->adminUsers as $user) {
-                    $this->getNotificationModel()->addNotification(
+                    $this->notificationModel->addNotification(
                         $errorMessage,
                         $this->getName(),
                         false,
