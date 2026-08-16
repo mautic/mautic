@@ -201,17 +201,13 @@ class UnitOfWork implements PropertyChangedListener
 
     /**
      * The entity persister instances used to persist entity instances.
-     *
-     * @var array
      */
-    private $persisters = [];
+    private array $persisters = [];
 
     /**
      * The collection persister instances used to persist collections.
-     *
-     * @var array
      */
-    private $collectionPersisters = [];
+    private array $collectionPersisters = [];
 
     /**
      * The EventManager used for dispatching events.
@@ -236,10 +232,8 @@ class UnitOfWork implements PropertyChangedListener
 
     /**
      * Orphaned entities that are scheduled for removal.
-     *
-     * @var array
      */
-    private $orphanRemovals = [];
+    private array $orphanRemovals = [];
 
     /**
      * Read-Only objects are never evaluated.
@@ -250,10 +244,8 @@ class UnitOfWork implements PropertyChangedListener
 
     /**
      * Map of Entity Class-Names and corresponding IDs that should eager loaded when requested.
-     *
-     * @var array
      */
-    private $eagerLoadingEntities = [];
+    private array $eagerLoadingEntities = [];
 
     /**
      * @var bool
