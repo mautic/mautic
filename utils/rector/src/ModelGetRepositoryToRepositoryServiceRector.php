@@ -56,7 +56,7 @@ final class ModelGetRepositoryToRepositoryServiceRector extends AbstractRector
      */
     private const TEST_CASE = 'PHPUnit\Framework\TestCase';
 
-    private const ABSTRACT_COMMON_MODEL = 'Mautic\CoreBundle\Model\AbstractCommonModel';
+    private const ABSTRACT_COMMON_MODEL = \Mautic\CoreBundle\Model\AbstractCommonModel::class;
 
     /**
      * Generic repository bases - a model that does not override getRepository() resolves to one of these,
@@ -64,7 +64,7 @@ final class ModelGetRepositoryToRepositoryServiceRector extends AbstractRector
      */
     private const GENERIC_REPOSITORIES = [
         'Doctrine\ORM\EntityRepository',
-        'Mautic\CoreBundle\Entity\CommonRepository',
+        \Mautic\CoreBundle\Entity\CommonRepository::class,
     ];
 
     public function __construct(

@@ -65,7 +65,7 @@ final class NoParentConstructorForwardingRule implements Rule
      * @var string[]
      */
     private const SKIPPED_CLASSES = [
-        'Mautic\ApiBundle\Controller\CommonApiController',
+        \Mautic\ApiBundle\Controller\CommonApiController::class,
     ];
 
     public function getNodeType(): string
