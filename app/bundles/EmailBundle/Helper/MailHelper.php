@@ -640,7 +640,6 @@ class MailHelper
     }
 
     /**
-     * Search and replace tokens
      * Adapted from \Swift_Plugins_DecoratorPlugin.
      *
      * @param array $search
