@@ -915,7 +915,7 @@ class UnitOfWork implements PropertyChangedListener
         $changeSet    = [];
 
         foreach ($actualData as $propName => $actualValue) {
-            $orgValue = isset($originalData[$propName]) ? $originalData[$propName] : null;
+            $orgValue = $originalData[$propName] ?? null;
 
             if ($orgValue !== $actualValue) {
                 $changeSet[$propName] = [$orgValue, $actualValue];
@@ -2510,7 +2510,7 @@ class UnitOfWork implements PropertyChangedListener
 
                     // TODO: Is this even computed right in all cases of composite keys?
                     foreach ($assoc['targetToSourceKeyColumns'] as $targetColumn => $srcColumn) {
-                        $joinColumnValue = isset($data[$srcColumn]) ? $data[$srcColumn] : null;
+                        $joinColumnValue = $data[$srcColumn] ?? null;
 
                         if (null !== $joinColumnValue) {
                             if ($targetClass->containsForeignIdentifier) {
@@ -2796,7 +2796,7 @@ class UnitOfWork implements PropertyChangedListener
             ? $this->getEntityIdentifier($entity)
             : $class->getIdentifierValues($entity);
 
-        return isset($values[$class->identifier[0]]) ? $values[$class->identifier[0]] : null;
+        return $values[$class->identifier[0]] ?? null;
     }
 
     /**
@@ -3193,12 +3193,10 @@ class UnitOfWork implements PropertyChangedListener
         $oid1 = spl_object_hash($entity1);
         $oid2 = spl_object_hash($entity2);
 
-        $id1 = isset($this->entityIdentifiers[$oid1])
-            ? $this->entityIdentifiers[$oid1]
-            : $this->identifierFlattener->flattenIdentifier($class, $class->getIdentifierValues($entity1));
-        $id2 = isset($this->entityIdentifiers[$oid2])
-            ? $this->entityIdentifiers[$oid2]
-            : $this->identifierFlattener->flattenIdentifier($class, $class->getIdentifierValues($entity2));
+        $id1 = $this->entityIdentifiers[$oid1]
+            ?? $this->identifierFlattener->flattenIdentifier($class, $class->getIdentifierValues($entity1));
+        $id2 = $this->entityIdentifiers[$oid2]
+            ?? $this->identifierFlattener->flattenIdentifier($class, $class->getIdentifierValues($entity2));
 
         return $id1 === $id2 || implode(' ', $id1) === implode(' ', $id2);
     }
