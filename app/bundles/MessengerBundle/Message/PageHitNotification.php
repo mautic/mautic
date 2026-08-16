@@ -13,7 +13,7 @@ final class PageHitNotification
 
     public function __construct(
         private readonly int $hitId,
-        private readonly Request $request,
+        private Request $request,
         private readonly bool $isNew,
         private readonly bool $isRedirect,
         private readonly ?int $pageId = null,

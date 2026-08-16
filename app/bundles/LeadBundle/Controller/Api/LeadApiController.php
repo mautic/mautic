@@ -52,7 +52,7 @@ final class LeadApiController extends CommonApiController
      */
     protected $model;
 
-    private readonly DoNotContactModel $doNotContactModel;
+    private DoNotContactModel $doNotContactModel;
 
     public function __construct(
         CorePermissions $security,
