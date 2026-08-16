@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
 final class EventController extends CommonFormController
@@ -60,7 +61,7 @@ final class EventController extends CommonFormController
     /**
      * Generates new form and processes post data.
      */
-    public function newAction(Request $request): JsonResponse|\Symfony\Component\HttpFoundation\Response
+    public function newAction(Request $request): JsonResponse|Response
     {
         $success = 0;
         $valid   = $cancelled   = false;
@@ -197,7 +198,7 @@ final class EventController extends CommonFormController
     /**
      * Generates edit form and processes post data.
      */
-    public function editAction(Request $request, string $objectId): JsonResponse|\Symfony\Component\HttpFoundation\Response
+    public function editAction(Request $request, string $objectId): JsonResponse|Response
     {
         $valid         = $cancelled = false;
         $method        = $request->getMethod();
@@ -526,7 +527,7 @@ final class EventController extends CommonFormController
         if (empty($event)) {
             return new JsonResponse([
                 'error' => $this->translator->trans('mautic.campaign.event.clone.request.missing'),
-            ], \Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST);
+            ], Response::HTTP_BAD_REQUEST);
         }
         $session->remove('mautic.campaign.events.clone.storage');
 

@@ -32,6 +32,7 @@ use Mautic\WebhookBundle\Http\Client;
 use Mautic\WebhookBundle\Model\WebhookModel;
 use Mautic\WebhookBundle\Service\WebhookService;
 use Mautic\WebhookBundle\WebhookEvents;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\StreamInterface;
@@ -44,7 +45,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class WebhookControllerTest extends TestCase
 {
     #[DataProvider('provideNewOrUpdate')]
