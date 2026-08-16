@@ -6,9 +6,6 @@ namespace Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric;
 
 use Mautic\CoreBundle\Security\Exception\Cryptography\Symmetric\InvalidDecryptionException;
 
-/**
- * Interface SymmetricCipherInterface.
- */
 interface SymmetricCipherInterface
 {
     /**

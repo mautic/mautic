@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Entity;
 
-/**
- * Interface UserTokenRepositoryInterface.
- */
 interface UserTokenRepositoryInterface
 {
     /**
