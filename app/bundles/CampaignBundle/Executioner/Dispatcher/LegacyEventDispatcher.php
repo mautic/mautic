@@ -20,7 +20,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 /**
  * @deprecated 2.13.0 to be removed in 3.0; BC support for old listeners
  */
-class LegacyEventDispatcher
+readonly class LegacyEventDispatcher
 {
     use EventArrayTrait;
 

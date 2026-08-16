@@ -20,7 +20,7 @@ final class oAuthHelper
 
     private $callback;
 
-    private array $settings;
+    private readonly array $settings;
 
     public function __construct(
         UnifiedIntegrationInterface $integration,

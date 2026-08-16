@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\MonitoredEmail\Accessor;
 
-final class ConfigAccessor
+final readonly class ConfigAccessor
 {
     /**
      * @param mixed[] $config

@@ -18,7 +18,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
-final class CustomFieldImportExportSubscriber implements EventSubscriberInterface
+final readonly class CustomFieldImportExportSubscriber implements EventSubscriberInterface
 {
     use ImportExportTrait;
 

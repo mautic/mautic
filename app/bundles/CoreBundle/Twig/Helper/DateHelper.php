@@ -11,12 +11,12 @@ final class DateHelper
     /**
      * @var string[]
      */
-    private array $formats;
+    private readonly array $formats;
 
     /**
      * @api cannot be readonly, as changed in tests via reflection
      */
-    private DateTimeHelper $helper;
+    private readonly DateTimeHelper $helper;
 
     /**
      * @param string $dateFullFormat

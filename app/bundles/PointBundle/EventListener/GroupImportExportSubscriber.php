@@ -18,7 +18,7 @@ use Mautic\PointBundle\Model\PointGroupModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
-final class GroupImportExportSubscriber implements EventSubscriberInterface
+final readonly class GroupImportExportSubscriber implements EventSubscriberInterface
 {
     use ImportExportTrait;
 

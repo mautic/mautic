@@ -30,7 +30,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class CampaignImportExportSubscriber implements EventSubscriberInterface
+final readonly class CampaignImportExportSubscriber implements EventSubscriberInterface
 {
     use ImportExportTrait;
 

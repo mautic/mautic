@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Exception\UniqueFieldNotFoundException;
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 
-class CompanyDeduper
+readonly class CompanyDeduper
 {
     use DeduperTrait;
 

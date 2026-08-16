@@ -24,8 +24,8 @@ final class DwcEntryFiltersType extends AbstractType
     use FilterTrait;
 
     public function __construct(
-        private TranslatorInterface $translator,
-        private ListModel $listModel,
+        private readonly TranslatorInterface $translator,
+        private readonly ListModel $listModel,
     ) {
     }
 

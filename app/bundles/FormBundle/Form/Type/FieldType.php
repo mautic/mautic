@@ -30,11 +30,11 @@ final class FieldType extends AbstractType
     use FormFieldTrait;
 
     public function __construct(
-        private TranslatorInterface $translator,
-        private ObjectCollectorInterface $objectCollector,
-        private FieldCollectorInterface $fieldCollector,
-        private AlreadyMappedFieldCollectorInterface $mappedFieldCollector,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly TranslatorInterface $translator,
+        private readonly ObjectCollectorInterface $objectCollector,
+        private readonly FieldCollectorInterface $fieldCollector,
+        private readonly AlreadyMappedFieldCollectorInterface $mappedFieldCollector,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

@@ -38,13 +38,13 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
     private const string EMAIL_ALIAS = 'email';
 
     public function __construct(
-        private LeadModel $leadModel,
-        private ListModel $listModel,
-        private CampaignModel $campaignModel,
-        private EmailModel $emailModel,
-        private CategoryModel $categoryModel,
-        private AssetModel $assetModel,
-        private TranslatorInterface $translator,
+        private readonly LeadModel $leadModel,
+        private readonly ListModel $listModel,
+        private readonly CampaignModel $campaignModel,
+        private readonly EmailModel $emailModel,
+        private readonly CategoryModel $categoryModel,
+        private readonly AssetModel $assetModel,
+        private readonly TranslatorInterface $translator,
         private readonly StageRepository $stageRepository,
     ) {
     }

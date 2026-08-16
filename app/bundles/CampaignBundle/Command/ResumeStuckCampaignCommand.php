@@ -42,14 +42,14 @@ final class ResumeStuckCampaignCommand extends Command
     private const int MAX_ALLOWED_RECORDS_EACH_PROCESS = 500;
 
     public function __construct(
-        private TranslatorInterface $translator,
-        private EventModel $eventModel,
-        private CampaignRepository $campaignRepository,
-        private LeadModel $leadModel,
-        private EventExecutioner $eventExecutioner,
-        private ProcessSignalService $processSignalService,
-        private EventDispatcherInterface $eventDispatcher,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly TranslatorInterface $translator,
+        private readonly EventModel $eventModel,
+        private readonly CampaignRepository $campaignRepository,
+        private readonly LeadModel $leadModel,
+        private readonly EventExecutioner $eventExecutioner,
+        private readonly ProcessSignalService $processSignalService,
+        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct();
     }

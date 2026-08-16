@@ -40,7 +40,7 @@ final class StageApiController extends CommonApiController
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
         StageModel $stageModel,
-        private LeadModel $leadModel,
+        private readonly LeadModel $leadModel,
     ) {
         $this->model            = $stageModel;
         $this->entityClass      = Stage::class;

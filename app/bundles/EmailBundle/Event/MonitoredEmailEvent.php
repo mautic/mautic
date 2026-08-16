@@ -13,7 +13,7 @@ final class MonitoredEmailEvent extends Event
 
     public function __construct(
         private readonly FormBuilderInterface $formBuilder,
-        private array $data,
+        private readonly array $data,
     ) {
     }
 

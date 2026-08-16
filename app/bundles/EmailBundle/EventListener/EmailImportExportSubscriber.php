@@ -24,7 +24,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
-final class EmailImportExportSubscriber implements EventSubscriberInterface
+final readonly class EmailImportExportSubscriber implements EventSubscriberInterface
 {
     use ImportExportTrait;
 

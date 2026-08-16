@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 
-final class ContactDeduper
+final readonly class ContactDeduper
 {
     use DeduperTrait;
 

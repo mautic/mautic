@@ -28,14 +28,14 @@ final class SearchSubscriber implements EventSubscriberInterface
     use QueryBuilderManipulatorTrait;
 
     public function __construct(
-        private LeadModel $leadModel,
-        private CompanyModel $companyModel,
-        private ListModel $listModel,
-        private EmailRepository $emailRepository,
-        private TranslatorInterface $translator,
-        private CorePermissions $security,
-        private Environment $twig,
-        private GlobalSearch $globalSearch,
+        private readonly LeadModel $leadModel,
+        private readonly CompanyModel $companyModel,
+        private readonly ListModel $listModel,
+        private readonly EmailRepository $emailRepository,
+        private readonly TranslatorInterface $translator,
+        private readonly CorePermissions $security,
+        private readonly Environment $twig,
+        private readonly GlobalSearch $globalSearch,
         private readonly LeadRepository $leadRepository,
     ) {
     }

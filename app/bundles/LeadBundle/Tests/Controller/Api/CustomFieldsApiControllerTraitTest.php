@@ -41,7 +41,7 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
             private string $entityNameOne = 'lead';
 
             public function __construct(
-                private object $model,
+                private readonly object $model,
             ) {
             }
 
@@ -90,7 +90,7 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
             private string $entityNameOne = 'lead';
 
             public function __construct(
-                private object $model,
+                private readonly object $model,
             ) {
             }
 

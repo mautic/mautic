@@ -20,7 +20,7 @@ final class BundleMetadataBuilder
 
     public function __construct(
         private readonly array $symfonyBundles,
-        private array $paths,
+        private readonly array $paths,
     ) {
         $this->buildMetadata();
     }
