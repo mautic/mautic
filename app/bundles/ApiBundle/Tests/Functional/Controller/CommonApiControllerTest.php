@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Security\UserTokenSetter;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -28,7 +29,7 @@ final class CommonApiControllerTest extends MauticMysqlTestCase
         $this->assertInstanceOf(\DateTimeInterface::class, $email->getCheckedOut());
         $this->assertEquals('Admin User', $email->getCheckedOutByUser());
 
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_PATCH, '/api/emails/'.$email->getId().'/edit', [
+        $this->client->request(Request::METHOD_PATCH, '/api/emails/'.$email->getId().'/edit', [
             'name' => 'Updated Email',
         ]);
         $response = $this->client->getResponse();
@@ -67,7 +68,7 @@ final class CommonApiControllerTest extends MauticMysqlTestCase
 
         $this->createAndAuthenticateApiUser('api_lead_user', 'api-lead@example.com');
 
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_PATCH, '/api/contacts/'.$lead->getId().'/edit', [
+        $this->client->request(Request::METHOD_PATCH, '/api/contacts/'.$lead->getId().'/edit', [
             'firstname' => 'Updated Firstname',
         ]);
         $response = $this->client->getResponse();
@@ -94,7 +95,7 @@ final class CommonApiControllerTest extends MauticMysqlTestCase
         ];
 
         $this->client->request(
-            \Symfony\Component\HttpFoundation\Request::METHOD_PATCH,
+            Request::METHOD_PATCH,
             '/api/emails/batch/edit',
             [],
             [],

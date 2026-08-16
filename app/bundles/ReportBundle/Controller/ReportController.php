@@ -526,7 +526,6 @@ final class ReportController extends FormController
     public function viewAction(Request $request, $objectId, $reportPage = 1): Response
     {
         $entity   = $this->reportModel->getEntity($objectId);
-        $security = $this->security;
 
         if (null === $entity) {
             $page = $request->getSession()->get('mautic.report.page', 1);
@@ -550,7 +549,7 @@ final class ReportController extends FormController
                 ]
             );
         }
-        if (!$security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $entity->getCreatedBy())) {
+        if (!$this->security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $entity->getCreatedBy())) {
             $this->throwAccessDenied();
         }
 
@@ -676,7 +675,7 @@ final class ReportController extends FormController
                     'reportDataResult' => $reportDataResult,
                     'tmpl'             => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                     'limit'            => $reportData['limit'],
-                    'permissions'      => $security->isGranted(
+                    'permissions'      => $this->security->isGranted(
                         [
                             'report:reports:viewown',
                             'report:reports:viewother',
@@ -758,7 +757,6 @@ final class ReportController extends FormController
     public function exportAction(Request $request, $objectId, $format = 'csv'): Response
     {
         $entity   = $this->reportModel->getEntity($objectId);
-        $security = $this->security;
 
         if (null === $entity) {
             $page = $request->getSession()->get('mautic.report.page', 1);
@@ -782,7 +780,7 @@ final class ReportController extends FormController
                 ]
             );
         }
-        if (!$security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $entity->getCreatedBy())) {
+        if (!$this->security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $entity->getCreatedBy())) {
             $this->throwAccessDenied();
         } elseif (!$this->security->isAdmin() && !$this->security->isGranted('report:export:enable', 'MATCH_ONE')) {
             $this->throwAccessDenied();
@@ -864,13 +862,11 @@ final class ReportController extends FormController
         /** @var Report $report */
         $report = $this->reportModel->getEntity($reportId);
 
-        $security = $this->security;
-
         if (empty($report)) {
             return $this->notFound($this->translator->trans('mautic.report.notfound', ['%id%' => $reportId]));
         }
 
-        if (!$security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $report->getCreatedBy())) {
+        if (!$this->security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $report->getCreatedBy())) {
             $this->throwAccessDenied();
         }
 

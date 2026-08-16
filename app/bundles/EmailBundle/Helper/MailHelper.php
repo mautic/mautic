@@ -640,7 +640,6 @@ class MailHelper
     }
 
     /**
-     * Search and replace tokens
      * Adapted from \Swift_Plugins_DecoratorPlugin.
      *
      * @param array $search
@@ -1320,10 +1319,9 @@ class MailHelper
             - if 'Disable unsubscribe link in header' setting is true in email configuration
         */
 
-        $email               = $this->email;
         $unsubscribeBodyText = $this->coreParametersHelper->get('unsubscribe_text') ?? '';
-        if (!$email
-            || $email->getSendToDnc()
+        if (!$this->email
+            || $this->email->getSendToDnc()
             || $this->coreParametersHelper->get('disable_unsubscribe_link_header')
             || !self::isUnsubscribeHeadersRequired($this->getBody(), $unsubscribeBodyText)) {
             return $headers;
@@ -1941,22 +1939,20 @@ class MailHelper
 
     private function setFromForSingleMessage(): void
     {
-        $email = $this->email;
-
-        if ($this->lead && $email && $email->getUseOwnerAsMailer()) {
+        if ($this->lead && $this->email && $this->email->getUseOwnerAsMailer()) {
             if (!isset($this->lead['owner_id'])) {
                 $this->lead['owner_id'] = 0;
             }
 
-            $from = $this->fromEmailHelper->getFromAddressConsideringOwner($this->getFrom(), $this->lead, $email);
+            $from = $this->fromEmailHelper->getFromAddressConsideringOwner($this->getFrom(), $this->lead, $this->email);
             $this->setMessageFrom($from);
 
             return;
         }
 
-        if ($email) {
-            $fromEmail = $email->getFromAddress();
-            $fromName  = $email->getFromName();
+        if ($this->email) {
+            $fromEmail = $this->email->getFromAddress();
+            $fromName  = $this->email->getFromName();
             if (!empty($fromEmail) || !empty($fromName)) {
                 if (empty($fromName)) {
                     $fromName = $this->getFrom()->getName();
@@ -1968,7 +1964,7 @@ class MailHelper
             }
         }
 
-        $from = $this->fromEmailHelper->getFromAddressDto($this->getFrom(), $this->lead, $email);
+        $from = $this->fromEmailHelper->getFromAddressDto($this->getFrom(), $this->lead, $this->email);
 
         $this->setMessageFrom($from);
     }

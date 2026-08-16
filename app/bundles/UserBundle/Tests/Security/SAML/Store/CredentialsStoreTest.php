@@ -8,10 +8,11 @@ use Composer\Autoload\ClassLoader;
 use LightSaml\Credential\X509Credential;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\UserBundle\Security\SAML\Store\CredentialsStore;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class CredentialsStoreTest extends TestCase
 {
     private string $cacheDir;

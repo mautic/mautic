@@ -13,7 +13,7 @@ final class EnvHelper extends Module
     private string $envLocalBackupPath = '.env.local.e2e.backup';
     private bool $envLocalOverridden   = false;
 
-    public function _beforeSuite($settings = [])
+    public function _beforeSuite($settings = []): void
     {
         if ($this->isTestEnvironment()) {
             return;

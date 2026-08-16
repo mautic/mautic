@@ -695,18 +695,15 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      */
     public function getName($lastFirst = false)
     {
-        $firstName = $this->firstname;
-        $lastName  = $this->lastname;
-
         $fullName = '';
-        if ($lastFirst && $firstName && $lastName) {
-            $fullName = $lastName.', '.$firstName;
-        } elseif ($firstName && $lastName) {
-            $fullName = $firstName.' '.$lastName;
-        } elseif ($firstName) {
-            $fullName = $firstName;
-        } elseif ($lastName) {
-            $fullName = $lastName;
+        if ($lastFirst && $this->firstname && $this->lastname) {
+            $fullName = $this->lastname.', '.$this->firstname;
+        } elseif ($this->firstname && $this->lastname) {
+            $fullName = $this->firstname.' '.$this->lastname;
+        } elseif ($this->firstname) {
+            $fullName = $this->firstname;
+        } elseif ($this->lastname) {
+            $fullName = $this->lastname;
         }
 
         return $fullName;

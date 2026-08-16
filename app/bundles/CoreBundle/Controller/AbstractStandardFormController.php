@@ -88,14 +88,14 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * Called after the entity has been persisted allowing for custom preperation of $entity prior to viewAction.
      */
-    protected function afterEntitySave($entity, Form $form, $action, $pass = null)
+    protected function afterEntitySave($entity, Form $form, $action, $pass = null): void
     {
     }
 
     /**
      * Called after the form is validated on POST.
      */
-    protected function afterFormProcessed($isValid, $entity, Form $form, $action, $isClone = false)
+    protected function afterFormProcessed($isValid, $entity, Form $form, $action, $isClone = false): void
     {
     }
 
@@ -183,7 +183,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * Do anything necessary before the form is checked for POST and processed.
      */
-    protected function beforeFormProcessed($entity, Form $form, $action, $isPost, $objectId = null, $isClone = false)
+    protected function beforeFormProcessed($entity, Form $form, $action, $isPost, $objectId = null, $isClone = false): void
     {
     }
 
