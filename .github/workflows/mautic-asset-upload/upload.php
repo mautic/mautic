@@ -84,7 +84,7 @@ $initAuth = new ApiAuth();
 $auth     = $initAuth->newAuth($settings, 'BasicAuth');
 $api      = new MauticApi();
 
-/** @var Mautic\Api\Assets */
+/** @var Mautic\Api\Assets $assetApi */
 $assetApi = $api->newApi('assets', $auth, $instanceUrl);
 
 /**
