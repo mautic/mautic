@@ -567,10 +567,9 @@ class Form extends FormEntity implements UuidInterface
     public function getFieldAliases(): array
     {
         $aliases = [];
-        $fields  = $this->fields;
 
-        if ($fields) {
-            foreach ($fields as $field) {
+        if ($this->fields) {
+            foreach ($this->fields as $field) {
                 $aliases[] = $field->getAlias();
             }
         }

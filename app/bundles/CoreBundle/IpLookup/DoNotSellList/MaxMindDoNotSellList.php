@@ -21,17 +21,15 @@ class MaxMindDoNotSellList implements DoNotSellListInterface
 
     public function loadList(): bool
     {
-        $listPath = $this->listPath;
-
-        if (false == $listPath) {
+        if (false == $this->listPath) {
             throw new BadConfigurationException('Please configure the path to the MaxMind Do Not Sell List.');
         }
 
-        if (!file_exists($listPath)) {
+        if (!file_exists($this->listPath)) {
             throw new FileNotFoundException('Please make sure the MaxMind Do Not Sell List file has been downloaded.');
         }
 
-        $json = file_get_contents($listPath);
+        $json = file_get_contents($this->listPath);
 
         if ($data = json_decode($json, true)) {
             $this->list = $data['exclusions'];
