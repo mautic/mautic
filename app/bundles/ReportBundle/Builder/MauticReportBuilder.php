@@ -248,6 +248,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         }
 
         $selectColumns = [];
+        $aggregators     = $this->entity->getAggregators();
 
         // Build SELECT clause
         if (!$event->getSelectColumns()) {
@@ -255,11 +256,20 @@ final class MauticReportBuilder implements ReportBuilderInterface
             $groupByColumns     = $queryBuilder->getQueryPart('groupBy');
             $groupByColumnsKeys = array_flip($groupByColumns);
             $groupByFieldKeys   = $groupByOptions ? array_flip($groupByOptions) : [];
+            $aggregatorFieldKeys = [];
+
+            if ($groupByOptions && $aggregators) {
+                foreach ($aggregators as $aggregator) {
+                    $aggregatorFieldKeys[$aggregator['column']] = true;
+                }
+            }
 
             foreach ($fields as $field) {
-                // With GROUP BY, ONLY_FULL_GROUP_BY rejects non-aggregated columns that are
-                // not in the group-by list (e.g. ph.id selected for COUNT but not grouped).
-                if ($groupByOptions && !isset($groupByFieldKeys[$field])) {
+                // With GROUP BY + aggregators, a column listed only for COUNT/AVG must not
+                // also appear as a raw SELECT (ONLY_FULL_GROUP_BY rejects ph.id when grouped
+                // by ph.url). Columns not in groupBy but functionally dependent (e.g. e.subject
+                // when grouped by e.id) must remain in SELECT.
+                if ($groupByOptions && !isset($groupByFieldKeys[$field]) && isset($aggregatorFieldKeys[$field])) {
                     continue;
                 }
 
@@ -311,7 +321,6 @@ final class MauticReportBuilder implements ReportBuilderInterface
         $queryBuilder->addSelect($selectColumns);
 
         // Add Aggregators
-        $aggregators      = $this->entity->getAggregators();
         $aggregatorSelect = [];
 
         if ($aggregators && $groupByOptions) {
