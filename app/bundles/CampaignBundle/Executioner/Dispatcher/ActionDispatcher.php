@@ -37,21 +37,19 @@ final readonly class ActionDispatcher
             $pendingEvent = new PendingEvent($config, $event, $logs);
         }
 
-        if ($customEvent = $config->getBatchEventName()) {
-            $this->dispatcher->dispatch($pendingEvent, $customEvent);
+        $this->dispatcher->dispatch($pendingEvent);
 
-            $success = $pendingEvent->getSuccessful();
-            $failed  = $pendingEvent->getFailures();
+        $success = $pendingEvent->getSuccessful();
+        $failed  = $pendingEvent->getFailures();
 
-            $this->validateProcessedLogs($logs, $success, $failed);
+        $this->validateProcessedLogs($logs, $success, $failed);
 
-            if ($success->count()) {
-                $this->dispatchExecutedEvent($config, $event, $success);
-            }
+        if ($success->count()) {
+            $this->dispatchExecutedEvent($config, $event, $success);
+        }
 
-            if ($failed->count()) {
-                $this->dispatchFailedEvent($config, $failed);
-            }
+        if ($failed->count()) {
+            $this->dispatchFailedEvent($config, $failed);
         }
 
         return $pendingEvent;
