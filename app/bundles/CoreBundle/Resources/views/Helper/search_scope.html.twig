@@ -6,7 +6,34 @@
         {% set hasCustomFieldScopes = true %}
     {% endif %}
 {% endfor %}
-<div class="search-scope-chosen">
+{% set activeScopeLabel = 'mautic.core.search.scope.label'|trans %}
+{% for scope in searchScopes %}
+    {% set scopeCommand = scope.command|default('') %}
+    {% if scope.indent|default(false) or scopeCommand in ['__custom_fields__', '__hint__'] %}
+    {% elseif scope.disabled|default(false) is same as(false) and parsedScope.command|default('') == scopeCommand %}
+        {% set activeScopeLabel = scope.translate|default(true) ? scope.label|trans : scope.label %}
+    {% endif %}
+{% endfor %}
+{% set mobileScopeTooltip = parsedScope.command|default('') is not empty
+    ? 'mautic.core.search.scope.filtering_by'|trans({'%label%': activeScopeLabel})
+    : activeScopeLabel %}
+<div class="search-scope-wrapper">
+    <button
+        type="button"
+        class="btn btn-ghost btn--icon-only search-scope-mobile-trigger{% if parsedScope.command|default('') is not empty %} search-scope-mobile-trigger--active{% endif %}"
+        data-livesearch-scope-trigger-for="{{ id }}"
+        data-toggle="tooltip"
+        data-placement="bottom"
+        data-container="body"
+        title="{{ mobileScopeTooltip|e('html_attr') }}"
+        data-filtering-by="{{ 'mautic.core.search.scope.filtering_by'|trans({'%label%': '__LABEL__'})|e('html_attr') }}"
+        aria-label="{{ 'mautic.core.search.scope.label'|trans }}"
+        aria-haspopup="listbox"
+        aria-expanded="false"
+    >
+        <i class="ri-focus-3-line ri-fw" aria-hidden="true"></i>
+    </button>
+    <div class="search-scope-chosen">
     <select
         id="{{ scopeId }}"
         class="form-control chosen search-scope-select"
@@ -51,5 +78,6 @@
             </optgroup>
         {% endif %}
     </select>
+    </div>
 </div>
 {% endif %}

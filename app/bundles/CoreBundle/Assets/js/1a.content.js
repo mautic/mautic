@@ -1381,6 +1381,72 @@ Mautic.applySearchScopeState = function (searchEl, searchString) {
 };
 
 /**
+ * Update the compact mobile scope trigger tooltip and active state.
+ */
+Mautic.updateSearchScopeMobileTrigger = function (scopeSelect) {
+    const $select = mQuery(scopeSelect);
+    const $wrapper = $select.closest('.search-scope-wrapper');
+    const $trigger = $wrapper.find('.search-scope-mobile-trigger');
+    if (!$trigger.length) {
+        return;
+    }
+
+    const selectedOption = $select.find('option:selected').first();
+    const scopeLabel = (selectedOption.text() || '').trim();
+    const command = $select.val() || '';
+    const filteringByTemplate = $trigger.attr('data-filtering-by') || 'Filtering by: __LABEL__';
+    const tooltipTitle = command ? filteringByTemplate.replace('__LABEL__', scopeLabel) : scopeLabel;
+
+    $trigger
+        .attr('title', tooltipTitle)
+        .attr('aria-expanded', $select.next('.chosen-container').hasClass('chosen-with-drop') ? 'true' : 'false')
+        .toggleClass('search-scope-mobile-trigger--active', command !== '');
+
+    if ($trigger.data('bs.tooltip')) {
+        $trigger.attr('data-original-title', tooltipTitle).tooltip('fixTitle');
+    }
+};
+
+/**
+ * Wire the compact mobile scope icon to open the existing Chosen dropdown.
+ */
+Mautic.activateSearchScopeMobileTrigger = function (scopeSelect) {
+    const $select = mQuery(scopeSelect);
+    const $wrapper = $select.closest('.search-scope-wrapper');
+    const $trigger = $wrapper.find('.search-scope-mobile-trigger');
+    if (!$trigger.length) {
+        return;
+    }
+
+    if (!$trigger.data('bs.tooltip')) {
+        $trigger.tooltip({container: 'body'});
+    }
+
+    $trigger.off('click.searchScopeMobile').on('click.searchScopeMobile', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (!$select.next('.chosen-container').length) {
+            return;
+        }
+
+        $select.trigger('chosen:open');
+        $trigger.attr('aria-expanded', 'true');
+    });
+
+    $select
+        .off('chosen:showing_dropdown.searchScopeMobile chosen:hiding_dropdown.searchScopeMobile')
+        .on('chosen:showing_dropdown.searchScopeMobile', function () {
+            $trigger.attr('aria-expanded', 'true');
+        })
+        .on('chosen:hiding_dropdown.searchScopeMobile', function () {
+            $trigger.attr('aria-expanded', 'false');
+        });
+
+    Mautic.updateSearchScopeMobileTrigger(scopeSelect);
+};
+
+/**
  * Initialize the Chosen-enhanced search scope dropdown (same UX as segment filter picker).
  */
 Mautic.activateSearchScopeChosen = function (scopeSelect) {
@@ -1429,6 +1495,7 @@ Mautic.refreshSearchScopeChosen = function (scopeSelect) {
     }
 
     $select.trigger('chosen:updated');
+    Mautic.updateSearchScopeMobileTrigger(scopeSelect);
 };
 
 /**
@@ -1730,8 +1797,10 @@ Mautic.activateSearchScope = function (searchEl) {
     Mautic.applySearchScopeState(searchInput, initialSearch);
 
     Mautic.activateSearchScopeChosen(scopeSelect);
+    Mautic.activateSearchScopeMobileTrigger(scopeSelect);
 
     scopeSelect.off('change.searchScope').on('change.searchScope', function () {
+        Mautic.updateSearchScopeMobileTrigger(scopeSelect);
         Mautic.submitSearchScopeChange(scopeSelect, searchInput, searchId);
     });
 };
