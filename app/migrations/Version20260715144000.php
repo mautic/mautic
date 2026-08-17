@@ -20,9 +20,9 @@ final class Version20260715144000 extends AbstractMauticMigration
             "UPDATE {$eventLogTable} l
                 INNER JOIN {$eventTable} e ON e.id = l.event_id
                 SET l.non_action_path_taken = 0
-                WHERE e.event_type = 'condition'
+                WHERE e.event_type IN ('condition', 'decision')
                     AND l.non_action_path_taken IS NULL
-                    AND l.date_triggered IS NOT NULL"
+                    AND l.date_triggered IS NOT NULL
         );
     }
 }
