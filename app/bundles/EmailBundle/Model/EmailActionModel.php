@@ -9,12 +9,12 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 
-class EmailActionModel
+final readonly class EmailActionModel
 {
     public function __construct(
-        private readonly EmailModel $emailModel,
-        private readonly EmailRepository $emailRepository,
-        private readonly CorePermissions $corePermissions,
+        private EmailModel $emailModel,
+        private EmailRepository $emailRepository,
+        private CorePermissions $corePermissions,
     ) {
     }
 

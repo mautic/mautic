@@ -100,7 +100,7 @@ final readonly class ImportContactSubscriber implements EventSubscriberInterface
                 (int) $event->import->getId(),
                 (bool) $event->import->getDefault('skip_if_exists')
             );
-            $event->setWasMerged((bool) $merged);
+            $event->setWasMerged($merged);
             $event->stopPropagation();
         }
     }
@@ -124,7 +124,7 @@ final readonly class ImportContactSubscriber implements EventSubscriberInterface
             array_filter($matchedFields)
         );
 
-        if (empty($matchedFields)) {
+        if ([] === $matchedFields) {
             $event->getForm()->addError(
                 new FormError(
                     $this->translator->trans('mautic.lead.import.matchfields', [], 'validators')

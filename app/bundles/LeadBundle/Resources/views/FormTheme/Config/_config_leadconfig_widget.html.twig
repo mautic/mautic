@@ -6,7 +6,7 @@
         <div class="panel-body">
             <div class="row">
                 <div class="col-xs-12">
-                    {{ form_row(form.contact_allow_multiple_companies) }}
+                    {{ formRowIfExists(form, 'contact_allow_multiple_companies') }}
                 </div>
             </div>
         </div>
@@ -20,7 +20,7 @@
         <div class="panel-body">
             <div class="row">
                 <div class="col-xs-12">
-                    {{ form_row(form.contact_unique_identifiers_operator) }}
+                    {{ formRowIfExists(form, 'contact_unique_identifiers_operator') }}
                 </div>
             </div>
         </div>
@@ -34,12 +34,13 @@
         <div class="panel-body">
             <div class="row">
                 <div class="col-xs-12">
-                    {{ form_row(form.contact_columns) }}
+                    {{ formRowIfExists(form, 'contact_columns') }}
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 
 <h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.config.tab.importconfig'|trans }}</h4>
 <div class="text-muted small pb-md">{{ 'mautic.core.config.header.importconfig.description'|trans }}</div>
@@ -48,7 +49,7 @@
         <div class="panel-body">
             <div class="row">
                 <div class="col-xs-12">
-                    {{ form_row(form.background_import_if_more_rows_than) }}
+                    {{ formRowIfExists(form, 'background_import_if_more_rows_than') }}
                 </div>
             </div>
         </div>
@@ -62,7 +63,7 @@
         <div class="panel-body">
             <div class="row">
                 <div class="col-xs-12">
-                    {{ form_row(form.contact_export_in_background) }}
+                    {{ formRowIfExists(form, 'contact_export_in_background') }}
                 </div>
             </div>
             <div class="row">
@@ -72,7 +73,7 @@
             </div>
             <div class="row">
                 <div class="col-md-12">
-                    {{ form_row(form.contact_export_limit) }}
+                    {{ formRowIfExists(form, 'contact_export_limit') }}
                 </div>
             </div>
         </div>

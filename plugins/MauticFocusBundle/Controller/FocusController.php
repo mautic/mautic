@@ -2,47 +2,33 @@
 
 namespace MauticPlugin\MauticFocusBundle\Controller;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
-use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Service\FlashBag;
-use Mautic\CoreBundle\Translation\Translator;
-use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
 final class FocusController extends AbstractStandardFormController
 {
-    public function __construct(
-        private readonly CacheProviderTagAwareInterface $cacheProvider,
-        FormFactoryInterface $formFactory,
-        FormFieldHelper $fieldHelper,
-        ManagerRegistry $doctrine,
-        ModelFactory $modelFactory,
-        UserHelper $userHelper,
-        CoreParametersHelper $coreParametersHelper,
-        EventDispatcherInterface $dispatcher,
-        Translator $translator,
-        FlashBag $flashBag,
-        RequestStack $requestStack,
-        CorePermissions $security,
-        private readonly FocusModel $focusModel,
-        private readonly TrackableModel $trackableModel,
-    ) {
-        parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    private CacheProviderTagAwareInterface $cacheProvider;
+
+    private FocusModel $focusModel;
+
+    private TrackableModel $trackableModel;
+
+    #[Required]
+    public function autowireFocusController(
+        CacheProviderTagAwareInterface $cacheProvider,
+        FocusModel $focusModel,
+        TrackableModel $trackableModel,
+    ): void {
+        $this->cacheProvider = $cacheProvider;
+        $this->focusModel = $focusModel;
+        $this->trackableModel = $trackableModel;
     }
 
     protected function getTemplateBase(): string
@@ -65,10 +51,8 @@ final class FocusController extends AbstractStandardFormController
 
     /**
      * Generates new form and processes post data.
-     *
-     * @return JsonResponse|Response
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request): Response
     {
         return parent::newStandard($request);
     }
@@ -86,10 +70,8 @@ final class FocusController extends AbstractStandardFormController
 
     /**
      * Displays details on a Focus.
-     *
-     * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(Request $request, $objectId): Response
     {
         return parent::viewStandard($request, $objectId, 'focus', 'focus');
     }
@@ -98,10 +80,8 @@ final class FocusController extends AbstractStandardFormController
      * Clone an entity.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
-    public function cloneAction(Request $request, $objectId)
+    public function cloneAction(Request $request, $objectId): Response
     {
         return parent::cloneStandard($request, $objectId);
     }
@@ -110,20 +90,16 @@ final class FocusController extends AbstractStandardFormController
      * Deletes the entity.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse|RedirectResponse
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         return parent::deleteStandard($request, $objectId);
     }
 
     /**
      * Deletes a group of entities.
-     *
-     * @return JsonResponse|RedirectResponse
      */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): Response
     {
         return parent::batchDeleteStandard($request);
     }

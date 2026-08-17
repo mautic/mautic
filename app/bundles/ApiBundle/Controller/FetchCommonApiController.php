@@ -29,6 +29,7 @@ use Mautic\CoreBundle\Model\MauticModelInterface;
 use Mautic\CoreBundle\Security\Exception\PermissionException;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\UserBundle\Entity\User;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -165,7 +166,6 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         $tableAlias    = $repo->getTableAlias();
         $publishedOnly = $request->get('published', 0);
         $minimal       = $request->get('minimal', 0);
-
         try {
             if (!$this->security->isGranted($this->permissionBase.':view')) {
                 return $this->accessDenied();
@@ -178,11 +178,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
             && !$this->security->isGranted($this->permissionBase.':viewother')
             && null !== $user = $userHelper->getUser()
         ) {
-            $this->listFilters[] = [
-                'column' => $tableAlias.'.createdBy',
-                'expr'   => 'eq',
-                'value'  => $user->getId(),
-            ];
+            $this->listFilters = array_merge($this->listFilters, $this->getOwnEntityListFilters($tableAlias, $user));
         }
 
         if ($publishedOnly) {
@@ -316,7 +312,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
             $this->customSelectRequested = true;
         }
 
-        if (!empty($args)) {
+        if ([] !== $args) {
             $args['id'] = $id;
             $entity     = $this->model->getEntity($args);
         } else {
@@ -689,7 +685,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
             $context = $apiSerializationContextEvent->getContext();
         }
 
-        if (!empty($this->serializerGroups)) {
+        if ([] !== $this->serializerGroups) {
             $context->setGroups($this->serializerGroups);
         }
 
@@ -758,5 +754,30 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     protected function getTotalCountTtl(): ?int
     {
         return null;
+    }
+
+    /**
+     * Returns filters for users who may only view their own entities.
+     *
+     * Child controllers can override this when "own" is not equivalent to "created by".
+     *
+     * @return array<int, array{
+     *     column?: string,
+     *     expr?: string,
+     *     value?: int|null,
+     *     group?: array<int, array<int, array{
+     *         column: string,
+     *         expr: string,
+     *         value?: int|null,
+     *     }>>,
+     * }>
+     */
+    protected function getOwnEntityListFilters(string $tableAlias, User $user): array
+    {
+        return [[
+            'column' => $tableAlias.'.createdBy',
+            'expr'   => 'eq',
+            'value'  => $user->getId(),
+        ]];
     }
 }

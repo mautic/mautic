@@ -113,7 +113,7 @@ final class PublicControllerRedirectTest extends MauticMysqlTestCase
         $this->em->persist($redirect);
         $this->em->flush();
 
-        $ct = $this->getEncodedClickThroughValue($stat->getTrackingHash(), (int) $lead->getId());
+        $ct = $this->getEncodedClickThroughValue($stat->getTrackingHash(), $lead->getId());
 
         $this->logoutUser();
 

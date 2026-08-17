@@ -207,8 +207,11 @@ class EmailRepository extends CommonRepository
 
         // Do not include leads that have already been emailed
         $statQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $statQb->select('stat.lead_id')
-            ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'stat');
+        $statQb->select('null')
+            ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'stat')
+            ->where(
+                $statQb->expr()->eq('stat.lead_id', 'l.id')
+            );
 
         $statQb->andWhere($statQb->expr()->isNotNull('stat.lead_id'));
 
@@ -237,7 +240,7 @@ class EmailRepository extends CommonRepository
 
             $listIds = array_column($lists, 'leadlist_id');
 
-            if (empty($listIds)) {
+            if ([] === $listIds) {
                 // Prevent fatal error
                 return ($countOnly) ? 0 : [];
             }
@@ -284,7 +287,7 @@ class EmailRepository extends CommonRepository
         $q->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->andWhere(sprintf('l.id IN (%s)', $segmentQb->getSQL()))
             ->andWhere(sprintf('l.id NOT IN (%s)', $dncQb->getSQL()))
-            ->andWhere(sprintf('l.id NOT IN (%s)', $statQb->getSQL()))
+            ->andWhere(sprintf('NOT EXISTS (%s)', $statQb->getSQL()))
             ->andWhere(sprintf('l.id NOT IN (%s)', $mqQb->getSQL()));
 
         $this->copyParams($segmentQb, $q);
@@ -453,7 +456,7 @@ class EmailRepository extends CommonRepository
             );
         }
 
-        if (!empty($ignoreIds)) {
+        if ([] !== $ignoreIds) {
             $q->andWhere($q->expr()->notIn('e.id', ':emailIds'))
                 ->setParameter('emailIds', $ignoreIds);
         }
@@ -830,7 +833,7 @@ class EmailRepository extends CommonRepository
     private function getPublishedBroadcastsQuery(?int $id = null): Query
     {
         $qb   = $this->createQueryBuilder($this->getTableAlias());
-        $expr = $this->getPublishedByDateExpression($qb, null, true, true, false);
+        $expr = $this->getPublishedByDateOrmExpression($qb, null, true, true, false);
 
         $expr->add(
             $qb->expr()->eq($this->getTableAlias().'.emailType', $qb->expr()->literal('list'))
@@ -944,7 +947,7 @@ class EmailRepository extends CommonRepository
     public function getPublishedEmailsWithVariant(): array
     {
         $qb   = $this->getEntityManager()->createQueryBuilder();
-        $expr = $this->getPublishedByDateExpression($qb, $this->getTableAlias());
+        $expr = $this->getPublishedByDateOrmExpression($qb, $this->getTableAlias());
 
         $qb->select($this->getTableAlias())
             ->from(Email::class, $this->getTableAlias())

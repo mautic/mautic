@@ -49,7 +49,6 @@ final class FieldModelTest extends TestCase
         $entityManager  = $this->createMock(EntityManager::class);
         $schemaHelper   = $this->createStub(ColumnSchemaHelper::class);
         $fieldModel     = new FieldModel(
-            $leadFieldModel,
             $entityManager,
             $this->createStub(CorePermissions::class),
             $this->createStub(EventDispatcherInterface::class),
@@ -58,9 +57,12 @@ final class FieldModelTest extends TestCase
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(CoreParametersHelper::class),
+        );
+        $fieldModel->autowireFieldModel(
+            $leadFieldModel,
             $this->createStub(RequestStack::class),
             $schemaHelper,
-            $this->createStub(FieldRepository::class) // $fieldRepository
+            $this->createStub(FieldRepository::class)
         );
 
         $entityManager

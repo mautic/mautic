@@ -91,7 +91,7 @@ final class CampaignAuditLogTest extends MauticMysqlTestCase
 
         // 2.c Save campaign through CampaignModel to trigger audit log creation
         /** @var CampaignModel $campaignModel */
-        $campaignModel = static::getContainer()->get(CampaignModel::class);
+        $campaignModel = self::getContainer()->get(CampaignModel::class);
         $campaign      = $campaignModel->getEntity($campaignId);
         $event         = $this->em->find(Event::class, $eventId);
         $this->assertInstanceOf(Event::class, $event);
@@ -106,7 +106,7 @@ final class CampaignAuditLogTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, $campaignViewUrl);
         $this->assertResponseIsSuccessful();
 
-        $translator = static::getContainer()->get(TranslatorInterface::class);
+        $translator = self::getContainer()->get(TranslatorInterface::class);
         $this->assertInstanceOf(TranslatorInterface::class, $translator);
 
         $this->assertStringContainsString(
