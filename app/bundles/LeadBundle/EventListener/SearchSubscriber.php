@@ -23,20 +23,20 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
-final class SearchSubscriber implements EventSubscriberInterface
+final readonly class SearchSubscriber implements EventSubscriberInterface
 {
     use QueryBuilderManipulatorTrait;
 
     public function __construct(
-        private readonly LeadModel $leadModel,
-        private readonly CompanyModel $companyModel,
-        private readonly ListModel $listModel,
-        private readonly EmailRepository $emailRepository,
-        private readonly TranslatorInterface $translator,
-        private readonly CorePermissions $security,
-        private readonly Environment $twig,
-        private readonly GlobalSearch $globalSearch,
-        private readonly LeadRepository $leadRepository,
+        private LeadModel $leadModel,
+        private CompanyModel $companyModel,
+        private ListModel $listModel,
+        private EmailRepository $emailRepository,
+        private TranslatorInterface $translator,
+        private CorePermissions $security,
+        private Environment $twig,
+        private GlobalSearch $globalSearch,
+        private LeadRepository $leadRepository,
     ) {
     }
 

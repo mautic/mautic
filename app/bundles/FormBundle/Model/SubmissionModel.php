@@ -903,7 +903,7 @@ final class SubmissionModel extends CommonFormModel
      *
      * @throws ORMException
      */
-    private function createLeadFromSubmit(Form $form, array $leadFieldMatches, $leadFields, ?Company $companyEntity = null): Lead
+    private function createLeadFromSubmit(Form $form, array $leadFieldMatches, array $leadFields, ?Company $companyEntity = null): Lead
     {
         // set the mapped data
         $inKioskMode   = $form->isInKioskMode();

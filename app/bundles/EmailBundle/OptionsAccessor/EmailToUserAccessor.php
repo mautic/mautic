@@ -5,12 +5,12 @@ namespace Mautic\EmailBundle\OptionsAccessor;
 use Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer;
 use Mautic\UserBundle\Entity\User;
 
-final class EmailToUserAccessor
+final readonly class EmailToUserAccessor
 {
-    private readonly ArrayStringTransformer $transformer;
+    private ArrayStringTransformer $transformer;
 
     public function __construct(
-        private readonly array $config,
+        private array $config,
     ) {
         $this->transformer = new ArrayStringTransformer();
     }
