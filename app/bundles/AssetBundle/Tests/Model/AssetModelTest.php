@@ -159,6 +159,10 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
     public function testTrackDownload(): void
     {
         $asset = new Asset();
+        $reflection = new \ReflectionClass($asset);
+        $idProperty = $reflection->getProperty('id');
+        $idProperty->setValue($asset, 1);
+
         $lead  = new Lead();
 
         $this->corePermissions->expects($this->once())

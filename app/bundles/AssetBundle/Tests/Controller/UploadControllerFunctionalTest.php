@@ -25,6 +25,7 @@ final class UploadControllerFunctionalTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         $this->configParams['allowed_extensions'] = ['csv', 'gif', 'jpg', 'jpeg', 'png'];
+        $this->configParams['max_size']           = 1;
 
         parent::setUp();
         $this->assetPath      = self::getContainer()->getParameter('mautic.upload_dir');
@@ -70,6 +71,18 @@ final class UploadControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
         $this->assertStringContainsString('state":1', (string) $this->client->getResponse()->getContent());
+    }
+
+    public function testUploadOverConfiguredMaxSizeIsRejected(): void
+    {
+        $filePath = $this->createSourcePath('png');
+        file_put_contents($filePath, str_repeat('a', 2 * 1024 * 1024));
+
+        $this->upload($this->createUploadedFile($filePath, 'image/png'));
+
+        $content = (string) $this->client->getResponse()->getContent();
+        $this->assertStringContainsString('Upload failed as the file is', $content);
+        $this->assertStringContainsString('maximum allowed file size', $content);
     }
 
     /**

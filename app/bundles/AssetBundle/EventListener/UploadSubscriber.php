@@ -61,14 +61,14 @@ final readonly class UploadSubscriber implements EventSubscriberInterface
     {
         $file       = $event->getFile();
         $extensions = $this->coreParametersHelper->get('allowed_extensions');
-        $maxSize    = $this->assetModel->getMaxUploadSize('B');
+        $maxSizeMB  = $this->assetModel->getMaxUploadSize('M');
 
         if (null === $file) {
             return;
         }
 
         try {
-            $this->fileUploadValidator->checkFileSize($file->getSize(), $maxSize);
+            $this->fileUploadValidator->checkFileSize($file->getSize(), (string) $maxSizeMB);
         } catch (FileInvalidException $e) {
             throw new ValidationException($e->getMessage(), $e->getCode(), $e);
         }

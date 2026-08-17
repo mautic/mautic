@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\AssetBundle\Security\Permissions;
 
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
@@ -9,8 +11,8 @@ final class AssetPermissions extends AbstractPermissions
 {
     public function __construct()
     {
-        $this->addExtendedPermissions('assets');
-        $this->addStandardPermissions('categories');
+        $this->addExtendedPermissions(['assets']);
+        $this->addStandardPermissions(['categories']);
     }
 
     public function getName(): string
