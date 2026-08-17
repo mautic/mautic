@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\DashboardBundle\Tests\Controller;
 
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\DashboardBundle\Entity\Widget;
@@ -14,11 +15,47 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 
 final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
+
+    public function testUploadedDashboardIsPreviewed(): void
+    {
+        $filePath = tempnam(sys_get_temp_dir(), 'mautic-dashboard-');
+        $this->assertNotFalse($filePath);
+        file_put_contents($filePath, json_encode([
+            'name'    => 'Automation test dashboard preview',
+            'widgets' => [],
+        ], JSON_THROW_ON_ERROR));
+
+        try {
+            $crawler = $this->client->request(Request::METHOD_GET, '/s/dashboard/import');
+            $token   = $crawler->filter('#dashboard_upload__token')->attr('value');
+            $uploadedFile = new UploadedFile($filePath, 'Automation test dashboard preview.json', 'application/json', null, true);
+            $this->client->request(
+                Request::METHOD_POST,
+                '/s/dashboard/import',
+                ['dashboard_upload' => ['start' => 'Upload', '_token' => $token]],
+                ['dashboard_upload' => ['file' => $uploadedFile]]
+            );
+
+            $this->assertResponseIsSuccessful();
+            $this->assertSelectorExists('.list-group-item.active');
+            $this->assertSelectorTextContains('.list-group-item.active', 'Automation test dashboard preview');
+        } finally {
+            $parameters        = self::getContainer()->get(CoreParametersHelper::class);
+            $uploadedDashboard = $parameters->get('dashboard_import_user_dir').'/Automation test dashboard preview.json';
+            if (file_exists($uploadedDashboard)) {
+                unlink($uploadedDashboard);
+            }
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
+        }
+    }
 
     public function testWidgetWithReport(): void
     {
