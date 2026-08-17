@@ -254,8 +254,15 @@ final class MauticReportBuilder implements ReportBuilderInterface
             $fields             = $this->entity->getColumns();
             $groupByColumns     = $queryBuilder->getQueryPart('groupBy');
             $groupByColumnsKeys = array_flip($groupByColumns);
+            $groupByFieldKeys   = $groupByOptions ? array_flip($groupByOptions) : [];
 
             foreach ($fields as $field) {
+                // With GROUP BY, ONLY_FULL_GROUP_BY rejects non-aggregated columns that are
+                // not in the group-by list (e.g. ph.id selected for COUNT but not grouped).
+                if ($groupByOptions && !isset($groupByFieldKeys[$field])) {
+                    continue;
+                }
+
                 if (isset($options['columns'][$field])) {
                     $fieldOptions = $options['columns'][$field];
 

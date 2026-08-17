@@ -157,6 +157,34 @@ final class MauticReportBuilderTest extends TestCase
         $this->assertSame('SELECT `a`.`someField` WHERE a.isPublished = :i0caisPublished', $query->getSql());
     }
 
+    public function testGroupByWithCountOmitsNonGroupedSelectColumns(): void
+    {
+        $report = new Report();
+        $report->setColumns(['ph.url_title', 'ph.url', 'ph.id']);
+        $report->setGroupBy(['ph.url', 'ph.url_title']);
+        $report->setAggregators([
+            [
+                'column'   => 'ph.id',
+                'function' => 'COUNT',
+            ],
+        ]);
+
+        $builder = $this->buildBuilder($report);
+        $query   = $builder->getQuery([
+            'columns' => [
+                'ph.url_title' => [],
+                'ph.url'       => [],
+                'ph.id'        => [],
+            ],
+            'groupBy' => ['ph.url', 'ph.url_title'],
+        ]);
+
+        $this->assertSame(trim(preg_replace('/\s{2,}/', ' ', '
+            SELECT `ph`.`url_title`, `ph`.`url`, COUNT(ph.id) AS \'COUNT ph.id\' GROUP BY ph.url, ph.url_title
+        ')), $query->getSql());
+        $this->assertStringNotContainsString('`ph`.`id`', $query->getSql());
+    }
+
     public function testReportWithPreciseAvg(): void
     {
         $report = new Report();
