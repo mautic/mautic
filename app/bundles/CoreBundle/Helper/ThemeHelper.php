@@ -355,7 +355,7 @@ class ThemeHelper implements ThemeHelperInterface
 
             if ($this->isUnsafeArchivePath($entry)) {
                 $zipper->close();
-                throw new \Exception('mautic.core.update.error_extracting_package');
+                throw new \Exception($this->translator->trans('mautic.core.update.error_extracting_package'));
             }
 
             $zipEntries[] = $entry;
@@ -502,7 +502,7 @@ class ThemeHelper implements ThemeHelperInterface
     private function getSafeThemeDestination(string $themePath, string $relativePath): string
     {
         if ($this->isUnsafeArchivePath($relativePath)) {
-            throw new \Exception('mautic.core.update.error_extracting_package');
+            throw new \Exception($this->translator->trans('mautic.core.update.error_extracting_package'));
         }
 
         $themeRoot   = Path::canonicalize($themePath);

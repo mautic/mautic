@@ -216,13 +216,18 @@ final class ThemeHelperTest extends TestCase
         }
         $zip->close();
 
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with('mautic.core.update.error_extracting_package')
+            ->willReturn('some translation');
+
         $thrown = false;
 
         try {
             $this->themeHelper->install($zipPath);
         } catch (\Exception $exception) {
             $thrown = true;
-            $this->assertSame('mautic.core.update.error_extracting_package', $exception->getMessage());
+            $this->assertSame('some translation', $exception->getMessage());
         } finally {
             $filesystem = new Filesystem();
             foreach ($escapedPaths as $escapedPath) {
