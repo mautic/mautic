@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "957d3336e72324a19dea6803d37e6a16",
+    "content-hash": "e2e19fdf4b35169cc1e7f8c1ecb0bf3c",
     "packages": [
         {
             "name": "api-platform/core",
@@ -19487,16 +19487,16 @@
         },
         {
             "name": "tomasvotruba/type-coverage",
-            "version": "2.3.0",
+            "version": "2.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/TomasVotruba/type-coverage.git",
-                "reference": "7ba48c1bf3bbb7ffe99caacc7017bae5ee72d644"
+                "reference": "875d70949691f46ef2d763df9e64696f7be7b38a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/TomasVotruba/type-coverage/zipball/7ba48c1bf3bbb7ffe99caacc7017bae5ee72d644",
-                "reference": "7ba48c1bf3bbb7ffe99caacc7017bae5ee72d644",
+                "url": "https://api.github.com/repos/TomasVotruba/type-coverage/zipball/875d70949691f46ef2d763df9e64696f7be7b38a",
+                "reference": "875d70949691f46ef2d763df9e64696f7be7b38a",
                 "shasum": ""
             },
             "require": {
@@ -19505,9 +19505,10 @@
                 "webmozart/assert": "^1.11 || ^2.1"
             },
             "require-dev": {
+                "doctrine/collections": "^2.3",
                 "phpstan/extension-installer": "^1.4",
                 "phpunit/phpunit": "^13.2",
-                "rector/jack": "^1.0",
+                "rector/jack": "^1.1",
                 "rector/rector": "^2.5",
                 "shipmonk/composer-dependency-analyser": "^1.8",
                 "symfony/dom-crawler": "^8.1",
@@ -19519,8 +19520,7 @@
             "extra": {
                 "phpstan": {
                     "includes": [
-                        "config/extension.neon",
-                        "packages/type-perfect/config/extension.neon"
+                        "config/extension.neon"
                     ]
                 }
             },
@@ -19541,7 +19541,7 @@
             ],
             "support": {
                 "issues": "https://github.com/TomasVotruba/type-coverage/issues",
-                "source": "https://github.com/TomasVotruba/type-coverage/tree/2.3.0"
+                "source": "https://github.com/TomasVotruba/type-coverage/tree/2.3.1"
             },
             "funding": [
                 {
@@ -19553,7 +19553,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-07-29T20:32:37+00:00"
+            "time": "2026-08-17T21:42:12+00:00"
         },
         {
             "name": "webmozart/assert",
