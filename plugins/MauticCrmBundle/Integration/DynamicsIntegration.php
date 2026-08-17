@@ -149,7 +149,7 @@ final class DynamicsIntegration extends CrmAbstractIntegration
     /**
      * @param bool $inAuthorization
      */
-    public function getBearerToken($inAuthorization = false)
+    public function getBearerToken($inAuthorization = false): false|string
     {
         if (!$inAuthorization && isset($this->keys[$this->getAuthTokenKey()])) {
             return $this->keys[$this->getAuthTokenKey()];

@@ -546,12 +546,10 @@ final class SalesforceApi extends CrmApi
     }
 
     /**
-     * @return string|false
-     *
      * @throws ApiErrorException
      * @throws RetryRequestException
      */
-    private function processError(array $error, bool $isRetry)
+    private function processError(array $error, bool $isRetry): string|false
     {
         switch ($error['errorCode']) {
             case 'INVALID_SESSION_ID':

@@ -19487,16 +19487,16 @@
         },
         {
             "name": "tomasvotruba/type-coverage",
-            "version": "2.3.1",
+            "version": "2.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/TomasVotruba/type-coverage.git",
-                "reference": "875d70949691f46ef2d763df9e64696f7be7b38a"
+                "reference": "64531e51398036cbc8b7eba4710d051a3bffdebc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/TomasVotruba/type-coverage/zipball/875d70949691f46ef2d763df9e64696f7be7b38a",
-                "reference": "875d70949691f46ef2d763df9e64696f7be7b38a",
+                "url": "https://api.github.com/repos/TomasVotruba/type-coverage/zipball/64531e51398036cbc8b7eba4710d051a3bffdebc",
+                "reference": "64531e51398036cbc8b7eba4710d051a3bffdebc",
                 "shasum": ""
             },
             "require": {
@@ -19512,6 +19512,7 @@
                 "rector/rector": "^2.5",
                 "shipmonk/composer-dependency-analyser": "^1.8",
                 "symfony/dom-crawler": "^8.1",
+                "symfony/form": "^8.1",
                 "symplify/easy-coding-standard": "^13.2",
                 "tomasvotruba/unused-public": "^2.2",
                 "tracy/tracy": "^2.12"
@@ -19541,7 +19542,7 @@
             ],
             "support": {
                 "issues": "https://github.com/TomasVotruba/type-coverage/issues",
-                "source": "https://github.com/TomasVotruba/type-coverage/tree/2.3.1"
+                "source": "https://github.com/TomasVotruba/type-coverage/tree/2.3.2"
             },
             "funding": [
                 {
@@ -19553,7 +19554,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-08-17T21:42:12+00:00"
+            "time": "2026-08-17T22:16:17+00:00"
         },
         {
             "name": "webmozart/assert",

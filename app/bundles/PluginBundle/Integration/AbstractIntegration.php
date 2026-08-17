@@ -1114,10 +1114,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * Extacts the auth keys from response and saves entity.
-     *
-     * @return bool|string false if no error; otherwise the error string
      */
-    public function extractAuthKeys($data, $tokenOverride = null)
+    public function extractAuthKeys($data, $tokenOverride = null): bool|string|array
     {
         // check to see if an entity exists
         $entity = $this->getIntegrationSettings();
@@ -2143,11 +2141,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * @param array $keys
-     *
-     * @return array
+     * @return array<string, mixed>
      */
-    protected function dispatchIntegrationKeyEvent(?string $eventName, $keys = [])
+    protected function dispatchIntegrationKeyEvent(?string $eventName, array $keys = [])
     {
         /** @var PluginIntegrationKeyEvent $event */
         $event = $this->dispatcher->dispatch(

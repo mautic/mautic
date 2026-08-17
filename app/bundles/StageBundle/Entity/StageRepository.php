@@ -158,12 +158,7 @@ class StageRepository extends CommonRepository
         return $q->getQuery()->getArrayResult();
     }
 
-    /**
-     * Get a list of stages.
-     *
-     * @return array
-     */
-    public function getStageByName($stageName)
+    public function getStageByName(string $stageName): array|false
     {
         if (!$stageName) {
             return false;
