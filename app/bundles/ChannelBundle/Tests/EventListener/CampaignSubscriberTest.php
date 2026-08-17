@@ -84,12 +84,10 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $scheduler = $this->createMock(EventScheduler::class);
-
         $eventDispatcher = new ActionDispatcher(
             $this->dispatcher,
             new NullLogger(),
-            $scheduler
+            $this->createStub(EventScheduler::class)
         );
 
         $eventCollector = $this->createMock(EventCollector::class);
