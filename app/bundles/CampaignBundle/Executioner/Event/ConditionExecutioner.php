@@ -20,8 +20,8 @@ class ConditionExecutioner implements EventInterface
 
     public function __construct(
         private readonly ConditionDispatcher $dispatcher,
-        private OptimisticLockServiceInterface $optimisticLockService,
-        private LoggerInterface $logger,
+        private readonly OptimisticLockServiceInterface $optimisticLockService,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
