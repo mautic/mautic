@@ -975,41 +975,106 @@ class LeadModel extends FormModel
     /**
      * Add lead to Stage.
      *
-     * @param array|Lead  $lead
-     * @param array|Stage $stage
-     * @param bool        $manuallyAdded
+     * @param array|Lead $lead
+     * @param bool       $manuallyAdded
      */
-    public function addToStages($lead, $stage, $manuallyAdded = true): static
+    public function addToStages($lead, Stage $stage, $manuallyAdded = true): static
     {
+        $origin = is_string($manuallyAdded)
+            ? $manuallyAdded
+            : $this->translator->trans('mautic.stage.event.added.batch');
+
         if (!$lead instanceof Lead) {
             $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
             $lead   = $this->em->getReference(Lead::class, $leadId);
         }
+
+        $this->addToStage($lead, $stage, $origin);
+
+        return $this;
+    }
+
+    public function addToStage(Lead $lead, Stage $stage, string $origin): static
+    {
         $lead->setStage($stage);
         $lead->stageChangeLogEntry(
             $stage,
             $stage->getId().': '.$stage->getName(),
-            $this->translator->trans('mautic.stage.event.added.batch')
+            $origin
         );
 
         return $this;
     }
 
+    public function changeStage(Lead $lead, Stage $stage, string $origin): void
+    {
+        $currentStage = $lead->getStage();
+
+        if (null !== $currentStage) {
+            if ($currentStage->getId() === $stage->getId()) {
+                throw new \UnexpectedValueException($this->translator->trans('mautic.stage.campaign.event.already_in_stage'));
+            }
+
+            if ($currentStage->getWeight() > $stage->getWeight()) {
+                throw new \UnexpectedValueException($this->translator->trans('mautic.stage.campaign.event.stage_invalid'));
+            }
+        }
+
+        $this->addToStage($lead, $stage, $origin);
+        $this->saveEntity($lead);
+
+        $this->logger->info(
+            sprintf(
+                'LeadBundle: Lead %s changed stage from %s (%s) to %s (%s) by %s',
+                $lead->getId(),
+                $currentStage?->getName(),
+                $currentStage?->getId(),
+                $stage->getName(),
+                $stage->getId(),
+                $origin
+            )
+        );
+    }
+
     /**
      * Remove lead from Stage.
      *
-     * @param bool $manuallyRemoved
+     * @param array|Lead $lead
+     * @param bool       $manuallyRemoved
      */
-    public function removeFromStages($lead, $stage, $manuallyRemoved = true): static
+    public function removeFromStages($lead, Stage $stage, $manuallyRemoved = true): static
     {
-        $lead->setStage(null);
+        $origin = is_string($manuallyRemoved)
+            ? $manuallyRemoved
+            : $this->translator->trans('mautic.stage.event.removed.batch');
+
+        if (!$lead instanceof Lead) {
+            $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
+            $lead   = $this->em->getReference(Lead::class, $leadId);
+        }
+
+        $this->removeFromStage($lead, $stage, $origin);
+
+        return $this;
+    }
+
+    public function removeFromStage(Lead $lead, Stage $stage, string $origin): void
+    {
+        $lead->setStage();
         $lead->stageChangeLogEntry(
             $stage,
             $stage->getId().': '.$stage->getName(),
-            $this->translator->trans('mautic.stage.event.removed.batch')
+            $origin
         );
 
-        return $this;
+        $this->saveEntity($lead);
+
+        $this->logger->info(
+            sprintf(
+                'LeadBundle: Lead %s removed from stage',
+                $lead->getId(),
+            )
+        );
     }
 
     /**
