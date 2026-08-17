@@ -18,10 +18,10 @@ parameters:
         constant: 60
         declare: 73
     type_perfect:
-        narrow_param: true
+        narrow_param: false
         narrow_return: true
-        no_mixed_property: true
-        no_mixed_caller: true
+        no_mixed_property: false
+        no_mixed_caller: false
         null_over_false: true
         no_param_type_removal: true
         no_isset_on_object: true
