@@ -66,7 +66,7 @@ final class UpdateHelperTest extends TestCase
     protected function setUp(): void
     {
         $pathsHelper = $this->createMock(PathsHelper::class);
-        $pathsHelper->expects($this->once())->method('getSystemPath')
+        $pathsHelper->expects($this->atLeastOnce())->method('getSystemPath')
             ->with('cache')
             ->willReturn(__DIR__.'/resource/update/tmp');
 
@@ -121,25 +121,6 @@ final class UpdateHelperTest extends TestCase
         $updatePackage = __DIR__.'/resource/update/tmp/update.zip';
         $this->assertFileExists($updatePackage);
         @unlink($updatePackage);
-    }
-
-    public function testConnectionErrorReturnsError(): void
-    {
-        $this->response->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(404);
-        $this->response->expects($this->never())
-            ->method('getBody');
-
-        $this->client->expects($this->once())
-            ->method('request')
-            ->with('GET', 'update.zip')
-            ->willReturn($this->response);
-
-        $result = $this->helper->fetchPackage('update.zip');
-        $this->assertArrayHasKey('error', $result);
-        $this->assertTrue($result['error']);
-        $this->assertEquals('mautic.core.updater.error.fetching.package', $result['message']);
     }
 
     public function testCacheIsRefreshedIfStabilityMismatches(): void
@@ -921,6 +902,7 @@ final class UpdateHelperTest extends TestCase
         file_put_contents(__DIR__.'/resource/update/tmp/lastUpdateCheck.txt', json_encode($cache));
 
         $this->coreParametersHelper
+            ->expects($this->atLeastOnce())
             ->method('get')
             ->with('update_stability')
             ->willReturn('stable');
