@@ -56,7 +56,7 @@ final class SortableListTransformer implements DataTransformerInterface
         }
 
         if ($this->withLabels) {
-            $array['list'] = AbstractFormFieldHelper::parseListForChoices($array['list']);
+            $array['list'] = AbstractFormFieldHelper::parseListForChoices(array_values($array['list']));
             $formatted     = [];
             foreach ($array['list'] as $label => $value) {
                 $formatted[] = [
@@ -66,7 +66,7 @@ final class SortableListTransformer implements DataTransformerInterface
             }
             $array['list'] = $formatted;
         } else {
-            $array['list'] = AbstractFormFieldHelper::parseList($array['list']);
+            $array['list'] = AbstractFormFieldHelper::parseList(array_values($array['list']));
             $array['list'] = array_keys($array['list']);
             $array['list'] = AbstractFormFieldHelper::formatList(AbstractFormFieldHelper::FORMAT_SIMPLE_ARRAY, $array['list']);
         }
