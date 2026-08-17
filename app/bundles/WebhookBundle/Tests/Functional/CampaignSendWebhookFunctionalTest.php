@@ -42,7 +42,7 @@ class CampaignSendWebhookFunctionalTest extends MauticMysqlTestCase
     /**
      * @return iterable<string, array{string, array<int, array{label: string, value: string}>, array<int, array{label: string, value: string}>}>
      */
-    public function webhookFormDataProvider(): iterable
+    public static function webhookFormDataProvider(): iterable
     {
         yield 'different labels with same value are both saved' => [
             'Different labels (paramA, paramB) with same value should save both entries',
@@ -161,7 +161,7 @@ class CampaignSendWebhookFunctionalTest extends MauticMysqlTestCase
     /**
      * @return iterable<string, array{string, array<int, array{label: string, value: string}>, array<int, array{label: string, value: string}>}>
      */
-    public function webhookApiDataProvider(): iterable
+    public static function webhookApiDataProvider(): iterable
     {
         yield 'different labels with same value via API' => [
             'Different labels with same value should save both via API',
