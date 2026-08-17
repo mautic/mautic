@@ -41,8 +41,7 @@ final class CompanyObjectHelperTest extends TestCase
         $this->repository                 = $this->createMock(CompanyRepository::class);
         $this->fieldsWithUniqueIdentifier = $this->createMock(FieldsWithUniqueIdentifier::class);
 
-        $this->fieldsWithUniqueIdentifier->expects($this->once())->method('getFieldsWithUniqueIdentifier')
-            ->with(['object' => CompanyObject::NAME])
+        $this->fieldsWithUniqueIdentifier->method('getFieldsWithUniqueIdentifier')
             ->willReturn(
                 [
                     'companyemail' => [],

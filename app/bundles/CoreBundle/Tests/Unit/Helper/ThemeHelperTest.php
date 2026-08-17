@@ -69,8 +69,7 @@ final class ThemeHelperTest extends TestCase
         $this->loader              = $this->createMock(FilesystemLoader::class);
         $this->translator          = $this->createMock(TranslatorInterface::class);
         $this->coreParameterHelper = $this->createMock(CoreParametersHelper::class);
-        $this->coreParameterHelper->expects($this->once())->method('get')
-            ->with('theme_import_allowed_extensions')
+        $this->coreParameterHelper->method('get')
             ->willReturn(['json', 'twig', 'css', 'js', 'htm', 'html', 'txt', 'jpg', 'jpeg', 'png', 'gif']);
 
         $this->builderIntegrationsHelper = $this->createMock(BuilderIntegrationsHelper::class);

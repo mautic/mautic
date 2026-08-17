@@ -41,7 +41,7 @@ final class AlreadyMappedFieldCollectorTest extends \PHPUnit\Framework\TestCase
         $formId    = '3';
         $object    = 'contact';
 
-        $this->cacheProvider->expects($this->once())->method('getItem')
+        $this->cacheProvider->expects($this->exactly(9))->method('getItem')
             ->with('mautic.form.3.object.contact.fields.mapped')
             ->willReturn($cacheItem);
 

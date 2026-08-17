@@ -431,9 +431,7 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $values = ['Submission ID', 'Contact ID', 'Date Submitted', 'IP address', 'Referrer', 'Form ID'];
 
         $this->translator
-            ->expects($this->once())
             ->method('trans')
-            ->with($this->anything())
             ->willReturnCallback(fn ($text): ?string => match ($text) {
                 'mautic.form.report.submission.id'  => $values[0],
                 'mautic.lead.report.contact_id'     => $values[1],

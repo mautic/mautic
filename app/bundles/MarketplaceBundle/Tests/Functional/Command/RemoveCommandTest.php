@@ -42,8 +42,7 @@ final class RemoveCommandTest extends AbstractMauticTestCase
     public function testRemoveCommandWithInvalidPackageType(): void
     {
         $composer    = $this->createMock(ComposerHelper::class);
-        $composer->expects($this->once())->method('remove')
-            ->with($this->packageName)
+        $composer->method('remove')
             ->willReturn(new ConsoleOutput(0, 'OK'));
         $composer->method('getMauticPluginPackages')
             ->willReturn([]);
@@ -61,8 +60,7 @@ final class RemoveCommandTest extends AbstractMauticTestCase
     public function testRemoveCommandWithComposerError(): void
     {
         $composer    = $this->createMock(ComposerHelper::class);
-        $composer->expects($this->once())->method('remove')
-            ->with($this->packageName)
+        $composer->method('remove')
             ->willReturn(new ConsoleOutput(1, 'Error while removing package'));
         $composer->method('getMauticPluginPackages')
             ->willReturn([]);

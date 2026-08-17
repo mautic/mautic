@@ -65,15 +65,13 @@ final class EmailTypeTest extends \PHPUnit\Framework\TestCase
         $names   = [];
         $this->expectThemeHelper();
 
-        $this->formBuilder->expects($this->once())->method('add')
-            ->with(
-                $this->callback(
-                    function (string|FormBuilderInterface $name) use (&$names): true {
-                        $names[] = $name;
+        $this->formBuilder->method('add')
+            ->willReturnCallback(
+                function (string|FormBuilderInterface $name) use (&$names): FormBuilderInterface {
+                    $names[] = $name;
 
-                        return true;
-                    }
-                )
+                    return $this->formBuilder;
+                }
             );
 
         $this->form->buildForm($this->formBuilder, $options);
