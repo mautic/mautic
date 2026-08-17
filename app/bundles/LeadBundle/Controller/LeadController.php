@@ -1827,12 +1827,20 @@ final class LeadController extends FormController
 
                     if (!empty($data['addstage'])) {
                         $stage = $this->stageModel->getEntity((int) $data['addstage']);
-                        $this->leadModel->addToStages($lead, $stage);
+                        $this->leadModel->addToStage(
+                            $lead,
+                            $stage,
+                            $this->translator->trans('mautic.stage.event.added.batch')
+                        );
                     }
 
                     if (!empty($data['removestage'])) {
                         $stage = $this->stageModel->getEntity($data['removestage']);
-                        $this->leadModel->removeFromStages($lead, $stage);
+                        $this->leadModel->removeFromStage(
+                            $lead,
+                            $stage,
+                            $this->translator->trans('mautic.stage.event.removed.batch')
+                        );
                     }
                 }
             }
