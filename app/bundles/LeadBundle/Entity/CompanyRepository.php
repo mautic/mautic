@@ -223,7 +223,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     public function getSearchCommands(): array
     {
         $commands = array_merge(['mautic.project.searchcommand.name'], $this->getStandardSearchCommands());
-        if (!empty($this->availableSearchFields)) {
+        if ([] !== $this->availableSearchFields) {
             $commands = array_merge($commands, $this->availableSearchFields);
         }
 
@@ -468,7 +468,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             $q->where($expr);
         }
 
-        if (!empty($parameters)) {
+        if ([] !== $parameters) {
             $q->setParameters($parameters);
         }
 

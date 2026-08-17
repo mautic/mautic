@@ -431,6 +431,19 @@ final class LeadController extends FormController
 
         $this->leadRepository->refetchEntity($lead);
 
+        $returnUrl = null;
+        if ('form_results' === $request->query->get('returnTo')) {
+            $formId   = (int) $request->query->get('formId');
+            $formPage = max(1, (int) $request->query->get('formPage', 1));
+
+            if ($formId > 0) {
+                $returnUrl = $this->generateUrl('mautic_form_results', [
+                    'objectId' => $formId,
+                    'page'     => $formPage,
+                ]);
+            }
+        }
+
         // set some permissions
         $permissions = $this->security->isGranted(
             [
@@ -507,6 +520,7 @@ final class LeadController extends FormController
                     'doNotContactSms'        => end($dncSms),
                     'pointGroups'            => $pointGroupModel->getEntities(),
                     'enableExportPermission' => $this->security->isAdmin() || $this->security->isGranted('lead:export:enable', 'MATCH_ONE'),
+                    'returnUrl'              => $returnUrl,
                     // 'leadNotes'         => $this->forward(
                     //    'Mautic\LeadBundle\Controller\NoteController::indexAction',
                     //    [
@@ -587,7 +601,7 @@ final class LeadController extends FormController
                     // Save here as we need the entity with an ID for the company code bellow.
                     $this->leadRepository->saveEntity($lead);
 
-                    if (!empty($companies)) {
+                    if ([] !== $companies) {
                         $this->leadModel->modifyCompanies($lead, $companies);
                     }
 
@@ -1160,10 +1174,8 @@ final class LeadController extends FormController
 
     /**
      * Deletes the entity.
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         $page      = $request->getSession()->get('mautic.lead.page', 1);
         $returnUrl = $this->generateUrl('mautic_contact_index', ['page' => $page]);
@@ -1270,7 +1282,7 @@ final class LeadController extends FormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $this->leadModel->deleteEntities($deleteIds);
 
                 $flashes[] = [

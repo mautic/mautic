@@ -124,7 +124,7 @@ final readonly class ImportContactSubscriber implements EventSubscriberInterface
             array_filter($matchedFields)
         );
 
-        if (empty($matchedFields)) {
+        if ([] === $matchedFields) {
             $event->getForm()->addError(
                 new FormError(
                     $this->translator->trans('mautic.lead.import.matchfields', [], 'validators')

@@ -118,7 +118,7 @@ class ContactRequestHelper
         } catch (ContactNotFoundException) {
         }
 
-        if (!empty($this->queryFields)) {
+        if ([] !== $this->queryFields) {
             /** @var Lead $foundContact */
             [$foundContact, $this->publiclyUpdatableFieldValues] = $this->leadModel->checkForDuplicateContact(
                 $this->queryFields,
@@ -174,7 +174,7 @@ class ContactRequestHelper
             $this->trackedContact->addIpAddress($ipAddress);
         }
 
-        if (!empty($this->publiclyUpdatableFieldValues)) {
+        if ([] !== $this->publiclyUpdatableFieldValues) {
             $this->leadModel->setFieldValues(
                 $this->trackedContact,
                 $this->publiclyUpdatableFieldValues,

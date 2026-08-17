@@ -253,7 +253,7 @@ final class SalesforceApi extends CrmApi
         $mActivityObjectName = $namespace.'mautic_timeline__c';
         $activityData        = [];
 
-        if (!empty($activity)) {
+        if ([] !== $activity) {
             foreach ($activity as $sfId => $records) {
                 foreach ($records['records'] as $record) {
                     $body = [
@@ -279,7 +279,7 @@ final class SalesforceApi extends CrmApi
                 }
             }
 
-            if (!empty($activityData)) {
+            if ([] !== $activityData) {
                 $request              = [];
                 $request['allOrNone'] = 'false';
                 $chunked              = array_chunk($activityData, 25);
@@ -445,7 +445,7 @@ final class SalesforceApi extends CrmApi
     public function checkCampaignMembership($campaignId, $object, array $people): array
     {
         $campaignMembers = [];
-        if (!empty($people)) {
+        if ([] !== $people) {
             $idField = "{$object}Id";
             $query   = "Select Id, {$idField} from CampaignMember where CampaignId = '".$campaignId
                 ."' and {$idField} in ('".implode("','", $people)."')";

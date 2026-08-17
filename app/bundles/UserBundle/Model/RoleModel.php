@@ -81,7 +81,7 @@ final class RoleModel extends FormModel implements GlobalSearchInterface
         }
 
         // set permissions if applicable and if the user is not an admin
-        $permissions = (!$entity->isAdmin() && !empty($rawPermissions)) ?
+        $permissions = (!$entity->isAdmin() && [] !== $rawPermissions) ?
             $this->security->generatePermissions($rawPermissions) :
             [];
 

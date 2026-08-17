@@ -345,7 +345,7 @@ final class PageType extends AbstractType
         ];
 
         $draftActionButtons = $this->getDraftActionButtons($options['data']);
-        if (!empty($draftActionButtons)) {
+        if ([] !== $draftActionButtons) {
             $extraButtons['post_extra_buttons'] = $draftActionButtons;
         }
         $builder->add('buttons',
