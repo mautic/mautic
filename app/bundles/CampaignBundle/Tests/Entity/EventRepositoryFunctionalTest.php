@@ -53,7 +53,7 @@ final class EventRepositoryFunctionalTest extends MauticMysqlTestCase
 
     public function testGetContactPendingEventsWaitsForConditionPathResult(): void
     {
-        $repository = static::getContainer()->get(EventRepository::class);
+        $repository = self::getContainer()->get(EventRepository::class);
         $this->assertInstanceOf(EventRepository::class, $repository);
 
         $campaign  = $this->createCampaign();
