@@ -23,6 +23,6 @@ final class Version20260715144000 extends AbstractMauticMigration
                 WHERE e.event_type IN ('condition', 'decision')
                     AND l.non_action_path_taken IS NULL
                     AND l.date_triggered IS NOT NULL
-        );
+        ");
     }
 }

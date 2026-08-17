@@ -64,7 +64,8 @@ final class EventRepositoryFunctionalTest extends MauticMysqlTestCase
         $yesDecision = $this->createEvent($campaign);
         $yesDecision->setEventType(Event::TYPE_DECISION);
         $yesDecision->setParent($condition);
-        $yesDecision->setDecisionPath(Event::PATH_ACTION);
+        // A null decision path is the legacy representation of the yes path.
+        $yesDecision->setDecisionPath(null);
 
         $noDecision = $this->createEvent($campaign);
         $noDecision->setEventType(Event::TYPE_DECISION);

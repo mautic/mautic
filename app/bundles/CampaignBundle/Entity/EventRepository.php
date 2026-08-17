@@ -77,9 +77,11 @@ class EventRepository extends CommonRepository
                 $parentQb->expr()->eq('parent_log_event.rotation', 'l.rotation'),
                 $parentQb->expr()->eq('parent_log_event.isScheduled', 0),
                 $parentQb->expr()->orX(
-                    $parentQb->expr()->isNull('e.decisionPath'),
                     $parentQb->expr()->andX(
-                        $parentQb->expr()->eq('e.decisionPath', ':positivePath'),
+                        $parentQb->expr()->orX(
+                            $parentQb->expr()->isNull('e.decisionPath'),
+                            $parentQb->expr()->eq('e.decisionPath', ':positivePath')
+                        ),
                         $parentQb->expr()->eq('parent_log_event.nonActionPathTaken', 0)
                     ),
                     $parentQb->expr()->andX(
