@@ -8,19 +8,18 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
 
-class CampaignSendWebhookFunctionalTest extends MauticMysqlTestCase
+final class CampaignSendWebhookFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 
     /**
-     * @dataProvider webhookFormDataProvider
-     *
      * @param array<int, array{label: string, value: string}> $inputData
      * @param array<int, array{label: string, value: string}> $expectedData
      */
+    #[DataProvider('webhookFormDataProvider')]
     public function testWebhookFormSubmission(string $scenario, array $inputData, array $expectedData): void
     {
         $segment  = $this->createSegment('test-segment-'.uniqid(), []);
@@ -31,11 +30,11 @@ class CampaignSendWebhookFunctionalTest extends MauticMysqlTestCase
         $responseData = $this->submitWebhookEventForm($campaign, $inputData);
         $properties   = $responseData['event']['properties'];
 
-        Assert::assertCount(count($expectedData), $properties['additional_data']['list'], "Failed for scenario: $scenario");
+        $this->assertCount(count($expectedData), $properties['additional_data']['list'], "Failed for scenario: $scenario");
 
         foreach ($expectedData as $index => $expected) {
-            Assert::assertEquals($expected['label'], $properties['additional_data']['list'][$index]['label']);
-            Assert::assertEquals($expected['value'], $properties['additional_data']['list'][$index]['value']);
+            $this->assertEquals($expected['label'], $properties['additional_data']['list'][$index]['label']);
+            $this->assertEquals($expected['value'], $properties['additional_data']['list'][$index]['value']);
         }
     }
 
@@ -81,11 +80,10 @@ class CampaignSendWebhookFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @dataProvider webhookApiDataProvider
-     *
      * @param array<int, array{label: string, value: string}> $inputData
      * @param array<int, array{label: string, value: string}> $expectedData
      */
+    #[DataProvider('webhookApiDataProvider')]
     public function testWebhookEventViaCampaignApi(string $scenario, array $inputData, array $expectedData): void
     {
         $segment = $this->createSegment('test-segment-'.uniqid(), []);
@@ -136,7 +134,7 @@ class CampaignSendWebhookFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request('POST', '/api/campaigns/new', $payload);
         $response = $this->client->getResponse();
-        Assert::assertSame(201, $response->getStatusCode(), $response->getContent());
+        $this->assertSame(201, $response->getStatusCode(), $response->getContent());
 
         $responseData = json_decode($response->getContent(), true);
         $campaignId   = $responseData['campaign']['id'];
@@ -150,11 +148,11 @@ class CampaignSendWebhookFunctionalTest extends MauticMysqlTestCase
         $event      = $events->first();
         $properties = $event->getProperties();
 
-        Assert::assertCount(count($expectedData), $properties['additional_data']['list'], "Failed for scenario: $scenario");
+        $this->assertCount(count($expectedData), $properties['additional_data']['list'], "Failed for scenario: $scenario");
 
         foreach ($expectedData as $index => $expected) {
-            Assert::assertEquals($expected['label'], $properties['additional_data']['list'][$index]['label']);
-            Assert::assertEquals($expected['value'], $properties['additional_data']['list'][$index]['value']);
+            $this->assertEquals($expected['label'], $properties['additional_data']['list'][$index]['label']);
+            $this->assertEquals($expected['value'], $properties['additional_data']['list'][$index]['value']);
         }
     }
 
@@ -202,7 +200,7 @@ class CampaignSendWebhookFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request('GET', $uri, [], [], $this->createAjaxHeaders());
         $response = $this->client->getResponse();
-        Assert::assertTrue($response->isOk(), $response->getContent());
+        $this->assertTrue($response->isOk(), $response->getContent());
 
         $responseData = json_decode($response->getContent(), true);
         $crawler      = new Crawler($responseData['newContent'], $this->client->getInternalRequest()->getUri());
@@ -228,10 +226,10 @@ class CampaignSendWebhookFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request($form->getMethod(), $form->getUri(), $formValues, [], $this->createAjaxHeaders());
         $response = $this->client->getResponse();
-        Assert::assertTrue($response->isOk(), $response->getContent());
+        $this->assertTrue($response->isOk(), $response->getContent());
 
         $responseData = json_decode($response->getContent(), true);
-        Assert::assertSame(1, $responseData['success'], $response->getContent());
+        $this->assertSame(1, $responseData['success'], $response->getContent());
 
         return $responseData;
     }
