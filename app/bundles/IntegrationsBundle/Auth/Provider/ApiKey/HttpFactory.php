@@ -84,16 +84,14 @@ final class HttpFactory implements AuthProviderInterface
         return !empty($credentials->getApiKey());
     }
 
-    private function getHeaderClient(): ClientInterface
+    private function getHeaderClient(): Client
     {
-        return new Client(
-            [
-                'headers' => [$this->credentials->getKeyName() => $this->credentials->getApiKey()],
-            ]
-        );
+        return new Client([
+            'headers' => [$this->credentials->getKeyName() => $this->credentials->getApiKey()],
+        ]);
     }
 
-    private function getParameterClient(): ClientInterface
+    private function getParameterClient(): Client
     {
         $handler = new HandlerStack();
         $handler->setHandler(new CurlHandler());
@@ -106,10 +104,8 @@ final class HttpFactory implements AuthProviderInterface
             )
         );
 
-        return new Client(
-            [
-                'handler' => $handler,
-            ]
-        );
+        return new Client([
+            'handler' => $handler,
+        ]);
     }
 }

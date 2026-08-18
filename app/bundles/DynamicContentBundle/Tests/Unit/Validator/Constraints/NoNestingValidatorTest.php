@@ -67,7 +67,7 @@ final class NoNestingValidatorTest extends TestCase
         $this->assertSame(self::TRANSLATED_MESSAGE, $this->context->getViolations()->get(0)->getMessage());
     }
 
-    private function createContext(): ExecutionContextInterface
+    private function createContext(): ExecutionContext
     {
         $locale     = 'en_US';
         $translator = new Translator($locale);

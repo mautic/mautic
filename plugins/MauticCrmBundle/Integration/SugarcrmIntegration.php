@@ -54,7 +54,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
      */
     private array $sugarDncKeys = ['email_opt_out', 'invalid_email'];
 
-    private $authorizationError;
+    private bool|string|array|null $authorizationError = null;
 
     /**
      * Returns the name of the social integration that must match the name of the file.
