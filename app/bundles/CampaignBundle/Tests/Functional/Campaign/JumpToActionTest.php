@@ -145,13 +145,11 @@ final class JumpToActionTest extends MauticMysqlTestCase
         $this->em->persist($jumpTo);
         $this->em->flush();
 
-        // Store IDs before command execution since the command may detach entities
         $contactId  = $contact->getId();
         $campaignId = $campaign->getId();
 
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => $campaignId]);
 
-        // Clear and refresh entity manager state after command (command uses DBAL upsert and detaches entities)
         $this->em->clear();
         $contact = $this->em->getRepository(Lead::class)->find($contactId);
 
@@ -168,8 +166,6 @@ final class JumpToActionTest extends MauticMysqlTestCase
         }
 
         $this->em->flush();
-
-        // Clear entity manager before second command execution
         $this->em->clear();
 
         // Executing the command for the second time should not schedule any new events:
