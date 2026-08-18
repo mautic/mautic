@@ -51,7 +51,7 @@
     "symfony/web-profiler-bundle": "~7.4.0",
     "symplify/easy-coding-standard": "^13.2.17",
     "symplify/phpstan-rules": "^14.12",
-    "tomasvotruba/type-coverage": "^2.3.1"
+    "tomasvotruba/type-coverage": "^2.3.4"
   },
   "replace": {
     "mautic/grapes-js-builder-bundle": "self.version",

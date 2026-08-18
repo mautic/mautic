@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e2e19fdf4b35169cc1e7f8c1ecb0bf3c",
+    "content-hash": "fc146c77543abfe3ff74a01a91528386",
     "packages": [
         {
             "name": "api-platform/core",
@@ -19487,16 +19487,16 @@
         },
         {
             "name": "tomasvotruba/type-coverage",
-            "version": "2.3.3",
+            "version": "2.3.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/TomasVotruba/type-coverage.git",
-                "reference": "03ec19026a2781edd7958d3118a7a2d405949026"
+                "reference": "7b4aec57af15514dac9a3c5a9671da501444ecd0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/TomasVotruba/type-coverage/zipball/03ec19026a2781edd7958d3118a7a2d405949026",
-                "reference": "03ec19026a2781edd7958d3118a7a2d405949026",
+                "url": "https://api.github.com/repos/TomasVotruba/type-coverage/zipball/7b4aec57af15514dac9a3c5a9671da501444ecd0",
+                "reference": "7b4aec57af15514dac9a3c5a9671da501444ecd0",
                 "shasum": ""
             },
             "require": {
@@ -19542,7 +19542,7 @@
             ],
             "support": {
                 "issues": "https://github.com/TomasVotruba/type-coverage/issues",
-                "source": "https://github.com/TomasVotruba/type-coverage/tree/2.3.3"
+                "source": "https://github.com/TomasVotruba/type-coverage/tree/2.3.4"
             },
             "funding": [
                 {
@@ -19554,7 +19554,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-08-18T06:31:46+00:00"
+            "time": "2026-08-18T07:48:32+00:00"
         },
         {
             "name": "webmozart/assert",

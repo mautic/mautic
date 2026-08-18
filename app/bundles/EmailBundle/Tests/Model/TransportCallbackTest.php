@@ -19,18 +19,22 @@ final class TransportCallbackTest extends TestCase
 {
     public function testStatSave(): void
     {
+        $dncStub = $this->createStub(DNC::class);
+
         $dncModel = new class() extends DoNotContact {
-            public function __construct()
+            private $dncStub;
+
+            public function __construct($dncStub)
             {
+                $this->dncStub = $dncStub;
             }
 
-            public function addDncForContact($contactId, $channel, $reason = DNC::BOUNCED, ?string $comments = '', $persist = true, $checkCurrentStatus = true, $allowUnsubscribeOverride = false): bool
+            public function addDncForContact($contactId, $channel, $reason = DNC::BOUNCED, ?string $comments = '', $persist = true, $checkCurrentStatus = true, $allowUnsubscribeOverride = false): DNC|false
             {
                 Assert::assertSame('email', $channel);
                 Assert::assertSame(DNC::BOUNCED, $reason);
 
-                // or DNC
-                return false;
+                return $this->dncStub;
             }
         };
 
