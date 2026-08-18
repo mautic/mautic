@@ -26,7 +26,7 @@ class SmsHelper
     ) {
     }
 
-    public function unsubscribe($number)
+    public function unsubscribe($number): false|DoNotContactEntity
     {
         $number = $this->phoneNumberHelper->format($number);
 
