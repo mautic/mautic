@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ChannelBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\EntityLookupType;

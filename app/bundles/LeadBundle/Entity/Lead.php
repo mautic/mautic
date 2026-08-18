@@ -304,7 +304,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->addLifecycleEvent('checkDateAdded', 'prePersist')
             ->addIndex(['date_added'], 'lead_date_added')
             ->addIndex(['date_modified'], 'lead_date_modified')
-            ->addIndex(['date_identified'], 'date_identified');
+            ->addIndex(['date_identified'], 'date_identified')
+            ->addIndex(['last_active'], 'last_active');
 
         $builder->addBigIntIdField();
 
@@ -528,7 +529,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $metadata->addConstraint(new UniqueCustomField(['object' => 'lead']));
+        $metadata->addConstraint(new UniqueCustomField(object: 'lead'));
     }
 
     public static function getDefaultIdentifierFields(): array

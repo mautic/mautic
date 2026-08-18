@@ -111,6 +111,34 @@ class ContactSegmentService
     }
 
     /**
+     * @param array<string, mixed> $batchLimiters
+     *
+     * @throws Exception\SegmentQueryException
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function hasNewLeadListLeads(LeadList $segment, array $batchLimiters): bool
+    {
+        $segmentId = $segment->getId();
+        $result    = $this->getNewLeadListLeads($segment, $batchLimiters, 1);
+
+        return !empty($result[$segmentId]);
+    }
+
+    /**
+     * @param array<string, mixed> $batchLimiters
+     *
+     * @throws Exception\SegmentQueryException
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function hasOrphanedLeadListLeads(LeadList $segment, array $batchLimiters = []): bool
+    {
+        $segmentId = $segment->getId();
+        $result    = $this->getOrphanedLeadListLeads($segment, $batchLimiters, 1);
+
+        return !empty($result[$segmentId]);
+    }
+
+    /**
      * @param mixed[] $batchLimiters
      */
     public function getNewLeadListLeadsQueryBuilder(LeadList $segment, array $batchLimiters, bool $addNewContactsRestrictions = true): QueryBuilder
