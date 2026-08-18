@@ -82,12 +82,7 @@ class HubspotIntegration extends CrmAbstractIntegration
         return ['push_lead', 'get_leads'];
     }
 
-    /**
-     * @param bool $inAuthorization
-     *
-     * @return mixed|string|null
-     */
-    public function getBearerToken($inAuthorization = false)
+    public function getBearerToken(bool $inAuthorization = false): ?string
     {
         $tokenData = $this->getKeys();
 
@@ -477,7 +472,7 @@ class HubspotIntegration extends CrmAbstractIntegration
             if (isset($stageName)) {
                 $stage = $this->stageRepository->getStageByName($stageName);
 
-                if (empty($stage)) {
+                if (null === $stage) {
                     $stage = new Stage();
                     $stage->setName($stageName);
                     $stages[$stageName] = $stage;
