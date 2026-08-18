@@ -1681,10 +1681,7 @@ class CommonRepository extends ServiceEntityRepository
         return [];
     }
 
-    /**
-     * @return mixed
-     */
-    protected function getIdsExpr(&$q, $filter)
+    protected function getIdsExpr(&$q, $filter): mixed
     {
         if ($ids = array_map(intval(...), explode(',', $filter->string))) {
             $parameterName = $this->generateRandomParameterName();

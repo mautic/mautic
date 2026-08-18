@@ -48,10 +48,8 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
 
     /**
      * Used by the mautic:iplookup:update_data command and form fetch button (if applicable) to update local IP data stores.
-     *
-     * @return bool
      */
-    public function downloadRemoteDataStore()
+    public function downloadRemoteDataStore(): bool
     {
         $package   = $this->getRemoteDateStoreDownloadUrl();
 
@@ -149,7 +147,7 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
         } catch (\Throwable $exception) {
             $this->logger->error('Failed to fetch remote IP data: '.$exception->getMessage());
 
-            $success = false;
+            return false;
         }
 
         return $success;
