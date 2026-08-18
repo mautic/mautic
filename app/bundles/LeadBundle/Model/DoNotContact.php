@@ -71,7 +71,7 @@ class DoNotContact implements MauticModelInterface
      * @param bool                 $allowUnsubscribeOverride
      *
      * @return false|DNC If a DNC entry is added or updated, returns the DoNotContact object. If a DNC is already present
-     *                  and has the specified reason, nothing is done and this returns false
+     *                   and has the specified reason, nothing is done and this returns false
      */
     public function addDncForContact(
         $contact,

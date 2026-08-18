@@ -29,7 +29,8 @@ final class TransportCallbackTest extends TestCase
                 Assert::assertSame('email', $channel);
                 Assert::assertSame(DNC::BOUNCED, $reason);
 
-                return true;
+                // or DNC
+                return false;
             }
         };
 

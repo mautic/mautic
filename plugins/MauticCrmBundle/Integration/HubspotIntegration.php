@@ -472,7 +472,7 @@ class HubspotIntegration extends CrmAbstractIntegration
             if (isset($stageName)) {
                 $stage = $this->stageRepository->getStageByName($stageName);
 
-                if (empty($stage)) {
+                if (null === $stage) {
                     $stage = new Stage();
                     $stage->setName($stageName);
                     $stages[$stageName] = $stage;

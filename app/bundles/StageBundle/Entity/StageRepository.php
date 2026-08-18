@@ -158,10 +158,10 @@ class StageRepository extends CommonRepository
         return $q->getQuery()->getArrayResult();
     }
 
-    public function getStageByName(string $stageName): array|false
+    public function getStageByName(string $stageName): ?Stage
     {
         if (!$stageName) {
-            return false;
+            return null;
         }
 
         $q = $this->_em->createQueryBuilder()
@@ -181,7 +181,7 @@ class StageRepository extends CommonRepository
             return $result[$key[0]];
         }
 
-        return null;
+        return false;
     }
 
     /**

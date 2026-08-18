@@ -19487,16 +19487,16 @@
         },
         {
             "name": "tomasvotruba/type-coverage",
-            "version": "2.3.2",
+            "version": "2.3.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/TomasVotruba/type-coverage.git",
-                "reference": "64531e51398036cbc8b7eba4710d051a3bffdebc"
+                "reference": "03ec19026a2781edd7958d3118a7a2d405949026"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/TomasVotruba/type-coverage/zipball/64531e51398036cbc8b7eba4710d051a3bffdebc",
-                "reference": "64531e51398036cbc8b7eba4710d051a3bffdebc",
+                "url": "https://api.github.com/repos/TomasVotruba/type-coverage/zipball/03ec19026a2781edd7958d3118a7a2d405949026",
+                "reference": "03ec19026a2781edd7958d3118a7a2d405949026",
                 "shasum": ""
             },
             "require": {
@@ -19542,7 +19542,7 @@
             ],
             "support": {
                 "issues": "https://github.com/TomasVotruba/type-coverage/issues",
-                "source": "https://github.com/TomasVotruba/type-coverage/tree/2.3.2"
+                "source": "https://github.com/TomasVotruba/type-coverage/tree/2.3.3"
             },
             "funding": [
                 {
@@ -19554,7 +19554,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-08-17T22:16:17+00:00"
+            "time": "2026-08-18T06:31:46+00:00"
         },
         {
             "name": "webmozart/assert",
