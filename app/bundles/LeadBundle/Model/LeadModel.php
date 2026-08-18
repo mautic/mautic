@@ -1385,7 +1385,7 @@ class LeadModel extends FormModel
                 // Set stage for contact
                 $stage = $this->stageRepository->getStageByName($stageName);
 
-                if (empty($stage)) {
+                if (null === $stage) {
                     $stage = new Stage();
                     $stage->setName($stageName);
                     $stages[$stageName] = $stage;

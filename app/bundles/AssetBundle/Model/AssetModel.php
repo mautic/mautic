@@ -614,16 +614,16 @@ class AssetModel extends FormModel implements GlobalSearchInterface
      *
      * @note The alias portion of the slug is no longer used for matching or validation.
      */
-    public function getEntityBySlugs($slug): Asset|bool
+    public function getEntityBySlugs(string $slug): ?Asset
     {
-        if (!is_string($slug) || !str_contains($slug, ':')) {
-            return false;
+        if (!str_contains($slug, ':')) {
+            return null;
         }
 
         [$id] = array_pad(explode(':', $slug, 2), 1, null);
 
         if (empty($id) || !ctype_digit($id)) {
-            return false;
+            return null;
         }
 
         $entity = $this->getEntity((int) $id);
@@ -631,6 +631,6 @@ class AssetModel extends FormModel implements GlobalSearchInterface
             return $entity;
         }
 
-        return false;
+        return null;
     }
 }

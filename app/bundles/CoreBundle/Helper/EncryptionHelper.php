@@ -64,13 +64,8 @@ class EncryptionHelper
     /**
      * Decrypt string.
      * Returns false in case of failed decryption.
-     *
-     * @param string $data
-     * @param bool   $mainDecryptOnly
-     *
-     * @return mixed|false
      */
-    public function decrypt($data, $mainDecryptOnly = false)
+    public function decrypt(string $data, bool $mainDecryptOnly = false): mixed
     {
         $encryptData      = explode('|', $data);
         $encryptedMessage = base64_decode($encryptData[0]);

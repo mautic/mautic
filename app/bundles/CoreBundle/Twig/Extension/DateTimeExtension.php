@@ -16,7 +16,7 @@ final readonly class DateTimeExtension
      * @see DateTimeHelper::getUtcDateTime
      */
     #[AsTwigFunction(name: 'dateTimeGetUtcDateTime', isSafe: ['all'])]
-    public function getUtcDateTime(): \DateTimeInterface
+    public function getUtcDateTime(): \DateTime
     {
         return $this->helper->getUtcDateTime();
     }

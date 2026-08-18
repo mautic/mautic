@@ -151,7 +151,7 @@ abstract class AbstractFormFieldHelper
     /**
      * @return mixed[]|string|false
      */
-    public static function formatList(string $format, $choices)
+    public static function formatList(string $format, $choices): array|string|false
     {
         switch ($format) {
             case self::FORMAT_JSON:

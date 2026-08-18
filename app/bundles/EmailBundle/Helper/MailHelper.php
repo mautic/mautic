@@ -1758,10 +1758,8 @@ class MailHelper
 
     /**
      * Check to see if a monitored email box is enabled and configured.
-     *
-     * @return bool|array
      */
-    public function isMontoringEnabled($bundleKey, $folderKey)
+    public function isMontoringEnabled(string $bundleKey, string $folderKey): false|array
     {
         if ($this->mailbox->isConfigured($bundleKey, $folderKey)) {
             return $this->mailbox->getMailboxSettings();
