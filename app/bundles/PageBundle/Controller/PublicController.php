@@ -42,8 +42,6 @@ use Symfony\Component\Routing\RouterInterface;
 final class PublicController extends AbstractFormController
 {
     /**
-     * @param string $slug
-     *
      * @throws \Exception
      * @throws FileNotFoundException
      */
@@ -57,9 +55,9 @@ final class PublicController extends AbstractFormController
         RouterInterface $router,
         DeviceTrackingServiceInterface $deviceTrackingService,
         PageModel $model,
-        $slug): RedirectResponse|Response
-    {
-        /** @var Page|bool $entity */
+        string $slug,
+    ): RedirectResponse|Response {
+        /** @var Page|null $entity */
         $entity = $model->getEntityBySlugs($slug);
 
         // Do not hit preference center pages
