@@ -60,7 +60,7 @@ final class HubspotIntegrationTest extends AbstractIntegrationTestCase
             ->willReturn($event);
 
         $this->integration->encryptAndSetApiKeys([HubspotIntegration::ACCESS_KEY], $this->createStub(Integration::class));
-        $this->assertNull($this->integration->getBearerToken());
+        $this->assertFalse($this->integration->getBearerToken());
     }
 
     public function testGetBearerTokenSet(): void

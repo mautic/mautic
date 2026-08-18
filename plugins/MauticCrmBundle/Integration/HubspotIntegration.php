@@ -82,7 +82,7 @@ class HubspotIntegration extends CrmAbstractIntegration
         return ['push_lead', 'get_leads'];
     }
 
-    public function getBearerToken(bool $inAuthorization): false|string
+    public function getBearerToken(bool $inAuthorization = false): false|string
     {
         $tokenData = $this->getKeys();
 

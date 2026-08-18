@@ -1359,7 +1359,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      *
      * @return string[]|bool|string|null
      */
-    public function sendEmail(Email $email, array $leads, array $options = [])
+    public function sendEmail(Email $email, array $leads, array $options = []): array|bool|string|null
     {
         $listId              = ArrayHelper::getValue('listId', $options);
         $ignoreDNC           = ArrayHelper::getValue('ignoreDNC', $options, false);
@@ -1757,13 +1757,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         return $event;
     }
 
-    /**
-     * @param int  $reason
-     * @param bool $flush
-     *
-     * @return bool|DoNotContact
-     */
-    public function setDoNotContact(Stat $stat, ?string $comments, $reason = DoNotContact::BOUNCED, $flush = true)
+    public function setDoNotContact(Stat $stat, ?string $comments, int $reason = DoNotContact::BOUNCED, bool $flush = true): DoNotContact|false
     {
         $lead = $stat->getLead();
 

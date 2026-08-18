@@ -193,15 +193,7 @@ trait CustomFieldEntityTrait
         return null;
     }
 
-    /**
-     * Get field details.
-     *
-     * @param string $key
-     * @param string $group
-     *
-     * @return array|false
-     */
-    public function getField($key, $group = null)
+    public function getField(string $key, ?string $group = null): array|false
     {
         if ($group && isset($this->fields[$group][$key])) {
             return $this->fields[$group][$key];

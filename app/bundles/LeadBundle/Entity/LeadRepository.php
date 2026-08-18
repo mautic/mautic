@@ -1101,12 +1101,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
     /**
      * Gets names, signature and email of the user(lead owner).
-     *
-     * @param int $ownerId
-     *
-     * @return array|false
      */
-    public function getLeadOwner($ownerId)
+    public function getLeadOwner(int $ownerId): array|false
     {
         if (!$ownerId) {
             return false;
