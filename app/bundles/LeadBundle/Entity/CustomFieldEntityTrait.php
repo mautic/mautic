@@ -11,25 +11,19 @@ trait CustomFieldEntityTrait
 {
     /**
      * Used by Mautic to populate the fields pulled from the DB.
-     *
-     * @var array
      */
-    protected $fields = [];
+    protected array $fields = [];
 
     /**
      * Just a place to store updated field values so we don't have to loop through them again comparing.
-     *
-     * @var array
      */
-    protected $updatedFields = [];
+    protected array $updatedFields = [];
 
     /**
      * A place events can use to pass data around on the object to prevent issues like creating a contact and having it processed to be sent back
      * to the origin of creation in a webhook.
-     *
-     * @var array
      */
-    protected $eventData = [];
+    protected array $eventData = [];
 
     /**
      * @return bool
@@ -193,15 +187,7 @@ trait CustomFieldEntityTrait
         return null;
     }
 
-    /**
-     * Get field details.
-     *
-     * @param string $key
-     * @param string $group
-     *
-     * @return array|false
-     */
-    public function getField($key, $group = null)
+    public function getField(string $key, ?string $group = null): array|false
     {
         if ($group && isset($this->fields[$group][$key])) {
             return $this->fields[$group][$key];

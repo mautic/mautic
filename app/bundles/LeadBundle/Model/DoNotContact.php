@@ -70,7 +70,7 @@ class DoNotContact implements MauticModelInterface
      * @param bool                 $checkCurrentStatus
      * @param bool                 $allowUnsubscribeOverride
      *
-     * @return bool|DNC If a DNC entry is added or updated, returns the DoNotContact object. If a DNC is already present
+     * @return DNC|null If a DNC entry is added or updated, returns the DoNotContact object. If a DNC is already present
      *                  and has the specified reason, nothing is done and this returns false
      */
     public function addDncForContact(
@@ -81,7 +81,7 @@ class DoNotContact implements MauticModelInterface
         $persist = true,
         $checkCurrentStatus = true,
         $allowUnsubscribeOverride = false,
-    ) {
+    ): ?DNC {
         $dnc     = false;
         if (is_numeric($contact)) {
             $contact = $this->leadModel->getEntity($contact);
@@ -89,7 +89,7 @@ class DoNotContact implements MauticModelInterface
 
         if (null === $contact) {
             // Contact not found, nothing to do
-            return false;
+            return null;
         }
 
         // if !$checkCurrentStatus, assume is contactable due to already being validated

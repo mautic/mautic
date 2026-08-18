@@ -139,12 +139,7 @@ class QueryBuilder extends BaseQueryBuilder
         return $fromClauses;
     }
 
-    /**
-     * @param string $alias
-     *
-     * @return string|false
-     */
-    public function getJoinCondition($alias)
+    public function getJoinCondition(string $alias): string|false
     {
         $parts = $this->getQueryParts();
         foreach ($parts['join']['l'] as $joinedTable) {
@@ -214,10 +209,7 @@ class QueryBuilder extends BaseQueryBuilder
         return $this;
     }
 
-    /**
-     * @return array|bool|string
-     */
-    public function getTableAlias(string $table, $joinType = null)
+    public function getTableAlias(string $table, $joinType = null): array|bool|string
     {
         if (null === $joinType) {
             $tables = $this->getTableAliases();
