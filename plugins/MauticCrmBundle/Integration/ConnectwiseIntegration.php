@@ -100,7 +100,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return $this->router->generate('mautic_integration_auth_callback', ['integration' => $this->getName()]);
     }
 
-    public function authCallback(array $settings = [], $parameters = []): string|false
+    public function authCallback(array $settings = [], array $parameters = []): string|false
     {
         $url   = $this->getApiUrl();
         $error = false;

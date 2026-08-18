@@ -109,12 +109,8 @@ abstract class MonitorTwitterBaseCommand extends Command
 
     /**
      * Search for tweets by creating your own search criteria.
-     *
-     * @param Monitoring $monitor
-     *
-     * @return array The results of makeRequest
      */
-    abstract protected function getTweets($monitor);
+    abstract protected function getTweets(Monitoring $monitor): array|false;
 
     /**
      * Main execution method. Gets the integration settings, processes the search criteria.
@@ -177,12 +173,8 @@ abstract class MonitorTwitterBaseCommand extends Command
      *
      * @Note: Keeping this method here instead of in the twitterCommandHelper
      *        so that the hashtag and mention commands can easily extend it.
-     *
-     * @param Monitoring $monitor
-     *
-     * @return bool
      */
-    protected function processMonitor($monitor)
+    protected function processMonitor(Monitoring $monitor): bool
     {
         $results = $this->getTweets($monitor);
 

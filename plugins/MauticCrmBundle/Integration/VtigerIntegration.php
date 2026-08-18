@@ -67,7 +67,7 @@ class VtigerIntegration extends CrmAbstractIntegration
     /**
      * @return bool|array<mixed>|string
      */
-    public function isAuthorized()
+    public function isAuthorized(): bool|string|array
     {
         if (!isset($this->keys['url'])) {
             return false;
@@ -117,10 +117,8 @@ class VtigerIntegration extends CrmAbstractIntegration
 
     /**
      * Retrieves and stores tokens returned from oAuthLogin.
-     *
-     * @param array $parameters
      */
-    public function authCallback(array $settings = [], $parameters = []): string|bool
+    public function authCallback(array $settings = [], array $parameters = []): string|false
     {
         $success = $this->isAuthorized();
         if (!$success) {

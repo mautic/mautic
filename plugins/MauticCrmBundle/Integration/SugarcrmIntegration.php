@@ -54,7 +54,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
      */
     private array $sugarDncKeys = ['email_opt_out', 'invalid_email'];
 
-    private $authorizationError;
+    private bool|string|array|null $authorizationError = null;
 
     /**
      * Returns the name of the social integration that must match the name of the file.
@@ -128,11 +128,9 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
     /**
      * Retrieves and stores tokens returned from oAuthLogin.
      *
-     * @param array $parameters
-     *
      * @return array
      */
-    public function authCallback(array $settings = [], $parameters = [])
+    public function authCallback(array $settings = [], array $parameters = []): array|false
     {
         if (isset($this->keys['version']) && '6' == $this->keys['version']) {
             $success = $this->isAuthorized();
@@ -589,10 +587,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
         return parent::prepareRequest($url, $parameters, $method, $settings, $authType);
     }
 
-    /**
-     * @return bool
-     */
-    public function isAuthorized()
+    public function isAuthorized(): bool
     {
         if (!$this->isConfigured()) {
             return false;

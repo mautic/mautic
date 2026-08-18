@@ -113,7 +113,7 @@ final class InstagramIntegration extends SocialIntegration
     /**
      * @param array<string, mixed> $socialCache
      */
-    private function getContactUserId(&$identifier, array &$socialCache)
+    private function getContactUserId(&$identifier, array &$socialCache): false|string
     {
         if (!empty($socialCache['id'])) {
             return $socialCache['id'];

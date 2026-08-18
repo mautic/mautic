@@ -13,12 +13,8 @@ final class MonitorTwitterMentionsCommand extends MonitorTwitterBaseCommand
 {
     /**
      * Search for tweets by mention.
-     *
-     * @param Monitoring $monitor
-     *
-     * @return bool|array False if missing the twitter handle, otherwise the array response from Twitter
      */
-    protected function getTweets($monitor)
+    protected function getTweets(Monitoring $monitor): array|false
     {
         $params = $monitor->getProperties();
         $stats  = $monitor->getStats();

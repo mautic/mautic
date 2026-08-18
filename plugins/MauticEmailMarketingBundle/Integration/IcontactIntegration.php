@@ -50,7 +50,7 @@ final class IcontactIntegration extends EmailAbstractIntegration
     /**
      * Get account ID and client folder ID.
      */
-    public function authCallback(array $settings = [], $parameters = [])
+    public function authCallback(array $settings = [], array $parameters = []): false|string
     {
         $url = $this->getApiUrl();
 
