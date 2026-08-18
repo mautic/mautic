@@ -1197,10 +1197,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * Checks if an integration is authorized and/or authorizes the request.
-     *
-     * @return bool
      */
-    public function isAuthorized()
+    public function isAuthorized(): bool|array|string
     {
         if (!$this->isConfigured()) {
             return false;
