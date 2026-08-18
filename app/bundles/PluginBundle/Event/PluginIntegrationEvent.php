@@ -14,10 +14,7 @@ final class PluginIntegrationEvent extends AbstractPluginIntegrationEvent
         $this->integration = $integration;
     }
 
-    /**
-     * @return Integration
-     */
-    public function getEntity()
+    public function getEntity(): ?Integration
     {
         return $this->integration->getIntegrationSettings();
     }

@@ -412,12 +412,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * Returns decrypted API keys.
-     *
-     * @param bool $entity
-     *
-     * @return array
      */
-    public function getDecryptedApiKeys($entity = false)
+    public function getDecryptedApiKeys(bool|Integration $entity = false): array
     {
         static $decryptedKeys = [];
 

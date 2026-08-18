@@ -339,7 +339,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
         $settings = $availableEvents[$eventType];
 
         if (isset($settings['callback']) && is_callable($settings['callback'])) {
-            return $this->invokeCallback($event, $lead, $settings);
+            return (bool) $this->invokeCallback($event, $lead, $settings);
         }
         /** @var TriggerEvent $triggerEvent */
         $triggerEvent = $this->triggerEventRepository->find($event['id']);
@@ -348,7 +348,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
 
         $this->dispatcher->dispatch($triggerExecutedEvent, $settings['eventName']);
 
-        return $triggerExecutedEvent->getResult();
+        return (bool) $triggerExecutedEvent->getResult();
     }
 
     private function invokeCallback(array $event, Lead $lead, array $settings): mixed
