@@ -323,11 +323,13 @@ class MailHelper
         if (empty($this->message->getReplyTo()) && !empty($this->getReplyTo())) {
             $this->setMessageReplyTo($this->getReplyTo());
         }
-        // Set system return path if applicable
+        // Sender wins over Return-Path in Symfony's envelope resolution, so drop it whenever a Return-Path is set.
         if (!$isQueueFlush && ($bounceEmail = $this->generateBounceEmail())) {
             $this->message->returnPath($bounceEmail);
+            $this->message->getHeaders()->remove('Sender');
         } elseif (!empty($this->returnPath)) {
             $this->message->returnPath($this->returnPath);
+            $this->message->getHeaders()->remove('Sender');
         }
 
         $this->dispatchPreSendEvent();
