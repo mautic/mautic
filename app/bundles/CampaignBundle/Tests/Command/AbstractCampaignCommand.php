@@ -198,7 +198,7 @@ abstract class AbstractCampaignCommand extends MauticMysqlTestCase
     protected function markEventLogAsCompleted(LeadEventLog $log): void
     {
         /** @var OptimisticLockServiceInterface $lockService */
-        $lockService = self::$container->get('mautic.core.service.optimistic_lock');
+        $lockService = self::getContainer()->get(OptimisticLockServiceInterface::class);
         $this->em->flush();
         $lockService->incrementVersion($log);
     }

@@ -69,20 +69,20 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
         $contact  = $this->createContact();
         $this->em->flush();
 
-        Assert::assertSame(0, $contact->getPoints());
+        $this->assertSame(0, $contact->getPoints());
 
         $contacts = new ArrayCollection([$contact->getId() => $contact]);
         $this->eventExecutioner->executeForContacts($event, $contacts);
 
         $logs = $this->em->getRepository(LeadEventLog::class)->findAll();
-        Assert::assertCount(1, $logs);
+        $this->assertCount(1, $logs);
 
         $log = reset($logs);
         \assert($log instanceof LeadEventLog);
-        Assert::assertSame(2, $log->getVersion(), 'Version should be incremented.');
+        $this->assertSame(2, $log->getVersion(), 'Version should be incremented.');
 
         $this->eventExecutioner->executeLogs($event, new ArrayCollection($logs));
-        Assert::assertTrue($this->testHandler->hasErrorThatContains(sprintf(
+        $this->assertTrue($this->testHandler->hasErrorThatContains(sprintf(
             'Campaign condition event log ID "%s" was skipped as it had been executed already.',
             $log->getId(),
         )), 'There should be an error log regarding the skipped log.');
