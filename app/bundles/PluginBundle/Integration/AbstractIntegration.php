@@ -72,6 +72,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     protected ?Integration $settings = null;
 
+    /**
+     * @var array<string, string>
+     */
     protected array $keys = [];
 
     protected CacheInterface $cache;
@@ -403,9 +406,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Returns already decrypted keys.
      *
-     * @return mixed
+     * @return array<string, string>
      */
-    public function getKeys()
+    public function getKeys(): array
     {
         return $this->keys;
     }
@@ -1306,7 +1309,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return string
      */
-    public function getBearerToken($inAuthorization = false)
+    public function getBearerToken(bool $inAuthorization): false|string
     {
         return '';
     }

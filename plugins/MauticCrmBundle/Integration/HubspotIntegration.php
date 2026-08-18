@@ -82,16 +82,11 @@ class HubspotIntegration extends CrmAbstractIntegration
         return ['push_lead', 'get_leads'];
     }
 
-    /**
-     * @param bool $inAuthorization
-     *
-     * @return mixed|string|null
-     */
-    public function getBearerToken($inAuthorization = false)
+    public function getBearerToken(bool $inAuthorization): false|string
     {
         $tokenData = $this->getKeys();
 
-        return $tokenData[self::ACCESS_KEY] ?? null;
+        return $tokenData[self::ACCESS_KEY] ?? false;
     }
 
     /**
