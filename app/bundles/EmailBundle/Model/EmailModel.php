@@ -1825,10 +1825,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
     /**
      * Get the settings for a monitored mailbox or false if not enabled.
-     *
-     * @return bool|array
      */
-    public function getMonitoredMailbox($bundleKey, $folderKey)
+    public function getMonitoredMailbox($bundleKey, $folderKey): false|array
     {
         if ($this->mailboxHelper->isConfigured($bundleKey, $folderKey)) {
             return $this->mailboxHelper->getMailboxSettings();

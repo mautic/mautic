@@ -181,7 +181,7 @@ class StageRepository extends CommonRepository
             return $result[$key[0]];
         }
 
-        return false;
+        return null;
     }
 
     /**
