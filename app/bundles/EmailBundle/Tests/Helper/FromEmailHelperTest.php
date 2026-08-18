@@ -137,7 +137,7 @@ final class FromEmailHelperTest extends TestCase
         $this->leadRepository->expects($this->once())
             ->method('getLeadOwner')
             ->with(1)
-            ->willReturn(null);
+            ->willReturn(false);
 
         $fromEmail = $this->getHelper()->getFromAddressConsideringOwner($defaultFrom, $contact);
 
@@ -267,7 +267,8 @@ final class FromEmailHelperTest extends TestCase
         $matcher = $this->exactly(2);
 
         $this->leadRepository->expects($matcher)
-            ->method('getLeadOwner')->willReturnCallback(function (...$parameters) use ($matcher, $users): array|false {
+            ->method('getLeadOwner')
+            ->willReturnCallback(function (...$parameters) use ($matcher, $users): array|false {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(1, $parameters[0]);
 
@@ -278,6 +279,8 @@ final class FromEmailHelperTest extends TestCase
 
                     return $users[1];
                 }
+
+                return false;
             });
 
         $helper = $this->getHelper();
@@ -590,7 +593,7 @@ final class FromEmailHelperTest extends TestCase
         $this->leadRepository->expects($this->once())
             ->method('getLeadOwner')
             ->with(1)
-            ->willReturn(null);
+            ->willReturn(false);
 
         $owner = $this->getHelper()->getContactOwner(1);
 
@@ -703,7 +706,7 @@ final class FromEmailHelperTest extends TestCase
         $this->leadRepository->expects($this->once())
             ->method('getLeadOwner')
             ->with(1)
-            ->willReturn(null);
+            ->willReturn(false);
 
         $helper = $this->getHelper();
         $helper->getFromAddressConsideringOwner(
@@ -750,6 +753,8 @@ final class FromEmailHelperTest extends TestCase
 
                     return $user2;
                 }
+
+                return false;
             });
 
         $helper = $this->getHelper();

@@ -1169,10 +1169,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return null == $this->dateIdentified && false === $this->isAnonymous();
     }
 
-    /**
-     * @return bool
-     */
-    protected function getFirstSocialIdentity()
+    protected function getFirstSocialIdentity(): mixed
     {
         if (isset($this->fields['social'])) {
             foreach ($this->fields['social'] as $social) {

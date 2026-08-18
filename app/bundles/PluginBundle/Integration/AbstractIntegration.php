@@ -1309,7 +1309,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return string
      */
-    public function getBearerToken(bool $inAuthorization): false|string
+    public function getBearerToken(bool $inAuthorization = false): false|string
     {
         return '';
     }
