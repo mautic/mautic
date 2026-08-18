@@ -33,16 +33,16 @@ class ContactTracker
     private bool $contactLastActiveLogged = false;
 
     public function __construct(
-        private LeadRepository $leadRepository,
-        private ContactTrackingServiceInterface $contactTrackingService,
-        private DeviceTracker $deviceTracker,
-        private CorePermissions $security,
-        private LoggerInterface $logger,
-        private IpLookupHelper $ipLookupHelper,
-        private RequestStack $requestStack,
-        private CoreParametersHelper $coreParametersHelper,
-        private EventDispatcherInterface $dispatcher,
-        private FieldModel $leadFieldModel,
+        private readonly LeadRepository $leadRepository,
+        private readonly ContactTrackingServiceInterface $contactTrackingService,
+        private readonly DeviceTracker $deviceTracker,
+        private readonly CorePermissions $security,
+        private readonly LoggerInterface $logger,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly RequestStack $requestStack,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly FieldModel $leadFieldModel,
     ) {
     }
 

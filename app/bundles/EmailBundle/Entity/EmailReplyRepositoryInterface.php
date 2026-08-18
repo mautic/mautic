@@ -6,9 +6,6 @@ namespace Mautic\EmailBundle\Entity;
 
 use Mautic\LeadBundle\Entity\Lead;
 
-/**
- * Interface EmailReplyRepositoryInterface.
- */
 interface EmailReplyRepositoryInterface
 {
     /**

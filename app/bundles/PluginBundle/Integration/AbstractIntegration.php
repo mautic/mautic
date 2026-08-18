@@ -70,7 +70,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     protected bool $coreIntegration = false;
 
-    protected Integration $settings;
+    protected ?Integration $settings = null;
 
     protected array $keys = [];
 
@@ -333,10 +333,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * Get the social integration entity.
-     *
-     * @return Integration
      */
-    public function getIntegrationSettings()
+    public function getIntegrationSettings(): ?Integration
     {
         return $this->settings;
     }
@@ -414,12 +412,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * Returns decrypted API keys.
-     *
-     * @param bool $entity
-     *
-     * @return array
      */
-    public function getDecryptedApiKeys($entity = false)
+    public function getDecryptedApiKeys(bool|Integration $entity = false): array
     {
         static $decryptedKeys = [];
 
@@ -1135,6 +1129,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             $entity = new Integration();
             $entity->setName($this->getName());
         }
+
         // Prepare the keys for extraction such as renaming, setting expiry, etc
         $data = $this->prepareResponseForExtraction($data);
 
@@ -1950,7 +1945,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             }
 
             $errorMessage = $e->getMessage();
-            $errorHeader  = $this->getTranslator()->trans(
+            $errorHeader  = $this->translator->trans(
                 'mautic.integration.error',
                 [
                     '%name%' => $this->getName(),
@@ -1962,7 +1957,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                 $contactId   = $contact->getId();
                 $contactName = $contact->getPrimaryIdentifier();
             } elseif ($contactId = $e->getContactId()) {
-                $contactName = $this->getTranslator()->trans('mautic.integration.error.generic_contact_name', ['%id%' => $contactId]);
+                $contactName = $this->translator->trans('mautic.integration.error.generic_contact_name', ['%id%' => $contactId]);
             }
 
             $this->lastIntegrationError = $errorHeader.': '.$errorMessage;
@@ -1983,7 +1978,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             $messageHash = md5($errorMessage);
             if (!array_key_exists($messageHash, $this->notifications)) {
                 foreach ($this->adminUsers as $user) {
-                    $this->getNotificationModel()->addNotification(
+                    $this->notificationModel->addNotification(
                         $errorMessage,
                         $this->getName(),
                         false,

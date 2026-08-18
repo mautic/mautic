@@ -18,7 +18,7 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
-final class AssetImportExportSubscriber implements EventSubscriberInterface
+final readonly class AssetImportExportSubscriber implements EventSubscriberInterface
 {
     use ImportExportTrait;
 

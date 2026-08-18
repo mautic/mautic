@@ -12,9 +12,9 @@ class PendingEvent extends AbstractLogCollectionEvent
 {
     use ContextTrait;
 
-    private ArrayCollection $failures;
+    private readonly ArrayCollection $failures;
 
-    private ArrayCollection $successful;
+    private readonly ArrayCollection $successful;
 
     /**
      * @var string|null
@@ -26,7 +26,7 @@ class PendingEvent extends AbstractLogCollectionEvent
      */
     private $channelId;
 
-    private \DateTimeInterface $now;
+    private readonly \DateTimeInterface $now;
 
     /**
      * @throws \Exception

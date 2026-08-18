@@ -56,9 +56,9 @@ final class EventLogApiController extends FetchCommonApiController
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
         EventLogModel $campaignEventLogModel,
-        private LeadModel $leadModel,
-        private CampaignModel $campaignModel,
-        private EventModel $eventModel,
+        private readonly LeadModel $leadModel,
+        private readonly CampaignModel $campaignModel,
+        private readonly EventModel $eventModel,
     ) {
         $this->model                    = $campaignEventLogModel;
         $this->entityClass              = LeadEventLog::class;

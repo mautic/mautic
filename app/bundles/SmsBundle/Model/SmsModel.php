@@ -55,7 +55,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         protected TrackableModel $pageTrackableModel,
         protected LeadModel $leadModel,
         protected TransportChain $transport,
-        private CacheProviderInterface $cacheProvider,
+        private readonly CacheProviderInterface $cacheProvider,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -193,7 +193,6 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         $sendTo  = is_array($sendTo) ? $sendTo : [$sendTo];
 
         $sentCount       = [];
-        $stats           = [];
         $results         = [];
         $contacts        = []; // Shall we reset the passed contacts param here?
         $fetchContacts   = [];

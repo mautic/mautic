@@ -11,7 +11,7 @@ final class DateHelper
     /**
      * @var string[]
      */
-    private array $formats;
+    private readonly array $formats;
 
     /**
      * @api cannot be readonly, as changed in tests via reflection
@@ -180,34 +180,22 @@ final class DateHelper
         return implode(' ', $formated);
     }
 
-    /**
-     * @return string
-     */
-    public function getFullFormat()
+    public function getFullFormat(): string
     {
         return $this->formats['datetime'];
     }
 
-    /**
-     * @return string
-     */
-    public function getDateFormat()
+    public function getDateFormat(): string
     {
         return $this->formats['date'];
     }
 
-    /**
-     * @return string
-     */
-    public function getTimeFormat()
+    public function getTimeFormat(): string
     {
         return $this->formats['time'];
     }
 
-    /**
-     * @return string
-     */
-    public function getShortFormat()
+    public function getShortFormat(): string
     {
         return $this->formats['short'];
     }

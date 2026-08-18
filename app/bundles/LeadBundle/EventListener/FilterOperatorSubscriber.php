@@ -58,11 +58,11 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
     ];
 
     public function __construct(
-        private OperatorOptions $operatorOptions,
-        private LeadFieldRepository $leadFieldRepository,
-        private TypeOperatorProviderInterface $typeOperatorProvider,
-        private FieldChoicesProviderInterface $fieldChoicesProvider,
-        private TranslatorInterface $translator,
+        private readonly OperatorOptions $operatorOptions,
+        private readonly LeadFieldRepository $leadFieldRepository,
+        private readonly TypeOperatorProviderInterface $typeOperatorProvider,
+        private readonly FieldChoicesProviderInterface $fieldChoicesProvider,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 

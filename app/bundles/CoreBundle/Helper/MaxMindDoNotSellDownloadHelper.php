@@ -13,7 +13,7 @@ final class MaxMindDoNotSellDownloadHelper
     /**
      * @var array<string>
      */
-    private array $auth;
+    private readonly array $auth;
 
     /**
      * @var string

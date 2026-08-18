@@ -7,9 +7,6 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\ORM\QueryBuilder as OrmQueryBuilder;
 
-/**
- * Interface CustomFieldRepositoryInterface.
- */
 interface CustomFieldRepositoryInterface
 {
     /**

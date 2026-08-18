@@ -22,7 +22,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
-final class SegmentImportExportSubscriber implements EventSubscriberInterface
+final readonly class SegmentImportExportSubscriber implements EventSubscriberInterface
 {
     use ImportExportTrait;
 

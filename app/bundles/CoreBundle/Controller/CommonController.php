@@ -76,8 +76,8 @@ class CommonController extends AbstractController implements MauticController
         protected CoreParametersHelper $coreParametersHelper,
         protected EventDispatcherInterface $dispatcher,
         protected Translator $translator,
-        private FlashBag $flashBag,
-        private RequestStack $requestStack,
+        private readonly FlashBag $flashBag,
+        private readonly RequestStack $requestStack,
         protected CorePermissions $security,
     ) {
         $this->user = $userHelper->getUser();

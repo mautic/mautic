@@ -58,9 +58,7 @@ final class TagApiController extends CommonApiController
         if (empty($params[$this->entityNameOne])) {
             throw new \InvalidArgumentException($this->translator->trans('mautic.lead.api.tag.required', [], 'validators'));
         }
-
-        $tagModel = $this->model;
-        \assert($tagModel instanceof TagModel);
+        \assert($this->model instanceof TagModel);
 
         return $this->tagRepository->getTagByNameOrCreateNewOne($params[$this->entityNameOne]);
     }

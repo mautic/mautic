@@ -19,10 +19,10 @@ abstract class AbstractHelper implements StatHelperInterface
     use DateRangeUnitTrait;
 
     public function __construct(
-        private Collector $collector,
+        private readonly Collector $collector,
         Connection $connection,
         protected GeneratedColumnsProviderInterface $generatedColumnsProvider,
-        private UserHelper $userHelper,
+        private readonly UserHelper $userHelper,
     ) {
         $this->connection               = $connection;
     }

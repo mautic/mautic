@@ -6,9 +6,6 @@ namespace Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory;
 
 use DeviceDetector\DeviceDetector;
 
-/**
- * Interface DeviceDetectorFactoryInterface.
- */
 interface DeviceDetectorFactoryInterface
 {
     /**

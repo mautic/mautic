@@ -73,7 +73,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
-        private FieldList $fieldList,
+        private readonly FieldList $fieldList,
         private readonly CompanyRepository $companyRepository,
         private readonly CompanyLeadRepository $companyLeadRepository,
         private readonly LeadRepository $leadRepository,

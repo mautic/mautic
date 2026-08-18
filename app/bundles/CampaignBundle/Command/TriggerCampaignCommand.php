@@ -54,18 +54,18 @@ final class TriggerCampaignCommand extends ModeratedCommand
     private ?Campaign $campaign = null;
 
     public function __construct(
-        private CampaignRepository $campaignRepository,
-        private EventDispatcherInterface $dispatcher,
-        private TranslatorInterface $translator,
-        private KickoffExecutioner $kickoffExecutioner,
-        private ScheduledExecutioner $scheduledExecutioner,
-        private InactiveExecutioner $inactiveExecutioner,
-        private LoggerInterface $logger,
-        private FormatterHelper $formatterHelper,
-        private SegmentCountCacheHelper $segmentCountCacheHelper,
+        private readonly CampaignRepository $campaignRepository,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly TranslatorInterface $translator,
+        private readonly KickoffExecutioner $kickoffExecutioner,
+        private readonly ScheduledExecutioner $scheduledExecutioner,
+        private readonly InactiveExecutioner $inactiveExecutioner,
+        private readonly LoggerInterface $logger,
+        private readonly FormatterHelper $formatterHelper,
+        private readonly SegmentCountCacheHelper $segmentCountCacheHelper,
         PathsHelper $pathsHelper,
-        private CoreParametersHelper $coreParametersHelper,
-        private ProcessSignalService $processSignalService,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly ProcessSignalService $processSignalService,
         private readonly LeadListRepository $leadListRepository,
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);

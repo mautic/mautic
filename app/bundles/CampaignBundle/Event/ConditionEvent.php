@@ -12,8 +12,8 @@ final class ConditionEvent extends CampaignExecutionEvent
     private bool $passed = false;
 
     public function __construct(
-        private AbstractEventAccessor $eventConfig,
-        private LeadEventLog $eventLog,
+        private readonly AbstractEventAccessor $eventConfig,
+        private readonly LeadEventLog $eventLog,
     ) {
         // @deprecated support for pre 2.13.0; to be removed in 3.0
         parent::__construct(

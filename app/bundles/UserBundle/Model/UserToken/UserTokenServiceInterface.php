@@ -6,9 +6,6 @@ namespace Mautic\UserBundle\Model\UserToken;
 
 use Mautic\UserBundle\Entity\UserToken;
 
-/**
- * Interface UserTokenServiceInterface.
- */
 interface UserTokenServiceInterface
 {
     /**

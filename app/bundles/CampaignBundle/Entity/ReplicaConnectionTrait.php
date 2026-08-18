@@ -6,9 +6,6 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 
-/**
- * Trait ReplicaConnectionTrait.
- */
 trait ReplicaConnectionTrait
 {
     /**

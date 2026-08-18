@@ -27,7 +27,7 @@ final class LeadTimelineEvent extends Event
      *
      * @var mixed[]
      */
-    private array $filters;
+    private readonly array $filters;
 
     /**
      * @var array<string, int>
@@ -70,7 +70,7 @@ final class LeadTimelineEvent extends Event
     public function __construct(
         private readonly ?Lead $lead = null,
         array $filters = [],
-        private ?array $orderBy = null,
+        private readonly ?array $orderBy = null,
         private $page = 1,
         private $limit = 25,
         private $forTimeline = true,

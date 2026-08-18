@@ -30,8 +30,8 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
     private string $context = '';
 
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
-        private FilterOperatorProviderInterface $filterOperatorProvider,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly FilterOperatorProviderInterface $filterOperatorProvider,
     ) {
     }
 
@@ -110,7 +110,7 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
     /**
      * @return array<string,mixed[]>
      */
-    protected function getFilterOperators(): array
+    private function getFilterOperators(): array
     {
         return $this->filterOperatorProvider->getAllOperators();
     }

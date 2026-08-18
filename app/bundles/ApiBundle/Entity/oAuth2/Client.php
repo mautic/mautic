@@ -185,9 +185,7 @@ class Client extends BaseClient
      */
     public function isAuthorizedClient(User $user)
     {
-        $users = $this->users;
-
-        return $users->contains($user);
+        return $this->users->contains($user);
     }
 
     public function addUser(User $users): static

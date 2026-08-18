@@ -23,7 +23,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
-final class SearchSubscriber implements EventSubscriberInterface
+final readonly class SearchSubscriber implements EventSubscriberInterface
 {
     use QueryBuilderManipulatorTrait;
 
@@ -36,7 +36,7 @@ final class SearchSubscriber implements EventSubscriberInterface
         private CorePermissions $security,
         private Environment $twig,
         private GlobalSearch $globalSearch,
-        private readonly LeadRepository $leadRepository,
+        private LeadRepository $leadRepository,
     ) {
     }
 

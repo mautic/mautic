@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Model;
 
-/**
- * Interface ChannelTimelineInterface.
- */
 interface ChannelTimelineInterface
 {
     /**

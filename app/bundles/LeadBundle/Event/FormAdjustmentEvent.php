@@ -19,7 +19,7 @@ final class FormAdjustmentEvent extends Event
         private readonly string $fieldAlias,
         private readonly string $fieldObject,
         private readonly string $operator,
-        private array $fieldDetails,
+        private readonly array $fieldDetails,
     ) {
     }
 

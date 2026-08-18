@@ -622,15 +622,13 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
      */
     public function hasOrphanEvents(): bool
     {
-        $canvasSettings = $this->canvasSettings;
-
-        if (empty($canvasSettings['nodes'])) {
+        if (empty($this->canvasSettings['nodes'])) {
             return false;
         }
 
         // Extract event IDs from canvas nodes (excludes 'lists', 'forms' and other non-event nodes)
         $eventIds = array_filter(
-            array_column($canvasSettings['nodes'], 'id'),
+            array_column($this->canvasSettings['nodes'], 'id'),
             fn ($id): bool => !in_array($id, ['lists', 'forms'])
         );
 
@@ -640,8 +638,8 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
 
         // Extract connected event IDs from connections
         $connectedEventIds = [];
-        if (!empty($canvasSettings['connections'])) {
-            $connectedEventIds = array_filter(array_column($canvasSettings['connections'], 'targetId'));
+        if (!empty($this->canvasSettings['connections'])) {
+            $connectedEventIds = array_filter(array_column($this->canvasSettings['connections'], 'targetId'));
         }
 
         return !empty(array_diff($eventIds, $connectedEventIds));
@@ -654,7 +652,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
 
     public function allowRestart(): bool
     {
-        return $this->getAllowRestart();
+        return $this->allowRestart;
     }
 
     /**

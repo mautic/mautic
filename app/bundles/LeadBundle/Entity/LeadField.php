@@ -818,7 +818,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     public function setColumnWasCreated(): void
     {
         $this->columnIsNotCreated = false;
-        $this->setIsPublished($this->getOriginalIsPublishedValue());
+        $this->setIsPublished($this->originalIsPublishedValue);
     }
 
     public function disablePublishChange(): bool

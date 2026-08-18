@@ -47,7 +47,7 @@ final class PointApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        private LeadModel $leadModel,
+        private readonly LeadModel $leadModel,
         PointModel $pointModel,
     ) {
         $this->model            = $pointModel;

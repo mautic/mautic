@@ -32,7 +32,7 @@ final class TimingSafeFormLoginAuthenticator implements AuthenticatorInterface, 
     /**
      * @var array<mixed>
      */
-    private array $options;
+    private readonly array $options;
 
     /**
      * @param array<mixed> $options
