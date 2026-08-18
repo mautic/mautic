@@ -333,10 +333,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * Get the social integration entity.
-     *
-     * @return Integration
      */
-    public function getIntegrationSettings()
+    public function getIntegrationSettings(): ?Integration
     {
         return $this->settings;
     }
