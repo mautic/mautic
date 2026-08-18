@@ -11,7 +11,6 @@ use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\NotificationBundle\Entity\Notification;
 use Mautic\NotificationBundle\Model\NotificationModel;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -565,10 +564,8 @@ final class NotificationController extends AbstractFormController
 
     /**
      * Deletes the entity.
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         $page      = $request->getSession()->get('mautic.notification.page', 1);
         $returnUrl = $this->generateUrl('mautic_notification_index', ['page' => $page]);
@@ -714,15 +711,13 @@ final class NotificationController extends AbstractFormController
 
     /**
      * @param int $page
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function contactsAction(
         Request $request,
         PageHelperFactoryInterface $pageHelperFactory,
         $objectId,
         $page = 1,
-    ) {
+    ): Response {
         return $this->generateContactsGrid(
             $request,
             $pageHelperFactory,

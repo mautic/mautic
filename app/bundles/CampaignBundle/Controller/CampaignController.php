@@ -397,8 +397,6 @@ class CampaignController extends AbstractStandardFormController
         $objectIds      = json_decode($ids, true);
 
         if (empty($ids)) {
-            $this->campaignRepository->setTranslator($this->translator);
-
             $args = [
                 'filter'           => $filter,
                 'orderBy'          => 'c.id',
@@ -446,8 +444,6 @@ class CampaignController extends AbstractStandardFormController
      * @param string|int $objectId
      * @param int        $page
      * @param int|null   $count
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
     public function contactsAction(
         Request $request,
@@ -457,7 +453,7 @@ class CampaignController extends AbstractStandardFormController
         $count = null,
         ?\DateTimeInterface $dateFrom = null,
         ?\DateTimeInterface $dateTo = null,
-    ) {
+    ): Response {
         $session = $request->getSession();
         $session->set('mautic.campaign.contact.page', $page);
 
@@ -629,15 +625,9 @@ class CampaignController extends AbstractStandardFormController
                         $this->campaignModel->saveEntity($campaign);
                         $this->afterEntitySave($campaign, $form, 'new', $valid);
 
-                        if (method_exists($this, 'viewAction')) {
-                            $viewParameters = ['objectId' => $campaign->getId(), 'objectAction' => 'view'];
-                            $returnUrl      = $this->generateUrl('mautic_campaign_action', $viewParameters);
-                            $template       = 'Mautic\CampaignBundle\Controller\CampaignController::viewAction';
-                        } else {
-                            $viewParameters = ['page' => $page];
-                            $returnUrl      = $this->generateUrl('mautic_campaign_index', $viewParameters);
-                            $template       = 'Mautic\CampaignBundle\Controller\CampaignController::indexAction';
-                        }
+                        $viewParameters = ['objectId' => $campaign->getId(), 'objectAction' => 'view'];
+                        $returnUrl      = $this->generateUrl('mautic_campaign_action', $viewParameters);
+                        $template       = 'Mautic\CampaignBundle\Controller\CampaignController::viewAction';
                     }
                 }
 

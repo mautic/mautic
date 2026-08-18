@@ -1576,7 +1576,7 @@ Mautic.campaignToggleTimeframes = function() {
  */
 Mautic.closeCampaignBuilder = function() {
     // Disable buttons
-    mQuery('.btns-builder').find('button').prop('disabled', true);
+    mQuery('#campaign-builder .header__action').prop('disabled', true);
     var builderCss = {
         margin: "0",
         padding: "0",
@@ -1597,14 +1597,13 @@ Mautic.closeCampaignBuilder = function() {
 
     Mautic.updateConnections(function(err, response) {
         mQuery('body').css('overflow-y', '');
+        mQuery('#builder-overlay').remove();
+        mQuery('#campaign-builder .header__action').prop('disabled', false);
 
         if (!err) {
-            mQuery('#builder-overlay').remove();
             mQuery('body').css('overflow-y', '');
             if (response.success) {
                 mQuery('#campaign-builder').trigger('campaign-builder:hide');
-                // Enable buttons
-                mQuery('.btns-builder').find('button').prop('disabled', false);
             }
         }
     });
@@ -1613,10 +1612,10 @@ Mautic.closeCampaignBuilder = function() {
 
 Mautic.saveCampaignFromBuilder = function() {
     // Disable buttons
-    mQuery('.btns-builder').find('button').prop('disabled', true);
+    mQuery('#campaign-builder .header__action').prop('disabled', true);
     Mautic.activateButtonLoadingIndicator(mQuery('.btn-apply-builder'));
-    Mautic.updateConnections(function(err) {
-        if (!err) {
+    Mautic.updateConnections(function(err, response) {
+        if (!err && response.success) {
             var applyBtn = mQuery('.btn-apply');
             mQuery('#campaign_campaignElements').val(JSON.stringify(Mautic.campaignBuilderCampaignElements));
             Mautic.inBuilderSubmissionOn(applyBtn.closest('form'));
@@ -1628,6 +1627,9 @@ Mautic.saveCampaignFromBuilder = function() {
 
             // Call our handler initialization function
             Mautic.ensureCampaignEventHandlers();
+        } else {
+            Mautic.removeButtonLoadingIndicator(mQuery('.btn-apply-builder'));
+            mQuery('#campaign-builder .header__action').prop('disabled', false);
         }
     });
 };

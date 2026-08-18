@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
