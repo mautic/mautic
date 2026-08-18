@@ -13,6 +13,7 @@ use Mautic\CampaignBundle\Executioner\Exception\ConditionFailedException;
 use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
 use Mautic\CoreBundle\Service\OptimisticLockServiceInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 class ConditionExecutioner implements EventInterface
 {
@@ -21,6 +22,7 @@ class ConditionExecutioner implements EventInterface
     public function __construct(
         private readonly ConditionDispatcher $dispatcher,
         private readonly OptimisticLockServiceInterface $optimisticLockService,
+        #[Autowire(service: 'monolog.logger.mautic')]
         private readonly LoggerInterface $logger,
     ) {
     }

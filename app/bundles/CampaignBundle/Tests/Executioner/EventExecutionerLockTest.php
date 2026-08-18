@@ -30,6 +30,10 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
 
     protected function setUp(): void // @phpstan-ignore phpunit.callParent
     {
+        // Prevent IP address lookups during campaign execution - this avoids issues with
+        // static IP address cache and DBAL upsert operations in tests
+        defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') || define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
+
         $this->loggerTraitSetup();
 
         $this->eventExecutioner = self::getContainer()->get(EventExecutioner::class);
@@ -78,7 +82,7 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
         $this->assertCount(1, $logs);
 
         $log = reset($logs);
-        \assert($log instanceof LeadEventLog);
+        $this->assertInstanceOf(LeadEventLog::class, $log);
         $this->assertSame(2, $log->getVersion(), 'Version should be incremented.');
 
         $this->eventExecutioner->executeLogs($event, new ArrayCollection($logs));

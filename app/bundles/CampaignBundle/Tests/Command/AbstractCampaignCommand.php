@@ -48,6 +48,10 @@ abstract class AbstractCampaignCommand extends MauticMysqlTestCase
      */
     protected function setUp(): void
     {
+        // Prevent IP address lookups during campaign execution - this avoids issues with
+        // static IP address cache and DBAL upsert operations in tests
+        defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') || define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
+
         // Everything needs to happen anonymously
         $this->defaultClientServer = $this->clientServer;
         $this->clientServer        = [];

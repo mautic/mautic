@@ -55,7 +55,8 @@ class EventLogger
 
     public function persistLog(LeadEventLog $log): void
     {
-        $this->leadEventLogRepository->saveEntity($log);
+        // Use upsert to handle potential duplicate key conflicts (e.g., from stuck campaign resume)
+        $this->leadEventLogRepository->upsert($log);
         if ($this->coreParametersHelper->get('campaign_use_summary')) {
             $this->summaryModel->updateSummary([$log]);
         }
@@ -120,7 +121,11 @@ class EventLogger
             return $this;
         }
 
-        $this->leadEventLogRepository->saveEntities($collection->getValues());
+        // Use upsert to handle potential duplicate key conflicts (e.g., from stuck campaign resume)
+        foreach ($collection as $log) {
+            $this->leadEventLogRepository->upsert($log);
+        }
+
         if ($this->coreParametersHelper->get('campaign_use_summary')) {
             $this->summaryModel->updateSummary($collection->getValues());
         }
@@ -203,7 +208,10 @@ class EventLogger
             return;
         }
 
-        $this->leadEventLogRepository->saveEntities($this->persistQueue->getValues());
+        // Use upsert to handle potential duplicate key conflicts (e.g., from stuck campaign resume)
+        foreach ($this->persistQueue as $log) {
+            $this->leadEventLogRepository->upsert($log);
+        }
 
         // Push them into the logs ArrayCollection to be used later.
         foreach ($this->persistQueue as $log) {
