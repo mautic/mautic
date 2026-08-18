@@ -87,7 +87,7 @@ class CampaignRepository extends CommonRepository
         }
 
         $q->leftJoin('c.lists', 'll')
-            ->where($this->getPublishedByDateExpression($q));
+            ->where($this->getPublishedByDateOrmExpression($q));
 
         if (!$viewOther) {
             $q->andWhere($q->expr()->eq('c.createdBy', ':id'))
@@ -132,7 +132,7 @@ class CampaignRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'campaigns', 'c');
 
         $q->join('c', MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref', 'll', 'c.id = ll.campaign_id')
-            ->where($this->getPublishedByDateExpression($q));
+            ->where($this->getPublishedByDateDbalExpression($q));
 
         $q->andWhere(
             $q->expr()->in('ll.leadlist_id', ':leadLists')
@@ -350,7 +350,7 @@ class CampaignRepository extends CommonRepository
             ->groupBy('c.id, c.name')
             ->setMaxResults($limit);
 
-        $expr = $this->getPublishedByDateExpression($q, 'c');
+        $expr = $this->getPublishedByDateDbalExpression($q, 'c');
         $q->where($expr);
 
         return $q->executeQuery()->fetchAllAssociative();
@@ -854,7 +854,7 @@ class CampaignRepository extends CommonRepository
         )
             ->from(MAUTIC_TABLE_PREFIX.'campaigns', 'c')
             ->where('c.deleted IS NULL')
-            ->andWhere($this->getPublishedByDateExpression($query))
+            ->andWhere($this->getPublishedByDateDbalExpression($query))
             ->andWhere(
                 sprintf('EXISTS (%s)', $innerQuery->getSQL())
             )
