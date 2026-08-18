@@ -15,9 +15,18 @@ parameters:
         return: 88.3
         param: 75.7
         property: 71.6
-        # wait for PHP 8.3 before changing
-        constant: 3
+        constant: 60
         declare: 73
+    type_perfect:
+        narrow_param: false
+        narrow_return: true
+        no_mixed_property: false
+        no_mixed_caller: false
+        null_over_false: true
+        no_param_type_removal: true
+        no_isset_on_object: true
+        no_empty_on_object: true
+
     paths:
         - app/bundles
         - app/config
