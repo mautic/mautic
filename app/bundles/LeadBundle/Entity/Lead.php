@@ -1177,7 +1177,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
                     return $social['value'];
                 }
             }
-        } elseif (!empty($this->updatedFields)) {
+        } elseif ([] !== $this->updatedFields) {
             foreach ($this->availableSocialFields as $social) {
                 if (!empty($this->updatedFields[$social])) {
                     return $this->updatedFields[$social];

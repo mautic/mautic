@@ -24,16 +24,11 @@ final class TransportCallbackTest extends TestCase
 
         $dncModel = new class($dncStub) extends DoNotContact {
             /**
-             * @var Stub&DNC
-             */
-            private Stub $dncStub;
-
-            /**
              * @param Stub&DNC $dncStub
              */
-            public function __construct(Stub $dncStub)
-            {
-                $this->dncStub = $dncStub;
+            public function __construct(
+                private readonly Stub $dncStub,
+            ) {
             }
 
             public function addDncForContact($contactId, $channel, $reason = DNC::BOUNCED, ?string $comments = '', $persist = true, $checkCurrentStatus = true, $allowUnsubscribeOverride = false): DNC
