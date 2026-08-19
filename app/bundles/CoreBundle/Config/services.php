@@ -226,7 +226,14 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.helper.update_checks', Mautic\CoreBundle\Helper\PreUpdateCheckHelper::class);
     $services->alias('mautic.update.step_provider', Mautic\CoreBundle\Update\StepProvider::class);
 
-    $services->get(Mautic\CoreBundle\Twig\Helper\AssetsHelper::class)->tag('twig.helper', ['alias' => 'assets']);
+    $services->get(Mautic\CoreBundle\Twig\Helper\AssetsHelper::class)
+        ->tag('twig.helper', ['alias' => 'assets'])
+        ->call('setPathsHelper', [service('mautic.helper.paths')])
+        ->call('setAssetHelper', [service('mautic.helper.assetgeneration')])
+        ->call('setBuilderIntegrationsHelper', [service('mautic.integrations.helper.builder_integrations')])
+        ->call('setInstallService', [service('mautic.install.service')])
+        ->call('setSiteUrl', ['%mautic.site_url%'])
+        ->call('setVersion', ['%mautic.secret_key%', MAUTIC_VERSION]);
 
     $services->get(Mautic\CoreBundle\Model\NotificationModel::class)->call('setDisableUpdates', ['%mautic.security.disableUpdates%']);
     $services->alias('mautic.core.model.auditlog', Mautic\CoreBundle\Model\AuditLogModel::class);
