@@ -1065,11 +1065,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      * @param mixed[] $settings
      * @param mixed[] $parameters
      *
-     * @return bool|string false if no error; otherwise the error string
-     *
      * @throws ApiErrorException if OAuth2 state does not match
      */
-    public function authCallback(array $settings = [], $parameters = [])
+    public function authCallback(array $settings = [], array $parameters = []): false|string|array
     {
         $authType = $this->getAuthenticationType();
 

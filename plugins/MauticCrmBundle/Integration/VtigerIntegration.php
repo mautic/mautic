@@ -117,10 +117,8 @@ class VtigerIntegration extends CrmAbstractIntegration
 
     /**
      * Retrieves and stores tokens returned from oAuthLogin.
-     *
-     * @param array $parameters
      */
-    public function authCallback(array $settings = [], $parameters = []): string|bool
+    public function authCallback(array $settings = [], array $parameters = []): string|false
     {
         $success = $this->isAuthorized();
         if (!$success) {

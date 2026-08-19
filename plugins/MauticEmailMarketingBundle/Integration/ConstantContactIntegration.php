@@ -39,12 +39,8 @@ final class ConstantContactIntegration extends EmailAbstractIntegration
 
     /**
      * Retrieves and stores tokens returned from oAuthLogin.
-     *
-     * @param array $parameters
-     *
-     * @return bool|string false if no error; otherwise the error string
      */
-    public function authCallback(array $settings = [], $parameters = [])
+    public function authCallback(array $settings = [], array $parameters = []): string|false
     {
         // Constanct Contact doesn't like POST
         $settings['method'] = 'GET';

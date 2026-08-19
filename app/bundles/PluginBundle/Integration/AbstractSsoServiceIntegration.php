@@ -66,11 +66,9 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
     }
 
     /**
-     * @param array $parameters
-     *
      * @return bool|string
      */
-    public function ssoAuthCallback(array $settings = [], $parameters = [])
+    public function ssoAuthCallback(array $settings = [], array $parameters = [])
     {
         $response = $this->authCallback($settings, $parameters);
 
