@@ -3,7 +3,6 @@
 namespace Mautic\UserBundle;
 
 use Mautic\UserBundle\DependencyInjection\Compiler\FormLoginAuthenticatorOptionsPass;
-use Mautic\UserBundle\DependencyInjection\Compiler\OAuthReplacePass;
 use Mautic\UserBundle\DependencyInjection\Compiler\SsoAuthenticatorPass;
 use Mautic\UserBundle\DependencyInjection\Firewall\Factory\MauticSsoFactory;
 use Mautic\UserBundle\DependencyInjection\Firewall\Factory\PluginFactory;
@@ -23,7 +22,6 @@ final class MauticUserBundle extends Bundle
         $extension->addAuthenticatorFactory(new PluginFactory());
         $extension->addAuthenticatorFactory(new MauticSsoFactory());
 
-        $container->addCompilerPass(new OAuthReplacePass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
         $container->addCompilerPass(new SsoAuthenticatorPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
         $container->addCompilerPass(new FormLoginAuthenticatorOptionsPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
     }

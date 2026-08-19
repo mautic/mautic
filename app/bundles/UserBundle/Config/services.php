@@ -56,6 +56,9 @@ return function (ContainerConfigurator $configurator): void {
             '$oAuth2' => service('fos_oauth_server.server'),
         ]);
 
+    $services->set('fos_oauth_server.security.authenticator.manager', Mautic\UserBundle\Security\Authenticator\Oauth2Authenticator::class)
+        ->args([service('fos_oauth_server.server')]);
+
     $services->set(Mautic\UserBundle\Security\SAML\Helper::class);
     $services->set(TokenPermissions::class);
 
