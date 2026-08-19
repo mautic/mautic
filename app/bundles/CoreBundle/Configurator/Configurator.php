@@ -5,6 +5,7 @@ namespace Mautic\CoreBundle\Configurator;
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Loader\ParameterLoader;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
@@ -38,10 +39,20 @@ class Configurator
      */
     protected array $parameters;
 
-    public function __construct(PathsHelper $pathsHelper)
-    {
+    /**
+     * @param iterable<int, StepInterface> $steps keyed by their priority tag attribute
+     */
+    public function __construct(
+        PathsHelper $pathsHelper,
+        #[AutowireIterator('mautic.configurator.step', indexAttribute: 'priority')]
+        iterable $steps = [],
+    ) {
         $this->filename   = ParameterLoader::getLocalConfigFile($pathsHelper->getSystemPath('root').'/app');
         $this->parameters = $this->read();
+
+        foreach ($steps as $priority => $step) {
+            $this->addStep($step, (int) $priority);
+        }
     }
 
     /**
