@@ -144,6 +144,36 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
         $this->assertStringContainsString('Failed to download', $result['errors'][0]);
     }
 
+    /**
+     * A malicious/misconfigured dist URL must not be able to fill the server's disk. The
+     * on_headers/progress hooks handle real (streaming) Guzzle clients; this test exercises
+     * the post-download filesize backstop that catches whatever a mocked/non-conforming
+     * client streamed straight to disk regardless of those hooks.
+     */
+    public function testInstallRejectsAndRemovesOversizedDownload(): void
+    {
+        $this->mockPackageWithDistUrl('https://example.test/pkg.zip');
+
+        $oversizedContent = str_repeat('a', 52428800 + 1);
+
+        $this->httpClient->method('request')
+            ->willReturnCallback(function (string $method, string $url, array $options) use ($oversizedContent): ResponseInterface {
+                file_put_contents($options['sink'], $oversizedContent);
+
+                return $this->successfulResponse();
+            });
+
+        $result = $this->installer->install(self::PACKAGE, 1);
+
+        $this->assertFalse($result['success']);
+        $this->assertStringContainsString('exceeds the maximum allowed size', $result['errors'][0]);
+        $this->assertFalse($this->installer->isInstalled(self::PACKAGE));
+
+        // The oversized file itself must be removed, not just rejected.
+        $importDir = $this->tmpRoot.'/import';
+        $this->assertSame([], glob($importDir.'/*') ?: []);
+    }
+
     public function testInstallReturnsErrorWhenDownloadYieldsEmptyFile(): void
     {
         $this->mockPackageWithDistUrl('https://example.test/pkg.zip');
@@ -200,7 +230,7 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->willReturnCallback(function (EntityImportEvent $event): EntityImportEvent {
-                $event->setStatus('imported', ['campaign' => ['ids' => [1], 'names' => ['Test'], 'count' => 1]]);
+                $event->setStatus(EntityImportEvent::NEW, ['campaign' => ['ids' => [1], 'names' => ['Test'], 'count' => 1]]);
 
                 return $event;
             });
@@ -210,6 +240,70 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
         $this->assertTrue($result['success']);
         $this->assertNotEmpty($result['summary']);
         $this->assertTrue($this->installer->isInstalled(self::PACKAGE));
+    }
+
+    public function testInstallRollsBackCreatedEntitiesAndFailsWhenImportReportsErrors(): void
+    {
+        $this->mockPackageWithDistUrl('https://example.test/pkg.zip');
+
+        $campaignJson = json_encode([
+            'campaign'       => [['id' => 1, 'name' => 'Test campaign'], ['id' => 2, 'name' => 'Second campaign']],
+            'campaign_event' => [],
+            'lists'          => [],
+        ]);
+        $zipContents = $this->buildZip(['campaign.json' => $campaignJson]);
+
+        $this->httpClient->method('request')
+            ->willReturnCallback(function (string $method, string $url, array $options) use ($zipContents): ResponseInterface {
+                file_put_contents($options['sink'], $zipContents);
+
+                return $this->successfulResponse();
+            });
+
+        // A single EntityImportEvent is dispatched per top-level entity group produced by
+        // readZipFile(); this fixture only produces one group, so a subscriber reporting an
+        // error is enough to exercise the rollback path.
+        $this->dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->willReturnCallback(function (EntityImportEvent $event): EntityImportEvent {
+                $event->setStatus(EntityImportEvent::NEW, ['campaign' => ['ids' => [1], 'names' => ['Test'], 'count' => 1]]);
+                $event->setStatus(EntityImportEvent::ERRORS, ['message' => 'Second campaign could not be imported.']);
+
+                return $event;
+            });
+
+        $result = $this->installer->install(self::PACKAGE, 1);
+
+        $this->assertFalse($result['success']);
+        $this->assertStringContainsString('Second campaign could not be imported', $result['errors'][0]);
+        $this->assertFalse($this->installer->isInstalled(self::PACKAGE), 'A failed install must not be recorded as installed.');
+    }
+
+    public function testInstallUndoesEntitiesCreatedBeforeALaterErrorOccurs(): void
+    {
+        $this->mockPackageWithDistUrl('https://example.test/pkg.zip');
+        $zipContents = $this->buildZip(['campaign.json' => json_encode(['campaign' => []])]);
+
+        $this->httpClient->method('request')
+            ->willReturnCallback(function (string $method, string $url, array $options) use ($zipContents): ResponseInterface {
+                file_put_contents($options['sink'], $zipContents);
+
+                return $this->successfulResponse();
+            });
+
+        $this->dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with($this->callback(function (EntityImportEvent $event): bool {
+                $event->setStatus(EntityImportEvent::NEW, ['campaign' => ['ids' => [1], 'names' => ['Test'], 'count' => 1]]);
+                $event->setStatus(EntityImportEvent::ERRORS, ['message' => 'boom']);
+
+                return true;
+            }));
+
+        $result = $this->installer->install(self::PACKAGE, 1);
+
+        $this->assertFalse($result['success']);
+        $this->assertSame([], $result['summary']);
     }
 
     public function testInstallRestoresPackagedAssetsToMediaDir(): void
@@ -236,7 +330,7 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
 
         $this->dispatcher->method('dispatch')
             ->willReturnCallback(function (EntityImportEvent $event): EntityImportEvent {
-                $event->setStatus('imported', ['campaign' => ['ids' => [1], 'names' => ['Test'], 'count' => 1]]);
+                $event->setStatus(EntityImportEvent::NEW, ['campaign' => ['ids' => [1], 'names' => ['Test'], 'count' => 1]]);
 
                 return $event;
             });
@@ -258,7 +352,7 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
     {
         $summary = [
             [
-                'imported' => [
+                EntityImportEvent::NEW => [
                     'campaign' => ['ids' => [1], 'names' => ['Test'], 'count' => 1],
                 ],
             ],
@@ -268,6 +362,39 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with($this->isInstanceOf(EntityImportUndoEvent::class));
+
+        $this->installer->uninstall(self::PACKAGE);
+
+        $this->assertFalse($this->installer->isInstalled(self::PACKAGE));
+    }
+
+    /**
+     * Entities recorded under the `update` status matched an existing UUID and pre-date the
+     * install, so uninstalling the package must never delete them — only entities the install
+     * actually created (`new`) belong to the package.
+     */
+    public function testUninstallNeverDeletesEntitiesThatWereOnlyUpdated(): void
+    {
+        $summary = [
+            [
+                EntityImportEvent::NEW    => [
+                    'campaign' => ['ids' => [1], 'names' => ['New campaign'], 'count' => 1],
+                ],
+                EntityImportEvent::UPDATE => [
+                    'campaign' => ['ids' => [42], 'names' => ['Pre-existing campaign'], 'count' => 1],
+                ],
+            ],
+        ];
+        $this->writeInstalledState([self::PACKAGE => $summary]);
+
+        $this->dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with($this->callback(function (EntityImportUndoEvent $event): bool {
+                $this->assertSame('campaign', $event->getEntityName());
+                $this->assertSame([1], $event->getSummary()['ids'] ?? null);
+
+                return true;
+            }));
 
         $this->installer->uninstall(self::PACKAGE);
 

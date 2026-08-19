@@ -27,6 +27,10 @@ final readonly class ResourceInstaller implements ResourceInstallerInterface
 
     private const MAX_REDIRECTS = 5;
 
+    // A resource is a campaign export (JSON + a handful of images), so a legitimate ZIP is
+    // small; this caps how much a malicious/misconfigured dist URL can make us write to disk.
+    private const MAX_DOWNLOAD_BYTES = 52428800; // 50 MB
+
     public function __construct(
         private Connection $connection,
         #[Autowire(service: 'mautic.http.client')]
@@ -83,6 +87,17 @@ final readonly class ResourceInstaller implements ResourceInstallerInterface
                 $event = new EntityImportEvent(Campaign::ENTITY_NAME, $entity, $userId);
                 $this->dispatcher->dispatch($event);
                 $status = $event->getStatus();
+
+                $statusErrors = $status[EntityImportEvent::ERRORS] ?? [];
+                if (!empty($statusErrors)) {
+                    $errors[] = 'Import reported errors: '.json_encode($statusErrors);
+                    // Roll back whatever this partial import already created so a failed
+                    // install never leaves orphaned entities behind.
+                    $this->undoNewEntities($summary);
+                    $summary = [];
+                    break;
+                }
+
                 if (!empty($status)) {
                     $summary[] = $status;
                 }
@@ -166,8 +181,20 @@ final readonly class ResourceInstaller implements ResourceInstallerInterface
                 'headers' => [
                     'User-Agent' => 'Mautic Marketplace',
                 ],
+                // Reject an honestly-declared oversized download before any body is read.
+                'on_headers' => function (ResponseInterface $response): void {
+                    $this->assertContentLengthWithinLimit($response);
+                },
+                // Chunked/absent Content-Length responses are caught mid-stream instead.
+                'progress' => function (int $downloadTotal, int $downloadedBytes) use ($filePath): void {
+                    if ($downloadedBytes > self::MAX_DOWNLOAD_BYTES) {
+                        $this->removeFile($filePath);
+                        throw new \RuntimeException('Download exceeds the maximum allowed size of '.self::MAX_DOWNLOAD_BYTES.' bytes.');
+                    }
+                },
             ]);
         } catch (GuzzleException $e) {
+            $this->removeFile($filePath);
             throw new \RuntimeException('Download failed: '.$e->getMessage(), $e->getCode(), $e);
         }
 
@@ -176,12 +203,27 @@ final readonly class ResourceInstaller implements ResourceInstallerInterface
             throw new \RuntimeException('Download returned HTTP '.$response->getStatusCode());
         }
 
+        // Backstop for the (mocked or otherwise non-conforming) clients that ignore the
+        // progress/on_headers hooks above and stream the whole body regardless.
+        if (file_exists($filePath) && filesize($filePath) > self::MAX_DOWNLOAD_BYTES) {
+            $this->removeFile($filePath);
+            throw new \RuntimeException('Download exceeds the maximum allowed size of '.self::MAX_DOWNLOAD_BYTES.' bytes.');
+        }
+
         if (!file_exists($filePath) || 0 === filesize($filePath)) {
             $this->removeFile($filePath);
             throw new \RuntimeException('Downloaded file is empty or missing');
         }
 
         return $filePath;
+    }
+
+    private function assertContentLengthWithinLimit(ResponseInterface $response): void
+    {
+        $contentLength = $response->getHeaderLine('Content-Length');
+        if ('' !== $contentLength && (int) $contentLength > self::MAX_DOWNLOAD_BYTES) {
+            throw new \RuntimeException('Download exceeds the maximum allowed size of '.self::MAX_DOWNLOAD_BYTES.' bytes.');
+        }
     }
 
     /**
@@ -364,25 +406,7 @@ final readonly class ResourceInstaller implements ResourceInstallerInterface
 
         $importSummary = $installed[$packageName];
 
-        // Dispatch undo events to delete imported entities
-        // Summary structure: [{status_type: {entity_name: {names: [], ids: [], count: N}}}]
-        foreach ($importSummary as $statusGroup) {
-            if (!is_array($statusGroup)) {
-                continue;
-            }
-            foreach ($statusGroup as $entities) {
-                if (!is_array($entities)) {
-                    continue;
-                }
-                foreach ($entities as $entityName => $entityInfo) {
-                    if (!is_array($entityInfo) || empty($entityInfo['ids'])) {
-                        continue;
-                    }
-                    $undoEvent = new EntityImportUndoEvent($entityName, $entityInfo);
-                    $this->dispatcher->dispatch($undoEvent);
-                }
-            }
-        }
+        $this->undoNewEntities($importSummary);
 
         unset($installed[$packageName]);
 
@@ -390,6 +414,29 @@ final readonly class ResourceInstaller implements ResourceInstallerInterface
         file_put_contents($path, json_encode($installed));
 
         $this->logger->info('Resource package uninstalled: '.$packageName);
+    }
+
+    /**
+     * Dispatches undo events for entities that were newly created by the install. Entities
+     * that matched an existing UUID and were only updated must never be deleted here, since
+     * they pre-date the install and belong to the user, not the package.
+     *
+     * @param array<int, mixed> $summary
+     */
+    private function undoNewEntities(array $summary): void
+    {
+        foreach ($summary as $statusGroup) {
+            if (!is_array($statusGroup) || !isset($statusGroup[EntityImportEvent::NEW]) || !is_array($statusGroup[EntityImportEvent::NEW])) {
+                continue;
+            }
+
+            foreach ($statusGroup[EntityImportEvent::NEW] as $entityName => $entityInfo) {
+                if (!is_array($entityInfo) || empty($entityInfo['ids'])) {
+                    continue;
+                }
+                $this->dispatcher->dispatch(new EntityImportUndoEvent($entityName, $entityInfo));
+            }
+        }
     }
 
     /**
