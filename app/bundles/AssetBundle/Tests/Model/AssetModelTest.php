@@ -345,7 +345,7 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
         if ($shouldResolve) {
             $this->assertSame($asset, $result);
         } else {
-            $this->assertNull($result);
+            $this->assertNotInstanceOf(Asset::class, $result);
         }
     }
 

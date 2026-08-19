@@ -253,10 +253,8 @@ class PointInsight extends FormEntity
 
     /**
      * Alias of isActive().
-     *
-     * @return bool
      */
-    public function getActive()
+    public function getActive(): bool
     {
         return $this->isActive();
     }
