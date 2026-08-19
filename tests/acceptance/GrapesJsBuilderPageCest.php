@@ -19,7 +19,7 @@ final class GrapesJsBuilderPageCest
         $I->waitForElementVisible('form[name="page"]');
         $I->fillField('input[name="page[title]"]', 'GrapesJS E2E '.date('YmdHis'));
 
-        $I->click('.btn-builder');
+        $this->openBuilder($I);
         $this->editCanvasText($I);
 
         $I->click('#btn-views-apply');
@@ -37,7 +37,7 @@ final class GrapesJsBuilderPageCest
         $I->reloadPage();
         $I->waitForElementVisible('.btn-builder');
 
-        $I->click('.btn-builder');
+        $this->openBuilder($I);
         $this->waitForCanvasContent($I);
         $I->switchToIFrame('iframe.gjs-frame');
         $I->see(self::EDITED_CONTENT);
@@ -60,6 +60,13 @@ final class GrapesJsBuilderPageCest
         $I->pressKey('[contenteditable="true"]', self::EDITED_CONTENT);
         $I->see(self::EDITED_CONTENT, '[contenteditable="true"]');
         $I->switchToIFrame();
+    }
+
+    private function openBuilder(AcceptanceTester $I): void
+    {
+        $I->waitForJS("return typeof Mautic.launchBuilder === 'function' && document.querySelector('#page_buttons_builder') !== null;", 30);
+        $I->executeJS("document.querySelector('#page_buttons_builder').click();");
+        $I->waitForElementVisible('.builder.builder-active', 30);
     }
 
     private function waitForCanvasContent(AcceptanceTester $I): void
