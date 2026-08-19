@@ -107,6 +107,7 @@ final class ThemeController extends FormController
                 'searchValue'     => $search,
                 'searchScopes'    => $searchScopes,
                 'tmpl'            => $tmpl,
+                'currentRoute'    => $action,
             ],
             'contentTemplate' => $contentTemplate,
             'passthroughVars' => [
