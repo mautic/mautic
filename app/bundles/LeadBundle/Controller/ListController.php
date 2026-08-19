@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Controller;
 
 use Doctrine\ORM\EntityNotFoundException;
+use Mautic\CoreBundle\Controller\CategoryListFiltersTrait;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\QuickFilterSearchTrait;
 use Mautic\CoreBundle\Exception\DeleteEntitiesDependencyException;
@@ -27,6 +28,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 final class ListController extends FormController
 {
+    use CategoryListFiltersTrait;
     use EntityContactsTrait;
     use QuickFilterSearchTrait;
 
@@ -838,71 +840,25 @@ final class ListController extends FormController
 
     protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = []): array
     {
-        $request        = $this->getCurrentRequest();
-        $session        = $request->getSession();
-        $currentFilters = $session->get('mautic.lead.list.list_filters', []);
-        $updatedFilters = $request->get('filters', false);
-
-        $sourceLists = $this->listModel->getSourceLists();
-        $listFilters = [
-            'filters' => [
-                'placeholder' => $this->translator->trans('mautic.lead.list.filter.placeholder'),
-                'multiple'    => true,
-                'groups'      => [
-                    'mautic.lead.list.source.segment.category' => [
-                        'options' => $sourceLists['categories'],
-                        'prefix'  => 'category',
-                    ],
-                ],
-            ],
-        ];
-
-        if ($updatedFilters) {
-            // Filters have been updated
-
-            // Parse the selected values
-            $newFilters     = [];
-            $updatedFilters = json_decode($updatedFilters, true);
-
-            if ($updatedFilters) {
-                foreach ($updatedFilters as $updatedFilter) {
-                    [$clmn, $fltr] = explode(':', $updatedFilter);
-
-                    $newFilters[$clmn][] = $fltr;
-                }
-
-                $currentFilters = $newFilters;
-            } else {
-                $currentFilters = [];
-            }
-        }
-        $session->set('mautic.lead.list.list_filters', $currentFilters);
-
-        $joinCategories = false;
-        if (!empty($currentFilters)) {
-            $catAliases = $searchFilterTerms = [];
-            foreach ($currentFilters as $type => $typeFilters) {
-                $listFilters['filters']['groups']['mautic.lead.list.source.segment.'.$type]['values'] = $typeFilters;
-
-                foreach ($typeFilters as $fltr) {
-                    if ('category' == $type) {
-                        $catAliases[]        = $fltr;
-                        $searchFilterTerms[] = 'category:'.$fltr;
-                    } // else for other group filters
-                }
-            }
-
-            $filter['string'] = $this->stripQuickFilterTokensFromSearch((string) ($filter['string'] ?? ''), $searchFilterTerms);
-            $session->set('mautic.lead.list.filter', $filter['string']);
-
-            if ([] !== $catAliases) {
-                $joinCategories    = true;
-                $filter['force'][] = ['column' => 'cat.alias', 'expr' => 'in', 'value' => array_values(array_unique($catAliases))];
-            }
-        }
+        $request          = $this->getCurrentRequest();
+        $filterForceCount = count($filter['force'] ?? []);
+        $categoryFilters  = $this->applyCategoryListFilter(
+            $request,
+            'mautic.lead.list.list_filters',
+            ['segment', 'lead.list'],
+            'cat.id',
+            $filter,
+            'mautic.lead.list.source.segment.category',
+            'mautic.lead.list.filter.placeholder',
+        );
+        $filter['string'] = $this->stripQuickFilterTokensFromSearch(
+            (string) ($filter['string'] ?? ''),
+            $categoryFilters['searchTerms'],
+        );
+        $joinCategories = count($filter['force'] ?? []) > $filterForceCount;
 
         // Store for customizeViewArguments
-        $this->listFilters = $listFilters;
+        $this->listFilters = $categoryFilters['filters'];
 
         return parent::getIndexItems(
             $start,

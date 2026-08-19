@@ -15,6 +15,7 @@ use Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CampaignBundle\Service\PublishStateService;
+use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Controller\QuickFilterSearchTrait;
 use Mautic\CoreBundle\Event\EntityExportEvent;
@@ -113,6 +114,7 @@ class CampaignController extends AbstractStandardFormController
         private PublishStateService $publishStateService,
         private CampaignModel $campaignModel,
         private EventModel $eventModel,
+        private CategoryModel $categoryModel,
         private readonly CampaignRepository $campaignRepository,
         private readonly SummaryRepository $summaryRepository,
         private readonly LeadEventLogRepository $leadEventLogRepository,
@@ -832,14 +834,15 @@ class CampaignController extends AbstractStandardFormController
         return '@MauticCampaign/Campaign';
     }
 
-    protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = [])
+    /**
+     * @return array{0: int, 1: array<int, mixed>}
+     */
+    protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = []): array
     {
-        $session        = $this->getCurrentRequest()->getSession();
-        $currentFilters = $session->get('mautic.campaign.list_filters', []);
-        $updatedFilters = $this->requestStack->getCurrentRequest()->get('filters', false);
-
         $sourceLists = $this->campaignModel->getSourceLists();
-        $listFilters = [
+        $categories           = $this->categoryModel->getLookupResults('campaign', '', 0);
+        $categoryFilterPrefix = $this->translator->trans('mautic.core.searchcommand.category');
+        $listFilters          = [
             'filters' => [
                 'placeholder' => $this->translator->trans('mautic.campaign.filter.placeholder'),
                 'multiple'    => true,
@@ -852,61 +855,17 @@ class CampaignController extends AbstractStandardFormController
                         'options' => $sourceLists['lists'],
                         'prefix'  => 'list',
                     ],
+                    'mautic.core.filter.categories'     => [
+                        'options' => $categories,
+                        'prefix'  => $categoryFilterPrefix,
+                    ],
                 ],
             ],
         ];
 
-        if ($updatedFilters) {
-            // Filters have been updated
-
-            // Parse the selected values
-            $newFilters     = [];
-            $updatedFilters = json_decode($updatedFilters, true);
-
-            if ($updatedFilters) {
-                foreach ($updatedFilters as $updatedFilter) {
-                    [$clmn, $fltr] = explode(':', $updatedFilter);
-
-                    $newFilters[$clmn][] = $fltr;
-                }
-
-                $currentFilters = $newFilters;
-            } else {
-                $currentFilters = [];
-            }
-        }
-        $session->set('mautic.campaign.list_filters', $currentFilters);
-
-        $joinLists = $joinForms = false;
-        if (!empty($currentFilters)) {
-            $formIds = $listAliases = $searchFilterTerms = [];
-            foreach ($currentFilters as $type => $typeFilters) {
-                $listFilters['filters']['groups']['mautic.campaign.leadsource.'.$type]['values'] = $typeFilters;
-
-                foreach ($typeFilters as $fltr) {
-                    if ('list' == $type) {
-                        $listAliases[]       = $fltr;
-                        $searchFilterTerms[] = 'list:'.$fltr;
-                    } else {
-                        $formIds[]           = (int) $fltr;
-                        $searchFilterTerms[] = 'form:'.$fltr;
-                    }
-                }
-            }
-
-            $filter['string'] = $this->stripQuickFilterTokensFromSearch((string) ($filter['string'] ?? ''), $searchFilterTerms);
-            $session->set('mautic.campaign.filter', $filter['string']);
-
-            if ([] !== $listAliases) {
-                $joinLists         = true;
-                $filter['force'][] = ['column' => 'l.alias', 'expr' => 'in', 'value' => array_values(array_unique($listAliases))];
-            }
-
-            if ([] !== $formIds) {
-                $joinForms         = true;
-                $filter['force'][] = ['column' => 'f.id', 'expr' => 'in', 'value' => $formIds];
-            }
-        }
+        $currentFilters          = $this->getCurrentCampaignListFilters();
+        $filter['string']        = $this->stripQuickFilterTokensFromSearch((string) ($filter['string'] ?? ''), $this->getQuickFilterSearchTerms($currentFilters));
+        [$joinLists, $joinForms] = $this->applyCampaignListFilters($currentFilters, $categories, $categoryFilterPrefix, $listFilters, $filter);
 
         // Store for customizeViewArguments
         $this->listFilters = $listFilters;
@@ -922,6 +881,129 @@ class CampaignController extends AbstractStandardFormController
                 'joinForms' => $joinForms,
             ]
         );
+    }
+
+    /**
+     * @return array<string, array<int, string>>
+     */
+    private function getCurrentCampaignListFilters(): array
+    {
+        $session        = $this->getCurrentRequest()->getSession();
+        $currentFilters = $session->get('mautic.campaign.list_filters', []);
+        $updatedFilters = $this->requestStack->getCurrentRequest()->get('filters', false);
+
+        if (!is_array($currentFilters)) {
+            $currentFilters = [];
+        }
+
+        if ($updatedFilters) {
+            $currentFilters = $this->parseCampaignListFilters($updatedFilters);
+        }
+
+        $session->set('mautic.campaign.list_filters', $currentFilters);
+
+        return $currentFilters;
+    }
+
+    /**
+     * @return array<string, array<int, string>>
+     */
+    private function parseCampaignListFilters(mixed $updatedFilters): array
+    {
+        $newFilters = [];
+
+        if (!is_string($updatedFilters)) {
+            return $newFilters;
+        }
+
+        $decodedFilters = json_decode($updatedFilters, true);
+
+        if (!is_array($decodedFilters)) {
+            return $newFilters;
+        }
+
+        foreach ($decodedFilters as $updatedFilter) {
+            if (!is_string($updatedFilter) || !str_contains($updatedFilter, ':')) {
+                continue;
+            }
+
+            [$clmn, $fltr]       = explode(':', $updatedFilter, 2);
+            $newFilters[$clmn][] = $fltr;
+        }
+
+        return $newFilters;
+    }
+
+    /**
+     * @param array<string, array<int, string>> $currentFilters
+     *
+     * @return string[]
+     */
+    private function getQuickFilterSearchTerms(array $currentFilters): array
+    {
+        $terms = [];
+        foreach ($currentFilters as $type => $values) {
+            foreach ($values as $value) {
+                $terms[] = $type.':'.$value;
+            }
+        }
+
+        return $terms;
+    }
+
+    /**
+     * @param array<string, array<int, string>>       $currentFilters
+     * @param array<int|string, array<string, mixed>> $categories
+     * @param array<string, mixed>                    $listFilters
+     * @param array<string, mixed>                    $filter
+     *
+     * @return array{0: bool, 1: bool}
+     */
+    private function applyCampaignListFilters(array $currentFilters, array $categories, string $categoryFilterPrefix, array &$listFilters, array &$filter): array
+    {
+        $joinLists = $joinForms = false;
+
+        if ([] !== $currentFilters) {
+            $listAliases = $catIds = $formIds = [];
+
+            foreach ($currentFilters as $type => $typeFilters) {
+                $type = $type === $categoryFilterPrefix ? 'category' : $type;
+                $key  = match ($type) {
+                    'list'     => 'mautic.campaign.leadsource.list',
+                    'form'     => 'mautic.campaign.leadsource.form',
+                    'category' => 'mautic.core.filter.categories',
+                    default    => $type,
+                };
+                $listFilters['filters']['groups'][$key]['values'] = $typeFilters;
+
+                $this->processTypeFilters($type, $typeFilters, $categories, $listAliases, $formIds, $catIds);
+            }
+
+            $joinLists = $this->appendCampaignFilter($filter, 'l.alias', $listAliases);
+            $joinForms = $this->appendCampaignFilter($filter, 'f.id', $formIds);
+            $this->appendCampaignFilter($filter, 'cat.id', $catIds);
+        }
+
+        return [$joinLists, $joinForms];
+    }
+
+    /**
+     * @param array<string, mixed>   $filter
+     * @param array<int, int|string> $values
+     */
+    private function appendCampaignFilter(array &$filter, string $column, array $values): bool
+    {
+        $hasValues = [] !== $values;
+
+        if ($hasValues) {
+            $filter['force'][] = [
+                'column' => $column,
+                'expr'   => 'in',
+                'value'  => $values,
+            ];
+        }
+
+        return $hasValues;
     }
 
     protected function getModelName(): string
@@ -1296,5 +1378,43 @@ class CampaignController extends AbstractStandardFormController
         }
 
         return $campaignLogCountsProcessed;
+    }
+
+    /**
+     * @param array<int|string, mixed>                $typeFilters
+     * @param array<int|string, array<string, mixed>> $categories
+     * @param array<int, string>                      $listAliases
+     * @param array<int>                              $formIds
+     * @param array<int>                              $catIds
+     */
+    private function processTypeFilters(string $type, array $typeFilters, array $categories, array &$listAliases, array &$formIds, array &$catIds): void
+    {
+        foreach ($typeFilters as $fltr) {
+            if ('list' === $type) {
+                $listAliases[] = (string) $fltr;
+                continue;
+            }
+
+            if ('form' === $type) {
+                $formIds[] = (int) $fltr;
+                continue;
+            }
+
+            if ('category' !== $type) {
+                continue;
+            }
+
+            if (is_numeric($fltr)) {
+                $catIds[] = (int) $fltr;
+                continue;
+            }
+
+            foreach ($categories as $category) {
+                if (($category['alias'] ?? null) === $fltr) {
+                    $catIds[] = (int) $category['id'];
+                    break;
+                }
+            }
+        }
     }
 }

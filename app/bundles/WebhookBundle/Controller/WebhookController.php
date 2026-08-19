@@ -3,6 +3,7 @@
 namespace Mautic\WebhookBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Controller\CategoryListFiltersTrait;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -19,6 +20,13 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class WebhookController extends FormController
 {
+    use CategoryListFiltersTrait;
+
+    /**
+     * @var array<string, mixed>
+     */
+    private array $listFilters = [];
+
     public function __construct(
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
@@ -52,6 +60,40 @@ final class WebhookController extends FormController
     public function indexAction(Request $request, $page = 1): Response
     {
         return parent::indexStandard($request, $page);
+    }
+
+    /**
+     * @param mixed   $start
+     * @param mixed   $limit
+     * @param mixed   $filter
+     * @param mixed   $orderBy
+     * @param mixed   $orderByDir
+     * @param mixed[] $args
+     *
+     * @return array{0: int, 1: array<int, mixed>}
+     */
+    protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = []): array
+    {
+        $request           = $this->getCurrentRequest();
+        $categoryFilters   = $this->applyCategoryListFilter($request, 'mautic.'.$this->getSessionBase().'.list_filters', 'Webhook', 'cat.id', $filter);
+        $this->listFilters = $categoryFilters['filters'];
+
+        return parent::getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, $args);
+    }
+
+    /**
+     * @param array<string, mixed> $args
+     * @param mixed                $action
+     *
+     * @return array<string, mixed>
+     */
+    public function getViewArguments(array $args, $action): array
+    {
+        if ('index' === $action) {
+            $args['viewParameters']['filters'] = $this->listFilters;
+        }
+
+        return $args;
     }
 
     /**

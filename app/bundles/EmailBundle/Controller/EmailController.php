@@ -3,6 +3,7 @@
 namespace Mautic\EmailBundle\Controller;
 
 use Mautic\AssetBundle\Model\AssetModel;
+use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Controller\QuickFilterSearchTrait;
@@ -65,12 +66,18 @@ final class EmailController extends FormController
 
     public const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
 
+    private const FILTER_TYPE_CATEGORY = 'category';
+
+    private const FILTER_TYPE_LIST     = 'list';
+
+    private const FILTER_TYPE_THEME    = 'theme';
+
     private bool $invalidHtmlError = false;
 
     /**
      * @param int $page
      */
-    public function indexAction(Request $request, EmailModel $model, EmailConfig $emailConfig, ThemeHelper $themeHelper, $page = 1): Response
+    public function indexAction(Request $request, EmailModel $model, EmailConfig $emailConfig, ThemeHelper $themeHelper, CategoryModel $categoryModel, $page = 1): Response
     {
         $isDraftEnabled = $emailConfig->isDraftEnabled();
         // set some permissions
@@ -130,14 +137,20 @@ final class EmailController extends FormController
         $availableLists                                               = $this->listModel->getUserLists();
         $listFilters['filters']['groups']['mautic.core.filter.lists'] = [
             'options' => array_column($availableLists, 'name', 'alias'),
-            'prefix'  => 'list',
+            'prefix'  => self::FILTER_TYPE_LIST,
         ];
-        $listAliasLookup = array_column($availableLists, 'alias', 'id');
-
         // retrieve a list of themes
         $listFilters['filters']['groups']['mautic.core.filter.themes'] = [
             'options' => $themeHelper->getInstalledThemes('email'),
-            'prefix'  => 'theme',
+            'prefix'  => self::FILTER_TYPE_THEME,
+        ];
+
+        // retrieve a list of categories
+        $categories                                                        = $categoryModel->getLookupResults('email', '', 0);
+        $categoryFilterPrefix                                              = $this->translator->trans('mautic.core.searchcommand.category');
+        $listFilters['filters']['groups']['mautic.core.filter.categories'] = [
+            'options' => $categories,
+            'prefix'  => $categoryFilterPrefix,
         ];
 
         $currentFilters = $session->get('mautic.email.list_filters', []);
@@ -145,17 +158,13 @@ final class EmailController extends FormController
         $ignoreListJoin = true;
 
         if ($updatedFilters) {
-            // Filters have been updated
-
-            // Parse the selected values
             $newFilters     = [];
             $updatedFilters = json_decode($updatedFilters, true);
 
             if ($updatedFilters) {
                 foreach ($updatedFilters as $updatedFilter) {
-                    [$column, $filterValue] = explode(':', $updatedFilter);
-
-                    $newFilters[$column][] = $filterValue;
+                    [$column, $flt]        = explode(':', $updatedFilter);
+                    $newFilters[$column][] = $flt;
                 }
 
                 $currentFilters = $newFilters;
@@ -165,49 +174,54 @@ final class EmailController extends FormController
         }
         $session->set('mautic.email.list_filters', $currentFilters);
 
+        $searchFilterTerms = [];
+        foreach ($currentFilters as $type => $typeFilters) {
+            foreach ($typeFilters as $typeFilter) {
+                $searchFilterTerms[] = $type.':'.$typeFilter;
+            }
+        }
+        $filter['string'] = $this->stripQuickFilterTokensFromSearch((string) $filter['string'], $searchFilterTerms);
+        $session->set('mautic.email.filter', $filter['string']);
+
         if (!empty($currentFilters)) {
-            $listAliases = $catIds = $templates = $searchFilterTerms = [];
+            $listAliases = $catIds = $templates = [];
             foreach ($currentFilters as $type => $typeFilters) {
-                switch ($type) {
-                    case 'list':
-                        $key = 'lists';
-                        break;
-                    case 'category':
-                        $key = 'categories';
-                        break;
-                    case 'theme':
-                        $key = 'themes';
-                        break;
+                if ($type === $categoryFilterPrefix) {
+                    $type = self::FILTER_TYPE_CATEGORY;
                 }
+
+                $key = match ($type) {
+                    self::FILTER_TYPE_LIST     => 'lists',
+                    self::FILTER_TYPE_CATEGORY => 'categories',
+                    self::FILTER_TYPE_THEME    => 'themes',
+                    default                    => $type,
+                };
 
                 $listFilters['filters']['groups']['mautic.core.filter.'.$key]['values'] = $typeFilters;
 
                 foreach ($typeFilters as $fltr) {
-                    switch ($type) {
-                        case 'list':
-                            $resolvedAlias       = $listAliasLookup[(int) $fltr] ?? $fltr;
-                            $listAliases[]       = $resolvedAlias;
-                            $searchFilterTerms[] = 'list:'.$fltr;
-                            $searchFilterTerms[] = 'list:'.$resolvedAlias;
-                            break;
-                        case 'category':
-                            $catIds[]            = (int) $fltr;
-                            $searchFilterTerms[] = 'category:'.$fltr;
-                            break;
-                        case 'theme':
-                            $templates[]         = $fltr;
-                            $searchFilterTerms[] = 'theme:'.$fltr;
-                            break;
+                    if (self::FILTER_TYPE_LIST === $type) {
+                        $listAliases[] = $fltr;
+                    } elseif (self::FILTER_TYPE_CATEGORY === $type) {
+                        if (is_numeric($fltr)) {
+                            $catIds[] = (int) $fltr;
+                            continue;
+                        }
+
+                        foreach ($categories as $category) {
+                            if (($category['alias'] ?? null) === $fltr) {
+                                $catIds[] = (int) $category['id'];
+                                break;
+                            }
+                        }
+                    } elseif (self::FILTER_TYPE_THEME === $type) {
+                        $templates[] = $fltr;
                     }
                 }
             }
 
-            $search = $this->stripQuickFilterTokensFromSearch($search, $searchFilterTerms);
-            $session->set('mautic.email.filter', $search);
-            $filter['string'] = $search;
-
             if ([] !== $listAliases) {
-                $filter['force'][] = ['column' => 'l.alias', 'expr' => 'in', 'value' => array_values(array_unique($listAliases))];
+                $filter['force'][] = ['column' => 'l.alias', 'expr' => 'in', 'value' => $listAliases];
                 $ignoreListJoin    = false;
             }
 

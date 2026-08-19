@@ -3,6 +3,7 @@
 namespace Mautic\FormBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Controller\CategoryListFiltersTrait;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
@@ -35,6 +36,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FormController extends CommonFormController
 {
+    use CategoryListFiltersTrait;
+
     public function __construct(
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
@@ -94,6 +97,13 @@ class FormController extends CommonFormController
         if (!$permissions['form:forms:viewother']) {
             $filter['force'][] = ['column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
         }
+        $categoryFilters = $this->applyCategoryListFilter(
+            $request,
+            'mautic.form.list_filters',
+            'form',
+            'c.id',
+            $filter
+        );
 
         $orderBy    = $session->get('mautic.form.orderby', 'f.dateModified');
         $orderByDir = $session->get('mautic.form.orderbydir', $this->getDefaultOrderDirection());
@@ -134,6 +144,7 @@ class FormController extends CommonFormController
             [
                 'viewParameters'  => [
                     'searchValue' => $search,
+                    'filters'     => $categoryFilters['filters'],
                     'items'       => $forms,
                     'totalItems'  => $count,
                     'page'        => $page,

@@ -16,12 +16,14 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\EventListener\WebhookSubscriber;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\WebhookBundle\Controller\AjaxController;
+use Mautic\WebhookBundle\Controller\WebhookController;
 use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\EventRepository;
 use Mautic\WebhookBundle\Entity\LogRepository;
@@ -39,6 +41,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -46,6 +49,51 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class WebhookControllerTest extends TestCase
 {
+    public function testIndexViewArgumentsIncludeListFilters(): void
+    {
+        $controller = new WebhookController(
+            $this->createStub(FormFactoryInterface::class),
+            $this->createStub(FormFieldHelper::class),
+            $this->createStub(ManagerRegistry::class),
+            $this->createStub(ModelFactory::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(CoreParametersHelper::class),
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(Translator::class),
+            $this->createStub(FlashBag::class),
+            new RequestStack(),
+            $this->createStub(CorePermissions::class),
+        );
+
+        $listFilters = [
+            'filters' => [
+                'groups' => [
+                    'mautic.core.filter.categories' => [
+                        'values' => ['news'],
+                    ],
+                ],
+            ],
+        ];
+        (new \ReflectionProperty(WebhookController::class, 'listFilters'))->setValue($controller, $listFilters);
+
+        $args = [
+            'viewParameters' => [
+                'items' => [],
+            ],
+        ];
+
+        $this->assertSame(
+            [
+                'viewParameters' => [
+                    'items'   => [],
+                    'filters' => $listFilters,
+                ],
+            ],
+            $controller->getViewArguments($args, 'index')
+        );
+        $this->assertSame($args, $controller->getViewArguments($args, 'edit'));
+    }
+
     #[DataProvider('provideNewOrUpdate')]
     public function testPayloadsAreSame(bool $isNew): void
     {
