@@ -3,13 +3,11 @@
 declare(strict_types=1);
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Mautic\CoreBundle\Menu\MenuRenderer;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\param;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
-use Symfony\Component\DependencyInjection\Reference;
 use Twig\Extra\String\StringExtension;
 
 return function (ContainerConfigurator $configurator): void {
@@ -231,59 +229,22 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.core.model.form', Mautic\CoreBundle\Model\FormModel::class);
     $services->set(Mautic\CoreBundle\Security\Permissions\SystemPermissions::class);
 
-    $services->setDefinition('mautic.menu_renderer.admin', new Definition(
-        MenuRenderer::class,
-        [
-            new Reference('knp_menu.matcher'),
-            new Reference('twig'),
-            [
-                'template' => '@MauticCore/Menu/admin.html.twig',
-                'class'   => Knp\Menu\MenuItem::class,
-                'factory' => ['@mautic.menu.builder', 'adminMenu'],
-            ],
-        ]
-    ))
-        ->addTag('knp_menu.renderer', ['alias' => 'admin']);
+    // Menus: each menu is a KnpMenu item built from the mautic.menu.builder,
+    // rendered by a dedicated MenuRenderer so it can use its own template.
+    $menuTemplates = [
+        'main'    => [],
+        'admin'   => ['template' => '@MauticCore/Menu/admin.html.twig'],
+        'extra'   => ['template' => '@MauticCore/Menu/extra.html.twig'],
+        'profile' => ['template' => '@MauticCore/Menu/profile_inline.html.twig'],
+    ];
 
-    $services->setDefinition('mautic.menu_renderer.main', new Definition(
-        MenuRenderer::class,
-        [
-            new Reference('knp_menu.matcher'),
-            new Reference('twig'),
-            [
-                'template' => '@MauticCore/Menu/main.html.twig',
-                'class'   => Knp\Menu\MenuItem::class,
-                'factory' => ['@mautic.menu.builder', 'mainMenu'],
-            ],
-        ]
-    ))
-        ->addTag('knp_menu.renderer', ['alias' => 'main']);
+    foreach ($menuTemplates as $alias => $options) {
+        $services->set('mautic.menu.'.$alias, Knp\Menu\MenuItem::class)
+            ->factory([service('mautic.menu.builder'), $alias.'Menu'])
+            ->tag('knp_menu.menu', ['alias' => $alias]);
 
-    $services->setDefinition('mautic.menu_renderer.extra', new Definition(
-        MenuRenderer::class,
-        [
-            new Reference('knp_menu.matcher'),
-            new Reference('twig'),
-            [
-                'template' => '@MauticCore/Menu/extra.html.twig',
-                'class'   => Knp\Menu\MenuItem::class,
-                'factory' => ['@mautic.menu.builder', 'extraMenu'],
-            ],
-        ]
-    ))
-        ->addTag('knp_menu.renderer', ['alias' => 'extra']);
-
-    $services->setDefinition('mautic.menu_renderer.profile', new Definition(
-        MenuRenderer::class,
-        [
-            new Reference('knp_menu.matcher'),
-            new Reference('twig'),
-            [
-                'template' => '@MauticCore/Menu/profile_inline.html.twig',
-                'class'   => Knp\Menu\MenuItem::class,
-                'factory' => ['@mautic.menu.builder', 'profileMenu'],
-            ],
-        ]
-    ))
-        ->addTag('knp_menu.renderer', ['alias' => 'profile']);
+        $services->set('mautic.menu_renderer.'.$alias, MenuRenderer::class)
+            ->args([service('knp_menu.matcher'), service('twig'), $options])
+            ->tag('knp_menu.renderer', ['alias' => $alias]);
+    }
 };
