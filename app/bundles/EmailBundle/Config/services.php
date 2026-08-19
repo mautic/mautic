@@ -55,9 +55,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->set(Mautic\EmailBundle\MonitoredEmail\Processor\Reply::class);
 
     $services->alias('mautic.email.model.email', Mautic\EmailBundle\Model\EmailModel::class);
-    $services->alias('mautic.email.model.send_email_to_user', Mautic\EmailBundle\Model\SendEmailToUser::class);
-    $services->alias('mautic.email.model.send_email_to_contacts', Mautic\EmailBundle\Model\SendEmailToContact::class);
-    $services->alias('mautic.email.model.transport_callback', Mautic\EmailBundle\Model\TransportCallback::class);
     $services->alias('mautic.email.stats.helper_container', Mautic\EmailBundle\Stats\StatHelperContainer::class);
 
     $services->get(Mautic\EmailBundle\EventListener\WebhookSubscriber::class)

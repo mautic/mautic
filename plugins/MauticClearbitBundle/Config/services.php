@@ -20,5 +20,4 @@ return function (ContainerConfigurator $configurator): void {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->alias('mautic.integration.clearbit', MauticPlugin\MauticClearbitBundle\Integration\ClearbitIntegration::class);
-    $services->alias('mautic.integration.clearbit.config', MauticPlugin\MauticClearbitBundle\Integration\Support\ConfigSupport::class);
 };

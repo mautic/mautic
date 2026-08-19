@@ -19,5 +19,4 @@ return function (ContainerConfigurator $configurator): void {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->alias('mautic.integration.gmail', MauticPlugin\MauticGmailBundle\Integration\GmailIntegration::class);
-    $services->alias('mautic.integration.gmail.config', MauticPlugin\MauticGmailBundle\Integration\Support\ConfigSupport::class);
 };
