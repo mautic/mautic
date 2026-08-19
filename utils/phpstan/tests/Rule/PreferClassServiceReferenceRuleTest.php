@@ -41,7 +41,7 @@ final class PreferClassServiceReferenceRuleTest extends RuleTestCase
         ], [
             [
                 'Reference the service by its class, service(Utils\PHPStan\Tests\Rule\Fixture\ClassServiceReferenceBundle\SomeHelper::class), rather than by the string id "mautic.some.helper" a class name alias already covers.',
-                19,
+                20,
             ],
         ]);
     }

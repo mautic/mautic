@@ -32,15 +32,15 @@ final class NoRedundantAutowiredServiceArgumentRuleTest extends RuleTestCase
         ], [
             [
                 'Every argument only repeats the type autowiring injects, remove the args() call and let autowiring resolve the constructor.',
-                19,
+                20,
             ],
             [
                 'Every argument only repeats the type autowiring injects, remove the args() call and let autowiring resolve the constructor.',
-                23,
+                24,
             ],
             [
                 'Argument "$bar" only repeats the type autowiring injects, remove the arg() call and let autowiring resolve "Utils\PHPStan\Tests\Rule\Fixture\AutowiredArgumentBundle\Bar".',
-                27,
+                28,
             ],
         ]);
     }
