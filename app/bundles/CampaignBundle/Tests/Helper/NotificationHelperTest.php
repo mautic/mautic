@@ -19,24 +19,24 @@ use Symfony\Component\Routing\Router;
 final class NotificationHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&UserModel
+     * @var MockObject&UserModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $userModel;
+    private MockObject $userModel;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&NotificationModel
+     * @var MockObject&NotificationModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $notificationModel;
+    private MockObject $notificationModel;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&Translator
+     * @var MockObject&Translator
      */
-    private \PHPUnit\Framework\MockObject\MockObject $translator;
+    private MockObject $translator;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&CoreParametersHelper
+     * @var MockObject&CoreParametersHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
+    private MockObject $coreParametersHelper;
 
     protected function setUp(): void
     {
@@ -230,7 +230,7 @@ final class NotificationHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param \PHPUnit\Framework\MockObject\MockObject&User $user
+     * @param MockObject&User $user
      */
     private function prepareCommonMocks(Event $event, MockObject $user): void
     {

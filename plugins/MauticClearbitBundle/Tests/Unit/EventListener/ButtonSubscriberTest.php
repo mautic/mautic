@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticClearbitBundle\Tests\Unit\EventListener;
 
-use MauticPlugin\MauticClearbitBundle\EventListener\ButtonSubscriber;
-use MauticPlugin\MauticClearbitBundle\Integration\ClearbitIntegration;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomButtonEvent;
 use Mautic\CoreBundle\Twig\Helper\ButtonHelper;
@@ -13,6 +11,8 @@ use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\Integration;
+use MauticPlugin\MauticClearbitBundle\EventListener\ButtonSubscriber;
+use MauticPlugin\MauticClearbitBundle\Integration\ClearbitIntegration;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;

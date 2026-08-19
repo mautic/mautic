@@ -7,13 +7,13 @@ namespace Utils\PHPStan\Rule;
 use Mautic\CoreBundle\Entity\CommonEntity;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Translation\Translator;
+use PhpParser\Node;
+use PhpParser\Node\Name;
+use PhpParser\Node\Stmt\ClassMethod;
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
-use PhpParser\Node;
-use PhpParser\Node\Name;
-use PhpParser\Node\Stmt\ClassMethod;
 
 /**
  * A shared service must be injected, not passed around as a method parameter.

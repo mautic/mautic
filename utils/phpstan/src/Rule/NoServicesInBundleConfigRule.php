@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Utils\PHPStan\Rule;
 
-use PHPStan\Analyser\Scope;
-use PHPStan\Rules\IdentifierRuleError;
-use PHPStan\Rules\Rule;
-use PHPStan\Rules\RuleErrorBuilder;
 use PhpParser\Node;
 use PhpParser\Node\ArrayItem;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\Return_;
+use PHPStan\Analyser\Scope;
+use PHPStan\Rules\IdentifierRuleError;
+use PHPStan\Rules\Rule;
+use PHPStan\Rules\RuleErrorBuilder;
 
 /**
  * Bundle Config/config.php must not define services, the autowired Config/services.php next to it is the place for them.
@@ -52,7 +52,7 @@ final class NoServicesInBundleConfigRule implements Rule
     /**
      * @param Return_ $node
      *
-     * @return list<\PHPStan\Rules\IdentifierRuleError>
+     * @return list<IdentifierRuleError>
      */
     public function processNode(Node $node, Scope $scope): array
     {
@@ -87,7 +87,7 @@ final class NoServicesInBundleConfigRule implements Rule
     /**
      * Every service group is reported on its own, the "menus" one being the only one left alone.
      *
-     * @return list<\PHPStan\Rules\IdentifierRuleError>
+     * @return list<IdentifierRuleError>
      */
     private function createGroupRuleErrors(ArrayItem $servicesArrayItem): array
     {

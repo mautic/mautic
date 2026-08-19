@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticFocusBundle\Tests\Functional\Controller;
 
-use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\ProjectBundle\Entity\Project;
+use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use Symfony\Component\HttpFoundation\Request;
 
 final class FocusControllerTest extends MauticMysqlTestCase
