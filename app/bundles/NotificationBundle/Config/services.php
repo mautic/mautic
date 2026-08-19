@@ -22,11 +22,10 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('Mautic\\NotificationBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
     $services->set(Mautic\NotificationBundle\EventListener\CampaignSubscriber::class)
-        ->arg('$notificationApi', service('mautic.notification.api'));
+        ->arg('$notificationApi', service(Mautic\NotificationBundle\Api\OneSignalApi::class));
     $services->alias('mautic.integration.onesignal', Mautic\NotificationBundle\Integration\OneSignalIntegration::class);
 
     $services->alias('mautic.notification.model.notification', Mautic\NotificationBundle\Model\NotificationModel::class);
 
-    $services->alias('mautic.notification.api', Mautic\NotificationBundle\Api\OneSignalApi::class);
     $services->set(Mautic\NotificationBundle\Security\Permissions\NotificationPermissions::class);
 };

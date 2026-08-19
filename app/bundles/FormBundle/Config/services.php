@@ -27,14 +27,14 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('Mautic\\FormBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
     $services->set(Mautic\FormBundle\Form\Type\FieldType::class)
-        ->call('setFieldModel', [service('mautic.form.model.field')])
-        ->call('setFormModel', [service('mautic.form.model.form')]);
+        ->call('setFieldModel', [service(Mautic\FormBundle\Model\FieldModel::class)])
+        ->call('setFormModel', [service(Mautic\FormBundle\Model\FormModel::class)]);
     $services->set(Mautic\FormBundle\Form\Type\SubmitActionEmailType::class)
-        ->call('setFieldModel', [service('mautic.form.model.field')])
-        ->call('setFormModel', [service('mautic.form.model.form')]);
+        ->call('setFieldModel', [service(Mautic\FormBundle\Model\FieldModel::class)])
+        ->call('setFormModel', [service(Mautic\FormBundle\Model\FormModel::class)]);
     $services->set(Mautic\FormBundle\Form\Type\SubmitActionRepostType::class)
-        ->call('setFieldModel', [service('mautic.form.model.field')])
-        ->call('setFormModel', [service('mautic.form.model.form')]);
+        ->call('setFieldModel', [service(Mautic\FormBundle\Model\FieldModel::class)])
+        ->call('setFormModel', [service(Mautic\FormBundle\Model\FormModel::class)]);
 
     $services->set(Mautic\FormBundle\Validator\Constraint\FileExtensionConstraintValidator::class)
         ->tag('validator.constraint_validator', ['alias' => 'file_extension_constraint_validator']);

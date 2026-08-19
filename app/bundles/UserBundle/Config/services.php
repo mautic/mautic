@@ -121,7 +121,7 @@ return function (ContainerConfigurator $configurator): void {
         ->decorate('security.authenticator.form_login.main')
         ->args([
             service('.inner'),
-            service('mautic.user.provider'),
+            service(UserProvider::class),
             service('security.password_hasher_factory'),
             [], // This will be replaced by the compiler pass
         ]);

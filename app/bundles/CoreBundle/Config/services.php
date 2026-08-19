@@ -52,10 +52,8 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\CoreBundle\\Entity\\', '../Entity/*Repository.php');
 
-    $services->alias('mautic.helper.core_parameters', Mautic\CoreBundle\Helper\CoreParametersHelper::class);
-
     $services->set(Mautic\CoreBundle\IpLookup\AbstractLookup::class)
-        ->factory([service('mautic.ip_lookup.factory'), 'getService'])
+        ->factory([service(Mautic\CoreBundle\Factory\IpLookupFactory::class), 'getService'])
         ->args([param('mautic.ip_lookup_service'), param('mautic.ip_lookup_auth'), param('mautic.ip_lookup_config'), service('mautic.http.client')]);
     $services->set(Symfony\Contracts\HttpClient\HttpClientInterface::class)
         ->factory(Symfony\Component\HttpClient\HttpClient::create(...));
@@ -96,7 +94,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->set(Mautic\CoreBundle\Factory\IpLookupFactory::class)
         ->arg('$lookupServices', param('mautic.ip_lookup_services'))
         ->arg('$cacheDir', param('kernel.cache_dir'));
-    $services->alias('mautic.ip_lookup.factory', Mautic\CoreBundle\Factory\IpLookupFactory::class);
     $services->set('mautic.schema.helper.column', Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper::class)
         ->arg('$prefix', param('mautic.db_table_prefix'));
     $services->alias(Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper::class, 'mautic.schema.helper.column');
@@ -126,7 +123,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->set('mautic.configurator', Mautic\CoreBundle\Configurator\Configurator::class);
     $services->alias(Mautic\CoreBundle\Configurator\Configurator::class, 'mautic.configurator');
     $services->set(Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher::class);
-    $services->alias('mautic.cipher.openssl', Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher::class);
     $services->set('mautic.security', Mautic\CoreBundle\Security\Permissions\CorePermissions::class)
         ->arg('$bundles', param('mautic.bundles'))
         ->arg('$pluginBundles', param('mautic.plugin.bundles'));
@@ -143,8 +139,8 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->set(Mautic\CoreBundle\Helper\EncryptionHelper::class)
         ->args([
-            service('mautic.helper.core_parameters'),
-            service('mautic.cipher.openssl'),
+            service(Mautic\CoreBundle\Helper\CoreParametersHelper::class),
+            service(Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher::class),
         ]);
 
     $services->set(Symfony\Component\Filesystem\Filesystem::class);

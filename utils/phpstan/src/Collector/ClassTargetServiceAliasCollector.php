@@ -37,7 +37,7 @@ final class ClassTargetServiceAliasCollector implements Collector
 
     /**
      * @return array{string, string, int}|null the string service id, the class name it points at and the
-     *                                          line of the alias() call
+     *                                         line of the alias() call
      */
     public function processNode(Node $node, Scope $scope): ?array
     {
