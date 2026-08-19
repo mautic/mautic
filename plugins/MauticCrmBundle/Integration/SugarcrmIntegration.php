@@ -587,10 +587,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
         return parent::prepareRequest($url, $parameters, $method, $settings, $authType);
     }
 
-    /**
-     * @return bool
-     */
-    public function isAuthorized()
+    public function isAuthorized(): bool
     {
         if (!$this->isConfigured()) {
             return false;

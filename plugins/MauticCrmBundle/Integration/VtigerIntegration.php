@@ -67,7 +67,7 @@ class VtigerIntegration extends CrmAbstractIntegration
     /**
      * @return bool|array<mixed>|string
      */
-    public function isAuthorized()
+    public function isAuthorized(): bool|string|array
     {
         if (!isset($this->keys['url'])) {
             return false;
