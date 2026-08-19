@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Knp\Menu\MenuItem;
+
 return [
     'routes' => [
         'main' => [
@@ -159,24 +161,32 @@ return [
         'menus' => [
             'mautic.menu.main' => [
                 'alias' => 'main',
+                'class'   => MenuItem::class,
+                'factory' => ['@mautic.menu.builder', 'mainMenu'],
             ],
             'mautic.menu.admin' => [
                 'alias'   => 'admin',
                 'options' => [
                     'template' => '@MauticCore/Menu/admin.html.twig',
                 ],
+                'class'   => MenuItem::class,
+                'factory' => ['@mautic.menu.builder', 'adminMenu'],
             ],
             'mautic.menu.extra' => [
                 'alias'   => 'extra',
                 'options' => [
                     'template' => '@MauticCore/Menu/extra.html.twig',
                 ],
+                'class'   => MenuItem::class,
+                'factory' => ['@mautic.menu.builder', 'extraMenu'],
             ],
             'mautic.menu.profile' => [
                 'alias'   => 'profile',
                 'options' => [
                     'template' => '@MauticCore/Menu/profile_inline.html.twig',
                 ],
+                'class'   => MenuItem::class,
+                'factory' => ['@mautic.menu.builder', 'profileMenu'],
             ],
         ],
     ],
