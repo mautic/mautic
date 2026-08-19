@@ -65,6 +65,7 @@ final class GrapesJsBuilderPageCest
     private function openBuilder(AcceptanceTester $I): void
     {
         $I->waitForJS("return typeof Mautic.launchBuilder === 'function' && Mautic.launchBuilder.toString().includes('builder-active') && document.querySelector('#page_buttons_builder') !== null;", 30);
+        $I->waitForJS("return document.querySelector('#page_buttons_builder').disabled === false;", 30);
         $I->executeJS("document.querySelector('#page_buttons_builder').click();");
         $I->waitForElementVisible('.builder.builder-active', 30);
     }
