@@ -49,6 +49,10 @@ final readonly class CampaignShareService
 
         $token = $this->storeTransientZip($zipFilePath);
 
+        // The ZIP itself was moved into the share dir by storeTransientZip(); only the
+        // now-empty per-request temp directory is left to clean up.
+        $this->filesystem->remove(\dirname($zipFilePath));
+
         return $this->urlGenerator->generate(
             'mautic_campaign_share_download',
             ['token' => $token],
@@ -73,7 +77,13 @@ final readonly class CampaignShareService
 
         $jsonOutput = json_encode([$exportData], JSON_PRETTY_PRINT);
 
-        $zipFilePath = $this->exportHelper->writeToZipFile($jsonOutput, $assetList, '');
+        // Each share/export gets its own directory, never the shared ExportHelper default
+        // (sys_get_temp_dir().'/entity_data.zip'), so concurrent requests can't unlink or
+        // overwrite one another's archive.
+        $tempDir = sys_get_temp_dir().'/mautic_campaign_share_'.bin2hex(random_bytes(16));
+        $this->filesystem->mkdir($tempDir, 0700);
+
+        $zipFilePath = $this->exportHelper->writeToZipFile($jsonOutput, $assetList, $tempDir);
         $this->addComposerJsonToZip($zipFilePath, $composerJson);
 
         // Banner and gallery live under assets/ so the shared archive keeps the same

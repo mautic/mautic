@@ -118,6 +118,48 @@ final class CampaignShareControllerTest extends MauticMysqlTestCase
         $this->assertStringContainsString('.zip', (string) $response->headers->get('Content-Disposition'));
     }
 
+    /**
+     * Regression test: buildShareZip() used to write every archive to the same fixed path
+     * (sys_get_temp_dir().'/entity_data.zip'). Two overlapping share/download requests would
+     * then race on that single file — one request could delete or overwrite the other's
+     * archive mid-flight. Each call must now get its own private temp file.
+     */
+    public function testConcurrentShareBuildsDoNotClobberEachOther(): void
+    {
+        $shareService = self::getContainer()->get(CampaignShareService::class);
+        $this->assertInstanceOf(CampaignShareService::class, $shareService);
+
+        $campaignOne = new Campaign();
+        $campaignOne->setName('Concurrent Campaign One');
+        $campaignTwo = new Campaign();
+        $campaignTwo->setName('Concurrent Campaign Two');
+        $this->em->persist($campaignOne);
+        $this->em->persist($campaignTwo);
+        $this->em->flush();
+
+        // Simulate two requests interleaving: build the first archive, then build the
+        // second before the first has been consumed.
+        $firstZipPath  = $shareService->buildShareZip($campaignOne, ['campaign' => [['id' => $campaignOne->getId(), 'name' => 'One']]], [], ['title' => 'One', 'vendorName' => 'acme', 'version' => '1.0.0']);
+        $secondZipPath = $shareService->buildShareZip($campaignTwo, ['campaign' => [['id' => $campaignTwo->getId(), 'name' => 'Two']]], [], ['title' => 'Two', 'vendorName' => 'acme', 'version' => '1.0.0']);
+
+        try {
+            $this->assertNotSame($firstZipPath, $secondZipPath, 'Each share build must use its own file, not a shared path.');
+            $this->assertFileExists($firstZipPath, 'Building the second archive must not delete the first.');
+            $this->assertFileExists($secondZipPath);
+
+            $zip = new \ZipArchive();
+            $this->assertTrue($zip->open($firstZipPath));
+            $composerJson = json_decode((string) $zip->getFromName('composer.json'), true);
+            $zip->close();
+            $this->assertStringContainsString('one', strtolower((string) $composerJson['name']));
+        } finally {
+            @unlink($firstZipPath);
+            @unlink($secondZipPath);
+            @rmdir(\dirname($firstZipPath));
+            @rmdir(\dirname($secondZipPath));
+        }
+    }
+
     public function testSharePublishRedirectsToMarketplace(): void
     {
         $nonAdminUser = $this->setupShareTestData(1024);
