@@ -6,24 +6,18 @@ namespace Mautic\CoreBundle\DependencyInjection\Compiler;
 
 use Knp\Menu\MenuItem;
 use Mautic\CoreBundle\Menu\MenuRenderer;
-use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\ExpressionLanguage\Expression;
 
 final class ServicePass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-//        $bundles = array_merge($container->getParameter('mautic.bundles'), $container->getParameter('mautic.plugin.bundles'));
-
         // Store menu renderer options to create unique renderering classes per menu
         // since KNP menus doesn't seem to support a Renderer factory
         $menus = [];
-
 
         // Setup default menu details
         if ('menus' == $type) {
@@ -47,8 +41,7 @@ final class ServicePass implements CompilerPassInterface
                     $options,
                 ]
             ))
-                ->addTag('knp_menu.renderer', ['alias' => $alias]   );
+                ->addTag('knp_menu.renderer', ['alias' => $alias]);
         }
     }
-
 }
