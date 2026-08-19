@@ -46,7 +46,6 @@ final class CampaignEventSubscriberFunctionalTest extends MauticMysqlTestCase
         /** @var EventDispatcherInterface $dispatcher */
         $dispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         $dispatcher->dispatch($unpublishEvent, CampaignEvents::ON_CAMPAIGN_UNPUBLISH_NOTIFY);
-        $this->assertInstanceOf(Campaign::class, $campaign);
 
         // Check for notifications - use a more general query
         $notifications = $this->em->getRepository(Notification::class)

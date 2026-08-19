@@ -205,10 +205,8 @@ class LanguageHelper
 
     /**
      * Fetches a language package from the remote server.
-     *
-     * @param string $languageCode
      */
-    public function fetchPackage($languageCode): array
+    public function fetchPackage(?string $languageCode): array
     {
         // Check if we have a cache file, generate it if not
         if (!is_readable($this->cacheFile)) {
@@ -222,10 +220,12 @@ class LanguageHelper
             ];
         }
 
-        $cacheData = json_decode(file_get_contents($this->cacheFile), true);
+        $cacheData     = json_decode(file_get_contents($this->cacheFile), true);
+        $languageCode  = (string) $languageCode;
+        $cacheLanguages = is_array($cacheData['languages'] ?? null) ? $cacheData['languages'] : [];
 
-        // Make sure the language actually exists
-        if (!isset($cacheData['languages'][$languageCode])) {
+        // Make sure the language code is valid and the language actually exists.
+        if ('' === $languageCode || !isset($cacheLanguages[$languageCode])) {
             return [
                 'error'   => true,
                 'message' => 'mautic.core.language.helper.invalid.language',
