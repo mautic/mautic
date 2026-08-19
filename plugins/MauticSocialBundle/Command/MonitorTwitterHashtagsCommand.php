@@ -13,12 +13,8 @@ final class MonitorTwitterHashtagsCommand extends MonitorTwitterBaseCommand
 {
     /**
      * Search for tweets by hashtag.
-     *
-     * @param Monitoring $monitor
-     *
-     * @return bool|array False if missing the hashtag, otherwise the array response from Twitter
      */
-    protected function getTweets($monitor)
+    protected function getTweets(Monitoring $monitor): array|false
     {
         $params = $monitor->getProperties();
         $stats  = $monitor->getStats();
