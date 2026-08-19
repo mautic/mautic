@@ -52,13 +52,13 @@ final class StageController extends AbstractFormController
 
         $pageHelper = $pageHelperFactory->make('mautic.stage', $page);
 
-        $limit      = $pageHelper->getLimit();
-        $start      = $pageHelper->getStart();
-        $search     = $request->get('search', $request->getSession()->get('mautic.stage.filter', ''));
-        $filter     = ['string' => $search, 'force' => []];
-        $orderBy    = $request->getSession()->get('mautic.stage.orderby', 's.name');
-        $orderByDir = $request->getSession()->get('mautic.stage.orderbydir', 'ASC');
-        $stages = $this->stageModel->getEntities(
+        $limit                                   = $pageHelper->getLimit();
+        $start                                   = $pageHelper->getStart();
+        $search                                  = $request->get('search', $request->getSession()->get('mautic.stage.filter', ''));
+        $filter                                  = ['string' => $search, 'force' => []];
+        $orderBy                                 = $request->getSession()->get('mautic.stage.orderby', 's.name');
+        $orderByDir                              = $request->getSession()->get('mautic.stage.orderbydir', 'ASC');
+        [$stageEntities, $contactCounts, $count] = $this->stageModel->getEntitiesWithContactCounts(
             [
                 'start'      => $start,
                 'limit'      => $limit,
@@ -69,8 +69,6 @@ final class StageController extends AbstractFormController
         );
 
         $request->getSession()->set('mautic.stage.filter', $search);
-
-        $count = count($stages);
         if ($count && $count < ($start + 1)) {
             $lastPage  = $pageHelper->countPage($count);
             $returnUrl = $this->generateUrl('mautic_stage_index', ['page' => $lastPage]);
@@ -97,13 +95,15 @@ final class StageController extends AbstractFormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'searchValue' => $search,
-                    'items'       => $stages,
-                    'actions'     => $actions['actions'],
-                    'page'        => $page,
-                    'limit'       => $limit,
-                    'permissions' => $permissions,
-                    'tmpl'        => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                    'searchValue'   => $search,
+                    'items'         => $stageEntities,
+                    'contactCounts' => $contactCounts,
+                    'actions'       => $actions['actions'],
+                    'page'          => $page,
+                    'limit'         => $limit,
+                    'permissions'   => $permissions,
+                    'tmpl'          => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                    'totalItems'    => $count,
                 ],
                 'contentTemplate' => '@MauticStage/Stage/list.html.twig',
                 'passthroughVars' => [

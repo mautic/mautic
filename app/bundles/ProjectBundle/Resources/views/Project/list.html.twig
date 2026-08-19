@@ -119,9 +119,18 @@
                             {% endif %}
                         </td>
                         <td class="visible-md visible-lg">
-                            <a href="{{ path('mautic_project_action', {'objectAction': 'view', 'objectId': item.getId()}) }}" data-toggle="ajax" data-menu-link="mautic_project_index" size="sm" class="label label-gray" {% if 0 == item.entitiesCount|default(0) %}disabled="disabled"{% endif %}>
-                               {{- 'mautic.project.entity.count'|trans({'%count%': item.entitiesCount|default(0)}) -}}
-                            </a>
+                            {% include '@MauticCore/Helper/_tag.html.twig' with {
+                                tags: [{
+                                    label: 'mautic.project.entity.count'|trans({'%count%': item.entitiesCount|default(0)}),
+                                    color: 'gray',
+                                    size: 'sm',
+                                    attributes: {
+                                        href: path('mautic_project_action', {'objectAction': 'view', 'objectId': item.getId()}),
+                                        'data-toggle': 'ajax',
+                                        'data-menu-link': 'mautic_project_index'
+                                    }|merge(0 == item.entitiesCount|default(0) ? {disabled: 'disabled'} : {})
+                                }]
+                            } %}
                         </td>
                         <td>
                             <abbr title="{{ dateToFull(item.getDateAdded) }}">

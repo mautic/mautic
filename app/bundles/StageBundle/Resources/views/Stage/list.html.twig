@@ -91,6 +91,12 @@
                     {{- include('@MauticCore/Helper/tableheader.html.twig',
                     {
                         'sessionVar' : 'stage',
+                        'text'       : 'mautic.lead.list.thead.leadcount',
+                        'class'      : 'visible-md visible-lg col-stage-leadcount',
+                    }) -}}
+                    {{- include('@MauticCore/Helper/tableheader.html.twig',
+                    {
+                        'sessionVar' : 'stage',
                         'orderBy'    : 's.id',
                         'text'       : 'mautic.core.id',
                         'class'      : 'visible-md visible-lg col-stage-id',
@@ -127,6 +133,17 @@
                                 },
                                 'customButtons'   : customButtons,
                                 'routeBase' : 'stage',
+                                'customButtons': {
+                                    'viewcontacts': {
+                                        'attr': {
+                                            'data-toggle': 'ajax',
+                                            'href': path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.stage'|trans ~ ':"' ~ item.name ~ '"'}),
+                                        },
+                                        'iconClass': 'ri-team-line',
+                                        'btnText': 'mautic.lead.list.view_contacts'|trans,
+                                        'priority': 100
+                                    }
+                                }
                             }) -}}
                     </td>
                     <td>
@@ -153,6 +170,20 @@
                     <td class="visible-md visible-lg">
                         {{ include('@MauticCore/Modules/category--expanded.html.twig', {'category': item.category}) }}
                     </td>
+                    <td class="visible-md visible-lg">
+                        {% set stageContactCount = contactCounts[item.id]|default(0) %}
+                        {% include '@MauticCore/Helper/_tag.html.twig' with {
+                            tags: [{
+                                label: 'mautic.lead.list.viewleads_count'|trans({'%count%': stageContactCount}),
+                                color: 'gray',
+                                size: 'sm',
+                                attributes: {
+                                    href: path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.stage'|trans ~ ':"' ~ item.name ~ '"'}),
+                                    'data-toggle': 'ajax'
+                                }|merge(0 == stageContactCount ? {disabled: 'disabled'} : {})
+                            }]
+                        } %}
+                    </td>
                     <td class="visible-md visible-lg">{{ item.getId() }}</td>
                 </tr>
             {% endfor %}
@@ -162,7 +193,7 @@
     <div class="panel-footer">
         {{- include('@MauticCore/Helper/pagination.html.twig',
             {
-                'totalItems' : items|length,
+                'totalItems' : totalItems,
                 'page'       : page,
                 'limit'      : limit,
                 'menuLinkId' : 'mautic_stage_index',
