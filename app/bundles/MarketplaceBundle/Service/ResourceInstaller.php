@@ -98,7 +98,7 @@ final readonly class ResourceInstaller implements ResourceInstallerInterface
                     break;
                 }
 
-                if (!empty($status)) {
+                if ([] !== $status) {
                     $summary[] = $status;
                 }
             }
@@ -109,12 +109,12 @@ final readonly class ResourceInstaller implements ResourceInstallerInterface
             $this->removeFile($zipPath);
         }
 
-        if (empty($errors)) {
+        if ([] === $errors) {
             $this->markAsInstalled($packageName, $summary);
         }
 
         return [
-            'success' => empty($errors),
+            'success' => [] === $errors,
             'summary' => $summary,
             'errors'  => $errors,
         ];
@@ -353,7 +353,7 @@ final readonly class ResourceInstaller implements ResourceInstallerInterface
                     $eventDeps[] = $dep;
                 }
             }
-            if (!empty($eventDeps)) {
+            if ([] !== $eventDeps) {
                 $deps['campaign_event'] = $eventDeps;
             }
 
@@ -363,7 +363,7 @@ final readonly class ResourceInstaller implements ResourceInstallerInterface
             }
         }
 
-        return empty($deps) ? [] : [$deps];
+        return [] === $deps ? [] : [$deps];
     }
 
     /**

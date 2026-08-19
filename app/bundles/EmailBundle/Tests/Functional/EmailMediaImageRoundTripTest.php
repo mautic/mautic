@@ -41,7 +41,7 @@ final class EmailMediaImageRoundTripTest extends MauticMysqlTestCase
 
     private function runRoundTrip(): void
     {
-        $container        = static::getContainer();
+        $container        = self::getContainer();
         $pathsHelper      = $container->get(PathsHelper::class);
         $exportHelper     = $container->get(ExportHelper::class);
         $importHelper     = $container->get(ImportHelper::class);
