@@ -32,8 +32,8 @@ final class AssetsHelperTest extends TestCase
             $this->createPackagesMock(),
             $this->pathsHelper,
             $this->createAssetGenerationHelper(),
-            $this->createMock(BuilderIntegrationsHelper::class),
-            $this->createMock(InstallService::class),
+            $this->createStub(BuilderIntegrationsHelper::class),
+            $this->createStub(InstallService::class),
             '',
         );
     }
@@ -41,10 +41,10 @@ final class AssetsHelperTest extends TestCase
     private function createAssetGenerationHelper(): AssetGenerationHelper
     {
         return new AssetGenerationHelper(
-            $this->createMock(BundleHelper::class),
+            $this->createStub(BundleHelper::class),
             $this->pathsHelper,
-            $this->createMock(CoreParametersHelper::class),
-            $this->createMock(AppVersion::class),
+            $this->createStub(CoreParametersHelper::class),
+            $this->createStub(AppVersion::class),
         );
     }
 

@@ -153,7 +153,7 @@ final readonly class AssetExtension
     #[AsTwigFunction(name: 'assetGetBaseUrl', isSafe: ['html'])]
     public function getBaseUrl(): string
     {
-        return (string) $this->assetsHelper->getBaseUrl();
+        return $this->assetsHelper->getBaseUrl();
     }
 
     /**

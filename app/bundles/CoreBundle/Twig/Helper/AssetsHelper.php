@@ -34,10 +34,7 @@ final class AssetsHelper
 
     private ?string $version = null;
 
-    /**
-     * @var string
-     */
-    private $siteUrl;
+    private readonly string $siteUrl;
 
     public function __construct(
         private readonly Packages $packages,
@@ -135,10 +132,7 @@ final class AssetsHelper
         return $this->packages->getUrl($path, $packageName);
     }
 
-    /**
-     * @return string
-     */
-    public function getBaseUrl()
+    public function getBaseUrl(): string
     {
         return $this->siteUrl;
     }
