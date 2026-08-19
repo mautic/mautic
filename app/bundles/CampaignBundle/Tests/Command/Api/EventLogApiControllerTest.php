@@ -9,6 +9,7 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignMember;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use Symfony\Component\HttpFoundation\Request;
 
 final class EventLogApiControllerTest extends MauticMysqlTestCase
 {
@@ -116,7 +117,7 @@ final class EventLogApiControllerTest extends MauticMysqlTestCase
             ],
         ];
 
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_PUT, '/api/campaigns/events/batch/edit', $payload);
+        $this->client->request(Request::METHOD_PUT, '/api/campaigns/events/batch/edit', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 

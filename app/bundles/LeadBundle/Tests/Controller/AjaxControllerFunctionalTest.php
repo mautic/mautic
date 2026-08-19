@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Controller;
 
+use MauticPlugin\MauticTagManagerBundle\Entity\Tag;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -16,10 +17,10 @@ use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
-use MauticPlugin\MauticTagManagerBundle\Entity\Tag;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
@@ -122,7 +123,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->setCsrfHeader();
         $this->client->xmlHttpRequest(Request::METHOD_POST, '/s/ajax', $payload);
-        $this->assertEquals(\Symfony\Component\HttpFoundation\Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode(), 'The user without campaign edit own/others permissions should not access toggle lead campaign action.');
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode(), 'The user without campaign edit own/others permissions should not access toggle lead campaign action.');
     }
 
     public function testSegmentDependencyTreeWithNotExistingSegment(): void

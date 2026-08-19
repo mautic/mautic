@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace Utils\PHPStan\Rule;
 
+use Mautic\CoreBundle\IpLookup\AbstractLookup;
+use PHPStan\Analyser\Scope;
+use PHPStan\Reflection\ReflectionProvider;
+use PHPStan\Rules\Rule;
+use PHPStan\Rules\RuleErrorBuilder;
 use PhpParser\Node;
 use PhpParser\Node\ComplexType;
 use PhpParser\Node\Name;
 use PhpParser\Node\NullableType;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\UnionType;
-use PHPStan\Analyser\Scope;
-use PHPStan\Reflection\ReflectionProvider;
-use PHPStan\Rules\Rule;
-use PHPStan\Rules\RuleErrorBuilder;
 
 /**
  * A constructor service dependency must not be nullable.
@@ -43,7 +44,7 @@ final class NoNullableServiceInConstructorRule implements Rule
     /**
      * @var string[]
      */
-    private const SKIPPED_EXACT_CLASSES = [\Mautic\CoreBundle\IpLookup\AbstractLookup::class];
+    private const SKIPPED_EXACT_CLASSES = [AbstractLookup::class];
 
     public function __construct(
         private readonly ReflectionProvider $reflectionProvider,

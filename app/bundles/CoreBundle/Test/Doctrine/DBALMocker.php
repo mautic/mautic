@@ -9,6 +9,7 @@ use Doctrine\DBAL\Result;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\MockObject\MockBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Rule\AnyInvokedCount;
 use PHPUnit\Framework\TestCase;
 
@@ -78,7 +79,7 @@ final class DBALMocker
         $this->resetInserted();
     }
 
-    public function getMockEm(): \PHPUnit\Framework\MockObject\MockObject
+    public function getMockEm(): MockObject
     {
         if (null === $this->mockEm) {
             $entityManagerMockBuilder = new MockBuilder($this->testCase, EntityManager::class);
@@ -114,7 +115,7 @@ final class DBALMocker
         return $this->mockEm;
     }
 
-    public function getMockConnection(): \PHPUnit\Framework\MockObject\MockObject
+    public function getMockConnection(): MockObject
     {
         if (null === $this->mockConnection) {
             $connectionMockBuilder = new MockBuilder($this->testCase, Connection::class);
@@ -148,7 +149,7 @@ final class DBALMocker
         return $this->mockConnection;
     }
 
-    public function getMockQueryBuilder(): \PHPUnit\Framework\MockObject\MockObject
+    public function getMockQueryBuilder(): MockObject
     {
         if (null === $this->mockQueryBuilder) {
             $queryBuilderMockBuilder = new MockBuilder($this->testCase, QueryBuilder::class);

@@ -29,6 +29,7 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe;
 use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Form\Type\PreferenceCenterListType;
 use Mautic\PageBundle\Model\PageModel;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -50,7 +51,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  * Mocking a representative ConfigForm by leveraging Symfony's TypeTestCase to test RestrictionHelper.
  */
 #[CoversClass(RestrictionHelper::class)]
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class RestrictionHelperTest extends TypeTestCase
 {
     private string $displayMode = RestrictionHelper::MODE_REMOVE;

@@ -4,19 +4,20 @@ declare(strict_types=1);
 
 namespace MauticPlugin\GrapesJsBuilderBundle\Tests\Unit\EventSubscriber;
 
-use Mautic\EmailBundle\Entity\Email;
-use Mautic\EmailBundle\Entity\EmailRepository;
-use Mautic\EmailBundle\Event\EmailEditSubmitEvent;
-use Mautic\EmailBundle\Helper\EmailConfigInterface;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository;
 use MauticPlugin\GrapesJsBuilderBundle\EventSubscriber\EmailSubscriber;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
 use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
+use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\EmailRepository;
+use Mautic\EmailBundle\Event\EmailEditSubmitEvent;
+use Mautic\EmailBundle\Helper\EmailConfigInterface;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class EmailSubscriberTest extends TestCase
 {
     /**

@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace Utils\PHPStan\Rule;
 
-use PhpParser\Node;
-use PhpParser\Node\Name;
-use PhpParser\Node\Stmt\ClassMethod;
+use Mautic\CoreBundle\Entity\CommonEntity;
+use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Translation\Translator;
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
+use PhpParser\Node;
+use PhpParser\Node\Name;
+use PhpParser\Node\Stmt\ClassMethod;
 
 /**
  * A shared service must be injected, not passed around as a method parameter.
@@ -67,7 +70,7 @@ final class NoServiceInMethodParameterRule implements Rule
      */
     private const SKIPPED_TYPES = [
         'Symfony\\Component\\DependencyInjection\\ContainerBuilder',
-        \Mautic\CoreBundle\Translation\Translator::class,
+        Translator::class,
     ];
 
     /**
@@ -76,7 +79,7 @@ final class NoServiceInMethodParameterRule implements Rule
      *
      * @var array<string, string>
      */
-    private const SKIPPED_PARENT_CLASS_METHODS = [\Mautic\CoreBundle\Model\FormModel::class => 'createform'];
+    private const SKIPPED_PARENT_CLASS_METHODS = [FormModel::class => 'createform'];
 
     /**
      * A test case has no container to inject from - it fetches services itself and hands them to its own data
@@ -97,7 +100,7 @@ final class NoServiceInMethodParameterRule implements Rule
     private const SKIPPED_CLASS_TYPES = [
         'Symfony\\Contracts\\EventDispatcher\\Event',
         'Symfony\\Component\\EventDispatcher\\Event',
-        \Mautic\CoreBundle\Entity\CommonEntity::class,
+        CommonEntity::class,
         'Twig\\Extension\\AbstractExtension',
         'FOS\\OAuthServerBundle\\Controller\\AuthorizeController',
     ];

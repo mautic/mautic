@@ -8,6 +8,7 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\HttpFoundation\Request;
 
 final class CampaignEventStatsTest extends MauticMysqlTestCase
 {
@@ -89,7 +90,7 @@ final class CampaignEventStatsTest extends MauticMysqlTestCase
         $before = $now->modify('-1 month');
         $after  = $now->modify('+1 month');
         $url    = sprintf('/s/campaigns/event/stats/%d/%s/%s', $campaign->getId(), $before->format('Y-m-d'), $after->format('Y-m-d'));
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, $url);
+        $this->client->request(Request::METHOD_GET, $url);
         $response = $this->client->getResponse();
         $body     = \json_decode($response->getContent(), true);
 

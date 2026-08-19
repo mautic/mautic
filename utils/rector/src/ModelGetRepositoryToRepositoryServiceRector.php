@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace Utils\Rector;
 
+use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Model\AbstractCommonModel;
+use PHPStan\Type\ObjectType;
 use PhpParser\Modifiers;
 use PhpParser\Node;
+use PhpParser\NodeFinder;
 use PhpParser\Node\Attribute;
 use PhpParser\Node\AttributeGroup;
 use PhpParser\Node\Expr\Assign;
@@ -17,12 +21,10 @@ use PhpParser\Node\Name;
 use PhpParser\Node\Name\FullyQualified;
 use PhpParser\Node\Param;
 use PhpParser\Node\PropertyItem;
-use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
+use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Property;
-use PhpParser\NodeFinder;
-use PHPStan\Type\ObjectType;
 use Rector\NodeManipulator\ClassDependencyManipulator;
 use Rector\PhpParser\AstResolver;
 use Rector\PostRector\ValueObject\PropertyMetadata;
@@ -56,7 +58,7 @@ final class ModelGetRepositoryToRepositoryServiceRector extends AbstractRector
      */
     private const TEST_CASE = 'PHPUnit\Framework\TestCase';
 
-    private const ABSTRACT_COMMON_MODEL = \Mautic\CoreBundle\Model\AbstractCommonModel::class;
+    private const ABSTRACT_COMMON_MODEL = AbstractCommonModel::class;
 
     /**
      * Generic repository bases - a model that does not override getRepository() resolves to one of these,
@@ -64,7 +66,7 @@ final class ModelGetRepositoryToRepositoryServiceRector extends AbstractRector
      */
     private const GENERIC_REPOSITORIES = [
         'Doctrine\ORM\EntityRepository',
-        \Mautic\CoreBundle\Entity\CommonRepository::class,
+        CommonRepository::class,
     ];
 
     public function __construct(

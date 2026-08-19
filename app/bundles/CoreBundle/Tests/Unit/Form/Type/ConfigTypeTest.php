@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Shortener\Shortener;
 use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Form\Type\PageListType;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\PreloadedExtension;
@@ -19,7 +20,7 @@ use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Validation;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class ConfigTypeTest extends TypeTestCase
 {
     public function testSubmitEmptyTrustedHosts(): void

@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticFocusBundle\Tests\Unit\Helper;
 
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Helper\TokenHelper;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class TokenHelperTest extends TestCase
 {
     /**

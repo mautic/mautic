@@ -9,6 +9,7 @@ use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\NotificationBundle\Entity\Notification;
 use Mautic\NotificationBundle\Form\Type\NotificationType;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\Form\FormExtensionInterface;
@@ -18,7 +19,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Validation;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class NotificationTypeTest extends TypeTestCase
 {
     /**

@@ -8,10 +8,11 @@ use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\SmsBundle\Integration\Twilio\Configuration;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use Twilio\Exceptions\ConfigurationException;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     private MockObject&IntegrationHelper $integrationHelper;

@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace Utils\PHPStan\Rule;
 
+use Mautic\ApiBundle\Controller\CommonApiController;
+use PHPStan\Analyser\Scope;
+use PHPStan\Reflection\ClassReflection;
+use PHPStan\Rules\Rule;
+use PHPStan\Rules\RuleErrorBuilder;
 use PhpParser\Node;
 use PhpParser\Node\Expr\StaticCall;
 use PhpParser\Node\Expr\Variable;
@@ -12,10 +17,6 @@ use PhpParser\Node\Name;
 use PhpParser\Node\Param;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Expression;
-use PHPStan\Analyser\Scope;
-use PHPStan\Reflection\ClassReflection;
-use PHPStan\Rules\Rule;
-use PHPStan\Rules\RuleErrorBuilder;
 
 /**
  * A constructor must not repeat the parameters of its parent only to hand them straight over.
@@ -65,7 +66,7 @@ final class NoParentConstructorForwardingRule implements Rule
      * @var string[]
      */
     private const SKIPPED_CLASSES = [
-        \Mautic\ApiBundle\Controller\CommonApiController::class,
+        CommonApiController::class,
     ];
 
     public function getNodeType(): string

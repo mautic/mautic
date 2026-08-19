@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace MauticPlugin\GrapesJsBuilderBundle\Tests\Functional\Controller;
 
+use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder;
+use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
-use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder;
-use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository;
+use Symfony\Component\HttpFoundation\Request;
 
 final class AssertCustomMjmlTest extends MauticMysqlTestCase
 {
@@ -32,7 +33,7 @@ final class AssertCustomMjmlTest extends MauticMysqlTestCase
         $emailId = $email->getId();
 
         // Get the Email via API and assert customMjml.
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/emails/'.$emailId);
+        $this->client->request(Request::METHOD_GET, '/api/emails/'.$emailId);
         $this->assertResponseStatusCodeSame(200);
         $content = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertNotEmpty($content['email']['grapesjsbuilder']['customMjml']);
@@ -51,7 +52,7 @@ final class AssertCustomMjmlTest extends MauticMysqlTestCase
         $this->addToGrapesJsBuilder($email);
 
         // Get email & check for both customHtml & customMjml in the response.
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/emails/'.$emailId);
+        $this->client->request(Request::METHOD_GET, '/api/emails/'.$emailId);
         $this->assertResponseStatusCodeSame(200);
         $content = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertNotEmpty($content['email']['customHtml']);
@@ -116,7 +117,7 @@ final class AssertCustomMjmlTest extends MauticMysqlTestCase
             'isPublished' => true,
         ];
 
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/emails/new', [], [], ['CONTENT_TYPE' => 'application/json'], json_encode($emailData));
+        $this->client->request(Request::METHOD_POST, '/api/emails/new', [], [], ['CONTENT_TYPE' => 'application/json'], json_encode($emailData));
         $this->assertResponseStatusCodeSame(201);
 
         return json_decode($this->client->getResponse()->getContent(), true);

@@ -21,6 +21,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -64,9 +65,9 @@ final class NotificationApiController extends CommonApiController
                 $this->leadModel->saveEntity($currentLead);
             }
 
-            return new JsonResponse(['success' => true, 'osid' => $osid], \Symfony\Component\HttpFoundation\Response::HTTP_OK, ['Access-Control-Allow-Origin' => '*']);
+            return new JsonResponse(['success' => true, 'osid' => $osid], Response::HTTP_OK, ['Access-Control-Allow-Origin' => '*']);
         }
 
-        return new JsonResponse(['success' => 'false'], \Symfony\Component\HttpFoundation\Response::HTTP_OK, ['Access-Control-Allow-Origin' => '*']);
+        return new JsonResponse(['success' => 'false'], Response::HTTP_OK, ['Access-Control-Allow-Origin' => '*']);
     }
 }

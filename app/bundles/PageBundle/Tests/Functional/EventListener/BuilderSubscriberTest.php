@@ -15,6 +15,7 @@ use Mautic\PageBundle\Entity\Page;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 #[PreserveGlobalState(false)]
@@ -89,7 +90,7 @@ final class BuilderSubscriberTest extends MauticMysqlTestCase
             'secretHash' => $mailHashHelper->getEmailHash($lead->getEmail()),
         ], UrlGeneratorInterface::ABSOLUTE_PATH);
 
-        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, $unsubscribeUrl);
+        $crawler = $this->client->request(Request::METHOD_GET, $unsubscribeUrl);
 
         $this->assertTrue($this->client->getResponse()->isSuccessful(), $this->client->getResponse()->getContent());
 

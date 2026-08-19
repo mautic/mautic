@@ -7,6 +7,8 @@ namespace MauticPlugin\MauticSocialBundle\Tests\Functional\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
@@ -16,44 +18,44 @@ final class MonitoringControllerTest extends MauticMysqlTestCase
 
     public function testIndex(): void
     {
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/monitoring');
+        $this->client->request(Request::METHOD_GET, '/s/monitoring');
         $this->assertResponseIsSuccessful();
     }
 
     public function testNew(): void
     {
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/monitoring/new');
+        $this->client->request(Request::METHOD_GET, '/s/monitoring/new');
         $this->assertResponseIsSuccessful();
     }
 
     public function testEdit(): void
     {
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/monitoring/edit/1');
+        $this->client->request(Request::METHOD_GET, '/s/monitoring/edit/1');
         $this->assertResponseIsSuccessful();
     }
 
     public function testIndexWithoutPermission(): void
     {
         $this->createAndLoginUser();
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/monitoring');
+        $this->client->request(Request::METHOD_GET, '/s/monitoring');
         $response = $this->client->getResponse();
-        $this->assertEquals(\Symfony\Component\HttpFoundation\Response::HTTP_FORBIDDEN, $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $response->getStatusCode());
     }
 
     public function testNewWithoutPermission(): void
     {
         $this->createAndLoginUser();
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/monitoring/new');
+        $this->client->request(Request::METHOD_GET, '/s/monitoring/new');
         $response = $this->client->getResponse();
-        $this->assertEquals(\Symfony\Component\HttpFoundation\Response::HTTP_FORBIDDEN, $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $response->getStatusCode());
     }
 
     public function testEditWithoutPermission(): void
     {
         $this->createAndLoginUser();
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/monitoring/edit/1');
+        $this->client->request(Request::METHOD_GET, '/s/monitoring/edit/1');
         $response = $this->client->getResponse();
-        $this->assertEquals(\Symfony\Component\HttpFoundation\Response::HTTP_FORBIDDEN, $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $response->getStatusCode());
     }
 
     private function createAndLoginUser(): User
