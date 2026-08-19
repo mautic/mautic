@@ -17,7 +17,6 @@ use PHPStan\Reflection\ParameterReflection;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
-use PHPStan\Type\ObjectType;
 
 /**
  * Reports the service() arguments of Config/services.php that only repeat the type autowiring resolves anyway,
@@ -270,6 +269,6 @@ final class NoRedundantAutowiredServiceArgumentRule implements Rule
     {
         $parameterType = $parameter->getType();
 
-        return $parameterType instanceof ObjectType && $parameterType->getClassName() === $serviceClass;
+        return $parameterType->isObject()->yes() && [$serviceClass] === $parameterType->getObjectClassNames();
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\SmsBundle\DependencyInjection\Compiler;
 
+use Mautic\SmsBundle\Sms\TransportChain;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -12,11 +13,7 @@ final class SmsTransportPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        if (!$container->has('mautic.sms.transport_chain')) {
-            return;
-        }
-
-        $definition     = $container->getDefinition('mautic.sms.transport_chain');
+        $definition     = $container->getDefinition(TransportChain::class);
         $taggedServices = $container->findTaggedServiceIds('mautic.sms_transport');
         foreach ($taggedServices as $id => $tags) {
             $definition->addMethodCall('addTransport', [

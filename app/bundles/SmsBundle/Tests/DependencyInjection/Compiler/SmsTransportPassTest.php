@@ -39,7 +39,7 @@ final class SmsTransportPassTest extends TestCase
             ->getMock();
 
         $container
-            ->register('mautic.sms.transport_chain')
+            ->register(TransportChain::class)
             ->setClass($transport::class)
             ->setArguments(['foo', $this->createStub(IntegrationHelper::class)])
             ->setShared(false)
@@ -51,7 +51,7 @@ final class SmsTransportPassTest extends TestCase
 
         $this->assertCount(2, $container->findTaggedServiceIds('mautic.sms_transport'));
 
-        $methodCalls = $container->getDefinition('mautic.sms.transport_chain')->getMethodCalls();
+        $methodCalls = $container->getDefinition(TransportChain::class)->getMethodCalls();
         $this->assertCount(count($methodCalls), $container->findTaggedServiceIds('mautic.sms_transport'));
 
         // Translation string
