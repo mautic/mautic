@@ -454,11 +454,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * @param bool $mainDecryptOnly
-     *
      * @return array
      */
-    public function decryptApiKeys(array $keys, $mainDecryptOnly = false)
+    public function decryptApiKeys(array $keys, bool $mainDecryptOnly = false)
     {
         $decrypted = [];
 
