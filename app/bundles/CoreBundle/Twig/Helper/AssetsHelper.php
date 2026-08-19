@@ -9,6 +9,7 @@ use Mautic\InstallBundle\Install\InstallService;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Symfony\Component\Asset\Packages;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class AssetsHelper
 {
@@ -21,8 +22,6 @@ final class AssetsHelper
      * Used within the content iframe when building content with a theme.
      */
     public const string CONTEXT_BUILDER = 'builder';
-
-    private ?AssetGenerationHelper $assetHelper = null;
 
     private string $context = self::CONTEXT_APP;
 
@@ -40,15 +39,19 @@ final class AssetsHelper
      */
     private $siteUrl;
 
-    private ?PathsHelper $pathsHelper = null;
-
-    private BuilderIntegrationsHelper $builderIntegrationsHelper;
-
-    private InstallService $installService;
-
     public function __construct(
         private readonly Packages $packages,
+        private readonly PathsHelper $pathsHelper,
+        private readonly AssetGenerationHelper $assetHelper,
+        private readonly BuilderIntegrationsHelper $builderIntegrationsHelper,
+        private readonly InstallService $installService,
+        #[Autowire(param: 'mautic.site_url')] string $siteUrl,
     ) {
+        if ($siteUrl && str_ends_with($siteUrl, '/')) {
+            $siteUrl = substr($siteUrl, 0, -1);
+        }
+
+        $this->siteUrl = $siteUrl;
     }
 
     /**
@@ -618,28 +621,6 @@ final class AssetsHelper
         return 'assets';
     }
 
-    public function setAssetHelper(AssetGenerationHelper $helper): void
-    {
-        $this->assetHelper = $helper;
-    }
-
-    /**
-     * @param ?string $siteUrl can be null on installation
-     */
-    public function setSiteUrl($siteUrl): void
-    {
-        if ($siteUrl && str_ends_with($siteUrl, '/')) {
-            $siteUrl = substr($siteUrl, 0, -1);
-        }
-
-        $this->siteUrl = $siteUrl;
-    }
-
-    public function setPathsHelper(PathsHelper $pathsHelper): void
-    {
-        $this->pathsHelper = $pathsHelper;
-    }
-
     /**
      * @param string     $secretKey
      * @param string|int $version
@@ -647,16 +628,6 @@ final class AssetsHelper
     public function setVersion($secretKey, $version): void
     {
         $this->version = substr(hash('sha1', $secretKey.$version), 0, 8);
-    }
-
-    public function setBuilderIntegrationsHelper(BuilderIntegrationsHelper $builderIntegrationsHelper): void
-    {
-        $this->builderIntegrationsHelper = $builderIntegrationsHelper;
-    }
-
-    public function setInstallService(InstallService $installService): void
-    {
-        $this->installService = $installService;
     }
 
     private function escape(string $string): string
