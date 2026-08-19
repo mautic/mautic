@@ -6,7 +6,7 @@ namespace Mautic\MarketplaceBundle\Controller\Package;
 
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Helper\ComposerHelper;
-use Mautic\MarketplaceBundle\Exception\RecordNotFoundException;
+use Mautic\MarketplaceBundle\Exception\ApiException;
 use Mautic\MarketplaceBundle\Model\PackageModel;
 use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
 use Mautic\MarketplaceBundle\Service\Config;
@@ -54,8 +54,12 @@ final class DetailController extends CommonController
 
         try {
             $packageDetail = $this->packageModel->getPackageDetail("{$vendor}/{$package}");
-        } catch (RecordNotFoundException $e) {
-            return $this->notFound($e->getMessage());
+        } catch (ApiException $e) {
+            if (Response::HTTP_NOT_FOUND === $e->getCode()) {
+                return $this->notFound();
+            }
+
+            throw $e;
         }
 
         $packageFullName = "{$vendor}/{$package}";

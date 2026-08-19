@@ -38,6 +38,26 @@ final class DetailControllerTest extends MauticMysqlTestCase
     }
 
     /**
+     * A 404 from the registry API must render Mautic's normal "not found" page rather than
+     * leaking the upstream registry URL/response body through an uncaught ApiException.
+     */
+    public function testMarketplaceDetailPageDoesNotLeakRegistryDetailsOnNotFound(): void
+    {
+        $handlerStack = $this->getClientMockHandler();
+        $handlerStack->append(
+            new Response(SymfonyResponse::HTTP_NOT_FOUND, [], (string) json_encode(['message' => 'Package not found']))
+        );
+
+        $this->client->request('GET', 's/marketplace/detail/mautic/unicorn');
+
+        self::assertResponseStatusCodeSame(SymfonyResponse::HTTP_NOT_FOUND);
+
+        $responseContent = (string) $this->client->getResponse()->getContent();
+        $this->assertStringNotContainsString('marketplace.mautic.org', $responseContent);
+        $this->assertStringNotContainsString('ApiException', $responseContent);
+    }
+
+    /**
      * @return iterable<array<string|int>>
      */
     public static function dataProvider(): iterable
