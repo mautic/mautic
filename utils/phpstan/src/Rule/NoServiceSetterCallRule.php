@@ -31,8 +31,9 @@ use PHPStan\Rules\RuleErrorBuilder;
  *         $this->listLeadRepository = $listLeadRepository;
  *     }
  *
- * Only a call() naming a setXxx() method is reported. A call() to another method, e.g. ->call('configure', ...),
- * runs logic the container cannot infer, so it stays a manual call.
+ * Only a call() naming a setXxx() method a service() feeds is reported. A call() to another method, e.g.
+ * ->call('configure', ...), runs logic the container cannot infer, and a setter fed a container parameter,
+ * e.g. ->call('setDefaultTheme', [param('mautic.theme')]), has no type to autowire, so both stay a manual call.
  *
  * @implements Rule<MethodCall>
  */
@@ -49,6 +50,11 @@ final class NoServiceSetterCallRule implements Rule
      * @var string
      */
     private const SETTER_METHOD_PATTERN = '#^set\p{Lu}#u';
+
+    /**
+     * @var string
+     */
+    private const SERVICE_FUNCTION = 'Symfony\Component\DependencyInjection\Loader\Configurator\service';
 
     public function getNodeType(): string
     {

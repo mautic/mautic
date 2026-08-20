@@ -12,15 +12,19 @@ use Utils\PHPStan\Tests\Rule\Fixture\SetterCallBundle\SomeService;
 return function (ContainerConfigurator $configurator): void {
     $services = $configurator->services();
 
-    // flagged: a setter wired by hand on a set() service
+    // flagged: a setter fed a service() on a set() service
     $services->set(SomeService::class)
         ->call('setRepository', [service(Repository::class)]);
 
-    // flagged: a setter wired by hand on a get() service
+    // flagged: a setter fed a service() on a get() service
     $services->get(Repository::class)
+        ->call('setRepository', [service(Repository::class)]);
+
+    // allowed: the setter is fed a container parameter, not a service
+    $services->set(SomeService::class)
         ->call('setUniqueIdentifiersOperator', ['%mautic.contact_unique_identifiers_operator%']);
 
-    // allowed: call() to a non-setter method the container cannot infer
+    // allowed: call() to a non-setter method
     $services->set(SomeService::class)
         ->call('configure', [service(Repository::class)]);
 };

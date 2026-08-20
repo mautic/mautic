@@ -30,7 +30,7 @@ final class NoServiceSetterCallRuleTest extends RuleTestCase
                 16,
             ],
             [
-                'Setter call() to "setUniqueIdentifiersOperator()" wires the dependency by hand, mark the method #[Required] and let autowiring call it instead.',
+                'Setter call() to "setRepository()" wires the dependency by hand, mark the method #[Required] and let autowiring call it instead.',
                 20,
             ],
         ]);

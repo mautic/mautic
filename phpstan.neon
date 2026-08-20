@@ -271,6 +271,7 @@ rules:
     - Utils\PHPStan\Rule\NoAutoconfiguredServiceTagRule
     - Utils\PHPStan\Rule\PreferClassServiceReferenceRule
     - Utils\PHPStan\Rule\NoRedundantAutowiredServiceArgumentRule
+    - Utils\PHPStan\Rule\NoServiceSetterCallRule
 
 services:
     - Utils\PHPStan\ServiceNameUsageResolver

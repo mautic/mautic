@@ -102,9 +102,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
     #[Required]
     public function setListLeadRepository(
-        ListLeadRepository $listLeadRepository
-    ): void
-    {
+        ListLeadRepository $listLeadRepository,
+    ): void {
         $this->listLeadRepository = $listLeadRepository;
     }
 

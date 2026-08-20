@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CacheBundle\Tests\EventListener;
 
-use Mautic\CacheBundle\Cache\AbstractCacheProvider;
+use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CacheBundle\EventListener\CacheClearSubscriber;
 use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -13,14 +13,14 @@ use Symfony\Component\Cache\Adapter\AdapterInterface;
 final class CacheClearSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject&AbstractCacheProvider
+     * @var MockObject&CacheProvider
      */
     private MockObject $adapter;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->adapter = $this->getMockBuilder(AbstractCacheProvider::class)
+        $this->adapter = $this->getMockBuilder(CacheProvider::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['clear', 'commit', 'getCacheAdapter'])
             ->getMock();

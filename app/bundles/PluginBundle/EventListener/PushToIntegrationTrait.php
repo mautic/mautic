@@ -23,9 +23,8 @@ trait PushToIntegrationTrait
      */
     #[Required]
     public function setIntegrationHelper(
-        IntegrationHelper $integrationHelper
-    ): void
-    {
+        IntegrationHelper $integrationHelper,
+    ): void {
         static::setStaticIntegrationHelper($integrationHelper);
     }
 
