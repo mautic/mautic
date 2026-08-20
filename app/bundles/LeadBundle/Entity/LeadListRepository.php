@@ -409,10 +409,7 @@ class LeadListRepository extends CommonRepository
         return $subQb;
     }
 
-    /**
-     * @param \Doctrine\ORM\QueryBuilder|QueryBuilder $q
-     */
-    protected function addCatchAllWhereClause($q, $filter): array
+    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|QueryBuilder $q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -424,10 +421,7 @@ class LeadListRepository extends CommonRepository
         );
     }
 
-    /**
-     * @param \Doctrine\ORM\QueryBuilder|QueryBuilder $q
-     */
-    protected function addSearchCommandWhereClause($q, $filter): array
+    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|QueryBuilder $q, $filter): array
     {
         [$expr, $parameters] = parent::addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {

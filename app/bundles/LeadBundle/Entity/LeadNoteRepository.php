@@ -66,10 +66,7 @@ class LeadNoteRepository extends CommonRepository
         return 'n';
     }
 
-    /**
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     */
-    protected function addCatchAllWhereClause($q, $filter): array
+    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -80,10 +77,7 @@ class LeadNoteRepository extends CommonRepository
         );
     }
 
-    /**
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     */
-    protected function addSearchCommandWhereClause($q, $filter): array
+    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q, $filter): array
     {
         $command                 = $filter->command;
         $string                  = $filter->string;

@@ -690,10 +690,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
     /**
      * Adds the "catch all" where clause to the QueryBuilder.
-     *
-     * @param \Doctrine\ORM\QueryBuilder|QueryBuilder $q
      */
-    protected function addCatchAllWhereClause($q, $filter): array
+    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|QueryBuilder $q, $filter): array
     {
         $customFields       = $this->getSearchableFieldAliases(self::$leadFieldRepository, 'lead');
         $availableForSearch = array_map(fn (string $alias): string => 'l.'.$alias, $customFields);
@@ -721,7 +719,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      *
      * @param QueryBuilder $q
      */
-    protected function addSearchCommandWhereClause($q, $filter): array
+    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|QueryBuilder $q, $filter): array
     {
         $command             = $filter->command;
         $string              = $filter->string;

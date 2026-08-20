@@ -235,7 +235,7 @@ class TagRepository extends CommonRepository
     /**
      * @return array<mixed>
      */
-    protected function addCatchAllWhereClause($qb, $filter): array
+    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $qb, $filter): array
     {
         $alias = $this->getTableAlias();
 

@@ -1021,10 +1021,9 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param QueryBuilder|DbalQueryBuilder $qb
-     * @param \StdClass                     $filter
+     * @param \StdClass $filter
      */
-    protected function addCatchAllWhereClause($qb, $filter): array
+    protected function addCatchAllWhereClause(QueryBuilder|DbalQueryBuilder $qb, $filter): array
     {
         foreach (['name', 'title'] as $column) {
             if ($this->getClassMetadata()->hasField($column)) {
@@ -1076,10 +1075,9 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param QueryBuilder|DbalQueryBuilder $q
-     * @param \StdClass                     $filter
+     * @param \StdClass $filter
      */
-    protected function addSearchCommandWhereClause($q, $filter): array
+    protected function addSearchCommandWhereClause(QueryBuilder|DbalQueryBuilder $q, $filter): array
     {
         $command = $filter->command;
         $expr    = false;
