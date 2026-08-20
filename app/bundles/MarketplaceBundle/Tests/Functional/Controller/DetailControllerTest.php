@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Test\Guzzle\ClientMockTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\MarketplaceBundle\Service\Allowlist;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 final class DetailControllerTest extends MauticMysqlTestCase
@@ -28,7 +29,7 @@ final class DetailControllerTest extends MauticMysqlTestCase
         $allowlist = self::getContainer()->get(Allowlist::class);
         $allowlist->clearCache();
 
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, "s/marketplace/detail/{$requestedPackage}");
+        $this->client->request(Request::METHOD_GET, "s/marketplace/detail/{$requestedPackage}");
 
         $responseContent = $this->client->getResponse()->getContent();
 

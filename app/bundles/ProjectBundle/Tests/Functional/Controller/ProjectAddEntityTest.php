@@ -11,6 +11,7 @@ use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Model\ProjectModel;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 
 final class ProjectAddEntityTest extends MauticMysqlTestCase
@@ -47,7 +48,7 @@ final class ProjectAddEntityTest extends MauticMysqlTestCase
     {
         $url = '/s/projects/selectEntityType/'.$this->testProject->getId();
 
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, $url);
+        $this->client->request(Request::METHOD_GET, $url);
         $response = $this->client->getResponse();
         $content  = $response->getContent();
 
@@ -59,7 +60,7 @@ final class ProjectAddEntityTest extends MauticMysqlTestCase
     public function testSelectEntityTypeActionNotFound(): void
     {
         $this->client->followRedirects(false);
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/projects/selectEntityType/99999');
+        $this->client->request(Request::METHOD_GET, '/s/projects/selectEntityType/99999');
         $this->assertResponseStatusCodeSame(404);
     }
 
@@ -67,7 +68,7 @@ final class ProjectAddEntityTest extends MauticMysqlTestCase
     {
         $url = '/s/projects/addEntity/'.$this->testProject->getId().'?entityType=email';
 
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, $url);
+        $this->client->request(Request::METHOD_GET, $url);
         $response = $this->client->getResponse();
         $content  = $response->getContent();
 
@@ -89,7 +90,7 @@ final class ProjectAddEntityTest extends MauticMysqlTestCase
 
         // View project page to verify email was added
         $url = '/s/projects/view/'.$this->testProject->getId();
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, $url);
+        $this->client->request(Request::METHOD_GET, $url);
 
         $response = $this->client->getResponse();
         $content  = $response->getContent();
@@ -104,7 +105,7 @@ final class ProjectAddEntityTest extends MauticMysqlTestCase
         $url = '/s/projects/addEntity/'.$this->testProject->getId().'?entityType=email';
 
         // Get the form
-        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, $url);
+        $crawler = $this->client->request(Request::METHOD_GET, $url);
         $this->assertResponseIsSuccessful();
 
         // Submit form with no entities selected
@@ -119,7 +120,7 @@ final class ProjectAddEntityTest extends MauticMysqlTestCase
         $url = '/s/projects/addEntity/'.$this->testProject->getId().'?entityType=email';
 
         // Get the form
-        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, $url);
+        $crawler = $this->client->request(Request::METHOD_GET, $url);
         $this->assertResponseIsSuccessful();
 
         // Submit form normally (simulating any button press)
@@ -135,7 +136,7 @@ final class ProjectAddEntityTest extends MauticMysqlTestCase
 
         // Get request with invalid entity type should redirect with error
         $this->client->followRedirects();
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, $url);
+        $this->client->request(Request::METHOD_GET, $url);
 
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
@@ -148,7 +149,7 @@ final class ProjectAddEntityTest extends MauticMysqlTestCase
     public function testAddEntityActionNotFound(): void
     {
         $this->client->followRedirects(false);
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/projects/addEntity/99999?entityType=email');
+        $this->client->request(Request::METHOD_GET, '/s/projects/addEntity/99999?entityType=email');
         $this->assertResponseStatusCodeSame(404);
     }
 
@@ -157,7 +158,7 @@ final class ProjectAddEntityTest extends MauticMysqlTestCase
         $this->createAndLoginUser();
 
         $url = '/s/projects/addEntity/'.$this->testProject->getId().'?entityType=email';
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, $url);
+        $this->client->request(Request::METHOD_GET, $url);
 
         $this->assertResponseStatusCodeSame(403);
     }

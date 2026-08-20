@@ -7,6 +7,7 @@ namespace Mautic\CoreBundle\Tests\Twig;
 use Mautic\CoreBundle\Form\Type\TelType;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Twig\Environment;
+use Twig\TwigFunction;
 
 /**
  * Smoke test: every Twig function declared by Mautic - either by the #[AsTwigFunction] attribute or by the
@@ -56,7 +57,7 @@ final class TwigFunctionSmokeTest extends KernelTestCase
 
         foreach (self::EXPECTED_FUNCTIONS as $name) {
             $this->assertInstanceOf(
-                \Twig\TwigFunction::class,
+                TwigFunction::class,
                 $twigEnvironment->getFunction($name),
                 sprintf('Twig function "%s" is not loaded in the Twig environment.', $name)
             );

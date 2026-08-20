@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace MauticPlugin\MauticGmailBundle\Tests\Unit\Form\Type;
 
 use MauticPlugin\MauticGmailBundle\Form\Type\GmailKeysType;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Validation;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class GmailKeysTypeTest extends TypeTestCase
 {
     /**

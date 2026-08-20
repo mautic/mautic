@@ -20,6 +20,7 @@ use MauticPlugin\MauticTagManagerBundle\Entity\Tag;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
@@ -122,7 +123,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->setCsrfHeader();
         $this->client->xmlHttpRequest(Request::METHOD_POST, '/s/ajax', $payload);
-        $this->assertEquals(\Symfony\Component\HttpFoundation\Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode(), 'The user without campaign edit own/others permissions should not access toggle lead campaign action.');
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode(), 'The user without campaign edit own/others permissions should not access toggle lead campaign action.');
     }
 
     public function testSegmentDependencyTreeWithNotExistingSegment(): void

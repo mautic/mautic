@@ -14,6 +14,7 @@ use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Event\LeadBuildSearchEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Ramsey\Uuid\Uuid;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 final class SearchSubscriberFunctionalTest extends MauticMysqlTestCase
@@ -42,7 +43,7 @@ final class SearchSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->prepareTestData();
         $this->em->flush();
 
-        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, sprintf('/s/contacts?search=email_pending:%d', $this->email->getId()));
+        $crawler = $this->client->request(Request::METHOD_GET, sprintf('/s/contacts?search=email_pending:%d', $this->email->getId()));
         self::assertResponseIsSuccessful();
 
         $text = $crawler->text();

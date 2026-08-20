@@ -8,6 +8,7 @@ use Doctrine\ORM\Exception\ORMException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\HttpFoundation\Request;
 
 final class LeadControllerListingPageTest extends MauticMysqlTestCase
 {
@@ -28,7 +29,7 @@ final class LeadControllerListingPageTest extends MauticMysqlTestCase
     {
         $this->createContact($location);
 
-        $crawler    = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, 's/contacts');
+        $crawler    = $this->client->request(Request::METHOD_GET, 's/contacts');
         $rowContent = $crawler->filterXPath("//table[@id='leadTable']//tbody//tr");
 
         $this->assertStringEndsWith($expected, $rowContent->text());

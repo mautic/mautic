@@ -6,6 +6,7 @@ namespace Mautic\UserBundle\Tests\Functional\ApiPlatform;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Tests that the User API endpoints properly handle password as write-only field.
@@ -40,7 +41,7 @@ final class UserApiTest extends MauticMysqlTestCase
         $userId = $adminUser->getId();
 
         // Test GET - password should not be in response
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, "/api/v2/users/{$userId}");
+        $this->client->request(Request::METHOD_GET, "/api/v2/users/{$userId}");
         $this->assertResponseIsSuccessful();
 
         $responseData = json_decode($this->client->getResponse()->getContent(), true);
@@ -58,7 +59,7 @@ final class UserApiTest extends MauticMysqlTestCase
     public function testPasswordNotExposedInCollection(): void
     {
         // Test GET collection
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/v2/users');
+        $this->client->request(Request::METHOD_GET, '/api/v2/users');
         $this->assertResponseIsSuccessful();
 
         $responseData = json_decode($this->client->getResponse()->getContent(), true);

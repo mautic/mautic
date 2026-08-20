@@ -12,6 +12,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 final class Issue9488Test extends MauticMysqlTestCase
@@ -90,7 +91,7 @@ final class Issue9488Test extends MauticMysqlTestCase
      */
     private function createContacts(): array
     {
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/contacts/batch/new', $this->contacts);
+        $this->client->request(Request::METHOD_POST, '/api/contacts/batch/new', $this->contacts);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 

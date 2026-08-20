@@ -8,6 +8,7 @@ use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\Download;
 use Mautic\LeadBundle\Tests\Functional\ApiPlatform\OwnershipScopedApiAuthorizationTestBase;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -64,7 +65,7 @@ final class DownloadOwnershipApiV2AuthorizationRegressionTest extends OwnershipS
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
 
         // Try to access the foreign download - should be forbidden
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/v2/downloads/'.$foreignDownload->getId());
+        $this->client->request(Request::METHOD_GET, '/api/v2/downloads/'.$foreignDownload->getId());
 
         self::assertResponseStatusCodeSame(
             Response::HTTP_FORBIDDEN,
@@ -137,7 +138,7 @@ final class DownloadOwnershipApiV2AuthorizationRegressionTest extends OwnershipS
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
 
         // Request downloads collection
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/v2/downloads?page=1&itemsPerPage=10');
+        $this->client->request(Request::METHOD_GET, '/api/v2/downloads?page=1&itemsPerPage=10');
         $response = $this->client->getResponse();
 
         self::assertResponseIsSuccessful($response->getContent());
@@ -215,7 +216,7 @@ final class DownloadOwnershipApiV2AuthorizationRegressionTest extends OwnershipS
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
 
         // Request page 1 with all items on one page first
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/v2/downloads?page=1&itemsPerPage=10');
+        $this->client->request(Request::METHOD_GET, '/api/v2/downloads?page=1&itemsPerPage=10');
         $response = $this->client->getResponse();
 
         self::assertResponseIsSuccessful($response->getContent());

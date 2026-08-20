@@ -7,6 +7,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -59,7 +60,7 @@ final readonly class ApiSubscriber implements EventSubscriberInterface
                         ],
                     ],
                 ],
-                \Symfony\Component\HttpFoundation\Response::HTTP_FORBIDDEN
+                Response::HTTP_FORBIDDEN
             );
 
             $event->setResponse($response);
@@ -82,7 +83,7 @@ final readonly class ApiSubscriber implements EventSubscriberInterface
                         ],
                     ],
                 ],
-                \Symfony\Component\HttpFoundation\Response::HTTP_FORBIDDEN
+                Response::HTTP_FORBIDDEN
             );
 
             $event->setResponse($response);

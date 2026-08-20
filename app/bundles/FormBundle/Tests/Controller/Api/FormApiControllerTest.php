@@ -7,6 +7,7 @@ namespace Mautic\FormBundle\Tests\Controller\Api;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Form;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 final class FormApiControllerTest extends MauticMysqlTestCase
@@ -20,7 +21,7 @@ final class FormApiControllerTest extends MauticMysqlTestCase
     public function testCreateFormWithFieldsAndActions(array $formData, int $expectedStatusCode): void
     {
         $this->client->request(
-            \Symfony\Component\HttpFoundation\Request::METHOD_POST,
+            Request::METHOD_POST,
             '/api/forms/new',
             $formData,
         );
@@ -69,7 +70,7 @@ final class FormApiControllerTest extends MauticMysqlTestCase
         $form = $this->createForm($initialFormData);
 
         $this->client->request(
-            \Symfony\Component\HttpFoundation\Request::METHOD_PUT,
+            Request::METHOD_PUT,
             '/api/forms/'.$form->getId().'/edit',
             $updateData,
         );
@@ -113,7 +114,7 @@ final class FormApiControllerTest extends MauticMysqlTestCase
         ];
 
         $this->client->request(
-            \Symfony\Component\HttpFoundation\Request::METHOD_POST,
+            Request::METHOD_POST,
             '/api/forms/new',
             $formData,
         );
@@ -151,7 +152,7 @@ final class FormApiControllerTest extends MauticMysqlTestCase
         ];
 
         $this->client->request(
-            \Symfony\Component\HttpFoundation\Request::METHOD_POST,
+            Request::METHOD_POST,
             '/api/forms/new',
             $formData,
         );
@@ -187,7 +188,7 @@ final class FormApiControllerTest extends MauticMysqlTestCase
         ];
 
         $this->client->request(
-            \Symfony\Component\HttpFoundation\Request::METHOD_PUT,
+            Request::METHOD_PUT,
             '/api/forms/'.$form->getId().'/edit',
             $updateData,
         );
@@ -271,7 +272,7 @@ final class FormApiControllerTest extends MauticMysqlTestCase
         // If fields are provided, create them through the API to properly test the preSaveEntity method
         if (isset($data['fields'])) {
             $this->client->request(
-                \Symfony\Component\HttpFoundation\Request::METHOD_PUT,
+                Request::METHOD_PUT,
                 '/api/forms/'.$form->getId().'/edit',
                 [
                     'name'   => $form->getName(),

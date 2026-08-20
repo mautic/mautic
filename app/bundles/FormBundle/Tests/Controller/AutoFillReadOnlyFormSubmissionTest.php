@@ -9,6 +9,7 @@ use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\HttpFoundation\Request;
 
 final class AutoFillReadOnlyFormSubmissionTest extends MauticMysqlTestCase
 {
@@ -37,7 +38,7 @@ final class AutoFillReadOnlyFormSubmissionTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, sprintf('/s/forms/edit/%d', $form->getId()));
+        $crawler = $this->client->request(Request::METHOD_GET, sprintf('/s/forms/edit/%d', $form->getId()));
         $this->assertResponseIsSuccessful();
 
         $formElement = $crawler->filterXPath('//form[@name="mauticform"]')->form();
@@ -121,7 +122,7 @@ final class AutoFillReadOnlyFormSubmissionTest extends MauticMysqlTestCase
         $formId = $form->getId();
 
         // Initial request
-        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/form/'.$formId);
+        $crawler = $this->client->request(Request::METHOD_GET, '/form/'.$formId);
         $this->assertResponseIsSuccessful();
         $this->assertInputCounts($crawler, 0);
 
@@ -137,7 +138,7 @@ final class AutoFillReadOnlyFormSubmissionTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         // Request the form again
-        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/form/'.$formId);
+        $crawler = $this->client->request(Request::METHOD_GET, '/form/'.$formId);
         $this->assertResponseIsSuccessful();
         $this->assertInputCounts($crawler, 2);
 

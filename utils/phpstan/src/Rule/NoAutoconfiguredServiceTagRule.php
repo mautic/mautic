@@ -17,6 +17,12 @@ use PHPStan\Node\FileNode;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\FormTypeInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
+use Twig\Extension\ExtensionInterface;
 
 /**
  * Reports the tags of Config/services.php that autoconfigure() adds by itself,
@@ -58,12 +64,12 @@ final class NoAutoconfiguredServiceTagRule implements Rule
      * @var array<string, string>
      */
     private const AUTOCONFIGURED_TAGS = [
-        'console.command'                => \Symfony\Component\Console\Command\Command::class,
-        'form.type'                      => \Symfony\Component\Form\FormTypeInterface::class,
-        'kernel.event_subscriber'        => \Symfony\Component\EventDispatcher\EventSubscriberInterface::class,
-        'security.voter'                 => \Symfony\Component\Security\Core\Authorization\Voter\VoterInterface::class,
-        'twig.extension'                 => \Twig\Extension\ExtensionInterface::class,
-        'validator.constraint_validator' => \Symfony\Component\Validator\ConstraintValidatorInterface::class,
+        'console.command'                => Command::class,
+        'form.type'                      => FormTypeInterface::class,
+        'kernel.event_subscriber'        => EventSubscriberInterface::class,
+        'security.voter'                 => VoterInterface::class,
+        'twig.extension'                 => ExtensionInterface::class,
+        'validator.constraint_validator' => ConstraintValidatorInterface::class,
     ];
 
     public function __construct(

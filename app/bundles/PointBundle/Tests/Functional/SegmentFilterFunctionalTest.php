@@ -11,6 +11,7 @@ use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\GroupContactScore;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
+use Symfony\Component\HttpFoundation\Request;
 
 final class SegmentFilterFunctionalTest extends MauticMysqlTestCase
 {
@@ -67,7 +68,7 @@ final class SegmentFilterFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame(0, $exitCode, $applicationTester->getDisplay());
 
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/contacts?search=segment:group-a-points-gte1');
+        $this->client->request(Request::METHOD_GET, '/api/contacts?search=segment:group-a-points-gte1');
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $response = json_decode($clientResponse->getContent(), true);

@@ -7,6 +7,7 @@ namespace Mautic\ReportBundle\Tests\Form\Type;
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Form\Type\DynamicFiltersType;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -465,7 +466,7 @@ final class DynamicFiltersTypeTest extends TestCase
     }
 }
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class DynamicFiltersTypeIntegrationTest extends TypeTestCase
 {
     public function testFilterWithValueIsSet(): void

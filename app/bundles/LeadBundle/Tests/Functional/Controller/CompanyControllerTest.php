@@ -7,6 +7,8 @@ namespace Mautic\LeadBundle\Tests\Functional\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
@@ -16,16 +18,16 @@ final class CompanyControllerTest extends MauticMysqlTestCase
 
     public function testMergeAction(): void
     {
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/companies/merge/1');
+        $this->client->request(Request::METHOD_GET, '/s/companies/merge/1');
         $this->assertResponseIsSuccessful();
     }
 
     public function testMergeActionWithoutPermission(): void
     {
         $this->createAndLoginUser();
-        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/companies/merge/1');
+        $this->client->request(Request::METHOD_GET, '/s/companies/merge/1');
         $clientResponse         = $this->client->getResponse();
-        $this->assertEquals(\Symfony\Component\HttpFoundation\Response::HTTP_FORBIDDEN, $clientResponse->getStatusCode());
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $clientResponse->getStatusCode());
     }
 
     private function createAndLoginUser(): User
