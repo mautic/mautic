@@ -102,8 +102,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias(Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper::class, 'mautic.schema.helper.index');
     $services->set(Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper::class)
         ->arg('$prefix', param('mautic.db_table_prefix'));
-    $services->set(Mautic\CoreBundle\Form\Type\DynamicContentFilterEntryFiltersType::class)
-        ->call('setConnection', [service('database_connection')]);
 
     $services->set(Mautic\CoreBundle\EventListener\RouterSubscriber::class)
         ->arg('$scheme', param('router.request_context.scheme'))

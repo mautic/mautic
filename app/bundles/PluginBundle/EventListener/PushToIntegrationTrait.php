@@ -5,6 +5,7 @@ namespace Mautic\PluginBundle\EventListener;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * Static methods must be used due to the Point triggers not being converted to Events yet
@@ -20,7 +21,10 @@ trait PushToIntegrationTrait
     /**
      * Used by methodCalls to event subscribers.
      */
-    public function setIntegrationHelper(IntegrationHelper $integrationHelper): void
+    #[Required]
+    public function setIntegrationHelper(
+        IntegrationHelper $integrationHelper
+    ): void
     {
         static::setStaticIntegrationHelper($integrationHelper);
     }

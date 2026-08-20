@@ -14,6 +14,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -30,7 +31,10 @@ trait FilterTrait
      */
     protected $connection;
 
-    public function setConnection(Connection $connection): void
+    #[Required]
+    public function setConnection(
+        Connection $connection
+    ): void
     {
         $this->connection = $connection;
     }

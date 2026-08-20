@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace Utils\PHPStan\Rule;
 
 use PhpParser\Node;
+use PhpParser\Node\Expr\Array_;
+use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Identifier;
+use PhpParser\Node\Name;
 use PhpParser\Node\Scalar\String_;
 use PHPStan\Analyser\Scope;
 use PHPStan\Rules\Rule;
@@ -77,6 +80,12 @@ final class NoServiceSetterCallRule implements Rule
             return [];
         }
 
+        // only a setter fed a service() can move to #[Required]; a container parameter, e.g. '%mautic.theme%',
+        // is not resolved by type, so its setter call stays
+        if (!$this->hasServiceArgument($node)) {
+            return [];
+        }
+
         return [
             RuleErrorBuilder::message(sprintf(
                 'Setter call() to "%s()" wires the dependency by hand, mark the method #[Required] and let autowiring call it instead.',
@@ -86,5 +95,36 @@ final class NoServiceSetterCallRule implements Rule
                 ->line($node->getStartLine())
                 ->build(),
         ];
+    }
+
+    /**
+     * The arguments of a call() travel in an array, e.g. ->call('setFieldModel', [service(FieldModel::class)]).
+     * A service() reference among them is the dependency #[Required] autowiring resolves by type.
+     */
+    private function hasServiceArgument(MethodCall $node): bool
+    {
+        $secondArg = $node->getArgs()[1] ?? null;
+        if (null === $secondArg || !$secondArg->value instanceof Array_) {
+            return false;
+        }
+
+        foreach ($secondArg->value->items as $item) {
+            if ($item->value instanceof FuncCall && $this->isServiceFunction($item->value)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function isServiceFunction(FuncCall $funcCall): bool
+    {
+        if (!$funcCall->name instanceof Name) {
+            return false;
+        }
+
+        $functionName = $funcCall->name->toString();
+
+        return 'service' === $functionName || self::SERVICE_FUNCTION === $functionName;
     }
 }
