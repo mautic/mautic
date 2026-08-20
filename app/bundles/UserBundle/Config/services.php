@@ -131,10 +131,6 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->set('mautic.user.model.user_token_service', Mautic\UserBundle\Model\UserToken\UserTokenService::class);
 
-    // RoleModel is final (not mockable); provider typehints FormModel for unit tests.
-    $services->get(Mautic\UserBundle\Helper\RoleSearchScopeProvider::class)
-        ->arg('$roleModel', service(Mautic\UserBundle\Model\RoleModel::class));
-
     // Decorate the form_login class to ensure no user enumeration can
     // happen via timing attacks.
     $services->set('mautic.security.authenticator.form_login.decorator', Mautic\UserBundle\Security\TimingSafeFormLoginAuthenticator::class)

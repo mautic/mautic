@@ -7,6 +7,8 @@ namespace Mautic\UserBundle\Helper;
 use Mautic\CoreBundle\Helper\AbstractSearchScopeProvider;
 use Mautic\CoreBundle\Helper\SearchScopePresets;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\UserBundle\Model\RoleModel;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class RoleSearchScopeProvider extends AbstractSearchScopeProvider
@@ -15,6 +17,7 @@ final class RoleSearchScopeProvider extends AbstractSearchScopeProvider
      * @param FormModel<object> $roleModel
      */
     public function __construct(
+        #[Autowire(service: RoleModel::class)]
         private readonly FormModel $roleModel,
         TranslatorInterface $translator,
     ) {

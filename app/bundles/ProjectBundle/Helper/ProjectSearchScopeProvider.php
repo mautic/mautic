@@ -7,6 +7,8 @@ namespace Mautic\ProjectBundle\Helper;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\AbstractSearchScopeProvider;
 use Mautic\CoreBundle\Helper\SearchScopePresets;
+use Mautic\ProjectBundle\Entity\ProjectRepository;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ProjectSearchScopeProvider extends AbstractSearchScopeProvider
@@ -15,6 +17,7 @@ final class ProjectSearchScopeProvider extends AbstractSearchScopeProvider
      * @param CommonRepository<object> $projectRepository
      */
     public function __construct(
+        #[Autowire(service: ProjectRepository::class)]
         private readonly CommonRepository $projectRepository,
         TranslatorInterface $translator,
     ) {
