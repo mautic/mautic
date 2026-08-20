@@ -985,7 +985,7 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param \StdClass|mixed[] $filters
+     * @param \stdClass|mixed[] $filters
      *
      * @return mixed[]
      */
@@ -1643,7 +1643,7 @@ class CommonRepository extends ServiceEntityRepository
         return [];
     }
 
-    protected function getIdsExpr(QueryBuilder|DbalQueryBuilder &$queryBuilder, \stdClass $filter): mixed
+    protected function getIdsExpr(QueryBuilder|DbalQueryBuilder &$queryBuilder, \stdClass $filter): Query\Expr\Func|string|false
     {
         if ($ids = array_map(intval(...), explode(',', $filter->string))) {
             $parameterName = $this->generateRandomParameterName();
@@ -1691,7 +1691,7 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param \StdClass $parseFilters
+     * @param \stdClass $parseFilters
      */
     protected function parseSearchFilters($parseFilters, QueryBuilder|DbalQueryBuilder $qb, $expressions, &$parameters)
     {
