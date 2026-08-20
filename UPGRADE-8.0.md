@@ -179,3 +179,15 @@
     ```php
     $services->set(MauticPlugin\AcmeBundle\Security\Permissions\AcmePermissions::class);
     ```
+
+- The query-builder and filter parameters of `Mautic\CoreBundle\Entity\CommonRepository` methods now carry native type declarations instead of docblock-only types: the query builder is `Doctrine\ORM\QueryBuilder|Doctrine\DBAL\Query\QueryBuilder` and the search filter is `\stdClass`. Repositories that extend `CommonRepository` and override these methods (most commonly `addCatchAllWhereClause()` and `addSearchCommandWhereClause()`) must keep their overrides compatible — either drop the parameter types entirely or match the parent exactly. Callers that pass a filter which is not a `\stdClass` will now hit a `TypeError`.
+
+    ```diff
+    -    protected function addCatchAllWhereClause($qb, $filter): array
+    +    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $qb, \stdClass $filter): array
+
+    -    protected function addSearchCommandWhereClause($q, $filter): array
+    +    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    ```
+
+- `Mautic\CoreBundle\Entity\CommonRepository::getIdsExpr()` return type was narrowed from `mixed` to `Doctrine\ORM\Query\Expr\Func|string|false`. Overrides must return a compatible type.
