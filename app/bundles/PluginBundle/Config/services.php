@@ -26,5 +26,12 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.plugin.model.plugin', Mautic\PluginBundle\Model\PluginModel::class);
     $services->alias('mautic.plugin.model.integration_entity', Mautic\PluginBundle\Model\IntegrationEntityModel::class);
 
+<<<<<<< HEAD
+=======
+    $services->set(FormSubscriber::class);
+        //->call('setIntegrationHelper', [service('mautic.helper.integration')]);
+    $services->set(CampaignSubscriber::class);
+        //->call('setIntegrationHelper', [service('mautic.helper.integration')]);
+>>>>>>> 82ffbc2098 (remove static from PushToIntegraiton)
     $services->set(Mautic\PluginBundle\Security\Permissions\PluginPermissions::class);
 };

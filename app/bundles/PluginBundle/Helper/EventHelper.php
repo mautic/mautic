@@ -14,7 +14,7 @@ final class EventHelper
     /**
      * @param array<string, mixed> $config
      */
-    public static function pushLead(array $config, $lead, LeadRepository $leadRepository, IntegrationHelper $integrationHelper): bool
+    public function pushLead(array $config, $lead, LeadRepository $leadRepository, IntegrationHelper $integrationHelper): bool
     {
         $contact = $leadRepository->getEntityWithPrimaryCompany($lead);
 
