@@ -434,10 +434,9 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param QueryBuilder|DbalQueryBuilder $q
-     * @param array<mixed>                  $filter
+     * @param array<mixed> $filter
      */
-    public function getFilterExpr($q, array $filter, ?string $unique = null): array
+    public function getFilterExpr(QueryBuilder|DbalQueryBuilder $q, array $filter, ?string $unique = null): array
     {
         $unique    = ($unique) ?: $this->generateRandomParameterName();
         $parameter = [];
@@ -986,12 +985,11 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param QueryBuilder|DbalQueryBuilder $qb
-     * @param \StdClass|mixed[]             $filters
+     * @param \StdClass|mixed[] $filters
      *
      * @return mixed[]
      */
-    protected function addAdvancedSearchWhereClause($qb, $filters): array
+    protected function addAdvancedSearchWhereClause(QueryBuilder|DbalQueryBuilder $qb, $filters): array
     {
         $parseFilters = [];
         if (isset($filters->root[0])) {
@@ -1042,11 +1040,8 @@ class CommonRepository extends ServiceEntityRepository
 
     /**
      * Unique handling for $filter->not since dbal does not support the not() function with it's QueryBuilder.
-     *
-     * @param QueryBuilder $q
-     * @param object       $filter
      */
-    protected function addDbalCatchAllWhereClause(&$q, $filter, array $columns): array
+    protected function addDbalCatchAllWhereClause(QueryBuilder|DbalQueryBuilder &$q, \stdClass $filter, array $columns): array
     {
         $unique = $this->generateRandomParameterName(); // ensure that the string has a unique parameter identifier
         $string = ($filter->strict) ? $filter->string : "{$filter->string}";
@@ -1089,11 +1084,7 @@ class CommonRepository extends ServiceEntityRepository
         ];
     }
 
-    /**
-     * @param QueryBuilder $q
-     * @param object       $filter
-     */
-    protected function addStandardCatchAllWhereClause(&$q, $filter, array $columns): array
+    protected function addStandardCatchAllWhereClause(QueryBuilder|DbalQueryBuilder &$q, \stdClass $filter, array $columns): array
     {
         $unique = $this->generateRandomParameterName(); // ensure that the string has a unique parameter identifier
         $string = $filter->string;
@@ -1137,11 +1128,7 @@ class CommonRepository extends ServiceEntityRepository
         ];
     }
 
-    /**
-     * @param DbalQueryBuilder|QueryBuilder $q
-     * @param \StdClass                     $filter
-     */
-    protected function addStandardSearchCommandWhereClause(&$q, $filter): array
+    protected function addStandardSearchCommandWhereClause(QueryBuilder|DbalQueryBuilder &$q, \stdClass $filter): array
     {
         $command         = $filter->command;
         $unique          = $this->generateRandomParameterName();
@@ -1240,10 +1227,7 @@ class CommonRepository extends ServiceEntityRepository
         }
     }
 
-    /**
-     * @param QueryBuilder $q
-     */
-    protected function buildClauses($q, array $args): bool
+    protected function buildClauses(QueryBuilder|DbalQueryBuilder $q, array $args): bool
     {
         $this->buildSelectClause($q, $args);
         $this->buildIndexByClause($q, $args);
@@ -1291,7 +1275,7 @@ class CommonRepository extends ServiceEntityRepository
         return $joinAdded;
     }
 
-    protected function buildIndexByClause($q, array $args)
+    protected function buildIndexByClause(QueryBuilder|DbalQueryBuilder $q, array $args)
     {
         if (!empty($args['index_by'])) {
             if (is_array($args['index_by'])) {
@@ -1307,10 +1291,7 @@ class CommonRepository extends ServiceEntityRepository
         }
     }
 
-    /**
-     * @param QueryBuilder|DbalQueryBuilder $q
-     */
-    protected function buildLimiterClauses($q, array $args): void
+    protected function buildLimiterClauses(QueryBuilder|DbalQueryBuilder $q, array $args): void
     {
         $start = array_key_exists('start', $args) ? $args['start'] : 0;
         $limit = array_key_exists('limit', $args) ? $args['limit'] : 0;
@@ -1321,10 +1302,7 @@ class CommonRepository extends ServiceEntityRepository
         }
     }
 
-    /**
-     * @param QueryBuilder|DbalQueryBuilder $q
-     */
-    protected function buildOrderByClause($q, array $args): void
+    protected function buildOrderByClause(QueryBuilder|DbalQueryBuilder $q, array $args): void
     {
         $orderBy = array_key_exists('orderBy', $args) ? $args['orderBy'] : '';
 
@@ -1353,10 +1331,9 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * Build order by from an array.
      *
-     * @param QueryBuilder|DbalQueryBuilder $query
-     * @param array                         $clauses [['col' => 'column_a', 'dir' => 'ASC']]
+     * @param array $clauses [['col' => 'column_a', 'dir' => 'ASC']]
      */
-    protected function buildOrderByClauseFromArray($query, array $clauses): void
+    protected function buildOrderByClauseFromArray(QueryBuilder|DbalQueryBuilder $query, array $clauses): void
     {
         foreach ($clauses as $clause) {
             $clause = $this->validateOrderByClause($clause);
@@ -1365,10 +1342,7 @@ class CommonRepository extends ServiceEntityRepository
         }
     }
 
-    /**
-     * @param QueryBuilder|DbalQueryBuilder $q
-     */
-    protected function buildSelectClause($q, array $args)
+    protected function buildSelectClause(QueryBuilder|DbalQueryBuilder $q, array $args)
     {
         $isOrm = $q instanceof QueryBuilder;
         if (isset($args['select'])) {
@@ -1438,10 +1412,7 @@ class CommonRepository extends ServiceEntityRepository
         }
     }
 
-    /**
-     * @param QueryBuilder|DbalQueryBuilder $q
-     */
-    protected function buildWhereClause($q, array $args)
+    protected function buildWhereClause(QueryBuilder|DbalQueryBuilder $q, array $args)
     {
         $filter                    = array_key_exists('filter', $args) ? $args['filter'] : '';
         $filterHelper              = new SearchStringHelper();
@@ -1550,10 +1521,9 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param QueryBuilder|DbalQueryBuilder $query
-     * @param array                         $clauses [['expr' => 'expression', 'col' => 'DB column', 'val' => 'value to search for']]
+     * @param array $clauses [['expr' => 'expression', 'col' => 'DB column', 'val' => 'value to search for']]
      */
-    protected function buildWhereClauseFromArray($query, array $clauses, $expr = null)
+    protected function buildWhereClauseFromArray(QueryBuilder|DbalQueryBuilder $query, array $clauses, $expr = null)
     {
         $columnValue = ['eq', 'neq', 'lt', 'lte', 'gt', 'gte', 'like', 'notLike', 'in', 'notIn', 'between', 'notBetween'];
         $justColumn  = ['isNull', 'isNotNull', 'isEmpty', 'isNotEmpty'];
@@ -1673,7 +1643,7 @@ class CommonRepository extends ServiceEntityRepository
         return [];
     }
 
-    protected function getIdsExpr(QueryBuilder|DbalQueryBuilder &$queryBuilder, $filter): mixed
+    protected function getIdsExpr(QueryBuilder|DbalQueryBuilder &$queryBuilder, \stdClass $filter): mixed
     {
         if ($ids = array_map(intval(...), explode(',', $filter->string))) {
             $parameterName = $this->generateRandomParameterName();
@@ -1721,10 +1691,9 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param \StdClass                     $parseFilters
-     * @param QueryBuilder|DbalQueryBuilder $qb
+     * @param \StdClass $parseFilters
      */
-    protected function parseSearchFilters($parseFilters, $qb, $expressions, &$parameters)
+    protected function parseSearchFilters($parseFilters, QueryBuilder|DbalQueryBuilder $qb, $expressions, &$parameters)
     {
         foreach ($parseFilters as $f) { /** @phpstan-ignore-line we are iterating over StdClass. We should refactor this into a collection of DTO objects in M6 */
             [$expr, $params] = $this->getSearchFilterExpression($qb, $f);
@@ -1738,11 +1707,9 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param QueryBuilder|DbalQueryBuilder $qb
-     *
      * @return array{0: mixed, 1: array<mixed>}
      */
-    private function getSearchFilterExpression($qb, \stdClass $filter): array
+    private function getSearchFilterExpression(QueryBuilder|DbalQueryBuilder $qb, \stdClass $filter): array
     {
         if ($filter->missingValue ?? false) {
             return [$qb->expr()->eq(1, 0), []];
