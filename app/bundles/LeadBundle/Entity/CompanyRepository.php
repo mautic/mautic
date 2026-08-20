@@ -150,7 +150,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         return 'comp';
     }
 
-    protected function addCatchAllWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q, $filter): array
+    protected function addCatchAllWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q, \stdClass $filter): array
     {
         $customFields       = $this->getSearchableFieldAliases($this->leadFieldRepository, 'company');
         $availableForSearch = array_map(fn (string $alias): string => 'comp.'.$alias, $customFields);
@@ -170,7 +170,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         );
     }
 
-    protected function addSearchCommandWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q, $filter): array
+    protected function addSearchCommandWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q, \stdClass $filter): array
     {
         [$expr, $parameters]     = $this->addStandardSearchCommandWhereClause($q, $filter);
         $unique                  = $this->generateRandomParameterName();
