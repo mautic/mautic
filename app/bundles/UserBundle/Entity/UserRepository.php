@@ -220,7 +220,7 @@ class UserRepository extends CommonRepository
         );
     }
 
-    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|QueryBuilder $q, $filter): array
+    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|QueryBuilder $q, \stdClass $filter): array
     {
         $command                 = $filter->command;
         $unique                  = $this->generateRandomParameterName();
