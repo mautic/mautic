@@ -7,18 +7,15 @@ namespace Mautic\ApiBundle\Helper;
 use Mautic\ApiBundle\Model\ClientModel;
 use Mautic\CoreBundle\Helper\AbstractSearchScopeProvider;
 use Mautic\CoreBundle\Helper\SearchScopePresets;
-use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Model\SearchCommandListInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ClientSearchScopeProvider extends AbstractSearchScopeProvider
 {
-    /**
-     * @param FormModel<object> $clientModel
-     */
     public function __construct(
         #[Autowire(service: ClientModel::class)]
-        private readonly FormModel $clientModel,
+        private readonly SearchCommandListInterface $clientModel,
         TranslatorInterface $translator,
     ) {
         parent::__construct($translator);

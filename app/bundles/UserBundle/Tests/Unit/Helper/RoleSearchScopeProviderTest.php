@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Tests\Unit\Helper;
 
-use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Model\SearchCommandListInterface;
 use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Mautic\UserBundle\Helper\RoleSearchScopeProvider;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -13,7 +13,7 @@ final class RoleSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
     protected function createProvider(): RoleSearchScopeProvider
     {
-        $roleModel  = $this->createMock(FormModel::class);
+        $roleModel  = $this->createMock(SearchCommandListInterface::class);
         $translator = $this->createMock(TranslatorInterface::class);
 
         $translator->method('trans')

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\PointBundle\Tests\Unit\Helper;
 
-use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\CoreBundle\Model\SearchCommandListInterface;
 use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Mautic\PointBundle\Helper\PointInsightSearchScopeProvider;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -13,7 +13,7 @@ final class PointInsightSearchScopeProviderTest extends SearchScopeProviderTestC
 {
     protected function createProvider(): PointInsightSearchScopeProvider
     {
-        $insightModel = $this->createMock(CommonFormModel::class);
+        $insightModel = $this->createMock(SearchCommandListInterface::class);
         $translator   = $this->createMock(TranslatorInterface::class);
 
         $translator->method('trans')
