@@ -63,8 +63,6 @@ return function (ContainerConfigurator $configurator): void {
         ->call('setDefaultTheme', [param('mautic.theme')]);
     $services->set(MenuRenderer::class)->tag('knp_menu.renderer', ['alias' => 'mautic']);
 
-    $services->alias('mautic.menu.builder', Mautic\CoreBundle\Menu\MenuBuilder::class);
-
     $services->set(Mautic\CoreBundle\Twig\Helper\DateHelper::class)
         ->arg('$dateFullFormat', param('mautic.date_format_full'))
         ->arg('$dateShortFormat', param('mautic.date_format_short'))
@@ -229,7 +227,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.core.model.form', Mautic\CoreBundle\Model\FormModel::class);
     $services->set(Mautic\CoreBundle\Security\Permissions\SystemPermissions::class);
 
-    // Menus: each menu is a KnpMenu item built from the mautic.menu.builder,
+    // Menus: each menu is a KnpMenu item built from the MenuBuilder,
     // rendered by a dedicated MenuRenderer so it can use its own template.
     $menuTemplates = [
         'main'    => [],
@@ -240,7 +238,7 @@ return function (ContainerConfigurator $configurator): void {
 
     foreach ($menuTemplates as $alias => $options) {
         $services->set('mautic.menu.'.$alias, Knp\Menu\MenuItem::class)
-            ->factory([service('mautic.menu.builder'), $alias.'Menu'])
+            ->factory([service(Mautic\CoreBundle\Menu\MenuBuilder::class), $alias.'Menu'])
             ->tag('knp_menu.menu', ['alias' => $alias]);
 
         $services->set('mautic.menu_renderer.'.$alias, MenuRenderer::class)

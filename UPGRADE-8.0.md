@@ -199,12 +199,13 @@
 
     ```php
     use Knp\Menu\MenuItem;
+    use Mautic\CoreBundle\Menu\MenuBuilder;
     use Mautic\CoreBundle\Menu\MenuRenderer;
 
     use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
     $services->set('mautic.menu.mybundle', MenuItem::class)
-        ->factory([service('mautic.menu.builder'), 'mybundleMenu'])
+        ->factory([service(MenuBuilder::class), 'mybundleMenu'])
         ->tag('knp_menu.menu', ['alias' => 'mybundle']);
 
     $services->set('mautic.menu_renderer.mybundle', MenuRenderer::class)
