@@ -150,7 +150,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         return 'comp';
     }
 
-    protected function addCatchAllWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q, \stdClass $filter): array
+    protected function addCatchAllWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         $customFields       = $this->getSearchableFieldAliases($this->leadFieldRepository, 'company');
         $availableForSearch = array_map(fn (string $alias): string => 'comp.'.$alias, $customFields);
@@ -164,15 +164,15 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         );
 
         return $this->addStandardCatchAllWhereClause(
-            $q,
+            $queryBuilder,
             $filter,
             $columns
         );
     }
 
-    protected function addSearchCommandWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q, \stdClass $filter): array
+    protected function addSearchCommandWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
-        [$expr, $parameters]     = $this->addStandardSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters]     = $this->addStandardSearchCommandWhereClause($queryBuilder, $filter);
         $unique                  = $this->generateRandomParameterName();
         $returnParameter         = true;
         $command                 = $filter->command;
@@ -192,11 +192,11 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         }
 
         if (in_array($command, $this->availableSearchFields)) {
-            $expr = $q->expr()->like($this->getTableAlias().".{$command}", ":{$unique}");
+            $expr = $queryBuilder->expr()->like($this->getTableAlias().".{$command}", ":{$unique}");
         }
 
         if ($this->dispatcher) {
-            $event = new CompanyBuildSearchEvent($filter->string, $filter->command, $unique, $filter->not, $q);
+            $event = new CompanyBuildSearchEvent($filter->string, $filter->command, $unique, $filter->not, $queryBuilder);
             $this->dispatcher->dispatch($event, LeadEvents::COMPANY_BUILD_SEARCH_COMMANDS);
             if ($event->isSearchDone()) {
                 $returnParameter = $event->getReturnParameters();

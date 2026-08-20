@@ -691,7 +691,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Adds the "catch all" where clause to the QueryBuilder.
      */
-    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|QueryBuilder $q, $filter): array
+    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         $customFields       = $this->getSearchableFieldAliases(self::$leadFieldRepository, 'lead');
         $availableForSearch = array_map(fn (string $alias): string => 'l.'.$alias, $customFields);
@@ -711,21 +711,21 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             $availableForSearch,
         );
 
-        return $this->addStandardCatchAllWhereClause($q, $filter, $columns);
+        return $this->addStandardCatchAllWhereClause($queryBuilder, $filter, $columns);
     }
 
     /**
      * Adds the command where clause to the QueryBuilder.
      *
-     * @param QueryBuilder $q
+     * @param QueryBuilder $queryBuilder
      */
-    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|QueryBuilder $q, \stdClass $filter): array
+    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         $command             = $filter->command;
         $string              = $filter->string;
         $unique              = $this->generateRandomParameterName();
         $returnParameter     = false; // returning a parameter that is not used will lead to a Doctrine error
-        [$expr, $parameters] = parent::addSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = parent::addSearchCommandWhereClause($queryBuilder, $filter);
 
         // DBAL QueryBuilder does not have an expr()->not() function; boo!!
 
@@ -755,39 +755,39 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         switch ($command) {
             case $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous', [], null, 'en_US'):
-                $expr = $q->expr()->{$nullExpr}('l.date_identified');
+                $expr = $queryBuilder->expr()->{$nullExpr}('l.date_identified');
                 break;
             case $this->translator->trans('mautic.core.searchcommand.ismine'):
             case $this->translator->trans('mautic.core.searchcommand.ismine', [], null, 'en_US'):
-                $expr = $q->expr()->{$eqExpr}('l.owner_id', $this->currentUser->getId());
+                $expr = $queryBuilder->expr()->{$eqExpr}('l.owner_id', $this->currentUser->getId());
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.isunowned'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.isunowned', [], null, 'en_US'):
-                $expr = $q->expr()->or(
-                    $q->expr()->{$eqExpr}('l.owner_id', 0),
-                    $q->expr()->{$nullExpr}('l.owner_id')
+                $expr = $queryBuilder->expr()->or(
+                    $queryBuilder->expr()->{$eqExpr}('l.owner_id', 0),
+                    $queryBuilder->expr()->{$nullExpr}('l.owner_id')
                 );
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.owner'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.owner', [], null, 'en_US'):
-                $q->leftJoin($this->getTableAlias(), MAUTIC_TABLE_PREFIX.'users', 'u', "u.id = {$this->getTableAlias()}.owner_id");
-                $expr = $q->expr()->or(
-                    $q->expr()->{$likeExpr}('u.first_name', ':'.$unique),
-                    $q->expr()->{$likeExpr}('u.last_name', ':'.$unique)
+                $queryBuilder->leftJoin($this->getTableAlias(), MAUTIC_TABLE_PREFIX.'users', 'u', "u.id = {$this->getTableAlias()}.owner_id");
+                $expr = $queryBuilder->expr()->or(
+                    $queryBuilder->expr()->{$likeExpr}('u.first_name', ':'.$unique),
+                    $queryBuilder->expr()->{$likeExpr}('u.last_name', ':'.$unique)
                 );
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
             case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
-                $expr = $q->expr()->or(
-                    $q->expr()->{$likeExpr}('l.firstname', ":{$unique}"),
-                    $q->expr()->{$likeExpr}('l.lastname', ":{$unique}")
+                $expr = $queryBuilder->expr()->or(
+                    $queryBuilder->expr()->{$likeExpr}('l.firstname', ":{$unique}"),
+                    $queryBuilder->expr()->{$likeExpr}('l.lastname', ":{$unique}")
                 );
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.email'):
             case $this->translator->trans('mautic.core.searchcommand.email', [], null, 'en_US'):
-                $expr            = $q->expr()->{$likeExpr}('l.email', ":{$unique}");
+                $expr            = $queryBuilder->expr()->{$likeExpr}('l.email', ":{$unique}");
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.list'):
@@ -796,24 +796,24 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $sq->select('1')
                     ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lla')
                     ->where(
-                        $q->expr()->and(
-                            $q->expr()->eq('l.id', 'lla.lead_id'),
-                            $q->expr()->eq('lla.manually_removed', 0),
-                            $q->expr()->in('lla.leadlist_id', ":{$unique}")
+                        $queryBuilder->expr()->and(
+                            $queryBuilder->expr()->eq('l.id', 'lla.lead_id'),
+                            $queryBuilder->expr()->eq('lla.manually_removed', 0),
+                            $queryBuilder->expr()->in('lla.leadlist_id', ":{$unique}")
                         )
                     );
-                $from = $q->getQueryPart('from')[0];
-                $q->resetQueryPart('from');
-                $q->add('from', ['hint' => 'USE INDEX FOR JOIN ('.MAUTIC_TABLE_PREFIX.'lead_date_added)'] + $from, true);
+                $from = $queryBuilder->getQueryPart('from')[0];
+                $queryBuilder->resetQueryPart('from');
+                $queryBuilder->add('from', ['hint' => 'USE INDEX FOR JOIN ('.MAUTIC_TABLE_PREFIX.'lead_date_added)'] + $from, true);
 
                 $filter->strict  = true;
-                $q->andWhere($this->getExistsExpression($filter->not).'('.$sq->getSQL().')');
-                $q->setParameter($unique, $this->getListIdsByAlias($string) ?: [0], ArrayParameterType::INTEGER);
+                $queryBuilder->andWhere($this->getExistsExpression($filter->not).'('.$sq->getSQL().')');
+                $queryBuilder->setParameter($unique, $this->getListIdsByAlias($string) ?: [0], ArrayParameterType::INTEGER);
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.company_id'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.company_id', [], null, 'en_US'):
                 $this->applySearchQueryRelationship(
-                    $q,
+                    $queryBuilder,
                     [
                         [
                             'from_alias' => 'l',
@@ -823,7 +823,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                         ],
                     ],
                     $innerJoinTables,
-                    $this->generateFilterExpression($q, 'comp_lead.company_id', $eqExpr, $unique, null)
+                    $this->generateFilterExpression($queryBuilder, 'comp_lead.company_id', $eqExpr, $unique, null)
                 );
                 $filter->strict  = true;
                 $returnParameter = true;
@@ -832,7 +832,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             case $this->translator->trans('mautic.core.searchcommand.ip'):
             case $this->translator->trans('mautic.core.searchcommand.ip', [], null, 'en_US'):
                 $this->applySearchQueryRelationship(
-                    $q,
+                    $queryBuilder,
                     [
                         [
                             'from_alias' => 'l',
@@ -848,7 +848,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                         ],
                     ],
                     $innerJoinTables,
-                    $this->generateFilterExpression($q, 'ip.ip_address', $likeExpr, $unique, null)
+                    $this->generateFilterExpression($queryBuilder, 'ip.ip_address', $likeExpr, $unique, null)
                 );
                 $returnParameter = true;
 
@@ -871,22 +871,22 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $sq->select('duplicate.lead_id')
                     ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'duplicate')
                     ->where(
-                        $q->expr()->and(
-                            $q->expr()->in('duplicate.leadlist_id', $imploder),
-                            $q->expr()->eq('duplicate.manually_removed', 0)
+                        $queryBuilder->expr()->and(
+                            $queryBuilder->expr()->in('duplicate.leadlist_id', $imploder),
+                            $queryBuilder->expr()->eq('duplicate.manually_removed', 0)
                         )
                     )
                     ->groupBy('duplicate.lead_id')
                     ->having("COUNT(duplicate.lead_id) = {$pluck}");
 
-                $expr            = $q->expr()->{$inExpr}('l.id', sprintf('(%s)', $sq->getSQL()));
+                $expr            = $queryBuilder->expr()->{$inExpr}('l.id', sprintf('(%s)', $sq->getSQL()));
                 $returnParameter = true;
 
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.tag'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.tag', [], null, 'en_US'):
                 $this->applySearchQueryRelationship(
-                    $q,
+                    $queryBuilder,
                     [
                         [
                             'from_alias' => 'l',
@@ -902,14 +902,14 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                         ],
                     ],
                     $innerJoinTables,
-                    $this->generateFilterExpression($q, 'tag.tag', $likeExpr, $unique, null)
+                    $this->generateFilterExpression($queryBuilder, 'tag.tag', $likeExpr, $unique, null)
                 );
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.company'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.company', [], null, 'en_US'):
                 $this->applySearchQueryRelationship(
-                    $q,
+                    $queryBuilder,
                     [
                         [
                             'from_alias' => 'l',
@@ -925,14 +925,14 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                         ],
                     ],
                     $innerJoinTables,
-                    $this->generateFilterExpression($q, 'comp.companyname', $likeExpr, $unique, null)
+                    $this->generateFilterExpression($queryBuilder, 'comp.companyname', $likeExpr, $unique, null)
                 );
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.stage'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.stage', [], null, 'en_US'):
                 $this->applySearchQueryRelationship(
-                    $q,
+                    $queryBuilder,
                     [
                         [
                             'from_alias' => 'l',
@@ -942,7 +942,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                         ],
                     ],
                     $innerJoinTables,
-                    $this->generateFilterExpression($q, 's.name', $likeExpr, $unique, null)
+                    $this->generateFilterExpression($queryBuilder, 's.name', $likeExpr, $unique, null)
                 );
                 $returnParameter = true;
                 break;
@@ -953,12 +953,12 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $sq           = $this->getEntityManager()->getConnection()->createQueryBuilder();
                 $sq->select('1')
                     ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')
-                    ->where($q->expr()->eq('l.id', 'dnc.lead_id'));
+                    ->where($queryBuilder->expr()->eq('l.id', 'dnc.lead_id'));
 
                 if ($string === $anyKeyword || $string === $anyKeywordEn) {
                     $returnParameter = false;
                 } else {
-                    $sq->andWhere($q->expr()->eq('dnc.channel', ":{$unique}"));
+                    $sq->andWhere($queryBuilder->expr()->eq('dnc.channel', ":{$unique}"));
                     $returnParameter = true;
                 }
                 $expr           = $this->getExistsExpression($filter->not).' ('.$sq->getSQL().')';
@@ -966,7 +966,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 break;
             case $formSearchCommand:
                 if (empty($string)) {
-                    $expr = $q->expr()->eq(1, 0);
+                    $expr = $queryBuilder->expr()->eq(1, 0);
                     break;
                 }
                 $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -974,24 +974,24 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 'fsub')
                     ->innerJoin('fsub', MAUTIC_TABLE_PREFIX.'forms', 'ffrm', 'fsub.form_id = ffrm.id')
                     ->where(
-                        $q->expr()->and(
-                            $q->expr()->eq('fsub.lead_id', 'l.id'),
-                            $q->expr()->eq('ffrm.alias', ":{$unique}")
+                        $queryBuilder->expr()->and(
+                            $queryBuilder->expr()->eq('fsub.lead_id', 'l.id'),
+                            $queryBuilder->expr()->eq('ffrm.alias', ":{$unique}")
                         )
                     );
                 $filter->strict = true;
-                $q->andWhere($this->getExistsExpression($filter->not).'('.$sq->getSQL().')');
-                $q->setParameter($unique, $string);
+                $queryBuilder->andWhere($this->getExistsExpression($filter->not).'('.$sq->getSQL().')');
+                $queryBuilder->setParameter($unique, $string);
                 break;
             default:
                 if (in_array($command, $this->availableSearchFields)) {
-                    $expr = $q->expr()->{$likeExpr}("l.{$command}", ":{$unique}");
+                    $expr = $queryBuilder->expr()->{$likeExpr}("l.{$command}", ":{$unique}");
                 }
                 $returnParameter = true;
                 break;
         }
 
-        $event = new LeadBuildSearchEvent($filter->string, $filter->command, $unique, $filter->not, $q);
+        $event = new LeadBuildSearchEvent($filter->string, $filter->command, $unique, $filter->not, $queryBuilder);
         $this->dispatcher->dispatch($event, LeadEvents::LEAD_BUILD_SEARCH_COMMANDS);
         if ($event->isSearchDone()) {
             $returnParameter = $event->getReturnParameters();

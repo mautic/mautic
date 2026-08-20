@@ -409,10 +409,10 @@ class LeadListRepository extends CommonRepository
         return $subQb;
     }
 
-    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|QueryBuilder $q, $filter): array
+    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|QueryBuilder $queryBuilder, $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
-            $q,
+            $queryBuilder,
             $filter,
             [
                 'l.name',
@@ -421,9 +421,9 @@ class LeadListRepository extends CommonRepository
         );
     }
 
-    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|QueryBuilder $q, $filter): array
+    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|QueryBuilder $queryBuilder, $filter): array
     {
-        [$expr, $parameters] = parent::addStandardSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = parent::addStandardSearchCommandWhereClause($queryBuilder, $filter);
         if ($expr) {
             return [$expr, $parameters];
         }
@@ -435,18 +435,18 @@ class LeadListRepository extends CommonRepository
         switch ($command) {
             case $this->translator->trans('mautic.lead.list.searchcommand.isglobal'):
             case $this->translator->trans('mautic.lead.list.searchcommand.isglobal', [], null, 'en_US'):
-                $expr            = $q->expr()->eq('l.isGlobal', ":{$unique}");
+                $expr            = $queryBuilder->expr()->eq('l.isGlobal', ":{$unique}");
                 $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
             case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
-                $expr            = $q->expr()->like('l.name', ':'.$unique);
+                $expr            = $queryBuilder->expr()->like('l.name', ':'.$unique);
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.lead.list.searchcommand.filters_field'):
             case $this->translator->trans('mautic.lead.list.searchcommand.filters_field', [], null, 'en_US'):
                 $pattern         = sprintf('%%s:5:"field";s:%d:"%s"%%', strlen($filter->string), $filter->string);
-                $expr            = $q->expr()->like('l.filters', ':'.$unique);
+                $expr            = $queryBuilder->expr()->like('l.filters', ':'.$unique);
                 $forceParameters = [$unique => $pattern];
                 break;
             case $this->translator->trans('mautic.project.searchcommand.name'):

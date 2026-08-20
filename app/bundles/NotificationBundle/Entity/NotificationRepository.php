@@ -53,9 +53,9 @@ final class NotificationRepository extends CommonRepository
         return $results;
     }
 
-    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q, \stdClass $filter): array
+    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
-        [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($queryBuilder, $filter);
         if ($expr) {
             return [$expr, $parameters];
         }
@@ -73,16 +73,16 @@ final class NotificationRepository extends CommonRepository
                     $langUnique => $langValue,
                     $unique     => $filter->string,
                 ];
-                $expr = $q->expr()->or(
-                    $q->expr()->eq('e.language', ":{$unique}"),
-                    $q->expr()->like('e.language', ":{$langUnique}")
+                $expr = $queryBuilder->expr()->or(
+                    $queryBuilder->expr()->eq('e.language', ":{$unique}"),
+                    $queryBuilder->expr()->like('e.language', ":{$langUnique}")
                 );
                 $returnParameter = true;
                 break;
         }
 
         if ($expr && $filter->not) {
-            $expr = $q->expr()->not($expr);
+            $expr = $queryBuilder->expr()->not($expr);
         }
 
         if (!empty($forceParameters)) {

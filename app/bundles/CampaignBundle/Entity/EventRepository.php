@@ -427,10 +427,10 @@ class EventRepository extends CommonRepository
      *
      * For the API
      */
-    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q, \stdClass $filter): array
+    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
-            $q,
+            $queryBuilder,
             $filter,
             [
                 $this->getTableAlias().'.name',
@@ -443,9 +443,9 @@ class EventRepository extends CommonRepository
      *
      * For the API
      */
-    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q, \stdClass $filter): array
+    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
-        return $this->addStandardSearchCommandWhereClause($q, $filter);
+        return $this->addStandardSearchCommandWhereClause($queryBuilder, $filter);
     }
 
     /**

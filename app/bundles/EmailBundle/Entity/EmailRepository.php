@@ -578,9 +578,9 @@ class EmailRepository extends CommonRepository
     /**
      * @param object $filter
      */
-    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|QueryBuilder $q, $filter): array
+    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|QueryBuilder $queryBuilder, $filter): array
     {
-        return $this->addStandardCatchAllWhereClause($q, $filter, [
+        return $this->addStandardCatchAllWhereClause($queryBuilder, $filter, [
             'e.name',
             'e.subject',
         ]);
@@ -589,9 +589,9 @@ class EmailRepository extends CommonRepository
     /**
      * @param object $filter
      */
-    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|QueryBuilder $q, $filter): array
+    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|QueryBuilder $queryBuilder, $filter): array
     {
-        [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($queryBuilder, $filter);
         if ($expr) {
             return [$expr, $parameters];
         }
@@ -624,7 +624,7 @@ class EmailRepository extends CommonRepository
                     $langUnique => $langValue,
                     $unique     => $filter->string,
                 ];
-                $expr            = '('.$q->expr()->eq('e.language', ":{$unique}").' OR '.$q->expr()->like('e.language', ":{$langUnique}").')';
+                $expr            = '('.$queryBuilder->expr()->eq('e.language', ":{$unique}").' OR '.$queryBuilder->expr()->like('e.language', ":{$langUnique}").')';
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.project.searchcommand.name'):
@@ -640,7 +640,7 @@ class EmailRepository extends CommonRepository
         }
 
         if ($expr && $filter->not) {
-            $expr = $q->expr()->not($expr);
+            $expr = $queryBuilder->expr()->not($expr);
         }
 
         if (!empty($forceParameters)) {

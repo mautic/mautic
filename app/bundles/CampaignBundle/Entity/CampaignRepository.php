@@ -253,17 +253,17 @@ class CampaignRepository extends CommonRepository
         return 'c';
     }
 
-    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q, \stdClass $filter): array
+    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
-        return $this->addStandardCatchAllWhereClause($q, $filter, [
+        return $this->addStandardCatchAllWhereClause($queryBuilder, $filter, [
             'c.name',
             'c.description',
         ]);
     }
 
-    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q, \stdClass $filter): array
+    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
-        [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($queryBuilder, $filter);
         if ($expr) {
             return [$expr, $parameters];
         }
@@ -273,21 +273,21 @@ class CampaignRepository extends CommonRepository
         switch ($filter->command) {
             case $this->translator->trans('mautic.campaign.campaign.searchcommand.isexpired'):
             case $this->translator->trans('mautic.campaign.campaign.searchcommand.isexpired', [], null, 'en_US'):
-                $expr = $q->expr()->and(
-                    $q->expr()->eq('c.isPublished', ":{$unique}"),
-                    $q->expr()->isNotNull('c.publishDown'),
-                    $q->expr()->neq('c.publishDown', $q->expr()->literal('')),
-                    $q->expr()->lt('c.publishDown', 'CURRENT_TIMESTAMP()')
+                $expr = $queryBuilder->expr()->and(
+                    $queryBuilder->expr()->eq('c.isPublished', ":{$unique}"),
+                    $queryBuilder->expr()->isNotNull('c.publishDown'),
+                    $queryBuilder->expr()->neq('c.publishDown', $queryBuilder->expr()->literal('')),
+                    $queryBuilder->expr()->lt('c.publishDown', 'CURRENT_TIMESTAMP()')
                 );
                 $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.campaign.campaign.searchcommand.ispending'):
             case $this->translator->trans('mautic.campaign.campaign.searchcommand.ispending', [], null, 'en_US'):
-                $expr = $q->expr()->and(
-                    $q->expr()->eq('c.isPublished', ":{$unique}"),
-                    $q->expr()->isNotNull('c.publishUp'),
-                    $q->expr()->neq('c.publishUp', $q->expr()->literal('')),
-                    $q->expr()->gt('c.publishUp', 'CURRENT_TIMESTAMP()')
+                $expr = $queryBuilder->expr()->and(
+                    $queryBuilder->expr()->eq('c.isPublished', ":{$unique}"),
+                    $queryBuilder->expr()->isNotNull('c.publishUp'),
+                    $queryBuilder->expr()->neq('c.publishUp', $queryBuilder->expr()->literal('')),
+                    $queryBuilder->expr()->gt('c.publishUp', 'CURRENT_TIMESTAMP()')
                 );
                 $forceParameters = [$unique => true];
                 break;
@@ -304,7 +304,7 @@ class CampaignRepository extends CommonRepository
         }
 
         if ($expr && $filter->not) {
-            $expr = $q->expr()->not($expr);
+            $expr = $queryBuilder->expr()->not($expr);
         }
 
         if (!empty($forceParameters)) {

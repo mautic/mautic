@@ -1067,7 +1067,7 @@ class CommonRepository extends ServiceEntityRepository
         ];
     }
 
-    protected function addSearchCommandWhereClause(QueryBuilder|DbalQueryBuilder $q, \stdClass $filter): array
+    protected function addSearchCommandWhereClause(QueryBuilder|DbalQueryBuilder $queryBuilder, \stdClass $filter): array
     {
         $command = $filter->command;
         $expr    = false;
@@ -1075,7 +1075,7 @@ class CommonRepository extends ServiceEntityRepository
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ids'):
             case $this->translator->trans('mautic.core.searchcommand.ids', [], null, 'en_US'):
-                $expr = $this->getIdsExpr($q, $filter);
+                $expr = $this->getIdsExpr($queryBuilder, $filter);
                 break;
         }
 
@@ -1130,46 +1130,46 @@ class CommonRepository extends ServiceEntityRepository
         ];
     }
 
-    protected function addStandardSearchCommandWhereClause(QueryBuilder|DbalQueryBuilder &$q, \stdClass $filter): array
+    protected function addStandardSearchCommandWhereClause(QueryBuilder|DbalQueryBuilder &$queryBuilder, \stdClass $filter): array
     {
         $command         = $filter->command;
         $unique          = $this->generateRandomParameterName();
         $returnParameter = true; // returning a parameter that is not used will lead to a Doctrine error
         $expr            = false;
         $prefix          = $this->getTableAlias();
-        $isDbalQB        = $q instanceof DbalQueryBuilder;
+        $isDbalQB        = $queryBuilder instanceof DbalQueryBuilder;
 
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
             case $this->translator->trans('mautic.core.searchcommand.ispublished', [], null, 'en_US'):
                 $column          = $isDbalQB ? 'is_published' : 'isPublished';
-                $expr            = $q->expr()->eq("{$prefix}.{$column}", ":{$unique}");
+                $expr            = $queryBuilder->expr()->eq("{$prefix}.{$column}", ":{$unique}");
                 $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
             case $this->translator->trans('mautic.core.searchcommand.isunpublished', [], null, 'en_US'):
                 $column          = $isDbalQB ? 'is_published' : 'isPublished';
-                $expr            = $q->expr()->eq("{$prefix}.{$column}", ":{$unique}");
+                $expr            = $queryBuilder->expr()->eq("{$prefix}.{$column}", ":{$unique}");
                 $forceParameters = [$unique => false];
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isuncategorized'):
             case $this->translator->trans('mautic.core.searchcommand.isuncategorized', [], null, 'en_US'):
-                $expr = $q->expr()->orX(
-                    $q->expr()->isNull("{$prefix}.category"),
-                    $q->expr()->eq("{$prefix}.category", $q->expr()->literal(''))
+                $expr = $queryBuilder->expr()->orX(
+                    $queryBuilder->expr()->isNull("{$prefix}.category"),
+                    $queryBuilder->expr()->eq("{$prefix}.category", $queryBuilder->expr()->literal(''))
                 );
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.ismine'):
             case $this->translator->trans('mautic.core.searchcommand.ismine', [], null, 'en_US'):
                 $column          = $isDbalQB ? 'created_by' : 'createdBy';
-                $expr            = $q->expr()->eq("{$prefix}.{$column}", ":{$unique}");
+                $expr            = $queryBuilder->expr()->eq("{$prefix}.{$column}", ":{$unique}");
                 $forceParameters = [$unique => $this->currentUser->getId()];
                 break;
             case $this->translator->trans('mautic.core.searchcommand.category'):
             case $this->translator->trans('mautic.core.searchcommand.category', [], null, 'en_US'):
                 // Find the category prefix
-                $joins     = $q->getDQLPart('join');
+                $joins     = $queryBuilder->getDQLPart('join');
                 $catPrefix = false;
                 foreach ($joins as $joinStatements) {
                     /** @var Query\Expr\Join $join */
@@ -1186,18 +1186,18 @@ class CommonRepository extends ServiceEntityRepository
                 if (false === $catPrefix) {
                     $catPrefix = 'c';
                 }
-                $expr           = $q->expr()->like("{$catPrefix}.alias", ":{$unique}");
+                $expr           = $queryBuilder->expr()->like("{$catPrefix}.alias", ":{$unique}");
                 $filter->strict = true;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.ids'):
             case $this->translator->trans('mautic.core.searchcommand.ids', [], null, 'en_US'):
-                $expr            = $this->getIdsExpr($q, $filter);
+                $expr            = $this->getIdsExpr($queryBuilder, $filter);
                 $returnParameter = false;
                 break;
         }
 
         if ($expr && $filter->not) {
-            $expr = $q->expr()->not($expr);
+            $expr = $queryBuilder->expr()->not($expr);
         }
 
         if (!empty($forceParameters)) {

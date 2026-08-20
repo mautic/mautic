@@ -26,9 +26,9 @@ final class ClientRepository extends CommonRepository
         return $query->getQuery()->getResult();
     }
 
-    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q, \stdClass $filter): array
+    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
-        return $this->addStandardCatchAllWhereClause($q, $filter, [
+        return $this->addStandardCatchAllWhereClause($queryBuilder, $filter, [
             'c.name',
             'c.redirectUris',
         ]);

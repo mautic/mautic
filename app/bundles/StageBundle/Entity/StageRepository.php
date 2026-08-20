@@ -90,15 +90,15 @@ class StageRepository extends CommonRepository
         return $return;
     }
 
-    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q, \stdClass $filter): array
+    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
-        return $this->addStandardCatchAllWhereClause($q, $filter, [
+        return $this->addStandardCatchAllWhereClause($queryBuilder, $filter, [
             's.name',
             's.description',
         ]);
     }
 
-    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q, \stdClass $filter): array
+    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return match ($filter->command) {
             $this->translator->trans('mautic.project.searchcommand.name'), $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US') => $this->handleProjectFilter(
@@ -109,7 +109,7 @@ class StageRepository extends CommonRepository
                 $filter->string,
                 $filter->not
             ),
-            default => $this->addStandardSearchCommandWhereClause($q, $filter),
+            default => $this->addStandardSearchCommandWhereClause($queryBuilder, $filter),
         };
     }
 

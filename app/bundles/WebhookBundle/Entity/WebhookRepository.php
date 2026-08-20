@@ -11,14 +11,14 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class WebhookRepository extends CommonRepository
 {
-    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q, \stdClass $filter): array
+    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
-        return $this->addStandardCatchAllWhereClause($q, $filter, ['e.name']);
+        return $this->addStandardCatchAllWhereClause($queryBuilder, $filter, ['e.name']);
     }
 
-    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q, \stdClass $filter): array
+    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
-        return $this->addStandardSearchCommandWhereClause($q, $filter);
+        return $this->addStandardSearchCommandWhereClause($queryBuilder, $filter);
     }
 
     /**

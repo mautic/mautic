@@ -142,10 +142,10 @@ class LeadFieldRepository extends CommonRepository
     /**
      * @param object $filter
      */
-    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q, \stdClass $filter): array
+    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
-            $q,
+            $queryBuilder,
             $filter,
             [
                 'f.label',
@@ -511,9 +511,9 @@ class LeadFieldRepository extends CommonRepository
     /**
      * @return mixed[]
      */
-    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q, \stdClass $filter): array
+    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
-        [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($queryBuilder, $filter);
         if ($expr) {
             return [$expr, $parameters];
         }
@@ -525,12 +525,12 @@ class LeadFieldRepository extends CommonRepository
 
         switch ($command) {
             case $this->translator->trans('mautic.lead.field.searchcommand.isindexed'):
-                $expr            = $q->expr()->eq($prefix.'.isIndex', ":{$unique}");
+                $expr            = $queryBuilder->expr()->eq($prefix.'.isIndex', ":{$unique}");
                 $forceParameters = [$unique => true];
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.lead.field.searchcommand.isunique'):
-                $expr            = $q->expr()->eq($prefix.'.isUniqueIdentifer', ":{$unique}");
+                $expr            = $queryBuilder->expr()->eq($prefix.'.isUniqueIdentifer', ":{$unique}");
                 $forceParameters = [$unique => true];
                 $returnParameter = true;
                 break;
@@ -538,20 +538,20 @@ class LeadFieldRepository extends CommonRepository
                 $forceParameters = [
                     $unique     => $filter->string,
                 ];
-                $expr            = $q->expr()->like($prefix.'.type', ":{$unique}");
+                $expr            = $queryBuilder->expr()->like($prefix.'.type', ":{$unique}");
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.lead.field.searchcommand.group'):
                 $forceParameters = [
                     $unique     => $filter->string,
                 ];
-                $expr            = $q->expr()->like($prefix.'.group', ":{$unique}");
+                $expr            = $queryBuilder->expr()->like($prefix.'.group', ":{$unique}");
                 $returnParameter = true;
                 break;
         }
 
         if ($expr && $filter->not) {
-            $expr = $q->expr()->not($expr);
+            $expr = $queryBuilder->expr()->not($expr);
         }
 
         if (!empty($forceParameters)) {

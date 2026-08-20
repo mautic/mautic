@@ -42,12 +42,12 @@ class FocusRepository extends CommonRepository
         return parent::getEntities($args);
     }
 
-    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q, \stdClass $filter): array
+    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
-        return $this->addStandardCatchAllWhereClause($q, $filter, ['f.name', 'f.website']);
+        return $this->addStandardCatchAllWhereClause($queryBuilder, $filter, ['f.name', 'f.website']);
     }
 
-    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q, \stdClass $filter): array
+    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return match ($filter->command) {
             $this->translator->trans('mautic.project.searchcommand.name'),
@@ -59,7 +59,7 @@ class FocusRepository extends CommonRepository
                 $filter->string,
                 $filter->not
             ),
-            default => $this->addStandardSearchCommandWhereClause($q, $filter),
+            default => $this->addStandardSearchCommandWhereClause($queryBuilder, $filter),
         };
     }
 
