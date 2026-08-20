@@ -11,15 +11,19 @@ final class EventHelper
 {
     use PushToIntegrationTrait;
 
+    public function __construct(
+        private readonly LeadRepository $leadRepository,
+    ) {
+    }
+
     /**
      * @param array<string, mixed> $config
      */
-    public function pushLead(array $config, $lead, LeadRepository $leadRepository, IntegrationHelper $integrationHelper): bool
+    public function pushLead(array $config, $lead): bool
     {
-        $contact = $leadRepository->getEntityWithPrimaryCompany($lead);
+        $contact = $this->leadRepository->getEntityWithPrimaryCompany($lead);
 
-        self::setStaticIntegrationHelper($integrationHelper);
-        $errors  = [];
+        $errors = [];
 
         return self::pushIt($config, $contact, $errors);
     }

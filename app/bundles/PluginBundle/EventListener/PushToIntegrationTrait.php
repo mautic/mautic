@@ -15,31 +15,15 @@ trait PushToIntegrationTrait
 {
     protected IntegrationHelper $integrationHelper;
 
-<<<<<<< HEAD
     /**
      * Used by methodCalls to event subscribers.
      */
-    #[Required]
-    public function setIntegrationHelper(
-        IntegrationHelper $integrationHelper,
-    ): void {
-        static::setStaticIntegrationHelper($integrationHelper);
-=======
     #[Required]
     public function autowirePushToIntegrationTrait(
         IntegrationHelper $integrationHelper,
     ): void {
         $this->integrationHelper = $integrationHelper;
->>>>>>> 82ffbc2098 (remove static from PushToIntegraiton)
     }
-
-    //    /**
-    //     * Used by callback methods such as point triggers.
-    //     */
-    //    public static function setStaticIntegrationHelper(IntegrationHelper $integrationHelper): void
-    //    {
-    //        static::$integrationHelper = $integrationHelper;
-    //    }
 
     protected function pushToIntegration(array $config, Lead $lead, array &$errors = []): bool
     {
