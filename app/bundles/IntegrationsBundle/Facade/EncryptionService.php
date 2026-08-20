@@ -32,11 +32,9 @@ final readonly class EncryptionService
     }
 
     /**
-     * @param bool $onlyPrimaryCipher
-     *
      * @return array|string
      */
-    public function decrypt($keys, $onlyPrimaryCipher = false)
+    public function decrypt($keys, bool $onlyPrimaryCipher = false)
     {
         if (!is_array($keys)) {
             return $this->encryptionHelper->decrypt($keys, $onlyPrimaryCipher);

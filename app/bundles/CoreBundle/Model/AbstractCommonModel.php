@@ -162,12 +162,8 @@ abstract class AbstractCommonModel implements MauticModelInterface
 
     /**
      * Retrieve entity based on id/alias slugs.
-     *
-     * @param string $slug
-     *
-     * @return object|bool
      */
-    public function getEntityBySlugs($slug)
+    public function getEntityBySlugs(string $slug): ?object
     {
         $slugs    = explode('/', $slug);
         $idSlug   = '';
@@ -208,10 +204,10 @@ abstract class AbstractCommonModel implements MauticModelInterface
         if ($lang && !isset($locales[$lang])) {
             // Language doesn't exist so return false
 
-            return false;
+            return null;
         }
 
-        $entity = false;
+        $entity = null;
         if (str_contains($idSlug, ':')) {
             $parts = explode(':', $idSlug);
             if (2 === count($parts)) {

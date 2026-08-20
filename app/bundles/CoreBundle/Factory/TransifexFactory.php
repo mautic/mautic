@@ -39,7 +39,7 @@ final class TransifexFactory
     /**
      * @throws InvalidConfigurationException
      */
-    private function create(string $apiToken): TransifexInterface
+    private function create(string $apiToken): Transifex
     {
         $config = new Config();
         $config->setApiToken($apiToken);

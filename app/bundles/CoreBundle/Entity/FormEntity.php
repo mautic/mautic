@@ -11,9 +11,6 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 class FormEntity extends CommonEntity
 {
-    /**
-     * @var bool
-     */
     #[Groups([
         'category:read', 'category:write',
         'notification:read', 'notification:write',
@@ -33,7 +30,7 @@ class FormEntity extends CommonEntity
         'segment:read', 'segment:write',
         'email:read', 'email:write',
     ])]
-    private $isPublished = true;
+    private bool $isPublished = true;
 
     /**
      * @var \DateTimeInterface|null
@@ -227,10 +224,8 @@ class FormEntity extends CommonEntity
      *
      * @param bool $checkPublishStatus
      * @param bool $checkCategoryStatus
-     *
-     * @return bool
      */
-    public function isPublished($checkPublishStatus = true, $checkCategoryStatus = true)
+    public function isPublished($checkPublishStatus = true, $checkCategoryStatus = true): bool
     {
         if ($checkPublishStatus && method_exists($this, 'getPublishUp')) {
             $status = $this->getPublishStatus();
@@ -394,10 +389,7 @@ class FormEntity extends CommonEntity
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function getIsPublished()
+    public function getIsPublished(): bool
     {
         return $this->isPublished;
     }

@@ -163,10 +163,7 @@ class DateTimeHelper
         return $this->datetime;
     }
 
-    /**
-     * @return bool|int
-     */
-    public function getLocalTimestamp()
+    public function getLocalTimestamp(): int|false
     {
         if ($this->datetime) {
             $local = $this->datetime->setTimezone($this->local);
@@ -177,10 +174,7 @@ class DateTimeHelper
         return false;
     }
 
-    /**
-     * @return bool|int
-     */
-    public function getUtcTimestamp()
+    public function getUtcTimestamp(): false|int
     {
         if ($this->datetime) {
             $utc = $this->datetime->setTimezone($this->utc);

@@ -19,12 +19,7 @@ trait ChannelTrait
         $this->modelFactory = $modelFactory;
     }
 
-    /**
-     * Get the model for a channel.
-     *
-     * @return mixed
-     */
-    protected function getChannelModel($channel)
+    protected function getChannelModel(string $channel): mixed
     {
         if ($this->modelFactory->hasModel($channel)) {
             return $this->modelFactory->getModel($channel);
@@ -33,12 +28,7 @@ trait ChannelTrait
         return false;
     }
 
-    /**
-     * Get the entity for a channel item.
-     *
-     * @return mixed
-     */
-    protected function getChannelEntity($channel, $channelId)
+    protected function getChannelEntity(string $channel, $channelId): mixed
     {
         $channelEntity = null;
         if ($channelModel = $this->getChannelModel($channel)) {
@@ -54,12 +44,8 @@ trait ChannelTrait
 
     /**
      * Get the name and/or view URL for a channel entity.
-     *
-     * @param bool $returnWithViewUrl
-     *
-     * @return array|bool|string
      */
-    protected function getChannelEntityName($channel, $channelId, $returnWithViewUrl = false)
+    protected function getChannelEntityName(string $channel, $channelId, bool $returnWithViewUrl = false): false|array|string
     {
         if ($channelEntity = $this->getChannelEntity($channel, $channelId)) {
             $channelModel = $this->getChannelModel($channel);
