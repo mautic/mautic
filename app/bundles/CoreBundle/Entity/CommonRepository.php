@@ -1020,10 +1020,7 @@ class CommonRepository extends ServiceEntityRepository
         return [$expressions, $parameters];
     }
 
-    /**
-     * @param \StdClass $filter
-     */
-    protected function addCatchAllWhereClause(QueryBuilder|DbalQueryBuilder $qb, $filter): array
+    protected function addCatchAllWhereClause(QueryBuilder|DbalQueryBuilder $qb, \stdClass $filter): array
     {
         foreach (['name', 'title'] as $column) {
             if ($this->getClassMetadata()->hasField($column)) {
@@ -1074,10 +1071,7 @@ class CommonRepository extends ServiceEntityRepository
         ];
     }
 
-    /**
-     * @param \StdClass $filter
-     */
-    protected function addSearchCommandWhereClause(QueryBuilder|DbalQueryBuilder $q, $filter): array
+    protected function addSearchCommandWhereClause(QueryBuilder|DbalQueryBuilder $q, \stdClass $filter): array
     {
         $command = $filter->command;
         $expr    = false;
@@ -1679,13 +1673,14 @@ class CommonRepository extends ServiceEntityRepository
         return [];
     }
 
-    protected function getIdsExpr(&$q, $filter): mixed
+    protected function getIdsExpr(QueryBuilder|DbalQueryBuilder &$queryBuilder, $filter): mixed
     {
         if ($ids = array_map(intval(...), explode(',', $filter->string))) {
             $parameterName = $this->generateRandomParameterName();
-            $q->setParameter($parameterName, $ids, ArrayParameterType::INTEGER);
+            $queryBuilder->setParameter($parameterName, $ids, ArrayParameterType::INTEGER);
 
-            return $q->expr()->in($this->getTableAlias().'.id', ':'.$parameterName);
+            return $queryBuilder->expr()
+                ->in($this->getTableAlias().'.id', ':'.$parameterName);
         }
 
         return false;
