@@ -1055,6 +1055,7 @@ class CommonRepository extends ServiceEntityRepository
         $expr = $q->expr()->{$xFunc}();
 
         foreach ($columns as $column) {
+            // @phpstan-ignore-next-line $q accepts ORM and DBAL QueryBuilder; add() is deprecated only on DBAL CompositeExpression, not on ORM Andx
             $expr->add(
                 $q->expr()->{$exprFunc}($column, ":{$unique}")
             );
@@ -1113,6 +1114,7 @@ class CommonRepository extends ServiceEntityRepository
 
         $expr = $q->expr()->{$xFunc}();
         foreach ($columns as $col) {
+            // @phpstan-ignore-next-line $q accepts ORM and DBAL QueryBuilder; add() is deprecated only on DBAL CompositeExpression, not on ORM Andx
             $expr->add(
                 $q->expr()->{$exprFunc}($col, ":{$unique}")
             );
