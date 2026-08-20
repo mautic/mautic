@@ -246,10 +246,9 @@ class SubmissionRepository extends CommonRepository
     }
 
     /**
-     * @param QueryBuilder|DbalQueryBuilder $q
-     * @param array<mixed>                  $filter
+     * @param array<mixed> $filter
      */
-    public function getFilterExpr($q, array $filter, ?string $unique = null): array
+    public function getFilterExpr(QueryBuilder|DbalQueryBuilder $q, array $filter, ?string $unique = null): array
     {
         if ('s.date_submitted' === $filter['column']) {
             $date       = new DateTimeHelper($filter['value'], 'Y-m-d')->toUtcString();

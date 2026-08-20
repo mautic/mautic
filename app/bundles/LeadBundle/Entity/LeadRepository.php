@@ -719,7 +719,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      *
      * @param QueryBuilder $q
      */
-    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|QueryBuilder $q, $filter): array
+    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|QueryBuilder $q, \stdClass $filter): array
     {
         $command             = $filter->command;
         $string              = $filter->string;
