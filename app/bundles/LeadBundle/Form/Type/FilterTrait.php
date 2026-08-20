@@ -14,24 +14,19 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * This trait is consumed dynamically by multiple form types at runtime.
- *
- * @phpstan-ignore-next-line trait.unused
- */
 trait FilterTrait
 {
     use RegexTrait;
 
-    /**
-     * @var Connection
-     */
-    protected $connection;
+    protected Connection $connection;
 
-    public function setConnection(Connection $connection): void
-    {
+    #[Required]
+    public function autowireFilterTrait(
+        Connection $connection,
+    ): void {
         $this->connection = $connection;
     }
 
@@ -313,7 +308,7 @@ trait FilterTrait
                 message: 'mautic.core.value.required'
             );
 
-            if (in_array($operator, ['regexp', '!regexp']) && $this->connection) {
+            if (in_array($operator, ['regexp', '!regexp'])) {
                 // Let's add a custom valdiator to test the regex
                 $customOptions['constraints'][] =
                     new Callback(

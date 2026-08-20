@@ -5,8 +5,6 @@ declare(strict_types=1);
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
-use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
-
 return function (ContainerConfigurator $configurator): void {
     $services = $configurator->services()
         ->defaults()
@@ -26,15 +24,6 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\FormBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
-    $services->set(Mautic\FormBundle\Form\Type\FieldType::class)
-        ->call('setFieldModel', [service('mautic.form.model.field')])
-        ->call('setFormModel', [service('mautic.form.model.form')]);
-    $services->set(Mautic\FormBundle\Form\Type\SubmitActionEmailType::class)
-        ->call('setFieldModel', [service('mautic.form.model.field')])
-        ->call('setFormModel', [service('mautic.form.model.form')]);
-    $services->set(Mautic\FormBundle\Form\Type\SubmitActionRepostType::class)
-        ->call('setFieldModel', [service('mautic.form.model.field')])
-        ->call('setFormModel', [service('mautic.form.model.form')]);
 
     $services->set(Mautic\FormBundle\Validator\Constraint\FileExtensionConstraintValidator::class)
         ->tag('validator.constraint_validator', ['alias' => 'file_extension_constraint_validator']);

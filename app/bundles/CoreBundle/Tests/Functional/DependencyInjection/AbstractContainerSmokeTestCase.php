@@ -46,7 +46,6 @@ abstract class AbstractContainerSmokeTestCase extends TestCase
         MemcachedTagAwareAdapter::class,
         RedisAdapter::class,
         RedisTagAwareAdapter::class,
-        'mautic.cache.adapter.memcached',
         'mautic.cache.adapter.redis',
         'mautic.cache.adapter.redis_tag_aware',
         'doctrine.uuid_generator',

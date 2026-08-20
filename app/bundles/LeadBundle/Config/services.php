@@ -80,8 +80,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->get(Mautic\LeadBundle\Entity\CompanyRepository::class)
         ->call('setUniqueIdentifiersOperator', ['%mautic.company_unique_identifiers_operator%']);
     $services->get(Mautic\LeadBundle\Entity\LeadRepository::class)
-        ->call('setUniqueIdentifiersOperator', ['%mautic.contact_unique_identifiers_operator%'])
-        ->call('setListLeadRepository', [\Symfony\Component\DependencyInjection\Loader\Configurator\service('mautic.lead.repository.list_lead')]);
+        ->call('setUniqueIdentifiersOperator', ['%mautic.contact_unique_identifiers_operator%']);
 
     $services->alias('mautic.lead.model.field', Mautic\LeadBundle\Model\FieldModel::class);
     $services->alias('mautic.lead.model.list', Mautic\LeadBundle\Model\ListModel::class);
@@ -94,6 +93,5 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.lead.model.dnc', Mautic\LeadBundle\Model\DoNotContact::class);
     $services->alias('mautic.lead.model.ipaddress', Mautic\LeadBundle\Model\IpAddressModel::class);
     $services->alias('mautic.lead.model.export_scheduler', Mautic\LeadBundle\Model\ContactExportSchedulerModel::class);
-    $services->alias('mautic.lead.repository.list_lead', Mautic\LeadBundle\Entity\ListLeadRepository::class);
     $services->set(Mautic\LeadBundle\Security\Permissions\LeadPermissions::class);
 };

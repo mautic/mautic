@@ -269,6 +269,9 @@ rules:
     - Utils\PHPStan\Rule\NoClassNameServiceAliasRule
     - Utils\PHPStan\Rule\NoAlreadyLoadedServiceSetRule
     - Utils\PHPStan\Rule\NoAutoconfiguredServiceTagRule
+    - Utils\PHPStan\Rule\PreferClassServiceReferenceRule
+    - Utils\PHPStan\Rule\NoRedundantAutowiredServiceArgumentRule
+    - Utils\PHPStan\Rule\NoServiceSetterCallRule
 
 services:
     - Utils\PHPStan\ServiceNameUsageResolver
@@ -290,5 +293,13 @@ services:
             - phpstan.collector
     -
         class: Utils\PHPStan\Collector\ServiceNameUsageCollector
+        tags:
+            - phpstan.collector
+    -
+        class: Utils\PHPStan\Collector\ClassTargetServiceAliasCollector
+        tags:
+            - phpstan.collector
+    -
+        class: Utils\PHPStan\Collector\ServiceStringReferenceCollector
         tags:
             - phpstan.collector
