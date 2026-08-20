@@ -139,9 +139,6 @@ class LeadFieldRepository extends CommonRepository
         return 'f';
     }
 
-    /**
-     * @param object $filter
-     */
     protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return $this->addStandardCatchAllWhereClause(

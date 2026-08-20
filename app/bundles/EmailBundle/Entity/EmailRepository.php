@@ -575,10 +575,7 @@ class EmailRepository extends CommonRepository
         return false;
     }
 
-    /**
-     * @param object $filter
-     */
-    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|QueryBuilder $queryBuilder, $filter): array
+    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return $this->addStandardCatchAllWhereClause($queryBuilder, $filter, [
             'e.name',
@@ -586,10 +583,7 @@ class EmailRepository extends CommonRepository
         ]);
     }
 
-    /**
-     * @param object $filter
-     */
-    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|QueryBuilder $queryBuilder, $filter): array
+    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($queryBuilder, $filter);
         if ($expr) {

@@ -1272,13 +1272,13 @@ parameters:
 		-
 			message: '#^Method Doctrine\\ORM\\Query\\Expr\:\:andX\(\) invoked with 2 parameters, 0\-1 required\.$#'
 			identifier: arguments.count
-			count: 1
+			count: 2
 			path: app/bundles/CoreBundle/Entity/CommonRepository.php
 
 		-
 			message: '#^Method Doctrine\\ORM\\Query\\Expr\:\:orX\(\) invoked with 2 parameters, 0\-1 required\.$#'
 			identifier: arguments.count
-			count: 1
+			count: 2
 			path: app/bundles/CoreBundle/Entity/CommonRepository.php
 
 		-
