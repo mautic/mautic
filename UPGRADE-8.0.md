@@ -179,3 +179,36 @@
     ```php
     $services->set(MauticPlugin\AcmeBundle\Security\Permissions\AcmePermissions::class);
     ```
+
+- The `Mautic\CoreBundle\DependencyInjection\Compiler\ServicePass` compiler pass was removed. It used to read the `services > menus` array from a bundle's `Config/config.php` and wire the menu item (`knp_menu.menu`) and its renderer (`knp_menu.renderer`) automatically. A bundle that registered its own menu must now declare both services explicitly in its `Config/services.php`.
+
+    Before — `Config/config.php`:
+
+    ```php
+    'services' => [
+        'menus' => [
+            'mautic.menu.mybundle' => [
+                'alias'   => 'mybundle',
+                'options' => ['template' => '@MyBundle/Menu/mybundle.html.twig'],
+            ],
+        ],
+    ],
+    ```
+
+    After — `Config/services.php`:
+
+    ```php
+    use Knp\Menu\MenuItem;
+    use Mautic\CoreBundle\Menu\MenuBuilder;
+    use Mautic\CoreBundle\Menu\MenuRenderer;
+
+    use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
+
+    $services->set('mautic.menu.mybundle', MenuItem::class)
+        ->factory([service(MenuBuilder::class), 'mybundleMenu'])
+        ->tag('knp_menu.menu', ['alias' => 'mybundle']);
+
+    $services->set('mautic.menu_renderer.mybundle', MenuRenderer::class)
+        ->args([service('knp_menu.matcher'), service('twig'), ['template' => '@MyBundle/Menu/mybundle.html.twig']])
+        ->tag('knp_menu.renderer', ['alias' => 'mybundle']);
+    ```

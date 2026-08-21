@@ -17,9 +17,6 @@ use PHPStan\Rules\RuleErrorBuilder;
 /**
  * Bundle Config/config.php must not define services, the autowired Config/services.php next to it is the place for them.
  *
- * The "menus" group is left alone - a menu is no service of its own, ServicePass builds it out of the KnpMenu builder
- * and gives it a renderer of its own, see Mautic\CoreBundle\DependencyInjection\Compiler\ServicePass.
- *
  * @implements Rule<Return_>
  */
 final class NoServicesInBundleConfigRule implements Rule
@@ -33,11 +30,6 @@ final class NoServicesInBundleConfigRule implements Rule
      * @var string
      */
     private const SERVICES_KEY_NAME = 'services';
-
-    /**
-     * @var string
-     */
-    private const MENUS_KEY_NAME = 'menus';
 
     /**
      * @var string
@@ -85,7 +77,7 @@ final class NoServicesInBundleConfigRule implements Rule
     }
 
     /**
-     * Every service group is reported on its own, the "menus" one being the only one left alone.
+     * Every service group is reported on its own, menus included.
      *
      * @return list<IdentifierRuleError>
      */
@@ -100,10 +92,6 @@ final class NoServicesInBundleConfigRule implements Rule
 
         foreach ($servicesValue->items as $groupArrayItem) {
             if (!$groupArrayItem->key instanceof String_) {
-                continue;
-            }
-
-            if (self::MENUS_KEY_NAME === $groupArrayItem->key->value) {
                 continue;
             }
 
