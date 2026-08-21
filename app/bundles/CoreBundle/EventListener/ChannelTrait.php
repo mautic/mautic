@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\EventListener;
 
 use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Model\AbstractCommonModel;
 
 trait ChannelTrait
 {
@@ -19,16 +20,16 @@ trait ChannelTrait
         $this->modelFactory = $modelFactory;
     }
 
-    protected function getChannelModel(string $channel): mixed
+    protected function getChannelModel(string $channel): ?AbstractCommonModel
     {
         if ($this->modelFactory->hasModel($channel)) {
             return $this->modelFactory->getModel($channel);
         }
 
-        return false;
+        return null;
     }
 
-    protected function getChannelEntity(string $channel, $channelId): mixed
+    protected function getChannelEntity(string $channel, $channelId): ?object
     {
         $channelEntity = null;
         if ($channelModel = $this->getChannelModel($channel)) {
@@ -47,10 +48,9 @@ trait ChannelTrait
      */
     protected function getChannelEntityName(string $channel, $channelId, bool $returnWithViewUrl = false): false|array|string
     {
-        if ($channelEntity = $this->getChannelEntity($channel, $channelId)) {
-            $channelModel = $this->getChannelModel($channel);
-            $name         = false;
-            if (method_exists($channelEntity, $channelModel->getNameGetter())) {
+        if (($channelEntity = $this->getChannelEntity($channel, $channelId)) && $channelModel = $this->getChannelModel($channel)) {
+            $name = false;
+            if (method_exists($channelModel, 'getNameGetter') && method_exists($channelEntity, $channelModel->getNameGetter())) {
                 $name = $channelEntity->{$channelModel->getNameGetter()}();
             }
 
