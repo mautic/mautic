@@ -162,6 +162,7 @@ final class SourceControllerTest extends MauticMysqlTestCase
             'campaign_leadsource' => [
                 'sourceType' => 'lists',
                 'lists'      => [(string) $segment->getId()],
+                '_token'     => $this->getCsrfToken('campaign_leadsource'),
             ],
             'submit' => '1',
         ];
