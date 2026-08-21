@@ -42,8 +42,12 @@ final class AssetsHelper
         private readonly AssetGenerationHelper $assetHelper,
         private readonly BuilderIntegrationsHelper $builderIntegrationsHelper,
         private readonly InstallService $installService,
-        #[Autowire(param: 'mautic.site_url')] string $siteUrl,
+        #[Autowire(param: 'mautic.site_url')] ?string $siteUrl,
     ) {
+        if (null === $siteUrl) {
+            $siteUrl = '';
+        }
+
         if ($siteUrl && str_ends_with($siteUrl, '/')) {
             $siteUrl = substr($siteUrl, 0, -1);
         }
