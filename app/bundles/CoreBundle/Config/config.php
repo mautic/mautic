@@ -155,31 +155,6 @@ return [
             ],
         ],
     ],
-    'services' => [
-        'menus' => [
-            'mautic.menu.main' => [
-                'alias' => 'main',
-            ],
-            'mautic.menu.admin' => [
-                'alias'   => 'admin',
-                'options' => [
-                    'template' => '@MauticCore/Menu/admin.html.twig',
-                ],
-            ],
-            'mautic.menu.extra' => [
-                'alias'   => 'extra',
-                'options' => [
-                    'template' => '@MauticCore/Menu/extra.html.twig',
-                ],
-            ],
-            'mautic.menu.profile' => [
-                'alias'   => 'profile',
-                'options' => [
-                    'template' => '@MauticCore/Menu/profile_inline.html.twig',
-                ],
-            ],
-        ],
-    ],
 
     'ip_lookup_services' => [
         'extreme-ip' => [
