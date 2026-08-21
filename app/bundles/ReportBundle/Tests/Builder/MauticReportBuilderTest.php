@@ -300,6 +300,21 @@ final class MauticReportBuilderTest extends TestCase
         Assert::assertNull($builder->getTagCondition($filters[2]));
     }
 
+    public function testTagFilterValuesAreCastToIntegers(): void
+    {
+        $filter = [
+            'column'    => 'tag',
+            'glue'      => 'and',
+            'value'     => ['1', 'abc', '2def'],
+            'condition' => 'in',
+        ];
+
+        $builder   = $this->buildBuilder(new Report());
+        $condition = $builder->getTagCondition($filter);
+
+        Assert::assertSame('l.id IN (SELECT DISTINCT lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_tags_xref ltx WHERE ltx.tag_id IN (1, 0, 2))', $condition);
+    }
+
     private function buildBuilder(Report $report): MauticReportBuilder
     {
         return new MauticReportBuilder(

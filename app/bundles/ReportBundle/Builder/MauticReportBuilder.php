@@ -488,7 +488,9 @@ final class MauticReportBuilder implements ReportBuilderInterface
             ->from(MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'ltx');
 
         if (in_array($filter['condition'], ['in', 'notIn']) && !empty($filter['value'])) {
-            $tagSubQuery->where($tagSubQuery->expr()->in('ltx.tag_id', $filter['value']));
+            // Cast every tag id to an integer so the inlined IN list can never carry SQL.
+            $tagIds = array_map(static fn ($value): string => (string) (int) $value, (array) $filter['value']);
+            $tagSubQuery->where($tagSubQuery->expr()->in('ltx.tag_id', $tagIds));
         }
 
         if (in_array($filter['condition'], ['in', 'notEmpty'])) {
