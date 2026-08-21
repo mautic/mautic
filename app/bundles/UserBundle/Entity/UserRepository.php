@@ -204,10 +204,10 @@ class UserRepository extends CommonRepository
         return $q->getQuery()->getArrayResult();
     }
 
-    protected function addCatchAllWhereClause($q, $filter): array
+    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
-            $q,
+            $queryBuilder,
             $filter,
             [
                 'u.username',
@@ -220,63 +220,63 @@ class UserRepository extends CommonRepository
         );
     }
 
-    protected function addSearchCommandWhereClause($q, $filter): array
+    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         $command                 = $filter->command;
         $unique                  = $this->generateRandomParameterName();
         $returnParameter         = false; // returning a parameter that is not used will lead to a Doctrine error
-        [$expr, $parameters]     = parent::addSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters]     = parent::addSearchCommandWhereClause($queryBuilder, $filter);
 
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
             case $this->translator->trans('mautic.core.searchcommand.ispublished', [], null, 'en_US'):
-                $expr            = $q->expr()->eq('u.isPublished', ":{$unique}");
+                $expr            = $queryBuilder->expr()->eq('u.isPublished', ":{$unique}");
                 $forceParameters = [$unique => true];
 
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
             case $this->translator->trans('mautic.core.searchcommand.isunpublished', [], null, 'en_US'):
-                $expr            = $q->expr()->eq('u.isPublished', ":{$unique}");
+                $expr            = $queryBuilder->expr()->eq('u.isPublished', ":{$unique}");
                 $forceParameters = [$unique => false];
 
                 break;
             case $this->translator->trans('mautic.user.user.searchcommand.isadmin'):
             case $this->translator->trans('mautic.user.user.searchcommand.isadmin', [], null, 'en_US'):
-                $expr            = $q->expr()->eq('r.isAdmin', ":{$unique}");
+                $expr            = $queryBuilder->expr()->eq('r.isAdmin', ":{$unique}");
                 $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.core.searchcommand.email'):
             case $this->translator->trans('mautic.core.searchcommand.email', [], null, 'en_US'):
-                $expr            = $q->expr()->like('u.email', ':'.$unique);
+                $expr            = $queryBuilder->expr()->like('u.email', ':'.$unique);
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.user.user.searchcommand.position'):
             case $this->translator->trans('mautic.user.user.searchcommand.position', [], null, 'en_US'):
-                $expr            = $q->expr()->like('u.position', ':'.$unique);
+                $expr            = $queryBuilder->expr()->like('u.position', ':'.$unique);
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.user.user.searchcommand.username'):
             case $this->translator->trans('mautic.user.user.searchcommand.username', [], null, 'en_US'):
-                $expr            = $q->expr()->like('u.username', ':'.$unique);
+                $expr            = $queryBuilder->expr()->like('u.username', ':'.$unique);
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.user.user.searchcommand.role'):
             case $this->translator->trans('mautic.user.user.searchcommand.role', [], null, 'en_US'):
-                $expr            = $q->expr()->like('r.name', ':'.$unique);
+                $expr            = $queryBuilder->expr()->like('r.name', ':'.$unique);
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
             case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
                 // This if/else can be removed once we upgrade to Dotrine 2.11 as both builders have the or() method there.
-                if ($q instanceof QueryBuilder) {
-                    $expr = $q->expr()->or(
-                        $q->expr()->like('u.firstName', ':'.$unique),
-                        $q->expr()->like('u.lastName', ':'.$unique)
+                if ($queryBuilder instanceof QueryBuilder) {
+                    $expr = $queryBuilder->expr()->or(
+                        $queryBuilder->expr()->like('u.firstName', ':'.$unique),
+                        $queryBuilder->expr()->like('u.lastName', ':'.$unique)
                     );
                 } else {
-                    $expr = $q->expr()->orX(
-                        $q->expr()->like('u.firstName', ':'.$unique),
-                        $q->expr()->like('u.lastName', ':'.$unique)
+                    $expr = $queryBuilder->expr()->orX(
+                        $queryBuilder->expr()->like('u.firstName', ':'.$unique),
+                        $queryBuilder->expr()->like('u.lastName', ':'.$unique)
                     );
                 }
                 $returnParameter = true;

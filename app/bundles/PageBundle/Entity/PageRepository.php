@@ -114,10 +114,10 @@ class PageRepository extends CommonRepository
         return $q->getQuery()->getArrayResult();
     }
 
-    protected function addCatchAllWhereClause($q, $filter): array
+    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
-            $q,
+            $queryBuilder,
             $filter,
             [
                 'p.title',
@@ -126,9 +126,9 @@ class PageRepository extends CommonRepository
         );
     }
 
-    protected function addSearchCommandWhereClause($q, $filter): array
+    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
-        [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($queryBuilder, $filter);
         if ($expr) {
             return [$expr, $parameters];
         }
@@ -162,12 +162,12 @@ class PageRepository extends CommonRepository
                     $langUnique => $langValue,
                     $unique     => $filter->string,
                 ];
-                $expr            = '('.$q->expr()->eq('p.language', ":{$unique}").' OR '.$q->expr()->like('p.language', ":{$langUnique}").')';
+                $expr            = '('.$queryBuilder->expr()->eq('p.language', ":{$unique}").' OR '.$queryBuilder->expr()->like('p.language', ":{$langUnique}").')';
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.page.searchcommand.isprefcenter'):
             case $this->translator->trans('mautic.page.searchcommand.isprefcenter', [], null, 'en_US'):
-                $expr            = $q->expr()->eq('p.isPreferenceCenter', ":{$unique}");
+                $expr            = $queryBuilder->expr()->eq('p.isPreferenceCenter', ":{$unique}");
                 $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.project.searchcommand.name'):
@@ -183,7 +183,7 @@ class PageRepository extends CommonRepository
         }
 
         if ($expr && $filter->not) {
-            $expr = $q->expr()->not($expr);
+            $expr = $queryBuilder->expr()->not($expr);
         }
 
         if (!empty($forceParameters)) {

@@ -82,10 +82,10 @@ class RoleRepository extends CommonRepository
         return $q->getQuery()->getArrayResult();
     }
 
-    protected function addCatchAllWhereClause($q, $filter): array
+    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
-            $q,
+            $queryBuilder,
             $filter,
             [
                 'r.name',
@@ -94,27 +94,27 @@ class RoleRepository extends CommonRepository
         );
     }
 
-    protected function addSearchCommandWhereClause($q, $filter): array
+    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         $command                 = $filter->command;
         $unique                  = $this->generateRandomParameterName();
         $returnParameter         = false; // returning a parameter that is not used will lead to a Doctrine error
-        [$expr, $parameters]     = parent::addSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters]     = parent::addSearchCommandWhereClause($queryBuilder, $filter);
 
         switch ($command) {
             case $this->translator->trans('mautic.user.user.searchcommand.isadmin'):
             case $this->translator->trans('mautic.user.user.searchcommand.isadmin', [], null, 'en_US'):
-                $expr = $q->expr()->eq('r.isAdmin', 1);
+                $expr = $queryBuilder->expr()->eq('r.isAdmin', 1);
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
             case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
-                $expr            = $q->expr()->like('r.name', ':'.$unique);
+                $expr            = $queryBuilder->expr()->like('r.name', ':'.$unique);
                 $returnParameter = true;
                 break;
         }
 
         if ($filter->not) {
-            $expr = $q->expr()->not($expr);
+            $expr = $queryBuilder->expr()->not($expr);
         }
 
         if ($returnParameter) {

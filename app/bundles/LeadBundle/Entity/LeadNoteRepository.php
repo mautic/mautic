@@ -66,13 +66,10 @@ class LeadNoteRepository extends CommonRepository
         return 'n';
     }
 
-    /**
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     */
-    protected function addCatchAllWhereClause($q, $filter): array
+    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
-            $q,
+            $queryBuilder,
             $filter,
             [
                 'n.text',
@@ -80,16 +77,13 @@ class LeadNoteRepository extends CommonRepository
         );
     }
 
-    /**
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     */
-    protected function addSearchCommandWhereClause($q, $filter): array
+    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         $command                 = $filter->command;
         $string                  = $filter->string;
         $unique                  = $this->generateRandomParameterName();
         $returnParameter         = false; // returning a parameter that is not used will lead to a Doctrine error
-        [$expr, $parameters]     = parent::addSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters]     = parent::addSearchCommandWhereClause($queryBuilder, $filter);
 
         switch ($command) {
             case $this->translator->trans('mautic.lead.note.searchcommand.type'):
@@ -116,13 +110,13 @@ class LeadNoteRepository extends CommonRepository
                         $returnParameter = true;
                         break;
                 }
-                $expr           = $q->expr()->eq('n.type', ":{$unique}");
+                $expr           = $queryBuilder->expr()->eq('n.type', ":{$unique}");
                 $filter->strict = true;
                 break;
         }
 
         if ($expr && $filter->not) {
-            $expr = $q->expr()->not($expr);
+            $expr = $queryBuilder->expr()->not($expr);
         }
 
         if ($returnParameter) {
