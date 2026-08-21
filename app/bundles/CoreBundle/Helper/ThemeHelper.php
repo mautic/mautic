@@ -407,7 +407,7 @@ class ThemeHelper implements ThemeHelperInterface
 
         if (!is_dir($themePath) && !mkdir($themePath, 0755, true) && !is_dir($themePath)) {
             $zipper->close();
-            throw new \Exception('mautic.core.update.error_extracting_package');
+            throw new \Exception($this->translator->trans('mautic.core.update.error_extracting_package'));
         }
 
         foreach ($allowedFiles as $file) {
@@ -420,13 +420,13 @@ class ThemeHelper implements ThemeHelperInterface
                 $destination = $this->getSafeThemeDestination($themePath, $targetFile);
             } catch (\Exception) {
                 $zipper->close();
-                throw new \Exception('mautic.core.update.error_extracting_package');
+                throw new \Exception($this->translator->trans('mautic.core.update.error_extracting_package'));
             }
 
             if (str_ends_with($file, '/')) {
                 if (!is_dir($destination) && !mkdir($destination, 0755, true) && !is_dir($destination)) {
                     $zipper->close();
-                    throw new \Exception('mautic.core.update.error_extracting_package');
+                    throw new \Exception($this->translator->trans('mautic.core.update.error_extracting_package'));
                 }
 
                 continue;
@@ -435,21 +435,21 @@ class ThemeHelper implements ThemeHelperInterface
             $stream = $zipper->getStream($file);
             if (!$stream) {
                 $zipper->close();
-                throw new \Exception('mautic.core.update.error_extracting_package');
+                throw new \Exception($this->translator->trans('mautic.core.update.error_extracting_package'));
             }
 
             $destinationDir = dirname($destination);
             if (!is_dir($destinationDir) && !mkdir($destinationDir, 0755, true) && !is_dir($destinationDir)) {
                 fclose($stream);
                 $zipper->close();
-                throw new \Exception('mautic.core.update.error_extracting_package');
+                throw new \Exception($this->translator->trans('mautic.core.update.error_extracting_package'));
             }
 
             $target = fopen($destination, 'wb');
             if (!$target) {
                 fclose($stream);
                 $zipper->close();
-                throw new \Exception('mautic.core.update.error_extracting_package');
+                throw new \Exception($this->translator->trans('mautic.core.update.error_extracting_package'));
             }
 
             while (!feof($stream)) {
@@ -458,7 +458,7 @@ class ThemeHelper implements ThemeHelperInterface
                     fclose($target);
                     fclose($stream);
                     $zipper->close();
-                    throw new \Exception('mautic.core.update.error_extracting_package');
+                    throw new \Exception($this->translator->trans('mautic.core.update.error_extracting_package'));
                 }
 
                 if ('' !== $chunk) {
@@ -509,7 +509,7 @@ class ThemeHelper implements ThemeHelperInterface
         $destination = Path::canonicalize($themePath.'/'.$relativePath);
 
         if ($destination !== $themeRoot && !Path::isBasePath($themeRoot, $destination)) {
-            throw new \Exception('mautic.core.update.error_extracting_package');
+            throw new \Exception($this->translator->trans('mautic.core.update.error_extracting_package'));
         }
 
         return $destination;
