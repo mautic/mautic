@@ -23,7 +23,7 @@ final class CampaignSubscriberTest extends TestCase
         $integrationHelper->method('getIntegrationObjects')->willReturn([]);
 
         $subscriber = new CampaignSubscriber();
-        $subscriber->setIntegrationHelper($integrationHelper);
+        $subscriber->autowirePushToIntegrationTrait($integrationHelper);
 
         $pendingEvent = $this->createPendingEvent();
 
