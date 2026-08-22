@@ -61,20 +61,17 @@ final class LeadTimelineEvent extends Event
     ];
 
     /**
-     * @param Lead|null   $lead        Lead entity for the lead the timeline is being generated for
-     * @param int         $page
-     * @param int         $limit       Limit per type
-     * @param bool        $forTimeline
-     * @param string|null $siteDomain
+     * @param Lead|null $lead  Lead entity for the lead the timeline is being generated for
+     * @param int       $limit Limit per type
      */
     public function __construct(
         private readonly ?Lead $lead = null,
         array $filters = [],
         private readonly ?array $orderBy = null,
-        private $page = 1,
-        private $limit = 25,
-        private $forTimeline = true,
-        private $siteDomain = null,
+        private int $page = 1,
+        private int $limit = 25,
+        private bool $forTimeline = true,
+        private ?string $siteDomain = null,
     ) {
         $this->filters = [] !== $filters
             ? $filters
