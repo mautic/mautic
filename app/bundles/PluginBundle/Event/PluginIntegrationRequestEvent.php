@@ -11,28 +11,22 @@ class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
 
     public function __construct(
         UnifiedIntegrationInterface $integration,
-        private string $url,
+        private readonly string $url,
         private array $parameters,
         private array $headers,
-        private string $method,
-        private array $settings,
-        private string $authType,
+        private readonly string $method,
+        private readonly array $settings,
+        private readonly string $authType,
     ) {
         $this->integration = $integration;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getUrl()
+    public function getUrl(): string
     {
         return $this->url;
     }
 
-    /**
-     * @return array
-     */
-    public function getParameters()
+    public function getParameters(): array
     {
         return $this->parameters;
     }
@@ -42,26 +36,17 @@ class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
         $this->parameters = $parameters;
     }
 
-    /**
-     * @return string
-     */
-    public function getMethod()
+    public function getMethod(): string
     {
         return $this->method;
     }
 
-    /**
-     * @return array
-     */
-    public function getSettings()
+    public function getSettings(): array
     {
         return $this->settings;
     }
 
-    /**
-     * @return string
-     */
-    public function getAuthType()
+    public function getAuthType(): string
     {
         return $this->authType;
     }
@@ -76,10 +61,7 @@ class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
         return $this->response;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getHeaders()
+    public function getHeaders(): array
     {
         return $this->headers;
     }

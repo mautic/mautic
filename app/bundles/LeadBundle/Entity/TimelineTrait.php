@@ -91,7 +91,7 @@ trait TimelineTrait
 
         $results = $query->executeQuery()->fetchAllAssociative();
 
-        if ($serializedColumns !== [] || $dateTimeColumns !== [] || is_callable($resultsParserCallback)) {
+        if ([] !== $serializedColumns || [] !== $dateTimeColumns || is_callable($resultsParserCallback)) {
             // Convert to array or \DateTime since we're using DBAL here
             foreach ($results as &$result) {
                 foreach ($serializedColumns as $col) {
