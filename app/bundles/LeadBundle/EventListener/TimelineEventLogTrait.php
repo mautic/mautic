@@ -18,7 +18,7 @@ trait TimelineEventLogTrait
      */
     private $eventLogRepository;
 
-    private function addEvents(LeadTimelineEvent $event, $eventType, $eventTypeName, $icon, $bundle = null, $object = null, $action = null, $contentTemplate = null): void
+    private function addEvents(LeadTimelineEvent $event, string $eventType, string $eventTypeName, string $icon, ?string $bundle = null, ?string $object = null, ?string $action = null, ?string $contentTemplate = null): void
     {
         $eventTypeName = $this->translator->trans($eventTypeName);
         $event->addEventType($eventType, $eventTypeName);
