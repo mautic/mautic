@@ -25,10 +25,10 @@ trait TimelineTrait
     private function getTimelineResults(
         QueryBuilder $query,
         array $options,
-        $eventNameColumn,
-        $timestampColumn,
-        $serializedColumns = [],
-        $dateTimeColumns = [],
+        string $eventNameColumn,
+        string $timestampColumn,
+        array $serializedColumns = [],
+        array $dateTimeColumns = [],
         $resultsParserCallback = null,
         ?string $secondaryOrdering = null,
     ) {
