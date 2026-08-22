@@ -46,19 +46,18 @@ class AuthenticationEvent extends Event
     protected $failedAuthMessage;
 
     /**
-     * @param string|User|null                $user
      * @param bool                            $isLoginCheck          Event executed from the mautic_sso_login_check route typically used as the SSO callback
      * @param string                          $authenticatingService Service Service requesting authentication
      * @param array<AbstractIntegration>|null $integrations
      */
     public function __construct(
-        protected $user,
+        protected string|User|null $user,
         protected TokenInterface $token,
         UserProviderInterface $userProvider,
         protected Request $request,
-        protected $isLoginCheck = false,
-        protected $authenticatingService = null,
-        protected $integrations = null,
+        protected bool $isLoginCheck = false,
+        protected ?string $authenticatingService = null,
+        protected ?array $integrations = null,
     ) {
         $this->isFormLogin           = $token instanceof UsernamePasswordToken;
 
