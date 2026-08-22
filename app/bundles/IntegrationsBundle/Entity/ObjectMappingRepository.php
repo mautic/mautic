@@ -189,14 +189,11 @@ class ObjectMappingRepository extends CommonRepository
     }
 
     /**
-     * @param string $integration
-     * @param string $integrationObjectName
      * @param string $integrationObjectId
-     * @param string $internalObjectName
      *
      * @return mixed[]|null
      */
-    private function doGetInternalObject($integration, $integrationObjectName, $integrationObjectId, $internalObjectName, ?string $lock = null): ?array
+    private function doGetInternalObject(string $integration, string $integrationObjectName, $integrationObjectId, string $internalObjectName, ?string $lock = null): ?array
     {
         $connection = $this->getEntityManager()->getConnection();
         $qb         = $connection->createQueryBuilder();
