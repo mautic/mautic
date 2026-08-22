@@ -9,20 +9,14 @@ class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
 {
     private ?ResponseInterface $response = null;
 
-    /**
-     * @param mixed[] $parameters
-     * @param string  $method
-     * @param mixed[] $settings
-     * @param string  $authType
-     */
     public function __construct(
         UnifiedIntegrationInterface $integration,
-        private $url,
-        private $parameters,
-        private $headers,
-        private $method,
-        private $settings,
-        private $authType,
+        private string $url,
+        private array $parameters,
+        private array $headers,
+        private string $method,
+        private array $settings,
+        private string $authType,
     ) {
         $this->integration = $integration;
     }
