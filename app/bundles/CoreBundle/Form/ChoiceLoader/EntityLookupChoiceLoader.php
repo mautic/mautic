@@ -77,12 +77,7 @@ final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         $this->selected = $this->sanitizeIds($event->getData());
     }
 
-    /**
-     * @param array|null $data
-     *
-     * @return array
-     */
-    private function getChoices($data = null, bool $includeNew = false)
+    private function getChoices(?array $data = null, bool $includeNew = false): array
     {
         if (null === $data) {
             $data = $this->selected;
@@ -143,10 +138,7 @@ final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         return $prepped;
     }
 
-    /**
-     * @return array
-     */
-    private function prepareChoices($choices)
+    private function prepareChoices(array $choices): array
     {
         $prepped   = $choices;
         $isGrouped = false;
@@ -182,7 +174,7 @@ final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     /**
      * @return array|mixed
      */
-    private function fetchChoices($modelName, array $data = [])
+    private function fetchChoices(string $modelName, array $data = [])
     {
         $labelColumn = $this->options['entity_label_column'];
         $idColumn    = $this->options['entity_id_column'];
