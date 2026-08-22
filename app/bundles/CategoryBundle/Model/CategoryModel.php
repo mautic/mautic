@@ -21,6 +21,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 class CategoryModel extends FormModel implements AjaxLookupModelInterface
 {
+    public static function getName(): string
+    {
+        return 'category.category';
+    }
+
     /**
      * @var array<string,mixed[]>
      */

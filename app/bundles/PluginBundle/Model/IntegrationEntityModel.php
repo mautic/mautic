@@ -13,6 +13,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 class IntegrationEntityModel extends FormModel
 {
+    public static function getName(): string
+    {
+        return 'plugin.integration_entity';
+    }
+
     private IntegrationEntityRepository $integrationEntityRepository;
 
     #[Required]

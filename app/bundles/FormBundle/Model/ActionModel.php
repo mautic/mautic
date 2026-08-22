@@ -14,6 +14,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 class ActionModel extends CommonFormModel
 {
+    public static function getName(): string
+    {
+        return 'form.action';
+    }
+
     private ActionRepository $actionRepository;
 
     #[Required]

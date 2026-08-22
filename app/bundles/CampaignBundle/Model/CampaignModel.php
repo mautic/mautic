@@ -50,6 +50,11 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class CampaignModel extends CommonFormModel implements GlobalSearchInterface
 {
+    public static function getName(): string
+    {
+        return 'campaign.campaign';
+    }
+
     public function __construct(
         protected ListModel $leadListModel,
         protected FormModel $formModel,

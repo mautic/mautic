@@ -20,6 +20,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 final class NoteModel extends FormModel
 {
+    public static function getName(): string
+    {
+        return 'lead.note';
+    }
+
     private RequestStack $requestStack;
 
     private LeadNoteRepository $leadNoteRepository;

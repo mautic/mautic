@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Factory;
 
 use Mautic\CoreBundle\Model\MauticModelInterface;
+use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
 /**
@@ -10,7 +11,13 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
  */
 class ModelFactory
 {
+    /**
+     * Tag applied (via autoconfiguration) to every MauticModelInterface service.
+     */
+    public const string TAG = 'mautic.model';
+
     public function __construct(
+        #[AutowireLocator(self::TAG, defaultIndexMethod: 'getName')]
         private readonly ServiceLocator $container,
     ) {
     }
@@ -69,31 +76,17 @@ class ModelFactory
      */
     public function getModel(string $modelNameKey): MauticModelInterface
     {
-        if (class_exists($modelNameKey) && $this->container->has($modelNameKey)) {
-            return $this->container->get($modelNameKey);
-        }
-
-        // Shortcut for models with the same name as the bundle
+        // Shortcut for models with the same name as the bundle, e.g. "lead" => "lead.lead"
         if (!str_contains($modelNameKey, '.')) {
             $modelNameKey = "{$modelNameKey}.{$modelNameKey}";
         }
 
-        $parts = explode('.', $modelNameKey);
-
-        if (2 !== count($parts)) {
-            throw new \InvalidArgumentException($modelNameKey.' is not a valid model key.');
+        // Each model is registered in the locator under the key returned by its static getName() method.
+        if ($this->container->has($modelNameKey)) {
+            return $this->container->get($modelNameKey);
         }
 
-        [$bundle, $name] = $parts;
-
-        // The container is now case sensitive
-        $containerKey = sprintf('mautic.%s.model.%s', $bundle, $name);
-
-        if ($this->container->has($containerKey)) {
-            return $this->container->get($containerKey);
-        }
-
-        throw new \InvalidArgumentException($containerKey.' is not a registered model container key.');
+        throw new \InvalidArgumentException($modelNameKey.' is not a registered model key.');
     }
 
     public function hasModel(string $modelNameKey): bool

@@ -44,6 +44,11 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class FieldModel extends FormModel
 {
+    public static function getName(): string
+    {
+        return 'lead.field';
+    }
+
     public static $coreFields = [
         // Listed according to $order for installation
         'title' => [

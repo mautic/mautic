@@ -16,6 +16,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 class RedirectModel extends FormModel
 {
+    public static function getName(): string
+    {
+        return 'page.redirect';
+    }
+
     private Shortener $shortener;
 
     private RedirectRepository $redirectRepository;

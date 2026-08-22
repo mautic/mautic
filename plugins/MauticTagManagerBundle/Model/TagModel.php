@@ -13,6 +13,11 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 final class TagModel extends BaseTagModel implements GlobalSearchInterface
 {
+    public static function getName(): string
+    {
+        return 'tagmanager.tag';
+    }
+
     private TagRepository $tagRepository;
 
     #[Required]

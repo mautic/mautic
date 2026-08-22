@@ -24,6 +24,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 final class TweetModel extends FormModel implements AjaxLookupModelInterface
 {
+    public static function getName(): string
+    {
+        return 'social.tweet';
+    }
+
     private TweetStatRepository $tweetStatRepository;
 
     private TweetRepository $tweetRepository;

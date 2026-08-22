@@ -28,24 +28,47 @@ final class ModelFactoryTest extends TestCase
         $this->factory   = new ModelFactory($this->container);
     }
 
-    public function testModelKeyIsLowerCaseToMatchServiceKeys(): void
+    public function testGetModelLooksUpByModelKey(): void
     {
-        $pointTriggerModel = $this->createStub(TriggerModel::class);
-        $modelName         = 'point.triggerEvent';
-        $containerKey      = 'mautic.point.model.triggerEvent';
+        $triggerModel = $this->createStub(TriggerModel::class);
+        $modelKey     = 'point.trigger';
 
         $this->container->expects($this->once())
             ->method('has')
-            ->with($containerKey)
+            ->with($modelKey)
             ->willReturn(true);
 
         $this->container->expects($this->once())
             ->method('get')
-            ->with($containerKey)
-            ->willReturn($pointTriggerModel);
+            ->with($modelKey)
+            ->willReturn($triggerModel);
 
-        $givenPointTriggerModel = $this->factory->getModel($modelName);
+        $this->assertInstanceOf(TriggerModel::class, $this->factory->getModel($modelKey));
+    }
 
-        $this->assertInstanceOf(TriggerModel::class, $givenPointTriggerModel);
+    public function testGetModelExpandsSingleWordKeyToBundleDotName(): void
+    {
+        $pointModel = $this->createStub(TriggerModel::class);
+
+        $this->container->expects($this->once())
+            ->method('has')
+            ->with('point.point')
+            ->willReturn(true);
+
+        $this->container->expects($this->once())
+            ->method('get')
+            ->with('point.point')
+            ->willReturn($pointModel);
+
+        $this->assertInstanceOf(TriggerModel::class, $this->factory->getModel('point'));
+    }
+
+    public function testGetModelThrowsWhenModelKeyIsNotRegistered(): void
+    {
+        $this->container->method('has')->willReturn(false);
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->factory->getModel('point.missing');
     }
 }

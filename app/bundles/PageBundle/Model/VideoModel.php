@@ -18,6 +18,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 final class VideoModel extends FormModel
 {
+    public static function getName(): string
+    {
+        return 'page.video';
+    }
+
     private IpLookupHelper $ipLookupHelper;
 
     private ContactTracker $contactTracker;

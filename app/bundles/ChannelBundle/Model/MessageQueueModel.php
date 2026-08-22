@@ -22,6 +22,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 class MessageQueueModel extends FormModel
 {
+    public static function getName(): string
+    {
+        return 'channel.queue';
+    }
+
     /**
      * @var string A default message reschedule interval
      */

@@ -37,6 +37,11 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class PointModel extends CommonFormModel implements GlobalSearchInterface, ResetInterface
 {
+    public static function getName(): string
+    {
+        return 'point.point';
+    }
+
     /**
      * @var array<string, mixed>
      */

@@ -38,6 +38,11 @@ use Twig\Environment;
  */
 class UserModel extends FormModel implements GlobalSearchInterface
 {
+    public static function getName(): string
+    {
+        return 'user.user';
+    }
+
     private const int INVITE_TOKEN_SELECTOR_BYTES = 16;
 
     private const int INVITE_TOKEN_VERIFIER_BYTES = 32;

@@ -164,6 +164,17 @@
 
 ## Changed code
 
+- `Mautic\CoreBundle\Factory\ModelFactory` now builds its service locator from a `defaultIndexMethod` on the `mautic.model` tag, replacing the removed `Mautic\CoreBundle\DependencyInjection\Compiler\ModelPass`. Every model (a service implementing `Mautic\CoreBundle\Model\MauticModelInterface`) declares its `ModelFactory::getModel()` lookup key via a static `getName()` method:
+
+    ```php
+    public static function getName(): string
+    {
+        return 'lead.lead';
+    }
+    ```
+
+    A custom model without `getName()` is still registered in the locator, but only under its fully-qualified class name; add the method so `$modelFactory->getModel('yourbundle.yourmodel')` can resolve it. `ModelFactory::getModel()` now resolves keys solely through this method and no longer accepts a fully-qualified class name.
+
 - `Mautic\CoreBundle\Security\Permissions\AbstractPermissions::definePermissions()` was removed. Define the permissions in the constructor instead:
 
     ```diff

@@ -48,6 +48,11 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class AssetModel extends FormModel implements GlobalSearchInterface
 {
+    public static function getName(): string
+    {
+        return 'asset.asset';
+    }
+
     /**
      * @var int
      */

@@ -51,6 +51,11 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
 {
     use TranslationModelTrait;
 
+    public static function getName(): string
+    {
+        return 'sms.sms';
+    }
+
     public function __construct(
         protected TrackableModel $pageTrackableModel,
         protected LeadModel $leadModel,

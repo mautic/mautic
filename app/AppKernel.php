@@ -204,7 +204,7 @@ class AppKernel extends Kernel
     protected function build(ContainerBuilder $container): void
     {
         $container->registerForAutoconfiguration(Mautic\CoreBundle\Model\MauticModelInterface::class)
-            ->addTag(Mautic\CoreBundle\DependencyInjection\Compiler\ModelPass::TAG);
+            ->addTag(Mautic\CoreBundle\Factory\ModelFactory::TAG);
     }
 
     public function boot(): void

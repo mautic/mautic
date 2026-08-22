@@ -43,6 +43,11 @@ use Twig\Runtime\EscaperRuntime;
  */
 class FocusModel extends FormModel implements GlobalSearchInterface
 {
+    public static function getName(): string
+    {
+        return 'focus.focus';
+    }
+
     public function __construct(
         protected \Mautic\FormBundle\Model\FormModel $formModel,
         protected TrackableModel $trackableModel,

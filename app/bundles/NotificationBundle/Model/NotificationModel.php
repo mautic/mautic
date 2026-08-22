@@ -33,6 +33,11 @@ final class NotificationModel extends FormModel implements AjaxLookupModelInterf
 {
     use TranslationModelTrait;
 
+    public static function getName(): string
+    {
+        return 'notification.notification';
+    }
+
     private TrackableModel $pageTrackableModel;
 
     private NotificationRepository $notificationRepository;

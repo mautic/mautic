@@ -21,6 +21,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 final class InsightModel extends CommonFormModel
 {
+    public static function getName(): string
+    {
+        return 'point.insight';
+    }
+
     private LeadModel $leadModel;
 
     private PointInsightRepository $pointInsightRepository;
