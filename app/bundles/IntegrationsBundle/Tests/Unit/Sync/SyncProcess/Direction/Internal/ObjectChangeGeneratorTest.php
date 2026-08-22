@@ -81,11 +81,11 @@ final class ObjectChangeGeneratorTest extends TestCase
         $this->assertSame($integration, $objectChangeDAO->getIntegration());
 
         // object and object ID should be Mautic's (from the Mautic's POV)
-        $this->assertEquals(Contact::NAME, $objectChangeDAO->getObject());
+        $this->assertSame(Contact::NAME, $objectChangeDAO->getObject());
         $this->assertEquals(1, $objectChangeDAO->getObjectId());
 
         // mapped object and ID should be the integrations
-        $this->assertEquals($objectName, $objectChangeDAO->getMappedObject());
+        $this->assertSame($objectName, $objectChangeDAO->getMappedObject());
         $this->assertEquals(2, $objectChangeDAO->getMappedObjectId());
 
         // Email should be a required field
@@ -148,11 +148,11 @@ final class ObjectChangeGeneratorTest extends TestCase
         $this->assertSame($integration, $objectChangeDAO->getIntegration());
 
         // object and object ID should be Mautic's (from the Mautic's POV)
-        $this->assertEquals(Contact::NAME, $objectChangeDAO->getObject());
+        $this->assertSame(Contact::NAME, $objectChangeDAO->getObject());
         $this->assertEquals(1, $objectChangeDAO->getObjectId());
 
         // mapped object and ID should be the integrations
-        $this->assertEquals($objectName, $objectChangeDAO->getMappedObject());
+        $this->assertSame($objectName, $objectChangeDAO->getMappedObject());
         $this->assertEquals(2, $objectChangeDAO->getMappedObjectId());
 
         // Email should be a required field

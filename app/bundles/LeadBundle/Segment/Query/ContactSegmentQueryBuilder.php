@@ -38,12 +38,11 @@ final class ContactSegmentQueryBuilder
     }
 
     /**
-     * @param int                   $segmentId
      * @param ContactSegmentFilters $segmentFilters
      *
      * @throws SegmentQueryException
      */
-    public function assembleContactsSegmentQueryBuilder($segmentId, $segmentFilters, bool $changeAlias = false): QueryBuilder
+    public function assembleContactsSegmentQueryBuilder(int $segmentId, $segmentFilters, bool $changeAlias = false): QueryBuilder
     {
         /** @var Connection $connection */
         $connection = $this->entityManager->getConnection();

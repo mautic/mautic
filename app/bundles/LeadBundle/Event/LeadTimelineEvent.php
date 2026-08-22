@@ -68,10 +68,10 @@ final class LeadTimelineEvent extends Event
         private readonly ?Lead $lead = null,
         array $filters = [],
         private readonly ?array $orderBy = null,
-        private int $page = 1,
-        private int $limit = 25,
-        private bool $forTimeline = true,
-        private ?string $siteDomain = null,
+        private readonly int $page = 1,
+        private readonly int $limit = 25,
+        private readonly bool $forTimeline = true,
+        private readonly ?string $siteDomain = null,
     ) {
         $this->filters = [] !== $filters
             ? $filters
@@ -465,10 +465,8 @@ final class LeadTimelineEvent extends Event
 
     /**
      * Check if the data is to be display for the contact's timeline or used for the API.
-     *
-     * @return bool
      */
-    public function isForTimeline()
+    public function isForTimeline(): bool
     {
         return $this->forTimeline;
     }

@@ -29,7 +29,7 @@ final class UrlHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testSanitizeAbsoluteUrlDoesNotModifyCorrectFullUrl(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             'http://username:password@hostname:9090/path?arg=value#anchor',
             UrlHelper::sanitizeAbsoluteUrl('http://username:password@hostname:9090/path?arg=value#anchor')
         );
@@ -37,7 +37,7 @@ final class UrlHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testSanitizeAbsoluteUrlSetHttpIfSchemeIsMissing(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             'http://username:password@hostname:9090/path?arg=value#anchor',
             UrlHelper::sanitizeAbsoluteUrl('username:password@hostname:9090/path?arg=value#anchor')
         );
@@ -45,7 +45,7 @@ final class UrlHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testSanitizeAbsoluteUrlSetHttpIfSchemeIsRelative(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             '//username:password@hostname:9090/path?arg=value#anchor',
             UrlHelper::sanitizeAbsoluteUrl('//username:password@hostname:9090/path?arg=value#anchor')
         );
@@ -53,7 +53,7 @@ final class UrlHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testSanitizeAbsoluteUrlDoNotSetHttpIfSchemeIsRelative(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             '//username:password@hostname:9090/path?arg=value#anchor',
             UrlHelper::sanitizeAbsoluteUrl('//username:password@hostname:9090/path?arg=value#anchor')
         );
@@ -61,7 +61,7 @@ final class UrlHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testSanitizeAbsoluteUrlWithHttps(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             'https://username:password@hostname:9090/path?arg=value#anchor',
             UrlHelper::sanitizeAbsoluteUrl('https://username:password@hostname:9090/path?arg=value#anchor')
         );
@@ -69,7 +69,7 @@ final class UrlHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testSanitizeAbsoluteUrlWithHttp(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             'http://username:password@hostname:9090/path?arg=value#anchor',
             UrlHelper::sanitizeAbsoluteUrl('http://username:password@hostname:9090/path?arg=value#anchor')
         );
@@ -77,7 +77,7 @@ final class UrlHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testSanitizeAbsoluteUrlWithFtp(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             'ftp://username:password@hostname:9090/path?arg=value#anchor',
             UrlHelper::sanitizeAbsoluteUrl('ftp://username:password@hostname:9090/path?arg=value#anchor')
         );
@@ -85,14 +85,14 @@ final class UrlHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testSanitizeAbsoluteUrlSanitizeQuery(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             'http://username:password@hostname:9090/path?ar%20g1=value&arg2=some%20email%40address.com#anchor',
             UrlHelper::sanitizeAbsoluteUrl(
                 'http://username:password@hostname:9090/path?ar g1=value&arg2=some+email@address.com#anchor'
             )
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             'http://username:password@hostname:9090/path?a',
             UrlHelper::sanitizeAbsoluteUrl(
                 'http://username:password@hostname:9090/path?a'
@@ -102,7 +102,7 @@ final class UrlHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testSanitizeAbsoluteUrlSanitizePathWhitespace(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             'http://username:password@hostname:9090/some%20path%20with%20whitespace',
             UrlHelper::sanitizeAbsoluteUrl('http://username:password@hostname:9090/some path with whitespace')
         );

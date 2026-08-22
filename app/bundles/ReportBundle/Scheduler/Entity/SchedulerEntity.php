@@ -14,9 +14,9 @@ final class SchedulerEntity implements SchedulerInterface
      */
     public function __construct(
         private $isScheduled,
-        private ?string $scheduleUnit,
-        private ?string $scheduleDay,
-        private ?string $scheduleMonthFrequency,
+        private readonly ?string $scheduleUnit,
+        private readonly ?string $scheduleDay,
+        private readonly ?string $scheduleMonthFrequency,
     ) {
     }
 
@@ -28,26 +28,17 @@ final class SchedulerEntity implements SchedulerInterface
         return $this->isScheduled;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getScheduleUnit()
+    public function getScheduleUnit(): ?string
     {
         return $this->scheduleUnit;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getScheduleDay()
+    public function getScheduleDay(): ?string
     {
         return $this->scheduleDay;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getScheduleMonthFrequency()
+    public function getScheduleMonthFrequency(): ?string
     {
         return $this->scheduleMonthFrequency;
     }

@@ -19,44 +19,32 @@ final class LeadListFilteringEvent extends CommonEvent
 
     public function __construct(
         private array $details,
-        private ?int $leadId,
-        private string $alias,
-        private string $func,
-        private QueryBuilder $queryBuilder,
+        private readonly ?int $leadId,
+        private readonly string $alias,
+        private readonly string $func,
+        private readonly QueryBuilder $queryBuilder,
         EntityManagerInterface $entityManager,
     ) {
         $this->em              = $entityManager;
         $this->leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
     }
 
-    /**
-     * @return array
-     */
-    public function getDetails()
+    public function getDetails(): array
     {
         return $this->details;
     }
 
-    /**
-     * @return int
-     */
-    public function getLeadId()
+    public function getLeadId(): ?int
     {
         return $this->leadId;
     }
 
-    /**
-     * @return string
-     */
-    public function getAlias()
+    public function getAlias(): string
     {
         return $this->alias;
     }
 
-    /**
-     * @return string
-     */
-    public function getFunc()
+    public function getFunc(): string
     {
         return $this->func;
     }
@@ -69,10 +57,7 @@ final class LeadListFilteringEvent extends CommonEvent
         return $this->em;
     }
 
-    /**
-     * @return QueryBuilder
-     */
-    public function getQueryBuilder()
+    public function getQueryBuilder(): QueryBuilder
     {
         return $this->queryBuilder;
     }
@@ -99,10 +84,7 @@ final class LeadListFilteringEvent extends CommonEvent
         return $this->subQuery;
     }
 
-    /**
-     * @param array $details
-     */
-    public function setDetails($details): void
+    public function setDetails(array $details): void
     {
         $this->details = $details;
     }

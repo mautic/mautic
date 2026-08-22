@@ -13,22 +13,22 @@ final class CounterTest extends \PHPUnit\Framework\TestCase
         $counter = new Counter(1, 1, 1, 1, 1, 1);
 
         $counter->advanceEvaluated(2);
-        $this->assertEquals(3, $counter->getEvaluated());
-        $this->assertEquals(3, $counter->getTotalEvaluated());
+        $this->assertSame(3, $counter->getEvaluated());
+        $this->assertSame(3, $counter->getTotalEvaluated());
 
         $counter->advanceTotalEvaluated(1);
-        $this->assertEquals(3, $counter->getEvaluated());
-        $this->assertEquals(4, $counter->getTotalEvaluated());
+        $this->assertSame(3, $counter->getEvaluated());
+        $this->assertSame(4, $counter->getTotalEvaluated());
 
         $counter->advanceExecuted(2);
-        $this->assertEquals(3, $counter->getExecuted());
-        $this->assertEquals(3, $counter->getTotalExecuted());
+        $this->assertSame(3, $counter->getExecuted());
+        $this->assertSame(3, $counter->getTotalExecuted());
 
         $counter->advanceTotalExecuted(1);
-        $this->assertEquals(3, $counter->getExecuted());
-        $this->assertEquals(4, $counter->getTotalExecuted());
+        $this->assertSame(3, $counter->getExecuted());
+        $this->assertSame(4, $counter->getTotalExecuted());
 
         $counter->advanceTotalScheduled(2);
-        $this->assertEquals(3, $counter->getTotalScheduled());
+        $this->assertSame(3, $counter->getTotalScheduled());
     }
 }

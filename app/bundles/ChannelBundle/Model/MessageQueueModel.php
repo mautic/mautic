@@ -58,12 +58,9 @@ class MessageQueueModel extends FormModel
     }
 
     /**
-     * @param int    $attempts
-     * @param int    $priority
-     * @param mixed  $messageQueue
-     * @param string $statTableName
-     * @param string $statContactColumn
-     * @param string $statSentColumn
+     * @param int   $attempts
+     * @param int   $priority
+     * @param mixed $messageQueue
      */
     public function processFrequencyRules(
         array &$leads,
@@ -73,9 +70,9 @@ class MessageQueueModel extends FormModel
         $attempts = 3,
         $priority = MessageQueue::PRIORITY_NORMAL,
         $messageQueue = null,
-        $statTableName = 'email_stats',
-        $statContactColumn = 'lead_id',
-        $statSentColumn = 'date_sent',
+        string $statTableName = 'email_stats',
+        string $statContactColumn = 'lead_id',
+        string $statSentColumn = 'date_sent',
     ): array {
         $leadIds = array_keys($leads);
         $leadIds = array_combine($leadIds, $leadIds);

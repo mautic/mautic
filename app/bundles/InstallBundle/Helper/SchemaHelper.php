@@ -306,7 +306,7 @@ final class SchemaHelper
         return $sql;
     }
 
-    private function generateBackupName(string $prefix, string $backupPrefix, string $name): string
+    private function generateBackupName(?string $prefix, string $backupPrefix, string $name): string
     {
         if (empty($prefix) || !str_contains($name, $prefix)) {
             return $backupPrefix.$name;

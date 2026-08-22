@@ -54,7 +54,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         $counter = $this->scheduledExecutioner->execute($campaign, $limiter, new BufferedOutput());
         $this->assertInstanceOf(Counter::class, $counter);
 
-        $this->assertEquals(4, $counter->getTotalEvaluated());
+        $this->assertSame(4, $counter->getTotalEvaluated());
     }
 
     public function testEventsAreExecutedInQuietMode(): void
@@ -83,7 +83,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         $counter = $this->scheduledExecutioner->execute($campaign, $limiter);
         $this->assertInstanceOf(Counter::class, $counter); // Quiet mode - no output
 
-        $this->assertEquals(4, $counter->getTotalEvaluated());
+        $this->assertSame(4, $counter->getTotalEvaluated());
     }
 
     public function testSpecificEventsAreExecuted(): void
@@ -105,7 +105,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         $counter = $this->scheduledExecutioner->executeByIds([$log1->getId(), $log2->getId()]);
         $this->assertInstanceOf(Counter::class, $counter);
 
-        $this->assertEquals(2, $counter->getTotalEvaluated());
+        $this->assertSame(2, $counter->getTotalEvaluated());
     }
 
     public function testEventsAreScheduled(): void
@@ -130,9 +130,9 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         $this->assertInstanceOf(Counter::class, $counter);
 
         // Both events should be evaluated since they are due for execution
-        $this->assertEquals(2, $counter->getTotalEvaluated());
+        $this->assertSame(2, $counter->getTotalEvaluated());
         // No events should be scheduled since they were due and processed
-        $this->assertEquals(0, $counter->getTotalScheduled());
+        $this->assertSame(0, $counter->getTotalScheduled());
     }
 
     public function testDeletedEventsAreRedirectedToTargetEvent(): void
@@ -274,7 +274,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         $counter = $this->scheduledExecutioner->executeByIds([$log1->getId(), $log2->getId()]);
         $this->assertInstanceOf(Counter::class, $counter);
 
-        $this->assertEquals(2, $counter->getTotalEvaluated());
+        $this->assertSame(2, $counter->getTotalEvaluated());
     }
 
     public function testSpecificEventsWithUnpublishedCampaign(): void
@@ -296,7 +296,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         $counter = $this->scheduledExecutioner->executeByIds([$log1->getId(), $log2->getId()]);
         $this->assertInstanceOf(Counter::class, $counter);
 
-        $this->assertEquals(0, $counter->getTotalEvaluated());
+        $this->assertSame(0, $counter->getTotalEvaluated());
     }
 
     public function testExecuteByIdsWithNonDeletedEvent(): void
@@ -317,7 +317,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         $this->assertInstanceOf(Counter::class, $counter);
 
         // Event should be evaluated since it's not deleted and campaign is published
-        $this->assertEquals(1, $counter->getTotalEvaluated());
+        $this->assertSame(1, $counter->getTotalEvaluated());
 
         // Verify the log still points to the original event (no redirection occurred)
         $updatedLog = $this->em->find(LeadEventLog::class, $log->getId());

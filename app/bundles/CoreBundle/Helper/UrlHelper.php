@@ -140,12 +140,8 @@ final class UrlHelper
 
     /**
      * Sanitize parts of the URL to make sure the URL query values are HTTP encoded.
-     *
-     * @param string $url
-     *
-     * @return string
      */
-    public static function sanitizeAbsoluteUrl($url)
+    public static function sanitizeAbsoluteUrl(string $url): string
     {
         if (!$url) {
             return $url;
@@ -202,10 +198,7 @@ final class UrlHelper
         return $url;
     }
 
-    /**
-     * @return string
-     */
-    private static function sanitizeUrlQuery(string $url): string|array
+    private static function sanitizeUrlQuery(string $url): string
     {
         $query = parse_url($url, PHP_URL_QUERY);
 

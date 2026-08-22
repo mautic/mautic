@@ -59,20 +59,15 @@ class PageHitEvent extends CommonEvent
         return $this->entity;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getClickthroughData()
+    public function getClickthroughData(): array
     {
         return $this->clickthroughData;
     }
 
     /**
      * Returns if this page hit is unique.
-     *
-     * @return bool
      */
-    public function isUnique()
+    public function isUnique(): bool
     {
         return $this->unique;
     }
