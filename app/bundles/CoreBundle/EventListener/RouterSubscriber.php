@@ -13,20 +13,13 @@ final class RouterSubscriber implements EventSubscriberInterface
 
     private readonly string|int $httpPort;
 
-    /**
-     * @param string|null $scheme
-     * @param string|null $host
-     * @param string|null $httpsPort
-     * @param string|null $httpPort
-     * @param string|null $baseUrl
-     */
     public function __construct(
         private readonly RouterInterface $router,
-        private $scheme,
-        private $host,
-        $httpsPort,
-        $httpPort,
-        private $baseUrl,
+        private ?string $scheme,
+        private ?string $host,
+        ?string $httpsPort,
+        ?string $httpPort,
+        private ?string $baseUrl,
     ) {
         $this->httpsPort = $httpsPort ?? 443;
         $this->httpPort  = $httpPort ?? 80;
