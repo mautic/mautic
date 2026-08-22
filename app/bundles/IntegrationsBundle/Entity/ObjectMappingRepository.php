@@ -14,7 +14,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
  */
 class ObjectMappingRepository extends CommonRepository
 {
-    public function getInternalObject($integration, $integrationObjectName, $integrationObjectId, $internalObjectName): ?array
+    public function getInternalObject(string $integration, string $integrationObjectName, $integrationObjectId, string $internalObjectName): ?array
     {
         return $this->doGetInternalObject($integration, $integrationObjectName, $integrationObjectId, $internalObjectName);
     }

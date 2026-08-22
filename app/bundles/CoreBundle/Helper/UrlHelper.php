@@ -203,11 +203,9 @@ final class UrlHelper
     }
 
     /**
-     * @param string $url
-     *
      * @return string
      */
-    private static function sanitizeUrlQuery($url)
+    private static function sanitizeUrlQuery(string $url): string|array
     {
         $query = parse_url($url, PHP_URL_QUERY);
 

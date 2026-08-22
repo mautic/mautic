@@ -16,18 +16,15 @@ class FrequencyRuleRepository extends CommonRepository
      * @param array       $leadIds
      * @param string|null $defaultFrequencyNumber
      * @param string|null $defaultFrequencyTime
-     * @param string      $statTable
-     * @param string      $statSentColumn
-     * @param string      $statContactColumn
      */
     public function getAppliedFrequencyRules(
         $channel,
         $leadIds,
         $defaultFrequencyNumber,
         $defaultFrequencyTime,
-        $statTable = 'email_stats',
-        $statContactColumn = 'lead_id',
-        $statSentColumn = 'date_sent',
+        string $statTable = 'email_stats',
+        string $statContactColumn = 'lead_id',
+        string $statSentColumn = 'date_sent',
     ): array {
         if (empty($leadIds)) {
             return [];

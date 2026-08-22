@@ -11,48 +11,30 @@ final class LeadManipulator
      */
     private bool $logged = false;
 
-    /**
-     * @param ?string $bundleName
-     * @param ?string $objectName
-     * @param ?int    $objectId
-     * @param ?string $objectDescription
-     */
     public function __construct(
-        private $bundleName = null,
-        private $objectName = null,
-        private $objectId = null,
-        private $objectDescription = null,
+        private readonly ?string $bundleName = null,
+        private readonly ?string $objectName = null,
+        private readonly ?int $objectId = null,
+        private readonly ?string $objectDescription = null,
     ) {
     }
 
-    /**
-     * @return ?string
-     */
-    public function getBundleName()
+    public function getBundleName(): ?string
     {
         return $this->bundleName;
     }
 
-    /**
-     * @return ?string
-     */
-    public function getObjectName()
+    public function getObjectName(): ?string
     {
         return $this->objectName;
     }
 
-    /**
-     * @return ?int
-     */
-    public function getObjectId()
+    public function getObjectId(): ?int
     {
         return $this->objectId;
     }
 
-    /**
-     * @return ?string
-     */
-    public function getObjectDescription()
+    public function getObjectDescription(): ?string
     {
         return $this->objectDescription;
     }
@@ -76,7 +58,7 @@ final class LeadManipulator
     public function getManipulatedBy(): string
     {
         if ($this->objectDescription) {
-            return (string) $this->objectDescription;
+            return $this->objectDescription;
         }
 
         return $this->getManipulatorKey();
