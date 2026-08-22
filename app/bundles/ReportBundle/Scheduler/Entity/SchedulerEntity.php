@@ -10,16 +10,13 @@ use Mautic\ReportBundle\Scheduler\SchedulerInterface;
 final class SchedulerEntity implements SchedulerInterface
 {
     /**
-     * @param bool        $isScheduled
-     * @param string|null $scheduleUnit
-     * @param string|null $scheduleDay
-     * @param string|null $scheduleMonthFrequency
+     * @param bool $isScheduled
      */
     public function __construct(
         private $isScheduled,
-        private $scheduleUnit,
-        private $scheduleDay,
-        private $scheduleMonthFrequency,
+        private ?string $scheduleUnit,
+        private ?string $scheduleDay,
+        private ?string $scheduleMonthFrequency,
     ) {
     }
 
