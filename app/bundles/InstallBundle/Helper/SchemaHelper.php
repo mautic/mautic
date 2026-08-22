@@ -306,10 +306,7 @@ final class SchemaHelper
         return $sql;
     }
 
-    /**
-     * @return mixed[]|string
-     */
-    private function generateBackupName(string $prefix, string $backupPrefix, string $name): string|array
+    private function generateBackupName(string $prefix, string $backupPrefix, string $name): string
     {
         if (empty($prefix) || !str_contains($name, $prefix)) {
             return $backupPrefix.$name;
