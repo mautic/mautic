@@ -23,7 +23,7 @@ final class HubspotApi extends CrmApi
         parent::__construct($integration);
     }
 
-    private function request($operation, $parameters = [], $method = 'GET', $object = 'contacts')
+    private function request(string $operation, array $parameters = [], string $method = 'GET', string $object = 'contacts')
     {
         if ('oauth2' === $this->integration->getAuthenticationType()) {
             $url     = sprintf('%s/%s/%s/', $this->integration->getApiUrl(), $object, $operation);
