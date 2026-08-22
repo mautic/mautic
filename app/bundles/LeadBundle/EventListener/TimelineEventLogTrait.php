@@ -44,7 +44,7 @@ trait TimelineEventLogTrait
         }
     }
 
-    private function getEventEntry(array $log, $eventType, $eventTypeName, $icon, $contentTemplate): array
+    private function getEventEntry(array $log, string $eventType, string $eventTypeName, string $icon, ?string $contentTemplate): array
     {
         $properties = json_decode($log['properties'], true);
 
@@ -66,10 +66,7 @@ trait TimelineEventLogTrait
         return $entry;
     }
 
-    /**
-     * @return string
-     */
-    private function getSourceName(array $log, $eventType)
+    private function getSourceName(array $log, string $eventType): string
     {
         $properties = json_decode($log['properties'], true);
 
