@@ -197,15 +197,12 @@ final class MenuHelper
     /**
      * @return mixed
      */
-    private function getParameter($name)
+    private function getParameter(string $name)
     {
         return $this->coreParametersHelper->get($name, false);
     }
 
-    /**
-     * @param string $integrationName
-     */
-    private function handleIntegrationChecks($integrationName, array $config): bool
+    private function handleIntegrationChecks(string $integrationName, array $config): bool
     {
         $integration = $this->integrationHelper->getIntegrationObject($integrationName);
 
@@ -238,28 +235,17 @@ final class MenuHelper
         return $passChecks;
     }
 
-    /**
-     * @param string $name
-     * @param mixed  $value
-     */
-    private function handleParametersChecks($name, $value): bool
+    private function handleParametersChecks(string $name, mixed $value): bool
     {
         return $this->getParameter($name) == $value;
     }
 
-    /**
-     * @param string $name
-     * @param mixed  $value
-     */
-    private function handleRequestChecks($name, $value): bool
+    private function handleRequestChecks(string $name, mixed $value): bool
     {
         return $this->requestStack->getCurrentRequest()->get($name) == $value;
     }
 
-    /**
-     * @return bool
-     */
-    private function handleAccessCheck($accessLevel)
+    private function handleAccessCheck(string $accessLevel): bool
     {
         return match ($accessLevel) {
             'admin' => $this->security->isAdmin(),
