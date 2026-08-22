@@ -12,16 +12,12 @@ class PageHitEvent extends CommonEvent
 {
     protected ?Page $page = null;
 
-    /**
-     * @param mixed[] $clickthroughData
-     * @param bool    $unique
-     */
     public function __construct(
         Hit $hit,
         protected $request,
         protected $code,
-        protected $clickthroughData = [],
-        protected $unique = false,
+        protected array $clickthroughData = [],
+        protected bool $unique = false,
     ) {
         $this->entity           = $hit;
         $this->page             = $hit->getPage();
