@@ -17,19 +17,12 @@ final class LeadListFilteringEvent extends CommonEvent
 
     private readonly string $leadsTableAlias;
 
-    /**
-     * @param array        $details
-     * @param int          $leadId
-     * @param string       $alias
-     * @param string       $func
-     * @param QueryBuilder $queryBuilder
-     */
     public function __construct(
-        private $details,
-        private $leadId,
-        private $alias,
-        private $func,
-        private $queryBuilder,
+        private array $details,
+        private ?int $leadId,
+        private string $alias,
+        private string $func,
+        private QueryBuilder $queryBuilder,
         EntityManagerInterface $entityManager,
     ) {
         $this->em              = $entityManager;
