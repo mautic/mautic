@@ -71,7 +71,7 @@ final class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
         $counter = $this->getExecutioner()->execute($campaign, $limiter, new BufferedOutput());
         $this->assertInstanceOf(Counter::class, $counter);
 
-        $this->assertEquals(0, $counter->getEvaluated());
+        $this->assertSame(0, $counter->getEvaluated());
     }
 
     public function testNoEventsFoundResultsInNothingExecuted(): void
@@ -89,7 +89,7 @@ final class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
         $counter = $this->getExecutioner()->execute($campaign, $limiter, new BufferedOutput());
         $this->assertInstanceOf(Counter::class, $counter);
 
-        $this->assertEquals(0, $counter->getTotalEvaluated());
+        $this->assertSame(0, $counter->getTotalEvaluated());
     }
 
     public function testNextBatchOfContactsAreExecuted(): void
@@ -151,7 +151,7 @@ final class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
 
         $counter = $this->getExecutioner()->validate(1, $limiter, new BufferedOutput());
         $this->assertInstanceOf(Counter::class, $counter);
-        $this->assertEquals(0, $counter->getTotalEvaluated());
+        $this->assertSame(0, $counter->getTotalEvaluated());
     }
 
     public function testValidationEvaluatesFoundEvents(): void

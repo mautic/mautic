@@ -251,7 +251,10 @@ final class MenuHelper
         return $this->requestStack->getCurrentRequest()->get($name) == $value;
     }
 
-    private function handleAccessCheck(string $accessLevel): bool
+    /**
+     * @param string|string[] $accessLevel
+     */
+    private function handleAccessCheck(string|array $accessLevel): bool
     {
         return match ($accessLevel) {
             'admin' => $this->security->isAdmin(),

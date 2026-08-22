@@ -7,14 +7,14 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouterInterface;
 
-final class RouterSubscriber implements EventSubscriberInterface
+final readonly class RouterSubscriber implements EventSubscriberInterface
 {
-    private readonly string|int $httpsPort;
+    private string|int $httpsPort;
 
-    private readonly string|int $httpPort;
+    private string|int $httpPort;
 
     public function __construct(
-        private readonly RouterInterface $router,
+        private RouterInterface $router,
         private ?string $scheme,
         private ?string $host,
         ?string $httpsPort,

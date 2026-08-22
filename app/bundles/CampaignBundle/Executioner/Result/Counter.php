@@ -18,10 +18,7 @@ final class Counter
     ) {
     }
 
-    /**
-     * @return int
-     */
-    public function getEventCount()
+    public function getEventCount(): int
     {
         return $this->eventCount;
     }
@@ -44,10 +41,7 @@ final class Counter
         return $this->rescheduled;
     }
 
-    /**
-     * @return int
-     */
-    public function getEvaluated()
+    public function getEvaluated(): int
     {
         return $this->evaluated;
     }
@@ -61,10 +55,7 @@ final class Counter
         $this->totalEvaluated += $step;
     }
 
-    /**
-     * @return int
-     */
-    public function getExecuted()
+    public function getExecuted(): int
     {
         return $this->executed;
     }
@@ -80,10 +71,8 @@ final class Counter
 
     /**
      * Includes all child events (conditions, etc) evaluated.
-     *
-     * @return int
      */
-    public function getTotalEvaluated()
+    public function getTotalEvaluated(): int
     {
         return $this->totalEvaluated;
     }
@@ -98,10 +87,8 @@ final class Counter
 
     /**
      * Includes all child events (conditions, etc) executed.
-     *
-     * @return int
      */
-    public function getTotalExecuted()
+    public function getTotalExecuted(): int
     {
         return $this->totalExecuted;
     }
@@ -114,10 +101,7 @@ final class Counter
         $this->totalExecuted += $step;
     }
 
-    /**
-     * @return int
-     */
-    public function getTotalScheduled()
+    public function getTotalScheduled(): int
     {
         return $this->totalScheduled;
     }
