@@ -49,25 +49,14 @@ return function (ContainerConfigurator $configurator): void {
     $services->set(Mautic\LeadBundle\Segment\Stat\SegmentChartQueryFactory::class);
 
     $services->set(Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare::class);
-    $services->alias('mautic.lead.model.lead_segment_filter_factory', Mautic\LeadBundle\Segment\ContactSegmentFilterFactory::class);
     $services->set(Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder::class);
-    $services->alias('mautic.lead.model.lead_segment_service', Mautic\LeadBundle\Segment\ContactSegmentService::class);
-    $services->alias('mautic.lead.model.lead_segment_schema_cache', Mautic\LeadBundle\Segment\TableSchemaColumnsCache::class);
-    $services->alias('mautic.lead.model.relative_date', Mautic\LeadBundle\Segment\RelativeDate::class);
-    $services->alias('mautic.lead.model.lead_segment_filter_operator', Mautic\LeadBundle\Segment\ContactSegmentFilterOperator::class);
     $services->set(Mautic\LeadBundle\Segment\Decorator\DecoratorFactory::class);
-    $services->alias('mautic.lead.model.lead_segment_decorator_factory', Mautic\LeadBundle\Segment\Decorator\DecoratorFactory::class);
     $services->set(Mautic\LeadBundle\Segment\Decorator\BaseDecorator::class);
-    $services->alias('mautic.lead.model.lead_segment_decorator_base', Mautic\LeadBundle\Segment\Decorator\BaseDecorator::class);
     $services->set(Mautic\LeadBundle\Segment\Decorator\CustomMappedDecorator::class);
-    $services->alias('mautic.lead.model.lead_segment_decorator_custom_mapped', Mautic\LeadBundle\Segment\Decorator\CustomMappedDecorator::class);
     $services->set(Mautic\LeadBundle\Segment\Decorator\CompanyDecorator::class);
-    $services->alias('mautic.lead.model.lead_segment_decorator_company', Mautic\LeadBundle\Segment\Decorator\CompanyDecorator::class);
     $services->set(Mautic\LeadBundle\Segment\Decorator\DateDecorator::class);
-    $services->alias('mautic.lead.model.lead_segment_decorator_date', Mautic\LeadBundle\Segment\Decorator\DateDecorator::class);
     $services->set(Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory::class);
     $services->set(Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver::class);
-    $services->alias('mautic.lead.model.random_parameter_name', Mautic\LeadBundle\Segment\RandomParameterName::class);
     $services->set('mautic.lead.query.builder.basic', Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder::class);
     $services->set('mautic.lead.query.builder.foreign.value', Mautic\LeadBundle\Segment\Query\Filter\ForeignValueFilterQueryBuilder::class);
     $services->set('mautic.lead.query.builder.foreign.func', Mautic\LeadBundle\Segment\Query\Filter\ForeignFuncFilterQueryBuilder::class);

@@ -69,10 +69,10 @@ $firewalls = [
         'pattern'       => '^/(s/|elfinder|efconnect)',
         'light_saml_sp' => [
             'provider'        => 'user_provider',
-            'success_handler' => 'mautic.security.authentication_handler',
-            'failure_handler' => 'mautic.security.authentication_handler',
+            'success_handler' => Mautic\UserBundle\Security\Authentication\AuthenticationHandler::class,
+            'failure_handler' => Mautic\UserBundle\Security\Authentication\AuthenticationHandler::class,
             'user_creator'    => 'mautic.security.saml.user_creator',
-            'username_mapper' => 'mautic.security.saml.username_mapper',
+            'username_mapper' => Mautic\UserBundle\Security\SAML\User\UserMapper::class,
 
             // If saml is disabled, these still must contain a proper saml login URLs.
             // Otherwise, this prevents handling of the
@@ -82,8 +82,8 @@ $firewalls = [
         ],
         'form_login' => [
             'enable_csrf'     => true,
-            'success_handler' => 'mautic.security.authentication_handler',
-            'failure_handler' => 'mautic.security.authentication_handler',
+            'success_handler' => Mautic\UserBundle\Security\Authentication\AuthenticationHandler::class,
+            'failure_handler' => Mautic\UserBundle\Security\Authentication\AuthenticationHandler::class,
             'login_path'      => '/s/login',
             'check_path'      => '/s/login_check',
         ],
@@ -123,7 +123,7 @@ $container->loadFromExtension(
     [
         'providers' => [
             'user_provider' => [
-                'id' => 'mautic.user.provider',
+                'id' => Mautic\UserBundle\Security\Provider\UserProvider::class,
             ],
         ],
         'password_hashers' => [
@@ -165,7 +165,7 @@ $container->loadFromExtension(
     [
         'own' => [
             'entity_descriptor_provider' => [
-                'id' => 'mautic.security.saml.entity_descriptor_provider',
+                'id' => LightSaml\Builder\EntityDescriptor\SimpleEntityDescriptorBuilder::class,
             ],
             'entity_id' => '%mautic.saml_idp_entity_id%',
         ],

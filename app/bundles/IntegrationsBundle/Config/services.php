@@ -40,11 +40,4 @@ return function (ContainerConfigurator $configurator): void {
     $services->set('mautic.sync.logger', Mautic\IntegrationsBundle\Sync\Logger\DebugLogger::class);
     $services->set(Mautic\IntegrationsBundle\Sync\Notification\Handler\CompanyNotificationHandler::class)->tag('mautic.sync.notification_handler');
     $services->set(Mautic\IntegrationsBundle\Sync\Notification\Handler\ContactNotificationHandler::class)->tag('mautic.sync.notification_handler');
-
-    $services->alias('mautic.integrations.helper', Mautic\IntegrationsBundle\Helper\IntegrationsHelper::class);
-    $services->alias('mautic.integrations.helper.auth_integrations', Mautic\IntegrationsBundle\Helper\AuthIntegrationsHelper::class);
-    $services->alias('mautic.integrations.helper.sync_integrations', Mautic\IntegrationsBundle\Helper\SyncIntegrationsHelper::class);
-    $services->alias('mautic.integrations.helper.config_integrations', Mautic\IntegrationsBundle\Helper\ConfigIntegrationsHelper::class);
-    $services->alias('mautic.integrations.helper.builder_integrations', Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper::class);
-    $services->alias('mautic.integrations.sync.notification.handler_container', Mautic\IntegrationsBundle\Sync\Notification\Handler\HandlerContainer::class);
 };

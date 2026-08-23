@@ -57,13 +57,13 @@ final class DeviceTrackerTest extends \PHPUnit\Framework\TestCase
         $coreParametersHelper->expects($this->once())
           ->method('get')
           ->with('cache_adapter')
-          ->willReturn('mautic.cache.adapter.filesystem');
+          ->willReturn(\Mautic\CacheBundle\Cache\Adapter\FilesystemTagAwareAdapter::class);
 
         $container = $this->createMock(ContainerInterface::class);
         $container
           ->expects($this->once())
           ->method('get')
-          ->with('mautic.cache.adapter.filesystem')
+          ->with(\Mautic\CacheBundle\Cache\Adapter\FilesystemTagAwareAdapter::class)
           ->willReturn($cacheAdapter);
 
         $cacheProvider               = new CacheProvider($coreParametersHelper, $container);

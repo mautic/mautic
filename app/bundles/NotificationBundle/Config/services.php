@@ -25,7 +25,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->set(Mautic\NotificationBundle\EventListener\CampaignSubscriber::class)
         ->arg('$notificationApi', service(Mautic\NotificationBundle\Api\OneSignalApi::class));
 
-    $services->alias('mautic.integration.onesignal', Mautic\NotificationBundle\Integration\OneSignalIntegration::class);
     $services->alias('mautic.notification.model.notification', Mautic\NotificationBundle\Model\NotificationModel::class);
 
     $services->set(Mautic\NotificationBundle\Security\Permissions\NotificationPermissions::class);

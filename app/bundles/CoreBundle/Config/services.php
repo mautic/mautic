@@ -82,7 +82,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->set(Mautic\CoreBundle\Service\LocalFileAdapterService::class)
         ->arg('$root', param('env(resolve:MAUTIC_EL_FINDER_PATH)'));
 
-    $services->alias('mautic.core.service.local_file_adapter', Mautic\CoreBundle\Service\LocalFileAdapterService::class);
     $services->set(Mautic\CoreBundle\Helper\MaxMindDoNotSellDownloadHelper::class)
         ->arg('$auth', param('mautic.ip_lookup_auth'));
     $services->set(Mautic\CoreBundle\Cache\MiddlewareCacheWarmer::class)
@@ -112,7 +111,6 @@ return function (ContainerConfigurator $configurator): void {
         ->arg('$cacheDir', param('kernel.cache_dir'))
         ->arg('$logsDir', param('kernel.logs_dir'))
         ->arg('$rootDir', param('mautic.application_dir'));
-    $services->alias('mautic.helper.paths', Mautic\CoreBundle\Helper\PathsHelper::class);
     $services->set(Mautic\CoreBundle\Helper\BundleHelper::class)
         ->arg('$coreBundles', param('mautic.bundles'))
         ->arg('$pluginBundles', param('mautic.plugin.bundles'));
@@ -183,7 +181,6 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->get(Mautic\CoreBundle\Monolog\Handler\FileLogHandler::class)
         ->arg('$exceptionFormatter', \Symfony\Component\DependencyInjection\Loader\Configurator\service('mautic.monolog.fulltrace.formatter'));
-    $services->alias('mautic.monolog.handler', Mautic\CoreBundle\Monolog\Handler\FileLogHandler::class);
 
     $services->set(Mautic\CoreBundle\DependencyInjection\EnvProcessor\NullableProcessor::class)
         ->tag('container.env_var_processor');
@@ -193,8 +190,6 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->set(Mautic\CoreBundle\DependencyInjection\EnvProcessor\MauticConstProcessor::class)
         ->tag('container.env_var_processor');
-
-    $services->alias('mautic.helper.token_builder', Mautic\CoreBundle\Helper\BuilderTokenHelper::class);
 
     // Explicitly register our Twig extension with high priority
     $services->set(Mautic\CoreBundle\Twig\Extension\OverrideIncludeExtension::class)
@@ -215,9 +210,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias(Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface::class, 'argument_resolver');
 
     $services->alias(Mautic\CoreBundle\Doctrine\Provider\VersionProviderInterface::class, Mautic\CoreBundle\Doctrine\Provider\VersionProvider::class);
-    $services->alias('mautic.helper.assetgeneration', Mautic\CoreBundle\Helper\AssetGenerationHelper::class);
-    $services->alias('mautic.helper.update_checks', Mautic\CoreBundle\Helper\PreUpdateCheckHelper::class);
-    $services->alias('mautic.update.step_provider', Mautic\CoreBundle\Update\StepProvider::class);
 
     $services->get(Mautic\CoreBundle\Twig\Helper\AssetsHelper::class)->tag('twig.helper', ['alias' => 'assets']);
 

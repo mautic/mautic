@@ -60,7 +60,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->set(TokenPermissions::class);
 
     $services->set(UserProvider::class);
-    $services->alias('mautic.user.provider', UserProvider::class);
 
     $services->load('Mautic\\UserBundle\\Security\\EntryPoint\\', '../Security/EntryPoint/*.php');
     $services->load('Mautic\\UserBundle\\Security\\Authentication\\Token\\Permissions\\', '../Security/Authentication/Token/Permissions/*.php');
@@ -85,7 +84,6 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->set(Mautic\UserBundle\Security\SAML\User\UserMapper::class)
         ->arg('$attributes', ['email' => param('mautic.saml_idp_email_attribute'), 'username' => param('mautic.saml_idp_username_attribute'), 'firstname' => param('mautic.saml_idp_firstname_attribute'), 'lastname' => param('mautic.saml_idp_lastname_attribute')]);
-    $services->alias('mautic.security.saml.username_mapper', Mautic\UserBundle\Security\SAML\User\UserMapper::class);
     $services->set(Doctrine\ORM\EntityManager::class)
         ->factory([service('doctrine'), 'getManagerForClass'])
         ->args([Mautic\UserBundle\Entity\User::class]);
@@ -95,7 +93,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->set(LightSaml\Builder\EntityDescriptor\SimpleEntityDescriptorBuilder::class)
         ->factory(Mautic\UserBundle\Security\SAML\EntityDescriptorProviderFactory::build(...))
         ->args([param('lightsaml.own.entity_id'), service('router'), param('lightsaml.route.login_check'), service('lightsaml.own.credential_store')]);
-    $services->alias('mautic.security.saml.entity_descriptor_provider', LightSaml\Builder\EntityDescriptor\SimpleEntityDescriptorBuilder::class);
     $services->set(Mautic\UserBundle\Security\SAML\Store\CredentialsStore::class)
         ->arg('$entityId', param('mautic.saml_idp_entity_id'))
         ->tag('lightsaml.own_credential_store');
@@ -106,7 +103,6 @@ return function (ContainerConfigurator $configurator): void {
         ->arg('$defaultRole', param('mautic.saml_idp_default_role'));
 
     $services->set(Mautic\UserBundle\Security\Authentication\AuthenticationHandler::class);
-    $services->alias('mautic.security.authentication_handler', Mautic\UserBundle\Security\Authentication\AuthenticationHandler::class);
 
     $services->set(Mautic\UserBundle\Security\SAML\Store\EntityDescriptorStore::class)->tag('lightsaml.idp_entity_store');
 

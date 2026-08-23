@@ -46,8 +46,6 @@ abstract class AbstractContainerSmokeTestCase extends TestCase
         MemcachedTagAwareAdapter::class,
         RedisAdapter::class,
         RedisTagAwareAdapter::class,
-        'mautic.cache.adapter.redis',
-        'mautic.cache.adapter.redis_tag_aware',
         'doctrine.uuid_generator',
 
         // not a service at all, an enum or a validation constraint
@@ -63,7 +61,6 @@ abstract class AbstractContainerSmokeTestCase extends TestCase
         BuilderTokenHelper::class,
         FieldApiController::class,
         'fos_oauth_server.controller.authorize',
-        'mautic.helper.token_builder',
     ];
 
     /**

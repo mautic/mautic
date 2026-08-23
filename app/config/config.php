@@ -249,7 +249,7 @@ $container->loadFromExtension('oneup_uploader', [
     // ),
     'mappings' => [
         'asset' => [
-            'error_handler'   => 'mautic.asset.upload.error.handler',
+            'error_handler'   => Mautic\AssetBundle\ErrorHandler\DropzoneErrorHandler::class,
             'frontend'        => 'custom',
             'custom_frontend' => [
                 'class' => Mautic\AssetBundle\Controller\UploadController::class,
@@ -391,7 +391,7 @@ $container->loadFromExtension('fm_elfinder', [
                         'path'          => '',
                         'flysystem'     => [
                             'type'            => 'custom',
-                            'adapter_service' => 'mautic.core.service.local_file_adapter',
+                            'adapter_service' => Mautic\CoreBundle\Service\LocalFileAdapterService::class,
                             'options'         => [],
                         ],
                         'upload_allow'  => ['image/png', 'image/jpg', 'image/jpeg', 'image/gif'],
