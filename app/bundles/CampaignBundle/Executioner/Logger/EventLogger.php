@@ -180,6 +180,14 @@ class EventLogger
             $log->setDateTriggered(new \DateTime());
             ChannelExtractor::setChannel($log, $event, $config);
 
+            if (!$isInactiveEntry) {
+                if (Event::TYPE_CONDITION === $event->getEventType()) {
+                    $log->setNonActionPathTaken(null);
+                } else {
+                    $log->setNonActionPathTaken(false);
+                }
+            }
+
             if ($isDecision) {
                 // Do not pre-persist decision logs as they must be evaluated first
                 $this->logs->add($log);

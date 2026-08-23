@@ -14,6 +14,8 @@ use Symfony\Component\Console\Exception\RuntimeException;
 
 final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
 {
+    private const TAG_GREATER_THAN_FOUR = 'greater than 4';
+
     protected function setUp(): void
     {
         $this->configParams['campaigns_resume_stuck_records_after'] = '2025-08-01 00:00:00';
@@ -72,6 +74,44 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
         $this->assertStringContainsString('Campaign with ID '.$campaign->getId().' is not published', $output);
     }
 
+    public function testCommandIgnoresConditionWithoutFinalPath(): void
+    {
+        $campaign = $this->createCampaign('Incomplete Condition Campaign');
+        $campaign->setIsPublished(true);
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        $contact = $this->createLead('Incomplete Condition Contact');
+        $this->createCampaignLead($campaign, $contact);
+
+        $condition = $this->createEvent('Incomplete Condition', $campaign, 'lead.field_value', 'condition', [
+            'field'    => 'points',
+            'operator' => 'gt',
+            'value'    => '4',
+        ]);
+
+        $yesPathAction = $this->createEvent('Incomplete Condition Child', $campaign, 'lead.changetags', 'action', [
+            'add_tags' => [
+                self::TAG_GREATER_THAN_FOUR,
+            ],
+        ]);
+        $yesPathAction->setParent($condition);
+        $yesPathAction->setDecisionPath(Event::PATH_ACTION);
+
+        $log = $this->createEventLog($contact, $condition, $campaign, 1);
+        $log->setNonActionPathTaken(null);
+        $this->em->flush();
+
+        $output = $this->executeCommand(
+            [
+                'campaign-id' => $campaign->getId(),
+                '--dry-run'   => true,
+            ]
+        );
+
+        $this->assertStringNotContainsString('Incomplete Condition Child', $output);
+    }
+
     public function testComplexCampaignExecution(): void
     {
         $campaign = $this->createCampaign('Complex Campaign');
@@ -107,7 +147,7 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
         // Third level events - YES path from decision
         $yesPathAction = $this->createEvent('Yes Path - Add Tag', $campaign, 'lead.changetags', 'action', [
             'add_tags' => [
-                'greater than 4',
+                self::TAG_GREATER_THAN_FOUR,
             ],
         ]);
         $yesPathAction->setParent($conditionEvent);
@@ -446,7 +486,7 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
         // Third level events - YES path from decision
         $yesPathAction = $this->createEvent('Yes Path - Add Tag', $campaign, 'lead.changetags', 'action', [
             'add_tags' => [
-                'greater than 4',
+                self::TAG_GREATER_THAN_FOUR,
             ],
         ]);
         $yesPathAction->setParent($decisionEvent);

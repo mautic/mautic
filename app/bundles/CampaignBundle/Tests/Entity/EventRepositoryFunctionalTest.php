@@ -8,10 +8,10 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Entity\Lead as CampaignMember;
+use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 final class EventRepositoryFunctionalTest extends MauticMysqlTestCase
@@ -49,6 +49,59 @@ final class EventRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $this->assertCount($expectedCount, $repository->getContactPendingEvents($lead->getId(), $event->getType()));
+    }
+
+    public function testGetContactPendingEventsWaitsForConditionPathResult(): void
+    {
+        $repository = self::getContainer()->get(EventRepository::class);
+        $this->assertInstanceOf(EventRepository::class, $repository);
+
+        $campaign  = $this->createCampaign();
+        $condition = $this->createEvent($campaign);
+        $condition->setType('lead.field_value');
+        $condition->setEventType(Event::TYPE_CONDITION);
+
+        $yesDecision = $this->createEvent($campaign);
+        $yesDecision->setEventType(Event::TYPE_DECISION);
+        $yesDecision->setParent($condition);
+        // A null decision path is the legacy representation of the yes path.
+        $yesDecision->setDecisionPath(null);
+
+        $noDecision = $this->createEvent($campaign);
+        $noDecision->setEventType(Event::TYPE_DECISION);
+        $noDecision->setParent($condition);
+        $noDecision->setDecisionPath(Event::PATH_INACTION);
+
+        $lead = $this->createLead();
+        $this->createCampaignMember($lead, $campaign);
+
+        $log = new LeadEventLog();
+        $log->setEvent($condition);
+        $log->setCampaign($campaign);
+        $log->setLead($lead);
+        $log->setRotation(1);
+        $log->setDateTriggered(new \DateTime());
+        $log->setNonActionPathTaken(null);
+        $this->em->persist($log);
+        $this->em->flush();
+
+        $this->assertSame([], $repository->getContactPendingEvents($lead->getId(), $yesDecision->getType()));
+
+        $log->setNonActionPathTaken(false);
+        $this->em->persist($log);
+        $this->em->flush();
+
+        $pendingEvents = $repository->getContactPendingEvents($lead->getId(), $yesDecision->getType());
+        $this->assertCount(1, $pendingEvents);
+        $this->assertSame($yesDecision->getId(), array_values($pendingEvents)[0]->getId());
+
+        $log->setNonActionPathTaken(true);
+        $this->em->persist($log);
+        $this->em->flush();
+
+        $pendingEvents = $repository->getContactPendingEvents($lead->getId(), $yesDecision->getType());
+        $this->assertCount(1, $pendingEvents);
+        $this->assertSame($noDecision->getId(), array_values($pendingEvents)[0]->getId());
     }
 
     public function testSetEventsAsDeletedWithRedirectUpdatesChains(): void

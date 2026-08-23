@@ -52,7 +52,12 @@ final readonly class DecisionHelper
                 throw new DecisionNotApplicableException("Parent {$parentEvent->getId()} has not been fired, event {$event->getId()} should not be fired.");
             }
 
-            $pathTaken   = (int) $log->getNonActionPathTaken();
+            $pathTakenValue = $log->getNonActionPathTaken();
+            if (null === $pathTakenValue) {
+                throw new DecisionNotApplicableException("Parent {$parentEvent->getId()} has not finished evaluating, event {$event->getId()} should not be fired.");
+            }
+
+            $pathTaken = (int) $pathTakenValue;
 
             if (1 === $pathTaken && !$parentEvent->getNegativeChildren()->contains($event)) {
                 throw new DecisionNotApplicableException("Parent {$parentEvent->getId()} take negative path, event {$event->getId()} is on positive path.");

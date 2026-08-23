@@ -773,10 +773,7 @@ class CampaignRepository extends CommonRepository
                                     $query->expr()->eq('ce.decision_path', $query->expr()->literal('yes')),
                                     $query->expr()->isNull('ce.decision_path')
                                 ),
-                                $query->expr()->or(
-                                    $query->expr()->eq('log.non_action_path_taken', 0),
-                                    $query->expr()->isNull('log.non_action_path_taken')
-                                )
+                                $query->expr()->eq('log.non_action_path_taken', 0)
                             )
                         )
                     ),
