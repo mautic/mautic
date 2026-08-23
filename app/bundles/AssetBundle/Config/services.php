@@ -26,10 +26,5 @@ return function (ContainerConfigurator $configurator): void {
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
 
     $services->set(Mautic\AssetBundle\Security\Permissions\AssetPermissions::class)->tag('mautic.permissions');
-<<<<<<< HEAD
-    $services->alias('mautic.asset.model.asset', Mautic\AssetBundle\Model\AssetModel::class);
-=======
-    $services->alias('mautic.asset.upload.error.handler', Mautic\AssetBundle\ErrorHandler\DropzoneErrorHandler::class);
->>>>>>> 017d645310 (Remove now-unused mautic.*.model.* service aliases for models)
     $services->alias(Oneup\UploaderBundle\Templating\Helper\UploaderHelper::class, 'oneup_uploader.templating.uploader_helper');
 };

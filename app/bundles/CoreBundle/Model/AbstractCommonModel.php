@@ -83,14 +83,6 @@ abstract class AbstractCommonModel implements MauticModelInterface
     }
 
     /**
-     * Name of the entity getter used to render an entity's display name.
-     */
-    public function getNameGetter(): string
-    {
-        return 'getName';
-    }
-
-    /**
      * Return a list of entities.
      *
      * @param array $args [start, limit, filter, orderBy, orderByDir]
