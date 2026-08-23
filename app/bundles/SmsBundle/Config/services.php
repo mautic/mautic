@@ -36,6 +36,10 @@ return function (ContainerConfigurator $configurator): void {
     $services->set(Mautic\SmsBundle\Integration\Twilio\TwilioCallback::class)->tag('mautic.sms_callback_handler');
     $services->set('mautic.integration.twilio', Mautic\SmsBundle\Integration\TwilioIntegration::class);
 
+<<<<<<< HEAD
     $services->alias('mautic.sms.model.sms', Mautic\SmsBundle\Model\SmsModel::class);
+=======
+    $services->alias('mautic.sms.callback_handler_container', Mautic\SmsBundle\Callback\HandlerContainer::class);
+>>>>>>> 017d645310 (Remove now-unused mautic.*.model.* service aliases for models)
     $services->set(Mautic\SmsBundle\Security\Permissions\SmsPermissions::class);
 };

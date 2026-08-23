@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Factory;
 
+use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Model\MauticModelInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
 use Symfony\Component\DependencyInjection\ServiceLocator;
@@ -12,7 +13,10 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 class ModelFactory
 {
     public function __construct(
-        #[AutowireLocator(MauticModelInterface::class, defaultIndexMethod: 'getName')]
+        #[AutowireLocator(
+            MauticModelInterface::class,
+            defaultIndexMethod: 'getName'
+        )]
         private readonly ServiceLocator $container,
     ) {
     }
@@ -20,7 +24,7 @@ class ModelFactory
     /**
      * @param non-empty-string $modelNameKey
      */
-    public function getModel(string $modelNameKey): MauticModelInterface
+    public function getModel(string $modelNameKey): AbstractCommonModel
     {
         // Shortcut for models with the same name as the bundle, e.g. "lead" => "lead.lead"
         if (!str_contains($modelNameKey, '.')) {

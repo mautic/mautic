@@ -66,8 +66,6 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->alias(Mautic\UserBundle\Entity\UserTokenRepositoryInterface::class, Mautic\UserBundle\Entity\UserTokenRepository::class);
 
-    $services->alias('mautic.user.model.role', Mautic\UserBundle\Model\RoleModel::class);
-    $services->alias('mautic.user.model.user', Mautic\UserBundle\Model\UserModel::class);
     $services->alias('mautic.user.model.password_strength_estimator', Mautic\UserBundle\Model\PasswordStrengthEstimatorModel::class);
 
     $services->load('Mautic\\UserBundle\\Security\\SAML\Store\\Request\\', '../Security/SAML/Store/Request/*.php');

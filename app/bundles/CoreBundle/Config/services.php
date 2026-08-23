@@ -216,9 +216,6 @@ return function (ContainerConfigurator $configurator): void {
         ->call('setVersion', [param('mautic.secret_key'), MAUTIC_VERSION]);
 
     $services->get(Mautic\CoreBundle\Model\NotificationModel::class)->call('setDisableUpdates', ['%mautic.security.disableUpdates%']);
-    $services->alias('mautic.core.model.auditlog', Mautic\CoreBundle\Model\AuditLogModel::class);
-    $services->alias('mautic.core.model.notification', Mautic\CoreBundle\Model\NotificationModel::class);
-    $services->alias('mautic.core.model.form', Mautic\CoreBundle\Model\FormModel::class);
     $services->set(Mautic\CoreBundle\Security\Permissions\SystemPermissions::class);
 
     // Menus: each menu is a KnpMenu item built from the MenuBuilder,

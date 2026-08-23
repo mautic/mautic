@@ -33,7 +33,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->set('mautic.report.model.message_schedule', Mautic\ReportBundle\Scheduler\Model\MessageSchedule::class);
     $services->set('mautic.report.model.report_data_adapter', Mautic\ReportBundle\Adapter\ReportDataAdapter::class);
 
-    $services->alias('mautic.report.model.report', Mautic\ReportBundle\Model\ReportModel::class);
     $services->alias('mautic.report.model.csv_exporter', Mautic\ReportBundle\Model\CsvExporter::class);
     $services->alias('mautic.report.model.excel_exporter', Mautic\ReportBundle\Model\ExcelExporter::class);
     $services->alias('mautic.report.model.report_exporter', Mautic\ReportBundle\Model\ReportExporter::class);

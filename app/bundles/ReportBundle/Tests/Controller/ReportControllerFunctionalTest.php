@@ -707,7 +707,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         ];
 
         $reportModel->method('getFilterList')->willReturn($filterDefinitions);
-        self::getContainer()->set('mautic.report.model.report', $reportModel);
+        self::getContainer()->set(ReportModel::class, $reportModel);
 
         $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId());
         self::assertResponseIsSuccessful();
