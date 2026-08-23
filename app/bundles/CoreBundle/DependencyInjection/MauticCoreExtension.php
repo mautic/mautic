@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\DependencyInjection;
 
 use Mautic\CoreBundle\Helper\Update\PreUpdateChecks\AbstractPreUpdateCheck;
+use Mautic\CoreBundle\Model\MauticModelInterface;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Mautic\CoreBundle\Update\Step\StepInterface;
 use Symfony\Component\Config\FileLocator;
@@ -36,6 +37,9 @@ final class MauticCoreExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container): void
     {
+        $container->registerForAutoconfiguration(MauticModelInterface::class)
+            ->addTag(MauticModelInterface::class);
+
         $container->registerForAutoconfiguration(AbstractPermissions::class)
             ->addTag('mautic.permissions');
 

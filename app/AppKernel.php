@@ -10,9 +10,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
 
-/**
- * Mautic Application Kernel.
- */
 class AppKernel extends Kernel
 {
     /**
@@ -199,12 +196,6 @@ class AppKernel extends Kernel
         }
 
         return $bundles;
-    }
-
-    protected function build(ContainerBuilder $container): void
-    {
-        $container->registerForAutoconfiguration(Mautic\CoreBundle\Model\MauticModelInterface::class)
-            ->addTag(Mautic\CoreBundle\Factory\ModelFactory::TAG);
     }
 
     public function boot(): void

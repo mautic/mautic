@@ -11,13 +11,8 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
  */
 class ModelFactory
 {
-    /**
-     * Tag applied (via autoconfiguration) to every MauticModelInterface service.
-     */
-    public const string TAG = 'mautic.model';
-
     public function __construct(
-        #[AutowireLocator(self::TAG, defaultIndexMethod: 'getName')]
+        #[AutowireLocator(MauticModelInterface::class, defaultIndexMethod: 'getName')]
         private readonly ServiceLocator $container,
     ) {
     }
@@ -37,7 +32,7 @@ class ModelFactory
             return $this->container->get($modelNameKey);
         }
 
-        throw new \InvalidArgumentException($modelNameKey . ' is not a registered model key.');
+        throw new \InvalidArgumentException($modelNameKey.' is not a registered model key.');
     }
 
     public function hasModel(string $modelNameKey): bool

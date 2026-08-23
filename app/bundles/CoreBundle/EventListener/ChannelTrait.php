@@ -3,7 +3,6 @@
 namespace Mautic\CoreBundle\EventListener;
 
 use Mautic\CoreBundle\Factory\ModelFactory;
-use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Model\MauticModelInterface;
 
 trait ChannelTrait
