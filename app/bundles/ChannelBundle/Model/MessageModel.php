@@ -75,7 +75,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
         return 'channel:messages';
     }
 
-    public function getRepository(): ?MessageRepository
+    public function getRepository(): MessageRepository
     {
         return $this->messageRepository;
     }

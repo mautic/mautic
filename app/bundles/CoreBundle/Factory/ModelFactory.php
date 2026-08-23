@@ -24,7 +24,7 @@ class ModelFactory
     /**
      * @param non-empty-string $modelNameKey
      */
-    public function getModel(string $modelNameKey): AbstractCommonModel
+    public function getModel(string $modelNameKey): MauticModelInterface
     {
         // Shortcut for models with the same name as the bundle, e.g. "lead" => "lead.lead"
         if (!str_contains($modelNameKey, '.')) {
