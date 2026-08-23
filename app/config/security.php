@@ -2,6 +2,7 @@
 
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 
+/** @var array<string, array<string, mixed>> $firewalls */
 $firewalls = [
     'install' => [
         'pattern'  => '^/installer',
