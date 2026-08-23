@@ -8,12 +8,14 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
 final class AuditlogController extends CommonController
 {
     use LeadAccessTrait;
     use LeadDetailsTrait;
 
+    #[Route('/s/contacts/auditlog/{leadId}/{page}', name: 'mautic_contact_auditlog_action', requirements: ['leadId' => '\d+', 'page' => '\d+'], defaults: ['page' => 0])]
     public function indexAction(Request $request, $leadId, int $page = 1): Response
     {
         if (empty($leadId)) {
@@ -64,6 +66,7 @@ final class AuditlogController extends CommonController
         );
     }
 
+    #[Route('/s/contacts/auditlog/batchExport/{leadId}', name: 'mautic_contact_auditlog_export_action', requirements: ['leadId' => '\d+'])]
     public function batchExportAction(Request $request, DateHelper $dateHelper, ExportHelper $exportHelper, $leadId): Response|\Symfony\Component\HttpFoundation\StreamedResponse
     {
         if (empty($leadId)) {

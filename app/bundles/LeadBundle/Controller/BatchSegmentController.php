@@ -9,6 +9,7 @@ use Mautic\LeadBundle\Model\SegmentActionModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
 final class BatchSegmentController extends AbstractFormController
@@ -29,6 +30,7 @@ final class BatchSegmentController extends AbstractFormController
     /**
      * API for batch action.
      */
+    #[Route('/s/segments/batch/contact/set', name: 'mautic_segment_batch_contact_set')]
     public function setAction(Request $request): JsonResponse
     {
         $params     = $request->query->all()['lead_batch'] ?? $request->request->all()['lead_batch'] ?? [];
@@ -62,6 +64,7 @@ final class BatchSegmentController extends AbstractFormController
     /**
      * View for batch action.
      */
+    #[Route('/s/segments/batch/contact/view', name: 'mautic_segment_batch_contact_view')]
     public function indexAction(): Response
     {
         $route = $this->generateUrl('mautic_segment_batch_contact_set');

@@ -9,6 +9,7 @@ use Mautic\NotificationBundle\Entity\NotificationRepository;
 use Mautic\NotificationBundle\Model\NotificationModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
 final class AppCallbackController extends CommonController
@@ -30,6 +31,7 @@ final class AppCallbackController extends CommonController
         $this->notificationRepository = $notificationRepository;
     }
 
+    #[Route('/notification/appcallback', name: 'mautic_app_notification')]
     public function indexAction(Request $request): JsonResponse
     {
         $requestBody = json_decode($request->getContent(), true);

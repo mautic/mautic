@@ -14,6 +14,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
 final class PublicController extends FormController
@@ -34,6 +35,7 @@ final class PublicController extends FormController
     /**
      * Generates a new password for the user and emails it to them.
      */
+    #[Route('/passwordreset', name: 'mautic_user_passwordreset')]
     public function passwordResetAction(Request $request, LoggerInterface $logger): RedirectResponse|Response
     {
         $data   = ['identifier' => ''];
@@ -86,6 +88,7 @@ final class PublicController extends FormController
         ]);
     }
 
+    #[Route('/passwordresetconfirm', name: 'mautic_user_passwordresetconfirm')]
     public function passwordResetConfirmAction(Request $request): RedirectResponse|Response
     {
         $action   = $this->generateUrl('mautic_user_passwordresetconfirm');
@@ -151,6 +154,7 @@ final class PublicController extends FormController
         ]);
     }
 
+    #[Route('/invite/{token}', name: 'mautic_user_invite_register')]
     public function inviteAction(Request $request, UserModel $model, LoggerInterface $logger): RedirectResponse|Response
     {
         $token    = $request->attributes->getString('token');

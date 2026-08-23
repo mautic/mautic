@@ -10,6 +10,7 @@ use Mautic\FormBundle\Crate\FieldCrate;
 use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
 final class AjaxController extends CommonAjaxController
@@ -135,6 +136,7 @@ final class AjaxController extends CommonAjaxController
     /**
      * Ajax submit for forms.
      */
+    #[Route('/form/submit/ajax', name: 'mautic_form_postresults_ajax')]
     public function submitAction(Request $request): JsonResponse
     {
         $response     = $this->forwardWithPost('Mautic\FormBundle\Controller\PublicController::submitAction', $request->request->all(), [], ['ajax' => true]);

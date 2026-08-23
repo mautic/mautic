@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
@@ -54,6 +55,7 @@ final class SecurityController extends CommonController implements EventSubscrib
     /**
      * Generates login form and processes login.
      */
+    #[Route('/s/login', name: 'login')]
     public function loginAction(Request $request, AuthenticationUtils $authenticationUtils, IntegrationHelper $integrationHelper, TranslatorInterface $translator): Response
     {
         $error = $authenticationUtils->getLastAuthenticationError();
@@ -99,6 +101,7 @@ final class SecurityController extends CommonController implements EventSubscrib
     /**
      * The plugin should be handling this in it's listener.
      */
+    #[Route('/s/sso_login/{integration}', name: 'mautic_sso_login')]
     public function ssoLoginAction($integration): RedirectResponse
     {
         return new RedirectResponse($this->generateUrl('login'));
@@ -107,6 +110,7 @@ final class SecurityController extends CommonController implements EventSubscrib
     /**
      * The plugin should be handling this in it's listener.
      */
+    #[Route('/s/sso_login_check/{integration}', name: 'mautic_sso_login_check')]
     public function ssoLoginCheckAction($integration): RedirectResponse
     {
         // The plugin should be handling this in it's listener
@@ -114,6 +118,7 @@ final class SecurityController extends CommonController implements EventSubscrib
         return new RedirectResponse($this->generateUrl('login'));
     }
 
+    #[Route('/saml/login_retry', name: 'mautic_saml_login_retry')]
     public function samlLoginRetryAction(SAMLHelper $samlHelper, SessionInterface $session): Response
     {
         if (!$samlHelper->isSamlEnabled()) {

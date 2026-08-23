@@ -4,54 +4,6 @@ declare(strict_types=1);
 
 return [
     'routes' => [
-        'main' => [
-            'mautic_report_index' => [
-                'path'       => '/reports/{page}',
-                'controller' => 'Mautic\ReportBundle\Controller\ReportController::indexAction',
-            ],
-            'mautic_report_export' => [
-                'path'       => '/reports/view/{objectId}/export/{format}',
-                'controller' => 'Mautic\ReportBundle\Controller\ReportController::exportAction',
-                'defaults'   => [
-                    'format' => 'csv',
-                ],
-            ],
-            'mautic_report_download' => [
-                'path'       => '/reports/download/{reportId}/{format}',
-                'controller' => 'Mautic\ReportBundle\Controller\ReportController::downloadAction',
-                'defaults'   => [
-                    'format' => 'csv',
-                ],
-            ],
-            'mautic_report_view' => [
-                'path'       => '/reports/view/{objectId}/{reportPage}',
-                'controller' => 'Mautic\ReportBundle\Controller\ReportController::viewAction',
-                'defaults'   => [
-                    'reportPage' => 1,
-                ],
-                'requirements' => [
-                    'reportPage' => '\d+',
-                ],
-            ],
-            'mautic_report_schedule_preview' => [
-                'path'       => '/reports/schedule/preview/{isScheduled}/{scheduleUnit}/{scheduleDay}/{scheduleMonthFrequency}',
-                'controller' => 'Mautic\ReportBundle\Controller\ScheduleController::indexAction',
-                'defaults'   => [
-                    'isScheduled'            => 0,
-                    'scheduleUnit'           => '',
-                    'scheduleDay'            => '',
-                    'scheduleMonthFrequency' => '',
-                ],
-            ],
-            'mautic_report_schedule' => [
-                'path'       => '/reports/schedule/{reportId}/now',
-                'controller' => 'Mautic\ReportBundle\Controller\ScheduleController::nowAction',
-            ],
-            'mautic_report_action' => [
-                'path'       => '/reports/{objectAction}/{objectId}',
-                'controller' => 'Mautic\ReportBundle\Controller\ReportController::executeAction',
-            ],
-        ],
         'api' => [
             'mautic_api_reportsstandard' => [
                 'standard_entity' => true,

@@ -4,16 +4,6 @@ declare(strict_types=1);
 
 return [
     'routes' => [
-        'main' => [
-            'mautic_stage_index' => [
-                'path'       => '/stages/{page}',
-                'controller' => 'Mautic\StageBundle\Controller\StageController::indexAction',
-            ],
-            'mautic_stage_action' => [
-                'path'       => '/stages/{objectAction}/{objectId}',
-                'controller' => 'Mautic\StageBundle\Controller\StageController::executeAction',
-            ],
-        ],
         'api' => [
             'mautic_api_stagesstandard' => [
                 'standard_entity' => true,

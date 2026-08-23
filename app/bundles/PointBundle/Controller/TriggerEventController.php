@@ -23,7 +23,7 @@ final class TriggerEventController extends CommonFormController
         $this->triggerModel = $triggerModel;
     }
 
-    #[Route('/s/points/triggers/events/{objectAction}/{objectId}', name: 'mautic_pointtriggerevent_action', defaults: ['objectId' => 0], requirements: ['objectId' => '[a-zA-Z0-9_-]+'])]
+    #[Route('/s/points/triggers/events/{objectAction}/{objectId}', name: 'mautic_pointtriggerevent_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0])]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);

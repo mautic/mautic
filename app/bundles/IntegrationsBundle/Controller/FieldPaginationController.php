@@ -14,9 +14,11 @@ use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
 final class FieldPaginationController extends CommonController
 {
+    #[Route('/s/integration/{integration}/config/{object}/{page}', name: 'mautic_integration_config_field_pagination', requirements: ['page' => '\d+'], defaults: ['page' => 1])]
     public function paginateAction(
         Request $request,
         ConfigIntegrationsHelper $integrationsHelper,

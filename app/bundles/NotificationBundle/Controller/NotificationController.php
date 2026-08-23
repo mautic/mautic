@@ -12,6 +12,7 @@ use Mautic\NotificationBundle\Entity\Notification;
 use Mautic\NotificationBundle\Model\NotificationModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
 final class NotificationController extends AbstractFormController
@@ -31,9 +32,16 @@ final class NotificationController extends AbstractFormController
         $this->notificationModel = $notificationModel;
     }
 
+    #[Route('/s/notifications/{objectAction}/{objectId}', name: 'mautic_notification_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0])]
+    public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
+    {
+        return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
+    }
+
     /**
      * @param int $page
      */
+    #[Route('/s/notifications/{page}', name: 'mautic_notification_index', requirements: ['page' => '\d+'], defaults: ['page' => 0])]
     public function indexAction(Request $request, $page = 1): Response
     {
         // set some permissions
@@ -711,6 +719,7 @@ final class NotificationController extends AbstractFormController
     /**
      * @param int $page
      */
+    #[Route('/s/notifications/view/{objectId}/contact/{page}', name: 'mautic_notification_contacts', requirements: ['page' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'], defaults: ['page' => 0, 'objectId' => 0])]
     public function contactsAction(
         Request $request,
         PageHelperFactoryInterface $pageHelperFactory,

@@ -12,6 +12,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
 final class RoleController extends FormController
@@ -39,6 +40,12 @@ final class RoleController extends FormController
         $this->roleModel = $roleModel;
     }
 
+    #[Route('/s/roles/{objectAction}/{objectId}', name: 'mautic_role_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0])]
+    public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
+    {
+        return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
+    }
+
     /**
      * @param int|string|null $objectId
      */
@@ -56,6 +63,7 @@ final class RoleController extends FormController
     /**
      * Generate's default role list view.
      */
+    #[Route('/s/roles/{page}', name: 'mautic_role_index', requirements: ['page' => '\d+'], defaults: ['page' => 0])]
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
     {
         if (!$this->security->isGranted(self::PERMISSION_VIEW)) {

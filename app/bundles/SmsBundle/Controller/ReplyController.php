@@ -9,6 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Routing\Attribute\Route;
 
 final class ReplyController extends AbstractController
 {
@@ -21,6 +22,7 @@ final class ReplyController extends AbstractController
     /**
      * @throws \Exception
      */
+    #[Route('/sms/{transport}/callback', name: 'mautic_sms_callback')]
     public function callbackAction(Request $request, $transport): Response
     {
         define('MAUTIC_NON_TRACKABLE_REQUEST', 1);

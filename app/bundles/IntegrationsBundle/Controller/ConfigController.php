@@ -30,6 +30,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
 final class ConfigController extends AbstractFormController
 {
@@ -40,6 +41,7 @@ final class ConfigController extends AbstractFormController
 
     private ?Integration $integrationConfiguration = null;
 
+    #[Route('/s/integration/{integration}/config', name: 'mautic_integration_config')]
     public function editAction(
         Request $request,
         ConfigIntegrationsHelper $integrationsHelper,

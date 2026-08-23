@@ -22,6 +22,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -56,6 +57,7 @@ final class NotificationApiController extends CommonApiController
     /**
      * Receive Web Push subscription request.
      */
+    #[Route('/notification/subscribe', name: 'mautic_subscribe_notification')]
     public function subscribeAction(Request $request): JsonResponse
     {
         $osid = $request->get('osid');

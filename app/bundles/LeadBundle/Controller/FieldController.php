@@ -15,6 +15,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
 final class FieldController extends FormController
@@ -28,11 +29,18 @@ final class FieldController extends FormController
         $this->fieldModel = $fieldModel;
     }
 
+    #[Route('/s/contacts/fields/{objectAction}/{objectId}', name: 'mautic_contactfield_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0])]
+    public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
+    {
+        return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
+    }
+
     /**
      * Generate's default list view.
      *
      * @param int $page
      */
+    #[Route('/s/contacts/fields/{page}', name: 'mautic_contactfield_index', requirements: ['page' => '\d+'], defaults: ['page' => 0])]
     public function indexAction(Request $request, FieldModel $fieldModel, $page = 1): Response
     {
         // set some permissions
