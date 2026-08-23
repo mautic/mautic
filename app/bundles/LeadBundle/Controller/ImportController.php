@@ -66,7 +66,7 @@ final class ImportController extends FormController
         $this->importRepository = $importRepository;
     }
 
-    #[Route('/s/{object}/import/{objectAction}/{objectId}', name: 'mautic_import_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0])]
+    #[Route('/s/{object}/import/{objectAction}/{objectId}', name: 'mautic_import_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -1)]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);

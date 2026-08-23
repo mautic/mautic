@@ -53,7 +53,7 @@ final class UserController extends FormController
         $this->roleRepository = $roleRepository;
     }
 
-    #[Route('/s/users/{objectAction}/{objectId}', name: 'mautic_user_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0])]
+    #[Route('/s/users/{objectAction}/{objectId}', name: 'mautic_user_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -1)]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);

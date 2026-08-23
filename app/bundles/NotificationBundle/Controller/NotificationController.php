@@ -32,7 +32,7 @@ final class NotificationController extends AbstractFormController
         $this->notificationModel = $notificationModel;
     }
 
-    #[Route('/s/notifications/{objectAction}/{objectId}', name: 'mautic_notification_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0])]
+    #[Route('/s/notifications/{objectAction}/{objectId}', name: 'mautic_notification_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -1)]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);

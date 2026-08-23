@@ -368,7 +368,7 @@ final class NoteController extends FormController
      * @param int $objectId
      * @param int $leadId
      */
-    #[Route('/s/contacts/notes/{leadId}/{objectAction}/{objectId}', name: 'mautic_contactnote_action', requirements: ['leadId' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0])]
+    #[Route('/s/contacts/notes/{leadId}/{objectAction}/{objectId}', name: 'mautic_contactnote_action', requirements: ['leadId' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -1)]
     public function executeNoteAction(Request $request, $objectAction, $objectId = 0, $leadId = 0): Response
     {
         if (method_exists($this, "{$objectAction}Action")) {

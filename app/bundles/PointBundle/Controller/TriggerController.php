@@ -28,7 +28,7 @@ final class TriggerController extends FormController
         $this->triggerModel      = $triggerModel;
     }
 
-    #[Route('/s/points/triggers/{objectAction}/{objectId}', name: 'mautic_pointtrigger_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0])]
+    #[Route('/s/points/triggers/{objectAction}/{objectId}', name: 'mautic_pointtrigger_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -1)]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
