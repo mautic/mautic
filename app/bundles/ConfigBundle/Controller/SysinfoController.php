@@ -19,7 +19,7 @@ final class SysinfoController extends FormController
         $this->sysinfoModel = $sysinfoModel;
     }
 
-    #[Route('/s/sysinfo', name: 'mautic_sysinfo_index')]
+    #[Route('/s/sysinfo', name: 'mautic_sysinfo_index', priority: -655)]
     public function indexAction(): Response
     {
         if (!$this->user->isAdmin() || $this->coreParametersHelper->get('sysinfo_disabled')) {

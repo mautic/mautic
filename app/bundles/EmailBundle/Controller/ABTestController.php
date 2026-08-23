@@ -19,7 +19,7 @@ final class ABTestController extends AbstractFormController
 
     public const int TOTAL_WEIGHT = 10;
 
-    #[Route('/s/email/abtest/generate/{objectId}', name: 'mautic_abtest_generate', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0])]
+    #[Route('/s/email/abtest/generate/{objectId}', name: 'mautic_abtest_generate', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -668)]
     public function generateABTestAction(Request $request, EmailModel $emailModel, int $objectId): Response
     {
         if (!$parent = $emailModel->getEntity($objectId)) {

@@ -31,7 +31,7 @@ final class AppCallbackController extends CommonController
         $this->notificationRepository = $notificationRepository;
     }
 
-    #[Route('/notification/appcallback', name: 'mautic_app_notification')]
+    #[Route('/notification/appcallback', name: 'mautic_app_notification', priority: -249)]
     public function indexAction(Request $request): JsonResponse
     {
         $requestBody = json_decode($request->getContent(), true);

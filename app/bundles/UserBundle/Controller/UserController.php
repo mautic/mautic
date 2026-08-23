@@ -53,7 +53,7 @@ final class UserController extends FormController
         $this->roleRepository = $roleRepository;
     }
 
-    #[Route('/s/users/{objectAction}/{objectId}', name: 'mautic_user_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -1)]
+    #[Route('/s/users/{objectAction}/{objectId}', name: 'mautic_user_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -759)]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
@@ -62,7 +62,7 @@ final class UserController extends FormController
     /**
      * Generate's default user list.
      */
-    #[Route('/s/users/{page}', name: 'mautic_user_index', requirements: ['page' => '\d+'], defaults: ['page' => 0])]
+    #[Route('/s/users/{page}', name: 'mautic_user_index', requirements: ['page' => '\d+'], defaults: ['page' => 0], priority: -758)]
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): JsonResponse|Response
     {
         if (!$this->security->isGranted('user:users:view')) {

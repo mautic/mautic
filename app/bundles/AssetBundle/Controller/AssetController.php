@@ -27,13 +27,13 @@ final class AssetController extends FormController
         $this->auditLogModel = $auditLogModel;
     }
 
-    #[Route('/s/assets/{objectAction}/{objectId}', name: 'mautic_asset_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -1)]
+    #[Route('/s/assets/{objectAction}/{objectId}', name: 'mautic_asset_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -630)]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
     }
 
-    #[Route('/s/assets/{page}', name: 'mautic_asset_index', requirements: ['page' => '\d+'], defaults: ['page' => 0])]
+    #[Route('/s/assets/{page}', name: 'mautic_asset_index', requirements: ['page' => '\d+'], defaults: ['page' => 0], priority: -628)]
     public function indexAction(Request $request, CoreParametersHelper $parametersHelper, AssetModel $assetModel, int $page = 1): Response
     {
         // set some permissions
@@ -724,7 +724,7 @@ final class AssetController extends FormController
     /**
      * Renders the container for the remote file browser.
      */
-    #[Route('/s/assets/remote', name: 'mautic_asset_remote')]
+    #[Route('/s/assets/remote', name: 'mautic_asset_remote', priority: -629)]
     public function remoteAction(Request $request, IntegrationHelper $integrationHelper): Response
     {
         // Check for integrations to cloud providers

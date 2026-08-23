@@ -15,7 +15,7 @@ final class AuditlogController extends CommonController
     use LeadAccessTrait;
     use LeadDetailsTrait;
 
-    #[Route('/s/contacts/auditlog/{leadId}/{page}', name: 'mautic_contact_auditlog_action', requirements: ['leadId' => '\d+', 'page' => '\d+'], defaults: ['page' => 0])]
+    #[Route('/s/contacts/auditlog/{leadId}/{page}', name: 'mautic_contact_auditlog_action', requirements: ['leadId' => '\d+', 'page' => '\d+'], defaults: ['page' => 0], priority: -693)]
     public function indexAction(Request $request, $leadId, int $page = 1): Response
     {
         if (empty($leadId)) {
@@ -66,7 +66,7 @@ final class AuditlogController extends CommonController
         );
     }
 
-    #[Route('/s/contacts/auditlog/batchExport/{leadId}', name: 'mautic_contact_auditlog_export_action', requirements: ['leadId' => '\d+'])]
+    #[Route('/s/contacts/auditlog/batchExport/{leadId}', name: 'mautic_contact_auditlog_export_action', requirements: ['leadId' => '\d+'], priority: -694)]
     public function batchExportAction(Request $request, DateHelper $dateHelper, ExportHelper $exportHelper, $leadId): Response|\Symfony\Component\HttpFoundation\StreamedResponse
     {
         if (empty($leadId)) {

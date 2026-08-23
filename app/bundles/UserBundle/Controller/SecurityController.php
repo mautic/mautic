@@ -55,7 +55,7 @@ final class SecurityController extends CommonController implements EventSubscrib
     /**
      * Generates login form and processes login.
      */
-    #[Route('/s/login', name: 'login')]
+    #[Route('/s/login', name: 'login', priority: -751)]
     public function loginAction(Request $request, AuthenticationUtils $authenticationUtils, IntegrationHelper $integrationHelper, TranslatorInterface $translator): Response
     {
         $error = $authenticationUtils->getLastAuthenticationError();
@@ -101,7 +101,7 @@ final class SecurityController extends CommonController implements EventSubscrib
     /**
      * The plugin should be handling this in it's listener.
      */
-    #[Route('/s/sso_login/{integration}', name: 'mautic_sso_login')]
+    #[Route('/s/sso_login/{integration}', name: 'mautic_sso_login', priority: -754)]
     public function ssoLoginAction($integration): RedirectResponse
     {
         return new RedirectResponse($this->generateUrl('login'));
@@ -110,7 +110,7 @@ final class SecurityController extends CommonController implements EventSubscrib
     /**
      * The plugin should be handling this in it's listener.
      */
-    #[Route('/s/sso_login_check/{integration}', name: 'mautic_sso_login_check')]
+    #[Route('/s/sso_login_check/{integration}', name: 'mautic_sso_login_check', priority: -755)]
     public function ssoLoginCheckAction($integration): RedirectResponse
     {
         // The plugin should be handling this in it's listener
@@ -118,7 +118,7 @@ final class SecurityController extends CommonController implements EventSubscrib
         return new RedirectResponse($this->generateUrl('login'));
     }
 
-    #[Route('/saml/login_retry', name: 'mautic_saml_login_retry')]
+    #[Route('/saml/login_retry', name: 'mautic_saml_login_retry', priority: -265)]
     public function samlLoginRetryAction(SAMLHelper $samlHelper, SessionInterface $session): Response
     {
         if (!$samlHelper->isSamlEnabled()) {

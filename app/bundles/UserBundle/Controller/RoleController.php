@@ -40,7 +40,7 @@ final class RoleController extends FormController
         $this->roleModel = $roleModel;
     }
 
-    #[Route('/s/roles/{objectAction}/{objectId}', name: 'mautic_role_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -1)]
+    #[Route('/s/roles/{objectAction}/{objectId}', name: 'mautic_role_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -761)]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
@@ -63,7 +63,7 @@ final class RoleController extends FormController
     /**
      * Generate's default role list view.
      */
-    #[Route('/s/roles/{page}', name: 'mautic_role_index', requirements: ['page' => '\d+'], defaults: ['page' => 0])]
+    #[Route('/s/roles/{page}', name: 'mautic_role_index', requirements: ['page' => '\d+'], defaults: ['page' => 0], priority: -760)]
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
     {
         if (!$this->security->isGranted(self::PERMISSION_VIEW)) {

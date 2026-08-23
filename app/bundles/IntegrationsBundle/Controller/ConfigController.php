@@ -41,7 +41,7 @@ final class ConfigController extends AbstractFormController
 
     private ?Integration $integrationConfiguration = null;
 
-    #[Route('/s/integration/{integration}/config', name: 'mautic_integration_config')]
+    #[Route('/s/integration/{integration}/config', name: 'mautic_integration_config', priority: -677)]
     public function editAction(
         Request $request,
         ConfigIntegrationsHelper $integrationsHelper,

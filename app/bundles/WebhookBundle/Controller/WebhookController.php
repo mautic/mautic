@@ -47,7 +47,7 @@ final class WebhookController extends FormController
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
-    #[Route('/s/webhooks/{objectAction}/{objectId}', name: 'mautic_webhook_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -1)]
+    #[Route('/s/webhooks/{objectAction}/{objectId}', name: 'mautic_webhook_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -764)]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
@@ -56,7 +56,7 @@ final class WebhookController extends FormController
     /**
      * @param int $page
      */
-    #[Route('/s/webhooks/{page}', name: 'mautic_webhook_index', requirements: ['page' => '\d+'], defaults: ['page' => 0])]
+    #[Route('/s/webhooks/{page}', name: 'mautic_webhook_index', requirements: ['page' => '\d+'], defaults: ['page' => 0], priority: -763)]
     public function indexAction(Request $request, $page = 1): Response
     {
         return parent::indexStandard($request, $page);

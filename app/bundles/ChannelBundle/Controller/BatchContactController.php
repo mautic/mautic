@@ -35,7 +35,7 @@ final class BatchContactController extends AbstractFormController
     /**
      * Execute the batch action.
      */
-    #[Route('/s/channels/batch/contact/set', name: 'mautic_channel_batch_contact_set')]
+    #[Route('/s/channels/batch/contact/set', name: 'mautic_channel_batch_contact_set', priority: -652)]
     public function setAction(Request $request): JsonResponse
     {
         $params = $request->get('contact_channels', []);
@@ -64,7 +64,7 @@ final class BatchContactController extends AbstractFormController
     /**
      * View for batch action.
      */
-    #[Route('/s/channels/batch/contact/view', name: 'mautic_channel_batch_contact_view')]
+    #[Route('/s/channels/batch/contact/view', name: 'mautic_channel_batch_contact_view', priority: -653)]
     public function indexAction(): Response
     {
         $route = $this->generateUrl('mautic_channel_batch_contact_set');

@@ -282,7 +282,7 @@ final class PublicController extends AbstractFormController
     /**
      * @throws FileNotFoundException
      */
-    #[Route('/page/preview/{id}/{objectType}', name: 'mautic_page_preview', defaults: ['objectType' => null])]
+    #[Route('/page/preview/{id}/{objectType}', name: 'mautic_page_preview', defaults: ['objectType' => null], priority: -255)]
     public function previewAction(Request $request, PageConfig $pageConfig, CorePermissions $security, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, ThemeHelper $themeHelper, PageModel $model, LeadModel $leadModel, int $id, ?string $objectType = null): Response
     {
         $page = $model->getEntity($id);
@@ -360,7 +360,7 @@ final class PublicController extends AbstractFormController
         return new Response($content);
     }
 
-    #[Route('/mtracking.gif', name: 'mautic_page_tracker')]
+    #[Route('/mtracking.gif', name: 'mautic_page_tracker', priority: -250)]
     public function trackingImageAction(Request $request, PageModel $model): Response
     {
         $model->hitPage(null, $request);
@@ -368,7 +368,7 @@ final class PublicController extends AbstractFormController
         return TrackingPixelHelper::getResponse($request);
     }
 
-    #[Route('/mtc/event', name: 'mautic_page_tracker_cors')]
+    #[Route('/mtc/event', name: 'mautic_page_tracker_cors', priority: -251)]
     public function trackingAction(
         Request $request,
         DeviceTrackingServiceInterface $deviceTrackingService,
@@ -415,8 +415,8 @@ final class PublicController extends AbstractFormController
     /**
      * @throws \Exception
      */
-    #[Route('/r/{redirectId}', name: 'mautic_url_redirect')]
-    #[Route('/redirect/{redirectId}', name: 'mautic_page_redirect')]
+    #[Route('/r/{redirectId}', name: 'mautic_url_redirect', priority: -253)]
+    #[Route('/redirect/{redirectId}', name: 'mautic_page_redirect', priority: -254)]
     public function redirectAction(
         Request $request,
         ContactRequestHelper $contactRequestHelper,
@@ -537,7 +537,7 @@ final class PublicController extends AbstractFormController
     /**
      * Get the ID of the currently tracked Contact.
      */
-    #[Route('/mtc', name: 'mautic_page_tracker_getcontact')]
+    #[Route('/mtc', name: 'mautic_page_tracker_getcontact', priority: -252)]
     public function getContactIdAction(DeviceTrackingServiceInterface $trackedDeviceService, ContactTracker $contactTracker): JsonResponse
     {
         $data = [];

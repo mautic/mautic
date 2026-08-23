@@ -21,7 +21,7 @@ final class ScheduleController extends CommonAjaxController
         $this->reportModel = $reportModel;
     }
 
-    #[Route('/s/reports/schedule/preview/{isScheduled}/{scheduleUnit}/{scheduleDay}/{scheduleMonthFrequency}', name: 'mautic_report_schedule_preview', defaults: ['isScheduled' => 0, 'scheduleUnit' => '', 'scheduleDay' => '', 'scheduleMonthFrequency' => ''])]
+    #[Route('/s/reports/schedule/preview/{isScheduled}/{scheduleUnit}/{scheduleDay}/{scheduleMonthFrequency}', name: 'mautic_report_schedule_preview', defaults: ['isScheduled' => 0, 'scheduleUnit' => '', 'scheduleDay' => '', 'scheduleMonthFrequency' => ''], priority: -743)]
     public function indexAction(DateBuilder $dateBuilder, $isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency): JsonResponse
     {
         $dates = $dateBuilder->getPreviewDays($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency);
@@ -45,7 +45,7 @@ final class ScheduleController extends CommonAjaxController
      *
      * @param int $reportId
      */
-    #[Route('/s/reports/schedule/{reportId}/now', name: 'mautic_report_schedule')]
+    #[Route('/s/reports/schedule/{reportId}/now', name: 'mautic_report_schedule', priority: -744)]
     public function nowAction($reportId): JsonResponse
     {
         /** @var \Mautic\ReportBundle\Entity\Report $report */

@@ -49,13 +49,13 @@ final class CompanyController extends FormController
         $this->companyRepository = $companyRepository;
     }
 
-    #[Route('/s/companies/{objectAction}/{objectId}', name: 'mautic_company_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -1)]
+    #[Route('/s/companies/{objectAction}/{objectId}', name: 'mautic_company_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -702)]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
     }
 
-    #[Route('/s/companies/{page}', name: 'mautic_company_index', requirements: ['page' => '\d+'], defaults: ['page' => 0])]
+    #[Route('/s/companies/{page}', name: 'mautic_company_index', requirements: ['page' => '\d+'], defaults: ['page' => 0], priority: -699)]
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, CompanyColumnsDictionary $companyColumnsDictionary, int $page = 1): Response
     {
         // set some permissions
@@ -156,7 +156,7 @@ final class CompanyController extends FormController
      * @param int $objectId company id
      * @param int $page
      */
-    #[Route('/s/company/{objectId}/contacts/{page}', name: 'mautic_company_contacts_list', requirements: ['objectId' => '\d+', 'page' => '\d+'], defaults: ['page' => 0, 'objectId' => 0])]
+    #[Route('/s/company/{objectId}/contacts/{page}', name: 'mautic_company_contacts_list', requirements: ['objectId' => '\d+', 'page' => '\d+'], defaults: ['page' => 0, 'objectId' => 0], priority: -700)]
     public function contactsListAction(Request $request, $objectId, $page = 1): Response
     {
         if (empty($objectId)) {
@@ -607,7 +607,7 @@ final class CompanyController extends FormController
         );
     }
 
-    #[Route('/s/company/graph/{objectId}', name: 'mautic_company_graph', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0])]
+    #[Route('/s/company/graph/{objectId}', name: 'mautic_company_graph', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -701)]
     public function graphAction(CompanyLeadRepository $companiesRepo, int $objectId): Response
     {
         $contacts       = $companiesRepo->getCompanyLeads($objectId);
@@ -1152,7 +1152,7 @@ final class CompanyController extends FormController
     /**
      * Export company's data.
      */
-    #[Route('/s/companies/company/export/{companyId}', name: 'mautic_company_export_action', requirements: ['companyId' => '\d+'])]
+    #[Route('/s/companies/company/export/{companyId}', name: 'mautic_company_export_action', requirements: ['companyId' => '\d+'], priority: -703)]
     public function companyExportAction(Request $request, ExportHelper $exportHelper, $companyId): Response|\Symfony\Component\HttpFoundation\StreamedResponse
     {
         // set some permissions
