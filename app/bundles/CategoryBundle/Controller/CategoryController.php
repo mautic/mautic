@@ -29,7 +29,7 @@ final class CategoryController extends AbstractFormController
      * @param int    $objectId
      * @param string $objectModel
      */
-    #[Route('/s/categories/{bundle}/{objectAction}/{objectId}', name: 'mautic_category_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['bundle' => 'category', 'objectId' => 0])]
+    #[Route('/s/categories/{bundle}/{objectAction}/{objectId}', name: 'mautic_category_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['bundle' => 'category', 'objectId' => 0], priority: -1)]
     public function executeCategoryAction(Request $request, $bundle, $objectAction, $objectId = 0, $objectModel = ''): Response
     {
         if (method_exists($this, $objectAction.'Action')) {
