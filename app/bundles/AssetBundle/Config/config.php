@@ -26,15 +26,6 @@ return [
                 'controller'      => Mautic\AssetBundle\Controller\Api\AssetApiController::class,
             ],
         ],
-        'public' => [
-            'mautic_asset_download' => [
-                'path'       => '/asset/{slug}',
-                'controller' => 'Mautic\AssetBundle\Controller\PublicController::downloadAction',
-                'defaults'   => [
-                    'slug' => '',
-                ],
-            ],
-        ],
     ],
 
     'menu' => [

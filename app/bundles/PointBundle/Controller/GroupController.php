@@ -5,6 +5,7 @@ namespace Mautic\PointBundle\Controller;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
 final class GroupController extends AbstractStandardFormController
 {
@@ -18,9 +19,13 @@ final class GroupController extends AbstractStandardFormController
         return 'point.group';
     }
 
-    /**
-     * @param int $page
-     */
+    #[Route('/s/points/groups/{objectAction}/{objectId}', name: 'mautic_point.group_action', defaults: ['objectId' => 0], requirements: ['objectId' => '[a-zA-Z0-9_-]+'])]
+    public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
+    {
+        return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
+    }
+
+    #[Route('/s/points/groups/{page}', name: 'mautic_point.group_index', defaults: ['page' => 0], requirements: ['page' => '\d+'])]
     public function indexAction(Request $request, $page = 1): Response
     {
         return parent::indexStandard($request, $page);

@@ -71,6 +71,18 @@ final class RouteLoader extends Loader
         }
         $collection->addCollection($secureCollection);
 
+        // Native #[Route] attributes declared directly on bundle controllers.
+        // Paths already carry their full prefix (e.g. /s, /api), so they are added
+        // to the root collection; forceSSL is applied here like every other group.
+        $attributeCollection = new RouteCollection();
+        foreach (glob(dirname(__DIR__, 2).'/*/Controller', GLOB_ONLYDIR) as $controllerDir) {
+            $attributeCollection->addCollection($this->import($controllerDir, 'attribute'));
+        }
+        if ($forceSSL) {
+            $attributeCollection->setSchemes('https');
+        }
+        $collection->addCollection($attributeCollection);
+
         // Catch all
         $event = new RouteEvent($this, 'catchall');
         $this->dispatcher->dispatch($event);

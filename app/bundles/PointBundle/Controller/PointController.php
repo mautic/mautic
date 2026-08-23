@@ -8,6 +8,7 @@ use Mautic\PointBundle\Entity\Point;
 use Mautic\PointBundle\Model\PointModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
 final class PointController extends AbstractFormController
@@ -21,6 +22,13 @@ final class PointController extends AbstractFormController
         $this->pointModel = $pointModel;
     }
 
+    #[Route('/s/points/{objectAction}/{objectId}', name: 'mautic_point_action', defaults: ['objectId' => 0], requirements: ['objectId' => '[a-zA-Z0-9_-]+'])]
+    public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
+    {
+        return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
+    }
+
+    #[Route('/s/points/{page}', name: 'mautic_point_index', defaults: ['page' => 0], requirements: ['page' => '\d+'])]
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
     {
         // set some permissions
