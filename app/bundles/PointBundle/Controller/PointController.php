@@ -22,13 +22,13 @@ final class PointController extends AbstractFormController
         $this->pointModel = $pointModel;
     }
 
-    #[Route('/s/points/{objectAction}/{objectId}', name: 'mautic_point_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -1)]
+    #[Route('/s/points/{objectAction}/{objectId}', name: 'mautic_point_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -736)]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
     }
 
-    #[Route('/s/points/{page}', name: 'mautic_point_index', requirements: ['page' => '\d+'], defaults: ['page' => 0])]
+    #[Route('/s/points/{page}', name: 'mautic_point_index', requirements: ['page' => '\d+'], defaults: ['page' => 0], priority: -735)]
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
     {
         // set some permissions

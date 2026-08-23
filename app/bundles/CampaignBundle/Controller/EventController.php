@@ -49,7 +49,7 @@ final class EventController extends CommonFormController
         $this->eventModel = $eventModel;
     }
 
-    #[Route('/s/campaigns/events/{objectAction}/{objectId}', name: 'mautic_campaignevent_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -1)]
+    #[Route('/s/campaigns/events/{objectAction}/{objectId}', name: 'mautic_campaignevent_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -631)]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);

@@ -35,7 +35,7 @@ final class PublicController extends FormController
     /**
      * Generates a new password for the user and emails it to them.
      */
-    #[Route('/passwordreset', name: 'mautic_user_passwordreset')]
+    #[Route('/passwordreset', name: 'mautic_user_passwordreset', priority: -260)]
     public function passwordResetAction(Request $request, LoggerInterface $logger): RedirectResponse|Response
     {
         $data   = ['identifier' => ''];
@@ -88,7 +88,7 @@ final class PublicController extends FormController
         ]);
     }
 
-    #[Route('/passwordresetconfirm', name: 'mautic_user_passwordresetconfirm')]
+    #[Route('/passwordresetconfirm', name: 'mautic_user_passwordresetconfirm', priority: -261)]
     public function passwordResetConfirmAction(Request $request): RedirectResponse|Response
     {
         $action   = $this->generateUrl('mautic_user_passwordresetconfirm');
@@ -154,7 +154,7 @@ final class PublicController extends FormController
         ]);
     }
 
-    #[Route('/invite/{token}', name: 'mautic_user_invite_register')]
+    #[Route('/invite/{token}', name: 'mautic_user_invite_register', priority: -262)]
     public function inviteAction(Request $request, UserModel $model, LoggerInterface $logger): RedirectResponse|Response
     {
         $token    = $request->attributes->getString('token');

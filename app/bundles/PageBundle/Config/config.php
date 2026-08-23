@@ -20,8 +20,8 @@ return [
                     'slug' => '^(?!(_(profiler|wdt)|css|images|js|favicon.ico|apps/bundles/|plugins/)).+',
                 ],
                 // Catch-all: must be matched only after every real route, including
-                // the low-priority (-1) native attribute {objectAction} action routes.
-                'priority'     => -2,
+                // the negative-priority native attribute {objectAction} action routes.
+                'priority'     => -2000,
             ],
         ],
     ],

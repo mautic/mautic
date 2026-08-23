@@ -25,7 +25,7 @@ final class DynamicContentApiController extends CommonController
         $this->pageModel = $pageModel;
     }
 
-    #[Route('/dwc/{objectAlias}', name: 'mautic_api_dynamicContent_action')]
+    #[Route('/dwc/{objectAlias}', name: 'mautic_api_dynamicContent_action', priority: -219)]
     public function processAction(Request $request, $objectAlias): Response
     {
         // Don't store a visitor with this request
@@ -45,7 +45,7 @@ final class DynamicContentApiController extends CommonController
         throw new HttpException(Response::HTTP_FORBIDDEN, 'This endpoint is not able to process '.strtoupper($method).' requests.');
     }
 
-    #[Route('/dwc', name: 'mautic_api_dynamicContent_index')]
+    #[Route('/dwc', name: 'mautic_api_dynamicContent_index', priority: -218)]
     public function getAction(
         Request $request,
         DynamicContentHelper $helper,

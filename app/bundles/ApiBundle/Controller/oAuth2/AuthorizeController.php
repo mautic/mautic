@@ -44,7 +44,7 @@ final class AuthorizeController extends \FOS\OAuthServerBundle\Controller\Author
         return new Response($response);
     }
 
-    #[Route('/oauth/v2/authorize', name: 'fos_oauth_server_authorize', methods: ['GET|POST'])]
+    #[Route('/oauth/v2/authorize', name: 'fos_oauth_server_authorize', methods: ['GET|POST'], priority: -214)]
     public function authorizeAction(Request $request, AuthorizeFormHandler $formHandler, Environment $twig): Response
     {
         // The parent bundle does not care about token being empty.

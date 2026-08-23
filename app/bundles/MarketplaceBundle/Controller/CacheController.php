@@ -27,7 +27,7 @@ final class CacheController extends CommonController
         $this->allowlist = $allowlist;
     }
 
-    #[Route('/s/marketplace/clear/cache', name: 'mautic_marketplace_clear_cache', methods: ['GET'])]
+    #[Route('/s/marketplace/clear/cache', name: 'mautic_marketplace_clear_cache', methods: ['GET'], priority: -711)]
     public function clearAction(): Response
     {
         if (!$this->config->marketplaceIsEnabled()) {

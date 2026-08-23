@@ -59,13 +59,13 @@ class FormController extends CommonFormController
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
-    #[Route('/s/forms/{objectAction}/{objectId}', name: 'mautic_form_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -1)]
+    #[Route('/s/forms/{objectAction}/{objectId}', name: 'mautic_form_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -676)]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
     }
 
-    #[Route('/s/forms/{page}', name: 'mautic_form_index', requirements: ['page' => '\d+'], defaults: ['page' => 0])]
+    #[Route('/s/forms/{page}', name: 'mautic_form_index', requirements: ['page' => '\d+'], defaults: ['page' => 0], priority: -671)]
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
     {
         // set some permissions

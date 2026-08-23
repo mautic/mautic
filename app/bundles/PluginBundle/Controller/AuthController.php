@@ -17,8 +17,8 @@ final class AuthController extends FormController
     /**
      * @param string $integration
      */
-    #[Route('/s/plugins/integrations/authcallback/{integration}', name: 'mautic_integration_auth_callback_secure')]
-    #[Route('/plugins/integrations/authcallback/{integration}', name: 'mautic_integration_auth_callback')]
+    #[Route('/s/plugins/integrations/authcallback/{integration}', name: 'mautic_integration_auth_callback_secure', priority: -722)]
+    #[Route('/plugins/integrations/authcallback/{integration}', name: 'mautic_integration_auth_callback', priority: -257)]
     public function authCallbackAction(Request $request, IntegrationHelper $integrationHelper, $integration): JsonResponse|RedirectResponse
     {
         $isAjax  = $request->isXmlHttpRequest();
@@ -70,8 +70,8 @@ final class AuthController extends FormController
         return new RedirectResponse($this->generateUrl('mautic_integration_auth_postauth', ['integration' => $integration]));
     }
 
-    #[Route('/s/plugins/integrations/authstatus/{integration}', name: 'mautic_integration_auth_postauth_secure')]
-    #[Route('/plugins/integrations/authstatus/{integration}', name: 'mautic_integration_auth_postauth')]
+    #[Route('/s/plugins/integrations/authstatus/{integration}', name: 'mautic_integration_auth_postauth_secure', priority: -723)]
+    #[Route('/plugins/integrations/authstatus/{integration}', name: 'mautic_integration_auth_postauth', priority: -258)]
     public function authStatusAction(Request $request, $integration): Response
     {
         $postAuthTemplate = '@MauticPlugin/Auth/postauth.html.twig';
@@ -98,7 +98,7 @@ final class AuthController extends FormController
         return $this->render($postAuthTemplate, ['message' => $message, 'alert' => $alert, 'data' => $userData]);
     }
 
-    #[Route('/plugins/integrations/authuser/{integration}', name: 'mautic_integration_auth_user')]
+    #[Route('/plugins/integrations/authuser/{integration}', name: 'mautic_integration_auth_user', priority: -256)]
     public function authUserAction(IntegrationHelper $integrationHelper, $integration): RedirectResponse
     {
         $integrationObject = $integrationHelper->getIntegrationObject($integration);

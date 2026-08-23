@@ -54,7 +54,7 @@ final class ListController extends FormController
 
     private array $listFilters = [];
 
-    #[Route('/s/segments/{objectAction}/{objectId}', name: 'mautic_segment_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -1)]
+    #[Route('/s/segments/{objectAction}/{objectId}', name: 'mautic_segment_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -685)]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
@@ -67,7 +67,7 @@ final class ListController extends FormController
      *
      * @throws \Exception
      */
-    #[Route('/s/segments/{page}', name: 'mautic_segment_index', requirements: ['page' => '\d+'], defaults: ['page' => 0])]
+    #[Route('/s/segments/{page}', name: 'mautic_segment_index', requirements: ['page' => '\d+'], defaults: ['page' => 0], priority: -684)]
     public function indexAction(Request $request, $page = 1): Response
     {
         $session = $request->getSession();
@@ -937,7 +937,7 @@ final class ListController extends FormController
      * @param int $objectId
      * @param int $page
      */
-    #[Route('/s/segment/view/{objectId}/contact/{page}', name: 'mautic_segment_contacts', requirements: ['page' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'], defaults: ['page' => 0, 'objectId' => 0])]
+    #[Route('/s/segment/view/{objectId}/contact/{page}', name: 'mautic_segment_contacts', requirements: ['page' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'], defaults: ['page' => 0, 'objectId' => 0], priority: -704)]
     public function contactsAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $objectId, $page = 1): Response
     {
         $session = $request->getSession();

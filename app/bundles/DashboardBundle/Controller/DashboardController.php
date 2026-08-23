@@ -37,7 +37,7 @@ final class DashboardController extends AbstractFormController
         $this->dashboardModel = $dashboardModel;
     }
 
-    #[Route('/s/dashboard/{objectAction}/{objectId}', name: 'mautic_dashboard_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -1)]
+    #[Route('/s/dashboard/{objectAction}/{objectId}', name: 'mautic_dashboard_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -658)]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
@@ -46,7 +46,7 @@ final class DashboardController extends AbstractFormController
     /**
      * Generates the default view.
      */
-    #[Route('/s/dashboard', name: 'mautic_dashboard_index')]
+    #[Route('/s/dashboard', name: 'mautic_dashboard_index', priority: -656)]
     public function indexAction(Request $request, WidgetService $widget, PathsHelper $pathsHelper, RouterInterface $urlGenerator): Response
     {
         $widgets = $this->dashboardModel->getWidgets();
@@ -109,7 +109,7 @@ final class DashboardController extends AbstractFormController
         ]);
     }
 
-    #[Route('/s/dashboard/widget/{widgetId}', name: 'mautic_dashboard_widget')]
+    #[Route('/s/dashboard/widget/{widgetId}', name: 'mautic_dashboard_widget', priority: -657)]
     public function widgetAction(Request $request, WidgetService $widgetService, Environment $twig, $widgetId): JsonResponse
     {
         if (!$request->isXmlHttpRequest()) {

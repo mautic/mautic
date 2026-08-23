@@ -68,13 +68,13 @@ final class EmailController extends FormController
 
     private bool $invalidHtmlError = false;
 
-    #[Route('/s/emails/{objectAction}/{objectId}', name: 'mautic_email_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -1)]
+    #[Route('/s/emails/{objectAction}/{objectId}', name: 'mautic_email_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -666)]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
     }
 
-    #[Route('/s/emails/{page}', name: 'mautic_email_index', requirements: ['page' => '\d+'], defaults: ['page' => 0])]
+    #[Route('/s/emails/{page}', name: 'mautic_email_index', requirements: ['page' => '\d+'], defaults: ['page' => 0], priority: -663)]
     public function indexAction(Request $request, EmailModel $model, EmailConfig $emailConfig, ThemeHelper $themeHelper, $page = 1): Response
     {
         $isDraftEnabled = $emailConfig->isDraftEnabled();
@@ -1830,7 +1830,7 @@ final class EmailController extends FormController
     /**
      * @param int $page
      */
-    #[Route('/s/emails/view/{objectId}/contact/{page}', name: 'mautic_email_contacts', requirements: ['objectId' => '[a-zA-Z0-9_-]+', 'page' => '\d+'], defaults: ['objectId' => 0, 'page' => 0])]
+    #[Route('/s/emails/view/{objectId}/contact/{page}', name: 'mautic_email_contacts', requirements: ['objectId' => '[a-zA-Z0-9_-]+', 'page' => '\d+'], defaults: ['objectId' => 0, 'page' => 0], priority: -667)]
     public function contactsAction(
         Request $request,
         PageHelperFactoryInterface $pageHelperFactory,

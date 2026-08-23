@@ -136,7 +136,7 @@ final class AjaxController extends CommonAjaxController
     /**
      * Ajax submit for forms.
      */
-    #[Route('/form/submit/ajax', name: 'mautic_form_postresults_ajax')]
+    #[Route('/form/submit/ajax', name: 'mautic_form_postresults_ajax', priority: -235)]
     public function submitAction(Request $request): JsonResponse
     {
         $response     = $this->forwardWithPost('Mautic\FormBundle\Controller\PublicController::submitAction', $request->request->all(), [], ['ajax' => true]);

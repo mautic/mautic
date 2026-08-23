@@ -30,13 +30,13 @@ final class StageController extends AbstractFormController
         $this->stageRepository = $stageRepository;
     }
 
-    #[Route('/s/stages/{objectAction}/{objectId}', name: 'mautic_stage_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -1)]
+    #[Route('/s/stages/{objectAction}/{objectId}', name: 'mautic_stage_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -750)]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
     }
 
-    #[Route('/s/stages/{page}', name: 'mautic_stage_index', requirements: ['page' => '\d+'], defaults: ['page' => 0])]
+    #[Route('/s/stages/{page}', name: 'mautic_stage_index', requirements: ['page' => '\d+'], defaults: ['page' => 0], priority: -749)]
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
     {
         // set some permissions

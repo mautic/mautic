@@ -62,13 +62,13 @@ final class ResultController extends CommonFormController
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
-    #[Route('/s/forms/results/{formId}/{objectAction}/{objectId}', name: 'mautic_form_results_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -1)]
+    #[Route('/s/forms/results/{formId}/{objectAction}/{objectId}', name: 'mautic_form_results_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -675)]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
     }
 
-    #[Route('/s/forms/results/{objectId}/{page}', name: 'mautic_form_results', requirements: ['objectId' => '[a-zA-Z0-9_-]+', 'page' => '\d+'], defaults: ['objectId' => 0, 'page' => 0])]
+    #[Route('/s/forms/results/{objectId}/{page}', name: 'mautic_form_results', requirements: ['objectId' => '[a-zA-Z0-9_-]+', 'page' => '\d+'], defaults: ['objectId' => 0, 'page' => 0], priority: -672)]
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFacotry, int $objectId, int $page = 1): Response
     {
         $form           = $this->formModel->getEntity($objectId);
@@ -207,7 +207,7 @@ final class ResultController extends CommonFormController
         );
     }
 
-    #[Route('/forms/results/file/{submissionId}/{field}', name: 'mautic_form_file_download')]
+    #[Route('/forms/results/file/{submissionId}/{field}', name: 'mautic_form_file_download', priority: -228)]
     public function downloadFileAction(int $submissionId, string $field, FormUploader $formUploader): BinaryFileResponse
     {
         $submission             = $this->submissionResultLoader->getSubmissionWithResult($submissionId);
@@ -249,7 +249,7 @@ final class ResultController extends CommonFormController
         return $response;
     }
 
-    #[Route('/forms/results/file/{fieldId}/filename/{fileName}', name: 'mautic_form_file_download_by_name')]
+    #[Route('/forms/results/file/{fieldId}/filename/{fileName}', name: 'mautic_form_file_download_by_name', priority: -229)]
     public function downloadFileByFileNameAction(string $fieldId, string $fileName, FieldModel $fieldModel, FormUploader $formUploader): BinaryFileResponse
     {
         $fieldEntity = $fieldModel->getEntity($fieldId);
@@ -285,7 +285,7 @@ final class ResultController extends CommonFormController
      *
      * @throws \Exception
      */
-    #[Route('/s/forms/results/{objectId}/export/{format}', name: 'mautic_form_export', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['format' => 'csv', 'objectId' => 0])]
+    #[Route('/s/forms/results/{objectId}/export/{format}', name: 'mautic_form_export', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['format' => 'csv', 'objectId' => 0], priority: -673)]
     public function exportAction(Request $request, $objectId, $format = 'csv'): Response
     {
         $form      = $this->formModel->getEntity($objectId);
@@ -463,7 +463,7 @@ final class ResultController extends CommonFormController
         return $formId;
     }
 
-    #[Route('/s/forms/results/{objectId}/add-to-segment', name: 'mautic_form_results_add_segment', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0])]
+    #[Route('/s/forms/results/{objectId}/add-to-segment', name: 'mautic_form_results_add_segment', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -674)]
     public function addToSegmentAction(Request $request, int $objectId, FormModel $formModel, SubmissionModel $model, ListModel $segmentModel): Response
     {
         $form      = $formModel->getEntity($objectId);

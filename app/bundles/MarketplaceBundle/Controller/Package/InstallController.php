@@ -32,7 +32,7 @@ final class InstallController extends CommonController
         $this->config        = $config;
     }
 
-    #[Route('/s/marketplace/install/{vendor}/{package}', name: 'mautic_marketplace_install', methods: ['GET|POST'])]
+    #[Route('/s/marketplace/install/{vendor}/{package}', name: 'mautic_marketplace_install', methods: ['GET|POST'], priority: -709)]
     public function viewAction(string $vendor, string $package): Response
     {
         if (!$this->config->marketplaceIsEnabled()) {

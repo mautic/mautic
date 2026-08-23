@@ -37,13 +37,13 @@ final class PageController extends FormController
         $this->pageModel = $pageModel;
     }
 
-    #[Route('/s/pages/{objectAction}/{objectId}', name: 'mautic_page_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -1)]
+    #[Route('/s/pages/{objectAction}/{objectId}', name: 'mautic_page_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -719)]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
     }
 
-    #[Route('/s/pages/{page}', name: 'mautic_page_index', requirements: ['page' => '\d+'], defaults: ['page' => 0])]
+    #[Route('/s/pages/{page}', name: 'mautic_page_index', requirements: ['page' => '\d+'], defaults: ['page' => 0], priority: -718)]
     public function indexAction(Request $request, PageConfig $pageConfig, PageHelperFactoryInterface $pageHelperFactory, PageModel $model, int $page = 1): Response
     {
         // set some permissions
@@ -987,7 +987,7 @@ final class PageController extends FormController
      * @param int $objectId
      * @param int $page
      */
-    #[Route('/s/pages/results/{objectId}/{page}', name: 'mautic_page_results', requirements: ['page' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'], defaults: ['page' => 0, 'objectId' => 0])]
+    #[Route('/s/pages/results/{objectId}/{page}', name: 'mautic_page_results', requirements: ['page' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'], defaults: ['page' => 0, 'objectId' => 0], priority: -720)]
     public function resultsAction(Request $request, PageModel $pageModel, SubmissionModel $submissionModel, $objectId, $page = 1): Response
     {
         $activePage   = $pageModel->getEntity($objectId);
@@ -1126,7 +1126,7 @@ final class PageController extends FormController
      *
      * @throws \Exception
      */
-    #[Route('/s/pages/results/{objectId}/export/{format}', name: 'mautic_page_export', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['format' => 'csv', 'objectId' => 0])]
+    #[Route('/s/pages/results/{objectId}/export/{format}', name: 'mautic_page_export', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['format' => 'csv', 'objectId' => 0], priority: -721)]
     public function exportAction(Request $request, PageModel $pageModel, SubmissionModel $submissionModel, $objectId, $format = 'csv'): Response
     {
         $activePage   = $pageModel->getEntity($objectId);

@@ -79,7 +79,7 @@ final class CampaignMapStatsController extends AbstractController
     /**
      * @throws \Exception
      */
-    #[Route('/s/campaign-map-stats/{objectId}/{dateFrom}/{dateTo}', name: 'mautic_campaign_map_stats', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0])]
+    #[Route('/s/campaign-map-stats/{objectId}/{dateFrom}/{dateTo}', name: 'mautic_campaign_map_stats', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -639)]
     public function viewAction(
         CorePermissions $security,
         int $objectId,

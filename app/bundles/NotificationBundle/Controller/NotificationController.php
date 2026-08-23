@@ -32,7 +32,7 @@ final class NotificationController extends AbstractFormController
         $this->notificationModel = $notificationModel;
     }
 
-    #[Route('/s/notifications/{objectAction}/{objectId}', name: 'mautic_notification_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -1)]
+    #[Route('/s/notifications/{objectAction}/{objectId}', name: 'mautic_notification_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -713)]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
@@ -41,7 +41,7 @@ final class NotificationController extends AbstractFormController
     /**
      * @param int $page
      */
-    #[Route('/s/notifications/{page}', name: 'mautic_notification_index', requirements: ['page' => '\d+'], defaults: ['page' => 0])]
+    #[Route('/s/notifications/{page}', name: 'mautic_notification_index', requirements: ['page' => '\d+'], defaults: ['page' => 0], priority: -712)]
     public function indexAction(Request $request, $page = 1): Response
     {
         // set some permissions
@@ -719,7 +719,7 @@ final class NotificationController extends AbstractFormController
     /**
      * @param int $page
      */
-    #[Route('/s/notifications/view/{objectId}/contact/{page}', name: 'mautic_notification_contacts', requirements: ['page' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'], defaults: ['page' => 0, 'objectId' => 0])]
+    #[Route('/s/notifications/view/{objectId}/contact/{page}', name: 'mautic_notification_contacts', requirements: ['page' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'], defaults: ['page' => 0, 'objectId' => 0], priority: -714)]
     public function contactsAction(
         Request $request,
         PageHelperFactoryInterface $pageHelperFactory,
