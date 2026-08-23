@@ -24,7 +24,7 @@ class ModelFactory
     /**
      * @param non-empty-string $modelNameKey
      */
-    public function getModel(string $modelNameKey): MauticModelInterface
+    public function getModel(string $modelNameKey): AbstractCommonModel
     {
         // Shortcut for models with the same name as the bundle, e.g. "lead" => "lead.lead"
         if (!str_contains($modelNameKey, '.')) {
@@ -33,7 +33,10 @@ class ModelFactory
 
         // Each model is registered in the locator under the key returned by its static getName() method.
         if ($this->container->has($modelNameKey)) {
-            return $this->container->get($modelNameKey);
+            $model = $this->container->get($modelNameKey);
+            \assert($model instanceof AbstractCommonModel);
+
+            return $model;
         }
 
         throw new \InvalidArgumentException($modelNameKey.' is not a registered model key.');

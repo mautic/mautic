@@ -3,7 +3,7 @@
 namespace Mautic\CoreBundle\EventListener;
 
 use Mautic\CoreBundle\Factory\ModelFactory;
-use Mautic\CoreBundle\Model\MauticModelInterface;
+use Mautic\CoreBundle\Model\AbstractCommonModel;
 
 trait ChannelTrait
 {
@@ -20,7 +20,7 @@ trait ChannelTrait
         $this->modelFactory = $modelFactory;
     }
 
-    protected function getChannelModel(string $channel): ?MauticModelInterface
+    protected function getChannelModel(string $channel): ?AbstractCommonModel
     {
         if ($this->modelFactory->hasModel($channel)) {
             return $this->modelFactory->getModel($channel);
