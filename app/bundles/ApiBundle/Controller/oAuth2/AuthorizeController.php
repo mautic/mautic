@@ -7,6 +7,7 @@ namespace Mautic\ApiBundle\Controller\oAuth2;
 use FOS\OAuthServerBundle\Form\Handler\AuthorizeFormHandler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -43,6 +44,7 @@ final class AuthorizeController extends \FOS\OAuthServerBundle\Controller\Author
         return new Response($response);
     }
 
+    #[Route('/oauth/v2/authorize', name: 'fos_oauth_server_authorize', methods: ['GET|POST'])]
     public function authorizeAction(Request $request, AuthorizeFormHandler $formHandler, Environment $twig): Response
     {
         // The parent bundle does not care about token being empty.

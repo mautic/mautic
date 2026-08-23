@@ -24,6 +24,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Twig\Environment;
 
 final class FieldController extends CommonFormController
@@ -49,6 +50,12 @@ final class FieldController extends CommonFormController
         $this->formFactory                 = $formFactory;
 
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    }
+
+    #[Route('/s/forms/field/{objectAction}/{objectId}', name: 'mautic_formfield_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0])]
+    public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
+    {
+        return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
     }
 
     /**

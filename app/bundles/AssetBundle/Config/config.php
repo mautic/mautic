@@ -4,20 +4,6 @@ declare(strict_types=1);
 
 return [
     'routes' => [
-        'main' => [
-            'mautic_asset_index' => [
-                'path'       => '/assets/{page}',
-                'controller' => 'Mautic\AssetBundle\Controller\AssetController::indexAction',
-            ],
-            'mautic_asset_remote' => [
-                'path'       => '/assets/remote',
-                'controller' => 'Mautic\AssetBundle\Controller\AssetController::remoteAction',
-            ],
-            'mautic_asset_action' => [
-                'path'       => '/assets/{objectAction}/{objectId}',
-                'controller' => 'Mautic\AssetBundle\Controller\AssetController::executeAction',
-            ],
-        ],
         'api' => [
             'mautic_api_assetsstandard' => [
                 'standard_entity' => true,

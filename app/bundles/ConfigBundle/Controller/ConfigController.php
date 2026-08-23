@@ -18,6 +18,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
@@ -30,6 +31,12 @@ final class ConfigController extends FormController
         TokenStorageInterface $tokenStorage,
     ): void {
         $this->tokenStorage = $tokenStorage;
+    }
+
+    #[Route('/s/config/{objectAction}/{objectId}', name: 'mautic_config_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0])]
+    public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
+    {
+        return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
     }
 
     /**

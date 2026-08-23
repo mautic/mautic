@@ -9,6 +9,7 @@ use Mautic\LeadBundle\Model\NoteModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
 final class NoteController extends FormController
@@ -27,6 +28,7 @@ final class NoteController extends FormController
     /**
      * Generate's default list view.
      */
+    #[Route('/s/contacts/notes/{leadId}/{page}', name: 'mautic_contactnote_index', requirements: ['leadId' => '\d+', 'page' => '\d+'], defaults: ['leadId' => 0, 'page' => 0])]
     public function indexAction(Request $request, NoteModel $model, int $leadId = 0, int $page = 1): Response
     {
         if (empty($leadId)) {
@@ -366,6 +368,7 @@ final class NoteController extends FormController
      * @param int $objectId
      * @param int $leadId
      */
+    #[Route('/s/contacts/notes/{leadId}/{objectAction}/{objectId}', name: 'mautic_contactnote_action', requirements: ['leadId' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0])]
     public function executeNoteAction(Request $request, $objectAction, $objectId = 0, $leadId = 0): Response
     {
         if (method_exists($this, "{$objectAction}Action")) {

@@ -10,6 +10,7 @@ use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
 use Mautic\MarketplaceBundle\Service\Config;
 use Mautic\MarketplaceBundle\Service\RouteProvider;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
 final class RemoveController extends CommonController
@@ -31,6 +32,7 @@ final class RemoveController extends CommonController
         $this->config        = $config;
     }
 
+    #[Route('/s/marketplace/remove/{vendor}/{package}', name: 'mautic_marketplace_remove', methods: ['GET|POST'])]
     public function viewAction(string $vendor, string $package): Response
     {
         if (!$this->config->marketplaceIsEnabled()) {

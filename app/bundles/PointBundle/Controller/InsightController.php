@@ -21,13 +21,13 @@ final class InsightController extends AbstractStandardFormController
         return 'point.insight';
     }
 
-    #[Route('/s/points/insights/{objectAction}/{objectId}', name: 'mautic_point.insight_action', defaults: ['objectId' => 0], requirements: ['objectId' => '[a-zA-Z0-9_-]+'])]
+    #[Route('/s/points/insights/{objectAction}/{objectId}', name: 'mautic_point.insight_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0])]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
     }
 
-    #[Route('/s/points/insights/{page}', name: 'mautic_point.insight_index', defaults: ['page' => 0], requirements: ['page' => '\d+'])]
+    #[Route('/s/points/insights/{page}', name: 'mautic_point.insight_index', requirements: ['page' => '\d+'], defaults: ['page' => 0])]
     public function indexAction(Request $request, $page = 1): Response
     {
         return parent::indexStandard($request, $page);

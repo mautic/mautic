@@ -9,6 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Routing\Attribute\Route;
 
 final class EmailGraphStatsController extends AbstractController
 {
@@ -22,6 +23,7 @@ final class EmailGraphStatsController extends AbstractController
      *
      * @throws \Exception
      */
+    #[Route('/s/emails-graph-stats/{objectId}/{isVariant}/{dateFrom}/{dateTo}', name: 'mautic_email_graph_stats', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0])]
     public function viewAction(
         Request $request,
         EmailModel $model,

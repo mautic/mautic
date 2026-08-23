@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
 final class DynamicContentApiController extends CommonController
@@ -24,6 +25,7 @@ final class DynamicContentApiController extends CommonController
         $this->pageModel = $pageModel;
     }
 
+    #[Route('/dwc/{objectAlias}', name: 'mautic_api_dynamicContent_action')]
     public function processAction(Request $request, $objectAlias): Response
     {
         // Don't store a visitor with this request
@@ -43,6 +45,7 @@ final class DynamicContentApiController extends CommonController
         throw new HttpException(Response::HTTP_FORBIDDEN, 'This endpoint is not able to process '.strtoupper($method).' requests.');
     }
 
+    #[Route('/dwc', name: 'mautic_api_dynamicContent_index')]
     public function getAction(
         Request $request,
         DynamicContentHelper $helper,

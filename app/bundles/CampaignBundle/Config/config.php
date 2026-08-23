@@ -5,61 +5,13 @@ declare(strict_types=1);
 return [
     'routes' => [
         'main' => [
-            'mautic_campaignevent_action'  => [
-                'path'       => '/campaigns/events/{objectAction}/{objectId}',
-                'controller' => 'Mautic\CampaignBundle\Controller\EventController::executeAction',
-            ],
-            'mautic_campaignsource_action' => [
-                'path'       => '/campaigns/sources/{objectAction}/{objectId}',
-                'controller' => 'Mautic\CampaignBundle\Controller\SourceController::executeAction',
-            ],
-            'mautic_campaign_index'        => [
-                'path'       => '/campaigns/{page}',
-                'controller' => 'Mautic\CampaignBundle\Controller\CampaignController::indexAction',
-            ],
-            'mautic_campaign_action'       => [
-                'path'       => '/campaigns/{objectAction}/{objectId}',
-                'controller' => 'Mautic\CampaignBundle\Controller\CampaignController::executeAction',
-            ],
-            'mautic_campaign_contacts'     => [
-                'path'       => '/campaigns/view/{objectId}/contact/{page}',
-                'controller' => 'Mautic\CampaignBundle\Controller\CampaignController::contactsAction',
-            ],
-            'mautic_campaign_event_stats'     => [
-                'path'       => '/campaigns/event/stats/{objectId}/{dateFromValue}/{dateToValue}',
-                'controller' => 'Mautic\CampaignBundle\Controller\CampaignController::eventStatsAction',
-            ],
-            'mautic_campaign_graph'     => [
-                'path'       => '/campaigns/graph/{objectId}/{dateFrom}/{dateTo}',
-                'controller' => 'Mautic\CampaignBundle\Controller\CampaignController::graphAction',
-            ],
             'mautic_campaign_preview'      => [
                 'path'       => '/campaign/preview/{objectId}',
                 'controller' => 'Mautic\EmailBundle\Controller\PublicController::previewAction',
             ],
-            'mautic_campaign_map_stats'    => [
-                'path'       => '/campaign-map-stats/{objectId}/{dateFrom}/{dateTo}',
-                'controller' => 'Mautic\CampaignBundle\Controller\CampaignMapStatsController::viewAction',
-            ],
-            'mautic_campaign_metrics_email_weekdays' => [
-                'path'       => '/campaign/metrics/email-weekdays/{objectId}/{dateFrom}/{dateTo}',
-                'controller' => 'Mautic\CampaignBundle\Controller\CampaignMetricsController::emailWeekdaysAction',
-            ],
-            'mautic_campaign_metrics_email_hours' => [
-                'path'       => '/campaign/metrics/email-hours/{objectId}/{dateFrom}/{dateTo}',
-                'controller' => 'Mautic\CampaignBundle\Controller\CampaignMetricsController::emailHoursAction',
-            ],
             'mautic_campaign_import_index' => [
                 'path'       => '/campaign/import',
                 'controller' => 'Mautic\CampaignBundle\Controller\ImportController::indexAction',
-            ],
-            'mautic_campaign_import_action' => [
-                'path'       => '/campaign/import/{objectAction}',
-                'controller' => 'Mautic\CampaignBundle\Controller\ImportController::executeAction',
-            ],
-            'mautic_campaign_metrics_event_details' => [
-                'path'       => '/campaign/metrics/event-details/{objectId}',
-                'controller' => 'Mautic\CampaignBundle\Controller\CampaignMetricsController::eventDetailsAction',
             ],
         ],
         'api'  => [

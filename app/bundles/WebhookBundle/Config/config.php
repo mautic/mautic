@@ -4,16 +4,6 @@ declare(strict_types=1);
 
 return [
     'routes' => [
-        'main' => [
-            'mautic_webhook_index' => [
-                'path'       => '/webhooks/{page}',
-                'controller' => 'Mautic\WebhookBundle\Controller\WebhookController::indexAction',
-            ],
-            'mautic_webhook_action' => [
-                'path'       => '/webhooks/{objectAction}/{objectId}',
-                'controller' => 'Mautic\WebhookBundle\Controller\WebhookController::executeAction',
-            ],
-        ],
         'api' => [
             'mautic_api_webhookstandard' => [
                 'standard_entity' => true,

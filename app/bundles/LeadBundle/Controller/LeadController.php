@@ -65,6 +65,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
@@ -138,9 +139,16 @@ final class LeadController extends FormController
         $this->emailRepository = $emailRepository;
     }
 
+    #[Route('/s/contacts/{objectAction}/{objectId}', name: 'mautic_contact_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0])]
+    public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
+    {
+        return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
+    }
+
     /**
      * @param int $page
      */
+    #[Route('/s/contacts/{page}', name: 'mautic_contact_index', requirements: ['page' => '\d+'], defaults: ['page' => 0])]
     public function indexAction(
         Request $request,
         DoNotContactModel $leadDNCModel,
@@ -2273,6 +2281,7 @@ final class LeadController extends FormController
         return $response;
     }
 
+    #[Route('/s/contacts/contact/export/{contactId}', name: 'mautic_contact_export_action', requirements: ['contactId' => '\d+'])]
     public function contactExportAction(Request $request, ExportHelper $exportHelper, EventDispatcherInterface $dispatcher, $contactId): Response|\Symfony\Component\HttpFoundation\StreamedResponse
     {
         // set some permissions
@@ -2318,6 +2327,7 @@ final class LeadController extends FormController
         return $this->exportResultsAs($export, $dataType, 'contact_data_'.($contactFields['email'] ?: $contactFields['id']), $exportHelper);
     }
 
+    #[Route('/s/contacts/export/download/{fileName}', name: 'mautic_contact_export_download')]
     public function downloadExportAction(string $fileName = ''): Response
     {
         $permissions = $this->security
@@ -2357,6 +2367,7 @@ final class LeadController extends FormController
     /**
      * Loads a specific lead statistic info.
      */
+    #[Route('/s/contacts/view/{objectId}/stats', name: 'mautic_contact_stats', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0])]
     public function contactStatsAction(int $objectId): Response
     {
         /** @var Lead $lead */

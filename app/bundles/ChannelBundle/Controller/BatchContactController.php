@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
 final class BatchContactController extends AbstractFormController
@@ -34,6 +35,7 @@ final class BatchContactController extends AbstractFormController
     /**
      * Execute the batch action.
      */
+    #[Route('/s/channels/batch/contact/set', name: 'mautic_channel_batch_contact_set')]
     public function setAction(Request $request): JsonResponse
     {
         $params = $request->get('contact_channels', []);
@@ -62,6 +64,7 @@ final class BatchContactController extends AbstractFormController
     /**
      * View for batch action.
      */
+    #[Route('/s/channels/batch/contact/view', name: 'mautic_channel_batch_contact_view')]
     public function indexAction(): Response
     {
         $route = $this->generateUrl('mautic_channel_batch_contact_set');
