@@ -17,6 +17,8 @@ use Mautic\FormBundle\Form\Type\SubmitActionEmailType;
 use Mautic\FormBundle\Form\Type\SubmitActionRepostType;
 use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -34,6 +36,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         private TranslatorInterface $translator,
         private RouterInterface $router,
         private LanguageHelper $languageHelper,
+        private UserRepository $userRepository,
     ) {
         $this->mailer = $mailer->getMailer();
     }
@@ -180,13 +183,34 @@ final readonly class FormSubscriber implements EventSubscriberInterface
             $this->mailer->send(true);
         }
 
-        $owner = null !== $lead ? $lead->getOwner() : null;
-        if (!empty($config['email_to_owner']) && null !== $owner) {
-            // Send copy to owner
-            $this->setMailer($config, $tokens, [$owner->getEmail() => null], $lead);
+        if (!empty($config['email_to_owner'])) {
+            $owner = $this->resolveEmailOwner($lead, $event->getSubmission()->getForm());
+            if (null !== $owner) {
+                $this->setMailer($config, $tokens, [$owner->getEmail() => null], $lead);
 
-            $this->mailer->send(true);
+                $this->mailer->send(true);
+            }
         }
+    }
+
+    /**
+     * Prefer the contact owner; if the contact has none, fall back to the form creator.
+     */
+    private function resolveEmailOwner(?Lead $lead, ?Form $form): ?User
+    {
+        $owner = $lead?->getOwner();
+        if ($owner instanceof User && $owner->getEmail()) {
+            return $owner;
+        }
+
+        $createdById = $form?->getCreatedBy();
+        if (!$createdById) {
+            return null;
+        }
+
+        $formCreator = $this->userRepository->find((int) $createdById);
+
+        return $formCreator instanceof User && $formCreator->getEmail() ? $formCreator : null;
     }
 
     public function onFormSubmitActionRepost(Events\SubmissionEvent $event): void

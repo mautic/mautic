@@ -16,6 +16,7 @@ use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\EventListener\FormSubscriber;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -32,6 +33,11 @@ final class FormSubscriberTest extends TestCase
      */
     private MockObject $mailer;
 
+    /**
+     * @var MockObject&UserRepository
+     */
+    private MockObject $userRepository;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -39,6 +45,7 @@ final class FormSubscriberTest extends TestCase
         $this->mailer->expects($this->once())
             ->method('getMailer')
             ->willReturnSelf();
+        $this->userRepository = $this->createMock(UserRepository::class);
 
         $this->subscriber = new FormSubscriber(
             $this->createStub(IpLookupHelper::class),
@@ -46,7 +53,8 @@ final class FormSubscriberTest extends TestCase
             $this->mailer,
             $this->createStub(TranslatorInterface::class),
             $this->createStub(RouterInterface::class),
-            $this->createStub(LanguageHelper::class)
+            $this->createStub(LanguageHelper::class),
+            $this->userRepository
         );
     }
 
@@ -376,6 +384,121 @@ New line',
         $this->subscriber->onFormSubmitActionSendEmail($submissionEvent);
     }
 
+    public function testOnFormSubmitSendsToFormCreatorWhenContactHasNoOwner(): void
+    {
+        $subject           = 'subject';
+        $message           = 'message';
+        $formCreatorEmail  = 'form-creator@email.email';
+        $tokensData        = [
+            'first_name' => 'Test&#39;s Name',
+            'notes'      => "A &#38; B \n &#60; dy &#62;",
+        ];
+
+        $emailTokens = [
+            'first_name' => "Test's Name",
+            'notes'      => "A & B <br />\n < dy >",
+        ];
+
+        $formCreator = new User();
+        $formCreator->setEmail($formCreatorEmail);
+
+        $form = $this->getForm();
+        $form->setCreatedBy(1);
+
+        $this->userRepository->expects($this->once())
+            ->method('find')
+            ->with(1)
+            ->willReturn($formCreator);
+
+        $request    = new Request();
+        $submission = $this->getFormSubmission($form);
+        $action     = $this->getFormSubmitActionSendEmail($form);
+        $action->setProperties([
+            'to'             => null,
+            'cc'             => null,
+            'bcc'            => null,
+            'copy_lead'      => false,
+            'email_to_owner' => true,
+            'subject'        => $subject,
+            'message'        => $message,
+        ]);
+
+        $submissionEvent = new SubmissionEvent($submission, [], $request->server, $request);
+        $submissionEvent->setTokens($tokensData)
+            ->setFields($this->getFormFields())
+            ->setAction($action);
+
+        $this->mailer->expects($this->once())
+            ->method('reset');
+        $this->mailer->expects($this->once())
+            ->method('send');
+        $this->mailer->expects($this->once())
+            ->method('setTo')
+            ->with([$formCreatorEmail => null]);
+        $this->mailer->expects($this->once())
+            ->method('setSubject')
+            ->with($subject);
+        $this->mailer->expects($this->once())
+            ->method('setBody')
+            ->with($message);
+        $this->mailer->expects($this->once())
+            ->method('parsePlainText')
+            ->with($message);
+        $this->mailer->expects($this->once())
+            ->method('addTokens')
+            ->with($emailTokens);
+        $this->mailer->expects($this->once())
+            ->method('setLead');
+
+        $this->subscriber->onFormSubmitActionSendEmail($submissionEvent);
+    }
+
+    public function testOnFormSubmitPrefersContactOwnerOverFormCreator(): void
+    {
+        $contactOwnerEmail = 'contact-owner@email.email';
+        $subject           = 'subject';
+        $message           = 'message';
+
+        $form = $this->getForm();
+        $form->setCreatedBy(1);
+
+        $this->userRepository->expects($this->never())
+            ->method('find');
+
+        $request    = new Request();
+        $submission = $this->getFormSubmission($form);
+        $owner      = new User();
+        $owner->setEmail($contactOwnerEmail);
+        $submission->getLead()->setOwner($owner);
+
+        $action = $this->getFormSubmitActionSendEmail($form);
+        $action->setProperties([
+            'to'             => null,
+            'cc'             => null,
+            'bcc'            => null,
+            'copy_lead'      => false,
+            'email_to_owner' => true,
+            'subject'        => $subject,
+            'message'        => $message,
+        ]);
+
+        $submissionEvent = new SubmissionEvent($submission, [], $request->server, $request);
+        $submissionEvent->setTokens([
+            'first_name' => 'Test&#39;s Name',
+            'notes'      => "A &#38; B \n &#60; dy &#62;",
+        ])
+            ->setFields($this->getFormFields())
+            ->setAction($action);
+
+        $this->mailer->expects($this->once())
+            ->method('send');
+        $this->mailer->expects($this->once())
+            ->method('setTo')
+            ->with([$contactOwnerEmail => null]);
+
+        $this->subscriber->onFormSubmitActionSendEmail($submissionEvent);
+    }
+
     public function testOnFormSubmitSendsIfAllWereSet(): void
     {
         $to         = 'to@email.email';
@@ -510,16 +633,16 @@ New line',
             ->setProperties($onSubmitActionConfig);
     }
 
-    private function getFormSubmitActionSendEmail(): Action
+    private function getFormSubmitActionSendEmail(?Form $form = null): Action
     {
         $action = new Action();
 
-        return $action->setForm($this->getForm())
+        return $action->setForm($form ?? $this->getForm())
             ->setType('form.email')
             ->setName('Test Action');
     }
 
-    private function getFormSubmission(): Submission
+    private function getFormSubmission(?Form $form = null): Submission
     {
         $lead = new Lead();
         $lead->setFields($this->getFormFields());
@@ -529,7 +652,7 @@ New line',
 
         $submission = new Submission();
 
-        return $submission->setForm($this->getForm())
+        return $submission->setForm($form ?? $this->getForm())
             ->setLead($lead)
             ->setIpAddress($ipAddress);
     }
