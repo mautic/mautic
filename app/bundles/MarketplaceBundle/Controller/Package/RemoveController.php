@@ -32,7 +32,12 @@ final class RemoveController extends CommonController
         $this->config        = $config;
     }
 
-    #[Route('/s/marketplace/remove/{vendor}/{package}', name: 'mautic_marketplace_remove', methods: ['GET|POST'], priority: -710)]
+    #[Route(
+        '/s/marketplace/remove/{vendor}/{package}',
+        name: 'mautic_marketplace_remove',
+        methods: ['GET|POST'],
+        priority: -710
+    )]
     public function viewAction(string $vendor, string $package): Response
     {
         if (!$this->config->marketplaceIsEnabled()) {

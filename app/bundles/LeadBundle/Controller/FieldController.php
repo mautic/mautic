@@ -29,7 +29,13 @@ final class FieldController extends FormController
         $this->fieldModel = $fieldModel;
     }
 
-    #[Route('/s/contacts/fields/{objectAction}/{objectId}', name: 'mautic_contactfield_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -687)]
+    #[Route(
+        '/s/contacts/fields/{objectAction}/{objectId}',
+        name: 'mautic_contactfield_action',
+        requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
+        defaults: ['objectId' => 0],
+        priority: -687
+    )]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
@@ -40,7 +46,13 @@ final class FieldController extends FormController
      *
      * @param int $page
      */
-    #[Route('/s/contacts/fields/{page}', name: 'mautic_contactfield_index', requirements: ['page' => '\d+'], defaults: ['page' => 0], priority: -686)]
+    #[Route(
+        '/s/contacts/fields/{page}',
+        name: 'mautic_contactfield_index',
+        requirements: ['page' => '\d+'],
+        defaults: ['page' => 0],
+        priority: -686
+    )]
     public function indexAction(Request $request, FieldModel $fieldModel, $page = 1): Response
     {
         // set some permissions

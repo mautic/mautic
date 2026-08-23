@@ -66,7 +66,13 @@ final class ImportController extends FormController
         $this->importRepository = $importRepository;
     }
 
-    #[Route('/s/{object}/import/{objectAction}/{objectId}', name: 'mautic_import_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -697)]
+    #[Route(
+        '/s/{object}/import/{objectAction}/{objectId}',
+        name: 'mautic_import_action',
+        requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
+        defaults: ['objectId' => 0],
+        priority: -697
+    )]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
@@ -75,7 +81,13 @@ final class ImportController extends FormController
     /**
      * @param int $page
      */
-    #[Route('/s/{object}/import/{page}', name: 'mautic_import_index', requirements: ['page' => '\d+'], defaults: ['page' => 0], priority: -696)]
+    #[Route(
+        '/s/{object}/import/{page}',
+        name: 'mautic_import_index',
+        requirements: ['page' => '\d+'],
+        defaults: ['page' => 0],
+        priority: -696
+    )]
     public function indexAction(Request $request, $page = 1): Response
     {
         $initEvent = $this->dispatchImportOnInit();

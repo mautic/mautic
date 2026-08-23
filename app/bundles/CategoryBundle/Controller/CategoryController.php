@@ -29,7 +29,13 @@ final class CategoryController extends AbstractFormController
      * @param int    $objectId
      * @param string $objectModel
      */
-    #[Route('/s/categories/{bundle}/{objectAction}/{objectId}', name: 'mautic_category_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['bundle' => 'category', 'objectId' => 0], priority: -648)]
+    #[Route(
+        '/s/categories/{bundle}/{objectAction}/{objectId}',
+        name: 'mautic_category_action',
+        requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
+        defaults: ['bundle' => 'category', 'objectId' => 0],
+        priority: -648
+    )]
     public function executeCategoryAction(Request $request, $bundle, $objectAction, $objectId = 0, $objectModel = ''): Response
     {
         if (method_exists($this, $objectAction.'Action')) {
@@ -51,7 +57,13 @@ final class CategoryController extends AbstractFormController
      * @param string $bundle
      * @param int    $page
      */
-    #[Route('/s/categories/{bundle}/{page}', name: 'mautic_category_index', requirements: ['page' => '\d+'], defaults: ['bundle' => 'category', 'page' => 0], priority: -647)]
+    #[Route(
+        '/s/categories/{bundle}/{page}',
+        name: 'mautic_category_index',
+        requirements: ['page' => '\d+'],
+        defaults: ['bundle' => 'category', 'page' => 0],
+        priority: -647
+    )]
     public function indexAction(Request $request, $bundle, $page = 1): Response
     {
         $session = $request->getSession();

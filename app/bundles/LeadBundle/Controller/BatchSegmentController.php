@@ -30,7 +30,11 @@ final class BatchSegmentController extends AbstractFormController
     /**
      * API for batch action.
      */
-    #[Route('/s/segments/batch/contact/set', name: 'mautic_segment_batch_contact_set', priority: -682)]
+    #[Route(
+        '/s/segments/batch/contact/set',
+        name: 'mautic_segment_batch_contact_set',
+        priority: -682
+    )]
     public function setAction(Request $request): JsonResponse
     {
         $params     = $request->query->all()['lead_batch'] ?? $request->request->all()['lead_batch'] ?? [];
@@ -64,7 +68,11 @@ final class BatchSegmentController extends AbstractFormController
     /**
      * View for batch action.
      */
-    #[Route('/s/segments/batch/contact/view', name: 'mautic_segment_batch_contact_view', priority: -683)]
+    #[Route(
+        '/s/segments/batch/contact/view',
+        name: 'mautic_segment_batch_contact_view',
+        priority: -683
+    )]
     public function indexAction(): Response
     {
         $route = $this->generateUrl('mautic_segment_batch_contact_set');

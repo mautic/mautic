@@ -11,7 +11,12 @@ use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 final class SecurityController extends CommonController
 {
-    #[Route('/oauth/v2/authorize_login', name: 'mautic_oauth2_server_auth_login', methods: ['GET|POST'], priority: -215)]
+    #[Route(
+        '/oauth/v2/authorize_login',
+        name: 'mautic_oauth2_server_auth_login',
+        methods: ['GET|POST'],
+        priority: -215
+    )]
     public function loginAction(Request $request): Response
     {
         $session = $request->getSession();
@@ -47,7 +52,12 @@ final class SecurityController extends CommonController
         );
     }
 
-    #[Route('/oauth/v2/authorize_login_check', name: 'mautic_oauth2_server_auth_login_check', methods: ['GET|POST'], priority: -216)]
+    #[Route(
+        '/oauth/v2/authorize_login_check',
+        name: 'mautic_oauth2_server_auth_login_check',
+        methods: ['GET|POST'],
+        priority: -216
+    )]
     public function loginCheckAction(): Response
     {
         return new Response('', Response::HTTP_BAD_REQUEST);

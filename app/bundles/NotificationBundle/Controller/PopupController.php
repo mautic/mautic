@@ -11,7 +11,11 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class PopupController extends CommonController
 {
-    #[Route('/notification', name: 'mautic_notification_popup', priority: -245)]
+    #[Route(
+        '/notification',
+        name: 'mautic_notification_popup',
+        priority: -245
+    )]
     public function indexAction(AssetsHelper $assetsHelper): Response
     {
         $assetsHelper->addStylesheet('/app/bundles/NotificationBundle/Assets/css/popup/popup.css');

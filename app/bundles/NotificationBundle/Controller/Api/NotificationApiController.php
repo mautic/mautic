@@ -57,7 +57,11 @@ final class NotificationApiController extends CommonApiController
     /**
      * Receive Web Push subscription request.
      */
-    #[Route('/notification/subscribe', name: 'mautic_subscribe_notification', priority: -244)]
+    #[Route(
+        '/notification/subscribe',
+        name: 'mautic_subscribe_notification',
+        priority: -244
+    )]
     public function subscribeAction(Request $request): JsonResponse
     {
         $osid = $request->get('osid');

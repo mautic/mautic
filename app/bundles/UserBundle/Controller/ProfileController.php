@@ -31,7 +31,11 @@ final class ProfileController extends FormController
     /**
      * Generate's account profile.
      */
-    #[Route('/s/account', name: 'mautic_user_account', priority: -762)]
+    #[Route(
+        '/s/account',
+        name: 'mautic_user_account',
+        priority: -762
+    )]
     public function indexAction(Request $request, LanguageHelper $languageHelper,
         TokenStorageInterface $tokenStorage, SAMLHelper $samlHelper): Response|RedirectResponse
     {

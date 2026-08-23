@@ -19,7 +19,11 @@ final class BatchEmailController extends AbstractFormController
     /**
      * Adds or removes categories to multiple emails defined by email ID.
      */
-    #[Route('/s/emails/batch/categories/set', name: 'mautic_email_batch_categories_set', priority: -662)]
+    #[Route(
+        '/s/emails/batch/categories/set',
+        name: 'mautic_email_batch_categories_set',
+        priority: -662
+    )]
     public function execAction(Request $request, EmailActionModel $actionModel, CategoryModel $categoryModel): JsonResponse
     {
         $params = $request->get('email_batch');
@@ -53,7 +57,11 @@ final class BatchEmailController extends AbstractFormController
     /**
      * View the modal form for adding contacts into categories in batches.
      */
-    #[Route('/s/emails/batch/categories/view', name: 'mautic_email_batch_categories_view', priority: -661)]
+    #[Route(
+        '/s/emails/batch/categories/view',
+        name: 'mautic_email_batch_categories_view',
+        priority: -661
+    )]
     public function indexAction(): Response
     {
         $route = $this->generateUrl('mautic_email_batch_categories_set');

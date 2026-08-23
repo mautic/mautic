@@ -24,7 +24,13 @@ final class ClientController extends AbstractStandardFormController
         $this->clientModel = $clientModel;
     }
 
-    #[Route('/s/credentials/{objectAction}/{objectId}', name: 'mautic_client_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -627)]
+    #[Route(
+        '/s/credentials/{objectAction}/{objectId}',
+        name: 'mautic_client_action',
+        requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
+        defaults: ['objectId' => 0],
+        priority: -627
+    )]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
@@ -33,7 +39,13 @@ final class ClientController extends AbstractStandardFormController
     /**
      * Generate's default client list.
      */
-    #[Route('/s/credentials/{page}', name: 'mautic_client_index', requirements: ['page' => '\d+'], defaults: ['page' => 0], priority: -626)]
+    #[Route(
+        '/s/credentials/{page}',
+        name: 'mautic_client_index',
+        requirements: ['page' => '\d+'],
+        defaults: ['page' => 0],
+        priority: -626
+    )]
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
     {
         if (!$this->security->isGranted('api:clients:view')) {

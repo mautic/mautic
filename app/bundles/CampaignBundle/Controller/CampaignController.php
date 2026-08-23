@@ -143,7 +143,13 @@ class CampaignController extends AbstractStandardFormController
         );
     }
 
-    #[Route('/s/campaigns/{objectAction}/{objectId}', name: 'mautic_campaign_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -634)]
+    #[Route(
+        '/s/campaigns/{objectAction}/{objectId}',
+        name: 'mautic_campaign_action',
+        requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
+        defaults: ['objectId' => 0],
+        priority: -634
+    )]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
@@ -294,7 +300,13 @@ class CampaignController extends AbstractStandardFormController
      * @param int        $page
      * @param int|null   $count
      */
-    #[Route('/s/campaigns/view/{objectId}/contact/{page}', name: 'mautic_campaign_contacts', requirements: ['page' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'], defaults: ['page' => 0, 'objectId' => 0], priority: -635)]
+    #[Route(
+        '/s/campaigns/view/{objectId}/contact/{page}',
+        name: 'mautic_campaign_contacts',
+        requirements: ['page' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'],
+        defaults: ['page' => 0, 'objectId' => 0],
+        priority: -635
+    )]
     public function contactsAction(
         Request $request,
         PageHelperFactoryInterface $pageHelperFactory,
@@ -336,7 +348,13 @@ class CampaignController extends AbstractStandardFormController
         );
     }
 
-    #[Route('/s/campaigns/event/stats/{objectId}/{dateFromValue}/{dateToValue}', name: 'mautic_campaign_event_stats', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -636)]
+    #[Route(
+        '/s/campaigns/event/stats/{objectId}/{dateFromValue}/{dateToValue}',
+        name: 'mautic_campaign_event_stats',
+        requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
+        defaults: ['objectId' => 0],
+        priority: -636
+    )]
     public function eventStatsAction(int $objectId, string $dateFromValue, string $dateToValue): JsonResponse
     {
         $response        = [];
@@ -388,7 +406,13 @@ class CampaignController extends AbstractStandardFormController
         return new JsonResponse(array_filter($response));
     }
 
-    #[Route('/s/campaigns/graph/{objectId}/{dateFrom}/{dateTo}', name: 'mautic_campaign_graph', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -637)]
+    #[Route(
+        '/s/campaigns/graph/{objectId}/{dateFrom}/{dateTo}',
+        name: 'mautic_campaign_graph',
+        requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
+        defaults: ['objectId' => 0],
+        priority: -637
+    )]
     public function graphAction(Request $request, int $objectId, string $dateFrom, string $dateTo): Response
     {
         $dateRangeValues = ['date_from' => $dateFrom, 'date_to' => $dateTo];
@@ -431,7 +455,13 @@ class CampaignController extends AbstractStandardFormController
     /**
      * @param int $page
      */
-    #[Route('/s/campaigns/{page}', name: 'mautic_campaign_index', requirements: ['page' => '\d+'], defaults: ['page' => 0], priority: -633)]
+    #[Route(
+        '/s/campaigns/{page}',
+        name: 'mautic_campaign_index',
+        requirements: ['page' => '\d+'],
+        defaults: ['page' => 0],
+        priority: -633
+    )]
     public function indexAction(Request $request, $page = null): Response
     {
         return $this->indexStandard($request, $page);

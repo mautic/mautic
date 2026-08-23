@@ -22,7 +22,11 @@ final class ReplyController extends AbstractController
     /**
      * @throws \Exception
      */
-    #[Route('/sms/{transport}/callback', name: 'mautic_sms_callback', priority: -259)]
+    #[Route(
+        '/sms/{transport}/callback',
+        name: 'mautic_sms_callback',
+        priority: -259
+    )]
     public function callbackAction(Request $request, $transport): Response
     {
         define('MAUTIC_NON_TRACKABLE_REQUEST', 1);

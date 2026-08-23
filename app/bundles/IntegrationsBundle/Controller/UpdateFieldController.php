@@ -11,7 +11,11 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class UpdateFieldController extends CommonController
 {
-    #[Route('/s/integration/{integration}/config/{object}/field/{field}', name: 'mautic_integration_config_field_update', priority: -679)]
+    #[Route(
+        '/s/integration/{integration}/config/{object}/field/{field}',
+        name: 'mautic_integration_config_field_update',
+        priority: -679
+    )]
     public function updateAction(Request $request, string $integration, string $object, string $field): JsonResponse
     {
         // Clear the session of previously stored fields in case it got stuck

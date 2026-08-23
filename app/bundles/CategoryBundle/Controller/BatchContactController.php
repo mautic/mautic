@@ -30,7 +30,11 @@ final class BatchContactController extends AbstractFormController
     /**
      * Adds or removes categories to multiple contacts defined by contact ID.
      */
-    #[Route('/s/categories/batch/contact/set', name: 'mautic_category_batch_contact_set', priority: -645)]
+    #[Route(
+        '/s/categories/batch/contact/set',
+        name: 'mautic_category_batch_contact_set',
+        priority: -645
+    )]
     public function execAction(Request $request): JsonResponse
     {
         $params = $request->get('lead_batch');
@@ -60,7 +64,11 @@ final class BatchContactController extends AbstractFormController
     /**
      * View the modal form for adding contacts into categories in batches.
      */
-    #[Route('/s/categories/batch/contact/view', name: 'mautic_category_batch_contact_view', priority: -646)]
+    #[Route(
+        '/s/categories/batch/contact/view',
+        name: 'mautic_category_batch_contact_view',
+        priority: -646
+    )]
     public function indexAction(): Response
     {
         $route = $this->generateUrl('mautic_category_batch_contact_set');

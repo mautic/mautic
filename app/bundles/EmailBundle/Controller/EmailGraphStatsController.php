@@ -23,7 +23,13 @@ final class EmailGraphStatsController extends AbstractController
      *
      * @throws \Exception
      */
-    #[Route('/s/emails-graph-stats/{objectId}/{isVariant}/{dateFrom}/{dateTo}', name: 'mautic_email_graph_stats', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -664)]
+    #[Route(
+        '/s/emails-graph-stats/{objectId}/{isVariant}/{dateFrom}/{dateTo}',
+        name: 'mautic_email_graph_stats',
+        requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
+        defaults: ['objectId' => 0],
+        priority: -664
+    )]
     public function viewAction(
         Request $request,
         EmailModel $model,

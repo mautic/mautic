@@ -33,7 +33,13 @@ final class MessageController extends AbstractStandardFormController
         $this->messageModel = $messageModel;
     }
 
-    #[Route('/s/messages/{objectAction}/{objectId}', name: 'mautic_message_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -651)]
+    #[Route(
+        '/s/messages/{objectAction}/{objectId}',
+        name: 'mautic_message_action',
+        requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
+        defaults: ['objectId' => 0],
+        priority: -651
+    )]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
@@ -60,7 +66,13 @@ final class MessageController extends AbstractStandardFormController
     /**
      * @param int $page
      */
-    #[Route('/s/messages/{page}', name: 'mautic_message_index', requirements: ['page' => '\d+'], defaults: ['page' => 0], priority: -649)]
+    #[Route(
+        '/s/messages/{page}',
+        name: 'mautic_message_index',
+        requirements: ['page' => '\d+'],
+        defaults: ['page' => 0],
+        priority: -649
+    )]
     public function indexAction(Request $request, $page = 1): Response
     {
         return $this->indexStandard($request, $page);
@@ -219,7 +231,13 @@ final class MessageController extends AbstractStandardFormController
     /**
      * @param int $page
      */
-    #[Route('/s/messages/contacts/{objectId}/{channel}/{page}', name: 'mautic_message_contacts', requirements: ['page' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'], defaults: ['page' => 0, 'objectId' => 0], priority: -650)]
+    #[Route(
+        '/s/messages/contacts/{objectId}/{channel}/{page}',
+        name: 'mautic_message_contacts',
+        requirements: ['page' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'],
+        defaults: ['page' => 0, 'objectId' => 0],
+        priority: -650
+    )]
     public function contactsAction(
         Request $request,
         PageHelperFactoryInterface $pageHelperFactory,

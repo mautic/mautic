@@ -38,7 +38,12 @@ final class DetailController extends CommonController
         $this->composer      = $composer;
     }
 
-    #[Route('/s/marketplace/detail/{vendor}/{package}', name: 'mautic_marketplace_detail', methods: ['GET'], priority: -708)]
+    #[Route(
+        '/s/marketplace/detail/{vendor}/{package}',
+        name: 'mautic_marketplace_detail',
+        methods: ['GET'],
+        priority: -708
+    )]
     public function viewAction(string $vendor, string $package): Response
     {
         if (!$this->config->marketplaceIsEnabled()) {

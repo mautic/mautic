@@ -36,7 +36,13 @@ final class SmsController extends FormController
         $this->auditLogModel = $auditLogModel;
     }
 
-    #[Route('/s/sms/{objectAction}/{objectId}', name: 'mautic_sms_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -747)]
+    #[Route(
+        '/s/sms/{objectAction}/{objectId}',
+        name: 'mautic_sms_action',
+        requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
+        defaults: ['objectId' => 0],
+        priority: -747
+    )]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
@@ -45,7 +51,13 @@ final class SmsController extends FormController
     /**
      * @param int $page
      */
-    #[Route('/s/sms/{page}', name: 'mautic_sms_index', requirements: ['page' => '\d+'], defaults: ['page' => 0], priority: -746)]
+    #[Route(
+        '/s/sms/{page}',
+        name: 'mautic_sms_index',
+        requirements: ['page' => '\d+'],
+        defaults: ['page' => 0],
+        priority: -746
+    )]
     public function indexAction(Request $request, TransportChain $transportChain, $page = 1): Response
     {
         // set some permissions
@@ -730,7 +742,13 @@ final class SmsController extends FormController
     /**
      * @param int $page
      */
-    #[Route('/s/sms/view/{objectId}/contact/{page}', name: 'mautic_sms_contacts', requirements: ['page' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'], defaults: ['page' => 0, 'objectId' => 0], priority: -748)]
+    #[Route(
+        '/s/sms/view/{objectId}/contact/{page}',
+        name: 'mautic_sms_contacts',
+        requirements: ['page' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'],
+        defaults: ['page' => 0, 'objectId' => 0],
+        priority: -748
+    )]
     public function contactsAction(
         Request $request,
         PageHelperFactoryInterface $pageHelperFactory,

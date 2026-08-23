@@ -12,7 +12,11 @@ final class JsController extends CommonController
      * We can't user JsonResponse here, because
      * it improperly encodes the data array.
      */
-    #[Route('/manifest.json', name: 'mautic_onesignal_manifest', priority: -248)]
+    #[Route(
+        '/manifest.json',
+        name: 'mautic_onesignal_manifest',
+        priority: -248
+    )]
     public function manifestAction(): Response
     {
         $gcmSenderId = $this->coreParametersHelper->get('gcm_sender_id', '446150739532');
@@ -31,7 +35,11 @@ final class JsController extends CommonController
         );
     }
 
-    #[Route('/OneSignalSDKWorker.js', name: 'mautic_onesignal_worker', priority: -246)]
+    #[Route(
+        '/OneSignalSDKWorker.js',
+        name: 'mautic_onesignal_worker',
+        priority: -246
+    )]
     public function workerAction(): Response
     {
         return new Response(
@@ -44,7 +52,11 @@ final class JsController extends CommonController
         );
     }
 
-    #[Route('/OneSignalSDKUpdaterWorker.js', name: 'mautic_onesignal_updater', priority: -247)]
+    #[Route(
+        '/OneSignalSDKUpdaterWorker.js',
+        name: 'mautic_onesignal_updater',
+        priority: -247
+    )]
     public function updaterAction(): Response
     {
         return new Response(

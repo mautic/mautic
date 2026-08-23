@@ -52,7 +52,11 @@ final class PublicController extends CommonFormController
 
     private array $tokens = [];
 
-    #[Route('/form/submit', name: 'mautic_form_postresults', priority: -230)]
+    #[Route(
+        '/form/submit',
+        name: 'mautic_form_postresults',
+        priority: -230
+    )]
     public function submitAction(
         Request $request,
         DateHelper $dateTemplateHelper,
@@ -492,7 +496,11 @@ final class PublicController extends CommonFormController
     /**
      * Displays a message.
      */
-    #[Route('/form/message', name: 'mautic_form_postmessage', priority: -232)]
+    #[Route(
+        '/form/message',
+        name: 'mautic_form_postmessage',
+        priority: -232
+    )]
     public function messageAction(Request $request, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, ThemeHelper $themeHelper): Response
     {
         $session = $request->getSession();
@@ -522,7 +530,12 @@ final class PublicController extends CommonFormController
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    #[Route('/form/{id}', name: 'mautic_form_preview', defaults: ['id' => '0'], priority: -233)]
+    #[Route(
+        '/form/{id}',
+        name: 'mautic_form_preview',
+        defaults: ['id' => '0'],
+        priority: -233
+    )]
     public function previewAction(Request $request, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, ThemeHelper $themeHelper, int $id = 0): Response
     {
         $objectId          = (empty($id)) ? (int) $request->get('id') : $id;
@@ -588,7 +601,11 @@ final class PublicController extends CommonFormController
     /**
      * Generates JS file for automatic form generation.
      */
-    #[Route('/form/generate.js', name: 'mautic_form_generateform', priority: -231)]
+    #[Route(
+        '/form/generate.js',
+        name: 'mautic_form_generateform',
+        priority: -231
+    )]
     public function generateAction(Request $request): Response
     {
         // Don't store a visitor with this request
@@ -613,7 +630,11 @@ final class PublicController extends CommonFormController
         return $response;
     }
 
-    #[Route('/form/embed/{id}', name: 'mautic_form_embed', priority: -234)]
+    #[Route(
+        '/form/embed/{id}',
+        name: 'mautic_form_embed',
+        priority: -234
+    )]
     public function embedAction(Request $request): Response
     {
         $formId = (int) $request->get('id');
@@ -665,7 +686,12 @@ final class PublicController extends CommonFormController
         return str_replace(array_keys($this->tokens), array_values($this->tokens), $string);
     }
 
-    #[Route('/form/company-lookup/autocomplete', name: 'mautic_form_company_lookup', methods: ['POST'], priority: -236)]
+    #[Route(
+        '/form/company-lookup/autocomplete',
+        name: 'mautic_form_company_lookup',
+        methods: ['POST'],
+        priority: -236
+    )]
     public function lookupCompanyAction(Request $request, FieldModel $fieldModel, CompanyModel $companyModel): JsonResponse
     {
         $parameters = json_decode($request->getContent(), true);

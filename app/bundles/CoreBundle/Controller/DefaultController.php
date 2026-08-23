@@ -28,7 +28,11 @@ final class DefaultController extends CommonController
         $this->pageModel = $pageModel;
     }
 
-    #[Route('/', name: 'mautic_base_index', priority: -209)]
+    #[Route(
+        '/',
+        name: 'mautic_base_index',
+        priority: -209
+    )]
     public function indexAction(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         $root = $this->coreParametersHelper->get('webroot');

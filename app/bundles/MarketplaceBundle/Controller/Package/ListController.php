@@ -33,7 +33,14 @@ final class ListController extends CommonController
         $this->config          = $config;
     }
 
-    #[Route('/s/marketplace/{page}', name: 'mautic_marketplace_list', requirements: ['page' => '\d+'], defaults: ['page' => 1], methods: ['GET|POST'], priority: -707)]
+    #[Route(
+        '/s/marketplace/{page}',
+        name: 'mautic_marketplace_list',
+        requirements: ['page' => '\d+'],
+        defaults: ['page' => 1],
+        methods: ['GET|POST'],
+        priority: -707
+    )]
     public function listAction(int $page = 1): Response
     {
         if (!$this->config->marketplaceIsEnabled()) {

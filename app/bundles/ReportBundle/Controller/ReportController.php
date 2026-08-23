@@ -33,13 +33,25 @@ final class ReportController extends FormController
         $this->reportModel = $reportModel;
     }
 
-    #[Route('/s/reports/{objectAction}/{objectId}', name: 'mautic_report_action', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['objectId' => 0], priority: -745)]
+    #[Route(
+        '/s/reports/{objectAction}/{objectId}',
+        name: 'mautic_report_action',
+        requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
+        defaults: ['objectId' => 0],
+        priority: -745
+    )]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
     }
 
-    #[Route('/s/reports/{page}', name: 'mautic_report_index', requirements: ['page' => '\d+'], defaults: ['page' => 0], priority: -739)]
+    #[Route(
+        '/s/reports/{page}',
+        name: 'mautic_report_index',
+        requirements: ['page' => '\d+'],
+        defaults: ['page' => 0],
+        priority: -739
+    )]
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
     {
         // set some permissions
@@ -531,7 +543,13 @@ final class ReportController extends FormController
      * @param int $objectId   Report ID
      * @param int $reportPage
      */
-    #[Route('/s/reports/view/{objectId}/{reportPage}', name: 'mautic_report_view', requirements: ['reportPage' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'], defaults: ['reportPage' => 1, 'objectId' => 0], priority: -742)]
+    #[Route(
+        '/s/reports/view/{objectId}/{reportPage}',
+        name: 'mautic_report_view',
+        requirements: ['reportPage' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'],
+        defaults: ['reportPage' => 1, 'objectId' => 0],
+        priority: -742
+    )]
     public function viewAction(Request $request, $objectId, $reportPage = 1): Response
     {
         $entity   = $this->reportModel->getEntity($objectId);
@@ -763,7 +781,13 @@ final class ReportController extends FormController
      *
      * @throws \Exception
      */
-    #[Route('/s/reports/view/{objectId}/export/{format}', name: 'mautic_report_export', requirements: ['objectId' => '[a-zA-Z0-9_-]+'], defaults: ['format' => 'csv', 'objectId' => 0], priority: -740)]
+    #[Route(
+        '/s/reports/view/{objectId}/export/{format}',
+        name: 'mautic_report_export',
+        requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
+        defaults: ['format' => 'csv', 'objectId' => 0],
+        priority: -740
+    )]
     public function exportAction(Request $request, $objectId, $format = 'csv'): Response
     {
         $entity   = $this->reportModel->getEntity($objectId);
@@ -863,7 +887,12 @@ final class ReportController extends FormController
      *
      * @throws \Exception
      */
-    #[Route('/s/reports/download/{reportId}/{format}', name: 'mautic_report_download', defaults: ['format' => 'csv'], priority: -741)]
+    #[Route(
+        '/s/reports/download/{reportId}/{format}',
+        name: 'mautic_report_download',
+        defaults: ['format' => 'csv'],
+        priority: -741
+    )]
     public function downloadAction(FileHandler $fileHandler, $reportId, $format = 'csv'): Response|BinaryFileResponse
     {
         if ('csv' !== $format) {
