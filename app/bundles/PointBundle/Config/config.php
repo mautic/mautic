@@ -4,44 +4,6 @@ declare(strict_types=1);
 
 return [
     'routes' => [
-        'main' => [
-            'mautic_pointtriggerevent_action' => [
-                'path'       => '/points/triggers/events/{objectAction}/{objectId}',
-                'controller' => 'Mautic\PointBundle\Controller\TriggerEventController::executeAction',
-            ],
-            'mautic_pointtrigger_index' => [
-                'path'       => '/points/triggers/{page}',
-                'controller' => 'Mautic\PointBundle\Controller\TriggerController::indexAction',
-            ],
-            'mautic_pointtrigger_action' => [
-                'path'       => '/points/triggers/{objectAction}/{objectId}',
-                'controller' => 'Mautic\PointBundle\Controller\TriggerController::executeAction',
-            ],
-            'mautic_point.group_index' => [
-                'path'       => '/points/groups/{page}',
-                'controller' => 'Mautic\PointBundle\Controller\GroupController::indexAction',
-            ],
-            'mautic_point.group_action' => [
-                'path'       => '/points/groups/{objectAction}/{objectId}',
-                'controller' => 'Mautic\PointBundle\Controller\GroupController::executeAction',
-            ],
-            'mautic_point.insight_index' => [
-                'path'       => '/points/insights/{page}',
-                'controller' => 'Mautic\PointBundle\Controller\InsightController::indexAction',
-            ],
-            'mautic_point.insight_action' => [
-                'path'       => '/points/insights/{objectAction}/{objectId}',
-                'controller' => 'Mautic\PointBundle\Controller\InsightController::executeAction',
-            ],
-            'mautic_point_index' => [
-                'path'       => '/points/{page}',
-                'controller' => 'Mautic\PointBundle\Controller\PointController::indexAction',
-            ],
-            'mautic_point_action' => [
-                'path'       => '/points/{objectAction}/{objectId}',
-                'controller' => 'Mautic\PointBundle\Controller\PointController::executeAction',
-            ],
-        ],
         'api' => [
             'mautic_api_pointactionsstandard' => [
                 'standard_entity' => true,
