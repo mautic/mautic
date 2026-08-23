@@ -12,7 +12,6 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
 final class InstallController extends CommonController
@@ -37,9 +36,6 @@ final class InstallController extends CommonController
      *
      * @throws \Doctrine\DBAL\Exception
      */
-    #[Route('/installer', name: 'mautic_installer_home', priority: -237)]
-    #[Route('/installer/step/{index}', name: 'mautic_installer_step', priority: -239)]
-    #[Route('/installer/{noerror}', name: 'mautic_installer_catchcall', requirements: ['noerror' => '^(?).+'], priority: -241)]
     public function stepAction(Request $request, EntityManagerInterface $entityManager, PathsHelper $pathsHelper, float $index = 0): \Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         // We're going to assume a bit here; if the config file exists already and DB info is provided, assume the app
@@ -216,7 +212,6 @@ final class InstallController extends CommonController
      *
      * @throws \Exception
      */
-    #[Route('/installer/final', name: 'mautic_installer_final', priority: -240)]
     public function finalAction(Request $request, PathsHelper $pathsHelper): \Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         $session = $request->getSession();

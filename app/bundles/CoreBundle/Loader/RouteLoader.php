@@ -75,14 +75,21 @@ final class RouteLoader extends Loader
         // Native #[Route] attributes declared directly on bundle controllers.
         // Paths already carry their full prefix (e.g. /s, /api), so they are added
         // to the root collection; forceSSL is applied here like every other group.
-        $attributeCollection = new RouteCollection();
-        foreach (glob(dirname(__DIR__, 2).'/*/Controller', GLOB_ONLYDIR) as $controllerDir) {
-            $attributeCollection->addCollection($this->import($controllerDir, 'attribute'));
+        //
+        // Skipped during installation: scanning every controller for attributes
+        // autoloads all of them, and the installer runs under a tight memory limit.
+        // The installer's own routes live on the config loader, so /installer still
+        // resolves without this scan.
+        if (!defined('MAUTIC_INSTALLER')) {
+            $attributeCollection = new RouteCollection();
+            foreach (glob(dirname(__DIR__, 2).'/*/Controller', GLOB_ONLYDIR) as $controllerDir) {
+                $attributeCollection->addCollection($this->import($controllerDir, 'attribute'));
+            }
+            if ($forceSSL) {
+                $attributeCollection->setSchemes('https');
+            }
+            $collection->addCollection($attributeCollection);
         }
-        if ($forceSSL) {
-            $attributeCollection->setSchemes('https');
-        }
-        $collection->addCollection($attributeCollection);
 
         // Catch all
         $event = new RouteEvent($this, 'catchall');
