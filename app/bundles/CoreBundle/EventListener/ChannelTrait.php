@@ -4,6 +4,7 @@ namespace Mautic\CoreBundle\EventListener;
 
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
+use Mautic\CoreBundle\Model\MauticModelInterface;
 
 trait ChannelTrait
 {
@@ -20,7 +21,7 @@ trait ChannelTrait
         $this->modelFactory = $modelFactory;
     }
 
-    protected function getChannelModel(string $channel): ?AbstractCommonModel
+    protected function getChannelModel(string $channel): ?MauticModelInterface
     {
         if ($this->modelFactory->hasModel($channel)) {
             return $this->modelFactory->getModel($channel);
@@ -31,16 +32,15 @@ trait ChannelTrait
 
     protected function getChannelEntity(string $channel, $channelId): ?object
     {
-        $channelEntity = null;
         if ($channelModel = $this->getChannelModel($channel)) {
             try {
-                $channelEntity = $channelModel->getEntity($channelId);
+                return $channelModel->getEntity($channelId);
             } catch (\Exception) {
                 // Not found
             }
         }
 
-        return $channelEntity;
+        return null;
     }
 
     /**
