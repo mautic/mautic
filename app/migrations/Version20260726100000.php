@@ -13,8 +13,8 @@ final class Version20260726100000 extends PreUpAssertionMigration
     protected const TABLE_NAME = 'campaign_lead_event_log';
     protected const INDEX_NAME = 'campaign_event_lead_ids';
 
-    private const CAMPAIGN_FIRST_COLUMNS = ['campaign_id', 'lead_id', 'rotation'];
-    private const LEAD_FIRST_COLUMNS     = ['lead_id', 'campaign_id', 'rotation'];
+    public const CAMPAIGN_FIRST_COLUMNS = ['campaign_id', 'lead_id', 'rotation'];
+    public const LEAD_FIRST_COLUMNS     = ['lead_id', 'campaign_id', 'rotation'];
 
     protected function preUpAssertions(): void
     {

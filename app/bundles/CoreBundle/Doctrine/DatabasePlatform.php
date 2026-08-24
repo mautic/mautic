@@ -1270,17 +1270,17 @@ final class DatabasePlatform
         string $fullTableName,
     ): array {
         $platform = $connection->getDatabasePlatform();
+        $indexes = [];
 
         if (!self::isPostgreSQL($platform)) {
             // Let Doctrine handle MySQL/MariaDB and other platforms
             $schemaManager = $connection->createSchemaManager();
 
-            return $schemaManager->listTableIndexes($fullTableName);
-        }
-
-        // Reliable custom query for PostgreSQL
-        // Use this till we apply doctrine-dbal-pgsql-platform-indexes.patch
-        $sql = "
+            $indexes = $schemaManager->listTableIndexes($fullTableName);
+        } else {
+            // Reliable custom query for PostgreSQL
+            // Use this till we apply doctrine-dbal-pgsql-platform-indexes.patch
+            $sql = "
             SELECT
                 i.relname AS index_name,
                 array_agg(a.attname ORDER BY c.ordinality) AS columns,
@@ -1304,30 +1304,30 @@ final class DatabasePlatform
                 i.relname;
         ";
 
-        $stmt = $connection->prepare($sql);
-        $stmt->bindValue('table', $fullTableName);
-        $results = $stmt->executeQuery()->fetchAllAssociative();
+            $stmt = $connection->prepare($sql);
+            $stmt->bindValue('table', $fullTableName);
+            $results = $stmt->executeQuery()->fetchAllAssociative();
 
-        $indexes = [];
-        foreach ($results as $row) {
-            $columns = $row['columns'];
+            foreach ($results as $row) {
+                $columns = $row['columns'];
 
-            // Handle both native PHP array and string representation {col1,col2}
-            if (is_string($columns)) {
-                $columnsStr = trim($columns, '{}');
-                $columns    = explode(',', $columnsStr);
-                $columns    = array_map(fn ($part): string => trim($part, '"'), $columns);
+                // Handle both native PHP array and string representation {col1,col2}
+                if (is_string($columns)) {
+                    $columnsStr = trim($columns, '{}');
+                    $columns = explode(',', $columnsStr);
+                    $columns = array_map(fn ($part): string => trim($part, '"'), $columns);
+                }
+
+                $indexes[] = new Index(
+                    $row['index_name'],
+                    $columns,
+                    (bool) $row['is_unique'],
+                    (bool) $row['is_primary']
+                );
             }
-
-            $indexes[] = new Index(
-                $row['index_name'],
-                $columns,
-                (bool) $row['is_unique'],
-                (bool) $row['is_primary']
-            );
         }
 
-        return $indexes;
+        return $indexes ?? [];
     }
 
     /**
