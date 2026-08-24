@@ -50,7 +50,7 @@ $container->loadFromExtension('monolog', [
         ],
         'mautic' => [
             'type'      => 'service',
-            'id'        => 'mautic.monolog.handler',
+            'id'        => Mautic\CoreBundle\Monolog\Handler\FileLogHandler::class,
             'channels'  => [
                 'mautic',
             ],
