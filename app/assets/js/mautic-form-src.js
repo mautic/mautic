@@ -558,6 +558,10 @@ var t,e;t=this,e=function(){"use strict";function t(t,e){var n=Object.keys(t);if
                     var formValid         = Form.customCallbackHandler(formId, 'onValidate');
                     var firstInvalidField = false;
 
+                    if (submitForm && validator.isSubmitting(theForm)) {
+                        return false;
+                    }
+
                     validator.disableSubmitButton();
 
                     // If true or false, then a callback handled it
@@ -856,27 +860,81 @@ var t,e;t=this,e=function(){"use strict";function t(t,e){var n=Object.keys(t);if
                     Form.syncSliderOutputs(formId);
                 },
 
+                getSubmitButtons: function(theForm) {
+                    if (!theForm) {
+                        return [];
+                    }
+
+                    return theForm.querySelectorAll('button.mauticform-button[type="submit"], button.mauticform-button:not([type]), input.mauticform-button[type="submit"], input[type="submit"]');
+                },
+
+                isSubmitting: function(theForm) {
+                    return theForm && theForm.getAttribute('data-mautic-form-submitting') === 'true';
+                },
+
+                setSubmitting: function(theForm, isSubmitting) {
+                    if (!theForm) {
+                        return;
+                    }
+
+                    if (isSubmitting) {
+                        theForm.setAttribute('data-mautic-form-submitting', 'true');
+                        theForm.setAttribute('aria-busy', 'true');
+
+                        return;
+                    }
+
+                    theForm.removeAttribute('data-mautic-form-submitting');
+                    theForm.removeAttribute('aria-busy');
+                },
+
                 disableSubmitButton: function() {
+                    var theForm = document.getElementById('mauticform_' + formId);
+
+                    validator.setSubmitting(theForm, true);
+
                     // If true, then a callback handled it
                     if (!Form.customCallbackHandler(formId, 'onSubmitButtonDisable')) {
-                        var submitButton = document.getElementById('mauticform_' + formId).querySelector('.mauticform-button');
+                        var submitButtons = validator.getSubmitButtons(theForm);
 
-                        if (submitButton) {
-                            MauticLang.submitMessage = submitButton.innerHTML;
-                            submitButton.innerHTML = MauticLang.submittingMessage;
-                            submitButton.disabled = 'disabled';
-                        }
+                        [].forEach.call(submitButtons, function(submitButton) {
+                            if (submitButton.tagName.toLowerCase() === 'input') {
+                                submitButton.setAttribute('data-mautic-form-submit-label', submitButton.value);
+                                submitButton.value = MauticLang.submittingMessage;
+                            } else {
+                                submitButton.setAttribute('data-mautic-form-submit-label', submitButton.innerHTML);
+                                submitButton.innerHTML = MauticLang.submittingMessage;
+                            }
+
+                            submitButton.disabled = true;
+                        });
                     }
                 },
 
                 enableSubmitButton: function() {
+                    var theForm = document.getElementById('mauticform_' + formId);
+
+                    validator.setSubmitting(theForm, false);
+
                     // If true, then a callback handled it
                     if (!Form.customCallbackHandler(formId, 'onSubmitButtonEnable')) {
-                        var submitButton = document.getElementById('mauticform_' + formId).querySelector('.mauticform-button');
-                        if (submitButton) {
-                            submitButton.innerHTML = MauticLang.submitMessage;
-                            submitButton.disabled = '';
-                        }
+                        var submitButtons = validator.getSubmitButtons(theForm);
+
+                        [].forEach.call(submitButtons, function(submitButton) {
+                            var submitLabel = submitButton.getAttribute('data-mautic-form-submit-label');
+
+                            if (submitLabel !== null) {
+                                if (submitButton.tagName.toLowerCase() === 'input') {
+                                    submitButton.value = submitLabel;
+                                } else {
+                                    submitButton.innerHTML = submitLabel;
+                                }
+
+                                submitButton.removeAttribute('data-mautic-form-submit-label');
+                            }
+
+                            submitButton.disabled = false;
+                        });
                     }
                 }
             };
