@@ -15,7 +15,7 @@ use Mautic\LeadBundle\Entity\Lead;
  *
  * @see Lead
  */
-final class IndexHelper
+class IndexHelper
 {
     /**
      * @var bool|array<string>
