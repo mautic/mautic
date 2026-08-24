@@ -95,7 +95,7 @@ final readonly class EmailListingHelper
     {
         $ignoreListJoin = true;
 
-        if (empty($currentFilters)) {
+        if ([] === $currentFilters) {
             return $ignoreListJoin;
         }
 
@@ -132,16 +132,16 @@ final readonly class EmailListingHelper
 
         $filter['string'] = $this->stripQuickFilterTokensFromSearch($filter['string'], $searchTerms);
 
-        if (!empty($listAliases)) {
+        if ([] !== $listAliases) {
             $filter['force'][] = ['column' => 'l.alias', 'expr' => 'in', 'value' => array_values(array_unique($listAliases))];
             $ignoreListJoin    = false;
         }
 
-        if (!empty($catIds)) {
+        if ([] !== $catIds) {
             $filter['force'][] = ['column' => 'c.id', 'expr' => 'in', 'value' => $catIds];
         }
 
-        if (!empty($templates)) {
+        if ([] !== $templates) {
             $filter['force'][] = ['column' => 'e.template', 'expr' => 'in', 'value' => $templates];
         }
 
@@ -183,7 +183,7 @@ final readonly class EmailListingHelper
      */
     private function stripQuickFilterTokensFromSearch(string $search, array $quickFilterTokens): string
     {
-        if (empty($quickFilterTokens)) {
+        if ([] === $quickFilterTokens) {
             return $search;
         }
 

@@ -418,7 +418,7 @@ final class ConfigType extends AbstractType
         $buildEmailColumnsField = static function (FormInterface $form, array $currentColumns, array $extraOptions = []): void {
             $order        = [];
             $orderColumns = [];
-            if (!empty($currentColumns)) {
+            if ([] !== $currentColumns) {
                 $orderColumns = array_values($currentColumns);
                 $order        = htmlspecialchars(json_encode($orderColumns), ENT_QUOTES, 'UTF-8');
             }
