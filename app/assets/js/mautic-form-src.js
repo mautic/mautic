@@ -722,7 +722,7 @@ var t,e;t=this,e=function(){"use strict";function t(t,e){var n=Object.keys(t);if
 
                             elErrorSpan.style.display = (valid) ? 'none' : '';
                             elErrorSpan.setAttribute('aria-hidden', valid ? 'true' : 'false');
-                            elContainer.className = elContainer.className + " mauticform-has-error";
+                            elContainer.classList.add('mauticform-has-error');
                         }
                     }
                 },
@@ -745,7 +745,7 @@ var t,e;t=this,e=function(){"use strict";function t(t,e){var n=Object.keys(t);if
                             if (elErrorSpan) {
                                 elErrorSpan.style.display = 'none';
                                 elErrorSpan.setAttribute('aria-hidden', 'true');
-                                elContainer.className = elContainer.className.replace(" mauticform-has-error", "");
+                                elContainer.classList.remove('mauticform-has-error');
                             }
                         }
                     }
