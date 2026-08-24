@@ -82,7 +82,7 @@ class DoNotContact implements MauticModelInterface
         $checkCurrentStatus = true,
         $allowUnsubscribeOverride = false,
     ): ?DNC {
-        $dnc     = false;
+        $dnc     = null;
         if (is_numeric($contact)) {
             $contact = $this->leadModel->getEntity($contact);
         }

@@ -188,7 +188,7 @@ final class ChannelActionModelTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->doNotContactMock->expects($matcher)
-            ->method('addDncForContact')->willReturnCallback(function (...$parameters) use ($matcher): false {
+            ->method('addDncForContact')->willReturnCallback(function (...$parameters) use ($matcher): null {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(5, $parameters[0]);
                     $this->assertSame('email', $parameters[1]);
@@ -200,7 +200,7 @@ final class ChannelActionModelTest extends \PHPUnit\Framework\TestCase
                     $this->assertSame(DNC::MANUAL, $parameters[2]);
                 }
 
-                return false;
+                return null;
             });
 
         $this->actionModel->update($contacts, $subscribedChannels);
