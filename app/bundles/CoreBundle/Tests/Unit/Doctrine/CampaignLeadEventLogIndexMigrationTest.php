@@ -43,7 +43,8 @@ final class CampaignLeadEventLogIndexMigrationTest extends TestCase
 
         $this->assertContains(
             DatabasePlatform::getDropIndexSql($this->platform, self::TABLE_NAME, self::INDEX_NAME),
-            $statements
+            $statements,
+            'STATEMENTS: '.implode(PHP_EOL, $statements)
         );
         $this->assertContains(
             DatabasePlatform::getCreateIndexSql(
@@ -52,7 +53,8 @@ final class CampaignLeadEventLogIndexMigrationTest extends TestCase
                 self::INDEX_NAME,
                 Version20260726100000::CAMPAIGN_FIRST_COLUMNS
             ),
-            $statements
+            $statements,
+            'STATEMENTS: '.implode(PHP_EOL, $statements)
         );
     }
 
@@ -77,6 +79,8 @@ final class CampaignLeadEventLogIndexMigrationTest extends TestCase
 
         $migration->up($schema);
 
+        $statements = $this->getStatements($migration);
+
         $this->assertSame(
             [
                 DatabasePlatform::getCreateIndexSql(
@@ -86,7 +90,8 @@ final class CampaignLeadEventLogIndexMigrationTest extends TestCase
                     Version20260726100000::CAMPAIGN_FIRST_COLUMNS
                 ),
             ],
-            $this->getStatements($migration)
+            $statements,
+            'STATEMENTS: '.implode(PHP_EOL, $statements)
         );
     }
 
@@ -99,7 +104,12 @@ final class CampaignLeadEventLogIndexMigrationTest extends TestCase
 
         $migration->up($schema);
 
-        $this->assertSame([], $this->getStatements($migration));
+        $statements = $this->getStatements($migration);
+
+        $this->assertSame([],
+            $statements,
+            'STATEMENTS: '.implode(PHP_EOL, $statements)
+        );
     }
 
     public function testDownRestoresLeadFirstIndex(): void
@@ -115,7 +125,8 @@ final class CampaignLeadEventLogIndexMigrationTest extends TestCase
 
         $this->assertContains(
             DatabasePlatform::getDropIndexSql($this->platform, self::TABLE_NAME, self::INDEX_NAME),
-            $statements
+            $statements,
+            'STATEMENTS: '.implode(PHP_EOL, $statements)
         );
         $this->assertContains(
             DatabasePlatform::getCreateIndexSql(
@@ -124,7 +135,8 @@ final class CampaignLeadEventLogIndexMigrationTest extends TestCase
                 self::INDEX_NAME,
                 Version20260726100000::LEAD_FIRST_COLUMNS
             ),
-            $statements
+            $statements,
+            'STATEMENTS: '.implode(PHP_EOL, $statements)
         );
     }
 
