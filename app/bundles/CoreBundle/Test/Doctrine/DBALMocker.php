@@ -144,7 +144,7 @@ final class DBALMocker
             $mock->expects(new AnyInvokedCount())
                 ->method('insert');
 
-            $mock->expects($this->testCase->any())
+            $mock->expects(new AnyInvokedCount())
                 ->method('getDatabasePlatform')
                 ->willReturn(new MySQLPlatform());
 

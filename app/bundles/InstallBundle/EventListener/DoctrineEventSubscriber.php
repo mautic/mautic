@@ -50,8 +50,12 @@ final class DoctrineEventSubscriber
                 $table->addIndex(['companyname', 'companycity', 'companycountry', 'companystate'], 'company_match');
             }
         }
+
         // Add MySQL missing functions + operators to PostgreSQL
-        $this->postgreSqlMySqlCompact($args->getEntityManager()->getConnection());
+        if ($args->getEntityManager()->getConnection() instanceof Connection) {
+            // only run when real connetion exists
+            $this->postgreSqlMySqlCompact($args->getEntityManager()->getConnection());
+        }
     }
 
     public function postgreSqlMySqlCompact(Connection $conn): void
