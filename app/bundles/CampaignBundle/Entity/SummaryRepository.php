@@ -148,11 +148,11 @@ final class SummaryRepository extends CommonRepository
             ';
 
             if (null !== $campaignId) {
-                $innerSql .= ' AND mclel.campaign_id = '.(int) $campaignId;
+                $innerSql .= ' AND mclel.campaign_id = '.$campaignId;
             }
 
             if (null !== $eventId) {
-                $innerSql .= ' AND mclel.event_id = '.(int) $eventId;
+                $innerSql .= ' AND mclel.event_id = '.$eventId;
             }
 
             $innerSql .= ' GROUP BY mclel.campaign_id, mclel.event_id';

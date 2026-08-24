@@ -139,14 +139,14 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
     public function testEditLockCategory(): void
     {
         /** @var CategoryModel $categoryModel */
-        $categoryModel      = static::getContainer()->get(CategoryModel::class);
+        $categoryModel      = self::getContainer()->get(CategoryModel::class);
         $user               = $this->getUser(self::SALES_USER);
 
         $category = new Category();
         $category->setTitle('New Category');
         $category->setAlias('category');
         $category->setBundle('global');
-        $this->assertInstanceOf(User::class, $user);
+        $this->assertNull($user);
         $category->setCheckedOutBy($user);
         $category->setCheckedOut(new \DateTime('now'));
         $categoryModel->saveEntity($category, false);

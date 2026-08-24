@@ -77,13 +77,26 @@ abstract class AbstractMauticMigration extends AbstractMigration
         $this->prefix = $prefix;
     }
 
-    protected function indexExists(string $tableName, string $indexName): bool
+    protected function indexExists(string $tableName, string $indexName, array $columns = []): bool
     {
         $indexes = $this->getIndexes($tableName);
 
         $lowerIndexName = strtolower($indexName);
+        $expectedColumns = array_map('strtolower', $columns);
         foreach ($indexes as $index) {
-            if (strtolower($index->getName()) === $lowerIndexName) {
+            if (strtolower($index->getName()) !== $lowerIndexName) {
+                continue;
+            }
+
+            // Name matches – if no columns were requested, we're done
+            if ([] === $expectedColumns) {
+                return true;
+            }
+
+            // Compare columns (order matters)
+            $actualColumns = array_map('strtolower', $index->getColumns());
+
+            if ($actualColumns === $expectedColumns) {
                 return true;
             }
         }

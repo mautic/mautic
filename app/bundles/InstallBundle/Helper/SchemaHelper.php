@@ -268,7 +268,7 @@ final class SchemaHelper
             } else {
                 // existing backup to be dropped
                 $dropTables[]    = $t;
-                array_push($dropSequences, $sequence);
+                $dropSequences[] = $sequence;
             }
 
             foreach ($restraints as $restraint) {

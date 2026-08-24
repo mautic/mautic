@@ -627,7 +627,7 @@ class CampaignRepository extends CommonRepository
                 't',
                 't.lead_id = cl.lead_id'
             )
-        ->setParameter('segmentId', (int) $segmentId)
+        ->setParameter('segmentId', $segmentId)
         ->groupBy('c.id');
 
         if ([] !== $campaignIds) {

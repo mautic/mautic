@@ -513,7 +513,7 @@ final class DatabasePlatform
      *
      * Prefers non-primary unique constraint if available, otherwise falls back to primary key.
      */
-    public static function getUpsertConflictTarget(Connection $connection, ClassMetadata $metadata, string $pkColumn): ?string
+    public static function getUpsertConflictTarget(Connection $connection, ClassMetadata $metadata, string $pkColumn): string
     {
         /**
          * Currently Unique Constrains are only used in PostgreSQL

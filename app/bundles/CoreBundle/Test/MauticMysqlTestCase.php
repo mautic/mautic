@@ -22,7 +22,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
     private bool $databaseInstalled = false;
 
-    private bool $setUpInvoked      = false;
+    private bool $setUpInvoked;
 
     /**
      * Use transaction rollback for cleanup. Sometimes it is not possible to use it because of the following:
@@ -317,7 +317,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
                 $prefixedTables = array_filter($tables, fn (string $table): bool => str_starts_with($table, $prefix));
 
-                if (!empty($prefixedTables)) {
+                if ([] !== $prefixedTables) {
                     $quotedTables = array_map($this->connection->quoteIdentifier(...), $prefixedTables);
                     $this->connection->executeStatement(
                         self::TRUNCATE_TABLE_SQL.' '.implode(', ', $quotedTables).' RESTART IDENTITY CASCADE'
@@ -396,7 +396,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
         $prefixedTables = array_filter($tables, fn (string $table): bool => str_starts_with($table, $prefix));
 
-        if (empty($prefixedTables)) {
+        if ([] !== $prefixedTables) {
             // Nothing to do
             file_put_contents($file, '-- No tables to truncate');
 

@@ -14,8 +14,8 @@ final readonly class SegmentLogReportSubscriber implements EventSubscriberInterf
     public const SEGMENT_LOG = 'segment.log';
 
     public function __construct(
-        private readonly FieldsBuilder $fieldsBuilder,
-        private readonly Connection $connection,
+        private FieldsBuilder $fieldsBuilder,
+        private Connection $connection,
     ) {
     }
 

@@ -134,7 +134,7 @@ final class LeadStageLogRepository extends CommonRepository
      */
     private function deleteDuplicateStageLogs(Connection $connection, string $table, int $fromStageId, int $toStageId, array $leadIds): void
     {
-        if (empty($leadIds)) {
+        if ([] === $leadIds) {
             return;
         }
 
@@ -151,7 +151,7 @@ final class LeadStageLogRepository extends CommonRepository
             ]
         );
 
-        if (empty($conflictingLeads)) {
+        if ([] === $conflictingLeads) {
             return;
         }
 

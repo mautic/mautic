@@ -85,7 +85,7 @@ final class GeneratedColumn implements GeneratedColumnInterface
     {
         $add = DatabasePlatform::getAddColumnKeyword($platform);
 
-        return "{$add} {$this->getColumnName()} {$this->getColumnDefinition($platform)}";
+        return "{$add} {$this->columnName} {$this->getColumnDefinition($platform)}";
     }
 
     public function getAddIndexSql(): string

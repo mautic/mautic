@@ -122,7 +122,7 @@ class IndexSchemaHelper
     {
         $textColumns = $this->getTextColumns($columns);
 
-        if (empty($textColumns)) {
+        if ([] === $textColumns) {
             return $this;
         }
 
@@ -214,7 +214,7 @@ class IndexSchemaHelper
     {
         foreach ($this->getTableIndexes($tableName) as $idx) {
             if (strtolower($idx->getName()) === strtolower($indexName)) {
-                if (empty($indexColumns)) {
+                if ([] === $indexColumns) {
                     return true;
                 }
                 $columns = $idx->getColumns();

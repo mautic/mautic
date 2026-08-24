@@ -116,7 +116,7 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
     public function testMixedModelAndRepositorySavesDoNotDoublePoints(): void
     {
         /** @var LeadModel $model */
-        $model = static::getContainer()->get(LeadModel::class);
+        $model = self::getContainer()->get(LeadModel::class);
         $lead  = $this->createLead();
         $lead->adjustPoints(120, Lead::POINTS_ADD);
         $model->saveEntity($lead);

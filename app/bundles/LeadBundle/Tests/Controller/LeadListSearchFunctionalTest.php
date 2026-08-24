@@ -27,7 +27,7 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->prefix = static::getContainer()->getParameter('mautic.db_table_prefix');
+        $this->prefix = self::getContainer()->getParameter('mautic.db_table_prefix');
     }
 
     /**
@@ -51,7 +51,6 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $this->client->enableProfiler();
-        $prefix          = self::getContainer()->getParameter('mautic.db_table_prefix');
         $previousQueries = [];
         $hint            = $this->getIndexHint();
 

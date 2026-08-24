@@ -461,7 +461,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         $model = $model ?: $this->model;
 
         $entities = [];
-        if (!empty($validIds)) {
+        if ([] !== $validIds) {
             $entities = $model->getEntities(
                 [
                     'filter' => [
