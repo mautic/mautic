@@ -18,7 +18,7 @@ class PluginIntegrationKeyEvent extends AbstractPluginIntegrationEvent
     /**
      * Get the keys array.
      *
-     * @return mixed[]|null
+     * @return array<string, mixed>|null
      */
     public function getKeys(): ?array
     {
@@ -26,7 +26,7 @@ class PluginIntegrationKeyEvent extends AbstractPluginIntegrationEvent
     }
 
     /**
-     * Set new keys array.
+     * @param array<string, mixed> $keys
      */
     public function setKeys(array $keys): void
     {

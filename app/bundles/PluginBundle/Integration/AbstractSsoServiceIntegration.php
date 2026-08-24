@@ -78,10 +78,8 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
 
     /**
      * Don't save the keys as they are only used to validate user login.
-     *
-     * @return array
      */
-    public function extractAuthKeys($data, $tokenOverride = null)
+    public function extractAuthKeys($data, $tokenOverride = null): bool|array
     {
         // Prepare the keys for extraction such as renaming, setting expiry, etc
         $data = $this->prepareResponseForExtraction($data);

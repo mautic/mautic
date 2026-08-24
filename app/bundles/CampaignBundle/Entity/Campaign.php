@@ -559,7 +559,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     }
 
     /**
-     * @return ArrayCollection<int, LeadList>
+     * @return Collection<int, LeadList>
      */
     public function getLists(): Collection
     {

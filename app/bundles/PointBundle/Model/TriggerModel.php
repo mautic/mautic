@@ -307,7 +307,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
      *
      * @return bool Was event triggered
      */
-    public function triggerEvent(array $event, ?Lead $lead = null, $force = false)
+    public function triggerEvent(array $event, ?Lead $lead = null, $force = false): bool
     {
         // only trigger events for anonymous users
         if (!$force && !$this->security->isAnonymous()) {

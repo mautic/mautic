@@ -129,12 +129,7 @@ class AuthenticationEvent extends Event
         return $this->token->getUserIdentifier();
     }
 
-    /**
-     * Get user provider to find and/or create new users.
-     *
-     * @return UserProvider
-     */
-    public function getUserProvider(): UserProviderInterface
+    public function getUserProvider(): UserProvider
     {
         return $this->userProvider;
     }

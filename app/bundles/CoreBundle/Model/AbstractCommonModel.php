@@ -202,7 +202,7 @@ abstract class AbstractCommonModel implements MauticModelInterface
         }
 
         if ($lang && !isset($locales[$lang])) {
-            // Language doesn't exist so return false
+            // Language doesn't exist so return null
 
             return null;
         }
