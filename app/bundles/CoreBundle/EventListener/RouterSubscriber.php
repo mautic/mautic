@@ -17,8 +17,8 @@ final readonly class RouterSubscriber implements EventSubscriberInterface
         private RouterInterface $router,
         private ?string $scheme,
         private ?string $host,
-        ?string $httpsPort,
-        ?string $httpPort,
+        ?int $httpsPort,
+        ?int $httpPort,
         private ?string $baseUrl,
     ) {
         $this->httpsPort = $httpsPort ?? 443;
