@@ -29,7 +29,7 @@ final class LeadManipulator
         return $this->objectName;
     }
 
-    public function getObjectId(): ?int
+    public function getObjectId(): int|string|null
     {
         return $this->objectId;
     }
