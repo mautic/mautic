@@ -20,7 +20,7 @@ class CampaignPermissions extends AbstractPermissions
     {
         parent::__construct($params);
         $this->addExtendedPermissions('campaigns');
-        $this->addCustomPermission('leads', ['addown' => 2, 'addother' => 4, 'full' => 1024]);
+        $this->addCustomPermission('leads', ['addown' => 2, 'addother' => 4]);
         $this->addStandardPermissions(['categories']);
         $this->addStandardPermissions(['imports']);
         $this->addCustomPermission('export', ['enable' => 1024]);
@@ -43,7 +43,6 @@ class CampaignPermissions extends AbstractPermissions
             [
                 'mautic.campaign.permissions.addown'   => 'addown',
                 'mautic.campaign.permissions.addother' => 'addother',
-                'mautic.core.permissions.full'         => 'full',
             ],
             $data
         );

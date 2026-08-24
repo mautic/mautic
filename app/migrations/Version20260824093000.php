@@ -75,7 +75,7 @@ final class Version20260824093000 extends AbstractMauticMigration
     private function mapCampaignPermissionsToCampaignLeadPermissions(array $campaignPerms): array
     {
         if (in_array('full', $campaignPerms, true)) {
-            return ['full'];
+            return ['addown', 'addother'];
         }
 
         $mappedPerms = [];
@@ -99,8 +99,8 @@ final class Version20260824093000 extends AbstractMauticMigration
      */
     private function mergeCampaignLeadPermissions(array $existingPerms, array $mappedPerms): array
     {
-        if (in_array('full', $existingPerms, true) || in_array('full', $mappedPerms, true)) {
-            return ['full'];
+        if (in_array('full', $existingPerms, true)) {
+            $existingPerms = ['addown', 'addother'];
         }
 
         $newPerms = array_values(array_unique(array_merge($existingPerms, $mappedPerms)));
@@ -119,7 +119,6 @@ final class Version20260824093000 extends AbstractMauticMigration
         $permBitwise = [
             'addown'   => 2,
             'addother' => 4,
-            'full'     => 1024,
         ];
 
         $bitwise = 0;
