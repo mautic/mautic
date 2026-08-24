@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Test;
 
 use Doctrine\DBAL\Exception as DBALException;
-use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CacheBundle\Cache\CacheProvider;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
 use Mautic\InstallBundle\InstallFixtures\ORM\RoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;

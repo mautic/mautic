@@ -10,8 +10,8 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\ImportModel;
-use Mautic\UserBundle\Security\UserTokenSetter;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Security\UserTokenSetter;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpFoundation\Request;
 

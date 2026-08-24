@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\InstallBundle\Tests\EventListener;
 
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
