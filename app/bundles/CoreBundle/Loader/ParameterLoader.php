@@ -140,10 +140,18 @@ final class ParameterLoader
             self::$defaultParameters['local_config_path'] = $paths['local_config'];
         }
 
-        // We need this for the file manager
+        // We need this for the file manager (ElFinder) and other webroot-relative paths.
+        // If local_root is explicitly set in paths_local.php, use that.
+        // Otherwise, auto-detect from composer.json's mautic-scaffold.locations.web-root
+        // or extra.public-dir for recommended-project installations.
         if (isset($paths['local_root'])) {
             if ($updateDefaultParameters) {
-                self::$defaultParameters['local_root'] = $paths['local_root'];
+                self::$defaultParameters['local_root'] = str_replace('%kernel.project_dir%', $projectRoot, $paths['local_root']);
+            }
+        } elseif ($updateDefaultParameters) {
+            $webrootDir = self::getWebrootDir($projectRoot);
+            if ($webrootDir !== $projectRoot) {
+                self::$defaultParameters['local_root'] = $webrootDir;
             }
         }
 
@@ -252,5 +260,47 @@ final class ParameterLoader
         }
 
         return $dir;
+    }
+
+    /**
+     * Detects the webroot directory from composer.json configuration.
+     *
+     * Checks for mautic-scaffold.locations.web-root (used by recommended-project)
+     * or Symfony's extra.public-dir. Returns the project root if no subdirectory
+     * webroot is configured.
+     */
+    public static function getWebrootDir(string $projectRoot): string
+    {
+        $composerFile = $projectRoot.'/composer.json';
+        if (!file_exists($composerFile)) {
+            return $projectRoot;
+        }
+
+        $composerContent = file_get_contents($composerFile);
+        if (false === $composerContent) {
+            return $projectRoot;
+        }
+
+        $composerJson = json_decode($composerContent, true);
+        if (!is_array($composerJson)) {
+            return $projectRoot;
+        }
+
+        // Check mautic-scaffold.locations.web-root (used by recommended-project)
+        $webRoot = $composerJson['extra']['mautic-scaffold']['locations']['web-root'] ?? null;
+
+        // Fallback to Symfony's public-dir
+        if (null === $webRoot) {
+            $webRoot = $composerJson['extra']['public-dir'] ?? '.';
+        }
+
+        $webRoot = rtrim($webRoot, '/');
+        if ('.' === $webRoot || '' === $webRoot) {
+            return $projectRoot;
+        }
+
+        $webrootPath = $projectRoot.'/'.$webRoot;
+
+        return is_dir($webrootPath) ? $webrootPath : $projectRoot;
     }
 }

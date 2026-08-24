@@ -2,9 +2,10 @@
     position: relative;
 }
 
-.toolbar--toolbar-content {
+    .toolbar--toolbar-content {
     .input-group .twitter-typeahead:last-child .tt-input, .input-group .twitter-typeahead:last-child .tt-hint,
     .form-control.search,
+    .search-scope-select,
     .input-group .input-group-btn button,
     .btn,
     div {
@@ -14,10 +15,273 @@
     }
     .input-group .twitter-typeahead:last-child .tt-input, .input-group .twitter-typeahead:last-child .tt-hint,
     .form-control.search,
+    .search-scope-select,
     .input-group .input-group-btn button,
     .btn-ghost {
         border: var(--border-no-width);
         &:hover { background-color: var(--field-hover); }
+    }
+
+    // Restore stock typeahead dropdown look; toolbar `div { height: 48px; margin: 0; border-radius: unset }`
+    // would otherwise crush the menu to one row and strip spacing/radius.
+    .twitter-typeahead {
+      .tt-menu {
+        height: auto;
+        margin: 2px 0 0;
+        border-radius: $border-radius-base;
+        padding: 5px 0;
+        background-color: $dropdown-bg;
+        border: 1px solid $dropdown-border;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+        z-index: $zindex-dropdown;
+      }
+
+      .tt-dataset,
+      .tt-suggestion {
+        height: auto;
+        margin: 0;
+        border-radius: 0;
+      }
+
+      .tt-suggestion {
+        display: block;
+        padding: 3px 20px;
+        clear: both;
+        font-weight: normal;
+        line-height: $line-height-base;
+        color: $dropdown-link-color;
+        white-space: nowrap;
+
+        &:hover,
+        &.tt-cursor {
+          text-decoration: none;
+          outline: 0;
+          background-color: $dropdown-link-hover-bg;
+          color: $dropdown-link-hover-color;
+        }
+      }
+    }
+
+    .search-scope-wrapper {
+      flex: 0 0 210px;
+      inline-size: 210px;
+      max-inline-size: 210px;
+      min-inline-size: 210px;
+      position: relative;
+    }
+
+    .search-scope-mobile-trigger {
+      display: none;
+    }
+
+    .search-scope-select {
+      flex: 0 0 210px;
+      inline-size: 210px;
+      max-inline-size: 210px;
+      border-inline-end: none;
+      padding-inline: var(--spacing-04);
+      background-color: var(--field);
+      color: var(--text-primary);
+    }
+
+    .search-scope-chosen {
+      flex: 0 0 210px;
+      inline-size: 210px;
+      max-inline-size: 210px;
+      min-inline-size: 210px;
+      position: relative;
+      z-index: 2;
+
+      // Let the open dropdown grow without inheriting toolbar's global `div { height: 48px }`.
+      .chosen-drop,
+      .chosen-drop .chosen-search,
+      .chosen-drop .search-scope-tip {
+        height: auto;
+      }
+
+      .chosen-container {
+        width: 100% !important;
+      }
+
+      .chosen-container-single .chosen-single {
+        height: 48px;
+        line-height: 48px;
+        border-inline-end: none;
+        border-radius: unset;
+        background-color: var(--field);
+        color: var(--text-primary);
+        border: var(--border-no-width);
+        padding-inline-end: 36px;
+        position: relative;
+
+        &:hover {
+          background-color: var(--field-hover);
+        }
+
+        div {
+          display: none;
+        }
+
+        &::after {
+          color: var(--text-secondary);
+          content: '\ea4e';
+          font-family: 'remixicon';
+          font-size: 18px;
+          inset-inline-end: 12px;
+          line-height: 1;
+          pointer-events: none;
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+        }
+      }
+
+      .chosen-container-active.chosen-with-drop {
+        z-index: 1061;
+
+        .chosen-single {
+          border-inline-end: none;
+
+          &::after {
+            content: '\ea78';
+          }
+        }
+
+        .chosen-drop {
+          background-color: var(--layer);
+          border: var(--border-no-width);
+          border-color: var(--border-strong);
+          box-shadow: 0 8px 8px rgba(0, 0, 0, 0.25);
+          inline-size: 210px;
+          min-inline-size: 210px;
+          overflow: hidden;
+          padding: 0;
+
+          .search-scope-tip {
+            background-color: #fff9c4;
+            border: none;
+            border-bottom: 1px solid #ffd54f;
+            color: #333;
+            cursor: default;
+            font-size: 13px;
+            font-weight: normal;
+            margin: 0;
+            padding: 8px 12px;
+            pointer-events: none;
+            text-align: left;
+            white-space: normal;
+          }
+
+          .chosen-search {
+            margin: 0;
+            padding: 0;
+            position: relative;
+
+            &::after {
+              color: var(--text-secondary);
+              content: '\f0d1';
+              font-family: 'remixicon';
+              font-size: 16px;
+              inset-inline-end: 12px;
+              line-height: 1;
+              pointer-events: none;
+              position: absolute;
+              top: 50%;
+              transform: translateY(-50%);
+              z-index: 1;
+            }
+
+            input[type="text"] {
+              background-color: var(--field);
+              background-image: none;
+              border: none;
+              border-bottom: var(--border-no-width);
+              border-color: var(--border-strong);
+              border-radius: 0;
+              box-shadow: none;
+              height: 40px;
+              margin: 0;
+              max-width: 100%;
+              outline: none;
+              padding: 0 36px 0 12px;
+              width: 100%;
+
+              &:focus {
+                outline: none;
+              }
+            }
+          }
+
+          .chosen-results {
+            background-color: var(--layer);
+            color: var(--text-secondary);
+            margin: 0;
+            max-height: 240px;
+            padding: 0;
+
+            li.highlighted {
+              background-color: var(--layer-hover);
+              color: var(--text-primary);
+            }
+
+            li.group-result {
+              color: var(--text-primary);
+            }
+          }
+        }
+      }
+    }
+
+    @media (max-width: 1100px) {
+        .search-scope-wrapper {
+            flex: 0 0 48px;
+            inline-size: 48px;
+            max-inline-size: 48px;
+            min-inline-size: 48px;
+        }
+
+        .search-scope-mobile-trigger {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            inset: 0;
+            z-index: 3;
+            inline-size: 48px;
+            block-size: 48px;
+            border: var(--border-no-width);
+            border-radius: unset;
+            margin: 0;
+
+            &:hover {
+                background-color: var(--field-hover);
+            }
+
+            &--active {
+                background-color: var(--field-hover);
+                color: var(--text-primary);
+            }
+        }
+
+        .search-scope-chosen {
+            flex: 0 0 48px;
+            inline-size: 48px;
+            max-inline-size: 48px;
+            min-inline-size: 48px;
+
+            .chosen-container-single .chosen-single {
+                opacity: 0;
+                pointer-events: none;
+            }
+
+            .chosen-container-active.chosen-with-drop {
+                z-index: 1061;
+
+                .chosen-drop {
+                    inset-inline-start: 0;
+                }
+            }
+        }
     }
 
     > .btn {
