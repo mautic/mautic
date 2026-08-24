@@ -10,6 +10,7 @@
     <link rel="apple-touch-icon" href="{{ getOverridableUrl('images/apple-touch-icon.png') }}" />
     {{ importmap('app') }}
     {{ outputSystemStylesheets() }}
+    {% set includeEditor = false %}
     {{- include('@MauticCore/Default/script.html.twig') -}}
     {{ outputHeadDeclarations() }}
 </head>

@@ -23,6 +23,7 @@ use Mautic\EmailBundle\Form\Type\BatchSendType;
 use Mautic\EmailBundle\Form\Type\ExampleSendType;
 use Mautic\EmailBundle\Form\Type\ScheduleSendType;
 use Mautic\EmailBundle\Helper\EmailConfig;
+use Mautic\EmailBundle\Helper\EmailSearchScopeProvider;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Services\EmailColumnsDictionary;
 use Mautic\EmailBundle\Services\EmailListingHelper;
@@ -76,6 +77,7 @@ final class EmailController extends FormController
         ThemeHelper $themeHelper,
         EmailColumnsDictionary $emailColumnsDictionary,
         EmailListingHelper $emailListingHelper,
+        EmailSearchScopeProvider $emailSearchScopeProvider,
         int $page = 1,
     ): JsonResponse|Response {
         $isDraftEnabled = $emailConfig->isDraftEnabled();
@@ -179,6 +181,7 @@ final class EmailController extends FormController
                     'permissions'      => $permissions,
                     'model'            => $model,
                     'isDraftEnabled'   => $isDraftEnabled,
+                    'searchScopes'     => $emailSearchScopeProvider->getScopes(),
                 ],
                 'contentTemplate' => '@MauticEmail/Email/list.html.twig',
                 'passthroughVars' => [
