@@ -10,7 +10,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\ImportModel;
-use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Security\UserTokenSetter;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpFoundation\Request;
@@ -171,12 +170,5 @@ final class ImportUrlValidationTest extends MauticMysqlTestCase
             '--id'    => $import->getId(),
             '--limit' => 10000,
         ]);
-    }
-
-    private function getUser(string $username): User
-    {
-        $repository = $this->em->getRepository(User::class);
-
-        return $repository->findOneBy(['username' => $username]);
     }
 }

@@ -31,7 +31,6 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\StageBundle\Entity\Stage;
-use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\TestDox;
 use Symfony\Component\DomCrawler\Crawler;
@@ -1413,12 +1412,5 @@ EMAIL;
         $this->assertResponseIsSuccessful();
         $leadsTableRows = $crawler->filterXPath("//table[@id='leadTable']//tbody//tr");
         $this->assertCount(0, $leadsTableRows, 'Should find 0 results for an invalid campaign ID format.');
-    }
-
-    private function getUser(string $username): User
-    {
-        $repository = $this->em->getRepository(User::class);
-
-        return $repository->findOneBy(['username' => $username]);
     }
 }

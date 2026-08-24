@@ -361,11 +361,4 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
             'webhook' => $webhookId,
         ]);
     }
-
-    private function getUser(string $username): User
-    {
-        $repository = $this->em->getRepository(User::class);
-
-        return $repository->findOneBy(['username' => $username]);
-    }
 }

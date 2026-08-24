@@ -10,7 +10,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Field\Command\CreateCustomFieldCommand;
 use Mautic\LeadBundle\Field\Notification\CustomFieldNotification;
-use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -126,12 +125,5 @@ final class CreateCustomFieldCommandTest extends MauticMysqlTestCase
 
         $this->assertContains('custom_field_1', $columnNames);
         $this->assertContains('custom_field_2', $columnNames);
-    }
-
-    private function getUser(string $username): User
-    {
-        $repository = $this->em->getRepository(User::class);
-
-        return $repository->findOneBy(['username' => $username]);
     }
 }

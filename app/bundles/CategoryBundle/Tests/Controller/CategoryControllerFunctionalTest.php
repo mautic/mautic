@@ -327,11 +327,4 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
 
         return $user;
     }
-
-    private function getUser(string $username): User
-    {
-        $repository = $this->em->getRepository(User::class);
-
-        return $repository->findOneBy(['username' => $username]);
-    }
 }

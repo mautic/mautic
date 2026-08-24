@@ -11,6 +11,7 @@ use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Exception\SkipMigration;
+use Doctrine\Migrations\Query\Query;
 use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\Migrations\Version20260726100000;
 use PHPUnit\Framework\TestCase;
@@ -43,8 +44,7 @@ final class CampaignLeadEventLogIndexMigrationTest extends TestCase
 
         $this->assertContains(
             DatabasePlatform::getDropIndexSql($this->platform, self::TABLE_NAME, self::INDEX_NAME),
-            $statements,
-            'STATEMENTS: '.implode(PHP_EOL, $statements)
+            $statements
         );
         $this->assertContains(
             DatabasePlatform::getCreateIndexSql(
@@ -53,8 +53,7 @@ final class CampaignLeadEventLogIndexMigrationTest extends TestCase
                 self::INDEX_NAME,
                 Version20260726100000::CAMPAIGN_FIRST_COLUMNS
             ),
-            $statements,
-            'STATEMENTS: '.implode(PHP_EOL, $statements)
+            $statements
         );
     }
 
@@ -79,8 +78,6 @@ final class CampaignLeadEventLogIndexMigrationTest extends TestCase
 
         $migration->up($schema);
 
-        $statements = $this->getStatements($migration);
-
         $this->assertSame(
             [
                 DatabasePlatform::getCreateIndexSql(
@@ -90,8 +87,7 @@ final class CampaignLeadEventLogIndexMigrationTest extends TestCase
                     Version20260726100000::CAMPAIGN_FIRST_COLUMNS
                 ),
             ],
-            $statements,
-            'STATEMENTS: '.implode(PHP_EOL, $statements)
+            $this->getStatements($migration)
         );
     }
 
@@ -104,11 +100,8 @@ final class CampaignLeadEventLogIndexMigrationTest extends TestCase
 
         $migration->up($schema);
 
-        $statements = $this->getStatements($migration);
-
         $this->assertSame([],
-            $statements,
-            'STATEMENTS: '.implode(PHP_EOL, $statements)
+            $this->getStatements($migration)
         );
     }
 
@@ -125,8 +118,7 @@ final class CampaignLeadEventLogIndexMigrationTest extends TestCase
 
         $this->assertContains(
             DatabasePlatform::getDropIndexSql($this->platform, self::TABLE_NAME, self::INDEX_NAME),
-            $statements,
-            'STATEMENTS: '.implode(PHP_EOL, $statements)
+            $statements
         );
         $this->assertContains(
             DatabasePlatform::getCreateIndexSql(
@@ -135,8 +127,7 @@ final class CampaignLeadEventLogIndexMigrationTest extends TestCase
                 self::INDEX_NAME,
                 Version20260726100000::LEAD_FIRST_COLUMNS
             ),
-            $statements,
-            'STATEMENTS: '.implode(PHP_EOL, $statements)
+            $statements
         );
     }
 
@@ -203,7 +194,7 @@ final class CampaignLeadEventLogIndexMigrationTest extends TestCase
     private function getStatements(Version20260726100000 $migration): array
     {
         return array_map(
-            static fn ($query) => $query->getStatement(),
+            static fn (Query $query) => $query->getStatement(),
             $migration->getSql()
         );
     }

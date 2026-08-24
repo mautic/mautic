@@ -618,11 +618,4 @@ final class ImportControllerTest extends MauticMysqlTestCase
         }));
         $mappingForm['lead_field_import[company]']->setValue(end($values));
     }
-
-    private function getUser(string $username): User
-    {
-        $repository = $this->em->getRepository(User::class);
-
-        return $repository->findOneBy(['username' => $username]);
-    }
 }

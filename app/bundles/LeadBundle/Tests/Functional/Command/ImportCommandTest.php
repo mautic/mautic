@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Model\ImportModel;
-use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 
 final class ImportCommandTest extends MauticMysqlTestCase
@@ -126,12 +125,5 @@ final class ImportCommandTest extends MauticMysqlTestCase
         $importModel->saveEntity($import);
 
         return $import;
-    }
-
-    private function getUser(string $username): User
-    {
-        $repository = $this->em->getRepository(User::class);
-
-        return $repository->findOneBy(['username' => $username]);
     }
 }

@@ -138,6 +138,13 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $this->client->getCookieJar()->clear();
     }
 
+    public function getUser(string $username): ?User
+    {
+        $repository = $this->em->getRepository(User::class);
+
+        return $repository->findOneBy(['username' => $username]);
+    }
+
     /**
      * Make `$append = true` default so we can avoid unnecessary purges.
      */

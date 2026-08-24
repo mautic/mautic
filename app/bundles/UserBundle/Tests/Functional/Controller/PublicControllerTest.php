@@ -6,7 +6,6 @@ namespace Mautic\UserBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\Role;
-use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserInvite;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -138,12 +137,5 @@ final class PublicControllerTest extends MauticMysqlTestCase
         $this->em->flush();
 
         return [$invite, $token.'.'.$tokenVerifier];
-    }
-
-    private function getUser(string $username): User
-    {
-        $repository = $this->em->getRepository(User::class);
-
-        return $repository->findOneBy(['username' => $username]);
     }
 }

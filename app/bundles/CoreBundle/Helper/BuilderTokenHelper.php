@@ -4,6 +4,7 @@ namespace Mautic\CoreBundle\Helper;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\DTO\TokenFormatOptions;
 use Mautic\CoreBundle\DTO\TokenLabelFormat;
 use Mautic\CoreBundle\Factory\ModelFactory;

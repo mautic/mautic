@@ -30,7 +30,9 @@ final class Version20260726100000 extends PreUpAssertionMigration
             $this->createIndex(
                 $this->getPrefixedTableName(),
                 $this->getPrefixedIndexName(),
-                self::CAMPAIGN_FIRST_COLUMNS
+                self::CAMPAIGN_FIRST_COLUMNS,
+                false,
+                false
             );
 
             return;
@@ -40,13 +42,16 @@ final class Version20260726100000 extends PreUpAssertionMigration
         if (!$this->indexExists($this->getPrefixedTableName(), $this->getPrefixedIndexName(), self::CAMPAIGN_FIRST_COLUMNS)) {
             $this->dropIndex(
                 $this->getPrefixedTableName(),
-                $this->getPrefixedIndexName()
+                $this->getPrefixedIndexName(),
+                false
             );
 
             $this->createIndex(
                 $this->getPrefixedTableName(),
                 $this->getPrefixedIndexName(),
-                self::CAMPAIGN_FIRST_COLUMNS
+                self::CAMPAIGN_FIRST_COLUMNS,
+                false,
+                false
             );
         }
     }
@@ -56,13 +61,16 @@ final class Version20260726100000 extends PreUpAssertionMigration
         if ($this->indexExists($this->getPrefixedTableName(), $this->getPrefixedIndexName(), self::CAMPAIGN_FIRST_COLUMNS)) {
             $this->dropIndex(
                 $this->getPrefixedTableName(),
-                $this->getPrefixedIndexName()
+                $this->getPrefixedIndexName(),
+                false
             );
 
             $this->createIndex(
                 $this->getPrefixedTableName(),
                 $this->getPrefixedIndexName(),
-                self::LEAD_FIRST_COLUMNS
+                self::LEAD_FIRST_COLUMNS,
+                false,
+                false
             );
         }
     }

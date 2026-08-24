@@ -7,7 +7,6 @@ namespace Mautic\IntegrationsBundle\Tests\Functional\Sync\Notification\Helper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\IntegrationsBundle\Sync\Notification\Helper\UserNotificationBuilder;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\UserBundle\Entity\User;
 
 final class UserNotificationBuilderTest extends MauticMysqlTestCase
 {
@@ -36,7 +35,7 @@ final class UserNotificationBuilderTest extends MauticMysqlTestCase
     {
         $user = $this->getUser(self::SALES_USER);
         $lead = new Lead();
-        $this->assertInstanceOf(User::class, $user);
+        $this->assertNotNull($user);
         $lead->setOwner($user);
         $this->em->persist($lead);
         $this->em->flush();
@@ -65,12 +64,5 @@ final class UserNotificationBuilderTest extends MauticMysqlTestCase
         $header = $this->notificationBuilder->formatMessage('Some message', 'Some link');
 
         $this->assertSame('Some link failed to sync with message, &quot;Some message&quot;', $header);
-    }
-
-    private function getUser(string $username): User
-    {
-        $repository = $this->em->getRepository(User::class);
-
-        return $repository->findOneBy(['username' => $username]);
     }
 }

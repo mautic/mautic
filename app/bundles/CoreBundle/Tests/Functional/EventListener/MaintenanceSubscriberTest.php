@@ -111,9 +111,4 @@ final class MaintenanceSubscriberTest extends MauticMysqlTestCase
 
         $this->em->flush();
     }
-
-    private function getUser(string $username): User
-    {
-        return $this->em->getRepository(User::class)->findOneBy(['username' => $username]);
-    }
 }

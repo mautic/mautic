@@ -385,13 +385,6 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         }
     }
 
-    private function getUser(string $username): User
-    {
-        $repository = $this->em->getRepository(User::class);
-
-        return $repository->findOneBy(['username' => $username]);
-    }
-
     /**
      * @param array<string, array<string, array<string>>> $permissions
      */

@@ -1562,11 +1562,4 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
     {
         return 'Maut1cR0cks!';
     }
-
-    private function getUser(string $username): User
-    {
-        $repository = $this->em->getRepository(User::class);
-
-        return $repository->findOneBy(['username' => $username]);
-    }
 }

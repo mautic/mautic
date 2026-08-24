@@ -10,7 +10,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Field\Notification\CustomFieldNotification;
 use Mautic\LeadBundle\Model\FieldModel;
-use Mautic\UserBundle\Entity\User;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class CustomFieldNotificationFunctionalTest extends MauticMysqlTestCase
@@ -75,12 +74,5 @@ final class CustomFieldNotificationFunctionalTest extends MauticMysqlTestCase
         $fieldModel->getRepository()->detachEntity($field);
 
         return $field;
-    }
-
-    private function getUser(string $username): User
-    {
-        $repository = $this->em->getRepository(User::class);
-
-        return $repository->findOneBy(['username' => $username]);
     }
 }

@@ -82,7 +82,7 @@ abstract class AbstractMauticMigration extends AbstractMigration
         $indexes = $this->getIndexes($tableName);
 
         $lowerIndexName = strtolower($indexName);
-        $expectedColumns = array_map('strtolower', $columns);
+        $expectedColumns = array_map(strtolower(...), $columns);
         foreach ($indexes as $index) {
             if (strtolower($index->getName()) !== $lowerIndexName) {
                 continue;
@@ -94,7 +94,7 @@ abstract class AbstractMauticMigration extends AbstractMigration
             }
 
             // Compare columns (order matters)
-            $actualColumns = array_map('strtolower', $index->getColumns());
+            $actualColumns = array_map(strtolower(...), $index->getColumns());
 
             if ($actualColumns === $expectedColumns) {
                 return true;
