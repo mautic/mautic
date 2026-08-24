@@ -882,6 +882,7 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
     public function testSingleNewEndpointCreateAndDeleteWithDnc(): void
     {
         $userOwner = $this->getUser(self::ADMIN_USER);
+        $this->assertInstanceOf(User::class, $userOwner);
 
         $payload = [
             'email'            => 'apidnc@email.com',
@@ -920,6 +921,8 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
     {
         $adminUser = $this->getUser(self::ADMIN_USER);
         $salesUser = $this->getUser(self::SALES_USER);
+        $this->assertInstanceOf(User::class, $adminUser);
+        $this->assertInstanceOf(User::class, $salesUser);
 
         $payload = [
             [

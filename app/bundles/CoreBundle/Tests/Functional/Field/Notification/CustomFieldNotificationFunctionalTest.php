@@ -46,6 +46,8 @@ final class CustomFieldNotificationFunctionalTest extends MauticMysqlTestCase
     public function testNotificationForLeadFieldCanNotUpdate(): void
     {
         $user = $this->getUser(self::ADMIN_USER);
+        $this->assertInstanceOf(User::class, $user);
+
         $this->notifier->customFieldCannotBeUpdated($this->leadField, $user->getId());
 
         /** @var NotificationRepository $notificationRepo */

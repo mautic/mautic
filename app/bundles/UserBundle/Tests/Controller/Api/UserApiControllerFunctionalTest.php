@@ -26,6 +26,8 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
     public function testRoleUpdateByApiGivesErrorResponseIfUserDoesNotExist(): void
     {
         $role = $this->getRole(self::ADMIN_ROLE);
+        $this->assertInstanceOf(Role::class, $role);
+
         // Assuming user with id 99999 does not exist
         $this->client->request(Request::METHOD_PATCH, '/api/users/99999/edit', ['role' => $role->getId()]);
         $clientResponse = $this->client->getResponse();
@@ -36,6 +38,7 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
     public function testRoleUpdateByApiGivesErrorResponseIfRoleDoesNotExist(): void
     {
         $user = $this->getUser(self::ADMIN_USER);
+        $this->assertInstanceOf(User::class, $user);
 
         // Assuming role with id 99999 does not exist
         $this->client->request(Request::METHOD_PATCH, '/api/users/'.$user->getId().'/edit', ['role' => 99999]);
@@ -48,6 +51,9 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
     {
         $user = $this->getUser(self::ADMIN_USER);
         $role = $this->getRole(self::SALES_ROLE);
+
+        $this->assertInstanceOf(User::class, $user);
+        $this->assertInstanceOf(Role::class, $role);
 
         // Correct request format is ['role' => 2]
         $this->client->request(Request::METHOD_PATCH, '/api/users/'.$user->getId().'/edit', ['role' => ['id' => $role->getId()]]);
@@ -142,6 +148,7 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
     public function testUserPasswordPolicy(int $responseCode, string $password): void
     {
         $role = $this->getRole(self::ADMIN_ROLE);
+        $this->assertInstanceOf(Role::class, $role);
 
         $userPayload = [
             'username'      => 'lorem_ipsum',
@@ -289,7 +296,7 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
     }
 
-    private function getRole(string $name): Role
+    private function getRole(string $name): ?Role
     {
         $repository = $this->em->getRepository(Role::class);
 

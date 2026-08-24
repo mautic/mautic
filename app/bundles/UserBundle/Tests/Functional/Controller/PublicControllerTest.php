@@ -104,7 +104,7 @@ final class PublicControllerTest extends MauticMysqlTestCase
     public function testInviteShowsErrorWhenInvitedEmailAlreadyExists(): void
     {
         $user = $this->getUser(self::ADMIN_USER);
-        $this->assertNotNull($user);
+        $this->assertInstanceOf(User::class, $user);
 
         [, $token] = $this->createInvite($user->getEmail(), 'existing-user-invite-token');
 

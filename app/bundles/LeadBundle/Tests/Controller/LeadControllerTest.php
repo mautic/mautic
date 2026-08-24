@@ -382,6 +382,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
     public function testCompanyChangesAreTrackedWhenContactAddedViaUI(): void
     {
         $adminUser = $this->getUser(self::ADMIN_USER);
+        $this->assertInstanceOf(User::class, $adminUser);
 
         $company = new Company();
         $company->setName('Doe Corp');
@@ -1299,6 +1300,7 @@ EMAIL;
         $this->loadFixtures([LoadLeadData::class]);
 
         $adminUser = $this->getUser(self::ADMIN_USER);
+        $this->assertInstanceOf(User::class, $adminUser);
 
         $this->client->request(Request::METHOD_GET, '/s/contacts/batchExport?filetype=xlsx');
         $content = $this->client->getInternalResponse()->getContent();

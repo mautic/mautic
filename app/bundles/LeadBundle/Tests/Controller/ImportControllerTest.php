@@ -468,6 +468,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
     private function assertNotificationMessageContains(string $expectedSubstring): void
     {
         $user = $this->getUser(self::ADMIN_USER);
+        $this->assertInstanceOf(User::class, $user);
         $this->assertNotificationMessageContainsForUser($user->getId(), $expectedSubstring);
     }
 

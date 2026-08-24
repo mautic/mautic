@@ -141,12 +141,12 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         /** @var CategoryModel $categoryModel */
         $categoryModel      = self::getContainer()->get(CategoryModel::class);
         $user               = $this->getUser(self::SALES_USER);
+        $this->assertInstanceOf(User::class, $user);
 
         $category = new Category();
         $category->setTitle('New Category');
         $category->setAlias('category');
         $category->setBundle('global');
-        $this->assertNotNull($user);
         $category->setCheckedOutBy($user);
         $category->setCheckedOut(new \DateTime('now'));
         $categoryModel->saveEntity($category, false);

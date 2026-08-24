@@ -30,6 +30,7 @@ final class CreateCustomFieldCommandTest extends MauticMysqlTestCase
     public function testWithIdAndUserArgs(): void
     {
         $userCreator = $this->getUser(self::ADMIN_USER);
+        $this->assertInstanceOf(User::class, $userCreator);
 
         $leadField = new LeadField();
         $leadField->setLabel('Custom Field 1');
@@ -76,6 +77,7 @@ final class CreateCustomFieldCommandTest extends MauticMysqlTestCase
     public function testWithNoArgs(): void
     {
         $userCreator = $this->getUser(self::ADMIN_USER);
+        $this->assertInstanceOf(User::class, $userCreator);
 
         $leadField1 = new LeadField();
         $leadField1->setLabel('Custom Field 1');

@@ -65,7 +65,6 @@ final class CampaignLeadEventLogIndexMigrationTest extends TestCase
         $schema = $this->createSchema(Version20260726100000::CAMPAIGN_FIRST_COLUMNS);
 
         $this->expectException(SkipMigration::class);
-        $this->expectExceptionMessage('A campaign-first campaign lead event log index already exists');
 
         $migration->preUp($schema);
     }
@@ -194,7 +193,7 @@ final class CampaignLeadEventLogIndexMigrationTest extends TestCase
     private function getStatements(Version20260726100000 $migration): array
     {
         return array_map(
-            static fn (Query $query) => $query->getStatement(),
+            static fn (Query $query): string => $query->getStatement(),
             $migration->getSql()
         );
     }

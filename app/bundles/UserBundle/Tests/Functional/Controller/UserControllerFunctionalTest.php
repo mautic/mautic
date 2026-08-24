@@ -27,6 +27,7 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
     public function testEditGetPage(): void
     {
         $user = $this->getUser(self::ADMIN_USER);
+        $this->assertInstanceOf(User::class, $user);
 
         $this->client->request('GET', self::USER_EDIT_PATH.$user->getId());
         $this->assertResponseIsSuccessful();
@@ -43,6 +44,7 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
     public function testEditActionFormSubmissionValid(): void
     {
         $user = $this->getUser(self::ADMIN_USER);
+        $this->assertInstanceOf(User::class, $user);
 
         $crawler                 = $this->client->request('GET', self::USER_EDIT_PATH.$user->getId());
         $buttonCrawlerNode       = $crawler->selectButton('Save & Close');
@@ -58,6 +60,7 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
     public function testEditActionFormSubmissionInvalid(): void
     {
         $user = $this->getUser(self::ADMIN_USER);
+        $this->assertInstanceOf(User::class, $user);
 
         $crawler = $this->client->request('GET', self::USER_EDIT_PATH.$user->getId());
 
@@ -164,6 +167,7 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
     public function testEditUserForPasswordField(array $data, string $message): void
     {
         $user = $this->getUser(self::ADMIN_USER);
+        $this->assertInstanceOf(User::class, $user);
 
         $crawler = $this->client->request('GET', self::USER_EDIT_PATH.$user->getId());
 

@@ -20,6 +20,7 @@ final class MaintenanceSubscriberTest extends MauticMysqlTestCase
     public function testMaintenanceDataCleanUp(): void
     {
         $admin = $this->getUser(self::ADMIN_USER);
+        $this->assertInstanceOf(User::class, $admin);
 
         $threeDaysAgo  = new \DateTime('3 days ago', new \DateTimeZone('UTC'));
         $today         = new \DateTime('+1 min', new \DateTimeZone('UTC'));
