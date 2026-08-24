@@ -11,8 +11,8 @@ return [
     'menu'     => [],
 
     'parameters' => [
-        'cache_adapter'           => 'mautic.cache.adapter.filesystem',
-        'cache_adapter_tag_aware' => 'mautic.cache.adapter.filesystem',
+        'cache_adapter'           => Mautic\CacheBundle\Cache\Adapter\FilesystemTagAwareAdapter::class,
+        'cache_adapter_tag_aware' => Mautic\CacheBundle\Cache\Adapter\FilesystemTagAwareAdapter::class,
         'cache_prefix'            => '',
         'cache_lifetime'          => 86400,
         'cache_adapter_memcached' => [

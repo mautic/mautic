@@ -7,7 +7,7 @@ $container->loadFromExtension('fos_oauth_server', [
     'refresh_token_class' => Mautic\ApiBundle\Entity\oAuth2\RefreshToken::class,
     'auth_code_class'     => Mautic\ApiBundle\Entity\oAuth2\AuthCode::class,
     'service'             => [
-        'user_provider' => 'mautic.user.provider',
+        'user_provider' => Mautic\UserBundle\Security\Provider\UserProvider::class,
         'options'       => [
             // 'supported_scopes' => 'user'
             'access_token_lifetime'  => '%env(int:MAUTIC_API_OAUTH2_ACCESS_TOKEN_LIFETIME)%',
