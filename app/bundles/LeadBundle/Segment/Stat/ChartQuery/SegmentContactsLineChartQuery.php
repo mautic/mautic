@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Segment\Exception\SegmentNotFoundException;
 
-class SegmentContactsLineChartQuery extends ChartQuery
+final class SegmentContactsLineChartQuery extends ChartQuery
 {
     /**
      * @var int

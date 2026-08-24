@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -14,7 +16,7 @@ use Symfony\Component\Validator\Constraints\Url;
 /**
  * @extends AbstractType<mixed>
  */
-class SubmitActionRepostType extends AbstractType
+final class SubmitActionRepostType extends AbstractType
 {
     use FormFieldTrait;
 

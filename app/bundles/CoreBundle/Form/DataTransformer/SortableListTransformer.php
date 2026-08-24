@@ -8,7 +8,7 @@ use Symfony\Component\Form\DataTransformerInterface;
 /**
  * @implements DataTransformerInterface<array<mixed>, array<mixed>>
  */
-class SortableListTransformer implements DataTransformerInterface
+final class SortableListTransformer implements DataTransformerInterface
 {
     /**
      * @param bool $withLabels

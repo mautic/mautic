@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\ImportModel;
+use Mautic\UserBundle\Security\UserTokenSetter;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpFoundation\Request;
@@ -134,10 +135,10 @@ final class ImportUrlValidationTest extends MauticMysqlTestCase
         ];
 
         $import->setProperties($properties);
-        self::getContainer()->get('mautic.security.user_token_setter')->setUser($import->getCreatedBy());
+        self::getContainer()->get(UserTokenSetter::class)->setUser($import->getCreatedBy());
 
         /** @var ImportModel $importModel */
-        $importModel = self::getContainer()->get('mautic.lead.model.import');
+        $importModel = self::getContainer()->get(ImportModel::class);
         $importModel->saveEntity($import);
 
         return $import;

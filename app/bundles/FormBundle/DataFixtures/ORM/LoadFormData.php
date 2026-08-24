@@ -10,14 +10,15 @@ use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\FormBundle\Entity\Action;
+use Mautic\FormBundle\Entity\ActionRepository;
 use Mautic\FormBundle\Entity\Field;
+use Mautic\FormBundle\Entity\FieldRepository;
 use Mautic\FormBundle\Entity\Form;
-use Mautic\FormBundle\Model\ActionModel;
-use Mautic\FormBundle\Model\FieldModel;
+use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class LoadFormData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadFormData extends AbstractFixture implements OrderedFixtureInterface
 {
     public const FORM_PREFIX = 'form-';
 
@@ -38,9 +39,10 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface
 
     public function __construct(
         private readonly FormModel $formModel,
-        private readonly FieldModel $formFieldModel,
-        private readonly ActionModel $actionModel,
         EventDispatcherInterface $eventDispatcher,
+        private readonly FormRepository $formRepository,
+        private readonly FieldRepository $fieldRepository,
+        private readonly ActionRepository $actionRepository,
     ) {
         // this will load the data before fixtures are loaded
         $eventDispatcher->addListener(PreExecuteEvent::class, function (PreExecuteEvent $event): void {
@@ -78,7 +80,7 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface
             // because form table data will be deleted we must have same autoincrement as before the insertion
             // to have the form_results table to match the form id in table name e.g. form_results_69_kaleidosco
             $connection    = $event->getEntityManager()->getConnection();
-            $formTableName = $this->formModel->getRepository()->getTableName();
+            $formTableName = $this->formRepository->getTableName();
 
             DatabasePlatform::resetAutoIncrement($connection, $formTableName, $firstId);
         });
@@ -91,16 +93,16 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface
         $this->getActionEntities();
 
         foreach ($this->formEntities as $key => $formEntity) {
-            $this->formModel->getRepository()->saveEntity($formEntity);
+            $this->formRepository->saveEntity($formEntity);
             $this->setReference(self::FORM_PREFIX.$key, $formEntity);
         }
 
         foreach ($this->fieldEntities as $field) {
-            $this->formFieldModel->getRepository()->saveEntity($field);
+            $this->fieldRepository->saveEntity($field);
         }
 
         foreach ($this->actionEntities as $action) {
-            $this->actionModel->getRepository()->saveEntity($action);
+            $this->actionRepository->saveEntity($action);
         }
     }
 

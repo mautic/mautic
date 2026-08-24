@@ -7,7 +7,7 @@ use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-class ParameterLoader
+final class ParameterLoader
 {
     private readonly string $configBaseDir;
 
@@ -18,17 +18,28 @@ class ParameterLoader
     /**
      * @var array<string, mixed>
      */
-    private array $localParameters = [];
+    private array $localParameters;
 
     /**
      * @var array<string, mixed>
      */
     private static array $defaultParameters = [];
 
+    /**
+     * Keys this loader has itself populated into the environment during this process, tracked so
+     * a later call (e.g. re-booting the kernel between tests within the same PHP process) can
+     * still refresh values it previously set. Without this, that protection would incorrectly
+     * extend to values that were never set by this method, e.g. a value from a .env/.env.local
+     * file loaded once during the application's real bootstrap.
+     *
+     * @var array<string, true>
+     */
+    private static array $selfPopulatedEnvKeys = [];
+
     public function __construct(
         private readonly string $rootPath = __DIR__.'/../../../',
     ) {
-        $this->configBaseDir = static::getLocalConfigBaseDir($this->rootPath);
+        $this->configBaseDir = self::getLocalConfigBaseDir($this->rootPath);
 
         $this->loadDefaultParameters();
         $this->loadLocalParameters();
@@ -76,8 +87,26 @@ class ParameterLoader
             if (null === $value) {
                 $envVariables->set($key, '');
             }
+
+            // Do not let a value derived from local.php override a value that has already been
+            // set in the environment - unless we are the ones who set it. This protects a value
+            // that came from a real system/OS environment variable or from a .env/.env.local file
+            // loaded earlier during the application's bootstrap. Dotenv::populate() only skips
+            // values that are *not* tracked in $_ENV['SYMFONY_DOTENV_VARS'], so a value loaded
+            // from a .env file (which *is* tracked there) would otherwise still be silently
+            // overwritten below, even though a plain system environment variable of the same name
+            // would not be. Keying the guard off our own tracking (rather than only off
+            // SYMFONY_DOTENV_VARS) also keeps a later call in the same process - e.g. a kernel
+            // reboot between tests - free to refresh values it previously computed itself.
+            if (!isset(self::$selfPopulatedEnvKeys[$key]) && isset($_ENV[$key])) {
+                $envVariables->remove($key);
+            }
         }
         $dotenv->populate($envVariables->all());
+
+        foreach ($envVariables->all() as $key => $value) {
+            self::$selfPopulatedEnvKeys[$key] = true;
+        }
     }
 
     public static function getLocalConfigFile(string $root, bool $updateDefaultParameters = true): string
@@ -111,10 +140,18 @@ class ParameterLoader
             self::$defaultParameters['local_config_path'] = $paths['local_config'];
         }
 
-        // We need this for the file manager
+        // We need this for the file manager (ElFinder) and other webroot-relative paths.
+        // If local_root is explicitly set in paths_local.php, use that.
+        // Otherwise, auto-detect from composer.json's mautic-scaffold.locations.web-root
+        // or extra.public-dir for recommended-project installations.
         if (isset($paths['local_root'])) {
             if ($updateDefaultParameters) {
-                self::$defaultParameters['local_root'] = $paths['local_root'];
+                self::$defaultParameters['local_root'] = str_replace('%kernel.project_dir%', $projectRoot, $paths['local_root']);
+            }
+        } elseif ($updateDefaultParameters) {
+            $webrootDir = self::getWebrootDir($projectRoot);
+            if ($webrootDir !== $projectRoot) {
+                self::$defaultParameters['local_root'] = $webrootDir;
             }
         }
 
@@ -225,5 +262,47 @@ class ParameterLoader
         }
 
         return $dir;
+    }
+
+    /**
+     * Detects the webroot directory from composer.json configuration.
+     *
+     * Checks for mautic-scaffold.locations.web-root (used by recommended-project)
+     * or Symfony's extra.public-dir. Returns the project root if no subdirectory
+     * webroot is configured.
+     */
+    public static function getWebrootDir(string $projectRoot): string
+    {
+        $composerFile = $projectRoot.'/composer.json';
+        if (!file_exists($composerFile)) {
+            return $projectRoot;
+        }
+
+        $composerContent = file_get_contents($composerFile);
+        if (false === $composerContent) {
+            return $projectRoot;
+        }
+
+        $composerJson = json_decode($composerContent, true);
+        if (!is_array($composerJson)) {
+            return $projectRoot;
+        }
+
+        // Check mautic-scaffold.locations.web-root (used by recommended-project)
+        $webRoot = $composerJson['extra']['mautic-scaffold']['locations']['web-root'] ?? null;
+
+        // Fallback to Symfony's public-dir
+        if (null === $webRoot) {
+            $webRoot = $composerJson['extra']['public-dir'] ?? '.';
+        }
+
+        $webRoot = rtrim($webRoot, '/');
+        if ('.' === $webRoot || '' === $webRoot) {
+            return $projectRoot;
+        }
+
+        $webrootPath = $projectRoot.'/'.$webRoot;
+
+        return is_dir($webrootPath) ? $webrootPath : $projectRoot;
     }
 }

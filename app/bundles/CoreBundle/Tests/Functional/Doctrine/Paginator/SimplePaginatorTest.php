@@ -25,7 +25,7 @@ final class SimplePaginatorTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $debugDataHolder = static::getContainer()->get('doctrine.debug_data_holder');
+        $debugDataHolder = self::getContainer()->get('doctrine.debug_data_holder');
         $this->assertInstanceOf(DebugDataHolder::class, $debugDataHolder);
         $debugDataHolder->reset();
 
@@ -60,8 +60,8 @@ final class SimplePaginatorTest extends MauticMysqlTestCase
             $ipAddress3->getId() => $ipAddress3,
         ], iterator_to_array($paginator), 'Only 2 last records should be returned.');
 
-        $prefix          = static::getContainer()->getParameter('mautic.db_table_prefix');
-        $queries         = $this->getQueries();
+        $prefix  = self::getContainer()->getParameter('mautic.db_table_prefix');
+        $queries = $this->getQueries();
 
         $this->assertCount(5, $queries, 'There should be exactly 5 queries executed.');
         $this->assertMatchesRegularExpression("/^SELECT count\((.{2}_)\.id\) AS sclr_0 FROM {$prefix}ip_addresses \\1$/", $queries[3]['sql'], 'Simple paginator should not use either a DISTINCT keyword or sub-queries.');

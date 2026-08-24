@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Tag;
+use Mautic\LeadBundle\Entity\TagRepository;
 use Mautic\LeadBundle\Model\TagModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -20,7 +21,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Tag>
  */
-class TagApiController extends CommonApiController
+final class TagApiController extends CommonApiController
 {
     public function __construct(
         CorePermissions $security,
@@ -35,7 +36,7 @@ class TagApiController extends CommonApiController
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
         TagModel $leadTagModel,
-        private readonly \Mautic\LeadBundle\Entity\TagRepository $tagRepository,
+        private readonly TagRepository $tagRepository,
     ) {
         $this->model           = $leadTagModel;
         $this->entityClass     = Tag::class;

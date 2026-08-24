@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -10,7 +12,7 @@ use Symfony\Component\Validator\Constraints\NotEqualTo;
 /**
  * @extends AbstractType<mixed>
  */
-class CompanyChangeScoreActionType extends AbstractType
+final class CompanyChangeScoreActionType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

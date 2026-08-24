@@ -14,7 +14,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<mixed>
  */
-class IntegrationsListType extends AbstractType
+final class IntegrationsListType extends AbstractType
 {
     public function __construct(
         private readonly IntegrationHelper $integrationHelper,

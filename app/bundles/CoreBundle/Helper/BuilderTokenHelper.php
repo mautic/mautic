@@ -4,26 +4,21 @@ namespace Mautic\CoreBundle\Helper;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
-use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\DTO\TokenFormatOptions;
 use Mautic\CoreBundle\DTO\TokenLabelFormat;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class BuilderTokenHelper
+final class BuilderTokenHelper
 {
     private bool $isConfigured = false;
 
-    protected $permissionSet;
+    private ?array $permissionSet = null;
 
-    protected $modelName;
+    private ?string $modelName = null;
 
-    protected $viewPermissionBase;
-
-    protected $langVar;
-
-    protected $bundleName;
+    private ?string $viewPermissionBase = null;
 
     /**
      * @param ModelFactory<object> $modelFactory
@@ -43,13 +38,9 @@ class BuilderTokenHelper
     public function configure(
         string $modelName,
         ?string $viewPermissionBase = null,
-        ?string $bundleName = null,
-        ?string $langVar = null,
     ): void {
         $this->modelName          = $modelName;
         $this->viewPermissionBase = (!empty($viewPermissionBase)) ? $viewPermissionBase : "{$modelName}:{$modelName}s";
-        $this->bundleName         = (!empty($bundleName)) ? $bundleName : 'Mautic'.ucfirst($modelName).'Bundle';
-        $this->langVar            = (!empty($langVar)) ? $langVar : $modelName;
 
         $this->permissionSet = [
             $this->viewPermissionBase.':viewown',
@@ -67,7 +58,7 @@ class BuilderTokenHelper
      * @param string              $valueColumn The column that houses the value
      * @param CompositeExpression $expr        Use $factory->getDatabase()->getExpressionBuilder()->andX()
      *
-     * @return array|void
+     * @return array<string,string>|null
      *
      * @throws \BadMethodCallException
      */
@@ -77,9 +68,9 @@ class BuilderTokenHelper
         string $labelColumn = 'name',
         $valueColumn = 'id',
         ?CompositeExpression $expr = null,
-    ) {
+    ): ?array {
         if (!$this->isConfigured) {
-            throw new \BadMethodCallException('You must call the "'.static::class.'::configure()" method first.');
+            throw new \BadMethodCallException('You must call the "'.self::class.'::configure()" method first.');
         }
 
         // set some permissions
@@ -89,7 +80,7 @@ class BuilderTokenHelper
         );
 
         if (1 === count(array_unique($permissions)) && false == end($permissions)) {
-            return;
+            return null;
         }
 
         $repo   = $this->modelFactory->getModel($this->modelName)->getRepository();
@@ -100,7 +91,7 @@ class BuilderTokenHelper
 
         $exprBuilder = $this->connection->createExpressionBuilder();
 
-        if (isset($expr) && isset($permissions[$this->viewPermissionBase.':viewother']) && !$permissions[$this->viewPermissionBase.':viewother']) {
+        if ($expr instanceof CompositeExpression && isset($permissions[$this->viewPermissionBase.':viewother']) && !$permissions[$this->viewPermissionBase.':viewother']) {
             $expr = $expr->with(
                 $exprBuilder->eq($prefix.'created_by', $this->userHelper->getUser()->getId())
             );
@@ -114,7 +105,7 @@ class BuilderTokenHelper
                 DatabasePlatform::FLAG_ENSURE_CAST | DatabasePlatform::FLAG_LOWER_COLUMN
             );
 
-            $expr       = isset($expr) ? $expr->with($filterExpr) : $exprBuilder->and($filterExpr);
+            $expr       = $expr instanceof CompositeExpression ? $expr->with($filterExpr) : $exprBuilder->and($filterExpr);
 
             $parameters = [
                 'label' => strtolower($filter).'%',
@@ -149,7 +140,7 @@ class BuilderTokenHelper
     ): array {
         $tokens = $this->getTokens($tokenRegex, $filter, $labelColumn, $valueColumn, $expr) ?? [];
 
-        if (empty($tokens)) {
+        if ([] === $tokens) {
             return [];
         }
 

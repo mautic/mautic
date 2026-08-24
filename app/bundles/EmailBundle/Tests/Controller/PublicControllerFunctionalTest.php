@@ -20,8 +20,10 @@ use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\PageRepository;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -74,7 +76,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testMailerCallbackWhenTransportDoesNotProccessIt(): void
     {
-        self::getContainer()->get('event_dispatcher')->addListener(EmailEvents::ON_TRANSPORT_WEBHOOK, fn (): null => null /* exists but does nothing */);
+        self::getContainer()->get(EventDispatcherInterface::class)->addListener(EmailEvents::ON_TRANSPORT_WEBHOOK, fn (): null => null /* exists but does nothing */);
         $this->client->request('POST', '/mailer/callback');
 
         self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
@@ -83,7 +85,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testMailerCallbackWhenTransportProccessesIt(): void
     {
-        self::getContainer()->get('event_dispatcher')->addListener(EmailEvents::ON_TRANSPORT_WEBHOOK, fn (TransportWebhookEvent $event) => $event->setResponse(new Response('OK')));
+        self::getContainer()->get(EventDispatcherInterface::class)->addListener(EmailEvents::ON_TRANSPORT_WEBHOOK, fn (TransportWebhookEvent $event) => $event->setResponse(new Response('OK')));
         $this->client->request('POST', '/mailer/callback');
 
         self::assertResponseIsSuccessful();
@@ -115,7 +117,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
 
-        $this->em->clear(Page::class);
+        $this->em->clear();
 
         $entity = self::getContainer()->get(PageRepository::class)->getEntity($stat->getEmail()->getPreferenceCenter()->getId());
         $this->assertSame(1, $entity->getHits(), $this->client->getResponse()->getContent());
@@ -141,7 +143,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         $this->assertCount(1, $crawler->filter('#success-message-text'), $this->client->getResponse()->getContent());
-        $expectedMessage = static::getContainer()->get('translator')->trans('mautic.email.preferences_center_success_message.text');
+        $expectedMessage = self::getContainer()->get(TranslatorInterface::class)->trans('mautic.email.preferences_center_success_message.text');
         $this->assertEquals($expectedMessage, trim($crawler->filter('#success-message-text')->text(null, false)));
         $this->assertResponseIsSuccessful();
 
@@ -327,7 +329,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
         $this->assertResponseIsSuccessful();
 
-        $translator = static::getContainer()->get('translator');
+        $translator = self::getContainer()->get(TranslatorInterface::class);
         $needle     = $translator->trans('mautic.page.form.saveprefs', [], null, $expectedLocale);
 
         $this->assertStringContainsString($needle, $crawler->html());
@@ -531,7 +533,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($lead);
         // Email hash
         /** @var CoreParametersHelper $coreParametersHelper */
-        $coreParametersHelper   = self::getContainer()->get('mautic.helper.core_parameters');
+        $coreParametersHelper   = self::getContainer()->get(CoreParametersHelper::class);
         $configSecretEmailHash  = $coreParametersHelper->get('secret_key');
         $rightHashForWrongEmail = hash_hmac('sha256', $wrongEmail, $configSecretEmailHash);
         $rightHashForRightEmail = hash_hmac('sha256', $rightEmail, $configSecretEmailHash);

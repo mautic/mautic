@@ -12,7 +12,6 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\WebhookBundle\Helper\CampaignHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -37,7 +36,6 @@ final class CampaignHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->contact           = $this->createMock(Lead::class);
         $this->client            = $this->createMock(Client::class);
-        $companyModel            = $this->createMock(CompanyModel::class);
         $ipCollection            = new ArrayCollection();
         $companyRepository       = $this->getMockBuilder(CompanyRepository::class)
             ->disableOriginalConstructor()
@@ -46,9 +44,7 @@ final class CampaignHelperTest extends \PHPUnit\Framework\TestCase
 
         $companyRepository->method('getCompaniesByLeadId')->willReturn([new Company()]);
 
-        $companyModel->method('getRepository')->willReturn($companyRepository);
-
-        $this->campaignHelper = new CampaignHelper($this->client, $companyModel, $this->createStub(EventDispatcherInterface::class));
+        $this->campaignHelper = new CampaignHelper($this->client, $this->createStub(EventDispatcherInterface::class), $companyRepository);
 
         $ipCollection->add((new IpAddress())->setIpAddress('127.0.0.1'));
         $ipCollection->add((new IpAddress())->setIpAddress('127.0.0.2'));
@@ -164,11 +160,10 @@ final class CampaignHelperTest extends \PHPUnit\Framework\TestCase
             ],
         ];
         if ('application/json' === $type) {
-            array_push($sample['headers']['list'],
-                [
-                    'label' => 'content-type',
-                    'value' => 'application/json',
-                ]);
+            $sample['headers']['list'][] = [
+                'label' => 'content-type',
+                'value' => 'application/json',
+            ];
         }
 
         return $sample;

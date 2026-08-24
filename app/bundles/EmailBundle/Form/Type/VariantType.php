@@ -20,7 +20,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class VariantType extends AbstractType
+final class VariantType extends AbstractType
 {
     public const DEFAULT_WINNER_DELAY = 24;
 

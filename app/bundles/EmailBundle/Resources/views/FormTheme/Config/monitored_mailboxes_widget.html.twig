@@ -1,10 +1,10 @@
 {% block monitored_mailboxes_widget %}
   <div class="row">
       {% if 'general' != mailbox %}
-        <div class="col-xs-12">{{ form_row(form.folder) }}</div>
-        <div class="col-xs-12">{{ form_row(form.override_settings) }}</div>
+        <div class="col-xs-12">{{ formRowIfExists(form, 'folder') }}</div>
+        <div class="col-xs-12">{{ formRowIfExists(form, 'override_settings') }}</div>
       {% else %}
-        <div class="col-xs-12">{{ form_row(form.address) }}</div>
+        <div class="col-xs-12">{{ formRowIfExists(form, 'address') }}</div>
         <div class="col-xs-12 pt-lg" id="{{ mailbox }}TestButtonContainer">
             <div class="button_container">
                 {{ form_widget(form.test_connection_button) }}
@@ -17,7 +17,7 @@
 
   {% if 'general' != mailbox %}
     <div class="row">
-        <div class="col-xs-12">{{ form_row(form.address) }}</div>
+        <div class="col-xs-12">{{ formRowIfExists(form, 'address') }}</div>
         <div class="col-xs-12 pt-lg" id="{{ mailbox }}TestButtonContainer" data-show-on='{"config_emailconfig_monitored_email_{{ mailbox }}_override_settings_1": "checked"}'>
             <div class="button_container">
                 {{ form_widget(form.test_connection_button) }}
@@ -30,24 +30,24 @@
 
   <div class="row">
       <div class="col-xs-12">
-          {{ form_row(form.host) }}
+          {{ formRowIfExists(form, 'host') }}
       </div>
       <div class="col-xs-12">
-          {{ form_row(form.port) }}
+          {{ formRowIfExists(form, 'port') }}
       </div>
       {% if is_extension_loaded('openssl') %}
         <div class="col-xs-12">
-            {{ form_row(form.encryption) }}
+            {{ formRowIfExists(form, 'encryption') }}
         </div>
       {% endif %}
   </div>
 
   <div class="row">
       <div class="col-xs-12">
-          {{ form_row(form.user) }}
+          {{ formRowIfExists(form, 'user') }}
       </div>
       <div class="col-xs-12">
-          {{ form_row(form.password) }}
+          {{ formRowIfExists(form, 'password') }}
       </div>
   </div>
 {% endblock %}

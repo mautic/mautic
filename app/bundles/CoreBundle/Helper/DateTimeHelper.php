@@ -19,7 +19,7 @@ class DateTimeHelper
 
     private string $format;
 
-    private ?string $timezone = null;
+    private ?string $timezone;
 
     private \DateTimeZone $utc;
 

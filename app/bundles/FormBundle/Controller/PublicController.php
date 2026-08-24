@@ -9,11 +9,13 @@ use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
+use Mautic\FormBundle\Entity\FieldRepository;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
@@ -26,9 +28,9 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 final class PublicController extends CommonFormController
 {
-    private \Mautic\LeadBundle\Entity\CompanyRepository $companyRepository;
+    private CompanyRepository $companyRepository;
 
-    private \Mautic\FormBundle\Entity\FieldRepository $fieldRepository;
+    private FieldRepository $fieldRepository;
 
     private SubmissionModel $submissionModel;
 
@@ -38,8 +40,8 @@ final class PublicController extends CommonFormController
     public function autowirePublicController(
         FormModel $formModel,
         SubmissionModel $submissionModel,
-        \Mautic\FormBundle\Entity\FieldRepository $fieldRepository,
-        \Mautic\LeadBundle\Entity\CompanyRepository $companyRepository,
+        FieldRepository $fieldRepository,
+        CompanyRepository $companyRepository,
     ): void {
         $this->formModel = $formModel;
         $this->submissionModel = $submissionModel;
@@ -49,16 +51,13 @@ final class PublicController extends CommonFormController
 
     private array $tokens = [];
 
-    /**
-     * @return RedirectResponse|Response
-     */
     public function submitAction(
         Request $request,
         DateHelper $dateTemplateHelper,
         PageTokenHelper $pageTokenHelper,
         NotificationModel $notificationModel,
         UserRepository $userRepository,
-    ) {
+    ): Response {
         if ('POST' !== $request->getMethod()) {
             $this->throwAccessDenied();
         }
@@ -144,8 +143,6 @@ final class PublicController extends CommonFormController
             if (null === $form) {
                 $result['error'] = $this->translator->trans('mautic.form.submit.error.unavailable', [], 'flashes');
             } else {
-                \assert($form instanceof Form);
-
                 $result['form']               = $form;
                 $result['postAction']         = $form->getPostAction();
                 $result['postActionProperty'] = $form->getPostActionProperty();

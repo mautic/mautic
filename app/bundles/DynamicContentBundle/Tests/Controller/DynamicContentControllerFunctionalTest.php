@@ -13,6 +13,7 @@ use Mautic\UserBundle\Entity\User;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
@@ -168,7 +169,7 @@ final class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
         $user->setLastName('Doe');
         $user->setUsername('john.doe');
         $user->setEmail('john.doe@email.com');
-        $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash('Maut1cR0cks!'));
         $user->setRole($role);

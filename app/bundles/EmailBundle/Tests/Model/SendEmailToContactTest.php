@@ -279,6 +279,7 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                 $this->redirectModel,
                 $this->sMimeHelper,
                 $this->emailStatModel,
+                $this->createStub(CopyRepository::class),
             ])
             ->onlyMethods(['createEmailStat'])
             ->getMock();
@@ -407,6 +408,7 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                 $this->createStub(RedirectModel::class),
                 $this->sMimeHelper,
                 $this->emailStatModel,
+                $this->createStub(CopyRepository::class),
             ])
             ->onlyMethods([])
             ->getMock();
@@ -496,6 +498,7 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                 $this->redirectModel,
                 $this->sMimeHelper,
                 $this->emailStatModel,
+                $this->createStub(CopyRepository::class),
             ])
             ->onlyMethods(['createEmailStat'])
             ->getMock();
@@ -615,6 +618,7 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                 $this->redirectModel,
                 $this->sMimeHelper,
                 $this->emailStatModel,
+                $this->createStub(CopyRepository::class),
             ])
             ->onlyMethods(['createEmailStat'])
             ->getMock();
@@ -669,7 +673,7 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
     #[TestDox('Test that sending an email with invalid Bcc address is handled')]
     public function testThatInvalidBccFailureIsHandled(): void
     {
-        defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
+        defined('MAUTIC_ENV') || define('MAUTIC_ENV', 'test');
 
         /** @var MockObject&FromEmailHelper $fromEmailHelper */
         $fromEmailHelper = $this->createStub(FromEmailHelper::class);
@@ -728,6 +732,7 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             $this->redirectModel,
             $this->sMimeHelper,
             $this->emailStatModel,
+            $this->createStub(CopyRepository::class),
         );
         $dncModel       = $this->createStub(DoNotContact::class);
         $translator     = $this->createStub(TranslatorInterface::class);

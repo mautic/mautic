@@ -21,7 +21,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class MonitoringType extends AbstractType
+final class MonitoringType extends AbstractType
 {
     public function __construct(
         private readonly MonitoringModel $monitoringModel,

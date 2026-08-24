@@ -17,11 +17,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class ConfigType extends AbstractType
+final class ConfigType extends AbstractType
 {
     public function __construct(
-        protected CoreParametersHelper $parameters,
-        protected TranslatorInterface $translator,
+        private readonly CoreParametersHelper $parameters,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 

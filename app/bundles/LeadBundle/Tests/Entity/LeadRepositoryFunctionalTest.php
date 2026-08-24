@@ -25,7 +25,7 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
     public function testPointsAreAdded(): void
     {
         /** @var LeadModel $model */
-        $model = static::getContainer()->get('mautic.lead.model.lead');
+        $model = self::getContainer()->get(LeadModel::class);
 
         $lead = $this->createLead();
         $lead->adjustPoints(100);
@@ -41,7 +41,7 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
     public function testPointsAreSubtracted(): void
     {
         /** @var LeadModel $model */
-        $model = static::getContainer()->get('mautic.lead.model.lead');
+        $model = self::getContainer()->get(LeadModel::class);
 
         $lead = $this->createLead();
         $lead->adjustPoints(100, Lead::POINTS_SUBTRACT);
@@ -57,7 +57,7 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
     public function testPointsAreMultiplied(): void
     {
         /** @var LeadModel $model */
-        $model = static::getContainer()->get('mautic.lead.model.lead');
+        $model = self::getContainer()->get(LeadModel::class);
 
         $lead = $this->createLead();
         $lead->adjustPoints(2, Lead::POINTS_MULTIPLY);
@@ -73,7 +73,7 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
     public function testPointsAreDivided(): void
     {
         /** @var LeadModel $model */
-        $model = static::getContainer()->get('mautic.lead.model.lead');
+        $model = self::getContainer()->get(LeadModel::class);
         $lead  = $this->createLead();
         $lead->adjustPoints(2, Lead::POINTS_DIVIDE);
 
@@ -88,7 +88,8 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
     public function testMixedOperatorPointsAreCalculated(): void
     {
         /** @var LeadModel $model */
-        $model = static::getContainer()->get('mautic.lead.model.lead');
+        $model = self::getContainer()->get(LeadModel::class);
+
         $lead  = $this->createLead();
         // PostgreSQL strictly forbids multiple assignments to the same column
         // in one SET clause → throws:
@@ -115,7 +116,7 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
     public function testMixedModelAndRepositorySavesDoNotDoublePoints(): void
     {
         /** @var LeadModel $model */
-        $model = static::getContainer()->get('mautic.lead.model.lead');
+        $model = static::getContainer()->get(LeadModel::class);
         $lead  = $this->createLead();
         $lead->adjustPoints(120, Lead::POINTS_ADD);
         $model->saveEntity($lead);

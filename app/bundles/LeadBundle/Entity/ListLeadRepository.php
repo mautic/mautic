@@ -36,7 +36,7 @@ class ListLeadRepository extends CommonRepository
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = '.(int) $fromLeadId);
 
-        if (!empty($lists)) {
+        if ([] !== $lists) {
             $q->andWhere(
                 $q->expr()->notIn('leadlist_id', ':ids')
             )

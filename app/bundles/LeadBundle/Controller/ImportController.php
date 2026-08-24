@@ -2,18 +2,12 @@
 
 namespace Mautic\LeadBundle\Controller;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\CoreBundle\Factory\ModelFactory;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\CsvHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
-use Mautic\CoreBundle\Translation\Translator;
-use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Entity\Import;
+use Mautic\LeadBundle\Entity\ImportRepository;
 use Mautic\LeadBundle\Event\ImportInitEvent;
 use Mautic\LeadBundle\Event\ImportMappingEvent;
 use Mautic\LeadBundle\Event\ImportValidateEvent;
@@ -26,20 +20,18 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Contracts\Service\Attribute\Required;
 
 final class ImportController extends FormController
 {
@@ -52,29 +44,29 @@ final class ImportController extends FormController
 
     public const STEP_IMPORT_FROM_CSV = 4;
 
-    public function __construct(
-        FormFactoryInterface $formFactory,
-        FormFieldHelper $fieldHelper,
-        private readonly LoggerInterface $logger,
-        ManagerRegistry $doctrine,
-        ModelFactory $modelFactory,
-        UserHelper $userHelper,
-        CoreParametersHelper $coreParametersHelper,
-        EventDispatcherInterface $dispatcher,
-        Translator $translator,
-        FlashBag $flashBag,
-        private readonly RequestStack $requestStack,
-        CorePermissions $security,
-        private readonly ImportModel $importModel,
-        private readonly \Mautic\LeadBundle\Entity\ImportRepository $importRepository,
-    ) {
-        parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    private LoggerInterface $logger;
+
+    private RequestStack $requestStack;
+
+    private ImportModel $importModel;
+
+    private ImportRepository $importRepository;
+
+    #[Required]
+    public function autowireImportController(
+        LoggerInterface $logger,
+        RequestStack $requestStack,
+        ImportModel $importModel,
+        ImportRepository $importRepository,
+    ): void {
+        $this->logger = $logger;
+        $this->requestStack = $requestStack;
+        $this->importModel = $importModel;
+        $this->importRepository = $importRepository;
     }
 
     /**
      * @param int $page
-     *
-     * @return JsonResponse|RedirectResponse
      */
     public function indexAction(Request $request, $page = 1): Response
     {
@@ -124,18 +116,14 @@ final class ImportController extends FormController
 
     /**
      * @param int $objectId
-     *
-     * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(Request $request, $objectId): Response
     {
         return $this->viewStandard($request, $objectId, 'import', 'lead');
     }
 
     /**
      * Cancel and unpublish the import during manual import.
-     *
-     * @return JsonResponse|RedirectResponse
      */
     public function cancelAction(Request $request, NotificationModel $notificationModel, UserRepository $userRepository): Response
     {
@@ -417,7 +405,7 @@ final class ImportController extends FormController
 
                     $matchedFields = $validateEvent->getMatchedFields();
 
-                    if (empty($matchedFields)) {
+                    if ([] === $matchedFields) {
                         $this->resetImport($object);
                         $this->removeImportFile($fullPath);
                         $this->logger->log(LogLevel::WARNING, "Import for file {$fullPath} was aborted as there were no matched files found.");
@@ -674,28 +662,24 @@ final class ImportController extends FormController
      */
     public function getViewArguments(array $args, $action): array
     {
-        switch ($action) {
-            case 'view':
-                /** @var Import $entity */
-                $entity = $args['entity'];
-
-                $args['viewParameters'] = array_merge(
-                    $args['viewParameters'],
-                    [
-                        'failedRows'        => $this->importModel->getFailedRows($entity->getId(), $entity->getObject()),
-                        'importedRowsChart' => $entity->getDateStarted() ? $this->importModel->getImportedRowsLineChartData(
-                            'i',
-                            $entity->getDateStarted(),
-                            $entity->getDateEnded() ?: $entity->getDateModified(),
-                            null,
-                            [
-                                'object_id' => $entity->getId(),
-                            ]
-                        ) : [],
-                    ]
-                );
-
-                break;
+        if ('view' === $action) {
+            /** @var Import $entity */
+            $entity = $args['entity'];
+            $args['viewParameters'] = array_merge(
+                $args['viewParameters'],
+                [
+                    'failedRows'        => $this->importModel->getFailedRows($entity->getId(), $entity->getObject()),
+                    'importedRowsChart' => $entity->getDateStarted() ? $this->importModel->getImportedRowsLineChartData(
+                        'i',
+                        $entity->getDateStarted(),
+                        $entity->getDateEnded() ?: $entity->getDateModified(),
+                        null,
+                        [
+                            'object_id' => $entity->getId(),
+                        ]
+                    ) : [],
+                ]
+            );
         }
 
         return $args;

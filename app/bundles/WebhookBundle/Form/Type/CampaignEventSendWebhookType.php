@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\WebhookBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\SortableListType;
@@ -14,7 +16,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class CampaignEventSendWebhookType extends AbstractType
+final class CampaignEventSendWebhookType extends AbstractType
 {
     public function __construct(
         private readonly TranslatorInterface $translator,

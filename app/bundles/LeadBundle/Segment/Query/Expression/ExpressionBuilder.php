@@ -6,13 +6,18 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder as BaseExpressionBuilder;
 use Mautic\CoreBundle\Doctrine\DatabasePlatform;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
 
 class ExpressionBuilder extends BaseExpressionBuilder
 {
-    public const REGEXP            = 'REGEXP';
+    public const REGEXP   = 'REGEXP';
 
-    public const BETWEEN           = 'BETWEEN';
+    public const BETWEEN  = 'BETWEEN';
+
+    private const IN_LAST = 'inLast';
+
+    private const IN_NEXT = 'inNext';
 
     private readonly AbstractPlatform $platform;
 
@@ -122,5 +127,31 @@ class ExpressionBuilder extends BaseExpressionBuilder
         }
 
         return $func.'('.$x.(count($additionArguments) ? ', ' : '').implode(',', $additionArguments).')';
+    }
+
+    /**
+     * Creates a between comparison expression for inTheLast operator.
+     */
+    public function inLast(string $x, string $y): string
+    {
+        return $this->between($x, [$y, $this->getCurrentDate(self::IN_LAST)]);
+    }
+
+    /**
+     * Creates a between comparison expression for inTheNext operator.
+     */
+    public function inNext(string $x, string $y): string
+    {
+        return $this->between($x, [$this->getCurrentDate(self::IN_NEXT), $y]);
+    }
+
+    private function getCurrentDate(string $operator): string
+    {
+        $timeStamps = [
+            self::IN_LAST => ' 23:59:59',
+            self::IN_NEXT => ' 00:00:00',
+        ];
+
+        return $this->literal((new DateTimeHelper())->toUtcString('Y-m-d').$timeStamps[$operator]);
     }
 }

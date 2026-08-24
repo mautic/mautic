@@ -242,10 +242,8 @@ class BuilderEvent extends Event
      * Get tokens from a BuilderTokenHelper.
      *
      * @deprecated use BuilderTokenHelper::getFormattedTokens
-     *
-     * @return array|void
      */
-    public function getTokensFromHelper(BuilderTokenHelper $tokenHelper, $tokens, string $labelColumn = 'name', $valueColumn = 'id')
+    public function getTokensFromHelper(BuilderTokenHelper $tokenHelper, $tokens, string $labelColumn = 'name', $valueColumn = 'id'): ?array
     {
         return $tokenHelper->getTokens(
             $tokens,

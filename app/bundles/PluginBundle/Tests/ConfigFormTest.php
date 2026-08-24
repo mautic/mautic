@@ -9,17 +9,15 @@ use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
-use Mautic\PluginBundle\Entity\Integration;
-use Mautic\PluginBundle\Entity\IntegrationEntity;
-use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\PluginBundle\Entity\IntegrationRepository;
 use Mautic\PluginBundle\Entity\Plugin;
-use Mautic\PluginBundle\Entity\PluginRepository;
 use Mautic\PluginBundle\Event\PluginIntegrationKeyEvent;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Model\PluginModel;
 use Mautic\PluginBundle\PluginEvents;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Twig\Environment;
 
 final class ConfigFormTest extends KernelTestCase
@@ -57,7 +55,7 @@ final class ConfigFormTest extends KernelTestCase
     public function testOauth(): void
     {
         $connectWiseHeader = ['appcookie' => 'rookie'];
-        self::getContainer()->get('event_dispatcher')->addListener(
+        self::getContainer()->get(EventDispatcherInterface::class)->addListener(
             PluginEvents::PLUGIN_ON_INTEGRATION_KEYS_DECRYPT,
             function (PluginIntegrationKeyEvent $event) use ($connectWiseHeader): PluginIntegrationKeyEvent {
                 $event->setKeys($connectWiseHeader);
@@ -133,28 +131,12 @@ final class ConfigFormTest extends KernelTestCase
         $bundleHelper         = $this->createMock(BundleHelper::class);
         $pluginModel          = $this->createMock(PluginModel::class);
         $coreParametersHelper = new CoreParametersHelper(self::$kernel->getContainer());
-        $entityManager        = $this->createMock(EntityManager::class);
 
-        $pluginRepository = $this->createMock(PluginRepository::class);
-
-        $registeredPluginBundles = static::getContainer()->getParameter('mautic.plugin.bundles');
-        $mauticPlugins           = static::getContainer()->getParameter('mautic.bundles');
+        $registeredPluginBundles = self::getContainer()->getParameter('mautic.plugin.bundles');
+        $mauticPlugins           = self::getContainer()->getParameter('mautic.bundles');
         $bundleHelper->method('getPluginBundles')->willReturn($registeredPluginBundles);
 
         $bundleHelper->method('getMauticBundles')->willReturn(array_merge($mauticPlugins, $registeredPluginBundles));
-        $integrationEntityRepository = $this->createMock(IntegrationEntityRepository::class);
-
-        $integrationRepository = $this->createMock(IntegrationRepository::class);
-
-        $entityManager->expects($this->exactly(3))
-                ->method('getRepository')
-                ->willReturnMap(
-                    [
-                        [Plugin::class, $pluginRepository],
-                        [Integration::class, $integrationRepository],
-                        [IntegrationEntity::class, $integrationEntityRepository],
-                    ]
-                );
 
         $pluginModel->method('getEntities')
             ->with(
@@ -169,12 +151,14 @@ final class ConfigFormTest extends KernelTestCase
 
         return new IntegrationHelper(
             self::getContainer(),
-            $entityManager,
+            $this->createStub(EntityManager::class),
             $this->createStub(PathsHelper::class),
             $bundleHelper,
             $coreParametersHelper,
             $this->createStub(Environment::class),
-            $pluginModel
+            $pluginModel,
+            $this->createStub(IntegrationRepository::class),
+            $this->createStub(LeadRepository::class)
         );
     }
 }

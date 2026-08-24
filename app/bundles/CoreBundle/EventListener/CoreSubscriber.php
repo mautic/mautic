@@ -11,8 +11,8 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Menu\MenuHelper;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Event\LoginEvent;
-use Mautic\UserBundle\Model\UserModel;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -31,9 +31,9 @@ final readonly class CoreSubscriber implements EventSubscriberInterface
         private UserHelper $userHelper,
         private CoreParametersHelper $coreParametersHelper,
         private AuthorizationCheckerInterface $securityContext,
-        private UserModel $userModel,
         private EventDispatcherInterface $dispatcher,
         private RequestStack $requestStack,
+        private UserRepository $userRepository,
     ) {
     }
 
@@ -67,7 +67,7 @@ final readonly class CoreSubscriber implements EventSubscriberInterface
             // mark the user as last logged in
             $user = $this->userHelper->getUser();
             if ($user instanceof User) {
-                $this->userModel->getRepository()->setLastLogin($user);
+                $this->userRepository->setLastLogin($user);
 
                 // Set the timezone and locale in session while we have it since Symfony dispatches the onKernelRequest prior to the
                 // firewall setting the known user
@@ -254,7 +254,7 @@ final readonly class CoreSubscriber implements EventSubscriberInterface
         }
         if (isset($details['format'])) {
             $defaults['_format'] = $details['format'];
-        } elseif ('api' == $type) {
+        } elseif ('api' === $type) {
             $defaults['_format'] = 'json';
         }
         $method = [];
@@ -285,7 +285,7 @@ final readonly class CoreSubscriber implements EventSubscriberInterface
                 $requirements['objectId'] = '[a-zA-Z0-9_-]+';
             }
         }
-        if ('api' == $type) {
+        if ('api' === $type) {
             if (str_contains($details['path'], '{id}')) {
                 if (!isset($requirements['page'])) {
                     $requirements['id'] = '\d+';

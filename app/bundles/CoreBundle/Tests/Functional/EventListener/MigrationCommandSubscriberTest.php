@@ -14,6 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 final class MigrationCommandSubscriberTest extends MauticMysqlTestCase
 {
@@ -27,8 +28,8 @@ final class MigrationCommandSubscriberTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->tablePrefix     = static::getContainer()->getParameter('mautic.db_table_prefix');
-        $this->eventDispatcher = static::getContainer()->get('event_dispatcher');
+        $this->tablePrefix     = self::getContainer()->getParameter('mautic.db_table_prefix');
+        $this->eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
     }
 
     protected function beforeTearDown(): void
@@ -145,7 +146,7 @@ final class MigrationCommandSubscriberTest extends MauticMysqlTestCase
         }
         // intentionally not using AbstractMauticTestCase::testSymfonyCommand() as it does not dispatch 'console.terminate' event
         $params      = ['command' => 'doctrine:migration:migrate', '--allow-no-migration' => true, '--no-interaction' => true];
-        $application = new Application(static::getContainer()->get('kernel'));
+        $application = new Application(self::getContainer()->get(KernelInterface::class));
         $application->setAutoExit(false);
         $application->setCatchExceptions(false);
         $output     = new BufferedOutput();

@@ -6,7 +6,6 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
-use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCrmBundle\Api\DynamicsApi;
 use Psr\Http\Message\ResponseInterface;
@@ -19,7 +18,7 @@ use Symfony\Component\Form\FormBuilder;
 /**
  * @extends CrmAbstractIntegration<DynamicsApi>
  */
-class DynamicsIntegration extends CrmAbstractIntegration
+final class DynamicsIntegration extends CrmAbstractIntegration
 {
     public function getName(): string
     {
@@ -164,10 +163,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
         return true;
     }
 
-    /**
-     * @return string|array
-     */
-    public function getFormNotes($section)
+    public function getFormNotes($section): array
     {
         if ('custom' === $section) {
             return [
@@ -209,11 +205,11 @@ class DynamicsIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $settings
+     * @param array<string, mixed> $settings
      *
      * @return array|mixed
      */
-    public function getFormLeadFields($settings = [])
+    public function getFormLeadFields(array $settings = [])
     {
         return $this->getFormFieldsByObject('contacts', $settings);
     }
@@ -318,10 +314,8 @@ class DynamicsIntegration extends CrmAbstractIntegration
         try {
             if ($this->isAuthorized()) {
                 $object = 'contacts';
-                /** @var IntegrationEntityRepository $integrationEntityRepo */
-                $integrationEntityRepo = $this->em->getRepository(IntegrationEntity::class);
-                $integrationId         = $integrationEntityRepo->getIntegrationsEntityId('Dynamics', $object, 'lead', $lead->getId());
-                if (!empty($integrationId)) {
+                $integrationId = $this->integrationEntityRepository->getIntegrationsEntityId('Dynamics', $object, 'lead', $lead->getId());
+                if ([] !== $integrationId) {
                     $integrationEntityId = $integrationId[0]['integration_entity_id'];
                     $this->getApiHelper()->updateLead($mappedData, $integrationEntityId);
 
@@ -342,7 +336,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                     $integrationEntity->setInternalEntityId($lead->getId());
                     $integrationEntity->setLastSyncDate(new \DateTime());
                     $this->em->persist($integrationEntity);
-                    $this->em->flush($integrationEntity);
+                    $this->em->flush();
 
                     return $id;
                 }
@@ -514,8 +508,6 @@ class DynamicsIntegration extends CrmAbstractIntegration
         if (isset($data['value'])) {
             $this->em->getConnection()->getConfiguration()->setMiddlewares([]);
             $entity = null;
-            /** @var IntegrationEntityRepository $integrationEntityRepo */
-            $integrationEntityRepo = $this->em->getRepository(IntegrationEntity::class);
             $objects               = $data['value'];
             $integrationEntities   = [];
             /** @var array $objects */
@@ -524,7 +516,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                 if ('accounts' === $object) {
                     $recordId = $entityData['accountid'];
                     // first try to find integration entity
-                    $integrationId = $integrationEntityRepo->getIntegrationsEntityId('Dynamics', $object, 'company',
+                    $integrationId = $this->integrationEntityRepository->getIntegrationsEntityId('Dynamics', $object, 'company',
                         null, null, null, false, 0, 0, "'".$recordId."'");
                     if (count($integrationId)) { // company exists, then update local fields
                         /** @var Company $entity */
@@ -574,7 +566,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                 } elseif ('contacts' === $object) {
                     $recordId = $entityData['contactid'];
                     // first try to find integration entity
-                    $integrationId = $integrationEntityRepo->getIntegrationsEntityId('Dynamics', $object, 'lead',
+                    $integrationId = $this->integrationEntityRepository->getIntegrationsEntityId('Dynamics', $object, 'lead',
                         null, null, null, false, 0, 0, "'".$recordId."'");
                     if (count($integrationId)) { // lead exists, then update
                         /** @var Lead $entity */
@@ -647,7 +639,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                 }
 
                 if ($entity) {
-                    $integrationId = $integrationEntityRepo->getIntegrationsEntityId(
+                    $integrationId = $this->integrationEntityRepository->getIntegrationsEntityId(
                         'Dynamics',
                         $object,
                         $mauticObjectReference,
@@ -664,7 +656,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                         $integrationEntity->setInternalEntityId($entity->getId());
                         $integrationEntities[] = $integrationEntity;
                     } else {
-                        $integrationEntity = $integrationEntityRepo->getEntity($integrationId[0]['id']);
+                        $integrationEntity = $this->integrationEntityRepository->getEntity($integrationId[0]['id']);
                         if ($isModified) {
                             $integrationEntity->setLastSyncDate(new \DateTime());
                             $integrationEntities[] = $integrationEntity;
@@ -675,10 +667,8 @@ class DynamicsIntegration extends CrmAbstractIntegration
                 }
             }
 
-            $integrationEntityRepo->saveEntities($integrationEntities);
+            $this->integrationEntityRepository->saveEntities($integrationEntities);
             $this->em->clear();
-
-            unset($integrationEntityRepo, $integrationEntities);
         }
 
         return $result;
@@ -696,7 +686,6 @@ class DynamicsIntegration extends CrmAbstractIntegration
         }
         $object                = 'contacts';
         $config                = $this->mergeConfigToFeatureSettings();
-        $integrationEntityRepo = $this->em->getRepository(IntegrationEntity::class);
         $fieldsToUpdateInCrm   = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 0) : [];
         $leadFields            = array_unique(array_values($config['leadFields'] ?? []));
         $totalUpdated          = $totalCreated          = $totalErrors          = 0;
@@ -708,7 +697,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
             unset($leadFields[$key]);
         }
 
-        if (empty($leadFields)) {
+        if ([] === $leadFields) {
             return [0, 0, 0];
         }
 
@@ -720,9 +709,9 @@ class DynamicsIntegration extends CrmAbstractIntegration
         $fieldsToUpdate[$object] = array_intersect_key($config['leadFields'] ?? [], array_flip($fieldsToUpdate[$object]));
 
         $progress      = false;
-        $totalToUpdate = array_sum($integrationEntityRepo->findLeadsToUpdate('Dynamics', 'lead', $fields, 0, $params['start'], $params['end'], [$object]));
-        $totalToCreate = $integrationEntityRepo->findLeadsToCreate('Dynamics', $fields, 0, $params['start'], $params['end']);
-        $totalToCreate = is_array($totalToCreate) ? count($totalToCreate) : (int) $totalToCreate;
+        $totalToUpdate = array_sum($this->integrationEntityRepository->findLeadsToUpdate('Dynamics', 'lead', $fields, 0, $params['start'], $params['end'], [$object]));
+        $totalToCreate = $this->integrationEntityRepository->findLeadsToCreate('Dynamics', $fields, 0, $params['start'], $params['end']);
+        $totalToCreate = is_array($totalToCreate) ? count($totalToCreate) : $totalToCreate;
         $totalCount    = $totalToCreate + $totalToUpdate;
 
         if (defined('IN_MAUTIC_CONSOLE')) {
@@ -740,7 +729,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
         $leadsToUpdateInD    = [];
         $integrationEntities = [];
 
-        $toUpdate = $integrationEntityRepo->findLeadsToUpdate('Dynamics', 'lead', $fields, $totalToUpdate, $params['start'], $params['end'], $object, [])[$object];
+        $toUpdate = $this->integrationEntityRepository->findLeadsToUpdate('Dynamics', 'lead', $fields, $totalToUpdate, $params['start'], $params['end'], $object, [])[$object];
 
         if (is_array($toUpdate)) {
             $totalUpdated += count($toUpdate);
@@ -759,7 +748,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
         // create lead records, including deleted on D side (last_sync = null)
         /** @var array $leadsToCreate */
-        $leadsToCreate = $integrationEntityRepo->findLeadsToCreate('Dynamics', $fields, $totalToCreate, $params['start'], $params['end']);
+        $leadsToCreate = $this->integrationEntityRepository->findLeadsToCreate('Dynamics', $fields, $totalToCreate, $params['start'], $params['end']);
         if (is_array($leadsToCreate)) {
             $totalCreated += count($leadsToCreate);
             foreach ($leadsToCreate as $lead) {
@@ -775,7 +764,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
         if (count($integrationEntities)) {
             // Persist updated entities if applicable
-            $integrationEntityRepo->saveEntities($integrationEntities);
+            $this->integrationEntityRepository->saveEntities($integrationEntities);
             $this->integrationEntityModel->getRepository()->detachEntities($integrationEntities);
         }
 
@@ -845,13 +834,13 @@ class DynamicsIntegration extends CrmAbstractIntegration
             // SEND 100 RECORDS AT A TIME
             if ($MAX_RECORDS === $rowNum) {
                 $ids = $this->getApiHelper()->createLeads($leadData, $object);
-                $this->createIntegrationEntities($ids, $object, $integrationEntityRepo);
+                $this->createIntegrationEntities($ids, $object);
                 $leadData = [];
                 $rowNum   = 0;
             }
         }
         $ids = $this->getApiHelper()->createLeads($leadData, $object);
-        $this->createIntegrationEntities($ids, $object, $integrationEntityRepo);
+        $this->createIntegrationEntities($ids, $object);
 
         if ($progress) {
             $progress->finish();
@@ -862,14 +851,13 @@ class DynamicsIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array                       $ids
-     * @param IntegrationEntityRepository $integrationEntityRepo
+     * @param array $ids
      */
-    private function createIntegrationEntities($ids, string $object, $integrationEntityRepo): void
+    private function createIntegrationEntities($ids, string $object): void
     {
         foreach ($ids as $oid => $leadId) {
             $this->logger->debug('CREATE INTEGRATION ENTITY: '.$oid);
-            $integrationId = $integrationEntityRepo->getIntegrationsEntityId('Dynamics', $object,
+            $integrationId = $this->integrationEntityRepository->getIntegrationsEntityId('Dynamics', $object,
                 'lead', null, null, null, false, 0, 0,
                 "'".$oid."'"
             );

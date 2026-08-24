@@ -23,6 +23,7 @@ use Mautic\UserBundle\Entity\UserRepository;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class SubmissionFunctionalTest extends MauticMysqlTestCase
@@ -468,7 +469,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $campaignSources = ['forms' => [$formId => $formId]];
 
         /** @var CampaignModel $campaignModel */
-        $campaignModel = static::getContainer()->get('mautic.campaign.model.campaign');
+        $campaignModel = self::getContainer()->get(CampaignModel::class);
 
         $campaign = new Campaign();
         $campaign->setName('Test Campaign');
@@ -593,7 +594,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $user->setLastName('test');
         $user->setRole($role);
 
-        $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash($this->getUserPlainPassword()));
 
@@ -1349,7 +1350,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(1, $submissionsData['submissions']);
 
         // The denormalised counter must match the single submission that was just created.
-        $prefix   = static::getContainer()->getParameter('mautic.db_table_prefix');
+        $prefix   = self::getContainer()->getParameter('mautic.db_table_prefix');
         $countSql = "SELECT submission_count FROM {$prefix}forms WHERE id = ?";
         $this->assertSame(1, (int) $this->connection->fetchOne($countSql, [$formId]));
 
@@ -1390,7 +1391,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Deleting the submission decrements the counter symmetrically (via the postRemove listener).
         $submissionId    = $finalSubmissionsData['submissions'][0]['id'];
         /** @var SubmissionModel $submissionModel */
-        $submissionModel = static::getContainer()->get('mautic.form.model.submission');
+        $submissionModel = self::getContainer()->get(SubmissionModel::class);
         $submission      = $submissionModel->getEntity($submissionId);
         $submissionModel->deleteEntity($submission);
 
@@ -1466,7 +1467,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         $this->assertResponseIsSuccessful();
 
-        $tablePrefix = static::getContainer()->getParameter('mautic.db_table_prefix');
+        $tablePrefix = self::getContainer()->getParameter('mautic.db_table_prefix');
 
         // we are expecting form results table to be deleted in background, so the table should exists
         $this->assertTrue($this->connection->createSchemaManager()->tablesExist("{$tablePrefix}form_results_{$formId}_{$formAlias}"));

@@ -9,7 +9,7 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Doctrine\DBAL\Schema\Index;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Tools\SchemaTool;
 use Mautic\CoreBundle\Doctrine\DatabasePlatform;
@@ -17,21 +17,18 @@ use Mautic\CoreBundle\Doctrine\Provider\VersionProvider;
 use Mautic\CoreBundle\Release\ThisRelease;
 use Mautic\InstallBundle\Exception\DatabaseVersionTooOldException;
 
-class SchemaHelper
+final class SchemaHelper
 {
-    protected Connection $db;
+    private Connection $db;
 
-    /**
-     * @var EntityManager
-     */
-    protected $em;
+    private ?EntityManagerInterface $em = null;
 
     /**
      * @var AbstractPlatform
      */
-    protected $platform;
+    private $platform;
 
-    protected array $dbParams;
+    private array $dbParams;
 
     /**
      * @var AbstractSchemaManager<AbstractPlatform>|null
@@ -63,7 +60,7 @@ class SchemaHelper
         $this->dbParams = $dbParams;
     }
 
-    public function setEntityManager(EntityManager $em): void
+    public function setEntityManager(EntityManagerInterface $em): void
     {
         $this->em = $em;
     }
@@ -225,7 +222,7 @@ class SchemaHelper
     /**
      * @throws DBALException
      */
-    protected function backupExistingSchema($tables, array $mauticTables, $backupPrefix): array
+    private function backupExistingSchema($tables, array $mauticTables, $backupPrefix): array
     {
         $sql = [];
         $sm  = $this->getSchemaManager();
@@ -359,7 +356,7 @@ class SchemaHelper
         return $sql;
     }
 
-    protected function dropExistingSchema($tables, array $mauticTables): array
+    private function dropExistingSchema($tables, array $mauticTables): array
     {
         $sql = [];
         $sm  = $this->getSchemaManager();
@@ -401,7 +398,7 @@ class SchemaHelper
     /**
      * @return mixed[]|string
      */
-    protected function generateBackupName($prefix, $backupPrefix, $name): string|array
+    private function generateBackupName($prefix, $backupPrefix, $name): string|array
     {
         if (empty($prefix) || !str_contains($name, $prefix)) {
             return $backupPrefix.$name;

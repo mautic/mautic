@@ -208,7 +208,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         /** @var DoctrineDataCollector $dbCollector */
         $dbCollector = $profile->getCollector('db');
         $queries     = $dbCollector->getQueries();
-        $prefix      = static::getContainer()->getParameter('mautic.db_table_prefix');
+        $prefix      = self::getContainer()->getParameter('mautic.db_table_prefix');
 
         $dncQueries = array_filter(
             $queries['default'],
@@ -294,6 +294,19 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$email->getId()}");
         $html    = $crawler->filterXPath('//*[@id="toolbar"]')->html();
         $this->assertStringNotContainsString('disabled', $html, $html);
+    }
+
+    public function testEmailListOffersSendExampleWithoutOpeningTheDetail(): void
+    {
+        $email = $this->createEmail('Automation test email', self::SUBJECT_A, 'template', 'blank', 'test html');
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails');
+        $button  = $crawler->filter("#row_email_{$email->getId()} a[href=\"/s/emails/sendExample/{$email->getId()}\"]");
+
+        $this->assertCount(1, $button);
+        $this->assertSame('ajaxmodal', $button->attr('data-toggle'));
+        $this->assertSame('Send example', trim($button->text()));
     }
 
     public function testEmailDetailPageForListEmailShowsScheduleButton(): void
@@ -1255,7 +1268,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $email = $this->createEmail('Email A', self::SUBJECT_A, 'list', 'blank', 'Ahoy <i>{contactfield=email}</i><a href="https://mautic.org">Mautic</a>', $segment);
         $this->em->persist($email);
-        $this->em->flush($email);
+        $this->em->flush();
 
         // Schedule the email to be sent
         $crawler       = $this->client->request(Request::METHOD_GET, "/s/emails/scheduleSend/{$email->getId()}");
@@ -1302,7 +1315,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $email = $this->createEmail('Email A', self::SUBJECT_A, 'list', 'blank', 'Ahoy <i>{contactfield=email}</i><a href="https://mautic.org">Mautic</a>', $segment);
         $this->em->persist($email);
-        $this->em->flush($email);
+        $this->em->flush();
 
         // Schedule the email to be sent
         $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/scheduleSend/{$email->getId()}");
@@ -1652,7 +1665,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     private function setPermission(Role $role, array $permissions): void
     {
         /** @var RoleModel $roleModel */
-        $roleModel = $this->getContainer()->get('mautic.user.model.role');
+        $roleModel = $this->getContainer()->get(RoleModel::class);
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);
         $this->em->flush();

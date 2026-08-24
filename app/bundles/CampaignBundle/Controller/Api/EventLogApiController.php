@@ -30,21 +30,15 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * @extends FetchCommonApiController<LeadEventLog>
  */
-class EventLogApiController extends FetchCommonApiController
+final class EventLogApiController extends FetchCommonApiController
 {
     use LeadAccessTrait;
 
     private const LOG_SERIALIZATION = 30;
 
-    /**
-     * @var Campaign
-     */
-    protected $campaign;
+    private ?Campaign $campaign = null;
 
-    /**
-     * @var Lead
-     */
-    protected $contact;
+    private ?Lead $contact = null;
 
     /**
      * @var EventLogModel|null
@@ -94,10 +88,8 @@ class EventLogApiController extends FetchCommonApiController
 
     /**
      * Get a list of events.
-     *
-     * @return Response
      */
-    public function getContactEventsAction(Request $request, UserHelper $userHelper, $contactId, $campaignId = null)
+    public function getContactEventsAction(Request $request, UserHelper $userHelper, $contactId, $campaignId = null): Response
     {
         // Ensure contact exists and user has access
         $contact = $this->checkLeadAccess($contactId, 'view');
@@ -144,10 +136,7 @@ class EventLogApiController extends FetchCommonApiController
         return $this->getEntitiesAction($request, $userHelper);
     }
 
-    /**
-     * @return Response
-     */
-    public function editContactEventAction(Request $request, $eventId, $contactId)
+    public function editContactEventAction(Request $request, $eventId, $contactId): Response
     {
         $parameters = $request->request->all();
 
@@ -246,7 +235,7 @@ class EventLogApiController extends FetchCommonApiController
             $this->entityNameMulti => $events,
         ];
 
-        if (!empty($errors)) {
+        if ([] !== $errors) {
             $payload['errors'] = $errors;
         }
 

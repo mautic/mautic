@@ -196,7 +196,9 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
             'between', // Used only for date with week combination (EQUAL [this week, next week, last week])
             'regexp',
             'notRegexp', // Different behaviour from 'notLike' because of BC (do not use condition for NULL). Could be changed in Mautic 3.
-            OperatorOptions::INCLUDING_ALL // For non-multiselect fields (e.g. select/country), treat as in
+            'inLast',
+            'inNext',
+            OperatorOptions::INCLUDING_ALL, // For non-multiselect fields (e.g. select/country), treat as in
         )) {
             return;
         }

@@ -20,11 +20,14 @@ use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadNote;
+use Mautic\UserBundle\Entity\Permission;
+use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -40,7 +43,7 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         // Disable API just for specific test.
         $this->configParams['api_enabled'] = 'testDisabledApi' !== $this->name();
 
-        static::getContainer()->set(
+        self::getContainer()->set(
             'session',
             new Session(
                 new class() extends FixedMockFileSessionStorage {
@@ -170,7 +173,7 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         /** @var ContactMerger $contactMerger */
-        $contactMerger = static::getContainer()->get('mautic.lead.merger');
+        $contactMerger = self::getContainer()->get(ContactMerger::class);
 
         $contactMerger->merge($contact1, $contact2);
 
@@ -232,7 +235,7 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $contactId4Created = $response['contacts'][3]['id'];
 
         /** @var ContactMerger $contactMerger */
-        $contactMerger = static::getContainer()->get('mautic.lead.merger');
+        $contactMerger = self::getContainer()->get(ContactMerger::class);
 
         // Merge contact 102 into 101.
         $contactMerger->merge(
@@ -516,6 +519,95 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $this->assertEquals('{"total":"0","contacts":{}}', $clientResponse->getContent());
+    }
+
+    public function testGetEntitiesReturnsContactsForViewOwnUserBasedOnPermissionUser(): void
+    {
+        /** @var User $adminUser */
+        $adminUser = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+
+        $role = new Role();
+        $role->setName('View own contacts');
+        $role->setIsAdmin(false);
+        $this->em->persist($role);
+
+        $permission = new Permission();
+        $permission->setBundle('lead');
+        $permission->setName('leads');
+        $permission->setRole($role);
+        $permission->setBitwise(2);
+        $this->em->persist($permission);
+
+        $user = $this->createApiUser(
+            $role,
+            'api-owner',
+            'api-owner@test.com',
+            'API',
+            'Owner'
+        );
+
+        $otherOwner = $this->createApiUser(
+            $role,
+            'api-other-owner',
+            'api-other-owner@test.com',
+            'Other',
+            'Owner'
+        );
+
+        $this->em->flush();
+
+        $ownedLead = new Lead();
+        $ownedLead->setEmail('api-view-own-scope-owned@test.com');
+        $ownedLead->setFirstname('Owned');
+        $ownedLead->setOwner($user);
+        $ownedLead->setCreatedBy($adminUser);
+        $this->em->persist($ownedLead);
+
+        $createdByLead = new Lead();
+        $createdByLead->setEmail('api-view-own-scope-created@test.com');
+        $createdByLead->setFirstname('Created');
+        $createdByLead->setCreatedBy($user);
+        $this->em->persist($createdByLead);
+
+        $ownedByOtherLead = new Lead();
+        $ownedByOtherLead->setEmail('api-view-own-scope-owned-by-other@test.com');
+        $ownedByOtherLead->setFirstname('Owned by other');
+        $ownedByOtherLead->setOwner($otherOwner);
+        $ownedByOtherLead->setCreatedBy($user);
+        $this->em->persist($ownedByOtherLead);
+
+        $unrelatedLead = new Lead();
+        $unrelatedLead->setEmail('api-view-own-scope-unrelated@test.com');
+        $unrelatedLead->setFirstname('Unrelated');
+        $unrelatedLead->setCreatedBy($adminUser);
+        $this->em->persist($unrelatedLead);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        /** @var User $apiUser */
+        $apiUser = $this->em->getRepository(User::class)->findOneBy(['username' => 'api-owner']);
+
+        $this->loginUser($apiUser);
+        $this->client->setServerParameter('PHP_AUTH_USER', $apiUser->getUserIdentifier());
+        $this->client->setServerParameter('PHP_AUTH_PW', $this->getUserPlainPassword());
+
+        $this->client->request('GET', '/api/contacts?search=api-view-own-scope-');
+        $clientResponse = $this->client->getResponse();
+        self::assertResponseIsSuccessful($clientResponse->getContent());
+
+        $response = json_decode($clientResponse->getContent(), true);
+        $this->assertSame('2', $response['total']);
+
+        $emails = array_map(
+            static fn (array $contact): string => $contact['fields']['all']['email'],
+            array_values($response['contacts'])
+        );
+
+        $this->assertContains('api-view-own-scope-owned@test.com', $emails);
+        $this->assertContains('api-view-own-scope-created@test.com', $emails);
+        $this->assertNotContains('api-view-own-scope-owned-by-other@test.com', $emails);
+        $this->assertNotContains('api-view-own-scope-unrelated@test.com', $emails);
     }
 
     public function testBatchEditEndpoint(): void
@@ -1447,6 +1539,28 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $campaignLead->setDateAdded(new \DateTime());
         $campaignLead->setManuallyRemoved($manuallyRemoved);
         $this->em->persist($campaignLead);
+    }
+
+    private function createApiUser(Role $role, string $username, string $email, string $firstName, string $lastName): User
+    {
+        $user = new User();
+        $user->setFirstName($firstName);
+        $user->setLastName($lastName);
+        $user->setEmail($email);
+        $user->setUsername($username);
+        $user->setRole($role);
+
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
+        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
+        $user->setPassword($hasher->hash($this->getUserPlainPassword()));
+        $this->em->persist($user);
+
+        return $user;
+    }
+
+    private function getUserPlainPassword(): string
+    {
+        return 'Maut1cR0cks!';
     }
 
     private function getUser(string $username): User

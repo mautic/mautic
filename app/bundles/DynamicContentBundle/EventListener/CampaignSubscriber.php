@@ -9,6 +9,7 @@ use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use Mautic\DynamicContentBundle\Entity\DynamicContentRepository;
 use Mautic\DynamicContentBundle\Form\Type\DynamicContentDecisionType;
 use Mautic\DynamicContentBundle\Form\Type\DynamicContentSendType;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
@@ -22,6 +23,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         private DynamicContentModel $dynamicContentModel,
         private CacheProvider $cache,
         private EventDispatcherInterface $dispatcher,
+        private DynamicContentRepository $dynamicContentRepository,
     ) {
     }
 
@@ -93,7 +95,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
             return false;
         }
 
-        $defaultDwc = $this->dynamicContentModel->getRepository()->getEntity($eventConfig['dynamicContent']);
+        $defaultDwc = $this->dynamicContentRepository->getEntity($eventConfig['dynamicContent']);
 
         if ($defaultDwc instanceof DynamicContent) {
             // Set the default content in case none of the actions return data
@@ -118,7 +120,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         $item = $this->cache->getItem('dwc.slot_name.lead.'.$lead->getId());
         $slot = $item->get();
 
-        $dwc = $this->dynamicContentModel->getRepository()->getEntity($eventConfig['dynamicContent']);
+        $dwc = $this->dynamicContentRepository->getEntity($eventConfig['dynamicContent']);
 
         if ($dwc instanceof DynamicContent) {
             // Use translation if available

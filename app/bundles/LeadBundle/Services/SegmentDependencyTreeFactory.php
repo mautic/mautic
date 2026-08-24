@@ -7,10 +7,10 @@ namespace Mautic\LeadBundle\Services;
 use Mautic\CoreBundle\Helper\Tree\IntNode;
 use Mautic\CoreBundle\Helper\Tree\NodeInterface;
 use Mautic\LeadBundle\Entity\LeadList;
-use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Symfony\Component\Routing\RouterInterface;
 
-class SegmentDependencyTreeFactory
+final class SegmentDependencyTreeFactory
 {
     /**
      * @var int[]
@@ -18,8 +18,8 @@ class SegmentDependencyTreeFactory
     private array $usedSegmentIds = [];
 
     public function __construct(
-        private readonly ListModel $segmentModel,
         private readonly RouterInterface $router,
+        private readonly LeadListRepository $leadListRepository,
     ) {
     }
 

@@ -25,7 +25,7 @@ final class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->integrationEntityRepository = $this->em->getRepository(IntegrationEntity::class);
+        $this->integrationEntityRepository = self::getContainer()->get(IntegrationEntityRepository::class);
     }
 
     public function testThatGetIntegrationsEntityIdReturnsCorrectValues(): void

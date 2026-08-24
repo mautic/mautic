@@ -26,7 +26,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Company>
  */
-class CompanyApiController extends CommonApiController
+final class CompanyApiController extends CommonApiController
 {
     use CustomFieldsApiControllerTrait;
     use LeadAccessTrait;

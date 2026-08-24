@@ -14,8 +14,9 @@ final class AjaxController extends CommonAjaxController
     private CategoryModel $categoryModel;
 
     #[Required]
-    public function autowireCategoryAjaxController(CategoryModel $categoryModel): void
-    {
+    public function autowireCategoryAjaxController(
+        CategoryModel $categoryModel,
+    ): void {
         $this->categoryModel = $categoryModel;
     }
 

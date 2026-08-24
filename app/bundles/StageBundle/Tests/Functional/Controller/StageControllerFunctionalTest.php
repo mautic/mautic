@@ -108,7 +108,7 @@ final class StageControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         /** @var StageModel $stageModel */
-        $stageModel = static::getContainer()->get('mautic.stage.model.stage');
+        $stageModel = self::getContainer()->get(StageModel::class);
         $stageModel->stageMerge($primaryStage, $mergedStage);
         $this->em->clear();
 

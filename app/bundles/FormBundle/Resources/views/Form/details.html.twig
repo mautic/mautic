@@ -171,7 +171,8 @@
                                 'title': 'mautic.form.stats.submission_counts.unique',
                                 'value': submissionCounts['unique'],
                                 'tooltip': 'mautic.form.stats.submission_counts.unique.desc',
-                                'icon': 'ri-user-6-line'
+                                'icon': 'ri-user-6-line',
+                                'link': path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.form'|trans) ~ ':' ~ activeForm.alias}),
                             }
                         ]}) }}
                         <div class="panel">

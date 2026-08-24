@@ -23,7 +23,7 @@ use Mautic\LeadBundle\Entity\Tag;
  *
  * Also a workaround for deprecated \Doctrine\DBAL\Platforms\AbstractPlatform::getName.
  */
-class DatabasePlatform
+final class DatabasePlatform
 {
     /* ===================================================================
      * Platform detection helpers

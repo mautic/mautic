@@ -6,6 +6,7 @@ namespace Mautic\CoreBundle\Test;
 
 use Doctrine\DBAL\Exception as DBALException;
 use Mautic\CoreBundle\Doctrine\DatabasePlatform;
+use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
 use Mautic\InstallBundle\InstallFixtures\ORM\RoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
@@ -574,7 +575,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
     private function clearCache(): void
     {
-        $cacheProvider = static::getContainer()->get('mautic.cache.provider');
+        $cacheProvider = static::getContainer()->get(CacheProvider::class);
         $this->assertInstanceOf(CacheItemPoolInterface::class, $cacheProvider);
         $cacheProvider->clear();
     }

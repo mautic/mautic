@@ -8,7 +8,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
-class Version20190410143658 extends AbstractMauticMigration
+final class Version20190410143658 extends AbstractMauticMigration
 {
     protected const TABLE_NAME = 'lead_donotcontact';
     protected const INDEX_NAME = 'leadid_reason_channel';

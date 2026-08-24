@@ -17,7 +17,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class DynamicFiltersType extends AbstractType
+final class DynamicFiltersType extends AbstractType
 {
     public function __construct(
         private readonly TranslatorInterface $translator,

@@ -12,12 +12,19 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\NotificationBundle\Api\AbstractNotificationApi;
+use Mautic\NotificationBundle\Api\OneSignalApi;
 use Mautic\NotificationBundle\Entity\Notification;
+use Mautic\NotificationBundle\Entity\NotificationRepository;
 use Mautic\NotificationBundle\EventListener\CampaignSubscriber;
+use Mautic\NotificationBundle\Model\NotificationModel;
 use Mautic\NotificationBundle\Tests\NotificationTrait;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use PHPUnit\Framework\Assert;
 use Psr\Http\Message\RequestInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class CampaignSubscriberTest extends MauticMysqlTestCase
 {
@@ -414,10 +421,10 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
 
     public function testNotificationsSentInBatches(): void
     {
-        $subscriber = new class(static::getContainer()->get('mautic.helper.integration'), static::getContainer()->get('mautic.notification.model.notification'), static::getContainer()->get('mautic.notification.api'), static::getContainer()->get('event_dispatcher'), static::getContainer()->get('mautic.lead.model.dnc'), static::getContainer()->get('translator')) extends CampaignSubscriber {
+        $subscriber = new class(self::getContainer()->get(IntegrationHelper::class), self::getContainer()->get(NotificationModel::class), self::getContainer()->get(OneSignalApi::class), self::getContainer()->get(EventDispatcherInterface::class), self::getContainer()->get(DoNotContactModel::class), self::getContainer()->get(TranslatorInterface::class), self::getContainer()->get(NotificationRepository::class)) extends CampaignSubscriber {
             protected const MAX_PLAYER_IDS_PER_REQUEST = 2;
         };
-        static::getContainer()->set('mautic.notification.campaignbundle.subscriber', $subscriber);
+        self::getContainer()->set('mautic.notification.campaignbundle.subscriber', $subscriber);
 
         $notification = $this->createNotification($this->em);
         $this->em->flush();
@@ -537,14 +544,7 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
      */
     private function getExpectedResponsePushIds(array $pushIds, Notification $notification): array
     {
-        return array_merge(
-            ['include_player_ids' => $pushIds],
-            [
-                'contents' => ['en' => $notification->getMessage()],
-                'headings' => ['en' => $notification->getHeading()],
-                'app_id'   => self::API_ID,
-            ]
-        );
+        return ['include_player_ids' => $pushIds, 'contents' => ['en' => $notification->getMessage()], 'headings' => ['en' => $notification->getHeading()], 'app_id' => self::API_ID];
     }
 
     private function noMoreRequestAssertion(): callable
@@ -557,7 +557,7 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
     private function convertToTrackedUrl(Notification $notification, Lead $leadOne): string
     {
         /** @var AbstractNotificationApi $api */
-        $api          = static::getContainer()->get('mautic.notification.api');
+        $api          = self::getContainer()->get(OneSignalApi::class);
         $clickThrough = [
             'notification' => $notification->getId(),
             'lead'         => $leadOne->getId(),

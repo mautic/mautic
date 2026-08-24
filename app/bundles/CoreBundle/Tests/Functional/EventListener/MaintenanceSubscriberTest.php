@@ -28,10 +28,10 @@ final class MaintenanceSubscriberTest extends MauticMysqlTestCase
         $this->createTestNotifications($admin, $threeDaysAgo, $today);
 
         /** @var TranslatorInterface $translator */
-        $translator = self::getContainer()->get('translator');
+        $translator = self::getContainer()->get(TranslatorInterface::class);
 
         /** @var EventDispatcherInterface $dispatcher */
-        $dispatcher = self::getContainer()->get('event_dispatcher');
+        $dispatcher = self::getContainer()->get(EventDispatcherInterface::class);
 
         $event = $dispatcher->dispatch(new MaintenanceEvent(2, false, 0), CoreEvents::MAINTENANCE_CLEANUP_DATA);
         $stats = $event->getStats();

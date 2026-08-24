@@ -19,7 +19,7 @@ use Mautic\LeadBundle\Segment\Query\QueryBuilder;
  *
  * @see \Mautic\LeadBundle\Segment\Decorator\CompanyDecorator
  */
-class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
+final class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
 {
     public static function getServiceId(): string
     {
@@ -103,6 +103,8 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
             case 'endsWith':
             case 'regexp':
             case 'notRegexp': // Different behaviour from 'notLike' because of BC (do not use condition for NULL). Could be changed in Mautic 3.
+            case 'inLast':
+            case 'inNext':
             case 'like':
                 $expression = $queryBuilder->expr()->{$filterOperator}(
                     DatabasePlatform::castIfStrict($platform, $tableAlias.'.'.$filter->getField()),
@@ -158,7 +160,7 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
                     );
                 }
 
-                if (empty($expressions)) {
+                if ([] === $expressions) {
                     $expression = $queryBuilder->expr()->and($applyIsNull ? '1 = 1' : '1 = 0');
                     break;
                 }

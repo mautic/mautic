@@ -20,6 +20,7 @@ use MauticPlugin\MauticTagManagerBundle\Entity\Tag;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
@@ -105,7 +106,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $user->setUsername('no-campaign-edit-user');
         $user->setRole($role);
 
-        $hasher = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
 
         $user->setPassword($hasher->hash('mautic'));
         $userRepository->saveEntity($user);
@@ -523,6 +524,8 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertCount(4, $foundNames);
 
+        // Results are ordered by last_active DESC; sort to verify all expected contacts are present.
+        sort($foundNames);
         foreach ($foundNames as $key => $name) {
             $this->assertSame('User '.($key + 1), $name);
         }
@@ -569,7 +572,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $user->setRole($role);
 
         /** @var PasswordHasherInterface $hasher */
-        $hasher = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
 
         $passwordNonAdmin = 'Maut1cR0cks!';
         $user->setPassword($hasher->hash($passwordNonAdmin));
@@ -606,6 +609,8 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $foundNames = array_column($data, 'value');
 
         $this->assertCount(2, $foundNames);
+        // Results are ordered by last_active DESC; sort to verify all expected contacts are present.
+        sort($foundNames);
         $this->assertSame('User 3', $foundNames[0]);
         $this->assertSame('User 4', $foundNames[1]);
     }
@@ -647,7 +652,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
             }
         }
         // Assert that the actual options match the expected options
-        if (empty($expectedOptions)) {
+        if ([] === $expectedOptions) {
             $this->assertEmpty($actualOptions);
         }
         foreach ($expectedOptions as $expectedValue) {

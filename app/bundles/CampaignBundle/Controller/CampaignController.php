@@ -3,17 +3,16 @@
 namespace Mautic\CampaignBundle\Controller;
 
 use Doctrine\DBAL\Cache\CacheException;
-use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\AssetBundle\Event\AssetExportListEvent;
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Event;
-use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
-use Mautic\CampaignBundle\Entity\Summary;
 use Mautic\CampaignBundle\Entity\SummaryRepository;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber;
+use Mautic\CampaignBundle\Helper\CampaignSearchScopeProvider;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CampaignBundle\Service\PublishStateService;
@@ -97,6 +96,11 @@ class CampaignController extends AbstractStandardFormController
 
     protected $sessionId;
 
+    /**
+     * @var list<array{command: string, label: string, suffix?: string, default?: bool, translate?: bool}>|null
+     */
+    private ?array $indexSearchScopes = null;
+
     public function __construct(
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
@@ -112,11 +116,12 @@ class CampaignController extends AbstractStandardFormController
         private LoggerInterface $logger,
         private RequestStack $requestStack,
         CorePermissions $security,
-        private EntityManager $em,
         private PublishStateService $publishStateService,
         private CampaignModel $campaignModel,
         private EventModel $eventModel,
-        private readonly \Mautic\CampaignBundle\Entity\CampaignRepository $campaignRepository,
+        private readonly CampaignRepository $campaignRepository,
+        private readonly SummaryRepository $summaryRepository,
+        private readonly LeadEventLogRepository $leadEventLogRepository,
     ) {
         parent::__construct($formFactory, $fieldHelper, $managerRegistry, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -240,9 +245,6 @@ class CampaignController extends AbstractStandardFormController
         $objectIds      = json_decode($ids, true);
 
         if (empty($ids)) {
-            $repo = $this->em->getRepository(Campaign::class);
-            $repo->setTranslator($this->translator);
-
             $args = [
                 'filter'           => $filter,
                 'orderBy'          => 'c.id',
@@ -251,7 +253,7 @@ class CampaignController extends AbstractStandardFormController
             ];
 
             // Query campaigns
-            $campaigns = $repo->getEntities($args);
+            $campaigns = $this->campaignRepository->getEntities($args);
 
             // Get campaign IDs
             $objectIds = array_map(fn ($c) => $c->getId(), $campaigns);
@@ -290,8 +292,6 @@ class CampaignController extends AbstractStandardFormController
      * @param string|int $objectId
      * @param int        $page
      * @param int|null   $count
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
     public function contactsAction(
         Request $request,
@@ -301,7 +301,7 @@ class CampaignController extends AbstractStandardFormController
         $count = null,
         ?\DateTimeInterface $dateFrom = null,
         ?\DateTimeInterface $dateTo = null,
-    ) {
+    ): Response {
         $session = $request->getSession();
         $session->set('mautic.campaign.contact.page', $page);
 
@@ -427,8 +427,10 @@ class CampaignController extends AbstractStandardFormController
     /**
      * @param int $page
      */
-    public function indexAction(Request $request, $page = null): Response
+    public function indexAction(Request $request, CampaignSearchScopeProvider $campaignSearchScopeProvider, $page = null): Response
     {
+        $this->indexSearchScopes = $campaignSearchScopeProvider->getScopes();
+
         return $this->indexStandard($request, $page);
     }
 
@@ -473,15 +475,9 @@ class CampaignController extends AbstractStandardFormController
                         $this->campaignModel->saveEntity($campaign);
                         $this->afterEntitySave($campaign, $form, 'new', $valid);
 
-                        if (method_exists($this, 'viewAction')) {
-                            $viewParameters = ['objectId' => $campaign->getId(), 'objectAction' => 'view'];
-                            $returnUrl      = $this->generateUrl('mautic_campaign_action', $viewParameters);
-                            $template       = 'Mautic\CampaignBundle\Controller\CampaignController::viewAction';
-                        } else {
-                            $viewParameters = ['page' => $page];
-                            $returnUrl      = $this->generateUrl('mautic_campaign_index', $viewParameters);
-                            $template       = 'Mautic\CampaignBundle\Controller\CampaignController::indexAction';
-                        }
+                        $viewParameters = ['objectId' => $campaign->getId(), 'objectAction' => 'view'];
+                        $returnUrl      = $this->generateUrl('mautic_campaign_action', $viewParameters);
+                        $template       = 'Mautic\CampaignBundle\Controller\CampaignController::viewAction';
                     }
                 }
 
@@ -757,7 +753,7 @@ class CampaignController extends AbstractStandardFormController
      */
     protected function beforeEntitySave($entity, FormInterface $form, $action, $objectId = null, $isClone = false): bool
     {
-        if (empty($this->campaignEvents)) {
+        if ([] === $this->campaignEvents) {
             // set the error
             $form->addError(
                 new FormError(
@@ -796,7 +792,7 @@ class CampaignController extends AbstractStandardFormController
         $this->campaignModel->setEvents($entity, $this->campaignEvents, $this->connections, $this->deletedEvents);
 
         if ('edit' === $action && null !== $this->connections) {
-            if (!empty($this->deletedEvents)) {
+            if ([] !== $this->deletedEvents) {
                 $this->eventModel->deleteEvents($entity->getEvents()->toArray(), $this->deletedEvents);
             }
         }
@@ -817,7 +813,7 @@ class CampaignController extends AbstractStandardFormController
      */
     protected function getCampaignSessionId(Campaign $campaign, $action, $objectId = null)
     {
-        if (isset($this->sessionId)) {
+        if (null !== $this->sessionId) {
             return $this->sessionId;
         }
 
@@ -909,12 +905,12 @@ class CampaignController extends AbstractStandardFormController
             $filter['string'] = $this->stripQuickFilterTokensFromSearch((string) ($filter['string'] ?? ''), $searchFilterTerms);
             $session->set('mautic.campaign.filter', $filter['string']);
 
-            if (!empty($listAliases)) {
+            if ([] !== $listAliases) {
                 $joinLists         = true;
                 $filter['force'][] = ['column' => 'l.alias', 'expr' => 'in', 'value' => array_values(array_unique($listAliases))];
             }
 
-            if (!empty($formIds)) {
+            if ([] !== $formIds) {
                 $joinForms         = true;
                 $filter['force'][] = ['column' => 'f.id', 'expr' => 'in', 'value' => $formIds];
             }
@@ -1034,6 +1030,10 @@ class CampaignController extends AbstractStandardFormController
                         null,
                         true));
                 $args['viewParameters']['enableExportPermission'] = $this->security->isAdmin() || $this->security->isGranted('campaign:export:enable', 'MATCH_ONE');
+                if (null !== $this->indexSearchScopes) {
+                    $args['viewParameters']['searchScopes'] = $this->indexSearchScopes;
+                    $this->indexSearchScopes                = null;
+                }
                 break;
             case 'view':
                 /** @var Campaign $entity */
@@ -1158,16 +1158,12 @@ class CampaignController extends AbstractStandardFormController
     private function processCampaignLogCounts(int $id, ?\DateTimeImmutable $dateFrom, ?\DateTimeImmutable $dateTo): array
     {
         if ($this->coreParametersHelper->get('campaign_use_summary')) {
-            /** @var SummaryRepository $summaryRepo */
-            $summaryRepo                = $this->doctrine->getManager()->getRepository(Summary::class);
-            $campaignLogCounts          = $summaryRepo->getCampaignLogCounts($id, $dateFrom, $dateTo);
+            $campaignLogCounts          = $this->summaryRepository->getCampaignLogCounts($id, $dateFrom, $dateTo);
             $campaignLogCountsProcessed = $this->getCampaignLogCountsProcessed($campaignLogCounts);
         } else {
             $cacheTTL = (int) $this->coreParametersHelper->get('campaign_event_cache_ttl');
-            /** @var LeadEventLogRepository $eventLogRepo */
-            $eventLogRepo               = $this->doctrine->getManager()->getRepository(LeadEventLog::class);
-            $campaignLogCounts          = $eventLogRepo->getCampaignLogCounts($id, false, false, false, $dateFrom, $dateTo, null, $cacheTTL);
-            $campaignLogCountsProcessed = $eventLogRepo->getCampaignLogCounts($id, true, false, false, $dateFrom, $dateTo, null, $cacheTTL);
+            $campaignLogCounts          = $this->leadEventLogRepository->getCampaignLogCounts($id, false, false, false, $dateFrom, $dateTo, null, $cacheTTL);
+            $campaignLogCountsProcessed = $this->leadEventLogRepository->getCampaignLogCounts($id, true, false, false, $dateFrom, $dateTo, null, $cacheTTL);
         }
 
         return [

@@ -25,11 +25,6 @@ final class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
 
     public const EXAMPLE_EMAIL_2 = 'lead.2@example.com';
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testGenerateFocusItemReportWithAllAvailableColumns(): void
     {
         $this->fillDatabase();

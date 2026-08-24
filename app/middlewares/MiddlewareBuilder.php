@@ -4,7 +4,7 @@ namespace Mautic\Middleware;
 
 use Mautic\CoreBundle\Cache\MiddlewareCacheWarmer;
 
-class MiddlewareBuilder
+final class MiddlewareBuilder
 {
     private \AppKernel $app;
 

@@ -2,7 +2,7 @@
 
 namespace Mautic\PointBundle\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -48,7 +48,7 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
         protected IpLookupHelper $ipLookupHelper,
         protected LeadModel $leadModel,
         private readonly ContactTracker $contactTracker,
-        EntityManager $em,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,
@@ -299,7 +299,7 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
             }
         }
 
-        if (!empty($persist)) {
+        if ([] !== $persist) {
             $this->pointRepository->saveEntities($persist);
             $this->pointRepository->detachEntities($persist);
         }

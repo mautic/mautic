@@ -2,13 +2,13 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
-use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Translation\Translator;
-use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -68,13 +68,13 @@ final class ReportSubscriber implements EventSubscriberInterface
         private readonly LeadModel $leadModel,
         private readonly FieldModel $fieldModel,
         private readonly StageModel $stageModel,
-        private readonly CampaignModel $campaignModel,
         private readonly EventCollector $eventCollector,
-        private readonly CompanyModel $companyModel,
         private readonly CompanyReportData $companyReportData,
         private readonly FieldsBuilder $fieldsBuilder,
         private readonly Translator $translator,
         private readonly DncReportService $dncReportService,
+        private readonly CompanyRepository $companyRepository,
+        private readonly CampaignRepository $campaignRepository,
     ) {
     }
 
@@ -393,7 +393,6 @@ final class ReportSubscriber implements EventSubscriberInterface
         $graphs       = $event->getRequestedGraphs();
         $qb           = $event->getQueryBuilder();
         $pointLogRepo = $this->leadModel->getPointLogRepository();
-        $companyRepo  = $this->companyModel->getRepository();
 
         foreach ($graphs as $g) {
             $queryBuilder = clone $qb;
@@ -579,7 +578,7 @@ final class ReportSubscriber implements EventSubscriberInterface
                     break;
 
                 case 'mautic.lead.table.pie.company.country':
-                    $counts       = $companyRepo->getCompaniesByGroup($queryBuilder, 'companycountry');
+                    $counts       = $this->companyRepository->getCompaniesByGroup($queryBuilder, 'companycountry');
                     $chart        = new PieChart();
                     $companyCount = 0;
                     foreach ($counts as $count) {
@@ -608,7 +607,7 @@ final class ReportSubscriber implements EventSubscriberInterface
                     $event->setGraph($g, $data);
                     break;
                 case 'mautic.lead.graph.pie.companies.industry':
-                    $counts       = $companyRepo->getCompaniesByGroup($queryBuilder, 'companyindustry');
+                    $counts       = $this->companyRepository->getCompaniesByGroup($queryBuilder, 'companyindustry');
                     $chart        = new PieChart();
                     $companyCount = 0;
                     foreach ($counts as $count) {
@@ -640,7 +639,7 @@ final class ReportSubscriber implements EventSubscriberInterface
                     $limit  = 10;
                     $offset = 0;
 
-                    $items                  = $companyRepo->getMostCompanies($queryBuilder, $limit, $offset);
+                    $items                  = $this->companyRepository->getMostCompanies($queryBuilder, $limit, $offset);
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
@@ -867,7 +866,7 @@ final class ReportSubscriber implements EventSubscriberInterface
         unset($channelActions, $channels);
 
         // Setup available channels
-        $campaigns                  = $this->campaignModel->getRepository()->getSimpleList();
+        $campaigns                  = $this->campaignRepository->getSimpleList();
         $filters['log.campaign_id'] = [
             'label' => 'mautic.lead.report.attribution.filter.campaign',
             'type'  => 'select',

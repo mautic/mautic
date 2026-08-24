@@ -21,8 +21,9 @@ final class AjaxController extends CommonAjaxController
     private PageModel $pageModel;
 
     #[Required]
-    public function autowirePageAjaxController(PageModel $pageModel): void
-    {
+    public function autowirePageAjaxController(
+        PageModel $pageModel,
+    ): void {
         $this->pageModel = $pageModel;
     }
 

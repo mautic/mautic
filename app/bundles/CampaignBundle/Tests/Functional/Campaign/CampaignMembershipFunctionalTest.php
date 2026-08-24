@@ -56,7 +56,7 @@ final class CampaignMembershipFunctionalTest extends MauticMysqlTestCase
         $eventId    = $event->getId();
         $contactId  = $contact->getId();
         $db         = $this->em->getConnection();
-        $prefix     = static::getContainer()->getParameter('mautic.db_table_prefix');
+        $prefix     = self::getContainer()->getParameter('mautic.db_table_prefix');
 
         $this->em->clear();
 
@@ -80,7 +80,7 @@ final class CampaignMembershipFunctionalTest extends MauticMysqlTestCase
         );
         $this->em->clear();
 
-        $adder              = static::getContainer()->get(Adder::class);
+        $adder              = self::getContainer()->get(Adder::class);
         $campaignLeadEntity = $this->em->getRepository(CampaignLead::class)->findOneBy([
             'lead'     => $contactId,
             'campaign' => $campaignId,

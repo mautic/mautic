@@ -3,7 +3,7 @@
 namespace Mautic\WebhookBundle\Model;
 
 use Doctrine\Common\Collections\Order;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use Mautic\ApiBundle\Serializer\Exclusion\PublishDetailsExclusionStrategy;
@@ -130,7 +130,7 @@ class WebhookModel extends FormModel
         CoreParametersHelper $coreParametersHelper,
         protected SerializerInterface $serializer,
         private readonly Client $httpClient,
-        EntityManager $em,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,

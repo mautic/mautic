@@ -23,8 +23,10 @@ use Mautic\EmailBundle\Form\Type\BatchSendType;
 use Mautic\EmailBundle\Form\Type\ExampleSendType;
 use Mautic\EmailBundle\Form\Type\ScheduleSendType;
 use Mautic\EmailBundle\Helper\EmailConfig;
+use Mautic\EmailBundle\Helper\EmailSearchScopeProvider;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Helper\FakeContactHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
@@ -41,7 +43,7 @@ final class EmailController extends FormController
     use EntityContactsTrait;
     use QuickFilterSearchTrait;
 
-    private \Mautic\LeadBundle\Entity\LeadRepository $leadRepository;
+    private LeadRepository $leadRepository;
 
     private EmailModel $emailModel;
 
@@ -54,7 +56,7 @@ final class EmailController extends FormController
         ListModel $listModel,
         AuditLogModel $auditLogModel,
         EmailModel $emailModel,
-        \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
+        LeadRepository $leadRepository,
     ): void {
         $this->listModel = $listModel;
         $this->auditLogModel = $auditLogModel;
@@ -69,7 +71,7 @@ final class EmailController extends FormController
     /**
      * @param int $page
      */
-    public function indexAction(Request $request, EmailModel $model, EmailConfig $emailConfig, ThemeHelper $themeHelper, $page = 1): Response
+    public function indexAction(Request $request, EmailModel $model, EmailConfig $emailConfig, ThemeHelper $themeHelper, EmailSearchScopeProvider $emailSearchScopeProvider, $page = 1): Response
     {
         $isDraftEnabled = $emailConfig->isDraftEnabled();
         // set some permissions
@@ -205,16 +207,16 @@ final class EmailController extends FormController
             $session->set('mautic.email.filter', $search);
             $filter['string'] = $search;
 
-            if (!empty($listAliases)) {
+            if ([] !== $listAliases) {
                 $filter['force'][] = ['column' => 'l.alias', 'expr' => 'in', 'value' => array_values(array_unique($listAliases))];
                 $ignoreListJoin    = false;
             }
 
-            if (!empty($catIds)) {
+            if ([] !== $catIds) {
                 $filter['force'][] = ['column' => 'c.id', 'expr' => 'in', 'value' => $catIds];
             }
 
-            if (!empty($templates)) {
+            if ([] !== $templates) {
                 $filter['force'][] = ['column' => 'e.template', 'expr' => 'in', 'value' => $templates];
             }
         }
@@ -272,6 +274,7 @@ final class EmailController extends FormController
                     'permissions'    => $permissions,
                     'model'          => $model,
                     'isDraftEnabled' => $isDraftEnabled,
+                    'searchScopes'   => $emailSearchScopeProvider->getScopes(),
                 ],
                 'contentTemplate' => '@MauticEmail/Email/list.html.twig',
                 'passthroughVars' => [
@@ -610,6 +613,7 @@ final class EmailController extends FormController
                         'updateSelect' => $form['updateSelect']->getData(),
                         'id'           => $entity->getId(),
                         'name'         => $entity->getName(),
+                        'optionLabel'  => sprintf('%s (%s)', $entity->getName(), $entity->getId()),
                         'group'        => $entity->getLanguage(),
                     ]
                 );
@@ -813,6 +817,7 @@ final class EmailController extends FormController
                         'updateSelect' => $form['updateSelect']->getData(),
                         'id'           => $entity->getId(),
                         'name'         => $entity->getName(),
+                        'optionLabel'  => sprintf('%s (%s)', $entity->getName(), $entity->getId()),
                         'group'        => $entity->getLanguage(),
                     ]
                 );
@@ -931,10 +936,8 @@ final class EmailController extends FormController
 
     /**
      * Clone an entity.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction(Request $request, EmailModel $model, ThemeHelper $themeHelper, $objectId)
+    public function cloneAction(Request $request, EmailModel $model, ThemeHelper $themeHelper, $objectId): Response
     {
         $emailEntity  = $model->getEntity($objectId);
         $entity       = null;
@@ -1188,10 +1191,8 @@ final class EmailController extends FormController
 
     /**
      * Deletes the entity.
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         $page      = $request->getSession()->get('mautic.email.page', 1);
         $returnUrl = $this->generateUrl('mautic_email_index', ['page' => $page]);
@@ -1599,7 +1600,7 @@ final class EmailController extends FormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $this->emailModel->deleteEntities($deleteIds);
 
                 $flashes[] = [
@@ -1739,7 +1740,7 @@ final class EmailController extends FormController
         $user   = $this->user;
 
         // We have to add prefix to example emails
-        $subject = sprintf('%s %s', static::EXAMPLE_EMAIL_SUBJECT_PREFIX, $entity->getSubject());
+        $subject = sprintf('%s %s', self::EXAMPLE_EMAIL_SUBJECT_PREFIX, $entity->getSubject());
         $entity->setSubject($subject);
 
         $form = $this->createForm(ExampleSendType::class, ['emails' => ['list' => [$user->getEmail()]]], ['action' => $action]);
@@ -1792,7 +1793,7 @@ final class EmailController extends FormController
                         // Send to current user
                         $error = $model->sendSampleEmailToUser($entity, $users, $fields, [], [], false);
                         if (count($error)) {
-                            array_push($errors, $error[0]);
+                            $errors[] = $error[0];
                         }
                     }
                 }
@@ -1828,15 +1829,13 @@ final class EmailController extends FormController
 
     /**
      * @param int $page
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function contactsAction(
         Request $request,
         PageHelperFactoryInterface $pageHelperFactory,
         $objectId,
         $page = 1,
-    ) {
+    ): Response {
         $permissions = [
             'lead:leads:viewown',
             'lead:leads:viewother',

@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Command;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
@@ -32,10 +32,10 @@ Performs a dry-run which will not actually purge any data, but will produce a li
 Set the number of records to return in a batch when processing the Do Not Sell List. This option is ignored if IPs are passed as an argument.
 TXT
 )]
-class MaxMindDoNotSellPurgeCommand extends Command
+final class MaxMindDoNotSellPurgeCommand extends Command
 {
     public function __construct(
-        private readonly EntityManager $em,
+        private readonly EntityManagerInterface $em,
         private readonly LeadRepository $leadRepository,
         private readonly MaxMindDoNotSellList $doNotSellList,
     ) {

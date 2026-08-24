@@ -618,7 +618,7 @@ SQL;
     {
         $segmentIds = $this->fetchContactToSegmentIdsRelationships($contactId, $expectedSegmentIds);
 
-        return !empty($segmentIds);
+        return [] !== $segmentIds;
     }
 
     /**
@@ -628,7 +628,7 @@ SQL;
     {
         $segmentIds = $this->fetchContactToSegmentIdsRelationships($contactId, $expectedSegmentIds);
 
-        if (empty($segmentIds)) {
+        if ([] === $segmentIds) {
             return true; // Contact is not associated wit any segment
         }
 

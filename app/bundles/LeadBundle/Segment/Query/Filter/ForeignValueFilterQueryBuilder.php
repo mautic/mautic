@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Segment\Query\LeadBatchLimiterTrait;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
-class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
+final class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 {
     use LeadBatchLimiterTrait;
 

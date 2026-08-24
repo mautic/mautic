@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\EmailBundle\Stats\FetchOptions\EmailStatOptions;
 use Mautic\StatsBundle\Aggregate\Collection\StatCollection;
 
-class ClickedHelper extends AbstractHelper
+final class ClickedHelper extends AbstractHelper
 {
     public const NAME = 'email-clicked';
 

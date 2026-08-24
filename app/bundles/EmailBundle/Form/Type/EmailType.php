@@ -30,7 +30,7 @@ use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Form\Type\PreferenceCenterListType;
 use Mautic\ProjectBundle\Form\Type\ProjectType;
-use Mautic\StageBundle\Model\StageModel;
+use Mautic\StageBundle\Entity\StageRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -49,19 +49,19 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<Email>
  */
-class EmailType extends AbstractType
+final class EmailType extends AbstractType
 {
     private readonly bool $isDraftEnabled;
 
     public function __construct(
         private readonly TranslatorInterface $translator,
         private readonly EntityManagerInterface $em,
-        private readonly StageModel $stageModel,
         private readonly CoreParametersHelper $coreParametersHelper,
         private readonly ThemeHelperInterface $themeHelper,
         private readonly CorePermissions $corePermissions,
         EmailConfigInterface $emailConfig,
         private readonly EmailDefaultsHelper $defaultsHelper,
+        private readonly StageRepository $stageRepository,
     ) {
         $this->isDraftEnabled = $emailConfig->isDraftEnabled();
     }
@@ -74,9 +74,8 @@ class EmailType extends AbstractType
         $emailEntity =  $options['data'];
         \assert($emailEntity instanceof Email);
 
-        // Pre-populates the form with config defaults for UI display.
-        // The authoritative application of defaults (covering API and programmatic creation)
-        // is handled by EmailDefaultsSubscriber on EMAIL_PRE_SAVE.
+        // Apply only defaults that should be persisted on new emails, such as UTM tags.
+        // Preference center fallback is resolved dynamically at unsubscribe time.
         $this->applyDefaultsForNewEmail($emailEntity);
 
         $builder->add(
@@ -564,7 +563,7 @@ class EmailType extends AbstractType
         ];
 
         $draftActionButtons = $this->getDraftActionButtons($emailEntity);
-        if (!empty($draftActionButtons)) {
+        if ([] !== $draftActionButtons) {
             $extraButtons['post_extra_buttons'] = $draftActionButtons;
         }
         $builder->add(
@@ -684,7 +683,7 @@ class EmailType extends AbstractType
 
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
-        $stages       = $this->stageModel->getRepository()->getSimpleList();
+        $stages       = $this->stageRepository->getSimpleList();
         $stageChoices = [];
 
         foreach ($stages as $stage) {

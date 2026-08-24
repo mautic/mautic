@@ -74,7 +74,7 @@ class TagRepository extends CommonRepository
      */
     public function getTagsByName(array $tags): array
     {
-        if (empty($tags)) {
+        if ([] === $tags) {
             return [];
         }
 
@@ -166,13 +166,13 @@ class TagRepository extends CommonRepository
     {
         $result = [];
 
-        if (empty($leadIds) || empty($tagIds)) {
+        if ([] === $leadIds || [] === $tagIds) {
             return $result;
         }
 
         $tags = $this->getTagById($tagIds);
 
-        if (empty($tags)) {
+        if ([] === $tags) {
             return $result;
         }
 

@@ -14,6 +14,8 @@ use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\PageBundle\Entity\RedirectRepository;
+use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -47,7 +49,9 @@ final class BuilderSubscriberTest extends TestCase
             $this->createStub(RedirectModel::class),
             $this->translator,
             new MailHashHelper($this->coreParametersHelper),
-            $fromEmailHelper
+            $fromEmailHelper,
+            $this->createStub(TrackableRepository::class),
+            $this->createStub(RedirectRepository::class)
         );
 
         parent::setUp();

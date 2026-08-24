@@ -140,7 +140,7 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
 
         $importHelper = $this->createMock(ImportHelper::class);
         $importHelper->method('readZipFile')->willReturn([]);
-        static::getContainer()->set(ImportHelper::class, $importHelper);
+        self::getContainer()->set(ImportHelper::class, $importHelper);
 
         $this->client->request('GET', '/s/campaign/import/progress');
         $response = $this->client->getResponse();
@@ -170,7 +170,7 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
 
         $importHelper = $this->createMock(ImportHelper::class);
         $importHelper->method('readZipFile')->willReturn(FixtureHelper::getPayload());
-        static::getContainer()->set(ImportHelper::class, $importHelper);
+        self::getContainer()->set(ImportHelper::class, $importHelper);
 
         $this->client->request('GET', '/s/campaign/import/progress');
         $response = $this->client->getResponse();
@@ -193,7 +193,7 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
 
         $importHelper = $this->createMock(ImportHelper::class);
         $importHelper->method('readZipFile')->willReturn([]);
-        static::getContainer()->set(ImportHelper::class, $importHelper);
+        self::getContainer()->set(ImportHelper::class, $importHelper);
 
         $this->client->request('GET', '/s/campaign/import/progress');
         $response = $this->client->getResponse();
@@ -223,7 +223,7 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
 
         $importHelper = $this->createMock(ImportHelper::class);
         $importHelper->method('readZipFile')->willReturn(FixtureHelper::getPayload());
-        static::getContainer()->set(ImportHelper::class, $importHelper);
+        self::getContainer()->set(ImportHelper::class, $importHelper);
 
         $this->client->request('GET', '/s/campaign/import/progress');
         $response = $this->client->getResponse();

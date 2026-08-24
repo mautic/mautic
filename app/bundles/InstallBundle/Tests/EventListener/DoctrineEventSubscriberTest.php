@@ -19,28 +19,6 @@ use PHPUnit\Framework\TestCase;
 
 final class DoctrineEventSubscriberTest extends TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&EntityManagerInterface
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $entityManager;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->entityManager = $this->createMock(EntityManagerInterface::class);
-        $connection          = $this->createStub(Connection::class);
-
-        // Default to MySQL platform for backward compatibility with existing tests
-        $platform = new MySQLPlatform();
-
-        $connection->method('getDatabasePlatform')
-            ->willReturn($platform);
-
-        $this->entityManager->method('getConnection')
-            ->willReturn($connection);
-    }
-
     public function testSubscriberWillAddCorrectIndexes(): void
     {
         $idColumn   = new Column('id', new BigIntType());
@@ -48,7 +26,7 @@ final class DoctrineEventSubscriberTest extends TestCase
         $dateColumn = new Column('date_added', new DateTimeType());
         $table      = new Table(MAUTIC_TABLE_PREFIX.'leads', [$idColumn, $textColumn, $dateColumn]);
         $schema     = new Schema([$table]);
-        $args       = new GenerateSchemaEventArgs($this->entityManager, $schema);
+        $args       = new GenerateSchemaEventArgs($this->createStub(EntityManagerInterface::class), $schema);
         $subscriber = new DoctrineEventSubscriber();
         $subscriber->postGenerateSchema($args);
 
@@ -62,7 +40,7 @@ final class DoctrineEventSubscriberTest extends TestCase
     {
         $table      = new Table(MAUTIC_TABLE_PREFIX.'some_plugin_table', [new Column('id', new BigIntType())]);
         $schema     = new Schema([$table]);
-        $args       = new GenerateSchemaEventArgs($this->entityManager, $schema);
+        $args       = new GenerateSchemaEventArgs($this->createStub(EntityManagerInterface::class), $schema);
         $subscriber = new DoctrineEventSubscriber();
         $subscriber->postGenerateSchema($args);
 

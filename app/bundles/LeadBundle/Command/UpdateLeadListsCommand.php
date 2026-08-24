@@ -6,6 +6,7 @@ use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -20,7 +21,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
     description: 'Update contacts in smart segments based on new contact data.',
     aliases: ['mautic:segments:rebuild']
 )]
-class UpdateLeadListsCommand extends ModeratedCommand
+final class UpdateLeadListsCommand extends ModeratedCommand
 {
     public const NAME = 'mautic:segments:update';
 
@@ -29,7 +30,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
         private readonly TranslatorInterface $translator,
         PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper,
-        private readonly \Mautic\LeadBundle\Entity\LeadListRepository $leadListRepository,
+        private readonly LeadListRepository $leadListRepository,
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
@@ -243,14 +244,20 @@ class UpdateLeadListsCommand extends ModeratedCommand
         }
 
         $output->writeln('<info>'.$this->translator->trans('mautic.lead.list.rebuild.rebuilding', ['%id%' => $segment->getId()]).'</info>');
-        $startTime   = microtime(true);
-        $processed   = $this->listModel->rebuildListLeads($segment, $batch, $max, $output);
-        $rebuildTime = round(microtime(true) - $startTime, 2);
+        $lastBuiltDateBefore = $segment->getLastBuiltDate();
+        $startTime           = microtime(true);
+        $processed           = $this->listModel->rebuildListLeads($segment, $batch, $max, $output);
+        $rebuildTime         = round(microtime(true) - $startTime, 2);
 
-        if (0 >= (int) $max) {
-            // Only full segment rebuilds count
-            $segment->setLastBuiltDateToCurrentDatetime();
-            $segment->setLastBuiltTime($rebuildTime);
+        // ListModel sets lastBuiltDate only when membership work is fully finished
+        // (including runs capped by --max-contacts that still drain the queue).
+        if ($segment->getLastBuiltDate() !== $lastBuiltDateBefore) {
+            if (!$this->areSegmentFilterDependenciesComplete($segment)) {
+                $segment->setLastBuiltDate(null);
+            } else {
+                $segment->setLastBuiltTime($rebuildTime);
+            }
+
             $this->listModel->saveEntity($segment);
         }
 
@@ -264,5 +271,33 @@ class UpdateLeadListsCommand extends ModeratedCommand
                 ['%time%' => $rebuildTime]
             ).'</>'."\n");
         }
+    }
+
+    /**
+     * A segment that filters on other segments must not be marked complete while
+     * any of those dependencies still need rebuilding (e.g. after a capped run).
+     */
+    private function areSegmentFilterDependenciesComplete(LeadList $segment): bool
+    {
+        foreach ($segment->getFilters() as $filter) {
+            if ('leadlist' !== $filter['type']) {
+                continue;
+            }
+
+            foreach ($filter['filter'] ?? [] as $dependentListId) {
+                $dependentListId = (int) $dependentListId;
+                $dependentList   = $this->listModel->getEntity($dependentListId);
+
+                if (!$dependentList instanceof LeadList) {
+                    continue;
+                }
+
+                if ($dependentList->needsRebuild()) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 }

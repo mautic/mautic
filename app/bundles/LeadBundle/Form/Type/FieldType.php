@@ -3,7 +3,6 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Doctrine\Common\Collections\Order;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
@@ -37,7 +36,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 /**
  * @extends AbstractType<LeadField>
  */
-class FieldType extends AbstractType
+final class FieldType extends AbstractType
 {
     /**
      * @var string[]
@@ -48,10 +47,11 @@ class FieldType extends AbstractType
     ];
 
     public function __construct(
-        private readonly EntityManagerInterface $em,
+        private readonly LeadFieldRepository $leadFieldRepository,
         private readonly Translator $translator,
         private readonly IdentifierFields $identifierFields,
         private readonly IndexHelper $indexHelper,
+        private readonly FormFieldHelper $formFieldHelper,
     ) {
     }
 
@@ -99,14 +99,12 @@ class FieldType extends AbstractType
         $type        = $options['data']->getType();
         $isIndex     = $options['data']->isIsIndex();
         $default     = (empty($type)) ? 'text' : $type;
-        $fieldHelper = new FormFieldHelper();
-        $fieldHelper->setTranslator($this->translator);
 
         $builder->add(
             'type',
             ChoiceType::class,
             [
-                'choices'     => $fieldHelper->getChoiceList(),
+                'choices'     => $this->formFieldHelper->getChoiceList(),
                 'expanded'    => false,
                 'multiple'    => false,
                 'label'       => 'mautic.lead.field.type',
@@ -435,9 +433,6 @@ class FieldType extends AbstractType
         };
 
         $setupOrderField = function (FormInterface $form, ?string $object = null, ?string $group = null) use ($builder, $disabled): void {
-            /** @var LeadFieldRepository $leadFieldRepository */
-            $leadFieldRepository = $this->em->getRepository(LeadField::class);
-
             $options = [
                 'label'         => 'mautic.core.order.field',
                 'class'         => LeadField::class,
@@ -463,7 +458,7 @@ class FieldType extends AbstractType
             }
 
             // get order list
-            $transformer = new FieldToOrderTransformer($leadFieldRepository);
+            $transformer = new FieldToOrderTransformer($this->leadFieldRepository);
             $form->add(
                 $builder->create(
                     'order',
@@ -488,7 +483,7 @@ class FieldType extends AbstractType
             function (FormEvent $event) use ($formModifier, $disableDefaultValue, $setupOrderField): void {
                 $data          = $event->getData();
                 $cleaningRules = $formModifier($event);
-                $masks         = !empty($cleaningRules) ? $cleaningRules : 'clean';
+                $masks         = [] !== $cleaningRules ? $cleaningRules : 'clean';
                 // clean the data
                 $data = InputHelper::_($data, $masks);
 
