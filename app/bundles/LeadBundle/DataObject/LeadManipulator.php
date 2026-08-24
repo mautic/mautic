@@ -14,7 +14,7 @@ final class LeadManipulator
     public function __construct(
         private readonly ?string $bundleName = null,
         private readonly ?string $objectName = null,
-        private readonly ?int $objectId = null,
+        private readonly int|string|null $objectId = null,
         private readonly ?string $objectDescription = null,
     ) {
     }

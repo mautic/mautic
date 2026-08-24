@@ -19,7 +19,7 @@ final class LeadListFilteringEvent extends CommonEvent
 
     public function __construct(
         private array $details,
-        private readonly ?int $leadId,
+        private readonly int|string|null $leadId,
         private readonly string $alias,
         private readonly string $func,
         private readonly QueryBuilder $queryBuilder,
