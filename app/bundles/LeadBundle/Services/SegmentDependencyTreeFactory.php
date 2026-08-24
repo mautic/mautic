@@ -76,7 +76,7 @@ final class SegmentDependencyTreeFactory
         }
 
         // findBy does not guarantee any specific order
-        return $this->segmentModel->getRepository()
+        return $this->leadListRepository
             ->createQueryBuilder('s')
             ->where('s.id IN (:ids)')
             ->setParameter('ids', $childSegmentIds)
