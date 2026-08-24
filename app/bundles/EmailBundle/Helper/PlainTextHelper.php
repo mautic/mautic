@@ -442,10 +442,8 @@ final class PlainTextHelper
 
     /**
      * Callback function for preg_replace_callback use in PRE content handler.
-     *
-     * @param array $matches PREG matches
      */
-    private function pregPreCallback(array $matches): ?string
+    private function pregPreCallback(): ?string
     {
         return $this->preContent;
     }
