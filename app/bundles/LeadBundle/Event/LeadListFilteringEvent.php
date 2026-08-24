@@ -34,7 +34,7 @@ final class LeadListFilteringEvent extends CommonEvent
         return $this->details;
     }
 
-    public function getLeadId(): ?int
+    public function getLeadId(): int|string|null
     {
         return $this->leadId;
     }
