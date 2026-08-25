@@ -90,12 +90,12 @@ final class DynamicContentEvents
     public const string ON_CAMPAIGN_TRIGGER_DECISION = 'mautic.dwc.on_campaign_trigger_decision';
 
     /**
-     * The mautic.asset.on_campaign_trigger_action event is fired when the campaign action triggers.
+     * The mautic.dwc.on_campaign_batch_action event is fired when the campaign action triggers.
      *
      * The event listener receives a
-     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
+     * Mautic\CampaignBundle\Event\PendingEvent
      */
-    public const string ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.dwc.on_campaign_trigger_action';
+    public const string ON_CAMPAIGN_BATCH_ACTION = 'mautic.dwc.on_campaign_batch_action';
 
     /**
      * The mautic.dwc.on_contact_filters_evaluate event is fired when dynamic content's decision's

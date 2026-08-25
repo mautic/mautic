@@ -82,10 +82,10 @@ final class SocialEvents
     public const string TWEET_POST_DELETE = 'mautic.tweet_post_delete';
 
     /**
-     * The mautic.social.on_campaign_trigger_action event is fired when the campaign action triggers.
+     * The mautic.social.on_campaign_batch_action event is fired when the campaign action triggers.
      *
      * The event listener receives a
-     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
+     * Mautic\CampaignBundle\Event\PendingEvent
      */
-    public const string ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.social.on_campaign_trigger_action';
+    public const string ON_CAMPAIGN_BATCH_ACTION = 'mautic.social.on_campaign_batch_action';
 }

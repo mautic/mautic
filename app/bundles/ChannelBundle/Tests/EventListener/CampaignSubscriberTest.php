@@ -8,12 +8,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
-use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Executioner\Dispatcher\ActionDispatcher;
-use Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\EventListener\CampaignSubscriber;
@@ -25,7 +23,6 @@ use Mautic\EmailBundle\Form\Type\EmailListType;
 use Mautic\EmailBundle\Form\Type\EmailSendType;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Form\Type\SmsSendType;
 use Mautic\SmsBundle\SmsEvents;
@@ -87,20 +84,10 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $scheduler = $this->createMock(EventScheduler::class);
-
-        $legacyDispatcher = new LegacyEventDispatcher(
-            $this->dispatcher,
-            $scheduler,
-            new NullLogger(),
-            $this->createStub(ContactTracker::class)
-        );
-
         $eventDispatcher = new ActionDispatcher(
             $this->dispatcher,
             new NullLogger(),
-            $scheduler,
-            $legacyDispatcher
+            $this->createStub(EventScheduler::class)
         );
 
         $eventCollector = $this->createMock(EventCollector::class);
@@ -128,7 +115,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
                                 [
                                     'label'            => 'mautic.campaign.sms.send_text_sms',
                                     'description'      => 'mautic.campaign.sms.send_text_sms.tooltip',
-                                    'eventName'        => SmsEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+                                    'batchEventName'   => SmsEvents::ON_CAMPAIGN_TRIGGER_BATCH_ACTION,
                                     'formType'         => SmsSendType::class,
                                     'formTypeOptions'  => ['update_select' => 'campaignevent_properties_sms'],
                                     'formTheme'        => 'MauticSmsBundle:FormTheme\SmsSendList',
@@ -151,7 +138,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->dispatcher->addSubscriber($campaignSubscriber);
         $this->dispatcher->addListener(EmailEvents::ON_CAMPAIGN_BATCH_ACTION, $this->sendMarketingMessageEmail(...));
-        $this->dispatcher->addListener(SmsEvents::ON_CAMPAIGN_TRIGGER_ACTION, $this->sendMarketingMessageSms(...));
+        $this->dispatcher->addListener(SmsEvents::ON_CAMPAIGN_TRIGGER_BATCH_ACTION, $this->sendMarketingMessageSms(...));
     }
 
     public function testCorrectChannelIsUsed(): void
@@ -220,23 +207,18 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * BC support for old campaign.
-     */
-    /**
-     * @phpstan-ignore parameter.deprecatedClass
-     */
-    public function sendMarketingMessageSms(CampaignExecutionEvent $event): void
+    public function sendMarketingMessageSms(PendingEvent $event): void
     {
-        $lead = $event->getLead();
-        if (1 === $lead->getId()) {
-            $event->setResult(true);
+        foreach ($event->getPending() as $log) {
+            if (1 === $log->getLead()->getId()) {
+                $event->pass($log);
 
-            return;
-        }
+                continue;
+            }
 
-        if (2 === $lead->getId()) {
-            $this->fail('Lead ID 2 is unsubscribed from SMS so this shouldn not have happened.');
+            if (2 === $log->getLead()->getId()) {
+                $this->fail('Lead ID 2 is unsubscribed from SMS so this shouldn not have happened.');
+            }
         }
     }
 

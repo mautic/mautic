@@ -4,7 +4,7 @@ namespace MauticPlugin\MauticSocialBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
-use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticSocialBundle\Form\Type\TweetSendType;
 use MauticPlugin\MauticSocialBundle\Helper\CampaignEventHelper;
@@ -24,8 +24,8 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CampaignEvents::CAMPAIGN_ON_BUILD        => ['onCampaignBuild', 0],
-            SocialEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignAction', 0],
+            CampaignEvents::CAMPAIGN_ON_BUILD      => ['onCampaignBuild', 0],
+            SocialEvents::ON_CAMPAIGN_BATCH_ACTION => ['onCampaignAction', 0],
         ];
     }
 
@@ -36,7 +36,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
             $action = [
                 'label'           => 'mautic.social.twitter.tweet.event.open',
                 'description'     => 'mautic.social.twitter.tweet.event.open_desc',
-                'eventName'       => SocialEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+                'batchEventName'  => SocialEvents::ON_CAMPAIGN_BATCH_ACTION,
                 'formTypeOptions' => ['update_select' => 'campaignevent_properties_channelId'],
                 'formType'        => TweetSendType::class,
                 'channel'         => 'social.tweet',
@@ -47,17 +47,29 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onCampaignAction(CampaignExecutionEvent $event): void
+    public function onCampaignAction(PendingEvent $event): void
     {
         $event->setChannel('social.twitter');
-        if ($response = $this->campaignEventHelper->sendTweetAction($event->getLead(), $event->getEvent())) {
-            $event->setResult($response);
+        $campaignEvent = $event->getEvent();
 
-            return;
+        foreach ($event->getPending() as $log) {
+            $response = $this->campaignEventHelper->sendTweetAction($log->getLead(), $campaignEvent);
+
+            if (false === $response) {
+                $event->passWithError($log, $this->translator->trans('mautic.social.twitter.error.handle_not_found'));
+
+                continue;
+            }
+
+            $log->appendToMetadata($response);
+
+            if (!empty($response['failed']) && isset($response['reason'])) {
+                $event->passWithError($log, $response['reason']);
+
+                continue;
+            }
+
+            $event->pass($log);
         }
-
-        $event->setFailed(
-            $this->translator->trans('mautic.social.twitter.error.handle_not_found')
-        );
     }
 }

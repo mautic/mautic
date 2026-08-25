@@ -2,6 +2,7 @@
 
 namespace Mautic\CampaignBundle\Event;
 
+use Mautic\CampaignBundle\Entity\Event as CampaignEvent;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -11,8 +12,12 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class CampaignExecutionEvent extends Event
 {
-    use EventArrayTrait;
     use ContextTrait;
+
+    /**
+     * @var array
+     */
+    protected $eventArray = [];
 
     /**
      * @var Lead|mixed
@@ -103,7 +108,52 @@ class CampaignExecutionEvent extends Event
      */
     public function getEvent()
     {
-        return ($this->event instanceof \Mautic\CampaignBundle\Entity\Event) ? $this->getEventArray($this->event) : $this->event;
+        return ($this->event instanceof CampaignEvent) ? $this->getEventArray($this->event) : $this->event;
+    }
+
+    /**
+     * Used to convert entities to the old array format; tried to minimize the need for this except where needed.
+     *
+     * @return array
+     */
+    protected function getEventArray(CampaignEvent $event)
+    {
+        $eventId = $event->getId() ?? '';
+        if (isset($this->eventArray[$eventId])) {
+            return $this->eventArray[$eventId];
+        }
+
+        $eventArray = $event->convertToArray();
+        $campaign   = $event->getCampaign();
+
+        $eventArray['campaign'] = [
+            'id'        => $campaign->getId(),
+            'name'      => $campaign->getName(),
+            'createdBy' => $campaign->getCreatedBy(),
+        ];
+
+        $eventArray['parent'] = null;
+        if ($parent = $event->getParent()) {
+            $eventArray['parent']             = $parent->convertToArray();
+            $eventArray['parent']['campaign'] = $eventArray['campaign'];
+        }
+
+        $eventArray['children'] = [];
+        if ($children = $event->getChildren()) {
+            /** @var CampaignEvent $child */
+            foreach ($children as $child) {
+                $childArray             = $child->convertToArray();
+                $childArray['parent']   =&$eventArray;
+                $childArray['campaign'] =&$eventArray['campaign'];
+                unset($childArray['children']);
+
+                $eventArray['children'] = $childArray;
+            }
+        }
+
+        $this->eventArray[$eventId] = $eventArray;
+
+        return $this->eventArray[$eventId];
     }
 
     /**

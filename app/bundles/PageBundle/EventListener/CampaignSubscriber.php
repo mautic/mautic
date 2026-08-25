@@ -5,6 +5,7 @@ namespace Mautic\PageBundle\EventListener;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadDeviceType;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -35,7 +36,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
                 ['onCampaignTriggerDecision', 0],
                 ['onCampaignTriggerDecisionDeviceHit', 1],
             ],
-            PageEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignTriggerAction', 0],
+            PageEvents::ON_CAMPAIGN_BATCH_ACTION => ['onCampaignTriggerAction', 0],
         ];
     }
 
@@ -71,7 +72,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
             $action = [
                 'label'                  => 'mautic.page.tracking.pixel.event.send',
                 'description'            => 'mautic.page.tracking.pixel.event.send_desc',
-                'eventName'              => PageEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+                'batchEventName'         => PageEvents::ON_CAMPAIGN_BATCH_ACTION,
                 'formType'               => TrackingPixelSendType::class,
                 'connectionRestrictions' => [
                     'anchor' => [
@@ -228,11 +229,12 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         return $event->setResult(false);
     }
 
-    public function onCampaignTriggerAction(CampaignExecutionEvent $event): void
+    public function onCampaignTriggerAction(PendingEvent $event): void
     {
-        $config = $event->getConfig();
+        $config = $event->getEvent()->getProperties();
+
         if (empty($config['services'])) {
-            $event->setResult(false);
+            $event->failAll('No tracking services enabled.');
 
             return;
         }
@@ -243,6 +245,6 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         }
         $this->trackingHelper->updateCacheItem($values);
 
-        $event->setResult(true);
+        $event->passAll();
     }
 }
