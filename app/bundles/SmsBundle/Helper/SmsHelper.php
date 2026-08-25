@@ -26,7 +26,7 @@ class SmsHelper
     ) {
     }
 
-    public function unsubscribe($number): false|DoNotContactEntity
+    public function unsubscribe($number): ?DoNotContactEntity
     {
         $number = $this->phoneNumberHelper->format($number);
 
@@ -55,7 +55,7 @@ class SmsHelper
             if (!empty($leads)) {
                 $lead = array_shift($leads);
             } else {
-                return false;
+                return null;
             }
         }
 

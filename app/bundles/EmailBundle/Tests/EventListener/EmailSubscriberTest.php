@@ -172,8 +172,8 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
         $message->subject('Subject');
 
         $event = new QueueEmailEvent($message);
-        $stat  = new Stat();
 
+        $stat  = new Stat();
         $stat->setRetryCount(4);
 
         $this->emailModel->expects($this->once())

@@ -698,9 +698,9 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->doNotContact->expects($this->once())
             ->method('addDncForContact')
             ->with(42, 'email', DoNotContactEntity::BOUNCED, 'comment', true)
-            ->willReturn(false);
+            ->willReturn(null);
 
-        $this->assertFalse($this->emailModel->setDoNotContactLead($lead, 'comment'));
+        $this->assertNotInstanceOf(DoNotContactEntity::class, $this->emailModel->setDoNotContactLead($lead, 'comment'));
     }
 
     /**

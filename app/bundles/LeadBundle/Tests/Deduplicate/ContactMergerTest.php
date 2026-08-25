@@ -474,7 +474,7 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $matcher2 = $this->exactly(3);
         $winner->expects($matcher2)
             ->method('getField')
-            ->willReturnCallback(function ($parameter) use ($matcher2) {
+            ->willReturnCallback(function (string $parameter) use ($matcher2): array|false {
                 if (1 === $matcher2->numberOfInvocations()) {
                     $this->assertSame('email', $parameter);
 
@@ -517,6 +517,8 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
                         'default_value' => 0,
                     ];
                 }
+
+                return false;
             });
         $matcher3 = $this->exactly(3);
 

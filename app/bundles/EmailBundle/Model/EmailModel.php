@@ -1359,7 +1359,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      *
      * @return string[]|bool|string|null
      */
-    public function sendEmail(Email $email, array $leads, array $options = [])
+    public function sendEmail(Email $email, array $leads, array $options = []): array|bool|string|null
     {
         $listId              = ArrayHelper::getValue('listId', $options);
         $ignoreDNC           = ArrayHelper::getValue('ignoreDNC', $options, false);
@@ -1757,13 +1757,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         return $event;
     }
 
-    /**
-     * @param int  $reason
-     * @param bool $flush
-     *
-     * @return bool|DoNotContact
-     */
-    public function setDoNotContact(Stat $stat, ?string $comments, $reason = DoNotContact::BOUNCED, $flush = true)
+    public function setDoNotContact(Stat $stat, ?string $comments, int $reason = DoNotContact::BOUNCED, bool $flush = true): ?DoNotContact
     {
         $lead = $stat->getLead();
 
@@ -1774,10 +1768,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             return $this->doNotContact->addDncForContact($lead->getId(), $channel, $reason, $comments, $flush);
         }
 
-        return false;
+        return null;
     }
 
-    public function setDoNotContactLead(Lead $lead, string $comments, int $reason = DoNotContact::BOUNCED, bool $flush = true): false|DoNotContact
+    public function setDoNotContactLead(Lead $lead, string $comments, int $reason = DoNotContact::BOUNCED, bool $flush = true): ?DoNotContact
     {
         return $this->doNotContact->addDncForContact($lead->getId(), 'email', $reason, $comments, $flush);
     }
@@ -1831,10 +1825,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
     /**
      * Get the settings for a monitored mailbox or false if not enabled.
-     *
-     * @return bool|array
      */
-    public function getMonitoredMailbox($bundleKey, $folderKey)
+    public function getMonitoredMailbox($bundleKey, $folderKey): false|array
     {
         if ($this->mailboxHelper->isConfigured($bundleKey, $folderKey)) {
             return $this->mailboxHelper->getMailboxSettings();
