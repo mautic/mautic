@@ -396,7 +396,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
         $prefixedTables = array_filter($tables, fn (string $table): bool => str_starts_with($table, $prefix));
 
-        if ([] !== $prefixedTables) {
+        if ([] === $prefixedTables) {
             // Nothing to do
             file_put_contents($file, '-- No tables to truncate');
 
