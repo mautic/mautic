@@ -12291,8 +12291,8 @@ parameters:
 			count: 2
 			path: plugins/MauticSocialBundle/Security/Permissions/MauticSocialPermissions.php
 
-        -
-            message: '#^Method Mautic\\CoreBundle\\Test\\MauticMysqlTestCase\:\:__construct\(\) overrides `@final` method Mautic\\CoreBundle\\Test\\AbstractMauticTestCase\:\:__construct\(\)\.$#'
+		-
+			message: '#^Method Mautic\\CoreBundle\\Test\\MauticMysqlTestCase\:\:__construct\(\) overrides `@final` method Mautic\\CoreBundle\\Test\\AbstractMauticTestCase\:\:__construct\(\)\.$#'
 			identifier: method.parentMethodFinalByPhpDoc
 			count: 1
 			path: app/bundles/CoreBundle/Test/MauticMysqlTestCase.php
