@@ -6,22 +6,22 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class DateHelper
+final readonly class DateHelper
 {
     /**
      * @var string[]
      */
-    private readonly array $formats;
+    private array $formats;
 
-    private readonly DateTimeHelper $helper;
+    private DateTimeHelper $helper;
 
     public function __construct(
         string $dateFullFormat,
         string $dateShortFormat,
         string $dateOnlyFormat,
         string $timeOnlyFormat,
-        private readonly TranslatorInterface $translator,
-        private readonly CoreParametersHelper $coreParametersHelper,
+        private TranslatorInterface $translator,
+        private CoreParametersHelper $coreParametersHelper,
         ?DateTimeHelper $helper = null,
     ) {
         $this->formats = [
