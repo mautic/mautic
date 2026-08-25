@@ -162,16 +162,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return sprintf('%s/services/data/v38.0', $this->keys['instance_url']);
     }
 
-    /**
-     * @param bool $inAuthorization
-     */
-    public function getBearerToken($inAuthorization = false): string|false
+    public function getBearerToken(bool $inAuthorization = false): ?string
     {
         if (!$inAuthorization && isset($this->keys[$this->getAuthTokenKey()])) {
             return $this->keys[$this->getAuthTokenKey()];
         }
 
-        return false;
+        return null;
     }
 
     public function getAuthenticationType(): string

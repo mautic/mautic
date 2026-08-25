@@ -146,16 +146,13 @@ final class DynamicsIntegration extends CrmAbstractIntegration
         return $url.('&resource='.urlencode($this->keys['resource']));
     }
 
-    /**
-     * @param bool $inAuthorization
-     */
-    public function getBearerToken($inAuthorization = false): string|false
+    public function getBearerToken(bool $inAuthorization = false): ?string
     {
         if (!$inAuthorization && isset($this->keys[$this->getAuthTokenKey()])) {
             return $this->keys[$this->getAuthTokenKey()];
         }
 
-        return false;
+        return null;
     }
 
     public function getDataPriority(): bool

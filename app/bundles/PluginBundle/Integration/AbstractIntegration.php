@@ -1306,10 +1306,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * Generate a bearer token.
-     *
-     * @return string
      */
-    public function getBearerToken($inAuthorization = false)
+    public function getBearerToken(bool $inAuthorization = false): ?string
     {
         return '';
     }
