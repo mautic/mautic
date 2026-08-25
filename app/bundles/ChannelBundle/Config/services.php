@@ -22,8 +22,6 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\ChannelBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
-    $services->alias('mautic.channel.model.message', Mautic\ChannelBundle\Model\MessageModel::class);
-    $services->alias('mautic.channel.model.queue', Mautic\ChannelBundle\Model\MessageQueueModel::class);
 
     $services->set(Mautic\ChannelBundle\Helper\ChannelListHelper::class)
         ->tag('twig.helper', ['alias' => 'channel']);

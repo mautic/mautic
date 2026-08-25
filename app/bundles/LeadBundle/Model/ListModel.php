@@ -59,6 +59,11 @@ class ListModel extends FormModel implements GlobalSearchInterface
 {
     use OperatorListTrait;
 
+    public static function getName(): string
+    {
+        return 'lead.list';
+    }
+
     /**
      * @var mixed[]
      */

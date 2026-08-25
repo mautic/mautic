@@ -74,6 +74,11 @@ class PageModel extends FormModel implements GlobalSearchInterface
     use VariantModelTrait;
     use BuilderModelTrait;
 
+    public static function getName(): string
+    {
+        return 'page.page';
+    }
+
     /**
      * We have to limit length of some fields
      * to store them in the database.

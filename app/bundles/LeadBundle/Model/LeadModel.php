@@ -99,6 +99,11 @@ class LeadModel extends FormModel
     use OperatorListTrait;
     use RequestTrait;
 
+    public static function getName(): string
+    {
+        return 'lead.lead';
+    }
+
     public const CHANNEL_FEATURE = 'contact_preference';
 
     /**

@@ -22,6 +22,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 final class RoleModel extends FormModel implements GlobalSearchInterface
 {
+    public static function getName(): string
+    {
+        return 'user.role';
+    }
+
     private UserRepository $userRepository;
 
     private PermissionRepository $permissionRepository;

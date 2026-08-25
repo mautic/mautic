@@ -48,6 +48,11 @@ use Twig\Environment;
  */
 class FormModel extends CommonFormModel implements GlobalSearchInterface
 {
+    public static function getName(): string
+    {
+        return 'form.form';
+    }
+
     public function __construct(
         protected RequestStack $requestStack,
         protected Environment $twig,

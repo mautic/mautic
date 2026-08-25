@@ -16,7 +16,7 @@ final class MauticCoreBundle extends Bundle
         $container->addCompilerPass(new Compiler\DbalPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
         $container->addCompilerPass(new Compiler\TranslationsPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -100);
         $container->addCompilerPass(new Compiler\TranslationLoaderPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 100);
-        $container->addCompilerPass(new Compiler\ModelPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
+
         $container->addCompilerPass(new Compiler\ORMPurgerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -10);
         $container->addCompilerPass(new Compiler\SystemThemeTemplatePathPass(), PassConfig::TYPE_BEFORE_REMOVING, 0);
 

@@ -49,6 +49,11 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     use DefaultValueTrait;
     use RequestTrait;
 
+    public static function getName(): string
+    {
+        return 'lead.company';
+    }
+
     /**
      * @var array
      */

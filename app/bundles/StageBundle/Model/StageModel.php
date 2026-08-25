@@ -26,6 +26,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 class StageModel extends CommonFormModel implements GlobalSearchInterface
 {
+    public static function getName(): string
+    {
+        return 'stage.stage';
+    }
+
     protected LeadModel $leadModel;
 
     private StageRepository $stageRepository;

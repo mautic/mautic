@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MauticPlugin\GrapesJsBuilderBundle\Tests\Unit\Controller;
 
 use Mautic\CoreBundle\Model\AbstractCommonModel;
-use Mautic\CoreBundle\Model\MauticModelInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Entity\Email;
 use MauticPlugin\GrapesJsBuilderBundle\Controller\GrapesJsController;
@@ -102,7 +101,7 @@ final class GrapesJsControllerTest extends TestCase
             /**
              * @return AbstractCommonModel<object>
              */
-            protected function getModel(string $modelNameKey): MauticModelInterface
+            protected function getModel(string $modelNameKey): AbstractCommonModel
             {
                 return new class($this->testEntity) extends AbstractCommonModel {
                     public function __construct(

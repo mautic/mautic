@@ -29,6 +29,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 class TagModel extends FormModel
 {
+    public static function getName(): string
+    {
+        return 'lead.tag';
+    }
+
     private ReportRepository $reportRepository;
 
     private LeadListRepository $leadListRepository;

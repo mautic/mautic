@@ -40,6 +40,11 @@ use Symfony\Contracts\EventDispatcher\Event as SymfonyEvent;
  */
 class WebhookModel extends FormModel
 {
+    public static function getName(): string
+    {
+        return 'webhook.webhook';
+    }
+
     /**
      *  2 possible types of the processing of the webhooks.
      */

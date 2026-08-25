@@ -40,6 +40,11 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class ImportModel extends FormModel
 {
+    public static function getName(): string
+    {
+        return 'lead.import';
+    }
+
     protected LeadEventLogRepository $leadEventLogRepo;
 
     public function __construct(

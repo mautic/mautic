@@ -8,6 +8,11 @@ use Mautic\FormBundle\Entity\SubmissionRepository;
 
 final readonly class SubmissionResultLoader implements MauticModelInterface
 {
+    public static function getName(): string
+    {
+        return 'form.submission_result_loader';
+    }
+
     public function __construct(
         private SubmissionRepository $submissionRepository,
     ) {

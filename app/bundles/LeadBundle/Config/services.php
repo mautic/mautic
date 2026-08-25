@@ -65,22 +65,12 @@ return function (ContainerConfigurator $configurator): void {
     $services->set('mautic.lead.query.builder.special.sessions', Mautic\LeadBundle\Segment\Query\Filter\SessionsFilterQueryBuilder::class);
     $services->set('mautic.lead.query.builder.complex_relation.value', Mautic\LeadBundle\Segment\Query\Filter\ComplexRelationValueFilterQueryBuilder::class);
     $services->set('mautic.lead.query.builder.channel_click.value', Mautic\LeadBundle\Segment\Query\Filter\ChannelClickQueryBuilder::class);
-    $services->alias('mautic.lead.model.lead', Mautic\LeadBundle\Model\LeadModel::class);
     $services->get(Mautic\LeadBundle\Entity\CompanyRepository::class)
         ->call('setUniqueIdentifiersOperator', ['%mautic.company_unique_identifiers_operator%']);
     $services->get(Mautic\LeadBundle\Entity\LeadRepository::class)
         ->call('setUniqueIdentifiersOperator', ['%mautic.contact_unique_identifiers_operator%']);
 
-    $services->alias('mautic.lead.model.field', Mautic\LeadBundle\Model\FieldModel::class);
-    $services->alias('mautic.lead.model.list', Mautic\LeadBundle\Model\ListModel::class);
-    $services->alias('mautic.lead.model.note', Mautic\LeadBundle\Model\NoteModel::class);
-    $services->alias('mautic.lead.model.device', Mautic\LeadBundle\Model\DeviceModel::class);
-    $services->alias('mautic.lead.model.company', Mautic\LeadBundle\Model\CompanyModel::class);
-    $services->alias('mautic.lead.model.import', Mautic\LeadBundle\Model\ImportModel::class);
-    $services->alias('mautic.lead.model.tag', Mautic\LeadBundle\Model\TagModel::class);
     $services->alias('mautic.lead.model.company_report_data', Mautic\LeadBundle\Model\CompanyReportData::class);
-    $services->alias('mautic.lead.model.dnc', Mautic\LeadBundle\Model\DoNotContact::class);
     $services->alias('mautic.lead.model.ipaddress', Mautic\LeadBundle\Model\IpAddressModel::class);
-    $services->alias('mautic.lead.model.export_scheduler', Mautic\LeadBundle\Model\ContactExportSchedulerModel::class);
     $services->set(Mautic\LeadBundle\Security\Permissions\LeadPermissions::class);
 };

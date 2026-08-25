@@ -22,6 +22,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 class FormModel extends AbstractCommonModel
 {
+    public static function getName(): string
+    {
+        return 'core.form';
+    }
+
     protected FormFactoryInterface $formFactory;
 
     #[Required]

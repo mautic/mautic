@@ -19,6 +19,5 @@ return function (ContainerConfigurator $configurator): void {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('Mautic\\CategoryBundle\\Entity\\', '../Entity/*Repository.php');
-    $services->alias('mautic.category.model.category', Mautic\CategoryBundle\Model\CategoryModel::class);
     $services->set(Mautic\CategoryBundle\Security\Permissions\CategoryPermissions::class);
 };

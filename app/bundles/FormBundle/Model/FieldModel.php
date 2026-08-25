@@ -22,6 +22,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 class FieldModel extends CommonFormModel
 {
+    public static function getName(): string
+    {
+        return 'form.field';
+    }
+
     protected LeadFieldModel $leadFieldModel;
 
     private RequestStack $requestStack;

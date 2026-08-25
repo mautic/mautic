@@ -28,10 +28,5 @@ return function (ContainerConfigurator $configurator): void {
     $services->set(Mautic\FormBundle\Validator\Constraint\FileExtensionConstraintValidator::class)
         ->tag('validator.constraint_validator', ['alias' => 'file_extension_constraint_validator']);
 
-    $services->alias('mautic.form.model.action', Mautic\FormBundle\Model\ActionModel::class);
-    $services->alias('mautic.form.model.field', Mautic\FormBundle\Model\FieldModel::class);
-    $services->alias('mautic.form.model.form', Mautic\FormBundle\Model\FormModel::class);
-    $services->alias('mautic.form.model.submission', Mautic\FormBundle\Model\SubmissionModel::class);
-    $services->alias('mautic.form.model.submission_result_loader', Mautic\FormBundle\Model\SubmissionResultLoader::class);
     $services->set(Mautic\FormBundle\Security\Permissions\FormPermissions::class);
 };

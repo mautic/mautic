@@ -31,16 +31,15 @@ trait ChannelTrait
 
     protected function getChannelEntity(string $channel, $channelId): ?object
     {
-        $channelEntity = null;
         if ($channelModel = $this->getChannelModel($channel)) {
             try {
-                $channelEntity = $channelModel->getEntity($channelId);
+                return $channelModel->getEntity($channelId);
             } catch (\Exception) {
                 // Not found
             }
         }
 
-        return $channelEntity;
+        return null;
     }
 
     /**

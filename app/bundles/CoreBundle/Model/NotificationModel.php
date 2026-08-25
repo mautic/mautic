@@ -17,6 +17,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 class NotificationModel extends FormModel
 {
+    public static function getName(): string
+    {
+        return 'core.notification';
+    }
+
     /**
      * @var bool
      */

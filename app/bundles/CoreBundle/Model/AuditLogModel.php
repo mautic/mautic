@@ -12,6 +12,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 class AuditLogModel extends AbstractCommonModel
 {
+    public static function getName(): string
+    {
+        return 'core.auditlog';
+    }
+
     private AuditLogRepository $auditLogRepository;
 
     #[Required]

@@ -23,6 +23,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 class PointGroupModel extends CommonFormModel implements GlobalSearchInterface
 {
+    public static function getName(): string
+    {
+        return 'point.group';
+    }
+
     private GroupRepository $groupRepository;
 
     #[Required]

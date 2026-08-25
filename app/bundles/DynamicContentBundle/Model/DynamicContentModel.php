@@ -33,6 +33,11 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
     use VariantModelTrait;
     use TranslationModelTrait;
 
+    public static function getName(): string
+    {
+        return 'dynamicContent.dynamicContent';
+    }
+
     private StatRepository $statRepository;
 
     private DynamicContentRepository $dynamicContentRepository;

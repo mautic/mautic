@@ -19,6 +19,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 class TrackableModel extends AbstractCommonModel
 {
+    public static function getName(): string
+    {
+        return 'page.trackable';
+    }
+
     /**
      * Array of URLs and/or tokens that should not be converted to trackables.
      *

@@ -49,6 +49,11 @@ use Twig\Environment;
  */
 class ReportModel extends FormModel implements GlobalSearchInterface
 {
+    public static function getName(): string
+    {
+        return 'report.report';
+    }
+
     public const CHANNEL_FEATURE = 'reporting';
 
     /**

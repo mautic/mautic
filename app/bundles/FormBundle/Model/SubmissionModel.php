@@ -73,6 +73,11 @@ use Twig\Environment;
  */
 final class SubmissionModel extends CommonFormModel
 {
+    public static function getName(): string
+    {
+        return 'form.submission';
+    }
+
     public function __construct(
         private readonly IpLookupHelper $ipLookupHelper,
         private readonly Environment $twig,

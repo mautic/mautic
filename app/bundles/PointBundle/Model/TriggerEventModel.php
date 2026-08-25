@@ -15,6 +15,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 class TriggerEventModel extends CommonFormModel
 {
+    public static function getName(): string
+    {
+        return 'point.triggerevent';
+    }
+
     private TriggerEventRepository $triggerEventRepository;
 
     #[Required]

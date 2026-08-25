@@ -31,6 +31,11 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class DashboardModel extends FormModel
 {
+    public static function getName(): string
+    {
+        return 'dashboard.dashboard';
+    }
+
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
         private readonly PathsHelper $pathsHelper,

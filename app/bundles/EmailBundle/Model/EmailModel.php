@@ -92,6 +92,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     use FilterTrait;
     use ApiEntityLockTrait;
 
+    public static function getName(): string
+    {
+        return 'email.email';
+    }
+
     /**
      * @var bool
      */

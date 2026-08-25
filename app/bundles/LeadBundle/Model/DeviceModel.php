@@ -18,6 +18,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 final class DeviceModel extends FormModel
 {
+    public static function getName(): string
+    {
+        return 'lead.device';
+    }
+
     private LeadDeviceRepository $leadDeviceRepository;
 
     #[Required]

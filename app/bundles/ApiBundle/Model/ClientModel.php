@@ -21,6 +21,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 final class ClientModel extends FormModel implements GlobalSearchInterface
 {
+    public static function getName(): string
+    {
+        return 'api.client';
+    }
+
     public const string API_MODE_OAUTH2 = 'oauth2';
 
     private ?string $apiMode = null;

@@ -693,22 +693,6 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->getContainer()->get(ReportModel::class)->saveEntity($report);
 
-        // Mock the ReportModel to add a defaultValue to the filter definition
-        $reportModel = $this->createMock(ReportModel::class);
-
-        $filterDefinitions              = new \stdClass();
-        $filterDefinitions->definitions = [
-            'l.email' => [
-                'alias'        => 'email',
-                'defaultValue' => self::DEFAULT_TEST_EMAIL,
-                'label'        => 'Email',
-                'type'         => 'text',
-            ],
-        ];
-
-        $reportModel->method('getFilterList')->willReturn($filterDefinitions);
-        self::getContainer()->set('mautic.report.model.report', $reportModel);
-
         $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId());
         self::assertResponseIsSuccessful();
 

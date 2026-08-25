@@ -37,6 +37,11 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class TriggerModel extends CommonFormModel implements GlobalSearchInterface
 {
+    public static function getName(): string
+    {
+        return 'point.trigger';
+    }
+
     protected $triggers = [];
 
     /**

@@ -63,7 +63,7 @@ abstract class AbstractCommonModel implements MauticModelInterface
      *
      * @return CommonRepository<T>
      */
-    public function getRepository()
+    public function getRepository(): CommonRepository
     {
         static $commonRepo;
 
@@ -76,10 +76,8 @@ abstract class AbstractCommonModel implements MauticModelInterface
 
     /**
      * Retrieve the permissions base.
-     *
-     * @return string
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return '';
     }

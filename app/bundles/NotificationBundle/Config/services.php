@@ -27,7 +27,6 @@ return function (ContainerConfigurator $configurator): void {
 
     // resolved dynamically by Mautic\PluginBundle\Helper\IntegrationHelper via "mautic.integration.{name}" service id
     $services->alias('mautic.integration.onesignal', Mautic\NotificationBundle\Integration\OneSignalIntegration::class);
-    $services->alias('mautic.notification.model.notification', Mautic\NotificationBundle\Model\NotificationModel::class);
 
     $services->set(Mautic\NotificationBundle\Security\Permissions\NotificationPermissions::class);
 };

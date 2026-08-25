@@ -13,6 +13,11 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class DoNotContact implements MauticModelInterface
 {
+    public static function getName(): string
+    {
+        return 'lead.dnc';
+    }
+
     public function __construct(
         protected LeadModel $leadModel,
         protected DoNotContactRepository $dncRepo,

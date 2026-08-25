@@ -24,6 +24,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 class MessageModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
 {
+    public static function getName(): string
+    {
+        return 'channel.message';
+    }
+
     public const CHANNEL_FEATURE = 'marketing_messages';
 
     protected static $channels;
@@ -70,7 +75,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
         return 'channel:messages';
     }
 
-    public function getRepository(): ?MessageRepository
+    public function getRepository(): MessageRepository
     {
         return $this->messageRepository;
     }

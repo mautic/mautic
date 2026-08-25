@@ -20,6 +20,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 final class MonitoringModel extends FormModel
 {
+    public static function getName(): string
+    {
+        return 'social.monitoring';
+    }
+
     private MonitoringRepository $monitoringRepository;
 
     #[Required]

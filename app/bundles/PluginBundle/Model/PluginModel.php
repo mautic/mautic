@@ -27,6 +27,11 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class PluginModel extends FormModel
 {
+    public static function getName(): string
+    {
+        return 'plugin.plugin';
+    }
+
     public function __construct(
         protected FieldModel $leadFieldModel,
         private readonly FieldList $fieldList,

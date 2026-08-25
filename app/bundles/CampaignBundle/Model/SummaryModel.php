@@ -18,6 +18,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 class SummaryModel extends AbstractCommonModel
 {
+    public static function getName(): string
+    {
+        return 'campaign.summary';
+    }
+
     private LeadEventLogRepository $leadEventLogRepository;
 
     private SummaryRepository $summaryRepository;

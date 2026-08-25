@@ -19,6 +19,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 class EventModel extends FormModel
 {
+    public static function getName(): string
+    {
+        return 'campaign.event';
+    }
+
     private LeadEventLogRepository $leadEventLogRepository;
 
     private CampaignRepository $campaignRepository;

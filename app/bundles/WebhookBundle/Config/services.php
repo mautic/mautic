@@ -26,6 +26,5 @@ return function (ContainerConfigurator $configurator): void {
     $services->set(Mautic\WebhookBundle\Helper\CampaignHelper::class)
         ->arg('$client', service('mautic.http.client'));
 
-    $services->alias('mautic.webhook.model.webhook', Mautic\WebhookBundle\Model\WebhookModel::class);
     $services->set(Mautic\WebhookBundle\Security\Permissions\WebhookPermissions::class);
 };
