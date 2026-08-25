@@ -66,6 +66,12 @@
 - Deprecated service alias `mautic.config.model.sysinfo` removed. Use the FQCN service id `Mautic\ConfigBundle\Model\SysinfoModel` instead.
 - Deprecated method `Mautic\NotificationBundle\Helper\NotificationHelper::unsubscribe()` removed with no replacement; it was unused. With it, the `LeadRepository` and `DoNotContact` constructor arguments of `NotificationHelper` were removed as well.
 - Deprecated service id `symfony.filesystem` removed. `Symfony\Component\Filesystem\Filesystem` is now registered under its class name, so autowired and FQCN-based usages are unaffected; only container lookups by the `symfony.filesystem` string need updating.
+- Deprecated service id `mautic.security` removed. `Mautic\CoreBundle\Security\Permissions\CorePermissions` is now registered under its class name only, so autowired and FQCN-based usages are unaffected; only container lookups by the `mautic.security` string need updating:
+
+    ```diff
+    -$security = $container->get('mautic.security');
+    +$security = $container->get(Mautic\CoreBundle\Security\Permissions\CorePermissions::class);
+    ```
 - Deprecated action `Mautic\LeadBundle\Controller\AjaxController::addLeadUtmTagsAction()` (ajax action `lead:addLeadUtmTags`) removed with no replacement. Its only caller, the unused JavaScript function `Mautic.createLeadUtmTag()`, was removed as well.
 - Deprecated interface `Mautic\CoreBundle\Entity\PublishStatusIconAttributesInterface` removed with no replacement. Nothing implemented it. Use the `CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE` event to change template params instead.
 - Deprecated method `Mautic\CoreBundle\Helper\AbstractFormFieldHelper::setTranslator()` removed. The translator is autowired via the `#[Required] autowireFormFieldHelper()` method, so there is nothing to pass manually.

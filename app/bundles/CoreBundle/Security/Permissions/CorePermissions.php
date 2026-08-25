@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Security\Exception\PermissionBadFormatException;
 use Mautic\CoreBundle\Security\Exception\PermissionNotFoundException;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Contracts\Service\ResetInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -26,14 +27,23 @@ class CorePermissions implements ResetInterface
 
     private bool $permissionObjectsGenerated = false;
 
+    /**
+     * @param iterable<AbstractPermissions> $permissionObjects services tagged 'mautic.permissions'
+     */
     public function __construct(
         protected UserHelper $userHelper,
         private readonly TranslatorInterface $translator,
         private readonly CoreParametersHelper $coreParametersHelper,
         private readonly array $bundles,
         private readonly array $pluginBundles,
+        #[AutowireIterator('mautic.permissions')]
+        iterable $permissionObjects = [],
     ) {
         $this->registerPermissionClasses();
+
+        foreach ($permissionObjects as $permissionObject) {
+            $this->setPermissionObject($permissionObject);
+        }
     }
 
     public function reset(): void
