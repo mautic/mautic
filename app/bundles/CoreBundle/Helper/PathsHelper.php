@@ -10,7 +10,7 @@ class PathsHelper
     /**
      * @var array<string, string>
      */
-    private array $paths;
+    private readonly array $paths;
 
     /**
      * @var string

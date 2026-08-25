@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Tracker;
 
+use Mautic\CacheBundle\Cache\Adapter\FilesystemTagAwareAdapter;
 use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\Lead;
@@ -57,13 +58,13 @@ final class DeviceTrackerTest extends \PHPUnit\Framework\TestCase
         $coreParametersHelper->expects($this->once())
           ->method('get')
           ->with('cache_adapter')
-          ->willReturn(\Mautic\CacheBundle\Cache\Adapter\FilesystemTagAwareAdapter::class);
+          ->willReturn(FilesystemTagAwareAdapter::class);
 
         $container = $this->createMock(ContainerInterface::class);
         $container
           ->expects($this->once())
           ->method('get')
-          ->with(\Mautic\CacheBundle\Cache\Adapter\FilesystemTagAwareAdapter::class)
+          ->with(FilesystemTagAwareAdapter::class)
           ->willReturn($cacheAdapter);
 
         $cacheProvider               = new CacheProvider($coreParametersHelper, $container);

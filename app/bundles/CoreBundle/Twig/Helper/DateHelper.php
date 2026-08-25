@@ -16,7 +16,7 @@ final class DateHelper
     /**
      * @api cannot be readonly, as changed in tests via reflection
      */
-    private DateTimeHelper $helper;
+    private readonly DateTimeHelper $helper;
 
     public function __construct(
         string $dateFullFormat,

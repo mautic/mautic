@@ -1121,7 +1121,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     public function extractAuthKeys($data, $tokenOverride = null): bool|string|array
     {
         // check to see if an entity exists
-        $entity = $this->getIntegrationSettings();
+        $entity = $this->settings;
         if (null == $entity) {
             $entity = new Integration();
             $entity->setName($this->getName());

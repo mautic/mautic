@@ -8,7 +8,7 @@ use Mautic\CampaignBundle\Entity\FailedLeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 
-class PendingEvent extends AbstractLogCollectionEvent
+final class PendingEvent extends AbstractLogCollectionEvent
 {
     use ContextTrait;
 
