@@ -87,7 +87,7 @@ class LeadEventLogRepository extends CommonRepository
                     ll.channel,
                     ll.channel_id as channel_id,
                     ll.lead_id,
-                    ll.non_action_path_taken as nonActionPathTaken,
+                    ll.non_action_path_taken as '.$connection->quoteIdentifier('nonActionPathTaken').',
                     fl.reason as fail_reason,
                     e.deleted AS event_deleted_timestamp,
                     e.redirect_event_id,

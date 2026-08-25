@@ -118,8 +118,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $this->client->disableReboot();
         $this->client->followRedirects(true);
 
-        // $this->em = static::getContainer()->get(ManagerRegistry::class)->getManager();
-        $this->em = static::getContainer()->get('doctrine')->getManager();
+        $this->em = static::getContainer()->get(ManagerRegistry::class)->getManager();
         $this->connection = $this->em->getConnection();
         $this->router     = static::getContainer()->get(RouterInterface::class);
         $scheme           = $this->router->getContext()->getScheme();

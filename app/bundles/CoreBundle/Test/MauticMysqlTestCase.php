@@ -11,7 +11,6 @@ use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
 use Mautic\InstallBundle\InstallFixtures\ORM\RoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
-use Mautic\UserBundle\Entity\User;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
@@ -22,7 +21,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
     private bool $databaseInstalled = false;
 
-    private bool $setUpInvoked      = false;
+    private bool $setUpInvoked;
 
     /**
      * Use transaction rollback for cleanup. Sometimes it is not possible to use it because of the following:
@@ -79,7 +78,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
             $this->markDatabasePrepared();
         }
 
-        $user = $this->em->getRepository(User::class)->findOneBy(['username' => $this->clientServer['PHP_AUTH_USER'] ?? 'admin']);
+        $user = $this->getUser($this->clientServer['PHP_AUTH_USER'] ?? 'admin');
         $this->loginUser($user); // also creates session
 
         if ($this->useCleanupRollback) {
