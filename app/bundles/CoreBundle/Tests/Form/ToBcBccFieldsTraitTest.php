@@ -73,7 +73,7 @@ final class ToBcBccFieldsTraitTest extends TypeTestCase
         $form->submit(['to' => '', 'cc' => '', 'bcc' => '']);
 
         $this->assertFalse($form->isValid());
-        $this->assertTrue($form->get('to')->getErrors()->count() > 0);
+        $this->assertGreaterThan(0, $form->get('to')->getErrors()->count());
     }
 
     public function testRequiredToValidEmailPasses(): void
@@ -130,9 +130,6 @@ final class ToBcBccStubFormType extends AbstractType
     }
 }
 
-/**
- * @extends AbstractType<mixed>
- */
 final class RequiredToBcBccStubFormType extends AbstractType
 {
     use ToBcBccFieldsTrait;
