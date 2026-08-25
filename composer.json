@@ -248,8 +248,14 @@
       "doctrine/persistence": {
         "PHP 8.6+ replace deprecated spl_object_hash() with spl_object_id()": "patches/doctrine-persistence-spl-object-id.patch"
       },
+      "symfony/event-dispatcher": {
+        "PHP 8.6+ replace deprecated spl_object_hash() with spl_object_id()": "patches/symfony-event-dispatcher-spl-object-id.patch"
+      },
+      "symfony/form": {
+        "PHP 8.6+ replace deprecated spl_object_hash() with spl_object_id()": "patches/symfony-form-spl-object-id.patch"
+      },
       "symfony/http-foundation": {
-        "PHP 8.6+ add missing create_sid() in abstract session handler": "patches/symfony-doctrine-bridge-spl-object-id.patch"
+        "PHP 8.6+ add missing create_sid() in abstract session handler": "patches/symfony-http-foundation-create-sid.patch"
       }
     }
   }

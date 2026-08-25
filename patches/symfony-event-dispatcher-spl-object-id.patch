@@ -1,0 +1,40 @@
+diff --git a/vendor/symfony/event-dispatcher/Debug/TraceableEventDispatcher.php.orig b/vendor/symfony/event-dispatcher/Debug/TraceableEventDispatcher.php
+index 0d78228b44..8cd330f333 100644
+--- a/vendor/symfony/event-dispatcher/Debug/TraceableEventDispatcher.php.orig
++++ b/vendor/symfony/event-dispatcher/Debug/TraceableEventDispatcher.php
+@@ -114,7 +114,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
+
+         $this->callStack ??= new \SplObjectStorage();
+
+-        $currentRequestHash = $this->currentRequestHash = $this->requestStack && ($request = $this->requestStack->getCurrentRequest()) ? spl_object_hash($request) : '';
++        $currentRequestHash = $this->currentRequestHash = $this->requestStack && ($request = $this->requestStack->getCurrentRequest()) ? spl_object_id($request) : '';
+
+         if (null !== $this->logger && $event instanceof StoppableEventInterface && $event->isPropagationStopped()) {
+             $this->logger->debug(\sprintf('The "%s" event is already stopped. No listeners have been called.', $eventName));
+@@ -149,7 +149,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
+             return [];
+         }
+
+-        $hash = $request ? spl_object_hash($request) : null;
++        $hash = $request ? spl_object_id($request) : null;
+         $called = [];
+
+         foreach ($this->calledListenerInfos as $requestHash => $infos) {
+@@ -172,7 +172,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
+             return [];
+         }
+
+-        $hash = $request ? spl_object_hash($request) : null;
++        $hash = $request ? spl_object_id($request) : null;
+         $calledListeners = [];
+
+         foreach ($this->calledOriginalListeners as $requestHash => $eventListeners) {
+@@ -204,7 +204,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
+     public function getOrphanedEvents(?Request $request = null): array
+     {
+         if ($request) {
+-            return $this->orphanedEvents[spl_object_hash($request)] ?? [];
++            return $this->orphanedEvents[spl_object_id($request)] ?? [];
+         }
+
+         if (!$this->orphanedEvents) {
