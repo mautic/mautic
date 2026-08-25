@@ -12,16 +12,12 @@ class PageHitEvent extends CommonEvent
 {
     protected ?Page $page = null;
 
-    /**
-     * @param mixed[] $clickthroughData
-     * @param bool    $unique
-     */
     public function __construct(
         Hit $hit,
         protected $request,
         protected $code,
-        protected $clickthroughData = [],
-        protected $unique = false,
+        protected array $clickthroughData = [],
+        protected bool $unique = false,
     ) {
         $this->entity           = $hit;
         $this->page             = $hit->getPage();
@@ -63,20 +59,15 @@ class PageHitEvent extends CommonEvent
         return $this->entity;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getClickthroughData()
+    public function getClickthroughData(): array
     {
         return $this->clickthroughData;
     }
 
     /**
      * Returns if this page hit is unique.
-     *
-     * @return bool
      */
-    public function isUnique()
+    public function isUnique(): bool
     {
         return $this->unique;
     }

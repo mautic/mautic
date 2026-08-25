@@ -140,12 +140,8 @@ final class UrlHelper
 
     /**
      * Sanitize parts of the URL to make sure the URL query values are HTTP encoded.
-     *
-     * @param string $url
-     *
-     * @return string
      */
-    public static function sanitizeAbsoluteUrl($url)
+    public static function sanitizeAbsoluteUrl(string $url): string
     {
         if (!$url) {
             return $url;
@@ -159,12 +155,8 @@ final class UrlHelper
 
     /**
      * Make sure the URL has a scheme. Defaults to HTTP if not provided.
-     *
-     * @param string $url
-     *
-     * @return string
      */
-    private static function sanitizeUrlScheme($url)
+    private static function sanitizeUrlScheme(string $url): string
     {
         $isRelative = str_starts_with($url, '//');
 
@@ -194,12 +186,7 @@ final class UrlHelper
         return $url;
     }
 
-    /**
-     * @param string $url
-     *
-     * @return string
-     */
-    private static function sanitizeUrlPath($url)
+    private static function sanitizeUrlPath(string $url): string
     {
         $path = parse_url($url, PHP_URL_PATH);
 
@@ -211,12 +198,7 @@ final class UrlHelper
         return $url;
     }
 
-    /**
-     * @param string $url
-     *
-     * @return string
-     */
-    private static function sanitizeUrlQuery($url)
+    private static function sanitizeUrlQuery(string $url): string
     {
         $query = parse_url($url, PHP_URL_QUERY);
 
@@ -243,12 +225,7 @@ final class UrlHelper
         return $url;
     }
 
-    /**
-     * @param string $string
-     *
-     * @return string
-     */
-    private static function removeTrailingNonAlphaNumeric($string)
+    private static function removeTrailingNonAlphaNumeric(string $string): string
     {
         // Special handling of closing bracket
         if (str_ends_with($string, '}') && preg_match('/^[^{\r\n]*\}.*?$/', $string)) {

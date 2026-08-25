@@ -282,12 +282,8 @@ final class PlainTextHelper
      * text, with numeric indices to the original point in the text they
      * appeared. Also makes an effort at identifying and handling absolute
      * and relative links.
-     *
-     * @param string $display Part of the text to associate number with
-     *
-     * @return string
      */
-    private function buildlinkList(string $link, $display, ?string $linkOverride = null)
+    private function buildlinkList(string $link, string $display, ?string $linkOverride = null): string
     {
         $linkMethod = $linkOverride ?: $this->options['do_links'];
         if ('none' == $linkMethod) {
@@ -446,10 +442,8 @@ final class PlainTextHelper
 
     /**
      * Callback function for preg_replace_callback use in PRE content handler.
-     *
-     * @param array $matches PREG matches
      */
-    private function pregPreCallback($matches): ?string
+    private function pregPreCallback(): ?string
     {
         return $this->preContent;
     }
@@ -496,11 +490,7 @@ final class PlainTextHelper
         return htmlspecialchars($str, ENT_COMPAT, self::ENCODING);
     }
 
-    /**
-     * @param string     $breakline
-     * @param bool|false $cut
-     */
-    private function linewrap(string $text, int $width, $breakline = "\n", $cut = false): string
+    private function linewrap(string $text, int $width, string $breakline = "\n", bool $cut = false): string
     {
         $lines = explode("\n", $text);
         $text  = '';

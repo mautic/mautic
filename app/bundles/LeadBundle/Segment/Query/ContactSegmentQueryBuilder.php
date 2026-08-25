@@ -38,12 +38,11 @@ final class ContactSegmentQueryBuilder
     }
 
     /**
-     * @param int                   $segmentId
      * @param ContactSegmentFilters $segmentFilters
      *
      * @throws SegmentQueryException
      */
-    public function assembleContactsSegmentQueryBuilder($segmentId, $segmentFilters, bool $changeAlias = false): QueryBuilder
+    public function assembleContactsSegmentQueryBuilder(int $segmentId, $segmentFilters, bool $changeAlias = false): QueryBuilder
     {
         /** @var Connection $connection */
         $connection = $this->entityManager->getConnection();
@@ -244,15 +243,9 @@ final class ContactSegmentQueryBuilder
     /**
      * Returns array with plan for processing.
      *
-     * @param int   $segmentId
-     * @param array $seen
-     * @param array $resolved
-     *
-     * @return array
-     *
      * @throws SegmentQueryException
      */
-    private function getResolutionPlan($segmentId, $seen = [], &$resolved = [])
+    private function getResolutionPlan(int $segmentId, array $seen = [], array &$resolved = []): array
     {
         $seen[] = $segmentId;
 
@@ -276,10 +269,7 @@ final class ContactSegmentQueryBuilder
         return $resolved;
     }
 
-    /**
-     * @param int $segmentId
-     */
-    private function getSegmentEdges($segmentId): array
+    private function getSegmentEdges(int $segmentId): array
     {
         $segment = $this->leadListRepository->find($segmentId);
         if (null === $segment) {

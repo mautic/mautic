@@ -10,16 +10,13 @@ use Mautic\ReportBundle\Scheduler\SchedulerInterface;
 final class SchedulerEntity implements SchedulerInterface
 {
     /**
-     * @param bool        $isScheduled
-     * @param string|null $scheduleUnit
-     * @param string|null $scheduleDay
-     * @param string|null $scheduleMonthFrequency
+     * @param bool $isScheduled
      */
     public function __construct(
         private $isScheduled,
-        private $scheduleUnit,
-        private $scheduleDay,
-        private $scheduleMonthFrequency,
+        private readonly ?string $scheduleUnit,
+        private readonly ?string $scheduleDay,
+        private readonly ?string $scheduleMonthFrequency,
     ) {
     }
 
@@ -31,26 +28,17 @@ final class SchedulerEntity implements SchedulerInterface
         return $this->isScheduled;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getScheduleUnit()
+    public function getScheduleUnit(): ?string
     {
         return $this->scheduleUnit;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getScheduleDay()
+    public function getScheduleDay(): ?string
     {
         return $this->scheduleDay;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getScheduleMonthFrequency()
+    public function getScheduleMonthFrequency(): ?string
     {
         return $this->scheduleMonthFrequency;
     }

@@ -26,18 +26,16 @@ final class ObjectChangeDAO
     ];
 
     /**
-     * @param string             $integration
-     * @param string             $object
      * @param mixed              $objectId
      * @param string             $mappedObject   Name of the source object type
      * @param mixed              $mappedId       ID of the source object
      * @param \DateTimeInterface $changeDateTime Date\Time the object was last changed
      */
     public function __construct(
-        private $integration,
-        private $object,
+        private readonly string $integration,
+        private readonly string $object,
         private $objectId,
-        private $mappedObject,
+        private readonly string $mappedObject,
         private $mappedId,
         private ?\DateTimeInterface $changeDateTime = null,
     ) {
@@ -62,10 +60,7 @@ final class ObjectChangeDAO
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getObject()
+    public function getObject(): string
     {
         return $this->object;
     }
@@ -88,10 +83,8 @@ final class ObjectChangeDAO
 
     /**
      * Returns the name/type for the object in this system that is being synced to the other.
-     *
-     * @return string
      */
-    public function getMappedObject()
+    public function getMappedObject(): string
     {
         return $this->mappedObject;
     }

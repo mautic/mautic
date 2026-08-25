@@ -198,7 +198,7 @@ final class SchemaHelper
     /**
      * @throws \Doctrine\DBAL\Exception
      */
-    private function backupExistingSchema($tables, array $mauticTables, $backupPrefix): array
+    private function backupExistingSchema(array $tables, array $mauticTables, string $backupPrefix): array
     {
         $sql = [];
         $sm  = $this->getSchemaManager();
@@ -292,7 +292,7 @@ final class SchemaHelper
         return $sql;
     }
 
-    private function dropExistingSchema($tables, array $mauticTables): array
+    private function dropExistingSchema(array $tables, array $mauticTables): array
     {
         $sql = [];
 
@@ -306,10 +306,7 @@ final class SchemaHelper
         return $sql;
     }
 
-    /**
-     * @return mixed[]|string
-     */
-    private function generateBackupName($prefix, $backupPrefix, $name): string|array
+    private function generateBackupName(?string $prefix, string $backupPrefix, string $name): string
     {
         if (empty($prefix) || !str_contains($name, $prefix)) {
             return $backupPrefix.$name;

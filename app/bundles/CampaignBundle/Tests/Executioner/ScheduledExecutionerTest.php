@@ -79,7 +79,7 @@ final class ScheduledExecutionerTest extends TestCase
         $counter = $this->getExecutioner()->execute($campaign, $limiter, new BufferedOutput());
         $this->assertInstanceOf(Counter::class, $counter);
 
-        $this->assertEquals(0, $counter->getTotalEvaluated());
+        $this->assertSame(0, $counter->getTotalEvaluated());
     }
 
     public function testSpecificEventsAreExecuted(): void
@@ -154,7 +154,7 @@ final class ScheduledExecutionerTest extends TestCase
         $this->assertInstanceOf(Counter::class, $counter);
 
         // Two events were evaluated
-        $this->assertEquals(2, $counter->getTotalEvaluated());
+        $this->assertSame(2, $counter->getTotalEvaluated());
     }
 
     public function testSpecificEventsWithUnpublishedCampaign(): void
@@ -229,8 +229,8 @@ final class ScheduledExecutionerTest extends TestCase
         $this->assertInstanceOf(Counter::class, $counter);
 
         // Two events were evaluated but not executed because campaign was unpublished
-        $this->assertEquals(2, $counter->getTotalEvaluated());
-        $this->assertEquals(0, $counter->getTotalExecuted());
+        $this->assertSame(2, $counter->getTotalEvaluated());
+        $this->assertSame(0, $counter->getTotalExecuted());
     }
 
     private function getExecutioner(): ScheduledExecutioner

@@ -18,17 +18,11 @@ final class DateHelper
      */
     private DateTimeHelper $helper;
 
-    /**
-     * @param string $dateFullFormat
-     * @param string $dateShortFormat
-     * @param string $dateOnlyFormat
-     * @param string $timeOnlyFormat
-     */
     public function __construct(
-        $dateFullFormat,
-        $dateShortFormat,
-        $dateOnlyFormat,
-        $timeOnlyFormat,
+        string $dateFullFormat,
+        string $dateShortFormat,
+        string $dateOnlyFormat,
+        string $timeOnlyFormat,
         private readonly TranslatorInterface $translator,
         private readonly CoreParametersHelper $coreParametersHelper,
     ) {

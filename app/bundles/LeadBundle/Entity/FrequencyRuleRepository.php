@@ -16,18 +16,15 @@ class FrequencyRuleRepository extends CommonRepository
      * @param array       $leadIds
      * @param string|null $defaultFrequencyNumber
      * @param string|null $defaultFrequencyTime
-     * @param string      $statTable
-     * @param string      $statSentColumn
-     * @param string      $statContactColumn
      */
     public function getAppliedFrequencyRules(
         $channel,
         $leadIds,
         $defaultFrequencyNumber,
         $defaultFrequencyTime,
-        $statTable = 'email_stats',
-        $statContactColumn = 'lead_id',
-        $statSentColumn = 'date_sent',
+        string $statTable = 'email_stats',
+        string $statContactColumn = 'lead_id',
+        string $statSentColumn = 'date_sent',
     ): array {
         if (empty($leadIds)) {
             return [];
@@ -115,11 +112,8 @@ class FrequencyRuleRepository extends CommonRepository
 
     /**
      * @param string $channel
-     * @param string $statTable
-     * @param string $statContactColumn
-     * @param string $statSentColumn
      */
-    private function getCustomFrequencyRuleViolations($channel, array $leadIds, $statTable, $statContactColumn, $statSentColumn): array
+    private function getCustomFrequencyRuleViolations($channel, array $leadIds, string $statTable, string $statContactColumn, string $statSentColumn): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -164,17 +158,14 @@ class FrequencyRuleRepository extends CommonRepository
     /**
      * @param string $defaultFrequencyNumber
      * @param string $defaultFrequencyTime
-     * @param string $statTable
-     * @param string $statContactColumn
-     * @param string $statSentColumn
      */
     private function getDefaultFrequencyRuleViolations(
         array $leadIds,
         $defaultFrequencyNumber,
         $defaultFrequencyTime,
-        $statTable,
-        $statContactColumn,
-        $statSentColumn,
+        string $statTable,
+        string $statContactColumn,
+        string $statSentColumn,
     ): array {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

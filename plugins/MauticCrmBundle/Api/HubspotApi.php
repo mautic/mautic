@@ -23,7 +23,7 @@ final class HubspotApi extends CrmApi
         parent::__construct($integration);
     }
 
-    private function request($operation, $parameters = [], $method = 'GET', $object = 'contacts')
+    private function request(string $operation, array $parameters = [], string $method = 'GET', string $object = 'contacts')
     {
         if ('oauth2' === $this->integration->getAuthenticationType()) {
             $url     = sprintf('%s/%s/%s/', $this->integration->getApiUrl(), $object, $operation);
@@ -101,7 +101,7 @@ final class HubspotApi extends CrmApi
      *
      * @return mixed
      */
-    public function getContacts($params = [])
+    public function getContacts(array $params = [])
     {
         return $this->request('v1/lists/recently_updated/contacts/recent?', $params, 'GET', 'contacts');
     }
@@ -111,7 +111,7 @@ final class HubspotApi extends CrmApi
      *
      * @return mixed
      */
-    public function getCompanies($params, $id)
+    public function getCompanies(array $params, $id)
     {
         if ($id) {
             return $this->request('v2/companies/'.$id, $params, 'GET', 'companies');
@@ -121,11 +121,9 @@ final class HubspotApi extends CrmApi
     }
 
     /**
-     * @param string $object
-     *
      * @return mixed|string
      */
-    public function createProperty($propertyName, $object = 'properties')
+    public function createProperty($propertyName, string $object = 'properties')
     {
         return $this->request('v1/contacts/properties', ['name' => $propertyName,  'groupName' => 'contactinformation', 'type' => 'string'], 'POST', $object);
     }

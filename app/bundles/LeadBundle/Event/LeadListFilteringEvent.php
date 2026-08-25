@@ -17,53 +17,34 @@ final class LeadListFilteringEvent extends CommonEvent
 
     private readonly string $leadsTableAlias;
 
-    /**
-     * @param array        $details
-     * @param int          $leadId
-     * @param string       $alias
-     * @param string       $func
-     * @param QueryBuilder $queryBuilder
-     */
     public function __construct(
-        private $details,
-        private $leadId,
-        private $alias,
-        private $func,
-        private $queryBuilder,
+        private array $details,
+        private readonly int|string|null $leadId,
+        private readonly string $alias,
+        private readonly string $func,
+        private readonly QueryBuilder $queryBuilder,
         EntityManagerInterface $entityManager,
     ) {
         $this->em              = $entityManager;
         $this->leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
     }
 
-    /**
-     * @return array
-     */
-    public function getDetails()
+    public function getDetails(): array
     {
         return $this->details;
     }
 
-    /**
-     * @return int
-     */
-    public function getLeadId()
+    public function getLeadId(): int|string|null
     {
         return $this->leadId;
     }
 
-    /**
-     * @return string
-     */
-    public function getAlias()
+    public function getAlias(): string
     {
         return $this->alias;
     }
 
-    /**
-     * @return string
-     */
-    public function getFunc()
+    public function getFunc(): string
     {
         return $this->func;
     }
@@ -76,10 +57,7 @@ final class LeadListFilteringEvent extends CommonEvent
         return $this->em;
     }
 
-    /**
-     * @return QueryBuilder
-     */
-    public function getQueryBuilder()
+    public function getQueryBuilder(): QueryBuilder
     {
         return $this->queryBuilder;
     }
@@ -106,10 +84,7 @@ final class LeadListFilteringEvent extends CommonEvent
         return $this->subQuery;
     }
 
-    /**
-     * @param array $details
-     */
-    public function setDetails($details): void
+    public function setDetails(array $details): void
     {
         $this->details = $details;
     }
