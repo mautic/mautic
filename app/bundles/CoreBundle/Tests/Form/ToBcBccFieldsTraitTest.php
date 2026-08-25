@@ -67,6 +67,23 @@ final class ToBcBccFieldsTraitTest extends TypeTestCase
         $this->assertTrue($form->isValid());
     }
 
+    public function testRequiredToEmptyValueFails(): void
+    {
+        $form = $this->factory->create(RequiredToBcBccStubFormType::class);
+        $form->submit(['to' => '', 'cc' => '', 'bcc' => '']);
+
+        $this->assertFalse($form->isValid());
+        $this->assertTrue($form->get('to')->getErrors()->count() > 0);
+    }
+
+    public function testRequiredToValidEmailPasses(): void
+    {
+        $form = $this->factory->create(RequiredToBcBccStubFormType::class);
+        $form->submit(['to' => 'user@example.com', 'cc' => '', 'bcc' => '']);
+
+        $this->assertTrue($form->isValid());
+    }
+
     public function testInvalidEmailFails(): void
     {
         $form = $this->factory->create(ToBcBccStubFormType::class);
@@ -110,5 +127,18 @@ final class ToBcBccStubFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $this->addToBcBccFields($builder);
+    }
+}
+
+/**
+ * @extends AbstractType<mixed>
+ */
+final class RequiredToBcBccStubFormType extends AbstractType
+{
+    use ToBcBccFieldsTrait;
+
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        $this->addToBcBccFields($builder, true);
     }
 }
