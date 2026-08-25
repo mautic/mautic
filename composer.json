@@ -239,11 +239,14 @@
         "Fix PostgreSQL platform indexes query for modern PG": "patches/doctrine-dbal-pgsql-platform-indexes.patch",
         "PHP 8.5+ PDO PgSQL driver compatibility": "patches/doctrine-dbal-pgsql-php85-driver.patch"
       },
-      "doctrine/persistence": {
-        "PHP 8.6+ replace deprecated spl_object_hash() with spl_object_id()": "patches/doctrine-persistence-spl-object-id.patch"
+      "doctrine/doctrine-bundle": {
+        "PHP 8.6+ replace deprecated spl_object_hash() with spl_object_id()": "patches/doctrine-bundle-spl-object-id.patch"
       },
       "symfony/doctrine-bridge": {
         "PHP 8.6+ replace deprecated spl_object_hash() with spl_object_id()": "patches/symfony-doctrine-bridge-spl-object-id.patch"
+      },
+      "doctrine/persistence": {
+        "PHP 8.6+ replace deprecated spl_object_hash() with spl_object_id()": "patches/doctrine-persistence-spl-object-id.patch"
       },
       "symfony/http-foundation": {
         "PHP 8.6+ add missing create_sid() in abstract session handler": "patches/symfony-doctrine-bridge-spl-object-id.patch"
