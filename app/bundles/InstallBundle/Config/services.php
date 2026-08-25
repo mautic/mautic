@@ -28,5 +28,4 @@ return function (ContainerConfigurator $configurator): void {
         ->tag('mautic.configurator.step', ['priority' => 0]);
     $services->set(Mautic\InstallBundle\Configurator\Step\DoctrineStep::class)->tag('mautic.configurator.step', ['priority' => 1]);
     $services->set(Mautic\InstallBundle\Configurator\Step\UserStep::class)->tag('mautic.configurator.step', ['priority' => 2]);
-    $services->set('mautic.install.service', Mautic\InstallBundle\Install\InstallService::class);
 };

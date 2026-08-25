@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Helper;
 
+use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Helper\AssetGenerationHelper;
+use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\CoreBundle\Twig\Helper\GravatarHelper;
+use Mautic\InstallBundle\Install\InstallService;
+use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Twig\Helper\AvatarHelper;
 use Mautic\LeadBundle\Twig\Helper\DefaultAvatarHelper;
@@ -28,7 +33,6 @@ final class AvatarHelperTest extends \PHPUnit\Framework\TestCase
     {
         $root = realpath(__DIR__.'/../../../../../');
 
-        $assetsHelperMock = new AssetsHelper($this->createStub(Packages::class));
         $pathsHelperMock  = $this->createMock(PathsHelper::class);
         $pathsHelperMock->method('getSystemPath')
         ->willReturn('http://localhost');
@@ -37,7 +41,21 @@ final class AvatarHelperTest extends \PHPUnit\Framework\TestCase
         $pathsHelperMock->method('getMediaPath')
           ->willReturn($root.'/media');
 
-        $assetsHelperMock->setPathsHelper($pathsHelperMock);
+        $assetGenerationHelperMock = new AssetGenerationHelper(
+            $this->createStub(BundleHelper::class),
+            $pathsHelperMock,
+            $this->createStub(CoreParametersHelper::class),
+            $this->createStub(AppVersion::class),
+        );
+
+        $assetsHelperMock = new AssetsHelper(
+            $this->createStub(Packages::class),
+            $pathsHelperMock,
+            $assetGenerationHelperMock,
+            $this->createStub(BuilderIntegrationsHelper::class),
+            $this->createStub(InstallService::class),
+            '',
+        );
         $defaultAvatarHelperMock       = new DefaultAvatarHelper($assetsHelperMock);
         $gravatarHelperMock            = new GravatarHelper($defaultAvatarHelperMock, $this->createStub(CoreParametersHelper::class), $this->createStub(RequestStack::class));
         $this->leadMock                = $this->createMock(Lead::class);
