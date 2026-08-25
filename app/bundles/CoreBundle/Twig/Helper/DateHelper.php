@@ -13,10 +13,7 @@ final class DateHelper
      */
     private readonly array $formats;
 
-    /**
-     * @api cannot be readonly, as changed in tests via reflection
-     */
-    private DateTimeHelper $helper;
+    private readonly DateTimeHelper $helper;
 
     public function __construct(
         string $dateFullFormat,
@@ -25,6 +22,7 @@ final class DateHelper
         string $timeOnlyFormat,
         private readonly TranslatorInterface $translator,
         private readonly CoreParametersHelper $coreParametersHelper,
+        ?DateTimeHelper $helper = null,
     ) {
         $this->formats = [
             'datetime' => $dateFullFormat,
@@ -33,7 +31,7 @@ final class DateHelper
             'time'     => $timeOnlyFormat,
         ];
 
-        $this->helper               = new DateTimeHelper('', 'Y-m-d H:i:s', 'local');
+        $this->helper = $helper ?? new DateTimeHelper('', 'Y-m-d H:i:s', 'local');
     }
 
     /**
