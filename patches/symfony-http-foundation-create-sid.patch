@@ -1,0 +1,16 @@
+diff --git a/vendor/symfony/http-foundation/Session/Storage/Handler/AbstractSessionHandler.php b/vendor/symfony/http-foundation/Session/Storage/Handler/AbstractSessionHandler.php
+index ccdabbfa7c..784dbaed4a 100644
+--- a/vendor/symfony/http-foundation/Session/Storage/Handler/AbstractSessionHandler.php
++++ b/vendor/symfony/http-foundation/Session/Storage/Handler/AbstractSessionHandler.php
+@@ -38,6 +38,11 @@ abstract class AbstractSessionHandler implements \SessionHandlerInterface, \Sess
+         return true;
+     }
+
++    public function create_sid(): string
++    {
++        return session_create_id() ?: throw new \RuntimeException('Unable to create a session ID.');
++    }
++
+     abstract protected function doRead(#[\SensitiveParameter] string $sessionId): string;
+
+     abstract protected function doWrite(#[\SensitiveParameter] string $sessionId, string $data): bool;

@@ -526,6 +526,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
             ->select('cl.lead_id, cl.manually_added, cl.manually_removed, cl.date_last_exited')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where("cl.campaign_id = {$campaignId}")
+            ->orderBy('cl.lead_id', 'ASC')
             ->executeQuery()
             ->fetchAllAssociative();
     }
