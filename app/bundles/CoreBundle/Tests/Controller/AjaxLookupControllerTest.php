@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class AjaxLookupControllerTest extends MauticMysqlTestCase
 {
-    private const AJAX_ROUTE = '/s/ajax';
+    private const string AJAX_ROUTE = '/s/ajax';
 
     public function testCompanyLookupWithOptions(): void
     {
