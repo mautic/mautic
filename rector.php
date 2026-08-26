@@ -30,7 +30,6 @@ return RectorConfig::configure()
         Rector\Instanceof_\Rector\Ternary\FlipNegatedTernaryInstanceofRector::class,
         Rector\TypeDeclarationDocblocks\Rector\ClassMethod\NarrowArrayCollectionUnionReturnDocblockRector::class,
         UnserializeToSerializerDecodeRector::class,
-        Utils\Rector\AddExpectsOnceToMockMethodCallRector::class,
 
         // DI
         Utils\Rector\ModelGetRepositoryToRepositoryServiceRector::class,
@@ -46,9 +45,6 @@ return RectorConfig::configure()
 
         // handle next
         Rector\PHPUnit\PHPUnit120\Rector\Class_\AllowMockObjectsWithoutExpectationsAttributeRector::class,
-
-        // applied in a follow-up pull request
-        Utils\Rector\AddExpectsOnceToMockMethodCallRector::class,
 
         Rector\Symfony\CodeQuality\Rector\Class_\LoadValidatorMetadataToAttributeRector::class,
         Utils\Rector\ModelGetRepositoryToRepositoryServiceRector::class => [
