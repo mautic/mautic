@@ -92,7 +92,7 @@ class TwilioTransport implements TransportInterface, MMSTransportInterface
      *
      * @throws NumberParseException
      */
-    private function sanitizeNumber($number)
+    private function sanitizeNumber(string $number)
     {
         $util   = PhoneNumberUtil::getInstance();
         $parsed = $util->parse($number, 'US');
