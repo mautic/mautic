@@ -88,7 +88,7 @@ final class DoctrineEventsSubscriber
 
                 $classMetadata->setSequenceGeneratorDefinition($newDefinition);
                 $em = $args->getEntityManager();
-                if (isset($classMetadata->idGenerator)) {
+                if (property_exists($classMetadata, 'idGenerator') && null !== $classMetadata->idGenerator) {
                     $sequenceGenerator = new SequenceGenerator(
                         $em->getConfiguration()->getQuoteStrategy()->getSequenceName(
                             $newDefinition,

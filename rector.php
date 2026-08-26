@@ -58,11 +58,6 @@ return RectorConfig::configure()
         // preference to compare null over object
         Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector::class,
 
-        Rector\CodeQuality\Rector\Isset_\IssetOnPropertyObjectToPropertyExistsRector::class => [
-            // doctrine magic
-            __DIR__.'/app/bundles/CoreBundle/EventListener/DoctrineEventsSubscriber.php',
-        ],
-
         // test fixtures
         __DIR__.'/plugins/*/node_modules/*',
         __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Helper/resource/',
