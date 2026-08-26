@@ -87,7 +87,7 @@ final class ReportOnDashboardAsTableFunctionalTest extends MauticMysqlTestCase
         $this->assertNotEmpty($query['daterange']['date_from'] ?? null);
         $this->assertNotEmpty($query['daterange']['date_to'] ?? null);
 
-        /** @var UrlGeneratorInterface $router */
+        /** @var string $expectedLink */
         $expectedLink = self::getContainer()->get(UrlGeneratorInterface::class)->generate('mautic_report_action', [
             'objectId'     => $report->getId(),
             'objectAction' => 'view',
