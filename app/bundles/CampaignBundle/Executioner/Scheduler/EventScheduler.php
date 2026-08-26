@@ -353,7 +353,7 @@ class EventScheduler
     /**
      * @param bool $isInactiveEvent
      */
-    private function scheduleEventForContacts(Event $event, AbstractEventAccessor $config, \DateTimeInterface $executionDate, ArrayCollection $contacts, $isInactiveEvent = false): void
+    private function scheduleEventForContacts(Event $event, AbstractEventAccessor $config, \DateTimeInterface $executionDate, ArrayCollection $contacts, bool $isInactiveEvent = false): void
     {
         foreach ($contacts as $contact) {
             // Create the entry
