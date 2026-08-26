@@ -9,6 +9,7 @@ use Doctrine\DBAL\Types\Types;
 use Mautic\CampaignBundle\DTO\EventLogStatsDto;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Entity\OptimisticLockInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
@@ -420,12 +421,14 @@ class LeadEventLogRepository extends CommonRepository
                     $q->expr()->eq('IDENTITY(o.event)', ':eventId'),
                     $q->expr()->eq('o.isScheduled', ':true'),
                     $q->expr()->lte('o.triggerDate', ':now'),
+                    $q->expr()->eq('o.version', ':initialVersion'),
                     $q->expr()->eq('c.isPublished', 1)
                 )
             )
             ->setParameter('eventId', (int) $eventId)
             ->setParameter('now', $now)
-            ->setParameter('true', true, Types::BOOLEAN);
+            ->setParameter('true', true, Types::BOOLEAN)
+            ->setParameter('initialVersion', OptimisticLockInterface::INITIAL_VERSION);
 
         $this->updateOrmQueryFromContactLimiter('o', $q, $limiter);
 

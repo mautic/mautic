@@ -39,9 +39,21 @@ final class OptimisticLockService implements OptimisticLockServiceInterface
 
     public function acquireLock(OptimisticLockInterface $entity, int $expectedVersion = OptimisticLockInterface::INITIAL_VERSION): bool
     {
-        $this->incrementVersion($entity);
+        $newVersion   = $expectedVersion + 1;
+        $affectedRows = $this->buildUpdateQuery($entity, $versionColumn)
+            ->set($versionColumn, ':newVersion')
+            ->andWhere($versionColumn.' = :expectedVersion')
+            ->setParameter('newVersion', $newVersion)
+            ->setParameter('expectedVersion', $expectedVersion)
+            ->executeStatement();
 
-        return ++$expectedVersion === $entity->getVersion();
+        if (1 !== $affectedRows) {
+            return false;
+        }
+
+        $entity->setVersion($newVersion);
+
+        return true;
     }
 
     private function buildUpdateQuery(OptimisticLockInterface $entity, ?string &$versionColumn = null): QueryBuilder // @phpstan-ignore parameterByRef.unusedType
