@@ -94,3 +94,16 @@ index befddb3681..b500a2c0a9 100644
          } elseif (isset($this->formsByView[$viewHash])) {
              // The FormInterface instance of the CSRF token is never contained in
              // the FormInterface tree of the form, so we need to get the
+diff --git a/vendor/symfony/form/Extension/DataCollector/FormDataExtractor.php.orig b/vendor/symfony/form/Extension/DataCollector/FormDataExtractor.php
+index f56fe911fa..1ab69e2419 100644
+--- a/vendor/symfony/form/Extension/DataCollector/FormDataExtractor.php.orig
++++ b/vendor/symfony/form/Extension/DataCollector/FormDataExtractor.php
+@@ -88,7 +88,7 @@ class FormDataExtractor implements FormDataExtractorInterface
+             $errorData = [
+                 'message' => $error->getMessage(),
+                 'origin' => \is_object($error->getOrigin())
+-                    ? spl_object_hash($error->getOrigin())
++                    ? spl_object_id($error->getOrigin())
+                     : null,
+                 'trace' => [],
+             ];
