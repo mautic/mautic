@@ -6,16 +6,13 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class DateHelper
+final readonly class DateHelper
 {
     /**
      * @var string[]
      */
-    private readonly array $formats;
+    private array $formats;
 
-    /**
-     * @api cannot be readonly, as changed in tests via reflection
-     */
     private DateTimeHelper $helper;
 
     public function __construct(
@@ -23,8 +20,9 @@ final class DateHelper
         string $dateShortFormat,
         string $dateOnlyFormat,
         string $timeOnlyFormat,
-        private readonly TranslatorInterface $translator,
-        private readonly CoreParametersHelper $coreParametersHelper,
+        private TranslatorInterface $translator,
+        private CoreParametersHelper $coreParametersHelper,
+        ?DateTimeHelper $helper = null,
     ) {
         $this->formats = [
             'datetime' => $dateFullFormat,
@@ -33,7 +31,7 @@ final class DateHelper
             'time'     => $timeOnlyFormat,
         ];
 
-        $this->helper               = new DateTimeHelper('', 'Y-m-d H:i:s', 'local');
+        $this->helper = $helper ?? new DateTimeHelper('', 'Y-m-d H:i:s', 'local');
     }
 
     /**

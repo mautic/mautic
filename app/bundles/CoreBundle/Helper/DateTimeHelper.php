@@ -6,11 +6,11 @@ use Mautic\CoreBundle\Loader\ParameterLoader;
 
 class DateTimeHelper
 {
-    public const FORMAT_DB = 'Y-m-d H:i:s';
+    public const string FORMAT_DB = 'Y-m-d H:i:s';
+
+    public const string FORMAT_DB_DATE_ONLY = 'Y-m-d';
 
     private static ?string $defaultLocalTimezone = null;
-
-    public const FORMAT_DB_DATE_ONLY = 'Y-m-d';
 
     /**
      * @var string
