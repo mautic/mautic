@@ -559,7 +559,7 @@ final class PublicController extends CommonFormController
     /**
      * @throws \Exception
      */
-    private function doTracking(Request $request, IntegrationHelper $integrationHelper, MailHelper $mailer, $integration): void
+    private function doTracking(Request $request, IntegrationHelper $integrationHelper, MailHelper $mailer, string $integration): void
     {
         // if additional data were sent with the tracking pixel
         $query_string = $request->server->get('QUERY_STRING');
@@ -664,7 +664,7 @@ final class PublicController extends CommonFormController
     /**
      * @param array<string, mixed> $query
      */
-    private function addStat(MailHelper $mailer, $lead, string $email, array $query, string $idHash): ?Stat
+    private function addStat(MailHelper $mailer, ?array $lead, string $email, array $query, string $idHash): ?Stat
     {
         if (null !== $lead) {
             // To lead
