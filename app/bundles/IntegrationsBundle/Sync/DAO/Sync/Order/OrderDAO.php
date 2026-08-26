@@ -63,8 +63,8 @@ class OrderDAO
      */
     public function __construct(
         private readonly \DateTimeInterface $syncDateTime,
-        private $isFirstTimeSync,
-        private $integration,
+        private bool $isFirstTimeSync,
+        private string $integration,
         private readonly array $options = [],
     ) {
     }

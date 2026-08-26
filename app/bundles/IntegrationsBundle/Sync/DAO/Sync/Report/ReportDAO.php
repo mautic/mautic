@@ -22,7 +22,7 @@ class ReportDAO
      * @param string $integration
      */
     public function __construct(
-        private $integration,
+        private string $integration,
     ) {
         $this->relationsDAO    = new RelationsDAO();
     }

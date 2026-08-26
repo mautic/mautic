@@ -18,8 +18,8 @@ class UpdatedObjectMappingDAO
      * @param mixed  $integrationObjectId
      */
     public function __construct(
-        private $integration,
-        private $integrationObjectName,
+        private string $integration,
+        private string $integrationObjectName,
         private $integrationObjectId,
         \DateTimeInterface $objectModifiedDate,
     ) {

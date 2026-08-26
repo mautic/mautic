@@ -18,7 +18,7 @@ final class ObjectDAO
      * @param mixed  $objectId
      */
     public function __construct(
-        private $object,
+        private string $object,
         private $objectId,
         private ?\DateTimeInterface $changeDateTime = null,
     ) {

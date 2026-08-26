@@ -12,7 +12,7 @@ final class FieldDAO
      * @param string $name
      */
     public function __construct(
-        private $name,
+        private string $name,
         private readonly NormalizedValueDAO $value,
     ) {
     }

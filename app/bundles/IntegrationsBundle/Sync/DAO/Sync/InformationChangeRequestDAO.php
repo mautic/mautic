@@ -18,7 +18,7 @@ final class InformationChangeRequestDAO
     public function __construct(
         private readonly string $integration,
         private readonly string $objectName,
-        private $objectId,
+        private mixed $objectId,
         private readonly string $field,
         private readonly NormalizedValueDAO $newValue,
     ) {

@@ -13,9 +13,9 @@ final class RemappedObjectDAO
     public function __construct(
         private readonly string $integration,
         private readonly string $oldObjectName,
-        private $oldObjectId,
+        private mixed $oldObjectId,
         private readonly string $newObjectName,
-        private $newObjectId,
+        private mixed $newObjectId,
     ) {
     }
 
