@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\Notification\Helper;
 
 use Mautic\IntegrationsBundle\Event\InternalObjectRouteEvent;
-use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
 use Mautic\IntegrationsBundle\Sync\Notification\Helper\RouteHelper;
@@ -55,8 +54,7 @@ final class RouteHelperTest extends TestCase
                     $event->setRoute('route/for/id/1');
 
                     return true;
-                }),
-                IntegrationEvents::INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE
+                })
             );
 
         $this->routeHelper->getRoute(Contact::NAME, 1);
@@ -81,8 +79,7 @@ final class RouteHelperTest extends TestCase
                     $event->setRoute('route/for/id/1');
 
                     return true;
-                }),
-                IntegrationEvents::INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE
+                })
             );
 
         $this->routeHelper->getRoute(Company::NAME, 1);
@@ -121,8 +118,7 @@ final class RouteHelperTest extends TestCase
                     $event->setRoute('route/for/id/1');
 
                     return true;
-                }),
-                IntegrationEvents::INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE
+                })
             );
 
         $link = $this->routeHelper->getLink(Contact::NAME, 1, 'Hello');
@@ -149,7 +145,6 @@ final class RouteHelperTest extends TestCase
                         $event->setRoute('route/for/id/1');
                     };
                     $callback($parameters[0]);
-                    $this->assertSame(IntegrationEvents::INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE, $parameters[1]);
                 }
                 if (2 === $matcher->numberOfInvocations()) {
                     $callback = function (InternalObjectRouteEvent $event) use ($internalObject): void {
@@ -160,7 +155,6 @@ final class RouteHelperTest extends TestCase
                         $event->setRoute('route/for/id/2');
                     };
                     $callback($parameters[0]);
-                    $this->assertSame(IntegrationEvents::INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE, $parameters[1]);
                 }
 
                 return $parameters[0];

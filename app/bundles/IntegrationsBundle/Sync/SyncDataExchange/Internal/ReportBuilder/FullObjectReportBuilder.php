@@ -101,7 +101,7 @@ class FullObjectReportBuilder
     {
         $fields = $requestedObjectDAO->getFields();
 
-        if ($this->dispatcher->hasListeners(IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORD)) {
+        if ($this->dispatcher->hasListeners(InternalObjectFindByIdEvent::class)) {
             $event = new InternalObjectFindByIdEvent($this->objectProvider->getObjectByName($requestedObjectDAO->getObject()));
         }
 
@@ -116,7 +116,7 @@ class FullObjectReportBuilder
             if (isset($event)) {
                 // Update object id rather than creating the event again.
                 $event->setId((int) $object['id']);
-                $this->dispatcher->dispatch($event, IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORD);
+                $this->dispatcher->dispatch($event);
 
                 if (!$event->getEntity()) {
                     // Object not found, continue.

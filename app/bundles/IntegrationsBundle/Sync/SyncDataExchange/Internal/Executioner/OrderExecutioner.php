@@ -6,7 +6,6 @@ namespace Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner;
 
 use Mautic\IntegrationsBundle\Event\InternalObjectCreateEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectUpdateEvent;
-use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectMappingsDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO;
@@ -86,7 +85,7 @@ class OrderExecutioner
             return;
         }
 
-        $this->dispatcher->dispatch($event, IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS);
+        $this->dispatcher->dispatch($event);
         $updatedObjectMappings = $event->getUpdatedObjectMappings();
         $this->mappingHelper->updateObjectMappings($updatedObjectMappings);
 
@@ -137,7 +136,7 @@ class OrderExecutioner
             return;
         }
 
-        $this->dispatcher->dispatch($event, IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS);
+        $this->dispatcher->dispatch($event);
         $createdObjectMappings = $event->getObjectMappings();
         $this->mappingHelper->saveObjectMappings($createdObjectMappings);
 

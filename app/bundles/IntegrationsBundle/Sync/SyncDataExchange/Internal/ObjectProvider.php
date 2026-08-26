@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal;
 
 use Mautic\IntegrationsBundle\Event\InternalObjectEvent;
-use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\ObjectInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -64,7 +63,7 @@ class ObjectProvider
     {
         if ([] === $this->objects) {
             $event = new InternalObjectEvent();
-            $this->dispatcher->dispatch($event, IntegrationEvents::INTEGRATION_COLLECT_INTERNAL_OBJECTS);
+            $this->dispatcher->dispatch($event);
             $this->objects = $event->getObjects();
         }
     }

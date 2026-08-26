@@ -7,7 +7,6 @@ namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange\Internal\Ex
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use Mautic\IntegrationsBundle\Event\InternalObjectCreateEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectUpdateEvent;
-use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO;
@@ -89,7 +88,6 @@ final class OrderExecutionerTest extends TestCase
                         $this->assertCount(2, $event->getUpdateObjects());
                     };
                     $callback($parameters[0]);
-                    $this->assertSame(IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS, $parameters[1]);
                 }
                 if (2 === $matcher->numberOfInvocations()) {
                     $callback = function (InternalObjectCreateEvent $event): void {
@@ -97,7 +95,6 @@ final class OrderExecutionerTest extends TestCase
                         $this->assertCount(1, $event->getCreateObjects());
                     };
                     $callback($parameters[0]);
-                    $this->assertSame(IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS, $parameters[1]);
                 }
 
                 return $parameters[0];
@@ -158,7 +155,6 @@ final class OrderExecutionerTest extends TestCase
                         $event->setUpdatedObjectMappings($updatedObjectMappings);
                     };
                     $callback($parameters[0]);
-                    $this->assertSame(IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS, $parameters[1]);
                 }
                 if (2 === $matcher->numberOfInvocations()) {
                     $callback = function (InternalObjectCreateEvent $event): void {
@@ -166,7 +162,6 @@ final class OrderExecutionerTest extends TestCase
                         $this->assertCount(1, $event->getCreateObjects());
                     };
                     $callback($parameters[0]);
-                    $this->assertSame(IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS, $parameters[1]);
                 }
 
                 return $parameters[0];
@@ -204,7 +199,6 @@ final class OrderExecutionerTest extends TestCase
                         $this->assertCount(2, $event->getUpdateObjects());
                     };
                     $callback($parameters[0]);
-                    $this->assertSame(IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS, $parameters[1]);
                 }
                 if (2 === $matcher->numberOfInvocations()) {
                     $callback = function (InternalObjectCreateEvent $event): void {
@@ -212,7 +206,6 @@ final class OrderExecutionerTest extends TestCase
                         $this->assertCount(1, $event->getCreateObjects());
                     };
                     $callback($parameters[0]);
-                    $this->assertSame(IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS, $parameters[1]);
                 }
 
                 return $parameters[0];
@@ -286,7 +279,6 @@ final class OrderExecutionerTest extends TestCase
                         $event->setUpdatedObjectMappings($updatedObjectMappings);
                     };
                     $callback($parameters[0]);
-                    $this->assertSame(IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS, $parameters[1]);
                 }
                 if (2 === $matcher->numberOfInvocations()) {
                     $callback = function (InternalObjectUpdateEvent $event): void {
@@ -311,7 +303,6 @@ final class OrderExecutionerTest extends TestCase
                         $event->setUpdatedObjectMappings($updatedObjectMappings);
                     };
                     $callback($parameters[0]);
-                    $this->assertSame(IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS, $parameters[1]);
                 }
                 if (3 === $matcher->numberOfInvocations()) {
                     $callback = function (InternalObjectCreateEvent $event): void {
@@ -329,7 +320,6 @@ final class OrderExecutionerTest extends TestCase
                         $event->setObjectMappings($createdObjectMappings);
                     };
                     $callback($parameters[0]);
-                    $this->assertSame(IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS, $parameters[1]);
                 }
                 if (4 === $matcher->numberOfInvocations()) {
                     $callback = function (InternalObjectCreateEvent $event): void {
@@ -347,7 +337,6 @@ final class OrderExecutionerTest extends TestCase
                         $event->setObjectMappings($createdObjectMappings);
                     };
                     $callback($parameters[0]);
-                    $this->assertSame(IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS, $parameters[1]);
                 }
 
                 return $parameters[0];
@@ -378,7 +367,7 @@ final class OrderExecutionerTest extends TestCase
 
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with($this->isInstanceOf(InternalObjectCreateEvent::class), IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS);
+            ->with($this->isInstanceOf(InternalObjectCreateEvent::class));
 
         $this->orderExecutioner->execute($syncOrder);
     }
@@ -390,7 +379,7 @@ final class OrderExecutionerTest extends TestCase
 
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with($this->isInstanceOf(InternalObjectUpdateEvent::class), IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS);
+            ->with($this->isInstanceOf(InternalObjectUpdateEvent::class));
 
         $this->orderExecutioner->execute($syncOrder);
     }
