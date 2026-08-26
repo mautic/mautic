@@ -1,0 +1,25 @@
+diff --git a/vendor/klapaudius/oauth-server-bundle/Util/Random.php b/vendor/klapaudius/oauth-server-bundle/Util/Random.php
+index 4532449195..5a9a04dfb3 100644
+--- a/vendor/klapaudius/oauth-server-bundle/Util/Random.php
++++ b/vendor/klapaudius/oauth-server-bundle/Util/Random.php
+@@ -23,7 +23,18 @@ class Random
+     public static function generateToken(): string
+     {
+         $bytes = random_bytes(32);
++        $hex   = bin2hex($bytes);
+
+-        return base_convert(bin2hex($bytes), 16, 36);
++        if (\function_exists('gmp_init')) {
++            return \gmp_strval(\gmp_init($hex, 16), 36);
++        }
++
++        // No GMP: convert 4-byte chunks (each fits float precision)
++        // Fix for input number is larger than PHP_INT_MAX, precision has been lost in conversion
++        $token = '';
++        foreach (str_split($bytes, 4) as $chunk) {
++            $token .= base_convert(bin2hex($chunk), 16, 36);
++        }
++
++        return $token;
+     }
+ }

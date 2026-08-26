@@ -2,7 +2,7 @@ diff --git a/vendor/symfony/event-dispatcher/Debug/TraceableEventDispatcher.php 
 index 0d78228b44..8cd330f333 100644
 --- a/vendor/symfony/event-dispatcher/Debug/TraceableEventDispatcher.php
 +++ b/vendor/symfony/event-dispatcher/Debug/TraceableEventDispatcher.php
-@@ -114,7 +114,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
+@@ -114,7 +114,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterface
 
          $this->callStack ??= new \SplObjectStorage();
 

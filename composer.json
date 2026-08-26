@@ -251,6 +251,9 @@
       "jms/serializer-bundle": {
         "PHP 8.6+ replace deprecated spl_object_hash() with spl_object_id()": "patches/jms-serializer-bundle-spl-object-id.patch"
       },
+      "klapaudius/oauth-server-bundle": {
+        "PHP 8.6+ precision lost in conversion fix": "patches/klapaudius-oauth-server-bundle-lost-precision.patch"
+      },
       "predis/predis": {
         "PHP 8.6+ replace deprecated spl_object_hash() with spl_object_id()": "patches/predis-spl-object-id.patch"
       },
