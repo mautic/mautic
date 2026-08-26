@@ -1,8 +1,8 @@
 diff --git a/vendor/klapaudius/oauth-server-bundle/Util/Random.php b/vendor/klapaudius/oauth-server-bundle/Util/Random.php
-index 4532449195..5a9a04dfb3 100644
+index 4532449195..031df1c44c 100644
 --- a/vendor/klapaudius/oauth-server-bundle/Util/Random.php
 +++ b/vendor/klapaudius/oauth-server-bundle/Util/Random.php
-@@ -23,7 +23,18 @@ class Random
+@@ -23,7 +23,19 @@ class Random
      public static function generateToken(): string
      {
          $bytes = random_bytes(32);
