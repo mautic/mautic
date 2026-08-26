@@ -12,7 +12,7 @@ final class HourStat
      * @param string $hour "2018-12-07 12" format
      */
     public function __construct(
-        private $hour,
+        private string $hour,
     ) {
     }
 

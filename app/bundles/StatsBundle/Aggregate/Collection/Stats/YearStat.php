@@ -14,7 +14,7 @@ final class YearStat implements StatInterface
     /**
      * @param int $year
      */
-    public function __construct($year)
+    public function __construct(int $year)
     {
         $this->year = (int) $year;
     }
