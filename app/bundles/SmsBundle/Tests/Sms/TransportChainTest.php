@@ -100,6 +100,11 @@ final class TransportChainTest extends MauticMysqlTestCase
             {
                 return true;
             }
+
+            public function getIntegrationAlias(): string
+            {
+                return 'BulkTwilio';
+            }
         };
         $this->createDataAndAssertSendMessage($bulkSmsTransport);
     }
@@ -115,6 +120,11 @@ final class TransportChainTest extends MauticMysqlTestCase
             public function sendSms(Lead $lead, $content): bool
             {
                 return true;
+            }
+
+            public function getIntegrationAlias(): string
+            {
+                return 'Twilio';
             }
         };
         $this->createDataAndAssertSendMessage($mmsTransport);

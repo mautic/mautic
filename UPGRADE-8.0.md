@@ -257,3 +257,21 @@
         ->args([service('knp_menu.matcher'), service('twig'), ['template' => '@MyBundle/Menu/mybundle.html.twig']])
         ->tag('knp_menu.renderer', ['alias' => 'mybundle']);
     ```
+
+- `Mautic\SmsBundle\Sms\TransportChain` now collects SMS transports through an `#[AutowireIterator('mautic.sms_transport')]` constructor argument instead of the removed `Mautic\SmsBundle\DependencyInjection\Compiler\SmsTransportPass`. The integration alias that used to be carried by the `integrationAlias` tag attribute is now read from a new `getIntegrationAlias()` method on `Mautic\SmsBundle\Sms\TransportInterface`. Every SMS transport must implement it and its `mautic.sms_transport` tag no longer needs the `integrationAlias` attribute:
+
+    ```diff
+     class MyTransport implements TransportInterface
+     {
+    +    public function getIntegrationAlias(): string
+    +    {
+    +        return 'MyIntegration';
+    +    }
+     }
+    ```
+
+    ```diff
+     $services->set(MyTransport::class)
+    -    ->tag('mautic.sms_transport', ['integrationAlias' => 'MyIntegration']);
+    +    ->tag('mautic.sms_transport');
+    ```

@@ -25,4 +25,9 @@ final class ArrayTransport implements TransportInterface
 
         return true;
     }
+
+    public function getIntegrationAlias(): string
+    {
+        return 'Twilio';
+    }
 }

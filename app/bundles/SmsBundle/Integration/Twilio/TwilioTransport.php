@@ -31,6 +31,11 @@ class TwilioTransport implements TransportInterface, MMSTransportInterface
         return $this->sendMessage($lead, $content);
     }
 
+    public function getIntegrationAlias(): string
+    {
+        return 'Twilio';
+    }
+
     /**
      * @param array<mixed> $media
      */

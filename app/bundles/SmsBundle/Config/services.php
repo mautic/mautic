@@ -25,7 +25,7 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->set(Mautic\SmsBundle\Integration\Twilio\TwilioTransport::class)
         ->arg('$logger', service('monolog.logger.mautic'))
-        ->tag('mautic.sms_transport', ['integrationAlias' => 'Twilio']);
+        ->tag('mautic.sms_transport');
 
     $services->alias('mautic.sms.twilio.transport', Mautic\SmsBundle\Integration\Twilio\TwilioTransport::class);
     $services->set(Mautic\SmsBundle\Helper\SmsHelper::class)->tag('twig.helper', ['alias' => 'sms_helper']);

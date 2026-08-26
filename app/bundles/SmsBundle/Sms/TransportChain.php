@@ -8,6 +8,7 @@ use Mautic\SmsBundle\Collection\RecipientCollection;
 use Mautic\SmsBundle\Entity\Stat;
 use Mautic\SmsBundle\Exception\PrimaryTransportNotEnabledException;
 use Mautic\SmsBundle\Helper\DTO\SmsRecipientDTO;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 class TransportChain
 {
@@ -17,12 +18,18 @@ class TransportChain
     private array $transports = [];
 
     /**
-     * @param string $primaryTransport
+     * @param string                       $primaryTransport
+     * @param iterable<TransportInterface> $transports       services tagged "mautic.sms_transport"
      */
     public function __construct(
         private $primaryTransport,
         private readonly IntegrationHelper $integrationHelper,
+        #[AutowireIterator('mautic.sms_transport')]
+        iterable $transports = [],
     ) {
+        foreach ($transports as $transport) {
+            $this->addTransport($transport::class, $transport, $transport::class, $transport->getIntegrationAlias());
+        }
     }
 
     /**
