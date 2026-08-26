@@ -1,0 +1,13 @@
+diff --git a/vendor/symfony/validator/Context/ExecutionContext.php b/vendor/symfony/validator/Context/ExecutionContext.php
+index 1fd373309d..0696c8d300 100644
+--- a/vendor/symfony/validator/Context/ExecutionContext.php
++++ b/vendor/symfony/validator/Context/ExecutionContext.php
+@@ -262,7 +262,7 @@ class ExecutionContext implements ExecutionContextInterface
+     public function generateCacheKey(object $object): string
+     {
+         if (!isset($this->cachedObjectsRefs[$object])) {
+-            $this->cachedObjectsRefs[$object] = spl_object_hash($object);
++            $this->cachedObjectsRefs[$object] = spl_object_id($object);
+         }
+
+         return $this->cachedObjectsRefs[$object];

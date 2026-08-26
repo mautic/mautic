@@ -256,6 +256,9 @@
       },
       "symfony/http-foundation": {
         "PHP 8.6+ add missing create_sid() in abstract session handler": "patches/symfony-http-foundation-create-sid.patch"
+      },
+      "symfony/validator": {
+        "PHP 8.6+ replace deprecated spl_object_hash() with spl_object_id()": "patches/symfony-validator-spl-object-id.patch"
       }
     }
   }
