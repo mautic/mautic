@@ -24,7 +24,7 @@ return RectorConfig::configure()
     ->withPhpSets(php84: true)
     ->withCache(__DIR__.'/var/cache/rector')
     ->withRules([
-        \Utils\Rector\AssertTrueResponseIsOkToAssertResponseIsSuccessfulRector::class,
+        Utils\Rector\AssertTrueResponseIsOkToAssertResponseIsSuccessfulRector::class,
         Rector\PHPUnit\CodeQuality\Rector\ClassMethod\AssertClassToThisAssertRector::class,
         Rector\TypeDeclarationDocblocks\Rector\Property\MergePhpstanDocTagIntoNativeRector::class,
 
