@@ -74,7 +74,26 @@ final class ReportOnDashboardAsTableFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($expected, $columns);
 
         $link = $crawler->filter('.pull-right a')->attr('href');
-        $this->assertSame('/s/reports/view/'.$report->getId(), $link);
+        $this->assertNotNull($link);
+
+        $parts = parse_url($link);
+        $this->assertSame('/s/reports/view/'.$report->getId(), $parts['path'] ?? null);
+
+        $query = [];
+        parse_str($parts['query'] ?? '', $query);
+
+        $this->assertArrayHasKey('daterange', $query);
+        $this->assertNotEmpty($query['daterange']['date_from'] ?? null);
+        $this->assertNotEmpty($query['daterange']['date_to'] ?? null);
+
+        // Regenrate full URL via router
+        $expectedLink = self::getContainer()->get('router')->generate('mautic_report_action', [
+            'objectId'     => $report->getId(),
+            'objectAction' => 'view',
+            'daterange'    => $query['daterange'],
+        ]);
+
+        $this->assertSame($expectedLink, $link);
     }
 
     private function createReport(): Report
