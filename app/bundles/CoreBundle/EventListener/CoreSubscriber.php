@@ -120,7 +120,7 @@ final readonly class CoreSubscriber implements EventSubscriberInterface
         foreach ($bundles as $bundle) {
             if (!empty($bundle['config']['routes'][$type])) {
                 foreach ($bundle['config']['routes'][$type] as $name => $details) {
-                    if ('api' == $type && !empty($details['standard_entity'])) {
+                    if ('api' === $type && !empty($details['standard_entity'])) {
                         $standards = [
                             'getall' => [
                                 'action' => 'getEntities',
