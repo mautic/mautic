@@ -82,7 +82,7 @@ class FilePathResolver
     /**
      * @param string $uploadDir
      */
-    private function getFilePath($uploadDir, string $fileName, string $ext): string
+    private function getFilePath(string $uploadDir, string $fileName, string $ext): string
     {
         return $uploadDir.DIRECTORY_SEPARATOR.$fileName.$ext;
     }
