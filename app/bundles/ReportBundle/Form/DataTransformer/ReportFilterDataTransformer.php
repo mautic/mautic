@@ -17,7 +17,7 @@ final class ReportFilterDataTransformer implements DataTransformerInterface
      * @param array $columns
      */
     public function __construct(
-        private $columns,
+        private array $columns,
     ) {
     }
 

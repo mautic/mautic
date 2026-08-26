@@ -12,7 +12,7 @@ use Symfony\Component\Form\DataTransformerInterface;
 final class SecondsConversionTransformer implements DataTransformerInterface
 {
     public function __construct(
-        private $viewFormat = 'H',
+        private string $viewFormat = 'H',
     ) {
     }
 

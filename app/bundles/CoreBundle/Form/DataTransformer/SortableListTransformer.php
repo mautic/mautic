@@ -15,8 +15,8 @@ final class SortableListTransformer implements DataTransformerInterface
      * @param bool $useKeyValuePairs
      */
     public function __construct(
-        private $withLabels = true,
-        private $useKeyValuePairs = false,
+        private bool $withLabels = true,
+        private bool $useKeyValuePairs = false,
     ) {
     }
 

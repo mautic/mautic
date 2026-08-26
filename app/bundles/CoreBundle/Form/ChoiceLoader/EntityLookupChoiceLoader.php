@@ -29,7 +29,7 @@ final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         private readonly ModelFactory $modelFactory,
         private readonly TranslatorInterface $translator,
         private readonly Connection $connection,
-        private $options = [],
+        private Options|array $options = [],
     ) {
         if (is_array($options)) {
             $options = new OptionsResolver()->setDefaults($options);
