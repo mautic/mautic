@@ -372,7 +372,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
         /**
          * @param mixed[] $context
          */
-        private function log(string $logLevel, string $message, array $context = [], $debugTrace = null): void
+        private function log(string $logLevel, string $message, array $context = [], ?array $debugTrace = null): void
         {
             $message = strip_tags($message);
             if ($this->logger) {
