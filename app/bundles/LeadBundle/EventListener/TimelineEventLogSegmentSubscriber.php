@@ -20,9 +20,9 @@ final class TimelineEventLogSegmentSubscriber implements EventSubscriberInterfac
 
     public function __construct(
         LeadEventLogRepository $eventLogRepository,
-        private UserHelper $userHelper,
+        private readonly UserHelper $userHelper,
         Translator $translator,
-        private EntityManagerInterface $em,
+        private readonly EntityManagerInterface $em,
     ) {
         $this->eventLogRepository = $eventLogRepository;
         $this->translator         = $translator;

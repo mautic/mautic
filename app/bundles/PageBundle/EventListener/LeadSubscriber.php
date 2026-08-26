@@ -23,10 +23,10 @@ final class LeadSubscriber implements EventSubscriberInterface
      * @param ModelFactory<object> $modelFactory
      */
     public function __construct(
-        private PageModel $pageModel,
-        private VideoModel $pageVideoModel,
-        private TranslatorInterface $translator,
-        private RouterInterface $router,
+        private readonly PageModel $pageModel,
+        private readonly VideoModel $pageVideoModel,
+        private readonly TranslatorInterface $translator,
+        private readonly RouterInterface $router,
         ModelFactory $modelFactory,
     ) {
         $this->setModelFactory($modelFactory);

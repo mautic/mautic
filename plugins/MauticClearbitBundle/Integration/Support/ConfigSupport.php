@@ -17,7 +17,7 @@ final class ConfigSupport extends ClearbitIntegration implements ConfigFormInter
     use DefaultConfigFormTrait;
 
     public function __construct(
-        private RouterInterface $router,
+        private readonly RouterInterface $router,
     ) {
     }
 

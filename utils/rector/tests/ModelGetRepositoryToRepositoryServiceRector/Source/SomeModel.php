@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Model\AbstractCommonModel;
 /**
  * @extends AbstractCommonModel<object>
  */
-class SomeModel extends AbstractCommonModel
+final class SomeModel extends AbstractCommonModel
 {
     public function __construct(
         private readonly SomeRepository $someRepository,

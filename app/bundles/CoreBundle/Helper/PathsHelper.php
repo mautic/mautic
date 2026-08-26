@@ -10,7 +10,7 @@ class PathsHelper
     /**
      * @var array<string, string>
      */
-    private array $paths;
+    private readonly array $paths;
 
     /**
      * @var string
@@ -58,6 +58,7 @@ class PathsHelper
         $this->kernelLogsDir          = $this->removeTrailingSlash($logsDir);
         $this->kernelRootDir          = $this->removeTrailingSlash($root);
 
+        /** @var array<string, string> $paths */
         $paths = [];
         include $root.'/config/paths_helper.php';
 
