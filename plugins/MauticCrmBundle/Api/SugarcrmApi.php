@@ -581,7 +581,6 @@ final class SugarcrmApi extends CrmApi
             $result = [];
 
             if ([] !== $fields) {
-                $q   = '';
                 $qry = [];
                 if (isset($query['start'])) {
                     $qry[] = ' '.strtolower($object).".date_modified >= '".$query['start']."' ";

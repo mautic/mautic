@@ -119,9 +119,9 @@ final class DateHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn($now);
 
         // Inject the mock DateTimeHelper into DateHelper
-        ReflectionHelper::setValue($this->helper, 'helper', $dateTimeHelperMock);
+        $helper = $this->createDateHelperWithDateTimeHelper($dateTimeHelperMock);
 
-        $result = $this->helper->toText($now);
+        $result = $helper->toText($now);
 
         // Assertions
         $this->assertSame('Today', $result);
@@ -177,10 +177,10 @@ final class DateHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn('today');
 
         // Inject the mock DateTimeHelper into DateHelper
-        ReflectionHelper::setValue($this->helper, 'helper', $dateTimeHelperMock);
+        $helper = $this->createDateHelperWithDateTimeHelper($dateTimeHelperMock);
 
         $now    = new \DateTime('now', new \DateTimeZone('UTC'));
-        $result = $this->helper->toTextShort($now);
+        $result = $helper->toTextShort($now);
 
         $this->assertSame('Today', $result);
     }
@@ -199,10 +199,10 @@ final class DateHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn('December 31, 2023');
 
         // Inject the mock DateTimeHelper into DateHelper
-        ReflectionHelper::setValue($this->helper, 'helper', $dateTimeHelperMock);
+        $helper = $this->createDateHelperWithDateTimeHelper($dateTimeHelperMock);
 
         $olderDate = '2023-12-31 23:59:59';
-        $result    = $this->helper->toTextShort($olderDate, 'UTC', 'Y-m-d H:i:s');
+        $result    = $helper->toTextShort($olderDate, 'UTC', 'Y-m-d H:i:s');
 
         // Should return formatted date
         $this->assertStringContainsString('2023', $result);
@@ -213,6 +213,19 @@ final class DateHelperTest extends \PHPUnit\Framework\TestCase
     {
         $result = $this->helper->toTextShort('');
         $this->assertSame('', $result);
+    }
+
+    private function createDateHelperWithDateTimeHelper(DateTimeHelper $dateTimeHelper): DateHelper
+    {
+        return new DateHelper(
+            'F j, Y g:i a T',
+            'D, M d',
+            'F j, Y',
+            'g:i a',
+            $this->translator,
+            $this->coreParametersHelper,
+            $dateTimeHelper,
+        );
     }
 
     private function setDefaultLocalTimezone(string $timezone): void

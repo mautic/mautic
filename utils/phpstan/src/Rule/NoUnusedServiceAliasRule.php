@@ -30,7 +30,7 @@ use Utils\PHPStan\ServiceNameUsageResolver;
  *
  * @implements Rule<CollectedDataNode>
  */
-final class NoUnusedServiceAliasRule implements Rule
+final readonly class NoUnusedServiceAliasRule implements Rule
 {
     /**
      * The "mautic.%s.model.%s" format ModelFactory builds a model container id by.
