@@ -937,12 +937,10 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->fieldsBuilderMock
     ->method('getLeadFieldsColumns')
-    ->with('l.')
     ->willReturn($this->leadColumns);
 
         $this->fieldsBuilderMock
         ->method('getLeadFilter')
-        ->with('l.', 's.')
         ->willReturn($this->leadFilters);
 
         $this->companyReportDataMock

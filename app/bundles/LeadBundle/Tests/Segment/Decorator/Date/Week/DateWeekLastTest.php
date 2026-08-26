@@ -35,7 +35,7 @@ final class DateWeekLastTest extends \PHPUnit\Framework\TestCase
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
         $timezoneResolver = $this->createStub(TimezoneResolver::class);
-        $dateDecorator->method('getOperator')
+        $dateDecorator->expects($this->once())->method('getOperator')
             ->with()
             ->willReturn('=<');
 
@@ -57,7 +57,7 @@ final class DateWeekLastTest extends \PHPUnit\Framework\TestCase
 
         $date = new DateTimeHelper('', null, 'local');
 
-        $timezoneResolver->method('getDefaultDate')
+        $timezoneResolver->expects($this->once())->method('getDefaultDate')
             ->with()
             ->willReturn($date);
 
@@ -88,7 +88,7 @@ final class DateWeekLastTest extends \PHPUnit\Framework\TestCase
 
         $date = new DateTimeHelper('', null, 'local');
 
-        $timezoneResolver->method('getDefaultDate')
+        $timezoneResolver->expects($this->once())->method('getDefaultDate')
             ->with()
             ->willReturn($date);
 
@@ -111,7 +111,7 @@ final class DateWeekLastTest extends \PHPUnit\Framework\TestCase
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
 
         $date = new DateTimeHelper('', null, 'local');
-        $timezoneResolver->method('getDefaultDate')
+        $timezoneResolver->expects($this->once())->method('getDefaultDate')
             ->with()
             ->willReturn($date);
 
@@ -134,7 +134,7 @@ final class DateWeekLastTest extends \PHPUnit\Framework\TestCase
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
 
         $date = new DateTimeHelper('', null, 'local');
-        $timezoneResolver->method('getDefaultDate')
+        $timezoneResolver->expects($this->once())->method('getDefaultDate')
             ->with()
             ->willReturn($date);
 

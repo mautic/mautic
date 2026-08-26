@@ -41,6 +41,12 @@ class ContainerGetService
         $this->container->get($serviceName);
     }
 
+    // monolog.logger.mautic cannot be injected as a typed property, so it is allowed
+    public function viaAllowedServiceName(): void
+    {
+        $this->container->get('monolog.logger.mautic');
+    }
+
     private function getContainer(): ContainerInterface
     {
         return $this->container;

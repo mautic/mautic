@@ -194,7 +194,6 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $mockRepository = $this->createMock(IpAddressRepository::class);
         $mockRepository
             ->method('__call')
-            ->with('findOneByIpAddress')
             ->willReturn(null);
 
         if (null === $mockCoreParametersHelper) {

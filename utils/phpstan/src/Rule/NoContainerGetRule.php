@@ -52,6 +52,15 @@ final class NoContainerGetRule implements Rule
     private const SERVICE_LOCATOR_TYPE = 'Symfony\Component\DependencyInjection\ServiceLocator';
 
     /**
+     * Services that cannot be injected as a typed property and must be fetched by name.
+     *
+     * @var string[]
+     */
+    private const ALLOWED_SERVICE_NAMES = [
+        'monolog.logger.mautic',
+    ];
+
+    /**
      * @var string[]
      */
     private const CONTAINER_TYPES = [
@@ -84,6 +93,10 @@ final class NoContainerGetRule implements Rule
         }
 
         if (!$this->isStaticServiceName($node)) {
+            return [];
+        }
+
+        if ($this->isAllowedServiceName($node)) {
             return [];
         }
 
@@ -125,6 +138,14 @@ final class NoContainerGetRule implements Rule
         return $serviceNameExpr instanceof ClassConstFetch
             && $serviceNameExpr->name instanceof Identifier
             && 'class' === $serviceNameExpr->name->toLowerString();
+    }
+
+    private function isAllowedServiceName(MethodCall $methodCall): bool
+    {
+        $serviceNameExpr = $methodCall->getArgs()[0]->value;
+
+        return $serviceNameExpr instanceof String_
+            && in_array($serviceNameExpr->value, self::ALLOWED_SERVICE_NAMES, true);
     }
 
     private function isContainerCaller(Type $callerType): bool

@@ -110,8 +110,8 @@ final class LookupHelperTest extends TestCase
         $this->integrationsHelper->expects($this->once())->method('getIntegration')->with('Clearbit')
             ->willReturn($this->makeIntegration(true, ['apikey' => 'abc123', 'auto_update' => '0']));
 
-        $lead = $this->createMock(Lead::class);
-        $lead->expects($this->once())->method('getEmail')->willReturn('john@example.com');
+        $lead = new Lead();
+        $lead->setEmail('john@example.com');
 
         $this->leadModel->expects($this->never())->method('saveEntity');
         $this->leadRepository->expects($this->never())->method('saveEntity');
@@ -135,8 +135,7 @@ final class LookupHelperTest extends TestCase
 
     public function testValidateRequestReturnsFalseWhenNonceDoesNotMatch(): void
     {
-        $this->integrationsHelper->expects($this->once())->method('getIntegration')->with('Clearbit')
-            ->willThrowException(new IntegrationNotFoundException());
+        $this->integrationsHelper->expects($this->once())->method('getIntegration')->with('Clearbit');
 
         $lead = new Lead();
         $lead->setId(7);

@@ -50,6 +50,7 @@ final class AjaxControllerTest extends AbstractMauticTestCase
         $this->marketplaceConfig->method('marketplaceIsEnabled')->willReturn(true);
         $this->marketplaceConfig->method('isComposerEnabled')->willReturn(true);
         $this->security
+            ->expects($this->once())
             ->method('isGranted')
             ->with(MarketplacePermissions::CAN_INSTALL_PACKAGES)
             ->willReturn(true);
@@ -68,6 +69,7 @@ final class AjaxControllerTest extends AbstractMauticTestCase
         $this->marketplaceConfig->method('marketplaceIsEnabled')->willReturn(true);
         $this->marketplaceConfig->method('isComposerEnabled')->willReturn(true);
         $this->security
+            ->expects($this->once())
             ->method('isGranted')
             ->with(MarketplacePermissions::CAN_REMOVE_PACKAGES)
             ->willReturn(true);

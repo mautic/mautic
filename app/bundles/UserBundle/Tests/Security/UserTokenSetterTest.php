@@ -20,7 +20,7 @@ final class UserTokenSetterTest extends AbstractMauticTestCase
         $userModel = $this->createMock(UserModel::class);
         $user      = new User();
 
-        $userModel->method('getEntity')
+        $userModel->expects($this->once())->method('getEntity')
             ->with(1)
             ->willReturn($user);
 

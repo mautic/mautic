@@ -243,7 +243,8 @@ final class OwnershipScopedCollectionExtensionTest extends TestCase
         );
         $metadata->method('hasAssociation')->willReturn(false);
 
-        $this->entityManager->method('getClassMetadata')
+        $this->entityManager->expects($this->atLeastOnce())
+            ->method('getClassMetadata')
             ->with($entityClass)
             ->willReturn($metadata);
     }

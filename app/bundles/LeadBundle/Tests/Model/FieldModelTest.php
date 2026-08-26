@@ -181,7 +181,7 @@ final class FieldModelTest extends MauticMysqlTestCase
         ->onlyMethods(['__call']) // only __call can intercept dynamic methods
         ->getMock();
 
-        $repoMock->method('__call')
+        $repoMock->expects($this->exactly(3))->method('__call')
             ->with('findOneByAlias', $this->anything())
             ->willReturnCallback(function ($method, $args): ?LeadField {
                 $alias = $args[0];

@@ -43,7 +43,7 @@ final class ContactExportSchedulerNotificationSubscriberTest extends TestCase
         };
 
         $translator = $this->createMock(TranslatorInterface::class);
-        $translator->method('trans')
+        $translator->expects($this->once())->method('trans')
             ->with('mautic.lead.export.being.prepared', ['%user_email%' => 'requester@example.com'])
             ->willReturn('Requester notification for requester@example.com');
 

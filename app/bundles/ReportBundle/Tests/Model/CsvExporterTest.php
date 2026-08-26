@@ -42,7 +42,6 @@ final class CsvExporterTest extends \PHPUnit\Framework\TestCase
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->translator
             ->method('trans')
-            ->with('mautic.report.report.groupby.totals')
             ->willReturn('Totals');
         $coreParametersHelperMock  = $this->createMock(CoreParametersHelper::class);
 

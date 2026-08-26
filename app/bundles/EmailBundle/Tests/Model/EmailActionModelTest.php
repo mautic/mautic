@@ -118,6 +118,7 @@ final class EmailActionModelTest extends TestCase
     protected function configureRepositoryToReturn(array $emails): void
     {
         $this->emailRepositoryMock
+            ->expects($this->once())
             ->method('findBy')
             ->with(
                 ['id' => array_map(fn (Email $email) => $email->getId(), $emails)]

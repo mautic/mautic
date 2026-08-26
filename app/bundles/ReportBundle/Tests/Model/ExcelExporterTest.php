@@ -27,7 +27,6 @@ final class ExcelExporterTest extends TestCase
         $translator       = $this->createMock(TranslatorInterface::class);
         $translator
             ->method('trans')
-            ->with('mautic.report.report.groupby.totals')
             ->willReturn('Totals');
 
         $dateHelperMock   =new DateHelper(

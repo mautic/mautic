@@ -326,9 +326,9 @@ final class ExportHelperTest extends TestCase
 
     public function testExportDataIntoFileCsvWithExistingFileNameWithZip(): void
     {
-        $this->coreParametersHelperMock->method('get')->with('contact_export_dir')->willReturn('/tmp');
+        $this->coreParametersHelperMock->expects($this->exactly(2))->method('get')->with('contact_export_dir')->willReturn('/tmp');
 
-        $this->filePathResolver->method('createDirectory')->with('/tmp');
+        $this->filePathResolver->expects($this->exactly(2))->method('createDirectory')->with('/tmp');
 
         $iteratorExportDataModelMock1 = $this->iteratorDataMock($this->dummyData);
         $this->filePaths[]            = $filePath = $this->exportHelper->exportDataIntoFile(

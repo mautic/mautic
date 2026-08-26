@@ -192,6 +192,7 @@ final class NotificationHelperTest extends \PHPUnit\Framework\TestCase
         $this->prepareCommonMocks($event, $user);
 
         $this->coreParametersHelper
+            ->expects($this->atLeastOnce())
             ->method('get')
             ->with('campaign_send_notification_to_author')
             ->willReturn(1);

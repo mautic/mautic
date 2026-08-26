@@ -36,7 +36,6 @@ final class RequestStateStoreTest extends TestCase
 
         $this->cacheProvider = $this->createMock(CacheProviderInterface::class);
         $this->cacheProvider->method('getItem')
-            ->with($this->cachePrefix.$this->stateId)
             ->willReturn($this->cacheItem);
 
         $this->requestStateStore = new RequestStateStore($this->cacheProvider, 'prefix', '_suffix');

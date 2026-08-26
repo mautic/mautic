@@ -406,7 +406,7 @@ final class ApiUserSubscriberTest extends TestCase
             ->method('hasBadge')
             ->with(AccessTokenBadge::class)
             ->willReturn(true);
-        $passport->method('getBadge')->with(AccessTokenBadge::class)->willReturn($accessTokenBadge);
+        $passport->expects($this->once())->method('getBadge')->with(AccessTokenBadge::class)->willReturn($accessTokenBadge);
 
         $event = $this->createMock(AuthenticationTokenCreatedEvent::class);
         $event->expects($this->once())
@@ -450,7 +450,7 @@ final class ApiUserSubscriberTest extends TestCase
             ->method('hasBadge')
             ->with(AccessTokenBadge::class)
             ->willReturn(true);
-        $passport->method('getBadge')->with(AccessTokenBadge::class)->willReturn($accessTokenBadge);
+        $passport->expects($this->once())->method('getBadge')->with(AccessTokenBadge::class)->willReturn($accessTokenBadge);
 
         $event = $this->createMock(AuthenticationTokenCreatedEvent::class);
         $event->expects($this->once())

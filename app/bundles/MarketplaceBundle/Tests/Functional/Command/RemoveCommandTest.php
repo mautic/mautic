@@ -23,7 +23,7 @@ final class RemoveCommandTest extends AbstractMauticTestCase
     public function testRemoveCommand(): void
     {
         $composer    = $this->createMock(ComposerHelper::class);
-        $composer->method('remove')
+        $composer->expects($this->once())->method('remove')
             ->with($this->packageName)
             ->willReturn(new ConsoleOutput(0, 'OK'));
         $composer->method('getMauticPluginPackages')
@@ -43,7 +43,6 @@ final class RemoveCommandTest extends AbstractMauticTestCase
     {
         $composer    = $this->createMock(ComposerHelper::class);
         $composer->method('remove')
-            ->with($this->packageName)
             ->willReturn(new ConsoleOutput(0, 'OK'));
         $composer->method('getMauticPluginPackages')
             ->willReturn([]);
@@ -62,7 +61,6 @@ final class RemoveCommandTest extends AbstractMauticTestCase
     {
         $composer    = $this->createMock(ComposerHelper::class);
         $composer->method('remove')
-            ->with($this->packageName)
             ->willReturn(new ConsoleOutput(1, 'Error while removing package'));
         $composer->method('getMauticPluginPackages')
             ->willReturn([]);

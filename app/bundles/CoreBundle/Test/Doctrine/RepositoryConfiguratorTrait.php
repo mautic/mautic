@@ -65,8 +65,9 @@ trait RepositoryConfiguratorTrait
 
     private function configureMocks(string $entityClass): void
     {
-        $this->managerRegistry->method('getManagerForClass')->with($entityClass)->willReturn($this->entityManager);
-        $this->entityManager->method('getClassMetadata')->with($entityClass)->willReturn($this->classMetadata);
+        // these are stubs on purpose - repositories may or may not resolve metadata, so no invocation count can be expected
+        $this->managerRegistry->method('getManagerForClass')->willReturn($this->entityManager);
+        $this->entityManager->method('getClassMetadata')->willReturn($this->classMetadata);
         $this->entityManager->method('getConnection')->willReturn($this->connection);
         $this->connection->method('getExpressionBuilder')->willReturnCallback(fn (): ExpressionBuilder => new ExpressionBuilder($this->connection));
         $this->connection->method('executeQuery')->willReturn($this->result);

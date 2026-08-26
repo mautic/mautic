@@ -86,7 +86,7 @@ final class UpdateSchemaStepTest extends AbstractStepTestCase
                 ['console.lazy_command.ids', false],
             ]);
 
-        $container->method('getParameter')
+        $container->expects($this->once())->method('getParameter')
             ->with('console.command.ids')
             ->willReturn(
                 ['doctrine:migrations:migrate']

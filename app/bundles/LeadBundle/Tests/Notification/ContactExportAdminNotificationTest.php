@@ -71,7 +71,7 @@ final class ContactExportAdminNotificationTest extends TestCase
             ->method('getMailer');
 
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $coreParametersHelper->method('get')
+        $coreParametersHelper->expects($this->once())->method('get')
             ->with('contact_export_notify_admins')
             ->willReturn(true);
 
@@ -173,7 +173,7 @@ final class ContactExportAdminNotificationTest extends TestCase
             ->with(true);
 
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $coreParametersHelper->method('get')
+        $coreParametersHelper->expects($this->once())->method('get')
             ->with('contact_export_notify_admins')
             ->willReturn(true);
 
@@ -205,7 +205,7 @@ final class ContactExportAdminNotificationTest extends TestCase
             ->method('getMailer');
 
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $coreParametersHelper->method('get')
+        $coreParametersHelper->expects($this->exactly(2))->method('get')
             ->with('contact_export_notify_admins')
             ->willReturn(false);
 

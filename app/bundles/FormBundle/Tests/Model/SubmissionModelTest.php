@@ -432,8 +432,7 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
 
         $this->translator
             ->method('trans')
-            ->with($this->anything())
-            ->willReturnCallback(fn ($text): ?string => match ($text) {
+            ->willReturnCallback(fn (string $text): ?string => match ($text) {
                 'mautic.form.report.submission.id'  => $values[0],
                 'mautic.lead.report.contact_id'     => $values[1],
                 'mautic.form.result.thead.date'     => $values[2],

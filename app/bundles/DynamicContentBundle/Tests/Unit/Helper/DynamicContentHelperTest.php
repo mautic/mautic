@@ -171,7 +171,7 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
         $this->mockModel->method('getTranslatedEntity')
             ->willReturn([$slot, $slot]);
 
-        $this->leadModel->method('getEntity')
+        $this->leadModel->expects($this->once())->method('getEntity')
             ->with(123)
             ->willReturn($contact);
 
@@ -222,7 +222,6 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn([$slot, $slot]);
 
         $this->leadModel->method('getEntity')
-            ->with(123)
             ->willReturn($contact);
 
         $this->mockDispatcher->method('hasListeners')->willReturn(false);
@@ -266,7 +265,6 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn([$slot, $slot]);
 
         $this->leadModel->method('getEntity')
-            ->with(123)
             ->willReturn($contact);
 
         $this->mockDispatcher->method('hasListeners')->willReturn(false);

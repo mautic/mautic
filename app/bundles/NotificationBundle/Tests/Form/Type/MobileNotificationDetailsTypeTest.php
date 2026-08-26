@@ -41,7 +41,7 @@ final class MobileNotificationDetailsTypeTest extends TypeTestCase
             ->willReturn($this->integrationSettings);
 
         $integrationHelper = $this->createMock(IntegrationHelper::class);
-        $integrationHelper->method('getIntegrationObject')
+        $integrationHelper->expects($this->once())->method('getIntegrationObject')
             ->with('OneSignal')
             ->willReturn($integration);
 

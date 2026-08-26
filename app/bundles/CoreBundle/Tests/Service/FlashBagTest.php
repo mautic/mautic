@@ -68,7 +68,7 @@ final class FlashBagTest extends TestCase
         $addNotification   = false;
         $translatedMessage = 'translated';
 
-        $this->translator->method('trans')
+        $this->translator->expects($this->once())->method('trans')
             ->with($message, $messageVars, $domain)
             ->willReturn($translatedMessage);
 

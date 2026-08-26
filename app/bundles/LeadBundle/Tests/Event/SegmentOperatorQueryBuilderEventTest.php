@@ -28,7 +28,7 @@ final class SegmentOperatorQueryBuilderEventTest extends \PHPUnit\Framework\Test
         $this->queryBuilder = $this->createMock(QueryBuilder::class);
         $this->filter       = $this->createMock(ContactSegmentFilter::class);
 
-        $this->queryBuilder->method('getTableAlias')
+        $this->queryBuilder->expects($this->once())->method('getTableAlias')
             ->with(MAUTIC_TABLE_PREFIX.'leads')
             ->willReturn('leads');
     }
