@@ -216,7 +216,7 @@ final class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @param string $name
      */
-    private static function getAliasFromName($name): string
+    private static function getAliasFromName(string $name): string
     {
         return strtolower(str_replace(' ', '', $name));
     }
