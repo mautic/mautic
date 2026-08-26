@@ -21,8 +21,8 @@
         {% set dateTo = dateToFullConcat(dateTo.date, dateTo.timezone) %}
     {% else %}
         {# DateTimeInterface: PHP8.6: Uncached data should also be stringify #}
-        {% set dateFrom = dateToFullConcat(dateFrom, dateFrom.timezone.getName()) %}
-        {% set dateTo = dateToFullConcat(dateTo, dateTo.timezone.getName()) %}
+        {% set dateFrom = dateToFullConcat(dateFrom, dateFrom.timezone) %}
+        {% set dateTo = dateToFullConcat(dateTo, dateTo.timezone) %}
     {% endif %}
     <div class="pull-right mr-md mb-md">
         <a href="{{ path('mautic_report_action', {'objectId': reportId, 'objectAction': 'view', 'daterange': {'date_to': dateTo, 'date_from': dateFrom}}) }}">
