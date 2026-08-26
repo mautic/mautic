@@ -68,7 +68,7 @@ final class InstallControllerTest extends \PHPUnit\Framework\TestCase
         $this->controller->setContainer($containerMock);
         $sessionMock->method('getFlashBag')->willReturn($this->createStub(FlashBagInterface::class));
 
-        $containerMock->method('get')
+        $containerMock->expects($this->once())->method('get')
             ->with('router')
             ->willReturn($this->routerMock);
     }

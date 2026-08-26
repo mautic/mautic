@@ -138,7 +138,7 @@ final class ConfigFormTest extends KernelTestCase
 
         $bundleHelper->method('getMauticBundles')->willReturn(array_merge($mauticPlugins, $registeredPluginBundles));
 
-        $pluginModel->method('getEntities')
+        $pluginModel->expects($this->once())->method('getEntities')
             ->with(
                 [
                     'hydration_mode' => 'hydrate_array',

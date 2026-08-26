@@ -208,7 +208,6 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $mockCoreParametersHelper->method('get')
-            ->with('default_timezone')
             ->willReturn('UTC');
 
         $lead = new Lead();
@@ -250,7 +249,6 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $mockCoreParametersHelper->method('get')
-            ->with('default_timezone')
             ->willReturn('UTC');
 
         $this->doNotContact->expects($this->once())->method('isContactable')->willReturn($dncLead);
@@ -425,6 +423,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getId')
             ->willReturn(6);
         $leadEventLog
+            ->expects($this->once())
             ->method('setIsScheduled')
             ->with(false)
             ->willReturn($leadEventLog);

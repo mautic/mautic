@@ -110,8 +110,8 @@ final class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('executeStatement')
             ->willReturn(1);
 
-        $qb->method('setMaxResults')->with(10000)->willReturn($qb);
-        $qb->method('setFirstResult')->with(0)->willReturn($qb);
+        $qb->expects($this->once())->method('setMaxResults')->with(10000)->willReturn($qb);
+        $qb->expects($this->once())->method('setFirstResult')->with(0)->willReturn($qb);
 
         $connection = $this->createMock(Connection::class);
         $connection

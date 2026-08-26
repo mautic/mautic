@@ -209,12 +209,7 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
         $this->loginUser($user);
         $security = $this->createMock(CorePermissions::class);
         $security->method('isAnonymous')->willReturn(false);
-        $security->method('hasEntityAccess')->with(
-            'page:pages:viewown',
-            'page:pages:viewother',
-            $page->getCreatedBy()
-        )->willReturn(false);
-
+        $security->method('hasEntityAccess')->willReturn(false);
         $this->getContainer()->set(CorePermissions::class, $security);
 
         $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());

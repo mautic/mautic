@@ -19,6 +19,7 @@ final class ExportHandlerTest extends \PHPUnit\Framework\TestCase
         $coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
 
         $coreParametersHelperMock
+            ->expects($this->once())
             ->method('get')
             ->with('report_temp_dir')
             ->willReturn($tmpDir);
@@ -47,6 +48,7 @@ final class ExportHandlerTest extends \PHPUnit\Framework\TestCase
         $coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
 
         $coreParametersHelperMock
+            ->expects($this->once())
             ->method('get')
             ->with('report_temp_dir')
             ->willReturn($tmpDir);
@@ -72,6 +74,7 @@ final class ExportHandlerTest extends \PHPUnit\Framework\TestCase
         $coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
 
         $coreParametersHelperMock
+            ->expects($this->once())
             ->method('get')
             ->with('report_temp_dir')
             ->willReturn($tmpDir);

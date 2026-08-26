@@ -24,6 +24,7 @@ final class ThemesExtensionTest extends TestCase
     public function testGetBrandPrimaryColor(): void
     {
         $this->coreParametersHelper
+            ->expects($this->once())
             ->method('get')
             ->with('primary_brand_color', '000000')
             ->willReturn('123456');
@@ -34,6 +35,7 @@ final class ThemesExtensionTest extends TestCase
     public function testGetTextOnBrandColor(): void
     {
         $this->coreParametersHelper
+            ->expects($this->exactly(2))
             ->method('get')
             ->with('primary_brand_color', '000000')
             ->willReturnOnConsecutiveCalls('000000', 'ffffff');
@@ -49,6 +51,7 @@ final class ThemesExtensionTest extends TestCase
     {
         // First call: primary color is '000000'
         $this->coreParametersHelper
+            ->expects($this->exactly(2))
             ->method('get')
             ->with('primary_brand_color', '000000')
             ->willReturnOnConsecutiveCalls('000000', 'ffffff');
@@ -64,6 +67,7 @@ final class ThemesExtensionTest extends TestCase
     {
         // First set of assertions: rounded corners set to 8
         $this->coreParametersHelper
+            ->expects($this->exactly(3))
             ->method('get')
             ->with('rounded_corners', 0)
             ->willReturn(8);
@@ -78,6 +82,7 @@ final class ThemesExtensionTest extends TestCase
 
         // Second set of assertions: rounded corners set to 16
         $this->coreParametersHelper
+            ->expects($this->exactly(3))
             ->method('get')
             ->with('rounded_corners', 0)
             ->willReturn(16);
@@ -92,6 +97,7 @@ final class ThemesExtensionTest extends TestCase
 
         // Third set of assertions: rounded corners set to 32
         $this->coreParametersHelper
+            ->expects($this->exactly(3))
             ->method('get')
             ->with('rounded_corners', 0)
             ->willReturn(32);

@@ -42,7 +42,8 @@ final class AdderTest extends \PHPUnit\Framework\TestCase
         $contact->method('getId')
             ->WillReturn(2);
 
-        $this->leadEventLogRepository->method('hasBeenInCampaignRotation')
+        $this->leadEventLogRepository->expects($this->once())
+            ->method('hasBeenInCampaignRotation')
             ->with(2, 1, 1)
             ->willReturn(true);
 

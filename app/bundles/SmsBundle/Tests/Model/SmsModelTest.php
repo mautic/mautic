@@ -98,15 +98,16 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
     {
         $entities = [['name' => 'Mautic', 'id' => 1, 'language' => 'cs'], ['name' => 'Mautic MMS', 'id' => 2, 'media' => ['test.jpg'], 'language' => 'cs']];
 
-        $this->smsRepository->method('getSmsList')
+        $this->smsRepository->expects($this->once())->method('getSmsList')
             ->with('', 10, 0, true, null)
             ->willReturn($entities);
 
-        $this->security->method('isGranted')
+        $this->security->expects($this->once())->method('isGranted')
             ->with('sms:smses:viewother')
             ->willReturn(true);
 
         $this->translator
+            ->expects($this->once())
             ->method('trans')
             ->with('mautic.sms.form.mms')
             ->willReturn('MMS');

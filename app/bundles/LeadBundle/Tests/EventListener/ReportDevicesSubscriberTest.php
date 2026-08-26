@@ -253,7 +253,7 @@ final class ReportDevicesSubscriberTest extends \PHPUnit\Framework\TestCase
             ->with(MAUTIC_TABLE_PREFIX.'lead_devices', 'dev')
             ->willReturn($queryBuilderMock);
 
-        $queryBuilderMock->method('leftJoin')
+        $queryBuilderMock->expects($this->once())->method('leftJoin')
             ->with('dev', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = dev.lead_id')
             ->willReturnSelf();
 

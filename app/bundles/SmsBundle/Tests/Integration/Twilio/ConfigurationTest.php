@@ -31,7 +31,7 @@ final class ConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->integrationObject->method('getIntegrationSettings')
             ->willReturn($integrationSettings);
 
-        $this->integrationHelper->method('getIntegrationObject')
+        $this->integrationHelper->expects($this->once())->method('getIntegrationObject')
             ->with('Twilio')
             ->willReturn($this->integrationObject);
     }

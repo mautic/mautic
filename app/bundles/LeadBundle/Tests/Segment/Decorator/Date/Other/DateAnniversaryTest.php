@@ -44,7 +44,7 @@ final class DateAnniversaryTest extends \PHPUnit\Framework\TestCase
         $dateDecorator    = $this->createStub(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
 
-        $timezoneResolver->method('getDefaultDate')
+        $timezoneResolver->expects($this->once())->method('getDefaultDate')
             ->with(false)
             ->willReturn(
                 new DateTimeHelper(
@@ -71,7 +71,7 @@ final class DateAnniversaryTest extends \PHPUnit\Framework\TestCase
 
         $date = new DateTimeHelper('2018-03-02', null, 'local');
 
-        $timezoneResolver->method('getDefaultDate')
+        $timezoneResolver->expects($this->once())->method('getDefaultDate')
             ->with()
             ->willReturn($date);
 
