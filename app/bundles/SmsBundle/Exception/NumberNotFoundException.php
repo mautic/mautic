@@ -1,18 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\SmsBundle\Exception;
 
 final class NumberNotFoundException extends \Exception
 {
     /**
      * @param string $number
-     * @param string $message
-     * @param int    $code
      */
     public function __construct(
         private $number,
-        $message = '',
-        $code = 0,
+        string $message = '',
+        int $code = 0,
         ?\Throwable $previous = null,
     ) {
         if (!$message) {
