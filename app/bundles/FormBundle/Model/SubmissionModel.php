@@ -769,7 +769,7 @@ final class SubmissionModel extends CommonFormModel
      *
      * @return array<string>
      */
-    private function getExportHeader(Form $form, $viewOnlyFields): array
+    private function getExportHeader(Form $form, array $viewOnlyFields): array
     {
         $fields = $form->getFields();
 
