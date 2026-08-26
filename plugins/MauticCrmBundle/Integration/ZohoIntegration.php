@@ -19,7 +19,7 @@ use Symfony\Component\Form\FormBuilder;
 /**
  * @extends CrmAbstractIntegration<ZohoApi>
  */
-class ZohoIntegration extends CrmAbstractIntegration
+final class ZohoIntegration extends CrmAbstractIntegration
 {
     /**
      * Returns the name of the social integration that must match the name of the file.
@@ -671,11 +671,9 @@ class ZohoIntegration extends CrmAbstractIntegration
     /**
      * Get available company fields for choices in the config UI.
      *
-     * @param array $settings
-     *
      * @return array
      */
-    public function getFormCompanyFields($settings = [])
+    public function getFormCompanyFields(array $settings = [])
     {
         return $this->getFormFieldsByObject('Accounts', $settings);
     }
@@ -789,7 +787,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         if ($key = array_search('mauticContactIsContactableByEmail', $leadFields)) {
             unset($leadFields[$key]);
         }
-        if (empty($leadFields)) {
+        if ([] === $leadFields) {
             return [0, 0, 0];
         }
 
@@ -1031,7 +1029,7 @@ class ZohoIntegration extends CrmAbstractIntegration
 
         try {
             if ($this->isAuthorized()) {
-                if (!empty($existingPerson) && empty($integrationId)) {
+                if ([] !== $existingPerson && [] === $integrationId) {
                     $this->createIntegrationEntity($zObject, $existingPerson['id'], 'lead', $lead->getId());
 
                     $mapper
@@ -1039,7 +1037,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                         ->setContact($lead->getProfileFields())
                         ->map($lead->getId(), $existingPerson['id']);
                     $this->updateContactInZoho($mapper, $zObject, $counter, $errorCounter);
-                } elseif (!empty($existingPerson) && !empty($integrationId)) { // contact exists, then update
+                } elseif ([] !== $existingPerson && [] !== $integrationId) { // contact exists, then update
                     $mapper
                         ->setMappedFields($fieldsToUpdate[$zObject])
                         ->setContact($lead->getProfileFields())
@@ -1062,7 +1060,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         return false;
     }
 
-    public function getBlankFieldsToUpdate($fields, $sfRecord, $objectFields, $config)
+    public function getBlankFieldsToUpdate(array $fields, $sfRecord, array $objectFields, array $config): array
     {
         // check if update blank fields is selected
         if (isset($config['updateBlanks']) && isset($config['updateBlanks'][0]) && 'updateBlanks' == $config['updateBlanks'][0]) {
@@ -1203,7 +1201,7 @@ class ZohoIntegration extends CrmAbstractIntegration
      *
      * @return array
      */
-    protected function cleanPriorityFields($fieldsToUpdate, $objects = null)
+    protected function cleanPriorityFields(array $fieldsToUpdate, $objects = null)
     {
         if (null === $objects) {
             $objects = ['Leads', 'Contacts'];

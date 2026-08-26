@@ -34,7 +34,7 @@ final class EventLogApiController extends FetchCommonApiController
 {
     use LeadAccessTrait;
 
-    private const LOG_SERIALIZATION = 30;
+    private const int LOG_SERIALIZATION = 30;
 
     private ?Campaign $campaign = null;
 
@@ -56,9 +56,9 @@ final class EventLogApiController extends FetchCommonApiController
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
         EventLogModel $campaignEventLogModel,
-        private LeadModel $leadModel,
-        private CampaignModel $campaignModel,
-        private EventModel $eventModel,
+        private readonly LeadModel $leadModel,
+        private readonly CampaignModel $campaignModel,
+        private readonly EventModel $eventModel,
     ) {
         $this->model                    = $campaignEventLogModel;
         $this->entityClass              = LeadEventLog::class;
@@ -88,10 +88,8 @@ final class EventLogApiController extends FetchCommonApiController
 
     /**
      * Get a list of events.
-     *
-     * @return Response
      */
-    public function getContactEventsAction(Request $request, UserHelper $userHelper, $contactId, $campaignId = null)
+    public function getContactEventsAction(Request $request, UserHelper $userHelper, $contactId, $campaignId = null): Response
     {
         // Ensure contact exists and user has access
         $contact = $this->checkLeadAccess($contactId, 'view');
@@ -138,10 +136,7 @@ final class EventLogApiController extends FetchCommonApiController
         return $this->getEntitiesAction($request, $userHelper);
     }
 
-    /**
-     * @return Response
-     */
-    public function editContactEventAction(Request $request, $eventId, $contactId)
+    public function editContactEventAction(Request $request, $eventId, $contactId): Response
     {
         $parameters = $request->request->all();
 
@@ -240,7 +235,7 @@ final class EventLogApiController extends FetchCommonApiController
             $this->entityNameMulti => $events,
         ];
 
-        if (!empty($errors)) {
+        if ([] !== $errors) {
             $payload['errors'] = $errors;
         }
 

@@ -13,9 +13,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class FileManagerController extends AjaxController
 {
-    private const DEFAULT_PAGE  = 1;
+    private const int DEFAULT_PAGE  = 1;
 
-    private const DEFAULT_LIMIT = 20;
+    private const int DEFAULT_LIMIT = 20;
 
     public function uploadAction(Request $request, FileManager $fileManager): Response
     {
@@ -40,16 +40,6 @@ final class FileManagerController extends AjaxController
         $fileManager->deleteFile($fileName);
 
         return $this->sendJsonResponse(['success'=> true]);
-    }
-
-    /**
-     * @deprecated since Mautic 5.2, to be removed in 6.0. Use FileManagerController::getMediaAction instead
-     */
-    public function assetsAction(FileManager $fileManager): JsonResponse
-    {
-        return $this->sendJsonResponse([
-            'data' => $fileManager->getImages(),
-        ]);
     }
 
     public function getMediaAction(Request $request, FileManager $fileManager): JsonResponse

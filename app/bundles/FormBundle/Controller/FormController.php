@@ -304,7 +304,7 @@ class FormController extends CommonFormController
         $deletedActions  = $session->get('mautic.form.'.$sessionId.'.actions.deleted', []);
 
         $action = $this->generateUrl('mautic_form_action', ['objectAction' => 'new']);
-        $form   = $this->formModel->createForm($entity, $this->formFactory, $action);
+        $form   = $this->formModel->createForm($entity, $action);
 
         // /Check for a submitted form and process it
         if ('POST' === $request->getMethod()) {
@@ -315,7 +315,7 @@ class FormController extends CommonFormController
                     $fields = array_diff_key($modifiedFields, array_flip($deletedFields));
 
                     // make sure that at least one field is selected
-                    if (empty($fields)) {
+                    if ([] === $fields) {
                         // set the error
                         $form->addError(
                             new FormError(
@@ -480,10 +480,8 @@ class FormController extends CommonFormController
      * @param int|Form $objectId
      * @param bool     $ignorePost
      * @param bool     $forceTypeSelection
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false, $forceTypeSelection = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false, $forceTypeSelection = false): Response
     {
         $formData         = $request->request->all()['mauticform'] ?? [];
         $sessionId        = $formData['sessionId'] ?? null;
@@ -553,7 +551,7 @@ class FormController extends CommonFormController
         }
 
         $action = $this->generateUrl('mautic_form_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $form   = $this->formModel->createForm($entity, $this->formFactory, $action);
+        $form   = $this->formModel->createForm($entity, $action);
 
         // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' === $request->getMethod()) {
@@ -571,7 +569,7 @@ class FormController extends CommonFormController
 
                 if ($valid = $this->isFormValid($form)) {
                     // make sure that at least one field is selected
-                    if (empty($fields)) {
+                    if ([] === $fields) {
                         // set the error
                         $form->addError(
                             new FormError(
@@ -683,7 +681,7 @@ class FormController extends CommonFormController
 
                 // Rebuild the form with new action so that apply doesn't keep creating a clone
                 $action = $this->generateUrl('mautic_form_action', ['objectAction' => 'edit', 'objectId' => $entity->getId()]);
-                $form   = $this->formModel->createForm($entity, $this->formFactory, $action);
+                $form   = $this->formModel->createForm($entity, $action);
             }
         } else {
             // lock the entity
@@ -960,10 +958,8 @@ class FormController extends CommonFormController
      * Deletes the entity.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         $page      = $request->getSession()->get('mautic.form.page', 1);
         $returnUrl = $this->generateUrl('mautic_form_index', ['page' => $page]);
@@ -1071,7 +1067,7 @@ class FormController extends CommonFormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $this->formModel->deleteEntities($deleteIds);
 
                 $flashes[] = [

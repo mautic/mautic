@@ -11,6 +11,7 @@ use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository;
 use MauticPlugin\GrapesJsBuilderBundle\EventSubscriber\InjectCustomContentSubscriber;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
 use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,6 +19,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
 
+#[AllowMockObjectsWithoutExpectations]
 final class InjectCustomContentSubscriberTest extends TestCase
 {
     /**
@@ -51,7 +53,7 @@ final class InjectCustomContentSubscriberTest extends TestCase
     public function testInjectViewCustomContentExitsWhenPluginNotPublished(): void
     {
         $requestStack = new RequestStack([new Request()]);
-        $this->config->method('isPublished')->willReturn(false);
+        $this->config->expects($this->once())->method('isPublished')->willReturn(false);
 
         $subscriber = new InjectCustomContentSubscriber($this->config, $this->createStub(GrapesJsBuilderModel::class), $this->twig, $requestStack, $this->router, $this->grapesJsBuilderRepository);
         $event      = new CustomContentEvent('view', 'email.settings.advanced', ['email' => new Email()]);
@@ -72,9 +74,9 @@ final class InjectCustomContentSubscriberTest extends TestCase
 
         $requestStack = new RequestStack([$request]);
 
-        $this->grapesJsBuilderRepository->method('findOneBy')->willReturn(null);
+        $this->grapesJsBuilderRepository->expects($this->once())->method('findOneBy')->willReturn(null);
 
-        $this->config->method('isPublished')->willReturn(true);
+        $this->config->expects($this->once())->method('isPublished')->willReturn(true);
 
         $this->twig->expects($this->once())
             ->method('render')
@@ -94,11 +96,11 @@ final class InjectCustomContentSubscriberTest extends TestCase
         $requestStack = new RequestStack([new Request([], [], [], [], [], ['REQUEST_METHOD' => 'GET'])]);
 
         $grapesJsBuilder = $this->createMock(GrapesJsBuilder::class);
-        $grapesJsBuilder->method('getCustomMjml')->willReturn('<mjml>stored</mjml>');
+        $grapesJsBuilder->expects($this->once())->method('getCustomMjml')->willReturn('<mjml>stored</mjml>');
 
-        $this->grapesJsBuilderRepository->method('findOneBy')->willReturn($grapesJsBuilder);
+        $this->grapesJsBuilderRepository->expects($this->once())->method('findOneBy')->willReturn($grapesJsBuilder);
 
-        $this->config->method('isPublished')->willReturn(true);
+        $this->config->expects($this->once())->method('isPublished')->willReturn(true);
 
         $this->twig->expects($this->once())
             ->method('render')
@@ -117,12 +119,11 @@ final class InjectCustomContentSubscriberTest extends TestCase
     {
         $requestStack = new RequestStack([new Request()]);
 
-        $this->config->method('isPublished')->willReturn(true);
+        $this->config->expects($this->once())->method('isPublished')->willReturn(true);
 
-        $this->router->expects($this->exactly(3))
+        $this->router->expects($this->exactly(2))
             ->method('generate')
             ->willReturnMap([
-                ['grapesjsbuilder_assets', [], 0, 'https://example.test/assets'],
                 ['grapesjsbuilder_upload', [], 0, 'https://example.test/upload'],
                 ['grapesjsbuilder_delete', [], 0, 'https://example.test/delete'],
             ]);
@@ -132,7 +133,6 @@ final class InjectCustomContentSubscriberTest extends TestCase
             ->with(
                 '@GrapesJsBuilder/Setting/vars.html.twig',
                 [
-                    'dataAssets' => 'https://example.test/assets',
                     'dataUpload' => 'https://example.test/upload',
                     'dataDelete' => 'https://example.test/delete',
                 ]

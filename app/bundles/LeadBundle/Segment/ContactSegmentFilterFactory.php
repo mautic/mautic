@@ -13,7 +13,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class ContactSegmentFilterFactory
 {
-    public const CUSTOM_OPERATOR = 'custom_operator';
+    public const string CUSTOM_OPERATOR = 'custom_operator';
 
     /**
      * @var array|string[]
@@ -122,21 +122,21 @@ final class ContactSegmentFilterFactory
                 // Don't group date/datetime type filters - they require special processing
                 // by DateOptionFactory and don't support IN operator with arrays
                 if (isset($filter['type']) && in_array($filter['type'], ['date', 'datetime'], true)) {
-                    array_push($shrinkedFilters, $filter);
+                    $shrinkedFilters[] = $filter;
                 } else {
                     if (!isset($arrStacks[$key])) {
                         $arrStacks[$key] = [];
                     }
-                    array_push($arrStacks[$key], $filter);
+                    $arrStacks[$key][] = $filter;
                 }
             } else { // glue = and
                 // if 'or' followed by 'and', it becomes - or (cond1 and cond2)
                 if (isset($arrStacks[$previousKey]) && count($arrStacks[$previousKey]) > 0) {
                     $previousFilter = array_pop($arrStacks[$previousKey]);
-                    array_push($shrinkedFilters, $previousFilter);
+                    $shrinkedFilters[] = $previousFilter;
                 }
 
-                array_push($shrinkedFilters, $filter);
+                $shrinkedFilters[] = $filter;
             }
 
             $previousKey = $key;
@@ -145,7 +145,7 @@ final class ContactSegmentFilterFactory
         // add all grouped conditions back
         foreach ($arrStacks as $stack) {
             $groupedFilter = $this->groupFilters($stack);
-            if (!empty($groupedFilter)) {
+            if ([] !== $groupedFilter) {
                 $shrinkedFilters[] = $groupedFilter;
             }
         }
@@ -160,7 +160,7 @@ final class ContactSegmentFilterFactory
      */
     private function groupFilters(array $stack): array
     {
-        if (empty($stack)) {
+        if ([] === $stack) {
             return [];
         }
 

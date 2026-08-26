@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\WebhookBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
@@ -49,7 +51,7 @@ class WebhookQueueRepository extends CommonRepository
             ->set('retries', 'retries + 1')
             ->set('date_modified', ':date_modified')
             ->setParameter('ids', $idList, ArrayParameterType::INTEGER)
-            ->setParameter('date_modified', (new \DateTimeImmutable())->format(DateTimeHelper::FORMAT_DB))
+            ->setParameter('date_modified', new \DateTimeImmutable()->format(DateTimeHelper::FORMAT_DB))
             ->executeStatement();
     }
 

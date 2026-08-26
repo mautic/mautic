@@ -4,11 +4,11 @@ namespace Mautic\CoreBundle\Helper;
 
 final class SearchStringHelper
 {
-    public const COMMAND_NEGATE  = 0;
+    public const int COMMAND_NEGATE  = 0;
 
-    public const COMMAND_POSIT   = 1;
+    public const int COMMAND_POSIT   = 1;
 
-    public const COMMAND_NEUTRAL = 2;
+    public const int COMMAND_NEUTRAL = 2;
 
     private array $needsParsing = [
         ' ',
@@ -133,7 +133,7 @@ final class SearchStringHelper
                     $command                              = substr($command, 1);
                 }
 
-                if (empty($chars)) {
+                if ([] === $chars) {
                     // Command hasn't been defined so don't allow empty or could end up searching entire table
                     $filters->{$baseName}[$keyCount]->command      = $command;
                     $filters->{$baseName}[$keyCount]->missingValue = true;
@@ -147,7 +147,7 @@ final class SearchStringHelper
                 if (' ' !== $string) {
                     $string = trim($string);
                     $type   = ('OR' === $string || 'AND' === $string) ? $string : '';
-                    $this->setFilter($filters, $baseName, $keyCount, $string, $command, $overrideCommand, true, $type, !empty($chars));
+                    $this->setFilter($filters, $baseName, $keyCount, $string, $command, $overrideCommand, true, $type, [] !== $chars);
                 }
                 continue;
             } elseif (in_array($char, $this->needsClosing)) {
@@ -205,7 +205,7 @@ final class SearchStringHelper
                         ++$closingCount;
                     }
                 }
-            } elseif (empty($chars)) {
+            } elseif ([] === $chars) {
                 $filters->{$baseName}[$keyCount]->command = $command;
                 $this->setFilter($filters, $baseName, $keyCount, $string, $command, $overrideCommand, true, null, false);
             }// else keep concocting chars

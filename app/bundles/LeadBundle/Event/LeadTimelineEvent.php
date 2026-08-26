@@ -27,7 +27,7 @@ final class LeadTimelineEvent extends Event
      *
      * @var mixed[]
      */
-    private array $filters;
+    private readonly array $filters;
 
     /**
      * @var array<string, int>
@@ -61,22 +61,19 @@ final class LeadTimelineEvent extends Event
     ];
 
     /**
-     * @param Lead|null   $lead        Lead entity for the lead the timeline is being generated for
-     * @param int         $page
-     * @param int         $limit       Limit per type
-     * @param bool        $forTimeline
-     * @param string|null $siteDomain
+     * @param Lead|null $lead  Lead entity for the lead the timeline is being generated for
+     * @param int       $limit Limit per type
      */
     public function __construct(
         private readonly ?Lead $lead = null,
         array $filters = [],
-        private ?array $orderBy = null,
-        private $page = 1,
-        private $limit = 25,
-        private $forTimeline = true,
-        private $siteDomain = null,
+        private readonly ?array $orderBy = null,
+        private readonly int $page = 1,
+        private readonly int $limit = 25,
+        private readonly bool $forTimeline = true,
+        private readonly ?string $siteDomain = null,
     ) {
-        $this->filters = !empty($filters)
+        $this->filters = [] !== $filters
             ? $filters
             :
             [
@@ -175,7 +172,7 @@ final class LeadTimelineEvent extends Event
      */
     public function getEvents()
     {
-        if (empty($this->events)) {
+        if ([] === $this->events) {
             return [];
         }
 
@@ -468,10 +465,8 @@ final class LeadTimelineEvent extends Event
 
     /**
      * Check if the data is to be display for the contact's timeline or used for the API.
-     *
-     * @return bool
      */
-    public function isForTimeline()
+    public function isForTimeline(): bool
     {
         return $this->forTimeline;
     }

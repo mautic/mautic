@@ -6,8 +6,6 @@ use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\PointBundle\Entity\Point;
 use Mautic\PointBundle\Model\PointModel;
-use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -104,7 +102,7 @@ final class PointController extends AbstractFormController
      *
      * @param Point $entity
      */
-    public function newAction(Request $request, FormFactoryInterface $formFactory, $entity = null): Response
+    public function newAction(Request $request, $entity = null): Response
     {
         if (!$entity instanceof Point) {
             /** @var Point $entity */
@@ -122,7 +120,7 @@ final class PointController extends AbstractFormController
         $actionType = 'POST' === $method ? ($point['type'] ?? '') : '';
         $action     = $this->generateUrl('mautic_point_action', ['objectAction' => 'new']);
         $actions    = $this->pointModel->getPointActions();
-        $form       = $this->pointModel->createForm($entity, $formFactory, $action, [
+        $form       = $this->pointModel->createForm($entity, $action, [
             'pointActions' => $actions,
             'actionType'   => $actionType,
         ]);
@@ -151,7 +149,7 @@ final class PointController extends AbstractFormController
                         $template  = 'Mautic\PointBundle\Controller\PointController::indexAction';
                     } else {
                         // return edit view so that all the session stuff is loaded
-                        return $this->editAction($request, $formFactory, $entity->getId(), true);
+                        return $this->editAction($request, $entity->getId(), true);
                     }
                 }
             } else {
@@ -203,10 +201,8 @@ final class PointController extends AbstractFormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function editAction(Request $request, FormFactoryInterface $formFactory, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false): Response
     {
         $entity = $this->pointModel->getEntity($objectId);
 
@@ -255,7 +251,7 @@ final class PointController extends AbstractFormController
 
         $action  = $this->generateUrl('mautic_point_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
         $actions = $this->pointModel->getPointActions();
-        $form    = $this->pointModel->createForm($entity, $formFactory, $action, [
+        $form    = $this->pointModel->createForm($entity, $action, [
             'pointActions' => $actions,
             'actionType'   => $actionType,
         ]);
@@ -334,7 +330,7 @@ final class PointController extends AbstractFormController
     /**
      * @param int $objectId
      */
-    public function cloneAction(Request $request, FormFactoryInterface $formFactory, $objectId): Response
+    public function cloneAction(Request $request, $objectId): Response
     {
         $entity = $this->pointModel->getEntity($objectId);
 
@@ -347,17 +343,15 @@ final class PointController extends AbstractFormController
             $entity->setIsPublished(false);
         }
 
-        return $this->newAction($request, $formFactory, $entity);
+        return $this->newAction($request, $entity);
     }
 
     /**
      * Deletes the entity.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         $page      = $request->getSession()->get('mautic.point.page', 1);
         $returnUrl = $this->generateUrl('mautic_point_index', ['page' => $page]);
@@ -451,7 +445,7 @@ final class PointController extends AbstractFormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $this->pointModel->deleteEntities($deleteIds);
 
                 $flashes[] = [

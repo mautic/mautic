@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class EmailFunctionalTest extends MauticMysqlTestCase
 {
-    public const SAVE_AND_CLOSE = 'Save & Close';
+    public const string SAVE_AND_CLOSE = 'Save & Close';
 
     public function testExcludedSegmentsConflicting(): void
     {
@@ -96,7 +96,6 @@ final class EmailFunctionalTest extends MauticMysqlTestCase
             $listOne->getId(),
             $listFour->getId(),
         ], $email->getLists());
-        $this->assertInstanceOf(Email::class, $email);
         $this->assertEmailLists([
             $listTwo->getId(),
             $listThree->getId(),

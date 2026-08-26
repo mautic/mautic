@@ -2,20 +2,28 @@
 
 namespace MauticPlugin\MauticCrmBundle\Api;
 
-use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\PluginBundle\Exception\ApiErrorException;
+use MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration;
 use MauticPlugin\MauticCrmBundle\Integration\HubspotIntegration;
 
 /**
  * @property HubspotIntegration $integration
  */
-class HubspotApi extends CrmApi
+final class HubspotApi extends CrmApi
 {
-    protected $requestSettings = [
+    private array $requestSettings = [
         'encode_parameters' => 'json',
     ];
 
-    protected function request($operation, $parameters = [], $method = 'GET', $object = 'contacts')
+    public function __construct(
+        CrmAbstractIntegration $integration,
+        private readonly EmailValidator $emailValidator,
+    ) {
+        parent::__construct($integration);
+    }
+
+    private function request(string $operation, array $parameters = [], string $method = 'GET', string $object = 'contacts')
     {
         if ('oauth2' === $this->integration->getAuthenticationType()) {
             $url     = sprintf('%s/%s/%s/', $this->integration->getApiUrl(), $object, $operation);
@@ -78,11 +86,11 @@ class HubspotApi extends CrmApi
         $email  = $data['email'];
         $result = [];
         // Check if the is a valid email
-        MailHelper::validateEmail($email);
+        $this->emailValidator->validate($email);
         // Format data for request
         $formattedLeadData = $this->integration->formatLeadDataForCreateOrUpdate($data, $lead, $updateLink);
         if ($formattedLeadData) {
-            $result = $this->request('v1/contact/createOrUpdate/email/'.$email, $formattedLeadData, 'POST');
+            return $this->request('v1/contact/createOrUpdate/email/'.$email, $formattedLeadData, 'POST');
         }
 
         return $result;
@@ -93,7 +101,7 @@ class HubspotApi extends CrmApi
      *
      * @return mixed
      */
-    public function getContacts($params = [])
+    public function getContacts(array $params = [])
     {
         return $this->request('v1/lists/recently_updated/contacts/recent?', $params, 'GET', 'contacts');
     }
@@ -103,7 +111,7 @@ class HubspotApi extends CrmApi
      *
      * @return mixed
      */
-    public function getCompanies($params, $id)
+    public function getCompanies(array $params, $id)
     {
         if ($id) {
             return $this->request('v2/companies/'.$id, $params, 'GET', 'companies');
@@ -113,11 +121,9 @@ class HubspotApi extends CrmApi
     }
 
     /**
-     * @param string $object
-     *
      * @return mixed|string
      */
-    public function createProperty($propertyName, $object = 'properties')
+    public function createProperty($propertyName, string $object = 'properties')
     {
         return $this->request('v1/contacts/properties', ['name' => $propertyName,  'groupName' => 'contactinformation', 'type' => 'string'], 'POST', $object);
     }

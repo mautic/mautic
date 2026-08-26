@@ -22,11 +22,11 @@ final class ExportControllerTest extends MauticMysqlTestCase
 
     protected bool $authenticateApi = true;
 
-    public const PERMISSION_LEAD_EXPORT     = 'lead:export:enable';
+    public const string PERMISSION_LEAD_EXPORT     = 'lead:export:enable';
 
-    public const PERMISSION_FORM_EXPORT     = 'form:export:enable';
+    public const string PERMISSION_FORM_EXPORT     = 'form:export:enable';
 
-    public const PERMISSION_REPORT_EXPORT   = 'report:export:enable';
+    public const string PERMISSION_REPORT_EXPORT   = 'report:export:enable';
 
     public function testContactExportAction(): void
     {
@@ -84,7 +84,7 @@ final class ExportControllerTest extends MauticMysqlTestCase
         $this->getContainer()->get(ReportModel::class)->saveEntity($report);
 
         // Check the details page
-        $this->client->request('GET', '/s/reports/view/'.$report->getId());
+        $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId());
         $this->assertResponseIsSuccessful();
 
         $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId().'');
@@ -211,7 +211,7 @@ final class ExportControllerTest extends MauticMysqlTestCase
             ],
         ];
 
-        $this->client->request('POST', '/api/forms/new', $formPayload);
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $formPayload);
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
         $response = json_decode($clientResponse->getContent(), true);

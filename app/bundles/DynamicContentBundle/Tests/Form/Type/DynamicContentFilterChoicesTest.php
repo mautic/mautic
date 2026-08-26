@@ -15,13 +15,13 @@ use Symfony\Component\HttpFoundation\Request;
  */
 final class DynamicContentFilterChoicesTest extends MauticMysqlTestCase
 {
-    private const LOCALE_VALUE   = 'en_US';
+    private const string LOCALE_VALUE   = 'en_US';
 
-    private const TIMEZONE_VALUE = 'America/New_York';
+    private const string TIMEZONE_VALUE = 'America/New_York';
 
-    private const REGION_VALUE   = 'California';
+    private const string REGION_VALUE   = 'California';
 
-    private const REGION_INDEX_NUMBER = '4';
+    private const string REGION_INDEX_NUMBER = '4';
 
     public function testLocaleFilterValueIsAcceptedByTheForm(): void
     {

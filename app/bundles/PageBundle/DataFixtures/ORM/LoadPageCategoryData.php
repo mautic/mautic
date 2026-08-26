@@ -2,16 +2,16 @@
 
 namespace Mautic\PageBundle\DataFixtures\ORM;
 
-use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CategoryBundle\Model\CategoryModel;
+use Mautic\CategoryBundle\Entity\CategoryRepository;
 
-final class LoadPageCategoryData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadPageCategoryData extends Fixture implements OrderedFixtureInterface
 {
     public function __construct(
-        private readonly CategoryModel $categoryModel,
+        private readonly CategoryRepository $categoryRepository,
     ) {
     }
 
@@ -26,7 +26,7 @@ final class LoadPageCategoryData extends AbstractFixture implements OrderedFixtu
         $cat->setTitle($events);
         $cat->setAlias(strtolower($events));
 
-        $this->categoryModel->getRepository()->saveEntity($cat);
+        $this->categoryRepository->saveEntity($cat);
         $this->setReference('page-cat-1', $cat);
     }
 

@@ -72,10 +72,8 @@ class CommonApiController extends FetchCommonApiController
 
     /**
      * Delete a batch of entities.
-     *
-     * @return array|Response
      */
-    public function deleteEntitiesAction(Request $request)
+    public function deleteEntitiesAction(Request $request): Response
     {
         $parameters = $request->query->all();
 
@@ -118,7 +116,7 @@ class CommonApiController extends FetchCommonApiController
             $this->doctrine->getManager()->detach($entity);
         }
 
-        if (!empty($errors)) {
+        if ([] !== $errors) {
             $content           = json_decode($response->getContent(), true);
             $content['errors'] = $errors;
             $response->setContent(json_encode($content));
@@ -163,10 +161,8 @@ class CommonApiController extends FetchCommonApiController
 
     /**
      * Edit a batch of entities.
-     *
-     * @return array|Response
      */
-    public function editEntitiesAction(Request $request)
+    public function editEntitiesAction(Request $request): Response
     {
         $parameters = $request->request->all();
 
@@ -223,7 +219,7 @@ class CommonApiController extends FetchCommonApiController
             'statusCodes'          => $statusCodes,
         ];
 
-        if (!empty($errors)) {
+        if ([] !== $errors) {
             $payload['errors'] = $errors;
         }
 
@@ -268,10 +264,8 @@ class CommonApiController extends FetchCommonApiController
 
     /**
      * Create a batch of new entities.
-     *
-     * @return array|Response
      */
-    public function newEntitiesAction(Request $request)
+    public function newEntitiesAction(Request $request): Response
     {
         $entity = $this->model->getEntity();
 
@@ -320,7 +314,7 @@ class CommonApiController extends FetchCommonApiController
             'statusCodes'          => $statusCodes,
         ];
 
-        if (!empty($errors)) {
+        if ([] !== $errors) {
             $payload['errors'] = $errors;
         }
 
@@ -354,7 +348,6 @@ class CommonApiController extends FetchCommonApiController
     {
         return $this->model->createForm(
             $entity,
-            $this->formFactory,
             null,
             array_merge(
                 [
@@ -395,12 +388,8 @@ class CommonApiController extends FetchCommonApiController
      * Convert posted parameters into what the form needs in order to successfully bind.
      *
      * @param mixed[] $parameters
-     * @param object  $entity
-     * @param string  $action
-     *
-     * @return mixed
      */
-    protected function prepareParametersForBinding(Request $request, $parameters, $entity, $action)
+    protected function prepareParametersForBinding(Request $request, array $parameters, object $entity, string $action): array|Response
     {
         return $parameters;
     }
@@ -409,7 +398,7 @@ class CommonApiController extends FetchCommonApiController
      * @param mixed[] $errors
      * @param mixed[] $entities
      */
-    protected function processBatchForm(Request $request, $key, $entity, $params, $method, &$errors, &$entities)
+    protected function processBatchForm(Request $request, $key, $entity, $params, $method, array &$errors, array &$entities)
     {
         $this->inBatchMode = true;
         $formResponse      = $this->processForm($request, $entity, $params, $method);

@@ -20,7 +20,7 @@ final class oAuthHelper
 
     private $callback;
 
-    private array $settings;
+    private readonly array $settings;
 
     public function __construct(
         UnifiedIntegrationInterface $integration,
@@ -75,12 +75,10 @@ final class oAuthHelper
     private function getCompositeKey(): string
     {
         if ('' !== $this->accessTokenSecret) {
-            $composite_key = $this->encode($this->clientSecret).'&'.$this->encode($this->accessTokenSecret);
-        } else {
-            $composite_key = $this->encode($this->clientSecret).'&';
+            return $this->encode($this->clientSecret).'&'.$this->encode($this->accessTokenSecret);
         }
 
-        return $composite_key;
+        return $this->encode($this->clientSecret).'&';
     }
 
     /**

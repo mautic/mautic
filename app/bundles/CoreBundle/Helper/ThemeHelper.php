@@ -430,9 +430,9 @@ class ThemeHelper implements ThemeHelperInterface
                 }
             }
 
-            $this->sandboxEnv->addRuntimeLoader(new class($this->twig) implements RuntimeLoaderInterface {
+            $this->sandboxEnv->addRuntimeLoader(new readonly class($this->twig) implements RuntimeLoaderInterface {
                 public function __construct(
-                    private readonly Environment $twig,
+                    private Environment $twig,
                 ) {
                 }
 
@@ -731,7 +731,7 @@ class ThemeHelper implements ThemeHelperInterface
         if (false !== $keyToRemove) {
             unset($hiddenThemes[$keyToRemove]);
 
-            if (empty($hiddenThemes)) {
+            if ([] === $hiddenThemes) {
                 $this->filesystem->remove($hidden);
             } else {
                 $this->filesystem->dumpFile($hidden, sprintf('|%s', implode('|', $hiddenThemes)));

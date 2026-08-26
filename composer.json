@@ -41,9 +41,9 @@
     "phpstan/phpstan-doctrine": "^2.0.28",
     "phpstan/phpstan-phpunit": "^2.0.18",
     "phpstan/phpstan-symfony": "^2.0.20",
-    "phpunit/phpunit": "^11.5",
+    "phpunit/phpunit": "^12.0",
     "rector/type-perfect": "^2.1.4",
-    "rector/rector": "^2.5.9",
+    "rector/rector": "dev-main",
     "symfony/browser-kit": "~7.4.0",
     "symfony/dom-crawler": "~7.4.0",
     "symfony/maker-bundle": "^1.64",
@@ -194,7 +194,7 @@
   },
   "config": {
     "platform": {
-      "php": "8.2.0"
+      "php": "8.4.0"
     },
     "bin-dir": "bin",
     "component-dir": "media/assets",

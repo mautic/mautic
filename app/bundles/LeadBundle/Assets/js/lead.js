@@ -506,16 +506,16 @@ Mautic.reorderSegmentFilters = function() {
             $element.attr('id', prefix + '_filters_'+counter+'_'+suffix);
 
             // Destroy the chosen and recreate
-            if ($element.is('select') && suffix === 'properties_filter') {
+            if ($element.is('select') && suffix.includes("_filter")) {
                 Mautic.destroyChosen($element);
                 Mautic.activateChosenSelect($element);
             }
 
             Mautic.segmentFilter().showCopyBasedOnGlue($filter);
 
-            if (mQuery(this).is(':radio') && id.includes("_dateTypeMode_")) {
-                if (mQuery(this).closest('label').hasClass('active')) {
-                    mQuery(this).click();
+            if ($element.is(':radio') && id.includes("_dateTypeMode_")) {
+                if ($element.closest('label').hasClass('active')) {
+                    $element.click();
                 }
             }
         });
@@ -778,7 +778,7 @@ Mautic.segmentFilter = function() {
     }
 
     const _cloneFilter = function($origin) {
-        $origin.find('.properties-form .choice-wrapper select').chosen('destroy');
+        $origin.find('.properties-form select').chosen('destroy');
         _setSelectedOptions($origin);
         const $clone = $origin.clone(false);
 
@@ -1489,32 +1489,6 @@ Mautic.createLeadTag = function (el) {
     Mautic.ajaxActionRequest('lead:addLeadTags', {tags: tags}, function(response) {
         if (response.tags) {
             mQuery('#' + mQuery(el).attr('id')).html(response.tags);
-            mQuery('#' + mQuery(el).attr('id')).trigger('chosen:updated');
-        }
-
-        Mautic.removeLabelLoadingIndicator();
-    });
-};
-
-Mautic.createLeadUtmTag = function (el) {
-    var newFound = false;
-    mQuery('#' + mQuery(el).attr('id') + ' :selected').each(function(i, selected) {
-        if (!mQuery.isNumeric(mQuery(selected).val())) {
-            newFound = true;
-        }
-    });
-
-    if (!newFound) {
-        return;
-    }
-
-    Mautic.activateLabelLoadingIndicator(mQuery(el).attr('id'));
-
-    var utmtags = JSON.stringify(mQuery(el).val());
-
-    Mautic.ajaxActionRequest('lead:addLeadUtmTags', {utmtags: utmtags}, function(response) {
-        if (response.tags) {
-            mQuery('#' + mQuery(el).attr('id')).html(response.utmtags);
             mQuery('#' + mQuery(el).attr('id')).trigger('chosen:updated');
         }
 

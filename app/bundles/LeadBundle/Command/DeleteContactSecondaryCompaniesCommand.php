@@ -25,7 +25,7 @@ TXT
 )]
 final class DeleteContactSecondaryCompaniesCommand extends Command
 {
-    public const NAME                    = 'mautic:contact:delete:secondary-companies';
+    public const string NAME                    = 'mautic:contact:delete:secondary-companies';
 
     public function __construct(
         private readonly LoggerInterface $logger,

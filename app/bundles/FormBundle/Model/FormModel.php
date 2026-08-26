@@ -36,7 +36,6 @@ use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -49,6 +48,11 @@ use Twig\Environment;
  */
 class FormModel extends CommonFormModel implements GlobalSearchInterface
 {
+    public static function getName(): string
+    {
+        return 'form.form';
+    }
+
     public function __construct(
         protected RequestStack $requestStack,
         protected Environment $twig,
@@ -91,7 +95,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         return 'getName';
     }
 
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Form) {
             throw new MethodNotAllowedHttpException(['Form']);
@@ -101,7 +105,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
             $options['action'] = $action;
         }
 
-        return $formFactory->create(FormType::class, $entity, $options);
+        return $this->formFactory->create(FormType::class, $entity, $options);
     }
 
     /**
@@ -355,12 +359,10 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         $html = $this->getFormHtml($form, $useCache);
 
         if ($withScript) {
-            $html = $this->getFormScript($form)."\n\n".$this->removeScriptTag($html);
-        } else {
-            $html = $this->removeScriptTag($html);
+            return $this->getFormScript($form)."\n\n".$this->removeScriptTag($html);
         }
 
-        return $html;
+        return $this->removeScriptTag($html);
     }
 
     /**
@@ -743,6 +745,10 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
      */
     public function populateValuesWithLead(Form $form, &$formHtml, ?string $formName = null): void
     {
+        if (!(bool) $this->coreParametersHelper->get('form_field_autofill', false)) {
+            return;
+        }
+
         $formName ??= $form->generateFormName();
         $fields            = $form->getFields();
         $autoFillFields    = [];

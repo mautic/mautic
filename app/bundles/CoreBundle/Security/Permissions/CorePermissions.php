@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Security\Exception\PermissionBadFormatException;
 use Mautic\CoreBundle\Security\Exception\PermissionNotFoundException;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Contracts\Service\ResetInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -26,14 +27,23 @@ class CorePermissions implements ResetInterface
 
     private bool $permissionObjectsGenerated = false;
 
+    /**
+     * @param iterable<AbstractPermissions> $permissionObjects services tagged 'mautic.permissions'
+     */
     public function __construct(
         protected UserHelper $userHelper,
         private readonly TranslatorInterface $translator,
         private readonly CoreParametersHelper $coreParametersHelper,
         private readonly array $bundles,
         private readonly array $pluginBundles,
+        #[AutowireIterator('mautic.permissions')]
+        iterable $permissionObjects = [],
     ) {
         $this->registerPermissionClasses();
+
+        foreach ($permissionObjects as $permissionObject) {
+            $this->setPermissionObject($permissionObject);
+        }
     }
 
     public function reset(): void
@@ -95,10 +105,6 @@ class CorePermissions implements ResetInterface
 
                 return false;
             }
-        }
-
-        if ($permissionObject->isEnabled()) {
-            $permissionObject->definePermissions();
         }
 
         return $permissionObject;
@@ -435,7 +441,7 @@ class CorePermissions implements ResetInterface
 
     protected function getPermissionClasses(): array
     {
-        if (empty($this->permissionClasses)) {
+        if ([] === $this->permissionClasses) {
             $this->registerPermissionClasses();
         }
 
@@ -458,7 +464,10 @@ class CorePermissions implements ResetInterface
 
         $permissionClass = $this->getPermissionClasses()[$class];
 
-        return new $permissionClass($this->getParams());
+        $permissionObject = new $permissionClass($this->getParams());
+        $permissionObject->autowireAbstractPermissions($this->coreParametersHelper);
+
+        return $permissionObject;
     }
 
     /**

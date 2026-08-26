@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 final class AssetsSubscriberTest extends TestCase
 {
-    private const ASSET_SUBDIR = 'plugins/GrapesJsBuilderBundle/Assets/library/js/dist';
+    private const string ASSET_SUBDIR = 'plugins/GrapesJsBuilderBundle/Assets/library/js/dist';
 
     private MockObject&CustomAssetsEvent $assetsEvent;
 
@@ -68,7 +68,7 @@ final class AssetsSubscriberTest extends TestCase
     public function testInjectAssetsSkipsWhenPluginNotPublished(): void
     {
         $config = $this->createMock(Config::class);
-        $config->method('isPublished')->willReturn(false);
+        $config->expects($this->once())->method('isPublished')->willReturn(false);
         $this->assetsEvent->expects($this->never())->method('addScript');
 
         $this->makeSubscriber($config)->injectAssets($this->assetsEvent);

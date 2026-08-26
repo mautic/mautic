@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -11,6 +12,8 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CampaignBundle\Event\PendingEvent;
+use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Lead;
@@ -29,6 +32,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
@@ -146,7 +150,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         // Execute the campaign.
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
 
-        $prefix = static::getContainer()->getParameter('mautic.db_table_prefix');
+        $prefix = self::getContainer()->getParameter('mautic.db_table_prefix');
 
         foreach ($listLeads as $contactId) {
             $points = $this->connection->fetchOne("SELECT points FROM {$prefix}leads WHERE id = :id", ['id' => $contactId]);
@@ -262,7 +266,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
             $args['lead'] = $this->contactRepository->getEntity($contact->getId());
 
             $event      = new CampaignExecutionEvent($args, true);
-            $dispatcher = static::getContainer()->get(EventDispatcherInterface::class);
+            $dispatcher = self::getContainer()->get(EventDispatcherInterface::class);
             $result     = $dispatcher->dispatch(
                 $event,
                 LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION
@@ -531,12 +535,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
      */
     private function createContacts(): array
     {
-        $contacts   = [];
-        $contacts[] = $this->createContact('contact1@email.com', 'Isaac', 'Asimov');
-        $contacts[] = $this->createContact('contact2@email.com', 'Robert A.', 'Heinlein');
-        $contacts[] = $this->createContact('contact3@email.com', 'Arthur C.', 'Clarke', 1);
-
-        return $contacts;
+        return [$this->createContact('contact1@email.com', 'Isaac', 'Asimov'), $this->createContact('contact2@email.com', 'Robert A.', 'Heinlein'), $this->createContact('contact3@email.com', 'Arthur C.', 'Clarke', 1)];
     }
 
     /**
@@ -545,7 +544,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
     private function createStages(): array
     {
         foreach ($this->stages as $key => $stage) {
-            $this->client->request('POST', '/api/stages/new', $stage);
+            $this->client->request(Request::METHOD_POST, '/api/stages/new', $stage);
             $clientResponse = $this->client->getResponse();
             $response       = json_decode($clientResponse->getContent(), true);
 
@@ -563,7 +562,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
     private function addStageToContacts(array $contacts, int $stageId): void
     {
         foreach ($contacts as $contact) {
-            $this->client->request('POST', "/api/stages/{$stageId}/contact/{$contact->getId()}/add");
+            $this->client->request(Request::METHOD_POST, "/api/stages/{$stageId}/contact/{$contact->getId()}/add");
             $clientResponse = $this->client->getResponse();
 
             $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
@@ -1049,18 +1048,12 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $lead = new Lead();
         $log  = new LeadEventLog();
         $log->setEvent($campaignEvent);
+        $log->setLead($lead);
 
-        $args = [
-            'lead'            => $lead,
-            'event'           => $campaignEvent,
-            'eventDetails'    => null,
-            'systemTriggered' => false,
-            'eventSettings'   => [],
-        ];
-
-        $event           = new CampaignExecutionEvent($args, false, $log);
-        $eventDispatcher = static::getContainer()->get(EventDispatcherInterface::class);
-        $eventDispatcher->dispatch($event, 'mautic.lead.on_campaign_trigger_action');
+        $eventAccessor   = new ActionAccessor([]);
+        $event           = new PendingEvent($eventAccessor, $campaignEvent, new ArrayCollection([$log]));
+        $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
+        $eventDispatcher->dispatch($event, LeadEvents::ON_CAMPAIGN_BATCH_ACTION);
 
         $leadManipulator = $lead->getManipulator();
         $this->assertInstanceOf(LeadManipulator::class, $leadManipulator);
@@ -1094,7 +1087,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         // Create a contact and set the custom field value
         $contact   = $this->createContact('john.doe@example.com');
         /** @var LeadModel $leadModel */
-        $leadModel = static::getContainer()->get(LeadModel::class);
+        $leadModel = self::getContainer()->get(LeadModel::class);
         $leadModel->setFieldValues($contact, ['test_date' => $fieldValue]);
         $leadModel->saveEntity($contact);
 
@@ -1122,7 +1115,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         // @phpstan-ignore-next-line new.deprecated
         $event = new CampaignExecutionEvent($eventArgs, true);
 
-        $dispatcher = static::getContainer()->get(EventDispatcherInterface::class);
+        $dispatcher = self::getContainer()->get(EventDispatcherInterface::class);
 
         // The test passes if no exception is thrown and the result is as expected
         $dispatcher->dispatch($event, LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION);
@@ -1131,7 +1124,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 
         // Clean up
         /** @var FieldModel $fieldModel */
-        $fieldModel = static::getContainer()->get(FieldModel::class);
+        $fieldModel = self::getContainer()->get(FieldModel::class);
         $field      = $fieldModel->getEntityByAlias('test_date');
         if ($field) {
             $fieldModel->deleteEntity($field);

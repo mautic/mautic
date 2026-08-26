@@ -383,7 +383,7 @@ final class FieldController extends CommonFormController
             $this->throwAccessDenied();
         }
 
-        $formField = (array_key_exists($objectId, $fields)) ? $fields[$objectId] : null;
+        $formField = $fields[$objectId] ?? null;
 
         if ('POST' === $request->getMethod() && null !== $formField) {
             if ($formField['mappedObject'] && $formField['mappedField']) {
@@ -421,7 +421,6 @@ final class FieldController extends CommonFormController
         $customParams     = $customComponents['fields'][$formField['type']] ?? false;
         $form = $this->formFieldModel->createForm(
             $formField,
-            $this->formFactory,
             (!empty($formField['id'])) ?
                 $this->generateUrl('mautic_formfield_action', ['objectAction' => 'edit', 'objectId' => $formField['id']])
                 : $this->generateUrl('mautic_formfield_action', ['objectAction' => 'new']),

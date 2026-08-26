@@ -116,7 +116,7 @@ trait FormSubmissionTrait
         $response       = json_decode($clientResponse->getContent(), true);
         $formId         = $response['form']['id'];
         $formAlias      = $response['form']['alias'];
-        Assert::assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        Assert::assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), (string) $clientResponse->getContent());
 
         return [$formId, $formAlias];
     }

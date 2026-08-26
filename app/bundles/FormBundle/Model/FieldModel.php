@@ -10,7 +10,6 @@ use Mautic\FormBundle\Event\FormFieldEvent;
 use Mautic\FormBundle\Form\Type\FieldType;
 use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -23,6 +22,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 class FieldModel extends CommonFormModel
 {
+    public static function getName(): string
+    {
+        return 'form.field';
+    }
+
     protected LeadFieldModel $leadFieldModel;
 
     private RequestStack $requestStack;
@@ -56,13 +60,13 @@ class FieldModel extends CommonFormModel
      *
      * @return FormInterface<mixed>
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, $options = []): FormInterface
     {
         if ($action) {
             $options['action'] = $action;
         }
 
-        return $formFactory->create(FieldType::class, $entity, $options);
+        return $this->formFactory->create(FieldType::class, $entity, $options);
     }
 
     public function getRepository(): FieldRepository

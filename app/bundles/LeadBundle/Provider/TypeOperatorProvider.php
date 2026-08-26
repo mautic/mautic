@@ -24,10 +24,26 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
      */
     private array $cachedTypeOperatorsChoices = [];
 
+    /**
+     * A context in which the operators are being used.
+     */
+    private string $context = '';
+
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
-        private FilterOperatorProviderInterface $filterOperatorProvider,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly FilterOperatorProviderInterface $filterOperatorProvider,
     ) {
+    }
+
+    public function setContext(string $context): void
+    {
+        $this->context                    = $context;
+        $this->cachedTypeOperatorsChoices = [];
+    }
+
+    public function getContext(): string
+    {
+        return $this->context;
     }
 
     public function getOperatorsIncluding(array $operators): array
@@ -60,8 +76,8 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
 
     public function getAllTypeOperators(): array
     {
-        if (empty($this->cachedTypeOperators)) {
-            $event = new TypeOperatorsEvent();
+        if ([] === $this->cachedTypeOperators) {
+            $event = new TypeOperatorsEvent($this->context);
 
             $this->dispatcher->dispatch($event, LeadEvents::COLLECT_OPERATORS_FOR_FIELD_TYPE);
 
@@ -92,16 +108,10 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
     }
 
     /**
-     * Overwriting deprecated method from OperatorListTrait.
-     *
-     * @param string $operator
-     *
      * @return array<string,mixed[]>
      */
-    public function getFilterExpressionFunctions($operator = null)
+    private function getFilterOperators(): array
     {
-        $operatorOptions = $this->filterOperatorProvider->getAllOperators();
-
-        return (null === $operator) ? $operatorOptions : $operatorOptions[$operator];
+        return $this->filterOperatorProvider->getAllOperators();
     }
 }

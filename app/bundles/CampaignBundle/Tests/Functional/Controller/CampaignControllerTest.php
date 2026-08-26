@@ -8,7 +8,6 @@ use Doctrine\ORM\Exception\NotSupported;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\Persistence\Mapping\MappingException;
-use GuzzleHttp\Utils;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
@@ -21,7 +20,6 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -279,9 +277,9 @@ final class CampaignControllerTest extends MauticMysqlTestCase
         $before = $now->modify('-1 month');
         $after  = $now->modify('+1 month');
         $url    = sprintf('s/campaigns/event/stats/%d/%s/%s', $campaign->getId(), $before->format('Y-m-d'), $after->format('Y-m-d'));
-        $this->client->request('GET', $url);
+        $this->client->request(Request::METHOD_GET, $url);
         $response = $this->client->getResponse();
-        $body     = Utils::jsonDecode($response->getContent(), true);
+        $body     = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $this->client->restart();
 
         return new Crawler($body['actions']);
@@ -325,7 +323,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
 
         $this->loginOtherUser($nonAdminUser);
 
-        $this->client->request('GET', '/s/campaigns/export/'.$this->campaign->getId());
+        $this->client->request(Request::METHOD_GET, '/s/campaigns/export/'.$this->campaign->getId());
 
         $response = $this->client->getResponse();
 
@@ -340,7 +338,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
         $this->loginOtherUser($nonAdminUser);
 
         $this->client->request(
-            'GET',
+            Request::METHOD_GET,
             '/s/campaigns/batchExport',
             [
                 'filetype' => 'zip',
@@ -361,7 +359,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
 
         $this->loginOtherUser($nonAdminUser);
 
-        $this->client->request('GET', '/s/campaigns/export/'.$this->campaign->getId());
+        $this->client->request(Request::METHOD_GET, '/s/campaigns/export/'.$this->campaign->getId());
 
         $response = $this->client->getResponse();
 
@@ -374,7 +372,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
 
         $this->loginOtherUser($nonAdminUser);
 
-        $this->client->request('GET', '/s/campaigns/export/999999'); // Non-existent campaign ID
+        $this->client->request(Request::METHOD_GET, '/s/campaigns/export/999999'); // Non-existent campaign ID
 
         $response = $this->client->getResponse();
 
@@ -390,11 +388,11 @@ final class CampaignControllerTest extends MauticMysqlTestCase
         $exportHelperMock->method('writeToZipFile')->willReturn('');
 
         // Inject the mock into the container
-        static::getContainer()->set(ExportHelper::class, $exportHelperMock);
+        self::getContainer()->set(ExportHelper::class, $exportHelperMock);
 
         $this->loginOtherUser($nonAdminUser);
 
-        $this->client->request('GET', '/s/campaigns/export/'.$this->campaign->getId());
+        $this->client->request(Request::METHOD_GET, '/s/campaigns/export/'.$this->campaign->getId());
 
         $response        = $this->client->getResponse();
         $responseContent = $response->getContent();
@@ -417,7 +415,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
 
         $this->loginOtherUser($nonAdminUser);
 
-        $this->client->request('GET', '/s/campaigns/batchExport');
+        $this->client->request(Request::METHOD_GET, '/s/campaigns/batchExport');
 
         $response = $this->client->getResponse();
 
@@ -430,7 +428,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
 
         $this->loginOtherUser($nonAdminUser);
 
-        $this->client->request('GET', '/s/campaigns/batchExport', [
+        $this->client->request(Request::METHOD_GET, '/s/campaigns/batchExport', [
             'ids' => json_encode([]), // Empty IDs to trigger query
         ]);
 
@@ -448,11 +446,11 @@ final class CampaignControllerTest extends MauticMysqlTestCase
         $exportHelperMock->method('writeToZipFile')->willReturn('/invalid/path/to/file.zip');
 
         // Use the test container to replace the service with the mock
-        static::getContainer()->set(ExportHelper::class, $exportHelperMock);
+        self::getContainer()->set(ExportHelper::class, $exportHelperMock);
 
         $this->loginOtherUser($nonAdminUser);
 
-        $this->client->request('GET', '/s/campaigns/batchExport', [
+        $this->client->request(Request::METHOD_GET, '/s/campaigns/batchExport', [
             'ids' => json_encode([$this->campaign->getId()]),
         ]);
 

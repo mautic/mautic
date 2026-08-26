@@ -32,14 +32,22 @@ final class ReferenceResolverTest extends TestCase
 
     public function testResolveLeadReferences(): void
     {
-        $this->connection->method('createQueryBuilder')
-            ->willReturn($this->createQueryBuilder('Company name', false));
+        $result = $this->createMock(Result::class);
+        $result->expects($this->exactly(2))->method('fetchOne')
+            ->willReturnOnConsecutiveCalls('Company name', false);
+
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $queryBuilder->expects($this->exactly(2))->method('executeQuery')
+            ->willReturn($result);
+
+        $this->connection->expects($this->exactly(2))->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
 
         $companyReference  = $this->createReference('company', 3);
         $userReference     = $this->createReference('user', 4);
         $notFoundReference = $this->createReference('company', 5);
 
-        $changedObject = (new ObjectChangeDAO('integration', 'lead', '1', 'Lead', '00Q4H00000juXes'))
+        $changedObject = new ObjectChangeDAO('integration', 'lead', '1', 'Lead', '00Q4H00000juXes')
             ->addField(new FieldDAO('company', new NormalizedValueDAO('reference', $companyReference, $companyReference)))
             ->addField(new FieldDAO('user', new NormalizedValueDAO('reference', $userReference, $userReference)))
             ->addField(new FieldDAO('city', new NormalizedValueDAO('text', 'Some city', 'Some city')))
@@ -70,12 +78,20 @@ final class ReferenceResolverTest extends TestCase
 
     public function testResolveCompanyReferences(): void
     {
+        $result = $this->createMock(Result::class);
+        $result->method('fetchOne')
+            ->willReturn('Company name');
+
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $queryBuilder->method('executeQuery')
+            ->willReturn($result);
+
         $this->connection->method('createQueryBuilder')
-            ->willReturn($this->createQueryBuilder('Company name'));
+            ->willReturn($queryBuilder);
 
         $companyReference  = $this->createReference('company', 3);
 
-        $changedObject = (new ObjectChangeDAO('integration', 'company', '1', 'Lead', '00Q4H00000juXes'))
+        $changedObject = new ObjectChangeDAO('integration', 'company', '1', 'Lead', '00Q4H00000juXes')
             ->addField(new FieldDAO('company', new NormalizedValueDAO('reference', $companyReference, $companyReference)));
 
         $this->referenceResolver->resolveReferences('company', [$changedObject]);
@@ -93,23 +109,5 @@ final class ReferenceResolverTest extends TestCase
         $reference->setValue($value);
 
         return $reference;
-    }
-
-    /**
-     * @param mixed $returnValues
-     *
-     * @return QueryBuilder&MockObject
-     */
-    private function createQueryBuilder(...$returnValues): MockObject
-    {
-        $result = $this->createMock(Result::class);
-        $result->method('fetchOne')
-            ->willReturnOnConsecutiveCalls(...$returnValues);
-
-        $queryBuilder = $this->createMock(QueryBuilder::class);
-        $queryBuilder->method('executeQuery')
-            ->willReturn($result);
-
-        return $queryBuilder;
     }
 }

@@ -8,7 +8,7 @@ use Mautic\StatsBundle\Aggregate\Collection\StatCollection;
 
 final class UnsubscribedHelper extends AbstractHelper
 {
-    public const NAME = 'email-unsubscribed';
+    public const string NAME = 'email-unsubscribed';
 
     public function getName(): string
     {

@@ -100,7 +100,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return $this->router->generate('mautic_integration_auth_callback', ['integration' => $this->getName()]);
     }
 
-    public function authCallback($settings = [], $parameters = []): string|false
+    public function authCallback(array $settings = [], array $parameters = []): string|false
     {
         $url   = $this->getApiUrl();
         $error = false;
@@ -132,15 +132,13 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     /**
      * Append ClientID into header to enable authentication.
      *
-     * @param string       $url
      * @param array<mixed> $parameters
-     * @param string       $method
      * @param array<mixed> $settings
      * @param string       $authType
      *
      * @return array<mixed>
      */
-    public function prepareRequest($url, $parameters, $method, $settings, $authType): array
+    public function prepareRequest(string $url, $parameters, string $method, array $settings, $authType): array
     {
         [$parameters,$headers] = parent::prepareRequest($url, $parameters, $method, $settings, $authType);
 
@@ -162,11 +160,9 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     /**
      * Get available company fields for choices in the config UI.
      *
-     * @param array $settings
-     *
      * @return array
      */
-    public function getFormCompanyFields($settings = [])
+    public function getFormCompanyFields(array $settings = [])
     {
         return $this->getFormFieldsByObject('company', $settings);
     }
@@ -588,7 +584,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                 foreach ($cwContactExists as $cwContact) { // go through array of contacts found since Connectwise lets you duplicate records with same email address
                     $mappedData = $this->getMappedFields($object, $lead, $personFound, $config, $cwContact);
 
-                    if (!empty($mappedData)) {
+                    if ([] !== $mappedData) {
                         $personData = $this->getApiHelper()->updateContact($mappedData, $cwContact['id']);
                     } else {
                         $personData['id'] = $cwContact['id'];
@@ -603,7 +599,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                 $id                    = $personData['id'];
                 $integrationEntities[] = $this->saveSyncedData($lead, $object, 'lead', $id);
 
-                if (isset($config['push_activities']) and true == $config['push_activities']) {
+                if (isset($config['push_activities']) && true == $config['push_activities']) {
                     $savedEntity = $this->createActivity($config['campaign_task'], $id, $lead->getId());
                     if ($savedEntity instanceof IntegrationEntity) {
                         $integrationEntities[] = $savedEntity;
@@ -712,7 +708,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                 if ($config['update']) {
                     $communicationItems = array_merge($config['communicationItems'], $communicationItems);
                 }
-                if (!empty($communicationItems)) {
+                if ([] !== $communicationItems) {
                     $matched[$integrationKey] = $communicationItems;
                 }
             }
@@ -765,7 +761,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      *
      * @return array
      */
-    protected function cleanPriorityFields($fieldsToUpdate, $objects = null)
+    protected function cleanPriorityFields(array $fieldsToUpdate, $objects = null)
     {
         if (null === $objects) {
             $objects = ['Leads', 'Contacts'];
@@ -785,7 +781,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      *
      * @return mixed
      */
-    protected function getPriorityFieldsForMautic($config, $object = null, $priorityObject = 'mautic')
+    protected function getPriorityFieldsForMautic(array $config, $object = null, $priorityObject = 'mautic')
     {
         if ('company' == $object) {
             $priority = parent::getPriorityFieldsForMautic($config, $object, 'mautic_company');
@@ -854,7 +850,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
                 $contactsToFetch = array_diff_key($recordList, array_flip($existingContactsIds));
 
-                if (!empty($contactsToFetch)) {
+                if ([] !== $contactsToFetch) {
                     $listOfContactsToFetch = implode(',', array_keys($contactsToFetch));
                     $params['Ids']         = $listOfContactsToFetch;
 
@@ -896,7 +892,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         // first find existing campaign members.
         foreach ($contacts as $contact) {
             $existingCampaignMember = $this->integrationEntityModel->getSyncedRecords($campaignMemberObject, $this->getName(), $campaignId, $contact['internal_entity_id']);
-            if (empty($existingCampaignMember)) {
+            if ([] === $existingCampaignMember) {
                 $persistEntities[] = $this->createIntegrationEntity(
                     $campaignMemberObject->getType(),
                     $campaignId,
@@ -970,7 +966,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      */
     public function createActivity(array $config, $cwContactId, $leadId): ?IntegrationEntity
     {
-        if ($cwContactId and !empty($config['activity_name'])) {
+        if ($cwContactId && !empty($config['activity_name'])) {
             $activity = [
                 'name'     => $config['activity_name'],
                 'type'     => ['id' => $config['campaign_activity_type']],

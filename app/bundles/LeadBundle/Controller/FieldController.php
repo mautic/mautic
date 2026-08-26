@@ -137,7 +137,7 @@ final class FieldController extends FormController
         $returnUrl = $this->generateUrl('mautic_contactfield_index');
         $action    = $this->generateUrl('mautic_contactfield_action', ['objectAction' => 'new']);
         // get the user form factory
-        $form = $this->fieldModel->createForm($field, $this->formFactory, $action);
+        $form = $this->fieldModel->createForm($field, $action);
 
         // /Check for a submitted form and process it
         if ('POST' === $request->getMethod()) {
@@ -214,7 +214,7 @@ final class FieldController extends FormController
             }
             // some bug in Symfony prevents repopulating list options on errors
             $field   = $form->getData();
-            $newForm = $this->fieldModel->createForm($field, $this->formFactory, $action);
+            $newForm = $this->fieldModel->createForm($field, $action);
             $this->copyErrorsRecursively($form, $newForm);
             $form = $newForm;
         }
@@ -278,7 +278,7 @@ final class FieldController extends FormController
         }
 
         $action = $this->generateUrl('mautic_contactfield_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $form   = $this->fieldModel->createForm($field, $this->formFactory, $action);
+        $form   = $this->fieldModel->createForm($field, $action);
 
         // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' === $request->getMethod()) {
@@ -338,11 +338,11 @@ final class FieldController extends FormController
             if ($valid) {
                 // Rebuild the form with new action so that apply doesn't keep creating a clone
                 $action = $this->generateUrl('mautic_contactfield_action', ['objectAction' => 'edit', 'objectId' => $field->getId()]);
-                $form   = $this->fieldModel->createForm($field, $this->formFactory, $action);
+                $form   = $this->fieldModel->createForm($field, $action);
             } else {
                 // some bug in Symfony prevents repopulating list options on errors
                 $field   = $form->getData();
-                $newForm = $this->fieldModel->createForm($field, $this->formFactory, $action);
+                $newForm = $this->fieldModel->createForm($field, $action);
                 $this->copyErrorsRecursively($form, $newForm);
                 $form = $newForm;
             }
@@ -380,7 +380,7 @@ final class FieldController extends FormController
         $fieldAliasHelper->makeAliasUnique($clone);
 
         $action    = $this->generateUrl('mautic_contactfield_action', ['objectAction' => 'new']);
-        $form      = $fieldModel->createForm($clone, $this->formFactory, $action);
+        $form      = $fieldModel->createForm($clone, $action);
 
         return $this->delegateView([
             'viewParameters' => [
@@ -398,10 +398,8 @@ final class FieldController extends FormController
 
     /**
      * Delete a field.
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         if (!$this->security->isGranted('lead:fields:full')) {
             $this->throwAccessDenied();

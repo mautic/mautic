@@ -31,7 +31,6 @@ use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ApiResource(
     operations: [
@@ -52,6 +51,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[NoOrphanEvents]
 class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterface
 {
     use UuidTrait;
@@ -74,6 +74,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
      * @var string|null
      */
     #[Groups(['campaign:read', 'campaign:write'])]
+    #[Assert\NotBlank(message: 'mautic.core.name.required')]
     private $name;
 
     /**
@@ -214,18 +215,6 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
         self::addVersionField($builder);
         static::addUuidField($builder);
         self::addProjectsField($builder, 'campaign_projects_xref', 'campaign_id');
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint(
-            'name',
-            new Assert\NotBlank(
-                message: 'mautic.core.name.required'
-            )
-        );
-
-        $metadata->addConstraint(new NoOrphanEvents());
     }
 
     /**
@@ -570,7 +559,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     }
 
     /**
-     * @return ArrayCollection<int, LeadList>
+     * @return Collection<int, LeadList>
      */
     public function getLists(): Collection
     {
@@ -633,26 +622,24 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
      */
     public function hasOrphanEvents(): bool
     {
-        $canvasSettings = $this->canvasSettings;
-
-        if (empty($canvasSettings['nodes'])) {
+        if (empty($this->canvasSettings['nodes'])) {
             return false;
         }
 
         // Extract event IDs from canvas nodes (excludes 'lists', 'forms' and other non-event nodes)
         $eventIds = array_filter(
-            array_column($canvasSettings['nodes'], 'id'),
+            array_column($this->canvasSettings['nodes'], 'id'),
             fn ($id): bool => !in_array($id, ['lists', 'forms'])
         );
 
-        if (empty($eventIds)) {
+        if ([] === $eventIds) {
             return false;
         }
 
         // Extract connected event IDs from connections
         $connectedEventIds = [];
-        if (!empty($canvasSettings['connections'])) {
-            $connectedEventIds = array_filter(array_column($canvasSettings['connections'], 'targetId'));
+        if (!empty($this->canvasSettings['connections'])) {
+            $connectedEventIds = array_filter(array_column($this->canvasSettings['connections'], 'targetId'));
         }
 
         return !empty(array_diff($eventIds, $connectedEventIds));
@@ -665,7 +652,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
 
     public function allowRestart(): bool
     {
-        return $this->getAllowRestart();
+        return $this->allowRestart;
     }
 
     /**
@@ -699,42 +686,6 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
                 ->where(Criteria::expr()->eq('lead', $contact))
                 ->orderBy(['dateAdded' => Order::Descending->value])
         );
-    }
-
-    /**
-     * @deprecated use CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE to change template params instead
-     */
-    public function getOnclickMethod(): string
-    {
-        return 'Mautic.confirmationCampaignPublishStatus(mQuery(this));';
-    }
-
-    /**
-     * @deprecated use CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE to change template params instead
-     *
-     * @return array<string, string>
-     */
-    public function getDataAttributes(): array
-    {
-        return [
-            'data-toggle'           => 'confirmation',
-            'data-confirm-callback' => 'confirmCallbackCampaignPublishStatus',
-            'data-cancel-callback'  => 'dismissConfirmation',
-        ];
-    }
-
-    /**
-     * @deprecated use CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE to change template params instead
-     *
-     * @return array<string, string>
-     */
-    public function getTranslationKeysDataAttributes(): array
-    {
-        return [
-            'data-message'      => 'mautic.campaign.form.confirmation.message',
-            'data-confirm-text' => 'mautic.campaign.form.confirmation.confirm_text',
-            'data-cancel-text'  => 'mautic.campaign.form.confirmation.cancel_text',
-        ];
     }
 
     /**

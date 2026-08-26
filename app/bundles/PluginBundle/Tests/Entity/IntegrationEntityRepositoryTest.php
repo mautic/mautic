@@ -14,11 +14,11 @@ use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
  */
 final class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
 {
-    public const INTEGRATION        = 'someIntegration';
+    public const string INTEGRATION        = 'someIntegration';
 
-    public const INTEGRATION_ENTITY = 'someIntegrationEntity';
+    public const string INTEGRATION_ENTITY = 'someIntegrationEntity';
 
-    public const INTERNAL_ENTITY    = 'lead';
+    public const string INTERNAL_ENTITY    = 'lead';
 
     private string $prefix;
 
@@ -27,7 +27,7 @@ final class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->prefix                      = static::getContainer()->getParameter('mautic.db_table_prefix');
+        $this->prefix                      = self::getContainer()->getParameter('mautic.db_table_prefix');
         $this->integrationEntityRepository = self::getContainer()->get(IntegrationEntityRepository::class);
     }
 
@@ -115,7 +115,7 @@ final class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
 
     public function testGetIntegrationEntityByLeadWhenNoIntegrationNamePassed(): void
     {
-        $prefix = static::getContainer()->getParameter('mautic.db_table_prefix');
+        $prefix = self::getContainer()->getParameter('mautic.db_table_prefix');
 
         $this->connection->executeQuery('SET FOREIGN_KEY_CHECKS=0;');
         $this->connection->executeQuery("INSERT INTO {$prefix}plugin_integration_settings(plugin_id, name, is_published, api_keys) VALUES (:id, :name, :isPublished, '')", ['id' => 1, 'name' => self::INTEGRATION, 'isPublished' => 1]);

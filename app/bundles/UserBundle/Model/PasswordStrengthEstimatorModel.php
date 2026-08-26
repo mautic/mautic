@@ -11,9 +11,9 @@ use ZxcvbnPhp\Zxcvbn as PasswordStrengthEstimator;
 
 final readonly class PasswordStrengthEstimatorModel
 {
-    public const MINIMUM_PASSWORD_STRENGTH_ALLOWED = 3;
+    public const int MINIMUM_PASSWORD_STRENGTH_ALLOWED = 3;
 
-    private const DICTIONARY = [
+    private const array DICTIONARY = [
         'mautic',
         'user',
         'lead',

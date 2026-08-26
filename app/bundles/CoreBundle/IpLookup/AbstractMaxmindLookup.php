@@ -45,7 +45,7 @@ abstract class AbstractMaxmindLookup extends AbstractRemoteDataLookup
         return $url."/{$this->ip}";
     }
 
-    protected function parseResponse($response)
+    protected function parseResponse($response): void
     {
         $data = json_decode($response);
 
@@ -91,7 +91,7 @@ abstract class AbstractMaxmindLookup extends AbstractRemoteDataLookup
 
     protected function shouldPerformLookup(): bool
     {
-        if (!isset($this->ip)) {
+        if (null === $this->ip) {
             return false;
         }
 

@@ -310,11 +310,11 @@ class EventRepository extends CommonRepository
      */
     public function setEventsAsDeletedWithRedirect(array $eventData): void
     {
-        if (empty($eventData)) {
+        if ([] === $eventData) {
             return;
         }
 
-        $dateTime = (new \DateTime())->format(DateTimeHelper::FORMAT_DB);
+        $dateTime = new \DateTime()->format(DateTimeHelper::FORMAT_DB);
         $conn     = $this->getEntityManager()->getConnection();
 
         // First, get all events current state in one query
@@ -354,7 +354,7 @@ class EventRepository extends CommonRepository
                ->executeStatement();
         }
 
-        if (!empty($eventData)) {
+        if ([] !== $eventData) {
             $this->updateRedirectionChains($eventData);
         }
     }
@@ -427,10 +427,10 @@ class EventRepository extends CommonRepository
      *
      * For the API
      */
-    protected function addCatchAllWhereClause($q, $filter): array
+    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
-            $q,
+            $queryBuilder,
             $filter,
             [
                 $this->getTableAlias().'.name',
@@ -443,9 +443,9 @@ class EventRepository extends CommonRepository
      *
      * For the API
      */
-    protected function addSearchCommandWhereClause($q, $filter): array
+    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
-        return $this->addStandardSearchCommandWhereClause($q, $filter);
+        return $this->addStandardSearchCommandWhereClause($queryBuilder, $filter);
     }
 
     /**

@@ -21,11 +21,6 @@ abstract class ModeratedCommand extends Command
 
     public const MODE_REDIS = 'redis';
 
-    /**
-     * @deprecated Symfony 4 Removed LockHandler and the replacement is the lock from the Lock component so there is no need for something custom
-     */
-    public const MODE_LOCK = 'file_lock';
-
     protected $moderationKey;
 
     protected $moderationMode;
@@ -88,10 +83,6 @@ abstract class ModeratedCommand extends Command
         }
 
         $this->moderationMode = $input->getOption('lock_mode');
-        if (self::MODE_LOCK === $this->moderationMode) {
-            // File lock is deprecated in favor of Symfony's Lock component's lock
-            $this->moderationMode = 'flock';
-        }
         if (!in_array($this->moderationMode, [self::MODE_PID, self::MODE_FLOCK, self::MODE_REDIS])) {
             $output->writeln('<error>Unknown locking method specified.</error>');
 

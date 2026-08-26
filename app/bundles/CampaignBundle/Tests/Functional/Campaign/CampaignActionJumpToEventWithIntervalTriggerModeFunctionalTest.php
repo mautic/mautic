@@ -15,7 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 final class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends MauticMysqlTestCase
 {
-    private const HOUR_DATE_FORMAT = 'Y-m-d H:00:00';
+    private const string HOUR_DATE_FORMAT = 'Y-m-d H:00:00';
 
     private static string $timezone;
 
@@ -161,7 +161,7 @@ final class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest exten
         ];
 
         $adjustPointEvent = clone $event;
-        $adjustPointEvent->setTriggerHour((new \DateTime())->modify('-1 hour')->format('H:00:00'));
+        $adjustPointEvent->setTriggerHour(new \DateTime()->modify('-1 hour')->format('H:00:00'));
 
         yield 'Points at a relative time: Scheduled at - before one hour. Should trigger now.' => [
             $adjustPointEvent,
@@ -176,7 +176,7 @@ final class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest exten
         $adjustPointEvent->setTriggerDate(new \DateTime());
         $adjustPointEvent->setTriggerInterval(1);
         $adjustPointEvent->setTriggerIntervalUnit('H');
-        $adjustPointEvent->setTriggerHour((new \DateTime())->modify('-1 hour')->format('H:i'));
+        $adjustPointEvent->setTriggerHour(new \DateTime()->modify('-1 hour')->format('H:i'));
 
         yield 'Points at a relative time: Scheduled at - before one hour with delay of 1 hour' => [
             $adjustPointEvent,
@@ -189,8 +189,8 @@ final class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest exten
         $adjustPointEvent = clone $event;
         $adjustPointEvent->setTriggerInterval(1);
         $adjustPointEvent->setTriggerIntervalUnit('d');
-        $adjustPointEvent->setTriggerRestrictedStartHour((new \DateTime())->modify('+2 hours'));
-        $adjustPointEvent->setTriggerRestrictedStopHour((new \DateTime())->modify('+3 hours'));
+        $adjustPointEvent->setTriggerRestrictedStartHour(new \DateTime()->modify('+2 hours'));
+        $adjustPointEvent->setTriggerRestrictedStopHour(new \DateTime()->modify('+3 hours'));
 
         yield 'Points at a relative time: Between future start and stop time with 1 day delay will trigger tomorrow when the time slot starts' => [
             $adjustPointEvent,
@@ -202,8 +202,8 @@ final class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest exten
         ];
 
         $adjustPointEvent = clone $event;
-        $adjustPointEvent->setTriggerRestrictedStartHour((new \DateTime())->modify('-2 hours'));
-        $adjustPointEvent->setTriggerRestrictedStopHour((new \DateTime())->modify('-1 hours'));
+        $adjustPointEvent->setTriggerRestrictedStartHour(new \DateTime()->modify('-2 hours'));
+        $adjustPointEvent->setTriggerRestrictedStopHour(new \DateTime()->modify('-1 hours'));
 
         yield 'Points at a relative time: Between passed time' => [
             $adjustPointEvent,
@@ -214,8 +214,8 @@ final class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest exten
         ];
 
         $adjustPointEvent = clone $event;
-        $adjustPointEvent->setTriggerRestrictedStartHour((new \DateTime())->modify('+3 hour'));
-        $adjustPointEvent->setTriggerRestrictedStopHour((new \DateTime())->modify('+4 hour'));
+        $adjustPointEvent->setTriggerRestrictedStartHour(new \DateTime()->modify('+3 hour'));
+        $adjustPointEvent->setTriggerRestrictedStopHour(new \DateTime()->modify('+4 hour'));
 
         yield 'Points at a relative time: Between future time today will schedule for today when the window starts' => [
             $adjustPointEvent,
@@ -227,14 +227,14 @@ final class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest exten
         ];
 
         $adjustPointEvent = clone $event;
-        $adjustPointEvent->setTriggerRestrictedStartHour((new \DateTime())->modify('-1 hour'));
-        $adjustPointEvent->setTriggerRestrictedStopHour((new \DateTime())->modify('+1 hour'));
+        $adjustPointEvent->setTriggerRestrictedStartHour(new \DateTime()->modify('-1 hour'));
+        $adjustPointEvent->setTriggerRestrictedStopHour(new \DateTime()->modify('+1 hour'));
 
         yield 'Points at a relative time: Between future time today will execute immediatelly as the window is open right now' => [
             $adjustPointEvent,
             function (LeadEventLog $eventLog): void {
                 Assert::assertFalse($eventLog->getIsScheduled());
-                self::assertPlusMinusOneMinuteOf((new \DateTime('now', new \DateTimeZone(self::$timezone)))->format('Y-m-d H:i'), $eventLog->getTriggerDate()->format('Y-m-d H:i'));
+                self::assertPlusMinusOneMinuteOf(new \DateTime('now', new \DateTimeZone(self::$timezone))->format('Y-m-d H:i'), $eventLog->getTriggerDate()->format('Y-m-d H:i'));
             },
         ];
 
@@ -253,7 +253,7 @@ final class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest exten
 
         $adjustPointEvent = clone $event;
         $adjustPointEvent->setTriggerMode(Event::TRIGGER_MODE_DATE);
-        $adjustPointEvent->setTriggerDate((new \DateTime())->modify('+5 hour'));
+        $adjustPointEvent->setTriggerDate(new \DateTime()->modify('+5 hour'));
 
         yield 'Points at specific date/time' => [
             $adjustPointEvent,
@@ -263,13 +263,13 @@ final class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest exten
             },
         ];
 
-        $triggerHourDate  = (new \DateTime())->modify('+3 hours');
+        $triggerHourDate  = new \DateTime()->modify('+3 hours');
         $adjustPointEvent = clone $event;
         $adjustPointEvent->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
         $adjustPointEvent->setTriggerHour($triggerHourDate->format('H:00:00'));
         $adjustPointEvent->setTriggerIntervalUnit('d');
         // This must conform the format of the date in the \Mautic\CampaignBundle\Executioner\Scheduler\Mode\Interval::getGroupExecutionDateTime
-        $adjustPointEvent->setTriggerRestrictedDaysOfWeek([(new \DateTime())->format('w')]);
+        $adjustPointEvent->setTriggerRestrictedDaysOfWeek([new \DateTime()->format('w')]);
 
         yield 'Schedule the event when Send From is in the future on the selected day when the day is today' => [
             $adjustPointEvent,
@@ -283,7 +283,7 @@ final class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest exten
         $adjustPointEvent->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
         $adjustPointEvent->setTriggerHour('15:00:00');
         $adjustPointEvent->setTriggerIntervalUnit('d');
-        $adjustPointEvent->setTriggerRestrictedDaysOfWeek([(new \DateTime('tomorrow'))->format('w')]);
+        $adjustPointEvent->setTriggerRestrictedDaysOfWeek([new \DateTime('tomorrow')->format('w')]);
 
         yield 'Schedule the event when Send From is in the future on the selected day when the day is tomorrow' => [
             $adjustPointEvent,
@@ -291,17 +291,17 @@ final class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest exten
                 Assert::assertTrue($eventLog->getIsScheduled());
                 // In this case firstly the time is set as 15:00 if less then that or right now if more, then the date is set to tomorrow.
                 // So the range can be tomorrow 15:00 - tomorrow 23:59:59
-                Assert::assertLessThanOrEqual((new \DateTime('tomorrow', new \DateTimeZone(self::$timezone)))->format('Y-m-d 23:59:59'), $eventLog->getTriggerDate()->format('Y-m-d H:i:s'));
-                Assert::assertGreaterThanOrEqual((new \DateTime('tomorrow', new \DateTimeZone(self::$timezone)))->format('Y-m-d 15:00:00'), $eventLog->getTriggerDate()->format('Y-m-d H:i:s'));
+                Assert::assertLessThanOrEqual(new \DateTime('tomorrow', new \DateTimeZone(self::$timezone))->format('Y-m-d 23:59:59'), $eventLog->getTriggerDate()->format('Y-m-d H:i:s'));
+                Assert::assertGreaterThanOrEqual(new \DateTime('tomorrow', new \DateTimeZone(self::$timezone))->format('Y-m-d 15:00:00'), $eventLog->getTriggerDate()->format('Y-m-d H:i:s'));
             },
         ];
 
-        $triggerHourDate  = (new \DateTime())->modify('-3 hours');
+        $triggerHourDate  = new \DateTime()->modify('-3 hours');
         $adjustPointEvent = clone $event;
         $adjustPointEvent->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
         $adjustPointEvent->setTriggerHour($triggerHourDate->format('H:00:00'));
         $adjustPointEvent->setTriggerIntervalUnit('d');
-        $adjustPointEvent->setTriggerRestrictedDaysOfWeek([(new \DateTime())->format('w')]);
+        $adjustPointEvent->setTriggerRestrictedDaysOfWeek([new \DateTime()->format('w')]);
 
         yield 'Execute the event when Send From is in the past on the selected day when the day is today' => [
             $adjustPointEvent,

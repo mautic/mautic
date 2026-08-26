@@ -19,7 +19,6 @@ use Mautic\NotificationBundle\Form\Type\MobileNotificationType;
 use Mautic\NotificationBundle\Form\Type\NotificationType;
 use Mautic\NotificationBundle\NotificationEvents;
 use Mautic\PageBundle\Model\TrackableModel;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -33,6 +32,11 @@ use Symfony\Contracts\Service\Attribute\Required;
 final class NotificationModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
 {
     use TranslationModelTrait;
+
+    public static function getName(): string
+    {
+        return 'notification.notification';
+    }
 
     private TrackableModel $pageTrackableModel;
 
@@ -102,7 +106,7 @@ final class NotificationModel extends FormModel implements AjaxLookupModelInterf
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Notification) {
             throw new MethodNotAllowedHttpException(['Notification']);
@@ -113,7 +117,7 @@ final class NotificationModel extends FormModel implements AjaxLookupModelInterf
 
         $type = str_contains($action, 'mobile_') ? MobileNotificationType::class : NotificationType::class;
 
-        return $formFactory->create($type, $entity, $options);
+        return $this->formFactory->create($type, $entity, $options);
     }
 
     /**
@@ -122,12 +126,10 @@ final class NotificationModel extends FormModel implements AjaxLookupModelInterf
     public function getEntity($id = null): ?Notification
     {
         if (null === $id) {
-            $entity = new Notification();
-        } else {
-            $entity = parent::getEntity($id);
+            return new Notification();
         }
 
-        return $entity;
+        return parent::getEntity($id);
     }
 
     public function saveEntity($entity, $unlock = true): void

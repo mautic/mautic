@@ -49,7 +49,7 @@ final class JsController extends CommonController
             $this->dispatcher->dispatch($event, CoreEvents::BUILD_MAUTIC_JS);
         }
 
-        return new Response($event->getJs(), 200, ['Content-Type' => 'application/javascript']);
+        return new Response($event->getJs(), Response::HTTP_OK, ['Content-Type' => 'application/javascript']);
     }
 
     /**

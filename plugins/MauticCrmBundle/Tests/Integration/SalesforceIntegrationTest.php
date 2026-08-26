@@ -18,18 +18,19 @@ use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use Mautic\UserBundle\Entity\RoleRepository;
 use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Rule\AnyInvokedCount;
 
 final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 {
-    public const SC_MULTIPLE_SF_LEADS        = 'multiple_sf_leads';
+    public const string SC_MULTIPLE_SF_LEADS        = 'multiple_sf_leads';
 
-    public const SC_MULTIPLE_SF_CONTACTS     = 'multiple_sf_contacts';
+    public const string SC_MULTIPLE_SF_CONTACTS     = 'multiple_sf_contacts';
 
-    public const SC_CONVERTED_SF_LEAD        = 'converted_sf_lead';
+    public const string SC_CONVERTED_SF_LEAD        = 'converted_sf_lead';
 
-    public const SC_EMAIL_WITH_APOSTROPHE    = 'email_with_apostrophe';
+    public const string SC_EMAIL_WITH_APOSTROPHE    = 'email_with_apostrophe';
 
-    public const SC_MULTIPLE_MAUTIC_CONTACTS = 'multiple_mautic_contacts';
+    public const string SC_MULTIPLE_MAUTIC_CONTACTS = 'multiple_mautic_contacts';
 
     /**
      * @var array<string, int>
@@ -78,6 +79,11 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
     ];
 
     /**
+     * @var array<string, array<string, array<string, mixed>>>
+     */
+    private array $cachedLeadFields = [];
+
+    /**
      * @var list<string>
      */
     private array $sfMockResetMethods = [
@@ -109,7 +115,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
     {
         parent::setUp();
 
-        defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
+        defined('MAUTIC_ENV') || define('MAUTIC_ENV', 'test');
     }
 
     /**
@@ -734,14 +740,16 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                 }
             );
 
+        $matcher = new AnyInvokedCount();
+
         $this->integrationEntityRepository
-            ->expects($spy = $this->any())
+            ->expects($matcher)
             ->method('getIntegrationsEntityId')
             ->willReturnCallback(
-                function () use ($spy): array {
+                function () use ($matcher): array {
                     // WARNING: this is using a PHPUnit undocumented workaround:
                     // https://github.com/sebastianbergmann/phpunit/issues/3888
-                    $spyParentProperties = self::getParentPrivateProperties($spy);
+                    $spyParentProperties = $this->getParentPrivateProperties($matcher);
                     $invocations         = $spyParentProperties['invocations'];
 
                     if (count($invocations) > $this->getMaxInvocations('getIntegrationsEntityId')) {
@@ -784,9 +792,8 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         $this->em->method('getReference')
             ->willReturnCallback(
                 function () {
-                    switch (func_get_arg(0)) {
-                        case IntegrationEntity::class:
-                            return new IntegrationEntity();
+                    if (IntegrationEntity::class === func_get_arg(0)) {
+                        return new IntegrationEntity();
                     }
                 }
             );
@@ -870,17 +877,10 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
             ],
         ];
 
-        $this->cache
-            ->method('get')
-            ->willReturnMap(
-                [
-                    ['leadFields.Lead', null, $leadFields],
-                    ['leadFields.Contact', null, $contactFields],
-                ]
-            );
-
-        $this->cache->method('getCache')
-            ->willReturn($this->cache);
+        $this->cachedLeadFields = [
+            'leadFields.Lead'    => $leadFields,
+            'leadFields.Contact' => $contactFields,
+        ];
     }
 
     /**
@@ -968,6 +968,10 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
             ])
             ->onlyMethods($this->sfMockMethods)
             ->getMock();
+
+        foreach ($this->cachedLeadFields as $key => $fields) {
+            $sf->getCache()->set($key, $fields);
+        }
 
         $this->autowireIntegrationRepositories($sf);
 
@@ -1406,7 +1410,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
     /**
      * @return array<string, mixed>
      */
-    private static function getParentPrivateProperties(mixed $instance): array
+    private function getParentPrivateProperties(mixed $instance): array
     {
         $reflectionClass       = new \ReflectionClass($instance::class);
         $parentReflectionClass = $reflectionClass->getParentClass();

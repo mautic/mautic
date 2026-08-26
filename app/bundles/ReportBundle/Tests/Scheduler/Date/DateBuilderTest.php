@@ -38,7 +38,7 @@ final class DateBuilderTest extends \PHPUnit\Framework\TestCase
         $dateBuilder              = new DateBuilder($schedulerBuilder);
         $schedulerEntity          = new SchedulerEntity(true, SchedulerEnum::UNIT_DAILY, null, null);
         $date                     = $dateBuilder->getNextEvent($schedulerEntity);
-        $expectedDate             = (new \DateTime())->setTime(0, 0)->modify('+1 day');
+        $expectedDate             = new \DateTime()->setTime(0, 0)->modify('+1 day');
 
         $this->assertEquals($expectedDate, $date);
     }

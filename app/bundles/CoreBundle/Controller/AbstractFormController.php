@@ -14,12 +14,7 @@ abstract class AbstractFormController extends CommonController
 {
     protected ?string $permissionBase = null;
 
-    /**
-     * @param string $objectModel
-     *
-     * @return RedirectResponse
-     */
-    public function unlockAction(Request $request, $objectId, $objectModel)
+    public function unlockAction(Request $request, $objectId, string $objectModel): RedirectResponse
     {
         $model                = $this->getModel($objectModel);
         $entity               = $model->getEntity($objectId);
@@ -63,21 +58,21 @@ abstract class AbstractFormController extends CommonController
      *
      * @param array  $postActionVars
      * @param object $entity
-     * @param string $model
      * @param bool   $batch          Flag if a batch action is being performed
      *
      * @return ($batch is true ? array : \Symfony\Component\HttpFoundation\JsonResponse|RedirectResponse)
      */
-    protected function isLocked($postActionVars, $entity, $model, $batch = false)
+    protected function isLocked($postActionVars, $entity, string $modelName, $batch = false)
     {
         $date                   = $entity->getCheckedOut();
         $postActionVars         = $this->refererPostActionVars($postActionVars);
         $returnUrl              = $postActionVars['returnUrl'] ?? null;
         $override               = '';
 
-        $modelClass             = $this->getModel($model);
-        $nameFunction           = $modelClass->getNameGetter();
-        $this->permissionBase   = $modelClass->getPermissionBase();
+        /** @var FormModel $model */
+        $model             = $this->getModel($modelName);
+        $nameFunction           = $model->getNameGetter();
+        $this->permissionBase   = $model->getPermissionBase();
 
         if ($this->canEdit($entity)) {
             $override = $this->translator->trans(
@@ -87,7 +82,7 @@ abstract class AbstractFormController extends CommonController
                         'mautic_core_form_action',
                         [
                             'objectAction' => 'unlock',
-                            'objectModel'  => $model,
+                            'objectModel'  => $modelName,
                             'objectId'     => $entity->getId(),
                             'returnUrl'    => $returnUrl,
                             'name'         => urlencode($entity->{$nameFunction}()),
@@ -108,7 +103,7 @@ abstract class AbstractFormController extends CommonController
                     [
                         'objectAction' => 'contact',
                         'objectId'     => $entity->getCheckedOutBy(),
-                        'entity'       => $model,
+                        'entity'       => $modelName,
                         'id'           => $entity->getId(),
                         'subject'      => 'locked',
                         'returnUrl'    => $returnUrl,
@@ -222,7 +217,7 @@ abstract class AbstractFormController extends CommonController
      *
      * @return array
      */
-    protected function refererPostActionVars($vars)
+    protected function refererPostActionVars(array $vars)
     {
         $request = $this->getCurrentRequest();
         if (empty($request->server->get('HTTP_REFERER'))) {
@@ -270,12 +265,6 @@ abstract class AbstractFormController extends CommonController
      */
     protected function isAnyOfButtonsClicked(FormInterface $form, array $names): bool
     {
-        foreach ($names as $name) {
-            if ($this->isButtonClicked($form, $name)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($names, fn (string $name): bool => $this->isButtonClicked($form, $name));
     }
 }

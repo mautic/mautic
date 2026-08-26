@@ -353,7 +353,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         }
 
         if ($error || $violations) {
-            $exception = (new ValidationException($error))
+            $exception = new ValidationException($error)
                 ->setViolations($violations);
 
             throw $exception;

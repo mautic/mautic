@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\Tests\Form\Type;
 
 use Mautic\FormBundle\Form\Type\FormFieldNumberType;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Test\TypeTestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 final class FormFieldNumberTypeTest extends TypeTestCase
 {
     /**

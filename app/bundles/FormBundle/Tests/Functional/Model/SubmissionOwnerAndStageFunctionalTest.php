@@ -18,11 +18,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class SubmissionOwnerAndStageFunctionalTest extends MauticMysqlTestCase
 {
-    private const STAGE_NAME_TOKEN       = '%stage_name%';
+    private const string STAGE_NAME_TOKEN       = '%stage_name%';
 
-    private const SALES_USER_EMAIL_TOKEN = '%sales_user_email%';
+    private const string SALES_USER_EMAIL_TOKEN = '%sales_user_email%';
 
-    private const STAGE_NAME             = 'Test Stage';
+    private const string STAGE_NAME             = 'Test Stage';
 
     protected $useCleanupRollback   = false;
 

@@ -17,7 +17,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
-    private const TEST_PAYLOAD = [
+    private const array TEST_PAYLOAD = [
         'name'        => 'API form',
         'description' => 'Form created via API test',
         'formType'    => 'standalone',
@@ -95,7 +95,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
     #[DataProvider('formDataProvider')]
     public function testAddAndEditForms(array $payload, array $expectedResponse): void
     {
-        $this->client->request('POST', '/api/forms/new', $payload);
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -107,12 +107,12 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $formId = $response['form']['id'];
         $this->assertGreaterThan(0, $formId);
         $this->assertEquals($payload['name'], $response['form']['name']);
-        $this->assertEquals($payload['formType'], $response['form']['formType']);
         $this->assertEquals($payload['isPublished'], $response['form']['isPublished']);
         $this->assertEquals($payload['description'], $response['form']['description']);
         $this->assertIsArray($response['form']['fields']);
         $this->assertCount(count($payload['fields']), $response['form']['fields']);
-        for ($i = 0; $i < count($payload['fields']); ++$i) {
+        $counter = count($payload['fields']);
+        for ($i = 0; $i < $counter; ++$i) {
             $this->assertEquals($payload['fields'][$i]['label'], $response['form']['fields'][$i]['label']);
             $this->assertEquals($payload['fields'][$i]['alias'], $response['form']['fields'][$i]['alias']);
             $this->assertEquals($payload['fields'][$i]['type'], $response['form']['fields'][$i]['type']);
@@ -122,18 +122,18 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         }
 
         // Edit PATCH:
-        $this->client->request('PATCH', "/api/forms/{$formId}/edit", ['name' => $expectedResponse['newName']]);
+        $this->client->request(Request::METHOD_PATCH, "/api/forms/{$formId}/edit", ['name' => $expectedResponse['newName']]);
         $clientResponse = $this->client->getResponse();
         $responsePatch  = json_decode($clientResponse->getContent(), true);
         $this->assertResponseIsSuccessful();
         $this->assertSame($formId, $responsePatch['form']['id'], 'ID of the created form does not match with the edited one.');
         $this->assertEquals($expectedResponse['newName'], $responsePatch['form']['name']);
-        $this->assertEquals($payload['formType'], $responsePatch['form']['formType']);
         $this->assertEquals($payload['isPublished'], $responsePatch['form']['isPublished']);
         $this->assertEquals($payload['description'], $responsePatch['form']['description']);
         $this->assertIsArray($responsePatch['form']['fields']);
         $this->assertCount(count($payload['fields']), $responsePatch['form']['fields']);
-        for ($i = 0; $i < count($payload['fields']); ++$i) {
+        $counter = count($payload['fields']);
+        for ($i = 0; $i < $counter; ++$i) {
             $this->assertEquals($payload['fields'][$i]['label'], $responsePatch['form']['fields'][$i]['label']);
             $this->assertEquals($payload['fields'][$i]['alias'], $responsePatch['form']['fields'][$i]['alias']);
             $this->assertEquals($payload['fields'][$i]['type'], $responsePatch['form']['fields'][$i]['type']);
@@ -278,7 +278,6 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertGreaterThan(0, $formId);
         $this->assertEquals($payload['name'], $response['form']['name']);
         $this->assertEquals($payload['description'], $response['form']['description']);
-        $this->assertEquals($payload['formType'], $response['form']['formType']);
         $this->assertNotEmpty($response['form']['cachedHtml']);
         $this->assertCount($fieldCount, $response['form']['fields']);
         $this->assertEquals($payload['fields'][0]['label'], $response['form']['fields'][0]['label']);
@@ -351,7 +350,6 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals('API form renamed', $response['form']['name']);
         $this->assertEquals($payload['description'], $response['form']['description']);
         $this->assertCount($fieldCount, $response['form']['fields']);
-        $this->assertEquals($payload['formType'], $response['form']['formType']);
         $this->assertNotEmpty($response['form']['cachedHtml']);
 
         // Edit PUT:
@@ -366,7 +364,6 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['name'], $response['form']['name']);
         $this->assertEquals('Form created via API test renamed', $response['form']['description']);
         $this->assertCount($fieldCount, $response['form']['fields']);
-        $this->assertEquals($payload['formType'], $response['form']['formType']);
         $this->assertNotEmpty($response['form']['cachedHtml']);
 
         // Get:
@@ -379,7 +376,6 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['name'], $response['form']['name']);
         $this->assertEquals($payload['description'], $response['form']['description']);
         $this->assertCount($fieldCount, $response['form']['fields']);
-        $this->assertEquals($payload['formType'], $response['form']['formType']);
         $this->assertNotEmpty($response['form']['cachedHtml']);
 
         // Submit the form:
@@ -448,7 +444,6 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['name'], $response['form']['name']);
         $this->assertEquals($payload['description'], $response['form']['description']);
         $this->assertCount($fieldCount, $response['form']['fields']);
-        $this->assertEquals($payload['formType'], $response['form']['formType']);
         $this->assertNotEmpty($response['form']['cachedHtml']);
 
         // Get (ensure that the form is gone):
@@ -466,12 +461,12 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $tag1Payload = ['tag' => 'add this'];
         $tag2Payload = ['tag' => 'remove this'];
 
-        $this->client->request('POST', '/api/tags/new', $tag1Payload);
+        $this->client->request(Request::METHOD_POST, '/api/tags/new', $tag1Payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         $tag1Id         = $response['tag']['id'];
 
-        $this->client->request('POST', '/api/tags/new', $tag2Payload);
+        $this->client->request(Request::METHOD_POST, '/api/tags/new', $tag2Payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         $tag2Id         = $response['tag']['id'];
@@ -505,7 +500,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
 
         // Create form with lead.changetags action:
-        $this->client->request('POST', '/api/forms/new', $payload);
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -517,12 +512,12 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $formId = $response['form']['id'];
         $this->assertGreaterThan(0, $formId);
         $this->assertEquals($payload['name'], $response['form']['name']);
-        $this->assertEquals($payload['formType'], $response['form']['formType']);
         $this->assertEquals($payload['isPublished'], $response['form']['isPublished']);
         $this->assertEquals($payload['description'], $response['form']['description']);
         $this->assertIsArray($response['form']['fields']);
         $this->assertCount(count($payload['fields']), $response['form']['fields']);
-        for ($i = 0; $i < count($payload['fields']); ++$i) {
+        $counter = count($payload['fields']);
+        for ($i = 0; $i < $counter; ++$i) {
             $this->assertEquals($payload['fields'][$i]['label'], $response['form']['fields'][$i]['label']);
             $this->assertEquals($payload['fields'][$i]['alias'], $response['form']['fields'][$i]['alias']);
             $this->assertEquals($payload['fields'][$i]['type'], $response['form']['fields'][$i]['type']);
@@ -660,7 +655,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ];
 
-        $this->client->request('POST', '/api/forms/new', $payload);
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 

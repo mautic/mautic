@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form;
 
 use Mautic\CoreBundle\Form\Type\BooleanType;
@@ -31,7 +33,7 @@ final class FieldAliasToFqcnMap
     /**
      * @format [field alias => field FQCN]
      */
-    public const MAP = [
+    public const array MAP = [
         'boolean'     => BooleanType::class,
         'country'     => CountryType::class,
         'date'        => DateType::class,

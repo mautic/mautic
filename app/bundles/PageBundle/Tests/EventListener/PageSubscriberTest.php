@@ -4,11 +4,18 @@ declare(strict_types=1);
 
 namespace Mautic\PageBundle\Tests\EventListener;
 
+use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Helper\AssetGenerationHelper;
+use Mautic\CoreBundle\Helper\BundleHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
+use Mautic\InstallBundle\Install\InstallService;
+use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageDisplayEvent;
@@ -77,7 +84,20 @@ EOF,
      */
     protected function getPageSubscriber(): PageSubscriber
     {
-        $assetsHelperMock   = new AssetsHelper($this->createStub(Packages::class));
+        $pathsHelper        = $this->createStub(PathsHelper::class);
+        $assetsHelperMock   = new AssetsHelper(
+            $this->createStub(Packages::class),
+            $pathsHelper,
+            new AssetGenerationHelper(
+                $this->createStub(BundleHelper::class),
+                $pathsHelper,
+                $this->createStub(CoreParametersHelper::class),
+                $this->createStub(AppVersion::class),
+            ),
+            $this->createStub(BuilderIntegrationsHelper::class),
+            $this->createStub(InstallService::class),
+            '',
+        );
 
         $assetsHelperMock->addScriptDeclaration("const foo='bar';", 'onPageDisplay_bodyOpen');
 

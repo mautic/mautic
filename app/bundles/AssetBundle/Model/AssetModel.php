@@ -2,6 +2,7 @@
 
 namespace Mautic\AssetBundle\Model;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\PersistentCollection;
 use Mautic\AssetBundle\AssetEvents;
@@ -12,6 +13,7 @@ use Mautic\AssetBundle\Entity\DownloadRepository;
 use Mautic\AssetBundle\Event\AssetEvent;
 use Mautic\AssetBundle\Event\AssetLoadEvent;
 use Mautic\AssetBundle\Form\Type\AssetType;
+use Mautic\CategoryBundle\Entity\CategoryRepository;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -34,7 +36,6 @@ use Mautic\LeadBundle\Tracker\Service\DeviceCreatorService\DeviceCreatorServiceI
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -47,6 +48,11 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class AssetModel extends FormModel implements GlobalSearchInterface
 {
+    public static function getName(): string
+    {
+        return 'asset.asset';
+    }
+
     /**
      * @var int
      */
@@ -72,6 +78,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         private readonly EmailRepository $emailRepository,
         private readonly AssetRepository $assetRepository,
         private readonly DownloadRepository $downloadRepository,
+        private readonly CategoryRepository $categoryRepository,
     ) {
         $this->maxAssetSize           = $coreParametersHelper->get('max_size');
 
@@ -91,15 +98,13 @@ class AssetModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param array $systemEntry
-     *
      * @throws \Doctrine\ORM\ORMException
      * @throws \Exception
      */
-    public function trackDownload(Asset $asset, $request = null, int $code = 200, $systemEntry = []): void
+    public function trackDownload(Asset $asset, ?Request $request = null, int $code = 200, array $systemEntry = []): void
     {
         // Don't skew results with in-house downloads
-        if (empty($systemEntry) && !$this->security->isAnonymous()) {
+        if ([] === $systemEntry && !$this->security->isAnonymous()) {
             return;
         }
 
@@ -129,7 +134,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         $ipAddress = $this->ipLookupHelper->getIpAddress();
 
         // Download triggered by lead
-        if (empty($systemEntry)) {
+        if ([] === $systemEntry) {
             // check for any clickthrough info
             $clickthrough = $request->get('ct', false);
             if (!empty($clickthrough)) {
@@ -240,7 +245,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
 
         $download->setTrackingId($trackingId);
 
-        if (empty($systemEntry)) {
+        if ([] === $systemEntry) {
             $download->setAsset($asset);
 
             $this->assetRepository->upDownloadCount($asset->getId(), 1, $isUnique);
@@ -275,13 +280,10 @@ class AssetModel extends FormModel implements GlobalSearchInterface
 
     /**
      * Increase the download count.
-     *
-     * @param int        $increaseBy
-     * @param bool|false $unique
      */
-    public function upDownloadCount($asset, $increaseBy = 1, $unique = false): void
+    public function upDownloadCount(Asset|int $asset, int $increaseBy = 1, bool $unique = false): void
     {
-        $id = ($asset instanceof Asset) ? $asset->getId() : (int) $asset;
+        $id = ($asset instanceof Asset) ? $asset->getId() : $asset;
 
         $this->assetRepository->upDownloadCount($id, $increaseBy, $unique);
     }
@@ -306,7 +308,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         return 'getTitle';
     }
 
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Asset) {
             throw new MethodNotAllowedHttpException(['Asset']);
@@ -316,7 +318,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
             $options['action'] = $action;
         }
 
-        return $formFactory->create(AssetType::class, $entity, $options);
+        return $this->formFactory->create(AssetType::class, $entity, $options);
     }
 
     /**
@@ -325,12 +327,10 @@ class AssetModel extends FormModel implements GlobalSearchInterface
     public function getEntity($id = null): ?Asset
     {
         if (null === $id) {
-            $entity = new Asset();
-        } else {
-            $entity = parent::getEntity($id);
+            return new Asset();
         }
 
-        return $entity;
+        return parent::getEntity($id);
     }
 
     /**
@@ -378,7 +378,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
      *
      * @return array
      */
-    public function getLookupResults($type, $filter = '', $limit = 10)
+    public function getLookupResults(string $type, string $filter = '', int $limit = 10)
     {
         $results = [];
         switch ($type) {
@@ -395,7 +395,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
                 $results = $this->assetRepository->getAssetList($filter, $limit, 0, $viewOther);
                 break;
             case 'category':
-                $results = $this->categoryModel->getRepository()->getCategoryList($filter, $limit, 0);
+                $results = $this->categoryRepository->getCategoryList($filter, $limit, 0);
                 break;
         }
 
@@ -417,7 +417,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         $referenceType = ($absolute) ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH;
         $url           = $this->router->generate('mautic_asset_download', $routeParams, $referenceType);
 
-        if (empty($clickthrough)) {
+        if ([] === $clickthrough) {
             return $url;
         }
 
@@ -435,7 +435,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
      *
      * @return float
      */
-    public function getMaxUploadSize($unit = 'M', $humanReadable = false)
+    public function getMaxUploadSize(string $unit = 'M', $humanReadable = false)
     {
         $maxAssetSize  = $this->maxAssetSize;
         $maxAssetSize  = (-1 == $maxAssetSize || 0 === $maxAssetSize) ? PHP_INT_MAX : FileHelper::convertMegabytesToBytes($maxAssetSize);
@@ -453,7 +453,10 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         return $number;
     }
 
-    public function getTotalFilesize($assets): int|string
+    /**
+     * @param Collection<Asset>|Asset[] $assets
+     */
+    public function getTotalFilesize(Collection|array $assets): int|string
     {
         $firstAsset = is_array($assets) ? reset($assets) : false;
         if ($assets instanceof PersistentCollection || is_object($firstAsset)) {
@@ -468,14 +471,14 @@ class AssetModel extends FormModel implements GlobalSearchInterface
             $assets = [$assets];
         }
 
-        if (empty($assets)) {
+        if ([] === $assets) {
             return 0;
         }
 
         $size = $this->assetRepository->getAssetSize($assets);
 
         if ($size) {
-            $size = Asset::convertBytesToHumanReadable($size);
+            return Asset::convertBytesToHumanReadable($size);
         }
 
         return $size;
@@ -515,9 +518,8 @@ class AssetModel extends FormModel implements GlobalSearchInterface
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      * @param mixed[]   $filters
-     * @param bool      $canViewOthers
      */
-    public function getUniqueVsRepetitivePieChartData($dateFrom, $dateTo, $filters = [], $canViewOthers = true): array
+    public function getUniqueVsRepetitivePieChartData($dateFrom, $dateTo, array $filters = [], bool $canViewOthers = true): array
     {
         $chart   = new PieChart();
         $query   = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -558,14 +560,8 @@ class AssetModel extends FormModel implements GlobalSearchInterface
 
     /**
      * Get a list of popular (by downloads) assets.
-     *
-     * @param int    $limit
-     * @param string $dateFrom
-     * @param string $dateTo
-     * @param array  $filters
-     * @param bool   $canViewOthers
      */
-    public function getPopularAssets($limit = 10, $dateFrom = null, $dateTo = null, $filters = [], $canViewOthers = true): array
+    public function getPopularAssets(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, array $filters = [], bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS download_count, a.id, a.title')
@@ -580,7 +576,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
                 ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
-        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom ?? new \DateTime('-30 days'), $dateTo ?? new \DateTime());
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_download');
 
@@ -590,10 +586,9 @@ class AssetModel extends FormModel implements GlobalSearchInterface
     /**
      * Get a list of assets in a date range.
      *
-     * @param int   $limit
      * @param array $filters
      */
-    public function getAssetList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], array $options = []): array
+    public function getAssetList(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], array $options = []): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('t.id, t.title as name, t.date_added, t.date_modified')
@@ -624,16 +619,16 @@ class AssetModel extends FormModel implements GlobalSearchInterface
      *
      * @note The alias portion of the slug is no longer used for matching or validation.
      */
-    public function getEntityBySlugs($slug): Asset|bool
+    public function getEntityBySlugs(string $slug): ?Asset
     {
-        if (!is_string($slug) || !str_contains($slug, ':')) {
-            return false;
+        if (!str_contains($slug, ':')) {
+            return null;
         }
 
         [$id] = array_pad(explode(':', $slug, 2), 1, null);
 
-        if (empty($id) || !ctype_digit((string) $id)) {
-            return false;
+        if (empty($id) || !ctype_digit($id)) {
+            return null;
         }
 
         $entity = $this->getEntity((int) $id);
@@ -641,6 +636,6 @@ class AssetModel extends FormModel implements GlobalSearchInterface
             return $entity;
         }
 
-        return false;
+        return null;
     }
 }

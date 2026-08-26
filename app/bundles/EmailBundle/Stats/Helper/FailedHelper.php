@@ -7,7 +7,7 @@ use Mautic\StatsBundle\Aggregate\Collection\StatCollection;
 
 final class FailedHelper extends AbstractHelper
 {
-    public const NAME = 'email-failed';
+    public const string NAME = 'email-failed';
 
     public function getName(): string
     {

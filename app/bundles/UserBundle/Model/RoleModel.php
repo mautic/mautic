@@ -11,7 +11,6 @@ use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Event\RoleEvent;
 use Mautic\UserBundle\Form\Type\RoleType;
 use Mautic\UserBundle\UserEvents;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
@@ -23,6 +22,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 final class RoleModel extends FormModel implements GlobalSearchInterface
 {
+    public static function getName(): string
+    {
+        return 'user.role';
+    }
+
     private UserRepository $userRepository;
 
     private PermissionRepository $permissionRepository;
@@ -81,7 +85,7 @@ final class RoleModel extends FormModel implements GlobalSearchInterface
         }
 
         // set permissions if applicable and if the user is not an admin
-        $permissions = (!$entity->isAdmin() && !empty($rawPermissions)) ?
+        $permissions = (!$entity->isAdmin() && [] !== $rawPermissions) ?
             $this->security->generatePermissions($rawPermissions) :
             [];
 
@@ -109,7 +113,7 @@ final class RoleModel extends FormModel implements GlobalSearchInterface
         parent::deleteEntity($entity);
     }
 
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Role) {
             throw new MethodNotAllowedHttpException(['Role']);
@@ -119,7 +123,7 @@ final class RoleModel extends FormModel implements GlobalSearchInterface
             $options['action'] = $action;
         }
 
-        return $formFactory->create(RoleType::class, $entity, $options);
+        return $this->formFactory->create(RoleType::class, $entity, $options);
     }
 
     public function getEntity($id = null): ?Role

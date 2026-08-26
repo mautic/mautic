@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\TagModel;
+use Symfony\Component\HttpFoundation\Request;
 
 final class BatchControllerTest extends MauticMysqlTestCase
 {
@@ -36,7 +37,7 @@ final class BatchControllerTest extends MauticMysqlTestCase
         ];
 
         /** @var TagModel $tagModel */
-        $tagModel            = static::getContainer()->get(TagModel::class);
+        $tagModel            = self::getContainer()->get(TagModel::class);
         $this->tagRepository = $tagModel->getRepository();
         $this->tags          = $this->addTags($tags);
         $this->leads         = $this->addLeads();
@@ -44,7 +45,7 @@ final class BatchControllerTest extends MauticMysqlTestCase
 
     public function testBatchViewAction(): void
     {
-        $this->client->request('GET', '/s/tags/batch/view');
+        $this->client->request(Request::METHOD_GET, '/s/tags/batch/view');
         $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('Add tags', (string) $this->client->getResponse()->getContent());
         $this->assertStringContainsString('Remove tags', (string) $this->client->getResponse()->getContent());
@@ -52,7 +53,7 @@ final class BatchControllerTest extends MauticMysqlTestCase
 
     public function testAddTagBatchSetAction(): void
     {
-        $crawler                                = $this->client->request('GET', '/s/tags/batch/view');
+        $crawler                                = $this->client->request(Request::METHOD_GET, '/s/tags/batch/view');
         $form                                   = $crawler->filter('form[name=batch_tag]')->form();
         $values                                 = $form->getValues();
         $values['batch_tag[tags][add_tags]']    = [$this->tags[0]->getId(), $this->tags[1]->getId()];
@@ -65,7 +66,7 @@ final class BatchControllerTest extends MauticMysqlTestCase
         $this->assertStringContainsString('3 contacts affected', (string) $this->client->getResponse()->getContent());
 
         /** @var LeadModel $leadModel */
-        $leadModel = static::getContainer()->get(LeadModel::class);
+        $leadModel = self::getContainer()->get(LeadModel::class);
         $lead1     = $leadModel->getEntity($this->leads[0]->getId());
         $this->assertInstanceOf(Lead::class, $lead1);
         $this->assertContains($this->tags[0], $lead1->getTags()->toArray());
@@ -76,12 +77,12 @@ final class BatchControllerTest extends MauticMysqlTestCase
     public function testAddAndRemoveBatchSetAction(): void
     {
         /** @var LeadModel $leadModel */
-        $leadModel = static::getContainer()->get(LeadModel::class);
+        $leadModel = self::getContainer()->get(LeadModel::class);
         $this->leads[0]->addTag($this->tags[1]);
         $this->leads[0]->addTag($this->tags[2]);
         $leadModel->saveEntity($this->leads[0]);
 
-        $crawler                                = $this->client->request('GET', '/s/tags/batch/view');
+        $crawler                                = $this->client->request(Request::METHOD_GET, '/s/tags/batch/view');
         $form                                   = $crawler->filter('form[name=batch_tag]')->form();
         $values                                 = $form->getValues();
         $values['batch_tag[tags][remove_tags]'] = [$this->tags[1]->getId()];
@@ -119,7 +120,7 @@ final class BatchControllerTest extends MauticMysqlTestCase
     public function addLeads(): array
     {
         /** @var LeadModel $leadModel */
-        $leadModel = static::getContainer()->get(LeadModel::class);
+        $leadModel = self::getContainer()->get(LeadModel::class);
         $lead      = $leadModel->getEntity();
 
         $lead->setEmail('example1@example.com');

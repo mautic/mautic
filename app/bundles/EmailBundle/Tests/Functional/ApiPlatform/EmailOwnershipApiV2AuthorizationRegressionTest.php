@@ -7,6 +7,7 @@ namespace Mautic\EmailBundle\Tests\Functional\ApiPlatform;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Tests\Functional\ApiPlatform\OwnershipScopedApiAuthorizationTestBase;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\HttpFoundation\Request;
 
 final class EmailOwnershipApiV2AuthorizationRegressionTest extends OwnershipScopedApiAuthorizationTestBase
 {
@@ -52,7 +53,7 @@ final class EmailOwnershipApiV2AuthorizationRegressionTest extends OwnershipScop
         $this->client->setServerParameter('PHP_AUTH_USER', $restrictedUser->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
 
-        $this->client->request('GET', '/api/v2/emails?page=1&itemsPerPage=10');
+        $this->client->request(Request::METHOD_GET, '/api/v2/emails?page=1&itemsPerPage=10');
         $response = $this->client->getResponse();
 
         self::assertResponseIsSuccessful();
@@ -114,7 +115,7 @@ final class EmailOwnershipApiV2AuthorizationRegressionTest extends OwnershipScop
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
 
         // Request page 1 with all items on one page first
-        $this->client->request('GET', '/api/v2/emails?page=1&itemsPerPage=10');
+        $this->client->request(Request::METHOD_GET, '/api/v2/emails?page=1&itemsPerPage=10');
         $response = $this->client->getResponse();
 
         self::assertResponseIsSuccessful();

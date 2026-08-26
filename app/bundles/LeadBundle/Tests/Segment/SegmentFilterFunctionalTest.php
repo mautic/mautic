@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
+use Symfony\Component\HttpFoundation\Request;
 
 final class SegmentFilterFunctionalTest extends MauticMysqlTestCase
 {
@@ -106,7 +107,7 @@ final class SegmentFilterFunctionalTest extends MauticMysqlTestCase
         ];
 
         // Create:
-        $this->client->request('POST', '/api/segments/new', $payload);
+        $this->client->request(Request::METHOD_POST, '/api/segments/new', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -125,7 +126,7 @@ final class SegmentFilterFunctionalTest extends MauticMysqlTestCase
     private function buildSegment(LeadList $segment, int $expectedCountInSegment): void
     {
         /** @var ContactSegmentService $contactSegmentService */
-        $contactSegmentService = static::getContainer()->get(ContactSegmentService::class);
+        $contactSegmentService = self::getContainer()->get(ContactSegmentService::class);
 
         $this->testSymfonyCommand('mautic:segments:update', [
             '-i'    => $segment->getId(),

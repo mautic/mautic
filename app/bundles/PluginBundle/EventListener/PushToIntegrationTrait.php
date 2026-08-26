@@ -5,6 +5,7 @@ namespace Mautic\PluginBundle\EventListener;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * Static methods must be used due to the Point triggers not being converted to Events yet
@@ -12,65 +13,56 @@ use Mautic\PluginBundle\Integration\AbstractIntegration;
  */
 trait PushToIntegrationTrait
 {
-    /**
-     * @var IntegrationHelper
-     */
-    protected static $integrationHelper;
+    protected IntegrationHelper $integrationHelper;
 
     /**
      * Used by methodCalls to event subscribers.
      */
-    public function setIntegrationHelper(IntegrationHelper $integrationHelper): void
-    {
-        static::setStaticIntegrationHelper($integrationHelper);
-    }
-
-    /**
-     * Used by callback methods such as point triggers.
-     */
-    public static function setStaticIntegrationHelper(IntegrationHelper $integrationHelper): void
-    {
-        static::$integrationHelper = $integrationHelper;
+    #[Required]
+    public function autowirePushToIntegrationTrait(
+        IntegrationHelper $integrationHelper,
+    ): void {
+        $this->integrationHelper = $integrationHelper;
     }
 
     protected function pushToIntegration(array $config, Lead $lead, array &$errors = []): bool
     {
-        return static::pushIt($config, $lead, $errors);
+        return $this->pushIt($config, $lead, $errors);
     }
 
     /**
      * Used because the the Point trigger actions have not be converted to Events yet and thus must leverage a callback.
      */
-    protected static function pushIt(array $config, $lead, &$errors): bool
+    protected function pushIt(array $config, $lead, &$errors): bool
     {
         $integration             = (!empty($config['integration'])) ? $config['integration'] : null;
         $integrationCampaign     = (!empty($config['config']['campaigns'])) ? $config['config']['campaigns'] : null;
         $integrationMemberStatus = (!empty($config['campaign_member_status']['campaign_member_status']))
             ? $config['campaign_member_status']['campaign_member_status'] : null;
-        $services = static::$integrationHelper->getIntegrationObjects($integration);
+        $services = $this->integrationHelper->getIntegrationObjects($integration);
         $success  = true;
 
-        foreach ($services as $s) {
-            /** @var AbstractIntegration $s */
-            $settings = $s->getIntegrationSettings();
+        foreach ($services as $service) {
+            /** @var AbstractIntegration $service */
+            $settings = $service->getIntegrationSettings();
             if (!$settings->isPublished()) {
                 continue;
             }
 
             $personIds = null;
-            if (method_exists($s, 'pushLead')) {
-                if (!$personIds = $s->resetLastIntegrationError()->pushLead($lead, $config)) {
+            if (method_exists($service, 'pushLead')) {
+                if (!$personIds = $service->resetLastIntegrationError()->pushLead($lead, $config)) {
                     $success = false;
-                    if ($error = $s->getLastIntegrationError()) {
+                    if ($error = $service->getLastIntegrationError()) {
                         $errors[] = $error;
                     }
                 }
             }
 
-            if ($success && $integrationCampaign && method_exists($s, 'pushLeadToCampaign')) {
-                if (!$s->resetLastIntegrationError()->pushLeadToCampaign($lead, $integrationCampaign, $integrationMemberStatus)) {
+            if ($success && $integrationCampaign && method_exists($service, 'pushLeadToCampaign')) {
+                if (!$service->resetLastIntegrationError()->pushLeadToCampaign($lead, $integrationCampaign, $integrationMemberStatus)) {
                     $success = false;
-                    if ($error = $s->getLastIntegrationError()) {
+                    if ($error = $service->getLastIntegrationError()) {
                         $errors[] = $error;
                     }
                 }

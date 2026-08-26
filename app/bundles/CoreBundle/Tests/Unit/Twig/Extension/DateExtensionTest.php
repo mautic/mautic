@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Twig\Extension\DateExtension;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Twig\TwigFunction;
+use Twig\Attribute\AsTwigFunction;
 
 final class DateExtensionTest extends TestCase
 {
@@ -47,14 +47,18 @@ final class DateExtensionTest extends TestCase
         return new DateExtension($mockedHelper);
     }
 
-    public function testGetFunctions(): void
+    public function testTwigFunctionAttributes(): void
     {
-        $functions = $this->dateExtension->getFunctions();
+        $reflectionClass = new \ReflectionClass(DateExtension::class);
 
-        $this->assertContainsOnlyInstancesOf(TwigFunction::class, $functions);
-        $this->assertCount(9, $functions);
+        $functionNames = [];
+        foreach ($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
+            foreach ($reflectionMethod->getAttributes(AsTwigFunction::class) as $reflectionAttribute) {
+                $functionNames[] = $reflectionAttribute->newInstance()->name;
+            }
+        }
 
-        $functionNames = array_map(fn (TwigFunction $function): string => $function->getName(), $functions);
+        $this->assertCount(9, $functionNames);
 
         $this->assertContains('dateToText', $functionNames);
         $this->assertContains('dateToFull', $functionNames);

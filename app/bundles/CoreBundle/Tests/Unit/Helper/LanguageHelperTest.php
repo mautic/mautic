@@ -120,7 +120,7 @@ final class LanguageHelperTest extends TestCase
         $langFile  = $this->tmpPath.'/../languageList.txt';
         file_put_contents($langFile, json_encode($languages));
 
-        $this->coreParametersHelper->method('get')
+        $this->coreParametersHelper->expects($this->once())->method('get')
             ->with('translations_fetch_url')
             ->willReturn('https://languages.test/');
 
@@ -137,6 +137,23 @@ final class LanguageHelperTest extends TestCase
 
         $this->assertFileExists($this->tmpPath.'/es.zip');
         @unlink($this->tmpPath.'/es.zip');
+    }
+
+    public function testFetchPackageWithNullLanguageCodeReturnsInvalidLanguageError(): void
+    {
+        $languages = ['languages' => ['es' => []]];
+        $langFile  = $this->tmpPath.'/../languageList.txt';
+        file_put_contents($langFile, json_encode($languages));
+
+        $this->client->expects($this->never())
+            ->method('get');
+
+        $error = $this->getHelper()->fetchPackage(null);
+        @unlink($langFile);
+
+        $this->assertTrue($error['error']);
+        $this->assertSame('mautic.core.language.helper.invalid.language', $error['message']);
+        $this->assertSame('', $error['vars']['%language%']);
     }
 
     public function testSupportedLanguagesAreReturned(): void

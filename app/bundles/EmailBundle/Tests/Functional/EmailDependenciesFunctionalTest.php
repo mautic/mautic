@@ -14,6 +14,7 @@ use Mautic\PointBundle\Entity\Point;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\ReportBundle\Entity\Report;
+use Symfony\Component\HttpFoundation\Request;
 
 final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
 {
@@ -68,7 +69,7 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($email);
         $this->em->flush();
 
-        $this->client->request('GET', "/s/ajax?action=email:getEmailUsages&id={$email->getId()}");
+        $this->client->request(Request::METHOD_GET, "/s/ajax?action=email:getEmailUsages&id={$email->getId()}");
         $clientResponse = $this->client->getResponse();
         $jsonResponse   = json_decode($clientResponse->getContent(), true);
 
@@ -83,7 +84,7 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
 
         $campaign = $this->campaignFixturesHelper->createCampaignWithEmailSent($email->getId());
 
-        $this->client->request('GET', "/s/ajax?action=email:getEmailUsages&id={$email->getId()}");
+        $this->client->request(Request::METHOD_GET, "/s/ajax?action=email:getEmailUsages&id={$email->getId()}");
         $clientResponse = $this->client->getResponse();
         $jsonResponse   = json_decode($clientResponse->getContent(), true);
 
@@ -100,7 +101,7 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
         $this->createFormActionEmailSend($formWithEmailSend, $email->getId());
         $this->createFormActionEmailSendToUser($formWithEmailSend, $email->getId());
 
-        $this->client->request('GET', "/s/ajax?action=email:getEmailUsages&id={$email->getId()}");
+        $this->client->request(Request::METHOD_GET, "/s/ajax?action=email:getEmailUsages&id={$email->getId()}");
         $clientResponse = $this->client->getResponse();
         $jsonResponse   = json_decode($clientResponse->getContent(), true);
 
@@ -119,7 +120,7 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
         $formWithEmailSendToUser = $this->createForm('form-with-email-send-to-user');
         $this->createFormActionEmailSendToUser($formWithEmailSendToUser, $email->getId());
 
-        $this->client->request('GET', "/s/ajax?action=email:getEmailUsages&id={$email->getId()}");
+        $this->client->request(Request::METHOD_GET, "/s/ajax?action=email:getEmailUsages&id={$email->getId()}");
         $clientResponse = $this->client->getResponse();
         $jsonResponse   = json_decode($clientResponse->getContent(), true);
 
@@ -135,7 +136,7 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
         $pointActionIsSent = $this->createEmailPointAction($email->getId(), 'email.send');
         $pointActionIsOpen = $this->createEmailPointAction($email->getId(), 'email.open');
 
-        $this->client->request('GET', "/s/ajax?action=email:getEmailUsages&id={$email->getId()}");
+        $this->client->request(Request::METHOD_GET, "/s/ajax?action=email:getEmailUsages&id={$email->getId()}");
         $clientResponse = $this->client->getResponse();
         $jsonResponse   = json_decode($clientResponse->getContent(), true);
 
@@ -150,7 +151,7 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
 
         $pointActionIsSent = $this->createPointTriggerWithEmailSendEvent($email->getId(), 'email.send');
 
-        $this->client->request('GET', "/s/ajax?action=email:getEmailUsages&id={$email->getId()}");
+        $this->client->request(Request::METHOD_GET, "/s/ajax?action=email:getEmailUsages&id={$email->getId()}");
         $clientResponse = $this->client->getResponse();
         $jsonResponse   = json_decode($clientResponse->getContent(), true);
 
@@ -166,7 +167,7 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
         $emailReport      = $this->createEmailReport($email->getId());
         $emailStatsReport = $this->createEmailStatsReport($email->getId());
 
-        $this->client->request('GET', "/s/ajax?action=email:getEmailUsages&id={$email->getId()}");
+        $this->client->request(Request::METHOD_GET, "/s/ajax?action=email:getEmailUsages&id={$email->getId()}");
         $clientResponse = $this->client->getResponse();
         $jsonResponse   = json_decode($clientResponse->getContent(), true);
 

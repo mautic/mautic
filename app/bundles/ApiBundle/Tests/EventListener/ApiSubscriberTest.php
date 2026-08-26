@@ -12,6 +12,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 final class ApiSubscriberTest extends CommonMocks
@@ -83,7 +84,7 @@ final class ApiSubscriberTest extends CommonMocks
             ->with($this->isInstanceOf(JsonResponse::class))
             ->willReturnCallback(
                 function (JsonResponse $response): void {
-                    $this->assertSame(403, $response->getStatusCode());
+                    $this->assertSame(Response::HTTP_FORBIDDEN, $response->getStatusCode(), (string) $response->getContent());
                 }
             );
 

@@ -20,7 +20,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 )]
 final class CampaignDeleteEventLogsCommand extends Command
 {
-    public const COMMAND_NAME = 'mautic:campaign:delete-event-logs';
+    public const string COMMAND_NAME = 'mautic:campaign:delete-event-logs';
 
     public function __construct(
         private readonly LeadEventLogRepository $leadEventLogRepository,

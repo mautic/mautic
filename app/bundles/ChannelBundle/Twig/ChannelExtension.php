@@ -7,28 +7,17 @@ namespace Mautic\ChannelBundle\Twig;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\LeadBundle\Exception\UnknownDncReasonException;
 use Mautic\LeadBundle\Twig\Helper\DncReasonHelper;
-use Twig\Extension\AbstractExtension;
-use Twig\TwigFunction;
+use Twig\Attribute\AsTwigFunction;
 
-final class ChannelExtension extends AbstractExtension
+final readonly class ChannelExtension
 {
     public function __construct(
-        private readonly DncReasonHelper $dncReasonHelper,
-        private readonly ChannelListHelper $channelListHelper,
+        private DncReasonHelper $dncReasonHelper,
+        private ChannelListHelper $channelListHelper,
     ) {
     }
 
-    /**
-     * @return TwigFunction[]
-     */
-    public function getFunctions(): array
-    {
-        return [
-            new TwigFunction('getChannelDncText', $this->getChannelDncText(...)),
-            new TwigFunction('getChannelLabel', $this->getChannelLabel(...)),
-        ];
-    }
-
+    #[AsTwigFunction(name: 'getChannelDncText')]
     public function getChannelDncText(int $reasonId): string
     {
         try {
@@ -38,6 +27,7 @@ final class ChannelExtension extends AbstractExtension
         }
     }
 
+    #[AsTwigFunction(name: 'getChannelLabel')]
     public function getChannelLabel(string $channel): string
     {
         return $this->channelListHelper->getChannelLabel($channel);

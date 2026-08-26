@@ -4,6 +4,7 @@ namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\StagesChangeLog;
@@ -26,13 +27,26 @@ class HubspotIntegration extends CrmAbstractIntegration
 
     protected UserHelper $userHelper;
 
+    private EmailValidator $emailValidator;
+
     #[Required]
     public function autowireHubspotIntegration(
         StageRepository $stageRepository,
         UserHelper $userHelper,
+        EmailValidator $emailValidator,
     ): void {
         $this->stageRepository = $stageRepository;
         $this->userHelper = $userHelper;
+        $this->emailValidator = $emailValidator;
+    }
+
+    public function getApiHelper(): HubspotApi
+    {
+        if (empty($this->helper)) {
+            $this->helper = new HubspotApi($this, $this->emailValidator);
+        }
+
+        return $this->helper;
     }
 
     public const ACCESS_KEY = 'accessKey';
@@ -68,12 +82,7 @@ class HubspotIntegration extends CrmAbstractIntegration
         return ['push_lead', 'get_leads'];
     }
 
-    /**
-     * @param bool $inAuthorization
-     *
-     * @return mixed|string|null
-     */
-    public function getBearerToken($inAuthorization = false)
+    public function getBearerToken(bool $inAuthorization = false): ?string
     {
         $tokenData = $this->getKeys();
 
@@ -112,11 +121,9 @@ class HubspotIntegration extends CrmAbstractIntegration
     /**
      * Get available company fields for choices in the config UI.
      *
-     * @param array $settings
-     *
      * @return array
      */
-    public function getFormCompanyFields($settings = [])
+    public function getFormCompanyFields(array $settings = [])
     {
         return $this->getFormFieldsByObject('company', $settings);
     }
@@ -152,7 +159,7 @@ class HubspotIntegration extends CrmAbstractIntegration
 
         try {
             if ($this->isAuthorized()) {
-                if (!empty($hubspotObjects) and is_array($hubspotObjects)) {
+                if (!empty($hubspotObjects) && is_array($hubspotObjects)) {
                     foreach ($hubspotObjects as $object) {
                         // Check the cache first
                         $settings['cache_suffix'] = $cacheSuffix = '.'.$object;
@@ -197,7 +204,7 @@ class HubspotIntegration extends CrmAbstractIntegration
      *
      * @return array
      */
-    protected function cleanPriorityFields($fieldsToUpdate, $objects = null)
+    protected function cleanPriorityFields(array $fieldsToUpdate, $objects = null)
     {
         if (null === $objects) {
             $objects = ['Leads', 'Contacts'];
@@ -414,7 +421,7 @@ class HubspotIntegration extends CrmAbstractIntegration
                         }
                     }
                 }
-                if (isset($data['hasMore']) and $data['hasMore']) {
+                if (isset($data['hasMore']) && $data['hasMore']) {
                     $params['offset'] = $data['offset'];
                     if ($params['offset'] < strtotime($params['start'])) {
                         $this->getCompanies($params, $id, $executed);
@@ -465,7 +472,7 @@ class HubspotIntegration extends CrmAbstractIntegration
             if (isset($stageName)) {
                 $stage = $this->stageRepository->getStageByName($stageName);
 
-                if (empty($stage)) {
+                if (null === $stage) {
                     $stage = new Stage();
                     $stage->setName($stageName);
                     $stages[$stageName] = $stage;
@@ -562,7 +569,7 @@ class HubspotIntegration extends CrmAbstractIntegration
 
             if (!empty($leadData['vid'])) {
                 $integrationId     = $this->integrationEntityRepository->getIntegrationsEntityId($this->getName(), $object, 'lead', $lead->getId());
-                $integrationEntity = (empty($integrationId)) ?
+                $integrationEntity = ([] === $integrationId) ?
                     $this->createIntegrationEntity(
                         $object,
                         $leadData['vid'],

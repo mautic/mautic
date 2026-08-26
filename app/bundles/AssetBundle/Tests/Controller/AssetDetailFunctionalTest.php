@@ -6,6 +6,7 @@ namespace Mautic\AssetBundle\Tests\Controller;
 
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Symfony\Component\HttpFoundation\Request;
 
 final class AssetDetailFunctionalTest extends MauticMysqlTestCase
 {
@@ -22,7 +23,7 @@ final class AssetDetailFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->detach($asset);
 
-        $crawler   = $this->client->request('GET', sprintf('/s/assets/view/%d', $asset->getId()));
+        $crawler   = $this->client->request(Request::METHOD_GET, sprintf('/s/assets/view/%d', $asset->getId()));
         $imageTag  = $crawler->filter('.img-thumbnail');
 
         $onError  = $imageTag->attr('onerror');

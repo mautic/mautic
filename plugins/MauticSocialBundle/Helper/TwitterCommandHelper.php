@@ -62,10 +62,7 @@ final class TwitterCommandHelper
         $this->output = $output;
     }
 
-    /**
-     * @param bool $newLine
-     */
-    private function output(string $message, $newLine = true): void
+    private function output(string $message, bool $newLine = true): void
     {
         if ($newLine) {
             $this->output->writeln($message);
@@ -76,10 +73,8 @@ final class TwitterCommandHelper
 
     /**
      * Processes a list of tweets and creates / updates leads in Mautic.
-     *
-     * @param Monitoring $monitor
      */
-    public function createLeadsFromStatuses(array $statusList, $monitor): int
+    public function createLeadsFromStatuses(array $statusList, Monitoring $monitor): int
     {
         $leadField = $this->leadFieldRepository->findOneBy(['alias' => $this->twitterHandleField]);
 
@@ -93,8 +88,8 @@ final class TwitterCommandHelper
         $handleFieldGroup = $leadField->getGroup();
 
         // Just a means to let any LeadEvents listeners know that many leads are likely coming in case that matters to their logic
-        defined('MASS_LEADS_MANIPULATION') or define('MASS_LEADS_MANIPULATION', 1);
-        defined('SOCIAL_MONITOR_IMPORT') or define('SOCIAL_MONITOR_IMPORT', 1);
+        defined('MASS_LEADS_MANIPULATION') || define('MASS_LEADS_MANIPULATION', 1);
+        defined('SOCIAL_MONITOR_IMPORT') || define('SOCIAL_MONITOR_IMPORT', 1);
 
         // Get a list of existing leads to tone down on queries
         $usersByHandles    = [];
@@ -129,7 +124,7 @@ final class TwitterCommandHelper
         }
         unset($expr);
 
-        if (!empty($usersByHandles)) {
+        if ([] !== $usersByHandles) {
             $leads = $this->leadRepository->getEntities(
                 [
                     'filter' => [
@@ -329,11 +324,8 @@ final class TwitterCommandHelper
 
     /**
      * Add new monitoring_leads record to track leads found via the search.
-     *
-     * @param Monitoring $monitor
-     * @param Lead       $lead
      */
-    private function setMonitorLeadStat($monitor, $lead): void
+    private function setMonitorLeadStat(Monitoring $monitor, Lead $lead): void
     {
         // track the lead in our monitor_leads table
         $monitorLead = new \MauticPlugin\MauticSocialBundle\Entity\Lead();
@@ -346,10 +338,8 @@ final class TwitterCommandHelper
 
     /**
      * Increment the post counter.
-     *
-     * @param Monitoring $monitor
      */
-    private function incrementPostCount($monitor, array $tweet): void
+    private function incrementPostCount(Monitoring $monitor, array $tweet): void
     {
         $date = new \DateTime($tweet['created_at']);
 

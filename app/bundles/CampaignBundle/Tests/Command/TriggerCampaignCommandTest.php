@@ -21,6 +21,7 @@ use Mautic\LeadBundle\Entity\ListLeadRepository;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\HttpFoundation\Request;
 
 final class TriggerCampaignCommandTest extends AbstractCampaignCommand
 {
@@ -35,7 +36,7 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         putenv('CAMPAIGN_EXECUTIONER_SCHEDULER_ACKNOWLEDGE_SECONDS=1');
 
-        $this->segmentCountCacheHelper = static::getContainer()->get(SegmentCountCacheHelper::class);
+        $this->segmentCountCacheHelper = self::getContainer()->get(SegmentCountCacheHelper::class);
     }
 
     public function beforeTearDown(): void
@@ -99,7 +100,7 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(0, $stats);
 
         // Wait 6 seconds then execute the campaign again to send scheduled events
-        static::getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
+        self::getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1, '-l' => 10]);
 
         // Send email 1 should no longer be scheduled
@@ -126,7 +127,7 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         // Now let's simulate email opens
         foreach ($stats as $stat) {
-            $this->client->request('GET', '/email/'.$stat['tracking_hash'].'.gif');
+            $this->client->request(Request::METHOD_GET, '/email/'.$stat['tracking_hash'].'.gif');
             $this->assertResponseIsSuccessful();
         }
 
@@ -143,7 +144,7 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(25, $byEvent[10]);
 
         // Wait another 6 seconds to go beyond the inaction timeframe
-        static::getContainer()->get(InactiveExecutioner::class)->setNowTime(new \DateTime('+'.(self::CONDITION_SECONDS * 2).' seconds'));
+        self::getContainer()->get(InactiveExecutioner::class)->setNowTime(new \DateTime('+'.(self::CONDITION_SECONDS * 2).' seconds'));
 
         // Execute the command again to trigger inaction related events
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1, '-l' => 10]);
@@ -266,7 +267,7 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(0, $stats);
 
         // Wait 6 seconds then execute the campaign again to send scheduled events
-        static::getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
+        self::getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-id' => 1]);
 
         // Send email 1 should no longer be scheduled
@@ -293,7 +294,7 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         // Now let's simulate email opens
         foreach ($stats as $stat) {
-            $this->client->request('GET', '/email/'.$stat['tracking_hash'].'.gif');
+            $this->client->request(Request::METHOD_GET, '/email/'.$stat['tracking_hash'].'.gif');
             $this->assertResponseIsSuccessful();
         }
 
@@ -310,7 +311,7 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(1, $byEvent[10]);
 
         // Wait 6 seconds to go beyond the inaction timeframe
-        static::getContainer()->get(InactiveExecutioner::class)->setNowTime(new \DateTime('+'.(self::CONDITION_SECONDS * 2).' seconds'));
+        self::getContainer()->get(InactiveExecutioner::class)->setNowTime(new \DateTime('+'.(self::CONDITION_SECONDS * 2).' seconds'));
 
         // Execute the command again to trigger inaction related events
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-id' => 1]);
@@ -427,7 +428,7 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(0, $stats);
 
         // Wait 6 seconds then execute the campaign again to send scheduled events
-        static::getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
+        self::getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3,4,19']);
 
         // Send email 1 should no longer be scheduled
@@ -453,7 +454,7 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         // Now let's simulate email opens
         foreach ($stats as $stat) {
-            $this->client->request('GET', '/email/'.$stat['tracking_hash'].'.gif');
+            $this->client->request(Request::METHOD_GET, '/email/'.$stat['tracking_hash'].'.gif');
             $this->assertResponseIsSuccessful();
         }
 
@@ -470,7 +471,7 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(2, $byEvent[10]);
 
         // Wait 6 seconds to go beyond the inaction timeframe
-        static::getContainer()->get(InactiveExecutioner::class)->setNowTime(new \DateTime('+'.(self::CONDITION_SECONDS * 2).' seconds'));
+        self::getContainer()->get(InactiveExecutioner::class)->setNowTime(new \DateTime('+'.(self::CONDITION_SECONDS * 2).' seconds'));
 
         // Execute the command again to trigger inaction related events
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3,4,19']);

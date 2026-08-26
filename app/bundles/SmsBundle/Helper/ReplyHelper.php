@@ -62,9 +62,9 @@ final readonly class ReplyHelper
                 }
             }
         } catch (BadRequestHttpException) {
-            return new Response('invalid request', 400);
+            return new Response('invalid request', Response::HTTP_BAD_REQUEST);
         } catch (NotFoundHttpException) {
-            return new Response('', 404);
+            return new Response('', Response::HTTP_NOT_FOUND);
         } catch (NumberNotFoundException $exception) {
             $this->logger->debug(
                 sprintf(

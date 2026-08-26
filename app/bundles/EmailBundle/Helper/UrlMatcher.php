@@ -43,7 +43,7 @@ final class UrlMatcher
 
         // Remove preceding //
         if (str_starts_with($url, '//')) {
-            $url = str_replace('//', '', $url);
+            return str_replace('//', '', $url);
         }
 
         return $url;

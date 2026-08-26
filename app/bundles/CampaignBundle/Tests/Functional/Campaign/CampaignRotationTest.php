@@ -45,12 +45,12 @@ final class CampaignRotationTest extends MauticMysqlTestCase
         $this->em->flush();
 
         /** @var ContactTracker $contactTracker */
-        $contactTracker               = static::getContainer()->get(ContactTracker::class);
-        $this->campaignLeadRepository = static::getContainer()->get(LeadRepository::class);
-        $this->leadEventLogRepository = static::getContainer()->get(LeadEventLogRepository::class);
+        $contactTracker               = self::getContainer()->get(ContactTracker::class);
+        $this->campaignLeadRepository = self::getContainer()->get(LeadRepository::class);
+        $this->leadEventLogRepository = self::getContainer()->get(LeadEventLogRepository::class);
 
         /** @var RequestStack $requestStack */
-        $requestStack = static::getContainer()->get(RequestStack::class);
+        $requestStack = self::getContainer()->get(RequestStack::class);
         $request      = new Request();
 
         $request->setSession($sessionMock = $this->createMock(Session::class));
@@ -76,7 +76,7 @@ final class CampaignRotationTest extends MauticMysqlTestCase
             $this->campaignWithJump->getId()
         );
 
-        $this->client->request('GET', sprintf('/%s', $this->page->getAlias()));
+        $this->client->request(Request::METHOD_GET, sprintf('/%s', $this->page->getAlias()));
 
         self::assertResponseIsSuccessful();
 
@@ -95,7 +95,7 @@ final class CampaignRotationTest extends MauticMysqlTestCase
             $this->campaignWithJump->getId()
         );
 
-        $this->client->request('GET', sprintf('/%s', $this->page->getAlias()));
+        $this->client->request(Request::METHOD_GET, sprintf('/%s', $this->page->getAlias()));
 
         self::assertResponseIsSuccessful();
 

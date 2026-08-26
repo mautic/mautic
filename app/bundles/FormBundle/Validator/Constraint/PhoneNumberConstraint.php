@@ -2,19 +2,29 @@
 
 namespace Mautic\FormBundle\Validator\Constraint;
 
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 
 /**
  * Phone number constraint.
  */
+#[\Attribute(\Attribute::TARGET_PROPERTY)]
 final class PhoneNumberConstraint extends Constraint
 {
-    public $message;
+    /**
+     * @param string[]|null $groups
+     */
+    #[HasNamedArguments]
+    public function __construct(
+        public ?string $message = null,
+        ?array $groups = null,
+        mixed $payload = null,
+    ) {
+        parent::__construct(null, $groups, $payload);
+    }
 
-    public function getMessage()
+    public function getMessage(): ?string
     {
-        if (null !== $this->message) {
-            return $this->message;
-        }
+        return $this->message;
     }
 }

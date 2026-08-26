@@ -13,12 +13,14 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\Integration;
 use MauticPlugin\MauticClearbitBundle\EventListener\ButtonSubscriber;
 use MauticPlugin\MauticClearbitBundle\Integration\ClearbitIntegration;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 final class ButtonSubscriberTest extends TestCase
 {
     private MockObject&IntegrationsHelper $integrationsHelper;
@@ -49,7 +51,7 @@ final class ButtonSubscriberTest extends TestCase
 
     public function testInjectViewButtonsDoesNothingWhenIntegrationNotFound(): void
     {
-        $this->integrationsHelper->method('getIntegration')->with('Clearbit')
+        $this->integrationsHelper->expects($this->once())->method('getIntegration')->with('Clearbit')
             ->willThrowException(new IntegrationNotFoundException());
 
         $event = $this->makeEvent(ButtonHelper::LOCATION_BULK_ACTIONS, 'mautic_contact_index');
@@ -61,7 +63,7 @@ final class ButtonSubscriberTest extends TestCase
 
     public function testInjectViewButtonsDoesNothingWhenIntegrationNotPublished(): void
     {
-        $this->integrationsHelper->method('getIntegration')->with('Clearbit')
+        $this->integrationsHelper->expects($this->once())->method('getIntegration')->with('Clearbit')
             ->willReturn($this->makeIntegration(false));
 
         $event = $this->makeEvent(ButtonHelper::LOCATION_BULK_ACTIONS, 'mautic_contact_index');
@@ -73,7 +75,7 @@ final class ButtonSubscriberTest extends TestCase
 
     public function testInjectViewButtonsAddsBulkActionButtonForContactRoute(): void
     {
-        $this->integrationsHelper->method('getIntegration')->with('Clearbit')
+        $this->integrationsHelper->expects($this->once())->method('getIntegration')->with('Clearbit')
             ->willReturn($this->makeIntegration(true));
 
         $event = $this->makeEvent(ButtonHelper::LOCATION_BULK_ACTIONS, 'mautic_contact_index');
@@ -85,12 +87,12 @@ final class ButtonSubscriberTest extends TestCase
 
     public function testInjectViewButtonsAddsPageActionButtonForContactViewWithItem(): void
     {
-        $this->integrationsHelper->method('getIntegration')->with('Clearbit')
+        $this->integrationsHelper->expects($this->once())->method('getIntegration')->with('Clearbit')
             ->willReturn($this->makeIntegration(true));
 
         $lead = $this->createMock(Lead::class);
-        $lead->method('getEmail')->willReturn('john@example.com');
-        $lead->method('getId')->willReturn(42);
+        $lead->expects($this->once())->method('getEmail')->willReturn('john@example.com');
+        $lead->expects($this->once())->method('getId')->willReturn(42);
 
         $event = $this->makeEvent(
             ButtonHelper::LOCATION_PAGE_ACTIONS,
@@ -106,7 +108,7 @@ final class ButtonSubscriberTest extends TestCase
 
     public function testInjectViewButtonsAddsBulkActionButtonForCompanyRoute(): void
     {
-        $this->integrationsHelper->method('getIntegration')->with('Clearbit')
+        $this->integrationsHelper->expects($this->once())->method('getIntegration')->with('Clearbit')
             ->willReturn($this->makeIntegration(true));
 
         $event = $this->makeEvent(ButtonHelper::LOCATION_BULK_ACTIONS, 'mautic_company_index');
@@ -118,7 +120,7 @@ final class ButtonSubscriberTest extends TestCase
 
     public function testInjectViewButtonsAddsNothingForUnrelatedRoute(): void
     {
-        $this->integrationsHelper->method('getIntegration')->with('Clearbit')
+        $this->integrationsHelper->expects($this->once())->method('getIntegration')->with('Clearbit')
             ->willReturn($this->makeIntegration(true));
 
         $event = $this->makeEvent(ButtonHelper::LOCATION_BULK_ACTIONS, 'mautic_email_index');

@@ -7,9 +7,9 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Handler\CurlHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\RequestOptions;
+use Mautic\CacheBundle\Cache\CacheProviderInterface;
 use Mautic\CoreBundle\Entity\CommonEntity;
 use Mautic\CoreBundle\Entity\FormEntity;
-use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
@@ -39,6 +39,9 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
+use Psr\SimpleCache\CacheInterface;
+use Symfony\Component\Cache\Adapter\ProxyAdapter;
+use Symfony\Component\Cache\Psr16Cache;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
@@ -67,11 +70,14 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     protected bool $coreIntegration = false;
 
-    protected Integration $settings;
+    protected ?Integration $settings = null;
 
+    /**
+     * @var array<string, string>
+     */
     protected array $keys = [];
 
-    protected ?CacheStorageHelper $cache;
+    protected CacheInterface $cache;
 
     protected ?Request $request;
 
@@ -117,7 +123,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     public function __construct(
         protected EventDispatcherInterface $dispatcher,
-        CacheStorageHelper $cacheStorageHelper,
+        CacheProviderInterface $cacheProvider,
         protected EntityManagerInterface $em,
         protected RequestStack $requestStack,
         protected RouterInterface $router,
@@ -133,7 +139,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         protected DoNotContactModel $doNotContact,
         protected FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
     ) {
-        $this->cache                  = $cacheStorageHelper->getCache($this->getName());
+        // the integration name namespaces the cache keys so that integrations cannot overwrite each other
+        $this->cache                  = new Psr16Cache(new ProxyAdapter($cacheProvider, (string) $this->getName()));
         $this->request                = (!defined('IN_MAUTIC_CONSOLE')) ? $requestStack->getCurrentRequest() : null;
 
         $this->setClientFactory(fn (array $options): Client => new Client([
@@ -148,10 +155,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         $this->commandParameters = $params;
     }
 
-    /**
-     * @return CacheStorageHelper
-     */
-    public function getCache()
+    public function getCache(): CacheInterface
     {
         return $this->cache;
     }
@@ -332,10 +336,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * Get the social integration entity.
-     *
-     * @return Integration
      */
-    public function getIntegrationSettings()
+    public function getIntegrationSettings(): ?Integration
     {
         return $this->settings;
     }
@@ -354,7 +356,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return void|array
      */
-    public function mergeApiKeys($mergeKeys, $withKeys = [], $return = false)
+    public function mergeApiKeys(array $mergeKeys, $withKeys = [], $return = false)
     {
         if (empty($withKeys)) {
             $withKeys = $this->keys;
@@ -404,21 +406,17 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Returns already decrypted keys.
      *
-     * @return mixed
+     * @return array<string, string>
      */
-    public function getKeys()
+    public function getKeys(): array
     {
         return $this->keys;
     }
 
     /**
      * Returns decrypted API keys.
-     *
-     * @param bool $entity
-     *
-     * @return array
      */
-    public function getDecryptedApiKeys($entity = false)
+    public function getDecryptedApiKeys(bool|Integration $entity = false): array
     {
         static $decryptedKeys = [];
 
@@ -459,11 +457,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * @param bool $mainDecryptOnly
-     *
      * @return array
      */
-    public function decryptApiKeys(array $keys, $mainDecryptOnly = false)
+    public function decryptApiKeys(array $keys, bool $mainDecryptOnly = false)
     {
         $decrypted = [];
 
@@ -654,7 +650,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return mixed|string|ResponseInterface
      */
-    public function makeRequest($url, $parameters = [], $method = 'GET', $settings = [])
+    public function makeRequest($url, $parameters = [], $method = 'GET', array $settings = [])
     {
         // If not authorizing the session itself, check isAuthorized which will refresh tokens if applicable
         if (empty($settings['authorize_session'])) {
@@ -875,7 +871,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return array
      */
-    public function prepareRequest($url, $parameters, $method, $settings, $authType)
+    public function prepareRequest(string $url, $parameters, string $method, array $settings, $authType)
     {
         $clientIdKey     = $this->getClientIdKey();
         $clientSecretKey = $this->getClientSecretKey();
@@ -1070,11 +1066,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      * @param mixed[] $settings
      * @param mixed[] $parameters
      *
-     * @return bool|string false if no error; otherwise the error string
-     *
      * @throws ApiErrorException if OAuth2 state does not match
      */
-    public function authCallback($settings = [], $parameters = [])
+    public function authCallback(array $settings = [], array $parameters = []): false|string|array
     {
         $authType = $this->getAuthenticationType();
 
@@ -1123,10 +1117,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * Extacts the auth keys from response and saves entity.
-     *
-     * @return bool|string false if no error; otherwise the error string
      */
-    public function extractAuthKeys($data, $tokenOverride = null)
+    public function extractAuthKeys($data, $tokenOverride = null): bool|string|array
     {
         // check to see if an entity exists
         $entity = $this->getIntegrationSettings();
@@ -1134,6 +1126,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             $entity = new Integration();
             $entity->setName($this->getName());
         }
+
         // Prepare the keys for extraction such as renaming, setting expiry, etc
         $data = $this->prepareResponseForExtraction($data);
 
@@ -1201,10 +1194,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * Checks if an integration is authorized and/or authorizes the request.
-     *
-     * @return bool
      */
-    public function isAuthorized()
+    public function isAuthorized(): bool|array|string
     {
         if (!$this->isConfigured()) {
             return false;
@@ -1292,7 +1283,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
         $url = $this->getRequestTokenUrl();
         if (!empty($url)) {
-            $result = $this->makeRequest(
+            return $this->makeRequest(
                 $url,
                 [],
                 'POST',
@@ -1315,10 +1306,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * Generate a bearer token.
-     *
-     * @return string
      */
-    public function getBearerToken($inAuthorization = false)
+    public function getBearerToken(bool $inAuthorization = false): ?string
     {
         return '';
     }
@@ -1336,7 +1325,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Get an array of public data.
      *
-     * @return mixed[]|void
+     * @return mixed[]|ResponseInterface|void
      */
     public function getUserData($identifier, &$socialCache)
     {
@@ -1469,7 +1458,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             $leadFields = $availableIntegrationFields;
         }
 
-        if (!empty($leadFields)) {
+        if ([] !== $leadFields) {
             $cleanup($submittedFields, $leadFields, $mauticLeadFields, 'leadFields');
             $featureSettings['leadFields'] = $submittedFields;
         }
@@ -1779,11 +1768,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Merges a config from integration_list with feature settings.
      *
-     * @param array $config
-     *
      * @return array|mixed
      */
-    public function mergeConfigToFeatureSettings($config = [])
+    public function mergeConfigToFeatureSettings(array $config = [])
     {
         $featureSettings = $this->settings->getFeatureSettings();
 
@@ -1792,7 +1779,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                 || (!empty($config['integration'])
                     && $config['integration'] == $this->getName()))
         ) {
-            $featureSettings = array_merge($featureSettings, $config['config']);
+            return array_merge($featureSettings, $config['config']);
         }
 
         return $featureSettings;
@@ -1951,7 +1938,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             }
 
             $errorMessage = $e->getMessage();
-            $errorHeader  = $this->getTranslator()->trans(
+            $errorHeader  = $this->translator->trans(
                 'mautic.integration.error',
                 [
                     '%name%' => $this->getName(),
@@ -1963,7 +1950,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                 $contactId   = $contact->getId();
                 $contactName = $contact->getPrimaryIdentifier();
             } elseif ($contactId = $e->getContactId()) {
-                $contactName = $this->getTranslator()->trans('mautic.integration.error.generic_contact_name', ['%id%' => $contactId]);
+                $contactName = $this->translator->trans('mautic.integration.error.generic_contact_name', ['%id%' => $contactId]);
             }
 
             $this->lastIntegrationError = $errorHeader.': '.$errorMessage;
@@ -1984,7 +1971,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             $messageHash = md5($errorMessage);
             if (!array_key_exists($messageHash, $this->notifications)) {
                 foreach ($this->adminUsers as $user) {
-                    $this->getNotificationModel()->addNotification(
+                    $this->notificationModel->addNotification(
                         $errorMessage,
                         $this->getName(),
                         false,
@@ -2123,11 +2110,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Get available company fields for choices in the config UI.
      *
-     * @param array $settings
-     *
      * @return array
      */
-    public function getFormCompanyFields($settings = [])
+    public function getFormCompanyFields(array $settings = [])
     {
         $settings['feature_settings']['objects']['company'] = 'company';
 
@@ -2157,11 +2142,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * @param array $keys
-     *
-     * @return array
+     * @return array<string, mixed>
      */
-    protected function dispatchIntegrationKeyEvent(?string $eventName, $keys = [])
+    protected function dispatchIntegrationKeyEvent(?string $eventName, array $keys = [])
     {
         /** @var PluginIntegrationKeyEvent $event */
         $event = $this->dispatcher->dispatch(
@@ -2264,9 +2247,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * @param array $mapping array of [$mauticId => ['entity' => FormEntity, 'integration_entity_id' => $integrationId]]
-     * @param array $params
      */
-    protected function buildIntegrationEntities(array $mapping, $integrationEntity, $internalEntity, $params = [])
+    protected function buildIntegrationEntities(array $mapping, $integrationEntity, $internalEntity, array $params = [])
     {
         $integrationEntities = $this->integrationEntityRepository->getIntegrationEntities(
             $this->getName(),
@@ -2309,12 +2291,11 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * @param CommonEntity|null $entity
-     * @param array             $params
      * @param bool              $ignoreEntityChanges
      *
      * @return bool|\DateTime|null
      */
-    protected function getLastSyncDate($entity = null, $params = [], $ignoreEntityChanges = true)
+    protected function getLastSyncDate($entity = null, array $params = [], $ignoreEntityChanges = true)
     {
         $isNew = ($entity instanceof FormEntity) && $entity->isNew();
         if (!$isNew && !$ignoreEntityChanges && isset($params['start']) && $entity && method_exists($entity, 'getChanges')) {
@@ -2358,7 +2339,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return array
      */
-    public function formatMatchedFields($fields)
+    public function formatMatchedFields(array $fields)
     {
         $formattedFields = [];
 
@@ -2373,8 +2354,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             }
         }
 
-        if (!empty($formattedFields)) {
-            $fields = $formattedFields;
+        if ([] !== $formattedFields) {
+            return $formattedFields;
         }
 
         return $fields;
@@ -2403,7 +2384,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return mixed
      */
-    public function getCompoundMauticFields($lead)
+    public function getCompoundMauticFields(array $lead)
     {
         if ($lead['internal_entity_id']) {
             $lead['mauticContactId']                   = $lead['internal_entity_id'];

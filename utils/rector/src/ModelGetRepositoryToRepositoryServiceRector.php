@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Utils\Rector;
 
+use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Model\AbstractCommonModel;
 use PhpParser\Modifiers;
 use PhpParser\Node;
 use PhpParser\Node\Attribute;
@@ -56,7 +58,7 @@ final class ModelGetRepositoryToRepositoryServiceRector extends AbstractRector
      */
     private const TEST_CASE = 'PHPUnit\Framework\TestCase';
 
-    private const ABSTRACT_COMMON_MODEL = 'Mautic\CoreBundle\Model\AbstractCommonModel';
+    private const ABSTRACT_COMMON_MODEL = AbstractCommonModel::class;
 
     /**
      * Generic repository bases - a model that does not override getRepository() resolves to one of these,
@@ -64,7 +66,7 @@ final class ModelGetRepositoryToRepositoryServiceRector extends AbstractRector
      */
     private const GENERIC_REPOSITORIES = [
         'Doctrine\ORM\EntityRepository',
-        'Mautic\CoreBundle\Entity\CommonRepository',
+        CommonRepository::class,
     ];
 
     public function __construct(
@@ -318,8 +320,6 @@ final class ModelGetRepositoryToRepositoryServiceRector extends AbstractRector
      */
     private function replaceNode(Class_ $class, MethodCall $oldNode, Node $newNode): void
     {
-        $this->traverseNodesWithCallable($class, static function (Node $node) use ($oldNode, $newNode): ?Node {
-            return $node === $oldNode ? $newNode : null;
-        });
+        $this->traverseNodesWithCallable($class, static fn (Node $node): ?Node => $node === $oldNode ? $newNode : null);
     }
 }

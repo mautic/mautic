@@ -82,7 +82,7 @@ final class FieldFilterHelperTest extends TestCase
             ->willReturn('field five');
 
         $integrationObject = $this->createMock(ConfigFormSyncInterface::class);
-        $integrationObject->method('getAllFieldsForMapping')
+        $integrationObject->expects($this->once())->method('getAllFieldsForMapping')
             ->willReturn(
                 [
                     'field1' => $field1,

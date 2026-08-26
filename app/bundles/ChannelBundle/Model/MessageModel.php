@@ -12,7 +12,6 @@ use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -25,6 +24,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 class MessageModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
 {
+    public static function getName(): string
+    {
+        return 'channel.message';
+    }
+
     public const CHANNEL_FEATURE = 'marketing_messages';
 
     protected static $channels;
@@ -71,7 +75,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
         return 'channel:messages';
     }
 
-    public function getRepository(): ?MessageRepository
+    public function getRepository(): MessageRepository
     {
         return $this->messageRepository;
     }
@@ -91,13 +95,13 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
      *
      * @return FormInterface<mixed>
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, $options = []): FormInterface
     {
         if (!empty($action)) {
             $options['action'] = $action;
         }
 
-        return $formFactory->create(MessageType::class, $entity, $options);
+        return $this->formFactory->create(MessageType::class, $entity, $options);
     }
 
     /**
@@ -143,22 +147,18 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
     public function getLookupResults(string $type, string|array $filter = '', int $limit = 10, int $start = 0, array $options = []): array
     {
         $results = [];
-        switch ($type) {
-            case 'channel.message':
-                $entities = $this->messageRepository->getMessageList(
-                    $filter,
-                    $limit,
-                    $start
-                );
-
-                foreach ($entities as $entity) {
-                    $results[] = [
-                        'label' => $entity['name'],
-                        'value' => $entity['id'],
-                    ];
-                }
-
-                break;
+        if ('channel.message' === $type) {
+            $entities = $this->messageRepository->getMessageList(
+                $filter,
+                $limit,
+                $start
+            );
+            foreach ($entities as $entity) {
+                $results[] = [
+                    'label' => $entity['name'],
+                    'value' => $entity['id'],
+                ];
+            }
         }
 
         return $results;

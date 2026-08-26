@@ -2,14 +2,14 @@
 
 namespace Mautic\LeadBundle\Tests\DataFixtures\ORM;
 
-use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 
-final class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadSegmentsData extends Fixture implements OrderedFixtureInterface
 {
     public function __construct(
         private readonly ListModel $listModel,
@@ -910,7 +910,7 @@ final class LoadSegmentsData extends AbstractFixture implements OrderedFixtureIn
                         'type'       => 'datetime',
                         'operator'   => 'gte',
                         'properties' => [
-                            'filter' => (new \DateTime())->format('Y-m-d H:i'),
+                            'filter' => new \DateTime()->format('Y-m-d H:i'),
                         ],
                     ],
                 ],
@@ -946,7 +946,7 @@ final class LoadSegmentsData extends AbstractFixture implements OrderedFixtureIn
                         'type'       => 'datetime',
                         'operator'   => 'gte',
                         'properties' => [
-                            'filter' => (new \DateTime())->format('Y-m-d H:i'),
+                            'filter' => new \DateTime()->format('Y-m-d H:i'),
                         ],
                     ],
                 ],
@@ -1059,6 +1059,46 @@ final class LoadSegmentsData extends AbstractFixture implements OrderedFixtureIn
                     ],
                 ],
                 'populate' => false,
+            ],
+            [ // ID 53
+                'name'    => 'segment with In The Last Filter',
+                'alias'   => 'segment-test-with-in-the-last-filter',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'object'   => 'lead',
+                        'type'     => 'date',
+                        'field'    => 'date_added',
+                        'operator' => 'inLast',
+                        'filter'   => [
+                            'interval' => '2',
+                            'unit'     => 'day',
+                        ],
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => true,
+            ],
+            [ // ID 54
+                'name'    => 'segment with In The Next Filter',
+                'alias'   => 'segment-test-with-in-the-next-filter',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'object'   => 'lead',
+                        'type'     => 'date',
+                        'field'    => 'date_added',
+                        'operator' => 'inNext',
+                        'filter'   => [
+                            'interval' => '2',
+                            'unit'     => 'day',
+                        ],
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => true,
             ],
         ];
 

@@ -15,7 +15,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class DashboardSubscriber extends MainDashboardSubscriber
 {
-    public const TYPE_RECENT_ACTIVITY = 'recent.activity';
+    public const string TYPE_RECENT_ACTIVITY = 'recent.activity';
 
     /**
      * Define the name of the bundle/category of the widget(s).

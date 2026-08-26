@@ -18,7 +18,7 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 
-    private const PREHEADER_TEXT = 'Preheader text';
+    private const string PREHEADER_TEXT = 'Preheader text';
 
     protected $useCleanupRollback = false;
 
@@ -135,7 +135,7 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
     {
         // Create custom field
         $this->client->request(
-            'POST',
+            Request::METHOD_POST,
             '/api/fields/contact/new',
             [
                 'label'      => 'bool',
@@ -151,7 +151,7 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
 
         // Create some contacts
         $this->client->request(
-            'POST',
+            Request::METHOD_POST,
             '/api/contacts/batch/new',
             [
                 [

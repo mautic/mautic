@@ -6,24 +6,13 @@ namespace Mautic\LeadBundle\Twig\Extension;
 
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Twig\Helper\AvatarHelper;
-use Twig\Extension\AbstractExtension;
-use Twig\TwigFunction;
+use Twig\Attribute\AsTwigFunction;
 
-final class LeadExtension extends AbstractExtension
+final readonly class LeadExtension
 {
     public function __construct(
-        private readonly AvatarHelper $avatarHelper,
+        private AvatarHelper $avatarHelper,
     ) {
-    }
-
-    /**
-     * @see Twig_Extension::getFunctions()
-     */
-    public function getFunctions(): array
-    {
-        return [
-            new TwigFunction('leadGetAvatar', $this->getAvatar(...)),
-        ];
     }
 
     /**
@@ -31,6 +20,7 @@ final class LeadExtension extends AbstractExtension
      *
      * @return mixed
      */
+    #[AsTwigFunction(name: 'leadGetAvatar')]
     public function getAvatar(Lead $lead)
     {
         return $this->avatarHelper->getAvatar($lead);

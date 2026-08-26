@@ -4,18 +4,16 @@ namespace MauticPlugin\MauticCrmBundle\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
 
-class ZohoApi extends CrmApi
+final class ZohoApi extends CrmApi
 {
     /**
      * @param string $operation
-     * @param string $method
-     * @param bool   $json
      *
      * @return array
      *
      * @throws ApiErrorException
      */
-    protected function request($operation, array $parameters = [], $method = 'GET', $json = false, array $settings = [])
+    private function request($operation, array $parameters = [], string $method = 'GET', bool $json = false, array $settings = [])
     {
         $tokenData = $this->integration->getKeys();
 
@@ -112,12 +110,10 @@ class ZohoApi extends CrmApi
                 $params['id'] = $id;
             }
 
-            $data = $this->request($object, $params, 'GET', false, $settings);
-        } else {
-            $data = $this->request($object, $params, 'GET', false, $settings);
+            return $this->request($object, $params, 'GET', false, $settings);
         }
 
-        return $data;
+        return $this->request($object, $params, 'GET', false, $settings);
     }
 
     /**
@@ -141,12 +137,10 @@ class ZohoApi extends CrmApi
         if ($id) {
             $params['id'] = $id;
 
-            $data = $this->request('Accounts', $params, 'GET', false, $settings);
-        } else {
-            $data = $this->request('Accounts', $params, 'GET', false, $settings);
+            return $this->request('Accounts', $params, 'GET', false, $settings);
         }
 
-        return $data;
+        return $this->request('Accounts', $params, 'GET', false, $settings);
     }
 
     /**

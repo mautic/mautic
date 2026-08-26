@@ -26,7 +26,6 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -37,13 +36,13 @@ use Symfony\Contracts\Service\Attribute\Required;
 final class ImportController extends FormController
 {
     // Steps of the import
-    public const STEP_UPLOAD_CSV      = 1;
+    public const int STEP_UPLOAD_CSV      = 1;
 
-    public const STEP_MATCH_FIELDS    = 2;
+    public const int STEP_MATCH_FIELDS    = 2;
 
-    public const STEP_PROGRESS_BAR    = 3;
+    public const int STEP_PROGRESS_BAR    = 3;
 
-    public const STEP_IMPORT_FROM_CSV = 4;
+    public const int STEP_IMPORT_FROM_CSV = 4;
 
     private LoggerInterface $logger;
 
@@ -68,8 +67,6 @@ final class ImportController extends FormController
 
     /**
      * @param int $page
-     *
-     * @return JsonResponse|RedirectResponse
      */
     public function indexAction(Request $request, $page = 1): Response
     {
@@ -119,18 +116,14 @@ final class ImportController extends FormController
 
     /**
      * @param int $objectId
-     *
-     * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(Request $request, $objectId): Response
     {
         return $this->viewStandard($request, $objectId, 'import', 'lead');
     }
 
     /**
      * Cancel and unpublish the import during manual import.
-     *
-     * @return JsonResponse|RedirectResponse
      */
     public function cancelAction(Request $request, NotificationModel $notificationModel, UserRepository $userRepository): Response
     {
@@ -216,7 +209,7 @@ final class ImportController extends FormController
             $this->requestStack->getSession()->set('mautic.'.$object.'.import.step', self::STEP_UPLOAD_CSV);
         }
 
-        $progress = (new Progress())->bindArray($this->requestStack->getSession()->get('mautic.'.$object.'.import.progress', [0, 0]));
+        $progress = new Progress()->bindArray($this->requestStack->getSession()->get('mautic.'.$object.'.import.progress', [0, 0]));
         $import   = $this->importModel->getEntity();
         $action   = $this->generateUrl('mautic_import_action', ['object' => $request->get('object'), 'objectAction' => 'new']);
 
@@ -397,7 +390,7 @@ final class ImportController extends FormController
 
                     $matchedFields = $validateEvent->getMatchedFields();
 
-                    if (empty($matchedFields)) {
+                    if ([] === $matchedFields) {
                         $this->resetImport($object);
                         $this->removeImportFile($fullPath);
                         $this->logger->log(LogLevel::WARNING, "Import for file {$fullPath} was aborted as there were no matched files found.");
@@ -654,28 +647,24 @@ final class ImportController extends FormController
      */
     public function getViewArguments(array $args, $action): array
     {
-        switch ($action) {
-            case 'view':
-                /** @var Import $entity */
-                $entity = $args['entity'];
-
-                $args['viewParameters'] = array_merge(
-                    $args['viewParameters'],
-                    [
-                        'failedRows'        => $this->importModel->getFailedRows($entity->getId(), $entity->getObject()),
-                        'importedRowsChart' => $entity->getDateStarted() ? $this->importModel->getImportedRowsLineChartData(
-                            'i',
-                            $entity->getDateStarted(),
-                            $entity->getDateEnded() ?: $entity->getDateModified(),
-                            null,
-                            [
-                                'object_id' => $entity->getId(),
-                            ]
-                        ) : [],
-                    ]
-                );
-
-                break;
+        if ('view' === $action) {
+            /** @var Import $entity */
+            $entity = $args['entity'];
+            $args['viewParameters'] = array_merge(
+                $args['viewParameters'],
+                [
+                    'failedRows'        => $this->importModel->getFailedRows($entity->getId(), $entity->getObject()),
+                    'importedRowsChart' => $entity->getDateStarted() ? $this->importModel->getImportedRowsLineChartData(
+                        'i',
+                        $entity->getDateStarted(),
+                        $entity->getDateEnded() ?: $entity->getDateModified(),
+                        null,
+                        [
+                            'object_id' => $entity->getId(),
+                        ]
+                    ) : [],
+                ]
+            );
         }
 
         return $args;

@@ -8,6 +8,7 @@ use Mautic\NotificationBundle\Form\Type\MobileNotificationDetailsType;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
@@ -16,6 +17,7 @@ use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Validation;
 
+#[AllowMockObjectsWithoutExpectations]
 final class MobileNotificationDetailsTypeTest extends TypeTestCase
 {
     /**

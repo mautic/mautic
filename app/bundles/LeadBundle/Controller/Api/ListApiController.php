@@ -47,8 +47,8 @@ final class ListApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        private ListModel $listModel,
-        private LeadModel $leadModel,
+        private readonly ListModel $listModel,
+        private readonly LeadModel $leadModel,
     ) {
         $this->model            = $listModel;
         $this->entityClass      = LeadList::class;
@@ -72,7 +72,7 @@ final class ListApiController extends CommonApiController
      * Those fields were moved to 'properties' subarray. We have to ensure BC and remove them
      * from filter root array so Symfony forms would not fail with unknown field error.
      */
-    protected function prepareParametersForBinding(Request $request, $parameters, $entity, $action)
+    protected function prepareParametersForBinding(Request $request, array $parameters, object $entity, string $action): array
     {
         if (empty($parameters['filters']) || !is_array($parameters['filters'])) {
             return $parameters;
@@ -101,7 +101,7 @@ final class ListApiController extends CommonApiController
         $withCounts = $request->query->has('withCounts');
         $response   = parent::getEntitiesAction($request, $userHelper);
 
-        if ($withCounts && $response instanceof Response && 200 === $response->getStatusCode()) {
+        if ($withCounts && $response instanceof Response && Response::HTTP_OK === $response->getStatusCode()) {
             $content = json_decode($response->getContent(), true);
 
             if (isset($content['lists']) && is_array($content['lists'])) {
@@ -179,11 +179,9 @@ final class ListApiController extends CommonApiController
      *
      * @param int $id segement ID
      *
-     * @return Response
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function addLeadsAction(Request $request, $id)
+    public function addLeadsAction(Request $request, $id): Response
     {
         $contactIds = $request->request->all()['ids'] ?? null;
         if (null === $contactIds) {

@@ -10,7 +10,6 @@ use Mautic\CategoryBundle\Event\CategoryTypeEntityEvent;
 use Mautic\CategoryBundle\Form\Type\CategoryType;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -22,6 +21,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 class CategoryModel extends FormModel implements AjaxLookupModelInterface
 {
+    public static function getName(): string
+    {
+        return 'category.category';
+    }
+
     /**
      * @var array<string,mixed[]>
      */
@@ -95,7 +99,7 @@ class CategoryModel extends FormModel implements AjaxLookupModelInterface
      * @param string|null $action
      * @param array       $options
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Category) {
             throw new MethodNotAllowedHttpException(['Category']);
@@ -104,7 +108,7 @@ class CategoryModel extends FormModel implements AjaxLookupModelInterface
             $options['action'] = $action;
         }
 
-        return $formFactory->create(CategoryType::class, $entity, $options);
+        return $this->formFactory->create(CategoryType::class, $entity, $options);
     }
 
     /**

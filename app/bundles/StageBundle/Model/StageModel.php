@@ -16,7 +16,6 @@ use Mautic\StageBundle\Event\StageBuilderEvent;
 use Mautic\StageBundle\Event\StageEvent;
 use Mautic\StageBundle\Form\Type\StageType;
 use Mautic\StageBundle\StageEvents;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -27,6 +26,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 class StageModel extends CommonFormModel implements GlobalSearchInterface
 {
+    public static function getName(): string
+    {
+        return 'stage.stage';
+    }
+
     protected LeadModel $leadModel;
 
     private StageRepository $stageRepository;
@@ -61,7 +65,7 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Stage) {
             throw new MethodNotAllowedHttpException(['Stage']);
@@ -70,7 +74,7 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
             $options['action'] = $action;
         }
 
-        return $formFactory->create(StageType::class, $entity, $options);
+        return $this->formFactory->create(StageType::class, $entity, $options);
     }
 
     public function getEntity($id = null): ?Stage

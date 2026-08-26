@@ -16,7 +16,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 final class CompanyListType extends AbstractType
 {
-    public const DEFAULT_LIMIT = 100;
+    public const int DEFAULT_LIMIT = 100;
 
     public function __construct(
         private readonly CompanyRepository $companyRepository,

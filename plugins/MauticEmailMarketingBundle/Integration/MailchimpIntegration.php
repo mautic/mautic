@@ -4,7 +4,7 @@ namespace MauticPlugin\MauticEmailMarketingBundle\Integration;
 
 use MauticPlugin\MauticEmailMarketingBundle\Form\Type\MailchimpType;
 
-class MailchimpIntegration extends EmailAbstractIntegration
+final class MailchimpIntegration extends EmailAbstractIntegration
 {
     public function getName(): string
     {
@@ -50,12 +50,7 @@ class MailchimpIntegration extends EmailAbstractIntegration
             ];
     }
 
-    /**
-     * @param array $parameters
-     *
-     * @return bool|string
-     */
-    public function authCallback($settings = [], $parameters = [])
+    public function authCallback(array $settings = [], array $parameters = []): string|false
     {
         $error = parent::authCallback($settings, $parameters);
 

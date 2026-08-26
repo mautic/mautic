@@ -53,17 +53,17 @@ final class CampaignApiController extends CommonApiController
         RouterInterface $router,
         FormFactoryInterface $formFactory,
         AppVersion $appVersion,
-        private RequestStack $requestStack,
-        private MembershipManager $membershipManager,
+        private readonly RequestStack $requestStack,
+        private readonly MembershipManager $membershipManager,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        private ValidatorInterface $validator,
-        private EventModel $eventModel,
-        private CampaignContactCountHelper $contactCountHelper,
+        private readonly ValidatorInterface $validator,
+        private readonly EventModel $eventModel,
+        private readonly CampaignContactCountHelper $contactCountHelper,
         CampaignModel $campaignModel,
-        private LeadModel $leadModel,
+        private readonly LeadModel $leadModel,
     ) {
         $this->model             = $campaignModel;
         $this->entityClass       = Campaign::class;
@@ -293,7 +293,7 @@ final class CampaignApiController extends CommonApiController
             $this->model->setCanvasSettings($entity, $parameters['canvasSettings']);
         }
 
-        if (Request::METHOD_PUT === $method && !empty($deletedEvents)) {
+        if (Request::METHOD_PUT === $method && [] !== $deletedEvents) {
             $this->eventModel->deleteEvents($entity->getEvents()->toArray(), $deletedEvents);
         }
     }
@@ -401,7 +401,7 @@ final class CampaignApiController extends CommonApiController
     /**
      * Get a list of events.
      */
-    public function exportCampaignAction(Request $request, int $campaignId): Response
+    public function exportCampaignAction(int $campaignId): Response
     {
         // Check if the campaign exists
         $campaign = $this->model->getEntity($campaignId);

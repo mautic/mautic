@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\WebhookBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -9,20 +11,14 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class WebhookRepository extends CommonRepository
 {
-    /**
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     */
-    protected function addCatchAllWhereClause($q, $filter): array
+    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
-        return $this->addStandardCatchAllWhereClause($q, $filter, ['e.name']);
+        return $this->addStandardCatchAllWhereClause($queryBuilder, $filter, ['e.name']);
     }
 
-    /**
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     */
-    protected function addSearchCommandWhereClause($q, $filter): array
+    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
-        return $this->addStandardSearchCommandWhereClause($q, $filter);
+        return $this->addStandardSearchCommandWhereClause($queryBuilder, $filter);
     }
 
     /**

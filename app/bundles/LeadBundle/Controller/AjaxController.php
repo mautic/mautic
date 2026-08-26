@@ -18,7 +18,6 @@ use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
-use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\ListTypeaheadEvent;
 use Mautic\LeadBundle\Form\Type\FieldType;
 use Mautic\LeadBundle\Form\Type\FilterPropertiesType;
@@ -55,6 +54,10 @@ final class AjaxController extends CommonAjaxController
 
     private DoNotContactRepository $doNotContactRepository;
 
+    private FormFactoryInterface $formFactory;
+
+    private FormFieldHelper $formFieldHelper;
+
     #[Required]
     public function autowireLeadAjaxController(
         LeadRepository $leadRepository,
@@ -62,12 +65,16 @@ final class AjaxController extends CommonAjaxController
         LeadFieldRepository $leadFieldRepository,
         LeadModel $leadModel,
         DoNotContactRepository $doNotContactRepository,
+        FormFactoryInterface $formFactory,
+        FormFieldHelper $formFieldHelper,
     ): void {
         $this->leadModel = $leadModel;
         $this->doNotContactRepository = $doNotContactRepository;
         $this->leadRepository = $leadRepository;
         $this->emailRepository = $emailRepository;
         $this->leadFieldRepository = $leadFieldRepository;
+        $this->formFactory = $formFactory;
+        $this->formFieldHelper = $formFieldHelper;
     }
 
     public function userListAction(Request $request): JsonResponse
@@ -151,7 +158,6 @@ final class AjaxController extends CommonAjaxController
 
     public function loadSegmentFilterFormAction(
         Request $request,
-        FormFactoryInterface $formFactory,
         FormAdjustmentsProviderInterface $formAdjustmentsProvider,
         ListModel $listModel,
     ): JsonResponse {
@@ -161,7 +167,7 @@ final class AjaxController extends CommonAjaxController
         $search      = InputHelper::clean($request->request->get('search'));
         $filterNum   = (int) $request->request->get('filterNum');
 
-        $form = $formFactory->createNamed('RENAME', FilterPropertiesType::class);
+        $form = $this->formFactory->createNamed('RENAME', FilterPropertiesType::class);
 
         if ($fieldAlias && $operator) {
             $formAdjustmentsProvider->adjustForm(
@@ -583,7 +589,7 @@ final class AjaxController extends CommonAjaxController
                 }
             }
 
-            if (!empty($newTags)) {
+            if ([] !== $newTags) {
                 $leadModel->getTagRepository()->saveEntities($newTags);
             }
 
@@ -599,49 +605,6 @@ final class AjaxController extends CommonAjaxController
             $data = [
                 'success' => 1,
                 'tags'    => $tagOptions,
-            ];
-        } else {
-            $data = ['success' => 0];
-        }
-
-        return $this->sendJsonResponse($data);
-    }
-
-    /**
-     * @deprecated since Mautic 7.2, will be removed in 8.0 with no replacement.
-     */
-    public function addLeadUtmTagsAction(Request $request, LeadModel $leadModel): JsonResponse
-    {
-        $utmTags = $request->request->get('utmtags');
-        $utmTags = json_decode($utmTags, true);
-
-        if (is_array($utmTags)) {
-            $newUtmTags = [];
-            foreach ($utmTags as $utmTag) {
-                if (!is_numeric($utmTag)) {
-                    // New tag
-                    $utmTagEntity = new UtmTag();
-                    $utmTagEntity->setUtmContent(InputHelper::clean($utmTag));
-                    $newUtmTags[] = $utmTagEntity;
-                }
-            }
-
-            if (!empty($newUtmTags)) {
-                $leadModel->getUtmTagRepository()->saveEntities($newUtmTags);
-            }
-
-            // Get an updated list of tags
-            $allUtmTags    = $leadModel->getUtmTagRepository()->getSimpleList(null, [], 'utmtag');
-            $utmTagOptions = '';
-
-            foreach ($allUtmTags as $utmTag) {
-                $selected = (in_array($utmTag['value'], $utmTags) || in_array($utmTag['label'], $utmTags)) ? ' selected="selected"' : '';
-                $utmTagOptions .= '<option'.$selected.' value="'.$utmTag['value'].'">'.$utmTag['label'].'</option>';
-            }
-
-            $data = [
-                'success' => 1,
-                'tags'    => $utmTagOptions,
             ];
         } else {
             $data = ['success' => 0];
@@ -706,9 +669,7 @@ final class AjaxController extends CommonAjaxController
                     case 'date':
                     case 'datetime':
                         if ('date' == $operator) {
-                            $fieldHelper = new FormFieldHelper();
-                            $fieldHelper->setTranslator($this->translator);
-                            $options = $fieldHelper->getDateChoices();
+                            $options = $this->formFieldHelper->getDateChoices();
                             $options = array_merge(
                                 [
                                     'custom' => $this->translator->trans('mautic.campaign.event.timed.choice.custom'),

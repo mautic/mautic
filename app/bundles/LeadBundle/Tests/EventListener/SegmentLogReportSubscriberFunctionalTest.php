@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\LeadBundle\EventListener\SegmentLogReportSubscriber;
 use Mautic\ReportBundle\Entity\Report;
+use Symfony\Component\HttpFoundation\Request;
 
 final class SegmentLogReportSubscriberFunctionalTest extends MauticMysqlTestCase
 {
@@ -39,7 +40,7 @@ final class SegmentLogReportSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $this->client->request('GET', 'api/reports/'.$report->getId());
+        $this->client->request(Request::METHOD_GET, 'api/reports/'.$report->getId());
         $clientResponse = $this->client->getResponse();
         $this->assertResponseStatusCodeSame(200, $clientResponse->getContent());
 

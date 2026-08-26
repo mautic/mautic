@@ -13,14 +13,14 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
-class FileManager
+final readonly class FileManager
 {
-    public const GRAPESJS_IMAGES_DIRECTORY = '';
+    public const string GRAPESJS_IMAGES_DIRECTORY = '';
 
     public function __construct(
-        private readonly FileUploader $fileUploader,
-        private readonly CoreParametersHelper $coreParametersHelper,
-        private readonly PathsHelper $pathsHelper,
+        private FileUploader $fileUploader,
+        private CoreParametersHelper $coreParametersHelper,
+        private PathsHelper $pathsHelper,
     ) {
     }
 
@@ -90,51 +90,6 @@ class FileManager
         return $this->pathsHelper->getSystemPath('images', $fullPath)
             .$separator
             .self::GRAPESJS_IMAGES_DIRECTORY;
-    }
-
-    /**
-     * @deprecated since Mautic 5.2, to be removed in 6.0. Use FileManager::getMediaFiles instead
-     */
-    public function getImages(): array
-    {
-        $files      = [];
-        $uploadDir  = $this->getUploadDir();
-
-        $fileSystem = new Filesystem();
-
-        if (!$fileSystem->exists($uploadDir)) {
-            try {
-                $fileSystem->mkdir($uploadDir);
-            } catch (IOException) {
-                return $files;
-            }
-        }
-
-        $finder = new Finder();
-        $finder->files()->in($uploadDir);
-
-        foreach ($finder as $file) {
-            // exclude certain folders from grapesjs file manager
-            if (in_array($file->getRelativePath(), $this->coreParametersHelper->get('image_path_exclude'))) {
-                continue;
-            }
-
-            $filePath = $this->getCompleteFilePath($file->getRelativePathname());
-            if ($size = @getimagesize($filePath)) {
-                $files[] = [
-                    'src'    => $this->getFullUrl($file->getRelativePathname()),
-                    'width'  => $size[0],
-                    'type'   => 'image',
-                    'height' => $size[1],
-                ];
-            } elseif ('svg' === strtolower($file->getExtension())) {
-                $files[] = $this->getSvgFileInfo($filePath, $file->getRelativePathname());
-            } else {
-                $files[] = $this->getFullUrl($file->getRelativePathname());
-            }
-        }
-
-        return $files;
     }
 
     /**

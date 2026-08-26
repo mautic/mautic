@@ -17,7 +17,6 @@ use Mautic\EmailBundle\Entity\CopyRepository;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
-use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Form\Type\ConfigType;
 use Mautic\EmailBundle\Helper\DTO\AddressDTO;
 use Mautic\EmailBundle\Helper\Exception\OwnerNotFoundException;
@@ -61,7 +60,7 @@ class MailHelper
 
     public const EMAIL_TYPE_MARKETING     = 'marketing';
 
-    private const DEFAULT_BODY            = [
+    private const array DEFAULT_BODY            = [
         'content'     => '',
         'contentType' => 'text/html',
         'charset'     => null,
@@ -308,7 +307,7 @@ class MailHelper
             // properly populate metadata for this transport
 
             if ($result = $this->queue($dispatchSendEvent)) {
-                $result = $this->flushQueue(['To', 'Cc', 'Bcc']);
+                return $this->flushQueue(['To', 'Cc', 'Bcc']);
             }
 
             return $result;
@@ -641,7 +640,6 @@ class MailHelper
     }
 
     /**
-     * Search and replace tokens
      * Adapted from \Swift_Plugins_DecoratorPlugin.
      *
      * @param array $search
@@ -734,10 +732,8 @@ class MailHelper
      *
      * @param string $template
      * @param bool   $returnContent
-     *
-     * @return void|string
      */
-    public function setTemplate($template, array $vars = [], $returnContent = false, $charset = null)
+    public function setTemplate($template, array $vars = [], $returnContent = false, $charset = null): ?string
     {
         $content = $this->twig->render($template, $vars);
 
@@ -749,6 +745,8 @@ class MailHelper
 
         $this->setBody($content, 'text/html', $charset);
         unset($content);
+
+        return null;
     }
 
     public function setSubject($subject): void
@@ -924,12 +922,12 @@ class MailHelper
         $this->checkBatchMaxRecipients();
 
         try {
-            $fullAddress          = (new AddressDTO($address, $name))->toMailerAddress();
-            $encodedAddressLength = strlen((new MailboxListHeader('To', [$fullAddress]))->getBodyAsString());
+            $fullAddress          = new AddressDTO($address, $name)->toMailerAddress();
+            $encodedAddressLength = strlen(new MailboxListHeader('To', [$fullAddress])->getBodyAsString());
 
             if ($encodedAddressLength > $this->addressLengthLimit) {
                 // When encoded address with name length doesn't meet the limit, use only the email
-                $shortAddress = (new AddressDTO($address))->toMailerAddress();
+                $shortAddress = new AddressDTO($address)->toMailerAddress();
                 $this->message->addTo($shortAddress);
             } else {
                 $this->message->addTo($fullAddress);
@@ -969,7 +967,7 @@ class MailHelper
                     $addressName = $value ?: $name; // Use provided name or default
                 }
 
-                $recipientAddresses[] = (new AddressDTO($address, $addressName))->toMailerAddress();
+                $recipientAddresses[] = new AddressDTO($address, $addressName)->toMailerAddress();
             }
 
             if ('cc' === $type) {
@@ -1008,7 +1006,7 @@ class MailHelper
         $this->checkBatchMaxRecipients(1, 'cc');
 
         try {
-            $this->message->addCc((new AddressDTO($address, $name ?? ''))->toMailerAddress());
+            $this->message->addCc(new AddressDTO($address, $name ?? '')->toMailerAddress());
 
             return true;
         } catch (\Exception $e) {
@@ -1040,7 +1038,7 @@ class MailHelper
         $this->checkBatchMaxRecipients(1, 'bcc');
 
         try {
-            $this->message->addBcc((new AddressDTO($address, $name))->toMailerAddress());
+            $this->message->addBcc(new AddressDTO($address, $name)->toMailerAddress());
 
             return true;
         } catch (\Exception $e) {
@@ -1092,7 +1090,7 @@ class MailHelper
 
         try {
             foreach ((array) $addresses as $address) {
-                $this->message->replyTo((new AddressDTO($address, $name))->toMailerAddress());
+                $this->message->replyTo(new AddressDTO($address, $name)->toMailerAddress());
             }
         } catch (\Exception $e) {
             $this->logError($e, 'reply to');
@@ -1321,10 +1319,9 @@ class MailHelper
             - if 'Disable unsubscribe link in header' setting is true in email configuration
         */
 
-        $email               = $this->email;
         $unsubscribeBodyText = $this->coreParametersHelper->get('unsubscribe_text') ?? '';
-        if (!$email
-            || $email->getSendToDnc()
+        if (!$this->email
+            || $this->email->getSendToDnc()
             || $this->coreParametersHelper->get('disable_unsubscribe_link_header')
             || !self::isUnsubscribeHeadersRequired($this->getBody(), $unsubscribeBodyText)) {
             return $headers;
@@ -1579,7 +1576,7 @@ class MailHelper
     protected function createAssetDownloadEntries(): void
     {
         // Nothing was sent out so bail
-        if ($this->fatal || empty($this->assetStats)) {
+        if ($this->fatal || [] === $this->assetStats) {
             return;
         }
 
@@ -1591,7 +1588,7 @@ class MailHelper
         }
 
         // Create a download entry if there is an Asset attachment
-        if (!empty($this->assetStats)) {
+        if ([] !== $this->assetStats) {
             foreach ($this->assets as $asset) {
                 foreach ($this->assetStats as $stat) {
                     $this->assetModel->trackDownload(
@@ -1615,7 +1612,7 @@ class MailHelper
      */
     protected function queueAssetDownloadEntry($contactEmail = null, ?array $metadata = null): void
     {
-        if ($this->internalSend || empty($this->assets)) {
+        if ($this->internalSend || [] === $this->assets) {
             return;
         }
 
@@ -1761,10 +1758,8 @@ class MailHelper
 
     /**
      * Check to see if a monitored email box is enabled and configured.
-     *
-     * @return bool|array
      */
-    public function isMontoringEnabled($bundleKey, $folderKey)
+    public function isMontoringEnabled(string $bundleKey, string $folderKey): false|array
     {
         if ($this->mailbox->isConfigured($bundleKey, $folderKey)) {
             return $this->mailbox->getMailboxSettings();
@@ -1834,7 +1829,7 @@ class MailHelper
 
         // If empty, replace with null so that email clients do not show empty name because of To: '' <email@domain.com>
         if (empty($name)) {
-            $name = null;
+            return null;
         }
 
         return $name;
@@ -1870,7 +1865,7 @@ class MailHelper
         $headers = $this->getCustomHeaders();
 
         // Set custom headers
-        if (!empty($headers)) {
+        if ([] !== $headers) {
             $tokens = $this->getTokens();
             // Replace tokens
             $messageHeaders = $this->message->getHeaders();
@@ -1923,24 +1918,6 @@ class MailHelper
         ];
     }
 
-    /**
-     * Validates a given address to ensure RFC 2822, 3.6.2 specs.
-     *
-     * @deprecated 2.11.0 to be removed in 3.0; use Mautic\EmailBundle\Helper\EmailValidator
-     *
-     * @throws InvalidEmailException
-     */
-    public static function validateEmail($address): void
-    {
-        $invalidChar = strpbrk($address, '\'^&*%');
-        if (false !== $invalidChar) {
-            throw new InvalidEmailException('Email address ['.$address.'] contains this invalid character: '.substr($invalidChar, 0, 1));
-        }
-        if (!filter_var($address, FILTER_VALIDATE_EMAIL)) {
-            throw new InvalidEmailException('Email address ['.$address.'] is invalid');
-        }
-    }
-
     private function setDefaultFrom(AddressDTO $systemFrom): void
     {
         $this->systemFrom = $systemFrom;
@@ -1960,22 +1937,20 @@ class MailHelper
 
     private function setFromForSingleMessage(): void
     {
-        $email = $this->email;
-
-        if ($this->lead && $email && $email->getUseOwnerAsMailer()) {
+        if ($this->lead && $this->email && $this->email->getUseOwnerAsMailer()) {
             if (!isset($this->lead['owner_id'])) {
                 $this->lead['owner_id'] = 0;
             }
 
-            $from = $this->fromEmailHelper->getFromAddressConsideringOwner($this->getFrom(), $this->lead, $email);
+            $from = $this->fromEmailHelper->getFromAddressConsideringOwner($this->getFrom(), $this->lead, $this->email);
             $this->setMessageFrom($from);
 
             return;
         }
 
-        if ($email) {
-            $fromEmail = $email->getFromAddress();
-            $fromName  = $email->getFromName();
+        if ($this->email) {
+            $fromEmail = $this->email->getFromAddress();
+            $fromName  = $this->email->getFromName();
             if (!empty($fromEmail) || !empty($fromName)) {
                 if (empty($fromName)) {
                     $fromName = $this->getFrom()->getName();
@@ -1987,7 +1962,7 @@ class MailHelper
             }
         }
 
-        $from = $this->fromEmailHelper->getFromAddressDto($this->getFrom(), $this->lead, $email);
+        $from = $this->fromEmailHelper->getFromAddressDto($this->getFrom(), $this->lead, $this->email);
 
         $this->setMessageFrom($from);
     }
@@ -2094,7 +2069,7 @@ class MailHelper
         $this->skip               = $event->isSkip();
         $this->fatal              = $event->isFatal();
         $errors                   = $event->getErrors();
-        if (!empty($errors)) {
+        if ([] !== $errors) {
             $currentErrors = [];
             if (isset($this->errors['failures']) && is_array($this->errors['failures'])) {
                 $currentErrors = $this->errors['failures'];

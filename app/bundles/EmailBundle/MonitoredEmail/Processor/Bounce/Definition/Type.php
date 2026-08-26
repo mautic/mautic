@@ -1,22 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition;
 
 final class Type
 {
-    public const AUTOREPLY    = 'autoreply';
+    public const string AUTOREPLY    = 'autoreply';
 
-    public const BLOCKED      = 'blocked';
+    public const string BLOCKED      = 'blocked';
 
-    public const HARD         = 'hard';
+    public const string HARD         = 'hard';
 
-    public const GENERIC      = 'generic';
+    public const string GENERIC      = 'generic';
 
-    public const UNKNOWN      = 'unknown';
+    public const string UNKNOWN      = 'unknown';
 
-    public const UNRECOGNIZED = 'unrecognized';
+    public const string UNRECOGNIZED = 'unrecognized';
 
-    public const SOFT         = 'soft';
+    public const string SOFT         = 'soft';
 
-    public const TEMPORARY    = 'temporary';
+    public const string TEMPORARY    = 'temporary';
 }

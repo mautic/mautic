@@ -19,7 +19,7 @@ final class ClassExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('get_class', fn ($value): string => (new \ReflectionClass($value))->getShortName()),
+            new TwigFunction('get_class', fn ($value): string => new \ReflectionClass($value)->getShortName()),
         ];
     }
 

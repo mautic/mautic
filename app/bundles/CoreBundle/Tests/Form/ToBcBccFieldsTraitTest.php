@@ -7,6 +7,7 @@ namespace Mautic\CoreBundle\Tests\Form;
 use Mautic\CoreBundle\Form\ToBcBccFieldsTrait;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\EmailBundle\Validator\MultipleEmailsValidValidator;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
@@ -16,6 +17,7 @@ use Symfony\Component\Validator\ConstraintValidatorFactory;
 use Symfony\Component\Validator\Validation;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 final class ToBcBccFieldsTraitTest extends TypeTestCase
 {
     protected function getExtensions(): array

@@ -22,8 +22,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('MauticPlugin\\MauticTagManagerBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
 
-    $services->alias('mautic.tagmanager.model.tag', MauticPlugin\MauticTagManagerBundle\Model\TagModel::class);
-    $services->alias('mautic.tagmanager.repository.tag', MauticPlugin\MauticTagManagerBundle\Entity\TagRepository::class);
     $services->alias('mautic.integration.tagmanager', MauticPlugin\MauticTagManagerBundle\Integration\TagManagerIntegration::class);
     $services->alias('mautic.integration.tagmanager.config', MauticPlugin\MauticTagManagerBundle\Integration\Support\ConfigSupport::class);
+    $services->set(MauticPlugin\MauticTagManagerBundle\Security\Permissions\TagManagerPermissions::class);
 };

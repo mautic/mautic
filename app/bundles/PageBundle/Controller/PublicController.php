@@ -42,8 +42,6 @@ use Symfony\Component\Routing\RouterInterface;
 final class PublicController extends AbstractFormController
 {
     /**
-     * @param string $slug
-     *
      * @throws \Exception
      * @throws FileNotFoundException
      */
@@ -53,14 +51,13 @@ final class PublicController extends AbstractFormController
         CookieHelper $cookieHelper,
         AnalyticsHelper $analyticsHelper,
         AssetsHelper $assetsHelper,
-        ThemeHelper $themeHelper,
         Tracking404Model $tracking404Model,
         RouterInterface $router,
         DeviceTrackingServiceInterface $deviceTrackingService,
         PageModel $model,
-        $slug): RedirectResponse|Response
-    {
-        /** @var Page|bool $entity */
+        string $slug,
+    ): RedirectResponse|Response {
+        /** @var Page|null $entity */
         $entity = $model->getEntityBySlugs($slug);
 
         // Do not hit preference center pages
@@ -109,7 +106,7 @@ final class PublicController extends AbstractFormController
                 if ($requestUri != $url) {
                     $model->hitPage($entity, $request, 301, $lead, $query);
 
-                    return $this->redirect($url, 301);
+                    return $this->redirect($url, Response::HTTP_MOVED_PERMANENTLY);
                 }
             }
 
@@ -121,7 +118,7 @@ final class PublicController extends AbstractFormController
                 $model->hitPage($entity, $request, 301, $lead, $query);
                 $url = $model->generateUrl($parentVariant, false);
 
-                return $this->redirect($url, 301);
+                return $this->redirect($url, Response::HTTP_MOVED_PERMANENTLY);
             }
 
             // First determine the A/B test to display if applicable
@@ -231,12 +228,12 @@ final class PublicController extends AbstractFormController
                     );
                     \assert($translatedEntity instanceof Page);
 
-                    if ($translationParent && $translatedEntity !== $entity) {
+                    if ($translatedEntity !== $entity) {
                         if (!$request->get('ntrd', 0)) {
                             $url = $model->generateUrl($translatedEntity, false);
                             $model->hitPage($entity, $request, 302, $lead, $query);
 
-                            return $this->redirect($url, 302);
+                            return $this->redirect($url, Response::HTTP_FOUND);
                         }
                     }
                 }
@@ -245,40 +242,13 @@ final class PublicController extends AbstractFormController
             // Generate contents
             $analytics = $analyticsHelper->getCode();
 
-            $BCcontent = $entity->getContent();
-            $content   = $entity->getCustomHtml();
-            // This condition remains so the Mautic v1 themes would display the content
-            if (empty($content) && !empty($BCcontent)) {
-                /**
-                 * @deprecated  BC support to be removed in 3.0
-                 */
-                $template = $entity->getTemplate();
-                // all the checks pass so display the content
-                $content = $entity->getContent();
+            $content = $entity->getCustomHtml();
 
-                // Add the GA code to the template assets
-                if (!empty($analytics)) {
-                    $assetsHelper->addCustomDeclaration($analytics);
-                }
-
-                $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
-
-                $content = $themeHelper->renderThemeTemplate(
-                    $logicalName,
-                    [
-                        'content'  => $content,
-                        'page'     => $entity,
-                        'template' => $template,
-                        'public'   => true,
-                    ]
-                );
-            } else {
-                if (!empty($analytics)) {
-                    $content = str_replace('</head>', $analytics."\n</head>", $content);
-                }
-                if ($entity->getNoIndex()) {
-                    $content = str_replace('</head>', "<meta name=\"robots\" content=\"noindex\">\n</head>", $content);
-                }
+            if (!empty($analytics)) {
+                $content = str_replace('</head>', $analytics."\n</head>", $content);
+            }
+            if ($entity->getNoIndex()) {
+                $content = str_replace('</head>', "<meta name=\"robots\" content=\"noindex\">\n</head>", $content);
             }
 
             $assetsHelper->addScript(
@@ -371,7 +341,6 @@ final class PublicController extends AbstractFormController
                     'content'  => $content,
                     'page'     => $page,
                     'template' => $template,
-                    'public'   => true, // @deprecated Remove in 2.0
                 ]
             );
         } else {
@@ -499,7 +468,7 @@ final class PublicController extends AbstractFormController
                     // Invalid ct value so we must unset it
                     // and process the request without it
 
-                    $logger->error(sprintf('Invalid clickthrough value: %s', $ct), ['exception' => $e]);
+                    $logger->warning(sprintf('Invalid clickthrough value: %s', $ct), ['exception' => $e]);
 
                     $request->request->remove('ct');
                     $request->query->remove('ct');

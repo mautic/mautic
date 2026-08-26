@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<Category>
  */
-final class CategoryRepository extends CommonRepository
+class CategoryRepository extends CommonRepository
 {
     /**
      * Get a list of entities.
@@ -76,41 +76,35 @@ final class CategoryRepository extends CommonRepository
         return $q->getQuery()->getArrayResult();
     }
 
-    /**
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     */
-    protected function addCatchAllWhereClause($q, $filter): array
+    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
-        return $this->addStandardCatchAllWhereClause($q, $filter, [
+        return $this->addStandardCatchAllWhereClause($queryBuilder, $filter, [
             'c.title',
             'c.description',
         ]);
     }
 
-    /**
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     */
-    protected function addSearchCommandWhereClause($q, $filter): array
+    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         $command                 = $field                 = $filter->command;
         $unique                  = $this->generateRandomParameterName();
-        [$expr, $parameters]     = parent::addSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters]     = parent::addSearchCommandWhereClause($queryBuilder, $filter);
 
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
             case $this->translator->trans('mautic.core.searchcommand.ispublished', [], null, 'en_US'):
-                $expr                = $q->expr()->eq('c.isPublished', ":{$unique}");
+                $expr                = $queryBuilder->expr()->eq('c.isPublished', ":{$unique}");
                 $parameters[$unique] = true;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
             case $this->translator->trans('mautic.core.searchcommand.isunpublished', [], null, 'en_US'):
-                $expr                = $q->expr()->eq('c.isPublished', ":{$unique}");
+                $expr                = $queryBuilder->expr()->eq('c.isPublished', ":{$unique}");
                 $parameters[$unique] = false;
                 break;
         }
 
         if ($expr && $filter->not) {
-            $expr = $q->expr()->not($expr);
+            $expr = $queryBuilder->expr()->not($expr);
         }
 
         return [

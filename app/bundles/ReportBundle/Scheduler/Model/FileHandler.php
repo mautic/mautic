@@ -14,7 +14,7 @@ use Mautic\ReportBundle\Exception\FileTooBigException;
 
 class FileHandler
 {
-    private const REPORTS_DIR = 'csv_reports';
+    private const string REPORTS_DIR = 'csv_reports';
 
     public function __construct(
         private readonly FilePathResolver $filePathResolver,

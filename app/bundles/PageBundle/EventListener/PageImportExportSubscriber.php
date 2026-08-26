@@ -18,7 +18,7 @@ use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
-final class PageImportExportSubscriber implements EventSubscriberInterface
+final readonly class PageImportExportSubscriber implements EventSubscriberInterface
 {
     use ImportExportTrait;
 

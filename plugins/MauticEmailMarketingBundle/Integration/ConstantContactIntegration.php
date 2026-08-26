@@ -4,7 +4,7 @@ namespace MauticPlugin\MauticEmailMarketingBundle\Integration;
 
 use MauticPlugin\MauticEmailMarketingBundle\Form\Type\ConstantContactType;
 
-class ConstantContactIntegration extends EmailAbstractIntegration
+final class ConstantContactIntegration extends EmailAbstractIntegration
 {
     public function getName(): string
     {
@@ -39,12 +39,8 @@ class ConstantContactIntegration extends EmailAbstractIntegration
 
     /**
      * Retrieves and stores tokens returned from oAuthLogin.
-     *
-     * @param array $parameters
-     *
-     * @return bool|string false if no error; otherwise the error string
      */
-    public function authCallback($settings = [], $parameters = [])
+    public function authCallback(array $settings = [], array $parameters = []): string|false
     {
         // Constanct Contact doesn't like POST
         $settings['method'] = 'GET';
@@ -139,12 +135,12 @@ class ConstantContactIntegration extends EmailAbstractIntegration
                     }
                 }
 
-                if (!empty($addresses)) {
+                if ([] !== $addresses) {
                     $addresses['address_type'] = 'PERSONAL';
                     $mappedData['addresses']   = $addresses;
                 }
 
-                if (!empty($customfields)) {
+                if ([] !== $customfields) {
                     $mappedData['custom_fields'] = $customfields;
                 }
 

@@ -8,6 +8,7 @@ use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Form\Type\EntityLookupType;
 use Mautic\NotificationBundle\Form\Type\MobileNotificationSendType;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
@@ -15,6 +16,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Validation;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 final class MobileNotificationSendTypeTest extends TypeTestCase
 {
     /**

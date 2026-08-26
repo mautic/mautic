@@ -9,6 +9,7 @@ use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Model\ProjectModel;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\HttpFoundation\Request;
 
 final class AjaxControllerTest extends MauticMysqlTestCase
 {
@@ -35,7 +36,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         );
 
         $this->client->request(
-            'POST',
+            Request::METHOD_POST,
             '/s/ajax?action=project:addProjects',
             [
                 'newProjectNames'    => json_encode(['Green Project']),
@@ -85,7 +86,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         );
 
         $this->client->request(
-            'POST',
+            Request::METHOD_POST,
             '/s/ajax?action=project:addProjects',
             [
                 'newProjectNames'    => json_encode(['yellow project']),
@@ -100,7 +101,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         );
 
         $this->client->request(
-            'POST',
+            Request::METHOD_POST,
             '/s/ajax?action=project:addProjects',
             [
                 'newProjectNames'    => json_encode(['green project']),
@@ -141,7 +142,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
         // Request the project options via AJAX without selecting the malicious project
         $this->client->request(
-            'POST',
+            Request::METHOD_POST,
             '/s/ajax?action=project:addProjects',
             [
                 'newProjectNames'    => json_encode([]),
@@ -170,7 +171,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
         // Verify the malicious project can still be selected and associated normally
         $this->client->request(
-            'POST',
+            Request::METHOD_POST,
             '/s/ajax?action=project:addProjects',
             [
                 'newProjectNames'    => json_encode([]),
@@ -234,7 +235,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
         // Request project options with the special char project selected
         $this->client->request(
-            'POST',
+            Request::METHOD_POST,
             '/s/ajax?action=project:addProjects',
             [
                 'newProjectNames'    => json_encode([]),
@@ -261,7 +262,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
         // Test that we can change selection (deselect the special char project, select the other)
         $this->client->request(
-            'POST',
+            Request::METHOD_POST,
             '/s/ajax?action=project:addProjects',
             [
                 'newProjectNames'    => json_encode([]),

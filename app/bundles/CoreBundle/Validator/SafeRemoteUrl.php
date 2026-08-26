@@ -4,9 +4,21 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Validator;
 
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 
+#[\Attribute(\Attribute::TARGET_PROPERTY)]
 final class SafeRemoteUrl extends Constraint
 {
-    public string $message = 'mautic.core.remote_url_not_allowed';
+    /**
+     * @param string[]|null $groups
+     */
+    #[HasNamedArguments]
+    public function __construct(
+        public string $message = 'mautic.core.remote_url_not_allowed',
+        ?array $groups = null,
+        mixed $payload = null,
+    ) {
+        parent::__construct(null, $groups, $payload);
+    }
 }

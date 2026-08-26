@@ -14,10 +14,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class MauticReportBuilder implements ReportBuilderInterface
 {
-    /**
-     * @var array
-     */
-    public const OPERATORS = [
+    public const array OPERATORS = [
         'default' => [
             'eq'         => 'mautic.core.operator.equals',
             'gt'         => 'mautic.core.operator.greaterthan',
@@ -69,17 +66,17 @@ final class MauticReportBuilder implements ReportBuilderInterface
     /**
      * Standard Channel Columns.
      */
-    public const CHANNEL_COLUMN_CATEGORY_ID     = 'channel.category_id';
+    public const string CHANNEL_COLUMN_CATEGORY_ID     = 'channel.category_id';
 
-    public const CHANNEL_COLUMN_NAME            = 'channel.name';
+    public const string CHANNEL_COLUMN_NAME            = 'channel.name';
 
-    public const CHANNEL_COLUMN_DESCRIPTION     = 'channel.description';
+    public const string CHANNEL_COLUMN_DESCRIPTION     = 'channel.description';
 
-    public const CHANNEL_COLUMN_DATE_ADDED      = 'channel.date_added';
+    public const string CHANNEL_COLUMN_DATE_ADDED      = 'channel.date_added';
 
-    public const CHANNEL_COLUMN_CREATED_BY      = 'channel.created_by';
+    public const string CHANNEL_COLUMN_CREATED_BY      = 'channel.created_by';
 
-    public const CHANNEL_COLUMN_CREATED_BY_USER = 'channel.created_by_user';
+    public const string CHANNEL_COLUMN_CREATED_BY_USER = 'channel.created_by_user';
 
     private ?string $contentTemplate = null;
 
@@ -552,7 +549,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
             $filter['value']
         );
 
-        if (empty($conditions)) {
+        if ([] === $conditions) {
             return null;
         }
 

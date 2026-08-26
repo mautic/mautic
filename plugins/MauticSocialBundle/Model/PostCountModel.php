@@ -12,6 +12,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 final class PostCountModel extends AbstractCommonModel
 {
+    public static function getName(): string
+    {
+        return 'social.postcount';
+    }
+
     private PostCountRepository $postCountRepository;
 
     #[Required]

@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 final class CampaignEventSubscriberFunctionalTest extends MauticMysqlTestCase
 {
@@ -44,9 +45,8 @@ final class CampaignEventSubscriberFunctionalTest extends MauticMysqlTestCase
 
         $unpublishEvent = new NotifyOfUnpublishEvent($failedEvent);
         /** @var EventDispatcherInterface $dispatcher */
-        $dispatcher = static::getContainer()->get(EventDispatcherInterface::class);
+        $dispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         $dispatcher->dispatch($unpublishEvent, CampaignEvents::ON_CAMPAIGN_UNPUBLISH_NOTIFY);
-        $this->assertInstanceOf(Campaign::class, $campaign);
 
         // Check for notifications - use a more general query
         $notifications = $this->em->getRepository(Notification::class)
@@ -87,7 +87,7 @@ final class CampaignEventSubscriberFunctionalTest extends MauticMysqlTestCase
             ];
         }
 
-        $this->client->request('POST', '/api/contacts/batch/new', $contacts);
+        $this->client->request(Request::METHOD_POST, '/api/contacts/batch/new', $contacts);
         $response = json_decode($this->client->getResponse()->getContent(), true);
         $contacts = $response['contacts'];
         $this->assertCount(150, $contacts);

@@ -52,6 +52,6 @@ final class ConditionDispatcherTest extends \PHPUnit\Framework\TestCase
                 return $event;
             });
 
-        (new ConditionDispatcher($this->dispatcher))->dispatchEvent($this->config, new LeadEventLog());
+        new ConditionDispatcher($this->dispatcher)->dispatchEvent($this->config, new LeadEventLog());
     }
 }

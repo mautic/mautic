@@ -47,7 +47,7 @@ final class ExecuteEventCommandTest extends AbstractCampaignCommand
         $lastId = array_pop($logIds);
 
         // Wait 6 seconds to go past scheduled time
-        static::getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
+        self::getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
 
         $this->testSymfonyCommand('mautic:campaigns:execute', ['--scheduled-log-ids' => implode(',', $logIds)]);
 
@@ -179,7 +179,7 @@ final class ExecuteEventCommandTest extends AbstractCampaignCommand
         $campaign      = $fixtureHelper->createCampaign('Scheduled event test');
         $fixtureHelper->addContactToCampaign($contact, $campaign);
         $hour = new \DateTime();
-        $hour->add((new DateTimeHelper())->buildInterval($interval, $unit));
+        $hour->add(new DateTimeHelper()->buildInterval($interval, $unit));
         $fixtureHelper->createCampaignWithScheduledEvent($campaign, $interval, $unit, $hour);
 
         $this->em->flush();

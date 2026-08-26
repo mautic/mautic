@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ConfigBundle;
 
 /**
@@ -12,26 +14,20 @@ final class ConfigEvents
      *
      * The event listener receives a
      * Mautic\ConfigBundle\Event\ConfigGenerateEvent instance.
-     *
-     * @var string
      */
-    public const CONFIG_ON_GENERATE = 'mautic.config_on_generate';
+    public const string CONFIG_ON_GENERATE = 'mautic.config_on_generate';
 
     /**
      * The mautic.config_pre_save event is thrown right before config data are saved.
      *
      * The event listener receives a Mautic\ConfigBundle\Event\ConfigEvent instance.
-     *
-     * @var string
      */
-    public const CONFIG_PRE_SAVE = 'mautic.config_pre_save';
+    public const string CONFIG_PRE_SAVE = 'mautic.config_pre_save';
 
     /**
      * The mautic.config_post_save event is thrown right after config data are saved.
      *
      * The event listener receives a Mautic\ConfigBundle\Event\ConfigEvent instance.
-     *
-     * @var string
      */
-    public const CONFIG_POST_SAVE = 'mautic.config_post_save';
+    public const string CONFIG_POST_SAVE = 'mautic.config_post_save';
 }

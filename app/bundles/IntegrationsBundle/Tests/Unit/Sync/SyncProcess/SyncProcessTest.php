@@ -141,14 +141,15 @@ final class SyncProcessTest extends TestCase
         $objectMappings = $this->createMock(ObjectMappingsDAO::class);
         $objectMappings->expects($this->once())
             ->method('getNewMappings')
-            ->willReturn([(new ObjectMapping())->setIntegrationObjectName('foo')]);
+            ->willReturn([new ObjectMapping()->setIntegrationObjectName('foo')]);
         $objectMappings->expects($this->once())
             ->method('getUpdatedMappings')
-            ->willReturn([(new ObjectMapping())->setIntegrationObjectName('bar')]);
+            ->willReturn([new ObjectMapping()->setIntegrationObjectName('bar')]);
         $this->internalSyncDataExchange->expects($this->once())
             ->method('executeSyncOrder')
             ->willReturn($objectMappings);
-        $matcher = $this->any();
+
+        $matcher = $this->exactly(3);
 
         $this->eventDispatcher->expects($matcher)
             ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher): object {
@@ -203,9 +204,9 @@ final class SyncProcessTest extends TestCase
             ->willReturn(true);
         $internalSyncOrder->expects($this->exactly(2))
             ->method('getObjectMappings')
-            ->willReturn([(new ObjectMapping())->setIntegrationObjectName('bar')]);
+            ->willReturn([new ObjectMapping()->setIntegrationObjectName('bar')]);
         $updatedObjectMapping = new UpdatedObjectMappingDAO('foobar', 'foo', 'foo1', new \DateTime());
-        $updatedObjectMapping->setObjectMapping((new ObjectMapping())->setIntegrationObjectName('foo'));
+        $updatedObjectMapping->setObjectMapping(new ObjectMapping()->setIntegrationObjectName('foo'));
 
         // Test that getOrderResultsForInternalSync ignores an object with a missing ObjectMapping
         $updatedObjectMapping2 = new UpdatedObjectMappingDAO('foobar', 'foo', 'foo2', new \DateTime());

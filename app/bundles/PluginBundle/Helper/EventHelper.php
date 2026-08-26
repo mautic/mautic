@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PluginBundle\Helper;
 
 use Mautic\LeadBundle\Entity\LeadRepository;
@@ -9,16 +11,20 @@ final class EventHelper
 {
     use PushToIntegrationTrait;
 
+    public function __construct(
+        private readonly LeadRepository $leadRepository,
+    ) {
+    }
+
     /**
      * @param array<string, mixed> $config
      */
-    public static function pushLead(array $config, $lead, LeadRepository $leadRepository, IntegrationHelper $integrationHelper): bool
+    public function pushLead(array $config, $lead): bool
     {
-        $contact = $leadRepository->getEntityWithPrimaryCompany($lead);
+        $contact = $this->leadRepository->getEntityWithPrimaryCompany($lead);
 
-        static::setStaticIntegrationHelper($integrationHelper);
-        $errors  = [];
+        $errors = [];
 
-        return static::pushIt($config, $contact, $errors);
+        return self::pushIt($config, $contact, $errors);
     }
 }

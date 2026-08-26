@@ -3,6 +3,7 @@
 namespace MauticPlugin\MauticSocialBundle\Helper;
 
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
+use Mautic\CampaignBundle\Entity\Event;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Entity\Trackable;
@@ -24,13 +25,14 @@ final class CampaignEventHelper
     ) {
     }
 
-    public function sendTweetAction(Lead $lead, array $event): array|false
+    public function sendTweetAction(Lead $lead, Event $event): array|false
     {
         $tweetSent   = false;
-        $tweetEntity = $this->tweetModel->getEntity($event['channelId']);
+        $channelId   = $event->getChannelId();
+        $tweetEntity = $this->tweetModel->getEntity(null !== $channelId ? (int) $channelId : null);
 
         if (!$tweetEntity) {
-            return ['failed' => 1, 'response' => 'Tweet entity '.$event['channelId'].' not found'];
+            return ['failed' => 1, 'response' => 'Tweet entity '.$channelId.' not found'];
         }
 
         /** @var \MauticPlugin\MauticSocialBundle\Integration\TwitterIntegration $twitterIntegration */
@@ -38,7 +40,7 @@ final class CampaignEventHelper
 
         // Setup clickthrough for URLs in tweet
         $this->clickthrough = [
-            'source' => ['campaign', $event['campaign']['id']],
+            'source' => ['campaign', $event->getCampaign()->getId()],
         ];
 
         $leadArray = $lead->getProfileFields();
@@ -60,7 +62,7 @@ final class CampaignEventHelper
         }
 
         if ($tweetSent) {
-            $this->tweetModel->registerSend($tweetEntity, $lead, $sendResponse, 'campaign.event', $event['id']);
+            $this->tweetModel->registerSend($tweetEntity, $lead, $sendResponse, 'campaign.event', $event->getId());
 
             return ['timeline' => $tweetText, 'response' => $sendResponse];
         }

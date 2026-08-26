@@ -4,7 +4,7 @@ namespace MauticPlugin\MauticEmailMarketingBundle\Integration;
 
 use MauticPlugin\MauticEmailMarketingBundle\Form\Type\IcontactType;
 
-class IcontactIntegration extends EmailAbstractIntegration
+final class IcontactIntegration extends EmailAbstractIntegration
 {
     public function getName(): string
     {
@@ -50,7 +50,7 @@ class IcontactIntegration extends EmailAbstractIntegration
     /**
      * Get account ID and client folder ID.
      */
-    public function authCallback($settings = [], $parameters = [])
+    public function authCallback(array $settings = [], array $parameters = []): false|string
     {
         $url = $this->getApiUrl();
 
@@ -89,7 +89,7 @@ class IcontactIntegration extends EmailAbstractIntegration
      *
      * @return mixed|string
      */
-    public function makeRequest($url, $parameters = [], $method = 'GET', $settings = [])
+    public function makeRequest($url, $parameters = [], $method = 'GET', array $settings = [])
     {
         $settings['headers'] = [
             'Except:',
@@ -203,7 +203,7 @@ class IcontactIntegration extends EmailAbstractIntegration
 
                 $listId = $config['list_settings']['list'];
 
-                if (!empty($customfields)) {
+                if ([] !== $customfields) {
                     $mappedData += $customfields;
                 }
 

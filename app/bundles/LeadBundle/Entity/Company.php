@@ -20,7 +20,6 @@ use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ApiResource(
     shortName: 'Companies',
@@ -41,6 +40,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[UniqueCustomField(object: 'company')]
 class Company extends FormEntity implements CustomFieldEntityInterface, IdentifierFieldEntityInterface
 {
     use CustomFieldEntityTrait;
@@ -60,6 +60,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
      * @var int|null
      */
     #[Groups(['company:read', 'company:write'])]
+    #[Assert\Range(min: 0, max: 2147483647)]
     private $score = 0;
 
     #[Groups(['company:read', 'company:write'])]
@@ -258,12 +259,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
             ->build();
 
         self::addProjectsInLoadApiMetadata($metadata, 'company');
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addConstraint(new UniqueCustomField(['object' => 'company']));
-        $metadata->addPropertyConstraint('score', new Assert\Range(min: 0, max: 2147483647));
     }
 
     public static function getDefaultIdentifierFields(): array

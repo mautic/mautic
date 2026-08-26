@@ -16,7 +16,7 @@ class TagRepository extends CommonRepository
      * @param Tag  $entity
      * @param bool $flush  true by default; use false if persisting in batches
      */
-    public function deleteEntity($entity, $flush = true): void
+    public function deleteEntity(object $entity, $flush = true): void
     {
         if ($entity instanceof Tag && null !== $entity->getId()) {
             $this->deleteLeadAssociations((int) $entity->getId());
@@ -71,7 +71,7 @@ class TagRepository extends CommonRepository
      */
     public function getTagsByName(array $tags): array
     {
-        if (empty($tags)) {
+        if ([] === $tags) {
             return [];
         }
 
@@ -163,13 +163,13 @@ class TagRepository extends CommonRepository
     {
         $result = [];
 
-        if (empty($leadIds) || empty($tagIds)) {
+        if ([] === $leadIds || [] === $tagIds) {
             return $result;
         }
 
         $tags = $this->getTagById($tagIds);
 
-        if (empty($tags)) {
+        if ([] === $tags) {
             return $result;
         }
 
@@ -235,7 +235,7 @@ class TagRepository extends CommonRepository
     /**
      * @return array<mixed>
      */
-    protected function addCatchAllWhereClause($qb, $filter): array
+    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $qb, \stdClass $filter): array
     {
         $alias = $this->getTableAlias();
 

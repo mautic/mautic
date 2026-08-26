@@ -2,8 +2,10 @@
 
 namespace Mautic\CoreBundle\Security\Permissions;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\UserBundle\Form\Type\PermissionListType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 abstract class AbstractPermissions
 {
@@ -12,18 +14,21 @@ abstract class AbstractPermissions
      */
     protected $permissions = [];
 
+    /**
+     * @param mixed[] $params
+     *
+     * @deprecated since Mautic 8.0, the parameters are injected by setCoreParametersHelper(); to be removed in Mautic 9.0
+     */
     public function __construct(
-        protected array $params,
+        protected array $params = [],
     ) {
     }
 
-    /**
-     * This method is called before the permissions object is used.
-     * Define permissions with `addExtendedPermissions` here instead of constructor.
-     */
-    public function definePermissions(): void
-    {
-        // Override this method in the final class
+    #[Required]
+    public function autowireAbstractPermissions(
+        CoreParametersHelper $coreParametersHelper,
+    ): void {
+        $this->params = $coreParametersHelper->all();
     }
 
     /**
@@ -183,11 +188,10 @@ abstract class AbstractPermissions
     /**
      * Determines if the user has access to the specified permission.
      *
-     * @param array  $userPermissions
      * @param string $name
      * @param string $level
      */
-    public function isGranted($userPermissions, $name, $level): bool
+    public function isGranted(array $userPermissions, $name, $level): bool
     {
         [$name, $level] = $this->getSynonym($name, $level);
 
@@ -357,10 +361,9 @@ abstract class AbstractPermissions
      * @param string               $bundle
      * @param string               $level
      * @param FormBuilderInterface $builder
-     * @param array                $data
      * @param bool                 $includePublish
      */
-    protected function addStandardFormFields($bundle, $level, &$builder, $data, $includePublish = true)
+    protected function addStandardFormFields($bundle, $level, &$builder, array $data, $includePublish = true)
     {
         $choices = [
             'mautic.core.permissions.view'   => 'view',
@@ -424,9 +427,8 @@ abstract class AbstractPermissions
      * @param string               $bundle
      * @param string               $level
      * @param FormBuilderInterface $builder
-     * @param array                $data
      */
-    protected function addManageFormFields($bundle, $level, &$builder, $data)
+    protected function addManageFormFields($bundle, $level, &$builder, array $data)
     {
         $choices = [
             'mautic.core.permissions.manage' => 'manage',
@@ -483,10 +485,9 @@ abstract class AbstractPermissions
      * @param string               $bundle
      * @param string               $level
      * @param FormBuilderInterface $builder
-     * @param array                $data
      * @param bool                 $includePublish
      */
-    protected function addExtendedFormFields($bundle, $level, &$builder, $data, $includePublish = true)
+    protected function addExtendedFormFields($bundle, $level, &$builder, array $data, $includePublish = true)
     {
         $choices = [
             'mautic.core.permissions.viewown'     => 'viewown',

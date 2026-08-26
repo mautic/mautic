@@ -6,7 +6,7 @@ namespace Mautic\CacheBundle\Cache;
 
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 
-final class CacheProvider extends AbstractCacheProvider
+class CacheProvider extends AbstractCacheProvider
 {
     public function getCacheAdapter(): AdapterInterface
     {

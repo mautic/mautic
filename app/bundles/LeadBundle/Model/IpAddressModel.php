@@ -12,7 +12,7 @@ use Psr\Log\LoggerInterface;
 
 class IpAddressModel
 {
-    private const DELETE_SIZE = 10000;
+    private const int DELETE_SIZE = 10000;
 
     public function __construct(
         protected EntityManagerInterface $entityManager,

@@ -8,16 +8,21 @@ use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
 use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Helper\AssetGenerationHelper;
+use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
-use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
+use Mautic\InstallBundle\Install\InstallService;
+use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Tracker\ContactTracker;
@@ -187,7 +192,20 @@ final class PublicControllerTest extends TestCase
         $pageEntityA->method('getVariantSettings')
             ->willReturn(['weight' => '50']);
 
-        $assetHelper = new AssetsHelper($this->createStub(Packages::class));
+        $pathsHelper = $this->createStub(PathsHelper::class);
+        $assetHelper = new AssetsHelper(
+            $this->createStub(Packages::class),
+            $pathsHelper,
+            new AssetGenerationHelper(
+                $this->createStub(BundleHelper::class),
+                $pathsHelper,
+                $this->createStub(CoreParametersHelper::class),
+                $this->createStub(AppVersion::class),
+            ),
+            $this->createStub(BuilderIntegrationsHelper::class),
+            $this->createStub(InstallService::class),
+            '',
+        );
 
         $mauticSecurity = $this->createMock(CorePermissions::class);
         $mauticSecurity->method('hasEntityAccess')
@@ -207,9 +225,6 @@ final class PublicControllerTest extends TestCase
             ->willReturn(new Lead());
 
         $this->request->attributes->set('ignore_mismatch', true);
-        $themeHelper = $this->createMock(ThemeHelper::class);
-        $themeHelper->expects($this->never())
-            ->method('checkForTwigTemplate');
 
         $controller = new PublicController(
             $this->createStub(ManagerRegistry::class),
@@ -230,7 +245,6 @@ final class PublicControllerTest extends TestCase
             $this->createStub(CookieHelper::class),
             $analyticsHelper,
             $assetHelper,
-            $themeHelper,
             $this->createStub(Tracking404Model::class),
             $this->router,
             $this->createStub(DeviceTrackingServiceInterface::class),
@@ -397,7 +411,7 @@ final class PublicControllerTest extends TestCase
             $redirectId
         );
         $this->assertSame($targetUrl, $response->getTargetUrl());
-        $this->assertSame(Response::HTTP_FOUND, $response->getStatusCode());
+        $this->assertSame(Response::HTTP_FOUND, $response->getStatusCode(), (string) $response->getContent());
     }
 
     public static function provideRedirectUrls(): \Generator

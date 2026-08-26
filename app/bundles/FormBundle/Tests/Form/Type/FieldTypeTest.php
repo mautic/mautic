@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Form\Type;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\FormBundle\Collection\FieldCollection;
 use Mautic\FormBundle\Collection\ObjectCollection;
 use Mautic\FormBundle\Collector\AlreadyMappedFieldCollectorInterface;
@@ -13,6 +14,7 @@ use Mautic\FormBundle\Crate\FieldCrate;
 use Mautic\FormBundle\Crate\ObjectCrate;
 use Mautic\FormBundle\Form\Type\FieldType;
 use Mautic\FormBundle\Form\Type\FormFieldRatingType;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\PreloadedExtension;
@@ -20,6 +22,7 @@ use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Validation;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 final class FieldTypeTest extends TypeTestCase
 {
     /**
@@ -63,7 +66,8 @@ final class FieldTypeTest extends TypeTestCase
                     $this->createStub(TranslatorInterface::class),
                     $this->objectCollector,
                     $this->fieldCollector,
-                    $this->createStub(AlreadyMappedFieldCollectorInterface::class)
+                    $this->createStub(AlreadyMappedFieldCollectorInterface::class),
+                    $this->createStub(CoreParametersHelper::class)
                 ),
                 FormFieldRatingType::class => new FormFieldRatingType($this->createStub(TranslatorInterface::class)),
             ], []),

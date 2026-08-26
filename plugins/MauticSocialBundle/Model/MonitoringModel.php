@@ -10,7 +10,6 @@ use MauticPlugin\MauticSocialBundle\Form\Type\MonitoringType;
 use MauticPlugin\MauticSocialBundle\Form\Type\TwitterHashtagType;
 use MauticPlugin\MauticSocialBundle\Form\Type\TwitterMentionType;
 use MauticPlugin\MauticSocialBundle\SocialEvents;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -21,6 +20,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 final class MonitoringModel extends FormModel
 {
+    public static function getName(): string
+    {
+        return 'social.monitoring';
+    }
+
     private MonitoringRepository $monitoringRepository;
 
     #[Required]
@@ -49,7 +53,7 @@ final class MonitoringModel extends FormModel
      * @param string|null $action
      * @param mixed[]     $options
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Monitoring) {
             throw new MethodNotAllowedHttpException(['Monitoring']);
@@ -59,7 +63,7 @@ final class MonitoringModel extends FormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create(MonitoringType::class, $entity, $options);
+        return $this->formFactory->create(MonitoringType::class, $entity, $options);
     }
 
     /**

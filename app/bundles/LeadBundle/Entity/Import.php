@@ -10,7 +10,6 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class Import extends FormEntity
 {
@@ -69,6 +68,7 @@ class Import extends FormEntity
      *
      * @var string
      */
+    #[Assert\NotBlank(message: 'mautic.lead.import.dir.notblank')]
     private $dir;
 
     /**
@@ -76,6 +76,7 @@ class Import extends FormEntity
      *
      * @var string
      */
+    #[Assert\NotBlank(message: 'mautic.lead.import.file.notblank')]
     private $file = 'import.csv';
 
     /**
@@ -108,12 +109,12 @@ class Import extends FormEntity
     /**
      * @var int
      */
-    private $priority;
+    private $priority = self::LOW;
 
     /**
      * @var int
      */
-    private $status;
+    private $status = self::QUEUED;
 
     private ?\DateTimeInterface $dateStarted = null;
 
@@ -131,12 +132,6 @@ class Import extends FormEntity
         $this->id = null;
 
         parent::__clone();
-    }
-
-    public function __construct()
-    {
-        $this->status   = self::QUEUED;
-        $this->priority = self::LOW;
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -161,17 +156,6 @@ class Import extends FormEntity
             ->addNullableField('dateEnded', Types::DATETIME_MUTABLE, 'date_ended')
             ->addField('object', Types::STRING)
             ->addNullableField('properties', Types::JSON);
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('dir', new Assert\NotBlank(
-            message: 'mautic.lead.import.dir.notblank'
-        ));
-
-        $metadata->addPropertyConstraint('file', new Assert\NotBlank(
-            message: 'mautic.lead.import.file.notblank'
-        ));
     }
 
     /**

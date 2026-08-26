@@ -13,7 +13,7 @@ class TokenHelper
     ) {
     }
 
-    public function findAssetTokens($content, $clickthrough = []): array
+    public function findAssetTokens(string $content, array $clickthrough = []): array
     {
         $tokens = [];
 

@@ -32,16 +32,6 @@ final class FormatterExtensionTest extends TestCase
         );
     }
 
-    public function testItContainsAtLeastOneFilter(): void
-    {
-        $this->assertGreaterThan(0, $this->extension->getFilters());
-    }
-
-    public function testItContainsAtLeastOneFunction(): void
-    {
-        $this->assertGreaterThan(0, $this->extension->getFunctions());
-    }
-
     public function testSimpleArrayToHtml(): void
     {
         $array = [

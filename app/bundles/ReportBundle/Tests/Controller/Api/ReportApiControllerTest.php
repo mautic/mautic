@@ -11,6 +11,7 @@ use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\RoleModel;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
@@ -22,35 +23,35 @@ final class ReportApiControllerTest extends MauticMysqlTestCase
     public function testGetReportFailByNoCorrectAccessRoleEmpty(): void
     {
         $reportId = $this->createReportStructure('Maut1cR0cks!!!!!', []);
-        $this->client->request('GET', '/api/reports/'.$reportId);
+        $this->client->request(Request::METHOD_GET, '/api/reports/'.$reportId);
         $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
     }
 
     public function testGetReportSuccessByCorrectAccessIsAdmin(): void
     {
         $reportId = $this->createReportStructure('Maut1cR0cks!!!!!', [], false, true);
-        $this->client->request('GET', '/api/reports/'.$reportId);
+        $this->client->request(Request::METHOD_GET, '/api/reports/'.$reportId);
         $this->assertResponseIsSuccessful();
     }
 
     public function testGetReportSuccessByNoCorrectAccessToViewOther(): void
     {
         $reportId = $this->createReportStructure('Maut1cR0cks!!!!!', ['report:reports'=>['viewother']]);
-        $this->client->request('GET', '/api/reports/'.$reportId);
+        $this->client->request(Request::METHOD_GET, '/api/reports/'.$reportId);
         $this->assertResponseIsSuccessful();
     }
 
     public function testReportFailByNoCorrectAccessToViewOwn(): void
     {
         $reportId = $this->createReportStructure('Maut1cR0cks!!!!!', ['report:reports'=>['viewown']]);
-        $this->client->request('GET', '/api/reports/'.$reportId);
+        $this->client->request(Request::METHOD_GET, '/api/reports/'.$reportId);
         $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
     }
 
     public function testReportSuccessViewOwnBySameUser(): void
     {
         $reportId = $this->createReportStructure('Maut1cR0cks!!!!!', ['report:reports'=>['viewown']], true);
-        $this->client->request('GET', '/api/reports/'.$reportId);
+        $this->client->request(Request::METHOD_GET, '/api/reports/'.$reportId);
         $this->assertResponseIsSuccessful();
     }
 
@@ -98,7 +99,7 @@ final class ReportApiControllerTest extends MauticMysqlTestCase
         // Set new permissions
         $role->setIsAdmin(false);
         /** @var RoleModel $roleModel */
-        $roleModel = static::getContainer()->get(RoleModel::class);
+        $roleModel = self::getContainer()->get(RoleModel::class);
         $this->assertInstanceOf(RoleModel::class, $roleModel);
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);

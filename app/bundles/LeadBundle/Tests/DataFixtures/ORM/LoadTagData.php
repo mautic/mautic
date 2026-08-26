@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\DataFixtures\ORM;
 
-use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\Tag;
 
-final class LoadTagData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadTagData extends Fixture implements OrderedFixtureInterface
 {
     public function load(ObjectManager $manager): void
     {

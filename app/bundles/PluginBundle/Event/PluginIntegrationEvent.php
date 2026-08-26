@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PluginBundle\Event;
 
 use Mautic\PluginBundle\Entity\Integration;
@@ -12,10 +14,7 @@ final class PluginIntegrationEvent extends AbstractPluginIntegrationEvent
         $this->integration = $integration;
     }
 
-    /**
-     * @return Integration
-     */
-    public function getEntity()
+    public function getEntity(): ?Integration
     {
         return $this->integration->getIntegrationSettings();
     }

@@ -12,29 +12,27 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class DateTokenHelperTest extends \PHPUnit\Framework\TestCase
 {
-    public const DATE_FORMAT      = 'F j, Y';
+    public const string DATE_FORMAT      = 'F j, Y';
 
-    public const TIME_FORMAT      = 'g:i a';
+    public const string TIME_FORMAT      = 'g:i a';
 
-    public const DATE_TIME_FORMAT = self::DATE_FORMAT.' '.self::TIME_FORMAT;
+    public const string DATE_TIME_FORMAT = self::DATE_FORMAT.' '.self::TIME_FORMAT;
 
-    public const TIMEZONE        = 'Europe/Paris';
+    public const string TIMEZONE        = 'Europe/Paris';
 
-    public const TIMEZONE_CUSTOM = 'America/Chicago';
+    public const string TIMEZONE_CUSTOM = 'America/Chicago';
 
     public function testGetTokens(): void
     {
         $coreParametersHelper = new class($this->createStub(ContainerInterface::class)) extends CoreParametersHelper {
-            public function get($name, $default = null)
+            public function get($name, $default = null): ?string
             {
-                switch ($name) {
-                    case 'default_timezone':
-                        return DateTokenHelperTest::TIMEZONE;
-                    case 'date_format_dateonly':
-                        return DateTokenHelperTest::DATE_FORMAT;
-                    case 'date_format_timeonly':
-                        return DateTokenHelperTest::TIME_FORMAT;
-                }
+                return match ($name) {
+                    'default_timezone' => DateTokenHelperTest::TIMEZONE,
+                    'date_format_dateonly' => DateTokenHelperTest::DATE_FORMAT,
+                    'date_format_timeonly' => DateTokenHelperTest::TIME_FORMAT,
+                    default => null,
+                };
             }
         };
 

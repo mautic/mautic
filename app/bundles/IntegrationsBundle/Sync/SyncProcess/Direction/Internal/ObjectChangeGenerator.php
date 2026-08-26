@@ -43,8 +43,6 @@ class ObjectChangeGenerator
     }
 
     /**
-     * @return ObjectChangeDAO
-     *
      * @throws ObjectNotFoundException
      */
     public function getSyncObjectChange(
@@ -53,7 +51,7 @@ class ObjectChangeGenerator
         ObjectMappingDAO $objectMapping,
         ReportObjectDAO $internalObject,
         ReportObjectDAO $integrationObject,
-    ) {
+    ): ObjectChangeDAO {
         $objectChange = new ObjectChangeDAO(
             $mappingManual->getIntegration(),
             $internalObject->getObject(),

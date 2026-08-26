@@ -1,62 +1,58 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Segment;
 
 final class OperatorOptions
 {
-    public const EQUAL_TO              = '=';
+    public const string EQUAL_TO              = '=';
 
-    public const NOT_EQUAL_TO          = '!=';
+    public const string NOT_EQUAL_TO          = '!=';
 
-    public const GREATER_THAN          = 'gt';
+    public const string GREATER_THAN          = 'gt';
 
-    public const GREATER_THAN_OR_EQUAL = 'gte';
+    public const string GREATER_THAN_OR_EQUAL = 'gte';
 
-    public const LESS_THAN             = 'lt';
+    public const string LESS_THAN             = 'lt';
 
-    public const LESS_THAN_OR_EQUAL    = 'lte';
+    public const string LESS_THAN_OR_EQUAL    = 'lte';
 
-    public const EMPTY                 = 'empty';
+    public const string EMPTY                 = 'empty';
 
-    public const NOT_EMPTY             = '!empty';
+    public const string NOT_EMPTY             = '!empty';
 
-    public const LIKE                  = 'like';
+    public const string LIKE                  = 'like';
 
-    public const NOT_LIKE              = '!like';
+    public const string NOT_LIKE              = '!like';
 
-    public const BETWEEN               = 'between';
+    public const string BETWEEN               = 'between';
 
-    public const NOT_BETWEEN           = '!between';
+    public const string NOT_BETWEEN           = '!between';
 
-    /**
-     * @deprecated Use OperatorOptions::INCLUDING_ANY
-     */
-    public const IN                    = 'in';
+    public const string INCLUDING_ANY         = 'in';
 
-    /**
-     * @deprecated Use OperatorOptions::EXCLUDING_ANY
-     */
-    public const NOT_IN                = '!in';
+    public const string EXCLUDING_ANY         = '!in';
 
-    public const INCLUDING_ANY         = 'in';
+    public const string INCLUDING_ALL         = 'in_all';
 
-    public const EXCLUDING_ANY         = '!in';
+    public const string EXCLUDING_ALL         = '!in_all';
 
-    public const INCLUDING_ALL         = 'in_all';
+    public const string REGEXP                = 'regexp';
 
-    public const EXCLUDING_ALL         = '!in_all';
+    public const string NOT_REGEXP            = '!regexp';
 
-    public const REGEXP                = 'regexp';
+    public const string DATE                  = 'date';
 
-    public const NOT_REGEXP            = '!regexp';
+    public const string STARTS_WITH           = 'startsWith';
 
-    public const DATE                  = 'date';
+    public const string ENDS_WITH             = 'endsWith';
 
-    public const STARTS_WITH           = 'startsWith';
+    public const string CONTAINS              = 'contains';
 
-    public const ENDS_WITH             = 'endsWith';
+    public const string IN_LAST               = 'inLast';
 
-    public const CONTAINS              = 'contains';
+    public const string IN_NEXT               = 'inNext';
 
     /**
      * @var array<string,array<string,string|bool>>
@@ -123,6 +119,16 @@ final class OperatorOptions
             'expr'        => 'notBetween', // special case
             'negate_expr' => 'between',
             'hide'        => true,
+        ],
+        self::IN_LAST => [
+            'label'       => 'mautic.lead.list.form.operator.inlast',
+            'expr'        => 'inLast',
+            'negate_expr' => 'inNext',
+        ],
+        self::IN_NEXT => [
+            'label'       => 'mautic.lead.list.form.operator.innext',
+            'expr'        => 'inNext',
+            'negate_expr' => 'inLast',
         ],
         self::INCLUDING_ANY => [
             'label'       => 'mautic.lead.list.form.operator.in',

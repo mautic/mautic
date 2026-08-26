@@ -7,6 +7,7 @@ namespace Mautic\LeadBundle\Tests\Controller\Api;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 final class TagApiControllerFunctionalTest extends MauticMysqlTestCase
@@ -16,7 +17,7 @@ final class TagApiControllerFunctionalTest extends MauticMysqlTestCase
         $tag1Payload = ['tag' => 'test_tag'];
 
         // Create new tag
-        $this->client->request('POST', '/api/tags/new', $tag1Payload);
+        $this->client->request(Request::METHOD_POST, '/api/tags/new', $tag1Payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         $tagId          = $response['tag']['id'];
@@ -26,7 +27,7 @@ final class TagApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($tag1Payload['tag'], $response['tag']['tag']);
 
         // Try to create tag with same name
-        $this->client->request('POST', '/api/tags/new', $tag1Payload);
+        $this->client->request(Request::METHOD_POST, '/api/tags/new', $tag1Payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         $this->assertResponseIsSuccessful('Return code must be 200.');
@@ -36,7 +37,7 @@ final class TagApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // Edit tag name
         $tag1RenamePayload = ['tag' => 'tag_renamed'];
-        $this->client->request('PATCH', "/api/tags/{$tagId}/edit", $tag1RenamePayload);
+        $this->client->request(Request::METHOD_PATCH, "/api/tags/{$tagId}/edit", $tag1RenamePayload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         $this->assertResponseIsSuccessful('Return code must be 200.');
@@ -44,7 +45,7 @@ final class TagApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($tag1RenamePayload['tag'], $response['tag']['tag']);
 
         // Get tag
-        $this->client->request('GET', "/api/tags/{$tagId}");
+        $this->client->request(Request::METHOD_GET, "/api/tags/{$tagId}");
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         $this->assertResponseIsSuccessful();
@@ -52,12 +53,12 @@ final class TagApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($tag1RenamePayload['tag'], $response['tag']['tag']);
 
         // Delete:
-        $this->client->request('DELETE', "/api/tags/{$tagId}/delete");
+        $this->client->request(Request::METHOD_DELETE, "/api/tags/{$tagId}/delete");
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful($clientResponse->getContent());
 
         // Get (ensure it's deleted):
-        $this->client->request('GET', "/api/tags/{$tagId}");
+        $this->client->request(Request::METHOD_GET, "/api/tags/{$tagId}");
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -74,7 +75,7 @@ final class TagApiControllerFunctionalTest extends MauticMysqlTestCase
         $whitespaceTestPayload = ['test', 'test ', ' test', "test\t", "\ttest"];
         $tagId                 = null;
         foreach ($whitespaceTestPayload as $payload) {
-            $this->client->request('POST', '/api/tags/new', ['tag' => $payload]);
+            $this->client->request(Request::METHOD_POST, '/api/tags/new', ['tag' => $payload]);
             $clientResponse = $this->client->getResponse();
             $response       = json_decode($clientResponse->getContent(), true);
 
@@ -95,7 +96,7 @@ final class TagApiControllerFunctionalTest extends MauticMysqlTestCase
     {
         $tagInputName    = 'hello" world';
 
-        $this->client->request('POST', '/api/tags/new', ['tag' => $tagInputName]);
+        $this->client->request(Request::METHOD_POST, '/api/tags/new', ['tag' => $tagInputName]);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         $tagId          = $response['tag']['id'];
@@ -103,7 +104,7 @@ final class TagApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($tagInputName, $response['tag']['tag']);
 
         // Try to create duplicate
-        $this->client->request('POST', '/api/tags/new', ['tag' => $tagInputName]);
+        $this->client->request(Request::METHOD_POST, '/api/tags/new', ['tag' => $tagInputName]);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         $this->assertSame($tagId, $response['tag']['id'], 'ID of created tag does not match. Possible duplicates.');
@@ -113,7 +114,7 @@ final class TagApiControllerFunctionalTest extends MauticMysqlTestCase
     {
         // Sending an empty payload should return a 500 server error
         // TODO ensure that the server sends back a 400 status code instead
-        $this->client->request('POST', '/api/tags/new', []);
+        $this->client->request(Request::METHOD_POST, '/api/tags/new', []);
 
         $this->assertResponseStatusCodeSame(500);
     }
@@ -123,13 +124,13 @@ final class TagApiControllerFunctionalTest extends MauticMysqlTestCase
         $tagRepository = $this->em->getRepository(Tag::class);
         $this->assertInstanceOf(TagRepository::class, $tagRepository);
 
-        $matchingTag = (new Tag('alpha_tag'))->setDescription('Contains the test keyword.');
-        $otherTag    = (new Tag('beta_tag'))->setDescription('No relevant text here.');
+        $matchingTag = new Tag('alpha_tag')->setDescription('Contains the test keyword.');
+        $otherTag    = new Tag('beta_tag')->setDescription('No relevant text here.');
 
         $tagRepository->saveEntity($matchingTag, false);
         $tagRepository->saveEntity($otherTag);
 
-        $this->client->request('GET', '/api/tags?limit=1&search=test');
+        $this->client->request(Request::METHOD_GET, '/api/tags?limit=1&search=test');
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 

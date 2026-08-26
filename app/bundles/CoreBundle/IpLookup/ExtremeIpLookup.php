@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\IpLookup;
 
-class ExtremeIpLookup extends AbstractRemoteDataLookup
+final class ExtremeIpLookup extends AbstractRemoteDataLookup
 {
     public string $businessWebsite = '';
 

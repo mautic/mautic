@@ -11,6 +11,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
 use Mautic\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface;
+use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Model\FieldModel;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -21,9 +22,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class FieldHelperTest extends TestCase
 {
     /**
-     * @var MockObject&FieldModel
+     * @var MockObject&FieldList
      */
-    private MockObject $fieldModel;
+    private MockObject $fieldListProvider;
 
     /**
      * @var MockObject&FieldsWithUniqueIdentifier
@@ -44,7 +45,7 @@ final class FieldHelperTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->fieldModel              = $this->createMock(FieldModel::class);
+        $this->fieldListProvider       = $this->createMock(FieldList::class);
         $channelListHelper             = $this->createMock(ChannelListHelper::class);
         $this->objectProvider          = $this->createMock(ObjectProvider::class);
         $channelListHelper->method('getFeatureChannels')
@@ -58,7 +59,8 @@ final class FieldHelperTest extends TestCase
         $this->fieldsWithUniqueIdentifier = $this->createMock(FieldsWithUniqueIdentifier::class);
 
         $this->fieldHelper = new FieldHelper(
-            $this->fieldModel,
+            $this->createStub(FieldModel::class),
+            $this->fieldListProvider,
             $this->fieldsWithUniqueIdentifier,
             $this->createStub(VariableExpresserHelperInterface::class),
             $channelListHelper,
@@ -73,12 +75,12 @@ final class FieldHelperTest extends TestCase
         $objectName = Contact::NAME;
         $syncFields = ['email' => 'Email'];
 
-        $this->mauticSyncFieldsLoadEvent->method('getObjectName')
+        $this->mauticSyncFieldsLoadEvent->expects($this->once())->method('getObjectName')
             ->willReturn($objectName);
-        $this->mauticSyncFieldsLoadEvent->method('getFields')
+        $this->mauticSyncFieldsLoadEvent->expects($this->once())->method('getFields')
             ->willReturn($syncFields);
 
-        $this->fieldModel->method('getFieldList')
+        $this->fieldListProvider->expects($this->once())->method('getFieldList')
             ->willReturn($syncFields);
 
         $fields = $this->fieldHelper->getSyncFields($objectName);
@@ -99,12 +101,12 @@ final class FieldHelperTest extends TestCase
         $objectName = Contact::NAME;
         $syncFields = ['email' => 'Email'];
 
-        $this->mauticSyncFieldsLoadEvent->method('getObjectName')
+        $this->mauticSyncFieldsLoadEvent->expects($this->once())->method('getObjectName')
             ->willReturn($objectName);
-        $this->mauticSyncFieldsLoadEvent->method('getFields')
+        $this->mauticSyncFieldsLoadEvent->expects($this->once())->method('getFields')
             ->willReturn($syncFields);
 
-        $this->fieldModel->method('getFieldList')
+        $this->fieldListProvider->expects($this->once())->method('getFieldList')
             ->willReturn($syncFields);
 
         $fields = $this->fieldHelper->getSyncFields($objectName);
@@ -122,7 +124,7 @@ final class FieldHelperTest extends TestCase
 
     public function testGetRequiredFieldsForContact(): void
     {
-        $this->fieldModel->expects($this->once())
+        $this->fieldListProvider->expects($this->once())
             ->method('getFieldList')
             ->willReturn(['some fields']);
 
@@ -144,7 +146,7 @@ final class FieldHelperTest extends TestCase
 
     public function testGetRequiredFieldsForCompany(): void
     {
-        $this->fieldModel->expects($this->once())
+        $this->fieldListProvider->expects($this->once())
             ->method('getFieldList')
             ->willReturn(['some fields']);
 

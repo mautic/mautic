@@ -6,6 +6,7 @@ namespace Mautic\AssetBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\HttpFoundation\Request;
 
 final class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -34,7 +35,7 @@ final class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
             'storageLocation' => 'remote',
             'title'           => 'title',
         ];
-        $this->client->request('POST', 'api/assets/new', $payload);
+        $this->client->request(Request::METHOD_POST, 'api/assets/new', $payload);
         $clientResponse = $this->client->getResponse();
         $this->assertResponseStatusCodeSame(201, $clientResponse->getContent());
         $response = json_decode($clientResponse->getContent(), true);
@@ -64,7 +65,7 @@ final class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
             'storageLocation' => 'remote',
             'title'           => 'title',
         ];
-        $this->client->request('POST', 'api/assets/new', $payload);
+        $this->client->request(Request::METHOD_POST, 'api/assets/new', $payload);
         $response = $this->client->getResponse();
         $content  = $response->getContent();
         $this->assertResponseStatusCodeSame(400, $response->getContent());
@@ -90,7 +91,7 @@ final class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
             'storageLocation' => 'remote',
             'title'           => 'title',
         ];
-        $this->client->request('POST', 'api/assets/new', $payload);
+        $this->client->request(Request::METHOD_POST, 'api/assets/new', $payload);
         $clientResponse = $this->client->getResponse();
         $content        = $clientResponse->getContent();
 
@@ -113,7 +114,7 @@ final class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
             'storageLocation' => 'local',
             'title'           => 'title',
         ];
-        $this->client->request('POST', 'api/assets/new', $payload);
+        $this->client->request(Request::METHOD_POST, 'api/assets/new', $payload);
         $clientResponse = $this->client->getResponse();
         $this->assertResponseStatusCodeSame(201, $clientResponse->getContent());
         $response = json_decode($clientResponse->getContent(), true);
@@ -134,7 +135,7 @@ final class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
 
         // Create asset first
-        $this->client->request('POST', 'api/assets/new', $payload);
+        $this->client->request(Request::METHOD_POST, 'api/assets/new', $payload);
         $createResponse = $this->client->getResponse();
         $this->assertResponseStatusCodeSame(201, $createResponse->getContent());
 
@@ -143,12 +144,12 @@ final class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertNotEmpty($assetId);
 
         // Delete must not fail with 500 due to post-delete serialization
-        $this->client->request('DELETE', sprintf('/api/assets/%d/delete', $assetId));
+        $this->client->request(Request::METHOD_DELETE, sprintf('/api/assets/%d/delete', $assetId));
         $deleteResponse = $this->client->getResponse();
         $this->assertResponseStatusCodeSame(200, $deleteResponse->getContent());
 
         // Verify the asset is actually removed
-        $this->client->request('GET', sprintf('/api/assets/%d', $assetId));
+        $this->client->request(Request::METHOD_GET, sprintf('/api/assets/%d', $assetId));
         $getDeletedResponse = $this->client->getResponse();
         $this->assertResponseStatusCodeSame(404, $getDeletedResponse->getContent());
     }

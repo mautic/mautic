@@ -140,7 +140,7 @@ final class DynamicContentController extends FormController
         $updateSelect = 'POST' === $method
             ? ($dwc['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
-        $form         = $this->dynamicContentModel->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
+        $form         = $this->dynamicContentModel->createForm($entity, $action, ['update_select' => $updateSelect]);
 
         if (Request::METHOD_POST === $method) {
             $valid = false;
@@ -280,7 +280,7 @@ final class DynamicContentController extends FormController
             ? ($dwc['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
 
-        $form = $this->dynamicContentModel->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
+        $form = $this->dynamicContentModel->createForm($entity, $action, ['update_select' => $updateSelect]);
 
         // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' === $method) {
@@ -446,10 +446,8 @@ final class DynamicContentController extends FormController
 
     /**
      * Deletes the entity.
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         $page      = $request->getSession()->get('mautic.dynamicContent.page', 1);
         $returnUrl = $this->generateUrl('mautic_dynamicContent_index', ['page' => $page]);
@@ -552,7 +550,7 @@ final class DynamicContentController extends FormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $this->dynamicContentModel->deleteEntities($deleteIds);
 
                 $flashes[] = [

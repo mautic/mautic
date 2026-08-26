@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PluginBundle\EventListener;
 
 use Mautic\PluginBundle\Form\Type\IntegrationsListType;
@@ -8,8 +10,13 @@ use Mautic\PointBundle\Event\TriggerBuilderEvent;
 use Mautic\PointBundle\PointEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class PointSubscriber implements EventSubscriberInterface
+final readonly class PointSubscriber implements EventSubscriberInterface
 {
+    public function __construct(
+        private EventHelper $eventHelper,
+    ) {
+    }
+
     public static function getSubscribedEvents(): array
     {
         return [
@@ -24,7 +31,7 @@ final class PointSubscriber implements EventSubscriberInterface
             'label'     => 'mautic.plugin.actions.push_lead',
             'formType'  => IntegrationsListType::class,
             // 'formTheme' => 'MauticPluginBundle:FormTheme:Integration',
-            'callback'  => [EventHelper::class, 'pushLead'],
+            'callback'  => $this->eventHelper->pushLead(...),
         ];
 
         $event->addEvent('plugin.leadpush', $action);

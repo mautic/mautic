@@ -18,9 +18,9 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
     public function testDownloadFileByFileNameAction(): void
     {
         /** @var FieldModel $fieldModel */
-        $fieldModel   = static::getContainer()->get(FieldModel::class);
+        $fieldModel   = self::getContainer()->get(FieldModel::class);
         /** @var FormUploader $formUploader */
-        $formUploader = static::getContainer()->get(FormUploader::class);
+        $formUploader = self::getContainer()->get(FormUploader::class);
         $fileName     = 'image.png';
 
         $this->createFile($fileName);
@@ -46,7 +46,7 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
             'postAction'  => 'return',
         ];
 
-        $this->client->request('POST', '/api/forms/new', $formPayload);
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $formPayload);
         $clientResponse = $this->client->getResponse();
 
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
@@ -98,7 +98,7 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
             'postAction'  => 'return',
         ];
 
-        $this->client->request('POST', '/api/forms/new', $formPayload);
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $formPayload);
         $clientResponse = $this->client->getResponse();
 
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
@@ -107,7 +107,7 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
         $formId   = $form['id'];
 
         // Submit a form result (simulate a contact submission)
-        $this->client->request('POST', "/form/{$formId}", [
+        $this->client->request(Request::METHOD_POST, "/form/{$formId}", [
             'mauticform[email]'  => 'test@example.com',
             'mauticform[formId]' => $formId,
             'mauticform[return]' => '',
@@ -115,7 +115,7 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         // Call the addToSegmentAction
-        $this->client->request('GET', "/s/forms/results/{$formId}/add-to-segment");
+        $this->client->request(Request::METHOD_GET, "/s/forms/results/{$formId}/add-to-segment");
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('form', (string) $response->getContent());
@@ -140,7 +140,7 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
             'postAction'  => 'return',
         ];
 
-        $this->client->request('POST', '/api/forms/new', $formPayload);
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $formPayload);
         $clientResponse = $this->client->getResponse();
 
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);

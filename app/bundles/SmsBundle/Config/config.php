@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'routes' => [
         'main' => [
@@ -20,14 +22,6 @@ return [
             'mautic_sms_callback' => [
                 'path'       => '/sms/{transport}/callback',
                 'controller' => 'Mautic\SmsBundle\Controller\ReplyController::callbackAction',
-            ],
-            /* @deprecated as this was Twilio specific */
-            'mautic_receive_sms' => [
-                'path'       => '/sms/receive',
-                'controller' => 'Mautic\SmsBundle\Controller\ReplyController::callbackAction',
-                'defaults'   => [
-                    'transport' => 'twilio',
-                ],
             ],
         ],
         'api' => [

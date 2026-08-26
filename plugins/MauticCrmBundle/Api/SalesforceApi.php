@@ -13,26 +13,24 @@ use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
 /**
  * @property SalesforceIntegration $integration
  */
-class SalesforceApi extends CrmApi
+final class SalesforceApi extends CrmApi
 {
     /**
      * This regular expression parses missing field's name from the error message.
-     *
-     * @var string
      */
-    public const REGEXP_MISSING_FIELD = "/ERROR\sat\sRow.+No\ssuch\scolumn\s'([^']+)'\son\sentity\s'([^']+)'/m";
+    public const string REGEXP_MISSING_FIELD = "/ERROR\sat\sRow.+No\ssuch\scolumn\s'([^']+)'\son\sentity\s'([^']+)'/m";
 
-    protected $object          = 'Lead';
+    private string $object          = 'Lead';
 
-    protected $requestSettings = [
+    private $requestSettings = [
         'encode_parameters' => 'json',
     ];
 
-    protected $apiRequestCounter   = 0;
+    private int $apiRequestCounter   = 0;
 
-    protected $requestCounter      = 1;
+    private int $requestCounter      = 1;
 
-    protected $maxLockRetries      = 3;
+    private int $maxLockRetries      = 3;
 
     private bool $optOutFieldAccessible = true;
 
@@ -186,13 +184,11 @@ class SalesforceApi extends CrmApi
      */
     public function createLead(array $data)
     {
-        $createdLeadData = [];
-
         if (isset($data['Email'])) {
-            $createdLeadData = $this->createObject($data, 'Lead');
+            return $this->createObject($data, 'Lead');
         }
 
-        return $createdLeadData;
+        return [];
     }
 
     /**
@@ -253,7 +249,7 @@ class SalesforceApi extends CrmApi
         $mActivityObjectName = $namespace.'mautic_timeline__c';
         $activityData        = [];
 
-        if (!empty($activity)) {
+        if ([] !== $activity) {
             foreach ($activity as $sfId => $records) {
                 foreach ($records['records'] as $record) {
                     $body = [
@@ -279,7 +275,7 @@ class SalesforceApi extends CrmApi
                 }
             }
 
-            if (!empty($activityData)) {
+            if ([] !== $activityData) {
                 $request              = [];
                 $request['allOrNone'] = 'false';
                 $chunked              = array_chunk($activityData, 25);
@@ -445,7 +441,7 @@ class SalesforceApi extends CrmApi
     public function checkCampaignMembership($campaignId, $object, array $people): array
     {
         $campaignMembers = [];
-        if (!empty($people)) {
+        if ([] !== $people) {
             $idField = "{$object}Id";
             $query   = "Select Id, {$idField} from CampaignMember where CampaignId = '".$campaignId
                 ."' and {$idField} in ('".implode("','", $people)."')";
@@ -474,10 +470,7 @@ class SalesforceApi extends CrmApi
         return $this->request('query', ['q' => $campaignQuery], 'GET', false, null, $queryUrl);
     }
 
-    /**
-     * @return int
-     */
-    public function getRequestCounter()
+    public function getRequestCounter(): int
     {
         $count                   = $this->apiRequestCounter;
         $this->apiRequestCounter = 0;
@@ -553,12 +546,10 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @return string|false
-     *
      * @throws ApiErrorException
      * @throws RetryRequestException
      */
-    private function processError(array $error, bool $isRetry)
+    private function processError(array $error, bool $isRetry): string|false
     {
         switch ($error['errorCode']) {
             case 'INVALID_SESSION_ID':
@@ -658,7 +649,7 @@ class SalesforceApi extends CrmApi
     {
         if (10 === $tries) {
             $this->integration->logIntegrationError(new \Exception(
-                sprintf('Maximum tries exceeded for handling missing field scenarios')
+                'Maximum tries exceeded for handling missing field scenarios'
             ));
         }
         try {

@@ -27,7 +27,6 @@ use Mautic\PointBundle\Form\Type\TriggerType;
 use Mautic\PointBundle\PointEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -38,6 +37,11 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class TriggerModel extends CommonFormModel implements GlobalSearchInterface
 {
+    public static function getName(): string
+    {
+        return 'point.trigger';
+    }
+
     protected $triggers = [];
 
     /**
@@ -86,7 +90,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Trigger) {
             throw new MethodNotAllowedHttpException(['Trigger']);
@@ -96,7 +100,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
             $options['action'] = $action;
         }
 
-        return $formFactory->create(TriggerType::class, $entity, $options);
+        return $this->formFactory->create(TriggerType::class, $entity, $options);
     }
 
     /**
@@ -124,7 +128,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
                             [
                                 'column' => 'l.date_added',
                                 'expr'   => 'lte',
-                                'value'  => (new DateTimeHelper($entity->getDateAdded()))->toUtcString(),
+                                'value'  => new DateTimeHelper($entity->getDateAdded())->toUtcString(),
                             ],
                         ],
                     ],
@@ -154,7 +158,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
                 if (!$isNew) {
                     // get a list of leads that has already had this event applied
                     $leadIds = $this->triggerEventRepository->getLeadsForEvent($event->getId());
-                    if (!empty($leadIds)) {
+                    if ([] !== $leadIds) {
                         $args['filter']['force'][] = [
                             'column' => 'l.id',
                             'expr'   => 'notIn',
@@ -180,7 +184,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
                 }
             }
 
-            if (!empty($persist)) {
+            if ([] !== $persist) {
                 $this->triggerEventRepository->saveEntities($persist);
             }
         }
@@ -275,7 +279,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
      */
     public function getEvents(): array
     {
-        if (empty($this->cachedEvents)) {
+        if ([] === $this->cachedEvents) {
             $event = new TriggerBuilderEvent($this->translator);
             $this->dispatcher->dispatch($event, PointEvents::TRIGGER_ON_BUILD);
             $this->cachedEvents = $event->getEvents();
@@ -308,7 +312,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
      *
      * @return bool Was event triggered
      */
-    public function triggerEvent(array $event, ?Lead $lead = null, $force = false)
+    public function triggerEvent(array $event, ?Lead $lead = null, $force = false): bool
     {
         // only trigger events for anonymous users
         if (!$force && !$this->security->isAnonymous()) {
@@ -340,7 +344,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
         $settings = $availableEvents[$eventType];
 
         if (isset($settings['callback']) && is_callable($settings['callback'])) {
-            return $this->invokeCallback($event, $lead, $settings);
+            return (bool) $this->invokeCallback($event, $lead, $settings);
         }
         /** @var TriggerEvent $triggerEvent */
         $triggerEvent = $this->triggerEventRepository->find($event['id']);
@@ -349,7 +353,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
 
         $this->dispatcher->dispatch($triggerExecutedEvent, $settings['eventName']);
 
-        return $triggerExecutedEvent->getResult();
+        return (bool) $triggerExecutedEvent->getResult();
     }
 
     private function invokeCallback(array $event, Lead $lead, array $settings): mixed
@@ -393,7 +397,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
         $groupEvents  = $this->triggerEventRepository->getPublishedByGroupScore($lead->getGroupScores());
         $events       = array_merge($events, $groupEvents);
 
-        if (!empty($events)) {
+        if ([] !== $events) {
             // get a list of actions that has already been applied to this lead
             $appliedEvents = $this->triggerEventRepository->getLeadTriggeredEvents($lead->getId());
             $ipAddress     = $this->ipLookupHelper->getIpAddress();
@@ -415,7 +419,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
                 }
             }
 
-            if (!empty($persist)) {
+            if ([] !== $persist) {
                 $this->triggerEventRepository->saveEntities($persist);
                 $this->triggerEventRepository->detachEntities($persist);
             }

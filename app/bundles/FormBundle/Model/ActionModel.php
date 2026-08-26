@@ -6,7 +6,6 @@ use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\ActionRepository;
 use Mautic\FormBundle\Form\Type\ActionType;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
@@ -15,6 +14,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 class ActionModel extends CommonFormModel
 {
+    public static function getName(): string
+    {
+        return 'form.action';
+    }
+
     private ActionRepository $actionRepository;
 
     #[Required]
@@ -47,7 +51,7 @@ class ActionModel extends CommonFormModel
      * @param object $entity
      * @param array  $options
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Action) {
             throw new \InvalidArgumentException('Entity must be of class Action');
@@ -61,7 +65,7 @@ class ActionModel extends CommonFormModel
             $options['formId'] = $entity->getForm()->getId();
         }
 
-        return $formFactory->create(ActionType::class, $entity->convertToArray(), $options);
+        return $this->formFactory->create(ActionType::class, $entity->convertToArray(), $options);
     }
 
     /**

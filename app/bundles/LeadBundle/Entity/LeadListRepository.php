@@ -10,14 +10,13 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends CommonRepository<LeadList>
  */
 class LeadListRepository extends CommonRepository
 {
-    use OperatorListTrait; // @deprecated to be removed in Mautic 3. Not used inside this class.
-
     use ExpressionHelperTrait;
     use RegexTrait;
     use ProjectRepositoryTrait;
@@ -358,8 +357,10 @@ class LeadListRepository extends CommonRepository
         return $objectFilters;
     }
 
-    public function setDispatcher(EventDispatcherInterface $dispatcher): void
-    {
+    #[Required]
+    public function autowireLeadListRepository(
+        EventDispatcherInterface $dispatcher,
+    ): void {
         $this->dispatcher = $dispatcher;
     }
 
@@ -408,13 +409,10 @@ class LeadListRepository extends CommonRepository
         return $subQb;
     }
 
-    /**
-     * @param \Doctrine\ORM\QueryBuilder|QueryBuilder $q
-     */
-    protected function addCatchAllWhereClause($q, $filter): array
+    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
-            $q,
+            $queryBuilder,
             $filter,
             [
                 'l.name',
@@ -423,12 +421,9 @@ class LeadListRepository extends CommonRepository
         );
     }
 
-    /**
-     * @param \Doctrine\ORM\QueryBuilder|QueryBuilder $q
-     */
-    protected function addSearchCommandWhereClause($q, $filter): array
+    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|QueryBuilder $queryBuilder, \stdClass $filter): array
     {
-        [$expr, $parameters] = parent::addStandardSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = parent::addStandardSearchCommandWhereClause($queryBuilder, $filter);
         if ($expr) {
             return [$expr, $parameters];
         }
@@ -440,18 +435,18 @@ class LeadListRepository extends CommonRepository
         switch ($command) {
             case $this->translator->trans('mautic.lead.list.searchcommand.isglobal'):
             case $this->translator->trans('mautic.lead.list.searchcommand.isglobal', [], null, 'en_US'):
-                $expr            = $q->expr()->eq('l.isGlobal', ":{$unique}");
+                $expr            = $queryBuilder->expr()->eq('l.isGlobal', ":{$unique}");
                 $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
             case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
-                $expr            = $q->expr()->like('l.name', ':'.$unique);
+                $expr            = $queryBuilder->expr()->like('l.name', ':'.$unique);
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.lead.list.searchcommand.filters_field'):
             case $this->translator->trans('mautic.lead.list.searchcommand.filters_field', [], null, 'en_US'):
                 $pattern         = sprintf('%%s:5:"field";s:%d:"%s"%%', strlen($filter->string), $filter->string);
-                $expr            = $q->expr()->like('l.filters', ':'.$unique);
+                $expr            = $queryBuilder->expr()->like('l.filters', ':'.$unique);
                 $forceParameters = [$unique => $pattern];
                 break;
             case $this->translator->trans('mautic.project.searchcommand.name'):
@@ -615,7 +610,7 @@ SQL;
     {
         $segmentIds = $this->fetchContactToSegmentIdsRelationships($contactId, $expectedSegmentIds);
 
-        return !empty($segmentIds);
+        return [] !== $segmentIds;
     }
 
     /**
@@ -625,17 +620,11 @@ SQL;
     {
         $segmentIds = $this->fetchContactToSegmentIdsRelationships($contactId, $expectedSegmentIds);
 
-        if (empty($segmentIds)) {
+        if ([] === $segmentIds) {
             return true; // Contact is not associated wit any segment
         }
 
-        foreach ($expectedSegmentIds as $expectedSegmentId) {
-            if (in_array($expectedSegmentId, $segmentIds)) { // No exact type comparison used!
-                return false;
-            }
-        }
-
-        return true;
+        return array_all($expectedSegmentIds, fn (int $expectedSegmentId): bool => !in_array($expectedSegmentId, $segmentIds));
     }
 
     /**
@@ -689,7 +678,7 @@ SQL;
 
     public function setSegmentAsDeleted(int $leadListId): void
     {
-        $dateTime = (new \DateTimeImmutable())->format(DateTimeHelper::FORMAT_DB);
+        $dateTime = new \DateTimeImmutable()->format(DateTimeHelper::FORMAT_DB);
 
         $this->getEntityManager()->getConnection()->update(
             MAUTIC_TABLE_PREFIX.LeadList::TABLE_NAME,

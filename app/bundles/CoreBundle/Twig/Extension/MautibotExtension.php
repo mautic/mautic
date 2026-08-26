@@ -5,26 +5,19 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Twig\Extension;
 
 use Mautic\CoreBundle\Twig\Helper\MautibotHelper;
-use Twig\Extension\AbstractExtension;
-use Twig\TwigFunction;
+use Twig\Attribute\AsTwigFunction;
 
-final class MautibotExtension extends AbstractExtension
+final readonly class MautibotExtension
 {
     public function __construct(
-        private readonly MautibotHelper $mautibotHelper,
+        private MautibotHelper $mautibotHelper,
     ) {
-    }
-
-    public function getFunctions(): array
-    {
-        return [
-            new TwigFunction('mautibotGetImage', $this->getImage(...), ['is_safe' => ['all']]),
-        ];
     }
 
     /**
      * @param string $image One of openMouth | smile | wave
      */
+    #[AsTwigFunction(name: 'mautibotGetImage', isSafe: ['all'])]
     public function getImage(string $image): string
     {
         return $this->mautibotHelper->getImage($image);

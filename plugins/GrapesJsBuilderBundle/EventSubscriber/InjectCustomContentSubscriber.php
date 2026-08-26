@@ -25,7 +25,7 @@ final readonly class InjectCustomContentSubscriber implements EventSubscriberInt
         private Environment $twig,
         private RequestStack $requestStack,
         private RouterInterface $router,
-        private readonly GrapesJsBuilderRepository $grapesJsBuilderRepository,
+        private GrapesJsBuilderRepository $grapesJsBuilderRepository,
     ) {
     }
 
@@ -83,7 +83,6 @@ final readonly class InjectCustomContentSubscriber implements EventSubscriberInt
             $customContentEvent->addContent($content);
         } elseif ('page.header.left' === $customContentEvent->getContext()) {
             // Inject fileManager URL
-            $passParams['dataAssets'] = $this->router->generate('grapesjsbuilder_assets', [], UrlGeneratorInterface::ABSOLUTE_URL);
             $passParams['dataUpload'] = $this->router->generate('grapesjsbuilder_upload', [], UrlGeneratorInterface::ABSOLUTE_URL);
             $passParams['dataDelete'] = $this->router->generate('grapesjsbuilder_delete', [], UrlGeneratorInterface::ABSOLUTE_URL);
 

@@ -99,7 +99,7 @@ final class DbHelper extends Module
         $this->runCommand($command, 'Populating database from dump.sql');
     }
 
-    private function runCommand($command, $description): void
+    private function runCommand($command, string $description): void
     {
         $process = Process::fromShellCommandline($command);
         $process->run();

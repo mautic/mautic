@@ -6,6 +6,7 @@ use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
@@ -23,7 +24,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         private DynamicContentModel $dynamicContentModel,
         private CacheProvider $cache,
         private EventDispatcherInterface $dispatcher,
-        private readonly DynamicContentRepository $dynamicContentRepository,
+        private DynamicContentRepository $dynamicContentRepository,
     ) {
     }
 
@@ -32,7 +33,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD                  => ['onCampaignBuild', 0],
             DynamicContentEvents::ON_CAMPAIGN_TRIGGER_DECISION => ['onCampaignTriggerDecision', 0],
-            DynamicContentEvents::ON_CAMPAIGN_TRIGGER_ACTION   => ['onCampaignTriggerAction', 0],
+            DynamicContentEvents::ON_CAMPAIGN_BATCH_ACTION     => ['onCampaignTriggerAction', 0],
         ];
     }
 
@@ -43,7 +44,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
             [
                 'label'                  => 'mautic.dynamicContent.campaign.send_dwc',
                 'description'            => 'mautic.dynamicContent.campaign.send_dwc.tooltip',
-                'eventName'              => DynamicContentEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+                'batchEventName'         => DynamicContentEvents::ON_CAMPAIGN_BATCH_ACTION,
                 'formType'               => DynamicContentSendType::class,
                 'formTypeOptions'        => ['update_select' => 'campaignevent_properties_dynamicContent'],
                 'formTheme'              => '@MauticDynamicContent/FormTheme/DynamicContentPushList/_dynamiccontentpush_list_row.html.twig',
@@ -112,38 +113,42 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         return $event->setResult(true);
     }
 
-    public function onCampaignTriggerAction(CampaignExecutionEvent $event): void
+    public function onCampaignTriggerAction(PendingEvent $event): void
     {
-        $eventConfig = $event->getConfig();
-        $lead        = $event->getLead();
+        $eventConfig = $event->getEvent()->getProperties();
 
-        $item = $this->cache->getItem('dwc.slot_name.lead.'.$lead->getId());
-        $slot = $item->get();
+        foreach ($event->getPending() as $log) {
+            $lead = $log->getLead();
 
-        $dwc = $this->dynamicContentRepository->getEntity($eventConfig['dynamicContent']);
+            $item = $this->cache->getItem('dwc.slot_name.lead.'.$lead->getId());
+            $slot = $item->get();
 
-        if ($dwc instanceof DynamicContent) {
-            // Use translation if available
-            [$ignore, $dwc] = $this->dynamicContentModel->getTranslatedEntity($dwc, $lead);
-            \assert($dwc instanceof DynamicContent);
+            $dwc = $this->dynamicContentRepository->getEntity($eventConfig['dynamicContent']);
 
-            if ($slot) {
-                $this->dynamicContentModel->setSlotContentForLead($dwc, $lead, $slot);
+            if ($dwc instanceof DynamicContent) {
+                // Use translation if available
+                [$ignore, $dwc] = $this->dynamicContentModel->getTranslatedEntity($dwc, $lead);
+                \assert($dwc instanceof DynamicContent);
+
+                if ($slot) {
+                    $this->dynamicContentModel->setSlotContentForLead($dwc, $lead, $slot);
+                }
+
+                $stat = $this->dynamicContentModel->createStatEntry($dwc, $lead, $slot);
+
+                $tokenEvent = new TokenReplacementEvent($dwc->getContent(), $lead, ['slot' => $slot, 'dynamic_content_id' => $dwc->getId()]);
+                $tokenEvent->setStat($stat);
+                $this->dispatcher->dispatch($tokenEvent, DynamicContentEvents::TOKEN_REPLACEMENT);
+
+                $content = $tokenEvent->getContent();
+                $content = preg_replace('#<script(.*?)>(.*?)</script>#is', '', $content);
+
+                $log->appendToMetadata(['timeline' => (string) $content]);
+                $log->setChannel('dynamicContent');
+                $log->setChannelId($dwc->getId());
             }
 
-            $stat = $this->dynamicContentModel->createStatEntry($dwc, $lead, $slot);
-
-            $tokenEvent = new TokenReplacementEvent($dwc->getContent(), $lead, ['slot' => $slot, 'dynamic_content_id' => $dwc->getId()]);
-            $tokenEvent->setStat($stat);
-            $this->dispatcher->dispatch($tokenEvent, DynamicContentEvents::TOKEN_REPLACEMENT);
-
-            $content = $tokenEvent->getContent();
-            $content = preg_replace('#<script(.*?)>(.*?)</script>#is', '', $content);
-
-            $event->stopPropagation();
-
-            $event->setResult($content);
-            $event->setChannel('dynamicContent', $dwc->getId());
+            $event->pass($log);
         }
     }
 }

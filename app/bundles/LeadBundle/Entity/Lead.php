@@ -28,7 +28,6 @@ use Mautic\PointBundle\Entity\GroupContactScore;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Serializer\Attribute\Groups;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ApiResource(
     shortName: 'Contacts',
@@ -50,6 +49,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[UniqueCustomField(object: 'lead')]
 class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierFieldEntityInterface, SkipModifiedInterface
 {
     use CustomFieldEntityTrait;
@@ -526,11 +526,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->build();
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addConstraint(new UniqueCustomField(['object' => 'lead']));
-    }
-
     public static function getDefaultIdentifierFields(): array
     {
         return [
@@ -700,18 +695,15 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      */
     public function getName($lastFirst = false)
     {
-        $firstName = $this->firstname;
-        $lastName  = $this->lastname;
-
         $fullName = '';
-        if ($lastFirst && $firstName && $lastName) {
-            $fullName = $lastName.', '.$firstName;
-        } elseif ($firstName && $lastName) {
-            $fullName = $firstName.' '.$lastName;
-        } elseif ($firstName) {
-            $fullName = $firstName;
-        } elseif ($lastName) {
-            $fullName = $lastName;
+        if ($lastFirst && $this->firstname && $this->lastname) {
+            $fullName = $this->lastname.', '.$this->firstname;
+        } elseif ($this->firstname && $this->lastname) {
+            $fullName = $this->firstname.' '.$this->lastname;
+        } elseif ($this->firstname) {
+            $fullName = $this->firstname;
+        } elseif ($this->lastname) {
+            $fullName = $this->lastname;
         }
 
         return $fullName;
@@ -1177,10 +1169,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return null == $this->dateIdentified && false === $this->isAnonymous();
     }
 
-    /**
-     * @return bool
-     */
-    protected function getFirstSocialIdentity()
+    protected function getFirstSocialIdentity(): mixed
     {
         if (isset($this->fields['social'])) {
             foreach ($this->fields['social'] as $social) {
@@ -1188,7 +1177,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
                     return $social['value'];
                 }
             }
-        } elseif (!empty($this->updatedFields)) {
+        } elseif ([] !== $this->updatedFields) {
             foreach ($this->availableSocialFields as $social) {
                 if (!empty($this->updatedFields[$social])) {
                     return $this->updatedFields[$social];
@@ -1407,7 +1396,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $attributionDate = $this->getFieldValue('attribution_date');
 
         if (!empty($attribution) && empty($attributionDate)) {
-            $this->addUpdatedField('attribution_date', (new \DateTime())->format('Y-m-d'));
+            $this->addUpdatedField('attribution_date', new \DateTime()->format('Y-m-d'));
         } elseif (empty($attribution) && !empty($attributionDate)) {
             $this->addUpdatedField('attribution_date', null);
         }

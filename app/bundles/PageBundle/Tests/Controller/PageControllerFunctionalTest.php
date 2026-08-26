@@ -92,7 +92,7 @@ final class PageControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $crawler = $this->client->request('GET', '/s/pages/edit/'.$page->getId());
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/pages/edit/'.$page->getId());
         $form    = $crawler->selectButton('Save')->form();
         $form['page[projects]']->setValue((string) $project->getId());
 
@@ -139,7 +139,7 @@ final class PageControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->assertPageVersion($page->getId(), $version);
 
-        $crawler = $this->client->request('GET', '/s/pages/edit/'.$page->getId());
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/pages/edit/'.$page->getId());
         $form    = $crawler->selectButton('Save')->form();
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();

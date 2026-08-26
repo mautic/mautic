@@ -74,11 +74,9 @@ abstract class EmailAbstractIntegration extends AbstractIntegration
     /**
      * Merges a config from integration_list with feature settings.
      *
-     * @param array $config
-     *
      * @return array|mixed
      */
-    public function mergeConfigToFeatureSettings($config = [])
+    public function mergeConfigToFeatureSettings(array $config = [])
     {
         $featureSettings = $this->settings->getFeatureSettings();
 
@@ -89,7 +87,7 @@ abstract class EmailAbstractIntegration extends AbstractIntegration
         }
 
         if (empty($config['integration']) || (!empty($config['integration']) && $config['integration'] == $this->getName())) {
-            $featureSettings = array_merge($featureSettings, $config['config']);
+            return array_merge($featureSettings, $config['config']);
         }
 
         return $featureSettings;

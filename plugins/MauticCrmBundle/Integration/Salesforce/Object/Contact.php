@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object;
 
-class Contact
+final class Contact
 {
-    public const OBJECT = 'Contact';
+    public const string OBJECT = 'Contact';
 
     public function __construct(
         private $id,

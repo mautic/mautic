@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
@@ -16,7 +18,7 @@ final class UpdateCompanyActionType extends AbstractType
     use EntityFieldsBuildFormTrait;
 
     public function __construct(
-        private FieldModel $fieldModel,
+        private readonly FieldModel $fieldModel,
     ) {
     }
 

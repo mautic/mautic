@@ -165,14 +165,14 @@ final class NoteController extends FormController
     /**
      * Generate's new note and processes post data.
      */
-    public function newAction(Request $request, $leadId): Response|JsonResponse|array
+    public function newAction(Request $request, $leadId): Response|JsonResponse
     {
         $lead = $this->checkLeadAccess($leadId, 'view');
         if ($lead instanceof Response) {
             return $lead;
         }
         if (!$this->security->isGranted('lead:notes:create')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         // retrieve the entity
@@ -186,7 +186,7 @@ final class NoteController extends FormController
             ]
         );
         // get the user form factory
-        $form       = $this->noteModel->createForm($note, $this->formFactory, $action);
+        $form       = $this->noteModel->createForm($note, $action);
         $closeModal = false;
         $valid      = false;
         // /Check for a submitted form and process it
@@ -251,7 +251,7 @@ final class NoteController extends FormController
     /**
      * Generate's edit form and processes post data.
      */
-    public function editAction(Request $request, $leadId, $objectId): Response|JsonResponse|array
+    public function editAction(Request $request, $leadId, $objectId): Response|JsonResponse
     {
         $lead = $this->checkLeadAccess($leadId, 'view');
         if ($lead instanceof Response) {
@@ -262,7 +262,7 @@ final class NoteController extends FormController
         $valid      = false;
 
         if (null === $note || !$this->security->hasEntityAccess('lead:notes:editown', 'lead:notes:editother', $note->getCreatedBy())) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $action = $this->generateUrl(
@@ -273,7 +273,7 @@ final class NoteController extends FormController
                 'leadId'       => $leadId,
             ]
         );
-        $form = $this->noteModel->createForm($note, $this->formFactory, $action);
+        $form = $this->noteModel->createForm($note, $action);
 
         // /Check for a submitted form and process it
         if (Request::METHOD_POST === $request->getMethod()) {
@@ -365,10 +365,8 @@ final class NoteController extends FormController
      *
      * @param int $objectId
      * @param int $leadId
-     *
-     * @return Response
      */
-    public function executeNoteAction(Request $request, $objectAction, $objectId = 0, $leadId = 0)
+    public function executeNoteAction(Request $request, $objectAction, $objectId = 0, $leadId = 0): Response
     {
         if (method_exists($this, "{$objectAction}Action")) {
             return $this->{"{$objectAction}Action"}($request, $leadId, $objectId);

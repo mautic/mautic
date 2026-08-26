@@ -4,8 +4,8 @@ namespace Mautic\SmsBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CacheBundle\Cache\CacheProviderInterface;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
-use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -36,7 +36,6 @@ use Mautic\SmsBundle\Sms\TransportChain;
 use Mautic\SmsBundle\SmsEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -52,11 +51,16 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
 {
     use TranslationModelTrait;
 
+    public static function getName(): string
+    {
+        return 'sms.sms';
+    }
+
     public function __construct(
         protected TrackableModel $pageTrackableModel,
         protected LeadModel $leadModel,
         protected TransportChain $transport,
-        private CacheStorageHelper $cacheStorageHelper,
+        private readonly CacheProviderInterface $cacheProvider,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -137,7 +141,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Sms) {
             throw new MethodNotAllowedHttpException(['Sms']);
@@ -146,7 +150,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
             $options['action'] = $action;
         }
 
-        return $formFactory->create(SmsType::class, $entity, $options);
+        return $this->formFactory->create(SmsType::class, $entity, $options);
     }
 
     /**
@@ -155,12 +159,10 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
     public function getEntity($id = null): ?Sms
     {
         if (null === $id) {
-            $entity = new Sms();
-        } else {
-            $entity = parent::getEntity($id);
+            return new Sms();
         }
 
-        return $entity;
+        return parent::getEntity($id);
     }
 
     /**
@@ -175,9 +177,9 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         $entities = parent::getEntities($args);
 
         foreach ($entities as $entity) {
-            $pending = $this->cacheStorageHelper->get(sprintf('%s|%s|%s', 'sms', $entity->getId(), 'pending'));
+            $pending = $this->cacheProvider->getSimpleCache()->get(sprintf('%s|%s|%s', 'sms', $entity->getId(), 'pending'));
 
-            if (false !== $pending) {
+            if (null !== $pending) {
                 $entity->setPendingCount($pending);
             }
         }
@@ -196,7 +198,6 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         $sendTo  = is_array($sendTo) ? $sendTo : [$sendTo];
 
         $sentCount       = [];
-        $stats           = [];
         $results         = [];
         $contacts        = []; // Shall we reset the passed contacts param here?
         $fetchContacts   = [];
@@ -241,7 +242,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         $contacts = $dncEvent->getContacts(); // The contacts param is reset here too, no?
 
         // Check if any contacts remain. If not, return early.
-        if (empty($contacts)) {
+        if ([] === $contacts) {
             return $results;
         }
 

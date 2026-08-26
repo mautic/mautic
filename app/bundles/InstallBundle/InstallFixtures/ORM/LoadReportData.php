@@ -2,15 +2,15 @@
 
 namespace Mautic\InstallBundle\InstallFixtures\ORM;
 
+use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
-use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\ReportBundle\Entity\Report;
 
-final class LoadReportData extends AbstractFixture implements OrderedFixtureInterface, FixtureGroupInterface
+final class LoadReportData extends Fixture implements OrderedFixtureInterface, FixtureGroupInterface
 {
     public static function getGroups(): array
     {

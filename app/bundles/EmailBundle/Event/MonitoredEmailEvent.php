@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Event;
 
 use Symfony\Component\Form\FormBuilderInterface;
@@ -11,7 +13,7 @@ final class MonitoredEmailEvent extends Event
 
     public function __construct(
         private readonly FormBuilderInterface $formBuilder,
-        private array $data,
+        private readonly array $data,
     ) {
     }
 

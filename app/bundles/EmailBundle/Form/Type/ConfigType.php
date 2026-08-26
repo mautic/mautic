@@ -26,7 +26,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 final class ConfigType extends AbstractType
 {
-    public const MINIFY_EMAIL_HTML = 'minify_email_html';
+    public const string MINIFY_EMAIL_HTML = 'minify_email_html';
 
     public function __construct(
         private readonly TranslatorInterface $translator,
@@ -266,7 +266,7 @@ final class ConfigType extends AbstractType
                     new NotBlank(
                         message: 'mautic.core.email.required'
                     ),
-                    new EmailOrEmailTokenList(['allowMultiple' => false]),
+                    new EmailOrEmailTokenList(allowMultiple: false),
                 ],
             ]
         );

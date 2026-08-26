@@ -55,7 +55,7 @@ TXT
 )]
 final class CleanupMaintenanceCommand extends ModeratedCommand
 {
-    public const NAME = 'mautic:maintenance:cleanup';
+    public const string NAME = 'mautic:maintenance:cleanup';
 
     public function __construct(
         private readonly TranslatorInterface $translator,

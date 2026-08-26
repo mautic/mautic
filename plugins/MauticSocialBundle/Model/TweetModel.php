@@ -12,7 +12,6 @@ use MauticPlugin\MauticSocialBundle\Entity\TweetStatRepository;
 use MauticPlugin\MauticSocialBundle\Event as Events;
 use MauticPlugin\MauticSocialBundle\Form\Type\TweetType;
 use MauticPlugin\MauticSocialBundle\SocialEvents;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -25,6 +24,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 final class TweetModel extends FormModel implements AjaxLookupModelInterface
 {
+    public static function getName(): string
+    {
+        return 'social.tweet';
+    }
+
     private TweetStatRepository $tweetStatRepository;
 
     private TweetRepository $tweetRepository;
@@ -130,7 +134,7 @@ final class TweetModel extends FormModel implements AjaxLookupModelInterface
      * @param Tweet        $entity
      * @param array<mixed> $options
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Tweet) {
             throw new MethodNotAllowedHttpException(['Tweet']);
@@ -140,7 +144,7 @@ final class TweetModel extends FormModel implements AjaxLookupModelInterface
             $options['action'] = $action;
         }
 
-        return $formFactory->create(TweetType::class, $entity, $options);
+        return $this->formFactory->create(TweetType::class, $entity, $options);
     }
 
     /**

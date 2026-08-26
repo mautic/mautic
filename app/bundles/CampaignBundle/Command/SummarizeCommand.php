@@ -23,11 +23,11 @@ final class SummarizeCommand extends ModeratedCommand
 {
     use WriteCountTrait;
 
-    public const NAME = 'mautic:campaigns:summarize';
+    public const string NAME = 'mautic:campaigns:summarize';
 
     public function __construct(
-        private TranslatorInterface $translator,
-        private SummaryModel $summaryModel,
+        private readonly TranslatorInterface $translator,
+        private readonly SummaryModel $summaryModel,
         PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper,
     ) {

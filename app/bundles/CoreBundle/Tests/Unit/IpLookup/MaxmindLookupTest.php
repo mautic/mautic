@@ -160,7 +160,7 @@ final class MaxmindLookupTest extends \PHPUnit\Framework\TestCase
 }
 RESPONSE);
 
-        $this->mockHttp->expects($this->once())
+        $this->mockHttp
             ->method('get')
             ->willReturn($mockResponse);
     }
@@ -171,7 +171,7 @@ RESPONSE);
             ->setConstructorArgs(['test', null, $this->cacheDir, null, $this->mockHttp, $this->mockCoreParamsHelper])
             ->onlyMethods(['shouldPerformLookup'])
             ->getMock();
-        $ipService->method('shouldPerformLookup')->willReturn(true);
+        $ipService->expects($this->once())->method('shouldPerformLookup')->willReturn(true);
 
         $details = $ipService->setIpAddress('1.2.3.4')->getDetails();
 
@@ -184,7 +184,7 @@ RESPONSE);
             ->setConstructorArgs(['test', null, $this->cacheDir, null, $this->mockHttp, $this->mockCoreParamsHelper])
             ->onlyMethods(['shouldPerformLookup'])
             ->getMock();
-        $ipService->method('shouldPerformLookup')->willReturn(true);
+        $ipService->expects($this->once())->method('shouldPerformLookup')->willReturn(true);
 
         $details = $ipService->setIpAddress('1.2.3.4')->getDetails();
 
@@ -197,7 +197,7 @@ RESPONSE);
             ->setConstructorArgs(['test', null, $this->cacheDir, null, $this->mockHttp, $this->mockCoreParamsHelper])
             ->onlyMethods(['shouldPerformLookup'])
             ->getMock();
-        $ipService->method('shouldPerformLookup')->willReturn(true);
+        $ipService->expects($this->once())->method('shouldPerformLookup')->willReturn(true);
 
         $details = $ipService->setIpAddress('1.2.3.4')->getDetails();
 

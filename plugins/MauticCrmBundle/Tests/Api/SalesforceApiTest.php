@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace MauticPlugin\MauticCrmBundle\Tests\Api;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCrmBundle\Api\SalesforceApi;
 use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
+use Psr\SimpleCache\CacheInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[CoversClass(SalesforceApi::class)]
@@ -224,7 +224,7 @@ final class SalesforceApiTest extends \PHPUnit\Framework\TestCase
         $integration->expects($this->once())
             ->method('makeRequest')
             ->willReturnCallback(
-                function ($url, $parameters = [], $method = 'GET', $settings = []): void {
+                function ($url, $parameters = [], $method = 'GET', array $settings = []): void {
                     $this->assertEquals(
                         [
                             'q' => 'select Id from Account where Name = \'Some\\\\thing E\\\'lse\' and BillingCountry =  \'Some\\\\Where E\\\'lse\' and BillingCity =  \'Some\\\\Where E\\\'lse\' and BillingState =  \'Some\\\\Where E\\\'lse\'',
@@ -269,7 +269,7 @@ final class SalesforceApiTest extends \PHPUnit\Framework\TestCase
         $integration->expects($this->once())
             ->method('makeRequest')
             ->willReturnCallback(
-                function ($url, $parameters = [], $method = 'GET', $settings = []): void {
+                function ($url, $parameters = [], $method = 'GET', array $settings = []): void {
                     $this->assertEquals(
                         [
                             'q' => 'select Id from Account where Name = \'Some\\\\thing\\\' E\\\'lse\' and BillingCountry =  \'Some\\\\Where\\\' E\\\'lse\' and BillingCity =  \'Some\\\\Where\\\' E\\\'lse\' and BillingState =  \'Some\\\\Where\\\' E\\\'lse\'',
@@ -318,7 +318,7 @@ final class SalesforceApiTest extends \PHPUnit\Framework\TestCase
         $integration->expects($this->once())
             ->method('makeRequest')
             ->willReturnCallback(
-                function ($url, $parameters = [], $method = 'GET', $settings = []): void {
+                function ($url, $parameters = [], $method = 'GET', array $settings = []): void {
                     $this->assertEquals(
                         [
                             'q' => 'select Id from Contact where email = \'con\\\\tact\\\'email@email.com\'',
@@ -365,7 +365,7 @@ final class SalesforceApiTest extends \PHPUnit\Framework\TestCase
         $integration->expects($this->once())
             ->method('makeRequest')
             ->willReturnCallback(
-                function ($url, $parameters = [], $method = 'GET', $settings = []): void {
+                function ($url, $parameters = [], $method = 'GET', array $settings = []): void {
                     $this->assertEquals(
                         [
                             'q' => 'select Id from Lead where email = \'con\\\\tact\\\'email@email.com\' and ConvertedContactId = NULL',
@@ -389,10 +389,7 @@ final class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 
     public function testHandleDeletesGracefullyWithHasOptedOutOfEmailAsMissingField(): void
     {
-        /**
-         * @phpstan-ignore-next-line
-         */
-        $cache = $this->createMock(CacheStorageHelper::class);
+        $cache = $this->createMock(CacheInterface::class);
 
         $cache
             ->method('get')
@@ -451,10 +448,7 @@ final class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 
     public function testHandleDeletesGracefully(): void
     {
-        /**
-         * @phpstan-ignore-next-line
-         */
-        $cache = $this->createMock(CacheStorageHelper::class);
+        $cache = $this->createMock(CacheInterface::class);
 
         $cache
             ->method('get')

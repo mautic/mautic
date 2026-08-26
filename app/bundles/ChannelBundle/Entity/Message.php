@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ChannelBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
@@ -20,7 +22,6 @@ use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Mapping\ClassMetadata as ValidationClassMetadata;
 
 #[ApiResource(
     operations: [
@@ -56,6 +57,7 @@ class Message extends FormEntity implements UuidInterface
      * @var string
      */
     #[Groups(['message:read', 'message:write', 'channel:read'])]
+    #[NotBlank(message: 'mautic.core.name.required')]
     private $name;
 
     /**
@@ -117,11 +119,6 @@ class Message extends FormEntity implements UuidInterface
 
         static::addUuidField($builder);
         self::addProjectsField($builder, 'message_projects_xref', 'message_id');
-    }
-
-    public static function loadValidatorMetadata(ValidationClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('name', new NotBlank(message: 'mautic.core.name.required'));
     }
 
     public static function loadApiMetadata(ApiMetadataDriver $metadata): void

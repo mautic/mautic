@@ -32,14 +32,14 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $this->deviceDetectorFactory = $this->createMock(DeviceDetectorFactoryInterface::class);
         $this->deviceDetector        = $this->createMock(DeviceDetector::class);
 
-        defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
+        defined('MAUTIC_ENV') || define('MAUTIC_ENV', 'test');
     }
 
     public function testDeviceDetectorBotsDetectionTrue(): void
     {
         $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.52']);
 
-        $this->deviceDetector
+        $this->deviceDetector->expects($this->once())
             ->method('isBot')
             ->willReturn(true);
 
@@ -51,7 +51,7 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
     {
         $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.53']);
 
-        $this->deviceDetector
+        $this->deviceDetector->expects($this->once())
             ->method('isBot')
             ->willReturn(false);
 

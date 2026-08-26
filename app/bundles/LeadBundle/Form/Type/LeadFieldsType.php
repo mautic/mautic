@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Helper\ArrayHelper;
-use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Field\FieldList;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
@@ -15,7 +17,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 final class LeadFieldsType extends AbstractType
 {
     public function __construct(
-        private readonly FieldModel $fieldModel,
+        private readonly FieldList $fieldList,
     ) {
     }
 
@@ -23,12 +25,12 @@ final class LeadFieldsType extends AbstractType
     {
         $resolver->setDefaults([
             'choices' => function (Options $options): array {
-                $fieldList = ArrayHelper::flipArray($this->fieldModel->getFieldList());
+                $fieldList = ArrayHelper::flipArray($this->fieldList->getFieldList());
                 if ($options['with_tags']) {
                     $fieldList['Core']['mautic.lead.field.tags'] = 'tags';
                 }
                 if ($options['with_company_fields']) {
-                    $fieldList['Company'] = array_flip($this->fieldModel->getFieldList(false, true, ['isPublished' => true, 'object' => 'company']));
+                    $fieldList['Company'] = array_flip($this->fieldList->getFieldList(false, true, ['isPublished' => true, 'object' => 'company']));
                 }
                 if ($options['with_utm']) {
                     $fieldList['UTM']['mautic.lead.field.utmcampaign'] = 'utm_campaign';

@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadList;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\HttpFoundation\Request;
 
 final class InfiniteLoopValidatorFunctionalTest extends MauticMysqlTestCase
 {
@@ -40,7 +41,7 @@ final class InfiniteLoopValidatorFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $responseData = json_decode($response->getContent(), true);
-        $this->assertSame($success, $responseData['success'], $response->getContent());
+        $this->assertSame($success, $responseData['success'], (string) $response->getContent());
 
         if ($expectedString) {
             $this->assertStringContainsString($expectedString, (string) $responseData['newContent']);
@@ -198,7 +199,7 @@ final class InfiniteLoopValidatorFunctionalTest extends MauticMysqlTestCase
 
         $expectedStatusCode = $success ? 201 : 422;
 
-        $this->client->request('POST', '/api/campaigns/new', $payload);
+        $this->client->request(Request::METHOD_POST, '/api/campaigns/new', $payload);
         $response = $this->client->getResponse();
         self::assertResponseStatusCodeSame($expectedStatusCode, $response->getContent());
 

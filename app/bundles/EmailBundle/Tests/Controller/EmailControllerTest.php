@@ -31,6 +31,7 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Router;
@@ -38,10 +39,7 @@ use Twig\Environment;
 
 final class EmailControllerTest extends TestCase
 {
-    /**
-     * @var string
-     */
-    public const NEW_CATEGORY_TITLE = 'New category';
+    public const string NEW_CATEGORY_TITLE = 'New category';
 
     /**
      * @var MockObject&Session
@@ -162,7 +160,7 @@ final class EmailControllerTest extends TestCase
             ->willReturn($this->sessionMock);
         $this->requestStack->push($request);
         $response = $this->controller->sendAction($request, 5);
-        $this->assertSame(302, $response->getStatusCode());
+        $this->assertSame(Response::HTTP_FOUND, $response->getStatusCode(), (string) $response->getContent());
     }
 
     public function testSendActionWhenEntityFoundButNotPublished(): void
@@ -194,7 +192,7 @@ final class EmailControllerTest extends TestCase
             ->willReturn($this->sessionMock);
         $this->requestStack->push($request);
         $response = $this->controller->sendAction($request, 5);
-        $this->assertSame(302, $response->getStatusCode());
+        $this->assertSame(Response::HTTP_FOUND, $response->getStatusCode(), (string) $response->getContent());
     }
 
     public function testThatExampleEmailsHaveTestStringInTheirSubject(): void

@@ -6,10 +6,10 @@ namespace Mautic\IntegrationsBundle\Facade;
 
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 
-class EncryptionService
+final readonly class EncryptionService
 {
     public function __construct(
-        private readonly EncryptionHelper $encryptionHelper,
+        private EncryptionHelper $encryptionHelper,
     ) {
     }
 
@@ -32,11 +32,9 @@ class EncryptionService
     }
 
     /**
-     * @param bool $onlyPrimaryCipher
-     *
      * @return array|string
      */
-    public function decrypt($keys, $onlyPrimaryCipher = false)
+    public function decrypt($keys, bool $onlyPrimaryCipher = false)
     {
         if (!is_array($keys)) {
             return $this->encryptionHelper->decrypt($keys, $onlyPrimaryCipher);

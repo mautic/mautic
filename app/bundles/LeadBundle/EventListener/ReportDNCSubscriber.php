@@ -15,7 +15,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 final readonly class ReportDNCSubscriber implements EventSubscriberInterface
 {
-    public const DNC = 'contact.dnc';
+    public const string DNC = 'contact.dnc';
 
     public function __construct(
         private FieldsBuilder $fieldsBuilder,

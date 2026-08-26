@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * This test is breaking other tests, so running it in a separate process.
@@ -28,7 +29,7 @@ final class JsControllerTest extends MauticMysqlTestCase
 
     public function testIndexActionRendersSuccessfully(): void
     {
-        $this->client->request('GET', '/mtc.js');
+        $this->client->request(Request::METHOD_GET, '/mtc.js');
         self::assertResponseIsSuccessful();
         $content = (string) $this->client->getResponse()->getContent();
         $this->assertStringContainsString('https://www.googletagmanager.com/gtag/js?id=G-F3825DS9CD', $content);
@@ -42,7 +43,7 @@ final class JsControllerTest extends MauticMysqlTestCase
 
     public function testIndexActionRendersSuccessfullyWithAnonymizeIp(): void
     {
-        $this->client->request('GET', '/mtc.js');
+        $this->client->request(Request::METHOD_GET, '/mtc.js');
         self::assertResponseIsSuccessful();
         $this->assertStringContainsString('https://www.googletagmanager.com/gtag/js?id=G-F3825DS9CD', (string) $this->client->getResponse()->getContent());
         $this->assertStringContainsString('window.gtag(\'config\',\'G-F3825DS9CD\',{"anonymize_ip":!0})', (string) $this->client->getResponse()->getContent());
@@ -50,7 +51,7 @@ final class JsControllerTest extends MauticMysqlTestCase
 
     public function testEssentialEndpointContainsAnonymousRuntimeOnly(): void
     {
-        $this->client->request('GET', '/mautic-essential.js');
+        $this->client->request(Request::METHOD_GET, '/mautic-essential.js');
 
         self::assertResponseIsSuccessful();
         $content = (string) $this->client->getResponse()->getContent();
@@ -73,7 +74,7 @@ final class JsControllerTest extends MauticMysqlTestCase
 
     public function testTrackingEndpointContainsIdentityWithoutRuntime(): void
     {
-        $this->client->request('GET', '/mautic-tracking.js');
+        $this->client->request(Request::METHOD_GET, '/mautic-tracking.js');
 
         self::assertResponseIsSuccessful();
         $content = (string) $this->client->getResponse()->getContent();
@@ -94,7 +95,7 @@ final class JsControllerTest extends MauticMysqlTestCase
     #[DataProvider('scriptEndpointProvider')]
     public function testScriptEndpoints(string $path, bool $containsTracking): void
     {
-        $this->client->request('GET', $path);
+        $this->client->request(Request::METHOD_GET, $path);
 
         self::assertResponseIsSuccessful();
         self::assertResponseHeaderSame('Content-Type', 'application/javascript');

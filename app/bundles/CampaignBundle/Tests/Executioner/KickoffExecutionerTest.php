@@ -67,7 +67,7 @@ final class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
         $counter = $this->getExecutioner()->execute($campaign, $limiter, new BufferedOutput());
         $this->assertInstanceOf(Counter::class, $counter);
 
-        $this->assertEquals(0, $counter->getTotalEvaluated());
+        $this->assertSame(0, $counter->getTotalEvaluated());
     }
 
     public function testEventsAreScheduledAndExecuted(): void
@@ -130,8 +130,8 @@ final class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
         $counter = $this->getExecutioner()->execute($campaign, $limiter, new BufferedOutput());
         $this->assertInstanceOf(Counter::class, $counter);
 
-        $this->assertEquals(4, $counter->getTotalEvaluated());
-        $this->assertEquals(2, $counter->getTotalScheduled());
+        $this->assertSame(4, $counter->getTotalEvaluated());
+        $this->assertSame(2, $counter->getTotalScheduled());
     }
 
     private function getExecutioner(): KickoffExecutioner

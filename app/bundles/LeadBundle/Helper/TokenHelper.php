@@ -8,9 +8,9 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 
 final class TokenHelper
 {
-    public const REGEX = '/({|%7B)contactfield=(.*?)(}|%7D)/';
+    public const string REGEX = '/({|%7B)contactfield=(.*?)(}|%7D)/';
 
-    private const DATETIME_REGEX = '/({|%7B)datetime=(.*?)(}|%7D)/';
+    private const string DATETIME_REGEX = '/({|%7B)datetime=(.*?)(}|%7D)/';
 
     /**
      * @var array
@@ -175,7 +175,7 @@ final class TokenHelper
     private static function getParameter(string $parameter)
     {
         if (null === self::$parameters) {
-            self::$parameters = (new ParamsLoaderHelper())->getParameters();
+            self::$parameters = new ParamsLoaderHelper()->getParameters();
         }
 
         return self::$parameters[$parameter];

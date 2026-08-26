@@ -239,9 +239,7 @@ if (!isset($args['repackage'])) {
     if (0 === $result) {
         $deletedFiles = array_unique(array_merge(
             $deletedFiles,
-            array_filter($vendorDeletedFiles, function ($path) {
-                return str_starts_with($path, 'vendor/');
-            })
+            array_filter($vendorDeletedFiles, fn ($path) => str_starts_with($path, 'vendor/'))
         ));
         sort($deletedFiles);
     }

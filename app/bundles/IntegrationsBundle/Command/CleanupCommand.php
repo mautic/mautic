@@ -17,7 +17,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 final class CleanupCommand extends Command
 {
-    public const NAME = 'mautic:integrations:cleanup';
+    public const string NAME = 'mautic:integrations:cleanup';
 
     public function __construct(
         private readonly FieldChangeRepository $fieldChangeRepository,

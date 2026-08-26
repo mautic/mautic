@@ -30,7 +30,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class PartialObjectReportBuilderTest extends TestCase
 {
-    private const INTEGRATION_NAME = 'Test';
+    private const string INTEGRATION_NAME = 'Test';
 
     /**
      * @var MockObject&FieldChangeRepository

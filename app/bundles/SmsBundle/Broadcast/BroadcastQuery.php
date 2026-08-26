@@ -8,7 +8,7 @@ use Mautic\CampaignBundle\Entity\ContactLimiterTrait;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\SmsBundle\Entity\Sms;
-use Mautic\SmsBundle\Model\SmsModel;
+use Mautic\SmsBundle\Entity\SmsRepository;
 
 final class BroadcastQuery
 {
@@ -17,8 +17,8 @@ final class BroadcastQuery
     private QueryBuilder $query;
 
     public function __construct(
-        private EntityManagerInterface $entityManager,
-        private SmsModel $smsModel,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly SmsRepository $smsRepository,
     ) {
     }
 
@@ -44,7 +44,7 @@ final class BroadcastQuery
 
     public function getBasicQuery(Sms $sms): QueryBuilder
     {
-        $this->query = $this->smsModel->getRepository()->getSegmentsContactsQuery($sms->getId());
+        $this->query = $this->smsRepository->getSegmentsContactsQuery($sms->getId());
         $this->query->andWhere(
             $this->query->expr()->or(
                 $this->query->expr()->or(

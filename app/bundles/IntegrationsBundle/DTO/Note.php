@@ -6,9 +6,9 @@ namespace Mautic\IntegrationsBundle\DTO;
 
 final readonly class Note
 {
-    public const TYPE_WARNING = 'warning';
+    public const string TYPE_WARNING = 'warning';
 
-    public const TYPE_INFO    = 'info';
+    public const string TYPE_INFO    = 'info';
 
     private string $type;
 

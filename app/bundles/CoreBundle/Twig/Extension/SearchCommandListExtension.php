@@ -5,26 +5,19 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Twig\Extension;
 
 use Mautic\CoreBundle\Service\SearchCommandListInterface;
-use Twig\Extension\AbstractExtension;
-use Twig\TwigFunction;
+use Twig\Attribute\AsTwigFunction;
 
-final class SearchCommandListExtension extends AbstractExtension
+final readonly class SearchCommandListExtension
 {
     public function __construct(
-        private readonly SearchCommandListInterface $searchCommandList,
+        private SearchCommandListInterface $searchCommandList,
     ) {
-    }
-
-    public function getFunctions(): array
-    {
-        return [
-            new TwigFunction('searchCommandList', $this->getSearchCommandList(...), ['is_safe' => ['all']]),
-        ];
     }
 
     /**
      * @return mixed[]
      */
+    #[AsTwigFunction(name: 'searchCommandList', isSafe: ['all'])]
     public function getSearchCommandList(): array
     {
         return $this->searchCommandList->getList();

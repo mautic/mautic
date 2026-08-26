@@ -5,8 +5,6 @@ namespace Mautic\CampaignBundle\Entity;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Exception;
-use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Mautic\CampaignBundle\Entity\Result\CountResult;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
@@ -44,7 +42,7 @@ class CampaignRepository extends CommonRepository
 
     public function setCampaignAsDeleted(int $campaignId): void
     {
-        $dateTime = (new \DateTime())->format('Y-m-d H:i:s');
+        $dateTime = new \DateTime()->format('Y-m-d H:i:s');
 
         $this->getEntityManager()->getConnection()->update(
             MAUTIC_TABLE_PREFIX.Event::TABLE_NAME,
@@ -255,23 +253,17 @@ class CampaignRepository extends CommonRepository
         return 'c';
     }
 
-    /**
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     */
-    protected function addCatchAllWhereClause($q, $filter): array
+    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
-        return $this->addStandardCatchAllWhereClause($q, $filter, [
+        return $this->addStandardCatchAllWhereClause($queryBuilder, $filter, [
             'c.name',
             'c.description',
         ]);
     }
 
-    /**
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     */
-    protected function addSearchCommandWhereClause($q, $filter): array
+    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
-        [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($queryBuilder, $filter);
         if ($expr) {
             return [$expr, $parameters];
         }
@@ -281,21 +273,21 @@ class CampaignRepository extends CommonRepository
         switch ($filter->command) {
             case $this->translator->trans('mautic.campaign.campaign.searchcommand.isexpired'):
             case $this->translator->trans('mautic.campaign.campaign.searchcommand.isexpired', [], null, 'en_US'):
-                $expr = $q->expr()->and(
-                    $q->expr()->eq('c.isPublished', ":{$unique}"),
-                    $q->expr()->isNotNull('c.publishDown'),
-                    $q->expr()->neq('c.publishDown', $q->expr()->literal('')),
-                    $q->expr()->lt('c.publishDown', 'CURRENT_TIMESTAMP()')
+                $expr = $queryBuilder->expr()->and(
+                    $queryBuilder->expr()->eq('c.isPublished', ":{$unique}"),
+                    $queryBuilder->expr()->isNotNull('c.publishDown'),
+                    $queryBuilder->expr()->neq('c.publishDown', $queryBuilder->expr()->literal('')),
+                    $queryBuilder->expr()->lt('c.publishDown', 'CURRENT_TIMESTAMP()')
                 );
                 $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.campaign.campaign.searchcommand.ispending'):
             case $this->translator->trans('mautic.campaign.campaign.searchcommand.ispending', [], null, 'en_US'):
-                $expr = $q->expr()->and(
-                    $q->expr()->eq('c.isPublished', ":{$unique}"),
-                    $q->expr()->isNotNull('c.publishUp'),
-                    $q->expr()->neq('c.publishUp', $q->expr()->literal('')),
-                    $q->expr()->gt('c.publishUp', 'CURRENT_TIMESTAMP()')
+                $expr = $queryBuilder->expr()->and(
+                    $queryBuilder->expr()->eq('c.isPublished', ":{$unique}"),
+                    $queryBuilder->expr()->isNotNull('c.publishUp'),
+                    $queryBuilder->expr()->neq('c.publishUp', $queryBuilder->expr()->literal('')),
+                    $queryBuilder->expr()->gt('c.publishUp', 'CURRENT_TIMESTAMP()')
                 );
                 $forceParameters = [$unique => true];
                 break;
@@ -312,7 +304,7 @@ class CampaignRepository extends CommonRepository
         }
 
         if ($expr && $filter->not) {
-            $expr = $q->expr()->not($expr);
+            $expr = $queryBuilder->expr()->not($expr);
         }
 
         if (!empty($forceParameters)) {
@@ -456,79 +448,6 @@ class CampaignRepository extends CommonRepository
     }
 
     /**
-     * Get a count of leads that belong to the campaign.
-     *
-     * @param int   $campaignId
-     * @param int   $leadId        Optional lead ID to check if lead is part of campaign
-     * @param array $pendingEvents List of specific events to rule out
-     *
-     * @throws \Doctrine\DBAL\Cache\CacheException
-     *
-     * @deprecated
-     */
-    public function getCampaignLeadCount($campaignId, $leadId = null, $pendingEvents = [], ?\DateTimeInterface $dateFrom = null, ?\DateTimeInterface $dateTo = null): int
-    {
-        $q = $this->getReplicaConnection()->createQueryBuilder();
-
-        $q->select('count(cl.lead_id) as lead_count')
-            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
-            ->where(
-                $q->expr()->and(
-                    $q->expr()->eq('cl.campaign_id', (int) $campaignId),
-                    $q->expr()->eq('cl.manually_removed', ':false')
-                )
-            )
-            ->setParameter('false', false, Types::BOOLEAN);
-
-        if ($leadId) {
-            $q->andWhere(
-                $q->expr()->eq('cl.lead_id', (int) $leadId)
-            );
-        }
-
-        if ($dateFrom && $dateTo) {
-            $q->andWhere('cl.date_added BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
-                ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
-                ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
-        }
-
-        if (count($pendingEvents) > 0) {
-            $sq = $this->getReplicaConnection()->createQueryBuilder();
-            $sq->select('null')
-                ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'e')
-                ->where(
-                    $sq->expr()->and(
-                        $sq->expr()->eq('cl.lead_id', 'e.lead_id'),
-                        $sq->expr()->in('e.event_id', $pendingEvents)
-                    )
-                );
-
-            if ($dateFrom && $dateTo) {
-                $sq->andWhere('cl.date_triggered BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
-                    ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
-                    ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
-            }
-
-            $q->andWhere(
-                sprintf('NOT EXISTS (%s)', $sq->getSQL())
-            );
-        }
-
-        if ($this->getReplicaConnection()->getConfiguration()->getResultCache()) {
-            $results = $this->getReplicaConnection()->executeCacheQuery(
-                $q->getSQL(),
-                $q->getParameters(),
-                $q->getParameterTypes(),
-                new QueryCacheProfile(600)
-            )->fetchAllAssociative();
-        } else {
-            $results = $q->executeQuery()->fetchAllAssociative();
-        }
-
-        return (int) $results[0]['lead_count'];
-    }
-
-    /**
      * Returns true if the campaign has at least one lead.
      */
     public function hasCampaignLeads(int $campaignId, int $cacheTTL = 0): bool
@@ -627,57 +546,12 @@ class CampaignRepository extends CommonRepository
             );
         $q->groupBy('c.id');
 
-        if (!empty($campaignIds)) {
+        if ([] !== $campaignIds) {
             $q->where($q->expr()->in('c.id', ':campaignIds'));
             $q->setParameter('campaignIds', $campaignIds, ArrayParameterType::INTEGER);
         }
 
         return $q->executeQuery()->fetchAllAssociative();
-    }
-
-    /**
-     * Searches for emails assigned to campaign and returns associative array of email ids in format:.
-     *
-     *  array (size=1)
-     *      0 =>
-     *          array (size=2)
-     *              'channelId' => int 18
-     *
-     * or empty array if nothing found.
-     *
-     * @param int $id
-     *
-     * @deprecated The method is deprecated and will be removed in Mautic 8.x.
-     * Use the `\Mautic\CampaignBundle\Entity\EventRepository::getCampaignEmailEvents()` method instead.
-     * @see EventRepository::getCampaignEmailEvents
-     */
-    #[\Deprecated('The method is deprecated and will be removed in Mautic 8.x. Use the `\Mautic\CampaignBundle\Entity\EventRepository::getCampaignEmailEvents()` method instead.')]
-    public function fetchEmailIdsById($id): array
-    {
-        $emails = $this->getEntityManager()
-            ->createQueryBuilder()
-            ->select('e.channelId')
-            ->from(Campaign::class, $this->getTableAlias(), $this->getTableAlias().'.id')
-            ->leftJoin(
-                $this->getTableAlias().'.events',
-                'e',
-                Expr\Join::WITH,
-                "e.channel = '".Event::CHANNEL_EMAIL."'"
-            )
-            ->where($this->getTableAlias().'.id = :id')
-            ->setParameter('id', $id)
-            ->andWhere('e.channelId IS NOT NULL')
-            ->getQuery()
-            ->setHydrationMode(Query::HYDRATE_ARRAY)
-            ->getResult();
-
-        $return = [];
-        foreach ($emails as $email) {
-            // Every channelId represents e-mail ID
-            $return[] = $email['channelId']; // mautic_campaign_events.channel_id
-        }
-
-        return $return;
     }
 
     /**

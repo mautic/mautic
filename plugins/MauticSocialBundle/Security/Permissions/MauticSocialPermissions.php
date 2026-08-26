@@ -5,14 +5,10 @@ namespace MauticPlugin\MauticSocialBundle\Security\Permissions;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class MauticSocialPermissions extends AbstractPermissions
+final class MauticSocialPermissions extends AbstractPermissions
 {
-    /**
-     * @param mixed[] $params
-     */
-    public function __construct(array $params)
+    public function __construct()
     {
-        parent::__construct($params);
         $this->addStandardPermissions('categories');
         $this->addStandardPermissions('monitoring');
         $this->addExtendedPermissions('tweets');

@@ -76,7 +76,7 @@ class InstallService
         $params = $this->configurator->getParameters();
 
         // Check to ensure the installer is in the right place
-        if ((empty($params)
+        if (([] === $params
                 || !isset($params['db_driver'])
                 || empty($params['db_driver'])) && $index > 1) {
             return $this->configurator->getStep(self::DOCTRINE_STEP)[0];
@@ -106,12 +106,11 @@ class InstallService
 
             // Load local config to override parameters
             include $localConfigFile;
-            $localParameters = $parameters;
-        } else {
-            $localParameters = [];
+
+            return $parameters;
         }
 
-        return $localParameters;
+        return [];
     }
 
     /**
@@ -138,7 +137,7 @@ class InstallService
      */
     private function translateMessages(array $messages): array
     {
-        if (empty($messages)) {
+        if ([] === $messages) {
             return $messages;
         }
 
@@ -246,12 +245,12 @@ class InstallService
     {
         $messages = $this->validateDatabaseParams($dbParams);
 
-        if (!empty($messages)) {
+        if ([] !== $messages) {
             return $messages;
         }
 
         // Check if connection works and/or create database if applicable
-        $schemaHelper = new SchemaHelper($dbParams);
+        $schemaHelper = new SchemaHelper($dbParams, $this->entityManager);
 
         try {
             $schemaHelper->testConnection();
@@ -259,7 +258,7 @@ class InstallService
 
             if ($schemaHelper->createDatabase()) {
                 $messages = $this->saveConfiguration($dbParams, $step, true);
-                if (empty($messages)) {
+                if ([] === $messages) {
                     return $messages;
                 }
             }
@@ -297,8 +296,7 @@ class InstallService
      */
     public function createSchemaStep(array $dbParams): array
     {
-        $schemaHelper = new SchemaHelper($dbParams);
-        $schemaHelper->setEntityManager($this->entityManager);
+        $schemaHelper = new SchemaHelper($dbParams, $this->entityManager);
 
         $messages = [];
         try {
@@ -402,7 +400,7 @@ class InstallService
             }
         }
 
-        if (!empty($messages)) {
+        if ([] !== $messages) {
             return $messages;
         }
 
@@ -424,7 +422,7 @@ class InstallService
             }
         }
 
-        if (!empty($messages)) {
+        if ([] !== $messages) {
             return $messages;
         }
 

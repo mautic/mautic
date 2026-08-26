@@ -17,7 +17,7 @@ final class HttpFactoryTest extends TestCase
 {
     public function testType(): void
     {
-        $this->assertSame('api_key', (new HttpFactory())->getAuthType());
+        $this->assertSame('api_key', new HttpFactory()->getAuthType());
     }
 
     public function testInvalidCredentialsThrowsException(): void
@@ -27,7 +27,7 @@ final class HttpFactoryTest extends TestCase
         $credentials = new class() implements AuthCredentialsInterface {
         };
 
-        (new HttpFactory())->getClient($credentials);
+        new HttpFactory()->getClient($credentials);
     }
 
     public function testMissingCredentialsThrowsException(): void
@@ -46,7 +46,7 @@ final class HttpFactoryTest extends TestCase
             }
         };
 
-        (new HttpFactory())->getClient($credentials);
+        new HttpFactory()->getClient($credentials);
     }
 
     public function testInstantiatedClientIsReturned(): void

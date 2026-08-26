@@ -12,7 +12,7 @@ use Mautic\ReportBundle\Model\ReportModel;
 
 final class DashboardSubscriber extends MainDashboardSubscriber
 {
-    private const TABLE_ROW_LIMIT = 10;
+    private const int TABLE_ROW_LIMIT = 10;
 
     /**
      * Define the name of the bundle/category of the widget(s).

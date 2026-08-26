@@ -23,7 +23,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 )]
 final class UpdateLeadListsCommand extends ModeratedCommand
 {
-    public const NAME = 'mautic:segments:update';
+    public const string NAME = 'mautic:segments:update';
 
     public function __construct(
         private readonly ListModel $listModel,

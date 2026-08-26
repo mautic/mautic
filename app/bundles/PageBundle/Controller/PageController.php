@@ -8,23 +8,19 @@ use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\ContentPreviewSettingsType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Translation\Translator;
-use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageEditSubmitEvent;
 use Mautic\PageBundle\Exception\InvalidRenderedHtmlException;
 use Mautic\PageBundle\Helper\PageConfig;
 use Mautic\PageBundle\Model\PageModel;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
 final class PageController extends FormController
@@ -370,7 +366,7 @@ final class PageController extends FormController
      *
      * @param Page|null $entity
      */
-    public function newAction(Request $request, PageConfig $pageConfig, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, ThemeHelper $themeHelper, PageModel $model, $entity = null): Response
+    public function newAction(Request $request, PageConfig $pageConfig, Translator $translator, ThemeHelper $themeHelper, PageModel $model, $entity = null): Response
     {
         if (!$entity instanceof Page) {
             $entity = $model->getEntity();
@@ -387,7 +383,7 @@ final class PageController extends FormController
         $action = $this->generateUrl('mautic_page_action', ['objectAction' => 'new']);
 
         // create the form
-        $form = $model->createForm($entity, $this->formFactory, $action);
+        $form = $model->createForm($entity, $action);
 
         // /Check for a submitted form and process it
         if ('POST' === $method) {
@@ -480,8 +476,6 @@ final class PageController extends FormController
 
     /**
      * Generates edit form and processes post data.
-     *
-     * @return JsonResponse|Response
      */
     public function editAction(
         Request $request,
@@ -490,7 +484,7 @@ final class PageController extends FormController
         ThemeHelper $themeHelper,
         int $objectId,
         bool $ignorePost = false,
-    ) {
+    ): Response {
         $entity     = $model->getEntity($objectId);
         $session    = $request->getSession();
         $page       = $request->getSession()->get('mautic.page.page', 1);
@@ -536,7 +530,7 @@ final class PageController extends FormController
 
         // Create the form
         $action = $this->generateUrl('mautic_page_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $form   = $model->createForm($entity, $this->formFactory, $action);
+        $form   = $model->createForm($entity, $action);
         $this->setOptimisticLockVersion($entity, $form);
         $existingPage = clone $entity;
         $this->restoreNullifiedFieldsDuringClone($existingPage, $entity);
@@ -600,7 +594,7 @@ final class PageController extends FormController
             }
             if ($valid) {
                 // Rebuild the form in the case apply is clicked so that DEC content is properly populated if all were removed
-                $form = $model->createForm($entity, $this->formFactory, $action);
+                $form = $model->createForm($entity, $action);
                 $this->setOptimisticLockVersion($entity, $form);
             }
         } else {
@@ -682,7 +676,7 @@ final class PageController extends FormController
      *
      * @param int $objectId
      */
-    public function cloneAction(Request $request, PageConfig $pageConfig, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, ThemeHelper $themeHelper, PageModel $model, $objectId): Response
+    public function cloneAction(Request $request, PageConfig $pageConfig, Translator $translator, ThemeHelper $themeHelper, PageModel $model, $objectId): Response
     {
         $entity = $model->getEntity($objectId);
 
@@ -709,15 +703,13 @@ final class PageController extends FormController
             $session->set($contentName, $entity->getCustomHtml());
         }
 
-        return $this->newAction($request, $pageConfig, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $themeHelper, $model, $entity);
+        return $this->newAction($request, $pageConfig, $translator, $themeHelper, $model, $entity);
     }
 
     /**
      * Deletes the entity.
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, PageModel $model, $objectId)
+    public function deleteAction(Request $request, PageModel $model, $objectId): Response
     {
         $page      = $request->getSession()->get('mautic.page.page', 1);
         $returnUrl = $this->generateUrl('mautic_page_index', ['page' => $page]);
@@ -816,7 +808,7 @@ final class PageController extends FormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $this->pageModel->deleteEntities($deleteIds);
 
                 $flashes[] = [
@@ -884,7 +876,7 @@ final class PageController extends FormController
     /**
      * @param int $objectId
      */
-    public function abtestAction(Request $request, PageConfig $pageConfig, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, ThemeHelper $themeHelper, PageModel $model, $objectId): Response
+    public function abtestAction(Request $request, PageConfig $pageConfig, Translator $translator, ThemeHelper $themeHelper, PageModel $model, $objectId): Response
     {
         $entity = $model->getEntity($objectId);
 
@@ -913,15 +905,13 @@ final class PageController extends FormController
         $clone->setIsPublished(false);
         $clone->setVariantParent($entity);
 
-        return $this->newAction($request, $pageConfig, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $themeHelper, $model, $clone);
+        return $this->newAction($request, $pageConfig, $translator, $themeHelper, $model, $clone);
     }
 
     /**
      * Make the variant the main.
-     *
-     * @return Response
      */
-    public function winnerAction(Request $request, PageModel $model, $objectId)
+    public function winnerAction(Request $request, PageModel $model, $objectId): Response
     {
         // todo - add confirmation to button click
         $page      = $request->getSession()->get('mautic.page.page', 1);

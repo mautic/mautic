@@ -49,10 +49,10 @@ final class FinalizeUpdateStepTest extends AbstractStepTestCase
         $this->appVersion   = $this->createMock(AppVersion::class);
         $request            = $this->createMock(Request::class);
 
-        $request->method('hasSession')->willReturn(true);
+        $request->expects($this->once())->method('hasSession')->willReturn(true);
         $request->method('getSession')->willReturn($this->session);
         $requestStack->method('getSession')->willReturn($this->session);
-        $requestStack->method('getCurrentRequest')->willReturn($request);
+        $requestStack->expects($this->once())->method('getCurrentRequest')->willReturn($request);
 
         $this->step = new FinalizeUpdateStep($this->translator, $this->pathsHelper, $requestStack, $this->appVersion);
     }

@@ -12,7 +12,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Shortener\Shortener;
 use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Form\Type\PageListType;
-use Mautic\PageBundle\Model\PageModel;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\PreloadedExtension;
@@ -20,6 +20,7 @@ use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Validation;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 final class ConfigTypeTest extends TypeTestCase
 {
     public function testSubmitEmptyTrustedHosts(): void
@@ -141,15 +142,11 @@ final class ConfigTypeTest extends TypeTestCase
         $configType = $this->getConfigFormType();
 
         $repoMock = $this->createMock(PageRepository::class);
-        $repoMock
+        $repoMock->expects($this->exactly(2))
                  ->method('getPageList')
                  ->willReturn([]);
 
-        $pageModelMock = $this->createMock(PageModel::class);
-        $pageModelMock
-                      ->method('getRepository')
-                      ->willReturn($repoMock);
-        $pageListType = new PageListType($pageModelMock, $this->createStub(CorePermissions::class));
+        $pageListType = new PageListType($this->createStub(CorePermissions::class), $repoMock);
 
         return [
             // register the type instances with the PreloadedExtension

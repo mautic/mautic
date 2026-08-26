@@ -5,23 +5,16 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Twig\Extension;
 
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
-use Twig\Extension\AbstractExtension;
-use Twig\TwigFunction;
+use Twig\Attribute\AsTwigFunction;
 
-final class AnalyticsExtension extends AbstractExtension
+final readonly class AnalyticsExtension
 {
     public function __construct(
-        private readonly AnalyticsHelper $helper,
+        private AnalyticsHelper $helper,
     ) {
     }
 
-    public function getFunctions(): array
-    {
-        return [
-            new TwigFunction('analyticsGetCode', $this->getCode(...), ['is_safe' => ['all']]),
-        ];
-    }
-
+    #[AsTwigFunction(name: 'analyticsGetCode', isSafe: ['all'])]
     public function getCode(): string
     {
         return $this->helper->getCode();

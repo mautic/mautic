@@ -152,7 +152,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
     {
         // Create custom field
         $this->client->request(
-            'POST',
+            Request::METHOD_POST,
             '/api/fields/contact/new',
             [
                 'label'      => 'bool',
@@ -224,7 +224,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
     {
         // Create custom field
         $this->client->request(
-            'POST',
+            Request::METHOD_POST,
             '/api/fields/contact/new',
             [
                 'label'      => 'bool',
@@ -280,7 +280,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
 
         // Create some contacts
         $this->client->request(
-            'POST',
+            Request::METHOD_POST,
             '/api/contacts/batch/new',
             [
                 [
@@ -316,7 +316,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
     {
         // Create custom field
         $this->client->request(
-            'POST',
+            Request::METHOD_POST,
             '/api/fields/contact/new',
             [
                 'label'      => 'bool',
@@ -372,7 +372,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
 
         // Create some contacts
         $this->client->request(
-            'POST',
+            Request::METHOD_POST,
             '/api/contacts/batch/new',
             [
                 [

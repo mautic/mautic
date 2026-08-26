@@ -19,7 +19,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class CompanyControllerTest extends MauticMysqlTestCase
 {
-    private const COUNTRY_UNITED_STATES = 'United States';
+    private const string COUNTRY_UNITED_STATES = 'United States';
 
     private int $company1Id;
 
@@ -73,7 +73,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
      */
     public function testViewActionCompany(): void
     {
-        $crawler                = $this->client->request('GET', '/s/companies/view/'.$this->company1Id);
+        $crawler                = $this->client->request(Request::METHOD_GET, '/s/companies/view/'.$this->company1Id);
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
         /** @var CompanyModel $model */
@@ -91,7 +91,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $this->createLead();
         $segment = $this->createSegment();
         $this->testSymfonyCommand('mautic:segments:update', ['--list-id' => $segment->getId()]);
-        $crawler  = $this->client->request('GET', "s/company/graph/{$this->company1Id}");
+        $crawler  = $this->client->request(Request::METHOD_GET, "s/company/graph/{$this->company1Id}");
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $body           = json_decode($response->getContent(), true);
@@ -111,7 +111,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
      */
     public function testEditActionCompany(): void
     {
-        $crawler                = $this->client->request('GET', '/s/companies/edit/'.$this->company1Id);
+        $crawler                = $this->client->request(Request::METHOD_GET, '/s/companies/edit/'.$this->company1Id);
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
         /** @var CompanyModel $model */
@@ -130,7 +130,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
 
     public function testEditAndCancelActionCompany(): void
     {
-        $crawler = $this->client->request('GET', '/s/companies/edit/'.$this->company1Id);
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/companies/edit/'.$this->company1Id);
         $this->assertResponseIsSuccessful();
         $buttonCrawler = $crawler->selectButton('Cancel');
         $form          = $buttonCrawler->form();
@@ -175,7 +175,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
             ->setEmail('example@idstart.com');
         $leadModel->saveEntity($lead3);
 
-        $crawler        = $this->client->request('GET', '/s/company/'.$this->company1Id.'/contacts/');
+        $crawler        = $this->client->request(Request::METHOD_GET, '/s/company/'.$this->company1Id.'/contacts/');
         $leadsTableRows = $crawler->filterXPath("//table[@id='leadTable']//tbody//tr");
 
         $this->assertResponseIsSuccessful();
@@ -186,7 +186,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $this->assertStringContainsString('/s/contacts/view/'.$lead1->getId(), (string) $clientResponse->getContent());
         $this->assertStringContainsString('1 item', (string) $clientResponse->getContent());
 
-        $crawler        = $this->client->request('GET', '/s/company/'.$this->company2Id.'/contacts/');
+        $crawler        = $this->client->request(Request::METHOD_GET, '/s/company/'.$this->company2Id.'/contacts/');
         $leadsTableRows = $crawler->filterXPath("//table[@id='leadTable']//tbody//tr");
 
         $this->assertResponseIsSuccessful();
@@ -306,7 +306,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
      */
     public function testNewActionCompany(): void
     {
-        $this->client->request('GET', '/s/companies/new/');
+        $this->client->request(Request::METHOD_GET, '/s/companies/new/');
         $clientResponse         = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
     }
@@ -323,7 +323,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
 
     public function testNewCompanyMergeButtonVisible(): void
     {
-        $this->client->request('GET', '/s/companies/new/');
+        $this->client->request(Request::METHOD_GET, '/s/companies/new/');
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
@@ -352,7 +352,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $crawler = $this->client->request('GET', '/s/companies/edit/'.$this->company1Id);
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/companies/edit/'.$this->company1Id);
         $form    = $crawler->selectButton('Save')->form();
         $form['company[projects]']->setValue((string) $project->getId());
 
@@ -370,7 +370,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $leadA = $this->createLead();
         $leadB = $this->createLead('F1', 'L1', 'f@l.com', '123');
 
-        $crawler = $this->client->request('GET', '/s/companies/edit/'.$this->company1Id);
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/companies/edit/'.$this->company1Id);
         $this->assertResponseIsSuccessful();
 
         $buttonCrawler = $crawler->selectButton('Save & Close');
@@ -405,7 +405,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
 
     public function testIndexAction(): void
     {
-        $this->client->request('GET', '/s/companies');
+        $this->client->request(Request::METHOD_GET, '/s/companies');
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
 

@@ -3,26 +3,19 @@
 namespace Mautic\CoreBundle\Twig\Extension;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Twig\Extension\AbstractExtension;
-use Twig\TwigFunction;
+use Twig\Attribute\AsTwigFunction;
 
-final class DateTimeExtension extends AbstractExtension
+final readonly class DateTimeExtension
 {
     public function __construct(
-        private readonly DateTimeHelper $helper,
+        private DateTimeHelper $helper,
     ) {
-    }
-
-    public function getFunctions(): array
-    {
-        return [
-            new TwigFunction('dateTimeGetUtcDateTime', $this->getUtcDateTime(...), ['is_safe' => ['all']]),
-        ];
     }
 
     /**
      * @see DateTimeHelper::getUtcDateTime
      */
+    #[AsTwigFunction(name: 'dateTimeGetUtcDateTime', isSafe: ['all'])]
     public function getUtcDateTime(): \DateTimeInterface
     {
         return $this->helper->getUtcDateTime();

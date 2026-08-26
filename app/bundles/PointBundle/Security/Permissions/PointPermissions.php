@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PointBundle\Security\Permissions;
 
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
@@ -7,13 +9,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 final class PointPermissions extends AbstractPermissions
 {
-    /**
-     * @param mixed[] $params
-     */
-    public function __construct(array $params)
+    public function __construct()
     {
-        parent::__construct($params);
-
         $this->addStandardPermissions(['points', 'triggers', 'groups', 'categories', 'insights']);
     }
 

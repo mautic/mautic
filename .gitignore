@@ -1,6 +1,7 @@
 .*
 !.github
 !.gitignore
+!.editorconfig
 !.htaccess
 !.gitkeep
 !.ddev

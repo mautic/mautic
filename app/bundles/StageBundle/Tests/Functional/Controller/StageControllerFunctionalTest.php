@@ -13,9 +13,9 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class StageControllerFunctionalTest extends MauticMysqlTestCase
 {
-    private const COUNT_SQL_PREFIX    = 'SELECT COUNT(*) FROM ';
+    private const string COUNT_SQL_PREFIX    = 'SELECT COUNT(*) FROM ';
 
-    private const MERGE_TEST_LOG_DATE = '2026-01-01 00:00:00';
+    private const string MERGE_TEST_LOG_DATE = '2026-01-01 00:00:00';
 
     public function testStageMenuString(): void
     {
@@ -41,7 +41,7 @@ final class StageControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $crawler = $this->client->request('GET', '/s/stages/edit/'.$stage->getId());
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/stages/edit/'.$stage->getId());
         $form    = $crawler->selectButton('Save')->form();
         $form['stage[projects]']->setValue((string) $project->getId());
 
@@ -101,7 +101,7 @@ final class StageControllerFunctionalTest extends MauticMysqlTestCase
         ]);
 
         /** @var StageModel $stageModel */
-        $stageModel = static::getContainer()->get(StageModel::class);
+        $stageModel = self::getContainer()->get(StageModel::class);
         $stageModel->stageMerge($primaryStage, $mergedStage);
         $this->em->clear();
 

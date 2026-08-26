@@ -7,33 +7,33 @@ namespace Mautic\LeadBundle\Tests\Deduplicate;
 use Mautic\LeadBundle\Deduplicate\CompanyDeduper;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Exception\UniqueFieldNotFoundException;
+use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
-use Mautic\LeadBundle\Model\FieldModel;
 use PHPUnit\Framework\MockObject\MockObject;
 
 final class CompanyDeduperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject&FieldModel
+     * @var MockObject&FieldList
      */
-    private MockObject $fieldModel;
+    private MockObject $fieldList;
 
     protected function setUp(): void
     {
-        $this->fieldModel = $this->createMock(FieldModel::class);
+        $this->fieldList = $this->createMock(FieldList::class);
     }
 
     public function testUniqueFieldNotFoundException(): void
     {
         $this->expectException(UniqueFieldNotFoundException::class);
-        $this->fieldModel->method('getFieldList')->willReturn([]);
+        $this->fieldList->method('getFieldList')->willReturn([]);
         $this->getDeduper()->checkForDuplicateCompanies([]);
     }
 
     private function getDeduper(): CompanyDeduper
     {
         return new CompanyDeduper(
-            $this->fieldModel,
+            $this->fieldList,
             $this->createStub(FieldsWithUniqueIdentifier::class),
             $this->createStub(CompanyRepository::class)
         );

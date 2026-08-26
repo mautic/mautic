@@ -32,7 +32,7 @@ final class MenuHelper
     public function createMenuStructure(array &$items, $depth = 0, $defaultPriority = 9999, $type = 'main'): void
     {
         foreach ($items as $k => &$i) {
-            if (!is_array($i) || empty($i)) {
+            if (!is_array($i) || [] === $i) {
                 continue;
             }
 
@@ -197,15 +197,12 @@ final class MenuHelper
     /**
      * @return mixed
      */
-    private function getParameter($name)
+    private function getParameter(string $name)
     {
         return $this->coreParametersHelper->get($name, false);
     }
 
-    /**
-     * @param string $integrationName
-     */
-    private function handleIntegrationChecks($integrationName, array $config): bool
+    private function handleIntegrationChecks(string $integrationName, array $config): bool
     {
         $integration = $this->integrationHelper->getIntegrationObject($integrationName);
 
@@ -239,27 +236,25 @@ final class MenuHelper
     }
 
     /**
-     * @param string $name
-     * @param mixed  $value
+     * @param mixed $value
      */
-    private function handleParametersChecks($name, $value): bool
+    private function handleParametersChecks(string $name, $value): bool
     {
         return $this->getParameter($name) == $value;
     }
 
     /**
-     * @param string $name
-     * @param mixed  $value
+     * @param mixed $value
      */
-    private function handleRequestChecks($name, $value): bool
+    private function handleRequestChecks(string $name, $value): bool
     {
         return $this->requestStack->getCurrentRequest()->get($name) == $value;
     }
 
     /**
-     * @return bool
+     * @param string|string[] $accessLevel
      */
-    private function handleAccessCheck($accessLevel)
+    private function handleAccessCheck(string|array $accessLevel): bool
     {
         return match ($accessLevel) {
             'admin' => $this->security->isAdmin(),

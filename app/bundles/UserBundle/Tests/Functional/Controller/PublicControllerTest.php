@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class PublicControllerTest extends MauticMysqlTestCase
 {
-    private const PASSWORD_RESET_URI = '/passwordreset';
+    private const string PASSWORD_RESET_URI = '/passwordreset';
 
     protected function setUp(): void
     {
@@ -120,12 +120,12 @@ final class PublicControllerTest extends MauticMysqlTestCase
      */
     private function createInvite(string $email, string $token): array
     {
-        $role = (new Role())
+        $role = new Role()
             ->setName('Invite role '.$token)
             ->setIsPublished(true);
         $tokenVerifier = $token.'-verifier';
 
-        $invite = (new UserInvite($role))
+        $invite = new UserInvite($role)
             ->setEmail($email)
             ->setTokenSelector($token)
             ->setTokenVerifierHash(password_hash($tokenVerifier, PASSWORD_DEFAULT))

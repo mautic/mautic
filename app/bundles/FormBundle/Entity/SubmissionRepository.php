@@ -21,7 +21,7 @@ class SubmissionRepository extends CommonRepository
      * @param Submission $entity
      * @param bool       $flush
      */
-    public function saveEntity($entity, $flush = true): void
+    public function saveEntity(object $entity, $flush = true): void
     {
         parent::saveEntity($entity, $flush);
 
@@ -101,7 +101,7 @@ class SubmissionRepository extends CommonRepository
         // Quote reserved keywords in field aliases
         $fieldAliases = array_map($databasePlatform->quoteIdentifier(...), $fieldAliases);
 
-        $fieldAliasSql = (!empty($fieldAliases)) ? ', r.'.implode(',r.', $fieldAliases) : '';
+        $fieldAliasSql = ([] !== $fieldAliases) ? ', r.'.implode(',r.', $fieldAliases) : '';
         $dq->select('r.submission_id, s.date_submitted as dateSubmitted, s.lead_id as leadId, s.referer, i.ip_address as ipAddress'.$fieldAliasSql);
         $results = $dq->executeQuery()->fetchAllAssociative();
 
@@ -246,13 +246,12 @@ class SubmissionRepository extends CommonRepository
     }
 
     /**
-     * @param QueryBuilder|DbalQueryBuilder $q
-     * @param array<mixed>                  $filter
+     * @param array<mixed> $filter
      */
-    public function getFilterExpr($q, array $filter, ?string $unique = null): array
+    public function getFilterExpr(QueryBuilder|DbalQueryBuilder $q, array $filter, ?string $unique = null): array
     {
         if ('s.date_submitted' === $filter['column']) {
-            $date       = (new DateTimeHelper($filter['value'], 'Y-m-d'))->toUtcString();
+            $date       = new DateTimeHelper($filter['value'], 'Y-m-d')->toUtcString();
             $date1      = $this->generateRandomParameterName();
             $date2      = $this->generateRandomParameterName();
             $parameters = [$date1 => $date.' 00:00:00', $date2 => $date.' 23:59:59'];
@@ -562,7 +561,7 @@ class SubmissionRepository extends CommonRepository
      */
     public function batchDeleteFormResultsTableRecord(array $submissionIds): void
     {
-        if (!empty($submissionIds)) {
+        if ([] !== $submissionIds) {
             $entity = $this->getEntity((int) $submissionIds[0]);
             $form   = $entity->getForm();
 

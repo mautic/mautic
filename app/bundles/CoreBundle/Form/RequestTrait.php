@@ -71,7 +71,7 @@ trait RequestTrait
                     }
 
                     // find property by value
-                    if (!empty($fields)) {
+                    if ([] !== $fields) {
                         $properties = ArrayHelper::getValue('properties', $fields[$name]);
                         if (is_array($properties)) {
                             $valuesAsKeys = array_flip(array_values($properties));
@@ -139,13 +139,13 @@ trait RequestTrait
                         case DateTimeType::class:
                         case PublishUpDateType::class:
                         case PublishDownDateType::class:
-                            $params[$name] = (new \DateTime(date('Y-m-d H:i:s', $timestamp)))->format('Y-m-d H:i:s');
+                            $params[$name] = new \DateTime(date('Y-m-d H:i:s', $timestamp))->format('Y-m-d H:i:s');
                             break;
                         case DateType::class:
-                            $params[$name] = (new \DateTime(date('Y-m-d', $timestamp)))->format('Y-m-d');
+                            $params[$name] = new \DateTime(date('Y-m-d', $timestamp))->format('Y-m-d');
                             break;
                         case TimeType::class:
-                            $params[$name] = (new \DateTime(date('H:i:s', $timestamp)))->format('H:i:s');
+                            $params[$name] = new \DateTime(date('H:i:s', $timestamp))->format('H:i:s');
                             break;
                     }
                     break;
@@ -199,13 +199,13 @@ trait RequestTrait
                     if ($timestamp) {
                         switch ($leadField['type']) {
                             case 'datetime':
-                                $fieldData[$leadField['alias']] = (new \DateTime(date('Y-m-d H:i:s', $timestamp)))->format('Y-m-d H:i:s');
+                                $fieldData[$leadField['alias']] = new \DateTime(date('Y-m-d H:i:s', $timestamp))->format('Y-m-d H:i:s');
                                 break;
                             case 'date':
-                                $fieldData[$leadField['alias']] = (new \DateTime(date('Y-m-d', $timestamp)))->format('Y-m-d');
+                                $fieldData[$leadField['alias']] = new \DateTime(date('Y-m-d', $timestamp))->format('Y-m-d');
                                 break;
                             case 'time':
-                                $fieldData[$leadField['alias']] = (new \DateTime(date('H:i:s', $timestamp)))->format('H:i:s');
+                                $fieldData[$leadField['alias']] = new \DateTime(date('H:i:s', $timestamp))->format('H:i:s');
                                 break;
                         }
                     }

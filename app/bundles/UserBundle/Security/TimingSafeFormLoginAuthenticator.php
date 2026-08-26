@@ -27,12 +27,12 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
-class TimingSafeFormLoginAuthenticator implements AuthenticatorInterface, AuthenticationEntryPointInterface, InteractiveAuthenticatorInterface
+final class TimingSafeFormLoginAuthenticator implements AuthenticatorInterface, AuthenticationEntryPointInterface, InteractiveAuthenticatorInterface
 {
     /**
      * @var array<mixed>
      */
-    private array $options;
+    private readonly array $options;
 
     /**
      * @param array<mixed> $options
@@ -58,7 +58,7 @@ class TimingSafeFormLoginAuthenticator implements AuthenticatorInterface, Authen
         ], $options);
     }
 
-    public function supports(Request $request): ?bool
+    public function supports(Request $request): bool
     {
         return $this->authenticator->supports($request);
     }
@@ -107,7 +107,7 @@ class TimingSafeFormLoginAuthenticator implements AuthenticatorInterface, Authen
         return $this->authenticator->onAuthenticationSuccess($request, $token, $firewallName);
     }
 
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response
     {
         return $this->authenticator->onAuthenticationFailure($request, $exception);
     }

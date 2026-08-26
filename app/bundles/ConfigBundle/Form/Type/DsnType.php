@@ -168,7 +168,7 @@ final class DsnType extends AbstractType
         }
 
         if ($dsn->getPassword()) {
-            $dsn = $dsn->setPassword('SECRET');
+            return $dsn->setPassword('SECRET');
         }
 
         return $dsn;

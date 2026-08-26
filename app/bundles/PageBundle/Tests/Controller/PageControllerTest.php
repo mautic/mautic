@@ -28,7 +28,7 @@ final class PageControllerTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->prefix = static::getContainer()->getParameter('mautic.db_table_prefix');
+        $this->prefix = self::getContainer()->getParameter('mautic.db_table_prefix');
 
         $pageData = [
             'title'    => 'Test Page',
@@ -36,7 +36,7 @@ final class PageControllerTest extends MauticMysqlTestCase
         ];
 
         /** @var PageModel $model */
-        $model = static::getContainer()->get(PageModel::class);
+        $model = self::getContainer()->get(PageModel::class);
         $page  = new Page();
         $page->setTitle($pageData['title'])
             ->setTemplate($pageData['template']);
@@ -65,7 +65,7 @@ final class PageControllerTest extends MauticMysqlTestCase
         $this->logoutUser();
         $this->connection->insert($this->prefix.'pages', [
             'is_published' => true,
-            'date_added'   => (new \DateTime())->format('Y-m-d H:i:s'),
+            'date_added'   => new \DateTime()->format('Y-m-d H:i:s'),
             'title'        => 'Page:Page:LandingPageTracking',
             'alias'        => 'page-page-landingPageTracking',
             'template'     => 'blank',
@@ -78,11 +78,11 @@ final class PageControllerTest extends MauticMysqlTestCase
         ]);
         $leadsBeforeTest   = $this->connection->fetchAllAssociative('SELECT `id` FROM `'.$this->prefix.'leads`;');
         $leadIdsBeforeTest = array_column($leadsBeforeTest, 'id');
-        $this->client->request('GET', '/page-page-landingPageTracking');
+        $this->client->request(Request::METHOD_GET, '/page-page-landingPageTracking');
         $this->assertResponseIsSuccessful();
 
         $sql = 'SELECT `id` FROM `'.$this->prefix.'leads`';
-        if (!empty($leadIdsBeforeTest)) {
+        if ([] !== $leadIdsBeforeTest) {
             $sql .= ' WHERE `id` NOT IN ('.implode(',', $leadIdsBeforeTest).');';
         }
         $newLeads = $this->connection->fetchAllAssociative($sql);
@@ -105,7 +105,7 @@ final class PageControllerTest extends MauticMysqlTestCase
     {
         $this->connection->insert($this->prefix.'pages', [
             'is_published' => true,
-            'date_added'   => (new \DateTime())->format('Y-m-d H:i:s'),
+            'date_added'   => new \DateTime()->format('Y-m-d H:i:s'),
             'title'        => 'Page:Page:LandingPageTrackingSecondVisit',
             'alias'        => 'page-page-landingPageTrackingSecondVisit',
             'template'     => 'blank',
@@ -117,10 +117,10 @@ final class PageControllerTest extends MauticMysqlTestCase
         ]);
         $leadsBeforeTest   = $this->connection->fetchAllAssociative('SELECT `id` FROM `'.$this->prefix.'leads`;');
         $leadIdsBeforeTest = array_column($leadsBeforeTest, 'id');
-        $this->client->request('GET', '/page-page-landingPageTrackingSecondVisit');
+        $this->client->request(Request::METHOD_GET, '/page-page-landingPageTrackingSecondVisit');
         $this->assertResponseIsSuccessful();
         $sql = 'SELECT `id` FROM `'.$this->prefix.'leads`';
-        if (!empty($leadIdsBeforeTest)) {
+        if ([] !== $leadIdsBeforeTest) {
             $sql .= ' WHERE `id` NOT IN ('.implode(',', $leadIdsBeforeTest).');';
         }
         $newLeadsAfterFirstVisit = $this->connection->fetchAllAssociative($sql);
@@ -134,7 +134,7 @@ final class PageControllerTest extends MauticMysqlTestCase
         );
         $this->assertCount(1, $eventLogsAfterFirstVisit);
         $this->assertSame('created_contact', reset($eventLogsAfterFirstVisit)['action']);
-        $this->client->request('GET', '/page-page-landingPageTrackingSecondVisit');
+        $this->client->request(Request::METHOD_GET, '/page-page-landingPageTrackingSecondVisit');
         $this->assertResponseIsSuccessful();
         $eventLogsAfterSecondVisit = $this->connection->fetchAllAssociative('
           SELECT `id`, `action`
@@ -156,7 +156,7 @@ final class PageControllerTest extends MauticMysqlTestCase
         $timestamp  = \time();
         $page       = $this->createTestPage();
 
-        $this->client->request('GET', "/{$page->getAlias()}?utm_source=linkedin&utm_medium=social&utm_campaign=mautic&utm_content=".$timestamp);
+        $this->client->request(Request::METHOD_GET, "/{$page->getAlias()}?utm_source=linkedin&utm_medium=social&utm_campaign=mautic&utm_content=".$timestamp);
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
 
@@ -199,11 +199,11 @@ final class PageControllerTest extends MauticMysqlTestCase
      */
     public function testViewActionPage(): void
     {
-        $this->client->request('GET', '/s/pages/view/'.$this->id);
+        $this->client->request(Request::METHOD_GET, '/s/pages/view/'.$this->id);
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
         /** @var PageModel $model */
-        $model                  = static::getContainer()->get(PageModel::class);
+        $model                  = self::getContainer()->get(PageModel::class);
         $page                   = $model->getEntity($this->id);
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $this->assertInstanceOf(Page::class, $page);
@@ -215,7 +215,7 @@ final class PageControllerTest extends MauticMysqlTestCase
      */
     public function testNewActionPage(): void
     {
-        $this->client->request('GET', '/s/pages/new/');
+        $this->client->request(Request::METHOD_GET, '/s/pages/new/');
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
     }
@@ -223,7 +223,7 @@ final class PageControllerTest extends MauticMysqlTestCase
     /* Get landing page's submissions list */
     public function testListLandingPageSubmissions(): void
     {
-        $this->client->request('GET', 's/pages/results/'.$this->id);
+        $this->client->request(Request::METHOD_GET, 's/pages/results/'.$this->id);
         $clientResponse         = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
@@ -277,7 +277,7 @@ final class PageControllerTest extends MauticMysqlTestCase
     public function testSavePageAliasWithUnderscores(): void
     {
         /** @var PageModel $pageModel */
-        $pageModel = static::getContainer()->get(PageModel::class);
+        $pageModel = self::getContainer()->get(PageModel::class);
 
         $parentPage = new Page();
         $parentPage->setTitle('This is My Page');

@@ -12,7 +12,7 @@ final class EmailHitNotification
     use MessageRequestTrait;
 
     public function __construct(
-        private string $statId,
+        private readonly string $statId,
         private Request $request,
         ?\DateTimeInterface $eventTime = null,
     ) {

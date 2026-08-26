@@ -53,7 +53,7 @@ class DynamicContentHelper
             $content = $data['content'];
             $dwc     = $this->dynamicContentModel->getEntity($data['id']);
             if ($dwc instanceof DynamicContent) {
-                $content = $this->getRealDynamicContent($slot, $lead, $dwc);
+                return $this->getRealDynamicContent($slot, $lead, $dwc);
             }
 
             return $content;

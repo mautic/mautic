@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 final readonly class CampaignContactCountHelper
 {
-    private const CACHE_TTL = 43200;
+    private const int CACHE_TTL = 43200;
 
     public function __construct(
         private CacheProviderInterface $cacheProvider,
@@ -37,7 +37,7 @@ final readonly class CampaignContactCountHelper
             }
         }
 
-        if (empty($campaignIdsForCountFromDb)) {
+        if ([] === $campaignIdsForCountFromDb) {
             return $contactCounts;
         }
 
@@ -48,7 +48,7 @@ final readonly class CampaignContactCountHelper
 
             $contactCountDetail = [
                 'contactCount'   => (int) $count['contact_count'],
-                'countFetchedAt' => (new DateTimeHelper())->getUtcDateTime()->format(DATE_ATOM),
+                'countFetchedAt' => new DateTimeHelper()->getUtcDateTime()->format(DATE_ATOM),
             ];
             $contactCounts[$campaignId] = $contactCountDetail;
             $this->setContactCountInCache($campaignId, $contactCountDetail);

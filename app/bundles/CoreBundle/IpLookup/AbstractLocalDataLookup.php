@@ -48,10 +48,8 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
 
     /**
      * Used by the mautic:iplookup:update_data command and form fetch button (if applicable) to update local IP data stores.
-     *
-     * @return bool
      */
-    public function downloadRemoteDataStore()
+    public function downloadRemoteDataStore(): bool
     {
         $package   = $this->getRemoteDateStoreDownloadUrl();
 
@@ -149,7 +147,7 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
         } catch (\Throwable $exception) {
             $this->logger->error('Failed to fetch remote IP data: '.$exception->getMessage());
 
-            $success = false;
+            return false;
         }
 
         return $success;
@@ -221,14 +219,13 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
     protected function sizeInByte($size)
     {
         $data = (int) substr($size, 0, -1);
-        switch (strtoupper(substr($size, -1))) {
-            case 'K':
-                return $data * 1024;
-            case 'M':
-                return $data * 1024 * 1024;
-            case 'G':
-                return $data * 1024 * 1024 * 1024;
-        }
+
+        return match (strtoupper(substr($size, -1))) {
+            'K' => $data * 1024,
+            'M' => $data * 1024 * 1024,
+            'G' => $data * 1024 * 1024 * 1024,
+            default => null,
+        };
     }
 
     private function endsWith(string $haystack, string $needle): bool

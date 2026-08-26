@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\NotificationBundle\Controller\Api;
 
 use Doctrine\Persistence\ManagerRegistry;
@@ -19,6 +21,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -62,9 +65,9 @@ final class NotificationApiController extends CommonApiController
                 $this->leadModel->saveEntity($currentLead);
             }
 
-            return new JsonResponse(['success' => true, 'osid' => $osid], 200, ['Access-Control-Allow-Origin' => '*']);
+            return new JsonResponse(['success' => true, 'osid' => $osid], Response::HTTP_OK, ['Access-Control-Allow-Origin' => '*']);
         }
 
-        return new JsonResponse(['success' => 'false'], 200, ['Access-Control-Allow-Origin' => '*']);
+        return new JsonResponse(['success' => 'false'], Response::HTTP_OK, ['Access-Control-Allow-Origin' => '*']);
     }
 }

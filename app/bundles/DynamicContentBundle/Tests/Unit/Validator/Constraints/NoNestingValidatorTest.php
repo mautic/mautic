@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 final class NoNestingValidatorTest extends TestCase
 {
-    private const TRANSLATED_MESSAGE = 'DWC tokens cannot be used within another DWC.';
+    private const string TRANSLATED_MESSAGE = 'DWC tokens cannot be used within another DWC.';
 
     private NoNesting $constraint;
 
@@ -67,7 +67,7 @@ final class NoNestingValidatorTest extends TestCase
         $this->assertSame(self::TRANSLATED_MESSAGE, $this->context->getViolations()->get(0)->getMessage());
     }
 
-    private function createContext(): ExecutionContextInterface
+    private function createContext(): ExecutionContext
     {
         $locale     = 'en_US';
         $translator = new Translator($locale);

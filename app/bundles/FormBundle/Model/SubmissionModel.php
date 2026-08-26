@@ -73,6 +73,11 @@ use Twig\Environment;
  */
 final class SubmissionModel extends CommonFormModel
 {
+    public static function getName(): string
+    {
+        return 'form.submission';
+    }
+
     public function __construct(
         private readonly IpLookupHelper $ipLookupHelper,
         private readonly Environment $twig,
@@ -180,7 +185,7 @@ final class SubmissionModel extends CommonFormModel
 
             if ($f->isCaptchaType()) {
                 $captcha = $this->fieldHelper->validateFieldValue($type, $value, $f);
-                if (!empty($captcha)) {
+                if ([] !== $captcha) {
                     $props = $f->getProperties();
                     // check for a custom message
                     $validationErrors[$alias] = (!empty($props['errorMessage'])) ? $props['errorMessage'] : implode('<br />', $captcha);
@@ -319,12 +324,12 @@ final class SubmissionModel extends CommonFormModel
         }
 
         // return errors if there any
-        if (!empty($validationErrors)) {
+        if ([] !== $validationErrors) {
             return ['errors' => $validationErrors];
         }
 
         // Create/update lead
-        if (!empty($leadFieldMatches)) {
+        if ([] !== $leadFieldMatches) {
             $lead = $this->createLeadFromSubmit($form, $leadFieldMatches, $leadFields, $company);
         }
 
@@ -472,7 +477,7 @@ final class SubmissionModel extends CommonFormModel
         $queryArgs['simpleResults']  = true;
         $results                     = $this->getEntities($queryArgs);
 
-        $date = (new DateTimeHelper())->toLocalString();
+        $date = new DateTimeHelper()->toLocalString();
         $name = str_replace(' ', '_', $date).'_'.$form->getAlias();
 
         switch ($format) {
@@ -579,7 +584,7 @@ final class SubmissionModel extends CommonFormModel
         $results    = $this->getEntitiesByPage($queryArgs);
         $results    = $results['results'];
 
-        $date = (new DateTimeHelper())->toLocalString();
+        $date = new DateTimeHelper()->toLocalString();
         $name = str_replace(' ', '_', $date).'_'.$page->getAlias();
 
         switch ($format) {
@@ -886,7 +891,7 @@ final class SubmissionModel extends CommonFormModel
      *
      * @throws ValidationException
      */
-    protected function executeFormActions(SubmissionEvent $event): void
+    private function executeFormActions(SubmissionEvent $event): void
     {
         $actions          = $event->getSubmission()->getForm()->getActions();
         $customComponents = $this->formModel->getCustomComponents();
@@ -903,7 +908,7 @@ final class SubmissionModel extends CommonFormModel
      *
      * @throws ORMException
      */
-    protected function createLeadFromSubmit(Form $form, array $leadFieldMatches, $leadFields, ?Company $companyEntity = null): Lead
+    private function createLeadFromSubmit(Form $form, array $leadFieldMatches, array $leadFields, ?Company $companyEntity = null): Lead
     {
         // set the mapped data
         $inKioskMode   = $form->isInKioskMode();
@@ -1146,7 +1151,7 @@ final class SubmissionModel extends CommonFormModel
         }
 
         $companyFieldMatches = $getCompanyData($leadFieldMatches);
-        if (!empty($companyFieldMatches)) {
+        if ([] !== $companyFieldMatches) {
             [$company, $leadAdded, $companyEntity] = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $lead, $this->companyModel);
             $companyChangeLog                      = null;
             if ($leadAdded) {
@@ -1158,7 +1163,7 @@ final class SubmissionModel extends CommonFormModel
                 $this->companyModel->saveEntity($companyEntity);
             }
 
-            if (!empty($company) and $companyEntity instanceof Company) {
+            if (!empty($company) && $companyEntity instanceof Company) {
                 // Save after the lead in for new leads created through the API and maybe other places
                 $this->companyModel->addLeadToCompany($companyEntity, $lead);
                 $this->leadModel->setPrimaryCompany($companyEntity->getId(), $lead->getId());
@@ -1174,10 +1179,10 @@ final class SubmissionModel extends CommonFormModel
     /**
      * @return bool|string True if valid; otherwise string with invalid reason
      */
-    protected function validateFieldValue(Field $field, $value)
+    private function validateFieldValue(Field $field, $value)
     {
         $standardValidation = $this->fieldHelper->validateFieldValue($field->getType(), $value, $field);
-        if (!empty($standardValidation)) {
+        if ([] !== $standardValidation) {
             return $standardValidation;
         }
 

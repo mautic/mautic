@@ -35,17 +35,14 @@ final class DynamicContentRepository extends CommonRepository
         return parent::getEntities($args);
     }
 
-    /**
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     */
-    protected function addSearchCommandWhereClause($q, $filter): array
+    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
-        [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($queryBuilder, $filter);
         if ($expr) {
             return [$expr, $parameters];
         }
 
-        [$expr, $parameters] = parent::addSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = parent::addSearchCommandWhereClause($queryBuilder, $filter);
         if ($expr) {
             return [$expr, $parameters];
         }
@@ -61,9 +58,9 @@ final class DynamicContentRepository extends CommonRepository
                     $langUnique => $langValue,
                     $unique     => $filter->string,
                 ];
-                $expr = $q->expr()->or(
-                    $q->expr()->eq('e.language', ":{$unique}"),
-                    $q->expr()->like('e.language', ":{$langUnique}")
+                $expr = $queryBuilder->expr()->or(
+                    $queryBuilder->expr()->eq('e.language', ":{$unique}"),
+                    $queryBuilder->expr()->like('e.language', ":{$langUnique}")
                 );
                 break;
             case $this->translator->trans('mautic.project.searchcommand.name'):
@@ -79,7 +76,7 @@ final class DynamicContentRepository extends CommonRepository
         }
 
         if ($expr && $filter->not) {
-            $expr = $q->expr()->not($expr);
+            $expr = $queryBuilder->expr()->not($expr);
         }
 
         if (!empty($forceParameters)) {

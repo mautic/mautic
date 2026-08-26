@@ -6,16 +6,12 @@ namespace Mautic\CacheBundle\EventListener;
 
 use Mautic\CacheBundle\Cache\CacheProvider;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 
 final readonly class CacheClearSubscriber implements CacheClearerInterface
 {
-    /**
-     * @param CacheProvider $cacheProvider
-     */
     public function __construct(
-        private AdapterInterface $cacheProvider,
+        private CacheProvider $cacheProvider,
         private LoggerInterface $logger,
     ) {
     }

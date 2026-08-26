@@ -19,7 +19,6 @@ use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\PointBundle\Entity\TriggerEventRepository;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Entity\ReportRepository;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -30,6 +29,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 class TagModel extends FormModel
 {
+    public static function getName(): string
+    {
+        return 'lead.tag';
+    }
+
     private ReportRepository $reportRepository;
 
     private LeadListRepository $leadListRepository;
@@ -62,7 +66,7 @@ class TagModel extends FormModel
     /**
      * @var array<int, string>
      */
-    private const TAG_PROPERTY_KEYS = [
+    private const array TAG_PROPERTY_KEYS = [
         'add_tags',
         'remove_tags',
         'tags',
@@ -96,7 +100,7 @@ class TagModel extends FormModel
      * @param Tag   $entity
      * @param array $options
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Tag) {
             throw new MethodNotAllowedHttpException(['Tag']);
@@ -106,7 +110,7 @@ class TagModel extends FormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create(TagEntityType::class, $entity, $options);
+        return $this->formFactory->create(TagEntityType::class, $entity, $options);
     }
 
     /**

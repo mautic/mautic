@@ -2,9 +2,9 @@
 
 namespace Mautic\SmsBundle\Controller;
 
+use Mautic\CacheBundle\Cache\CacheProviderInterface;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
-use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\TokenSorter;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\SmsBundle\Broadcast\BroadcastQuery;
@@ -33,7 +33,7 @@ final class AjaxController extends CommonAjaxController
         $this->smsModel = $smsModel;
     }
 
-    public function getSmsCountStatsAction(Request $request, BroadcastQuery $broadcastQuery, CacheStorageHelper $cacheStorageHelper): JsonResponse
+    public function getSmsCountStatsAction(Request $request, BroadcastQuery $broadcastQuery, CacheProviderInterface $cacheProvider): JsonResponse
     {
         $id  = $request->get('id');
         $ids = $request->query->all()['ids'] ?? [];
@@ -51,7 +51,7 @@ final class AjaxController extends CommonAjaxController
                 }
 
                 $pending = $broadcastQuery->getPendingCount($sms);
-                $cacheStorageHelper->set(sprintf('%s|%s|%s', 'sms', $sms->getId(), 'pending'), $pending);
+                $cacheProvider->getSimpleCache()->set(sprintf('%s|%s|%s', 'sms', $sms->getId(), 'pending'), $pending);
                 if (!$pending) {
                     continue;
                 }

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MauticPlugin\GrapesJsBuilderBundle\Tests\Unit\Controller;
 
 use Mautic\CoreBundle\Model\AbstractCommonModel;
-use Mautic\CoreBundle\Model\MauticModelInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Entity\Email;
 use MauticPlugin\GrapesJsBuilderBundle\Controller\GrapesJsController;
@@ -38,11 +37,11 @@ final class GrapesJsControllerTest extends TestCase
     public function testEditorStateActionReturnsEditorStateFromJsonContent(): void
     {
         $security = $this->createMock(CorePermissions::class);
-        $security->method('hasEntityAccess')->willReturn(true);
+        $security->expects($this->once())->method('hasEntityAccess')->willReturn(true);
 
         $entity = $this->createMock(Email::class);
-        $entity->method('getCreatedBy')->willReturn(1);
-        $entity->method('getContent')->willReturn(json_encode([
+        $entity->expects($this->once())->method('getCreatedBy')->willReturn(1);
+        $entity->expects($this->once())->method('getContent')->willReturn(json_encode([
             'grapesjsbuilder' => [
                 'editorState' => json_encode(['components' => [['type' => 'text']]]),
             ],
@@ -57,11 +56,11 @@ final class GrapesJsControllerTest extends TestCase
     public function testEditorStateActionReturnsEditorStateFromSerializedContent(): void
     {
         $security = $this->createMock(CorePermissions::class);
-        $security->method('hasEntityAccess')->willReturn(true);
+        $security->expects($this->once())->method('hasEntityAccess')->willReturn(true);
 
         $entity = $this->createMock(Email::class);
-        $entity->method('getCreatedBy')->willReturn(1);
-        $entity->method('getContent')->willReturn('a:1:{s:15:"grapesjsbuilder";a:1:{s:11:"editorState";a:1:{s:5:"pages";a:0:{}}}}');
+        $entity->expects($this->once())->method('getCreatedBy')->willReturn(1);
+        $entity->expects($this->once())->method('getContent')->willReturn('a:1:{s:15:"grapesjsbuilder";a:1:{s:11:"editorState";a:1:{s:5:"pages";a:0:{}}}}');
 
         $controller = $this->getControllerForEditorState($security, $entity);
         $response   = $controller->editorStateAction('email', '33');
@@ -72,11 +71,11 @@ final class GrapesJsControllerTest extends TestCase
     public function testEditorStateActionReturnsNullWhenEditorStateCannotBeDecoded(): void
     {
         $security = $this->createMock(CorePermissions::class);
-        $security->method('hasEntityAccess')->willReturn(true);
+        $security->expects($this->once())->method('hasEntityAccess')->willReturn(true);
 
         $entity = $this->createMock(Email::class);
-        $entity->method('getCreatedBy')->willReturn(1);
-        $entity->method('getContent')->willReturn([
+        $entity->expects($this->once())->method('getCreatedBy')->willReturn(1);
+        $entity->expects($this->once())->method('getContent')->willReturn([
             'grapesjsbuilder' => [
                 'editorState' => 'not-a-json',
             ],
@@ -102,7 +101,7 @@ final class GrapesJsControllerTest extends TestCase
             /**
              * @return AbstractCommonModel<object>
              */
-            protected function getModel($modelNameKey): MauticModelInterface
+            protected function getModel(string $modelNameKey): AbstractCommonModel
             {
                 return new class($this->testEntity) extends AbstractCommonModel {
                     public function __construct(

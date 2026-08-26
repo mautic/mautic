@@ -21,15 +21,15 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class ProjectController extends AbstractFormController
 {
-    public const ROUTE_INDEX     = 'mautic_project_index';
+    public const string ROUTE_INDEX     = 'mautic_project_index';
 
-    private const ROUTE_ACTION   = 'mautic_project_action';
+    private const string ROUTE_ACTION   = 'mautic_project_action';
 
-    private const LINK_ID_INDEX  = '#'.self::ROUTE_INDEX;
+    private const string LINK_ID_INDEX  = '#'.self::ROUTE_INDEX;
 
-    private const TEMPLATE_INDEX = 'Mautic\ProjectBundle\Controller\ProjectController::indexAction';
+    private const string TEMPLATE_INDEX = 'Mautic\ProjectBundle\Controller\ProjectController::indexAction';
 
-    private const TEMPLATE_FORM  = '@MauticProject/Project/form.html.twig';
+    private const string TEMPLATE_FORM  = '@MauticProject/Project/form.html.twig';
 
     public function indexAction(Request $request, ProjectModel $projectModel, CorePermissions $corePermissions, ProjectEntityLoaderService $entityLoader, int $page = 1): Response
     {
@@ -135,7 +135,7 @@ final class ProjectController extends AbstractFormController
         ]);
     }
 
-    public function newAction(Request $request, ProjectModel $projectModel, FormFactoryInterface $formFactory, CorePermissions $corePermissions): Response
+    public function newAction(Request $request, ProjectModel $projectModel, CorePermissions $corePermissions): Response
     {
         if (!$corePermissions->isGranted(ProjectPermissions::CAN_CREATE)) {
             $this->throwAccessDenied();
@@ -146,7 +146,7 @@ final class ProjectController extends AbstractFormController
         $returnUrl = $this->generateUrl(self::ROUTE_INDEX, ['page' => $page]);
         $action    = $this->generateUrl(self::ROUTE_ACTION, ['objectAction' => 'new']);
 
-        $form = $this->buildForm($project, $action, $formFactory);
+        $form = $this->buildForm($project, $action);
 
         if ('POST' === $request->getMethod()) {
             $valid     = $this->isFormValid($form);
@@ -176,7 +176,7 @@ final class ProjectController extends AbstractFormController
             }
 
             if ($valid) {
-                return $this->editAction($project->getId(), $request, $projectModel, $formFactory, $corePermissions, true);
+                return $this->editAction($project->getId(), $request, $projectModel, $corePermissions, true);
             }
         }
 
@@ -194,7 +194,7 @@ final class ProjectController extends AbstractFormController
         ]);
     }
 
-    public function editAction(string|int $objectId, Request $request, ProjectModel $projectModel, FormFactoryInterface $formFactory, CorePermissions $corePermissions, bool $ignorePost = false): Response
+    public function editAction(string|int $objectId, Request $request, ProjectModel $projectModel, CorePermissions $corePermissions, bool $ignorePost = false): Response
     {
         if (!$corePermissions->isGranted(ProjectPermissions::CAN_EDIT)) {
             $this->throwAccessDenied();
@@ -211,7 +211,7 @@ final class ProjectController extends AbstractFormController
             }
 
             $action = $this->generateUrl(self::ROUTE_ACTION, ['objectAction' => 'edit', 'objectId' => $objectId]);
-            $form   = $this->buildForm($project, $action, $formFactory);
+            $form   = $this->buildForm($project, $action);
 
             if (!$ignorePost && 'POST' === $request->getMethod()) {
                 if ($this->isFormCancelled($form)) {
@@ -242,7 +242,7 @@ final class ProjectController extends AbstractFormController
                         // Re-create the form once more with the fresh project and action.
                         // The alias was empty on redirect after cloning.
                         $editAction = $this->generateUrl(self::ROUTE_ACTION, ['objectAction' => 'edit', 'objectId' => $project->getId()]);
-                        $form       = $this->buildForm($project, $editAction, $formFactory);
+                        $form       = $this->buildForm($project, $editAction);
 
                         $postActionVars['viewParameters'] = [
                             'objectAction' => 'edit',
@@ -451,7 +451,7 @@ final class ProjectController extends AbstractFormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 try {
                     $entities = $projectModel->deleteEntities($deleteIds);
                 } catch (ForeignKeyConstraintViolationException) {
@@ -735,8 +735,8 @@ final class ProjectController extends AbstractFormController
     /**
      * @return FormInterface<FormInterface>&FormInterface
      */
-    private function buildForm(Project $project, string $action, FormFactoryInterface $formFactory): FormInterface
+    private function buildForm(Project $project, string $action): FormInterface
     {
-        return $formFactory->create(ProjectEntityType::class, $project, ['action' => $action]);
+        return $this->createForm(ProjectEntityType::class, $project, ['action' => $action]);
     }
 }

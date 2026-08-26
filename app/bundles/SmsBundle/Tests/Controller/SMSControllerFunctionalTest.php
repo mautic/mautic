@@ -11,11 +11,11 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class SMSControllerFunctionalTest extends MauticMysqlTestCase
 {
-    private const EDIT_SMS_PATH       = '/s/sms/edit/';
+    private const string EDIT_SMS_PATH       = '/s/sms/edit/';
 
-    private const DEFAULT_SMS_MESSAGE = 'sms body';
+    private const string DEFAULT_SMS_MESSAGE = 'sms body';
 
-    private const SAVE_AND_CLOSE      = 'Save & Close';
+    private const string SAVE_AND_CLOSE      = 'Save & Close';
 
     protected function setUp(): void
     {
@@ -34,7 +34,7 @@ final class SMSControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $crawler = $this->client->request('GET', self::EDIT_SMS_PATH.$sms->getId());
+        $crawler = $this->client->request(Request::METHOD_GET, self::EDIT_SMS_PATH.$sms->getId());
         $form    = $crawler->selectButton('Save')->form();
         $form['sms[projects]']->setValue((string) $project->getId());
 

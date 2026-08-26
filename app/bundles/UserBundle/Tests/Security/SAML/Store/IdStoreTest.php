@@ -8,9 +8,11 @@ use Doctrine\ORM\EntityManager;
 use LightSaml\Provider\TimeProvider\TimeProviderInterface;
 use Mautic\UserBundle\Entity\IdEntry;
 use Mautic\UserBundle\Security\SAML\Store\IdStore;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 final class IdStoreTest extends TestCase
 {
     /**

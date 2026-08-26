@@ -171,11 +171,11 @@ final class MauticSyncDataExchangeTest extends TestCase
             ->with($mappingManualDao, 'lead', $integrationObjectDao)
             ->willReturn(new ObjectDAO('lead', 123));
 
-        $this->mappingHelper->method('getMauticEntityClassName')
+        $this->mappingHelper->expects($this->once())->method('getMauticEntityClassName')
             ->with('lead')
             ->willReturn(Lead::class);
 
-        $this->fieldHelper->method('getFieldChangeObject')
+        $this->fieldHelper->expects($this->once())->method('getFieldChangeObject')
             ->with($fieldChange)
             ->willReturn(new FieldDAO('some-field-name', new NormalizedValueDAO('type', 'some-field-value')));
 

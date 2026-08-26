@@ -30,7 +30,6 @@ use MauticPlugin\MauticFocusBundle\FocusEvents;
 use MauticPlugin\MauticFocusBundle\Form\Type\FocusType;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -44,6 +43,11 @@ use Twig\Runtime\EscaperRuntime;
  */
 class FocusModel extends FormModel implements GlobalSearchInterface
 {
+    public static function getName(): string
+    {
+        return 'focus.focus';
+    }
+
     public function __construct(
         protected \Mautic\FormBundle\Model\FormModel $formModel,
         protected TrackableModel $trackableModel,
@@ -83,7 +87,7 @@ class FocusModel extends FormModel implements GlobalSearchInterface
      *
      * @throws NotFoundHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Focus) {
             throw new MethodNotAllowedHttpException(['Focus']);
@@ -93,7 +97,7 @@ class FocusModel extends FormModel implements GlobalSearchInterface
             $options['action'] = $action;
         }
 
-        return $formFactory->create(FocusType::class, $entity, $options);
+        return $this->formFactory->create(FocusType::class, $entity, $options);
     }
 
     public function getRepository(): FocusRepository
@@ -152,7 +156,7 @@ class FocusModel extends FormModel implements GlobalSearchInterface
 
         $content = $this->getContent($focusArray, $isPreview, $url);
         $data    = [
-            'js'    => (new Minify\JS($javascript))->minify(),
+            'js'    => new Minify\JS($javascript)->minify(),
             'focus' => InputHelper::minifyHTML($content['focus']),
             'form'  => InputHelper::minifyHTML($content['form']),
         ];

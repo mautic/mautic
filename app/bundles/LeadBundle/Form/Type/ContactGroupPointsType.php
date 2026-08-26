@@ -14,7 +14,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ContactGroupPointsType extends AbstractType
 {
-    private const SCORE_FIELD_PREFIX = 'score_group_';
+    private const string SCORE_FIELD_PREFIX = 'score_group_';
 
     public function __construct(
         private readonly TranslatorInterface $translator,

@@ -25,7 +25,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class TagControllerTest extends MauticMysqlTestCase
 {
-    private const MERGE_ROUTE_BASE = '/s/tags/merge/';
+    private const string MERGE_ROUTE_BASE = '/s/tags/merge/';
 
     private TagRepository $tagRepository;
 
@@ -33,7 +33,7 @@ final class TagControllerTest extends MauticMysqlTestCase
     {
         parent::setUp();
         /** @var TagModel $tagModel */
-        $tagModel            = static::getContainer()->get(TagModel::class);
+        $tagModel            = self::getContainer()->get(TagModel::class);
         $this->tagRepository = $tagModel->getRepository();
 
         $tags = ['tag1', 'tag2', 'tag3', 'tag4', 'tag5'];
@@ -52,7 +52,7 @@ final class TagControllerTest extends MauticMysqlTestCase
      */
     public function testIndexActionWhenNotFiltered(): void
     {
-        $this->client->request('GET', '/s/tags');
+        $this->client->request(Request::METHOD_GET, '/s/tags');
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
 
@@ -66,7 +66,7 @@ final class TagControllerTest extends MauticMysqlTestCase
      */
     public function testIndexActionWhenFiltered(): void
     {
-        $this->client->request('GET', '/s/tags?search=tag1');
+        $this->client->request(Request::METHOD_GET, '/s/tags?search=tag1');
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
 
@@ -87,7 +87,7 @@ final class TagControllerTest extends MauticMysqlTestCase
         $otherTag->setDescription('No related content.');
         $this->tagRepository->saveEntity($otherTag);
 
-        $this->client->request('GET', '/s/tags?search=test');
+        $this->client->request(Request::METHOD_GET, '/s/tags?search=test');
         $clientResponse        = $this->client->getResponse();
         $clientResponseContent = $clientResponse->getContent();
 
@@ -99,7 +99,7 @@ final class TagControllerTest extends MauticMysqlTestCase
     public function testTagDeletion(): void
     {
         $tagId = $this->tagRepository->findOneBy([])->getId();
-        $this->client->request('POST', '/s/tags/delete/'.$tagId);
+        $this->client->request(Request::METHOD_POST, '/s/tags/delete/'.$tagId);
         $this->assertResponseIsSuccessful();
         $this->assertNotInstanceOf(Tag::class, $this->tagRepository->find($tagId), 'Assert that tag is deleted');
     }
@@ -119,7 +119,7 @@ final class TagControllerTest extends MauticMysqlTestCase
 
         $this->assertSame(1, $this->countLeadTagAssociations($tagId));
 
-        $this->client->request('POST', '/s/tags/delete/'.$tagId);
+        $this->client->request(Request::METHOD_POST, '/s/tags/delete/'.$tagId);
         $this->assertResponseIsSuccessful();
         $this->assertNotInstanceOf(Tag::class, $this->tagRepository->find($tagId), 'Assert that tag is deleted');
         $this->assertSame(0, $this->countLeadTagAssociations($tagId));
@@ -133,7 +133,7 @@ final class TagControllerTest extends MauticMysqlTestCase
         $tag = $this->tagRepository->findOneBy([]);
         $this->assertInstanceOf(Tag::class, $tag);
 
-        $this->client->request('GET', '/s/tags/view/'.$tag->getId());
+        $this->client->request(Request::METHOD_GET, '/s/tags/view/'.$tag->getId());
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
         $this->assertResponseIsSuccessful();
@@ -143,7 +143,7 @@ final class TagControllerTest extends MauticMysqlTestCase
     public function testViewActionNotFound(): void
     {
         $this->client->followRedirects(false);
-        $this->client->request('GET', '/s/tags/view/99999');
+        $this->client->request(Request::METHOD_GET, '/s/tags/view/99999');
         $clientResponse = $this->client->getResponse();
         $this->assertTrue($clientResponse->isRedirection(), 'Must be redirect response.');
     }
@@ -168,7 +168,7 @@ final class TagControllerTest extends MauticMysqlTestCase
         $tag     = $this->tagRepository->findOneBy([]);
         $this->assertInstanceOf(Tag::class, $tag);
 
-        $crawler                = $this->client->request('GET', '/s/tags/edit/'.$tag->getId());
+        $crawler                = $this->client->request(Request::METHOD_GET, '/s/tags/edit/'.$tag->getId());
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
         $this->assertResponseIsSuccessful();
@@ -184,7 +184,7 @@ final class TagControllerTest extends MauticMysqlTestCase
     public function testEditActionNotFound(): void
     {
         $this->client->followRedirects(false);
-        $this->client->request('GET', '/s/tags/edit/99999');
+        $this->client->request(Request::METHOD_GET, '/s/tags/edit/99999');
         $clientResponse = $this->client->getResponse();
         $this->assertTrue($clientResponse->isRedirection(), 'Must be redirect response.');
     }
@@ -195,7 +195,7 @@ final class TagControllerTest extends MauticMysqlTestCase
     public function testNewAction(): void
     {
         $TagName        = 'Test tag';
-        $crawler        = $this->client->request('GET', '/s/tags/new');
+        $crawler        = $this->client->request(Request::METHOD_GET, '/s/tags/new');
         $this->assertResponseIsSuccessful();
 
         $form = $crawler->selectButton('Save')->form();
@@ -207,7 +207,7 @@ final class TagControllerTest extends MauticMysqlTestCase
 
     public function testNewActionValidation(): void
     {
-        $crawler = $this->client->request('GET', '/s/tags/new');
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/tags/new');
         $this->assertResponseIsSuccessful();
 
         $buttonCrawler  = $crawler->selectButton('Save');
@@ -221,7 +221,7 @@ final class TagControllerTest extends MauticMysqlTestCase
     public function testNewActionDuplicateTag(): void
     {
         $TagName        = $this->tagRepository->findOneBy([])->getTag();
-        $crawler        = $this->client->request('GET', '/s/tags/new');
+        $crawler        = $this->client->request(Request::METHOD_GET, '/s/tags/new');
         $this->assertResponseIsSuccessful();
 
         $form = $crawler->selectButton('Save')->form();
@@ -235,7 +235,7 @@ final class TagControllerTest extends MauticMysqlTestCase
     {
         $tags   = $this->tagRepository->findAll();
         $tagsId = array_map(fn (Tag $tag) => $tag->getId(), $tags);
-        $this->client->request('POST', '/s/tags/batchDelete?ids='.json_encode($tagsId), [], [], $this->createAjaxHeaders());
+        $this->client->request(Request::METHOD_POST, '/s/tags/batchDelete?ids='.json_encode($tagsId), [], [], $this->createAjaxHeaders());
         $this->assertResponseIsSuccessful();
         $this->assertEmpty($this->tagRepository->count([]), 'All tags must be deleted.');
     }
@@ -271,7 +271,7 @@ final class TagControllerTest extends MauticMysqlTestCase
         $tags       = $this->tagRepository->findAll();
         $primaryTag = $tags[0];
 
-        $this->client->request('GET', self::MERGE_ROUTE_BASE.$primaryTag->getId());
+        $this->client->request(Request::METHOD_GET, self::MERGE_ROUTE_BASE.$primaryTag->getId());
         $this->client->getResponse();
         $this->assertResponseIsSuccessful('Return code must be 200.');
 
@@ -284,7 +284,7 @@ final class TagControllerTest extends MauticMysqlTestCase
         $tags       = $this->tagRepository->findAll();
         $currentTag = $tags[0];
 
-        $this->client->request('GET', self::MERGE_ROUTE_BASE.$currentTag->getId());
+        $this->client->request(Request::METHOD_GET, self::MERGE_ROUTE_BASE.$currentTag->getId());
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful('Return code must be 200.');
 
@@ -303,7 +303,7 @@ final class TagControllerTest extends MauticMysqlTestCase
 
     public function testMergeActionWithInvalidTag(): void
     {
-        $this->client->request('GET', self::MERGE_ROUTE_BASE.'999999');
+        $this->client->request(Request::METHOD_GET, self::MERGE_ROUTE_BASE.'999999');
         $this->client->getResponse();
         $this->assertResponseIsSuccessful('Return code must be 200 (redirect with error).');
     }
@@ -317,7 +317,7 @@ final class TagControllerTest extends MauticMysqlTestCase
         $secondaryTagId = (int) $secondaryTag->getId();
 
         // Test that the merge action returns the correct response
-        $this->client->request('GET', self::MERGE_ROUTE_BASE.$secondaryTagId);
+        $this->client->request(Request::METHOD_GET, self::MERGE_ROUTE_BASE.$secondaryTagId);
         $response = $this->client->getResponse();
 
         // Debug: check what status code and content we're getting
@@ -356,7 +356,7 @@ final class TagControllerTest extends MauticMysqlTestCase
 
         // Test the actual merge functionality by calling the model directly
         /** @var TagModel $tagModel */
-        $tagModel = static::getContainer()->get(TagModel::class);
+        $tagModel = self::getContainer()->get(TagModel::class);
         $tagModel->tagMerge($primaryTag, $secondaryTag);
 
         $this->em->clear();
@@ -396,7 +396,7 @@ final class TagControllerTest extends MauticMysqlTestCase
         $reportId              = (int) $report->getId();
 
         /** @var TagModel $tagModel */
-        $tagModel = static::getContainer()->get(TagModel::class);
+        $tagModel = self::getContainer()->get(TagModel::class);
         $tagModel->tagMerge($primaryTag, $secondaryTag);
 
         $this->em->clear();

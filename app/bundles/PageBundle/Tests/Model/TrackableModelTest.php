@@ -138,10 +138,10 @@ final class TrackableModelTest extends TestCase
         $model = $this->getModel();
 
         if (null !== $useMap) {
-            $emailContent = $this->generateContent($url, 'html', false, $useMap);
+            $emailContent = $this->generateContent($url, 'html', $useMap);
         } else {
-            $emailContent = $this->generateContent($url, 'html', false, true)
-                .$this->generateContent($url, 'html', false, false);
+            $emailContent = $this->generateContent($url, 'html', true)
+                .$this->generateContent($url, 'html', false);
         }
 
         [$content, $trackables] = $model->parseContentForTrackables(
@@ -175,10 +175,10 @@ final class TrackableModelTest extends TestCase
         $model = $this->getModel();
 
         if (null !== $useMap) {
-            $emailContent = $this->generateContent($url, 'html', false, $useMap);
+            $emailContent = $this->generateContent($url, 'html', $useMap);
         } else {
-            $emailContent = $this->generateContent($url, 'html', false, true)
-                .$this->generateContent($url, 'html', false, false);
+            $emailContent = $this->generateContent($url, 'html', true)
+                .$this->generateContent($url, 'html', false);
         }
 
         [$content, $trackables] = $model->parseContentForTrackables(
@@ -212,10 +212,10 @@ final class TrackableModelTest extends TestCase
         $model = $this->getModel();
 
         if (null !== $useMap) {
-            $emailContent = $this->generateContent($url, 'html', false, $useMap);
+            $emailContent = $this->generateContent($url, 'html', $useMap);
         } else {
-            $emailContent = $this->generateContent($url, 'html', false, true)
-                .$this->generateContent($url, 'html', false, false);
+            $emailContent = $this->generateContent($url, 'html', true)
+                .$this->generateContent($url, 'html', false);
         }
 
         [$content, $trackables] = $model->parseContentForTrackables(
@@ -460,10 +460,10 @@ final class TrackableModelTest extends TestCase
         $model = $this->getModel();
 
         if (null !== $useMap) {
-            $emailContent = $this->generateContent($url, 'html', false, $useMap);
+            $emailContent = $this->generateContent($url, 'html', $useMap);
         } else {
-            $emailContent = $this->generateContent($url, 'html', false, true)
-                .$this->generateContent($url, 'html', false, false);
+            $emailContent = $this->generateContent($url, 'html', true)
+                .$this->generateContent($url, 'html', false);
         }
 
         [$content, $trackables] = $model->parseContentForTrackables(
@@ -495,10 +495,10 @@ final class TrackableModelTest extends TestCase
         $model = $this->getModel();
 
         if (null !== $useMap) {
-            $emailContent = $this->generateContent($urls, 'html', false, $useMap);
+            $emailContent = $this->generateContent($urls, 'html', $useMap);
         } else {
-            $emailContent = $this->generateContent($urls, 'html', false, true)
-                .$this->generateContent($urls, 'html', false, false);
+            $emailContent = $this->generateContent($urls, 'html', true)
+                .$this->generateContent($urls, 'html', false);
         }
 
         [$content, $trackables] = $model->parseContentForTrackables(
@@ -560,11 +560,11 @@ TEXT;
         $this->assertCount(1, $trackables);
 
         // No links so no trackables
-        $this->assertEquals($html, $content[0]);
+        $this->assertSame($html, $content[0]);
         $token = array_key_first($trackables);
         $this->assertNotNull($token);
 
-        $this->assertEquals(str_replace('https://plaintexttest.io', $token, $plainText), $content[1]);
+        $this->assertSame(str_replace('https://plaintexttest.io', $token, $plainText), $content[1]);
     }
 
     #[TestDox('Tests that URL based contact fields are found in plain text')]
@@ -595,11 +595,11 @@ TEXT;
         $this->assertCount(1, $trackables);
 
         // No links so no trackables
-        $this->assertEquals($html, $content[0]);
+        $this->assertSame($html, $content[0]);
         $token = array_key_first($trackables);
         $this->assertNotNull($token);
 
-        $this->assertEquals(str_replace('{contactfield=website}', $token, $plainText), $content[1]);
+        $this->assertSame(str_replace('{contactfield=website}', $token, $plainText), $content[1]);
     }
 
     /**
@@ -679,7 +679,7 @@ TEXT;
     /**
      * @param array<int, string>|string $urls
      */
-    protected function generateContent($urls, string $type, bool $doNotTrack = false, bool $useMap = false): string
+    protected function generateContent($urls, string $type, bool $useMap = false): string
     {
         $content = '';
         if (!is_array($urls)) {
@@ -688,17 +688,15 @@ TEXT;
 
         foreach ($urls as $url) {
             if ('html' === $type) {
-                $dnc = ($doNotTrack) ? ' mautic:disable-tracking' : '';
-
                 if ($useMap) {
                     $content .= <<<CONTENT
     ABC123 321ABC
-    ABC123 <map><area href="{$url}"{$dnc} alt="alt" /></map> 321ABC
+    ABC123 <map><area href="{$url}" alt="alt" /></map> 321ABC
 CONTENT;
                 } else {
                     $content .= <<<CONTENT
     ABC123 321ABC
-    ABC123 <a href="{$url}"{$dnc}>{$url}</a> 321ABC
+    ABC123 <a href="{$url}">{$url}</a> 321ABC
 CONTENT;
                 }
             } else {

@@ -15,7 +15,7 @@ final class StatHelperPassTest extends TestCase
     /**
      * There are 6 stat helpers in the container, keep a small reserve for removed ones.
      */
-    private const MINIMAL_STAT_HELPER_COUNT = 6;
+    private const int MINIMAL_STAT_HELPER_COUNT = 6;
 
     public function testStatHelpersAreAddedToStatHelperContainer(): void
     {
@@ -25,7 +25,7 @@ final class StatHelperPassTest extends TestCase
         $statHelperContainer = $kernel->getContainer()->get(StatHelperContainer::class);
         $this->assertInstanceOf(StatHelperContainer::class, $statHelperContainer);
 
-        $helpers = (new \ReflectionProperty(StatHelperContainer::class, 'helpers'))
+        $helpers = new \ReflectionProperty(StatHelperContainer::class, 'helpers')
             ->getValue($statHelperContainer);
 
         $this->assertGreaterThanOrEqual(self::MINIMAL_STAT_HELPER_COUNT, count($helpers));

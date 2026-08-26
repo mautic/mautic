@@ -17,7 +17,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 final class WidgetTest extends TestCase
 {
-    private const USER_ID = 1;
+    private const int USER_ID = 1;
 
     /**
      * @var MockObject&DashboardModel

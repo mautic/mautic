@@ -65,15 +65,15 @@ final class VisitedPageConditionControllerFunctionalTest extends MauticMysqlTest
     {
         yield [
             'pageUrl'          => ['page_url', 'https://example.com'],
-            'startDate'        => ['startDate', (new \DateTime())->format('Y-m-d H:i:s')],
-            'endDate'          => ['endDate', (new \DateTime())->modify('+ 5 days')->format('Y-m-d H:i:s')],
+            'startDate'        => ['startDate', new \DateTime()->format('Y-m-d H:i:s')],
+            'endDate'          => ['endDate', new \DateTime()->modify('+ 5 days')->format('Y-m-d H:i:s')],
             'accumulativeTime' => ['accumulative_time', 5],
             'page'             => ['page', null],
         ];
         yield [
             'pageUrl'          => ['page_url', 'https://example.com'],
-            'startDate'        => ['startDate', (new \DateTime())->format('Y-m-d H:i:s')],
-            'endDate'          => ['endDate', (new \DateTime())->modify('+ 10 days')->format('Y-m-d H:i:s')],
+            'startDate'        => ['startDate', new \DateTime()->format('Y-m-d H:i:s')],
+            'endDate'          => ['endDate', new \DateTime()->modify('+ 10 days')->format('Y-m-d H:i:s')],
             'accumulativeTime' => ['accumulative_time', null],
             'page'             => ['page', ''],
         ];

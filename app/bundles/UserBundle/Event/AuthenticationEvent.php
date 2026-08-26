@@ -46,19 +46,18 @@ class AuthenticationEvent extends Event
     protected $failedAuthMessage;
 
     /**
-     * @param string|User|null                $user
      * @param bool                            $isLoginCheck          Event executed from the mautic_sso_login_check route typically used as the SSO callback
      * @param string                          $authenticatingService Service Service requesting authentication
      * @param array<AbstractIntegration>|null $integrations
      */
     public function __construct(
-        protected $user,
+        protected string|User|null $user,
         protected TokenInterface $token,
         UserProviderInterface $userProvider,
         protected Request $request,
-        protected $isLoginCheck = false,
-        protected $authenticatingService = null,
-        protected $integrations = null,
+        protected bool $isLoginCheck = false,
+        protected ?string $authenticatingService = null,
+        protected ?array $integrations = null,
     ) {
         $this->isFormLogin           = $token instanceof UsernamePasswordToken;
 
@@ -79,10 +78,8 @@ class AuthenticationEvent extends Event
 
     /**
      * Get user returned by username search.
-     *
-     * @return string|User|null
      */
-    public function getUser()
+    public function getUser(): string|User|null
     {
         return $this->user;
     }
@@ -112,7 +109,7 @@ class AuthenticationEvent extends Event
         return $this->token;
     }
 
-    public function setToken($service, TokenInterface $token): void
+    public function setToken(?string $service, TokenInterface $token): void
     {
         $this->token                 = $token;
         $this->authenticatingService = $service;
@@ -129,12 +126,7 @@ class AuthenticationEvent extends Event
         return $this->token->getUserIdentifier();
     }
 
-    /**
-     * Get user provider to find and/or create new users.
-     *
-     * @return UserProvider
-     */
-    public function getUserProvider(): UserProviderInterface
+    public function getUserProvider(): UserProvider
     {
         return $this->userProvider;
     }
@@ -145,7 +137,7 @@ class AuthenticationEvent extends Event
      * @param string    $service           Service that authenticated the user; if using a Integration, it should match that of AbstractIntegration::getName();
      * @param bool|true $createIfNotExists
      */
-    public function setIsAuthenticated($service, ?User $user = null, $createIfNotExists = true): void
+    public function setIsAuthenticated(?string $service, ?User $user = null, $createIfNotExists = true): void
     {
         $this->authenticatingService = $service;
 
@@ -210,10 +202,8 @@ class AuthenticationEvent extends Event
 
     /**
      * Get the service that authenticated the user.
-     *
-     * @return string
      */
-    public function getAuthenticatingService()
+    public function getAuthenticatingService(): ?string
     {
         return $this->authenticatingService;
     }
@@ -254,10 +244,8 @@ class AuthenticationEvent extends Event
 
     /**
      * Check if the event is executed as the result of accessing mautic_sso_login_check.
-     *
-     * @return bool
      */
-    public function isLoginCheck()
+    public function isLoginCheck(): bool
     {
         return $this->isLoginCheck;
     }

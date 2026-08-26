@@ -9,7 +9,7 @@ use Symfony\Component\DomCrawler\Crawler;
 
 final class ChangeOwnerTypeFunctionalTest extends MauticMysqlTestCase
 {
-    private const TEMP_CAMPAIGN_ID = 'mautic_89f7f52426c1dff3daa3beaea708a6b39fe7a775';
+    private const string TEMP_CAMPAIGN_ID = 'mautic_89f7f52426c1dff3daa3beaea708a6b39fe7a775';
 
     public function testCampaignBuilderWithChangeOwnerActionDoesNotBreakOtherEventLinks(): void
     {

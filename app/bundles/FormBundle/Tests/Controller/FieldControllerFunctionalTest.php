@@ -78,8 +78,8 @@ final class FieldControllerFunctionalTest extends MauticMysqlTestCase
 
         $response = json_decode($this->client->getResponse()->getContent(), true);
 
-        $this->assertSame(1, $response['success'] ?? null, $this->client->getResponse()->getContent());
-        $this->assertSame(1, $response['closeModal'] ?? null, $this->client->getResponse()->getContent());
+        $this->assertSame(1, $response['success'] ?? null, (string) $this->client->getResponse()->getContent());
+        $this->assertSame(1, $response['closeModal'] ?? null, (string) $this->client->getResponse()->getContent());
     }
 
     public function testNewCompanyLookupFieldForm(): void

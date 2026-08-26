@@ -1,7 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\DependencyInjection;
 
+use Mautic\CoreBundle\Helper\Update\PreUpdateChecks\AbstractPreUpdateCheck;
+use Mautic\CoreBundle\Model\MauticModelInterface;
+use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
+use Mautic\CoreBundle\Update\Step\StepInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -9,7 +15,7 @@ use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 
 final class MauticCoreExtension extends Extension
 {
-    public const DEFAULT_EXCLUDES = [
+    public const array DEFAULT_EXCLUDES = [
         'Config',
         'Crate',
         'DataObject',
@@ -31,6 +37,18 @@ final class MauticCoreExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container): void
     {
+        $container->registerForAutoconfiguration(MauticModelInterface::class)
+            ->addTag(MauticModelInterface::class);
+
+        $container->registerForAutoconfiguration(AbstractPermissions::class)
+            ->addTag('mautic.permissions');
+
+        $container->registerForAutoconfiguration(StepInterface::class)
+            ->addTag('mautic.update_step');
+
+        $container->registerForAutoconfiguration(AbstractPreUpdateCheck::class)
+            ->addTag('mautic.update_check');
+
         // For the project:
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../../../config'));
         $loader->load('services.php');

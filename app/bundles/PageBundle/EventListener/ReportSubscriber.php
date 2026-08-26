@@ -18,11 +18,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class ReportSubscriber implements EventSubscriberInterface
 {
-    public const CONTEXT_PAGES      = 'pages';
+    public const string CONTEXT_PAGES      = 'pages';
 
-    public const CONTEXT_PAGE_HITS  = 'page.hits';
+    public const string CONTEXT_PAGE_HITS  = 'page.hits';
 
-    public const CONTEXT_VIDEO_HITS = 'video.hits';
+    public const string CONTEXT_VIDEO_HITS = 'video.hits';
 
     public function __construct(
         private CompanyReportData $companyReportData,

@@ -103,11 +103,9 @@ final class MessageRepository extends CommonRepository
     }
 
     /**
-     * @param object $filter
-     *
      * @return mixed[]
      */
-    protected function addSearchCommandWhereClause($q, $filter): array
+    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return match ($filter->command) {
             $this->translator->trans('mautic.project.searchcommand.name'),
@@ -119,7 +117,7 @@ final class MessageRepository extends CommonRepository
                 $filter->string,
                 $filter->not
             ),
-            default => $this->addStandardSearchCommandWhereClause($q, $filter),
+            default => $this->addStandardSearchCommandWhereClause($queryBuilder, $filter),
         };
     }
 

@@ -54,7 +54,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         $counter = $this->scheduledExecutioner->execute($campaign, $limiter, new BufferedOutput());
         $this->assertInstanceOf(Counter::class, $counter);
 
-        $this->assertEquals(4, $counter->getTotalEvaluated());
+        $this->assertSame(4, $counter->getTotalEvaluated());
     }
 
     public function testEventsAreExecutedInQuietMode(): void
@@ -83,7 +83,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         $counter = $this->scheduledExecutioner->execute($campaign, $limiter);
         $this->assertInstanceOf(Counter::class, $counter); // Quiet mode - no output
 
-        $this->assertEquals(4, $counter->getTotalEvaluated());
+        $this->assertSame(4, $counter->getTotalEvaluated());
     }
 
     public function testSpecificEventsAreExecuted(): void
@@ -105,7 +105,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         $counter = $this->scheduledExecutioner->executeByIds([$log1->getId(), $log2->getId()]);
         $this->assertInstanceOf(Counter::class, $counter);
 
-        $this->assertEquals(2, $counter->getTotalEvaluated());
+        $this->assertSame(2, $counter->getTotalEvaluated());
     }
 
     public function testEventsAreScheduled(): void
@@ -130,9 +130,9 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         $this->assertInstanceOf(Counter::class, $counter);
 
         // Both events should be evaluated since they are due for execution
-        $this->assertEquals(2, $counter->getTotalEvaluated());
+        $this->assertSame(2, $counter->getTotalEvaluated());
         // No events should be scheduled since they were due and processed
-        $this->assertEquals(0, $counter->getTotalScheduled());
+        $this->assertSame(0, $counter->getTotalScheduled());
     }
 
     public function testDeletedEventsAreRedirectedToTargetEvent(): void
@@ -212,12 +212,10 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
             $log2->getEvent()->getId(),
             'Log2 should now point to redirect target event'
         );
-        $this->assertInstanceOf(LeadEventLog::class, $log1);
 
         // Verify rotation values are correctly calculated
         // (should be 3 and 4 since we had an existing log with rotation 2)
         $this->assertContains($log1->getRotation(), [3, 4], 'Log1 should have rotation 3 or 4');
-        $this->assertInstanceOf(LeadEventLog::class, $log2);
         $this->assertContains($log2->getRotation(), [3, 4], 'Log2 should have rotation 3 or 4');
         $this->assertNotEquals(
             $log1->getRotation(),
@@ -276,7 +274,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         $counter = $this->scheduledExecutioner->executeByIds([$log1->getId(), $log2->getId()]);
         $this->assertInstanceOf(Counter::class, $counter);
 
-        $this->assertEquals(2, $counter->getTotalEvaluated());
+        $this->assertSame(2, $counter->getTotalEvaluated());
     }
 
     public function testSpecificEventsWithUnpublishedCampaign(): void
@@ -298,7 +296,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         $counter = $this->scheduledExecutioner->executeByIds([$log1->getId(), $log2->getId()]);
         $this->assertInstanceOf(Counter::class, $counter);
 
-        $this->assertEquals(0, $counter->getTotalEvaluated());
+        $this->assertSame(0, $counter->getTotalEvaluated());
     }
 
     public function testExecuteByIdsWithNonDeletedEvent(): void
@@ -319,7 +317,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         $this->assertInstanceOf(Counter::class, $counter);
 
         // Event should be evaluated since it's not deleted and campaign is published
-        $this->assertEquals(1, $counter->getTotalEvaluated());
+        $this->assertSame(1, $counter->getTotalEvaluated());
 
         // Verify the log still points to the original event (no redirection occurred)
         $updatedLog = $this->em->find(LeadEventLog::class, $log->getId());

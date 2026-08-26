@@ -9,9 +9,9 @@ use PHPUnit\Framework\TestCase;
 
 final class EventTest extends TestCase
 {
-    private const TEST_NAME = 'Test Name';
+    private const string TEST_NAME = 'Test Name';
 
-    private const DATE      = '2021-10-08 08:00:00';
+    private const string DATE      = '2021-10-08 08:00:00';
 
     public function testSetTriggerHourWhenEmpty(): void
     {

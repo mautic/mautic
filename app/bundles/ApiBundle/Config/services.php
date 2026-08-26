@@ -24,12 +24,8 @@ return function (ContainerConfigurator $configurator): void {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('Mautic\\ApiBundle\\Entity\\oAuth2\\', '../Entity/oAuth2/*Repository.php');
-    $services->set('mautic.api.helper.entity_result', Mautic\ApiBundle\Helper\EntityResultHelper::class);
 
-    $services->set(Mautic\ApiBundle\EventListener\PreAuthorizationEventListener::class);
-
-    $services->set('mautic.validator.oauthcallback', Mautic\ApiBundle\Form\Validator\Constraints\OAuthCallbackValidator::class)->tag('validator.constraint_validator');
-    $services->set('mautic.api.security.voter.permission', Mautic\ApiBundle\Security\Voter\ApiPermissionVoter::class)->tag('security.voter');
+    $services->set(Mautic\ApiBundle\Security\Voter\ApiPermissionVoter::class);
 
     $services->alias(AuthorizeFormHandler::class, 'fos_oauth_server.authorize.form.handler.default');
 
@@ -38,8 +34,6 @@ return function (ContainerConfigurator $configurator): void {
         ->arg('$oAuth2Server', service('fos_oauth_server.server'))
         ->arg('$clientManager', service('fos_oauth_server.client_manager.default'))
         ->tag('controller.service_arguments');
-
-    $services->alias('mautic.api.model.client', Mautic\ApiBundle\Model\ClientModel::class);
 
     // Register custom PUT processor to fix PUT operations globally
     // This ensures PUT requests update existing entities instead of creating new ones
@@ -50,4 +44,5 @@ return function (ContainerConfigurator $configurator): void {
             service('.inner'),
             service('doctrine.orm.entity_manager'),
         ]);
+    $services->set(Mautic\ApiBundle\Security\Permissions\ApiPermissions::class);
 };

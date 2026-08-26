@@ -30,6 +30,7 @@ use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\StageBundle\Model\StageModel;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Rule\AnyInvokedCount;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
@@ -303,7 +304,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testNotRelevantContextBuilder(): void
     {
-        $matcher = $this->any();
+        $matcher = new AnyInvokedCount();
         $this->reportBuilderEventMock->expects($matcher)->method('checkContext')
             ->willReturnCallback(
                 function (...$parameters) use ($matcher): false {
@@ -829,7 +830,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     #[DataProvider('eventDataProvider')]
     public function testReportGenerate(string $context): void
     {
-        $matcher = $this->any();
+        $matcher = new AnyInvokedCount();
         $this->reportGeneratorEventMock->expects($matcher)->method('checkContext')
             ->willReturnCallback(
                 function (...$parameters) use ($matcher): true {

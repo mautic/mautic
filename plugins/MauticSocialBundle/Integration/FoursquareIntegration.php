@@ -2,7 +2,7 @@
 
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
-class FoursquareIntegration extends SocialIntegration
+final class FoursquareIntegration extends SocialIntegration
 {
     public function getName(): string
     {
@@ -55,7 +55,7 @@ class FoursquareIntegration extends SocialIntegration
      *
      * @return mixed|string
      */
-    public function makeRequest($url, $parameters = [], $method = 'GET', $settings = [])
+    public function makeRequest($url, $parameters = [], $method = 'GET', array $settings = [])
     {
         $settings[$this->getAuthTokenKey()] = 'oauth_token';
 
@@ -247,10 +247,8 @@ class FoursquareIntegration extends SocialIntegration
 
     /**
      * @param array<string, mixed> $socialCache
-     *
-     * @return bool
      */
-    private function getContactUserId(array|string &$identifier, array &$socialCache)
+    private function getContactUserId(array|string &$identifier, array &$socialCache): false|string
     {
         if (!empty($socialCache['id'])) {
             return $socialCache['id'];

@@ -11,7 +11,6 @@ use Mautic\IntegrationsBundle\Helper\ConfigIntegrationsHelper;
 use Mautic\IntegrationsBundle\Helper\FieldFilterHelper;
 use Mautic\IntegrationsBundle\Helper\FieldMergerHelper;
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,7 +19,6 @@ final class FieldPaginationController extends CommonController
 {
     public function paginateAction(
         Request $request,
-        FormFactoryInterface $formFactory,
         ConfigIntegrationsHelper $integrationsHelper,
         string $integration,
         string $object,
@@ -52,7 +50,7 @@ final class FieldPaginationController extends CommonController
         }
 
         // Create the form
-        $form = $formFactory->create(
+        $form = $this->createForm(
             IntegrationSyncSettingsObjectFieldMappingType::class,
             $currentFields,
             [

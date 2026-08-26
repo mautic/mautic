@@ -4,9 +4,9 @@ namespace MauticPlugin\MauticSocialBundle\Integration;
 
 use MauticPlugin\MauticSocialBundle\Form\Type\TwitterType;
 
-class TwitterIntegration extends SocialIntegration
+final class TwitterIntegration extends SocialIntegration
 {
-    public const NAME = 'Twitter';
+    public const string NAME = 'Twitter';
 
     public function getName(): string
     {
@@ -62,7 +62,7 @@ class TwitterIntegration extends SocialIntegration
         return 'oauth1a';
     }
 
-    public function prepareRequest($url, $parameters, $method, $settings, $authType)
+    public function prepareRequest(string $url, $parameters, string $method, array $settings, $authType)
     {
         // Prevent SSL issues
         $settings['ssl_verifypeer'] = false;

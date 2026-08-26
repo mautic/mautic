@@ -1,33 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Executioner\Result;
 
 final class Counter
 {
     private int $rescheduled = 0;
 
-    /**
-     * @param int $eventCount
-     * @param int $evaluated
-     * @param int $executed
-     * @param int $totalEvaluated
-     * @param int $totalExecuted
-     * @param int $totalScheduled
-     */
     public function __construct(
-        private $eventCount = 0,
-        private $evaluated = 0,
-        private $executed = 0,
-        private $totalEvaluated = 0,
-        private $totalExecuted = 0,
-        private $totalScheduled = 0,
+        private int $eventCount = 0,
+        private int $evaluated = 0,
+        private int $executed = 0,
+        private int $totalEvaluated = 0,
+        private int $totalExecuted = 0,
+        private int $totalScheduled = 0,
     ) {
     }
 
-    /**
-     * @return int
-     */
-    public function getEventCount()
+    public function getEventCount(): int
     {
         return $this->eventCount;
     }
@@ -50,10 +41,7 @@ final class Counter
         return $this->rescheduled;
     }
 
-    /**
-     * @return int
-     */
-    public function getEvaluated()
+    public function getEvaluated(): int
     {
         return $this->evaluated;
     }
@@ -67,10 +55,7 @@ final class Counter
         $this->totalEvaluated += $step;
     }
 
-    /**
-     * @return int
-     */
-    public function getExecuted()
+    public function getExecuted(): int
     {
         return $this->executed;
     }
@@ -86,10 +71,8 @@ final class Counter
 
     /**
      * Includes all child events (conditions, etc) evaluated.
-     *
-     * @return int
      */
-    public function getTotalEvaluated()
+    public function getTotalEvaluated(): int
     {
         return $this->totalEvaluated;
     }
@@ -104,10 +87,8 @@ final class Counter
 
     /**
      * Includes all child events (conditions, etc) executed.
-     *
-     * @return int
      */
-    public function getTotalExecuted()
+    public function getTotalExecuted(): int
     {
         return $this->totalExecuted;
     }
@@ -120,10 +101,7 @@ final class Counter
         $this->totalExecuted += $step;
     }
 
-    /**
-     * @return int
-     */
-    public function getTotalScheduled()
+    public function getTotalScheduled(): int
     {
         return $this->totalScheduled;
     }

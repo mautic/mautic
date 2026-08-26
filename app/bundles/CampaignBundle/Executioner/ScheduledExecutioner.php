@@ -403,7 +403,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
             $metadata['redirection_history'][] = [
                 'original_event_id' => $originalEvent->getId(),
                 'original_rotation' => $log->getRotation(),
-                'redirect_time'     => (new \DateTime())->format(DateTimeHelper::FORMAT_DB),
+                'redirect_time'     => new \DateTime()->format(DateTimeHelper::FORMAT_DB),
             ];
 
             $metadata['redirect_applied']     = true;

@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace Mautic\ConfigBundle\Tests\Controller;
 
+use Mautic\ConfigBundle\Form\Helper\RestrictionHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 {
-    private const SUBDOMAIN_URL = 'subdomain_url.com';
+    private const string SUBDOMAIN_URL = 'subdomain_url.com';
 
     private string $prefix;
 
@@ -28,6 +30,17 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $this->configParams['subdomain_url'] = self::SUBDOMAIN_URL;
 
         parent::setUp();
+
+        if ('testRestrictedAssetFieldIsNotRenderedInConfigForm' === $this->name()) {
+            $translator        = self::getContainer()->get(TranslatorInterface::class);
+            $restrictionHelper = new RestrictionHelper(
+                $translator,
+                ['upload_dir'],
+                RestrictionHelper::MODE_REMOVE
+            );
+            self::getContainer()->set(RestrictionHelper::class, $restrictionHelper);
+            self::getContainer()->set('mautic.config.form.restriction_helper', $restrictionHelper);
+        }
 
         $this->prefix = MAUTIC_TABLE_PREFIX;
     }
@@ -89,7 +102,7 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
     private function getConfigPath(): string
     {
         /** @var \AppKernel $kernel */
-        $kernel = static::getContainer()->get(KernelInterface::class);
+        $kernel = self::getContainer()->get(KernelInterface::class);
 
         return $kernel->getLocalConfigFile();
     }
@@ -115,7 +128,7 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         // insert published record
         $this->connection->insert($this->prefix.'pages', [
             'is_published' => 1,
-            'date_added'   => (new \DateTime())->format('Y-m-d H:i:s'),
+            'date_added'   => new \DateTime()->format('Y-m-d H:i:s'),
             'title'        => 'page1',
             'alias'        => 'page1',
             'template'     => 'blank',
@@ -131,7 +144,7 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         // insert unpublished record
         $this->connection->insert($this->prefix.'pages', [
             'is_published' => 0,
-            'date_added'   => (new \DateTime())->format('Y-m-d H:i:s'),
+            'date_added'   => new \DateTime()->format('Y-m-d H:i:s'),
             'title'        => 'page2',
             'alias'        => 'page2',
             'template'     => 'blank',
@@ -147,7 +160,7 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         // insert published record
         $this->connection->insert($this->prefix.'pages', [
             'is_published' => 1,
-            'date_added'   => (new \DateTime())->format('Y-m-d H:i:s'),
+            'date_added'   => new \DateTime()->format('Y-m-d H:i:s'),
             'title'        => 'page3',
             'alias'        => 'page3',
             'template'     => 'blank',
@@ -274,6 +287,17 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $form          = $buttonCrawler->form();
 
         $this->assertSame('0', $form['config[leadconfig][contact_export_notify_admins]']->getValue());
+    }
+
+    public function testRestrictedAssetFieldIsNotRenderedInConfigForm(): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
+        $this->assertResponseIsSuccessful();
+
+        // Restricted explicitly in test setUp().
+        $this->assertCount(0, $crawler->filter('#config_assetconfig_upload_dir'));
+        $this->assertCount(1, $crawler->filter('#config_assetconfig_max_size'));
+        $this->assertCount(1, $crawler->filter('#config_assetconfig_allowed_extensions'));
     }
 
     public function testUserAndSystemLocale(): void

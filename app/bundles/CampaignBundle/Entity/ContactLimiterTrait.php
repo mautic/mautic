@@ -10,11 +10,7 @@ use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 
 trait ContactLimiterTrait
 {
-    /**
-     * @param string $alias
-     * @param bool   $isCount
-     */
-    private function updateQueryFromContactLimiter($alias, DbalQueryBuilder $qb, ContactLimiter $contactLimiter, $isCount = false): void
+    private function updateQueryFromContactLimiter(string $alias, DbalQueryBuilder $qb, ContactLimiter $contactLimiter, bool $isCount = false): void
     {
         $minContactId = $contactLimiter->getMinContactId();
         $maxContactId = $contactLimiter->getMaxContactId();
@@ -61,11 +57,7 @@ trait ContactLimiterTrait
         }
     }
 
-    /**
-     * @param string $alias
-     * @param bool   $isCount
-     */
-    private function updateOrmQueryFromContactLimiter($alias, OrmQueryBuilder $qb, ContactLimiter $contactLimiter, $isCount = false): void
+    private function updateOrmQueryFromContactLimiter(string $alias, OrmQueryBuilder $qb, ContactLimiter $contactLimiter, bool $isCount = false): void
     {
         $minContactId = $contactLimiter->getMinContactId();
         $maxContactId = $contactLimiter->getMaxContactId();

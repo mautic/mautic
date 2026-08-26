@@ -48,8 +48,8 @@ final class CompanyApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        private CompanyModel $companyModel,
-        private LeadModel $leadModel,
+        private readonly CompanyModel $companyModel,
+        private readonly LeadModel $leadModel,
     ) {
         $this->model              = $companyModel;
         $this->entityClass        = Company::class;

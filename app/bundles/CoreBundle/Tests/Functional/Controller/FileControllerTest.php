@@ -6,6 +6,7 @@ namespace Mautic\CoreBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\Request;
 
 final class FileControllerTest extends MauticMysqlTestCase
 {
@@ -14,7 +15,7 @@ final class FileControllerTest extends MauticMysqlTestCase
     public function testImageUploadSuccess(): void
     {
         $image = $this->createUploadFile('png-test.png', 'tmp-png-test.png');
-        $this->client->request('POST', 's/file/upload?editor=ckeditor', [], ['upload' => $image]);
+        $this->client->request(Request::METHOD_POST, 's/file/upload?editor=ckeditor', [], ['upload' => $image]);
         $response = $this->client->getResponse();
         self::assertResponseIsSuccessful();
         $responseData = json_decode($response->getContent(), true);
@@ -22,7 +23,7 @@ final class FileControllerTest extends MauticMysqlTestCase
         $this->arrayHasKey('url');
         $this->assertNotEmpty($responseData['url']);
         $uploadedFileName = basename($responseData['url']);
-        $uploadedImage    = static::getContainer()->getParameter('mautic.application_dir').'/media/images/'.$uploadedFileName;
+        $uploadedImage    = self::getContainer()->getParameter('mautic.application_dir').'/media/images/'.$uploadedFileName;
         $this->assertFileExists($uploadedImage);
     }
 
@@ -30,7 +31,7 @@ final class FileControllerTest extends MauticMysqlTestCase
     {
         $image = $this->createUploadFile('test.json', 'tmp-test.json');
 
-        $this->client->request('POST', 's/file/upload?editor=ckeditor', [], ['upload' => $image]);
+        $this->client->request(Request::METHOD_POST, 's/file/upload?editor=ckeditor', [], ['upload' => $image]);
         $response = $this->client->getResponse();
         self::assertResponseIsSuccessful();
         $responseData = json_decode($response->getContent(), true);

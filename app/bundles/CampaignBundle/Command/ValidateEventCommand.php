@@ -21,9 +21,9 @@ final class ValidateEventCommand extends Command
     use WriteCountTrait;
 
     public function __construct(
-        private InactiveExecutioner $inactiveExecution,
-        private TranslatorInterface $translator,
-        private FormatterHelper $formatterHelper,
+        private readonly InactiveExecutioner $inactiveExecution,
+        private readonly TranslatorInterface $translator,
+        private readonly FormatterHelper $formatterHelper,
     ) {
         parent::__construct();
     }
@@ -58,7 +58,7 @@ final class ValidateEventCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
+        defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') || define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
 
         $decisionId = $input->getOption('decision-id');
         $contactId  = $input->getOption('contact-id');

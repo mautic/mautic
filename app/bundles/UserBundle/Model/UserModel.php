@@ -26,7 +26,6 @@ use Mautic\UserBundle\Model\UserToken\UserTokenServiceInterface;
 use Mautic\UserBundle\UserEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -39,9 +38,14 @@ use Twig\Environment;
  */
 class UserModel extends FormModel implements GlobalSearchInterface
 {
-    private const INVITE_TOKEN_SELECTOR_BYTES = 16;
+    public static function getName(): string
+    {
+        return 'user.user';
+    }
 
-    private const INVITE_TOKEN_VERIFIER_BYTES = 32;
+    private const int INVITE_TOKEN_SELECTOR_BYTES = 16;
+
+    private const int INVITE_TOKEN_VERIFIER_BYTES = 32;
 
     public function __construct(
         protected MailHelper $mailHelper,
@@ -59,6 +63,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
         private readonly PermissionRepository $permissionRepository,
         private readonly RoleRepository $roleRepository,
         private readonly UserInviteRepository $userInviteRepository,
+        private readonly UserPasswordHasherInterface $userPasswordHasher,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -106,7 +111,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
      * @param string     $submittedPassword
      * @param bool|false $validate
      */
-    public function checkNewPassword(User $entity, UserPasswordHasherInterface $hasher, $submittedPassword, $validate = false): ?string
+    public function checkNewPassword(User $entity, $submittedPassword, $validate = false): ?string
     {
         if ($validate) {
             if (strlen($submittedPassword) < 6) {
@@ -116,13 +121,13 @@ class UserModel extends FormModel implements GlobalSearchInterface
 
         if (!empty($submittedPassword)) {
             // hash the clear password submitted via the form
-            return $hasher->hashPassword($entity, $submittedPassword);
+            return $this->userPasswordHasher->hashPassword($entity, $submittedPassword);
         }
 
         return $entity->getPassword();
     }
 
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof User) {
             throw new MethodNotAllowedHttpException(['User'], $this->translator->trans('mautic.user.entity.must.be.user', [], 'validators'));
@@ -131,7 +136,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
             $options['action'] = $action;
         }
 
-        return $formFactory->create(UserType::class, $entity, $options);
+        return $this->formFactory->create(UserType::class, $entity, $options);
     }
 
     public function getEntity($id = null): ?User
@@ -232,9 +237,9 @@ class UserModel extends FormModel implements GlobalSearchInterface
      *
      * @param string $newPassword
      */
-    public function resetPassword(User $user, UserPasswordHasherInterface $hasher, $newPassword): void
+    public function resetPassword(User $user, $newPassword): void
     {
-        $hashedPassword = $this->checkNewPassword($user, $hasher, $newPassword);
+        $hashedPassword = $this->checkNewPassword($user, $newPassword);
 
         $user->setPassword($hashedPassword);
         $this->saveEntity($user);
@@ -248,7 +253,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
         $userToken = new UserToken();
         $userToken->setUser($user)
             ->setAuthorizator(UserTokenAuthorizator::RESET_PASSWORD_AUTHORIZATOR)
-            ->setExpiration((new \DateTime())->add(new \DateInterval('PT24H')))
+            ->setExpiration(new \DateTime()->add(new \DateInterval('PT24H')))
             ->setOneTimeOnly();
 
         return $this->userTokenService->generateSecret($userToken, 64);
@@ -415,11 +420,11 @@ class UserModel extends FormModel implements GlobalSearchInterface
     public function createInvite(string $email, Role $role): UserInvite
     {
         $inviteToken = $this->createInviteToken();
-        $invite      = (new UserInvite($role))
+        $invite      = new UserInvite($role)
             ->setEmail($email)
             ->setTokenSelector($inviteToken['selector'])
             ->setTokenVerifierHash(password_hash($inviteToken['verifier'], PASSWORD_DEFAULT))
-            ->setExpiration((new \DateTime())->add(new \DateInterval('PT48H')));
+            ->setExpiration(new \DateTime()->add(new \DateInterval('PT48H')));
         $this->userInviteRepository->revokeOutstandingInvites($email);
         $this->em->persist($invite);
         $this->em->flush();

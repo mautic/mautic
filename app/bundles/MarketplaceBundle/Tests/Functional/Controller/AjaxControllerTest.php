@@ -23,6 +23,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 
 final class AjaxControllerTest extends AbstractMauticTestCase
 {
@@ -56,7 +57,7 @@ final class AjaxControllerTest extends AbstractMauticTestCase
         $response = $controller->installPackageAction($request);
 
         $this->assertSame('{"success":true}', $response->getContent());
-        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
     }
 
     public function testRemovePackageAction(): void
@@ -74,7 +75,7 @@ final class AjaxControllerTest extends AbstractMauticTestCase
         $response = $controller->removePackageAction($request);
 
         $this->assertSame('{"success":true}', $response->getContent());
-        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
     }
 
     private function generateController(bool $isPackageInstalled): AjaxController
@@ -107,7 +108,7 @@ final class AjaxControllerTest extends AbstractMauticTestCase
             $this->createStub(LoggerInterface::class),
             $this->marketplaceConfig
         );
-        $controller->setContainer(static::getContainer());
+        $controller->setContainer(self::getContainer());
 
         return $controller;
     }

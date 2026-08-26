@@ -24,7 +24,6 @@ use Mautic\LeadBundle\Validator\Constraints\SegmentUsedInCampaigns;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ApiResource(
     shortName: 'Segments',
@@ -46,6 +45,9 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[UniqueUserAlias(field: 'alias', message: 'mautic.lead.list.alias.unique')]
+#[SegmentUsedInCampaigns]
+#[SegmentInUse]
 class LeadList extends FormEntity implements UuidInterface
 {
     use UuidTrait;
@@ -66,6 +68,7 @@ class LeadList extends FormEntity implements UuidInterface
      * @var string
      */
     #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
+    #[Assert\NotBlank(message: 'mautic.core.name.required')]
     private $name;
 
     /**
@@ -178,21 +181,6 @@ class LeadList extends FormEntity implements UuidInterface
         $builder->addNullableField('deleted', 'datetime');
 
         static::addUuidField($builder);
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('name', new Assert\NotBlank(
-            message: 'mautic.core.name.required'
-        ));
-
-        $metadata->addConstraint(new UniqueUserAlias([
-            'field'   => 'alias',
-            'message' => 'mautic.lead.list.alias.unique',
-        ]));
-
-        $metadata->addConstraint(new SegmentUsedInCampaigns());
-        $metadata->addConstraint(new SegmentInUse());
     }
 
     /**
@@ -479,7 +467,7 @@ class LeadList extends FormEntity implements UuidInterface
 
     public function setLastBuiltDateToCurrentDatetime(): void
     {
-        $now = (new DateTimeHelper())->getUtcDateTime();
+        $now = new DateTimeHelper()->getUtcDateTime();
         $this->setLastBuiltDate($now);
     }
 

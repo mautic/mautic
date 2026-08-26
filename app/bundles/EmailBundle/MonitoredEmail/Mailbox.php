@@ -727,9 +727,9 @@ class Mailbox
     /**
      * Retrieve the quota settings per user.
      *
-     * @return array - FALSE in the case of call failure
+     * @return array|false - FALSE in the case of call failure
      */
-    protected function getQuota(): array|bool
+    protected function getQuota(): array|false
     {
         return imap_get_quotaroot($this->getImapStream(), 'INBOX');
     }
@@ -737,13 +737,13 @@ class Mailbox
     /**
      * Return quota limit in KB.
      *
-     * @return int - FALSE in the case of call failure
+     * @return int|false - FALSE in the case of call failure
      */
-    public function getQuotaLimit()
+    public function getQuotaLimit(): int|false
     {
         $quota = $this->getQuota();
         if (is_array($quota)) {
-            $quota = $quota['STORAGE']['limit'];
+            return $quota['STORAGE']['limit'];
         }
 
         return $quota;
@@ -752,13 +752,13 @@ class Mailbox
     /**
      * Return quota usage in KB.
      *
-     * @return int - FALSE in the case of call failure
+     * @return int|false - FALSE in the case of call failure
      */
-    public function getQuotaUsage()
+    public function getQuotaUsage(): int|false
     {
         $quota = $this->getQuota();
         if (is_array($quota)) {
-            $quota = $quota['STORAGE']['usage'];
+            return $quota['STORAGE']['usage'];
         }
 
         return $quota;
@@ -1009,7 +1009,8 @@ class Mailbox
     {
         $newString = '';
         $elements  = imap_mime_header_decode($string);
-        for ($i = 0; $i < count($elements); ++$i) {
+        $counter = count($elements);
+        for ($i = 0; $i < $counter; ++$i) {
             if ('default' == $elements[$i]->charset) {
                 $elements[$i]->charset = 'iso-8859-1';
             }

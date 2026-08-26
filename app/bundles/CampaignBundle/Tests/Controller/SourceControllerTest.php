@@ -7,16 +7,17 @@ namespace Mautic\CampaignBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
+use Symfony\Component\HttpFoundation\Request;
 
 final class SourceControllerTest extends MauticMysqlTestCase
 {
-    private const ACCESS_DENIED      = 'You do not have access to the requested area\/action';
+    private const string ACCESS_DENIED      = 'You do not have access to the requested area\/action';
 
-    private const NEW_FORMS_URL      = '/s/campaigns/sources/new/1?sourceType=forms';
+    private const string NEW_FORMS_URL      = '/s/campaigns/sources/new/1?sourceType=forms';
 
-    private const DELETE_FORMS_URL   = '/s/campaigns/sources/delete/1?sourceType=forms';
+    private const string DELETE_FORMS_URL   = '/s/campaigns/sources/delete/1?sourceType=forms';
 
-    private const NEW_LISTS_URL      = '/s/campaigns/sources/new/1?sourceType=lists';
+    private const string NEW_LISTS_URL      = '/s/campaigns/sources/new/1?sourceType=lists';
 
     public function testNewActionWithInvalidSourceType(): void
     {
@@ -27,7 +28,7 @@ final class SourceControllerTest extends MauticMysqlTestCase
 
     public function testNewActionWithNonAjaxRequest(): void
     {
-        $this->client->request('GET', self::NEW_FORMS_URL);
+        $this->client->request(Request::METHOD_GET, self::NEW_FORMS_URL);
         $response = $this->client->getResponse();
         $this->assertStringContainsString(self::ACCESS_DENIED, (string) $response->getContent());
     }

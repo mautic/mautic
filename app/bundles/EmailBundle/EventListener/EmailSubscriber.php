@@ -3,7 +3,6 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\EmailEvents;
@@ -20,15 +19,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class EmailSubscriber implements EventSubscriberInterface
 {
-    public const PREHEADER_HTML_ELEMENT_BEFORE  = '<div class="preheader" style="font-size:1px;line-height:1px;display:none;color:#fff;max-height:0;max-width:0;opacity:0;overflow:hidden">';
+    public const string PREHEADER_HTML_ELEMENT_BEFORE  = '<div class="preheader" style="font-size:1px;line-height:1px;display:none;color:#fff;max-height:0;max-width:0;opacity:0;overflow:hidden">';
 
-    public const PREHEADER_HTML_ELEMENT_AFTER   = '</div>';
+    public const string PREHEADER_HTML_ELEMENT_AFTER   = '</div>';
 
-    public const PREHEADER_HTML_SEARCH_PATTERN  = '/<body[^>]*>.*?<div class="preheader"[^>]*>(.*?)<\/div>/s';
+    public const string PREHEADER_HTML_SEARCH_PATTERN  = '/<body[^>]*>.*?<div class="preheader"[^>]*>(.*?)<\/div>/s';
 
-    public const PREHEADER_HTML_REPLACE_PATTERN = '/<div class="preheader"[^>]*>(.*?)<\/div>/s';
+    public const string PREHEADER_HTML_REPLACE_PATTERN = '/<div class="preheader"[^>]*>(.*?)<\/div>/s';
 
-    private const RETRY_COUNT = 3;
+    private const int RETRY_COUNT = 3;
 
     public function __construct(
         private IpLookupHelper $ipLookupHelper,
@@ -37,7 +36,7 @@ final readonly class EmailSubscriber implements EventSubscriberInterface
         private TranslatorInterface $translator,
         private EntityManagerInterface $entityManager,
         private EmailDraftModel $emailDraftModel,
-        private readonly EmailRepository $emailRepository,
+        private EmailRepository $emailRepository,
     ) {
     }
 
@@ -133,7 +132,7 @@ final readonly class EmailSubscriber implements EventSubscriberInterface
 
             if (null !== $stat) {
                 $reason = $this->translator->trans('mautic.email.dnc.failed', [
-                    '%subject%' => EmojiHelper::toShort($message->getSubject()),
+                    '%subject%' => $message->getSubject(),
                 ]);
                 $this->emailModel->setDoNotContact($stat, $reason);
             }
@@ -162,7 +161,7 @@ final readonly class EmailSubscriber implements EventSubscriberInterface
         if ($stat->getRetryCount() > self::RETRY_COUNT) {
             // tried too many times so just fail
             $reason = $this->translator->trans('mautic.email.dnc.retries', [
-                '%subject%' => EmojiHelper::toShort($message->getSubject()),
+                '%subject%' => $message->getSubject(),
             ]);
             $this->emailModel->setDoNotContact($stat, $reason);
         } else {

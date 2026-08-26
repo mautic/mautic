@@ -137,7 +137,7 @@ final class CategoryType extends AbstractType
                 'show_bundle_select' => false,
                 'bundle'             => function (Options $options) {
                     if (!$bundle = $options['data']->getBundle()) {
-                        $bundle = 'category';
+                        return 'category';
                     }
 
                     return $bundle;

@@ -19,7 +19,7 @@ class DownloadRepository extends CommonRepository
     /**
      * Determine if the download is a unique download.
      */
-    public function isUniqueDownload($assetId, $trackingId): bool
+    public function isUniqueDownload(int $assetId, string $trackingId): bool
     {
         $q  = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q2 = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -30,7 +30,7 @@ class DownloadRepository extends CommonRepository
         $q2->where(
             $q2->expr()->and(
                 $q2->expr()->eq('d.tracking_id', ':id'),
-                $q2->expr()->eq('d.asset_id', (int) $assetId)
+                $q2->expr()->eq('d.asset_id', $assetId)
             )
         );
 
@@ -137,9 +137,11 @@ class DownloadRepository extends CommonRepository
     }
 
     /**
+     * @param int[]|int $pageId
+     *
      * @return array<mixed, array<string, mixed>>
      */
-    public function getDownloadCountsByPage($pageId, ?\DateTime $fromDate = null): array
+    public function getDownloadCountsByPage(int|array $pageId, ?\DateTime $fromDate = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('count(distinct(a.tracking_id)) as count, a.source_id as id, p.title as name, p.hits as total')
@@ -152,7 +154,7 @@ class DownloadRepository extends CommonRepository
                 ->groupBy('p.id, a.source_id, p.title, p.hits');
         } else {
             $q->where($q->expr()->eq('p.id', ':page'))
-                ->setParameter('page', (int) $pageId);
+                ->setParameter('page', $pageId);
         }
 
         $q->andWhere('a.source = "page"')
@@ -178,9 +180,11 @@ class DownloadRepository extends CommonRepository
      * Get download count by email by linking emails that have been associated with a page hit that has the
      * same tracking ID as an asset download tracking ID and thus assumed happened in the same session.
      *
+     * @param int[]|int $emailId
+     *
      * @return array<mixed, array<string, mixed>>
      */
-    public function getDownloadCountsByEmail($emailId, ?\DateTime $fromDate = null, ?\DateTime $toDate = null): array
+    public function getDownloadCountsByEmail(int|array $emailId, ?\DateTime $fromDate = null, ?\DateTime $toDate = null): array
     {
         // link email to page hit tracking id to download tracking id
         $q = $this->_em->getConnection()->createQueryBuilder();
@@ -194,7 +198,7 @@ class DownloadRepository extends CommonRepository
                 ->groupBy('e.id, e.subject, e.variant_sent_count');
         } else {
             $q->where($q->expr()->eq('e.id', ':email'))
-                ->setParameter('email', (int) $emailId);
+                ->setParameter('email', $emailId);
         }
 
         $q->andWhere('a.code = 200');
@@ -221,11 +225,11 @@ class DownloadRepository extends CommonRepository
         return $downloads;
     }
 
-    public function updateLeadByTrackingId($leadId, $newTrackingId, $oldTrackingId): void
+    public function updateLeadByTrackingId(int $leadId, ?string $newTrackingId, string $oldTrackingId): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'asset_downloads')
-            ->set('lead_id', (int) $leadId)
+            ->set('lead_id', (string) $leadId)
             ->set('tracking_id', ':newTrackingId')
             ->where(
                 $q->expr()->eq('tracking_id', ':oldTrackingId')
@@ -240,12 +244,12 @@ class DownloadRepository extends CommonRepository
     /**
      * Updates lead ID (e.g. after a lead merge).
      */
-    public function updateLead($fromLeadId, $toLeadId): void
+    public function updateLead(int $fromLeadId, int $toLeadId): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'asset_downloads')
-            ->set('lead_id', (int) $toLeadId)
-            ->where('lead_id = '.(int) $fromLeadId)
+            ->set('lead_id', (string) $toLeadId)
+            ->where('lead_id = '.$fromLeadId)
             ->executeStatement();
     }
 }

@@ -30,7 +30,12 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 final class ContactExportSchedulerModel extends AbstractCommonModel
 {
-    private const EXPORT_FILE_NAME_DATE_FORMAT = 'Y_m_d_H_i_s';
+    public static function getName(): string
+    {
+        return 'lead.export_scheduler';
+    }
+
+    private const string EXPORT_FILE_NAME_DATE_FORMAT = 'Y_m_d_H_i_s';
 
     public function __construct(
         private readonly RequestStack $requestStack,

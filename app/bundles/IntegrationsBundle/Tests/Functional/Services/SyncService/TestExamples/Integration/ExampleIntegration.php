@@ -15,7 +15,7 @@ use Mautic\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples
 
 final class ExampleIntegration extends BasicIntegration implements IntegrationInterface, SyncInterface
 {
-    public const NAME = 'Example';
+    public const string NAME = 'Example';
 
     public function __construct(
         private readonly ExampleSyncDataExchange $syncDataExchange,

@@ -16,19 +16,19 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 final class RoleController extends FormController
 {
-    private const PERMISSION_VIEW = 'user:roles:view';
+    private const string PERMISSION_VIEW = 'user:roles:view';
 
-    private const PERMISSION_CREATE = 'user:roles:create';
+    private const string PERMISSION_CREATE = 'user:roles:create';
 
-    private const PERMISSION_EDIT   = 'user:roles:edit';
+    private const string PERMISSION_EDIT   = 'user:roles:edit';
 
-    private const PERMISSION_DELETE = 'user:roles:delete';
+    private const string PERMISSION_DELETE = 'user:roles:delete';
 
-    private const FLASH_MENU_LINK = '%menu_link%';
+    private const string FLASH_MENU_LINK = '%menu_link%';
 
-    private const FLASH_URL       = '%url%';
+    private const string FLASH_URL       = '%url%';
 
-    private const TEMPLATE_FORM = '@MauticUser/Role/form.html.twig';
+    private const string TEMPLATE_FORM = '@MauticUser/Role/form.html.twig';
 
     private RoleModel $roleModel;
 
@@ -148,7 +148,7 @@ final class RoleController extends FormController
 
         // get the user form factory
         $permissionsConfig = $this->getPermissionsConfig($entity);
-        $form              = $this->roleModel->createForm($entity, $this->formFactory, $action, ['permissionsConfig' => $permissionsConfig['config']]);
+        $form              = $this->roleModel->createForm($entity, $action, ['permissionsConfig' => $permissionsConfig['config']]);
 
         // /Check for a submitted form and process it
         if ('POST' === $request->getMethod()) {
@@ -269,7 +269,7 @@ final class RoleController extends FormController
         $entity            = $model->cloneEntity($source);
         $permissionsConfig = $this->getPermissionsConfig($source);
         $action            = $this->generateUrl('mautic_role_action', ['objectAction' => 'clone', 'objectId' => $objectId]);
-        $form              = $model->createForm($entity, $this->formFactory, $action, ['permissionsConfig' => $permissionsConfig['config']]);
+        $form              = $model->createForm($entity, $action, ['permissionsConfig' => $permissionsConfig['config']]);
         if (!$request->isMethod('POST')) {
             return $this->renderRoleCloneForm($form, $permissionsConfig, $action);
         }
@@ -343,10 +343,8 @@ final class RoleController extends FormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false): Response
     {
         if (!$this->security->isGranted(self::PERMISSION_EDIT)) {
             $this->throwAccessDenied();
@@ -390,7 +388,7 @@ final class RoleController extends FormController
 
         $permissionsConfig = $this->getPermissionsConfig($entity);
         $action            = $this->generateUrl('mautic_role_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $form              = $this->roleModel->createForm($entity, $this->formFactory, $action, ['permissionsConfig' => $permissionsConfig['config']]);
+        $form              = $this->roleModel->createForm($entity, $action, ['permissionsConfig' => $permissionsConfig['config']]);
 
         // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' === $request->getMethod()) {
@@ -425,7 +423,7 @@ final class RoleController extends FormController
             }
             // the form has to be rebuilt because the permissions were updated
             $permissionsConfig = $this->getPermissionsConfig($entity);
-            $form              = $this->roleModel->createForm($entity, $this->formFactory, $action, ['permissionsConfig' => $permissionsConfig['config']]);
+            $form              = $this->roleModel->createForm($entity, $action, ['permissionsConfig' => $permissionsConfig['config']]);
         } else {
             // lock the entity
             $this->roleModel->lockEntity($entity);
@@ -498,10 +496,8 @@ final class RoleController extends FormController
      * Delete's a role.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         if (!$this->security->isGranted(self::PERMISSION_DELETE)) {
             $this->throwAccessDenied();
@@ -613,7 +609,7 @@ final class RoleController extends FormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $model->deleteEntities($deleteIds);
 
                 $flashes[] = [

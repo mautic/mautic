@@ -41,9 +41,9 @@ final class ContactCampaignApiControllerFunctionalTest extends AbstractCampaignT
         $clientResponse = $this->client->getResponse();
         self::assertResponseIsSuccessful();
         $body = json_decode($clientResponse->getContent(), true);
-        $this->assertSame(1, $body['total'], $clientResponse->getContent());
-        $this->assertSame($campaign->getId(), $body['campaigns'][$campaign->getId()]['id'], $clientResponse->getContent());
-        $this->assertSame($campaign->getName(), $body['campaigns'][$campaign->getId()]['name'], $clientResponse->getContent());
+        $this->assertSame(1, $body['total'], (string) $clientResponse->getContent());
+        $this->assertSame($campaign->getId(), $body['campaigns'][$campaign->getId()]['id'], (string) $clientResponse->getContent());
+        $this->assertSame($campaign->getName(), $body['campaigns'][$campaign->getId()]['name'], (string) $clientResponse->getContent());
         $this->assertNotEmpty($body['campaigns'][$campaign->getId()]['dateAdded'], $clientResponse->getContent());
         $this->assertFalse($body['campaigns'][$campaign->getId()]['manuallyRemoved'], $clientResponse->getContent());
         $this->assertTrue($body['campaigns'][$campaign->getId()]['manuallyAdded'], $clientResponse->getContent());

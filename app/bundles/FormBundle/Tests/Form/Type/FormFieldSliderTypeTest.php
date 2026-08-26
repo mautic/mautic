@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\Tests\Form\Type;
 
 use Mautic\FormBundle\Form\Type\FormFieldSliderType;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Validation;
 
+#[AllowMockObjectsWithoutExpectations]
 final class FormFieldSliderTypeTest extends TypeTestCase
 {
     protected function getExtensions(): array

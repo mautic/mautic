@@ -19,9 +19,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 final class SegmentTrackingSubscriberFunctionalTest extends MauticMysqlTestCase
 {
-    private const TEST_URL = 'https://example.com/page';
+    private const string TEST_URL = 'https://example.com/page';
 
-    private const SEGMENT_IDS_PARAM = 'segment_ids=';
+    private const string SEGMENT_IDS_PARAM = 'segment_ids=';
 
     private EventDispatcherInterface $dispatcher;
 

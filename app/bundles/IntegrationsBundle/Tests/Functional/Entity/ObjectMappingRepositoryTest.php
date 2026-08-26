@@ -11,15 +11,15 @@ use Mautic\IntegrationsBundle\Entity\ObjectMappingRepository;
 
 final class ObjectMappingRepositoryTest extends MauticMysqlTestCase
 {
-    private const INTEGRATION             = 'integration';
+    private const string INTEGRATION             = 'integration';
 
-    private const INTEGRATION_OBJECT_NAME = 'integrationObjectName';
+    private const string INTEGRATION_OBJECT_NAME = 'integrationObjectName';
 
-    private const INTEGRATION_OBJECT_ID   = '123';
+    private const string INTEGRATION_OBJECT_ID   = '123';
 
-    private const INTERNAL_OBJECT_NAME    = 'internalObjectName';
+    private const string INTERNAL_OBJECT_NAME    = 'internalObjectName';
 
-    private const INTERNAL_OBJECT_ID      = 569;
+    private const int INTERNAL_OBJECT_ID      = 569;
 
     private ObjectMappingRepository $repository;
 
@@ -27,7 +27,7 @@ final class ObjectMappingRepositoryTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->repository = static::getContainer()->get(ObjectMappingRepository::class);
+        $this->repository = self::getContainer()->get(ObjectMappingRepository::class);
     }
 
     public function testGetInternalObject(): void

@@ -12,10 +12,7 @@ use Doctrine\DBAL\Types\Type;
  */
 final class GeneratedType extends Type
 {
-    /**
-     * @var string
-     */
-    public const GENERATED = 'generated';
+    public const string GENERATED = 'generated';
 
     public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform): string
     {

@@ -10,8 +10,6 @@ use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -34,18 +32,12 @@ final class MessageController extends AbstractStandardFormController
         $this->messageModel = $messageModel;
     }
 
-    /**
-     * @return JsonResponse|RedirectResponse
-     */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): Response
     {
         return $this->batchDeleteStandard($request);
     }
 
-    /**
-     * @return Response|JsonResponse|RedirectResponse
-     */
-    public function cloneAction(Request $request, $objectId)
+    public function cloneAction(Request $request, $objectId): Response
     {
         return $this->cloneStandard($request, $objectId);
     }
@@ -71,10 +63,7 @@ final class MessageController extends AbstractStandardFormController
         return $this->newStandard($request);
     }
 
-    /**
-     * @return array|JsonResponse|RedirectResponse|Response
-     */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(Request $request, $objectId): Response
     {
         return $this->viewStandard($request, $objectId, 'message', 'channel');
     }
@@ -179,10 +168,7 @@ final class MessageController extends AbstractStandardFormController
         return $args;
     }
 
-    /**
-     * @return JsonResponse|RedirectResponse
-     */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         return $this->deleteStandard($request, $objectId);
     }
@@ -224,8 +210,6 @@ final class MessageController extends AbstractStandardFormController
 
     /**
      * @param int $page
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
     public function contactsAction(
         Request $request,
@@ -233,7 +217,7 @@ final class MessageController extends AbstractStandardFormController
         $objectId,
         $channel,
         $page = 1,
-    ) {
+    ): Response {
         $filter = [];
         if ('all' !== $channel) {
             $returnUrl = $this->generateUrl(

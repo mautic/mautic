@@ -20,7 +20,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Bounce implements ProcessorInterface
 {
-    private const RETRY_COUNT = 5;
+    private const int RETRY_COUNT = 5;
 
     /**
      * @var string
@@ -61,7 +61,7 @@ class Bounce implements ProcessorInterface
 
         if (!$bounce) {
             try {
-                $bounce = (new Parser($this->message))->parse();
+                $bounce = new Parser($this->message)->parse();
             } catch (BounceNotFound) {
                 return false;
             }

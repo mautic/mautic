@@ -9,11 +9,11 @@ use Mautic\CoreBundle\Helper\Serializer;
  */
 final class CustomFieldValueHelper
 {
-    public const TYPE_BOOLEAN     = 'boolean';
+    public const string TYPE_BOOLEAN     = 'boolean';
 
-    public const TYPE_SELECT      = 'select';
+    public const string TYPE_SELECT      = 'select';
 
-    public const TYPE_MULTISELECT = 'multiselect';
+    public const string TYPE_MULTISELECT = 'multiselect';
 
     public static function normalizeValues(array $customFields): array
     {

@@ -15,6 +15,7 @@ use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 final class EmailMapStatsControllerTest extends MauticMysqlTestCase
@@ -78,7 +79,7 @@ final class EmailMapStatsControllerTest extends MauticMysqlTestCase
         }
         $this->em->flush();
 
-        $this->client->request('GET', "s/emails-map-stats/{$email->getId()}/false/2023-07-20/2023-07-25");
+        $this->client->request(Request::METHOD_GET, "s/emails-map-stats/{$email->getId()}/false/2023-07-20/2023-07-25");
         $clientResponse = $this->client->getResponse();
         $crawler        = new Crawler($clientResponse->getContent(), $this->client->getInternalRequest()->getUri());
 

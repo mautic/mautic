@@ -1,14 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tracker\Service\DeviceCreatorService;
 
 use DeviceDetector\DeviceDetector;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 
-/**
- * Interface DeviceCreatorServiceInterface.
- */
 interface DeviceCreatorServiceInterface
 {
     /**

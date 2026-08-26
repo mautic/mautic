@@ -63,7 +63,7 @@ abstract class AbstractCommonModel implements MauticModelInterface
      *
      * @return CommonRepository<T>
      */
-    public function getRepository()
+    public function getRepository(): CommonRepository
     {
         static $commonRepo;
 
@@ -76,10 +76,8 @@ abstract class AbstractCommonModel implements MauticModelInterface
 
     /**
      * Retrieve the permissions base.
-     *
-     * @return string
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return '';
     }
@@ -94,12 +92,11 @@ abstract class AbstractCommonModel implements MauticModelInterface
     public function getEntities(array $args = [])
     {
         // set the translator
-        $repo = $this->getRepository();
+        $repository = $this->getRepository();
 
-        $repo->setTranslator($this->translator);
-        $repo->setCurrentUser($this->userHelper->getUser());
+        $repository->setCurrentUser($this->userHelper->getUser());
 
-        return $repo->getEntities($args);
+        return $repository->getEntities($args);
     }
 
     /**
@@ -163,12 +160,8 @@ abstract class AbstractCommonModel implements MauticModelInterface
 
     /**
      * Retrieve entity based on id/alias slugs.
-     *
-     * @param string $slug
-     *
-     * @return object|bool
      */
-    public function getEntityBySlugs($slug)
+    public function getEntityBySlugs(string $slug): ?object
     {
         $slugs    = explode('/', $slug);
         $idSlug   = '';
@@ -207,12 +200,12 @@ abstract class AbstractCommonModel implements MauticModelInterface
         }
 
         if ($lang && !isset($locales[$lang])) {
-            // Language doesn't exist so return false
+            // Language doesn't exist so return null
 
-            return false;
+            return null;
         }
 
-        $entity = false;
+        $entity = null;
         if (str_contains($idSlug, ':')) {
             $parts = explode(':', $idSlug);
             if (2 === count($parts)) {
@@ -276,7 +269,7 @@ abstract class AbstractCommonModel implements MauticModelInterface
         $isGranted      = false;
         $permissionBase = $this->getPermissionBase();
         if ($this->security->checkPermissionExists("{$permissionBase}:viewown")) {
-            $isGranted = $this->security->isGranted("{$permissionBase}:viewown");
+            return $this->security->isGranted("{$permissionBase}:viewown");
         }
 
         return $isGranted;
@@ -291,7 +284,7 @@ abstract class AbstractCommonModel implements MauticModelInterface
         $isGranted      = false;
         $permissionBase = $this->getPermissionBase();
         if ($this->security->checkPermissionExists("{$permissionBase}:viewother")) {
-            $isGranted = $this->security->isGranted(["{$permissionBase}:viewother"]);
+            return $this->security->isGranted(["{$permissionBase}:viewother"]);
         }
 
         return $isGranted;

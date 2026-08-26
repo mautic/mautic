@@ -8,12 +8,12 @@ use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\ApiBundle\Model\ApiEntityLockTrait;
 use Mautic\ApiBundle\Model\ApiLockAwareInterface;
+use Mautic\CacheBundle\Cache\CacheProviderInterface;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Helper\ArrayHelper;
-use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -54,6 +54,7 @@ use Mautic\EmailBundle\Model\AbTest\EmailVariantConverterService;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Stats\FetchOptions\EmailStatOptions;
 use Mautic\EmailBundle\Stats\Helper\FilterTrait;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
@@ -72,7 +73,6 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -91,6 +91,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     use BuilderModelTrait;
     use FilterTrait;
     use ApiEntityLockTrait;
+
+    public static function getName(): string
+    {
+        return 'email.email';
+    }
 
     /**
      * @var bool
@@ -113,12 +118,12 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         protected UserModel $userModel,
         protected MessageQueueModel $messageQueueModel,
         protected SendEmailToContact $sendModel,
-        private DeviceTracker $deviceTracker,
-        private RedirectRepository $redirectRepository,
-        private CacheStorageHelper $cacheStorageHelper,
-        private ContactTracker $contactTracker,
-        private DNC $doNotContact,
-        private StatsCollectionHelper $statsCollectionHelper,
+        private readonly DeviceTracker $deviceTracker,
+        private readonly RedirectRepository $redirectRepository,
+        private readonly CacheProviderInterface $cacheProvider,
+        private readonly ContactTracker $contactTracker,
+        private readonly DNC $doNotContact,
+        private readonly StatsCollectionHelper $statsCollectionHelper,
         CorePermissions $security,
         EntityManagerInterface $em,
         EventDispatcherInterface $dispatcher,
@@ -127,10 +132,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
-        private EmailStatModel $emailStatModel,
-        private BotRatioHelper $botRatioHelper,
-        private AbTestSettingsService $abTestSettingsService,
-        private EmailVariantConverterService $variantConverterService,
+        private readonly EmailStatModel $emailStatModel,
+        private readonly BotRatioHelper $botRatioHelper,
+        private readonly AbTestSettingsService $abTestSettingsService,
+        private readonly EmailVariantConverterService $variantConverterService,
         private readonly EmailRepository $emailRepository,
         private readonly CopyRepository $copyRepository,
         private readonly StatDeviceRepository $statDeviceRepository,
@@ -140,6 +145,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         private readonly TrackableRepository $trackableRepository,
         private readonly LeadRepository $leadRepository,
         private readonly LeadEventLogRepository $leadEventLogRepository,
+        private readonly CompanyRepository $companyRepository,
     ) {
         $this->connection = $em->getConnection(); // Necessary for FilterTrait
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
@@ -321,7 +327,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      *
      * @return FormInterface<Email>
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Email) {
             throw new MethodNotAllowedHttpException(['Email']);
@@ -330,7 +336,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             $options['action'] = $action;
         }
 
-        return $formFactory->create(EmailType::class, $entity, $options);
+        return $this->formFactory->create(EmailType::class, $entity, $options);
     }
 
     /**
@@ -542,7 +548,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             }
 
             if (null !== $hitDateTime && $lead->getLastActive() < $hitDateTime) { // We need to perform the update after all is saved
-                $this->leadModel->getRepository()->updateLastActive($lead->getId(), $hitDateTime);
+                $this->leadRepository->updateLastActive($lead->getId(), $hitDateTime);
             }
         }
     }
@@ -1032,7 +1038,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
                 $toStore = count($total);
             }
 
-            $this->cacheStorageHelper->set(sprintf('%s|%s|%s', 'email', $email->getId(), 'pending'), $toStore);
+            $this->cacheProvider->getSimpleCache()->set(sprintf('%s|%s|%s', 'email', $email->getId(), 'pending'), $toStore);
         }
 
         return $total;
@@ -1049,7 +1055,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         }
 
         $queued = $this->messageQueueModel->getQueuedChannelCount('email', $ids);
-        $this->cacheStorageHelper->set(sprintf('%s|%s|%s', 'email', $email->getId(), 'queued'), $queued);
+        $this->cacheProvider->getSimpleCache()->set(sprintf('%s|%s|%s', 'email', $email->getId(), 'queued'), $queued);
 
         return $queued;
     }
@@ -1358,7 +1364,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      *
      * @return string[]|bool|string|null
      */
-    public function sendEmail(Email $email, array $leads, array $options = [])
+    public function sendEmail(Email $email, array $leads, array $options = []): array|bool|string|null
     {
         $listId              = ArrayHelper::getValue('listId', $options);
         $ignoreDNC           = ArrayHelper::getValue('ignoreDNC', $options, false);
@@ -1413,7 +1419,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
         // Process frequency rules for email
         if (!$email->getSendToDnc() && count($sendTo)) {
-            $campaignEventId = (is_array($channel) && !empty($channel) && 'campaign.event' === $channel[0] && !empty($channel[1])) ? $channel[1]
+            $campaignEventId = (is_array($channel) && [] !== $channel && 'campaign.event' === $channel[0] && !empty($channel[1])) ? $channel[1]
                 : null;
 
             $this->messageQueueModel->processFrequencyRules(
@@ -1565,7 +1571,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
         unset($emailSettings, $options, $sendTo);
 
-        $success = empty($failedContacts);
+        $success = [] === $failedContacts;
         if (!$success && $returnErrorMessages) {
             return $singleEmail ? $errorMessages[$singleEmail] : $errorMessages;
         }
@@ -1607,13 +1613,13 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $emailSettings = &$this->getEmailSettings($email, false);
 
         // No one to send to so bail
-        if (empty($users) && empty($to)) {
+        if ([] === $users && [] === $to) {
             return false;
         }
 
         $mailer            = $this->mailHelper->getMailer();
         if (!isset($lead['companies'])) {
-            $lead['companies'] = $this->companyModel->getRepository()->getCompaniesByLeadId($lead['id']);
+            $lead['companies'] = $this->companyRepository->getCompaniesByLeadId($lead['id']);
         }
         $mailer->setLead($lead, true);
         $mailer->setTokens($tokens);
@@ -1756,13 +1762,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         return $event;
     }
 
-    /**
-     * @param int  $reason
-     * @param bool $flush
-     *
-     * @return bool|DoNotContact
-     */
-    public function setDoNotContact(Stat $stat, ?string $comments, $reason = DoNotContact::BOUNCED, $flush = true)
+    public function setDoNotContact(Stat $stat, ?string $comments, int $reason = DoNotContact::BOUNCED, bool $flush = true): ?DoNotContact
     {
         $lead = $stat->getLead();
 
@@ -1773,10 +1773,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             return $this->doNotContact->addDncForContact($lead->getId(), $channel, $reason, $comments, $flush);
         }
 
-        return false;
+        return null;
     }
 
-    public function setDoNotContactLead(Lead $lead, string $comments, int $reason = DoNotContact::BOUNCED, bool $flush = true): false|DoNotContact
+    public function setDoNotContactLead(Lead $lead, string $comments, int $reason = DoNotContact::BOUNCED, bool $flush = true): ?DoNotContact
     {
         return $this->doNotContact->addDncForContact($lead->getId(), 'email', $reason, $comments, $flush);
     }
@@ -1830,10 +1830,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
     /**
      * Get the settings for a monitored mailbox or false if not enabled.
-     *
-     * @return bool|array
      */
-    public function getMonitoredMailbox($bundleKey, $folderKey)
+    public function getMonitoredMailbox($bundleKey, $folderKey): false|array
     {
         if ($this->mailboxHelper->isConfigured($bundleKey, $folderKey)) {
             return $this->mailboxHelper->getMailboxSettings();
@@ -1877,7 +1875,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
         $q                     = $query->prepareTimeDataQuery('email_stats', $column, $filter);
         $columnWithTimezone    = 't.'.$column;
-        $defaultTimezoneOffset = (new DateTimeHelper())->getLocalTimezoneOffset();
+        $defaultTimezoneOffset = new DateTimeHelper()->getLocalTimezoneOffset();
         $columnName            = "CONVERT_TZ({$columnWithTimezone}, '+00:00', '{$defaultTimezoneOffset}')";
         $q->select('CONCAT(TIME_FORMAT('.$columnName.', \''.$format.'\'),\'-\',TIME_FORMAT('.$columnName.' + INTERVAL 1 HOUR, \''.$format.'\'),\'\') as hour, COUNT(t.id) AS count')
         ->groupBy('hour')
@@ -2046,7 +2044,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             $dateTo
         );
 
-        if (empty($deviceStats)) {
+        if ([] === $deviceStats) {
             $deviceStats[] = [
                 'count'   => 0,
                 'device'  => $this->translator->trans('mautic.report.report.noresults'),
@@ -2148,32 +2146,27 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     public function getLookupResults(string $type, string|array $filter = '', int $limit = 10, int $start = 0, array $options = []): array
     {
         $results = [];
-        switch ($type) {
-            case 'email':
-                $this->emailRepository->setCurrentUser($this->userHelper->getUser());
-                $emails = $this->emailRepository->getEmailList(
-                    $filter,
-                    $limit,
-                    $start,
-                    $this->security->isGranted('email:emails:viewother'),
-                    $options['top_level'] ?? false,
-                    $options['email_type'] ?? null,
-                    $options['ignore_ids'] ?? [],
-                    $options['variant_parent'] ?? null
-                );
-
-                foreach ($emails as $email) {
-                    if (empty($options['name_is_key'])) {
-                        $results[$email['language']][$email['id']] = sprintf('%s (%s)', $email['name'], $email['id']);
-                    } else {
-                        $results[$email['language']][$email['name']] = $email['id'];
-                    }
+        if ('email' === $type) {
+            $this->emailRepository->setCurrentUser($this->userHelper->getUser());
+            $emails = $this->emailRepository->getEmailList(
+                $filter,
+                $limit,
+                $start,
+                $this->security->isGranted('email:emails:viewother'),
+                $options['top_level'] ?? false,
+                $options['email_type'] ?? null,
+                $options['ignore_ids'] ?? [],
+                $options['variant_parent'] ?? null
+            );
+            foreach ($emails as $email) {
+                if (empty($options['name_is_key'])) {
+                    $results[$email['language']][$email['id']] = sprintf('%s (%s)', $email['name'], $email['id']);
+                } else {
+                    $results[$email['language']][$email['name']] = $email['id'];
                 }
-
-                // sort by language
-                ksort($results);
-
-                break;
+            }
+            // sort by language
+            ksort($results);
         }
 
         return $results;
@@ -2190,8 +2183,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             return $contact;
         }
 
-        $companies = $this->companyModel
-            ->getRepository()
+        $companies = $this->companyRepository
             ->getCompaniesForContacts([$contact['id']]);
 
         $contact['companies'] = $companies[$contact['id']] ?? [];
@@ -2238,7 +2230,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $emailSettings = &$this->getEmailSettings($email, false);
 
         // noone to send to so bail
-        if (empty($users)) {
+        if ([] === $users) {
             return false;
         }
 
@@ -2393,15 +2385,15 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     }
 
     /**
-     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws \Psr\SimpleCache\InvalidArgumentException
      */
     public function invalidatePendingCountCache(int $emailId): void
     {
-        $this->cacheStorageHelper->delete(sprintf('%s|%s|%s', 'email', $emailId, 'pending'));
+        $this->cacheProvider->getSimpleCache()->delete(sprintf('%s|%s|%s', 'email', $emailId, 'pending'));
     }
 
     /**
-     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws \Psr\SimpleCache\InvalidArgumentException
      */
     public function invalidatePendingCountCacheForList(int $listId): void
     {
@@ -2411,25 +2403,25 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     }
 
     /**
-     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws \Psr\SimpleCache\InvalidArgumentException
      */
     protected function setCachedCount(mixed $entity): void
     {
-        $queued = $this->cacheStorageHelper->get(sprintf('%s|%s|%s', 'email', $entity->getId(), 'queued'));
+        $queued = $this->cacheProvider->getSimpleCache()->get(sprintf('%s|%s|%s', 'email', $entity->getId(), 'queued'));
 
-        if (false !== $queued) {
+        if (null !== $queued) {
             $entity->setQueuedCount($queued);
         }
 
-        $pending = $this->cacheStorageHelper->get(sprintf('%s|%s|%s', 'email', $entity->getId(), 'pending'));
+        $pending = $this->cacheProvider->getSimpleCache()->get(sprintf('%s|%s|%s', 'email', $entity->getId(), 'pending'));
 
-        if (false === $pending && $entity instanceof Email && $entity->isSegmentEmail() && null !== $entity->getId()) {
+        if (null === $pending && $entity instanceof Email && $entity->isSegmentEmail() && null !== $entity->getId()) {
             $entity->setPendingCount($this->getPendingLeads($entity, null, true));
 
             return;
         }
 
-        if (false !== $pending) {
+        if (null !== $pending) {
             $entity->setPendingCount($pending);
         }
     }

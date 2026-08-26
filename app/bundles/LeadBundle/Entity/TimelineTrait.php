@@ -25,10 +25,10 @@ trait TimelineTrait
     private function getTimelineResults(
         QueryBuilder $query,
         array $options,
-        $eventNameColumn,
-        $timestampColumn,
-        $serializedColumns = [],
-        $dateTimeColumns = [],
+        string $eventNameColumn,
+        string $timestampColumn,
+        array $serializedColumns = [],
+        array $dateTimeColumns = [],
         $resultsParserCallback = null,
         ?string $secondaryOrdering = null,
     ) {
@@ -91,7 +91,7 @@ trait TimelineTrait
 
         $results = $query->executeQuery()->fetchAllAssociative();
 
-        if (!empty($serializedColumns) || !empty($dateTimeColumns) || is_callable($resultsParserCallback)) {
+        if ([] !== $serializedColumns || [] !== $dateTimeColumns || is_callable($resultsParserCallback)) {
             // Convert to array or \DateTime since we're using DBAL here
             foreach ($results as &$result) {
                 foreach ($serializedColumns as $col) {

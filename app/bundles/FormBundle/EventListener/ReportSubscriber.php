@@ -21,11 +21,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class ReportSubscriber implements EventSubscriberInterface
 {
-    public const CONTEXT_FORMS           = 'forms';
+    public const string CONTEXT_FORMS           = 'forms';
 
-    public const CONTEXT_FORM_SUBMISSION = 'form.submissions';
+    public const string CONTEXT_FORM_SUBMISSION = 'form.submissions';
 
-    public const CONTEXT_FORM_RESULT     = 'form.results';
+    public const string CONTEXT_FORM_RESULT     = 'form.results';
 
     public function __construct(
         private CompanyReportData $companyReportData,
@@ -35,7 +35,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
         private CoreParametersHelper $coreParametersHelper,
         private TranslatorInterface $translator,
         private DncReportService $dncReportService,
-        private readonly FormRepository $formRepository,
+        private FormRepository $formRepository,
     ) {
     }
 

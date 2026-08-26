@@ -6,7 +6,6 @@ use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\PointBundle\Entity\TriggerEventRepository;
 use Mautic\PointBundle\Form\Type\TriggerEventType;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -16,6 +15,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 class TriggerEventModel extends CommonFormModel
 {
+    public static function getName(): string
+    {
+        return 'point.triggerevent';
+    }
+
     private TriggerEventRepository $triggerEventRepository;
 
     #[Required]
@@ -47,7 +51,7 @@ class TriggerEventModel extends CommonFormModel
     /**
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof TriggerEvent) {
             throw new MethodNotAllowedHttpException(['Trigger']);
@@ -57,7 +61,7 @@ class TriggerEventModel extends CommonFormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create(TriggerEventType::class, $entity, $options);
+        return $this->formFactory->create(TriggerEventType::class, $entity, $options);
     }
 
     /**

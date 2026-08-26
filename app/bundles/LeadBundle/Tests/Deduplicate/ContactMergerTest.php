@@ -40,17 +40,17 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
 
     private \PHPUnit\Framework\MockObject\MockObject&CompanyLeadRepository $companyLeadRepo;
 
+    private \PHPUnit\Framework\MockObject\MockObject&LeadRepository $leadRepository;
+
     protected function setUp(): void
     {
         $this->leadModel       = $this->createMock(LeadModel::class);
-        $leadRepo              = $this->createMock(LeadRepository::class);
+        $this->leadRepository  = $this->createMock(LeadRepository::class);
         $this->mergeRecordRepo = $this->createMock(MergeRecordRepository::class);
         $this->logger          = $this->createMock(Logger::class);
         $this->companyLeadRepo = $this->createMock(CompanyLeadRepository::class);
 
-        $this->leadModel->method('getRepository')->willReturn($leadRepo);
-
-        $leadRepo->method('getFieldValues')->willReturn([]);
+        $this->leadRepository->method('getFieldValues')->willReturn([]);
     }
 
     public function testMergeTimestamps(): void
@@ -91,13 +91,13 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
     public function testMergeIpAddresses(): void
     {
         $winner = new Lead();
-        $winner->addIpAddress((new IpAddress('1.2.3.4'))->setIpDetails(['extra' => 'from winner']));
-        $winner->addIpAddress((new IpAddress('4.3.2.1'))->setIpDetails(['extra' => 'from winner']));
-        $winner->addIpAddress((new IpAddress('5.6.7.8'))->setIpDetails(['extra' => 'from winner']));
+        $winner->addIpAddress(new IpAddress('1.2.3.4')->setIpDetails(['extra' => 'from winner']));
+        $winner->addIpAddress(new IpAddress('4.3.2.1')->setIpDetails(['extra' => 'from winner']));
+        $winner->addIpAddress(new IpAddress('5.6.7.8')->setIpDetails(['extra' => 'from winner']));
 
         $loser = new Lead();
-        $loser->addIpAddress((new IpAddress('5.6.7.8'))->setIpDetails(['extra' => 'from loser']));
-        $loser->addIpAddress((new IpAddress('8.7.6.5'))->setIpDetails(['extra' => 'from loser']));
+        $loser->addIpAddress(new IpAddress('5.6.7.8')->setIpDetails(['extra' => 'from loser']));
+        $loser->addIpAddress(new IpAddress('8.7.6.5')->setIpDetails(['extra' => 'from loser']));
 
         $this->getMerger()->mergeIpAddressHistory($winner, $loser);
 
@@ -474,7 +474,7 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $matcher2 = $this->exactly(3);
         $winner->expects($matcher2)
             ->method('getField')
-            ->willReturnCallback(function ($parameter) use ($matcher2) {
+            ->willReturnCallback(function (string $parameter) use ($matcher2): array|false {
                 if (1 === $matcher2->numberOfInvocations()) {
                     $this->assertSame('email', $parameter);
 
@@ -517,6 +517,8 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
                         'default_value' => 0,
                     ];
                 }
+
+                return false;
             });
         $matcher3 = $this->exactly(3);
 
@@ -866,7 +868,8 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
             $this->mergeRecordRepo,
             $this->createStub(EventDispatcher::class),
             $this->logger,
-            $this->companyLeadRepo
+            $this->companyLeadRepo,
+            $this->leadRepository
         );
     }
 }

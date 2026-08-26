@@ -59,9 +59,7 @@ final class PasswordResetConfirmType extends AbstractType
                     'constraints'    => [
                         new Assert\NotBlank(message: 'mautic.user.user.passwordreset.notblank'),
                         new Assert\Length(min: 6, minMessage: 'mautic.user.user.password.minlength'),
-                        new NotWeak([
-                            'message' => 'mautic.user.user.password.weak',
-                        ]),
+                        new NotWeak(message: 'mautic.user.user.password.weak'),
                     ],
                 ],
                 'second_name'    => 'confirm',

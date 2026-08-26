@@ -93,7 +93,6 @@ final class PluginAuthenticatorTest extends TestCase
         );
 
         $authenticateResult = $authenticateResult->authenticate($request);
-        $this->assertInstanceOf(SelfValidatingPassport::class, $authenticateResult);
         $this->assertCount(2, $authenticateResult->getBadges());
 
         $userBadge = $authenticateResult->getBadge(UserBadge::class);
@@ -202,7 +201,7 @@ final class PluginAuthenticatorTest extends TestCase
         $passportUser->method('getPassword')->willReturn($encodedPassword);
         $passportUser->method('getRoles')->willReturn($roles);
 
-        $userBadge = new UserBadge('', fn (): UserInterface => $passportUser);
+        $userBadge = new UserBadge('user', fn (): UserInterface => $passportUser);
 
         $pluginBadge = new PluginBadge(null, $pluginResponse, $authenticatingService);
 

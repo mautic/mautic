@@ -14,7 +14,6 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\CopyRepository;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
-use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Helper\FromEmailHelper;
 use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
@@ -46,7 +45,7 @@ use Twig\Environment;
 
 final class MailHelperTest extends TestCase
 {
-    private const MINIFY_HTML = '<!doctype html>
+    private const string MINIFY_HTML = '<!doctype html>
     <html lang=3D"en" xmlns=3D"http://www.w3.org/1999/xhtml" xmlns:v=3D"urn:schemas-microsoft-com:vml" xmlns:o=3D"urn:schemas-microsoft-com:office:office">
       <head>
         <title>Test</title>
@@ -136,13 +135,13 @@ final class MailHelperTest extends TestCase
 
     protected function setUp(): void
     {
-        defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
+        defined('MAUTIC_ENV') || define('MAUTIC_ENV', 'test');
 
         // Some local environments do not have ext-imap loaded, but Mailbox uses these
         // constants in method signatures and class loading fails without them.
-        defined('SORTARRIVAL') or define('SORTARRIVAL', 0);
-        defined('SE_UID') or define('SE_UID', 1);
-        defined('FT_PEEK') or define('FT_PEEK', 2);
+        defined('SORTARRIVAL') || define('SORTARRIVAL', 0);
+        defined('SE_UID') || define('SE_UID', 1);
+        defined('FT_PEEK') || define('FT_PEEK', 2);
 
         $this->contactRepository    = $this->createMock(LeadRepository::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
@@ -686,109 +685,6 @@ final class MailHelperTest extends TestCase
                 $this->assertEquals('{signature}', $body); // The {signature} token is replaced in a subscriber with the current user's signature. But this is a unit test, so the subscriber doesn't run.
             }
         }
-    }
-
-    #[DataProvider('provideEmails')]
-    public function testValidateEmails(string $email, bool $isValid): void
-    {
-        $helper = $this->mockEmptyMailHelper();
-        if (!$isValid) {
-            $this->expectException(InvalidEmailException::class);
-        }
-        $this->assertNull($helper::validateEmail($email)); /** @phpstan-ignore-line as it's testing a deprecated method */
-    }
-
-    public function testValidateValidEmails(): void
-    {
-        $helper    = $this->mockEmptyMailHelper();
-        $addresses = [
-            'john@doe.com',
-            'john@doe.email',
-            'john.doe@email.com',
-            'john+doe@email.com',
-            'john@doe.whatevertldtheycomewithinthefuture',
-        ];
-
-        foreach ($addresses as $address) {
-            // will throw InvalidEmailException if it will find the address invalid
-            $this->assertNull($helper::validateEmail($address)); /** @phpstan-ignore-line as it's testing a deprecated method */
-        }
-    }
-
-    /**
-     * @return \Iterator<(int|string), mixed>
-     */
-    public static function provideEmails(): \Iterator
-    {
-        yield ['john@doe.com', true];
-        yield ['john@doe.email', true];
-        yield ['john@doe.whatevertldtheycomewithinthefuture', true];
-        yield ['john.doe@email.com', true];
-        yield ['john+doe@email.com', true];
-        yield ['john@doe', false];
-        yield ['jo hn@doe.email', false];
-        yield ['jo^hn@doe.email', false];
-        yield ['jo\'hn@doe.email', false];
-        yield ['jo;hn@doe.email', false];
-        yield ['jo&hn@doe.email', false];
-        yield ['jo*hn@doe.email', false];
-        yield ['jo%hn@doe.email', false];
-    }
-
-    public function testValidateEmailWithoutTld(): void
-    {
-        $helper = $this->mockEmptyMailHelper();
-        $this->expectException(InvalidEmailException::class);
-        $helper::validateEmail('john@doe'); /** @phpstan-ignore-line as it's testing a deprecated method */
-    }
-
-    public function testValidateEmailWithSpaceInIt(): void
-    {
-        $helper = $this->mockEmptyMailHelper();
-        $this->expectException(InvalidEmailException::class);
-        $helper::validateEmail('jo hn@doe.email'); /** @phpstan-ignore-line as it's testing a deprecated method */
-    }
-
-    public function testValidateEmailWithCaretInIt(): void
-    {
-        $helper = $this->mockEmptyMailHelper();
-        $this->expectException(InvalidEmailException::class);
-        $helper::validateEmail('jo^hn@doe.email'); /** @phpstan-ignore-line as it's testing a deprecated method */
-    }
-
-    public function testValidateEmailWithApostropheInIt(): void
-    {
-        $helper = $this->mockEmptyMailHelper();
-        $this->expectException(InvalidEmailException::class);
-        $helper::validateEmail('jo\'hn@doe.email'); /** @phpstan-ignore-line as it's testing a deprecated method */
-    }
-
-    public function testValidateEmailWithSemicolonInIt(): void
-    {
-        $helper = $this->mockEmptyMailHelper();
-        $this->expectException(InvalidEmailException::class);
-        $helper::validateEmail('jo;hn@doe.email'); /** @phpstan-ignore-line as it's testing a deprecated method */
-    }
-
-    public function testValidateEmailWithAmpersandInIt(): void
-    {
-        $helper = $this->mockEmptyMailHelper();
-        $this->expectException(InvalidEmailException::class);
-        $helper::validateEmail('jo&hn@doe.email'); /** @phpstan-ignore-line as it's testing a deprecated method */
-    }
-
-    public function testValidateEmailWithStarInIt(): void
-    {
-        $helper = $this->mockEmptyMailHelper();
-        $this->expectException(InvalidEmailException::class);
-        $helper::validateEmail('jo*hn@doe.email'); /** @phpstan-ignore-line as it's testing a deprecated method */
-    }
-
-    public function testValidateEmailWithPercentInIt(): void
-    {
-        $helper = $this->mockEmptyMailHelper();
-        $this->expectException(InvalidEmailException::class);
-        $helper::validateEmail('jo%hn@doe.email'); /** @phpstan-ignore-line as it's testing a deprecated method */
     }
 
     public function testGlobalHeadersAreSet(): void

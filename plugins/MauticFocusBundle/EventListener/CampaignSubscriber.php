@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
-use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\PageBundle\Helper\TrackingHelper;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
 use MauticPlugin\MauticFocusBundle\Form\Type\FocusShowType;
@@ -23,8 +25,8 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CampaignEvents::CAMPAIGN_ON_BUILD       => ['onCampaignBuild', 0],
-            FocusEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignTriggerAction', 0],
+            CampaignEvents::CAMPAIGN_ON_BUILD     => ['onCampaignBuild', 0],
+            FocusEvents::ON_CAMPAIGN_BATCH_ACTION => ['onCampaignTriggerAction', 0],
         ];
     }
 
@@ -33,7 +35,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         $action = [
             'label'                  => 'mautic.focus.campaign.event.show_focus',
             'description'            => 'mautic.focus.campaign.event.show_focus_descr',
-            'eventName'              => FocusEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+            'batchEventName'         => FocusEvents::ON_CAMPAIGN_BATCH_ACTION,
             'formType'               => FocusShowType::class,
             'formTheme'              => '@MauticFocus/FormTheme/FocusShowList/focusshow_list_row.html.twig',
             'formTypeOptions'        => ['update_select' => 'campaignevent_properties_focus'],
@@ -51,18 +53,22 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         $event->addAction('focus.show', $action);
     }
 
-    public function onCampaignTriggerAction(CampaignExecutionEvent $event): void
+    public function onCampaignTriggerAction(PendingEvent $event): void
     {
-        $focusId = (int) $event->getConfig()['focus'];
-        if (!$focusId) {
-            $event->setResult(false);
+        $focusId = (int) $event->getEvent()->getProperties()['focus'];
 
-            return;
+        foreach ($event->getPending() as $log) {
+            if (!$focusId) {
+                $event->fail($log, 'Focus is not configured.');
+
+                continue;
+            }
+
+            $values                 = [];
+            $values['focus_item'][] = ['id' => $focusId, 'js' => $this->router->generate('mautic_focus_generate', ['id' => $focusId], UrlGeneratorInterface::ABSOLUTE_URL)];
+            $this->trackingHelper->updateCacheItem($values);
+
+            $event->pass($log);
         }
-        $values                 = [];
-        $values['focus_item'][] = ['id' => $focusId, 'js' => $this->router->generate('mautic_focus_generate', ['id' => $focusId], UrlGeneratorInterface::ABSOLUTE_URL)];
-        $this->trackingHelper->updateCacheItem($values);
-
-        $event->setResult(true);
     }
 }

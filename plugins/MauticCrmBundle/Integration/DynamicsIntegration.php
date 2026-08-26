@@ -18,7 +18,7 @@ use Symfony\Component\Form\FormBuilder;
 /**
  * @extends CrmAbstractIntegration<DynamicsApi>
  */
-class DynamicsIntegration extends CrmAbstractIntegration
+final class DynamicsIntegration extends CrmAbstractIntegration
 {
     public function getName(): string
     {
@@ -146,16 +146,13 @@ class DynamicsIntegration extends CrmAbstractIntegration
         return $url.('&resource='.urlencode($this->keys['resource']));
     }
 
-    /**
-     * @param bool $inAuthorization
-     */
-    public function getBearerToken($inAuthorization = false)
+    public function getBearerToken(bool $inAuthorization = false): ?string
     {
         if (!$inAuthorization && isset($this->keys[$this->getAuthTokenKey()])) {
             return $this->keys[$this->getAuthTokenKey()];
         }
 
-        return false;
+        return null;
     }
 
     public function getDataPriority(): bool
@@ -163,10 +160,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
         return true;
     }
 
-    /**
-     * @return string|array
-     */
-    public function getFormNotes($section)
+    public function getFormNotes($section): array
     {
         if ('custom' === $section) {
             return [
@@ -198,11 +192,9 @@ class DynamicsIntegration extends CrmAbstractIntegration
     /**
      * Get available company fields for choices in the config UI.
      *
-     * @param array $settings
-     *
      * @return array
      */
-    public function getFormCompanyFields($settings = [])
+    public function getFormCompanyFields(array $settings = [])
     {
         return $this->getFormFieldsByObject('accounts', $settings);
     }
@@ -318,7 +310,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
             if ($this->isAuthorized()) {
                 $object = 'contacts';
                 $integrationId = $this->integrationEntityRepository->getIntegrationsEntityId('Dynamics', $object, 'lead', $lead->getId());
-                if (!empty($integrationId)) {
+                if ([] !== $integrationId) {
                     $integrationEntityId = $integrationId[0]['integration_entity_id'];
                     $this->getApiHelper()->updateLead($mappedData, $integrationEntityId);
 
@@ -700,7 +692,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
             unset($leadFields[$key]);
         }
 
-        if (empty($leadFields)) {
+        if ([] === $leadFields) {
             return [0, 0, 0];
         }
 

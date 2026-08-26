@@ -8,9 +8,11 @@ use Composer\Autoload\ClassLoader;
 use LightSaml\Credential\X509Credential;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\UserBundle\Security\SAML\Store\CredentialsStore;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 final class CredentialsStoreTest extends TestCase
 {
     private string $cacheDir;
@@ -23,7 +25,7 @@ final class CredentialsStoreTest extends TestCase
     protected function setUp(): void
     {
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->cacheDir             = dirname((new \ReflectionClass(ClassLoader::class))->getFileName(), 3);
+        $this->cacheDir             = dirname(new \ReflectionClass(ClassLoader::class)->getFileName(), 3);
     }
 
     public function testEmptyArrayReturnedIfEntityIdsDoNotMatch(): void

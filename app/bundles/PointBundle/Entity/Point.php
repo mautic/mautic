@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PointBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
@@ -21,7 +23,6 @@ use Mautic\CoreBundle\Helper\IntHelper;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ApiResource(
     operations: [
@@ -59,6 +60,7 @@ class Point extends FormEntity implements UuidInterface
      * @var string
      */
     #[Groups(['point:read', 'point:write'])]
+    #[Assert\NotBlank(message: 'mautic.core.name.required')]
     private $name;
 
     /**
@@ -71,6 +73,7 @@ class Point extends FormEntity implements UuidInterface
      * @var string
      */
     #[Groups(['point:read', 'point:write'])]
+    #[Assert\NotBlank(message: 'mautic.point.type.notblank')]
     private $type;
 
     /**
@@ -95,6 +98,8 @@ class Point extends FormEntity implements UuidInterface
      * @var int
      */
     #[Groups(['point:read', 'point:write'])]
+    #[Assert\NotBlank(message: 'mautic.point.delta.notblank')]
+    #[Assert\Range(min: IntHelper::MIN_INTEGER_VALUE, max: IntHelper::MAX_INTEGER_VALUE)]
     private $delta = 0;
 
     /**
@@ -168,17 +173,6 @@ class Point extends FormEntity implements UuidInterface
 
         static::addUuidField($builder);
         self::addProjectsField($builder, 'point_projects_xref', 'point_id');
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('name', new Assert\NotBlank(message: 'mautic.core.name.required'));
-
-        $metadata->addPropertyConstraint('type', new Assert\NotBlank(message: 'mautic.point.type.notblank'));
-
-        $metadata->addPropertyConstraint('delta', new Assert\NotBlank(message: 'mautic.point.delta.notblank'));
-
-        $metadata->addPropertyConstraint('delta', new Assert\Range(min: IntHelper::MIN_INTEGER_VALUE, max: IntHelper::MAX_INTEGER_VALUE));
     }
 
     /**

@@ -114,8 +114,8 @@ final class MessageOfTheDayCommandTest extends MauticMysqlTestCase
                         'content'  => [
                             'cli' => ['Active timed message'],
                         ],
-                        'start' => (new \DateTime('-1 day'))->format('c'),
-                        'end'   => (new \DateTime('+1 day'))->format('c'),
+                        'start' => new \DateTime('-1 day')->format('c'),
+                        'end'   => new \DateTime('+1 day')->format('c'),
                     ],
                 ],
             ],
@@ -135,8 +135,8 @@ final class MessageOfTheDayCommandTest extends MauticMysqlTestCase
                         'content'  => [
                             'cli' => ['Expired timed message'],
                         ],
-                        'start' => (new \DateTime('-3 days'))->format('c'),
-                        'end'   => (new \DateTime('-1 day'))->format('c'),
+                        'start' => new \DateTime('-3 days')->format('c'),
+                        'end'   => new \DateTime('-1 day')->format('c'),
                     ],
                 ],
             ],
@@ -182,7 +182,7 @@ final class MessageOfTheDayCommandTest extends MauticMysqlTestCase
         file_put_contents($this->cachePath, 'stale-cache');
         touch($this->cachePath, time() - 7200);
 
-        $httpClient = static::getContainer()->get(HttpClientInterface::class);
+        $httpClient = self::getContainer()->get(HttpClientInterface::class);
         $this->assertInstanceOf(MockHttpClient::class, $httpClient);
         $httpClient->setResponseFactory([
             new MockResponse('', ['http_code' => 500]),

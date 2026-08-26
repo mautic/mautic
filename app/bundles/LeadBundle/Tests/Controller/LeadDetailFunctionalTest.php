@@ -8,6 +8,7 @@ use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class LeadDetailFunctionalTest extends MauticMysqlTestCase
@@ -79,7 +80,7 @@ final class LeadDetailFunctionalTest extends MauticMysqlTestCase
 
         $expectedLabels = array_merge(['Created on', 'ID'], $expectedLabels);
 
-        $crawler = $this->client->request('GET', sprintf('/s/contacts/view/%d', $lead->getId()));
+        $crawler = $this->client->request(Request::METHOD_GET, sprintf('/s/contacts/view/%d', $lead->getId()));
 
         // get actual core labels
         $actualLabels = $crawler->filter('#lead-details table')
@@ -100,7 +101,7 @@ final class LeadDetailFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $crawler = $this->client->request('GET', sprintf('/s/contacts/view/%d', $lead->getId()));
+        $crawler = $this->client->request(Request::METHOD_GET, sprintf('/s/contacts/view/%d', $lead->getId()));
 
         $anchorTag  = $crawler->filter('#toolbar ul.dropdown-menu-right li')->first()->filter('a');
         $mouseOver  = $anchorTag->attr('onmouseover');
@@ -121,17 +122,17 @@ final class LeadDetailFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $crawler = $this->client->request('GET', 's/contacts/view/'.$contact->getId());
+        $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/view/'.$contact->getId());
         $data    = $crawler->filterXPath('//div[@id="social"]//td');
         $this->assertCount(1, $data);
 
-        $translator = static::getContainer()->get(TranslatorInterface::class);
+        $translator = self::getContainer()->get(TranslatorInterface::class);
         $this->assertStringContainsString($translator->trans('mautic.lead.field.group.no_data'), $data->text());
     }
 
     public function testLeadDetailPageForSocialTabInDetailsCollapsible(): void
     {
-        $crawler = $this->client->request('GET', 's/contacts/new/');
+        $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/new/');
 
         $fbLink  = 'https://fb.com/john_doe_test';
         $form    = $crawler->selectButton('Save & Close')->form();

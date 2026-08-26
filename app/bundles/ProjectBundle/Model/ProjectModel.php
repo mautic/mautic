@@ -12,6 +12,11 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 final class ProjectModel extends FormModel implements AjaxLookupModelInterface
 {
+    public static function getName(): string
+    {
+        return 'project.project';
+    }
+
     private ProjectEntityLoaderService $entityLoaderService;
 
     private ProjectRepository $projectRepository;

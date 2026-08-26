@@ -37,19 +37,19 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 {
     use ControllerTrait;
 
-    private const SUBJECT_A      = 'Subject A';
+    private const string SUBJECT_A      = 'Subject A';
 
-    private const SUBJECT_B      = 'Subject B';
+    private const string SUBJECT_B      = 'Subject B';
 
-    private const SUBJECT_C      = 'Subject C';
+    private const string SUBJECT_C      = 'Subject C';
 
-    private const SEGMENT_B      = 'Segment B';
+    private const string SEGMENT_B      = 'Segment B';
 
-    private const CLICK_URL_LOW  = 'https://example.com/low';
+    private const string CLICK_URL_LOW  = 'https://example.com/low';
 
-    private const CLICK_URL_MID  = 'https://example.com/mid';
+    private const string CLICK_URL_MID  = 'https://example.com/mid';
 
-    private const CLICK_URL_HIGH = 'https://example.com/high';
+    private const string CLICK_URL_HIGH = 'https://example.com/high';
 
     protected function setUp(): void
     {
@@ -77,7 +77,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->detach($email);
 
-        $this->client->request('GET', '/s/emails');
+        $this->client->request(Request::METHOD_GET, '/s/emails');
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful('Return code must be 200');
         $this->assertStringContainsString('February 7, 2020', (string) $clientResponse->getContent());
@@ -98,7 +98,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
      */
     public function testIndexActionWhenFiltering(): void
     {
-        $this->client->request('GET', '/s/emails?search=has%3Aresults&tmpl=list');
+        $this->client->request(Request::METHOD_GET, '/s/emails?search=has%3Aresults&tmpl=list');
         $this->assertResponseIsSuccessful();
     }
 
@@ -208,7 +208,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         /** @var DoctrineDataCollector $dbCollector */
         $dbCollector = $profile->getCollector('db');
         $queries     = $dbCollector->getQueries();
-        $prefix      = static::getContainer()->getParameter('mautic.db_table_prefix');
+        $prefix      = self::getContainer()->getParameter('mautic.db_table_prefix');
 
         $dncQueries = array_filter(
             $queries['default'],
@@ -294,6 +294,19 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$email->getId()}");
         $html    = $crawler->filterXPath('//*[@id="toolbar"]')->html();
         $this->assertStringNotContainsString('disabled', $html, $html);
+    }
+
+    public function testEmailListOffersSendExampleWithoutOpeningTheDetail(): void
+    {
+        $email = $this->createEmail('Automation test email', self::SUBJECT_A, 'template', 'blank', 'test html');
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails');
+        $button  = $crawler->filter("#row_email_{$email->getId()} a[href=\"/s/emails/sendExample/{$email->getId()}\"]");
+
+        $this->assertCount(1, $button);
+        $this->assertSame('ajaxmodal', $button->attr('data-toggle'));
+        $this->assertSame('Send example', trim($button->text()));
     }
 
     public function testEmailDetailPageForListEmailShowsScheduleButton(): void
@@ -873,7 +886,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $crawler = $this->client->request('GET', '/s/emails/edit/'.$email->getId());
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/edit/'.$email->getId());
         $form    = $crawler->selectButton('Save')->form();
         $form['emailform[projects]']->setValue((string) $project->getId());
 
@@ -893,7 +906,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->assertEmailVersion($email->getId(), $version);
 
-        $crawler = $this->client->request('GET', '/s/emails/edit/'.$email->getId());
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/edit/'.$email->getId());
         $form    = $crawler->selectButton('Save')->form();
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
@@ -1214,7 +1227,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $form          = $crawler->selectButton('schedule_send[buttons][save]')->form();
 
         // Set publish up date to 1 hour ago
-        $publishUpDate = (new \DateTime('now -30 minutes'))->format('Y-m-d H:i');
+        $publishUpDate = new \DateTime('now -30 minutes')->format('Y-m-d H:i');
         $form['schedule_send[publishUp]']->setValue($publishUpDate);
         $form['schedule_send[continueSending]']->setValue('0');
 
@@ -1262,7 +1275,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $form          = $crawler->selectButton('schedule_send[buttons][save]')->form();
 
         // Set publish up date to 1 hour ago
-        $publishUpDate = (new \DateTime('now -1 hour'))->format('Y-m-d H:i');
+        $publishUpDate = new \DateTime('now -1 hour')->format('Y-m-d H:i');
         $form['schedule_send[publishUp]']->setValue($publishUpDate);
         $form['schedule_send[continueSending]']->setValue('1');
 
@@ -1309,7 +1322,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $form    = $crawler->selectButton('schedule_send[buttons][save]')->form();
 
         // Set publish up date to 1 hour ago
-        $publishUpDate = (new \DateTime('now'))->format('Y-m-d H:i');
+        $publishUpDate = new \DateTime('now')->format('Y-m-d H:i');
         $form['schedule_send[publishUp]']->setValue($publishUpDate);
 
         $this->client->submit($form);

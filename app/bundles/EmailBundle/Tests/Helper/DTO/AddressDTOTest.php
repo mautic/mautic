@@ -17,7 +17,7 @@ final class AddressDTOTest extends TestCase
 
     public function testNameTokenReturnsFalse(): void
     {
-        $this->assertFalse((new AddressDTO('someone@somewhere.com', 'Someone Somewhere'))->isNameTokenized());
+        $this->assertFalse(new AddressDTO('someone@somewhere.com', 'Someone Somewhere')->isNameTokenized());
     }
 
     public function testNameTokenEmptyThrowsException(): void
@@ -33,25 +33,25 @@ final class AddressDTOTest extends TestCase
 
         $this->assertSame(
             'Thing Two',
-            (new AddressDTO('someone@somewhere.com', '{contactfield=other_name}'))->getNameTokenValue($contact)
+            new AddressDTO('someone@somewhere.com', '{contactfield=other_name}')->getNameTokenValue($contact)
         );
     }
 
     public function testEmailTokenReturnsTrue(): void
     {
-        $this->assertTrue((new AddressDTO('{contactfield=other_email}', 'Someone Somewhere'))->isEmailTokenized());
+        $this->assertTrue(new AddressDTO('{contactfield=other_email}', 'Someone Somewhere')->isEmailTokenized());
     }
 
     public function testEmailTokenReturnsFalse(): void
     {
-        $this->assertFalse((new AddressDTO('someone@somewhere.com', 'Someone Somewhere'))->isEmailTokenized());
+        $this->assertFalse(new AddressDTO('someone@somewhere.com', 'Someone Somewhere')->isEmailTokenized());
     }
 
     public function testEmailTokenEmptyThrowsException(): void
     {
         $this->expectException(TokenNotFoundOrEmptyException::class);
 
-        (new AddressDTO('{contactfield=other_email}', 'Thing One'))->getEmailTokenValue([]);
+        new AddressDTO('{contactfield=other_email}', 'Thing One')->getEmailTokenValue([]);
     }
 
     public function testEmailTokenIsReturned(): void
@@ -60,7 +60,7 @@ final class AddressDTOTest extends TestCase
 
         $this->assertSame(
             'other@somewhere.com',
-            (new AddressDTO('{contactfield=other_email}', ''))->getEmailTokenValue($contact)
+            new AddressDTO('{contactfield=other_email}', '')->getEmailTokenValue($contact)
         );
     }
 

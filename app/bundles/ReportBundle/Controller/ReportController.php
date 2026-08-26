@@ -256,7 +256,7 @@ final class ReportController extends FormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $this->reportModel->deleteEntities($deleteIds);
 
                 $flashes[] = [
@@ -284,8 +284,6 @@ final class ReportController extends FormController
      *
      * @param int  $objectId   Item ID
      * @param bool $ignorePost Flag to ignore POST data
-     *
-     * @return HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|Response
      */
     public function editAction(Request $request, int $objectId, $ignorePost = false): false|Response
     {
@@ -320,7 +318,7 @@ final class ReportController extends FormController
 
         // Create the form
         $action = $this->generateUrl('mautic_report_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $form   = $this->reportModel->createForm($entity, $this->formFactory, $action);
+        $form   = $this->reportModel->createForm($entity, $action);
 
         // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' === $request->getMethod()) {
@@ -400,7 +398,7 @@ final class ReportController extends FormController
             }
             if ($valid) {
                 // Rebuild the form for updated columns
-                $form = $this->reportModel->createForm($entity, $this->formFactory, $action);
+                $form = $this->reportModel->createForm($entity, $action);
             }
         } else {
             // lock the entity
@@ -443,7 +441,7 @@ final class ReportController extends FormController
         $page    = $session->get('mautic.report.page', 1);
 
         $action = $this->generateUrl('mautic_report_action', ['objectAction' => 'new']);
-        $form   = $this->reportModel->createForm($entity, $this->formFactory, $action);
+        $form   = $this->reportModel->createForm($entity, $action);
 
         // /Check for a submitted form and process it
         if (Request::METHOD_POST === $request->getMethod()) {
@@ -528,7 +526,6 @@ final class ReportController extends FormController
     public function viewAction(Request $request, $objectId, $reportPage = 1): Response
     {
         $entity   = $this->reportModel->getEntity($objectId);
-        $security = $this->security;
 
         if (null === $entity) {
             $page = $request->getSession()->get('mautic.report.page', 1);
@@ -552,7 +549,7 @@ final class ReportController extends FormController
                 ]
             );
         }
-        if (!$security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $entity->getCreatedBy())) {
+        if (!$this->security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $entity->getCreatedBy())) {
             $this->throwAccessDenied();
         }
 
@@ -678,7 +675,7 @@ final class ReportController extends FormController
                     'reportDataResult' => $reportDataResult,
                     'tmpl'             => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                     'limit'            => $reportData['limit'],
-                    'permissions'      => $security->isGranted(
+                    'permissions'      => $this->security->isGranted(
                         [
                             'report:reports:viewown',
                             'report:reports:viewother',
@@ -760,7 +757,6 @@ final class ReportController extends FormController
     public function exportAction(Request $request, $objectId, $format = 'csv'): Response
     {
         $entity   = $this->reportModel->getEntity($objectId);
-        $security = $this->security;
 
         if (null === $entity) {
             $page = $request->getSession()->get('mautic.report.page', 1);
@@ -784,17 +780,17 @@ final class ReportController extends FormController
                 ]
             );
         }
-        if (!$security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $entity->getCreatedBy())) {
+        if (!$this->security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $entity->getCreatedBy())) {
             $this->throwAccessDenied();
         } elseif (!$this->security->isAdmin() && !$this->security->isGranted('report:export:enable', 'MATCH_ONE')) {
             $this->throwAccessDenied();
         }
 
         $session  = $request->getSession();
-        $fromDate = $session->get('mautic.report.date.from', (new \DateTime('-30 days'))->format('Y-m-d'));
-        $toDate   = $session->get('mautic.report.date.to', (new \DateTime())->format('Y-m-d'));
+        $fromDate = $session->get('mautic.report.date.from', new \DateTime('-30 days')->format('Y-m-d'));
+        $toDate   = $session->get('mautic.report.date.to', new \DateTime()->format('Y-m-d'));
 
-        $date    = (new DateTimeHelper())->toLocalString();
+        $date    = new DateTimeHelper()->toLocalString();
         $name    = str_replace(' ', '_', $date).'_'.InputHelper::alphanum($entity->getName(), false, '-');
         $options = ['dateFrom' => new \DateTime($fromDate), 'dateTo' => new \DateTime($toDate)];
 
@@ -855,8 +851,6 @@ final class ReportController extends FormController
      * @param int    $reportId
      * @param string $format
      *
-     * @return BinaryFileResponse
-     *
      * @throws \Exception
      */
     public function downloadAction(FileHandler $fileHandler, $reportId, $format = 'csv'): Response|BinaryFileResponse
@@ -868,13 +862,11 @@ final class ReportController extends FormController
         /** @var Report $report */
         $report = $this->reportModel->getEntity($reportId);
 
-        $security = $this->security;
-
         if (empty($report)) {
             return $this->notFound($this->translator->trans('mautic.report.notfound', ['%id%' => $reportId]));
         }
 
-        if (!$security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $report->getCreatedBy())) {
+        if (!$this->security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $report->getCreatedBy())) {
             $this->throwAccessDenied();
         }
 

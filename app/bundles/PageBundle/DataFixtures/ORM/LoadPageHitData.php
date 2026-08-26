@@ -2,18 +2,18 @@
 
 namespace Mautic\PageBundle\DataFixtures\ORM;
 
-use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\PageBundle\Entity\Hit;
-use Mautic\PageBundle\Model\PageModel;
+use Mautic\PageBundle\Entity\PageRepository;
 
-final class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadPageHitData extends Fixture implements OrderedFixtureInterface
 {
     public function __construct(
-        private readonly PageModel $pageModel,
+        private readonly PageRepository $pageRepository,
     ) {
     }
 
@@ -38,7 +38,7 @@ final class LoadPageHitData extends AbstractFixture implements OrderedFixtureInt
                     }
                 }
             }
-            $this->pageModel->getRepository()->saveEntity($hit);
+            $this->pageRepository->saveEntity($hit);
         }
     }
 

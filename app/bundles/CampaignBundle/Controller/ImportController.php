@@ -35,11 +35,11 @@ use Symfony\Contracts\Service\Attribute\Required;
 final class ImportController extends AbstractFormController
 {
     // Steps of the import
-    public const STEP_UPLOAD_ZIP      = 1;
+    public const int STEP_UPLOAD_ZIP      = 1;
 
-    public const STEP_PROGRESS_BAR    = 2;
+    public const int STEP_PROGRESS_BAR    = 2;
 
-    public const STEP_IMPORT_FROM_ZIP = 3;
+    public const int STEP_IMPORT_FROM_ZIP = 3;
 
     private UserHelper $userHelper;
 
@@ -136,7 +136,7 @@ final class ImportController extends AbstractFormController
                 $this->requestStack->getSession()->remove('mautic.campaign.import.summary');
                 try {
                     // Ensure the import directory exists
-                    (new Filesystem())->mkdir($importDir, 0755);
+                    new Filesystem()->mkdir($importDir, 0755);
 
                     // Remove existing file if it exists
                     if (file_exists($fullPath)) {
@@ -230,7 +230,7 @@ final class ImportController extends AbstractFormController
         }
 
         $uniqueId = bin2hex(random_bytes(8));
-        $fileName = sprintf('%s_%s.zip', (new DateTimeHelper())->toUtcString('YmdHis'), $uniqueId);
+        $fileName = sprintf('%s_%s.zip', new DateTimeHelper()->toUtcString('YmdHis'), $uniqueId);
 
         $session->set('mautic.campaign.import.file', $fileName);
 
@@ -257,7 +257,7 @@ final class ImportController extends AbstractFormController
         if (self::STEP_PROGRESS_BAR === $step) {
             $analyzeSummary = $this->analyzeData($importHelper, $fullPath);
 
-            if (empty($analyzeSummary)) {
+            if ([] === $analyzeSummary) {
                 $this->addFlashMessage('mautic.campaign.import.nofile', [], FlashBag::LEVEL_ERROR, 'validators');
                 $this->removeImportFile($fullPath);
                 $this->resetImport();
@@ -331,7 +331,7 @@ final class ImportController extends AbstractFormController
                 $event  = new EntityImportEvent(Campaign::ENTITY_NAME, $entity, $userId);
                 $this->dispatcher->dispatch($event);
                 $summary = $event->getStatus();
-                if (!empty($summary)) {
+                if ([] !== $summary) {
                     $importSummary[] = $summary;
                 }
             }
@@ -439,7 +439,7 @@ final class ImportController extends AbstractFormController
                     }
                 }
             }
-            if (!empty($mergedSummary)) {
+            if ([] !== $mergedSummary) {
                 $allData[] = $mergedSummary;
             }
         }

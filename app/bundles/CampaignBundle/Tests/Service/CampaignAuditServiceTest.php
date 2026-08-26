@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class CampaignAuditServiceTest extends MauticMysqlTestCase
 {
-    private const CAMPAIGN_NAME = 'Test Campaign';
+    private const string CAMPAIGN_NAME = 'Test Campaign';
 
     private CampaignAuditService $campaignAuditService;
 

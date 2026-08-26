@@ -54,18 +54,18 @@ final class TriggerCampaignCommand extends ModeratedCommand
     private ?Campaign $campaign = null;
 
     public function __construct(
-        private CampaignRepository $campaignRepository,
-        private EventDispatcherInterface $dispatcher,
-        private TranslatorInterface $translator,
-        private KickoffExecutioner $kickoffExecutioner,
-        private ScheduledExecutioner $scheduledExecutioner,
-        private InactiveExecutioner $inactiveExecutioner,
-        private LoggerInterface $logger,
-        private FormatterHelper $formatterHelper,
-        private SegmentCountCacheHelper $segmentCountCacheHelper,
+        private readonly CampaignRepository $campaignRepository,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly TranslatorInterface $translator,
+        private readonly KickoffExecutioner $kickoffExecutioner,
+        private readonly ScheduledExecutioner $scheduledExecutioner,
+        private readonly InactiveExecutioner $inactiveExecutioner,
+        private readonly LoggerInterface $logger,
+        private readonly FormatterHelper $formatterHelper,
+        private readonly SegmentCountCacheHelper $segmentCountCacheHelper,
         PathsHelper $pathsHelper,
-        private CoreParametersHelper $coreParametersHelper,
-        private ProcessSignalService $processSignalService,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly ProcessSignalService $processSignalService,
         private readonly LeadListRepository $leadListRepository,
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
@@ -219,7 +219,7 @@ final class TriggerCampaignCommand extends ModeratedCommand
 
         $this->limiter = new ContactLimiter($batchLimit, $contactId, $contactMinId, $contactMaxId, $contactIds, $threadId, $maxThreads, $campaignLimit);
 
-        defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
+        defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') || define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
 
         $moderationKey = sprintf('%s-%s', $id, $threadId);
         if (!$this->checkRunStatus($input, $this->output, $moderationKey)) {

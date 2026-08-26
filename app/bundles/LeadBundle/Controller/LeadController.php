@@ -370,7 +370,7 @@ final class LeadController extends FormController
             ]
         );
 
-        $quickForm = $this->leadModel->createForm($this->leadModel->getEntity(), $this->formFactory, $action, ['fields' => $fields, 'isShortForm' => true]);
+        $quickForm = $this->leadModel->createForm($this->leadModel->getEntity(), $action, ['fields' => $fields, 'isShortForm' => true]);
 
         // set the default owner to the currently logged in user
         $currentUser = $tokenStorage->getToken()->getUser();
@@ -430,6 +430,19 @@ final class LeadController extends FormController
         }
 
         $this->leadRepository->refetchEntity($lead);
+
+        $returnUrl = null;
+        if ('form_results' === $request->query->get('returnTo')) {
+            $formId   = (int) $request->query->get('formId');
+            $formPage = max(1, (int) $request->query->get('formPage', 1));
+
+            if ($formId > 0) {
+                $returnUrl = $this->generateUrl('mautic_form_results', [
+                    'objectId' => $formId,
+                    'page'     => $formPage,
+                ]);
+            }
+        }
 
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -507,6 +520,7 @@ final class LeadController extends FormController
                     'doNotContactSms'        => end($dncSms),
                     'pointGroups'            => $pointGroupModel->getEntities(),
                     'enableExportPermission' => $this->security->isAdmin() || $this->security->isGranted('lead:export:enable', 'MATCH_ONE'),
+                    'returnUrl'              => $returnUrl,
                     // 'leadNotes'         => $this->forward(
                     //    'Mautic\LeadBundle\Controller\NoteController::indexAction',
                     //    [
@@ -547,7 +561,7 @@ final class LeadController extends FormController
         $page           = $request->getSession()->get('mautic.lead.page', 1);
         $action         = $this->generateUrl('mautic_contact_action', ['objectAction' => 'new']);
         $fields = $this->leadFieldModel->getPublishedFieldArrays('lead');
-        $form   = $this->leadModel->createForm($lead, $this->formFactory, $action, ['fields' => $fields]);
+        $form   = $this->leadModel->createForm($lead, $action, ['fields' => $fields]);
 
         // /Check for a submitted form and process it
         if (Request::METHOD_POST === $request->getMethod()) {
@@ -587,7 +601,7 @@ final class LeadController extends FormController
                     // Save here as we need the entity with an ID for the company code bellow.
                     $this->leadRepository->saveEntity($lead);
 
-                    if (!empty($companies)) {
+                    if ([] !== $companies) {
                         $this->leadModel->modifyCompanies($lead, $companies);
                     }
 
@@ -751,7 +765,7 @@ final class LeadController extends FormController
 
         $action         = $this->generateUrl('mautic_contact_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
         $fields = $this->leadFieldModel->getPublishedFieldArrays('lead');
-        $form   = $this->leadModel->createForm($lead, $this->formFactory, $action, ['fields' => $fields]);
+        $form   = $this->leadModel->createForm($lead, $action, ['fields' => $fields]);
 
         // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' === $request->getMethod()) {
@@ -850,7 +864,7 @@ final class LeadController extends FormController
             if ($valid) {
                 // Refetch and recreate the form in order to populate data manipulated in the entity itself
                 $lead = $this->leadModel->getEntity($objectId);
-                $form = $this->leadModel->createForm($lead, $this->formFactory, $action, ['fields' => $fields]);
+                $form = $this->leadModel->createForm($lead, $action, ['fields' => $fields]);
             }
         } else {
             // lock the entity
@@ -1160,10 +1174,8 @@ final class LeadController extends FormController
 
     /**
      * Deletes the entity.
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         $page      = $request->getSession()->get('mautic.lead.page', 1);
         $returnUrl = $this->generateUrl('mautic_contact_index', ['page' => $page]);
@@ -1270,7 +1282,7 @@ final class LeadController extends FormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $this->leadModel->deleteEntities($deleteIds);
 
                 $flashes[] = [
@@ -1506,7 +1518,6 @@ final class LeadController extends FormController
                         $mailer->setEmail($emailEntity);
                     }
 
-                    // Ensure safe emoji for notification
                     if ($mailer->send(true, false)) {
                         $mailer->createEmailStat();
                         $this->addFlashMessage(
@@ -2159,7 +2170,7 @@ final class LeadController extends FormController
      *
      * @throws \Exception
      */
-    public function batchExportAction(Request $request, ExportHelper $exportHelper, EventDispatcherInterface $dispatcher): Response
+    public function batchExportAction(Request $request, ExportHelper $exportHelper): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -2241,7 +2252,7 @@ final class LeadController extends FormController
         }
 
         if ('csv' === $fileType && $this->coreParametersHelper->get('contact_export_in_background', false)) {
-            return $this->contactExportCSVScheduler($dispatcher, $permissions);
+            return $this->contactExportCSVScheduler($permissions);
         }
 
         $iterator = new IteratorExportDataModel(
@@ -2254,7 +2265,7 @@ final class LeadController extends FormController
         $details['total'] = $iterator->getTotal();
         $details['args']  = $iterator->getArgs();
 
-        $dispatcher->dispatch(
+        $this->dispatcher->dispatch(
             new ContactExportEvent($details, 'ContactExports'),
             LeadEvents::POST_CONTACT_EXPORT
         );
@@ -2326,12 +2337,12 @@ final class LeadController extends FormController
     /**
      * @param array<mixed> $permissions
      */
-    private function contactExportCSVScheduler(EventDispatcherInterface $dispatcher, array $permissions): JsonResponse
+    private function contactExportCSVScheduler(array $permissions): JsonResponse
     {
         $data                   = $this->contactExportSchedulerModel->prepareData($permissions);
         $contactExportScheduler = $this->contactExportSchedulerModel->saveEntity($data);
 
-        $dispatcher->dispatch(
+        $this->dispatcher->dispatch(
             new ContactExportSchedulerEvent($contactExportScheduler),
             LeadEvents::POST_CONTACT_EXPORT_SCHEDULED
         );
@@ -2466,13 +2477,7 @@ final class LeadController extends FormController
 
         return $this->delegateView(
             [
-                'viewParameters' => array_merge(
-                    [
-                        'fields' => $fields,
-                        'form'   => $form->createView(),
-                        'lead'   => $lead,
-                    ],
-                ),
+                'viewParameters' => ['fields' => $fields, 'form' => $form->createView(), 'lead' => $lead],
                 'contentTemplate' => '@MauticLead/Lead/group_points.html.twig',
             ]
         );

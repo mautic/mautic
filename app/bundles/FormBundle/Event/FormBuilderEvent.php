@@ -21,7 +21,7 @@ final class FormBuilderEvent extends Event
     private array $validators = [];
 
     public function __construct(
-        private TranslatorInterface $translator,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -172,7 +172,7 @@ final class FormBuilderEvent extends Event
      */
     public function addValidatorsToBuilder(FormInterface $form): void
     {
-        if (!empty($this->validators)) {
+        if ([] !== $this->validators) {
             $validationData = $form->getData()['validation'] ?? [];
             foreach ($this->validators as $validator) {
                 if (isset($validator['formType']) && isset($validator['fieldType']) && $validator['fieldType'] == $form->getData()['type']) {

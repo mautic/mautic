@@ -19,6 +19,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 class TrackableModel extends AbstractCommonModel
 {
+    public static function getName(): string
+    {
+        return 'page.trackable';
+    }
+
     /**
      * Array of URLs and/or tokens that should not be converted to trackables.
      *
@@ -106,7 +111,7 @@ class TrackableModel extends AbstractCommonModel
         }
 
         if ($shortenUrl) {
-            $trackedUrl = $this->redirectModel->shortenUrl($trackedUrl);
+            return $this->redirectModel->shortenUrl($trackedUrl);
         }
 
         return $trackedUrl;
@@ -331,20 +336,16 @@ class TrackableModel extends AbstractCommonModel
 
     /**
      * @phpstan-impure
-     *
-     * @return array
      */
-    protected function extractTrackablesFromContent($content)
+    protected function extractTrackablesFromContent($content): array
     {
         if (0 !== preg_match('/<[^<]+>/', $content)) {
             // Parse as HTML
-            $trackableUrls = $this->extractTrackablesFromHtml($content);
-        } else {
-            // Parse as plain text
-            $trackableUrls = $this->extractTrackablesFromText($content);
+            return $this->extractTrackablesFromHtml($content);
         }
 
-        return $trackableUrls;
+        // Parse as plain text
+        return $this->extractTrackablesFromText($content);
     }
 
     /**
@@ -550,10 +551,8 @@ class TrackableModel extends AbstractCommonModel
      * Find and extract tokens from the URL as this have to be processed outside of tracking tokens.
      *
      * @param array<string, mixed> $urlParts from parse_url
-     *
-     * @return array|false
      */
-    protected function extractTokensFromQuery(array &$urlParts)
+    protected function extractTokensFromQuery(array &$urlParts): array|false
     {
         $tokenizedParams = false;
 
@@ -668,16 +667,6 @@ class TrackableModel extends AbstractCommonModel
 
         // Reset content replacement arrays
         $this->contentReplacements = [
-            // PHPSTAN reported duplicate keys in this array. I can't determine which is the right one.
-            // I'm leaving the second one to keep current behaviour but leaving the first one commented
-            // out as it may be the one we want.
-            // 'first_pass'  => [
-            //     // Remove internal attributes
-            //     // Editor may convert to HTML4
-            //     'mautic:disable-tracking=""' => '',
-            //     // HTML5
-            //     'mautic:disable-tracking'    => '',
-            // ],
             'first_pass'  => [],
             'second_pass' => [],
         ];
@@ -737,13 +726,6 @@ class TrackableModel extends AbstractCommonModel
         /** @var \DOMElement $link */
         foreach ($this->extractHrefs($links) as $link) {
             $url = $link->getAttribute('href');
-
-            // Check for a do not track
-            // @deprecated since 7.x — Will be removed in 8.0. Use data-mautic-disable-tracking.
-            if ($link->hasAttribute('mautic:disable-tracking')) {
-                $this->doNotTrack[$url] = $url;
-                continue;
-            }
 
             // Check for a do not track in proper HTML format
             if ($link->hasAttribute('data-mautic-disable-tracking') && 'true' === $link->getAttribute('data-mautic-disable-tracking')) {

@@ -10,11 +10,12 @@ use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
 use MauticPlugin\MauticClearbitBundle\Integration\Support\ConfigSupport;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
 
 final class ConfigControllerTest extends MauticMysqlTestCase
 {
-    private const API_KEY = 'test_api_key_123';
+    private const string API_KEY = 'test_api_key_123';
 
     private string $configRoute;
 
@@ -35,7 +36,7 @@ final class ConfigControllerTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
-        $this->configRoute = static::getContainer()->get(RouterInterface::class)->generate('mautic_plugin_config', ['name' => 'Clearbit']);
+        $this->configRoute = self::getContainer()->get(RouterInterface::class)->generate('mautic_plugin_config', ['name' => 'Clearbit']);
     }
 
     public function testSavedIntegrationIsPublishedAndApiKeyIsEncryptedAtRest(): void
@@ -55,9 +56,9 @@ final class ConfigControllerTest extends MauticMysqlTestCase
         $this->em->clear();
 
         /** @var IntegrationsHelper $integrationsHelper */
-        $integrationsHelper = static::getContainer()->get(IntegrationsHelper::class);
+        $integrationsHelper = self::getContainer()->get(IntegrationsHelper::class);
         /** @var ConfigSupport $configSupport */
-        $configSupport = static::getContainer()->get(ConfigSupport::class);
+        $configSupport = self::getContainer()->get(ConfigSupport::class);
         $decrypted     = $integrationsHelper->getIntegrationConfiguration($configSupport);
 
         $this->assertSame(self::API_KEY, $decrypted->getApiKeys()['apikey']);
@@ -68,7 +69,7 @@ final class ConfigControllerTest extends MauticMysqlTestCase
     {
         $this->saveConfigForm();
 
-        $crawler = $this->client->request('GET', $this->configRoute);
+        $crawler = $this->client->request(Request::METHOD_GET, $this->configRoute);
         $this->assertResponseIsSuccessful();
         $this->assertSame(self::API_KEY, $crawler->filter('#integration_config_apiKeys_apikey')->attr('value'));
         $this->assertNotNull($crawler->filter('#integration_config_isPublished_1')->attr('checked'));
@@ -77,7 +78,7 @@ final class ConfigControllerTest extends MauticMysqlTestCase
 
     private function saveConfigForm(): void
     {
-        $crawler = $this->client->request('GET', $this->configRoute);
+        $crawler = $this->client->request(Request::METHOD_GET, $this->configRoute);
         $this->assertResponseIsSuccessful();
 
         $form = $crawler->selectButton('Save & Close')->form();

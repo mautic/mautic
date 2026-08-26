@@ -7,19 +7,20 @@ namespace Mautic\PointBundle\Tests\Controller\Api;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PointBundle\Entity\PointInsight;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class PointInsightApiControllerTest extends MauticMysqlTestCase
 {
-    private const UPDATED_NAME = 'Updated Point Insight';
+    private const string UPDATED_NAME = 'Updated Point Insight';
 
     public function testPointInsightCRUDActions(): void
     {
         /** @var Translator $translator */
-        $translator = static::getContainer()->get(TranslatorInterface::class);
+        $translator = self::getContainer()->get(TranslatorInterface::class);
 
-        $this->client->request('POST', '/api/points/insights/new', [
+        $this->client->request(Request::METHOD_POST, '/api/points/insights/new', [
             'name'          => 'New Point Insight',
             'description'   => 'Description of the new point insight',
             'insightType'   => PointInsight::INSIGHT_TYPE_COMPARE_POINT_GROUPS,
@@ -40,7 +41,7 @@ final class PointInsightApiControllerTest extends MauticMysqlTestCase
         $this->assertArrayHasKey('insightAction', $createdData);
         $this->assertEquals(PointInsight::INSIGHT_ACTION_SET_CUSTOM_FIELD, $createdData['insightAction']);
 
-        $this->client->request('GET', '/api/points/insights');
+        $this->client->request(Request::METHOD_GET, '/api/points/insights');
         $getAllResponse = $this->client->getResponse();
 
         $this->assertResponseIsSuccessful();
@@ -58,7 +59,7 @@ final class PointInsightApiControllerTest extends MauticMysqlTestCase
             'insightAction' => PointInsight::INSIGHT_ACTION_SET_CUSTOM_FIELD,
         ];
 
-        $this->client->request('PATCH', "/api/points/insights/{$createdData['id']}/edit", $updatePayload);
+        $this->client->request(Request::METHOD_PATCH, "/api/points/insights/{$createdData['id']}/edit", $updatePayload);
         $updateResponse = $this->client->getResponse();
 
         $this->assertResponseIsSuccessful();
@@ -67,7 +68,7 @@ final class PointInsightApiControllerTest extends MauticMysqlTestCase
         $updatedData = $responseData['insight'];
         $this->assertEquals(self::UPDATED_NAME, $updatedData['name']);
 
-        $this->client->request('DELETE', "/api/points/insights/{$createdData['id']}/delete");
+        $this->client->request(Request::METHOD_DELETE, "/api/points/insights/{$createdData['id']}/delete");
         $deleteResponse = $this->client->getResponse();
 
         $this->assertResponseIsSuccessful();
@@ -76,7 +77,7 @@ final class PointInsightApiControllerTest extends MauticMysqlTestCase
         $deleteData = $responseData['insight'];
         $this->assertEquals(self::UPDATED_NAME, $deleteData['name']);
 
-        $this->client->request('GET', "/api/points/insights/{$createdData['id']}");
+        $this->client->request(Request::METHOD_GET, "/api/points/insights/{$createdData['id']}");
         $getResponse = $this->client->getResponse();
         $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
         $responseData = json_decode($getResponse->getContent(), true);

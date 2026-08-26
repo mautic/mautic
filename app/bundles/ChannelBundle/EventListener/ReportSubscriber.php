@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ChannelBundle\EventListener;
 
 use Mautic\LeadBundle\Model\CompanyReportData;
@@ -12,7 +14,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 final readonly class ReportSubscriber implements EventSubscriberInterface
 {
-    public const CONTEXT_MESSAGE_CHANNEL = 'message.channel';
+    public const string CONTEXT_MESSAGE_CHANNEL = 'message.channel';
 
     public function __construct(
         private CompanyReportData $companyReportData,

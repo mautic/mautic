@@ -27,8 +27,8 @@ class EntityResultHelper
         }
 
         // solving array/object discrepancy for empty values
-        if ($this->isKeyedById($results) && empty($entities)) {
-            $entities = new \ArrayObject();
+        if ($this->isKeyedById($results) && [] === $entities) {
+            return new \ArrayObject();
         }
 
         return $entities;

@@ -24,7 +24,7 @@ abstract class AbstractSearchTestCase extends MauticMysqlTestCase
         /** @var LeadModel $leadModel */
         $leadModel = static::getContainer()->get(LeadModel::class);
 
-        $contact = (new Lead())
+        $contact = new Lead()
             ->setFirstname($data['firstname'])
             ->setLastname($data['lastname'])
             ->setEmail($data['email'])
@@ -61,7 +61,7 @@ abstract class AbstractSearchTestCase extends MauticMysqlTestCase
         /** @var CompanyModel $companyModel */
         $companyModel = static::getContainer()->get(CompanyModel::class);
 
-        $company = (new Company())
+        $company = new Company()
             ->setName($data['name'] ?? null)
             ->setEmail($data['email'] ?? null);
 

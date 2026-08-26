@@ -8,7 +8,6 @@ use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Service\FlashBag;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,16 +15,12 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 final class CategoryController extends AbstractFormController
 {
-    private FormFactoryInterface $formFactory;
-
     private CategoryModel $categoryModel;
 
     #[Required]
     public function autowireCategoryController(
-        FormFactoryInterface $formFactory,
         CategoryModel $categoryModel,
     ): void {
-        $this->formFactory   = $formFactory;
         $this->categoryModel = $categoryModel;
     }
 
@@ -211,7 +206,7 @@ final class CategoryController extends AbstractFormController
             'objectAction' => 'new',
             'bundle'       => $bundle,
         ]);
-        $form = $this->categoryModel->createForm($entity, $this->formFactory, $action, ['bundle' => $bundle, 'show_bundle_select' => 'category' === $bundle]);
+        $form = $this->categoryModel->createForm($entity, $action, ['bundle' => $bundle, 'show_bundle_select' => 'category' === $bundle]);
         $form['inForm']->setData($inForm);
         // /Check for a submitted form and process it
         if (Request::METHOD_POST === $method) {
@@ -324,7 +319,7 @@ final class CategoryController extends AbstractFormController
                 'bundle'       => $bundle,
             ]
         );
-        $form = $this->categoryModel->createForm($entity, $this->formFactory, $action, ['bundle' => $bundle]);
+        $form = $this->categoryModel->createForm($entity, $action, ['bundle' => $bundle]);
         $form['inForm']->setData($inForm);
 
         // /Check for a submitted form and process it
@@ -354,7 +349,7 @@ final class CategoryController extends AbstractFormController
                                 'bundle'       => $bundle,
                             ]
                         );
-                        $form = $this->categoryModel->createForm($entity, $this->formFactory, $action, ['bundle' => $bundle]);
+                        $form = $this->categoryModel->createForm($entity, $action, ['bundle' => $bundle]);
                     }
                 }
             } else {
@@ -424,10 +419,8 @@ final class CategoryController extends AbstractFormController
 
     /**
      * Deletes the entity.
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, ?string $bundle, $objectId)
+    public function deleteAction(Request $request, ?string $bundle, $objectId): Response
     {
         $session    = $request->getSession();
         $page       = $session->get('mautic.category.page', 1);
@@ -545,7 +538,7 @@ final class CategoryController extends AbstractFormController
                 }
             }
 
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $flashes[] = [
                     'type'    => 'notice',
                     'msg'     => 'mautic.category.notice.batch_deleted',

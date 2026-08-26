@@ -250,13 +250,11 @@ class EmailSendEvent extends CommonEvent
      */
     public function getTokens($includeGlobal = true): array
     {
-        $tokens = $this->tokens;
-
         if ($includeGlobal && null !== $this->helper) {
-            $tokens = array_merge($this->helper->getGlobalTokens(), $tokens);
+            return array_merge($this->helper->getGlobalTokens(), $this->tokens);
         }
 
-        return $tokens;
+        return $this->tokens;
     }
 
     public function addTextHeader($name, $value): void

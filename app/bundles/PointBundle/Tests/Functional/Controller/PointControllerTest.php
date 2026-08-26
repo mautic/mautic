@@ -7,6 +7,7 @@ namespace Mautic\PointBundle\Tests\Functional\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PointBundle\Entity\Point;
 use Mautic\ProjectBundle\Entity\Project;
+use Symfony\Component\HttpFoundation\Request;
 
 final class PointControllerTest extends MauticMysqlTestCase
 {
@@ -24,7 +25,7 @@ final class PointControllerTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $crawler = $this->client->request('GET', '/s/points/edit/'.$point->getId());
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/points/edit/'.$point->getId());
         $form    = $crawler->selectButton('Save')->form();
         $form['point[projects]']->setValue((string) $project->getId());
 

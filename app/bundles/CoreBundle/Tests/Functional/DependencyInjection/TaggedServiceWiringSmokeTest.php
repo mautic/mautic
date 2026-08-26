@@ -4,7 +4,16 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Functional\DependencyInjection;
 
+use Mautic\CoreBundle\Helper\PreUpdateCheckHelper;
 use Mautic\CoreBundle\Shortener\Shortener;
+use Mautic\CoreBundle\Update\StepProvider;
+use Mautic\IntegrationsBundle\Helper\AuthIntegrationsHelper;
+use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
+use Mautic\IntegrationsBundle\Helper\ConfigIntegrationsHelper;
+use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
+use Mautic\IntegrationsBundle\Helper\SyncIntegrationsHelper;
+use Mautic\IntegrationsBundle\Sync\Notification\Handler\HandlerContainer as IntegrationsNotificationHandlerContainer;
+use Mautic\SmsBundle\Callback\HandlerContainer as SmsCallbackHandlerContainer;
 
 /**
  * These services used to collect their tagged services through compiler passes and now use #[AutowireIterator].
@@ -17,18 +26,18 @@ final class TaggedServiceWiringSmokeTest extends AbstractContainerSmokeTestCase
      *
      * @var array<string, int>
      */
-    private const EXPECTED_COLLECTED_SERVICE_COUNTS = [
-        'mautic.email.stats.helper_container'                     => 6,
-        'mautic.helper.update_checks'                             => 2,
-        'mautic.integrations.helper'                              => 3,
-        'mautic.integrations.helper.auth_integrations'            => 0,
-        'mautic.integrations.helper.builder_integrations'         => 1,
-        'mautic.integrations.helper.config_integrations'          => 3,
-        'mautic.integrations.helper.sync_integrations'            => 0,
-        'mautic.integrations.sync.notification.handler_container' => 2,
-        'mautic.sms.callback_handler_container'                   => 1,
-        'mautic.update.step_provider'                             => 7,
-        Shortener::class                                          => 0,
+    private const array EXPECTED_COLLECTED_SERVICE_COUNTS = [
+        'mautic.email.stats.helper_container'         => 6,
+        PreUpdateCheckHelper::class                   => 2,
+        IntegrationsHelper::class                     => 4,
+        AuthIntegrationsHelper::class                 => 0,
+        BuilderIntegrationsHelper::class              => 1,
+        ConfigIntegrationsHelper::class               => 4,
+        SyncIntegrationsHelper::class                 => 0,
+        IntegrationsNotificationHandlerContainer::class => 2,
+        SmsCallbackHandlerContainer::class            => 1,
+        StepProvider::class                           => 7,
+        Shortener::class                              => 0,
     ];
 
     public function testTaggedServicesAreCollectedByTheConstructor(): void
@@ -51,7 +60,7 @@ final class TaggedServiceWiringSmokeTest extends AbstractContainerSmokeTestCase
     {
         $count = 0;
 
-        foreach ((new \ReflectionObject($service))->getProperties() as $property) {
+        foreach (new \ReflectionObject($service)->getProperties() as $property) {
             if (!$property->isInitialized($service)) {
                 continue;
             }

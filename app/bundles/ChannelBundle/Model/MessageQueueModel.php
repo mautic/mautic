@@ -11,6 +11,7 @@ use Mautic\ChannelBundle\Event\MessageQueueProcessEvent;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -21,6 +22,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 class MessageQueueModel extends FormModel
 {
+    public static function getName(): string
+    {
+        return 'channel.queue';
+    }
+
     /**
      * @var string A default message reschedule interval
      */
@@ -34,17 +40,21 @@ class MessageQueueModel extends FormModel
 
     private FrequencyRuleRepository $frequencyRuleRepository;
 
+    private LeadRepository $leadRepository;
+
     #[Required]
     public function autowireMessageQueueModel(
         LeadModel $leadModel,
         CompanyModel $companyModel,
         MessageQueueRepository $messageQueueRepository,
         FrequencyRuleRepository $frequencyRuleRepository,
+        LeadRepository $leadRepository,
     ): void {
         $this->leadModel               = $leadModel;
         $this->companyModel            = $companyModel;
         $this->messageQueueRepository  = $messageQueueRepository;
         $this->frequencyRuleRepository = $frequencyRuleRepository;
+        $this->leadRepository = $leadRepository;
     }
 
     public function getRepository(): MessageQueueRepository
@@ -53,12 +63,9 @@ class MessageQueueModel extends FormModel
     }
 
     /**
-     * @param int    $attempts
-     * @param int    $priority
-     * @param mixed  $messageQueue
-     * @param string $statTableName
-     * @param string $statContactColumn
-     * @param string $statSentColumn
+     * @param int   $attempts
+     * @param int   $priority
+     * @param mixed $messageQueue
      */
     public function processFrequencyRules(
         array &$leads,
@@ -68,9 +75,9 @@ class MessageQueueModel extends FormModel
         $attempts = 3,
         $priority = MessageQueue::PRIORITY_NORMAL,
         $messageQueue = null,
-        $statTableName = 'email_stats',
-        $statContactColumn = 'lead_id',
-        $statSentColumn = 'date_sent',
+        string $statTableName = 'email_stats',
+        string $statContactColumn = 'lead_id',
+        string $statSentColumn = 'date_sent',
     ): array {
         $leadIds = array_keys($leads);
         $leadIds = array_combine($leadIds, $leadIds);
@@ -136,7 +143,7 @@ class MessageQueueModel extends FormModel
     ): bool {
         $messageQueues = [];
 
-        $scheduledDate = (new \DateTime())->add($scheduledInterval);
+        $scheduledDate = new \DateTime()->add($scheduledInterval);
 
         foreach ($leads as $lead) {
             $leadId = (is_array($lead)) ? $lead['id'] : $lead->getId();
@@ -211,8 +218,8 @@ class MessageQueueModel extends FormModel
                 $contacts[$message->getId()] = $message->getLead()->getId();
             }
         }
-        if (!empty($contacts)) {
-            $contactData = $this->leadModel->getRepository()->getContacts($contacts);
+        if ([] !== $contacts) {
+            $contactData = $this->leadRepository->getContacts($contacts);
             foreach ($contacts as $messageId => $contactId) {
                 $queue[$messageId]->getLead()->setFields($contactData[$contactId]);
             }

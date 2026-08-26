@@ -19,7 +19,7 @@ use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
 {
-    private const SEGMENTS_ROUTE = '/s/segments';
+    private const string SEGMENTS_ROUTE = '/s/segments';
 
     private User $nonAdminUser;
 
@@ -654,7 +654,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $this->assertTrue($segment->isPublished());
 
         $this->client->request(
-            'POST',
+            Request::METHOD_POST,
             '/s/ajax',
             [
                 'action' => 'togglePublishStatus',
@@ -689,7 +689,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $segment = $this->createSegment('Segment Without Publish', $user);
 
         $this->client->request(
-            'POST',
+            Request::METHOD_POST,
             '/s/ajax',
             [
                 'action' => 'togglePublishStatus',
@@ -698,7 +698,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
             ]
         );
 
-        $this->assertEquals(403, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
 
         $this->em->refresh($segment);
         $this->assertTrue($segment->isPublished());

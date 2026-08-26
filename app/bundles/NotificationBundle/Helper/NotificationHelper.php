@@ -4,9 +4,6 @@ namespace Mautic\NotificationBundle\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
-use Mautic\LeadBundle\Entity\DoNotContact;
-use Mautic\LeadBundle\Entity\LeadRepository;
-use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -15,49 +12,31 @@ use Symfony\Component\Routing\RouterInterface;
 class NotificationHelper
 {
     public function __construct(
-        protected LeadRepository $leadRepository,
         protected AssetsHelper $assetsHelper,
         protected CoreParametersHelper $coreParametersHelper,
         protected IntegrationHelper $integrationHelper,
         protected RouterInterface $router,
         protected RequestStack $requestStack,
-        private readonly DoNotContactModel $doNotContact,
     ) {
     }
 
-    /**
-     * @param string $notification
-     *
-     * @return bool|DoNotContact
-     *
-     * @deprecated as unused. To be removed in 8.0
-     */
-    public function unsubscribe($notification)
-    {
-        $lead = $this->leadRepository->getLeadByEmail($notification);
-
-        if (!is_array($lead) || !isset($lead['id'])) {
-            return false;
-        }
-
-        return $this->doNotContact->addDncForContact((int) $lead['id'], 'notification', DoNotContact::UNSUBSCRIBED);
-    }
-
-    public function getHeaderScript()
+    public function getHeaderScript(): ?string
     {
         if ($this->hasScript()) {
             return 'MauticJS.insertScript(\'https://cdn.onesignal.com/sdks/OneSignalSDK.js\');
                     var OneSignal = OneSignal || [];';
         }
+
+        return null;
     }
 
-    public function getScript()
+    public function getScript(): ?string
     {
         if ($this->hasScript()) {
             $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
 
             if (!$integration || false === $integration->getIntegrationSettings()->getIsPublished()) {
-                return;
+                return null;
             }
 
             $settings        = $integration->getIntegrationSettings();
@@ -158,6 +137,8 @@ JS;
 
             return $oneSignalInit;
         }
+
+        return null;
     }
 
     private function hasScript(): bool

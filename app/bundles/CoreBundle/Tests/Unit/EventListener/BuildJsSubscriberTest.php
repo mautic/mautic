@@ -15,7 +15,7 @@ final class BuildJsSubscriberTest extends TestCase
     {
         $event = new BuildJsEvent('', true, [BuildJsScope::RUNTIME]);
 
-        (new BuildJsSubscriber())->onBuildJs($event);
+        new BuildJsSubscriber()->onBuildJs($event);
 
         $js = $event->getJs();
         $this->assertStringContainsString('MauticJS.makeCORSRequest = function', $js);
@@ -33,7 +33,7 @@ final class BuildJsSubscriberTest extends TestCase
     {
         $event = new BuildJsEvent('', true, [BuildJsScope::TRACKING]);
 
-        (new BuildJsSubscriber())->onBuildJs($event);
+        new BuildJsSubscriber()->onBuildJs($event);
 
         $js = $event->getJs();
         $this->assertStringContainsString('MauticJS.runtimeReady !== true', $js);
@@ -50,7 +50,7 @@ final class BuildJsSubscriberTest extends TestCase
     {
         $event = new BuildJsEvent('', true);
 
-        (new BuildJsSubscriber())->onBuildJs($event);
+        new BuildJsSubscriber()->onBuildJs($event);
 
         $js = $event->getJs();
         $this->assertLessThan(strpos($js, 'MauticJS.trackingEnabled = true'), strpos($js, 'MauticJS.runtimeReady = true'));

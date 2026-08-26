@@ -6,7 +6,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use Psr\Http\Message\ResponseInterface;
 
-class DynamicsApi extends CrmApi
+final class DynamicsApi extends CrmApi
 {
     private function getUrl(): string
     {
@@ -16,14 +16,13 @@ class DynamicsApi extends CrmApi
     }
 
     /**
-     * @param string $method
      * @param string $moduleobject
      *
      * @return array|ResponseInterface
      *
      * @throws ApiErrorException
      */
-    protected function request($operation, array $parameters = [], $method = 'GET', $moduleobject = 'contacts', $settings = [])
+    private function request(string $operation, array $parameters = [], string $method = 'GET', $moduleobject = 'contacts', array $settings = [])
     {
         if ('company' === $moduleobject) {
             $moduleobject = 'accounts';
@@ -119,12 +118,11 @@ class DynamicsApi extends CrmApi
     {
         if ($id) {
             $operation = sprintf('accounts(%s)', $id);
-            $data      = $this->request($operation, $params, 'GET');
-        } else {
-            $data = $this->request('', $params, 'GET', 'accounts');
+
+            return $this->request($operation, $params, 'GET');
         }
 
-        return $data;
+        return $this->request('', $params, 'GET', 'accounts');
     }
 
     /**

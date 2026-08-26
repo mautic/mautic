@@ -24,9 +24,9 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 {
     use ControllerTrait;
 
-    private const SALES_USER = 'sales';
+    private const string SALES_USER = 'sales';
 
-    private const ADMIN_USER = 'admin';
+    private const string ADMIN_USER = 'admin';
 
     protected function setUp(): void
     {
@@ -51,7 +51,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $title   = 'Remote image asset with query string';
         $fileUrl = 'https://fastly.picsum.photos/id/13/2500/1667.jpg?hmac=SoX9UoHhN8HyklRA4A3vcCWJMVtiBXUg0W4ljWTor7s';
 
-        $crawlerCreate = $this->client->request('GET', '/s/assets/new');
+        $crawlerCreate = $this->client->request(Request::METHOD_GET, '/s/assets/new');
         $createForm    = $crawlerCreate->selectButton('Save')->form();
         $createForm->setValues([
             'asset[title]'           => $title,
@@ -66,7 +66,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $asset = $this->em->getRepository(Asset::class)->findOneBy(['title' => $title]);
         $this->assertInstanceOf(Asset::class, $asset, 'Asset should be created successfully');
 
-        $crawlerEdit = $this->client->request('GET', '/s/assets/edit/'.$asset->getId());
+        $crawlerEdit = $this->client->request(Request::METHOD_GET, '/s/assets/edit/'.$asset->getId());
         $editForm    = $crawlerEdit->selectButton('Save')->form();
 
         $crawlerAfterEdit = $this->client->submit($editForm);
@@ -168,7 +168,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
     public function testAssetSizes(): void
     {
-        $this->client->request('GET', '/s/ajax?action=email:getAttachmentsSize&assets%5B%5D='.$this->asset->getId());
+        $this->client->request(Request::METHOD_GET, '/s/ajax?action=email:getAttachmentsSize&assets%5B%5D='.$this->asset->getId());
         $this->assertResponseIsSuccessful();
         $this->assertSame('{"size":"178 bytes"}', $this->client->getResponse()->getContent());
     }
@@ -178,7 +178,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
      */
     public function testPreviewActionStreamByDefault(): void
     {
-        $this->client->request('GET', '/s/assets/preview/'.$this->asset->getId());
+        $this->client->request(Request::METHOD_GET, '/s/assets/preview/'.$this->asset->getId());
         ob_start();
         $response = $this->client->getResponse();
         $response->sendContent();
@@ -196,7 +196,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
      */
     public function testPreviewActionStreamIsZero(): void
     {
-        $this->client->request('GET', '/s/assets/preview/'.$this->asset->getId().'?stream=0&download=1');
+        $this->client->request(Request::METHOD_GET, '/s/assets/preview/'.$this->asset->getId().'?stream=0&download=1');
         ob_start();
         $response = $this->client->getResponse();
         $response->sendContent();
@@ -213,7 +213,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
      */
     public function testPreviewActionStreamDownloadAreZero(): void
     {
-        $this->client->request('GET', '/s/assets/preview/'.$this->asset->getId().'?stream=0&download=0');
+        $this->client->request(Request::METHOD_GET, '/s/assets/preview/'.$this->asset->getId().'?stream=0&download=0');
         ob_start();
         $response = $this->client->getResponse();
         $response->sendContent();
@@ -347,7 +347,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $tmpDir = 'tmp_'.substr(md5(uniqid()), 0, 13);
 
         $this->client->request(
-            'POST',
+            Request::METHOD_POST,
             '/s/_uploader/asset/upload',
             ['tempId' => '../../'.$tmpDir],
             ['file'   => $uploadedFile],
@@ -412,7 +412,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         // Set new permissions
         $role->setIsAdmin(false);
         /** @var RoleModel $roleModel */
-        $roleModel = static::getContainer()->get(RoleModel::class);
+        $roleModel = self::getContainer()->get(RoleModel::class);
         $this->assertInstanceOf(RoleModel::class, $roleModel);
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);
@@ -492,7 +492,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $crawler = $this->client->request('GET', '/s/assets/edit/'.$asset->getId());
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/assets/edit/'.$asset->getId());
         $form    = $crawler->selectButton('Save')->form();
         $form['asset[projects]']->setValue((string) $project->getId());
 
@@ -519,7 +519,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
     public function testCreateNewRemoteAssetWithValidateRemoteDomainsEnabled(string $file, bool $isAllowed): void
     {
         $message = 'The remote domain in the URL is not allowed due to security reasons.';
-        $crawler = $this->client->request('GET', '/s/assets/new');
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/assets/new');
         $form    = $crawler->selectButton('Save')->form();
         $form->setValues([
             'asset[title]'           => 'Title',

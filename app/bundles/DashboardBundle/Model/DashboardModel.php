@@ -4,7 +4,6 @@ namespace Mautic\DashboardBundle\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface;
-use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\Filesystem;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -22,7 +21,6 @@ use Mautic\DashboardBundle\Form\Type\WidgetType;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -33,6 +31,11 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class DashboardModel extends FormModel
 {
+    public static function getName(): string
+    {
+        return 'dashboard.dashboard';
+    }
+
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
         private readonly PathsHelper $pathsHelper,
@@ -140,7 +143,7 @@ class DashboardModel extends FormModel
             'mautic.dashboard.generated_by',
             [
                 '%name%' => $this->userHelper->getUser()->getName(),
-                '%date%' => (new \DateTime())->format('Y-m-d H:i:s'),
+                '%date%' => new \DateTime()->format('Y-m-d H:i:s'),
             ]
         );
     }
@@ -257,11 +260,6 @@ class DashboardModel extends FormModel
      */
     public function clearDashboardCache(): void
     {
-        $cacheDir     = $this->coreParametersHelper->get('cached_data_dir', $this->pathsHelper->getSystemPath('cache', true));
-        $cacheStorage = new CacheStorageHelper(CacheStorageHelper::ADAPTOR_FILESYSTEM, $this->userHelper->getUser()->getId(), null, $cacheDir);
-
-        $cacheStorage->clear();
-
         $this->cacheProvider->invalidateTags([WidgetDetailEvent::DASHBOARD_CACHE_TAG]);
     }
 
@@ -274,7 +272,7 @@ class DashboardModel extends FormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Widget) {
             throw new MethodNotAllowedHttpException(['Widget'], 'Entity must be of class Widget()');
@@ -284,7 +282,7 @@ class DashboardModel extends FormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create(WidgetType::class, $entity, $options);
+        return $this->formFactory->create(WidgetType::class, $entity, $options);
     }
 
     /**

@@ -39,12 +39,6 @@ class QueryBuilder extends BaseQueryBuilder
 
     public function setParameter($key, $value, $type = null)
     {
-        if (str_starts_with($key, ':')) {
-            // For consistency sake, remove the :
-            $key = substr($key, 1);
-            @\trigger_error('Using query key with ":" is deprecated. Use key without ":" instead.', \E_USER_DEPRECATED);
-        }
-
         if (is_bool($value)) {
             $value = (int) $value;
         }
@@ -145,12 +139,7 @@ class QueryBuilder extends BaseQueryBuilder
         return $fromClauses;
     }
 
-    /**
-     * @param string $alias
-     *
-     * @return string|false
-     */
-    public function getJoinCondition($alias)
+    public function getJoinCondition(string $alias): string|false
     {
         $parts = $this->getQueryParts();
         foreach ($parts['join']['l'] as $joinedTable) {
@@ -220,10 +209,7 @@ class QueryBuilder extends BaseQueryBuilder
         return $this;
     }
 
-    /**
-     * @return array|bool|string
-     */
-    public function getTableAlias(string $table, $joinType = null)
+    public function getTableAlias(string $table, $joinType = null): array|bool|string
     {
         if (null === $joinType) {
             $tables = $this->getTableAliases();

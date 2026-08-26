@@ -123,7 +123,6 @@ namespace Mautic\CoreBundle\ErrorHandler {
             $errorReporting = ('dev' === self::$environment) ? -1 : error_reporting();
             if ($level & $errorReporting) {
                 switch (true) {
-                    case $level & E_STRICT:
                     case $level & E_NOTICE:
                     case $level & E_USER_NOTICE:
                         $logLevel = LogLevel::NOTICE;
@@ -473,7 +472,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 }
             }
 
-            defined('MAUTIC_OFFLINE') or define('MAUTIC_OFFLINE', 1);
+            defined('MAUTIC_OFFLINE') || define('MAUTIC_OFFLINE', 1);
 
             try {
                 // Get the URLs base path
@@ -548,7 +547,7 @@ namespace {
                 if (1 === count($context) && true === $context[0]) {
                     ErrorHandler::logDebugEntry($log, $context, true);
                 } else {
-                    ErrorHandler::logDebugEntry($log, (empty($context)) ? [] : $context);
+                    ErrorHandler::logDebugEntry($log, $context);
                 }
             }
         }

@@ -21,7 +21,5 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('Mautic\\StageBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
 
-    $services->alias('mautic.stage.model.stage', Mautic\StageBundle\Model\StageModel::class);
-    $services->alias('mautic.stage.repository.lead_stage_log', Mautic\StageBundle\Entity\LeadStageLogRepository::class);
-    $services->alias('mautic.stage.repository.stage', Mautic\StageBundle\Entity\StageRepository::class);
+    $services->set(Mautic\StageBundle\Security\Permissions\StagePermissions::class);
 };

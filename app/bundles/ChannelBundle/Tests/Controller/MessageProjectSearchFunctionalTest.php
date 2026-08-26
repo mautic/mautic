@@ -92,7 +92,7 @@ final class MessageProjectSearchFunctionalTest extends AbstractProjectSearchTest
     {
         $message = new Message();
         $message->setName($name);
-        $message->addChannel((new Channel())
+        $message->addChannel(new Channel()
             ->setChannel('email')
             ->setMessage($message));
         $this->em->persist($message);

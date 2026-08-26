@@ -7,10 +7,12 @@ namespace Mautic\UserBundle\Tests\Security\SAML\Store\Request;
 use LightSaml\State\Request\RequestState;
 use Mautic\CacheBundle\Cache\CacheProviderInterface;
 use Mautic\UserBundle\Security\SAML\Store\Request\RequestStateStore;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\CacheItem;
 
+#[AllowMockObjectsWithoutExpectations]
 final class RequestStateStoreTest extends TestCase
 {
     /**

@@ -2,19 +2,19 @@
 
 namespace Mautic\FormBundle\DataFixtures\ORM;
 
-use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\FormBundle\Entity\Submission;
-use Mautic\FormBundle\Model\SubmissionModel;
+use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\PageBundle\Model\PageModel;
 
-final class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadFormResultData extends Fixture implements OrderedFixtureInterface
 {
     public function __construct(
         private readonly PageModel $pageModel,
-        private readonly SubmissionModel $submissionModel,
+        private readonly SubmissionRepository $submissionRepository,
     ) {
     }
 
@@ -48,7 +48,7 @@ final class LoadFormResultData extends AbstractFixture implements OrderedFixture
                 }
 
                 $submission->setResults($rows);
-                $this->submissionModel->getRepository()->saveEntity($submission);
+                $this->submissionRepository->saveEntity($submission);
             }
         };
 

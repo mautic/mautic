@@ -20,7 +20,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 )]
 final class MessageOfTheDayCommand extends Command
 {
-    private const CHANNEL = 'cli';
+    private const string CHANNEL = 'cli';
 
     public function __construct(
         private readonly HttpClientInterface $httpClient,

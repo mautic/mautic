@@ -8,11 +8,12 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 final class ProjectEntityLookupLimitTest extends MauticMysqlTestCase
 {
-    private const LOOKUP_CHOICE_LIST_URL = '/s/ajax?action=project:getLookupChoiceList';
+    private const string LOOKUP_CHOICE_LIST_URL = '/s/ajax?action=project:getLookupChoiceList';
 
     /**
      * Create 2000 test emails.
@@ -42,7 +43,7 @@ final class ProjectEntityLookupLimitTest extends MauticMysqlTestCase
         $this->createTestEmails();
 
         // Act: trigger AJAX lookup endpoint
-        $this->client->request('GET', self::LOOKUP_CHOICE_LIST_URL, [
+        $this->client->request(Request::METHOD_GET, self::LOOKUP_CHOICE_LIST_URL, [
             'entityType' => 'email',
             'filter'     => 'Common',
         ]);

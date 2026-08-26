@@ -19,12 +19,12 @@ final class LoadAssetDataTest extends MauticMysqlTestCase
         );
         $this->assertInstanceOf(Asset::class, $asset);
         $this->assertSame('asset1', $asset->getAlias());
-        $this->assertEquals('@TOCHANGE: Asset1 Original File Name', $asset->getOriginalFileName());
-        $this->assertEquals('fdb8e28357b02d12d068de3e5661832e21bc08ec.doc', $asset->getPath());
-        $this->assertEquals(1, $asset->getDownloadCount());
-        $this->assertEquals(1, $asset->getUniqueDownloadCount());
-        $this->assertEquals(1, $asset->getRevision());
-        $this->assertEquals('en', $asset->getLanguage());
+        $this->assertSame('@TOCHANGE: Asset1 Original File Name', $asset->getOriginalFileName());
+        $this->assertSame('fdb8e28357b02d12d068de3e5661832e21bc08ec.doc', $asset->getPath());
+        $this->assertSame(1, $asset->getDownloadCount());
+        $this->assertSame(1, $asset->getUniqueDownloadCount());
+        $this->assertSame(1, $asset->getRevision());
+        $this->assertSame('en', $asset->getLanguage());
     }
 
     public function testLoadFixturesOrder(): void

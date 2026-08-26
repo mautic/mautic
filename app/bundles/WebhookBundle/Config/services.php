@@ -23,10 +23,8 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\WebhookBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
-    $services->set('mautic.webhook.campaign.helper', Mautic\WebhookBundle\Helper\CampaignHelper::class)
+    $services->set(Mautic\WebhookBundle\Helper\CampaignHelper::class)
         ->arg('$client', service('mautic.http.client'));
-    $services->alias(Mautic\WebhookBundle\Helper\CampaignHelper::class, 'mautic.webhook.campaign.helper');
 
-    $services->alias('mautic.webhook.model.webhook', Mautic\WebhookBundle\Model\WebhookModel::class);
-    $services->alias('mautic.webhook.repository.queue', Mautic\WebhookBundle\Entity\WebhookQueueRepository::class);
+    $services->set(Mautic\WebhookBundle\Security\Permissions\WebhookPermissions::class);
 };

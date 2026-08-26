@@ -26,7 +26,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class OrderExecutionerTest extends TestCase
 {
-    private const INTEGRATION_NAME = 'Test';
+    private const string INTEGRATION_NAME = 'Test';
 
     /**
      * @var MockObject&MappingHelper

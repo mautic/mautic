@@ -33,8 +33,6 @@ final class FullContactController extends FormController
     /**
      * @param string $objectId
      *
-     * @return JsonResponse
-     *
      * @throws \InvalidArgumentException
      */
     public function lookupPersonAction(Request $request, LookupHelper $lookupHelper, $objectId = ''): JsonResponse|Response
@@ -121,12 +119,10 @@ final class FullContactController extends FormController
             );
         }
 
-        return new Response('Bad Request', 400);
+        return new Response('Bad Request', Response::HTTP_BAD_REQUEST);
     }
 
     /**
-     * @return JsonResponse
-     *
      * @throws \InvalidArgumentException
      */
     public function batchLookupPersonAction(Request $request, LookupHelper $lookupHelper): JsonResponse|Response
@@ -273,15 +269,13 @@ final class FullContactController extends FormController
             );
         }
 
-        return new Response('Bad Request', 400);
+        return new Response('Bad Request', Response::HTTP_BAD_REQUEST);
     }
 
     /* COMPANY */
 
     /**
      * @param string $objectId
-     *
-     * @return JsonResponse
      *
      * @throws \InvalidArgumentException
      */
@@ -368,12 +362,10 @@ final class FullContactController extends FormController
             );
         }
 
-        return new Response('Bad Request', 400);
+        return new Response('Bad Request', Response::HTTP_BAD_REQUEST);
     }
 
     /**
-     * @return JsonResponse
-     *
      * @throws \InvalidArgumentException
      */
     public function batchLookupCompanyAction(Request $request, LookupHelper $lookupHelper): JsonResponse|Response
@@ -519,6 +511,6 @@ final class FullContactController extends FormController
             );
         }
 
-        return new Response('Bad Request', 400);
+        return new Response('Bad Request', Response::HTTP_BAD_REQUEST);
     }
 }

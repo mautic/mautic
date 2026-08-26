@@ -19,10 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 )]
 final class AnonymizeIpCommand extends Command
 {
-    /**
-     * @var string
-     */
-    public const COMMAND_NAME = 'mautic:anonymize:ip';
+    public const string COMMAND_NAME = 'mautic:anonymize:ip';
 
     public function __construct(
         private readonly IpAddressRepository $ipAddressRepository,

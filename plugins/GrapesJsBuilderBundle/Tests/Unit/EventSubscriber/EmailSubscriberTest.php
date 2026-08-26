@@ -13,9 +13,11 @@ use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository;
 use MauticPlugin\GrapesJsBuilderBundle\EventSubscriber\EmailSubscriber;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
 use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 final class EmailSubscriberTest extends TestCase
 {
     /**
@@ -69,7 +71,7 @@ final class EmailSubscriberTest extends TestCase
             ->method('isSaveAsDraft')
             ->willReturn(true);
 
-        $this->grapesJsBuilderRepo->method('findOneBy')
+        $this->grapesJsBuilderRepo->expects($this->once())->method('findOneBy')
             ->willReturn($grapesJsBuilder = $this->createMock(GrapesJsBuilder::class));
 
         $this->config->expects($this->once())
@@ -94,7 +96,7 @@ final class EmailSubscriberTest extends TestCase
             ->method('isApplyDraft')
             ->willReturn(true);
 
-        $this->grapesJsBuilderRepo->method('findOneBy')
+        $this->grapesJsBuilderRepo->expects($this->once())->method('findOneBy')
             ->willReturn($grapesJsBuilder = $this->createMock(GrapesJsBuilder::class));
 
         $this->config->expects($this->once())
@@ -123,7 +125,7 @@ final class EmailSubscriberTest extends TestCase
             ->method('hasDraft')
             ->willReturn(true);
 
-        $this->grapesJsBuilderRepo->method('findOneBy')
+        $this->grapesJsBuilderRepo->expects($this->once())->method('findOneBy')
             ->willReturn($grapesJsBuilder = $this->createMock(GrapesJsBuilder::class));
 
         $this->config->expects($this->once())

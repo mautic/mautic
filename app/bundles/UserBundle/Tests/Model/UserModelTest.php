@@ -23,14 +23,17 @@ use Mautic\UserBundle\Entity\UserToken;
 use Mautic\UserBundle\Exception\PasswordResetTokenCreationFailedException;
 use Mautic\UserBundle\Model\UserModel;
 use Mautic\UserBundle\Model\UserToken\UserTokenServiceInterface;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
+#[AllowMockObjectsWithoutExpectations]
 final class UserModelTest extends TestCase
 {
     private UserModel $userModel;
@@ -115,6 +118,7 @@ final class UserModelTest extends TestCase
             $this->createStub(PermissionRepository::class),
             $this->createStub(RoleRepository::class),
             $this->userInviteRepository,
+            $this->createStub(UserPasswordHasherInterface::class)
         );
     }
 
@@ -319,7 +323,7 @@ final class UserModelTest extends TestCase
 
     public function testGetInviteReturnsNullWhenInviteExpired(): void
     {
-        $invite = (new UserInvite(new Role()))
+        $invite = new UserInvite(new Role())
             ->setExpiration(new \DateTimeImmutable('-1 minute'));
 
         $this->userInviteRepository->expects($this->once())
@@ -336,7 +340,7 @@ final class UserModelTest extends TestCase
 
     public function testGetInviteReturnsNullWhenTokenVerifierDoesNotMatch(): void
     {
-        $invite = (new UserInvite(new Role()))
+        $invite = new UserInvite(new Role())
             ->setTokenVerifierHash(password_hash('expected-verifier', PASSWORD_DEFAULT))
             ->setExpiration(new \DateTimeImmutable('+1 minute'));
 
@@ -354,7 +358,7 @@ final class UserModelTest extends TestCase
 
     public function testGetInviteReturnsNullWhenInviteAlreadyUsed(): void
     {
-        $invite = (new UserInvite(new Role()))
+        $invite = new UserInvite(new Role())
             ->setUsed(true)
             ->setTokenVerifierHash(password_hash('verifier', PASSWORD_DEFAULT))
             ->setExpiration(new \DateTimeImmutable('+1 minute'));
@@ -382,7 +386,7 @@ final class UserModelTest extends TestCase
 
     public function testGetInviteReturnsActiveInvite(): void
     {
-        $invite = (new UserInvite(new Role()))
+        $invite = new UserInvite(new Role())
             ->setTokenVerifierHash(password_hash('verifier', PASSWORD_DEFAULT))
             ->setExpiration(new \DateTimeImmutable('+1 minute'));
 

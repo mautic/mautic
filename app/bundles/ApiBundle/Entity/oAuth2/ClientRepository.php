@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ApiBundle\Entity\oAuth2;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -24,9 +26,9 @@ final class ClientRepository extends CommonRepository
         return $query->getQuery()->getResult();
     }
 
-    protected function addCatchAllWhereClause($q, $filter): array
+    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
-        return $this->addStandardCatchAllWhereClause($q, $filter, [
+        return $this->addStandardCatchAllWhereClause($queryBuilder, $filter, [
             'c.name',
             'c.redirectUris',
         ]);

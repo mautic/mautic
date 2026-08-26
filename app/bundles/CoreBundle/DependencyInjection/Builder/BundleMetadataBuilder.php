@@ -20,7 +20,7 @@ final class BundleMetadataBuilder
 
     public function __construct(
         private readonly array $symfonyBundles,
-        private array $paths,
+        private readonly array $paths,
     ) {
         $this->buildMetadata();
     }
@@ -127,7 +127,7 @@ final class BundleMetadataBuilder
             $this->ipLookupServices = array_merge($foundIpLookupServices, $this->ipLookupServices);
         }
 
-        (new PermissionClassMetadata($metadata))->build();
+        new PermissionClassMetadata($metadata)->build();
 
         $this->buildMappings($metadata);
     }

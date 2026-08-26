@@ -178,7 +178,7 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
             foreach ($fieldChanges as $key => [$oldValue, $newValue]) {
                 $valueDAO          = $this->variableExpressor->encodeVariable($newValue);
                 $changedFields[]   = $key;
-                $fieldChangeEntity = (new FieldChange())
+                $fieldChangeEntity = new FieldChange()
                     ->setObjectType($objectType)
                     ->setObjectId($objectId)
                     ->setModifiedAt(new \DateTime())

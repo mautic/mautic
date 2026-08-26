@@ -13,7 +13,6 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\TrailingSlashHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
-use Mautic\CoreBundle\Model\MauticModelInterface;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
@@ -76,8 +75,8 @@ class CommonController extends AbstractController implements MauticController
         protected CoreParametersHelper $coreParametersHelper,
         protected EventDispatcherInterface $dispatcher,
         protected Translator $translator,
-        private FlashBag $flashBag,
-        private RequestStack $requestStack,
+        private readonly FlashBag $flashBag,
+        private readonly RequestStack $requestStack,
         protected CorePermissions $security,
     ) {
         $this->user = $userHelper->getUser();
@@ -110,65 +109,7 @@ class CommonController extends AbstractController implements MauticController
         return [];
     }
 
-    /**
-     * Get a model instance from the service container.
-     *
-     * For long return map @see https://phpstan.org/blog/phpstan-1-6-0-with-conditional-return-types
-     *
-     * @param string $modelNameKey
-     *
-     * @return ($modelNameKey is 'asset' ? \Mautic\AssetBundle\Model\AssetModel
-     * : ($modelNameKey is 'campaign' ? \Mautic\CampaignBundle\Model\CampaignModel
-     * : ($modelNameKey is 'campaign.event' ? \Mautic\CampaignBundle\Model\EventModel
-     * : ($modelNameKey is 'campaign.event_log' ? \Mautic\CampaignBundle\Model\EventLogModel
-     * : ($modelNameKey is 'category' ? \Mautic\CategoryBundle\Model\CategoryModel
-     * : ($modelNameKey is 'channel.message' ? \Mautic\ChannelBundle\Model\MessageModel
-     * : ($modelNameKey is 'channel.queue' ? \Mautic\ChannelBundle\Model\MessageQueueModel
-     * : ($modelNameKey is 'core.auditlog' ? \Mautic\CoreBundle\Model\AuditLogModel
-     * : ($modelNameKey is 'core.notification' ? \Mautic\CoreBundle\Model\NotificationModel
-     * : ($modelNameKey is 'dashboard' ? \Mautic\DashboardBundle\Model\DashboardModel
-     * : ($modelNameKey is 'dynamicContent' ? \Mautic\DynamicContentBundle\Model\DynamicContentModel
-     * : ($modelNameKey is 'email' ? \Mautic\EmailBundle\Model\EmailModel
-     * : ($modelNameKey is 'focus' ? \MauticPlugin\MauticFocusBundle\Model\FocusModel
-     * : ($modelNameKey is 'form' ? \Mautic\FormBundle\Model\FormModel
-     * : ($modelNameKey is 'form.action' ? \Mautic\FormBundle\Model\ActionModel
-     * : ($modelNameKey is 'form.field' ? \Mautic\FormBundle\Model\FieldModel
-     * : ($modelNameKey is 'form.form' ? \Mautic\FormBundle\Model\FormModel
-     * : ($modelNameKey is 'form.submission' ? \Mautic\FormBundle\Model\SubmissionModel
-     * : ($modelNameKey is 'form.submission_result_loader' ? \Mautic\FormBundle\Model\SubmissionResultLoader
-     * : ($modelNameKey is 'lead' ? \Mautic\LeadBundle\Model\LeadModel
-     * : ($modelNameKey is 'lead.company' ? \Mautic\LeadBundle\Model\CompanyModel
-     * : ($modelNameKey is 'lead.device' ? \Mautic\LeadBundle\Model\DeviceModel
-     * : ($modelNameKey is 'lead.export_scheduler' ? \Mautic\LeadBundle\Model\ContactExportSchedulerModel
-     * : ($modelNameKey is 'lead.field' ? \Mautic\LeadBundle\Model\FieldModel
-     * : ($modelNameKey is 'lead.lead' ? \Mautic\LeadBundle\Model\LeadModel
-     * : ($modelNameKey is 'lead.list' ? \Mautic\LeadBundle\Model\ListModel
-     * : ($modelNameKey is 'lead.note' ? \Mautic\LeadBundle\Model\NoteModel
-     * : ($modelNameKey is 'lead.tag' ? \Mautic\LeadBundle\Model\TagModel
-     * : ($modelNameKey is 'notification' ? \Mautic\CoreBundle\Model\NotificationModel
-     * : ($modelNameKey is 'page' ? \Mautic\PageBundle\Model\PageModel
-     * : ($modelNameKey is 'page.page' ? \Mautic\PageBundle\Model\PageModel
-     * : ($modelNameKey is 'page.trackable' ? \Mautic\PageBundle\Model\TrackableModel
-     * : ($modelNameKey is 'plugin' ? \Mautic\PluginBundle\Model\PluginModel
-     * : ($modelNameKey is 'point' ? \Mautic\PointBundle\Model\PointModel
-     * : ($modelNameKey is 'point.insight' ? \Mautic\PointBundle\Model\InsightModel
-     * : ($modelNameKey is 'point.trigger' ? \Mautic\PointBundle\Model\TriggerModel
-     * : ($modelNameKey is 'point.triggerevent' ? \Mautic\PointBundle\Model\TriggerEventModel
-     * : ($modelNameKey is 'report' ? \Mautic\ReportBundle\Model\ReportModel
-     * : ($modelNameKey is 'sms' ? \Mautic\SmsBundle\Model\SmsModel
-     * : ($modelNameKey is 'social.monitoring' ? \MauticPlugin\MauticSocialBundle\Model\MonitoringModel
-     * : ($modelNameKey is 'social.postcount' ? \MauticPlugin\MauticSocialBundle\Model\PostCountModel
-     * : ($modelNameKey is 'social.tweet' ? \MauticPlugin\MauticSocialBundle\Model\TweetModel
-     * : ($modelNameKey is 'stage' ? \Mautic\StageBundle\Model\StageModel
-     * : ($modelNameKey is 'stage.stage' ? \Mautic\StageBundle\Model\StageModel
-     * : ($modelNameKey is 'tagmanager.tag' ? \MauticPlugin\MauticTagManagerBundle\Model\TagModel
-     * : ($modelNameKey is 'user' ? \Mautic\UserBundle\Model\UserModel
-     * : ($modelNameKey is 'user.role' ? \Mautic\UserBundle\Model\RoleModel
-     * : ($modelNameKey is 'user.user' ? \Mautic\UserBundle\Model\UserModel
-     * : ($modelNameKey is 'webhook' ? \Mautic\WebhookBundle\Model\WebhookModel
-     *     : \Mautic\CoreBundle\Model\AbstractCommonModel<object>)))))))))))))))))))))))))))))))))))))))))))))))))
-     */
-    protected function getModel($modelNameKey): MauticModelInterface
+    protected function getModel(string $modelNameKey): AbstractCommonModel
     {
         return $this->modelFactory->getModel($modelNameKey);
     }
@@ -183,7 +124,7 @@ class CommonController extends AbstractController implements MauticController
      *
      * @return Response A Response instance
      */
-    public function forwardWithPost($controller, array $request = [], array $path = [], array $query = [])
+    public function forwardWithPost($controller, array $request = [], array $path = [], array $query = []): Response
     {
         $path['_controller'] = $controller;
         $subRequest          = $this->requestStack->getCurrentRequest()->duplicate($query, $request, $path);
@@ -281,7 +222,7 @@ class CommonController extends AbstractController implements MauticController
      * Determines if a redirect response should be returned or a Json response directing the ajax call to force a page
      * refresh.
      */
-    public function delegateRedirect($url): JsonResponse|RedirectResponse
+    public function delegateRedirect(string $url): JsonResponse|RedirectResponse
     {
         $request = $this->getCurrentRequest();
 
@@ -297,7 +238,7 @@ class CommonController extends AbstractController implements MauticController
      */
     public function removeTrailingSlashAction(Request $request, TrailingSlashHelper $trailingSlashHelper): RedirectResponse
     {
-        return $this->redirect($trailingSlashHelper->getSafeRedirectUrl($request), 301);
+        return $this->redirect($trailingSlashHelper->getSafeRedirectUrl($request), Response::HTTP_MOVED_PERMANENTLY);
     }
 
     /**
@@ -353,7 +294,7 @@ class CommonController extends AbstractController implements MauticController
      *
      * @param array $args [parameters, contentTemplate, passthroughVars, forwardController]
      */
-    public function ajaxAction(Request $request, $args = []): Response
+    public function ajaxAction(Request $request, array $args = []): Response
     {
         defined('MAUTIC_AJAX_VIEW') || define('MAUTIC_AJAX_VIEW', 1);
 
@@ -471,10 +412,8 @@ class CommonController extends AbstractController implements MauticController
 
     /**
      * Get's the content of error page.
-     *
-     * @return Response
      */
-    public function renderException(\Exception $e)
+    public function renderException(\Exception $e): Response
     {
         $request = $this->getCurrentRequest();
 
@@ -496,10 +435,8 @@ class CommonController extends AbstractController implements MauticController
      * @param int    $objectId
      * @param int    $objectSubId
      * @param string $objectModel
-     *
-     * @return Response
      */
-    public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = '')
+    public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
         if (method_exists($this, $objectAction.'Action')) {
             return $this->forward(
@@ -538,34 +475,11 @@ class CommonController extends AbstractController implements MauticController
     }
 
     /**
-     * Generates access denied message.
-     *
-     * @deprecated Use getAccessDeniedFlash or throwAccessDenied
-     *
-     * @param bool   $batch Flag if a batch action is being performed
-     * @param string $msg   Message that is logged
-     *
-     * @return array{type: string, msg: string}
-     *
-     * @throws AccessDeniedHttpException
-     */
-    public function accessDenied($batch = false, $msg = 'mautic.core.url.error.401'): array
-    {
-        if ($this->security->isAnonymous() || !$batch) {
-            $this->throwAccessDenied($msg);
-        }
-
-        return $this->getAccessDeniedFlash();
-    }
-
-    /**
      * Generate 404 not found message.
-     *
-     * @param string $msg
      *
      * @return Response
      */
-    public function notFound($msg = 'mautic.core.url.error.404')
+    public function notFound(string $msg = 'mautic.core.url.error.404')
     {
         $request = $this->getCurrentRequest();
         $page404 = $this->coreParametersHelper->get('404_page');
@@ -598,10 +512,8 @@ class CommonController extends AbstractController implements MauticController
 
     /**
      * Returns a json encoded access denied error for modal windows.
-     *
-     * @param string $msg
      */
-    public function modalAccessDenied($msg = 'mautic.core.error.accessdenied'): JsonResponse
+    public function modalAccessDenied(string $msg = 'mautic.core.error.accessdenied'): JsonResponse
     {
         return new JsonResponse([
             'error' => $this->translator->trans($msg, [], 'flashes'),
@@ -704,7 +616,7 @@ class CommonController extends AbstractController implements MauticController
      * @param string|null  $domain
      * @param bool|null    $addNotification
      */
-    public function addFlashMessage($message, $messageVars = [], $level = FlashBag::LEVEL_NOTICE, $domain = 'flashes', $addNotification = false): void
+    public function addFlashMessage($message, array $messageVars = [], $level = FlashBag::LEVEL_NOTICE, $domain = 'flashes', $addNotification = false): void
     {
         $this->flashBag->add($message, $messageVars, $level, $domain, $addNotification);
     }
@@ -720,7 +632,7 @@ class CommonController extends AbstractController implements MauticController
 
         $dateFormat = $this->coreParametersHelper->get('date_format_dateonly');
         $dateFormat = str_replace('--', '-', preg_replace('/[^a-zA-Z]/', '-', $dateFormat));
-        $filename   = strtolower($filename.'_'.(new \DateTime())->format($dateFormat).'.'.$type);
+        $filename   = strtolower($filename.'_'.new \DateTime()->format($dateFormat).'.'.$type);
         if (empty($toExport)) {
             $toExport[] = [$this->translator->trans('mautic.core.noresults.header')];
         }
@@ -734,20 +646,15 @@ class CommonController extends AbstractController implements MauticController
      * Overwrite in your controller if required.
      *
      * @param AbstractCommonModel<object> $model
-     *
-     * @return array
      */
-    protected function getDataForExport(AbstractCommonModel $model, array $args, ?callable $resultsCallback = null, ?int $start = 0)
+    protected function getDataForExport(AbstractCommonModel $model, array $args, ?callable $resultsCallback = null, ?int $start = 0): ?array
     {
         $data = new DataExporterHelper();
 
         return $data->getDataForExport($start, $model, $args, $resultsCallback);
     }
 
-    /**
-     * @return string
-     */
-    protected function getDefaultOrderDirection()
+    protected function getDefaultOrderDirection(): string
     {
         return 'ASC';
     }

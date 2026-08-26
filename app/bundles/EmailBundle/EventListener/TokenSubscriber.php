@@ -12,7 +12,7 @@ use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class TokenSubscriber implements EventSubscriberInterface
+readonly class TokenSubscriber implements EventSubscriberInterface
 {
     use MatchFilterForLeadTrait;
 

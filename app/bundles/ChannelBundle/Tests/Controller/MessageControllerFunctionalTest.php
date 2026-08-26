@@ -7,6 +7,7 @@ namespace Mautic\ChannelBundle\Tests\Controller;
 use Mautic\ChannelBundle\Entity\Message;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\ProjectBundle\Entity\Project;
+use Symfony\Component\HttpFoundation\Request;
 
 final class MessageControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -23,7 +24,7 @@ final class MessageControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $crawler = $this->client->request('GET', '/s/messages/edit/'.$message->getId());
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/messages/edit/'.$message->getId());
         $form    = $crawler->selectButton('Save')->form();
         $form['message[projects]']->setValue((string) $project->getId());
 

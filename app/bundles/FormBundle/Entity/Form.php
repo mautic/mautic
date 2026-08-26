@@ -24,7 +24,6 @@ use Mautic\FormBundle\Validator\Constraint\IsPostActionRedirectUrl;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ApiResource(
     operations: [
@@ -68,6 +67,7 @@ class Form extends FormEntity implements UuidInterface
      * @var string
      */
     #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
+    #[Assert\NotBlank(message: 'mautic.core.name.required', groups: ['form'])]
     private $name;
 
     /**
@@ -110,6 +110,10 @@ class Form extends FormEntity implements UuidInterface
      * @var string|null
      */
     #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
+    #[Assert\NotBlank(message: 'mautic.form.form.postactionproperty_message.notblank', groups: ['messageRequired'])]
+    #[Assert\NotBlank(message: 'mautic.form.form.postactionproperty_redirect.notblank', groups: ['urlRequired'])]
+    #[Assert\NotBlank(message: 'mautic.form.form.postactionproperty_hideform.notblank', groups: ['hideformRequired'])]
+    #[IsPostActionRedirectUrl(groups: ['urlRequired'])]
     private $postActionProperty;
 
     /**
@@ -164,23 +168,16 @@ class Form extends FormEntity implements UuidInterface
     public int $submission_count = 0;
 
     /**
-     * @var string|null
-     *
-     * @deprecated since Mautic 7.1, will be removed in 8.0. Form types are no longer used.
-     */
-    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
-    private $formType = 'standalone';
-
-    /**
      * @var bool|null
      */
     #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
-    private $noIndex;
+    private $noIndex = true;
 
     /**
      * @var int|null
      */
     #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
+    #[Assert\GreaterThan(value: 0, message: 'mautic.form.form.progressive_profiling_limit.error', groups: ['progressiveProfilingLimit'])]
     private $progressiveProfilingLimit;
 
     #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
@@ -211,7 +208,6 @@ class Form extends FormEntity implements UuidInterface
         $this->fields      = new ArrayCollection();
         $this->actions     = new ArrayCollection();
         $this->submissions = new ArrayCollection();
-        $this->noIndex     = true;
         $this->initializeProjects();
     }
 
@@ -296,8 +292,6 @@ class Form extends FormEntity implements UuidInterface
             ->columnName('submission_count')
             ->build();
 
-        $builder->addNullableField('formType', 'string', 'form_type');
-
         $builder->createField('noIndex', 'boolean')
             ->columnName('no_index')
             ->nullable()
@@ -307,21 +301,6 @@ class Form extends FormEntity implements UuidInterface
 
         static::addUuidField($builder);
         self::addProjectsField($builder, 'form_projects_xref', 'form_id');
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('name', new Assert\NotBlank(message: 'mautic.core.name.required', groups: ['form']));
-
-        $metadata->addPropertyConstraint('postActionProperty', new Assert\NotBlank(message: 'mautic.form.form.postactionproperty_message.notblank', groups: ['messageRequired']));
-
-        $metadata->addPropertyConstraint('postActionProperty', new Assert\NotBlank(message: 'mautic.form.form.postactionproperty_redirect.notblank', groups: ['urlRequired']));
-
-        $metadata->addPropertyConstraint('postActionProperty', new IsPostActionRedirectUrl(groups: ['urlRequired']));
-
-        $metadata->addPropertyConstraint('postActionProperty', new Assert\NotBlank(message: 'mautic.form.form.postactionproperty_hideform.notblank', groups: ['hideformRequired']));
-
-        $metadata->addPropertyConstraint('progressiveProfilingLimit', new Assert\GreaterThan(value: 0, message: 'mautic.form.form.progressive_profiling_limit.error', groups: ['progressiveProfilingLimit']));
     }
 
     public static function determineValidationGroups(\Symfony\Component\Form\Form $form): array
@@ -371,7 +350,6 @@ class Form extends FormEntity implements UuidInterface
                     'template',
                     'inKioskMode',
                     'renderStyle',
-                    'formType',
                     'postAction',
                     'postActionProperty',
                     'noIndex',
@@ -589,10 +567,9 @@ class Form extends FormEntity implements UuidInterface
     public function getFieldAliases(): array
     {
         $aliases = [];
-        $fields  = $this->fields;
 
-        if ($fields) {
-            foreach ($fields as $field) {
+        if ($this->fields) {
+            foreach ($this->fields as $field) {
                 $aliases[] = $field->getAlias();
             }
         }
@@ -776,31 +753,6 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @deprecated since Mautic 7.1, will be removed in 8.0. Form types are no longer used.
-     *
-     * @return string|null
-     */
-    public function getFormType()
-    {
-        trigger_deprecation('mautic/mautic', '7.1', 'Form::getFormType() is deprecated and will be removed in 8.0.');
-
-        return $this->formType;
-    }
-
-    /**
-     * @deprecated since Mautic 7.1, will be removed in 8.0. Form types are no longer used.
-     *
-     * @param mixed $formType
-     */
-    public function setFormType($formType): static
-    {
-        trigger_deprecation('mautic/mautic', '7.1', 'Form::setFormType() is deprecated and will be removed in 8.0.');
-        $this->formType = $formType;
-
-        return $this;
-    }
-
-    /**
      * @param bool|null $noIndex
      */
     public function setNoIndex($noIndex): void
@@ -848,16 +800,6 @@ class Form extends FormEntity implements UuidInterface
     public function getLanguage(): ?string
     {
         return $this->language;
-    }
-
-    /**
-     * @deprecated since Mautic 7.1, will be removed in 8.0. All forms can now be used in campaigns.
-     */
-    public function isStandalone(): bool
-    {
-        trigger_deprecation('mautic/mautic', '7.1', 'Form::isStandalone() is deprecated and will be removed in 8.0.');
-
-        return 'campaign' != $this->formType;
     }
 
     /**

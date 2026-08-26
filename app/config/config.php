@@ -79,7 +79,7 @@ $container->loadFromExtension('framework', [
     'form'            => null,
     'csrf_protection' => true,
     'validation'      => [
-        'enable_attributes' => false,
+        'enable_attributes' => true,
     ],
     'default_locale' => '%mautic.locale%',
     'translator'     => [
@@ -200,7 +200,8 @@ $container->loadFromExtension('doctrine', [
             ]),
         ],
         'types'    => [
-            Types::ARRAY                  => Type\ArrayType::class,
+            // Types::ARRAY is deprecated in DBAL, but the "array" type name is still used by entity mappings
+            'array'                       => Type\ArrayType::class,
             Types::DATETIME_MUTABLE       => Type\UTCDateTimeType::class,
             Types::DATETIME_IMMUTABLE     => Type\UTCDateTimeImmutableType::class,
             Type\GeneratedType::GENERATED => Type\GeneratedType::class,
@@ -248,10 +249,10 @@ $container->loadFromExtension('oneup_uploader', [
     // ),
     'mappings' => [
         'asset' => [
-            'error_handler'   => 'mautic.asset.upload.error.handler',
+            'error_handler'   => Mautic\AssetBundle\ErrorHandler\DropzoneErrorHandler::class,
             'frontend'        => 'custom',
             'custom_frontend' => [
-                'class' => 'Mautic\AssetBundle\Controller\UploadController',
+                'class' => Mautic\AssetBundle\Controller\UploadController::class,
                 'name'  => 'mautic',
             ],
             // 'max_size' => ($maxSize * 1000000),
@@ -390,7 +391,7 @@ $container->loadFromExtension('fm_elfinder', [
                         'path'          => '',
                         'flysystem'     => [
                             'type'            => 'custom',
-                            'adapter_service' => 'mautic.core.service.local_file_adapter',
+                            'adapter_service' => Mautic\CoreBundle\Service\LocalFileAdapterService::class,
                             'options'         => [],
                         ],
                         'upload_allow'  => ['image/png', 'image/jpg', 'image/jpeg', 'image/gif'],

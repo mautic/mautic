@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'routes' => [
         'main' => [
@@ -150,31 +152,6 @@ return [
             'items'    => [
                 'name'     => 'profile',
                 'children' => [],
-            ],
-        ],
-    ],
-    'services' => [
-        'menus' => [
-            'mautic.menu.main' => [
-                'alias' => 'main',
-            ],
-            'mautic.menu.admin' => [
-                'alias'   => 'admin',
-                'options' => [
-                    'template' => '@MauticCore/Menu/admin.html.twig',
-                ],
-            ],
-            'mautic.menu.extra' => [
-                'alias'   => 'extra',
-                'options' => [
-                    'template' => '@MauticCore/Menu/extra.html.twig',
-                ],
-            ],
-            'mautic.menu.profile' => [
-                'alias'   => 'profile',
-                'options' => [
-                    'template' => '@MauticCore/Menu/profile_inline.html.twig',
-                ],
             ],
         ],
     ],

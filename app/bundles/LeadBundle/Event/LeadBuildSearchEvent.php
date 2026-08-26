@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Event;
 
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -7,15 +9,15 @@ use Mautic\CoreBundle\Event\CommonEvent;
 
 class LeadBuildSearchEvent extends CommonEvent
 {
-    protected string $subQuery;
+    protected string $subQuery = '';
 
-    protected bool $isSearchDone;
+    protected bool $isSearchDone = false;
 
-    protected bool $returnParameters;
+    protected bool $returnParameters = false;
 
-    protected bool $strict;
+    protected bool $strict = false;
 
-    protected array $parameters;
+    protected array $parameters = [];
 
     /**
      * @param string $string
@@ -29,11 +31,6 @@ class LeadBuildSearchEvent extends CommonEvent
         protected bool $negate,
         protected QueryBuilder $queryBuilder,
     ) {
-        $this->subQuery         = '';
-        $this->isSearchDone     = false;
-        $this->strict           = false;
-        $this->returnParameters = false;
-        $this->parameters       = [];
     }
 
     /**

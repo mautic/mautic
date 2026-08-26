@@ -62,21 +62,21 @@ final class LeadApiController extends CommonApiController
         FormFactoryInterface $formFactory,
         DoNotContactModel $doNotContactModel,
         AppVersion $appVersion,
-        private ContactMerger $contactMerger,
-        private UserHelper $userHelper,
-        private IpLookupHelper $ipLookupHelper,
+        private readonly ContactMerger $contactMerger,
+        private readonly UserHelper $userHelper,
+        private readonly IpLookupHelper $ipLookupHelper,
         RequestStack $requestStack,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        private CampaignModel $campaignModel,
-        private FieldModel $leadFieldModel,
+        private readonly CampaignModel $campaignModel,
+        private readonly FieldModel $leadFieldModel,
         LeadModel $leadModel,
-        private StageModel $stageModel,
-        private UserModel $userModel,
-        private DeviceModel $deviceModel,
-        private NoteModel $noteModel,
+        private readonly StageModel $stageModel,
+        private readonly UserModel $userModel,
+        private readonly DeviceModel $deviceModel,
+        private readonly NoteModel $noteModel,
     ) {
         $this->doNotContactModel = $doNotContactModel;
 
@@ -404,10 +404,8 @@ final class LeadApiController extends CommonApiController
 
     /**
      * Adds a DNC to the contact.
-     *
-     * @return Response
      */
-    public function addDncAction(Request $request, $id, $channel)
+    public function addDncAction(Request $request, $id, $channel): Response
     {
         $entity = $this->model->getEntity((int) $id);
 
@@ -476,10 +474,8 @@ final class LeadApiController extends CommonApiController
      * @param int              $id
      * @param string           $method
      * @param array<mixed>|int $data
-     *
-     * @return Response
      */
-    protected function applyUtmTagsAction($id, $method, $data)
+    protected function applyUtmTagsAction($id, $method, $data): Response
     {
         $entity = $this->model->getEntity((int) $id);
 
@@ -543,7 +539,7 @@ final class LeadApiController extends CommonApiController
         return $this->model->checkForDuplicateContact($params);
     }
 
-    protected function prepareParametersForBinding(Request $request, $parameters, $entity, $action)
+    protected function prepareParametersForBinding(Request $request, array $parameters, object $entity, string $action): array
     {
         // Unset the tags from params to avoid a validation error
         if (isset($parameters['tags'])) {

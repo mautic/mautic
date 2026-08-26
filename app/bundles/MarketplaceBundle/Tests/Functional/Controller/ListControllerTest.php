@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Test\Guzzle\ClientMockTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\MarketplaceBundle\Service\Allowlist;
 use Mautic\MarketplaceBundle\Service\Config;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 final class ListControllerTest extends MauticMysqlTestCase
@@ -32,10 +33,10 @@ final class ListControllerTest extends MauticMysqlTestCase
         );
 
         /** @var Allowlist $allowlist */
-        $allowlist = static::getContainer()->get(Allowlist::class);
+        $allowlist = self::getContainer()->get(Allowlist::class);
         $allowlist->clearCache();
 
-        $crawler = $this->client->request('GET', 's/marketplace');
+        $crawler = $this->client->request(Request::METHOD_GET, 's/marketplace');
 
         self::assertResponseIsSuccessful($this->client->getResponse()->getContent());
 
@@ -63,10 +64,10 @@ final class ListControllerTest extends MauticMysqlTestCase
         );
 
         /** @var Allowlist $allowlist */
-        $allowlist = static::getContainer()->get(Allowlist::class);
+        $allowlist = self::getContainer()->get(Allowlist::class);
         $allowlist->clearCache();
 
-        $crawler = $this->client->request('GET', 's/marketplace');
+        $crawler = $this->client->request(Request::METHOD_GET, 's/marketplace');
 
         self::assertResponseIsSuccessful();
 

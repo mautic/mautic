@@ -67,7 +67,7 @@ class VtigerIntegration extends CrmAbstractIntegration
     /**
      * @return bool|array<mixed>|string
      */
-    public function isAuthorized()
+    public function isAuthorized(): bool|string|array
     {
         if (!isset($this->keys['url'])) {
             return false;
@@ -117,11 +117,8 @@ class VtigerIntegration extends CrmAbstractIntegration
 
     /**
      * Retrieves and stores tokens returned from oAuthLogin.
-     *
-     * @param array $settings
-     * @param array $parameters
      */
-    public function authCallback($settings = [], $parameters = []): string|bool
+    public function authCallback(array $settings = [], array $parameters = []): string|false
     {
         $success = $this->isAuthorized();
         if (!$success) {
@@ -250,10 +247,8 @@ class VtigerIntegration extends CrmAbstractIntegration
 
     /**
      * Get available company fields for choices in the config UI.
-     *
-     * @param array $settings
      */
-    public function getFormCompanyFields($settings = []): array
+    public function getFormCompanyFields(array $settings = []): array
     {
         return parent::getAvailableLeadFields(['cache_suffix' => '.company']);
     }

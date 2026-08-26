@@ -32,7 +32,7 @@ final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         private $options = [],
     ) {
         if (is_array($options)) {
-            $options = (new OptionsResolver())->setDefaults($options);
+            $options = new OptionsResolver()->setDefaults($options);
         }
 
         $this->options = $options;
@@ -77,12 +77,7 @@ final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         $this->selected = $this->sanitizeIds($event->getData());
     }
 
-    /**
-     * @param array|null $data
-     *
-     * @return array
-     */
-    private function getChoices($data = null, bool $includeNew = false)
+    private function getChoices(?array $data = null, bool $includeNew = false): array
     {
         if (null === $data) {
             $data = $this->selected;
@@ -105,7 +100,7 @@ final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
                 $this->formatChoices($choices);
             }
 
-            if ($includeNew && !empty($data)) {
+            if ($includeNew && [] !== $data) {
                 // Fetch some extra choices
                 $extraChoices = $this->fetchChoices($modelName);
 
@@ -137,16 +132,13 @@ final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         array_multisort($prepped_keys, SORT_NATURAL | SORT_FLAG_CASE, $prepped);
 
         if ($includeNew && $modalRoute) {
-            $prepped = array_replace([$this->translator->trans('mautic.core.createnew') => 'new'], $prepped);
+            return array_replace([$this->translator->trans('mautic.core.createnew') => 'new'], $prepped);
         }
 
         return $prepped;
     }
 
-    /**
-     * @return array
-     */
-    private function prepareChoices($choices)
+    private function prepareChoices(array $choices): array
     {
         $prepped   = $choices;
         $isGrouped = false;
@@ -182,7 +174,7 @@ final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     /**
      * @return array|mixed
      */
-    private function fetchChoices($modelName, array $data = [])
+    private function fetchChoices(string $modelName, array $data = [])
     {
         $labelColumn = $this->options['entity_label_column'];
         $idColumn    = $this->options['entity_id_column'];
@@ -202,7 +194,7 @@ final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 
         // Default to 100 records if no data is populated
         if (!isset($args['limit'])) {
-            $args['limit'] = empty($data) ? 100 : count($data);
+            $args['limit'] = [] === $data ? 100 : count($data);
         } elseif (0 !== $args['limit']) {
             $args['limit'] = max($args['limit'], count($data));
         }

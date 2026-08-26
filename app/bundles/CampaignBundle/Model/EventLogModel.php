@@ -18,6 +18,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 final class EventLogModel extends AbstractCommonModel
 {
+    public static function getName(): string
+    {
+        return 'campaign.event_log';
+    }
+
     private EventModel $eventModel;
 
     private IpLookupHelper $ipLookupHelper;
@@ -134,7 +139,7 @@ final class EventLogModel extends AbstractCommonModel
                 );
             }
 
-            $log = (new LeadEventLog())
+            $log = new LeadEventLog()
                 ->setLead($contact)
                 ->setEvent($event);
             $created = true;

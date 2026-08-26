@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\LeadBundle\Model\CompanyReportData;
@@ -11,7 +13,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class ReportUtmTagSubscriber implements EventSubscriberInterface
 {
-    public const UTM_TAG = 'lead.utmTag';
+    public const string UTM_TAG = 'lead.utmTag';
 
     public function __construct(
         private FieldsBuilder $fieldsBuilder,

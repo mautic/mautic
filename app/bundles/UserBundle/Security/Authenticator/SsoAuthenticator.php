@@ -39,7 +39,7 @@ final class SsoAuthenticator extends AbstractAuthenticator implements Interactiv
     /**
      * @var array<mixed>
      */
-    private array $options;
+    private readonly array $options;
 
     /**
      * @param array<mixed> $options

@@ -2,7 +2,7 @@
 
 namespace Mautic\CampaignBundle\Form\Type;
 
-use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -17,8 +17,8 @@ final class CampaignListType extends AbstractType
     private readonly bool $canViewOther;
 
     public function __construct(
-        private readonly CampaignModel $model,
         CorePermissions $security,
+        private readonly CampaignRepository $campaignRepository,
     ) {
         $this->canViewOther = $security->isGranted('campaign:campaigns:viewother');
     }
@@ -29,7 +29,7 @@ final class CampaignListType extends AbstractType
             [
                 'choices'      => function (Options $options): array {
                     $choices   = [];
-                    $campaigns = $this->model->getRepository()->getPublishedCampaigns(null, null, true, $this->canViewOther);
+                    $campaigns = $this->campaignRepository->getPublishedCampaigns(null, null, true, $this->canViewOther);
                     foreach ($campaigns as $campaign) {
                         $choices[$campaign['name']] = $campaign['id'];
                     }
@@ -38,7 +38,7 @@ final class CampaignListType extends AbstractType
                     ksort($choices);
 
                     if ($options['include_this']) {
-                        $choices = [$options['this_translation'] => 'this'] + $choices;
+                        return [$options['this_translation'] => 'this'] + $choices;
                     }
 
                     return $choices;

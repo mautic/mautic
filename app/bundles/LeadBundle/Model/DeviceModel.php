@@ -8,7 +8,6 @@ use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Event\LeadDeviceEvent;
 use Mautic\LeadBundle\Form\Type\DeviceType;
 use Mautic\LeadBundle\LeadEvents;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -19,6 +18,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 final class DeviceModel extends FormModel
 {
+    public static function getName(): string
+    {
+        return 'lead.device';
+    }
+
     private LeadDeviceRepository $leadDeviceRepository;
 
     #[Required]
@@ -53,7 +57,7 @@ final class DeviceModel extends FormModel
     /**
      * @param array $options
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof LeadDevice) {
             throw new MethodNotAllowedHttpException(['LeadDevice']);
@@ -63,7 +67,7 @@ final class DeviceModel extends FormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create(DeviceType::class, $entity, $options);
+        return $this->formFactory->create(DeviceType::class, $entity, $options);
     }
 
     /**

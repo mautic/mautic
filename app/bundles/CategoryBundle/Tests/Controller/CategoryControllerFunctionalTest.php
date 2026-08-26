@@ -40,7 +40,7 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ];
         /** @var CategoryModel $model */
-        $model      = static::getContainer()->get(CategoryModel::class);
+        $model      = self::getContainer()->get(CategoryModel::class);
 
         foreach ($categoriesData as $categoryData) {
             $category = new Category();
@@ -50,7 +50,7 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
             $model->saveEntity($category);
         }
 
-        $this->translator = static::getContainer()->get(TranslatorInterface::class);
+        $this->translator = self::getContainer()->get(TranslatorInterface::class);
     }
 
     /**
@@ -58,7 +58,7 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
      */
     public function testIndexActionWhenNotFiltered(): void
     {
-        $this->client->request('GET', '/s/categories?tmpl=list&bundle=category');
+        $this->client->request(Request::METHOD_GET, '/s/categories?tmpl=list&bundle=category');
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
 
@@ -72,7 +72,7 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
      */
     public function testIndexActionWhenFiltered(): void
     {
-        $this->client->request('GET', '/s/categories/page?tmpl=list&bundle=page');
+        $this->client->request(Request::METHOD_GET, '/s/categories/page?tmpl=list&bundle=page');
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
 
@@ -138,9 +138,9 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
     public function testEditLockCategory(): void
     {
         /** @var CategoryModel $categoryModel */
-        $categoryModel      = static::getContainer()->get(CategoryModel::class);
+        $categoryModel      = self::getContainer()->get(CategoryModel::class);
         /** @var UserModel $userModel */
-        $userModel      = static::getContainer()->get(UserModel::class);
+        $userModel      = self::getContainer()->get(UserModel::class);
         $user           = $userModel->getEntity(2);
 
         $category = new Category();
@@ -196,7 +196,7 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
             'validators'
         );
 
-        $this->client->request('POST', 's/categories/category/delete/'.$category->getId(), [], [], [
+        $this->client->request(Request::METHOD_POST, 's/categories/category/delete/'.$category->getId(), [], [], [
             'HTTP_Content-Type'     => 'application/x-www-form-urlencoded; charset=UTF-8',
             'HTTP_X-Requested-With' => 'XMLHttpRequest',
             'HTTP_X-CSRF-Token'     => $this->getCsrfToken('mautic_ajax_post'),
@@ -230,7 +230,7 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         $parameters = 'ids=["'.$category->getId().'"]';
-        $this->client->request('POST', 's/categories/category/batchDelete?'.$parameters, [], [], [
+        $this->client->request(Request::METHOD_POST, 's/categories/category/batchDelete?'.$parameters, [], [], [
             'HTTP_Content-Type'     => 'application/x-www-form-urlencoded; charset=UTF-8',
             'HTTP_X-Requested-With' => 'XMLHttpRequest',
             'HTTP_X-CSRF-Token'     => $this->getCsrfToken('mautic_ajax_post'),
@@ -296,7 +296,7 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $category->setBundle($bundle);
         $category->setAlias($alias);
         /** @var CategoryModel $categoryModel */
-        $categoryModel      = static::getContainer()->get(CategoryModel::class);
+        $categoryModel      = self::getContainer()->get(CategoryModel::class);
         $categoryModel->saveEntity($category);
 
         return $category;

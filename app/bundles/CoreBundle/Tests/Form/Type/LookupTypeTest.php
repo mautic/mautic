@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\LookupType;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Form\Test\TypeTestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 final class LookupTypeTest extends TypeTestCase
 {
     /**

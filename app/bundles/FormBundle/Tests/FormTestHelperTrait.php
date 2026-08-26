@@ -55,7 +55,7 @@ trait FormTestHelperTrait
         $response       = json_decode($clientResponse->getContent(), true);
         $form           = $response['form'];
 
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), (string) $clientResponse->getContent());
 
         return $form;
     }
@@ -76,7 +76,7 @@ trait FormTestHelperTrait
 
         $clientResponse = $this->client->getResponse();
 
-        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), (string) $clientResponse->getContent());
     }
 
     protected function deleteAllFormResultsTable(): void

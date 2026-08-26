@@ -22,9 +22,9 @@ use Mautic\IntegrationsBundle\Exception\PluginNotConfiguredException;
 /**
  * Factory for building HTTP clients using basic auth.
  */
-class HttpFactory implements AuthProviderInterface
+final class HttpFactory implements AuthProviderInterface
 {
-    public const NAME = 'api_key';
+    public const string NAME = 'api_key';
 
     /**
      * Cache of initialized clients.
@@ -84,16 +84,14 @@ class HttpFactory implements AuthProviderInterface
         return !empty($credentials->getApiKey());
     }
 
-    private function getHeaderClient(): ClientInterface
+    private function getHeaderClient(): Client
     {
-        return new Client(
-            [
-                'headers' => [$this->credentials->getKeyName() => $this->credentials->getApiKey()],
-            ]
-        );
+        return new Client([
+            'headers' => [$this->credentials->getKeyName() => $this->credentials->getApiKey()],
+        ]);
     }
 
-    private function getParameterClient(): ClientInterface
+    private function getParameterClient(): Client
     {
         $handler = new HandlerStack();
         $handler->setHandler(new CurlHandler());
@@ -106,10 +104,8 @@ class HttpFactory implements AuthProviderInterface
             )
         );
 
-        return new Client(
-            [
-                'handler' => $handler,
-            ]
-        );
+        return new Client([
+            'handler' => $handler,
+        ]);
     }
 }

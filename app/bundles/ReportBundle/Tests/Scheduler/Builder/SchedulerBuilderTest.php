@@ -25,7 +25,7 @@ final class SchedulerBuilderTest extends \PHPUnit\Framework\TestCase
         $event = $events[0];
         $this->assertInstanceOf(Recurrence::class, $event);
 
-        $expectedDate = (new \DateTime())->setTime(0, 0)->modify('+1 day');
+        $expectedDate = new \DateTime()->setTime(0, 0)->modify('+1 day');
         $this->assertEquals($expectedDate, $event->getStart());
     }
 
@@ -41,7 +41,7 @@ final class SchedulerBuilderTest extends \PHPUnit\Framework\TestCase
         $event = $events[0];
         $this->assertInstanceOf(Recurrence::class, $event);
 
-        $expectedDate = (new \DateTime())->setTime(0, 0)->modify('+1 day');
+        $expectedDate = new \DateTime()->setTime(0, 0)->modify('+1 day');
         $this->assertEquals($expectedDate, $event->getStart());
 
         $event = $events[1];

@@ -28,7 +28,7 @@ final class ParameterLoader
     public function __construct(
         private readonly string $rootPath = __DIR__.'/../../../',
     ) {
-        $this->configBaseDir = static::getLocalConfigBaseDir($this->rootPath);
+        $this->configBaseDir = self::getLocalConfigBaseDir($this->rootPath);
 
         $this->loadDefaultParameters();
         $this->loadLocalParameters();
@@ -129,7 +129,7 @@ final class ParameterLoader
             return;
         }
 
-        $finder = (new Finder())
+        $finder = new Finder()
             ->files()
             ->followLinks()
             ->depth('== 0')

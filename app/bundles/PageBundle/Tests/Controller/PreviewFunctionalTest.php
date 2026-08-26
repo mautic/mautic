@@ -214,7 +214,9 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
             'page:pages:viewother',
             $page->getCreatedBy()
         )->willReturn(false);
-        $this->getContainer()->set('mautic.security', $security);
+
+        $this->getContainer()->set(CorePermissions::class, $security);
+
         $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
         $this->assertStringContainsString('Unauthorized access to requested URL: /page/preview/'.$pageId, $crawler->text());
     }

@@ -11,24 +11,18 @@ final class DateHelper
     /**
      * @var string[]
      */
-    private array $formats;
+    private readonly array $formats;
 
     /**
      * @api cannot be readonly, as changed in tests via reflection
      */
     private DateTimeHelper $helper;
 
-    /**
-     * @param string $dateFullFormat
-     * @param string $dateShortFormat
-     * @param string $dateOnlyFormat
-     * @param string $timeOnlyFormat
-     */
     public function __construct(
-        $dateFullFormat,
-        $dateShortFormat,
-        $dateOnlyFormat,
-        $timeOnlyFormat,
+        string $dateFullFormat,
+        string $dateShortFormat,
+        string $dateOnlyFormat,
+        string $timeOnlyFormat,
         private readonly TranslatorInterface $translator,
         private readonly CoreParametersHelper $coreParametersHelper,
     ) {
@@ -173,41 +167,29 @@ final class DateHelper
             }
         }
 
-        if (empty($formated)) {
+        if ([] === $formated) {
             return $this->translator->trans('mautic.core.date.less.than.second');
         }
 
         return implode(' ', $formated);
     }
 
-    /**
-     * @return string
-     */
-    public function getFullFormat()
+    public function getFullFormat(): string
     {
         return $this->formats['datetime'];
     }
 
-    /**
-     * @return string
-     */
-    public function getDateFormat()
+    public function getDateFormat(): string
     {
         return $this->formats['date'];
     }
 
-    /**
-     * @return string
-     */
-    public function getTimeFormat()
+    public function getTimeFormat(): string
     {
         return $this->formats['time'];
     }
 
-    /**
-     * @return string
-     */
-    public function getShortFormat()
+    public function getShortFormat(): string
     {
         return $this->formats['short'];
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Utils\PHPStan\Rule;
 
+use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use PhpParser\Node;
 use PhpParser\Node\ComplexType;
 use PhpParser\Node\Name;
@@ -43,7 +44,7 @@ final class NoNullableServiceInConstructorRule implements Rule
     /**
      * @var string[]
      */
-    private const SKIPPED_EXACT_CLASSES = ['Mautic\\CoreBundle\\IpLookup\\AbstractLookup'];
+    private const SKIPPED_EXACT_CLASSES = [AbstractLookup::class];
 
     public function __construct(
         private readonly ReflectionProvider $reflectionProvider,

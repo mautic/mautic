@@ -9,7 +9,7 @@ use Predis\Command\PrefixableCommandInterface;
 
 final class Unlink extends Command implements PrefixableCommandInterface
 {
-    public const ID = 'UNLINK';
+    public const string ID = 'UNLINK';
 
     public function getId(): string
     {

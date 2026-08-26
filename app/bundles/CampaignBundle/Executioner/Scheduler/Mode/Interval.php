@@ -14,7 +14,7 @@ use Psr\Log\LoggerInterface;
 
 final class Interval implements ScheduleModeInterface
 {
-    public const LOG_DATE_FORMAT = 'Y-m-d H:i:s T';
+    public const string LOG_DATE_FORMAT = 'Y-m-d H:i:s T';
 
     private ?\DateTimeZone $defaultTimezone = null;
 
@@ -37,7 +37,7 @@ final class Interval implements ScheduleModeInterface
                 'CAMPAIGN: ('.$event->getId().') Adding interval of '.$interval.$unit.' to '.$comparedToDateTime->format(self::LOG_DATE_FORMAT)
             );
             /** @var \DateTime $comparedToDateTime */
-            $comparedToDateTime->add((new DateTimeHelper())->buildInterval($interval, $unit));
+            $comparedToDateTime->add(new DateTimeHelper()->buildInterval($interval, $unit));
         } catch (\Exception $exception) {
             $this->logger->error('CAMPAIGN: Determining interval scheduled failed with "'.$exception->getMessage().'"');
 
@@ -81,7 +81,7 @@ final class Interval implements ScheduleModeInterface
 
         if ($interval && $unit) {
             /** @var \DateTime $dateTriggered */
-            $dateTriggered->add((new DateTimeHelper())->buildInterval($interval, $unit));
+            $dateTriggered->add(new DateTimeHelper()->buildInterval($interval, $unit));
         }
 
         if ($dateTriggered < $compareFromDateTime) {

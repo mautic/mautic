@@ -11,7 +11,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 final readonly class ReportNormalizeSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly LeadFieldRepository $leadFieldRepository,
+        private LeadFieldRepository $leadFieldRepository,
     ) {
     }
 
@@ -49,12 +49,6 @@ final readonly class ReportNormalizeSubscriber implements EventSubscriberInterfa
      */
     private function useContactOrCompanyColumn(array $columns): bool
     {
-        foreach ($columns as $column) {
-            if (str_starts_with($column, 'l.') || str_starts_with($column, 'comp.')) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($columns, fn (string $column): bool => str_starts_with($column, 'l.') || str_starts_with($column, 'comp.'));
     }
 }

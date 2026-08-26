@@ -7,8 +7,6 @@ use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\UserBundle\Entity\User;
 use OAuth2\OAuth2;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -187,7 +185,7 @@ final class ClientController extends AbstractStandardFormController
 
         // get the user form factory
         $action = $this->generateUrl('mautic_client_action', ['objectAction' => 'new']);
-        $form   = $this->clientModel->createForm($client, $this->formFactory, $action);
+        $form   = $this->clientModel->createForm($client, $action);
 
         // remove the client id and secret fields as they'll be auto generated
         $form->remove('randomId');
@@ -266,10 +264,8 @@ final class ClientController extends AbstractStandardFormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false): Response
     {
         if (!$this->security->isGranted('api:clients:editother')) {
             $this->throwAccessDenied();
@@ -310,7 +306,7 @@ final class ClientController extends AbstractStandardFormController
         }
 
         $action = $this->generateUrl('mautic_client_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $form   = $this->clientModel->createForm($client, $this->formFactory, $action);
+        $form   = $this->clientModel->createForm($client, $action);
 
         // remove api_mode field
         $form->remove('api_mode');
@@ -371,10 +367,8 @@ final class ClientController extends AbstractStandardFormController
      * Deletes the entity.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         if (!$this->security->isGranted('api:clients:delete')) {
             $this->throwAccessDenied();

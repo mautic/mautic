@@ -60,7 +60,7 @@ abstract class SocialIntegration extends AbstractIntegration
         if (empty($fields)) {
             $s         = $this->getName();
             $available = $this->getAvailableLeadFields($settings);
-            if (empty($available)) {
+            if ([] === $available) {
                 return [];
             }
             // create social profile fields
@@ -125,7 +125,7 @@ abstract class SocialIntegration extends AbstractIntegration
         return $fields;
     }
 
-    public function getFormCompanyFields($settings = [])
+    public function getFormCompanyFields(array $settings = [])
     {
         $settings['feature_settings']['objects'] = ['Company'];
 

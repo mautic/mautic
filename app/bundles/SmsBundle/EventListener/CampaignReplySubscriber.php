@@ -15,7 +15,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class CampaignReplySubscriber implements EventSubscriberInterface
 {
-    public const TYPE = 'sms.reply';
+    public const string TYPE = 'sms.reply';
 
     public function __construct(
         private TransportChain $transportChain,

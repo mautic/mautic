@@ -66,12 +66,9 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
     }
 
     /**
-     * @param array $settings
-     * @param array $parameters
-     *
      * @return bool|string
      */
-    public function ssoAuthCallback($settings = [], $parameters = [])
+    public function ssoAuthCallback(array $settings = [], array $parameters = [])
     {
         $response = $this->authCallback($settings, $parameters);
 
@@ -81,10 +78,8 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
 
     /**
      * Don't save the keys as they are only used to validate user login.
-     *
-     * @return array
      */
-    public function extractAuthKeys($data, $tokenOverride = null)
+    public function extractAuthKeys($data, $tokenOverride = null): bool|array
     {
         // Prepare the keys for extraction such as renaming, setting expiry, etc
         $data = $this->prepareResponseForExtraction($data);

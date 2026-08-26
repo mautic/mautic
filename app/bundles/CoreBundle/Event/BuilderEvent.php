@@ -2,7 +2,6 @@
 
 namespace Mautic\CoreBundle\Event;
 
-use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -149,14 +148,7 @@ class BuilderEvent extends Event
                 if (!is_array($tokenKeys)) {
                     $tokenKeys = [$tokenKeys];
                 }
-
-                $found = false;
-                foreach ($tokenKeys as $token) {
-                    if (0 === stripos($token, $this->tokenFilter)) {
-                        $found = true;
-                        break;
-                    }
-                }
+                $found = array_any($tokenKeys, fn ($token): bool => 0 === stripos($token, $this->tokenFilter));
 
                 if (!$found) {
                     $requested = false;
@@ -195,65 +187,18 @@ class BuilderEvent extends Event
 
         if ('label' === $this->tokenFilterTarget) {
             // Do a search against the label
-            $tokens = array_filter(
+            return array_filter(
                 $tokens,
                 fn ($v): bool => 0 === stripos($v, $filter)
             );
-        } else {
-            // Do a search against the token
-            $found = array_filter(
-                array_keys($tokens),
-                fn (int|string $k): bool => 0 === stripos($k, $filter)
-            );
-
-            $tokens = array_intersect_key($tokens, array_flip($found));
         }
-
-        return $tokens;
-    }
-
-    /**
-     * Add tokens from a BuilderTokenHelper.
-     *
-     * @deprecated use BuilderTokenHelper::getFormattedTokens and $this->addTokens
-     *
-     * @param string $labelColumn
-     * @param string $valueColumn
-     * @param bool   $convertToLinks If true, the tokens will be converted to links
-     */
-    public function addTokensFromHelper(
-        BuilderTokenHelper $tokenHelper,
-        $tokens,
-        $labelColumn = 'name',
-        $valueColumn = 'id',
-        $convertToLinks = false,
-    ): void {
-        $tokens = $this->getTokensFromHelper($tokenHelper, $tokens, $labelColumn, $valueColumn);
-        if (null == $tokens) {
-            $tokens = [];
-        }
-
-        $this->addTokens(
-            $tokens,
-            $convertToLinks
+        // Do a search against the token
+        $found = array_filter(
+            array_keys($tokens),
+            fn (int|string $k): bool => 0 === stripos($k, $filter)
         );
-    }
 
-    /**
-     * Get tokens from a BuilderTokenHelper.
-     *
-     * @deprecated use BuilderTokenHelper::getFormattedTokens
-     *
-     * @return array|void
-     */
-    public function getTokensFromHelper(BuilderTokenHelper $tokenHelper, $tokens, $labelColumn = 'name', $valueColumn = 'id')
-    {
-        return $tokenHelper->getTokens(
-            $tokens,
-            'label' === $this->tokenFilterTarget ? $this->tokenFilterText : '',
-            $labelColumn,
-            $valueColumn
-        );
+        return array_intersect_key($tokens, array_flip($found));
     }
 
     /**

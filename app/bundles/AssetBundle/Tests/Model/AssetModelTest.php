@@ -12,6 +12,7 @@ use Mautic\AssetBundle\Entity\Download;
 use Mautic\AssetBundle\Entity\DownloadRepository;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CacheBundle\Cache\CacheProvider;
+use Mautic\CategoryBundle\Entity\CategoryRepository;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -118,9 +119,10 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
             $this->userHelper,
             $this->logger,
             $this->coreParametersHelper,
-            $this->createStub(EmailRepository::class), // $emailRepository
+            $this->createStub(EmailRepository::class),
             $this->assetRepository,
-            $this->createStub(DownloadRepository::class), // $downloadRepository
+            $this->createStub(DownloadRepository::class),
+            $this->createStub(CategoryRepository::class),
         );
     }
 
@@ -157,6 +159,10 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
     public function testTrackDownload(): void
     {
         $asset = new Asset();
+        $reflection = new \ReflectionClass($asset);
+        $idProperty = $reflection->getProperty('id');
+        $idProperty->setValue($asset, 1);
+
         $lead  = new Lead();
 
         $this->corePermissions->expects($this->once())
@@ -320,6 +326,7 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
                 $this->createStub(EmailRepository::class),
                 $this->createStub(AssetRepository::class),
                 $this->createStub(DownloadRepository::class),
+                $this->createStub(CategoryRepository::class),
             ])
             ->onlyMethods(['getEntity'])
             ->getMock();
@@ -338,7 +345,7 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
         if ($shouldResolve) {
             $this->assertSame($asset, $result);
         } else {
-            $this->assertFalse($result);
+            $this->assertNotInstanceOf(Asset::class, $result);
         }
     }
 

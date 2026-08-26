@@ -1,12 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tracker\Service\DeviceTrackingService;
 
 use Mautic\LeadBundle\Entity\LeadDevice;
 
-/**
- * Interface DeviceTrackingServiceInterface.
- */
 interface DeviceTrackingServiceInterface
 {
     /**

@@ -39,7 +39,7 @@ final class DateAnniversaryTest extends \PHPUnit\Framework\TestCase
         /**
          * Today in '%-m-d%' format. This matches date and datetime fields.
          */
-        $expectedResult = '%'.(new \DateTime('now', new \DateTimeZone('UTC')))->format('-m-d').'%';
+        $expectedResult = '%'.new \DateTime('now', new \DateTimeZone('UTC'))->format('-m-d').'%';
 
         $dateDecorator    = $this->createStub(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);

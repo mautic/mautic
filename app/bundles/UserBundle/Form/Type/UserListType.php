@@ -2,7 +2,7 @@
 
 namespace Mautic\UserBundle\Form\Type;
 
-use Mautic\UserBundle\Model\UserModel;
+use Mautic\UserBundle\Entity\UserRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -18,7 +18,7 @@ final class UserListType extends AbstractType
     private array $choices = [];
 
     public function __construct(
-        private readonly UserModel $userModel,
+        private readonly UserRepository $userRepository,
     ) {
     }
 
@@ -49,7 +49,7 @@ final class UserListType extends AbstractType
             return $this->choices;
         }
 
-        $users = $this->userModel->getRepository()->getEntities(
+        $users = $this->userRepository->getEntities(
             [
                 'filter' => [
                     'force' => [

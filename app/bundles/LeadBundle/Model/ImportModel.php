@@ -40,6 +40,11 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class ImportModel extends FormModel
 {
+    public static function getName(): string
+    {
+        return 'lead.import';
+    }
+
     protected LeadEventLogRepository $leadEventLogRepo;
 
     public function __construct(
@@ -118,13 +123,13 @@ class ImportModel extends FormModel
      * Check if there are some IN_PROGRESS imports which got stuck for a while.
      * Set those as failed.
      */
-    public function setGhostImportsAsFailed()
+    public function setGhostImportsAsFailed(): void
     {
         $ghostDelay = 2;
         $imports    = $this->importRepository->getGhostImports($ghostDelay, 5);
 
         if (empty($imports)) {
-            return null;
+            return;
         }
 
         foreach ($imports as $import) {
@@ -457,7 +462,7 @@ class ImportModel extends FormModel
      */
     public function isEmptyCsvRow($row): bool
     {
-        if (!is_array($row) || empty($row)) {
+        if (!is_array($row) || [] === $row) {
             return true;
         }
 
@@ -567,7 +572,7 @@ class ImportModel extends FormModel
      */
     public function getUniqueFileName(): string
     {
-        return (new DateTimeHelper())->toUtcString('YmdHis').'.csv';
+        return new DateTimeHelper()->toUtcString('YmdHis').'.csv';
     }
 
     /**

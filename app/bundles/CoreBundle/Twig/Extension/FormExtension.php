@@ -5,23 +5,21 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Twig\Extension;
 
 use Mautic\FormBundle\Helper\FormFieldHelper;
+use Symfony\Component\Form\FormRendererInterface;
 use Symfony\Component\Form\FormView;
-use Twig\Extension\AbstractExtension;
-use Twig\TwigFunction;
+use Twig\Attribute\AsTwigFunction;
 
-final class FormExtension extends AbstractExtension
+final readonly class FormExtension
 {
-    public function getFunctions(): array
-    {
-        return [
-            new TwigFunction('formFieldFormatList', $this->formatList(...), ['is_safe' => ['all']]),
-            new TwigFunction('formContainsErrors', $this->containsErrors(...), ['is_safe' => ['all']]),
-        ];
+    public function __construct(
+        private FormRendererInterface $formRenderer,
+    ) {
     }
 
     /**
      * @param array<string> $v
      */
+    #[AsTwigFunction(name: 'formFieldFormatList', isSafe: ['all'])]
     public function formatList(string $format, array $v): string
     {
         return FormFieldHelper::formatList($format, $v);
@@ -32,6 +30,7 @@ final class FormExtension extends AbstractExtension
      *
      * @param array<string> $excluding
      */
+    #[AsTwigFunction(name: 'formContainsErrors', isSafe: ['all'])]
     public function containsErrors(FormView $form, array $excluding = []): bool
     {
         if (count($form->vars['errors'])) {
@@ -55,5 +54,18 @@ final class FormExtension extends AbstractExtension
         }
 
         return false;
+    }
+
+    /**
+     * @param array<string, mixed> $variables
+     */
+    #[AsTwigFunction(name: 'formRowIfExists', isSafe: ['html'])]
+    public function rowIfExists(FormView $form, string $fieldName, array $variables = []): string
+    {
+        if (!isset($form[$fieldName])) {
+            return '';
+        }
+
+        return $this->formRenderer->searchAndRenderBlock($form[$fieldName], 'row', $variables);
     }
 }

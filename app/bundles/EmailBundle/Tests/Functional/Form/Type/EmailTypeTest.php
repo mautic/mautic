@@ -151,10 +151,10 @@ final class EmailTypeTest extends MauticMysqlTestCase
         $response       = json_decode($clientResponse->getContent(), true);
 
         self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
-        $this->assertSame(Response::HTTP_CREATED, $response['statusCodes'][0], $clientResponse->getContent());
-        $this->assertSame(Response::HTTP_CREATED, $response['statusCodes'][1], $clientResponse->getContent());
-        $this->assertSame(Response::HTTP_CREATED, $response['statusCodes'][2], $clientResponse->getContent());
-        $this->assertSame(Response::HTTP_CREATED, $response['statusCodes'][3], $clientResponse->getContent());
+        $this->assertSame(Response::HTTP_CREATED, $response['statusCodes'][0], (string) $clientResponse->getContent());
+        $this->assertSame(Response::HTTP_CREATED, $response['statusCodes'][1], (string) $clientResponse->getContent());
+        $this->assertSame(Response::HTTP_CREATED, $response['statusCodes'][2], (string) $clientResponse->getContent());
+        $this->assertSame(Response::HTTP_CREATED, $response['statusCodes'][3], (string) $clientResponse->getContent());
 
         return [
             $response['contacts'][0]['id'],
@@ -170,7 +170,7 @@ final class EmailTypeTest extends MauticMysqlTestCase
     private function addContactToDnc(array $contactIds): void
     {
         /** @var DoNotContactModel $dncModel */
-        $dncModel = static::getContainer()->get(DoNotContactModel::class);
+        $dncModel = self::getContainer()->get(DoNotContactModel::class);
 
         foreach ($contactIds as $contactId) {
             $dncModel->addDncForContact($contactId, 'email', DoNotContact::MANUAL, 'Some comment');

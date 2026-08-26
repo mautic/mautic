@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\DataFixtures\ORM;
 
-use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\CoreBundle\Entity\IpAddress;
@@ -12,7 +12,7 @@ use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 
-final class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadLeadData extends Fixture implements OrderedFixtureInterface
 {
     public function __construct(
         private readonly LeadRepository $leadRepository,

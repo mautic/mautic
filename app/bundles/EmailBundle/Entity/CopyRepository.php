@@ -28,7 +28,7 @@ class CopyRepository extends CommonRepository
                     'body'         => $body,
                     'body_text'    => $bodyText,
                     'subject'      => $subject,
-                    'date_created' => (new \DateTime())->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d H:i:s'),
+                    'date_created' => new \DateTime()->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d H:i:s'),
                 ]
             );
 

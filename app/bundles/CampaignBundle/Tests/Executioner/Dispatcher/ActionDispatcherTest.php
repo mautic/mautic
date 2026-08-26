@@ -15,7 +15,6 @@ use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\Executioner\Dispatcher\ActionDispatcher;
 use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
-use Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -28,16 +27,12 @@ final class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
 
     private MockObject&EventScheduler $scheduler;
 
-    private MockObject&LegacyEventDispatcher $legacyDispatcher;
-
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->dispatcher         = $this->createMock(EventDispatcherInterface::class);
-        $this->scheduler          = $this->createMock(EventScheduler::class);
-        /** @phpstan-ignore classConstant.deprecatedClass */
-        $this->legacyDispatcher   = $this->createMock(LegacyEventDispatcher::class);
+        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->scheduler  = $this->createMock(EventScheduler::class);
     }
 
     public function testActionBatchEventIsDispatchedWithSuccessAndFailedLogs(): void
@@ -106,7 +101,6 @@ final class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
                     ++$dispatcCounter;
                     if (1 === $dispatcCounter) {
                         $this->assertInstanceOf(PendingEvent::class, $event);
-                        $this->assertInstanceOf(PendingEvent::class, $event);
                         $event->pass($logs->get(1));
                         $event->fail($logs->get(2), 'just because');
                     } elseif (2 === $dispatcCounter) {
@@ -137,9 +131,6 @@ final class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
                     $this->assertEquals($log2, $logs->first());
                 }
             );
-
-        $this->legacyDispatcher->expects($this->once())
-            ->method('dispatchExecutionEvents');
 
         $this->getEventDispatcher()->dispatchEvent($config, $event, $logs);
     }
@@ -265,7 +256,7 @@ final class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->getEventDispatcher()->dispatchEvent($config, $event, $logs);
     }
 
-    public function testActionBatchEventIsIgnoredWithLegacy(): void
+    public function testActionWithoutBatchEventNameDispatchesNothing(): void
     {
         $event  = new Event();
         $config = $this->createMock(ActionAccessor::class);
@@ -277,9 +268,6 @@ final class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->never())
             ->method('dispatch');
 
-        $this->legacyDispatcher->expects($this->once())
-            ->method('dispatchCustomEvent');
-
         $this->getEventDispatcher()->dispatchEvent($config, $event, new ArrayCollection());
     }
 
@@ -288,8 +276,7 @@ final class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
         return new ActionDispatcher(
             $this->dispatcher,
             new NullLogger(),
-            $this->scheduler,
-            $this->legacyDispatcher
+            $this->scheduler
         );
     }
 }

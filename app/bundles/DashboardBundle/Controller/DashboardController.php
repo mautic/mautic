@@ -15,7 +15,6 @@ use Mautic\DashboardBundle\Form\Type\UploadType;
 use Mautic\DashboardBundle\Model\DashboardModel;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -40,7 +39,7 @@ final class DashboardController extends AbstractFormController
     /**
      * Generates the default view.
      */
-    public function indexAction(Request $request, WidgetService $widget, FormFactoryInterface $formFactory, PathsHelper $pathsHelper, RouterInterface $urlGenerator): Response
+    public function indexAction(Request $request, WidgetService $widget, PathsHelper $pathsHelper, RouterInterface $urlGenerator): Response
     {
         $widgets = $this->dashboardModel->getWidgets();
 
@@ -76,7 +75,7 @@ final class DashboardController extends AbstractFormController
         // Set the final date range to the form
         $dateRangeFilter['date_from'] = $filter['dateFrom']->format(WidgetService::FORMAT_HUMAN);
         $dateRangeFilter['date_to']   = $filter['dateTo']->format(WidgetService::FORMAT_HUMAN);
-        $dateRangeForm                = $formFactory->create(DateRangeType::class, $dateRangeFilter, ['action' => $action]);
+        $dateRangeForm                = $this->createForm(DateRangeType::class, $dateRangeFilter, ['action' => $action]);
 
         $this->dashboardModel->populateWidgetsContent($widgets, $filter);
         $releaseMetadata = ThisRelease::getMetadata();
@@ -132,14 +131,14 @@ final class DashboardController extends AbstractFormController
     /**
      * Generate new dashboard widget and processes post data.
      */
-    public function newAction(Request $request, FormFactoryInterface $formFactory): JsonResponse|Response
+    public function newAction(Request $request): JsonResponse|Response
     {
         // retrieve the entity
         $widget = new Widget();
         $action = $this->generateUrl('mautic_dashboard_action', ['objectAction' => 'new']);
 
         // get the user form factory
-        $form       = $this->dashboardModel->createForm($widget, $formFactory, $action);
+        $form       = $this->dashboardModel->createForm($widget, $action);
         $closeModal = false;
         $valid      = false;
 
@@ -193,13 +192,13 @@ final class DashboardController extends AbstractFormController
     /**
      * edit widget and processes post data.
      */
-    public function editAction(Request $request, FormFactoryInterface $formFactory, $objectId): JsonResponse|Response
+    public function editAction(Request $request, $objectId): JsonResponse|Response
     {
         $widget = $this->dashboardModel->getEntity($objectId);
         $action = $this->generateUrl('mautic_dashboard_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
 
         // get the user form factory
-        $form       = $this->dashboardModel->createForm($widget, $formFactory, $action);
+        $form       = $this->dashboardModel->createForm($widget, $action);
         $closeModal = false;
         $valid      = false;
         // /Check for a submitted form and process it
@@ -421,7 +420,7 @@ final class DashboardController extends AbstractFormController
         return $this->redirect($urlGenerator->generate('mautic_dashboard_index'));
     }
 
-    public function importAction(Request $request, FormFactoryInterface $formFactory, PathsHelper $pathsHelper): Response
+    public function importAction(Request $request, PathsHelper $pathsHelper): Response
     {
         $preview = $request->get('preview');
 
@@ -431,7 +430,7 @@ final class DashboardController extends AbstractFormController
         ];
 
         $action = $this->generateUrl('mautic_dashboard_action', ['objectAction' => 'import']);
-        $form   = $formFactory->create(UploadType::class, [], ['action' => $action]);
+        $form   = $this->createForm(UploadType::class, [], ['action' => $action]);
 
         if ($request->isMethod(Request::METHOD_POST)) {
             if (!$this->isFormCancelled($form)) {
@@ -542,6 +541,6 @@ final class DashboardController extends AbstractFormController
      */
     private function getNameFromRequest(Request $request): string
     {
-        return $request->get('name', (new \DateTime())->format('Y-m-dTH:i:s'));
+        return $request->get('name', new \DateTime()->format('Y-m-dTH:i:s'));
     }
 }

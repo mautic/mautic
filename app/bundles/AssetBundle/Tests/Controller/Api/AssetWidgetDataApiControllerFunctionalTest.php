@@ -6,6 +6,8 @@ namespace Mautic\AssetBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 final class AssetWidgetDataApiControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -23,11 +25,11 @@ final class AssetWidgetDataApiControllerFunctionalTest extends MauticMysqlTestCa
     #[DataProvider('assetWidgetTypesProvider')]
     public function testAssetWidgetDataEndpointReturnsNonEmptyDataForApiLibraryShape(string $type): void
     {
-        $this->client->request('GET', '/api/data/'.$type);
+        $this->client->request(Request::METHOD_GET, '/api/data/'.$type);
         $response = $this->client->getResponse();
 
         $this->assertNotSame(
-            404,
+            Response::HTTP_NOT_FOUND,
             $response->getStatusCode(),
             'Unexpected 404 for widget "'.$type.'". Body: '.$response->getContent()
         );

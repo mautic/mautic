@@ -6,9 +6,15 @@ namespace Mautic\DynamicContentBundle\Tests\Unit\EventListener;
 
 use Mautic\CoreBundle\Event\BuildJsEvent;
 use Mautic\CoreBundle\Event\BuildJsScope;
+use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Helper\AssetGenerationHelper;
+use Mautic\CoreBundle\Helper\BundleHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\DynamicContentBundle\EventListener\BuildJsSubscriber;
+use Mautic\InstallBundle\Install\InstallService;
+use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,9 +31,21 @@ final class BuildJsSubscriberTest extends TestCase
         $pathsHelper = $this->createStub(PathsHelper::class);
         $pathsHelper->method('getSystemPath')->willReturn('');
 
-        $assetsHelper = new AssetsHelper($this->createStub(Packages::class));
-        $assetsHelper->setPathsHelper($pathsHelper);
-        $assetsHelper->setSiteUrl('https://mautic.example');
+        $assetGenerationHelper = new AssetGenerationHelper(
+            $this->createStub(BundleHelper::class),
+            $pathsHelper,
+            $this->createStub(CoreParametersHelper::class),
+            $this->createStub(AppVersion::class),
+        );
+
+        $assetsHelper = new AssetsHelper(
+            $this->createStub(Packages::class),
+            $pathsHelper,
+            $assetGenerationHelper,
+            $this->createStub(BuilderIntegrationsHelper::class),
+            $this->createStub(InstallService::class),
+            'https://mautic.example',
+        );
 
         $translator = $this->createStub(TranslatorInterface::class);
         $translator->method('trans')->willReturn('Please wait');

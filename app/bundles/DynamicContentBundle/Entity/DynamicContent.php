@@ -235,7 +235,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         $metadata->addPropertyConstraint('content', new NoNesting());
 
         $metadata->addPropertyConstraint('type', new NotBlank(message: 'mautic.core.type.required'));
-        $metadata->addPropertyConstraint('type', new Choice(choices: (new TypeList())->getChoices()));
+        $metadata->addPropertyConstraint('type', new Choice(choices: new TypeList()->getChoices()));
 
         $metadata->addConstraint(new SlotNameType());
 
@@ -259,7 +259,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                     $violations = $validator->validate(
                         $dwc->getFilters(),
                         [
-                            new Count(minMessage: 'mautic.dynamicContent.filter.options.empty', min: 1),
+                            new Count(min: 1, minMessage: 'mautic.dynamicContent.filter.options.empty'),
                         ]
                     );
                     foreach ($violations as $violation) {

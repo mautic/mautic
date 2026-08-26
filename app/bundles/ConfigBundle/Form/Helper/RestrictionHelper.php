@@ -8,9 +8,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class RestrictionHelper
 {
-    public const MODE_REMOVE = 'remove';
+    public const string MODE_REMOVE = 'remove';
 
-    public const MODE_MASK   = 'mask';
+    public const string MODE_MASK   = 'mask';
 
     /**
      * @var string[]

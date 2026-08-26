@@ -207,8 +207,11 @@ class EmailRepository extends CommonRepository
 
         // Do not include leads that have already been emailed
         $statQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $statQb->select('stat.lead_id')
-            ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'stat');
+        $statQb->select('null')
+            ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'stat')
+            ->where(
+                $statQb->expr()->eq('stat.lead_id', 'l.id')
+            );
 
         $statQb->andWhere($statQb->expr()->isNotNull('stat.lead_id'));
 
@@ -237,7 +240,7 @@ class EmailRepository extends CommonRepository
 
             $listIds = array_column($lists, 'leadlist_id');
 
-            if (empty($listIds)) {
+            if ([] === $listIds) {
                 // Prevent fatal error
                 return ($countOnly) ? 0 : [];
             }
@@ -269,7 +272,7 @@ class EmailRepository extends CommonRepository
 
         if ($sendStopDate) {
             $segmentQb->andWhere($segmentQb->expr()->lt('ll.date_added', ':sendStopDate'));
-            $q->setParameter('sendStopDate', (new DateTimeHelper($sendStopDate))->toUtcString());
+            $q->setParameter('sendStopDate', new DateTimeHelper($sendStopDate)->toUtcString());
         }
 
         if ($countOnly) {
@@ -284,7 +287,7 @@ class EmailRepository extends CommonRepository
         $q->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->andWhere(sprintf('l.id IN (%s)', $segmentQb->getSQL()))
             ->andWhere(sprintf('l.id NOT IN (%s)', $dncQb->getSQL()))
-            ->andWhere(sprintf('l.id NOT IN (%s)', $statQb->getSQL()))
+            ->andWhere(sprintf('NOT EXISTS (%s)', $statQb->getSQL()))
             ->andWhere(sprintf('l.id NOT IN (%s)', $mqQb->getSQL()));
 
         $this->copyParams($segmentQb, $q);
@@ -453,7 +456,7 @@ class EmailRepository extends CommonRepository
             );
         }
 
-        if (!empty($ignoreIds)) {
+        if ([] !== $ignoreIds) {
             $q->andWhere($q->expr()->notIn('e.id', ':emailIds'))
                 ->setParameter('emailIds', $ignoreIds);
         }
@@ -572,25 +575,17 @@ class EmailRepository extends CommonRepository
         return false;
     }
 
-    /**
-     * @param \Doctrine\ORM\QueryBuilder|QueryBuilder $q
-     * @param object                                  $filter
-     */
-    protected function addCatchAllWhereClause($q, $filter): array
+    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|QueryBuilder $queryBuilder, \stdClass $filter): array
     {
-        return $this->addStandardCatchAllWhereClause($q, $filter, [
+        return $this->addStandardCatchAllWhereClause($queryBuilder, $filter, [
             'e.name',
             'e.subject',
         ]);
     }
 
-    /**
-     * @param \Doctrine\ORM\QueryBuilder|QueryBuilder $q
-     * @param object                                  $filter
-     */
-    protected function addSearchCommandWhereClause($q, $filter): array
+    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|QueryBuilder $queryBuilder, \stdClass $filter): array
     {
-        [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($queryBuilder, $filter);
         if ($expr) {
             return [$expr, $parameters];
         }
@@ -623,7 +618,7 @@ class EmailRepository extends CommonRepository
                     $langUnique => $langValue,
                     $unique     => $filter->string,
                 ];
-                $expr            = '('.$q->expr()->eq('e.language', ":{$unique}").' OR '.$q->expr()->like('e.language', ":{$langUnique}").')';
+                $expr            = '('.$queryBuilder->expr()->eq('e.language', ":{$unique}").' OR '.$queryBuilder->expr()->like('e.language', ":{$langUnique}").')';
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.project.searchcommand.name'):
@@ -639,7 +634,7 @@ class EmailRepository extends CommonRepository
         }
 
         if ($expr && $filter->not) {
-            $expr = $q->expr()->not($expr);
+            $expr = $queryBuilder->expr()->not($expr);
         }
 
         if (!empty($forceParameters)) {

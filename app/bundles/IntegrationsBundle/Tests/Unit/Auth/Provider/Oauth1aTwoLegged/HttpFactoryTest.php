@@ -13,7 +13,7 @@ final class HttpFactoryTest extends TestCase
 {
     public function testType(): void
     {
-        $this->assertSame('oauth1a_two_legged', (new HttpFactory())->getAuthType());
+        $this->assertSame('oauth1a_two_legged', new HttpFactory()->getAuthType());
     }
 
     public function testGetClientWithEmptyCredentials(): void
@@ -27,8 +27,8 @@ final class HttpFactoryTest extends TestCase
     public function testGetClientWithFullCredentials(): void
     {
         $credentials = $this->createMock(CredentialsInterface::class);
-        $credentials->method('getConsumerKey')->willReturn('ConsumerKeyValue');
-        $credentials->method('getConsumerSecret')->willReturn('ConsumerSecretValue');
+        $credentials->expects($this->exactly(5))->method('getConsumerKey')->willReturn('ConsumerKeyValue');
+        $credentials->expects($this->exactly(2))->method('getConsumerSecret')->willReturn('ConsumerSecretValue');
         $credentials->method('getToken')->willReturn('TokenValue');
         $credentials->method('getTokenSecret')->willReturn('TokenSecretValue');
         $credentials->method('getAuthUrl')->willReturn('AuthUrlValue');

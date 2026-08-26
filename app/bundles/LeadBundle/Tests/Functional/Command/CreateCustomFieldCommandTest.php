@@ -35,7 +35,7 @@ final class CreateCustomFieldCommandTest extends MauticMysqlTestCase
         $this->em->persist($leadField);
         $this->em->flush();
 
-        $kernel = static::getContainer()->get(KernelInterface::class);
+        $kernel = self::getContainer()->get(KernelInterface::class);
         $this->assertInstanceOf(KernelInterface::class, $kernel);
 
         $expectedUserId          = 1;
@@ -44,7 +44,7 @@ final class CreateCustomFieldCommandTest extends MauticMysqlTestCase
             ->expects($this->once())
             ->method('customFieldWasCreated')
             ->with(self::isInstanceOf(LeadField::class), self::equalTo($expectedUserId));
-        $kernel->getContainer()->set('mautic.lead.field.notification.custom_field', $customFieldNotification);
+        $kernel->getContainer()->set(CustomFieldNotification::class, $customFieldNotification);
 
         $application   = new Application($kernel);
         $application->setAutoExit(false);
@@ -89,7 +89,7 @@ final class CreateCustomFieldCommandTest extends MauticMysqlTestCase
         $this->em->persist($leadField2);
         $this->em->flush();
 
-        $kernel = static::getContainer()->get(KernelInterface::class);
+        $kernel = self::getContainer()->get(KernelInterface::class);
         $this->assertInstanceOf(KernelInterface::class, $kernel);
 
         $expectedUserId          = 1;
@@ -98,7 +98,7 @@ final class CreateCustomFieldCommandTest extends MauticMysqlTestCase
             ->expects($this->exactly(2))
             ->method('customFieldWasCreated')
             ->with(self::isInstanceOf(LeadField::class), self::equalTo($expectedUserId));
-        $kernel->getContainer()->set('mautic.lead.field.notification.custom_field', $customFieldNotification);
+        $kernel->getContainer()->set(CustomFieldNotification::class, $customFieldNotification);
 
         $application   = new Application($kernel);
         $application->setAutoExit(false);

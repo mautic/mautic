@@ -224,20 +224,19 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $args = [
-            'lead'  => $lead,
-            'event' => [
-                'type'       => 'lead.updatecompany',
-                'properties' => $this->configTo,
-            ],
-            'eventDetails'    => [],
-            'systemTriggered' => true,
-            'eventSettings'   => [],
-        ];
+        $campaignEvent = new Event();
+        $campaignEvent->setType('lead.updatecompany');
+        $campaignEvent->setProperties($this->configTo);
 
-        $event = new CampaignExecutionEvent($args, true);
-        $this->subscriber->onCampaignTriggerActionUpdateCompany($event);
-        $this->assertTrue($event->getResult());
+        $leadEventLog = $this->createMock(LeadEventLog::class);
+        $leadEventLog->method('getLead')->willReturn($lead);
+        $leadEventLog->method('getId')->willReturn(1);
+
+        $pendingEvent = new PendingEvent($this->createStub(ActionAccessor::class), $campaignEvent, new ArrayCollection([$leadEventLog]));
+        $this->subscriber->onCampaignTriggerActionUpdateCompany($pendingEvent);
+
+        $this->assertCount(1, $pendingEvent->getSuccessful());
+        $this->assertCount(0, $pendingEvent->getFailures());
 
         $primaryCompany = $lead->getPrimaryCompany();
         $this->assertSame($this->configTo['companyname'], $primaryCompany['companyname']);
@@ -414,9 +413,9 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $properties    = [
             'points' => 10,
         ];
-        $event         = (new Event())->setProperties($properties);
+        $event         = new Event()->setProperties($properties);
         $event->setType('lead.updatelead');
-        $lead          = (new Lead())->setEmail('tester@mautic.org');
+        $lead          = new Lead()->setEmail('tester@mautic.org');
 
         $leadEventLog = $this->createMock(LeadEventLog::class);
         $leadEventLog

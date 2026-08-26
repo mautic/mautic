@@ -23,7 +23,6 @@ use Mautic\ReportBundle\Scheduler\SchedulerInterface;
 use Mautic\ReportBundle\Scheduler\Validator as ReportAssert;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ApiResource(
     operations: [
@@ -43,6 +42,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[ReportAssert\ScheduleIsValid]
 class Report extends FormEntity implements SchedulerInterface, UuidInterface
 {
     use UuidTrait;
@@ -57,6 +57,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
      * @var string
      */
     #[Groups(['report:read', 'report:write'])]
+    #[NotBlank(message: 'mautic.core.name.required')]
     private $name;
 
     /**
@@ -131,6 +132,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
      * @var string|null
      */
     #[Groups(['report:read', 'report:write'])]
+    #[EmailAssert\MultipleEmailsValid]
     private $toAddress;
 
     /**
@@ -215,15 +217,6 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
         $builder->addNullableField('scheduleMonthFrequency', Types::STRING, 'schedule_month_frequency');
 
         static::addUuidField($builder);
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('name', new NotBlank(message: 'mautic.core.name.required'));
-
-        $metadata->addPropertyConstraint('toAddress', new EmailAssert\MultipleEmailsValid());
-
-        $metadata->addConstraint(new ReportAssert\ScheduleIsValid());
     }
 
     /**
@@ -404,7 +397,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
             }
         }
 
-        if (empty($values)) {
+        if ([] === $values) {
             throw new \UnexpectedValueException("Column {$column} doesn't have any filter.");
         }
 
@@ -702,11 +695,6 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
      */
     public function getSchedule(): array
     {
-        $schedule                             = [];
-        $schedule['schedule_unit']            = $this->scheduleUnit;
-        $schedule['schedule_day']             = $this->scheduleDay;
-        $schedule['schedule_month_frequency'] = $this->scheduleMonthFrequency;
-
-        return $schedule;
+        return ['schedule_unit' => $this->scheduleUnit, 'schedule_day' => $this->scheduleDay, 'schedule_month_frequency' => $this->scheduleMonthFrequency];
     }
 }

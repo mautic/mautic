@@ -110,7 +110,7 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
 
         $deviceTrackingId = $this->cookieHelper->getCookie('mautic_device_id');
         if (null === $deviceTrackingId) {
-            $deviceTrackingId = $request->get('mautic_device_id');
+            return $request->get('mautic_device_id');
         }
 
         return $deviceTrackingId;

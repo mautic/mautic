@@ -43,7 +43,7 @@ final class ImportHelperTest extends TestCase
         $pathsHelper       = $this->createMock(PathsHelper::class);
 
         $testTempDir = $systemTempDirBase.'/tmp';
-        $pathsHelper->method('getTemporaryPath')->willReturn($testTempDir);
+        $pathsHelper->expects($this->once())->method('getTemporaryPath')->willReturn($testTempDir);
         $filesystem->mkdir($testTempDir);
 
         $mediaDir = $systemTempDirBase.'/media';

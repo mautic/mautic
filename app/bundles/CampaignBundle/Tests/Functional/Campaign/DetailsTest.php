@@ -6,6 +6,7 @@ namespace Mautic\CampaignBundle\Tests\Functional\Campaign;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Symfony\Component\HttpFoundation\Request;
 
 final class DetailsTest extends MauticMysqlTestCase
 {
@@ -41,7 +42,7 @@ final class DetailsTest extends MauticMysqlTestCase
         $this->em->persist($campaign);
         $this->em->flush();
 
-        $this->client->request('GET', sprintf('/s/campaigns/view/%s', $campaign->getId()));
+        $this->client->request(Request::METHOD_GET, sprintf('/s/campaigns/view/%s', $campaign->getId()));
 
         $response = $this->client->getResponse();
         self::assertResponseIsSuccessful();

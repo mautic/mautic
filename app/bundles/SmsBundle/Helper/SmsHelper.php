@@ -2,7 +2,6 @@
 
 namespace Mautic\SmsBundle\Helper;
 
-use libphonenumber\PhoneNumberFormat;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PhoneNumberHelper;
 use Mautic\LeadBundle\Entity\DoNotContact as DoNotContactEntity;
@@ -27,9 +26,9 @@ class SmsHelper
     ) {
     }
 
-    public function unsubscribe($number)
+    public function unsubscribe($number): ?DoNotContactEntity
     {
-        $number = $this->phoneNumberHelper->format($number, PhoneNumberFormat::E164);
+        $number = $this->phoneNumberHelper->format($number);
 
         $args = [
             'filter' => [
@@ -56,7 +55,7 @@ class SmsHelper
             if (!empty($leads)) {
                 $lead = array_shift($leads);
             } else {
-                return false;
+                return null;
             }
         }
 

@@ -9,7 +9,6 @@ use Mautic\LeadBundle\Entity\LeadNoteRepository;
 use Mautic\LeadBundle\Event\LeadNoteEvent;
 use Mautic\LeadBundle\Form\Type\NoteType;
 use Mautic\LeadBundle\LeadEvents;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -21,6 +20,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 final class NoteModel extends FormModel
 {
+    public static function getName(): string
+    {
+        return 'lead.note';
+    }
+
     private RequestStack $requestStack;
 
     private LeadNoteRepository $leadNoteRepository;
@@ -60,7 +64,7 @@ final class NoteModel extends FormModel
      * @param string|null $action
      * @param array       $options
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof LeadNote) {
             throw new MethodNotAllowedHttpException(['LeadNote']);
@@ -70,7 +74,7 @@ final class NoteModel extends FormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create(NoteType::class, $entity, $options);
+        return $this->formFactory->create(NoteType::class, $entity, $options);
     }
 
     /**

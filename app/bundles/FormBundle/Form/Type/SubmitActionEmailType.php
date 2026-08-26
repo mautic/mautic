@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\ToBcBccFieldsTrait;
@@ -23,7 +25,7 @@ final class SubmitActionEmailType extends AbstractType
     use ToBcBccFieldsTrait;
 
     public function __construct(
-        private TranslatorInterface $translator,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 

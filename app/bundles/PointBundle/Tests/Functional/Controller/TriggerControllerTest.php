@@ -7,6 +7,7 @@ namespace Mautic\PointBundle\Tests\Functional\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\ProjectBundle\Entity\Project;
+use Symfony\Component\HttpFoundation\Request;
 
 final class TriggerControllerTest extends MauticMysqlTestCase
 {
@@ -23,7 +24,7 @@ final class TriggerControllerTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $crawler = $this->client->request('GET', '/s/points/triggers/edit/'.$trigger->getId());
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/points/triggers/edit/'.$trigger->getId());
         $form    = $crawler->selectButton('Save')->form();
         $form['pointtrigger[projects]']->setValue((string) $project->getId());
 

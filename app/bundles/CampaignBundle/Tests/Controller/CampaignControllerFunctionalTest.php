@@ -17,9 +17,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
 {
-    private const CAMPAIGN_SUMMARY_PARAM = 'campaign_use_summary';
+    private const string CAMPAIGN_SUMMARY_PARAM = 'campaign_use_summary';
 
-    private const CAMPAIGN_RANGE_PARAM   = 'campaign_by_range';
+    private const string CAMPAIGN_RANGE_PARAM   = 'campaign_by_range';
 
     private CampaignModel $campaignModel;
 
@@ -40,10 +40,10 @@ final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
         $this->configParams[self::CAMPAIGN_RANGE_PARAM]   = in_array($this->name(), $functionForUseRange);
         parent::setUp();
 
-        $model = static::getContainer()->get(CampaignModel::class);
+        $model = self::getContainer()->get(CampaignModel::class);
 
         $this->campaignModel                                           = $model;
-        $this->campaignLeadsLabel                                      = static::getContainer()->get(TranslatorInterface::class)->trans('mautic.campaign.campaign.leads');
+        $this->campaignLeadsLabel                                      = self::getContainer()->get(TranslatorInterface::class)->trans('mautic.campaign.campaign.leads');
         $this->configParams['delete_campaign_event_log_in_background'] = false;
     }
 
@@ -178,7 +178,7 @@ final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
     {
         $from = date('Y-m-d', strtotime('-2 months'));
         $to   = date('Y-m-d', strtotime('-1 month'));
-        $this->client->request('GET', sprintf('s/campaigns/graph/%d/%s/%s', $campaignId, $from, $to));
+        $this->client->request(Request::METHOD_GET, sprintf('s/campaigns/graph/%d/%s/%s', $campaignId, $from, $to));
         $response      = $this->client->getResponse();
         $body          = json_decode($response->getContent(), true);
         $crawler       = new Crawler($body['newContent']);
@@ -213,7 +213,7 @@ final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
         $from = date('Y-m-d', strtotime('-2 months'));
         $to   = date('Y-m-d', strtotime('-1 month'));
         $url  = sprintf('s/campaigns/event/stats/%d/%s/%s', $campaignId, $from, $to);
-        $this->client->request('GET', $url);
+        $this->client->request(Request::METHOD_GET, $url);
         $response = $this->client->getResponse();
         $body     = json_decode($response->getContent(), true);
         $this->client->restart();
@@ -356,7 +356,7 @@ final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
     public function testCampaignView(): void
     {
         $campaign = $this->saveSomeCampaignLeadEventLogs();
-        $crawler  = $this->client->request('GET', sprintf('/s/campaigns/view/%d', $campaign->getId()));
+        $crawler  = $this->client->request(Request::METHOD_GET, sprintf('/s/campaigns/view/%d', $campaign->getId()));
         $response = $this->client->getResponse();
         self::assertResponseIsSuccessful();
         $this->assertStringContainsString('Campaign ABC', (string) $response->getContent());
@@ -371,7 +371,7 @@ final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
         $from     = date('Y-m-d', strtotime('-2 months'));
         $to       = date('Y-m-d', strtotime('-1 month'));
         $campaign = $this->saveSomeCampaignLeadEventLogs();
-        $this->client->request('GET', sprintf('s/campaigns/event/stats/%d/%s/%s', $campaign->getId(), $from, $to));
+        $this->client->request(Request::METHOD_GET, sprintf('s/campaigns/event/stats/%d/%s/%s', $campaign->getId(), $from, $to));
         $response = $this->client->getResponse();
         self::assertResponseIsSuccessful();
         $body     = json_decode($response->getContent(), true);

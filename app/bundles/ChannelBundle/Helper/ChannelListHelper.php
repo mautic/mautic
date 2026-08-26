@@ -69,7 +69,7 @@ class ChannelListHelper
         }
 
         if (1 === count($features)) {
-            $channels = $channels[$features[0]];
+            return $channels[$features[0]];
         }
 
         return $channels;
@@ -101,7 +101,7 @@ class ChannelListHelper
      */
     private function setupChannels(): void
     {
-        if (!empty($this->channels)) {
+        if ([] !== $this->channels) {
             return;
         }
 

@@ -20,6 +20,7 @@ use MauticPlugin\MauticTagManagerBundle\Entity\Tag;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
@@ -57,7 +58,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(
             [['lead_id' => (string) $contact->getId(), 'manually_added' => '1', 'manually_removed' => '0']],
             $this->getMembersForCampaign($campaign->getId()),
-            $this->client->getResponse()->getContent()
+            (string) $this->client->getResponse()->getContent()
         );
 
         $this->assertArrayHasKey('success', $response, 'The response does not contain the `success` param.');
@@ -106,7 +107,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $user->setUsername('no-campaign-edit-user');
         $user->setRole($role);
 
-        $hasher = static::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
 
         $user->setPassword($hasher->hash('mautic'));
         $userRepository->saveEntity($user);
@@ -122,7 +123,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->setCsrfHeader();
         $this->client->xmlHttpRequest(Request::METHOD_POST, '/s/ajax', $payload);
-        $this->assertEquals(403, $this->client->getResponse()->getStatusCode(), 'The user without campaign edit own/others permissions should not access toggle lead campaign action.');
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode(), 'The user without campaign edit own/others permissions should not access toggle lead campaign action.');
     }
 
     public function testSegmentDependencyTreeWithNotExistingSegment(): void
@@ -570,7 +571,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $user->setRole($role);
 
         /** @var PasswordHasherInterface $hasher */
-        $hasher = static::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
 
         $passwordNonAdmin = 'Maut1cR0cks!';
         $user->setPassword($hasher->hash($passwordNonAdmin));
@@ -648,7 +649,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
             }
         }
         // Assert that the actual options match the expected options
-        if (empty($expectedOptions)) {
+        if ([] === $expectedOptions) {
             $this->assertEmpty($actualOptions);
         }
         foreach ($expectedOptions as $expectedValue) {

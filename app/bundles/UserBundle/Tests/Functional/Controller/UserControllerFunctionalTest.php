@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\HttpFoundation\Request;
 
 final class UserControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -22,13 +23,13 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testEditGetPage(): void
     {
-        $this->client->request('GET', '/s/users/edit/1');
+        $this->client->request(Request::METHOD_GET, '/s/users/edit/1');
         $this->assertResponseIsSuccessful();
     }
 
     public function testRedirectNonExistingUser(): void
     {
-        $crawler = $this->client->request('GET', '/s/users/edit/00000');
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/users/edit/00000');
         $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('Users', $crawler->filter('h1')->text());
         $this->assertStringContainsString('User not found with', $crawler->filter('#flashes')->text());
@@ -36,7 +37,7 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testEditActionFormSubmissionValid(): void
     {
-        $crawler                 = $this->client->request('GET', '/s/users/edit/1');
+        $crawler                 = $this->client->request(Request::METHOD_GET, '/s/users/edit/1');
         $buttonCrawlerNode       = $crawler->selectButton('Save & Close');
         $form                    = $buttonCrawlerNode->form();
         $form['user[firstName]'] = 'test';
@@ -49,7 +50,7 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testEditActionFormSubmissionInvalid(): void
     {
-        $crawler = $this->client->request('GET', '/s/users/edit/1');
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/users/edit/1');
 
         $form = $crawler->selectButton('Save')->form([
             'user[firstName]'               => '',
@@ -66,7 +67,7 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testIndexIncludesInviteForm(): void
     {
-        $crawler = $this->client->request('GET', '/s/users');
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/users');
 
         $this->assertResponseIsSuccessful();
         $this->assertGreaterThan(0, $crawler->filter('#invite-user-form')->count());
@@ -74,7 +75,7 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testInviteActionShowsForm(): void
     {
-        $crawler = $this->client->request('GET', '/s/users/invite');
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/users/invite');
 
         $this->assertResponseIsSuccessful();
         $this->assertGreaterThan(0, $crawler->filter('#invite-user-form')->count());
@@ -82,7 +83,7 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testInviteActionReturnsInvalidForm(): void
     {
-        $this->client->request('POST', '/s/users/invite');
+        $this->client->request(Request::METHOD_POST, '/s/users/invite');
 
         $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('name="user_invite"', (string) $this->client->getResponse()->getContent());
@@ -94,7 +95,7 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
     #[DataProvider('dataNewUserForPasswordField')]
     public function testNewUserForPasswordField(array $data, string $message): void
     {
-        $crawler = $this->client->request('GET', '/s/users/new');
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/users/new');
 
         $formData = [
             'user[firstName]' => 'John',
@@ -153,7 +154,7 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
     #[DataProvider('dataForEditUserForPasswordField')]
     public function testEditUserForPasswordField(array $data, string $message): void
     {
-        $crawler = $this->client->request('GET', '/s/users/edit/1');
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/users/edit/1');
 
         $form = $crawler->selectButton('Save')->form($data);
 

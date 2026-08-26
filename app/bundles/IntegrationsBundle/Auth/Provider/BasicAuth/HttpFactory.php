@@ -14,9 +14,9 @@ use Mautic\IntegrationsBundle\Exception\PluginNotConfiguredException;
 /**
  * Factory for building HTTP clients using basic auth.
  */
-class HttpFactory implements AuthProviderInterface
+final class HttpFactory implements AuthProviderInterface
 {
-    public const NAME = 'basic_auth';
+    public const string NAME = 'basic_auth';
 
     /**
      * Cache of initialized clients.
@@ -56,7 +56,7 @@ class HttpFactory implements AuthProviderInterface
         return $this->initializedClients[$credentials->getUsername()];
     }
 
-    protected function credentialsAreConfigured(CredentialsInterface $credentials): bool
+    private function credentialsAreConfigured(CredentialsInterface $credentials): bool
     {
         return $credentials->getUsername() && $credentials->getPassword();
     }

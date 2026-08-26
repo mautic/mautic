@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\DataFixtures\ORM;
 
-use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\EmailBundle\Entity\Email;
@@ -12,7 +12,7 @@ use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\SmsBundle\Entity\Sms;
 
-final class LoadClickData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadClickData extends Fixture implements OrderedFixtureInterface
 {
     public function load(ObjectManager $manager): void
     {

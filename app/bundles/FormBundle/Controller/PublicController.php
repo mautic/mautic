@@ -51,16 +51,13 @@ final class PublicController extends CommonFormController
 
     private array $tokens = [];
 
-    /**
-     * @return RedirectResponse|Response
-     */
     public function submitAction(
         Request $request,
         DateHelper $dateTemplateHelper,
         PageTokenHelper $pageTokenHelper,
         NotificationModel $notificationModel,
         UserRepository $userRepository,
-    ) {
+    ): Response {
         if ('POST' !== $request->getMethod()) {
             $this->throwAccessDenied();
         }
@@ -528,7 +525,6 @@ final class PublicController extends CommonFormController
         $css               = InputHelper::string((string) $request->get('css'));
         $form              = $this->formModel->getEntity($objectId);
         $customStylesheets = (!empty($css)) ? explode(',', $css) : [];
-        $template          = null;
 
         if (null === $form || !$form->isPublished()) {
             return $this->notFound();

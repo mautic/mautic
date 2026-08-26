@@ -42,13 +42,13 @@ final class LeadControllerTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 
-    private const CONTACT_A_EMAIL               = 'contact@a.email';
+    private const string CONTACT_A_EMAIL               = 'contact@a.email';
 
-    private const CONTACT_B_EMAIL               = 'contact@b.email';
+    private const string CONTACT_B_EMAIL               = 'contact@b.email';
 
-    private const CONTACT_C_EMAIL               = 'contact@c.email';
+    private const string CONTACT_C_EMAIL               = 'contact@c.email';
 
-    private const CLOSE_MODAL_ASSERTION_MESSAGE = 'The response does not contain the `closeModal` param.';
+    private const string CLOSE_MODAL_ASSERTION_MESSAGE = 'The response does not contain the `closeModal` param.';
 
     protected function setUp(): void
     {
@@ -263,7 +263,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $contactC = $this->createContact(self::CONTACT_C_EMAIL);
 
         /** @var LeadModel $contactModel */
-        $contactModel = static::getContainer()->get(LeadModel::class);
+        $contactModel = self::getContainer()->get(LeadModel::class);
 
         foreach ([$contactA, $contactB] as $contact) {
             $contactModel->setFieldValues($contact, ['preferred_locale' => 'en_GB'], true, false);
@@ -316,7 +316,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $contactG = $this->createContact('fifth@matching.email');
 
         /** @var LeadModel $contactModel */
-        $contactModel = static::getContainer()->get(LeadModel::class);
+        $contactModel = self::getContainer()->get(LeadModel::class);
 
         foreach ([$contactA, $contactB, $contactC, $contactE, $contactF, $contactG] as $contact) {
             $contactModel->setFieldValues($contact, ['preferred_locale' => 'en_GB'], true, false);
@@ -383,7 +383,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $this->em->persist($company);
         $this->em->flush();
 
-        $crawler = $this->client->request('GET', 's/contacts/new/');
+        $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/new/');
         $form    = $crawler->filterXPath('//form[@name="lead"]')->form();
         $form->setValues(
             [
@@ -430,7 +430,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $this->assertInstanceOf(ContactExportScheduler::class, $contactExportScheduler);
         $data                   = $contactExportScheduler->getData();
         /** @var CoreParametersHelper $coreParametersHelper */
-        $coreParametersHelper = static::getContainer()->get(CoreParametersHelper::class);
+        $coreParametersHelper = self::getContainer()->get(CoreParametersHelper::class);
 
         $this->assertSame([
             'start'  => 0,
@@ -537,9 +537,9 @@ final class LeadControllerTest extends MauticMysqlTestCase
     #[TestDox('Ensure correct Preferred Timezone placeholder on add/edit contact page')]
     public function testEnsureCorrectPreferredTimeZonePlaceHolderOnContactPage(): void
     {
-        $crawler             = $this->client->request('GET', '/s/contacts/new');
+        $crawler             = $this->client->request(Request::METHOD_GET, '/s/contacts/new');
         $elementPlaceholder  = $crawler->filter('#lead_timezone')->filter('select')->attr('data-placeholder');
-        $expectedPlaceholder = static::getContainer()->get(TranslatorInterface::class)->trans('mautic.lead.field.timezone');
+        $expectedPlaceholder = self::getContainer()->get(TranslatorInterface::class)->trans('mautic.lead.field.timezone');
         $this->assertEquals($expectedPlaceholder, $elementPlaceholder);
 
         // Test that a locale option is present correctly.
@@ -551,7 +551,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
 
     public function testQuickAddAction(): void
     {
-        $this->client->request('GET', '/s/contacts/quickAdd');
+        $this->client->request(Request::METHOD_GET, '/s/contacts/quickAdd');
 
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
     }
@@ -565,7 +565,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $firstnameField->setIsRequired(true);
         $fieldModel->getRepository()->saveEntity($firstnameField);
 
-        $crawler = $this->client->request('GET', 's/contacts/new/');
+        $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/new/');
         $form    = $crawler->filterXPath('//form[@name="lead"]')->form();
         $form->setValues(
             [
@@ -580,7 +580,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
 
     public function testAddContactsErrorMessageForEmailWithTwoDots(): void
     {
-        $crawler = $this->client->request('GET', 's/contacts/new/');
+        $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/new/');
         $form    = $crawler->filterXPath('//form[@name="lead"]')->form();
         $form->setValues(
             [
@@ -642,7 +642,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $email = $this->getMailerMessage();
         $this->assertInstanceOf(MauticMessage::class, $email);
 
-        $userHelper = static::getContainer()->get(UserHelper::class);
+        $userHelper = self::getContainer()->get(UserHelper::class);
         $user       = $userHelper->getUser();
 
         $this->assertSame('Ahoy contact@an.email', $email->getSubject());
@@ -692,7 +692,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $email = $this->getMailerMessage();
         $this->assertInstanceOf(MauticMessage::class, $email);
 
-        $userHelper = static::getContainer()->get(UserHelper::class);
+        $userHelper = self::getContainer()->get(UserHelper::class);
         $user       = $userHelper->getUser();
 
         $this->assertSame('Ahoy contact@an.email', $email->getSubject());
@@ -733,7 +733,7 @@ EMAIL;
 
     public function testLookupTypeFieldOnError(): void
     {
-        $crawler = $this->client->request('GET', 's/contacts/new/');
+        $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/new/');
         $form    = $crawler->filterXPath('//form[@name="lead"]')->form();
         $form->setValues(
             [
@@ -750,7 +750,7 @@ EMAIL;
     {
         $email = 'duplicate@email.a';
         $this->createContact($email);
-        $crawler = $this->client->request('GET', 's/contacts/quickAdd');
+        $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/quickAdd');
         $form    = $crawler->filter('form[name="lead"]')->form([
             'lead' => [
                 'email' => $email,
@@ -769,7 +769,7 @@ EMAIL;
     {
         $email = 'duplicate@email.a';
         $this->createContact($email);
-        $crawler = $this->client->request('GET', 's/contacts/new');
+        $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/new');
         $form    = $crawler->filter('form[name="lead"]')->form([
             'lead' => [
                 'email' => $email,
@@ -859,7 +859,7 @@ EMAIL;
         $companyField->setValue($expectedCompanies);
         $crawler    = $this->client->submit($form);
         $companies  = $this->getCompanyLeads($leadId);
-        $collection = (new Collection($companies))->keyBy('company_id');
+        $collection = new Collection($companies)->keyBy('company_id');
         // Should have only one company associated
         $this->assertCount(count($expectedCompanies), $collection);
         $this->assertEquals($expectedCompanies, $collection->keys()->toArray());
@@ -879,21 +879,21 @@ EMAIL;
     public function testContactCompanyEditShowsOldCompanyNameInAuditLog(): void
     {
         /** @var CompanyModel $companyModel */
-        $companyModel = static::getContainer()->get(CompanyModel::class);
+        $companyModel = self::getContainer()->get(CompanyModel::class);
         /** @var LeadModel $contactModel */
-        $contactModel = static::getContainer()->get(LeadModel::class);
+        $contactModel = self::getContainer()->get(LeadModel::class);
 
         // Create companies
-        $company = (new Company())
+        $company = new Company()
             ->setName('Co.');
-        $newCompany = (new Company())
+        $newCompany = new Company()
             ->setName('New Co.');
         $companyModel->saveEntities([$company, $newCompany]);
         $companyId    = $company->getId();
         $newCompanyId = $newCompany->getId();
 
         // Create contact with first 'Co.' company
-        $contact = (new Lead())
+        $contact = new Lead()
             ->setFirstname('C1')
             ->setCompany($company);
         $contactModel->saveEntity($contact);
@@ -922,7 +922,7 @@ EMAIL;
     public function testSetNullCompanyToContact(): void
     {
         /** @var LeadModel $contactModel */
-        $contactModel = static::getContainer()->get(LeadModel::class);
+        $contactModel = self::getContainer()->get(LeadModel::class);
 
         $company = new Company();
         $company->setName('Doe Corp');
@@ -930,7 +930,7 @@ EMAIL;
         $this->em->persist($company);
         $this->em->flush();
 
-        $crawler = $this->client->request('GET', 's/contacts/new/');
+        $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/new/');
         $form    = $crawler->filterXPath('//form[@name="lead"]')->form();
         $form->setValues(
             [
@@ -1069,6 +1069,21 @@ EMAIL;
         $this->assertEquals(true, $this->client->getResponse()->isRedirect('/s/contacts/1'));
     }
 
+    public function testContactViewReturnsToFormResultsWhenContextIsProvided(): void
+    {
+        $this->loadFixtures([LoadLeadData::class]);
+
+        $this->client->xmlHttpRequest(
+            Request::METHOD_GET,
+            '/s/contacts/view/1?returnTo=form_results&formId=12&formPage=2'
+        );
+
+        $response = json_decode((string) $this->client->getResponse()->getContent(), true);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('/s/forms/results/12/2', (string) $response['newContent']);
+    }
+
     public function testContactGroupPointsEdit(): void
     {
         $contact = $this->createContact('test-contact@example.com');
@@ -1127,7 +1142,7 @@ EMAIL;
 
     public function testMultipleCompanyFeature(): void
     {
-        $crawler     = $this->client->request('GET', 's/contacts/new/');
+        $crawler     = $this->client->request(Request::METHOD_GET, 's/contacts/new/');
         $multiple    = $crawler->filterXPath('//*[@id="lead_companies"]')->attr('multiple');
         $this->assertSame('multiple', $multiple);
     }

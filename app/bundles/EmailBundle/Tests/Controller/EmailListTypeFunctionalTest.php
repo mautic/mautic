@@ -11,11 +11,11 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class EmailListTypeFunctionalTest extends MauticMysqlTestCase
 {
-    private const PARENT_EMAIL      = 'Parent Email';
+    private const string PARENT_EMAIL      = 'Parent Email';
 
-    private const VARIANT_EMAIL     = 'Variant Email';
+    private const string VARIANT_EMAIL     = 'Variant Email';
 
-    private const TRANSLATION_EMAIL = 'Translation Email';
+    private const string TRANSLATION_EMAIL = 'Translation Email';
 
     /**
      * @param bool|string|string[] $topLevel

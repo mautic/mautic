@@ -111,9 +111,9 @@ final class FieldApiController extends CommonApiController
     }
 
     /**
-     * @return mixed|void
+     * @return mixed[]
      */
-    protected function prepareParametersForBinding(Request $request, $parameters, $entity, $action)
+    protected function prepareParametersForBinding(Request $request, array $parameters, object $entity, string $action): array
     {
         $parameters['object'] = $this->fieldObject;
         // Workaround for mispelled isUniqueIdentifer.

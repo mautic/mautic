@@ -90,7 +90,7 @@ final class FileUploaderTest extends \PHPUnit\Framework\TestCase
 
         $translatorMock = $this->createMock(Translator::class);
 
-        $translatorMock->method('trans')
+        $translatorMock->expects($this->once())->method('trans')
             ->willReturn('Could not upload filed');
 
         $fileMock = $this->createMock(UploadedFile::class);

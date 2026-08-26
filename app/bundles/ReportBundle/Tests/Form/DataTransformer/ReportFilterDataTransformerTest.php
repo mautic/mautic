@@ -14,7 +14,7 @@ use Symfony\Component\Form\Extension\Core\Type\TimeType;
 
 final class ReportFilterDataTransformerTest extends TestCase
 {
-    private const LOCAL_TIMEZONE = 'Europe/Paris'; // UTC+2 during DST
+    private const string LOCAL_TIMEZONE = 'Europe/Paris'; // UTC+2 during DST
 
     /**
      * @var array<string, array<string, string>>

@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Segment\Query\LeadBatchLimiterTrait;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Psr\Log\LoggerInterface;
 
-class ContactSegmentService
+readonly class ContactSegmentService
 {
     use LeadBatchLimiterTrait;
 

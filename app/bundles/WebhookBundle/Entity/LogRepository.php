@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class LogRepository extends CommonRepository
 {
-    private const LOG_DELETE_BATCH_SIZE = 5000;
+    private const int LOG_DELETE_BATCH_SIZE = 5000;
 
     /**
      * @return int[]

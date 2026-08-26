@@ -43,7 +43,7 @@ final readonly class ContactExportSchedulerLoggerSubscriber implements EventSubs
         $this->logger->debug(
             'Contact export #ID '.$event->getContactExportScheduler()->getId()
             .' scheduled at '.$utcScheduledDateTimeStr.' UTC has been processed at '
-            .(new \DateTime())->setTimezone(new \DateTimeZone('UTC'))->format(DateTimeHelper::FORMAT_DB)
+            .new \DateTime()->setTimezone(new \DateTimeZone('UTC'))->format(DateTimeHelper::FORMAT_DB)
             .' UTC'
         );
     }

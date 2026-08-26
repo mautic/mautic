@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\UserBundle\DependencyInjection\Firewall\Factory;
 
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
@@ -10,7 +12,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 final class PluginFactory implements AuthenticatorFactoryInterface
 {
-    public const PRIORITY = -30;
+    public const int PRIORITY = -30;
 
     public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): string
     {

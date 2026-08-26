@@ -7,12 +7,12 @@ namespace Mautic\EmailBundle\Tests\Model;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
+use Mautic\CacheBundle\Cache\CacheProviderInterface;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\ChannelBundle\Entity\MessageQueueRepository;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Entity\IpAddress;
-use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
@@ -67,9 +67,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class EmailModelTest extends \PHPUnit\Framework\TestCase
 {
-    public const SEGMENT_A = 'segment A';
+    public const string SEGMENT_A = 'segment A';
 
-    public const SEGMENT_B = 'segment B';
+    public const string SEGMENT_B = 'segment B';
 
     /**
      * @var MockObject&LeadDeviceRepository
@@ -269,7 +269,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->sendToContactModel,
             $this->deviceTrackerMock,
             $this->redirectRepositoryMock,
-            $this->createStub(CacheStorageHelper::class),
+            $this->createStub(CacheProviderInterface::class),
             $this->createStub(ContactTracker::class),
             $this->doNotContact,
             $this->createStub(StatsCollectionHelper::class),
@@ -294,6 +294,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(TrackableRepository::class), // $trackableRepository
             $this->createStub(LeadRepository::class), // $leadRepository
             $this->createStub(LeadEventLogRepository::class), // $leadEventLogRepository
+            $this->companyRepository, // $companyRepository
         );
 
         $this->emailStatModel->method('getRepository')->willReturn($this->statRepository);
@@ -587,8 +588,8 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             ->willReturn([1 => 'someone@domain.com']);
 
         // If it makes it to the point of calling getContactCompanies then DNC failed
-        $this->companyModel->expects($this->exactly(0))
-            ->method('getRepository');
+        $this->companyRepository->expects($this->exactly(0))
+            ->method('getCompaniesForContacts');
 
         $this->emailEntity->method('getId')
             ->willReturn(1);
@@ -613,7 +614,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $sendToContactModelMock,
             $this->deviceTrackerMock,
             $this->redirectRepositoryMock,
-            $this->createStub(CacheStorageHelper::class),
+            $this->createStub(CacheProviderInterface::class),
             $this->createStub(ContactTracker::class),
             $this->doNotContact,
             $this->createStub(StatsCollectionHelper::class),
@@ -638,6 +639,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(TrackableRepository::class), // $trackableRepository
             $this->createStub(LeadRepository::class), // $leadRepository
             $this->createStub(LeadEventLogRepository::class), // $leadEventLogRepository
+            $this->companyRepository, // $companyRepository
         );
 
         $contacts = [
@@ -696,9 +698,9 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->doNotContact->expects($this->once())
             ->method('addDncForContact')
             ->with(42, 'email', DoNotContactEntity::BOUNCED, 'comment', true)
-            ->willReturn(false);
+            ->willReturn(null);
 
-        $this->assertFalse($this->emailModel->setDoNotContactLead($lead, 'comment'));
+        $this->assertNotInstanceOf(DoNotContactEntity::class, $this->emailModel->setDoNotContactLead($lead, 'comment'));
     }
 
     /**
@@ -715,7 +717,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->frequencyRepository->method('getAppliedFrequencyRules')
             ->willReturn([['lead_id' => 1, 'frequency_number' => 1, 'frequency_time' => 'DAY']]);
 
-        $leadEntity = (new Lead())
+        $leadEntity = new Lead()
             ->setEmail('someone@domain.com');
 
         $this->entityManager
@@ -740,7 +742,8 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->leadModel,
             $this->companyModel,
             $this->createStub(MessageQueueRepository::class),
-            $this->frequencyRepository
+            $this->frequencyRepository,
+            $this->createStub(LeadRepository::class)
         );
 
         $emailModel = new EmailModel(
@@ -756,7 +759,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->sendToContactModel,
             $this->deviceTrackerMock,
             $this->redirectRepositoryMock,
-            $this->createStub(CacheStorageHelper::class),
+            $this->createStub(CacheProviderInterface::class),
             $this->createStub(ContactTracker::class),
             $this->doNotContact,
             $this->createStub(StatsCollectionHelper::class),
@@ -781,6 +784,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(TrackableRepository::class), // $trackableRepository
             $this->createStub(LeadRepository::class), // $leadRepository
             $this->createStub(LeadEventLogRepository::class), // $leadEventLogRepository
+            $this->companyRepository, // $companyRepository
         );
 
         $this->emailEntity->method('getId')

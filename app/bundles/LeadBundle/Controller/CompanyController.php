@@ -117,7 +117,7 @@ final class CompanyController extends FormController
 
         $tmpl  = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
         $companyIds = array_keys($companies);
-        $leadCounts = (!empty($companyIds)) ? $this->companyRepository->getLeadCount($companyIds) : [];
+        $leadCounts = ([] !== $companyIds) ? $this->companyRepository->getLeadCount($companyIds) : [];
 
         return $this->delegateView(
             [
@@ -217,7 +217,7 @@ final class CompanyController extends FormController
                 : $request->get('updateSelect', false)
         );
         $fields = $this->fieldModel->getPublishedFieldArrays('company');
-        $form   = $this->companyModel->createForm($entity, $this->formFactory, $action, ['fields' => $fields, 'update_select' => $updateSelect]);
+        $form   = $this->companyModel->createForm($entity, $action, ['fields' => $fields, 'update_select' => $updateSelect]);
 
         $viewParameters = ['page' => $page];
         $returnUrl      = $this->generateUrl('mautic_company_index', $viewParameters);
@@ -331,10 +331,8 @@ final class CompanyController extends FormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false): Response
     {
         $entity = $this->companyModel->getEntity($objectId);
 
@@ -392,7 +390,6 @@ final class CompanyController extends FormController
         $fields = $this->fieldModel->getPublishedFieldArrays('company');
         $form   = $this->companyModel->createForm(
             $entity,
-            $this->formFactory,
             $action,
             ['fields' => $fields, 'update_select' => $updateSelect]
         );
@@ -475,7 +472,7 @@ final class CompanyController extends FormController
             if ($valid) {
                 // Refetch and recreate the form in order to populate data manipulated in the entity itself
                 $company = $this->companyModel->getEntity($objectId);
-                $form    = $this->companyModel->createForm($company, $this->formFactory, $action, ['fields' => $fields, 'update_select' => $updateSelect]);
+                $form    = $this->companyModel->createForm($company, $action, ['fields' => $fields, 'update_select' => $updateSelect]);
             }
         } else {
             // lock the entity
@@ -695,10 +692,8 @@ final class CompanyController extends FormController
      * Deletes the entity.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         $page      = $request->getSession()->get('mautic.company.page', 1);
         $returnUrl = $this->generateUrl('mautic_company_index', ['page' => $page]);
@@ -794,7 +789,7 @@ final class CompanyController extends FormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $this->companyModel->deleteEntities($deleteIds);
                 $deleted  = count($entities);
                 $this->addFlashMessage(

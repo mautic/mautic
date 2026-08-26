@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Company;
+use Symfony\Component\HttpFoundation\Request;
 
 final class CompanyListColumnConfigurationFunctionalTest extends MauticMysqlTestCase
 {
@@ -25,7 +26,7 @@ final class CompanyListColumnConfigurationFunctionalTest extends MauticMysqlTest
         $this->em->persist($company);
         $this->em->flush();
 
-        $crawler = $this->client->request('GET', '/s/companies');
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/companies');
 
         $this->assertResponseIsSuccessful();
 

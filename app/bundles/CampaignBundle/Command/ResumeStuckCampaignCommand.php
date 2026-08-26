@@ -37,19 +37,19 @@ final class ResumeStuckCampaignCommand extends Command
 {
     use WriteCountTrait;
 
-    public const COMMAND_NAME                      = 'mautic:campaigns:resume-stuck';
+    public const string COMMAND_NAME                      = 'mautic:campaigns:resume-stuck';
 
-    private const MAX_ALLOWED_RECORDS_EACH_PROCESS = 500;
+    private const int MAX_ALLOWED_RECORDS_EACH_PROCESS = 500;
 
     public function __construct(
-        private TranslatorInterface $translator,
-        private EventModel $eventModel,
-        private CampaignRepository $campaignRepository,
-        private LeadModel $leadModel,
-        private EventExecutioner $eventExecutioner,
-        private ProcessSignalService $processSignalService,
-        private EventDispatcherInterface $eventDispatcher,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly TranslatorInterface $translator,
+        private readonly EventModel $eventModel,
+        private readonly CampaignRepository $campaignRepository,
+        private readonly LeadModel $leadModel,
+        private readonly EventExecutioner $eventExecutioner,
+        private readonly ProcessSignalService $processSignalService,
+        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct();
     }
@@ -294,7 +294,7 @@ final class ResumeStuckCampaignCommand extends Command
             }
         }
 
-        if (empty($contacts)) {
+        if ([] === $contacts) {
             return;
         }
 

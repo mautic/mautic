@@ -205,7 +205,7 @@ final class InputHelper
 
         $delimiter = '~';
 
-        if (!empty($allowedCharacters)) {
+        if ([] !== $allowedCharacters) {
             $regex = $delimiter.'[^0-9a-z'.preg_quote(implode('', $allowedCharacters), $delimiter).']+'.$delimiter.'i';
         } else {
             $regex = $delimiter.'[^0-9a-z]+'.$delimiter.'i';
@@ -242,7 +242,7 @@ final class InputHelper
     public static function raw($value, $urldecode = false)
     {
         if ($urldecode) {
-            $value = urldecode($value);
+            return urldecode($value);
         }
 
         return $value;
@@ -349,7 +349,7 @@ final class InputHelper
 
         // Put a value into array if not an array
         if (!is_array($value)) {
-            $value = [$value];
+            return [$value];
         }
 
         return $value;

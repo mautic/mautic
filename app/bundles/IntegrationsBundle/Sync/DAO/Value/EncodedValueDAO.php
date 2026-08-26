@@ -6,17 +6,17 @@ namespace Mautic\IntegrationsBundle\Sync\DAO\Value;
 
 final class EncodedValueDAO
 {
-    public const STRING_TYPE   = 'string';
+    public const string STRING_TYPE   = 'string';
 
-    public const INT_TYPE      = 'int';
+    public const string INT_TYPE      = 'int';
 
-    public const FLOAT_TYPE    = 'float';
+    public const string FLOAT_TYPE    = 'float';
 
-    public const DOUBLE_TYPE   = self::FLOAT_TYPE; // float and double are the same in PHP
+    public const string DOUBLE_TYPE   = self::FLOAT_TYPE; // float and double are the same in PHP
 
-    public const DATETIME_TYPE = 'datetime';
+    public const string DATETIME_TYPE = 'datetime';
 
-    public const BOOLEAN_TYPE  = 'boolean';
+    public const string BOOLEAN_TYPE  = 'boolean';
 
     /**
      * @param string $type
