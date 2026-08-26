@@ -4,7 +4,7 @@ namespace Mautic\NotificationBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
-use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CampaignBundle\Event\ConditionEvent;
 use Mautic\NotificationBundle\Entity\PushID;
 use Mautic\NotificationBundle\NotificationEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -31,7 +31,7 @@ final class CampaignConditionSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function onCampaignTriggerHasActiveCondition(CampaignExecutionEvent $event): void
+    public function onCampaignTriggerHasActiveCondition(ConditionEvent $event): void
     {
         if (!$event->checkContext('notification.has.active')) {
             return;
@@ -41,12 +41,12 @@ final class CampaignConditionSubscriber implements EventSubscriberInterface
         /** @var PushID $pushID */
         foreach ($pushIds as $pushID) {
             if ($pushID->isEnabled()) {
-                $event->setResult(true);
+                $event->pass();
 
                 return;
             }
         }
 
-        $event->setResult(false);
+        $event->fail();
     }
 }

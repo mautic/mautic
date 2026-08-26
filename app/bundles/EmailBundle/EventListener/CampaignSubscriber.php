@@ -6,7 +6,7 @@ use Doctrine\ORM\ORMException;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
-use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CampaignBundle\Event\DecisionEvent;
 use Mautic\CampaignBundle\Event\EventPreview;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
@@ -189,7 +189,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onCampaignTriggerDecision(CampaignExecutionEvent $event): void
+    public function onCampaignTriggerDecision(DecisionEvent $event): void
     {
         /** @var Email $eventDetails */
         $eventDetails = $event->getEventDetails();
@@ -197,8 +197,6 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         $eventConfig  = $event->getConfig();
 
         if (null == $eventDetails) {
-            $event->setResult(false);
-
             return;
         }
 
@@ -212,33 +210,34 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
                     if (!empty($eventConfig['urls']['list'])) {
                         $limitToUrls = (array) $eventConfig['urls']['list'];
                         if (UrlMatcher::hasMatch($limitToUrls, $hit->getUrl())) {
-                            $event->setResult(true);
+                            $event->setAsApplicable();
 
                             return;
                         }
                     } else {
-                        $event->setResult(true);
+                        $event->setAsApplicable();
 
                         return;
                     }
                 }
-                $event->setResult(false);
 
                 return;
             }
             if ($event->checkContext('email.open')) {
-                $event->setResult(in_array((int) $eventParent['properties']['email'], $eventDetails->getRelatedEntityIds()));
+                if (in_array((int) $eventParent['properties']['email'], $eventDetails->getRelatedEntityIds())) {
+                    $event->setAsApplicable();
+                }
 
                 return;
             }
             if ($event->checkContext('email.reply')) {
-                $event->setResult(in_array((int) $eventParent['properties']['email'], $eventDetails->getRelatedEntityIds()));
+                if (in_array((int) $eventParent['properties']['email'], $eventDetails->getRelatedEntityIds())) {
+                    $event->setAsApplicable();
+                }
 
                 return;
             }
         }
-
-        $event->setResult(false);
     }
 
     /**
