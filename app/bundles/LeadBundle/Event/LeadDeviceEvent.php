@@ -9,10 +9,7 @@ use Mautic\LeadBundle\Entity\LeadDevice;
 
 final class LeadDeviceEvent extends CommonEvent
 {
-    /**
-     * @param bool $isNew
-     */
-    public function __construct(LeadDevice &$device, $isNew = false)
+    public function __construct(LeadDevice &$device, bool $isNew = false)
     {
         $this->entity = &$device;
         $this->isNew  = $isNew;

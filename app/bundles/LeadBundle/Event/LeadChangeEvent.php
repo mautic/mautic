@@ -11,7 +11,7 @@ final class LeadChangeEvent extends Event
 {
     public function __construct(
         private readonly Lead $oldLead,
-        private $oldTrackingId,
+        private readonly string $oldTrackingId,
         private readonly Lead $newLead,
         private $newTrackingId,
     ) {
@@ -22,10 +22,7 @@ final class LeadChangeEvent extends Event
         return $this->oldLead;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getOldTrackingId()
+    public function getOldTrackingId(): string
     {
         return $this->oldTrackingId;
     }

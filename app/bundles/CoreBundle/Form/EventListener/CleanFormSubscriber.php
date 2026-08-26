@@ -12,13 +12,13 @@ use Symfony\Component\Form\FormEvents;
 /**
  * Clean data before persisting to DB.
  */
-final class CleanFormSubscriber implements EventSubscriberInterface
+final readonly class CleanFormSubscriber implements EventSubscriberInterface
 {
     /**
      * @param string|mixed[] $masks
      */
     public function __construct(
-        private $masks = 'clean',
+        private string|array $masks = 'clean',
     ) {
     }
 

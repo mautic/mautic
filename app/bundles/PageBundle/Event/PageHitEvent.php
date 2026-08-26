@@ -7,6 +7,7 @@ namespace Mautic\PageBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
+use Symfony\Component\HttpFoundation\Request;
 
 class PageHitEvent extends CommonEvent
 {
@@ -14,7 +15,7 @@ class PageHitEvent extends CommonEvent
 
     public function __construct(
         Hit $hit,
-        protected $request,
+        protected Request $request,
         protected $code,
         protected array $clickthroughData = [],
         protected bool $unique = false,
@@ -33,10 +34,8 @@ class PageHitEvent extends CommonEvent
 
     /**
      * Get page request.
-     *
-     * @return string
      */
-    public function getRequest()
+    public function getRequest(): Request
     {
         return $this->request;
     }

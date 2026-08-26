@@ -9,10 +9,7 @@ use Mautic\PageBundle\Entity\Page;
 
 final class PageEvent extends CommonEvent
 {
-    /**
-     * @param bool $isNew
-     */
-    public function __construct(Page $page, $isNew = false)
+    public function __construct(Page $page, bool $isNew = false)
     {
         $this->entity = $page;
         $this->isNew  = $isNew;

@@ -70,8 +70,8 @@ class SubmissionEvent extends CommonEvent
      */
     public function __construct(
         Submission $submission,
-        private $post,
-        private $server,
+        private readonly array $post,
+        private readonly array|ServerBag $server,
         private readonly Request $request,
     ) {
         $this->entity  = $submission;
@@ -82,10 +82,7 @@ class SubmissionEvent extends CommonEvent
         return $this->entity;
     }
 
-    /**
-     * @return array
-     */
-    public function getPost()
+    public function getPost(): array
     {
         return $this->post;
     }
@@ -93,7 +90,7 @@ class SubmissionEvent extends CommonEvent
     /**
      * @return array
      */
-    public function getServer()
+    public function getServer(): ServerBag|array
     {
         return $this->server;
     }

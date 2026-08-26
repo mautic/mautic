@@ -54,13 +54,10 @@ class EmailSendEvent extends CommonEvent
      */
     private array $errors = [];
 
-    /**
-     * @param bool $isDynamicContentParsing
-     */
     public function __construct(
         private readonly ?MailHelper $helper = null,
         array $args = [],
-        private $isDynamicContentParsing = false,
+        private readonly bool $isDynamicContentParsing = false,
     ) {
         $this->content     = $args['content'] ?? '';
         $this->plainText   = $args['plainText'] ?? '';
@@ -314,10 +311,7 @@ class EmailSendEvent extends CommonEvent
         return md5($this->getContent().$this->getPlainText());
     }
 
-    /**
-     * @return bool
-     */
-    public function isDynamicContentParsing()
+    public function isDynamicContentParsing(): bool
     {
         return $this->isDynamicContentParsing;
     }

@@ -13,10 +13,7 @@ class LeadListEvent extends CommonEvent implements DependencyErrorEventInterface
 {
     use DependencyErrorEventTrait;
 
-    /**
-     * @param bool $isNew
-     */
-    public function __construct(LeadList $list, $isNew = false)
+    public function __construct(LeadList $list, bool $isNew = false)
     {
         $this->entity = $list;
         $this->isNew  = $isNew;

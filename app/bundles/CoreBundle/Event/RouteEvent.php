@@ -10,12 +10,9 @@ final class RouteEvent extends Event
 {
     private readonly RouteCollection $collection;
 
-    /**
-     * @param string $type
-     */
     public function __construct(
         private readonly Loader $loader,
-        private $type = 'main',
+        private readonly string $type = 'main',
     ) {
         $this->collection = new RouteCollection();
     }
@@ -33,10 +30,7 @@ final class RouteEvent extends Event
         return $this->collection;
     }
 
-    /**
-     * @return string
-     */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }

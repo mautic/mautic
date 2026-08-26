@@ -12,12 +12,9 @@ final class MenuEvent extends Event
      */
     private $menuItems = ['children' => []];
 
-    /**
-     * @param string $type
-     */
     public function __construct(
         private readonly MenuHelper $helper,
-        private $type = 'main',
+        private readonly string $type = 'main',
     ) {
     }
 
@@ -66,10 +63,7 @@ final class MenuEvent extends Event
         return $this->menuItems;
     }
 
-    /**
-     * @return string
-     */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }

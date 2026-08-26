@@ -8,10 +8,7 @@ use Mautic\LeadBundle\Entity\LeadNote;
 
 final class LeadNoteEvent extends CommonEvent
 {
-    /**
-     * @param bool $isNew
-     */
-    public function __construct(LeadNote $note, $isNew = false)
+    public function __construct(LeadNote $note, bool $isNew = false)
     {
         $this->entity = $note;
         $this->isNew  = $isNew;

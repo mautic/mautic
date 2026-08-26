@@ -9,10 +9,7 @@ use Mautic\FormBundle\Entity\Form;
 
 final class FormEvent extends CommonEvent
 {
-    /**
-     * @param bool $isNew
-     */
-    public function __construct(Form &$form, $isNew = false)
+    public function __construct(Form &$form, bool $isNew = false)
     {
         $this->entity = &$form;
         $this->isNew  = $isNew;

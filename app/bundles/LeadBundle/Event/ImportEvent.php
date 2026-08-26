@@ -9,10 +9,7 @@ use Mautic\LeadBundle\Entity\Import;
 
 final class ImportEvent extends CommonEvent
 {
-    /**
-     * @param bool $isNew
-     */
-    public function __construct(Import $entity, $isNew)
+    public function __construct(Import $entity, bool $isNew)
     {
         $this->entity = $entity;
         $this->isNew  = $isNew;
