@@ -3,7 +3,6 @@
 namespace Mautic\CoreBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomTemplateEvent;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -137,11 +136,8 @@ class CommonController extends AbstractController implements MauticController
      */
     public function eventAwareRenderView(string &$contentTemplate, array &$parameters, ?Request $request = null): string
     {
-        if ($this->dispatcher->hasListeners(CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE)) {
-            $event = $this->dispatcher->dispatch(
-                new CustomTemplateEvent($request, $contentTemplate, $parameters),
-                CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE
-            );
+        if ($this->dispatcher->hasListeners(CustomTemplateEvent::class)) {
+            $event = $this->dispatcher->dispatch(new CustomTemplateEvent($request, $contentTemplate, $parameters));
 
             $contentTemplate   = $event->getTemplate();
             $parameters        = $event->getVars(); // @phpstan-ignore parameterByRef.type
@@ -201,11 +197,8 @@ class CommonController extends AbstractController implements MauticController
         $code     = $args['responseCode'] ?? 200;
         $response = new Response('', $code);
 
-        if ($this->dispatcher->hasListeners(CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE)) {
-            $event = $this->dispatcher->dispatch(
-                new CustomTemplateEvent($request, $template, $parameters),
-                CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE
-            );
+        if ($this->dispatcher->hasListeners(CustomTemplateEvent::class)) {
+            $event = $this->dispatcher->dispatch(new CustomTemplateEvent($request, $template, $parameters));
 
             $template   = $event->getTemplate();
             $parameters = $event->getVars();

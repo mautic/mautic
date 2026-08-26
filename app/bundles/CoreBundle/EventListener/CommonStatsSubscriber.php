@@ -3,7 +3,6 @@
 namespace Mautic\CoreBundle\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Event\StatsEvent;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -36,7 +35,7 @@ abstract class CommonStatsSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CoreEvents::LIST_STATS => ['onStatsFetch', 0],
+            StatsEvent::class => ['onStatsFetch', 0],
         ];
     }
 

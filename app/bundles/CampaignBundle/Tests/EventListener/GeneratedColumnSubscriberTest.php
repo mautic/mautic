@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\EventListener;
 
 use Mautic\CampaignBundle\EventListener\GeneratedColumnSubscriber;
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumnInterface;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns;
 use Mautic\CoreBundle\Doctrine\Provider\VersionProviderInterface;
@@ -17,7 +16,7 @@ final class GeneratedColumnSubscriberTest extends TestCase
     public function testGetSubscribedEvents(): void
     {
         $subscribedEvents = [
-            CoreEvents::ON_GENERATED_COLUMNS_BUILD => ['onGeneratedColumnsBuild', 0],
+            GeneratedColumnsEvent::class => ['onGeneratedColumnsBuild', 0],
         ];
 
         $this->assertSame($subscribedEvents, GeneratedColumnSubscriber::getSubscribedEvents());

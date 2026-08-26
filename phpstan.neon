@@ -273,6 +273,7 @@ rules:
     - Utils\PHPStan\Rule\PreferClassServiceReferenceRule
     - Utils\PHPStan\Rule\NoRedundantAutowiredServiceArgumentRule
     - Utils\PHPStan\Rule\NoServiceSetterCallRule
+    - Utils\PHPStan\Rule\SingleArgumentDispatchRule
 
 services:
     - Utils\PHPStan\ServiceNameUsageResolver

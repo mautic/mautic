@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Service;
 
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CommandListEvent;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
@@ -27,7 +26,7 @@ final class SearchCommandList implements SearchCommandListInterface
         }
 
         $event = new CommandListEvent();
-        $this->dispatcher->dispatch($event, CoreEvents::BUILD_COMMAND_LIST);
+        $this->dispatcher->dispatch($event);
 
         return $this->searchCommands = $event->getCommands();
     }

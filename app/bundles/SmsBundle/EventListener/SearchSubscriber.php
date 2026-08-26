@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\SmsBundle\EventListener;
 
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\DTO\GlobalSearchFilterDTO;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CoreBundle\Service\GlobalSearch;
@@ -22,7 +21,7 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CoreEvents::GLOBAL_SEARCH => ['onGlobalSearch', 0],
+            MauticEvents\GlobalSearchEvent::class => ['onGlobalSearch', 0],
         ];
     }
 

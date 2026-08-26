@@ -2,7 +2,6 @@
 
 namespace Mautic\CoreBundle\Twig\Helper;
 
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomContentEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Twig\Environment;
@@ -30,10 +29,7 @@ final readonly class ContentHelper
         }
 
         /** @var CustomContentEvent $event */
-        $event = $this->dispatcher->dispatch(
-            new CustomContentEvent($viewName, $context, $vars),
-            CoreEvents::VIEW_INJECT_CUSTOM_CONTENT
-        );
+        $event = $this->dispatcher->dispatch(new CustomContentEvent($viewName, $context, $vars));
 
         $content = $event->getContent();
 

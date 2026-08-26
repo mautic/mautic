@@ -2,7 +2,6 @@
 
 namespace Mautic\CoreBundle\Twig\Helper;
 
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomButtonEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -310,11 +309,8 @@ final class ButtonHelper
 
     private function fetchCustomButtons(): self
     {
-        if (!$this->buttonsFetched && $this->dispatcher->hasListeners(CoreEvents::VIEW_INJECT_CUSTOM_BUTTONS)) {
-            $event = $this->dispatcher->dispatch(
-                new CustomButtonEvent($this->location, $this->request, $this->buttons, $this->item),
-                CoreEvents::VIEW_INJECT_CUSTOM_BUTTONS
-            );
+        if (!$this->buttonsFetched && $this->dispatcher->hasListeners(CustomButtonEvent::class)) {
+            $event = $this->dispatcher->dispatch(new CustomButtonEvent($this->location, $this->request, $this->buttons, $this->item));
             $this->buttonsFetched = true;
             $this->buttons        = $event->getButtons();
             $this->buttonCount    = count($this->buttons);

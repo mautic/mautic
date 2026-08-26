@@ -3,7 +3,6 @@
 namespace Mautic\CoreBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\StatsEvent;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -36,7 +35,7 @@ final class StatsApiController extends CommonApiController
 
         try {
             $event = new StatsEvent($table, $start, $limit, $order, $where, $userHelper->getUser());
-            $this->dispatcher->dispatch($event, CoreEvents::LIST_STATS);
+            $this->dispatcher->dispatch($event);
 
             // Return available tables if no result was set
             if (!$event->hasResults()) {

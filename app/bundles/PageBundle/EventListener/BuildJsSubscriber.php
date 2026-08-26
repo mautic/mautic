@@ -2,7 +2,6 @@
 
 namespace Mautic\PageBundle\EventListener;
 
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\BuildJsEvent;
 use Mautic\CoreBundle\Event\BuildJsScope;
 use Mautic\PageBundle\Helper\TrackingHelper;
@@ -21,7 +20,7 @@ final readonly class BuildJsSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CoreEvents::BUILD_MAUTIC_JS => [
+            BuildJsEvent::class => [
                 // onBuildJs must always needs to be last to ensure setup before delivering the event
                 ['onBuildJs', -255],
                 ['onBuildJsForTrackingEvent', 256],

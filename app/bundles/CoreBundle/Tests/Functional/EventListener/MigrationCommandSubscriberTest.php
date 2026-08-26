@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Functional\EventListener;
 
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Event\GeneratedColumnsEvent;
 use Mautic\CoreBundle\Helper\ExitCode;
@@ -41,13 +40,13 @@ final class MigrationCommandSubscriberTest extends MauticMysqlTestCase
     {
         $this->createTables();
 
-        $this->eventDispatcher->addListener(CoreEvents::ON_GENERATED_COLUMNS_BUILD, function (GeneratedColumnsEvent $event): void {
+        $this->eventDispatcher->addListener(GeneratedColumnsEvent::class, function (GeneratedColumnsEvent $event): void {
             $event->addGeneratedColumn(new GeneratedColumn('test_first', 'generated_name_one', 'CHAR(2)', 'SUBSTRING(name, 1, 2)'));
             $event->addGeneratedColumn(new GeneratedColumn('test_first', 'generated_name_two', 'CHAR(2)', 'SUBSTRING(name, 3, 2)'));
             $event->addGeneratedColumn(new GeneratedColumn('test_first', 'generated_name_three', 'CHAR(2)', 'SUBSTRING(name, 5, 2)'));
         });
 
-        $this->eventDispatcher->addListener(CoreEvents::ON_GENERATED_COLUMNS_BUILD, function (GeneratedColumnsEvent $event): void {
+        $this->eventDispatcher->addListener(GeneratedColumnsEvent::class, function (GeneratedColumnsEvent $event): void {
             $generatedColumn = new GeneratedColumn('test_second', 'generated_date_year', 'YEAR', 'YEAR(date_added)');
             $generatedColumn->prependIndexColumn('campaign_id');
             $generatedColumn->addIndexColumn('id');

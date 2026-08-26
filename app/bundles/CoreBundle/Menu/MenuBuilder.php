@@ -5,7 +5,6 @@ namespace Mautic\CoreBundle\Menu;
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\Loader\ArrayLoader;
 use Knp\Menu\Matcher\MatcherInterface;
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MenuEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -81,7 +80,7 @@ final readonly class MenuBuilder
 
             // dispatch the MENU_BUILD event to retrieve bundle menu items
             $event = new MenuEvent($this->menuHelper, $name);
-            $this->dispatcher->dispatch($event, CoreEvents::BUILD_MENU);
+            $this->dispatcher->dispatch($event);
 
             $menuItems    = $event->getMenuItems();
 

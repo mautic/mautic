@@ -4,7 +4,6 @@ namespace Mautic\LeadBundle\EventListener;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Entity\MessageQueue;
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\DTO\GlobalSearchFilterDTO;
 use Mautic\CoreBundle\Event\CommandListEvent;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
@@ -43,12 +42,12 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CoreEvents::GLOBAL_SEARCH  => [
+            GlobalSearchEvent::class               => [
                 ['onGlobalSearchForContacts', 0],
                 ['onGlobalSearchForCompanies', 0],
                 ['onGlobalSearchForSegments', 0],
             ],
-            CoreEvents::BUILD_COMMAND_LIST         => ['onBuildCommandList', 0],
+            CommandListEvent::class                => ['onBuildCommandList', 0],
             LeadEvents::LEAD_BUILD_SEARCH_COMMANDS => ['onBuildSearchCommands', 0],
         ];
     }
