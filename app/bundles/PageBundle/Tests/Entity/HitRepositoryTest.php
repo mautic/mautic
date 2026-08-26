@@ -140,7 +140,7 @@ final class HitRepositoryTest extends MauticMysqlTestCase
     /**
      * @param Email|Page|null $entity
      */
-    private function createHit(Lead $lead, \DateTime $dateHit, string $trackingId, $entity = null): Hit
+    private function createHit(Lead $lead, \DateTime $dateHit, string $trackingId, Email|Page|null $entity = null): Hit
     {
         $hit = new Hit();
         $hit->setLead($lead);
