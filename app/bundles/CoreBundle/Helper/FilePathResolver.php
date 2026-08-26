@@ -16,11 +16,9 @@ class FilePathResolver
     }
 
     /**
-     * @param string $uploadDir
-     *
      * @throws FilePathException
      */
-    public function getUniqueFileName($uploadDir, UploadedFile $file): string
+    public function getUniqueFileName(string $uploadDir, UploadedFile $file): string
     {
         $fullName          = $file->getClientOriginalName();
         $fullNameSanitized = $this->inputHelper::filename($fullName);

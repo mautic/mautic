@@ -988,7 +988,7 @@ class MailHelper
      * @param array<string|int,?string> $addresses Array of emails as values or keys
      * @param ?string                   $name      Default name for addresses without specified names
      */
-    public function setCc($addresses, $name = null): bool
+    public function setCc(array $addresses, ?string $name = null): bool
     {
         return $this->setRecipients('cc', $addresses, $name);
     }
@@ -1020,7 +1020,7 @@ class MailHelper
      * @param array<string|int,?string> $addresses Array of emails as values or keys
      * @param ?string                   $name      Default name for addresses without specified names
      */
-    public function setBcc($addresses, $name = null): bool
+    public function setBcc(array $addresses, ?string $name = null): bool
     {
         return $this->setRecipients('bcc', $addresses, $name);
     }

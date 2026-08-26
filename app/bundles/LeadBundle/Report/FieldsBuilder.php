@@ -19,10 +19,7 @@ class FieldsBuilder
     ) {
     }
 
-    /**
-     * @param string $prefix
-     */
-    public function getLeadFieldsColumns($prefix): array
+    public function getLeadFieldsColumns(string $prefix): array
     {
         $baseColumns  = $this->getBaseLeadColumns();
         $leadFields   = $this->fieldModel->getLeadFields();
@@ -97,10 +94,7 @@ class FieldsBuilder
         return $filters;
     }
 
-    /**
-     * @param string $prefix
-     */
-    public function getCompanyFieldsColumns($prefix): array
+    public function getCompanyFieldsColumns(string $prefix): array
     {
         $baseColumns   = $this->getBaseCompanyColumns();
         $companyFields = $this->fieldModel->getCompanyFields();

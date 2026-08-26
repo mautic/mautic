@@ -47,15 +47,13 @@ class RealTimeExecutioner
 
     /**
      * @param mixed       $passthrough
-     * @param string|null $channel
-     * @param int|null    $channelId
      *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function execute(string $type, $passthrough = null, $channel = null, $channelId = null): ?Responses
+    public function execute(string $type, $passthrough = null, ?string $channel = null, ?int $channelId = null): ?Responses
     {
         $this->responses = new Responses();
         $now             = new \DateTime();

@@ -654,7 +654,7 @@ final class PublicController extends CommonFormController
         }
     }
 
-    public function pluginTrackingGifAction(Request $request, IntegrationHelper $integrationHelper, MailHelper $mailer, $integration): Response
+    public function pluginTrackingGifAction(Request $request, IntegrationHelper $integrationHelper, MailHelper $mailer, string $integration): Response
     {
         $this->doTracking($request, $integrationHelper, $mailer, $integration);
 

@@ -50,10 +50,7 @@ class EventScheduler
         $this->schedule($event, $executionDate, $contacts);
     }
 
-    /**
-     * @param bool $isInactiveEvent
-     */
-    public function schedule(Event $event, \DateTimeInterface $executionDate, ArrayCollection $contacts, $isInactiveEvent = false): void
+    public function schedule(Event $event, \DateTimeInterface $executionDate, ArrayCollection $contacts, bool $isInactiveEvent = false): void
     {
         $config = $this->collector->getEventConfig($event);
 
