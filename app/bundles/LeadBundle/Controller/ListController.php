@@ -248,7 +248,7 @@ final class ListController extends FormController
     /**
      * Generate's edit form and processes post data.
      *
-     * @param int  $objectId
+     * @param int $objectId
      */
     public function editAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $listModel, AuditLogModel $auditLogModel, $objectId, bool $ignorePost = false, bool $isNew = false): Response
     {

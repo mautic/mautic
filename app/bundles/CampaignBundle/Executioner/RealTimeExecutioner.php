@@ -46,7 +46,7 @@ class RealTimeExecutioner
     }
 
     /**
-     * @param mixed       $passthrough
+     * @param mixed $passthrough
      *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
