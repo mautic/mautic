@@ -15,12 +15,7 @@ final readonly class FrequencyActionModel
     ) {
     }
 
-    /**
-     * Update channels.
-     *
-     * @param string $preferredChannel
-     */
-    public function update(array $contactIds, array $params, $preferredChannel): void
+    public function update(array $contactIds, array $params, ?string $preferredChannel): void
     {
         $contacts = $this->contactModel->getLeadsByIds($contactIds);
 
