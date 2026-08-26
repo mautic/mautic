@@ -274,7 +274,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
      *
      * @throws MappingException
      */
-    private function parseContentForUrls(EmailSendEvent $event, $emailId): array
+    private function parseContentForUrls(EmailSendEvent $event, ?int $emailId): array
     {
         $cacheKey = $event->getContentHash().'-'.$emailId;
 
