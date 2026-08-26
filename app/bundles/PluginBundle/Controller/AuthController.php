@@ -5,7 +5,6 @@ namespace Mautic\PluginBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\PluginBundle\Event\PluginIntegrationAuthRedirectEvent;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
-use Mautic\PluginBundle\PluginEvents;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -105,8 +104,7 @@ final class AuthController extends FormController
             new PluginIntegrationAuthRedirectEvent(
                 $integrationObject,
                 $integrationObject->getAuthLoginUrl()
-            ),
-            PluginEvents::PLUGIN_ON_INTEGRATION_AUTH_REDIRECT
+            )
         );
         $oauthUrl = $event->getAuthUrl();
 

@@ -8,7 +8,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\PluginBundle\Bundle\PluginDatabase;
 use Mautic\PluginBundle\Event\PluginInstallEvent;
-use Mautic\PluginBundle\PluginEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class PluginSubscriber implements EventSubscriberInterface
@@ -50,7 +49,7 @@ final readonly class PluginSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            PluginEvents::ON_PLUGIN_INSTALL => ['onInstall', 100],
+            PluginInstallEvent::class => ['onInstall', 100],
         ];
     }
 

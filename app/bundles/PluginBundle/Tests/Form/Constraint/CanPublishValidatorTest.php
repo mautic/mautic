@@ -7,7 +7,6 @@ namespace Mautic\PluginBundle\Tests\Form\Constraint;
 use Mautic\PluginBundle\Event\PluginIsPublishedEvent;
 use Mautic\PluginBundle\Form\Constraint\CanPublish;
 use Mautic\PluginBundle\Form\Constraint\CanPublishValidator;
-use Mautic\PluginBundle\PluginEvents;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -70,7 +69,7 @@ final class CanPublishValidatorTest extends TestCase
 
         $this->dispatcher->expects($this->never())
             ->method('dispatch')
-            ->with(PluginEvents::PLUGIN_IS_PUBLISHED_STATE_CHANGING)
+            ->with($this->isInstanceOf(PluginIsPublishedEvent::class))
             ->willReturn($this->event);
 
         $this->canPublishValidator->initialize($this->createStub(ExecutionContext::class));
@@ -90,7 +89,7 @@ final class CanPublishValidatorTest extends TestCase
 
         $this->dispatcher->expects($this->never())
             ->method('dispatch')
-            ->with(PluginEvents::PLUGIN_IS_PUBLISHED_STATE_CHANGING)
+            ->with($this->isInstanceOf(PluginIsPublishedEvent::class))
             ->willReturn($this->event);
 
         $this->canPublishValidator->initialize($this->createStub(ExecutionContext::class));

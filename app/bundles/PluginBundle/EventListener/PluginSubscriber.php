@@ -7,7 +7,6 @@ namespace Mautic\PluginBundle\EventListener;
 use Mautic\PluginBundle\Bundle\PluginDatabase;
 use Mautic\PluginBundle\Event\PluginInstallEvent;
 use Mautic\PluginBundle\Event\PluginUpdateEvent;
-use Mautic\PluginBundle\PluginEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class PluginSubscriber implements EventSubscriberInterface
@@ -42,8 +41,8 @@ final readonly class PluginSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            PluginEvents::ON_PLUGIN_INSTALL => ['onInstall', 0],
-            PluginEvents::ON_PLUGIN_UPDATE  => ['onUpdate', 0],
+            PluginInstallEvent::class => ['onInstall', 0],
+            PluginUpdateEvent::class  => ['onUpdate', 0],
         ];
     }
 }

@@ -207,6 +207,33 @@
     | `IntegrationEvents::INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE` | `InternalObjectRouteEvent` |
     | `IntegrationEvents::INTEGRATION_OBJECT_TOKEN_EVENT` | `MappedIntegrationObjectTokenEvent` |
 
+- PluginBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\PluginBundle\PluginEvents` string constants. Update any subscriber or listener that keys on one of the converted `PluginEvents::*` constants to key on the event class instead:
+
+    ```diff
+     public static function getSubscribedEvents(): array
+     {
+         return [
+    -        PluginEvents::ON_PLUGIN_INSTALL => ['onInstall', 0],
+    +        PluginInstallEvent::class => ['onInstall', 0],
+         ];
+     }
+    ```
+
+    Dispatching drops the redundant second argument, e.g. `$dispatcher->dispatch($event, PluginEvents::ON_PLUGIN_INSTALL)` becomes `$dispatcher->dispatch($event)`. The `Mautic\PluginBundle\PluginEvents` constants are kept for backwards compatibility but are no longer used internally for the events below. Constants that share an event class (e.g. the `PLUGIN_ON_INTEGRATION_KEYS_ENCRYPT` / `_KEYS_DECRYPT` / `_KEYS_MERGE` group and the `PLUGIN_ON_INTEGRATION_REQUEST` / `_RESPONSE` pair) are unchanged.
+
+    Full mapping of the converted constants to their event class (all in the `Mautic\PluginBundle\Event` namespace):
+
+    | `PluginEvents` constant | New event class |
+    | --- | --- |
+    | `PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE` | `PluginIntegrationEvent` |
+    | `PluginEvents::PLUGIN_ON_INTEGRATION_AUTH_REDIRECT` | `PluginIntegrationAuthRedirectEvent` |
+    | `PluginEvents::PLUGIN_ON_INTEGRATION_GET_AUTH_CALLBACK_URL` | `PluginIntegrationAuthCallbackUrlEvent` |
+    | `PluginEvents::PLUGIN_ON_INTEGRATION_FORM_DISPLAY` | `PluginIntegrationFormDisplayEvent` |
+    | `PluginEvents::PLUGIN_ON_INTEGRATION_FORM_BUILD` | `PluginIntegrationFormBuildEvent` |
+    | `PluginEvents::ON_PLUGIN_UPDATE` | `PluginUpdateEvent` |
+    | `PluginEvents::ON_PLUGIN_INSTALL` | `PluginInstallEvent` |
+    | `PluginEvents::PLUGIN_IS_PUBLISHED_STATE_CHANGING` | `PluginIsPublishedEvent` |
+
 - `Mautic\CoreBundle\Factory\ModelFactory` now builds its service locator from a `defaultIndexMethod` on the `mautic.model` tag, replacing the removed `Mautic\CoreBundle\DependencyInjection\Compiler\ModelPass`. Every model (a service implementing `Mautic\CoreBundle\Model\MauticModelInterface`) declares its `ModelFactory::getModel()` lookup key via a static `getName()` method:
 
     ```php
