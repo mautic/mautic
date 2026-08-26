@@ -35,12 +35,6 @@ final class ProjectModel extends FormModel implements AjaxLookupModelInterface
         return $this->projectRepository;
     }
 
-    /**
-     * @param string|array<int, string> $filter
-     * @param array<string, mixed>      $options
-     *
-     * @return array<int|string, string>
-     */
     public function getLookupResults(string $type, string|array $filter = '', int $limit = 10, int $start = 0, array $options = []): array
     {
         // Convert filter to string if it's an array (happens when $data is replaced with actual data)

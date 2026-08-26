@@ -310,12 +310,6 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
         return $chart->render();
     }
 
-    /**
-     * @param string|array<int, string> $filter
-     * @param array<string, mixed>      $options
-     *
-     * @return mixed[]
-     */
     public function getLookupResults(string $type, string|array $filter = '', int $limit = 10, int $start = 0, array $options = []): array
     {
         $results = [];
