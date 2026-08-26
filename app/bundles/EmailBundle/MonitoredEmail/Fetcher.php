@@ -92,7 +92,7 @@ final class Fetcher
      * @param int  $limit
      * @param bool $markAsSeen
      */
-    private function getMessages(array $mailIds, $limit, $markAsSeen): array
+    private function getMessages(array $mailIds, ?int $limit, bool $markAsSeen): array
     {
         if (!count($mailIds)) {
             return [];
