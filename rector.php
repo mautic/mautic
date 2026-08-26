@@ -24,9 +24,11 @@ return RectorConfig::configure()
     ->withPhpSets(php84: true)
     ->withCache(__DIR__.'/var/cache/rector')
     ->withRules([
+        \Utils\Rector\AssertTrueResponseIsOkToAssertResponseIsSuccessfulRector::class,
         Rector\PHPUnit\CodeQuality\Rector\ClassMethod\AssertClassToThisAssertRector::class,
         Rector\TypeDeclarationDocblocks\Rector\Property\MergePhpstanDocTagIntoNativeRector::class,
 
+        // to be added to set
         Rector\Instanceof_\Rector\Ternary\FlipNegatedTernaryInstanceofRector::class,
         Rector\TypeDeclarationDocblocks\Rector\ClassMethod\NarrowArrayCollectionUnionReturnDocblockRector::class,
         UnserializeToSerializerDecodeRector::class,
