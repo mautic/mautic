@@ -140,7 +140,7 @@ final class oAuthHelper
      *
      * @return string|array<string,string>
      */
-    private function normalizeParameters(array $parameters, $encode = false, bool $returnarray = false, array $normalized = [], int|string $key = '')
+    private function normalizeParameters(array $parameters, bool $encode = false, bool $returnarray = false, array $normalized = [], int|string $key = '')
     {
         // Sort by key
         ksort($parameters);
@@ -178,7 +178,7 @@ final class oAuthHelper
      *
      * @param int $bits
      */
-    private function generateNonce($bits = 64): string
+    private function generateNonce(int $bits = 64): string
     {
         $result          = '';
         $accumulatedBits = 0;
