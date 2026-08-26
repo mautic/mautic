@@ -77,7 +77,7 @@ final class SearchStringHelper
         }
     }
 
-    private function addFilterCommand(&$filters, $mergeFilter): void
+    private function addFilterCommand(\stdClass &$filters, \stdClass $mergeFilter): void
     {
         $command = $mergeFilter->command;
         if ('is' === $command) {
