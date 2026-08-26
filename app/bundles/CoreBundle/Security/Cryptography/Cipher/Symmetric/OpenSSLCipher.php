@@ -66,9 +66,6 @@ class OpenSSLCipher implements SymmetricCipherInterface
         return openssl_cipher_iv_length($this->cipher);
     }
 
-    /**
-     * @param string $data
-     */
     private function getHash(string $data, string $key): string
     {
         return hash_hmac('sha256', $data, $key);

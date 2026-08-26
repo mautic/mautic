@@ -229,8 +229,6 @@ class EventExecutioner
     }
 
     /**
-     * @param bool $isInactive
-     *
      * @return ArrayCollection
      *
      * @throws Scheduler\Exception\NotSchedulableException

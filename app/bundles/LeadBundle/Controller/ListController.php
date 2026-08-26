@@ -378,8 +378,6 @@ final class ListController extends FormController
     /**
      * Create modifying response for segments - edit.
      *
-     * @param bool $ignorePost
-     *
      * @return Response
      */
     private function createSegmentModifyResponse(Request $request, LeadList $segment, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $segmentModel, AuditLogModel $auditLogModel, array $postActionVars, string $action, bool $ignorePost)

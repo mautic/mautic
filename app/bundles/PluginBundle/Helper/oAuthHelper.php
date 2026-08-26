@@ -135,7 +135,6 @@ final class oAuthHelper
 
     /**
      * @param array<string, mixed> $parameters
-     * @param bool                 $encode
      * @param array<int, string>   $normalized
      *
      * @return string|array<string,string>
@@ -175,8 +174,6 @@ final class oAuthHelper
 
     /**
      * OAuth1.0 nonce generator.
-     *
-     * @param int $bits
      */
     private function generateNonce(int $bits = 64): string
     {

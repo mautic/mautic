@@ -137,9 +137,6 @@ final class HitRepositoryTest extends MauticMysqlTestCase
         $this->assertSame($expectedHitDate->getTimestamp(), $hitDate->getTimestamp());
     }
 
-    /**
-     * @param Email|Page|null $entity
-     */
     private function createHit(Lead $lead, \DateTime $dateHit, string $trackingId, Email|Page|null $entity = null): Hit
     {
         $hit = new Hit();

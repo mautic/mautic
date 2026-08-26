@@ -268,8 +268,6 @@ final class BuilderSubscriber implements EventSubscriberInterface
     /**
      * Parses the content for URLs and replaces them for trackables.
      *
-     * @param ?int $emailId
-     *
      * @return Trackable[]|Redirect[]
      *
      * @throws MappingException

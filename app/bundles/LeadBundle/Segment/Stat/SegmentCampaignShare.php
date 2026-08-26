@@ -56,7 +56,6 @@ final readonly class SegmentCampaignShare
     }
 
     /**
-     * @param int $segmentId
      * @param int $campaignId
      */
     private function getCachedKey(?int $segmentId, $campaignId): string

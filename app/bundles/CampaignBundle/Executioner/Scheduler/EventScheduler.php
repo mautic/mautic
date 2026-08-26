@@ -350,9 +350,6 @@ class EventScheduler
         );
     }
 
-    /**
-     * @param bool $isInactiveEvent
-     */
     private function scheduleEventForContacts(Event $event, AbstractEventAccessor $config, \DateTimeInterface $executionDate, ArrayCollection $contacts, bool $isInactiveEvent = false): void
     {
         foreach ($contacts as $contact) {

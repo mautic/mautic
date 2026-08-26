@@ -283,8 +283,6 @@ readonly class ContactSegmentService
     }
 
     /**
-     * @param int $segmentId
-     *
      * @return mixed
      *
      * @throws \Exception
@@ -314,8 +312,6 @@ readonly class ContactSegmentService
     }
 
     /**
-     * @param int $segmentId
-     *
      * @return mixed
      *
      * @throws \Exception

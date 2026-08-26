@@ -192,7 +192,6 @@ class FieldsBuilder
 
     /**
      * @param LeadField[] $fields
-     * @param string      $prefix
      */
     private function getFieldColumns($fields, string $prefix): array
     {
@@ -219,9 +218,6 @@ class FieldsBuilder
         return $columns;
     }
 
-    /**
-     * @param string $prefix
-     */
     private function sanitizePrefix(string $prefix): string
     {
         if (!str_contains($prefix, '.')) {

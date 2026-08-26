@@ -79,9 +79,6 @@ class FilePathResolver
         $this->filesystem->rename($originPath, $targetPath);
     }
 
-    /**
-     * @param string $uploadDir
-     */
     private function getFilePath(string $uploadDir, string $fileName, string $ext): string
     {
         return $uploadDir.DIRECTORY_SEPARATOR.$fileName.$ext;

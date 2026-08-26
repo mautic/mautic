@@ -81,9 +81,6 @@ final class BuilderSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param array    $source
-     * @param int|null $emailId
-     *
      * @return mixed[]
      */
     private function generateTokensFromContent(EmailSendEvent|PageDisplayEvent $event, ?int $leadId, array $source = [], ?int $emailId = null): array

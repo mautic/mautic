@@ -144,9 +144,7 @@ class RealTimeExecutioner
     }
 
     /**
-     * @param mixed       $passthrough
-     * @param string|null $channel
-     * @param int|null    $channelId
+     * @param mixed $passthrough
      *
      * @throws DecisionNotApplicableException
      * @throws Exception\CannotProcessEventException

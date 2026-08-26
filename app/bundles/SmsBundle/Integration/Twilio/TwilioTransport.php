@@ -86,8 +86,6 @@ class TwilioTransport implements TransportInterface, MMSTransportInterface
     }
 
     /**
-     * @param string $number
-     *
      * @return string
      *
      * @throws NumberParseException
