@@ -35,7 +35,7 @@ final class LineChart extends AbstractChart implements ChartInterface
         ?string $unit = null,
         ?\DateTimeInterface $dateFrom = null,
         ?\DateTimeInterface $dateTo = null,
-        private $dateFormat = null,
+        private ?string $dateFormat = null,
     ) {
         $this->unit       = $unit ?? $this->getTimeUnitFromDateRange($dateFrom, $dateTo);
         $this->isTimeUnit = in_array($this->unit, ['H', 'i', 's']);

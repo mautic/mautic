@@ -66,7 +66,7 @@ class ChartQuery extends AbstractChart
         protected Connection $connection,
         \DateTime $dateFrom,
         \DateTime $dateTo,
-        $unit = null,
+        ?string $unit = null,
     ) {
         $this->dateTimeHelper = new DateTimeHelper();
         $this->unit           = $unit ?? $this->getTimeUnitFromDateRange($dateFrom, $dateTo);
