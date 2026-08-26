@@ -947,7 +947,7 @@ class MailHelper
      * @param array<string|int,?string> $addresses Array of emails as values or keys
      * @param ?string                   $name      Default name for addresses without specified names
      */
-    private function setRecipients(string $type, $addresses, $name = null): bool
+    private function setRecipients(string $type, array $addresses, ?string $name = null): bool
     {
         $this->checkBatchMaxRecipients(count($addresses), $type);
 
