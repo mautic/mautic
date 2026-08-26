@@ -9,14 +9,9 @@ final class YearStat implements StatInterface
      */
     private array $stats = [];
 
-    private readonly int $year;
-
-    /**
-     * @param int $year
-     */
-    public function __construct(int $year)
-    {
-        $this->year = (int) $year;
+    public function __construct(
+        private readonly int $year,
+    ) {
     }
 
     /**

@@ -12,14 +12,10 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 final class TagEntityModelTransformer implements DataTransformerInterface
 {
-    /**
-     * @param string $repository
-     * @param bool   $isArray
-     */
     public function __construct(
         private readonly EntityManagerInterface $em,
         private string $repository = '',
-        private bool $isArray = false,
+        private readonly bool $isArray = false,
     ) {
     }
 
@@ -98,10 +94,8 @@ final class TagEntityModelTransformer implements DataTransformerInterface
 
     /**
      * Set the repository to use.
-     *
-     * @param string $repo
      */
-    public function setRepository($repo): void
+    public function setRepository(string $repo): void
     {
         $this->repository = $repo;
     }

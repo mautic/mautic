@@ -36,7 +36,7 @@ abstract class AbstractMauticMigration extends AbstractMigration
     /**
      * Database prefix.
      */
-    protected string $prefix;
+    protected ?string $prefix = null;
 
     /**
      * @throws \Doctrine\DBAL\Exception

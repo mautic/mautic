@@ -56,12 +56,9 @@ class EmailReply
             ->build();
     }
 
-    /**
-     * @param string $messageId
-     */
     public function __construct(
         private readonly Stat $stat,
-        private string $messageId,
+        private readonly string $messageId,
         ?\DateTime $dateReplied = null,
     ) {
         $this->id          = Uuid::uuid4()->toString();
@@ -83,10 +80,7 @@ class EmailReply
         return $this->dateReplied;
     }
 
-    /**
-     * @return string
-     */
-    public function getMessageId()
+    public function getMessageId(): string
     {
         return $this->messageId;
     }

@@ -6,21 +6,15 @@ namespace Mautic\IntegrationsBundle\Sync\DAO\Sync\Order;
 
 use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 
-final class FieldDAO
+final readonly class FieldDAO
 {
-    /**
-     * @param string $name
-     */
     public function __construct(
         private string $name,
-        private readonly NormalizedValueDAO $value,
+        private NormalizedValueDAO $value,
     ) {
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }

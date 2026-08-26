@@ -12,14 +12,11 @@ final class HourStat
      * @param string $hour "2018-12-07 12" format
      */
     public function __construct(
-        private string $hour,
+        private readonly string $hour,
     ) {
     }
 
-    /**
-     * @return string
-     */
-    public function getHour()
+    public function getHour(): string
     {
         return $this->hour;
     }

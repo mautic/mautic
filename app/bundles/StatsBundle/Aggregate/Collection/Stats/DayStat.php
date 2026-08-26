@@ -13,7 +13,7 @@ final class DayStat implements StatInterface
      * @param string $day "2019-11-07" format
      */
     public function __construct(
-        private string $day,
+        private readonly string $day,
     ) {
     }
 

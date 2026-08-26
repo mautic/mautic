@@ -11,7 +11,7 @@ final class RepliedEmail
      */
     public function __construct(
         private $fromAddress,
-        private ?string $statHash = null,
+        private readonly ?string $statHash = null,
     ) {
     }
 
@@ -23,10 +23,7 @@ final class RepliedEmail
         return $this->fromAddress;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getStatHash()
+    public function getStatHash(): ?string
     {
         return $this->statHash;
     }

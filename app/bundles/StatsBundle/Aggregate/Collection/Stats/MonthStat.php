@@ -13,7 +13,7 @@ final class MonthStat implements StatInterface
      * @param string $month "2019-01" format
      */
     public function __construct(
-        private string $month,
+        private readonly string $month,
     ) {
     }
 

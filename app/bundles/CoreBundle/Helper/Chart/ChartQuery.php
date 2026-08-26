@@ -59,8 +59,6 @@ class ChartQuery extends AbstractChart
      * Possible values are 'd'/'H'/'i'/'i'/'W'/'m'/'Y'.
      *
      * @see DateRangeUnitTrait::getTimeUnitFromDateRange()
-     *
-     * @param string|null $unit
      */
     public function __construct(
         protected Connection $connection,

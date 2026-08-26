@@ -41,7 +41,7 @@ final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     /**
      * @param Options<array<mixed>>|array<mixed> $options
      */
-    public function setOptions($options): void
+    public function setOptions(Options|array $options): void
     {
         $this->options = $options;
     }

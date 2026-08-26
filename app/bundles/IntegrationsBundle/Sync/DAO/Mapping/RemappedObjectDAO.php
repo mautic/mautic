@@ -4,17 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\DAO\Mapping;
 
-final class RemappedObjectDAO
+final readonly class RemappedObjectDAO
 {
-    /**
-     * @param mixed $oldObjectId
-     * @param mixed $newObjectId
-     */
     public function __construct(
-        private readonly string $integration,
-        private readonly string $oldObjectName,
+        private string $integration,
+        private string $oldObjectName,
         private mixed $oldObjectId,
-        private readonly string $newObjectName,
+        private string $newObjectName,
         private mixed $newObjectId,
     ) {
     }

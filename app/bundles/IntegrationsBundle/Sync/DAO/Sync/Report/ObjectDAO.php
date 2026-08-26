@@ -14,11 +14,10 @@ final class ObjectDAO
     private array $fields = [];
 
     /**
-     * @param string $object
-     * @param mixed  $objectId
+     * @param mixed $objectId
      */
     public function __construct(
-        private string $object,
+        private readonly string $object,
         private $objectId,
         private ?\DateTimeInterface $changeDateTime = null,
     ) {
@@ -51,10 +50,7 @@ final class ObjectDAO
         return $this->objectId;
     }
 
-    /**
-     * @return string
-     */
-    public function getObject()
+    public function getObject(): string
     {
         return $this->object;
     }

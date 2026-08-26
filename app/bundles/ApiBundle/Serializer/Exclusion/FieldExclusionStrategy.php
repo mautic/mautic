@@ -14,18 +14,11 @@ use JMS\Serializer\Metadata\PropertyMetadata;
  */
 class FieldExclusionStrategy implements ExclusionStrategyInterface
 {
-    private readonly int $level;
-
-    /**
-     * @param int         $level
-     * @param string|null $path
-     */
     public function __construct(
         private readonly array $fields,
-        int $level = 3,
-        private ?string $path = null,
+        private readonly int $level = 3,
+        private readonly ?string $path = null,
     ) {
-        $this->level  = (int) $level;
     }
 
     public function shouldSkipClass(ClassMetadata $metadata, Context $navigatorContext): bool

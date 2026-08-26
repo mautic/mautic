@@ -4,13 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Mapper;
 
-final class Category
+final readonly class Category
 {
-    /**
-     * @param string $category
-     * @param string $type
-     * @param bool   $isPermanent
-     */
     public function __construct(
         private string $category,
         private string $type,
@@ -19,26 +14,17 @@ final class Category
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getCategory()
+    public function getCategory(): string
     {
         return $this->category;
     }
 
-    /**
-     * @return string
-     */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
 
-    /**
-     * @return bool
-     */
-    public function isPermanent()
+    public function isPermanent(): bool
     {
         return $this->isPermanent;
     }

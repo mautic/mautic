@@ -13,9 +13,6 @@ use Symfony\Component\Form\Extension\Core\Type\TimeType;
  */
 final class ReportFilterDataTransformer implements DataTransformerInterface
 {
-    /**
-     * @param array $columns
-     */
     public function __construct(
         private array $columns,
     ) {

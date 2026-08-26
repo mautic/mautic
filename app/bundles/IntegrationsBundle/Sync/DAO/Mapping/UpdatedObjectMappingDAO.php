@@ -13,13 +13,11 @@ class UpdatedObjectMappingDAO
     private ?ObjectMapping $objectMapping = null;
 
     /**
-     * @param string $integration
-     * @param string $integrationObjectName
-     * @param mixed  $integrationObjectId
+     * @param mixed $integrationObjectId
      */
     public function __construct(
-        private string $integration,
-        private string $integrationObjectName,
+        private readonly string $integration,
+        private readonly string $integrationObjectName,
         private $integrationObjectId,
         \DateTimeInterface $objectModifiedDate,
     ) {

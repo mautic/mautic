@@ -12,19 +12,13 @@ use JMS\Serializer\Metadata\PropertyMetadata;
 /**
  * Include specific fields at a specific level.
  */
-final class FieldInclusionStrategy implements ExclusionStrategyInterface
+final readonly class FieldInclusionStrategy implements ExclusionStrategyInterface
 {
-    private readonly int $level;
-
-    /**
-     * @param int $level
-     */
     public function __construct(
-        private readonly array $fields,
-        int $level = 3,
+        private array $fields,
+        private int $level = 3,
         private ?string $path = null,
     ) {
-        $this->level  = (int) $level;
     }
 
     public function shouldSkipClass(ClassMetadata $metadata, Context $navigatorContext): bool

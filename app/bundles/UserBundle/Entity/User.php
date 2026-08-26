@@ -164,7 +164,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
      * @param bool $guest
      */
     public function __construct(
-        private bool $guest = false,
+        private $guest = false,
     ) {
     }
 

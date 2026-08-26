@@ -8,12 +8,8 @@ use Symfony\Component\Form\DataTransformerInterface;
 /**
  * @implements DataTransformerInterface<array<mixed>, array<mixed>>
  */
-final class SortableListTransformer implements DataTransformerInterface
+final readonly class SortableListTransformer implements DataTransformerInterface
 {
-    /**
-     * @param bool $withLabels
-     * @param bool $useKeyValuePairs
-     */
     public function __construct(
         private bool $withLabels = true,
         private bool $useKeyValuePairs = false,
