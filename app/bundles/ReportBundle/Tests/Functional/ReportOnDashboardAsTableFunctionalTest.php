@@ -10,6 +10,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class ReportOnDashboardAsTableFunctionalTest extends MauticMysqlTestCase
 {
@@ -86,8 +87,8 @@ final class ReportOnDashboardAsTableFunctionalTest extends MauticMysqlTestCase
         $this->assertNotEmpty($query['daterange']['date_from'] ?? null);
         $this->assertNotEmpty($query['daterange']['date_to'] ?? null);
 
-        // Regenrate full URL via router
-        $expectedLink = self::getContainer()->get('router')->generate('mautic_report_action', [
+        /** @var UrlGeneratorInterface $router */
+        $expectedLink = self::getContainer()->get(UrlGeneratorInterface::class)->generate('mautic_report_action', [
             'objectId'     => $report->getId(),
             'objectAction' => 'view',
             'daterange'    => $query['daterange'],
