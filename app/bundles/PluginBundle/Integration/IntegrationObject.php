@@ -11,8 +11,8 @@ final class IntegrationObject
      * @param string $internalType
      */
     public function __construct(
-        private $type,
-        private $internalType,
+        private string $type,
+        private string $internalType,
     ) {
     }
 

@@ -49,7 +49,7 @@ abstract class AbstractLookup
 
     public function __construct(
         protected ?string $auth = null,
-        protected $config = null,
+        protected ?array $config = null,
         protected ?string $cacheDir = null,
         protected ?LoggerInterface $logger = null,
         protected ?Client $client = null,

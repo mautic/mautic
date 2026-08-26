@@ -17,7 +17,7 @@ class PluginToken extends AbstractToken
     public function __construct(
         ?string $providerKey,
         private ?string $authenticatingService = null,
-        $user = null,
+        UserInterface|string|null $user = null,
         private string $credentials = '',
         array $roles = [],
         private readonly ?Response $response = null,

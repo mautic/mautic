@@ -94,7 +94,7 @@ class IpAddress
      */
     public function __construct(
         #[Groups(['ipaddress:read', 'ipaddress:write', 'download:read'])]
-        private $ipAddress = null,
+        private ?string $ipAddress = null,
     ) {
     }
 

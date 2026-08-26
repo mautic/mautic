@@ -19,7 +19,7 @@ final class BatchIdToEntityHelper
      */
     public function __construct(
         array $parameters,
-        private $idKey = 'id',
+        private string $idKey = 'id',
     ) {
         $this->extractIds($parameters);
     }

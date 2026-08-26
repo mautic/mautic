@@ -20,7 +20,7 @@ class TransportChain
      * @param string $primaryTransport
      */
     public function __construct(
-        private $primaryTransport,
+        private string $primaryTransport,
         private readonly IntegrationHelper $integrationHelper,
     ) {
     }
