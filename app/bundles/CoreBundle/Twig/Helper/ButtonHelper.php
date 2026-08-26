@@ -244,7 +244,7 @@ final class ButtonHelper
      * @param array<string,mixed> $button
      * @param int                 $buttonCount
      */
-    private function buildButton(array $button, $buttonCount = 0): string
+    private function buildButton(array $button, int $buttonCount = 0): string
     {
         $buttons = '';
 
