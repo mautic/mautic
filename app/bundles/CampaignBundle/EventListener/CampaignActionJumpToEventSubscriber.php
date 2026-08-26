@@ -32,7 +32,7 @@ final readonly class CampaignActionJumpToEventSubscriber implements EventSubscri
     {
         return [
             CampaignEvents::CAMPAIGN_POST_SAVE     => ['processCampaignEventsAfterSave', 1],
-            CampaignEvents::CAMPAIGN_ON_BUILD      => ['onCampaignBuild', 0],
+            CampaignBuilderEvent::class            => ['onCampaignBuild', 0],
             CampaignEvents::ON_EVENT_JUMP_TO_EVENT => ['onJumpToEvent', 0],
         ];
     }

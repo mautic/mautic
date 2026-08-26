@@ -7,6 +7,7 @@ namespace Mautic\CoreBundle\Tests\Functional\DependencyInjection;
 use FOS\OAuthServerBundle\Event\OAuthEvent;
 use Mautic\ApiBundle\EventListener\ApiSubscriber;
 use Mautic\ApiBundle\EventListener\PreAuthorizationEventListener;
+use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\EventListener\CampaignActionChangeMembershipSubscriber;
 use Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber;
 use Mautic\CoreBundle\EventListener\AssetsSubscriber;
@@ -99,7 +100,7 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
         'security.interactive_login' => [
             CoreSubscriber::class,
         ],
-        'mautic.campaign_on_build' => [
+        CampaignBuilderEvent::class => [
             \MauticPlugin\MauticFocusBundle\EventListener\CampaignSubscriber::class,
             \MauticPlugin\MauticSocialBundle\EventListener\CampaignSubscriber::class,
             \Mautic\AssetBundle\EventListener\CampaignSubscriber::class,

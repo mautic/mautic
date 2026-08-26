@@ -175,6 +175,36 @@
 
 ## Changed code
 
+- CampaignBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\CampaignBundle\CampaignEvents` string constants. Update any subscriber or listener that keys on one of the converted `CampaignEvents::*` constants (or the raw string name such as `mautic.campaign_on_build`) to key on the event class instead:
+
+    ```diff
+     public static function getSubscribedEvents(): array
+     {
+         return [
+    -        CampaignEvents::CAMPAIGN_ON_BUILD => ['onCampaignBuild', 0],
+    +        CampaignBuilderEvent::class      => ['onCampaignBuild', 0],
+         ];
+     }
+    ```
+
+    Dispatching drops the redundant second argument, e.g. `$dispatcher->dispatch($event, CampaignEvents::CAMPAIGN_ON_BUILD)` becomes `$dispatcher->dispatch($event)`. The `Mautic\CampaignBundle\CampaignEvents` constants are kept for backwards compatibility but are no longer used internally for these events.
+
+    Full mapping of old event name to new event class (all in the `Mautic\CampaignBundle\Event` namespace):
+
+    | Old event name | `CampaignEvents` constant | New event class |
+    | --- | --- | --- |
+    | `mautic.on_campaign_delete` | `CampaignEvents::ON_CAMPAIGN_DELETE` | `DeleteCampaign` |
+    | `mautic.campaign_on_build` | `CampaignEvents::CAMPAIGN_ON_BUILD` | `CampaignBuilderEvent` |
+    | `mautic.campaign_on_trigger` | `CampaignEvents::CAMPAIGN_ON_TRIGGER` | `CampaignTriggerEvent` |
+    | `mautic.campaign_on_event_executed` | `CampaignEvents::ON_EVENT_EXECUTED` | `ExecutedEvent` |
+    | `mautic.campaign_on_event_executed_batch` | `CampaignEvents::ON_EVENT_EXECUTED_BATCH` | `ExecutedBatchEvent` |
+    | `mautic.campaign_on_event_failed` | `CampaignEvents::ON_EVENT_FAILED` | `FailedEvent` |
+    | `mautic.campaign_on_event_scheduled` | `CampaignEvents::ON_EVENT_SCHEDULED` | `ScheduledEvent` |
+    | `mautic.campaign_on_event_scheduled_batch` | `CampaignEvents::ON_EVENT_SCHEDULED_BATCH` | `ScheduledBatchEvent` |
+    | `mautic.campaign_on_event_decision_evaluation_results` | `CampaignEvents::ON_EVENT_DECISION_EVALUATION_RESULTS` | `DecisionResultsEvent` |
+    | `mautic.campaign_failure_notify` | `CampaignEvents::ON_CAMPAIGN_FAILURE_NOTIFY` | `NotifyOfFailureEvent` |
+    | `mautic.campaign_unpublish_notify` | `CampaignEvents::ON_CAMPAIGN_UNPUBLISH_NOTIFY` | `NotifyOfUnpublishEvent` |
+
 - `Mautic\CoreBundle\Factory\ModelFactory` now builds its service locator from a `defaultIndexMethod` on the `mautic.model` tag, replacing the removed `Mautic\CoreBundle\DependencyInjection\Compiler\ModelPass`. Every model (a service implementing `Mautic\CoreBundle\Model\MauticModelInterface`) declares its `ModelFactory::getModel()` lookup key via a static `getName()` method:
 
     ```php

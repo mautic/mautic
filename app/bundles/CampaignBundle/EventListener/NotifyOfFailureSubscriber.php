@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\EventListener;
 
-use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\NotifyOfFailureEvent;
 use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -19,7 +18,7 @@ final readonly class NotifyOfFailureSubscriber implements EventSubscriberInterfa
     public static function getSubscribedEvents(): array
     {
         return [
-            CampaignEvents::ON_CAMPAIGN_FAILURE_NOTIFY => 'notifyOfFailure',
+            NotifyOfFailureEvent::class => 'notifyOfFailure',
         ];
     }
 

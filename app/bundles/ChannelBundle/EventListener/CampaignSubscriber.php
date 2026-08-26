@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\ChannelBundle\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
@@ -45,7 +44,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CampaignEvents::CAMPAIGN_ON_BUILD       => ['onCampaignBuild', 0],
+            CampaignBuilderEvent::class => ['onCampaignBuild', 0],
             ChannelEvents::ON_CAMPAIGN_BATCH_ACTION => ['onCampaignTriggerAction', 0],
         ];
     }

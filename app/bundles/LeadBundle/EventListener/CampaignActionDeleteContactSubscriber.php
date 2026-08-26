@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
-use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\Helper\RemovedContactTracker;
@@ -21,7 +20,7 @@ final readonly class CampaignActionDeleteContactSubscriber implements EventSubsc
     public static function getSubscribedEvents(): array
     {
         return [
-            CampaignEvents::CAMPAIGN_ON_BUILD             => ['configureAction', 0],
+            CampaignBuilderEvent::class => ['configureAction', 0],
             LeadEvents::ON_CAMPAIGN_ACTION_DELETE_CONTACT => ['deleteContacts', 0],
         ];
     }

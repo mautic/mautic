@@ -45,8 +45,7 @@ final readonly class DecisionDispatcher
         }
 
         $this->dispatcher->dispatch(
-            new DecisionResultsEvent($config, $logs, $evaluatedContacts),
-            CampaignEvents::ON_EVENT_DECISION_EVALUATION_RESULTS
+            new DecisionResultsEvent($config, $logs, $evaluatedContacts)
         );
     }
 }

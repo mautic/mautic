@@ -2,7 +2,6 @@
 
 namespace Mautic\PluginBundle\EventListener;
 
-use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\PluginBundle\Form\Type\IntegrationsListType;
@@ -16,7 +15,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CampaignEvents::CAMPAIGN_ON_BUILD      => ['onCampaignBuild', 0],
+            CampaignBuilderEvent::class => ['onCampaignBuild', 0],
             PluginEvents::ON_CAMPAIGN_BATCH_ACTION => ['onCampaignTriggerAction', 0],
         ];
     }

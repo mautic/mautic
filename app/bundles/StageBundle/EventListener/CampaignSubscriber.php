@@ -2,7 +2,6 @@
 
 namespace Mautic\StageBundle\EventListener;
 
-use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
@@ -27,7 +26,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CampaignEvents::CAMPAIGN_ON_BUILD     => ['onCampaignBuild', 0],
+            CampaignBuilderEvent::class => ['onCampaignBuild', 0],
             StageEvents::ON_CAMPAIGN_BATCH_ACTION => ['onCampaignTriggerStageChange', 0],
         ];
     }

@@ -26,7 +26,7 @@ final readonly class CampaignEventDeleteSubscriber implements EventSubscriberInt
     public static function getSubscribedEvents(): array
     {
         return [
-            CampaignEvents::ON_CAMPAIGN_DELETE => ['onCampaignDelete', 0],
+            DeleteCampaign::class              => ['onCampaignDelete', 0],
             CampaignEvents::ON_EVENT_DELETE    => ['onEventDelete', 0],
         ];
     }

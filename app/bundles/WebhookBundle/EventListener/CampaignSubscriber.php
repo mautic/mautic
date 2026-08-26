@@ -2,8 +2,7 @@
 
 namespace Mautic\WebhookBundle\EventListener;
 
-use Mautic\CampaignBundle\CampaignEvents;
-use Mautic\CampaignBundle\Event as Events;
+use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\WebhookBundle\Form\Type\CampaignEventSendWebhookType;
 use Mautic\WebhookBundle\Helper\CampaignHelper;
@@ -20,7 +19,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CampaignEvents::CAMPAIGN_ON_BUILD       => ['onCampaignBuild', 0],
+            CampaignBuilderEvent::class             => ['onCampaignBuild', 0],
             WebhookEvents::ON_CAMPAIGN_BATCH_ACTION => ['onCampaignTriggerAction', 0],
         ];
     }
@@ -46,7 +45,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
     /**
      * Add event triggers and actions.
      */
-    public function onCampaignBuild(Events\CampaignBuilderEvent $event): void
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $sendWebhookAction = [
             'label'              => 'mautic.webhook.event.sendwebhook',

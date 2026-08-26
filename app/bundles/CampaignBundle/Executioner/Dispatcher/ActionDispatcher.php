@@ -3,7 +3,6 @@
 namespace Mautic\CampaignBundle\Executioner\Dispatcher;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\ExecutedBatchEvent;
@@ -65,14 +64,12 @@ final readonly class ActionDispatcher
 
         foreach ($logs as $log) {
             $this->dispatcher->dispatch(
-                new ExecutedEvent($config, $log),
-                CampaignEvents::ON_EVENT_EXECUTED
+                new ExecutedEvent($config, $log)
             );
         }
 
         $this->dispatcher->dispatch(
-            new ExecutedBatchEvent($config, $event, $logs),
-            CampaignEvents::ON_EVENT_EXECUTED_BATCH
+            new ExecutedBatchEvent($config, $event, $logs)
         );
     }
 
@@ -89,8 +86,7 @@ final readonly class ActionDispatcher
             );
 
             $this->dispatcher->dispatch(
-                new FailedEvent($config, $log),
-                CampaignEvents::ON_EVENT_FAILED
+                new FailedEvent($config, $log)
             );
         }
 

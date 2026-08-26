@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\EventListener;
 
-use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\FailedLeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\ExecutedBatchEvent;
@@ -20,7 +19,7 @@ final readonly class CampaignEventLogCleanupSubscriber implements EventSubscribe
     public static function getSubscribedEvents(): array
     {
         return [
-            CampaignEvents::ON_EVENT_EXECUTED_BATCH => ['onEventBatchExecuted', -100],
+            ExecutedBatchEvent::class => ['onEventBatchExecuted', -100],
         ];
     }
 
