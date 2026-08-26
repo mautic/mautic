@@ -22,8 +22,8 @@ class FieldExclusionStrategy implements ExclusionStrategyInterface
      */
     public function __construct(
         private readonly array $fields,
-        $level = 3,
-        private $path = null,
+        int $level = 3,
+        private ?string $path = null,
     ) {
         $this->level  = (int) $level;
     }
