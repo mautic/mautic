@@ -69,7 +69,7 @@ class OpenSSLCipher implements SymmetricCipherInterface
     /**
      * @param string $data
      */
-    private function getHash($data, string $key): string
+    private function getHash(string $data, string $key): string
     {
         return hash_hmac('sha256', $data, $key);
     }
