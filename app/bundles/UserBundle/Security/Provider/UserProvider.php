@@ -81,8 +81,6 @@ class UserProvider implements UserProviderInterface
     /**
      * Create/update user from authentication plugins.
      *
-     * @param bool|true $createIfNotExists
-     *
      * @return User
      *
      * @throws BadCredentialsException

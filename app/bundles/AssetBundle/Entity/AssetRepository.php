@@ -36,10 +36,9 @@ class AssetRepository extends CommonRepository
     }
 
     /**
-     * @param string     $search
-     * @param int        $limit
-     * @param int        $start
-     * @param bool|false $viewOther
+     * @param string $search
+     * @param int    $limit
+     * @param int    $start
      *
      * @return array
      */

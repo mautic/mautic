@@ -67,7 +67,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 }
 
                 $debug = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-                if (true === $backtrace) {
+                if ($backtrace) {
                     $context['trace'] = array_slice($debug, 1, 5);
                 }
 

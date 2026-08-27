@@ -173,7 +173,7 @@ final class LookupHelper
         return ($person) ? new FullContact_Person($keys['apikey']) : new FullContact_Company($keys['apikey']);
     }
 
-    private function getCache(Lead|Company $entity, $notify): array
+    private function getCache(Lead|Company $entity, bool $notify): array
     {
         $user      = $this->userHelper->getUser();
         $nonce     = substr(EncryptionHelper::generateKey(), 0, 16);

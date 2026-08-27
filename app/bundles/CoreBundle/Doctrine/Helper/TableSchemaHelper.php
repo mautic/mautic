@@ -105,7 +105,7 @@ class TableSchemaHelper
         }
 
         if ($checkExists || $dropExisting) {
-            $throwException = !(bool) $dropExisting;
+            $throwException = !$dropExisting;
             if ($this->checkTableExists($table['name'], $throwException) && $dropExisting) {
                 $this->deleteTable($table['name']);
             }

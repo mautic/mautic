@@ -14,7 +14,7 @@ final class ScheduledBatchEvent extends AbstractLogCollectionEvent
         AbstractEventAccessor $config,
         Event $event,
         ArrayCollection $logs,
-        private bool $isReschedule = false,
+        private readonly bool $isReschedule = false,
     ) {
         parent::__construct($config, $event, $logs);
     }
@@ -27,10 +27,7 @@ final class ScheduledBatchEvent extends AbstractLogCollectionEvent
         return $this->logs;
     }
 
-    /**
-     * @return bool
-     */
-    public function isReschedule()
+    public function isReschedule(): bool
     {
         return $this->isReschedule;
     }

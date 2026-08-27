@@ -18,7 +18,7 @@ final class TagEntityModelTransformer implements DataTransformerInterface
     public function __construct(
         private readonly EntityManagerInterface $em,
         private $repository = '',
-        private bool $isArray = false,
+        private readonly bool $isArray = false,
     ) {
     }
 

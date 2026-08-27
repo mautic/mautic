@@ -376,12 +376,11 @@ class ListModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param int      $limit
-     * @param bool|int $maxLeads
+     * @param int $limit
      *
      * @throws \Exception
      */
-    public function rebuildListLeads(LeadList $leadList, $limit = 100, bool $maxLeads = false, ?OutputInterface $output = null): int
+    public function rebuildListLeads(LeadList $leadList, $limit = 100, int|bool|null $maxLeads = false, ?OutputInterface $output = null): int
     {
         defined('MAUTIC_REBUILDING_LEAD_LISTS') || define('MAUTIC_REBUILDING_LEAD_LISTS', 1);
 

@@ -122,9 +122,6 @@ final class ApiMetadataDriver implements DriverInterface
 
     /**
      * Create properties.
-     *
-     * @param bool|false $addToListGroup
-     * @param bool|false $useGetter
      */
     public function addProperties(array $properties, bool $addToListGroup = false, bool $useGetter = false): static
     {

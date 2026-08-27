@@ -370,7 +370,7 @@ class LeadRepository extends CommonRepository
             ->setParameter('segments', $segments, ArrayParameterType::INTEGER);
 
         $this->updateQueryFromContactLimiter('ll', $qb, $limiter, true);
-        $this->updateQueryWithExistingMembershipExclusion((int) $campaignId, $qb, (bool) $campaignCanBeRestarted);
+        $this->updateQueryWithExistingMembershipExclusion((int) $campaignId, $qb, $campaignCanBeRestarted);
 
         if (!$campaignCanBeRestarted) {
             $this->updateQueryWithHistoryExclusion($campaignId, $qb);
@@ -410,7 +410,7 @@ class LeadRepository extends CommonRepository
             ->orderBy('ll.lead_id');
 
         $this->updateQueryFromContactLimiter('ll', $qb, $limiter);
-        $this->updateQueryWithExistingMembershipExclusion((int) $campaignId, $qb, (bool) $campaignCanBeRestarted);
+        $this->updateQueryWithExistingMembershipExclusion((int) $campaignId, $qb, $campaignCanBeRestarted);
 
         if (!$campaignCanBeRestarted) {
             $this->updateQueryWithHistoryExclusion($campaignId, $qb);

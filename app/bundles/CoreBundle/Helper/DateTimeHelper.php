@@ -189,7 +189,6 @@ class DateTimeHelper
      * Gets a difference.
      *
      * @param string|\DateTime $compare
-     * @param bool|false       $resetTime
      *
      * @return bool|\DateInterval|string
      */

@@ -154,8 +154,6 @@ final class InputHelper
     /**
      * Cleans value by HTML-escaping '"<>& and characters with ASCII value less than 32.
      *
-     * @param bool|false $urldecode
-     *
      * @return false|string|mixed[]
      */
     public static function clean(mixed $value, bool $urldecode = false): array|string|false
@@ -234,8 +232,6 @@ final class InputHelper
     /**
      * Returns raw value.
      *
-     * @param bool|false $urldecode
-     *
      * @return string
      */
     public static function raw($value, bool $urldecode = false)
@@ -250,11 +246,9 @@ final class InputHelper
     /**
      * Removes all characters except those allowed in URLs.
      *
-     * @param bool|false         $urldecode
      * @param array<string>|null $allowedProtocols
      * @param mixed              $defaultProtocol
      * @param array<string>      $removeQuery
-     * @param bool|false         $ignoreFragment
      */
     public static function url(?string $value, bool $urldecode = false, $allowedProtocols = null, $defaultProtocol = null, $removeQuery = [], bool $ignoreFragment = false): string|false
     {
@@ -317,8 +311,6 @@ final class InputHelper
 
     /**
      * Removes all characters except those allowed in emails.
-     *
-     * @param bool|false $urldecode
      */
     public static function email($value, bool $urldecode = false): string
     {

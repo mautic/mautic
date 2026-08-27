@@ -17,10 +17,7 @@ class ErrorHandlerException extends \Exception
         parent::__construct($message, $code, $previous);
     }
 
-    /**
-     * @return bool
-     */
-    public function showMessage()
+    public function showMessage(): bool
     {
         return $this->showMessage;
     }

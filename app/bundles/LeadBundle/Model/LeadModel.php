@@ -559,9 +559,7 @@ class LeadModel extends FormModel
     /**
      * Populates custom field values for updating the lead. Also retrieves social media data.
      *
-     * @param bool|false $overwriteWithBlank
-     * @param bool|true  $fetchSocialProfiles
-     * @param bool|false $bindWithForm        Send $data through the Lead form and only use valid data (should be used with request data)
+     * @param bool|false $bindWithForm Send $data through the Lead form and only use valid data (should be used with request data)
      *
      * @throws ImportFailedException
      */
@@ -1570,8 +1568,6 @@ class LeadModel extends FormModel
 
     /**
      * Update a leads tags.
-     *
-     * @param bool|false $removeOrphans
      */
     public function setTags(Lead $lead, array $tags, bool $removeOrphans = false): void
     {

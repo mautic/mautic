@@ -13,7 +13,7 @@ final class BuildJsEvent extends Event
      */
     public function __construct(
         private $js,
-        private bool $debugMode = false,
+        private readonly bool $debugMode = false,
         private readonly array $acceptedScopes = [
             BuildJsScope::RUNTIME,
             BuildJsScope::ESSENTIAL,

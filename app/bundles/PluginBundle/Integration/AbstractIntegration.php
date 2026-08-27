@@ -2190,14 +2190,12 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * @param bool|\Exception $error
-     *
      * @return int Number ignored due to being duplicates
      *
      * @throws ApiErrorException
      * @throws \Exception
      */
-    protected function cleanupFromSync(&$leadsToSync = [], bool $error = false)
+    protected function cleanupFromSync(&$leadsToSync = [], bool|\Exception $error = false)
     {
         $duplicates = 0;
         if ($this->mauticDuplicates) {

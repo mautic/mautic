@@ -227,7 +227,7 @@ final class ListController extends FormController
                 $auditLogModel,
                 $postActionVars,
                 $this->generateUrl('mautic_segment_action', ['objectAction' => 'clone', 'objectId' => $objectId]),
-                (bool) $ignorePost
+                $ignorePost
             );
         } catch (EntityNotFoundException) {
             return $this->postActionRedirect(
@@ -376,11 +376,9 @@ final class ListController extends FormController
     /**
      * Create modifying response for segments - edit.
      *
-     * @param bool $ignorePost
-     *
      * @return Response
      */
-    private function createSegmentModifyResponse(Request $request, LeadList $segment, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $segmentModel, AuditLogModel $auditLogModel, array $postActionVars, string $action, $ignorePost)
+    private function createSegmentModifyResponse(Request $request, LeadList $segment, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $segmentModel, AuditLogModel $auditLogModel, array $postActionVars, string $action, bool $ignorePost)
     {
         if ($segmentModel->isLocked($segment)) {
             return $this->isLocked($postActionVars, $segment, 'lead.list');

@@ -692,7 +692,7 @@ class MailHelper
      */
     public function attachFile($filePath, $fileName = null, $contentType = null, bool $inline = false): void
     {
-        if (true === $inline) {
+        if ($inline) {
             $this->message->embedFromPath($filePath, $fileName, $contentType);
 
             return;
@@ -1653,7 +1653,6 @@ class MailHelper
     }
 
     /**
-     * @param bool|true   $persist
      * @param string|null $emailAddress
      */
     public function createEmailStat(bool $persist = true, $emailAddress = null, $listId = null): Stat

@@ -156,11 +156,9 @@ class EventLogger
     }
 
     /**
-     * @param bool $isInactiveEntry
-     *
      * @return ArrayCollection
      */
-    public function generateLogsFromContacts(Event $event, AbstractEventAccessor $config, ArrayCollection $contacts, $isInactiveEntry)
+    public function generateLogsFromContacts(Event $event, AbstractEventAccessor $config, ArrayCollection $contacts, bool $isInactiveEntry)
     {
         $isDecision = Event::TYPE_DECISION === $event->getEventType();
         $campaign   = $event->getCampaign();

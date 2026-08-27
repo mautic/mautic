@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\WebhookBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
@@ -13,12 +15,12 @@ class WebhookEvent extends CommonEvent
     protected $entity;
 
     /**
-     * @param string $reason
+     * @param bool $isNew
      */
     public function __construct(
         Webhook $webhook,
         protected $isNew = false,
-        private $reason = '',
+        private string $reason = '',
     ) {
         $this->entity = $webhook;
     }
@@ -41,7 +43,7 @@ class WebhookEvent extends CommonEvent
         $this->entity = $webhook;
     }
 
-    public function setReason($reason): void
+    public function setReason(string $reason): void
     {
         $this->reason = $reason;
     }

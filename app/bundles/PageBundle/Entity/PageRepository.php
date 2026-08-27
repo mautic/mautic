@@ -62,16 +62,15 @@ class PageRepository extends CommonRepository
     }
 
     /**
-     * @param string      $search
-     * @param int         $limit
-     * @param int         $start
-     * @param string|bool $topLevel
-     * @param array       $ignoreIds
-     * @param array       $extraColumns
+     * @param string $search
+     * @param int    $limit
+     * @param int    $start
+     * @param array  $ignoreIds
+     * @param array  $extraColumns
      *
      * @return array
      */
-    public function getPageList($search = '', $limit = 10, $start = 0, bool $viewOther = false, bool $topLevel = false, $ignoreIds = [], $extraColumns = [], bool $publishedOnly = false)
+    public function getPageList($search = '', $limit = 10, $start = 0, bool $viewOther = false, string|bool $topLevel = false, $ignoreIds = [], $extraColumns = [], bool $publishedOnly = false)
     {
         $q = $this->createQueryBuilder('p');
         $q->select(sprintf('partial p.{id, title, language, alias %s}', empty($extraColumns) ? '' : ','.implode(',', $extraColumns)));
@@ -249,9 +248,7 @@ class PageRepository extends CommonRepository
     }
 
     /**
-     * @param int        $increaseBy
-     * @param bool|false $unique
-     * @param bool|false $variant
+     * @param int $increaseBy
      */
     public function upHitCount($id, $increaseBy = 1, bool $unique = false, bool $variant = false): void
     {

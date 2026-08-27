@@ -209,7 +209,7 @@ class ChartQuery extends AbstractChart
      *
      * @return QueryBuilder
      */
-    public function prepareTimeDataQuery($table, $column, $filters = [], $countColumn = '*', bool $isEnumerable = true, bool $useSqlOrder = true)
+    public function prepareTimeDataQuery($table, $column, $filters = [], $countColumn = '*', bool|string $isEnumerable = true, bool|string $useSqlOrder = true)
     {
         // Convert time unitst to the right form for current database platform
         $query = $this->connection->createQueryBuilder();
@@ -230,7 +230,7 @@ class ChartQuery extends AbstractChart
      * @param string      $countColumn
      * @param bool|string $isEnumerable true = COUNT, string sum = SUM
      */
-    public function modifyTimeDataQuery(QueryBuilder $query, $column, $tablePrefix = 't', $countColumn = '*', bool $isEnumerable = true, bool $useSqlOrder = true): void
+    public function modifyTimeDataQuery(QueryBuilder $query, $column, $tablePrefix = 't', $countColumn = '*', bool|string $isEnumerable = true, bool $useSqlOrder = true): void
     {
         // Convert time units to the right form for current database platform
         $limit         = $this->countAmountFromDateRange();

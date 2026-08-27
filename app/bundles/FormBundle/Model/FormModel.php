@@ -344,9 +344,6 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
 
     /**
      * Obtains the content.
-     *
-     * @param bool|true $withScript
-     * @param bool|true $useCache
      */
     public function getContent(Form $form, bool $withScript = true, bool $useCache = true): string
     {
@@ -367,8 +364,6 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
 
     /**
      * Obtains the cached HTML of a form and generates it if missing.
-     *
-     * @param bool|true $useCache
      *
      * @return string
      */

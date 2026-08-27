@@ -237,8 +237,6 @@ final class FieldController extends FormController
 
     /**
      * Generate's edit form and processes post data.
-     *
-     * @param bool|false $ignorePost
      */
     public function editAction(Request $request, $objectId, bool $ignorePost = false): Response
     {

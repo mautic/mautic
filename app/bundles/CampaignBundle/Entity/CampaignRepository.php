@@ -482,9 +482,8 @@ class CampaignRepository extends CommonRepository
     /**
      * Get lead data of a campaign.
      *
-     * @param int        $start
-     * @param bool|false $limit
-     * @param array      $select
+     * @param int   $start
+     * @param array $select
      *
      * @return mixed[]
      */

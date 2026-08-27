@@ -84,8 +84,7 @@ final class AssetsHelper
      * This could be logo's, country flags, ...
      * So to be able to override an asset, it has to exist in the assets folder.
      *
-     * @param string     $path
-     * @param bool|false $absolute
+     * @param string $path
      */
     public function getOverridableUrl($path, bool $absolute = false): false|string
     {
@@ -108,9 +107,7 @@ final class AssetsHelper
     /**
      * Set asset url path.
      *
-     * @param string     $path
-     * @param bool|false $absolute
-     * @param bool|false $ignorePrefix
+     * @param string $path
      */
     public function getUrl($path, ?string $packageName = null, ?string $version = null, bool $absolute = false, bool $ignorePrefix = false): string
     {
@@ -411,9 +408,6 @@ final class AssetsHelper
         }
     }
 
-    /**
-     * @param bool|false $includeEditor
-     */
     public function outputSystemScripts(bool $includeEditor = false): void
     {
         $assets = $this->assetHelper->getAssets();
@@ -586,9 +580,8 @@ final class AssetsHelper
     }
 
     /**
-     * @param string    $country
-     * @param bool|true $urlOnly
-     * @param string    $class
+     * @param string $country
+     * @param string $class
      */
     public function getCountryFlag($country, bool $urlOnly = true, $class = ''): string
     {

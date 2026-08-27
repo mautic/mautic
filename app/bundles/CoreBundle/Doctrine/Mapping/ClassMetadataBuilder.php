@@ -224,8 +224,6 @@ final class ClassMetadataBuilder extends OrmClassMetadataBuilder
 
     /**
      * Added dateAdded column.
-     *
-     * @param bool|false $nullable
      */
     public function addDateAdded(bool $nullable = false): static
     {
@@ -244,9 +242,7 @@ final class ClassMetadataBuilder extends OrmClassMetadataBuilder
     /**
      * Add a contact column.
      *
-     * @param bool|false  $nullable
      * @param string      $onDelete
-     * @param bool|false  $isPrimaryKey
      * @param string|null $inversedBy
      */
     public function addContact(bool $nullable = false, $onDelete = 'CASCADE', bool $isPrimaryKey = false, $inversedBy = null): static
@@ -271,9 +267,7 @@ final class ClassMetadataBuilder extends OrmClassMetadataBuilder
     /**
      * Add a lead column.
      *
-     * @param bool|false $nullable
-     * @param string     $onDelete
-     * @param bool|false $isPrimaryKey
+     * @param string $onDelete
      *
      * @deprecated Use addContact instead; existing implementations will need a migration to rename lead_id to contact_id
      */

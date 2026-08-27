@@ -712,8 +712,6 @@ final class LeadController extends FormController
 
     /**
      * Generates edit form.
-     *
-     * @param bool|false $ignorePost
      */
     public function editAction(Request $request, UserHelper $userHelper, AvatarHelper $avatarHelper, $objectId, bool $ignorePost = false): Response
     {

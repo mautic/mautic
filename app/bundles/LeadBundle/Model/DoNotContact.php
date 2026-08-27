@@ -29,10 +29,9 @@ class DoNotContact implements MauticModelInterface
     /**
      * Remove a Lead's DNC entry based on channel.
      *
-     * @param int|Lead  $contact
-     * @param string    $channel
-     * @param bool|true $persist
-     * @param int|null  $reason
+     * @param int|Lead $contact
+     * @param string   $channel
+     * @param int|null $reason
      */
     public function removeDncForContact($contact, $channel, bool $persist = true, $reason = null): bool
     {

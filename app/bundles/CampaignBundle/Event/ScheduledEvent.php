@@ -61,10 +61,7 @@ final class ScheduledEvent extends Event
         return $this->eventLog;
     }
 
-    /**
-     * @return bool
-     */
-    public function isReschedule()
+    public function isReschedule(): bool
     {
         return $this->isReschedule;
     }

@@ -160,8 +160,11 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     #[Groups(['user:read', 'user:write'])]
     private $signature;
 
+    /**
+     * @param bool $guest
+     */
     public function __construct(
-        private bool $guest = false,
+        private $guest = false,
     ) {
     }
 
