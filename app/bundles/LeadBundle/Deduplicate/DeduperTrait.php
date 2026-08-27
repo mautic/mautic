@@ -14,7 +14,7 @@ trait DeduperTrait
     private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier;
 
     /**
-     * @var array
+     * @var array|null
      */
     private $availableFields;
 

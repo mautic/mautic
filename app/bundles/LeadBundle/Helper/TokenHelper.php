@@ -13,7 +13,7 @@ final class TokenHelper
     private const string DATETIME_REGEX = '/({|%7B)datetime=(.*?)(}|%7D)/';
 
     /**
-     * @var array
+     * @var array|null
      */
     private static $parameters;
 

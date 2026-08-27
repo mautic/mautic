@@ -32,10 +32,8 @@ abstract class AbstractCustomRequestEvent extends Event
                 $this->routeParams = $ajaxRoute['_route_params'];
             } else {
                 $this->route       = $this->request->attributes->get('_route');
-                $this->routeParams = $this->request->attributes->get('_route_params');
+                $this->routeParams = $this->request->attributes->get('_route_params') ?? [];
             }
-
-            $this->routeParams ??= [];
         }
     }
 

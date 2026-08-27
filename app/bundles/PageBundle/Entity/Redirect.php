@@ -105,10 +105,7 @@ class Redirect extends FormEntity
         return $this->redirectId;
     }
 
-    /**
-     * @param string $redirectId
-     */
-    public function setRedirectId($redirectId = null): void
+    public function setRedirectId(?string $redirectId = null): void
     {
         $redirectId ??= substr(hash('sha1', uniqid(mt_rand())), 0, 25);
         $this->redirectId = $redirectId;
