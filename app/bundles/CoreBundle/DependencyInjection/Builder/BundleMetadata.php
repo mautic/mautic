@@ -25,11 +25,19 @@ class BundleMetadata
     private $bundleName;
 
     /**
+     * @var array<string, mixed>
+     */
+    private array $metadata = [
+        'config'            => [],
+        'permissionClasses' => [],
+    ];
+
+    /**
      * @param array<string, mixed> $metadata
      */
-    public function __construct(
-        private array $metadata,
-    ) {
+    public function __construct(array $metadata)
+    {
+        $this->metadata = $metadata;
         $this->metadata['permissionClasses'] ??= [];
         $this->metadata['config'] ??= [];
         $this->directory  = $this->metadata['directory'];
