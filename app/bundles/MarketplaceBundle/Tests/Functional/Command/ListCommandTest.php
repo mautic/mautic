@@ -12,6 +12,7 @@ use Mautic\MarketplaceBundle\Service\Allowlist;
 use Mautic\MarketplaceBundle\Service\PluginCollector;
 use PHPUnit\Framework\Exception;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class ListCommandTest extends AbstractMauticTestCase
 {
     public function testCommand(): void

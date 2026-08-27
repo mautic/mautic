@@ -16,6 +16,7 @@ use MauticPlugin\MauticFocusBundle\EventListener\CampaignSubscriber;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class CampaignSubscriberTest extends TestCase
 {
     public function testActionPassesWhenFocusIsConfigured(): void

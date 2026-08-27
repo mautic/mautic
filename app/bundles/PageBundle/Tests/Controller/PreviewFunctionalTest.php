@@ -13,6 +13,7 @@ use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class PreviewFunctionalTest extends MauticMysqlTestCase
 {
     public function testPreviewPageWithContact(): void

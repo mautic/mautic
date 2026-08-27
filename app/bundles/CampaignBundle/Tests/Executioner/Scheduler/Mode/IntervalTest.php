@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Log\NullLogger;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class IntervalTest extends \PHPUnit\Framework\TestCase
 {
     /**

@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Model\ListModel;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class LeadListModelTest extends \PHPUnit\Framework\TestCase
 {
     /**

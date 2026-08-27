@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class DateRangeUnitTraitTest extends TestCase
 {
     private MockObject&ChartQuery $trait;

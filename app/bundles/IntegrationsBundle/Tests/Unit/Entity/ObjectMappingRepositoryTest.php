@@ -15,6 +15,7 @@ use Mautic\IntegrationsBundle\Entity\ObjectMappingRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class ObjectMappingRepositoryTest extends TestCase
 {
     use RepositoryConfiguratorTrait;

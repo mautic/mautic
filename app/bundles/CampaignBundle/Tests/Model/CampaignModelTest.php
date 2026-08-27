@@ -9,6 +9,7 @@ use Mautic\CampaignBundle\Tests\CampaignTestAbstract;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class CampaignModelTest extends CampaignTestAbstract
 {
     public function testGetSourceListsWithNull(): void

@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use PHPUnit\Framework\MockObject\MockObject;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class ClassMetadataBuilderTest extends \PHPUnit\Framework\TestCase
 {
     /**

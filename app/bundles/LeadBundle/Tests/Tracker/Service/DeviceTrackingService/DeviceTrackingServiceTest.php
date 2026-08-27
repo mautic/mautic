@@ -16,6 +16,7 @@ use PHPUnit\Framework\MockObject\Rule\AnyInvokedCount;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
 {
     /**

@@ -15,6 +15,7 @@ use Mautic\SmsBundle\EventListener\SendSmsSubscriber;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class SendSmsSubscriberTest extends TestCase
 {
     private SendSmsSubscriber $subscriber;

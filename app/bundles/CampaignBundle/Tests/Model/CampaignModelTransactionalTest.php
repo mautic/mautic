@@ -30,6 +30,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class CampaignModelTransactionalTest extends TestCase
 {
     private MockObject&CampaignRepository $campaignRepositoryMock;

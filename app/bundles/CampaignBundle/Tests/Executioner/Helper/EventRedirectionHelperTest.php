@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Test\ReflectionHelper;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class EventRedirectionHelperTest extends TestCase
 {
     /**

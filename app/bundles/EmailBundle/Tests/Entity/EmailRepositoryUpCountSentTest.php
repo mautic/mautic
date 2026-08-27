@@ -11,6 +11,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class EmailRepositoryUpCountSentTest extends \PHPUnit\Framework\TestCase
 {
     use RepositoryConfiguratorTrait;

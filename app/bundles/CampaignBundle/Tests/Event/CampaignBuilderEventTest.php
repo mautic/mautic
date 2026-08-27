@@ -11,6 +11,7 @@ use Mautic\CampaignBundle\Tests\CampaignTestAbstract;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Form\Type\CampaignEventFormFieldValueType;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class CampaignBuilderEventTest extends CampaignTestAbstract
 {
     public function testAddGetDecision(): void

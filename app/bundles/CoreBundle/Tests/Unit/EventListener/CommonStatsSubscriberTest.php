@@ -15,6 +15,7 @@ use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class CommonStatsSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**

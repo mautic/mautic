@@ -22,6 +22,7 @@ use Mautic\PointBundle\Model\PointGroupModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Request;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class FormSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**

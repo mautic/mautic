@@ -10,6 +10,7 @@ use Mautic\StageBundle\Form\Type\StageListType;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormBuilderInterface;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class CampaignEventLeadStagesTypeTest extends AbstractMauticTestCase
 {
     private CampaignEventLeadStagesType $campaignEventLeadStagesType;

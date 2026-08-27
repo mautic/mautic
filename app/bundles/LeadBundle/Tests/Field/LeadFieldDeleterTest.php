@@ -14,6 +14,7 @@ use Mautic\LeadBundle\Field\Settings\BackgroundSettings;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class LeadFieldDeleterTest extends TestCase
 {
     private MockObject&LeadFieldRepository $leadFieldRepositoryMock;

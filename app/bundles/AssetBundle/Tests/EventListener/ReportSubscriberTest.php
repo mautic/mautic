@@ -18,6 +18,7 @@ use Mautic\ReportBundle\Helper\ReportHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private ChannelListHelper $channelListHelper;

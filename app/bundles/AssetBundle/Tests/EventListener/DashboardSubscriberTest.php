@@ -15,6 +15,7 @@ use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class DashboardSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private AssetModel&MockObject $assetModel;

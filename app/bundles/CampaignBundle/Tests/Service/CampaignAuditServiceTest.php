@@ -13,6 +13,7 @@ use Mautic\EmailBundle\Entity\Email;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class CampaignAuditServiceTest extends MauticMysqlTestCase
 {
     private const string CAMPAIGN_NAME = 'Test Campaign';

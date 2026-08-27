@@ -20,6 +20,7 @@ use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Rule\AnyInvokedCount;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 {
     public const string SC_MULTIPLE_SF_LEADS        = 'multiple_sf_leads';

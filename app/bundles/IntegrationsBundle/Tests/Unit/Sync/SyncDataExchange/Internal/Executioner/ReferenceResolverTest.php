@@ -15,6 +15,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\Referen
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class ReferenceResolverTest extends TestCase
 {
     /**

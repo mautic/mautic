@@ -13,6 +13,7 @@ use Mautic\PointBundle\Event\TriggerExecutedEvent;
 use Mautic\PointBundle\PointEvents;
 use PHPUnit\Framework\MockObject\MockObject;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class PointSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**

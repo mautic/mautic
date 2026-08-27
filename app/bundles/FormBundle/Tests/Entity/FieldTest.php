@@ -11,6 +11,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class FieldTest extends \PHPUnit\Framework\TestCase
 {
     public function testShowForConditionalFieldWithNoParent(): void

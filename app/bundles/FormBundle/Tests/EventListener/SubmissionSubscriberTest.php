@@ -11,6 +11,7 @@ use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\EventListener\SubmissionSubscriber;
 use PHPUnit\Framework\TestCase;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class SubmissionSubscriberTest extends TestCase
 {
     public function testPostPersistIncrementsCount(): void

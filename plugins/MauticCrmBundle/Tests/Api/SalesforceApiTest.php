@@ -15,6 +15,7 @@ use Psr\SimpleCache\CacheInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[CoversClass(SalesforceApi::class)]
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 {
     #[TestDox('Test that a locked record request is retried up to 3 times')]

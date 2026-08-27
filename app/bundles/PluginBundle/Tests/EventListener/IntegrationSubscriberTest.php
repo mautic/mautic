@@ -9,6 +9,7 @@ use Mautic\PluginBundle\EventListener\IntegrationSubscriber;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class IntegrationSubscriberTest extends TestCase
 {
     public function testOnRequestLogging(): void

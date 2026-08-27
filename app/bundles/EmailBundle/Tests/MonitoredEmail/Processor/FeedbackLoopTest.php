@@ -19,6 +19,7 @@ use PHPUnit\Framework\Attributes\TestDox;
 
 #[CoversClass(FeedbackLoop::class)]
 #[CoversClass(Result::class)]
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class FeedbackLoopTest extends \PHPUnit\Framework\TestCase
 {
     #[TestDox('Test that the message is processed appropriately')]

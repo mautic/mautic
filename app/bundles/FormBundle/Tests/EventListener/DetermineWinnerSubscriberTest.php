@@ -11,6 +11,7 @@ use Mautic\PageBundle\Entity\Page;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**

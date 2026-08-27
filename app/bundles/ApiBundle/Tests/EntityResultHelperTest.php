@@ -9,6 +9,7 @@ use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\TestCase;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class EntityResultHelperTest extends TestCase
 {
     public const string NEW_TITLE = 'Callback Title';

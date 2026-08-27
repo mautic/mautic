@@ -13,6 +13,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[CoversClass(FormValidationSubscriber::class)]
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class FormValidationSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private const string MINIMUM_TWO_OPTIONS_MESSAGE = 'You must select at least 2 options.';

@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class AbstractFormControllerTest extends \PHPUnit\Framework\TestCase
 {
     private AbstractFormController $classFromAbstractFormController;

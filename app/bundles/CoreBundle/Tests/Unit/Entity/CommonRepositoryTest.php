@@ -17,6 +17,7 @@ use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\MockObject\MockObject;
 
 #[CoversClass(CommonRepository::class)]
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     /**

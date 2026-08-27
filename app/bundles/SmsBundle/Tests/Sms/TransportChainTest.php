@@ -17,6 +17,7 @@ use Mautic\SmsBundle\Sms\TransportChain;
 use Mautic\SmsBundle\Sms\TransportInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class TransportChainTest extends MauticMysqlTestCase
 {
     private TransportChain $transportChain;

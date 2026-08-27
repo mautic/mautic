@@ -12,6 +12,7 @@ use PHPUnit\Framework\Attributes\TestDox;
 
 #[CoversClass(BadFormConfigException::class)]
 #[CoversClass(ConfigMapper::class)]
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class ConfigMapperTest extends \PHPUnit\Framework\TestCase
 {
     /**

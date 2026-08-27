@@ -11,6 +11,7 @@ use Mautic\DynamicContentBundle\Validator\Constraints\SlotNameTypeValidator;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class SlotNameTypeValidatorTest extends ConstraintValidatorTestCase
 {
     /**

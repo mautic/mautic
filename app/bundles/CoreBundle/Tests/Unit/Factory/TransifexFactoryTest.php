@@ -11,6 +11,7 @@ use Mautic\Transifex\Exception\MissingCredentialsException;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Http\Client\ClientInterface;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class TransifexFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**

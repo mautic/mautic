@@ -10,6 +10,7 @@ use Mautic\IntegrationsBundle\Mapping\MappedFieldInfoInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class FieldFilterHelperTest extends TestCase
 {
     public function testFieldsFilteredByPage(): void

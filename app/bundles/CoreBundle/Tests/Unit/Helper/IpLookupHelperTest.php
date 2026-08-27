@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 #[CoversClass(IpLookupHelper::class)]
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**

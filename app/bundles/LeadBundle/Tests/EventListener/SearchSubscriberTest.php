@@ -23,6 +23,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class SearchSubscriberTest extends TestCase
 {
     use MockedConnectionTrait;

@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 #[PreserveGlobalState(false)]
 #[RunTestsInSeparateProcesses]
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class Oauth2Test extends MauticMysqlTestCase
 {
     protected function setUp(): void

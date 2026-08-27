@@ -20,6 +20,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class AvatarHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**

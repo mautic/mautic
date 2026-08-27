@@ -16,6 +16,7 @@ use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class ExcelExporterTest extends TestCase
 {
     private ExcelExporter $excelExporter;

@@ -11,6 +11,7 @@ use Mautic\IntegrationsBundle\Entity\FieldChangeRepository;
 use Mautic\LeadBundle\Entity\Company;
 use PHPUnit\Framework\TestCase;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class FieldChangeRepositoryTest extends TestCase
 {
     use RepositoryConfiguratorTrait;

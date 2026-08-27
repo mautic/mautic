@@ -11,6 +11,7 @@ use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class MaxMindDoNotSellDownloadHelperTest extends \PHPUnit\Framework\TestCase
 {
     public const string TEMP_TEST_FILE = './DoNotSellTest.json';

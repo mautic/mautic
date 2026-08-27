@@ -7,6 +7,7 @@ namespace MauticPlugin\MauticOutlookBundle\Tests\Integration;
 use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticOutlookBundle\Integration\OutlookIntegration;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class OutlookIntegrationTest extends AbstractIntegrationTestCase
 {
     private OutlookIntegration $integration;
