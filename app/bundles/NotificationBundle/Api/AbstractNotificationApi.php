@@ -39,6 +39,6 @@ abstract class AbstractNotificationApi
     {
         $trackable = $this->trackableModel->getTrackableByUrl($url, 'notification', $clickthrough['notification']);
 
-        return $this->trackableModel->generateTrackableUrl($trackable, $clickthrough, [], $notification->getUtmTags());
+        return $this->trackableModel->generateTrackableUrl($trackable, $clickthrough, false, $notification->getUtmTags());
     }
 }

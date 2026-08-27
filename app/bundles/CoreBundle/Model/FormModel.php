@@ -188,10 +188,8 @@ class FormModel extends AbstractCommonModel
      * Determines if an entity is new or not.
      *
      * @param mixed $entity
-     *
-     * @return bool
      */
-    public function isNewEntity($entity)
+    public function isNewEntity($entity): bool
     {
         if (method_exists($entity, 'isNew')) {
             return $entity->isNew();
