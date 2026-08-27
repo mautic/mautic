@@ -60,10 +60,6 @@ phpstan.neon.dist
 /vendor/*
 !/vendor/.htaccess
 
-/bin/*
-!/bin/.htaccess
-!/bin/console
-
 /assets/ckeditor/build/*
 /assets/build/*
 /var/dart-sass/*

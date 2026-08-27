@@ -10,8 +10,8 @@ Mautic is an open-source marketing automation platform built on **Symfony 7.4** 
 
 ### Command Execution Rule
 - Prefer `ddev` wrappers for agent-run PHP, Composer, Symfony console, and PHPUnit commands in this repository.
-- Use forms like `ddev exec php bin/phpunit -c app/phpunit.xml.dist ...`, `ddev exec php bin/console ...`, and `ddev composer ...`.
-- Avoid running `php`, `composer`, `bin/console`, or `bin/phpunit` directly on the host unless the user explicitly asks for that.
+- Use forms like `ddev exec php vendor/bin/phpunit -c app/phpunit.xml.dist ...`, `ddev exec php bin/console ...`, and `ddev composer ...`.
+- Avoid running `php`, `composer`, `bin/console`, or `vendor/bin/phpunit` directly on the host unless the user explicitly asks for that.
 
 ### Development Setup
 ```bash
@@ -30,13 +30,13 @@ ddev exec php bin/console mautic:install <site-url>
 ddev composer test
 
 # Run specific test file
-ddev exec php bin/phpunit -c app/phpunit.xml.dist app/bundles/EmailBundle/Tests/Functional/EmailClickTrackingTest.php
+ddev exec php vendor/bin/phpunit -c app/phpunit.xml.dist app/bundles/EmailBundle/Tests/Functional/EmailClickTrackingTest.php
 
 # Run specific bundle tests
-ddev exec php bin/phpunit -c app/phpunit.xml.dist app/bundles/CoreBundle/Tests
+ddev exec php vendor/bin/phpunit -c app/phpunit.xml.dist app/bundles/CoreBundle/Tests
 
 # Run specific test method
-ddev exec php bin/phpunit -c app/phpunit.xml.dist --filter testGuessTimezoneFromOffset
+ddev exec php vendor/bin/phpunit -c app/phpunit.xml.dist --filter testGuessTimezoneFromOffset
 
 # E2E acceptance tests (Codeception)
 ddev composer run e2e-test

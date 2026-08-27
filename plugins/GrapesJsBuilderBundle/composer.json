@@ -23,9 +23,9 @@
     "quicktest": [
       "@unit"
     ],
-    "phpunit": "../../bin/phpunit -d memory_limit=2048M --bootstrap ../../vendor/autoload.php --configuration phpunit.xml --fail-on-warning --testsuite=all",
-    "unit": "../../bin/phpunit -d memory_limit=2048M --bootstrap ../../vendor/autoload.php --configuration phpunit.xml --fail-on-warning --testsuite=unit",
-    "coverage": "../../bin/phpunit -d memory_limit=2048M --bootstrap ../../vendor/autoload.php --configuration phpunit.xml --fail-on-warning --testsuite=all --coverage-text --coverage-html=Tests/Coverage",
+    "phpunit": "../../vendor/bin/phpunit -d memory_limit=2048M --bootstrap ../../vendor/autoload.php --configuration phpunit.xml --fail-on-warning --testsuite=all",
+    "unit": "../../vendor/bin/phpunit -d memory_limit=2048M --bootstrap ../../vendor/autoload.php --configuration phpunit.xml --fail-on-warning --testsuite=unit",
+    "coverage": "../../vendor/bin/phpunit -d memory_limit=2048M --bootstrap ../../vendor/autoload.php --configuration phpunit.xml --fail-on-warning --testsuite=all --coverage-text --coverage-html=Tests/Coverage",
     "phpstan": "vendor/bin/phpstan analyse --autoload-file=../../vendor/autoload.php --level=max Config Connection Entity Form Integration Migrations Sync Tests",
     "csfixer": "vendor/bin/ecs check .",
     "fixcs": "vendor/bin/ecs check . --fix"
