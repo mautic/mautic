@@ -2,7 +2,7 @@
   "version": "7.2.0-rc2",
   "stability": "rc",
   "minimum_php_version": "8.2.0",
-  "maximum_php_version": "8.5.99",
+  "maximum_php_version": "8.6.99",
   "minimum_mysql_version": "8.4.0",
   "minimum_mariadb_version": "10.11.0",
   "minimum_postgresql_version": "14.0.0",
