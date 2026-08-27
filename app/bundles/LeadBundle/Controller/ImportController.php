@@ -342,13 +342,12 @@ final class ImportController extends FormController
                                 // $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']) is deprecated
                                 // Below workaround for this deprecation in PHP8.6+
                                 $file->setFlags(\SplFileObject::DROP_NEW_LINE);
-                                $line = $file->fgets();
-                                $headers = (false !== $line) ? str_getcsv(
-                                    $line,
+                                $headers = str_getcsv(
+                                    $file->fgets(),
                                     $config['delimiter'],
                                     $config['enclosure'],
                                     $config['escape']
-                                ) : false;
+                                );
                                 // End of workaround
 
                                 // Get the number of lines so we can track progress
@@ -370,7 +369,8 @@ final class ImportController extends FormController
                                     }
                                 }
 
-                                if (!empty($headers) && is_array($headers)) {
+                                // Treat a single null field (blank line) as no headers
+                                if ([] !== $headers && [null] !== $headers) {
                                     $headers = CsvHelper::sanitizeHeaders($headers);
 
                                     $this->requestStack->getSession()->set('mautic.'.$object.'.import.headers', $headers);
