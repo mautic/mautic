@@ -1,0 +1,5858 @@
+{
+    "fos_oauth_server_authorize": {
+        "path": "/oauth/v2/authorize",
+        "methods": [
+            "GET",
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\ApiBundle\\Controller\\oAuth2\\AuthorizeController::authorizeAction"
+        },
+        "requirements": []
+    },
+    "login": {
+        "path": "/s/login",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\UserBundle\\Controller\\SecurityController::loginAction"
+        },
+        "requirements": []
+    },
+    "mautic_abtest_generate": {
+        "path": "/s/email/abtest/generate/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\EmailBundle\\Controller\\ABTestController::generateABTestAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_api_adjustcontactgrouppoints": {
+        "path": "/api/contacts/{contactId}/points/groups/{groupId}/{operator}/{value}",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\PointGroupsApiController::adjustGroupPointsAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "contactId": "\\d+",
+            "groupId": "\\d+"
+        }
+    },
+    "mautic_api_adjustcontactpoints": {
+        "path": "/api/contacts/{leadId}/points/{operator}/{delta}",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\PointApiController::adjustPointsAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "leadId": "\\d+"
+        }
+    },
+    "mautic_api_assets_delete": {
+        "path": "/api/assets/{id}/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\AssetBundle\\Controller\\Api\\AssetApiController::deleteEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_assets_deletebatch": {
+        "path": "/api/assets/batch/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\AssetBundle\\Controller\\Api\\AssetApiController::deleteEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_assets_editbatchpatch": {
+        "path": "/api/assets/batch/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\AssetBundle\\Controller\\Api\\AssetApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_assets_editbatchput": {
+        "path": "/api/assets/batch/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\AssetBundle\\Controller\\Api\\AssetApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_assets_editpatch": {
+        "path": "/api/assets/{id}/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\AssetBundle\\Controller\\Api\\AssetApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_assets_editput": {
+        "path": "/api/assets/{id}/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\AssetBundle\\Controller\\Api\\AssetApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_assets_getall": {
+        "path": "/api/assets",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\AssetBundle\\Controller\\Api\\AssetApiController::getEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_assets_getone": {
+        "path": "/api/assets/{id}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\AssetBundle\\Controller\\Api\\AssetApiController::getEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_assets_new": {
+        "path": "/api/assets/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\AssetBundle\\Controller\\Api\\AssetApiController::newEntityAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_assets_newbatch": {
+        "path": "/api/assets/batch/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\AssetBundle\\Controller\\Api\\AssetApiController::newEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_campaign_contact_events": {
+        "path": "/api/campaigns/{campaignId}/events/contact/{contactId}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CampaignBundle\\Controller\\Api\\EventLogApiController::getContactEventsAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "campaignId": "\\d+",
+            "contactId": "\\d+"
+        }
+    },
+    "mautic_api_campaignaddcontact": {
+        "path": "/api/campaigns/{id}/contact/{leadId}/add",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CampaignBundle\\Controller\\Api\\CampaignApiController::addLeadAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+",
+            "id}/contact/{leadId": "\\d+"
+        }
+    },
+    "mautic_api_campaigngetcontacts": {
+        "path": "/api/campaigns/{id}/contacts",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CampaignBundle\\Controller\\Api\\CampaignApiController::getContactsAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_campaignremovecontact": {
+        "path": "/api/campaigns/{id}/contact/{leadId}/remove",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CampaignBundle\\Controller\\Api\\CampaignApiController::removeLeadAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+",
+            "id}/contact/{leadId": "\\d+"
+        }
+    },
+    "mautic_api_campaigns_batchedit_events": {
+        "path": "/api/campaigns/events/batch/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CampaignBundle\\Controller\\Api\\EventLogApiController::editEventsAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_campaigns_delete": {
+        "path": "/api/campaigns/{id}/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CampaignBundle\\Controller\\Api\\CampaignApiController::deleteEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_campaigns_deletebatch": {
+        "path": "/api/campaigns/batch/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CampaignBundle\\Controller\\Api\\CampaignApiController::deleteEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_campaigns_edit_contact_event": {
+        "path": "/api/campaigns/events/{eventId}/contact/{contactId}/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CampaignBundle\\Controller\\Api\\EventLogApiController::editContactEventAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "contactId": "\\d+",
+            "eventId": "\\d+"
+        }
+    },
+    "mautic_api_campaigns_editbatchpatch": {
+        "path": "/api/campaigns/batch/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CampaignBundle\\Controller\\Api\\CampaignApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_campaigns_editbatchput": {
+        "path": "/api/campaigns/batch/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CampaignBundle\\Controller\\Api\\CampaignApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_campaigns_editpatch": {
+        "path": "/api/campaigns/{id}/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CampaignBundle\\Controller\\Api\\CampaignApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_campaigns_editput": {
+        "path": "/api/campaigns/{id}/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CampaignBundle\\Controller\\Api\\CampaignApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_campaigns_events_contact": {
+        "path": "/api/campaigns/events/contact/{contactId}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CampaignBundle\\Controller\\Api\\EventLogApiController::getContactEventsAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "contactId": "\\d+"
+        }
+    },
+    "mautic_api_campaigns_getall": {
+        "path": "/api/campaigns",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CampaignBundle\\Controller\\Api\\CampaignApiController::getEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_campaigns_getone": {
+        "path": "/api/campaigns/{id}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CampaignBundle\\Controller\\Api\\CampaignApiController::getEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_campaigns_new": {
+        "path": "/api/campaigns/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CampaignBundle\\Controller\\Api\\CampaignApiController::newEntityAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_campaigns_newbatch": {
+        "path": "/api/campaigns/batch/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CampaignBundle\\Controller\\Api\\CampaignApiController::newEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_categories_delete": {
+        "path": "/api/categories/{id}/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CategoryBundle\\Controller\\Api\\CategoryApiController::deleteEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_categories_deletebatch": {
+        "path": "/api/categories/batch/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CategoryBundle\\Controller\\Api\\CategoryApiController::deleteEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_categories_editbatchpatch": {
+        "path": "/api/categories/batch/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CategoryBundle\\Controller\\Api\\CategoryApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_categories_editbatchput": {
+        "path": "/api/categories/batch/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CategoryBundle\\Controller\\Api\\CategoryApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_categories_editpatch": {
+        "path": "/api/categories/{id}/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CategoryBundle\\Controller\\Api\\CategoryApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_categories_editput": {
+        "path": "/api/categories/{id}/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CategoryBundle\\Controller\\Api\\CategoryApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_categories_getall": {
+        "path": "/api/categories",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CategoryBundle\\Controller\\Api\\CategoryApiController::getEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_categories_getone": {
+        "path": "/api/categories/{id}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CategoryBundle\\Controller\\Api\\CategoryApiController::getEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_categories_new": {
+        "path": "/api/categories/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CategoryBundle\\Controller\\Api\\CategoryApiController::newEntityAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_categories_newbatch": {
+        "path": "/api/categories/batch/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CategoryBundle\\Controller\\Api\\CategoryApiController::newEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_checkpermission": {
+        "path": "/api/users/{id}/permissioncheck",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\UserBundle\\Controller\\Api\\UserApiController::isGrantedAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_companies_delete": {
+        "path": "/api/companies/{id}/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\CompanyApiController::deleteEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_companies_deletebatch": {
+        "path": "/api/companies/batch/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\CompanyApiController::deleteEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_companies_editbatchpatch": {
+        "path": "/api/companies/batch/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\CompanyApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_companies_editbatchput": {
+        "path": "/api/companies/batch/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\CompanyApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_companies_editpatch": {
+        "path": "/api/companies/{id}/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\CompanyApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_companies_editput": {
+        "path": "/api/companies/{id}/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\CompanyApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_companies_getall": {
+        "path": "/api/companies",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\CompanyApiController::getEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_companies_getone": {
+        "path": "/api/companies/{id}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\CompanyApiController::getEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_companies_new": {
+        "path": "/api/companies/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\CompanyApiController::newEntityAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_companies_newbatch": {
+        "path": "/api/companies/batch/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\CompanyApiController::newEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_companyaddcontact": {
+        "path": "/api/companies/{companyId}/contact/{contactId}/add",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\CompanyApiController::addContactAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "companyId": "\\d+",
+            "contactId": "\\d+"
+        }
+    },
+    "mautic_api_companyremovecontact": {
+        "path": "/api/companies/{companyId}/contact/{contactId}/remove",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\CompanyApiController::removeContactAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "companyId": "\\d+",
+            "contactId": "\\d+"
+        }
+    },
+    "mautic_api_contact_clone_campaign": {
+        "path": "/api/campaigns/clone/{campaignId}",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CampaignBundle\\Controller\\Api\\CampaignApiController::cloneCampaignAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "campaignId": "\\d+"
+        }
+    },
+    "mautic_api_contactformresults": {
+        "path": "/api/forms/{formId}/submissions/contact/{contactId}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\FormBundle\\Controller\\Api\\SubmissionApiController::getEntitiesForContactAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "contactId": "\\d+",
+            "formId": "\\d+"
+        }
+    },
+    "mautic_api_contacts_delete": {
+        "path": "/api/contacts/{id}/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\LeadApiController::deleteEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_contacts_deletebatch": {
+        "path": "/api/contacts/batch/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\LeadApiController::deleteEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_contacts_editbatchpatch": {
+        "path": "/api/contacts/batch/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\LeadApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_contacts_editbatchput": {
+        "path": "/api/contacts/batch/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\LeadApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_contacts_editpatch": {
+        "path": "/api/contacts/{id}/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\LeadApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_contacts_editput": {
+        "path": "/api/contacts/{id}/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\LeadApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_contacts_getall": {
+        "path": "/api/contacts",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\LeadApiController::getEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_contacts_getone": {
+        "path": "/api/contacts/{id}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\LeadApiController::getEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_contacts_new": {
+        "path": "/api/contacts/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\LeadApiController::newEntityAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_contacts_newbatch": {
+        "path": "/api/contacts/batch/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\LeadApiController::newEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_devices_delete": {
+        "path": "/api/devices/{id}/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\DeviceApiController::deleteEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_devices_deletebatch": {
+        "path": "/api/devices/batch/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\DeviceApiController::deleteEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_devices_editbatchpatch": {
+        "path": "/api/devices/batch/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\DeviceApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_devices_editbatchput": {
+        "path": "/api/devices/batch/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\DeviceApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_devices_editpatch": {
+        "path": "/api/devices/{id}/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\DeviceApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_devices_editput": {
+        "path": "/api/devices/{id}/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\DeviceApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_devices_getall": {
+        "path": "/api/devices",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\DeviceApiController::getEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_devices_getone": {
+        "path": "/api/devices/{id}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\DeviceApiController::getEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_devices_new": {
+        "path": "/api/devices/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\DeviceApiController::newEntityAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_devices_newbatch": {
+        "path": "/api/devices/batch/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\DeviceApiController::newEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_dncaddcontact": {
+        "path": "/api/contacts/{id}/dnc/{channel}/add",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\LeadApiController::addDncAction",
+            "_format": "json",
+            "channel": "email"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_dncremovecontact": {
+        "path": "/api/contacts/{id}/dnc/{channel}/remove",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\LeadApiController::removeDncAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_dynamicContent_action": {
+        "path": "/dwc/{objectAlias}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\DynamicContentBundle\\Controller\\DynamicContentApiController::processAction"
+        },
+        "requirements": []
+    },
+    "mautic_api_dynamicContent_index": {
+        "path": "/dwc",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\DynamicContentBundle\\Controller\\DynamicContentApiController::getAction"
+        },
+        "requirements": []
+    },
+    "mautic_api_dynamicContents_delete": {
+        "path": "/api/dynamiccontents/{id}/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\DynamicContentBundle\\Controller\\Api\\DynamicContentApiController::deleteEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_dynamicContents_deletebatch": {
+        "path": "/api/dynamiccontents/batch/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\DynamicContentBundle\\Controller\\Api\\DynamicContentApiController::deleteEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_dynamicContents_editbatchpatch": {
+        "path": "/api/dynamiccontents/batch/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\DynamicContentBundle\\Controller\\Api\\DynamicContentApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_dynamicContents_editbatchput": {
+        "path": "/api/dynamiccontents/batch/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\DynamicContentBundle\\Controller\\Api\\DynamicContentApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_dynamicContents_editpatch": {
+        "path": "/api/dynamiccontents/{id}/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\DynamicContentBundle\\Controller\\Api\\DynamicContentApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_dynamicContents_editput": {
+        "path": "/api/dynamiccontents/{id}/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\DynamicContentBundle\\Controller\\Api\\DynamicContentApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_dynamicContents_getall": {
+        "path": "/api/dynamiccontents",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\DynamicContentBundle\\Controller\\Api\\DynamicContentApiController::getEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_dynamicContents_getone": {
+        "path": "/api/dynamiccontents/{id}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\DynamicContentBundle\\Controller\\Api\\DynamicContentApiController::getEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_dynamicContents_new": {
+        "path": "/api/dynamiccontents/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\DynamicContentBundle\\Controller\\Api\\DynamicContentApiController::newEntityAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_dynamicContents_newbatch": {
+        "path": "/api/dynamiccontents/batch/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\DynamicContentBundle\\Controller\\Api\\DynamicContentApiController::newEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_emails_delete": {
+        "path": "/api/emails/{id}/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\EmailBundle\\Controller\\Api\\EmailApiController::deleteEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_emails_deletebatch": {
+        "path": "/api/emails/batch/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\EmailBundle\\Controller\\Api\\EmailApiController::deleteEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_emails_editbatchpatch": {
+        "path": "/api/emails/batch/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\EmailBundle\\Controller\\Api\\EmailApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_emails_editbatchput": {
+        "path": "/api/emails/batch/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\EmailBundle\\Controller\\Api\\EmailApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_emails_editpatch": {
+        "path": "/api/emails/{id}/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\EmailBundle\\Controller\\Api\\EmailApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_emails_editput": {
+        "path": "/api/emails/{id}/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\EmailBundle\\Controller\\Api\\EmailApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_emails_getall": {
+        "path": "/api/emails",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\EmailBundle\\Controller\\Api\\EmailApiController::getEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_emails_getone": {
+        "path": "/api/emails/{id}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\EmailBundle\\Controller\\Api\\EmailApiController::getEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_emails_new": {
+        "path": "/api/emails/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\EmailBundle\\Controller\\Api\\EmailApiController::newEntityAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_emails_newbatch": {
+        "path": "/api/emails/batch/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\EmailBundle\\Controller\\Api\\EmailApiController::newEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_events_getall": {
+        "path": "/api/campaigns/events",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CampaignBundle\\Controller\\Api\\EventApiController::getEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_events_getone": {
+        "path": "/api/campaigns/events/{id}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CampaignBundle\\Controller\\Api\\EventApiController::getEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_export_campaign": {
+        "path": "/api/campaigns/export/{campaignId}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CampaignBundle\\Controller\\Api\\CampaignApiController::exportCampaignAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "campaignId": "\\d+"
+        }
+    },
+    "mautic_api_fields_delete": {
+        "path": "/api/fields/{object}/{id}/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\FieldApiController::deleteEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_fields_deletebatch": {
+        "path": "/api/fields/{object}/batch/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\FieldApiController::deleteEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_fields_editbatchpatch": {
+        "path": "/api/fields/{object}/batch/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\FieldApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_fields_editbatchput": {
+        "path": "/api/fields/{object}/batch/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\FieldApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_fields_editpatch": {
+        "path": "/api/fields/{object}/{id}/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\FieldApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_fields_editput": {
+        "path": "/api/fields/{object}/{id}/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\FieldApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_fields_getall": {
+        "path": "/api/fields/{object}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\FieldApiController::getEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_fields_getone": {
+        "path": "/api/fields/{object}/{id}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\FieldApiController::getEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_fields_new": {
+        "path": "/api/fields/{object}/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\FieldApiController::newEntityAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_fields_newbatch": {
+        "path": "/api/fields/{object}/batch/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\FieldApiController::newEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_formdeleteactions": {
+        "path": "/api/forms/{formId}/actions/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\FormBundle\\Controller\\Api\\FormApiController::deleteActionsAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "formId": "\\d+"
+        }
+    },
+    "mautic_api_formdeletefields": {
+        "path": "/api/forms/{formId}/fields/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\FormBundle\\Controller\\Api\\FormApiController::deleteFieldsAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "formId": "\\d+"
+        }
+    },
+    "mautic_api_formresult": {
+        "path": "/api/forms/{formId}/submissions/{submissionId}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\FormBundle\\Controller\\Api\\SubmissionApiController::getEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "formId": "\\d+",
+            "submissionId": "\\d+"
+        }
+    },
+    "mautic_api_formresults": {
+        "path": "/api/forms/{formId}/submissions",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\FormBundle\\Controller\\Api\\SubmissionApiController::getEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "formId": "\\d+"
+        }
+    },
+    "mautic_api_forms_delete": {
+        "path": "/api/forms/{id}/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\FormBundle\\Controller\\Api\\FormApiController::deleteEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_forms_deletebatch": {
+        "path": "/api/forms/batch/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\FormBundle\\Controller\\Api\\FormApiController::deleteEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_forms_editbatchpatch": {
+        "path": "/api/forms/batch/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\FormBundle\\Controller\\Api\\FormApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_forms_editbatchput": {
+        "path": "/api/forms/batch/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\FormBundle\\Controller\\Api\\FormApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_forms_editpatch": {
+        "path": "/api/forms/{id}/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\FormBundle\\Controller\\Api\\FormApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_forms_editput": {
+        "path": "/api/forms/{id}/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\FormBundle\\Controller\\Api\\FormApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_forms_getall": {
+        "path": "/api/forms",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\FormBundle\\Controller\\Api\\FormApiController::getEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_forms_getone": {
+        "path": "/api/forms/{id}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\FormBundle\\Controller\\Api\\FormApiController::getEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_forms_new": {
+        "path": "/api/forms/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\FormBundle\\Controller\\Api\\FormApiController::newEntityAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_forms_newbatch": {
+        "path": "/api/forms/batch/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\FormBundle\\Controller\\Api\\FormApiController::newEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_getcontactcampaigns": {
+        "path": "/api/contacts/{id}/campaigns",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\LeadApiController::getCampaignsAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_getcontactdevices": {
+        "path": "/api/contacts/{id}/devices",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\LeadApiController::getDevicesAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_getcontactevents": {
+        "path": "/api/contacts/{id}/activity",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\LeadApiController::getActivityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_getcontactfields": {
+        "path": "/api/contacts/list/fields",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\LeadApiController::getFieldsAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_getcontactnotes": {
+        "path": "/api/contacts/{id}/notes",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\LeadApiController::getNotesAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_getcontactowners": {
+        "path": "/api/contacts/list/owners",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\LeadApiController::getOwnersAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_getcontactpointgroup": {
+        "path": "/api/contacts/{contactId}/points/groups/{groupId}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\PointGroupsApiController::getContactPointGroupAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "contactId": "\\d+",
+            "groupId": "\\d+"
+        }
+    },
+    "mautic_api_getcontactpointgroups": {
+        "path": "/api/contacts/{contactId}/points/groups",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\PointGroupsApiController::getContactPointGroupsAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "contactId": "\\d+"
+        }
+    },
+    "mautic_api_getcontactscompanies": {
+        "path": "/api/contacts/{id}/companies",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\LeadApiController::getCompaniesAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_getcontactsegments": {
+        "path": "/api/contacts/list/segments",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\ListApiController::getListsAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_getcontactsevents": {
+        "path": "/api/contacts/activity",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\LeadApiController::getAllActivityAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_getcontactssegments": {
+        "path": "/api/contacts/{id}/segments",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\LeadApiController::getListsAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_getpointactiontypes": {
+        "path": "/api/points/actions/types",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\PointApiController::getPointActionTypesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_getpointtriggereventtypes": {
+        "path": "/api/points/triggers/events/types",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\TriggerApiController::getPointTriggerEventTypesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_getself": {
+        "path": "/api/users/self",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\UserBundle\\Controller\\Api\\UserApiController::getSelfAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_getuserroles": {
+        "path": "/api/users/list/roles",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\UserBundle\\Controller\\Api\\UserApiController::getRolesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_hooks_delete": {
+        "path": "/api/hooks/{id}/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\WebhookBundle\\Controller\\Api\\WebhookApiController::deleteEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_hooks_deletebatch": {
+        "path": "/api/hooks/batch/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\WebhookBundle\\Controller\\Api\\WebhookApiController::deleteEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_hooks_editbatchpatch": {
+        "path": "/api/hooks/batch/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\WebhookBundle\\Controller\\Api\\WebhookApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_hooks_editbatchput": {
+        "path": "/api/hooks/batch/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\WebhookBundle\\Controller\\Api\\WebhookApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_hooks_editpatch": {
+        "path": "/api/hooks/{id}/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\WebhookBundle\\Controller\\Api\\WebhookApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_hooks_editput": {
+        "path": "/api/hooks/{id}/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\WebhookBundle\\Controller\\Api\\WebhookApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_hooks_getall": {
+        "path": "/api/hooks",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\WebhookBundle\\Controller\\Api\\WebhookApiController::getEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_hooks_getone": {
+        "path": "/api/hooks/{id}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\WebhookBundle\\Controller\\Api\\WebhookApiController::getEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_hooks_new": {
+        "path": "/api/hooks/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\WebhookBundle\\Controller\\Api\\WebhookApiController::newEntityAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_hooks_newbatch": {
+        "path": "/api/hooks/batch/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\WebhookBundle\\Controller\\Api\\WebhookApiController::newEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_import_campaign": {
+        "path": "/api/campaigns/import",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CampaignBundle\\Controller\\Api\\CampaignApiController::importCampaignAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_insights_delete": {
+        "path": "/api/points/insights/{id}/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\PointInsightApiController::deleteEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_insights_deletebatch": {
+        "path": "/api/points/insights/batch/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\PointInsightApiController::deleteEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_insights_editbatchpatch": {
+        "path": "/api/points/insights/batch/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\PointInsightApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_insights_editbatchput": {
+        "path": "/api/points/insights/batch/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\PointInsightApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_insights_editpatch": {
+        "path": "/api/points/insights/{id}/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\PointInsightApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_insights_editput": {
+        "path": "/api/points/insights/{id}/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\PointInsightApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_insights_getall": {
+        "path": "/api/points/insights",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\PointInsightApiController::getEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_insights_getone": {
+        "path": "/api/points/insights/{id}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\PointInsightApiController::getEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_insights_new": {
+        "path": "/api/points/insights/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\PointInsightApiController::newEntityAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_insights_newbatch": {
+        "path": "/api/points/insights/batch/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\PointInsightApiController::newEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_lists_delete": {
+        "path": "/api/segments/{id}/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\ListApiController::deleteEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_lists_deletebatch": {
+        "path": "/api/segments/batch/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\ListApiController::deleteEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_lists_editbatchpatch": {
+        "path": "/api/segments/batch/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\ListApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_lists_editbatchput": {
+        "path": "/api/segments/batch/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\ListApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_lists_editpatch": {
+        "path": "/api/segments/{id}/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\ListApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_lists_editput": {
+        "path": "/api/segments/{id}/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\ListApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_lists_getall": {
+        "path": "/api/segments",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\ListApiController::getEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_lists_getone": {
+        "path": "/api/segments/{id}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\ListApiController::getEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_lists_new": {
+        "path": "/api/segments/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\ListApiController::newEntityAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_lists_newbatch": {
+        "path": "/api/segments/batch/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\ListApiController::newEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_messages_delete": {
+        "path": "/api/messages/{id}/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\ChannelBundle\\Controller\\Api\\MessageApiController::deleteEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_messages_deletebatch": {
+        "path": "/api/messages/batch/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\ChannelBundle\\Controller\\Api\\MessageApiController::deleteEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_messages_editbatchpatch": {
+        "path": "/api/messages/batch/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\ChannelBundle\\Controller\\Api\\MessageApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_messages_editbatchput": {
+        "path": "/api/messages/batch/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\ChannelBundle\\Controller\\Api\\MessageApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_messages_editpatch": {
+        "path": "/api/messages/{id}/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\ChannelBundle\\Controller\\Api\\MessageApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_messages_editput": {
+        "path": "/api/messages/{id}/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\ChannelBundle\\Controller\\Api\\MessageApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_messages_getall": {
+        "path": "/api/messages",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\ChannelBundle\\Controller\\Api\\MessageApiController::getEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_messages_getone": {
+        "path": "/api/messages/{id}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\ChannelBundle\\Controller\\Api\\MessageApiController::getEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_messages_new": {
+        "path": "/api/messages/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\ChannelBundle\\Controller\\Api\\MessageApiController::newEntityAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_messages_newbatch": {
+        "path": "/api/messages/batch/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\ChannelBundle\\Controller\\Api\\MessageApiController::newEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_notes_delete": {
+        "path": "/api/notes/{id}/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\NoteApiController::deleteEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_notes_deletebatch": {
+        "path": "/api/notes/batch/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\NoteApiController::deleteEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_notes_editbatchpatch": {
+        "path": "/api/notes/batch/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\NoteApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_notes_editbatchput": {
+        "path": "/api/notes/batch/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\NoteApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_notes_editpatch": {
+        "path": "/api/notes/{id}/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\NoteApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_notes_editput": {
+        "path": "/api/notes/{id}/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\NoteApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_notes_getall": {
+        "path": "/api/notes",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\NoteApiController::getEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_notes_getone": {
+        "path": "/api/notes/{id}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\NoteApiController::getEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_notes_new": {
+        "path": "/api/notes/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\NoteApiController::newEntityAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_notes_newbatch": {
+        "path": "/api/notes/batch/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\NoteApiController::newEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_notifications_delete": {
+        "path": "/api/notifications/{id}/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\NotificationBundle\\Controller\\Api\\NotificationApiController::deleteEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_notifications_deletebatch": {
+        "path": "/api/notifications/batch/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\NotificationBundle\\Controller\\Api\\NotificationApiController::deleteEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_notifications_editbatchpatch": {
+        "path": "/api/notifications/batch/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\NotificationBundle\\Controller\\Api\\NotificationApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_notifications_editbatchput": {
+        "path": "/api/notifications/batch/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\NotificationBundle\\Controller\\Api\\NotificationApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_notifications_editpatch": {
+        "path": "/api/notifications/{id}/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\NotificationBundle\\Controller\\Api\\NotificationApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_notifications_editput": {
+        "path": "/api/notifications/{id}/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\NotificationBundle\\Controller\\Api\\NotificationApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_notifications_getall": {
+        "path": "/api/notifications",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\NotificationBundle\\Controller\\Api\\NotificationApiController::getEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_notifications_getone": {
+        "path": "/api/notifications/{id}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\NotificationBundle\\Controller\\Api\\NotificationApiController::getEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_notifications_new": {
+        "path": "/api/notifications/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\NotificationBundle\\Controller\\Api\\NotificationApiController::newEntityAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_notifications_newbatch": {
+        "path": "/api/notifications/batch/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\NotificationBundle\\Controller\\Api\\NotificationApiController::newEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_pages_delete": {
+        "path": "/api/pages/{id}/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PageBundle\\Controller\\Api\\PageApiController::deleteEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_pages_deletebatch": {
+        "path": "/api/pages/batch/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PageBundle\\Controller\\Api\\PageApiController::deleteEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_pages_editbatchpatch": {
+        "path": "/api/pages/batch/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PageBundle\\Controller\\Api\\PageApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_pages_editbatchput": {
+        "path": "/api/pages/batch/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PageBundle\\Controller\\Api\\PageApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_pages_editpatch": {
+        "path": "/api/pages/{id}/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PageBundle\\Controller\\Api\\PageApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_pages_editput": {
+        "path": "/api/pages/{id}/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PageBundle\\Controller\\Api\\PageApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_pages_getall": {
+        "path": "/api/pages",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PageBundle\\Controller\\Api\\PageApiController::getEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_pages_getone": {
+        "path": "/api/pages/{id}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PageBundle\\Controller\\Api\\PageApiController::getEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_pages_new": {
+        "path": "/api/pages/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PageBundle\\Controller\\Api\\PageApiController::newEntityAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_pages_newbatch": {
+        "path": "/api/pages/batch/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PageBundle\\Controller\\Api\\PageApiController::newEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_pointGroups_delete": {
+        "path": "/api/points/groups/{id}/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\PointGroupsApiController::deleteEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_pointGroups_deletebatch": {
+        "path": "/api/points/groups/batch/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\PointGroupsApiController::deleteEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_pointGroups_editbatchpatch": {
+        "path": "/api/points/groups/batch/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\PointGroupsApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_pointGroups_editbatchput": {
+        "path": "/api/points/groups/batch/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\PointGroupsApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_pointGroups_editpatch": {
+        "path": "/api/points/groups/{id}/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\PointGroupsApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_pointGroups_editput": {
+        "path": "/api/points/groups/{id}/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\PointGroupsApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_pointGroups_getall": {
+        "path": "/api/points/groups",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\PointGroupsApiController::getEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_pointGroups_getone": {
+        "path": "/api/points/groups/{id}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\PointGroupsApiController::getEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_pointGroups_new": {
+        "path": "/api/points/groups/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\PointGroupsApiController::newEntityAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_pointGroups_newbatch": {
+        "path": "/api/points/groups/batch/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\PointGroupsApiController::newEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_points_delete": {
+        "path": "/api/points/{id}/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\PointApiController::deleteEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_points_deletebatch": {
+        "path": "/api/points/batch/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\PointApiController::deleteEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_points_editbatchpatch": {
+        "path": "/api/points/batch/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\PointApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_points_editbatchput": {
+        "path": "/api/points/batch/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\PointApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_points_editpatch": {
+        "path": "/api/points/{id}/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\PointApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_points_editput": {
+        "path": "/api/points/{id}/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\PointApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_points_getall": {
+        "path": "/api/points",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\PointApiController::getEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_points_getone": {
+        "path": "/api/points/{id}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\PointApiController::getEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_points_new": {
+        "path": "/api/points/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\PointApiController::newEntityAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_points_newbatch": {
+        "path": "/api/points/batch/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\PointApiController::newEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_pointtriggerdeleteevents": {
+        "path": "/api/points/triggers/{triggerId}/events/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\TriggerApiController::deletePointTriggerEventsAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "triggerId": "\\d+"
+        }
+    },
+    "mautic_api_reply": {
+        "path": "/api/emails/reply/{trackingHash}",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\EmailBundle\\Controller\\Api\\EmailApiController::replyAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_reports_delete": {
+        "path": "/api/reports/{id}/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\ReportBundle\\Controller\\Api\\ReportApiController::deleteEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_reports_deletebatch": {
+        "path": "/api/reports/batch/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\ReportBundle\\Controller\\Api\\ReportApiController::deleteEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_reports_editbatchpatch": {
+        "path": "/api/reports/batch/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\ReportBundle\\Controller\\Api\\ReportApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_reports_editbatchput": {
+        "path": "/api/reports/batch/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\ReportBundle\\Controller\\Api\\ReportApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_reports_editpatch": {
+        "path": "/api/reports/{id}/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\ReportBundle\\Controller\\Api\\ReportApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_reports_editput": {
+        "path": "/api/reports/{id}/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\ReportBundle\\Controller\\Api\\ReportApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_reports_getall": {
+        "path": "/api/reports",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\ReportBundle\\Controller\\Api\\ReportApiController::getEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_reports_getone": {
+        "path": "/api/reports/{id}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\ReportBundle\\Controller\\Api\\ReportApiController::getEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_reports_new": {
+        "path": "/api/reports/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\ReportBundle\\Controller\\Api\\ReportApiController::newEntityAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_reports_newbatch": {
+        "path": "/api/reports/batch/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\ReportBundle\\Controller\\Api\\ReportApiController::newEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_roles_delete": {
+        "path": "/api/roles/{id}/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\UserBundle\\Controller\\Api\\RoleApiController::deleteEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_roles_deletebatch": {
+        "path": "/api/roles/batch/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\UserBundle\\Controller\\Api\\RoleApiController::deleteEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_roles_editbatchpatch": {
+        "path": "/api/roles/batch/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\UserBundle\\Controller\\Api\\RoleApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_roles_editbatchput": {
+        "path": "/api/roles/batch/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\UserBundle\\Controller\\Api\\RoleApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_roles_editpatch": {
+        "path": "/api/roles/{id}/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\UserBundle\\Controller\\Api\\RoleApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_roles_editput": {
+        "path": "/api/roles/{id}/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\UserBundle\\Controller\\Api\\RoleApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_roles_getall": {
+        "path": "/api/roles",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\UserBundle\\Controller\\Api\\RoleApiController::getEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_roles_getone": {
+        "path": "/api/roles/{id}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\UserBundle\\Controller\\Api\\RoleApiController::getEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_roles_new": {
+        "path": "/api/roles/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\UserBundle\\Controller\\Api\\RoleApiController::newEntityAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_roles_newbatch": {
+        "path": "/api/roles/batch/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\UserBundle\\Controller\\Api\\RoleApiController::newEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_segmentaddcontact": {
+        "path": "/api/segments/{id}/contact/{leadId}/add",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\ListApiController::addLeadAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+",
+            "id}/contact/{leadId": "\\d+"
+        }
+    },
+    "mautic_api_segmentaddcontacts": {
+        "path": "/api/segments/{id}/contacts/add",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\ListApiController::addLeadsAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_segmentremovecontact": {
+        "path": "/api/segments/{id}/contact/{leadId}/remove",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\ListApiController::removeLeadAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+",
+            "id}/contact/{leadId": "\\d+"
+        }
+    },
+    "mautic_api_sendcontactemail": {
+        "path": "/api/emails/{id}/contact/{leadId}/send",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\EmailBundle\\Controller\\Api\\EmailApiController::sendLeadAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+",
+            "id}/contact/{leadId": "\\d+"
+        }
+    },
+    "mautic_api_sendemail": {
+        "path": "/api/emails/{id}/send",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\EmailBundle\\Controller\\Api\\EmailApiController::sendAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_smses_delete": {
+        "path": "/api/smses/{id}/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\SmsBundle\\Controller\\Api\\SmsApiController::deleteEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_smses_deletebatch": {
+        "path": "/api/smses/batch/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\SmsBundle\\Controller\\Api\\SmsApiController::deleteEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_smses_editbatchpatch": {
+        "path": "/api/smses/batch/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\SmsBundle\\Controller\\Api\\SmsApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_smses_editbatchput": {
+        "path": "/api/smses/batch/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\SmsBundle\\Controller\\Api\\SmsApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_smses_editpatch": {
+        "path": "/api/smses/{id}/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\SmsBundle\\Controller\\Api\\SmsApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_smses_editput": {
+        "path": "/api/smses/{id}/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\SmsBundle\\Controller\\Api\\SmsApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_smses_getall": {
+        "path": "/api/smses",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\SmsBundle\\Controller\\Api\\SmsApiController::getEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_smses_getone": {
+        "path": "/api/smses/{id}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\SmsBundle\\Controller\\Api\\SmsApiController::getEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_smses_new": {
+        "path": "/api/smses/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\SmsBundle\\Controller\\Api\\SmsApiController::newEntityAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_smses_newbatch": {
+        "path": "/api/smses/batch/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\SmsBundle\\Controller\\Api\\SmsApiController::newEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_smses_send": {
+        "path": "/api/smses/{id}/contact/{contactId}/send",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\SmsBundle\\Controller\\Api\\SmsApiController::sendAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+",
+            "id}/contact/{contactId": "\\d+"
+        }
+    },
+    "mautic_api_stageddcontact": {
+        "path": "/api/stages/{id}/contact/{contactId}/add",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\StageBundle\\Controller\\Api\\StageApiController::addContactAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+",
+            "id}/contact/{contactId": "\\d+"
+        }
+    },
+    "mautic_api_stageremovecontact": {
+        "path": "/api/stages/{id}/contact/{contactId}/remove",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\StageBundle\\Controller\\Api\\StageApiController::removeContactAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+",
+            "id}/contact/{contactId": "\\d+"
+        }
+    },
+    "mautic_api_stages_delete": {
+        "path": "/api/stages/{id}/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\StageBundle\\Controller\\Api\\StageApiController::deleteEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_stages_deletebatch": {
+        "path": "/api/stages/batch/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\StageBundle\\Controller\\Api\\StageApiController::deleteEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_stages_editbatchpatch": {
+        "path": "/api/stages/batch/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\StageBundle\\Controller\\Api\\StageApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_stages_editbatchput": {
+        "path": "/api/stages/batch/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\StageBundle\\Controller\\Api\\StageApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_stages_editpatch": {
+        "path": "/api/stages/{id}/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\StageBundle\\Controller\\Api\\StageApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_stages_editput": {
+        "path": "/api/stages/{id}/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\StageBundle\\Controller\\Api\\StageApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_stages_getall": {
+        "path": "/api/stages",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\StageBundle\\Controller\\Api\\StageApiController::getEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_stages_getone": {
+        "path": "/api/stages/{id}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\StageBundle\\Controller\\Api\\StageApiController::getEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_stages_new": {
+        "path": "/api/stages/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\StageBundle\\Controller\\Api\\StageApiController::newEntityAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_stages_newbatch": {
+        "path": "/api/stages/batch/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\StageBundle\\Controller\\Api\\StageApiController::newEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_tags_delete": {
+        "path": "/api/tags/{id}/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\TagApiController::deleteEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_tags_deletebatch": {
+        "path": "/api/tags/batch/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\TagApiController::deleteEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_tags_editbatchpatch": {
+        "path": "/api/tags/batch/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\TagApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_tags_editbatchput": {
+        "path": "/api/tags/batch/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\TagApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_tags_editpatch": {
+        "path": "/api/tags/{id}/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\TagApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_tags_editput": {
+        "path": "/api/tags/{id}/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\TagApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_tags_getall": {
+        "path": "/api/tags",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\TagApiController::getEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_tags_getone": {
+        "path": "/api/tags/{id}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\TagApiController::getEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_tags_new": {
+        "path": "/api/tags/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\TagApiController::newEntityAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_tags_newbatch": {
+        "path": "/api/tags/batch/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\TagApiController::newEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_triggers_delete": {
+        "path": "/api/points/triggers/{id}/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\TriggerApiController::deleteEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_triggers_deletebatch": {
+        "path": "/api/points/triggers/batch/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\TriggerApiController::deleteEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_triggers_editbatchpatch": {
+        "path": "/api/points/triggers/batch/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\TriggerApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_triggers_editbatchput": {
+        "path": "/api/points/triggers/batch/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\TriggerApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_triggers_editpatch": {
+        "path": "/api/points/triggers/{id}/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\TriggerApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_triggers_editput": {
+        "path": "/api/points/triggers/{id}/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\TriggerApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_triggers_getall": {
+        "path": "/api/points/triggers",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\TriggerApiController::getEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_triggers_getone": {
+        "path": "/api/points/triggers/{id}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\TriggerApiController::getEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_triggers_new": {
+        "path": "/api/points/triggers/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\TriggerApiController::newEntityAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_triggers_newbatch": {
+        "path": "/api/points/triggers/batch/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\Api\\TriggerApiController::newEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_users_delete": {
+        "path": "/api/users/{id}/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\UserBundle\\Controller\\Api\\UserApiController::deleteEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_users_deletebatch": {
+        "path": "/api/users/batch/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\UserBundle\\Controller\\Api\\UserApiController::deleteEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_users_editbatchpatch": {
+        "path": "/api/users/batch/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\UserBundle\\Controller\\Api\\UserApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_users_editbatchput": {
+        "path": "/api/users/batch/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\UserBundle\\Controller\\Api\\UserApiController::editEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_users_editpatch": {
+        "path": "/api/users/{id}/edit",
+        "methods": [
+            "PATCH"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\UserBundle\\Controller\\Api\\UserApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_users_editput": {
+        "path": "/api/users/{id}/edit",
+        "methods": [
+            "PUT"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\UserBundle\\Controller\\Api\\UserApiController::editEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_users_getall": {
+        "path": "/api/users",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\UserBundle\\Controller\\Api\\UserApiController::getEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_users_getone": {
+        "path": "/api/users/{id}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\UserBundle\\Controller\\Api\\UserApiController::getEntityAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_users_new": {
+        "path": "/api/users/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\UserBundle\\Controller\\Api\\UserApiController::newEntityAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_users_newbatch": {
+        "path": "/api/users/batch/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\UserBundle\\Controller\\Api\\UserApiController::newEntitiesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_api_utmcreateevent": {
+        "path": "/api/contacts/{id}/utm/add",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\LeadApiController::addUtmTagsAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_utmremoveevent": {
+        "path": "/api/contacts/{id}/utm/{utmid}/remove",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\Api\\LeadApiController::removeUtmTagsAction",
+            "_format": "json"
+        },
+        "requirements": {
+            "id": "\\d+"
+        }
+    },
+    "mautic_api_webhookevents": {
+        "path": "/api/hooks/triggers",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\WebhookBundle\\Controller\\Api\\WebhookApiController::getTriggersAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_app_notification": {
+        "path": "/notification/appcallback",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\NotificationBundle\\Controller\\AppCallbackController::indexAction"
+        },
+        "requirements": []
+    },
+    "mautic_asset_action": {
+        "path": "/s/assets/{objectAction}/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\AssetBundle\\Controller\\AssetController::executeAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_asset_download": {
+        "path": "/asset/{slug}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\AssetBundle\\Controller\\PublicController::downloadAction",
+            "slug": ""
+        },
+        "requirements": []
+    },
+    "mautic_asset_index": {
+        "path": "/s/assets/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\AssetBundle\\Controller\\AssetController::indexAction",
+            "page": 0
+        },
+        "requirements": {
+            "page": "\\d+"
+        }
+    },
+    "mautic_asset_remote": {
+        "path": "/s/assets/remote",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\AssetBundle\\Controller\\AssetController::remoteAction"
+        },
+        "requirements": []
+    },
+    "mautic_base_index": {
+        "path": "/",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\CoreBundle\\Controller\\DefaultController::indexAction"
+        },
+        "requirements": []
+    },
+    "mautic_campaign_action": {
+        "path": "/s/campaigns/{objectAction}/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\CampaignBundle\\Controller\\CampaignController::executeAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_campaign_contacts": {
+        "path": "/s/campaigns/view/{objectId}/contact/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\CampaignBundle\\Controller\\CampaignController::contactsAction",
+            "objectId": 0,
+            "page": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+",
+            "page": "\\d+"
+        }
+    },
+    "mautic_campaign_event_stats": {
+        "path": "/s/campaigns/event/stats/{objectId}/{dateFromValue}/{dateToValue}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\CampaignBundle\\Controller\\CampaignController::eventStatsAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_campaign_graph": {
+        "path": "/s/campaigns/graph/{objectId}/{dateFrom}/{dateTo}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\CampaignBundle\\Controller\\CampaignController::graphAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_campaign_import_action": {
+        "path": "/s/campaign/import/{objectAction}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\CampaignBundle\\Controller\\ImportController::executeAction"
+        },
+        "requirements": []
+    },
+    "mautic_campaign_import_index": {
+        "path": "/s/campaign/import",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\CampaignBundle\\Controller\\ImportController::indexAction"
+        },
+        "requirements": []
+    },
+    "mautic_campaign_index": {
+        "path": "/s/campaigns/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\CampaignBundle\\Controller\\CampaignController::indexAction",
+            "page": 0
+        },
+        "requirements": {
+            "page": "\\d+"
+        }
+    },
+    "mautic_campaign_map_stats": {
+        "path": "/s/campaign-map-stats/{objectId}/{dateFrom}/{dateTo}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\CampaignBundle\\Controller\\CampaignMapStatsController::viewAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_campaign_metrics_email_hours": {
+        "path": "/s/campaign/metrics/email-hours/{objectId}/{dateFrom}/{dateTo}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\CampaignBundle\\Controller\\CampaignMetricsController::emailHoursAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_campaign_metrics_email_weekdays": {
+        "path": "/s/campaign/metrics/email-weekdays/{objectId}/{dateFrom}/{dateTo}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\CampaignBundle\\Controller\\CampaignMetricsController::emailWeekdaysAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_campaign_metrics_event_details": {
+        "path": "/s/campaign/metrics/event-details/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\CampaignBundle\\Controller\\CampaignMetricsController::eventDetailsAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_campaign_preview": {
+        "path": "/s/campaign/preview/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\EmailBundle\\Controller\\PublicController::previewAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_campaignevent_action": {
+        "path": "/s/campaigns/events/{objectAction}/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\CampaignBundle\\Controller\\EventController::executeAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_campaignsource_action": {
+        "path": "/s/campaigns/sources/{objectAction}/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\CampaignBundle\\Controller\\SourceController::executeAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_category_action": {
+        "path": "/s/categories/{bundle}/{objectAction}/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\CategoryBundle\\Controller\\CategoryController::executeCategoryAction",
+            "bundle": "category",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_category_batch_contact_set": {
+        "path": "/s/categories/batch/contact/set",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\CategoryBundle\\Controller\\BatchContactController::execAction"
+        },
+        "requirements": []
+    },
+    "mautic_category_batch_contact_view": {
+        "path": "/s/categories/batch/contact/view",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\CategoryBundle\\Controller\\BatchContactController::indexAction"
+        },
+        "requirements": []
+    },
+    "mautic_category_index": {
+        "path": "/s/categories/{bundle}/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\CategoryBundle\\Controller\\CategoryController::indexAction",
+            "bundle": "category",
+            "page": 0
+        },
+        "requirements": {
+            "page": "\\d+"
+        }
+    },
+    "mautic_channel_batch_contact_set": {
+        "path": "/s/channels/batch/contact/set",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\ChannelBundle\\Controller\\BatchContactController::setAction"
+        },
+        "requirements": []
+    },
+    "mautic_channel_batch_contact_view": {
+        "path": "/s/channels/batch/contact/view",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\ChannelBundle\\Controller\\BatchContactController::indexAction"
+        },
+        "requirements": []
+    },
+    "mautic_client_action": {
+        "path": "/s/credentials/{objectAction}/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\ApiBundle\\Controller\\ClientController::executeAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_client_index": {
+        "path": "/s/credentials/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\ApiBundle\\Controller\\ClientController::indexAction",
+            "page": 0
+        },
+        "requirements": {
+            "page": "\\d+"
+        }
+    },
+    "mautic_company_action": {
+        "path": "/s/companies/{objectAction}/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\CompanyController::executeAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_company_contacts_list": {
+        "path": "/s/company/{objectId}/contacts/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\CompanyController::contactsListAction",
+            "objectId": 0,
+            "page": 0
+        },
+        "requirements": {
+            "objectId": "\\d+",
+            "page": "\\d+"
+        }
+    },
+    "mautic_company_export_action": {
+        "path": "/s/companies/company/export/{companyId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\CompanyController::companyExportAction"
+        },
+        "requirements": {
+            "companyId": "\\d+"
+        }
+    },
+    "mautic_company_graph": {
+        "path": "/s/company/graph/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\CompanyController::graphAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_company_index": {
+        "path": "/s/companies/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\CompanyController::indexAction",
+            "page": 0
+        },
+        "requirements": {
+            "page": "\\d+"
+        }
+    },
+    "mautic_config_action": {
+        "path": "/s/config/{objectAction}/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\ConfigBundle\\Controller\\ConfigController::executeAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_contact_action": {
+        "path": "/s/contacts/{objectAction}/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\LeadController::executeAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_contact_auditlog_action": {
+        "path": "/s/contacts/auditlog/{leadId}/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\AuditlogController::indexAction",
+            "page": 0
+        },
+        "requirements": {
+            "leadId": "\\d+",
+            "page": "\\d+"
+        }
+    },
+    "mautic_contact_auditlog_export_action": {
+        "path": "/s/contacts/auditlog/batchExport/{leadId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\AuditlogController::batchExportAction"
+        },
+        "requirements": {
+            "leadId": "\\d+"
+        }
+    },
+    "mautic_contact_export_action": {
+        "path": "/s/contacts/contact/export/{contactId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\LeadController::contactExportAction"
+        },
+        "requirements": {
+            "contactId": "\\d+"
+        }
+    },
+    "mautic_contact_export_download": {
+        "path": "/s/contacts/export/download/{fileName}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\LeadController::downloadExportAction"
+        },
+        "requirements": []
+    },
+    "mautic_contact_index": {
+        "path": "/s/contacts/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\LeadController::indexAction",
+            "page": 0
+        },
+        "requirements": {
+            "page": "\\d+"
+        }
+    },
+    "mautic_contact_stats": {
+        "path": "/s/contacts/view/{objectId}/stats",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\LeadController::contactStatsAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_contact_timeline_export_action": {
+        "path": "/s/contacts/timeline/batchExport/{leadId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\TimelineController::batchExportAction"
+        },
+        "requirements": {
+            "leadId": "\\d+"
+        }
+    },
+    "mautic_contactfield_action": {
+        "path": "/s/contacts/fields/{objectAction}/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\FieldController::executeAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_contactfield_index": {
+        "path": "/s/contacts/fields/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\FieldController::indexAction",
+            "page": 0
+        },
+        "requirements": {
+            "page": "\\d+"
+        }
+    },
+    "mautic_contactnote_action": {
+        "path": "/s/contacts/notes/{leadId}/{objectAction}/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\NoteController::executeNoteAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "leadId": "\\d+",
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_contactnote_index": {
+        "path": "/s/contacts/notes/{leadId}/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\NoteController::indexAction",
+            "leadId": 0,
+            "page": 0
+        },
+        "requirements": {
+            "leadId": "\\d+",
+            "page": "\\d+"
+        }
+    },
+    "mautic_contacttimeline_action": {
+        "path": "/s/contacts/timeline/{leadId}/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\TimelineController::indexAction",
+            "page": 0
+        },
+        "requirements": {
+            "leadId": "\\d+",
+            "page": "\\d+"
+        }
+    },
+    "mautic_core_ajax": {
+        "path": "/s/ajax",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\CoreBundle\\Controller\\AjaxController::delegateAjaxAction"
+        },
+        "requirements": []
+    },
+    "mautic_core_api_file_create": {
+        "path": "/api/files/{dir}/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CoreBundle\\Controller\\Api\\FileApiController::createAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_core_api_file_delete": {
+        "path": "/api/files/{dir}/{file}/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CoreBundle\\Controller\\Api\\FileApiController::deleteAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_core_api_file_list": {
+        "path": "/api/files/{dir}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CoreBundle\\Controller\\Api\\FileApiController::listAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_core_api_stats": {
+        "path": "/api/stats/{table}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CoreBundle\\Controller\\Api\\StatsApiController::listAction",
+            "_format": "json",
+            "table": ""
+        },
+        "requirements": []
+    },
+    "mautic_core_api_theme_create": {
+        "path": "/api/themes/new",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CoreBundle\\Controller\\Api\\ThemeApiController::newAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_core_api_theme_delete": {
+        "path": "/api/themes/{theme}/delete",
+        "methods": [
+            "DELETE"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CoreBundle\\Controller\\Api\\ThemeApiController::deleteAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_core_api_theme_get": {
+        "path": "/api/themes/{theme}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CoreBundle\\Controller\\Api\\ThemeApiController::getAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_core_api_theme_list": {
+        "path": "/api/themes",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CoreBundle\\Controller\\Api\\ThemeApiController::listAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_core_file_action": {
+        "path": "/s/file/{objectAction}/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\CoreBundle\\Controller\\FileController::executeAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_core_form_action": {
+        "path": "/s/action/{objectAction}/{objectModel}/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\CoreBundle\\Controller\\FormController::executeAction",
+            "objectId": 0,
+            "objectModel": ""
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_core_keep_alive": {
+        "path": "/s/keep-alive",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\CoreBundle\\Controller\\KeepAliveController::keepAliveAction"
+        },
+        "requirements": []
+    },
+    "mautic_dashboard_action": {
+        "path": "/s/dashboard/{objectAction}/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\DashboardBundle\\Controller\\DashboardController::executeAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_dashboard_index": {
+        "path": "/s/dashboard",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\DashboardBundle\\Controller\\DashboardController::indexAction"
+        },
+        "requirements": []
+    },
+    "mautic_dashboard_widget": {
+        "path": "/s/dashboard/widget/{widgetId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\DashboardBundle\\Controller\\DashboardController::widgetAction"
+        },
+        "requirements": []
+    },
+    "mautic_dynamicContent_action": {
+        "path": "/s/dwc/{objectAction}/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\DynamicContentBundle\\Controller\\DynamicContentController::executeAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_dynamicContent_index": {
+        "path": "/s/dwc/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\DynamicContentBundle\\Controller\\DynamicContentController::indexAction",
+            "page": 0
+        },
+        "requirements": {
+            "page": "\\d+"
+        }
+    },
+    "mautic_email_action": {
+        "path": "/s/emails/{objectAction}/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\EmailBundle\\Controller\\EmailController::executeAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_email_batch_categories_set": {
+        "path": "/s/emails/batch/categories/set",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\EmailBundle\\Controller\\BatchEmailController::execAction"
+        },
+        "requirements": []
+    },
+    "mautic_email_batch_categories_view": {
+        "path": "/s/emails/batch/categories/view",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\EmailBundle\\Controller\\BatchEmailController::indexAction"
+        },
+        "requirements": []
+    },
+    "mautic_email_contacts": {
+        "path": "/s/emails/view/{objectId}/contact/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\EmailBundle\\Controller\\EmailController::contactsAction",
+            "objectId": 0,
+            "page": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+",
+            "page": "\\d+"
+        }
+    },
+    "mautic_email_graph_stats": {
+        "path": "/s/emails-graph-stats/{objectId}/{isVariant}/{dateFrom}/{dateTo}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\EmailBundle\\Controller\\EmailGraphStatsController::viewAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_email_index": {
+        "path": "/s/emails/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\EmailBundle\\Controller\\EmailController::indexAction",
+            "page": 0
+        },
+        "requirements": {
+            "page": "\\d+"
+        }
+    },
+    "mautic_email_map_stats": {
+        "path": "/s/emails-map-stats/{objectId}/{isVariant}/{dateFrom}/{dateTo}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\EmailBundle\\Controller\\EmailMapStatsController::viewAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_email_preview": {
+        "path": "/email/preview/{objectId}/{objectType}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\EmailBundle\\Controller\\PublicController::previewAction",
+            "objectId": 0,
+            "objectType": null
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_email_resubscribe": {
+        "path": "/email/resubscribe/{idHash}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\EmailBundle\\Controller\\PublicController::resubscribeAction"
+        },
+        "requirements": []
+    },
+    "mautic_email_tracker": {
+        "path": "/email/{idHash}.gif",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\EmailBundle\\Controller\\PublicController::trackingImageAction"
+        },
+        "requirements": []
+    },
+    "mautic_email_unsubscribe": {
+        "path": "/email/unsubscribe/{idHash}/{urlEmail}/{secretHash}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\EmailBundle\\Controller\\PublicController::unsubscribeAction",
+            "secretHash": null,
+            "urlEmail": null
+        },
+        "requirements": []
+    },
+    "mautic_email_unsubscribe_all": {
+        "path": "/email/dnc/{idHash}/{urlEmail}/{secretHash}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\EmailBundle\\Controller\\PublicController::unsubscribeAllAction",
+            "secretHash": null,
+            "urlEmail": null
+        },
+        "requirements": []
+    },
+    "mautic_email_webview": {
+        "path": "/email/view/{idHash}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\EmailBundle\\Controller\\PublicController::indexAction"
+        },
+        "requirements": []
+    },
+    "mautic_essential_js": {
+        "path": "/mautic-essential.js",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\CoreBundle\\Controller\\JsController::essentialAction"
+        },
+        "requirements": []
+    },
+    "mautic_form_action": {
+        "path": "/s/forms/{objectAction}/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\FormBundle\\Controller\\FormController::executeAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_form_company_lookup": {
+        "path": "/form/company-lookup/autocomplete",
+        "methods": [
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\FormBundle\\Controller\\PublicController::lookupCompanyAction"
+        },
+        "requirements": []
+    },
+    "mautic_form_embed": {
+        "path": "/form/embed/{id}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\FormBundle\\Controller\\PublicController::embedAction"
+        },
+        "requirements": []
+    },
+    "mautic_form_export": {
+        "path": "/s/forms/results/{objectId}/export/{format}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\FormBundle\\Controller\\ResultController::exportAction",
+            "format": "csv",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_form_file_download": {
+        "path": "/forms/results/file/{submissionId}/{field}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\FormBundle\\Controller\\ResultController::downloadFileAction"
+        },
+        "requirements": []
+    },
+    "mautic_form_file_download_by_name": {
+        "path": "/forms/results/file/{fieldId}/filename/{fileName}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\FormBundle\\Controller\\ResultController::downloadFileByFileNameAction"
+        },
+        "requirements": []
+    },
+    "mautic_form_generateform": {
+        "path": "/form/generate.js",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\FormBundle\\Controller\\PublicController::generateAction"
+        },
+        "requirements": []
+    },
+    "mautic_form_index": {
+        "path": "/s/forms/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\FormBundle\\Controller\\FormController::indexAction",
+            "page": 0
+        },
+        "requirements": {
+            "page": "\\d+"
+        }
+    },
+    "mautic_form_postmessage": {
+        "path": "/form/message",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\FormBundle\\Controller\\PublicController::messageAction"
+        },
+        "requirements": []
+    },
+    "mautic_form_postresults": {
+        "path": "/form/submit",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\FormBundle\\Controller\\PublicController::submitAction"
+        },
+        "requirements": []
+    },
+    "mautic_form_postresults_ajax": {
+        "path": "/form/submit/ajax",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\FormBundle\\Controller\\AjaxController::submitAction"
+        },
+        "requirements": []
+    },
+    "mautic_form_preview": {
+        "path": "/form/{id}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\FormBundle\\Controller\\PublicController::previewAction",
+            "id": "0"
+        },
+        "requirements": []
+    },
+    "mautic_form_results": {
+        "path": "/s/forms/results/{objectId}/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\FormBundle\\Controller\\ResultController::indexAction",
+            "objectId": 0,
+            "page": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+",
+            "page": "\\d+"
+        }
+    },
+    "mautic_form_results_action": {
+        "path": "/s/forms/results/{formId}/{objectAction}/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\FormBundle\\Controller\\ResultController::executeAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_form_results_add_segment": {
+        "path": "/s/forms/results/{objectId}/add-to-segment",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\FormBundle\\Controller\\ResultController::addToSegmentAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_formaction_action": {
+        "path": "/s/forms/action/{objectAction}/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\FormBundle\\Controller\\ActionController::executeAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_formfield_action": {
+        "path": "/s/forms/field/{objectAction}/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\FormBundle\\Controller\\FieldController::executeAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_import_action": {
+        "path": "/s/{object}/import/{objectAction}/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\ImportController::executeAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_import_index": {
+        "path": "/s/{object}/import/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\ImportController::indexAction",
+            "page": 0
+        },
+        "requirements": {
+            "page": "\\d+"
+        }
+    },
+    "mautic_installer_catchcall": {
+        "path": "/installer/{noerror}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\InstallBundle\\Controller\\InstallController::stepAction"
+        },
+        "requirements": {
+            "noerror": "(?).+"
+        }
+    },
+    "mautic_installer_final": {
+        "path": "/installer/final",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\InstallBundle\\Controller\\InstallController::finalAction"
+        },
+        "requirements": []
+    },
+    "mautic_installer_home": {
+        "path": "/installer",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\InstallBundle\\Controller\\InstallController::stepAction"
+        },
+        "requirements": []
+    },
+    "mautic_installer_remove_slash": {
+        "path": "/installer/",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\CoreBundle\\Controller\\CommonController::removeTrailingSlashAction"
+        },
+        "requirements": []
+    },
+    "mautic_installer_step": {
+        "path": "/installer/step/{index}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\InstallBundle\\Controller\\InstallController::stepAction"
+        },
+        "requirements": []
+    },
+    "mautic_integration_auth_callback": {
+        "path": "/plugins/integrations/authcallback/{integration}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\PluginBundle\\Controller\\AuthController::authCallbackAction"
+        },
+        "requirements": []
+    },
+    "mautic_integration_auth_callback_secure": {
+        "path": "/s/plugins/integrations/authcallback/{integration}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\PluginBundle\\Controller\\AuthController::authCallbackAction"
+        },
+        "requirements": []
+    },
+    "mautic_integration_auth_postauth": {
+        "path": "/plugins/integrations/authstatus/{integration}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\PluginBundle\\Controller\\AuthController::authStatusAction"
+        },
+        "requirements": []
+    },
+    "mautic_integration_auth_postauth_secure": {
+        "path": "/s/plugins/integrations/authstatus/{integration}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\PluginBundle\\Controller\\AuthController::authStatusAction"
+        },
+        "requirements": []
+    },
+    "mautic_integration_auth_user": {
+        "path": "/plugins/integrations/authuser/{integration}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\PluginBundle\\Controller\\AuthController::authUserAction"
+        },
+        "requirements": []
+    },
+    "mautic_integration_config": {
+        "path": "/s/integration/{integration}/config",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\IntegrationsBundle\\Controller\\ConfigController::editAction"
+        },
+        "requirements": []
+    },
+    "mautic_integration_config_field_pagination": {
+        "path": "/s/integration/{integration}/config/{object}/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\IntegrationsBundle\\Controller\\FieldPaginationController::paginateAction",
+            "page": 1
+        },
+        "requirements": {
+            "page": "\\d+"
+        }
+    },
+    "mautic_integration_config_field_update": {
+        "path": "/s/integration/{integration}/config/{object}/field/{field}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\IntegrationsBundle\\Controller\\UpdateFieldController::updateAction"
+        },
+        "requirements": []
+    },
+    "mautic_integration_public_callback": {
+        "path": "/integration/{integration}/callback",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\IntegrationsBundle\\Controller\\AuthController::callbackAction"
+        },
+        "requirements": []
+    },
+    "mautic_js": {
+        "path": "/mtc.js",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\CoreBundle\\Controller\\JsController::indexAction"
+        },
+        "requirements": []
+    },
+    "mautic_mailer_transport_callback": {
+        "path": "/mailer/callback",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\EmailBundle\\Controller\\PublicController::mailerCallbackAction"
+        },
+        "requirements": []
+    },
+    "mautic_marketplace_clear_cache": {
+        "path": "/s/marketplace/clear/cache",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\MarketplaceBundle\\Controller\\CacheController::clearAction"
+        },
+        "requirements": []
+    },
+    "mautic_marketplace_detail": {
+        "path": "/s/marketplace/detail/{vendor}/{package}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\MarketplaceBundle\\Controller\\Package\\DetailController::viewAction"
+        },
+        "requirements": []
+    },
+    "mautic_marketplace_install": {
+        "path": "/s/marketplace/install/{vendor}/{package}",
+        "methods": [
+            "GET",
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\MarketplaceBundle\\Controller\\Package\\InstallController::viewAction"
+        },
+        "requirements": []
+    },
+    "mautic_marketplace_list": {
+        "path": "/s/marketplace/{page}",
+        "methods": [
+            "GET",
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\MarketplaceBundle\\Controller\\Package\\ListController::listAction",
+            "page": 1
+        },
+        "requirements": {
+            "page": "\\d+"
+        }
+    },
+    "mautic_marketplace_remove": {
+        "path": "/s/marketplace/remove/{vendor}/{package}",
+        "methods": [
+            "GET",
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\MarketplaceBundle\\Controller\\Package\\RemoveController::viewAction"
+        },
+        "requirements": []
+    },
+    "mautic_message_action": {
+        "path": "/s/messages/{objectAction}/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\ChannelBundle\\Controller\\MessageController::executeAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_message_contacts": {
+        "path": "/s/messages/contacts/{objectId}/{channel}/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\ChannelBundle\\Controller\\MessageController::contactsAction",
+            "objectId": 0,
+            "page": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+",
+            "page": "\\d+"
+        }
+    },
+    "mautic_message_index": {
+        "path": "/s/messages/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\ChannelBundle\\Controller\\MessageController::indexAction",
+            "page": 0
+        },
+        "requirements": {
+            "page": "\\d+"
+        }
+    },
+    "mautic_mobile_notification_action": {
+        "path": "/s/mobile_notifications/{objectAction}/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\NotificationBundle\\Controller\\MobileNotificationController::executeAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_mobile_notification_contacts": {
+        "path": "/s/mobile_notifications/view/{objectId}/contact/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\NotificationBundle\\Controller\\MobileNotificationController::contactsAction",
+            "objectId": 0,
+            "page": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+",
+            "page": "\\d+"
+        }
+    },
+    "mautic_mobile_notification_index": {
+        "path": "/s/mobile_notifications/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\NotificationBundle\\Controller\\MobileNotificationController::indexAction",
+            "page": 0
+        },
+        "requirements": {
+            "page": "\\d+"
+        }
+    },
+    "mautic_notification_action": {
+        "path": "/s/notifications/{objectAction}/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\NotificationBundle\\Controller\\NotificationController::executeAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_notification_contacts": {
+        "path": "/s/notifications/view/{objectId}/contact/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\NotificationBundle\\Controller\\NotificationController::contactsAction",
+            "objectId": 0,
+            "page": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+",
+            "page": "\\d+"
+        }
+    },
+    "mautic_notification_index": {
+        "path": "/s/notifications/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\NotificationBundle\\Controller\\NotificationController::indexAction",
+            "page": 0
+        },
+        "requirements": {
+            "page": "\\d+"
+        }
+    },
+    "mautic_notification_popup": {
+        "path": "/notification",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\NotificationBundle\\Controller\\PopupController::indexAction"
+        },
+        "requirements": []
+    },
+    "mautic_oauth2_server_auth_login": {
+        "path": "/oauth/v2/authorize_login",
+        "methods": [
+            "GET",
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\ApiBundle\\Controller\\oAuth2\\SecurityController::loginAction"
+        },
+        "requirements": []
+    },
+    "mautic_oauth2_server_auth_login_check": {
+        "path": "/oauth/v2/authorize_login_check",
+        "methods": [
+            "GET",
+            "POST"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\ApiBundle\\Controller\\oAuth2\\SecurityController::loginCheckAction"
+        },
+        "requirements": []
+    },
+    "mautic_onesignal_manifest": {
+        "path": "/manifest.json",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\NotificationBundle\\Controller\\JsController::manifestAction"
+        },
+        "requirements": []
+    },
+    "mautic_onesignal_updater": {
+        "path": "/OneSignalSDKUpdaterWorker.js",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\NotificationBundle\\Controller\\JsController::updaterAction"
+        },
+        "requirements": []
+    },
+    "mautic_onesignal_worker": {
+        "path": "/OneSignalSDKWorker.js",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\NotificationBundle\\Controller\\JsController::workerAction"
+        },
+        "requirements": []
+    },
+    "mautic_page_action": {
+        "path": "/s/pages/{objectAction}/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\PageBundle\\Controller\\PageController::executeAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_page_export": {
+        "path": "/s/pages/results/{objectId}/export/{format}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\PageBundle\\Controller\\PageController::exportAction",
+            "format": "csv",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_page_index": {
+        "path": "/s/pages/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\PageBundle\\Controller\\PageController::indexAction",
+            "page": 0
+        },
+        "requirements": {
+            "page": "\\d+"
+        }
+    },
+    "mautic_page_preview": {
+        "path": "/page/preview/{id}/{objectType}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\PageBundle\\Controller\\PublicController::previewAction",
+            "objectType": null
+        },
+        "requirements": []
+    },
+    "mautic_page_public": {
+        "path": "/{slug}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\PageBundle\\Controller\\PublicController::indexAction"
+        },
+        "requirements": {
+            "slug": "(?!(_(profiler|wdt)|css|images|js|favicon.ico|apps/bundles/|plugins/)).+"
+        }
+    },
+    "mautic_page_redirect": {
+        "path": "/redirect/{redirectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\PageBundle\\Controller\\PublicController::redirectAction"
+        },
+        "requirements": []
+    },
+    "mautic_page_results": {
+        "path": "/s/pages/results/{objectId}/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\PageBundle\\Controller\\PageController::resultsAction",
+            "objectId": 0,
+            "page": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+",
+            "page": "\\d+"
+        }
+    },
+    "mautic_page_tracker": {
+        "path": "/mtracking.gif",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\PageBundle\\Controller\\PublicController::trackingImageAction"
+        },
+        "requirements": []
+    },
+    "mautic_page_tracker_cors": {
+        "path": "/mtc/event",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\PageBundle\\Controller\\PublicController::trackingAction"
+        },
+        "requirements": []
+    },
+    "mautic_page_tracker_getcontact": {
+        "path": "/mtc",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\PageBundle\\Controller\\PublicController::getContactIdAction"
+        },
+        "requirements": []
+    },
+    "mautic_plugin_config": {
+        "path": "/s/plugins/config/{name}/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\PluginBundle\\Controller\\PluginController::configAction",
+            "page": 0
+        },
+        "requirements": {
+            "page": "\\d+"
+        }
+    },
+    "mautic_plugin_index": {
+        "path": "/s/plugins",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\PluginBundle\\Controller\\PluginController::indexAction"
+        },
+        "requirements": []
+    },
+    "mautic_plugin_info": {
+        "path": "/s/plugins/info/{name}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\PluginBundle\\Controller\\PluginController::infoAction"
+        },
+        "requirements": []
+    },
+    "mautic_plugin_reload": {
+        "path": "/s/plugins/reload",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\PluginBundle\\Controller\\PluginController::reloadAction"
+        },
+        "requirements": []
+    },
+    "mautic_plugin_timeline_index": {
+        "path": "/s/plugin/{integration}/timeline/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\TimelineController::pluginIndexAction",
+            "page": 0
+        },
+        "requirements": {
+            "integration": ".+",
+            "page": "\\d+"
+        }
+    },
+    "mautic_plugin_timeline_view": {
+        "path": "/s/plugin/{integration}/timeline/view/{leadId}/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\TimelineController::pluginViewAction",
+            "page": 0
+        },
+        "requirements": {
+            "integration": ".+",
+            "leadId": "\\d+",
+            "page": "\\d+"
+        }
+    },
+    "mautic_plugin_tracker": {
+        "path": "/plugin/{integration}/tracking.gif",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\EmailBundle\\Controller\\PublicController::pluginTrackingGifAction"
+        },
+        "requirements": {
+            "integration": ".+"
+        }
+    },
+    "mautic_point.group_action": {
+        "path": "/s/points/groups/{objectAction}/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\GroupController::executeAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_point.group_index": {
+        "path": "/s/points/groups/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\GroupController::indexAction",
+            "page": 0
+        },
+        "requirements": {
+            "page": "\\d+"
+        }
+    },
+    "mautic_point.insight_action": {
+        "path": "/s/points/insights/{objectAction}/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\InsightController::executeAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_point.insight_index": {
+        "path": "/s/points/insights/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\InsightController::indexAction",
+            "page": 0
+        },
+        "requirements": {
+            "page": "\\d+"
+        }
+    },
+    "mautic_point_action": {
+        "path": "/s/points/{objectAction}/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\PointController::executeAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_point_index": {
+        "path": "/s/points/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\PointController::indexAction",
+            "page": 0
+        },
+        "requirements": {
+            "page": "\\d+"
+        }
+    },
+    "mautic_pointtrigger_action": {
+        "path": "/s/points/triggers/{objectAction}/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\TriggerController::executeAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_pointtrigger_index": {
+        "path": "/s/points/triggers/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\TriggerController::indexAction",
+            "page": 0
+        },
+        "requirements": {
+            "page": "\\d+"
+        }
+    },
+    "mautic_pointtriggerevent_action": {
+        "path": "/s/points/triggers/events/{objectAction}/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\PointBundle\\Controller\\TriggerEventController::executeAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_project_action": {
+        "path": "/s/projects/{objectAction}/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\ProjectBundle\\Controller\\ProjectController::executeAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_project_index": {
+        "path": "/s/projects/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\ProjectBundle\\Controller\\ProjectController::indexAction",
+            "page": 0
+        },
+        "requirements": {
+            "page": "\\d+"
+        }
+    },
+    "mautic_receive_notification": {
+        "path": "/notification/receive",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\NotificationBundle\\Controller\\Api\\NotificationApiController::receiveAction"
+        },
+        "requirements": []
+    },
+    "mautic_remove_trailing_slash": {
+        "path": "/{url}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\CoreBundle\\Controller\\CommonController::removeTrailingSlashAction"
+        },
+        "requirements": {
+            "url": ".*/"
+        }
+    },
+    "mautic_report_action": {
+        "path": "/s/reports/{objectAction}/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\ReportBundle\\Controller\\ReportController::executeAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_report_download": {
+        "path": "/s/reports/download/{reportId}/{format}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\ReportBundle\\Controller\\ReportController::downloadAction",
+            "format": "csv"
+        },
+        "requirements": []
+    },
+    "mautic_report_export": {
+        "path": "/s/reports/view/{objectId}/export/{format}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\ReportBundle\\Controller\\ReportController::exportAction",
+            "format": "csv",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_report_index": {
+        "path": "/s/reports/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\ReportBundle\\Controller\\ReportController::indexAction",
+            "page": 0
+        },
+        "requirements": {
+            "page": "\\d+"
+        }
+    },
+    "mautic_report_schedule": {
+        "path": "/s/reports/schedule/{reportId}/now",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\ReportBundle\\Controller\\ScheduleController::nowAction"
+        },
+        "requirements": []
+    },
+    "mautic_report_schedule_preview": {
+        "path": "/s/reports/schedule/preview/{isScheduled}/{scheduleUnit}/{scheduleDay}/{scheduleMonthFrequency}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\ReportBundle\\Controller\\ScheduleController::indexAction",
+            "isScheduled": 0,
+            "scheduleDay": "",
+            "scheduleMonthFrequency": "",
+            "scheduleUnit": ""
+        },
+        "requirements": []
+    },
+    "mautic_report_view": {
+        "path": "/s/reports/view/{objectId}/{reportPage}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\ReportBundle\\Controller\\ReportController::viewAction",
+            "objectId": 0,
+            "reportPage": 1
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+",
+            "reportPage": "\\d+"
+        }
+    },
+    "mautic_role_action": {
+        "path": "/s/roles/{objectAction}/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\UserBundle\\Controller\\RoleController::executeAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_role_index": {
+        "path": "/s/roles/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\UserBundle\\Controller\\RoleController::indexAction",
+            "page": 0
+        },
+        "requirements": {
+            "page": "\\d+"
+        }
+    },
+    "mautic_saml_login_retry": {
+        "path": "/saml/login_retry",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\UserBundle\\Controller\\SecurityController::samlLoginRetryAction"
+        },
+        "requirements": []
+    },
+    "mautic_secure_root": {
+        "path": "/s",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\CoreBundle\\Controller\\DefaultController::redirectSecureRootAction"
+        },
+        "requirements": []
+    },
+    "mautic_secure_root_slash": {
+        "path": "/s/",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\CoreBundle\\Controller\\DefaultController::redirectSecureRootAction"
+        },
+        "requirements": []
+    },
+    "mautic_segment_action": {
+        "path": "/s/segments/{objectAction}/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\ListController::executeAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_segment_batch_contact_set": {
+        "path": "/s/segments/batch/contact/set",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\BatchSegmentController::setAction"
+        },
+        "requirements": []
+    },
+    "mautic_segment_batch_contact_view": {
+        "path": "/s/segments/batch/contact/view",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\BatchSegmentController::indexAction"
+        },
+        "requirements": []
+    },
+    "mautic_segment_contacts": {
+        "path": "/s/segment/view/{objectId}/contact/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\ListController::contactsAction",
+            "objectId": 0,
+            "page": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+",
+            "page": "\\d+"
+        }
+    },
+    "mautic_segment_index": {
+        "path": "/s/segments/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\LeadBundle\\Controller\\ListController::indexAction",
+            "page": 0
+        },
+        "requirements": {
+            "page": "\\d+"
+        }
+    },
+    "mautic_sms_action": {
+        "path": "/s/sms/{objectAction}/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\SmsBundle\\Controller\\SmsController::executeAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_sms_callback": {
+        "path": "/sms/{transport}/callback",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\SmsBundle\\Controller\\ReplyController::callbackAction"
+        },
+        "requirements": []
+    },
+    "mautic_sms_contacts": {
+        "path": "/s/sms/view/{objectId}/contact/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\SmsBundle\\Controller\\SmsController::contactsAction",
+            "objectId": 0,
+            "page": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+",
+            "page": "\\d+"
+        }
+    },
+    "mautic_sms_index": {
+        "path": "/s/sms/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\SmsBundle\\Controller\\SmsController::indexAction",
+            "page": 0
+        },
+        "requirements": {
+            "page": "\\d+"
+        }
+    },
+    "mautic_sso_login": {
+        "path": "/s/sso_login/{integration}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\UserBundle\\Controller\\SecurityController::ssoLoginAction"
+        },
+        "requirements": []
+    },
+    "mautic_sso_login_check": {
+        "path": "/s/sso_login_check/{integration}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\UserBundle\\Controller\\SecurityController::ssoLoginCheckAction"
+        },
+        "requirements": []
+    },
+    "mautic_stage_action": {
+        "path": "/s/stages/{objectAction}/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\StageBundle\\Controller\\StageController::executeAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_stage_index": {
+        "path": "/s/stages/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\StageBundle\\Controller\\StageController::indexAction",
+            "page": 0
+        },
+        "requirements": {
+            "page": "\\d+"
+        }
+    },
+    "mautic_subscribe_notification": {
+        "path": "/notification/subscribe",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\NotificationBundle\\Controller\\Api\\NotificationApiController::subscribeAction"
+        },
+        "requirements": []
+    },
+    "mautic_sysinfo_index": {
+        "path": "/s/sysinfo",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\ConfigBundle\\Controller\\SysinfoController::indexAction"
+        },
+        "requirements": []
+    },
+    "mautic_themes_action": {
+        "path": "/s/themes/{objectAction}/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\CoreBundle\\Controller\\ThemeController::executeAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_themes_index": {
+        "path": "/s/themes",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\CoreBundle\\Controller\\ThemeController::indexAction"
+        },
+        "requirements": []
+    },
+    "mautic_tracking_js": {
+        "path": "/mautic-tracking.js",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\CoreBundle\\Controller\\JsController::trackingAction"
+        },
+        "requirements": []
+    },
+    "mautic_url_redirect": {
+        "path": "/r/{redirectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\PageBundle\\Controller\\PublicController::redirectAction"
+        },
+        "requirements": []
+    },
+    "mautic_user_account": {
+        "path": "/s/account",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\UserBundle\\Controller\\ProfileController::indexAction"
+        },
+        "requirements": []
+    },
+    "mautic_user_action": {
+        "path": "/s/users/{objectAction}/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\UserBundle\\Controller\\UserController::executeAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_user_index": {
+        "path": "/s/users/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\UserBundle\\Controller\\UserController::indexAction",
+            "page": 0
+        },
+        "requirements": {
+            "page": "\\d+"
+        }
+    },
+    "mautic_user_invite_register": {
+        "path": "/invite/{token}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\UserBundle\\Controller\\PublicController::inviteAction"
+        },
+        "requirements": []
+    },
+    "mautic_user_logincheck": {
+        "path": "/s/login_check",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\UserBundle\\Controller\\SecurityController::loginCheckAction"
+        },
+        "requirements": []
+    },
+    "mautic_user_passwordreset": {
+        "path": "/passwordreset",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\UserBundle\\Controller\\PublicController::passwordResetAction"
+        },
+        "requirements": []
+    },
+    "mautic_user_passwordresetconfirm": {
+        "path": "/passwordresetconfirm",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\UserBundle\\Controller\\PublicController::passwordResetConfirmAction"
+        },
+        "requirements": []
+    },
+    "mautic_webhook_action": {
+        "path": "/s/webhooks/{objectAction}/{objectId}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\WebhookBundle\\Controller\\WebhookController::executeAction",
+            "objectId": 0
+        },
+        "requirements": {
+            "objectId": "[a-zA-Z0-9_-]+"
+        }
+    },
+    "mautic_webhook_index": {
+        "path": "/s/webhooks/{page}",
+        "methods": [],
+        "defaults": {
+            "_controller": "Mautic\\WebhookBundle\\Controller\\WebhookController::indexAction",
+            "page": 0
+        },
+        "requirements": {
+            "page": "\\d+"
+        }
+    },
+    "mautic_widget_data": {
+        "path": "/api/data/{type}",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\DashboardBundle\\Controller\\Api\\WidgetApiController::getDataAction",
+            "_format": "json"
+        },
+        "requirements": []
+    },
+    "mautic_widget_types": {
+        "path": "/api/data",
+        "methods": [
+            "GET"
+        ],
+        "defaults": {
+            "_controller": "Mautic\\DashboardBundle\\Controller\\Api\\WidgetApiController::getTypesAction",
+            "_format": "json"
+        },
+        "requirements": []
+    }
+}
