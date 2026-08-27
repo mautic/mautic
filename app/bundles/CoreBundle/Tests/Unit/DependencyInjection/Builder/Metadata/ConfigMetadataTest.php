@@ -7,55 +7,58 @@ namespace Mautic\CoreBundle\Tests\Unit\DependencyInjection\Builder\Metadata;
 use Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadata;
 use Mautic\CoreBundle\DependencyInjection\Builder\Metadata\ConfigMetadata;
 use Mautic\CoreBundle\IpLookup\ExtremeIpLookup;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 final class ConfigMetadataTest extends TestCase
 {
-    /**
-     * @var BundleMetadata|MockObject
-     */
-    private MockObject $metadata;
+    //    /**
+    //     * @var BundleMetadata|MockObject
+    //     */
+    //    private MockObject $metadata;
 
-    protected function setUp(): void
-    {
-        $this->metadata = $this->getMockBuilder(BundleMetadata::class)
-            ->onlyMethods(['getDirectory'])
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
+    //    protected function setUp(): void
+    //    {
+    // //        $this->metadata = new BundleMetadata();
+    // //            ->onlyMethods(['getDirectory'])
+    // //            ->disableOriginalConstructor()
+    // //            ->getMock();
+    //    }
 
     public function testMissingConfigIsIgnored(): void
     {
-        $this->metadata->expects($this->once())
-            ->method('getDirectory')
-            ->willReturn('/foo/bar');
+        $bundleMetadata = new BundleMetadata([
+            'directory' => '/foo/bar',
+        ]);
 
-        $configMetadata = new ConfigMetadata($this->metadata);
+        //        $this->metadata->expects($this->once())
+        //            ->method('getDirectory')
+        //            ->willReturn('/foo/bar');
+
+        $configMetadata = new ConfigMetadata($bundleMetadata);
         $configMetadata->build();
 
-        $this->assertEquals([], $this->metadata->toArray()['config']);
+        $this->assertEquals([], $bundleMetadata->toArray()['config']);
     }
 
     public function testBadConfigIsIgnored(): void
     {
-        $this->metadata->expects($this->once())
-            ->method('getDirectory')
-            ->willReturn(__DIR__.'/resource/BadConfig');
+        $bundleMetadata = new BundleMetadata([
+            'directory' => __DIR__.'/resource/BadConfig',
+        ]);
 
-        $configMetadata = new ConfigMetadata($this->metadata);
+        $configMetadata = new ConfigMetadata($bundleMetadata);
         $configMetadata->build();
 
-        $this->assertEquals([], $this->metadata->toArray()['config']);
+        $this->assertEquals([], $bundleMetadata->toArray()['config']);
     }
 
     public function testIpLookupServicesAreLoaded(): void
     {
-        $this->metadata->expects($this->once())
-            ->method('getDirectory')
-            ->willReturn(__DIR__.'/resource/GoodConfig');
+        $bundleMetadata = new BundleMetadata([
+            'directory' => __DIR__.'/resource/GoodConfig',
+        ]);
 
-        $configMetadata = new ConfigMetadata($this->metadata);
+        $configMetadata = new ConfigMetadata($bundleMetadata);
         $configMetadata->build();
 
         $this->assertSame(
@@ -71,41 +74,41 @@ final class ConfigMetadataTest extends TestCase
 
     public function testConfigIsLoaded(): void
     {
-        $this->metadata->expects($this->once())
-            ->method('getDirectory')
-            ->willReturn(__DIR__.'/resource/GoodConfig');
+        $bundleMetadata = new BundleMetadata([
+            'directory' => __DIR__.'/resource/GoodConfig',
+        ]);
 
-        $configMetadata = new ConfigMetadata($this->metadata);
+        $configMetadata = new ConfigMetadata($bundleMetadata);
         $configMetadata->build();
 
-        $config = $this->metadata->toArray()['config'];
+        $config = $bundleMetadata->toArray()['config'];
         $this->assertArrayHasKey('mautic.helper.bundle', $config['services']['helpers']);
         $this->assertArrayHasKey('log_path', $config['parameters']);
     }
 
     public function testOptionalMissingServicesAreIgnored(): void
     {
-        $this->metadata->expects($this->once())
-            ->method('getDirectory')
-            ->willReturn(__DIR__.'/resource/GoodConfig');
+        $bundleMetadata = new BundleMetadata([
+            'directory' => __DIR__.'/resource/GoodConfig',
+        ]);
 
-        $configMetadata = new ConfigMetadata($this->metadata);
+        $configMetadata = new ConfigMetadata($bundleMetadata);
         $configMetadata->build();
 
-        $config = $this->metadata->toArray()['config'];
+        $config = $bundleMetadata->toArray()['config'];
         $this->assertArrayNotHasKey('mautic.test.fixture', $config['services']['fixtures']);
     }
 
     public function testParameterArgumentsAreEncoded(): void
     {
-        $this->metadata->expects($this->once())
-            ->method('getDirectory')
-            ->willReturn(__DIR__.'/resource/GoodConfig');
+        $bundleMetadata = new BundleMetadata([
+            'directory' => __DIR__.'/resource/GoodConfig',
+        ]);
 
-        $configMetadata = new ConfigMetadata($this->metadata);
+        $configMetadata = new ConfigMetadata($bundleMetadata);
         $configMetadata->build();
 
-        $config = $this->metadata->toArray()['config'];
+        $config = $bundleMetadata->toArray()['config'];
         $this->assertArrayHasKey('mautic.helper.bundle', $config['services']['helpers']);
 
         $this->assertEquals('%%mautic.bundles%%', $config['services']['helpers']['mautic.helper.bundle']['arguments'][0]);
@@ -113,14 +116,14 @@ final class ConfigMetadataTest extends TestCase
 
     public function testParametersAreEncoded(): void
     {
-        $this->metadata->expects($this->once())
-            ->method('getDirectory')
-            ->willReturn(__DIR__.'/resource/GoodConfig');
+        $bundleMetadata = new BundleMetadata([
+            'directory' => __DIR__.'/resource/GoodConfig',
+        ]);
 
-        $configMetadata = new ConfigMetadata($this->metadata);
+        $configMetadata = new ConfigMetadata($bundleMetadata);
         $configMetadata->build();
 
-        $config = $this->metadata->toArray()['config'];
+        $config = $bundleMetadata->toArray()['config'];
         $this->assertArrayHasKey('log_path', $config['parameters']);
 
         $this->assertEquals('%%kernel.project_dir%%/var/logs', $config['parameters']['log_path']);
@@ -128,14 +131,14 @@ final class ConfigMetadataTest extends TestCase
 
     public function testParameterTypesArePreserved(): void
     {
-        $this->metadata->expects($this->once())
-            ->method('getDirectory')
-            ->willReturn(__DIR__.'/resource/GoodConfig');
+        $bundleMetadata = new BundleMetadata([
+            'directory' => __DIR__.'/resource/GoodConfig',
+        ]);
 
-        $configMetadata = new ConfigMetadata($this->metadata);
+        $configMetadata = new ConfigMetadata($bundleMetadata);
         $configMetadata->build();
 
-        $config = $this->metadata->toArray()['config'];
+        $config = $bundleMetadata->toArray()['config'];
         $this->assertArrayHasKey('log_path', $config['parameters']);
 
         $this->assertEquals('%%kernel.project_dir%%/var/logs', $config['parameters']['log_path']);
