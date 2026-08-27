@@ -88,14 +88,20 @@ final class ModifyCustomFieldCommand extends Command
      */
     private function convertCsvToArray(\SplFileObject $inputCsv): array
     {
-        $inputCsv->setFlags(\SplFileObject::READ_CSV | \SplFileObject::SKIP_EMPTY | \SplFileObject::DROP_NEW_LINE);
+        // \SplFileObject::READ_CSV is deprecated
+        $inputCsv->setFlags(\SplFileObject::SKIP_EMPTY | \SplFileObject::DROP_NEW_LINE);
         $headerSkipped  = false;
         $keys           = [];
         $data           = [];
 
-        foreach ($inputCsv as $row) {
-            if (false === $row) {
+        foreach ($inputCsv as $line) {
+            if (false === $line) {
                 // skip the last empty row
+                continue;
+            }
+
+            $row = str_getcsv((string) $line);
+            if (false === $row) {
                 continue;
             }
 

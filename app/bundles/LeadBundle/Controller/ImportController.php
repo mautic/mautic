@@ -339,7 +339,17 @@ final class ImportController extends FormController
                                 $this->requestStack->getSession()->set('mautic.'.$object.'.import.config', $config);
 
                                 // Get the headers for matching
-                                $headers = $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']);
+                                // $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']) is deprecated
+                                // Below workaround for this deprecation in PHP8.6+
+                                $file->setFlags(\SplFileObject::DROP_NEW_LINE);
+                                $line = $file->fgets();
+                                $headers = (false !== $line) ? str_getcsv(
+                                    $line,
+                                    $config['delimiter'],
+                                    $config['enclosure'],
+                                    $config['escape']
+                                ) : false;
+                                // End of workaround
 
                                 // Get the number of lines so we can track progress
                                 $file->seek(PHP_INT_MAX);

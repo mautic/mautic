@@ -34,7 +34,7 @@ jobs:
             db-types: 'mysql:26.7' # 'mysql:9.7'
             experimental: true
           - php-versions: '8.6'
-            db-types: 'mariadb:13.0-rc'
+            db-types: 'mariadb:13.0-rc' # 'mariadb:12.3'
             experimental: true
 
     name: PHPUnit ${{ matrix.php-versions }} ${{ matrix.db-types }}
