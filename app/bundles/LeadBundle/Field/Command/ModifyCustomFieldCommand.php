@@ -95,7 +95,19 @@ final class ModifyCustomFieldCommand extends Command
         $data           = [];
 
         foreach ($inputCsv as $line) {
-            $row = str_getcsv($line);
+            /*
+             * As of PHP 8.4.0, depending on the default value of escape is deprecated.
+             * It needs to be provided explicitly either positionally or by the use
+             * of Named Arguments, or by a call to SplFileObject::setCsvControl().
+             *
+             * When escape is set to anything other than an empty string ("")
+             * it can result in CSV that is not compliant with » RFC 4180
+             * or unable to survive a roundtrip through the PHP CSV functions.
+             * The default for escape is "\\" so it is recommended to set it to the empty string explicitly.
+             *
+             * The default value will change in a future version of PHP, no earlier than PHP 9.0.
+            */
+            $row = str_getcsv($line, escape: '\\');
 
             // Treat a single null value (blank line) as no row
             if ([] === $row || [null] === $row) {
