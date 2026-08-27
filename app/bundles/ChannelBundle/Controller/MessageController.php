@@ -42,10 +42,7 @@ final class MessageController extends AbstractStandardFormController
         return $this->cloneStandard($request, $objectId);
     }
 
-    /**
-     * @param bool $ignorePost
-     */
-    public function editAction(Request $request, $objectId, $ignorePost = false): Response
+    public function editAction(Request $request, $objectId, bool $ignorePost = false): Response
     {
         return $this->editStandard($request, $objectId, $ignorePost);
     }

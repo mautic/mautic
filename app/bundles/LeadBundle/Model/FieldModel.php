@@ -604,7 +604,6 @@ class FieldModel extends FormModel
 
     /**
      * @param LeadField $entity
-     * @param bool      $unlock
      *
      * @throws AbortColumnCreateException
      * @throws AbortColumnUpdateException
@@ -613,7 +612,7 @@ class FieldModel extends FormModel
      * @throws SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
-    public function saveEntity($entity, $unlock = true): void
+    public function saveEntity($entity, bool $unlock = true): void
     {
         if (!$entity instanceof LeadField) {
             throw new MethodNotAllowedHttpException(['LeadEntity']);
@@ -646,7 +645,6 @@ class FieldModel extends FormModel
      * Build schema for each entity.
      *
      * @param array $entities
-     * @param bool  $unlock
      *
      * @throws AbortColumnCreateException
      * @throws Exception
@@ -654,7 +652,7 @@ class FieldModel extends FormModel
      * @throws SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
-    public function saveEntities($entities, $unlock = true): void
+    public function saveEntities($entities, bool $unlock = true): void
     {
         foreach ($entities as $entity) {
             $this->saveEntity($entity, $unlock);
@@ -855,7 +853,7 @@ class FieldModel extends FormModel
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         switch ($action) {
             case 'pre_save':

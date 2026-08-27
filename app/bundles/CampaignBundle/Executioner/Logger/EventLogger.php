@@ -61,10 +61,7 @@ class EventLogger
         }
     }
 
-    /**
-     * @param bool $isInactiveEvent
-     */
-    public function buildLogEntry(Event $event, ?Lead $contact = null, $isInactiveEvent = false): LeadEventLog
+    public function buildLogEntry(Event $event, ?Lead $contact = null, bool $isInactiveEvent = false): LeadEventLog
     {
         $log = new LeadEventLog();
 
@@ -147,11 +144,9 @@ class EventLogger
     }
 
     /**
-     * @param bool $isInactiveEntry
-     *
      * @return ArrayCollection
      */
-    public function fetchRotationAndGenerateLogsFromContacts(Event $event, AbstractEventAccessor $config, ArrayCollection $contacts, $isInactiveEntry = false)
+    public function fetchRotationAndGenerateLogsFromContacts(Event $event, AbstractEventAccessor $config, ArrayCollection $contacts, bool $isInactiveEntry = false)
     {
         $this->hydrateContactRotationsForNewLogs($contacts->getKeys(), $event->getCampaign()->getId());
 
@@ -159,11 +154,9 @@ class EventLogger
     }
 
     /**
-     * @param bool $isInactiveEntry
-     *
      * @return ArrayCollection
      */
-    public function generateLogsFromContacts(Event $event, AbstractEventAccessor $config, ArrayCollection $contacts, $isInactiveEntry)
+    public function generateLogsFromContacts(Event $event, AbstractEventAccessor $config, ArrayCollection $contacts, bool $isInactiveEntry)
     {
         $isDecision = Event::TYPE_DECISION === $event->getEventType();
         $campaign   = $event->getCampaign();

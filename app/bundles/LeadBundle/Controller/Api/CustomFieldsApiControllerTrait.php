@@ -165,11 +165,10 @@ trait CustomFieldsApiControllerTrait
      * @param Lead|Company         $entity
      * @param FormInterface<mixed> $form
      * @param mixed[]              $parameters
-     * @param bool                 $isPostOrPatch
      *
      * @return bool|void
      */
-    protected function setCustomFieldValues($entity, $form, $parameters, $isPostOrPatch = false)
+    protected function setCustomFieldValues($entity, $form, $parameters, bool $isPostOrPatch = false)
     {
         // set the custom field values
         // pull the data from the form in order to apply the form's formatting
