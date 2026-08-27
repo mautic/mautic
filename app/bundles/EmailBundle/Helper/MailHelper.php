@@ -469,12 +469,10 @@ class MailHelper
                     $tokens['{signature}'] = $this->fromEmailHelper->getSignature();
                 }
 
-                if (!isset($this->metadata[$metadataKey])) {
-                    $this->metadata[$metadataKey] = [
-                        'from'     => $from,
-                        'contacts' => [],
-                    ];
-                }
+                $this->metadata[$metadataKey] ??= [
+                    'from'     => $from,
+                    'contacts' => [],
+                ];
 
                 $this->metadata[$metadataKey]['contacts'][$email] = $this->buildMetadata($name, $tokens);
             }
@@ -1145,14 +1143,11 @@ class MailHelper
     }
 
     /**
-     * @param string|null $idHash
-     * @param bool        $statToBeGenerated Pass false if a stat entry is not to be created
+     * @param bool $statToBeGenerated Pass false if a stat entry is not to be created
      */
-    public function setIdHash($idHash = null, $statToBeGenerated = true): void
+    public function setIdHash(?string $idHash = null, $statToBeGenerated = true): void
     {
-        if (null === $idHash) {
-            $idHash = str_replace('.', '', uniqid('', true));
-        }
+        $idHash ??= str_replace('.', '', uniqid('', true));
 
         $this->idHash      = $idHash;
         $this->idHashState = $statToBeGenerated;
@@ -1471,17 +1466,11 @@ class MailHelper
      */
     public function dispatchSendEvent(): void
     {
-        if (null === $this->bodyInitial) {
-            $this->bodyInitial = $this->body;
-        }
+        $this->bodyInitial ??= $this->body;
 
-        if (null === $this->plainTextInitial) {
-            $this->plainTextInitial = $this->plainText;
-        }
+        $this->plainTextInitial ??= $this->plainText;
 
-        if (null === $this->subjectInitial) {
-            $this->subjectInitial = $this->subject;
-        }
+        $this->subjectInitial ??= $this->subject;
 
         // Reset body, text, subject and tokens, so the latter listeners use the same data as the former ones.
         $this->setBody($this->bodyInitial['content'], $this->bodyInitial['contentType'], $this->bodyInitial['charset'], true);
@@ -1938,9 +1927,7 @@ class MailHelper
     private function setFromForSingleMessage(): void
     {
         if ($this->lead && $this->email && $this->email->getUseOwnerAsMailer()) {
-            if (!isset($this->lead['owner_id'])) {
-                $this->lead['owner_id'] = 0;
-            }
+            $this->lead['owner_id'] ??= 0;
 
             $from = $this->fromEmailHelper->getFromAddressConsideringOwner($this->getFrom(), $this->lead, $this->email);
             $this->setMessageFrom($from);

@@ -104,17 +104,11 @@ trait LeadDetailsTrait
             throw new \InvalidArgumentException('filters parameter must be an array');
         }
 
-        if (!isset($filters['search'])) {
-            $filters['search'] = '';
-        }
+        $filters['search'] ??= '';
 
-        if (!isset($filters['includeEvents'])) {
-            $filters['includeEvents'] = [];
-        }
+        $filters['includeEvents'] ??= [];
 
-        if (!isset($filters['excludeEvents'])) {
-            $filters['excludeEvents'] = [];
-        }
+        $filters['excludeEvents'] ??= [];
 
         return $filters;
     }

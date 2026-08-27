@@ -33,9 +33,7 @@ final class CategoryTypeEntityEvent extends CommonEvent
     public function addCategoryTypeEntity(string $type, ?array $data): void
     {
         if (!empty($data)) {
-            if (!isset($data['label'])) {
-                $data['label'] = 'mautic.'.$type.'.'.$type;
-            }
+            $data['label'] ??= 'mautic.'.$type.'.'.$type;
             $this->types[$type] = $data;
         }
     }

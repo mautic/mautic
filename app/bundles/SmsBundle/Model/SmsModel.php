@@ -312,9 +312,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
                 SmsEvents::TOKEN_REPLACEMENT
             );
 
-            if (!isset($recipientCollections[$translatedSms->getId()])) {
-                $recipientCollections[$translatedSms->getId()] = new RecipientCollection($translatedSms);
-            }
+            $recipientCollections[$translatedSms->getId()] ??= new RecipientCollection($translatedSms);
             $recipientCollections[$translatedSms->getId()]->append(new SmsRecipientDTO($contact, $tokenEvent->getTokens(), $tokenEvent->getContent()));
 
             unset($smsEvent, $tokenEvent);

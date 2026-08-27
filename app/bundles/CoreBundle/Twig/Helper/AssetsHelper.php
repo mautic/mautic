@@ -44,9 +44,7 @@ final class AssetsHelper
         private readonly InstallService $installService,
         #[Autowire(param: 'mautic.site_url')] ?string $siteUrl,
     ) {
-        if (null === $siteUrl) {
-            $siteUrl = '';
-        }
+        $siteUrl ??= '';
 
         if ($siteUrl && str_ends_with($siteUrl, '/')) {
             $siteUrl = substr($siteUrl, 0, -1);
@@ -146,15 +144,11 @@ final class AssetsHelper
      *
      * If changing the context from app, it's important to reset the context back to app after
      * injecting/fetching assets for a different context.
-     *
-     * @param string $context
      */
-    public function setContext($context = self::CONTEXT_APP): self
+    public function setContext(string $context = self::CONTEXT_APP): self
     {
         $this->context = $context;
-        if (!isset($this->assets[$context])) {
-            $this->assets[$context] = [];
-        }
+        $this->assets[$context] ??= [];
 
         return $this;
     }
@@ -177,9 +171,7 @@ final class AssetsHelper
                 // special place for these so that declarations and scripts can be mingled
                 $assets['headDeclarations'][$name] = ['script' => [$s, $async]];
             } else {
-                if (!isset($assets['scripts'][$location])) {
-                    $assets['scripts'][$location] = [];
-                }
+                $assets['scripts'][$location] ??= [];
 
                 if (!in_array($s, $assets['scripts'][$location])) {
                     $assets['scripts'][$location][$name] = [$s, $async];
@@ -210,9 +202,7 @@ final class AssetsHelper
             // special place for these so that declarations and scripts can be mingled
             $this->assets[$this->context]['headDeclarations'][] = ['declaration' => $script];
         } else {
-            if (!isset($this->assets[$this->context]['scriptDeclarations'][$location])) {
-                $this->assets[$this->context]['scriptDeclarations'][$location] = [];
-            }
+            $this->assets[$this->context]['scriptDeclarations'][$location] ??= [];
 
             if (!in_array($script, $this->assets[$this->context]['scriptDeclarations'][$location])) {
                 $this->assets[$this->context]['scriptDeclarations'][$location][] = $script;
@@ -230,9 +220,7 @@ final class AssetsHelper
     public function addStylesheet($stylesheet): self
     {
         $addSheet = function ($s): void {
-            if (!isset($this->assets[$this->context]['stylesheets'])) {
-                $this->assets[$this->context]['stylesheets'] = [];
-            }
+            $this->assets[$this->context]['stylesheets'] ??= [];
 
             if (!in_array($s, $this->assets[$this->context]['stylesheets'])) {
                 $this->assets[$this->context]['stylesheets'][] = $s;
@@ -257,9 +245,7 @@ final class AssetsHelper
      */
     public function addStyleDeclaration($styles): self
     {
-        if (!isset($this->assets[$this->context]['styleDeclarations'])) {
-            $this->assets[$this->context]['styleDeclarations'] = [];
-        }
+        $this->assets[$this->context]['styleDeclarations'] ??= [];
 
         if (!in_array($styles, $this->assets[$this->context]['styleDeclarations'])) {
             $this->assets[$this->context]['styleDeclarations'][] = $styles;
@@ -279,9 +265,7 @@ final class AssetsHelper
         if ('head' == $location) {
             $this->assets[$this->context]['headDeclarations'][] = ['custom' => $declaration];
         } else {
-            if (!isset($this->assets[$this->context]['customDeclarations'][$location])) {
-                $this->assets[$this->context]['customDeclarations'][$location] = [];
-            }
+            $this->assets[$this->context]['customDeclarations'][$location] ??= [];
 
             if (!in_array($declaration, $this->assets[$this->context]['customDeclarations'][$location])) {
                 $this->assets[$this->context]['customDeclarations'][$location][] = $declaration;

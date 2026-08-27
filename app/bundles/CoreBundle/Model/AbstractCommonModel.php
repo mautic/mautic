@@ -67,9 +67,7 @@ abstract class AbstractCommonModel implements MauticModelInterface
     {
         static $commonRepo;
 
-        if (null === $commonRepo) {
-            $commonRepo = $this->em->getRepository(FormEntity::class);
-        }
+        $commonRepo ??= $this->em->getRepository(FormEntity::class);
 
         return $commonRepo;
     }

@@ -228,10 +228,7 @@ class ContactTracker
             $this->hydrateCustomFieldData($lead);
         }
 
-        if (null === $lead) {
-            // Check to see if a contact is being tracked via the old cookie method in order to migrate them to the new
-            $lead = $this->contactTrackingService->getTrackedLead();
-        }
+        $lead ??= $this->contactTrackingService->getTrackedLead();
 
         if ($lead) {
             $this->logger->debug("CONTACT: Existing lead found with ID# {$lead->getId()}.");

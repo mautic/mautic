@@ -98,9 +98,7 @@ class Bounce implements ProcessorInterface
         $dtHelper    = new DateTimeHelper();
         $openDetails = $stat->getOpenDetails();
 
-        if (!isset($openDetails['bounces'])) {
-            $openDetails['bounces'] = [];
-        }
+        $openDetails['bounces'] ??= [];
 
         $openDetails['bounces'][] = [
             'datetime' => $dtHelper->toUtcString(),

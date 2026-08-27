@@ -31,9 +31,7 @@ final class IntegrationsListType extends AbstractType
 
             if ($settings->isPublished()) {
                 $pluginName = $settings->getPlugin()->getName();
-                if (!isset($integrations[$pluginName])) {
-                    $integrations[$pluginName] = [];
-                }
+                $integrations[$pluginName] ??= [];
                 $integrations[$pluginName][$object->getDisplayName()] = $object->getName();
             }
         }

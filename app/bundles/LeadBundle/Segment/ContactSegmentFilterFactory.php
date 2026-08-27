@@ -124,9 +124,7 @@ final class ContactSegmentFilterFactory
                 if (isset($filter['type']) && in_array($filter['type'], ['date', 'datetime'], true)) {
                     $shrinkedFilters[] = $filter;
                 } else {
-                    if (!isset($arrStacks[$key])) {
-                        $arrStacks[$key] = [];
-                    }
+                    $arrStacks[$key] ??= [];
                     $arrStacks[$key][] = $filter;
                 }
             } else { // glue = and

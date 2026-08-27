@@ -394,10 +394,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
             $contactIds[] = $contactId;
             $metadata     = $log->getMetadata() ?? [];
 
-            // Store original event information for tracking
-            if (!isset($metadata['redirection_history'])) {
-                $metadata['redirection_history'] = [];
-            }
+            $metadata['redirection_history'] ??= [];
 
             // Add to redirection history
             $metadata['redirection_history'][] = [
@@ -462,15 +459,11 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
             $eventType = $event->getType();
 
             if (CampaignActionJumpToEventSubscriber::EVENT_NAME === $eventType) {
-                if (!isset($jumpTo[$event->getId()])) {
-                    $jumpTo[$event->getId()] = new ArrayCollection();
-                }
+                $jumpTo[$event->getId()] ??= new ArrayCollection();
 
                 $jumpTo[$event->getId()]->set($log->getId(), $log);
             } else {
-                if (!isset($other[$event->getId()])) {
-                    $other[$event->getId()] = new ArrayCollection();
-                }
+                $other[$event->getId()] ??= new ArrayCollection();
 
                 $other[$event->getId()]->set($log->getId(), $log);
             }

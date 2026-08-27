@@ -156,9 +156,7 @@ final class OwnerSubscriber implements EventSubscriberInterface
      */
     private function getOwner(int $ownerId)
     {
-        if (!isset($this->owners[$ownerId])) {
-            $this->owners[$ownerId] = $this->leadRepository->getLeadOwner($ownerId);
-        }
+        $this->owners[$ownerId] ??= $this->leadRepository->getLeadOwner($ownerId);
 
         return $this->owners[$ownerId];
     }

@@ -107,17 +107,11 @@ trait FrequencyRuleTrait
 
         /** @var LeadModel $model */
         $model = $this->getModel('lead');
-        if (null === $allChannels) {
-            $allChannels = $model->getPreferenceChannels();
-        }
+        $allChannels ??= $model->getPreferenceChannels();
 
-        if (null === $leadChannels) {
-            $leadChannels = $model->getContactChannels($lead);
-        }
+        $leadChannels ??= $model->getContactChannels($lead);
 
-        if (null === $frequencyRules) {
-            $frequencyRules = $model->getFrequencyRules($lead);
-        }
+        $frequencyRules ??= $model->getFrequencyRules($lead);
 
         foreach ($allChannels as $channel) {
             if (isset($frequencyRules[$channel])) {

@@ -45,9 +45,7 @@ class FieldHelper
 
     public function getFieldList(string $object): array
     {
-        if (!isset($this->fieldList[$object])) {
-            $this->fieldList[$object] = $this->fieldModel->getFieldListWithProperties($object);
-        }
+        $this->fieldList[$object] ??= $this->fieldModel->getFieldListWithProperties($object);
 
         return $this->fieldList[$object];
     }

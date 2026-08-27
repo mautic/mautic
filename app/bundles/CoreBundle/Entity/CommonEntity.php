@@ -72,12 +72,10 @@ class CommonEntity implements \Stringable
             }
         } elseif ($current !== $val) {
             if ($current instanceof Collection || $val instanceof Collection) {
-                if (!isset($this->changes[$prop])) {
-                    $this->changes[$prop] = [
-                        'added'   => [],
-                        'removed' => [],
-                    ];
-                }
+                $this->changes[$prop] ??= [
+                    'added'   => [],
+                    'removed' => [],
+                ];
 
                 if (is_object($val)) {
                     // Entity is getting added to the collection

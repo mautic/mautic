@@ -82,11 +82,9 @@ final class ApiMetadataDriver implements DriverInterface
     /**
      * Create a new property.
      */
-    public function createProperty($name): static
+    public function createProperty(?string $name): static
     {
-        if (!isset($this->properties[$name])) {
-            $this->properties[$name] = new PropertyMetadata($this->metadata->name, $name);
-        }
+        $this->properties[$name] ??= new PropertyMetadata($this->metadata->name, $name);
 
         $this->currentPropertyName = $name;
 
@@ -159,9 +157,7 @@ final class ApiMetadataDriver implements DriverInterface
 
     public function setSinceVersion($version, $property = null): static
     {
-        if (null === $property) {
-            $property = $this->getCurrentPropertyName();
-        }
+        $property ??= $this->getCurrentPropertyName();
 
         $this->properties[$property]->sinceVersion = $version;
 
@@ -170,9 +166,7 @@ final class ApiMetadataDriver implements DriverInterface
 
     public function setUntilVersion($version, $property = null): static
     {
-        if (null === $property) {
-            $property = $this->getCurrentPropertyName();
-        }
+        $property ??= $this->getCurrentPropertyName();
 
         $this->properties[$property]->untilVersion = $version;
 
@@ -181,9 +175,7 @@ final class ApiMetadataDriver implements DriverInterface
 
     public function setSerializedName($name, $property = null): static
     {
-        if (null === $property) {
-            $property = $this->getCurrentPropertyName();
-        }
+        $property ??= $this->getCurrentPropertyName();
 
         $this->properties[$property]->serializedName = $name;
 
@@ -199,9 +191,7 @@ final class ApiMetadataDriver implements DriverInterface
             $groups = [$groups];
         }
 
-        if (null === $property) {
-            $property = $this->getCurrentPropertyName();
-        }
+        $property ??= $this->getCurrentPropertyName();
 
         $this->properties[$property]->groups = $groups;
 
@@ -220,9 +210,7 @@ final class ApiMetadataDriver implements DriverInterface
                 $this->addGroup($group, $prop);
             }
         } else {
-            if (null === $property) {
-                $property = $this->getCurrentPropertyName();
-            }
+            $property ??= $this->getCurrentPropertyName();
 
             $this->properties[$property]->groups[] = $group;
         }
@@ -246,9 +234,7 @@ final class ApiMetadataDriver implements DriverInterface
      */
     public function setMaxDepth($depth, $property = null): static
     {
-        if (null === $property) {
-            $property = $this->getCurrentPropertyName();
-        }
+        $property ??= $this->getCurrentPropertyName();
 
         $this->properties[$property]->maxDepth = (int) $depth;
 

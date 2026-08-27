@@ -41,9 +41,7 @@ trait TranslationModelTrait
             $translationList = [];
             foreach ($translations as $id => $language) {
                 $core = $this->getTranslationLocaleCore($language);
-                if (!isset($translationList[$core])) {
-                    $translationList[$core] = [];
-                }
+                $translationList[$core] ??= [];
                 $translationList[$core][$language] = $id;
             }
 
@@ -73,9 +71,7 @@ trait TranslationModelTrait
                         // change - to _
                         $language = str_replace('-', '_', $language);
 
-                        if (!isset($languageList[$language])) {
-                            $languageList[$language] = $language;
-                        }
+                        $languageList[$language] ??= $language;
                     }
                 }
             }
