@@ -72,11 +72,9 @@ trait CustomFieldEntityTrait
     }
 
     /**
-     * @param bool $ungroup
-     *
      * @return array
      */
-    public function getFields($ungroup = false)
+    public function getFields(bool $ungroup = false)
     {
         if ($ungroup && isset($this->fields['core'])) {
             $return = [];

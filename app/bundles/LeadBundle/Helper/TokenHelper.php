@@ -22,7 +22,7 @@ final class TokenHelper
      *
      * @return array|string
      */
-    public static function findLeadTokens($content, $lead, $replace = false)
+    public static function findLeadTokens($content, $lead, bool $replace = false)
     {
         if (!$lead) {
             return $replace ? $content : [];

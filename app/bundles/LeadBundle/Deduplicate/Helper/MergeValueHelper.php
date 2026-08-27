@@ -13,13 +13,12 @@ final class MergeValueHelper
      * @param mixed $olderValue
      * @param mixed $currentValue
      * @param mixed $defaultValue
-     * @param bool  $newIsAnonymous
      *
      * @return mixed
      *
      * @throws ValueNotMergeableException
      */
-    public static function getMergeValue($newerValue, $olderValue, $currentValue = null, $defaultValue = null, $newIsAnonymous = false)
+    public static function getMergeValue($newerValue, $olderValue, $currentValue = null, $defaultValue = null, bool $newIsAnonymous = false)
     {
         if ($newerValue === $olderValue) {
             throw new ValueNotMergeableException($newerValue, $olderValue);

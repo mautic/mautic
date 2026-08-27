@@ -108,7 +108,7 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Point) {
             throw new MethodNotAllowedHttpException(['Point']);
@@ -168,13 +168,12 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
     /**
      * Triggers a specific point change.
      *
-     * @param mixed $eventDetails     passthrough from function triggering action to the callback function
-     * @param mixed $typeId           Something unique to the triggering event to prevent  unnecessary duplicate calls
-     * @param bool  $allowUserRequest
+     * @param mixed $eventDetails passthrough from function triggering action to the callback function
+     * @param mixed $typeId       Something unique to the triggering event to prevent  unnecessary duplicate calls
      *
      * @throws \ReflectionException
      */
-    public function triggerAction($type, $eventDetails = null, $typeId = null, ?Lead $lead = null, $allowUserRequest = false): void
+    public function triggerAction($type, $eventDetails = null, $typeId = null, ?Lead $lead = null, bool $allowUserRequest = false): void
     {
         // only trigger actions for not logged Mautic users
         if (!$this->security->isAnonymous() && !$allowUserRequest) {
@@ -316,12 +315,11 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
     /**
      * Get line chart data of points.
      *
-     * @param string $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string $dateFormat
      * @param array  $filter
-     * @param bool   $canViewOthers
      */
-    public function getPointLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
+    public function getPointLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], bool $canViewOthers = true): array
     {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
