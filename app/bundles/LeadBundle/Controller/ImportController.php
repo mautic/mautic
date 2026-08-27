@@ -342,8 +342,9 @@ final class ImportController extends FormController
                                 // $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']) is deprecated
                                 // Below workaround for this deprecation in PHP8.6+
                                 $file->setFlags(\SplFileObject::DROP_NEW_LINE);
+                                $line = $file->fgets();
                                 $headers = str_getcsv(
-                                    (string) $file->fgets(),
+                                    $line,
                                     $config['delimiter'],
                                     $config['enclosure'],
                                     $config['escape']
