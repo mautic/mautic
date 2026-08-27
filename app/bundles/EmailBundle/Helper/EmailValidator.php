@@ -21,12 +21,10 @@ class EmailValidator
      * Validate that an email is the correct format, doesn't have invalid characters, a MX record is associated with the domain, and
      * leverage integrations to validate.
      *
-     * @param bool $doDnsCheck
-     *
      * @throws UnexpectedValueException
      * @throws InvalidEmailException
      */
-    public function validate($address, $doDnsCheck = false): void
+    public function validate($address, bool $doDnsCheck = false): void
     {
         if (!is_string($address)) {
             throw new UnexpectedValueException($address, 'string');

@@ -95,7 +95,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * Called after the form is validated on POST.
      */
-    protected function afterFormProcessed($isValid, $entity, Form $form, $action, $isClone = false): void
+    protected function afterFormProcessed($isValid, $entity, Form $form, $action, bool $isClone = false): void
     {
     }
 
@@ -175,7 +175,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @return mixed Whatever is returned will be passed into afterEntitySave; pass false to fail validation
      */
-    protected function beforeEntitySave($entity, Form $form, $action, $objectId = null, $isClone = false): bool
+    protected function beforeEntitySave($entity, Form $form, $action, $objectId = null, bool $isClone = false): bool
     {
         return true;
     }
@@ -183,7 +183,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * Do anything necessary before the form is checked for POST and processed.
      */
-    protected function beforeFormProcessed($entity, Form $form, $action, $isPost, $objectId = null, $isClone = false): void
+    protected function beforeFormProcessed($entity, Form $form, $action, $isPost, $objectId = null, bool $isClone = false): void
     {
     }
 
@@ -329,13 +329,11 @@ abstract class AbstractStandardFormController extends AbstractFormController
     }
 
     /**
-     * @param bool $ignorePost
-     *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      *
      * @throws \Exception
      */
-    protected function editStandard(Request $request, $objectId, $ignorePost = false)
+    protected function editStandard(Request $request, $objectId, bool $ignorePost = false)
     {
         $isClone = false;
         $model   = $this->getModel($this->getModelName());

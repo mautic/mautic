@@ -282,10 +282,7 @@ class MailHelper
         return $this->transport instanceof TokenTransportInterface;
     }
 
-    /**
-     * @param bool $cleanSlate
-     */
-    public function getMailer($cleanSlate = true): static
+    public function getMailer(bool $cleanSlate = true): static
     {
         $this->reset($cleanSlate);
 
@@ -295,12 +292,11 @@ class MailHelper
     /**
      * Send the message.
      *
-     * @param bool $dispatchSendEvent
-     * @param bool $isQueueFlush      (a tokenized/batch send via API such as Mandrill)
+     * @param bool $isQueueFlush (a tokenized/batch send via API such as Mandrill)
      *
      * @return bool
      */
-    public function send($dispatchSendEvent = false, $isQueueFlush = false)
+    public function send(bool $dispatchSendEvent = false, bool $isQueueFlush = false)
     {
         if ($this->tokenizationEnabled && !empty($this->queuedRecipients) && !$isQueueFlush) {
             // This transport uses tokenization and queue()/flushQueue() was not used therefore use them in order
@@ -436,18 +432,17 @@ class MailHelper
      * If batching is supported and enabled, the message will be queued and will on be sent upon flushQueue().
      * Otherwise, the message will be sent to the transport immediately.
      *
-     * @param bool   $dispatchSendEvent
-     * @param string $returnMode        What should happen post send/queue to $this->message after the email send is attempted.
-     *                                  Options are:
-     *                                  RESET_TO           resets the to recipients and resets errors
-     *                                  FULL_RESET         creates a new MauticMessage instance and resets errors
-     *                                  DO_NOTHING         leaves the current errors array and MauticMessage instance intact
-     *                                  NOTHING_IF_FAILED  leaves the current errors array MauticMessage instance intact if it fails, otherwise reset_to
-     *                                  RETURN_ERROR       return an array of [success, $errors]; only one applicable if message is queued
+     * @param string $returnMode What should happen post send/queue to $this->message after the email send is attempted.
+     *                           Options are:
+     *                           RESET_TO           resets the to recipients and resets errors
+     *                           FULL_RESET         creates a new MauticMessage instance and resets errors
+     *                           DO_NOTHING         leaves the current errors array and MauticMessage instance intact
+     *                           NOTHING_IF_FAILED  leaves the current errors array MauticMessage instance intact if it fails, otherwise reset_to
+     *                           RETURN_ERROR       return an array of [success, $errors]; only one applicable if message is queued
      *
      * @return bool|array
      */
-    public function queue($dispatchSendEvent = false, $returnMode = self::QUEUE_RESET_TO)
+    public function queue(bool $dispatchSendEvent = false, $returnMode = self::QUEUE_RESET_TO)
     {
         if ($this->tokenizationEnabled) {
             // Dispatch event to get custom tokens from listeners
@@ -599,10 +594,8 @@ class MailHelper
 
     /**
      * Resets the mailer.
-     *
-     * @param bool $cleanSlate
      */
-    public function reset($cleanSlate = true): void
+    public function reset(bool $cleanSlate = true): void
     {
         $this->eventTokens      = [];
         $this->queuedRecipients = [];
@@ -694,11 +687,10 @@ class MailHelper
      * @param string $filePath
      * @param string $fileName
      * @param string $contentType
-     * @param bool   $inline
      */
-    public function attachFile($filePath, $fileName = null, $contentType = null, $inline = false): void
+    public function attachFile($filePath, $fileName = null, $contentType = null, bool $inline = false): void
     {
-        if (true === $inline) {
+        if ($inline) {
             $this->message->embedFromPath($filePath, $fileName, $contentType);
 
             return;
@@ -729,9 +721,8 @@ class MailHelper
      * Use a template as the body.
      *
      * @param string $template
-     * @param bool   $returnContent
      */
-    public function setTemplate($template, array $vars = [], $returnContent = false, $charset = null): ?string
+    public function setTemplate($template, array $vars = [], bool $returnContent = false, $charset = null): ?string
     {
         $content = $this->twig->render($template, $vars);
 
@@ -795,9 +786,8 @@ class MailHelper
 
     /**
      * @param string $contentType
-     * @param bool   $ignoreTrackingPixel
      */
-    public function setBody($content, $contentType = 'text/html', $charset = null, $ignoreTrackingPixel = false): void
+    public function setBody($content, $contentType = 'text/html', $charset = null, bool $ignoreTrackingPixel = false): void
     {
         if (!$ignoreTrackingPixel && $this->coreParametersHelper->get('mailer_append_tracking_pixel')) {
             // Append tracking pixel
@@ -1145,7 +1135,7 @@ class MailHelper
     /**
      * @param bool $statToBeGenerated Pass false if a stat entry is not to be created
      */
-    public function setIdHash(?string $idHash = null, $statToBeGenerated = true): void
+    public function setIdHash(?string $idHash = null, bool $statToBeGenerated = true): void
     {
         $idHash ??= str_replace('.', '', uniqid('', true));
 
@@ -1170,7 +1160,7 @@ class MailHelper
     /**
      * @param array|Lead $lead
      */
-    public function setLead($lead, $interalSend = false): void
+    public function setLead($lead, bool $interalSend = false): void
     {
         $this->lead         = $lead;
         $this->internalSend = $interalSend;
@@ -1217,7 +1207,7 @@ class MailHelper
      *
      * @return bool Returns false if there were errors with the email configuration
      */
-    public function setEmail(Email $email, $allowBcc = true, $assetAttachments = [], $ignoreTrackingPixel = false): bool
+    public function setEmail(Email $email, bool $allowBcc = true, $assetAttachments = [], bool $ignoreTrackingPixel = false): bool
     {
         if ($this->coreParametersHelper->get(ConfigType::MINIFY_EMAIL_HTML)) {
             $email->setCustomHtml(InputHelper::minifyHTML($email->getCustomHtml()));
@@ -1286,10 +1276,7 @@ class MailHelper
         return empty($this->errors);
     }
 
-    /**
-     * @param bool $merge
-     */
-    public function setCustomHeaders(array $headers, $merge = true): void
+    public function setCustomHeaders(array $headers, bool $merge = true): void
     {
         if ($merge) {
             $this->headers = array_merge($this->headers, $headers);
@@ -1451,10 +1438,8 @@ class MailHelper
 
     /**
      * Enables queue mode if the transport supports tokenization.
-     *
-     * @param bool $enabled
      */
-    public function enableQueue($enabled = true): void
+    public function enableQueue(bool $enabled = true): void
     {
         if ($this->tokenizationEnabled) {
             $this->queueEnabled = $enabled;
@@ -1522,7 +1507,7 @@ class MailHelper
      *
      * @return array
      */
-    public function getErrors($reset = true)
+    public function getErrors(bool $reset = true)
     {
         $errors = $this->errors;
 
@@ -1657,10 +1642,9 @@ class MailHelper
     }
 
     /**
-     * @param bool|true   $persist
      * @param string|null $emailAddress
      */
-    public function createEmailStat($persist = true, $emailAddress = null, $listId = null): Stat
+    public function createEmailStat(bool $persist = true, $emailAddress = null, $listId = null): Stat
     {
         $stat = new Stat();
         $stat->setDateSent(new \DateTime());

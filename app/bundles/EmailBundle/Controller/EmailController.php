@@ -666,10 +666,6 @@ final class EmailController extends FormController
         );
     }
 
-    /**
-     * @param bool $ignorePost
-     * @param bool $forceTypeSelection
-     */
     public function editAction(
         Request $request,
         AssetModel $assetModel,
@@ -678,8 +674,8 @@ final class EmailController extends FormController
         EmailModel $model,
         ThemeHelper $themeHelper,
         $objectId,
-        $ignorePost = false,
-        $forceTypeSelection = false,
+        bool $ignorePost = false,
+        bool $forceTypeSelection = false,
     ): Response {
         $method  = $request->getMethod();
         $entity  = $model->getEntity($objectId);

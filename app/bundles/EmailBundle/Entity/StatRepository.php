@@ -213,11 +213,10 @@ class StatRepository extends CommonRepository
     /**
      * @param array<int,int|string>|int|null      $emailIds
      * @param array<int,int|string>|int|true|null $listId
-     * @param bool                                $combined
      *
      * @return array|int
      */
-    public function getSentCount($emailIds = null, $listId = null, ?ChartQuery $chartQuery = null, $combined = false)
+    public function getSentCount($emailIds = null, $listId = null, ?ChartQuery $chartQuery = null, bool $combined = false)
     {
         return $this->getStatusCount('is_sent', $emailIds, $listId, $chartQuery, $combined);
     }
@@ -225,11 +224,10 @@ class StatRepository extends CommonRepository
     /**
      * @param array<int,int|string>|int|null $emailIds
      * @param array<int,int|string>|int|null $listId
-     * @param bool                           $combined
      *
      * @return array|int
      */
-    public function getReadCount($emailIds = null, $listId = null, ?ChartQuery $chartQuery = null, $combined = false)
+    public function getReadCount($emailIds = null, $listId = null, ?ChartQuery $chartQuery = null, bool $combined = false)
     {
         return $this->getStatusCount('is_read', $emailIds, $listId, $chartQuery, $combined);
     }
@@ -237,11 +235,10 @@ class StatRepository extends CommonRepository
     /**
      * @param array<int,int|string>|int|null      $emailIds
      * @param array<int,int|string>|int|true|null $listId
-     * @param bool                                $combined
      *
      * @return array|int
      */
-    public function getFailedCount($emailIds = null, $listId = null, ?ChartQuery $chartQuery = null, $combined = false)
+    public function getFailedCount($emailIds = null, $listId = null, ?ChartQuery $chartQuery = null, bool $combined = false)
     {
         return $this->getStatusCount('is_failed', $emailIds, $listId, $chartQuery, $combined);
     }
@@ -250,11 +247,10 @@ class StatRepository extends CommonRepository
      * @param string                              $column
      * @param array<int,int|string>|int|null      $emailIds
      * @param array<int,int|string>|int|true|null $listId
-     * @param bool                                $combined
      *
      * @return array|int
      */
-    public function getStatusCount($column, $emailIds = null, $listId = null, ?ChartQuery $chartQuery = null, $combined = false)
+    public function getStatusCount($column, $emailIds = null, $listId = null, ?ChartQuery $chartQuery = null, bool $combined = false)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 

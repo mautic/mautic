@@ -14,10 +14,7 @@ class UserHelper
     ) {
     }
 
-    /**
-     * @param bool $nullIfGuest
-     */
-    public function getUser($nullIfGuest = false): ?User
+    public function getUser(bool $nullIfGuest = false): ?User
     {
         $user  = null;
         $token = $this->tokenStorage->getToken();
