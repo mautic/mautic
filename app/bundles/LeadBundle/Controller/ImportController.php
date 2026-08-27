@@ -370,7 +370,7 @@ final class ImportController extends FormController
                                 }
 
                                 // Treat a single null field (blank line) as no headers
-                                if ([] !== $headers && [null] !== $headers) {
+                                if ([null] !== $headers) {
                                     $headers = CsvHelper::sanitizeHeaders($headers);
 
                                     $this->requestStack->getSession()->set('mautic.'.$object.'.import.headers', $headers);

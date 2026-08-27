@@ -110,7 +110,7 @@ final class ModifyCustomFieldCommand extends Command
             $row = str_getcsv($line, escape: '\\');
 
             // Treat a single null value (blank line) as no row
-            if ([] === $row || [null] === $row) {
+            if ([null] === $row) {
                 continue;
             }
 
