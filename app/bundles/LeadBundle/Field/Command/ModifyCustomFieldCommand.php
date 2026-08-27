@@ -107,7 +107,7 @@ final class ModifyCustomFieldCommand extends Command
              *
              * The default value will change in a future version of PHP, no earlier than PHP 9.0.
             */
-            $row = str_getcsv($line, escape: '\\');
+            $row = str_getcsv((string) $line, escape: '\\');
 
             // Treat a single null value (blank line) as no row
             if ([null] === $row) {

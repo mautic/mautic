@@ -343,7 +343,7 @@ final class ImportController extends FormController
                                 // Below workaround for this deprecation in PHP8.6+
                                 $file->setFlags(\SplFileObject::DROP_NEW_LINE);
                                 $headers = str_getcsv(
-                                    $file->fgets(),
+                                    (string) $file->fgets(),
                                     $config['delimiter'],
                                     $config['enclosure'],
                                     $config['escape']
