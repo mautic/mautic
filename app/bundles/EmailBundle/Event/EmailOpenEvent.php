@@ -13,12 +13,11 @@ final class EmailOpenEvent extends CommonEvent
 
     /**
      * @param Request $request
-     * @param bool    $firstTime
      */
     public function __construct(
         Stat $stat,
         private $request,
-        private $firstTime = false,
+        private bool $firstTime = false,
     ) {
         $this->entity    = $stat;
         $this->email     = $stat->getEmail();

@@ -65,7 +65,7 @@ class CampaignRepository extends CommonRepository
      *
      * @return array
      */
-    public function getPublishedCampaigns($specificId = null, ?int $leadId = null, $forList = false, $viewOther = false)
+    public function getPublishedCampaigns($specificId = null, ?int $leadId = null, bool $forList = false, bool $viewOther = false)
     {
         $q = $this->getEntityManager()->createQueryBuilder()
             ->from(Campaign::class, 'c', 'c.id');
@@ -488,7 +488,7 @@ class CampaignRepository extends CommonRepository
      *
      * @return mixed[]
      */
-    public function getCampaignLeads($campaignId, $start = 0, $limit = false, $select = ['cl.lead_id']): array
+    public function getCampaignLeads($campaignId, $start = 0, bool $limit = false, $select = ['cl.lead_id']): array
     {
         $q = $this->getReplicaConnection()->createQueryBuilder();
 

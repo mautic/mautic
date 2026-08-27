@@ -9,10 +9,7 @@ use Mautic\StageBundle\Entity\Stage;
 
 final class StageEvent extends CommonEvent
 {
-    /**
-     * @param bool $isNew
-     */
-    public function __construct(Stage &$stage, $isNew = false)
+    public function __construct(Stage &$stage, bool $isNew = false)
     {
         $this->entity = &$stage;
         $this->isNew  = $isNew;

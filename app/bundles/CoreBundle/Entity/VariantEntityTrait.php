@@ -220,11 +220,9 @@ trait VariantEntityTrait
     /**
      * Get an array of all IDs for parent/child variants and associated translations if applicable.
      *
-     * @param bool $publishedOnly
-     *
      * @return array<int,int|string>
      */
-    public function getRelatedEntityIds($publishedOnly = false): array
+    public function getRelatedEntityIds(bool $publishedOnly = false): array
     {
         [$parent, $children] = $this->getVariants();
 

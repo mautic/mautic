@@ -356,7 +356,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return void|array
      */
-    public function mergeApiKeys(array $mergeKeys, $withKeys = [], $return = false)
+    public function mergeApiKeys(array $mergeKeys, $withKeys = [], bool $return = false)
     {
         if (empty($withKeys)) {
             $withKeys = $this->keys;
@@ -569,11 +569,10 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      * Extract the tokens returned by the oauth callback.
      *
      * @param string $data
-     * @param bool   $postAuthorization
      *
      * @return mixed
      */
-    public function parseCallbackResponse($data, $postAuthorization = false)
+    public function parseCallbackResponse($data, bool $postAuthorization = false)
     {
         // remove control characters that will break json_decode from parsing
         $data = preg_replace('/[[:cntrl:]]/', '', $data);
@@ -828,16 +827,13 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         return $this->parseCallbackResponse($result->getBody(), !empty($settings['authorize_session']));
     }
 
-    /**
-     * @param bool $persist
-     */
     public function createIntegrationEntity(
         $integrationEntity,
         $integrationEntityId,
         $internalEntity,
         $internalEntityId,
         ?array $internal = null,
-        $persist = true,
+        bool $persist = true,
     ): ?IntegrationEntity {
         $date = (defined('MAUTIC_DATE_MODIFIED_OVERRIDE')) ? \DateTime::createFromFormat('U', MAUTIC_DATE_MODIFIED_OVERRIDE)
             : new \DateTime();
@@ -1680,7 +1676,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return Lead
      */
-    public function getMauticLead($data, $persist = true, $socialCache = null, $identifiers = null)
+    public function getMauticLead($data, bool $persist = true, $socialCache = null, $identifiers = null)
     {
         if (is_object($data)) {
             // Convert to array in all levels
@@ -2201,7 +2197,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      * @throws ApiErrorException
      * @throws \Exception
      */
-    protected function cleanupFromSync(&$leadsToSync = [], $error = false)
+    protected function cleanupFromSync(&$leadsToSync = [], bool $error = false)
     {
         $duplicates = 0;
         if ($this->mauticDuplicates) {
@@ -2291,11 +2287,10 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * @param CommonEntity|null $entity
-     * @param bool              $ignoreEntityChanges
      *
      * @return bool|\DateTime|null
      */
-    protected function getLastSyncDate($entity = null, array $params = [], $ignoreEntityChanges = true)
+    protected function getLastSyncDate($entity = null, array $params = [], bool $ignoreEntityChanges = true)
     {
         $isNew = ($entity instanceof FormEntity) && $entity->isNew();
         if (!$isNew && !$ignoreEntityChanges && isset($params['start']) && $entity && method_exists($entity, 'getChanges')) {

@@ -178,7 +178,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, ?\Symfony\Contracts\EventDispatcher\Event $event = null): ?\Symfony\Contracts\EventDispatcher\Event
+    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?\Symfony\Contracts\EventDispatcher\Event $event = null): ?\Symfony\Contracts\EventDispatcher\Event
     {
         if ($entity instanceof CampaignLead) {
             return null;
@@ -526,9 +526,8 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
      * Get a list of source choices.
      *
      * @param string $sourceType
-     * @param bool   $globalOnly
      */
-    public function getSourceLists($sourceType = null, $globalOnly = false, bool $useIdsForLists = false): array
+    public function getSourceLists($sourceType = null, bool $globalOnly = false, bool $useIdsForLists = false): array
     {
         $choices = [];
         switch ($sourceType) {
@@ -580,11 +579,9 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * Gets the campaigns a specific lead is part of.
      *
-     * @param bool $forList
-     *
      * @return mixed
      */
-    public function getLeadCampaigns(?Lead $lead = null, $forList = false)
+    public function getLeadCampaigns(?Lead $lead = null, bool $forList = false)
     {
         static $campaigns = [];
 
@@ -682,12 +679,11 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * Get line chart data of leads added to campaigns.
      *
-     * @param string $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string $dateFormat
      * @param array  $filter
-     * @param bool   $canViewOthers
      */
-    public function getLeadsAddedLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
+    public function getLeadsAddedLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], bool $canViewOthers = true): array
     {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -793,10 +789,9 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param int  $limit
-     * @param bool $maxLeads
+     * @param int $limit
      */
-    public function rebuildCampaignLeads(Campaign $campaign, $limit = 1000, $maxLeads = false, ?OutputInterface $output = null): int
+    public function rebuildCampaignLeads(Campaign $campaign, $limit = 1000, bool $maxLeads = false, ?OutputInterface $output = null): int
     {
         $contactLimiter = new ContactLimiter($limit);
 

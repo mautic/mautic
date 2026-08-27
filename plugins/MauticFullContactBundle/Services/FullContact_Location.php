@@ -28,7 +28,7 @@ final class FullContact_Location extends FullContact_Base
      *
      * @return mixed
      */
-    public function normalizer($place, $includeZeroPopulation = false, $casing = 'titlecase')
+    public function normalizer($place, bool $includeZeroPopulation = false, $casing = 'titlecase')
     {
         $includeZeroPopulation = ($includeZeroPopulation) ? 'true' : 'false';
 
@@ -39,7 +39,7 @@ final class FullContact_Location extends FullContact_Base
         return $this->response_obj;
     }
 
-    public function enrichment($place, $includeZeroPopulation = false, $casing = 'titlecase')
+    public function enrichment($place, bool $includeZeroPopulation = false, $casing = 'titlecase')
     {
         $includeZeroPopulation = ($includeZeroPopulation) ? 'true' : 'false';
 

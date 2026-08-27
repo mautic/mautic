@@ -9,10 +9,7 @@ use Mautic\NotificationBundle\Entity\Notification;
 
 final class NotificationEvent extends CommonEvent
 {
-    /**
-     * @param bool $isNew
-     */
-    public function __construct(Notification $notification, $isNew = false)
+    public function __construct(Notification $notification, bool $isNew = false)
     {
         $this->entity = $notification;
         $this->isNew  = $isNew;

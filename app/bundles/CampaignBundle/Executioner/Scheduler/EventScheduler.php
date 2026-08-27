@@ -50,10 +50,7 @@ class EventScheduler
         $this->schedule($event, $executionDate, $contacts);
     }
 
-    /**
-     * @param bool $isInactiveEvent
-     */
-    public function schedule(Event $event, \DateTimeInterface $executionDate, ArrayCollection $contacts, $isInactiveEvent = false): void
+    public function schedule(Event $event, \DateTimeInterface $executionDate, ArrayCollection $contacts, bool $isInactiveEvent = false): void
     {
         $config = $this->collector->getEventConfig($event);
 
@@ -350,10 +347,7 @@ class EventScheduler
         );
     }
 
-    /**
-     * @param bool $isInactiveEvent
-     */
-    private function scheduleEventForContacts(Event $event, AbstractEventAccessor $config, \DateTimeInterface $executionDate, ArrayCollection $contacts, $isInactiveEvent = false): void
+    private function scheduleEventForContacts(Event $event, AbstractEventAccessor $config, \DateTimeInterface $executionDate, ArrayCollection $contacts, bool $isInactiveEvent = false): void
     {
         foreach ($contacts as $contact) {
             // Create the entry

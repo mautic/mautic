@@ -95,10 +95,7 @@ class BuilderEvent extends Event
         }
     }
 
-    /**
-     * @param bool $convertToLinks
-     */
-    public function addTokens(array $tokens, $convertToLinks = false): void
+    public function addTokens(array $tokens, bool $convertToLinks = false): void
     {
         if ($convertToLinks) {
             array_walk($tokens, function (&$val, $key): void {
@@ -119,7 +116,7 @@ class BuilderEvent extends Event
      *
      * @return array
      */
-    public function getTokens($withBC = true)
+    public function getTokens(bool $withBC = true)
     {
         if (false === $withBC) {
             $tokens = [];

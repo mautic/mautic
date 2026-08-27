@@ -107,11 +107,10 @@ final class InputHelper
      *
      * @param mixed $value
      * @param mixed $mask
-     * @param bool  $urldecode
      *
      * @return mixed
      */
-    public static function _($value, $mask = 'clean', $urldecode = false)
+    public static function _($value, $mask = 'clean', bool $urldecode = false)
     {
         if (is_array($value)) {
             foreach ($value as $k => &$v) {
@@ -159,7 +158,7 @@ final class InputHelper
      *
      * @return false|string|mixed[]
      */
-    public static function clean(mixed $value, $urldecode = false): array|string|false
+    public static function clean(mixed $value, bool $urldecode = false): array|string|false
     {
         if (is_array($value)) {
             foreach ($value as &$v) {
@@ -239,7 +238,7 @@ final class InputHelper
      *
      * @return string
      */
-    public static function raw($value, $urldecode = false)
+    public static function raw($value, bool $urldecode = false)
     {
         if ($urldecode) {
             return urldecode($value);
@@ -257,7 +256,7 @@ final class InputHelper
      * @param array<string>      $removeQuery
      * @param bool|false         $ignoreFragment
      */
-    public static function url(?string $value, $urldecode = false, $allowedProtocols = null, $defaultProtocol = null, $removeQuery = [], $ignoreFragment = false): string|false
+    public static function url(?string $value, bool $urldecode = false, $allowedProtocols = null, $defaultProtocol = null, $removeQuery = [], bool $ignoreFragment = false): string|false
     {
         if ($urldecode) {
             $value = urldecode($value);
@@ -321,7 +320,7 @@ final class InputHelper
      *
      * @param bool|false $urldecode
      */
-    public static function email($value, $urldecode = false): string
+    public static function email($value, bool $urldecode = false): string
     {
         if ($urldecode) {
             $value = urldecode($value);

@@ -77,10 +77,8 @@ class UpdateHelper
 
     /**
      * Retrieves the update data from our home server.
-     *
-     * @param bool $overrideCache
      */
-    public function fetchData($overrideCache = false): array
+    public function fetchData(bool $overrideCache = false): array
     {
         $cacheFile       = $this->pathsHelper->getSystemPath('cache').'/lastUpdateCheck.txt';
         $updateStability = $this->coreParametersHelper->get('update_stability');

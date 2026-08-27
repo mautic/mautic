@@ -130,9 +130,8 @@ final class DynamicsApi extends CrmApi
      *
      * @param array  $data
      * @param string $object
-     * @param bool   $isUpdate
      */
-    public function createLeads($data, $object = 'contacts', $isUpdate = false): array
+    public function createLeads($data, $object = 'contacts', bool $isUpdate = false): array
     {
         if (0 === count($data)) {
             return [];

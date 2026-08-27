@@ -285,7 +285,7 @@ final class ReportController extends FormController
      * @param int  $objectId   Item ID
      * @param bool $ignorePost Flag to ignore POST data
      */
-    public function editAction(Request $request, int $objectId, $ignorePost = false): false|Response
+    public function editAction(Request $request, int $objectId, bool $ignorePost = false): false|Response
     {
         $entity  = $this->reportModel->getEntity($objectId);
         $session = $request->getSession();

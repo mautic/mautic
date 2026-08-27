@@ -160,11 +160,8 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     #[Groups(['user:read', 'user:write'])]
     private $signature;
 
-    /**
-     * @param bool $guest
-     */
     public function __construct(
-        private $guest = false,
+        private bool $guest = false,
     ) {
     }
 
@@ -477,10 +474,8 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
 
     /**
      * Get full name.
-     *
-     * @param bool $lastFirst
      */
-    public function getName($lastFirst = false): string
+    public function getName(bool $lastFirst = false): string
     {
         return ($lastFirst) ? $this->lastName.', '.$this->firstName : $this->firstName.' '.$this->lastName;
     }

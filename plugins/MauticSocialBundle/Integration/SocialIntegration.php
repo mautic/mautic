@@ -167,11 +167,10 @@ abstract class SocialIntegration extends AbstractIntegration
 
     /**
      * @param string $data
-     * @param bool   $postAuthorization
      *
      * @return mixed
      */
-    public function parseCallbackResponse($data, $postAuthorization = false)
+    public function parseCallbackResponse($data, bool $postAuthorization = false)
     {
         if ($postAuthorization) {
             return json_decode($data, true);

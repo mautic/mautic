@@ -9,10 +9,7 @@ use Mautic\PointBundle\Entity\Point;
 
 final class PointEvent extends CommonEvent
 {
-    /**
-     * @param bool $isNew
-     */
-    public function __construct(Point &$point, $isNew = false)
+    public function __construct(Point &$point, bool $isNew = false)
     {
         $this->entity = &$point;
         $this->isNew  = $isNew;

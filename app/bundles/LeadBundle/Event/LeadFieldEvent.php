@@ -13,10 +13,7 @@ final class LeadFieldEvent extends CommonEvent implements DependencyErrorEventIn
 {
     use DependencyErrorEventTrait;
 
-    /**
-     * @param bool $isNew
-     */
-    public function __construct(LeadField &$field, $isNew = false)
+    public function __construct(LeadField &$field, bool $isNew = false)
     {
         $this->entity = &$field;
         $this->isNew  = $isNew;

@@ -8,13 +8,12 @@ use Symfony\Contracts\EventDispatcher\Event;
 final class BuildJsEvent extends Event
 {
     /**
-     * @param bool           $debugMode
      * @param string         $js
      * @param BuildJsScope[] $acceptedScopes
      */
     public function __construct(
         private $js,
-        private $debugMode = false,
+        private bool $debugMode = false,
         private readonly array $acceptedScopes = [
             BuildJsScope::RUNTIME,
             BuildJsScope::ESSENTIAL,

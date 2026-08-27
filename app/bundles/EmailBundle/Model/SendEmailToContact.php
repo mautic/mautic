@@ -47,10 +47,7 @@ class SendEmailToContact
     ) {
     }
 
-    /**
-     * @param bool $resetMailer
-     */
-    public function flush($resetMailer = true): static
+    public function flush(bool $resetMailer = true): static
     {
         // Flushes the batch in case of using API mailers
         if ($this->emailEntityId && !$flushResult = $this->mailer->flushQueue()) {
@@ -207,12 +204,11 @@ class SendEmailToContact
     }
 
     /**
-     * @param bool  $hasBadEmail
      * @param array $errorMessages
      *
      * @throws FailedToSendToContactException
      */
-    protected function failContact($hasBadEmail = true, $errorMessages = null)
+    protected function failContact(bool $hasBadEmail = true, $errorMessages = null)
     {
         if (null === $errorMessages) {
             // Clear the errors so it doesn't stop the next send

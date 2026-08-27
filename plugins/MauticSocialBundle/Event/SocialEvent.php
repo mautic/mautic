@@ -9,10 +9,7 @@ use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 
 final class SocialEvent extends CommonEvent
 {
-    /**
-     * @param bool $isNew
-     */
-    public function __construct(Monitoring $monitoring, $isNew = false)
+    public function __construct(Monitoring $monitoring, bool $isNew = false)
     {
         $this->entity = $monitoring;
         $this->isNew  = $isNew;

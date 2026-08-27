@@ -10,14 +10,11 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 
 final class ScheduledBatchEvent extends AbstractLogCollectionEvent
 {
-    /**
-     * @param bool $isReschedule
-     */
     public function __construct(
         AbstractEventAccessor $config,
         Event $event,
         ArrayCollection $logs,
-        private $isReschedule = false,
+        private bool $isReschedule = false,
     ) {
         parent::__construct($config, $event, $logs);
     }

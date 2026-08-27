@@ -132,7 +132,7 @@ class FieldModel extends CommonFormModel
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Field) {
             throw new MethodNotAllowedHttpException(['Form']);

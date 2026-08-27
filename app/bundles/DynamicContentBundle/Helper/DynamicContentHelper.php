@@ -179,11 +179,10 @@ class DynamicContentHelper
 
     /**
      * @param string $slotName
-     * @param bool   $publishedOnly
      *
      * @return array|\Doctrine\ORM\Tools\Pagination\Paginator
      */
-    public function getDwcsBySlotName($slotName, $publishedOnly = false)
+    public function getDwcsBySlotName($slotName, bool $publishedOnly = false)
     {
         $filter = [
             'where' => [

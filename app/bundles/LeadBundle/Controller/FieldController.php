@@ -240,7 +240,7 @@ final class FieldController extends FormController
      *
      * @param bool|false $ignorePost
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false): Response
+    public function editAction(Request $request, $objectId, bool $ignorePost = false): Response
     {
         if (!$this->security->isGranted('lead:fields:full')) {
             $this->throwAccessDenied();

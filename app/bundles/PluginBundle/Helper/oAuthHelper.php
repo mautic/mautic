@@ -135,12 +135,11 @@ final class oAuthHelper
 
     /**
      * @param array<string, mixed> $parameters
-     * @param bool                 $encode
      * @param array<int, string>   $normalized
      *
      * @return string|array<string,string>
      */
-    private function normalizeParameters(array $parameters, $encode = false, bool $returnarray = false, array $normalized = [], int|string $key = '')
+    private function normalizeParameters(array $parameters, bool $encode = false, bool $returnarray = false, array $normalized = [], int|string $key = '')
     {
         // Sort by key
         ksort($parameters);

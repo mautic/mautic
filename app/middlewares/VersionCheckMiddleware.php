@@ -43,7 +43,7 @@ final class VersionCheckMiddleware implements HttpKernelInterface, PrioritizedMi
      *
      * {@inheritDoc}
      */
-    public function handle(Request $request, $type = self::MAIN_REQUEST, $catch = true): Response
+    public function handle(Request $request, $type = self::MAIN_REQUEST, bool $catch = true): Response
     {
         // Are we running the minimum version?
         if (version_compare(PHP_VERSION, $this->minimumPHPVersion, 'lt')) {

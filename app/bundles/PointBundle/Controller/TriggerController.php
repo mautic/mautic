@@ -290,10 +290,9 @@ final class TriggerController extends FormController
     /**
      * Generates edit form and processes post data.
      *
-     * @param int  $objectId
-     * @param bool $ignorePost
+     * @param int $objectId
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false): Response
+    public function editAction(Request $request, $objectId, bool $ignorePost = false): Response
     {
         $entity     = $this->triggerModel->getEntity($objectId);
         $session    = $request->getSession();

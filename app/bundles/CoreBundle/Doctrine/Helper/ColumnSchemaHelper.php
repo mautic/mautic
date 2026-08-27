@@ -49,11 +49,9 @@ class ColumnSchemaHelper
     /**
      * Set the table to be manipulated.
      *
-     * @param bool $addPrefix
-     *
      * @throws SchemaException
      */
-    public function setName($table, $addPrefix = true): static
+    public function setName($table, bool $addPrefix = true): static
     {
         $this->tableName = ($addPrefix) ? $this->prefix.$table : $table;
 
@@ -132,7 +130,7 @@ class ColumnSchemaHelper
      *
      * @throws SchemaException
      */
-    public function addColumn(array $column, $checkExists = true): static
+    public function addColumn(array $column, bool $checkExists = true): static
     {
         if (empty($column['name'])) {
             throw new SchemaException('Column is missing required name key.');
@@ -199,11 +197,10 @@ class ColumnSchemaHelper
      * Determine if a column already exists.
      *
      * @param string $column
-     * @param bool   $throwException
      *
      * @throws SchemaException
      */
-    public function checkColumnExists($column, $throwException = false): bool
+    public function checkColumnExists($column, bool $throwException = false): bool
     {
         // check to ensure column doesn't exist
         if ($this->toTable->hasColumn($column)) {
@@ -224,7 +221,7 @@ class ColumnSchemaHelper
      *
      * @throws SchemaException
      */
-    public function checkTableExists($table, $throwException = false): bool
+    public function checkTableExists($table, bool $throwException = false): bool
     {
         if (!$this->sm->tablesExist([$table])) {
             if ($throwException) {

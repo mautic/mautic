@@ -17,5 +17,5 @@ interface HashHelperInterface
      *                unless <i>raw_output</i> is set to true in which case the raw
      *                binary representation of the message digest is returned
      */
-    public function hash($algo, $data, $raw_output = false);
+    public function hash($algo, $data, bool $raw_output = false);
 }

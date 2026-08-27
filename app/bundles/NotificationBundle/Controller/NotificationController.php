@@ -376,11 +376,7 @@ final class NotificationController extends AbstractFormController
         );
     }
 
-    /**
-     * @param bool $ignorePost
-     * @param bool $forceTypeSelection
-     */
-    public function editAction(Request $request, $objectId, $ignorePost = false, $forceTypeSelection = false): Response
+    public function editAction(Request $request, $objectId, bool $ignorePost = false, bool $forceTypeSelection = false): Response
     {
         $method  = $request->getMethod();
         $entity  = $this->notificationModel->getEntity($objectId);

@@ -387,11 +387,7 @@ final class MobileNotificationController extends FormController
         );
     }
 
-    /**
-     * @param bool $ignorePost
-     * @param bool $forceTypeSelection
-     */
-    public function editAction(Request $request, IntegrationHelper $integrationHelper, $objectId, $ignorePost = false, $forceTypeSelection = false): Response
+    public function editAction(Request $request, IntegrationHelper $integrationHelper, $objectId, bool $ignorePost = false, bool $forceTypeSelection = false): Response
     {
         $method  = $request->getMethod();
         $entity  = $this->notificationModel->getEntity($objectId);

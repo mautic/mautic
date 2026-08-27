@@ -34,7 +34,7 @@ final class HSTSMiddleware implements HttpKernelInterface, PrioritizedMiddleware
         $this->expireTime        = $this->config['headers_sts_expire_time'] ?? 60;
     }
 
-    public function handle(Request $request, $type = self::MAIN_REQUEST, $catch = true): Response
+    public function handle(Request $request, $type = self::MAIN_REQUEST, bool $catch = true): Response
     {
         $response = $this->app->handle($request, $type, $catch);
 

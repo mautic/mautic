@@ -46,13 +46,12 @@ final class SalesforceApi extends CrmApi
     /**
      * @param array  $elementData
      * @param string $method
-     * @param bool   $isRetry
      *
      * @return mixed|string
      *
      * @throws ApiErrorException
      */
-    public function request($operation, $elementData = [], $method = 'GET', $isRetry = false, $object = null, $queryUrl = null)
+    public function request($operation, $elementData = [], $method = 'GET', bool $isRetry = false, $object = null, $queryUrl = null)
     {
         if (!$object) {
             $object = $this->object;

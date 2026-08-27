@@ -206,10 +206,9 @@ final class ListController extends FormController
     /**
      * Generate's clone form and processes post data.
      *
-     * @param int  $objectId
-     * @param bool $ignorePost
+     * @param int $objectId
      */
-    public function cloneAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $listModel, AuditLogModel $auditLogModel, $objectId, $ignorePost = false): Response
+    public function cloneAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $listModel, AuditLogModel $auditLogModel, $objectId, bool $ignorePost = false): Response
     {
         if (!$this->security->isGranted(LeadPermissions::LISTS_CREATE)) {
             $this->throwAccessDenied();
@@ -248,10 +247,9 @@ final class ListController extends FormController
     /**
      * Generate's edit form and processes post data.
      *
-     * @param int  $objectId
-     * @param bool $ignorePost
+     * @param int $objectId
      */
-    public function editAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $listModel, AuditLogModel $auditLogModel, $objectId, $ignorePost = false, bool $isNew = false): Response
+    public function editAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $listModel, AuditLogModel $auditLogModel, $objectId, bool $ignorePost = false, bool $isNew = false): Response
     {
         $postActionVars = $this->getPostActionVars($request, $objectId);
 

@@ -39,10 +39,7 @@ class ChannelListHelper
         return $channels;
     }
 
-    /**
-     * @param bool $listOnly
-     */
-    public function getFeatureChannels($features, $listOnly = false): array
+    public function getFeatureChannels($features, bool $listOnly = false): array
     {
         $this->setupChannels();
 

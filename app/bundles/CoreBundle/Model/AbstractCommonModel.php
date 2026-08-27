@@ -131,11 +131,9 @@ abstract class AbstractCommonModel implements MauticModelInterface
     /**
      * Decode a string appended to URL into an array.
      *
-     * @param bool $urlDecode
-     *
      * @return mixed
      */
-    public function decodeArrayFromUrl($string, $urlDecode = true)
+    public function decodeArrayFromUrl($string, bool $urlDecode = true)
     {
         try {
             return ClickthroughHelper::decodeArrayFromUrl($string, $urlDecode);
@@ -145,12 +143,11 @@ abstract class AbstractCommonModel implements MauticModelInterface
     }
 
     /**
-     * @param bool  $absolute
      * @param array $clickthrough
      *
      * @return string
      */
-    public function buildUrl(string $route, array $routeParams = [], $absolute = true, $clickthrough = [])
+    public function buildUrl(string $route, array $routeParams = [], bool $absolute = true, $clickthrough = [])
     {
         $referenceType = ($absolute) ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH;
         $url           = $this->router->generate($route, $routeParams, $referenceType);

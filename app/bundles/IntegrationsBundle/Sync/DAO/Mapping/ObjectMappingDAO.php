@@ -31,9 +31,8 @@ final class ObjectMappingDAO
      * @param string $internalField
      * @param string $integrationField
      * @param string $direction
-     * @param bool   $isRequired
      */
-    public function addFieldMapping($internalField, $integrationField, $direction = self::SYNC_BIDIRECTIONALLY, $isRequired = false): self
+    public function addFieldMapping($internalField, $integrationField, $direction = self::SYNC_BIDIRECTIONALLY, bool $isRequired = false): self
     {
         $this->fieldMappings[] = new FieldMappingDAO(
             $this->internalObjectName,

@@ -478,10 +478,8 @@ class FormController extends CommonFormController
      * Generates edit form and processes post data.
      *
      * @param int|Form $objectId
-     * @param bool     $ignorePost
-     * @param bool     $forceTypeSelection
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false, $forceTypeSelection = false): Response
+    public function editAction(Request $request, $objectId, bool $ignorePost = false, bool $forceTypeSelection = false): Response
     {
         $formData         = $request->request->all()['mauticform'] ?? [];
         $sessionId        = $formData['sessionId'] ?? null;

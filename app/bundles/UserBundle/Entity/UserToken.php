@@ -152,10 +152,7 @@ class UserToken
         return $this->oneTimeOnly;
     }
 
-    /**
-     * @param bool $oneTimeOnly
-     */
-    public function setOneTimeOnly($oneTimeOnly = true): static
+    public function setOneTimeOnly(bool $oneTimeOnly = true): static
     {
         $this->oneTimeOnly = $oneTimeOnly;
 

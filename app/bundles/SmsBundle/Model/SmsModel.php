@@ -96,7 +96,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         return 'sms:smses';
     }
 
-    public function saveEntity($entity, $unlock = true): void
+    public function saveEntity($entity, bool $unlock = true): void
     {
         parent::saveEntity($entity, $unlock);
 
@@ -108,7 +108,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
      *
      * @param iterable<Sms> $entities
      */
-    public function saveEntities($entities, $unlock = true): void
+    public function saveEntities($entities, bool $unlock = true): void
     {
         // iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
@@ -382,11 +382,9 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
     }
 
     /**
-     * @param bool $persist
-     *
      * @throws \Exception
      */
-    public function createStatEntry(Sms $sms, Lead $lead, $source = null, $persist = true, $listId = null): Stat
+    public function createStatEntry(Sms $sms, Lead $lead, $source = null, bool $persist = true, $listId = null): Stat
     {
         $stat = new Stat();
         $stat->setDateSent(new \DateTime());
@@ -412,7 +410,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Sms) {
             throw new MethodNotAllowedHttpException(['Sms']);
@@ -462,11 +460,10 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
     /**
      * Get line chart data of hits.
      *
-     * @param ?string $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param ?string $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string  $dateFormat
-     * @param bool    $canViewOthers
      */
-    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], $canViewOthers = true): array
+    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], bool $canViewOthers = true): array
     {
         $flag = null;
 

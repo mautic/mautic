@@ -117,11 +117,9 @@ class CommonEntity implements \Stringable
     }
 
     /**
-     * @param bool $includePast
-     *
      * @return mixed[]
      */
-    public function getChanges($includePast = false)
+    public function getChanges(bool $includePast = false)
     {
         if ($includePast && empty($this->changes) && !empty($this->pastChanges)) {
             return $this->pastChanges;

@@ -129,7 +129,7 @@ class StageRepository extends CommonRepository
      *
      * @return array<int, array<string, mixed>>
      */
-    public function getStages($user = false, $id = ''): array
+    public function getStages(bool $user = false, $id = ''): array
     {
         if (is_object($user)) {
             $user = $user->getId();

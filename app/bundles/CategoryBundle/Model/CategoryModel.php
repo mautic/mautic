@@ -68,7 +68,7 @@ class CategoryModel extends FormModel implements AjaxLookupModelInterface
         return $bundle.':categories';
     }
 
-    public function saveEntity($entity, $unlock = true): void
+    public function saveEntity($entity, bool $unlock = true): void
     {
         $alias = $entity->getAlias();
         if (empty($alias)) {
@@ -126,7 +126,7 @@ class CategoryModel extends FormModel implements AjaxLookupModelInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Category) {
             throw new MethodNotAllowedHttpException(['Category']);

@@ -38,11 +38,7 @@ final class LookupHelper
         $this->integration  = $integrationHelper->getIntegrationObject('FullContact');
     }
 
-    /**
-     * @param bool $notify
-     * @param bool $checkAuto
-     */
-    public function lookupContact(Lead $lead, $notify = false, $checkAuto = false): void
+    public function lookupContact(Lead $lead, bool $notify = false, bool $checkAuto = false): void
     {
         if (!$lead->getEmail()) {
             return;
@@ -84,11 +80,7 @@ final class LookupHelper
         }
     }
 
-    /**
-     * @param bool $notify
-     * @param bool $checkAuto
-     */
-    public function lookupCompany(Company $company, $notify = false, $checkAuto = false): void
+    public function lookupCompany(Company $company, bool $notify = false, bool $checkAuto = false): void
     {
         if (!$website = $company->getFieldValue('companywebsite')) {
             return;

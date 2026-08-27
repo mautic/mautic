@@ -13,10 +13,7 @@ final class CategoryEvent extends CommonEvent implements DependencyErrorEventInt
 {
     use DependencyErrorEventTrait;
 
-    /**
-     * @param bool $isNew
-     */
-    public function __construct(Category &$category, $isNew = false)
+    public function __construct(Category &$category, bool $isNew = false)
     {
         $this->entity = &$category;
         $this->isNew  = $isNew;

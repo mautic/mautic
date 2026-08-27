@@ -43,7 +43,7 @@ class AssetRepository extends CommonRepository
      *
      * @return array
      */
-    public function getAssetList($search = '', $limit = 10, $start = 0, $viewOther = false)
+    public function getAssetList($search = '', $limit = 10, $start = 0, bool $viewOther = false)
     {
         $q = $this->createQueryBuilder('a');
         $q->select('partial a.{id, title, path, alias, language}');

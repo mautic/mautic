@@ -33,7 +33,7 @@ final class IpRestrictMiddlewareTest extends \PHPUnit\Framework\TestCase
         $inputRequest = new Request();
         $inputRequest->server->set('REMOTE_ADDR', '127.0.0.1'); // 127.0.0.1 is always allowed.
         $httpKernel = new class() implements HttpKernelInterface {
-            public function handle(Request $request, $type = HttpKernelInterface::MAIN_REQUEST, $catch = true): Response
+            public function handle(Request $request, $type = HttpKernelInterface::MAIN_REQUEST, bool $catch = true): Response
             {
                 return new Response();
             }
@@ -52,7 +52,7 @@ final class IpRestrictMiddlewareTest extends \PHPUnit\Framework\TestCase
         $httpKernel                 = new class() implements HttpKernelInterface {
             public $handleWasCalled = false;
 
-            public function handle(Request $request, $type = HttpKernelInterface::MAIN_REQUEST, $catch = true): Response
+            public function handle(Request $request, $type = HttpKernelInterface::MAIN_REQUEST, bool $catch = true): Response
             {
                 $this->handleWasCalled = true;
 
@@ -77,7 +77,7 @@ final class IpRestrictMiddlewareTest extends \PHPUnit\Framework\TestCase
         $inputRequest = new Request();
         $inputRequest->server->set('REMOTE_ADDR', 'configured.ip.address');
         $httpKernel = new class($inputRequest) implements HttpKernelInterface {
-            public function handle(Request $request, $type = HttpKernelInterface::MAIN_REQUEST, $catch = true): Response
+            public function handle(Request $request, $type = HttpKernelInterface::MAIN_REQUEST, bool $catch = true): Response
             {
                 return new Response();
             }

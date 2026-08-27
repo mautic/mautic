@@ -131,7 +131,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Form) {
             throw new MethodNotAllowedHttpException(['Form']);
@@ -320,7 +320,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         }
     }
 
-    public function saveEntity($entity, $unlock = true): void
+    public function saveEntity($entity, bool $unlock = true): void
     {
         $isNew = !(bool) $entity->getId();
 
@@ -348,7 +348,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
      * @param bool|true $withScript
      * @param bool|true $useCache
      */
-    public function getContent(Form $form, $withScript = true, $useCache = true): string
+    public function getContent(Form $form, bool $withScript = true, bool $useCache = true): string
     {
         if ($form->isSubmissionLimitReached()) {
             $message = $form->getSubmissionLimitMessage() ?? $this->translator->trans('mautic.form.submission.limit_reached');
@@ -372,7 +372,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
      *
      * @return string
      */
-    public function getFormHtml(Form $form, $useCache = true)
+    public function getFormHtml(Form $form, bool $useCache = true)
     {
         if ($useCache && !$form->usesProgressiveProfiling()) {
             $cachedHtml = $form->getCachedHtml();
@@ -408,10 +408,8 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
 
     /**
      * Generate the form's html.
-     *
-     * @param bool $persist
      */
-    public function generateHtml(Form $entity, $persist = true): string
+    public function generateHtml(Form $entity, bool $persist = true): string
     {
         // Use specific template or system-wide default theme
         $theme         = $entity->getTemplate() ?? $this->coreParametersHelper->get('theme');
@@ -525,11 +523,8 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
 
     /**
      * Creates the table structure for form results.
-     *
-     * @param bool $isNew
-     * @param bool $dropExisting
      */
-    public function createTableSchema(Form $entity, $isNew = false, $dropExisting = false): void
+    public function createTableSchema(Form $entity, bool $isNew = false, bool $dropExisting = false): void
     {
         // create the field as its own column in the leads table
         $name         = 'form_results_'.$entity->getId().'_'.$entity->getAlias();

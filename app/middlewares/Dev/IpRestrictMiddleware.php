@@ -46,7 +46,7 @@ final class IpRestrictMiddleware implements HttpKernelInterface, PrioritizedMidd
      *
      * {@inheritDoc}
      */
-    public function handle(Request $request, $type = self::MAIN_REQUEST, $catch = true): Response
+    public function handle(Request $request, $type = self::MAIN_REQUEST, bool $catch = true): Response
     {
         if (in_array($request->getClientIp(), $this->allowedIps) || false !== getenv('DDEV_TLD')) {
             return $this->app->handle($request, $type, $catch);

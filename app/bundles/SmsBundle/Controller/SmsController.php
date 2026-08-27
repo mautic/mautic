@@ -385,11 +385,7 @@ final class SmsController extends FormController
         );
     }
 
-    /**
-     * @param bool $ignorePost
-     * @param bool $forceTypeSelection
-     */
-    public function editAction(Request $request, $objectId, $ignorePost = false, $forceTypeSelection = false): JsonResponse|RedirectResponse|Response
+    public function editAction(Request $request, $objectId, bool $ignorePost = false, bool $forceTypeSelection = false): JsonResponse|RedirectResponse|Response
     {
         $method  = $request->getMethod();
         $entity  = $this->smsModel->getEntity($objectId);

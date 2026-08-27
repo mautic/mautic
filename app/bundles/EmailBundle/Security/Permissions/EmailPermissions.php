@@ -34,9 +34,8 @@ final class EmailPermissions extends AbstractPermissions
      * @param string               $level
      * @param FormBuilderInterface $builder
      * @param mixed[]              $data
-     * @param bool                 $includePublish
      */
-    protected function addExtendedFormFields($bundle, $level, &$builder, array $data, $includePublish = true): void
+    protected function addExtendedFormFields($bundle, $level, &$builder, array $data, bool $includePublish = true): void
     {
         $choices = [
             'mautic.core.permissions.viewown'     => 'viewown',

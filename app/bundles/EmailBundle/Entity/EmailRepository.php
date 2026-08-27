@@ -161,22 +161,20 @@ class EmailRepository extends CommonRepository
      * @param int            $emailId
      * @param int[]|null     $variantIds
      * @param int[]|null     $listIds
-     * @param bool           $countOnly
      * @param int|null       $limit
      * @param int|null       $minContactId
      * @param int|null       $maxContactId
-     * @param bool           $countWithMaxMin
      * @param \DateTime|null $maxDate
      */
     public function getEmailPendingQuery(
         $emailId,
         $variantIds = null,
         $listIds = null,
-        $countOnly = false,
+        bool $countOnly = false,
         $limit = null,
         $minContactId = null,
         $maxContactId = null,
-        $countWithMaxMin = false,
+        bool $countWithMaxMin = false,
         $maxDate = null,
         ?int $maxThreads = null,
         ?int $threadId = null,
@@ -336,11 +334,9 @@ class EmailRepository extends CommonRepository
      * @param int        $emailId
      * @param int[]|null $variantIds
      * @param int[]|null $listIds
-     * @param bool       $countOnly
      * @param int|null   $limit
      * @param int|null   $minContactId
      * @param int|null   $maxContactId
-     * @param bool       $countWithMaxMin
      *
      * @return array|int
      */
@@ -348,11 +344,11 @@ class EmailRepository extends CommonRepository
         $emailId,
         $variantIds = null,
         $listIds = null,
-        $countOnly = false,
+        bool $countOnly = false,
         $limit = null,
         $minContactId = null,
         $maxContactId = null,
-        $countWithMaxMin = false,
+        bool $countWithMaxMin = false,
         ?int $maxThreads = null,
         ?int $threadId = null,
         ?\DateTimeInterface $sendStopDate = null,
@@ -397,14 +393,12 @@ class EmailRepository extends CommonRepository
      * @param string|array<int|string> $search
      * @param int                      $limit
      * @param int                      $start
-     * @param bool                     $viewOther
-     * @param bool                     $topLevel
      * @param string|null              $emailType
      * @param int|null                 $variantParentId
      *
      * @return array
      */
-    public function getEmailList($search = '', $limit = 10, $start = 0, $viewOther = false, $topLevel = false, $emailType = null, array $ignoreIds = [], $variantParentId = null)
+    public function getEmailList($search = '', $limit = 10, $start = 0, bool $viewOther = false, bool $topLevel = false, $emailType = null, array $ignoreIds = [], $variantParentId = null)
     {
         $q = $this->createQueryBuilder('e');
         $q->select('partial e.{id, subject, name, language}');

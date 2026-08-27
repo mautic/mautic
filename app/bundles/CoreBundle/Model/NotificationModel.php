@@ -83,7 +83,7 @@ class NotificationModel extends FormModel
     public function addNotification(
         $message,
         $type = null,
-        $isRead = false,
+        bool $isRead = false,
         $header = null,
         $iconClass = null,
         ?\DateTime $datetime = null,
@@ -145,10 +145,9 @@ class NotificationModel extends FormModel
     /**
      * Get content for notifications.
      *
-     * @param bool $includeRead
-     * @param int  $limit
+     * @param int $limit
      */
-    public function getNotificationContent($afterId = null, $includeRead = false, $limit = null): array
+    public function getNotificationContent($afterId = null, bool $includeRead = false, $limit = null): array
     {
         if ($this->userHelper->getUser()->isGuest()) {
             return [[], false, ''];

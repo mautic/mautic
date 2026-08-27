@@ -48,11 +48,10 @@ final class FacebookIntegration extends SocialIntegration
 
     /**
      * @param string $data
-     * @param bool   $postAuthorization
      *
      * @return mixed
      */
-    public function parseCallbackResponse($data, $postAuthorization = false)
+    public function parseCallbackResponse($data, bool $postAuthorization = false)
     {
         // Facebook is inconsistent in that it returns errors as json and data as parameter list
         $values = parent::parseCallbackResponse($data, $postAuthorization);

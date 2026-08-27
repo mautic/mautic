@@ -10,12 +10,9 @@ final class ListPreProcessListEvent extends CommonEvent
 {
     private $result;
 
-    /**
-     * @param bool $isNew
-     */
     public function __construct(
         private array $list,
-        $isNew = false,
+        bool $isNew = false,
     ) {
         $this->isNew = $isNew;
     }

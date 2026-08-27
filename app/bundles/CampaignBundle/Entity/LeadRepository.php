@@ -350,10 +350,9 @@ class LeadRepository extends CommonRepository
     }
 
     /**
-     * @param int  $campaignId
-     * @param bool $campaignCanBeRestarted
+     * @param int $campaignId
      */
-    public function getCountsForCampaignContactsBySegment($campaignId, ContactLimiter $limiter, $campaignCanBeRestarted = false): CountResult
+    public function getCountsForCampaignContactsBySegment($campaignId, ContactLimiter $limiter, bool $campaignCanBeRestarted = false): CountResult
     {
         if (!$segments = $this->getCampaignSegments($campaignId)) {
             return new CountResult(0, 0, 0);
@@ -388,12 +387,11 @@ class LeadRepository extends CommonRepository
      * and the campaign setting if a contact is allowed to restart
      * a campaign.
      *
-     * @param int  $campaignId
-     * @param bool $campaignCanBeRestarted
+     * @param int $campaignId
      *
      * @return array<int|string, string>
      */
-    public function getCampaignContactsBySegments($campaignId, ContactLimiter $limiter, $campaignCanBeRestarted = false): array
+    public function getCampaignContactsBySegments($campaignId, ContactLimiter $limiter, bool $campaignCanBeRestarted = false): array
     {
         if (!$segments = $this->getCampaignSegments($campaignId)) {
             return [];

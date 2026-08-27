@@ -14,12 +14,11 @@ final class TagEntityModelTransformer implements DataTransformerInterface
 {
     /**
      * @param string $repository
-     * @param bool   $isArray
      */
     public function __construct(
         private readonly EntityManagerInterface $em,
         private $repository = '',
-        private $isArray = false,
+        private bool $isArray = false,
     ) {
     }
 

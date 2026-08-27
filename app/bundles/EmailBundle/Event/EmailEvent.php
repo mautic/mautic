@@ -9,10 +9,7 @@ use Mautic\EmailBundle\Entity\Email;
 
 final class EmailEvent extends CommonEvent
 {
-    /**
-     * @param bool $isNew
-     */
-    public function __construct(Email &$email, $isNew = false)
+    public function __construct(Email &$email, bool $isNew = false)
     {
         $this->entity = &$email;
         $this->isNew  = $isNew;

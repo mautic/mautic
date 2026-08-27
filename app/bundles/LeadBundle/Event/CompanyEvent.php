@@ -10,12 +10,11 @@ use Mautic\LeadBundle\Entity\Company;
 class CompanyEvent extends CommonEvent
 {
     /**
-     * @param bool $isNew
-     * @param int  $score
+     * @param int $score
      */
     public function __construct(
         Company $company,
-        $isNew = false,
+        bool $isNew = false,
         protected $score = 0,
     ) {
         $this->entity = $company;

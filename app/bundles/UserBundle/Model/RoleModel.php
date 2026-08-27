@@ -57,7 +57,7 @@ final class RoleModel extends FormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    public function saveEntity($entity, $unlock = true): void
+    public function saveEntity($entity, bool $unlock = true): void
     {
         if (!$entity instanceof Role) {
             throw new MethodNotAllowedHttpException(['Role'], 'Entity must be of class Role()');
@@ -151,7 +151,7 @@ final class RoleModel extends FormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Role) {
             throw new MethodNotAllowedHttpException(['Role'], 'Entity must be of class Role()');

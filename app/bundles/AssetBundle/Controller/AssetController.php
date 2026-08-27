@@ -397,10 +397,9 @@ final class AssetController extends FormController
     /**
      * Generates edit form and processes post data.
      *
-     * @param int  $objectId
-     * @param bool $ignorePost
+     * @param int $objectId
      */
-    public function editAction(Request $request, UploaderHelper $uploaderHelper, IntegrationHelper $integrationHelper, AssetModel $model, $objectId, $ignorePost = false): Response
+    public function editAction(Request $request, UploaderHelper $uploaderHelper, IntegrationHelper $integrationHelper, AssetModel $model, $objectId, bool $ignorePost = false): Response
     {
         $entity = $model->getEntity($objectId);
 

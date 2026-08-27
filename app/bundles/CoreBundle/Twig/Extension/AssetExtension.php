@@ -44,11 +44,8 @@ final readonly class AssetExtension
         return $this->assetsHelper->includeStylesheet($assetFilePath);
     }
 
-    /**
-     * @param bool $includeEditor
-     */
     #[AsTwigFunction(name: 'outputSystemScripts', isSafe: ['html'])]
-    public function outputSystemScripts($includeEditor = false): string
+    public function outputSystemScripts(bool $includeEditor = false): string
     {
         ob_start();
 
@@ -93,12 +90,8 @@ final readonly class AssetExtension
         return $this->assetsHelper->addScript($script, $location, $async, $name);
     }
 
-    /**
-     * @param bool $absolute
-     * @param bool $ignorePrefix
-     */
     #[AsTwigFunction(name: 'getAssetUrl', isSafe: ['html'])]
-    public function getAssetUrl(string $path, ?string $packageName = null, ?string $version = null, $absolute = false, $ignorePrefix = false): string
+    public function getAssetUrl(string $path, ?string $packageName = null, ?string $version = null, bool $absolute = false, bool $ignorePrefix = false): string
     {
         return $this->assetsHelper->getUrl($path, $packageName, $version, $absolute, $ignorePrefix);
     }
@@ -108,7 +101,7 @@ final readonly class AssetExtension
      * @param bool|false $absolute
      */
     #[AsTwigFunction(name: 'getOverridableUrl', isSafe: ['html'])]
-    public function getOverridableUrl($path, $absolute = false): string
+    public function getOverridableUrl($path, bool $absolute = false): string
     {
         return $this->assetsHelper->getOverridableUrl($path, $absolute);
     }

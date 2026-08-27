@@ -336,7 +336,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      *
      * @return Lead|null
      */
-    public function getMauticLead($data, $persist = true, $socialCache = null, $identifiers = null, $object = null)
+    public function getMauticLead($data, bool $persist = true, $socialCache = null, $identifiers = null, $object = null)
     {
         if (is_object($data)) {
             // Convert to array in all levels

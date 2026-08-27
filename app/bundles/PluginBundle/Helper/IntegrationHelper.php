@@ -60,7 +60,6 @@ class IntegrationHelper
      *
      * @param array|string $specificIntegrations
      * @param array        $withFeatures
-     * @param bool         $alphabetical
      * @param int|null     $pluginFilter
      * @param bool|false   $publishedOnly
      *
@@ -68,7 +67,7 @@ class IntegrationHelper
      *
      * @throws \Doctrine\ORM\ORMException
      */
-    public function getIntegrationObjects($specificIntegrations = null, $withFeatures = null, $alphabetical = false, $pluginFilter = null, $publishedOnly = false): array
+    public function getIntegrationObjects($specificIntegrations = null, $withFeatures = null, bool $alphabetical = false, $pluginFilter = null, bool $publishedOnly = false): array
     {
         // Build the service classes
         if ([] === $this->available) {
@@ -342,7 +341,7 @@ class IntegrationHelper
      *
      * @todo Extend this method to allow plugins to add URLs to these arrays
      */
-    public function getSocialProfileUrlRegex($find = true): array
+    public function getSocialProfileUrlRegex(bool $find = true): array
     {
         if ($find) {
             // regex to find a match
@@ -397,14 +396,11 @@ class IntegrationHelper
      *
      * @param Lead   $lead
      * @param array  $fields
-     * @param bool   $refresh
      * @param string $specificIntegration
-     * @param bool   $persistLead
-     * @param bool   $returnSettings
      *
      * @return array
      */
-    public function getUserProfiles(object $lead, $fields = [], $refresh = false, $specificIntegration = null, $persistLead = true, $returnSettings = false)
+    public function getUserProfiles(object $lead, $fields = [], bool $refresh = false, $specificIntegration = null, bool $persistLead = true, bool $returnSettings = false)
     {
         $socialCache     = $lead->getSocialCache();
         $featureSettings = [];
@@ -475,11 +471,9 @@ class IntegrationHelper
     }
 
     /**
-     * @param bool $integration
-     *
      * @return array
      */
-    public function clearIntegrationCache(object $lead, $integration = false)
+    public function clearIntegrationCache(object $lead, bool $integration = false)
     {
         $socialCache = $lead->getSocialCache();
         if (!empty($integration)) {

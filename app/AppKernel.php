@@ -54,7 +54,7 @@ class AppKernel extends Kernel
         parent::__construct($environment, $debug);
     }
 
-    public function handle(Request $request, $type = HttpKernelInterface::MAIN_REQUEST, $catch = true): Response
+    public function handle(Request $request, $type = HttpKernelInterface::MAIN_REQUEST, bool $catch = true): Response
     {
         if (str_contains($request->getRequestUri(), 'installer') || !$this->isInstalled()) {
             defined('MAUTIC_INSTALLER') or define('MAUTIC_INSTALLER', 1);

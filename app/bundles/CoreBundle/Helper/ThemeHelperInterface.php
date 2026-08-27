@@ -88,18 +88,17 @@ interface ThemeHelperInterface
      *
      * @return array<string[]>|string[]
      */
-    public function getInstalledThemes($specificFeature = 'all', $extended = false, $ignoreCache = false, $includeDirs = true);
+    public function getInstalledThemes($specificFeature = 'all', bool $extended = false, bool $ignoreCache = false, bool $includeDirs = true);
 
     /**
      * @param string $theme
-     * @param bool   $throwException
      *
      * @return twigThemeHelper
      *
      * @throws FileNotFoundException
      * @throws BadConfigurationException
      */
-    public function getTheme($theme = 'current', $throwException = false);
+    public function getTheme($theme = 'current', bool $throwException = false);
 
     /**
      * Install a theme from a zip package.

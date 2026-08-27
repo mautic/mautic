@@ -193,7 +193,7 @@ class DateTimeHelper
      *
      * @return bool|\DateInterval|string
      */
-    public function getDiff($compare = 'now', $format = null, $resetTime = false)
+    public function getDiff($compare = 'now', $format = null, bool $resetTime = false)
     {
         if ('now' == $compare) {
             $compare = new \DateTime('now', $this->datetime->getTimezone());
@@ -218,7 +218,7 @@ class DateTimeHelper
      *
      * @return \DateTimeInterface
      */
-    public function add($intervalString, $clone = false)
+    public function add($intervalString, bool $clone = false)
     {
         $interval = new \DateInterval($intervalString);
 
@@ -240,7 +240,7 @@ class DateTimeHelper
      *
      * @return \DateTimeInterface
      */
-    public function sub($intervalString, $clone = false)
+    public function sub($intervalString, bool $clone = false)
     {
         $interval = new \DateInterval($intervalString);
 
@@ -296,7 +296,7 @@ class DateTimeHelper
      *
      * @return \DateTimeInterface
      */
-    public function modify($string, $clone = false)
+    public function modify($string, bool $clone = false)
     {
         if ($clone) {
             $dt = clone $this->datetime;

@@ -282,7 +282,7 @@ final class CategoryController extends AbstractFormController
     /**
      * Generates edit form and processes post data.
      */
-    public function editAction(Request $request, ?string $bundle, $objectId, $ignorePost = false): JsonResponse|Response
+    public function editAction(Request $request, ?string $bundle, $objectId, bool $ignorePost = false): JsonResponse|Response
     {
         $session = $request->getSession();
         $entity    = $this->categoryModel->getEntity($objectId);

@@ -715,7 +715,7 @@ final class LeadController extends FormController
      *
      * @param bool|false $ignorePost
      */
-    public function editAction(Request $request, UserHelper $userHelper, AvatarHelper $avatarHelper, $objectId, $ignorePost = false): Response
+    public function editAction(Request $request, UserHelper $userHelper, AvatarHelper $avatarHelper, $objectId, bool $ignorePost = false): Response
     {
         $lead  = $this->leadModel->getEntity($objectId);
 
