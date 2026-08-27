@@ -31,7 +31,7 @@ jobs:
           - php-versions: '8.5'
             db-types: 'mariadb:11.4'
           - php-versions: '8.6'
-            db-types: 'mysql:9.7'
+            db-types: 'mysql:26.7' # 'mysql:9.7'
             experimental: true
           - php-versions: '8.6'
             db-types: 'mariadb:13.0-rc'
