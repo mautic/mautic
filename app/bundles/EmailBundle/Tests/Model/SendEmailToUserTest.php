@@ -123,11 +123,9 @@ final class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
             }
 
             /**
-             * @param bool $includeGlobal
-             *
              * @return string[]
              */
-            public function getTokens($includeGlobal = true): array
+            public function getTokens(bool $includeGlobal = true): array
             {
                 ++$this->getTokenMethodCallCounter;
 
@@ -209,7 +207,7 @@ final class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
         $this->emailModel
             ->expects($this->once())
             ->method('sendEmailToUser')
-            ->willReturnCallback(function ($email, $users, ?array $leadCredentials, array $tokens, array $assetAttachments, $saveStat, array $to, array $cc, array $bcc): array {
+            ->willReturnCallback(function ($email, $users, ?array $leadCredentials, array $tokens, array $assetAttachments, bool $saveStat, array $to, array $cc, array $bcc): array {
                 $expectedUsers = [
                     ['id' => 6],
                     ['id' => 7],

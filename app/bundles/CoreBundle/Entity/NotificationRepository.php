@@ -84,11 +84,9 @@ class NotificationRepository extends CommonRepository
     /**
      * Fetch notifications for this user.
      *
-     * @param bool $includeRead
-     *
      * @return array
      */
-    public function getNotifications($userId, $afterId = null, $includeRead = false, $type = null, $limit = null)
+    public function getNotifications($userId, $afterId = null, bool $includeRead = false, $type = null, $limit = null)
     {
         $qb = $this->createQueryBuilder('n');
 

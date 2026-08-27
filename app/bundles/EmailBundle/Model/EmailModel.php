@@ -224,7 +224,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * @param Email $entity
      */
-    public function saveEntity($entity, $unlock = true): void
+    public function saveEntity($entity, bool $unlock = true): void
     {
         $type = $entity->getEmailType();
         if (empty($type)) {
@@ -285,7 +285,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * Save an array of entities.
      */
-    public function saveEntities($entities, $unlock = true): void
+    public function saveEntities($entities, bool $unlock = true): void
     {
         // iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
@@ -383,7 +383,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Email) {
             throw new MethodNotAllowedHttpException(['Email']);
@@ -705,10 +705,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
     /**
      * Get a stats for email by list.
-     *
-     * @param bool $includeVariants
      */
-    public function getEmailListStats($email, $includeVariants = false, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null): array
+    public function getEmailListStats($email, bool $includeVariants = false, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null): array
     {
         $dateTo = $dateTo ? (clone $dateTo)->setTime(23, 59, 59) : null;
 
@@ -801,9 +799,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      * Get a stats for email by list.
      *
      * @param Email|int $email
-     * @param bool      $includeVariants
      */
-    public function getEmailDeviceStats($email, $includeVariants = false, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null): array
+    public function getEmailDeviceStats($email, bool $includeVariants = false, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null): array
     {
         if (!$email instanceof Email) {
             $email = $this->getEntity($email);
@@ -996,13 +993,13 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     public function getPendingLeads(
         Email $email,
         $listId = null,
-        $countOnly = false,
+        bool $countOnly = false,
         $limit = null,
-        $includeVariants = true,
+        bool $includeVariants = true,
         $minContactId = null,
         $maxContactId = null,
-        $countWithMaxMin = false,
-        $storeToCache = true,
+        bool $countWithMaxMin = false,
+        bool $storeToCache = true,
         ?int $maxThreads = null,
         ?int $threadId = null,
     ) {
@@ -1037,10 +1034,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         return $total;
     }
 
-    /**
-     * @param bool $includeVariants
-     */
-    public function getQueuedCounts(Email $email, $includeVariants = true): int
+    public function getQueuedCounts(Email $email, bool $includeVariants = true): int
     {
         $ids = ($includeVariants) ? $email->getRelatedEntityIds() : null;
         if (!in_array($email->getId(), $ids)) {
@@ -1197,11 +1191,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * Gets template, stats, weights, etc for an email in preparation to be sent.
      *
-     * @param bool $includeVariants
-     *
      * @return array
      */
-    public function &getEmailSettings(Email $email, $includeVariants = true)
+    public function &getEmailSettings(Email $email, bool $includeVariants = true)
     {
         if (empty($this->emailSettings[$email->getId()])) {
             // store the settings of all the variants in order to properly disperse the emails
@@ -1572,7 +1564,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      * Send an email to lead(s).
      *
      * @param mixed[]|int $users
-     * @param bool        $saveStat
      *
      * @return false|string[]
      *
@@ -1584,7 +1575,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         ?array $lead = null,
         array $tokens = [],
         array $assetAttachments = [],
-        $saveStat = false,
+        bool $saveStat = false,
         array $to = [],
         array $cc = [],
         array $bcc = [],
@@ -1790,10 +1781,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     }
 
     /**
-     * @param int  $reason
-     * @param bool $flush
+     * @param int $reason
      */
-    public function setEmailDoNotContact($email, $reason = DoNotContact::BOUNCED, ?string $comments = '', $flush = true, $leadId = null): array
+    public function setEmailDoNotContact($email, $reason = DoNotContact::BOUNCED, ?string $comments = '', bool $flush = true, $leadId = null): array
     {
         if (null === $leadId) {
             $leadId = (array) $this->leadRepository->getLeadByEmail($email, true);
@@ -1839,14 +1829,13 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
     /**
      * @param string $column
-     * @param bool   $canViewOthers
      */
     public function getBestHours(
         $column,
         \DateTime $dateFrom,
         \DateTime $dateTo,
         array $filter = [],
-        $canViewOthers = true,
+        bool $canViewOthers = true,
         $timeFormat = 24,
     ): array {
         $companyId  = ArrayHelper::pickValue('companyId', $filter);
@@ -1985,9 +1974,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      * @param string $dateFrom
      * @param string $dateTo
      * @param array  $filters
-     * @param bool   $canViewOthers
      */
-    public function getIgnoredVsReadPieChartData($dateFrom, $dateTo, $filters = [], $canViewOthers = true): array
+    public function getIgnoredVsReadPieChartData($dateFrom, $dateTo, $filters = [], bool $canViewOthers = true): array
     {
         $chart = new PieChart();
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -2114,10 +2102,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * Get a list of upcoming emails.
      *
-     * @param int  $limit
-     * @param bool $canViewOthers
+     * @param int $limit
      */
-    public function getUpcomingEmails($limit = 10, $canViewOthers = true): array
+    public function getUpcomingEmails($limit = 10, bool $canViewOthers = true): array
     {
         $this->leadEventLogRepository->setCurrentUser($this->userHelper->getUser());
 
@@ -2190,7 +2177,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      *
      * @param array                   $assetAttachments
      * @param array<string>|Lead|null $leadFields
-     * @param bool                    $saveStat
      *
      * @return false|mixed[]
      *
@@ -2202,7 +2188,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $leadFields = null,
         array $tokens = [],
         $assetAttachments = [],
-        $saveStat = true,
+        bool $saveStat = true,
     ): false|array {
         if (!$emailId = $email->getId()) {
             return false;
@@ -2343,12 +2329,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
     /**
      * @param array<string, string>|array<string, int> $routeParams
-     * @param bool                                     $absolute
      * @param array<array<string>>                     $clickthrough
      *
      * @return string
      */
-    public function buildUrl(string $route, array $routeParams = [], $absolute = true, $clickthrough = [])
+    public function buildUrl(string $route, array $routeParams = [], bool $absolute = true, $clickthrough = [])
     {
         $parts = parse_url($this->coreParametersHelper->get('site_url') ?: '');
 

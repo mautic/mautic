@@ -116,7 +116,7 @@ class EmailSendEvent extends CommonEvent
      *
      * @return string
      */
-    public function getContent($replaceTokens = false)
+    public function getContent(bool $replaceTokens = false)
     {
         if (null !== $this->helper) {
             $content = $this->helper->getBody();
@@ -245,7 +245,7 @@ class EmailSendEvent extends CommonEvent
     /**
      * Get token array.
      */
-    public function getTokens($includeGlobal = true): array
+    public function getTokens(bool $includeGlobal = true): array
     {
         if ($includeGlobal && null !== $this->helper) {
             return array_merge($this->helper->getGlobalTokens(), $this->tokens);

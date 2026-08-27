@@ -21,11 +21,9 @@ class BundleHelper
     }
 
     /**
-     * @param bool $includePlugins
-     *
      * @return mixed[]
      */
-    public function getMauticBundles($includePlugins = true): array
+    public function getMauticBundles(bool $includePlugins = true): array
     {
         return $includePlugins ? $this->allBundles : $this->coreBundles;
     }
@@ -42,13 +40,12 @@ class BundleHelper
      * Gets an array of a specific bundle's config settings.
      *
      * @param string $configKey
-     * @param bool   $includePlugins
      *
      * @return mixed
      *
      * @throws \Exception
      */
-    public function getBundleConfig($bundleName, $configKey = '', $includePlugins = false)
+    public function getBundleConfig($bundleName, $configKey = '', bool $includePlugins = false)
     {
         // get the configs
         $configFiles = $this->getMauticBundles($includePlugins);

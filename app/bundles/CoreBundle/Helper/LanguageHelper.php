@@ -118,11 +118,9 @@ class LanguageHelper
     /**
      * Fetches the list of available languages.
      *
-     * @param bool $overrideCache
-     *
      * @return array
      */
-    public function fetchLanguages($overrideCache = false, $returnError = true)
+    public function fetchLanguages(bool $overrideCache = false, bool $returnError = true)
     {
         $overrideFile = $this->coreParametersHelper->get('language_list_file');
         if (!empty($overrideFile) && is_readable($overrideFile)) {

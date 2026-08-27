@@ -687,7 +687,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @return int
      */
-    public function getReadCount($includeVariants = false)
+    public function getReadCount(bool $includeVariants = false)
     {
         return ($includeVariants) ? $this->getAccumulativeVariantCount('getReadCount') : $this->readCount;
     }
@@ -923,11 +923,9 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param bool $includeVariants
-     *
      * @return int
      */
-    public function getSentCount($includeVariants = false)
+    public function getSentCount(bool $includeVariants = false)
     {
         return ($includeVariants) ? $this->getAccumulativeVariantCount('getSentCount') : $this->sentCount;
     }
@@ -942,7 +940,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @return int
      */
-    public function getVariantSentCount($includeVariants = false)
+    public function getVariantSentCount(bool $includeVariants = false)
     {
         return ($includeVariants) ? $this->getAccumulativeVariantCount('getVariantSentCount') : $this->variantSentCount;
     }
@@ -1201,7 +1199,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * Calculate Read Percentage for each Email.
      */
-    public function getReadPercentage($includevariants = false): float|int
+    public function getReadPercentage(bool $includevariants = false): float|int
     {
         if ($this->getSentCount($includevariants) > 0) {
             return round($this->getReadCount($includevariants) / $this->getSentCount($includevariants) * 100, 2);
