@@ -77,7 +77,7 @@ final class BulkNotificationTest extends TestCase
             {
             }
 
-            public function addNotification($message, $type = null, $isRead = false, $header = null, $iconClass = null, ?\DateTime $datetime = null, ?User $user = null, ?string $deduplicateValue = null, ?\DateTime $deduplicateDateTimeFrom = null): void
+            public function addNotification($message, $type = null, bool $isRead = false, $header = null, $iconClass = null, ?\DateTime $datetime = null, ?User $user = null, ?string $deduplicateValue = null, ?\DateTime $deduplicateDateTimeFrom = null): void
             {
                 $this->notifications[] = func_get_args();
             }

@@ -128,10 +128,9 @@ final class MenuHelper
     /**
      * Give orphaned menu items a home.
      *
-     * @param bool $appendOrphans
-     * @param int  $depth
+     * @param int $depth
      */
-    public function placeOrphans(array &$menuItems, $appendOrphans = false, $depth = 1, $type = 'main'): void
+    public function placeOrphans(array &$menuItems, bool $appendOrphans = false, $depth = 1, $type = 'main'): void
     {
         foreach ($menuItems as $key => &$items) {
             if (isset($this->orphans[$type]) && isset($this->orphans[$type][$key])) {

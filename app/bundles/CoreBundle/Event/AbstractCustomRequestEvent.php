@@ -47,11 +47,9 @@ abstract class AbstractCustomRequestEvent extends Event
     /**
      * Get Symfony route name for the current view.
      *
-     * @param bool $withParams
-     *
      * @return array|mixed
      */
-    public function getRoute($withParams = false)
+    public function getRoute(bool $withParams = false)
     {
         return ($withParams) ? [$this->route, $this->routeParams] : $this->route;
     }

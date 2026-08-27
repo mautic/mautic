@@ -15,11 +15,9 @@ final class OneToManyAssociationBuilder extends \Doctrine\ORM\Mapping\Builder\On
     /**
      * Set orphanRemoval.
      *
-     * @param bool $orphanRemoval
-     *
      * @return OneToManyAssociationBuilder
      */
-    public function orphanRemoval($orphanRemoval = true)
+    public function orphanRemoval(bool $orphanRemoval = true)
     {
         $this->mapping['orphanRemoval'] = $orphanRemoval;
 

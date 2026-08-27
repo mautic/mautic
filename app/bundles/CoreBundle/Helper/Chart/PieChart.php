@@ -12,7 +12,7 @@ final class PieChart extends AbstractChart implements ChartInterface
     /**
      * @return array{labels: mixed[], datasets: mixed[]}
      */
-    public function render($withCounts = true): array
+    public function render(bool $withCounts = true): array
     {
         $data = ['data' => [], 'backgroundColor' => [], 'hoverBackgroundColor' => []];
 

@@ -59,10 +59,9 @@ trait VariantModelTrait
     /**
      * Run post saving a variant aware entity.
      *
-     * @param bool  $resetVariants
      * @param array $relatedIds
      */
-    protected function postVariantSaveEntity(VariantEntityInterface $entity, $resetVariants = false, $relatedIds = [], ?\DateTime $variantStartDate = null): void
+    protected function postVariantSaveEntity(VariantEntityInterface $entity, bool $resetVariants = false, $relatedIds = [], ?\DateTime $variantStartDate = null): void
     {
         // If parent, add this entity as a child of the parent so that it populates the list in the tab (due to Doctrine hanging on to entities in memory)
         if ($parent = $entity->getVariantParent()) {

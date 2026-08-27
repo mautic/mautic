@@ -26,9 +26,8 @@ class CustomAssetsEvent extends Event
 
     /**
      * @param string $location
-     * @param bool   $async
      */
-    public function addScript($script, $location = 'head', $async = false, $name = null, string $context = AssetsHelper::CONTEXT_APP): static
+    public function addScript($script, $location = 'head', bool $async = false, $name = null, string $context = AssetsHelper::CONTEXT_APP): static
     {
         $this->assetsHelper->setContext($context)
             ->addScript($script, $location, $async, $name)
