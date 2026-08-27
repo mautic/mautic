@@ -26,8 +26,6 @@ return RectorConfig::configure()
     ->withRules([
         Rector\PHPUnit\CodeQuality\Rector\ClassMethod\AssertClassToThisAssertRector::class,
         Rector\TypeDeclarationDocblocks\Rector\Property\MergePhpstanDocTagIntoNativeRector::class,
-
-        Rector\Instanceof_\Rector\Ternary\FlipNegatedTernaryInstanceofRector::class,
         Rector\TypeDeclarationDocblocks\Rector\ClassMethod\NarrowArrayCollectionUnionReturnDocblockRector::class,
         UnserializeToSerializerDecodeRector::class,
 
