@@ -80,7 +80,7 @@ final class LeadPermissions extends AbstractPermissions
         $this->addStandardFormFields($this->getName(), 'imports', $builder, $data);
     }
 
-    public function analyzePermissions(array &$permissions, $allPermissions, $isSecondRound = false): bool
+    public function analyzePermissions(array &$permissions, $allPermissions, bool $isSecondRound = false): bool
     {
         parent::analyzePermissions($permissions, $allPermissions, $isSecondRound);
 

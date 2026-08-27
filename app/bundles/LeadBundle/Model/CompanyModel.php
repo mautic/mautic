@@ -89,9 +89,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
     /**
      * @param Company $entity
-     * @param bool    $unlock
      */
-    public function saveEntity($entity, $unlock = true): void
+    public function saveEntity($entity, bool $unlock = true): void
     {
         // Update leads primary company name
         $this->setEntityDefaultValues($entity, 'company');
@@ -103,9 +102,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      * Save an array of entities.
      *
      * @param array $entities
-     * @param bool  $unlock
      */
-    public function saveEntities($entities, $unlock = true): void
+    public function saveEntities($entities, bool $unlock = true): void
     {
         // Update leads primary company name
         foreach ($entities as $entity) {
@@ -614,7 +612,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Company) {
             throw new MethodNotAllowedHttpException(['Email']);
@@ -792,7 +790,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     /**
      * @throws \Exception
      */
-    public function importCompany(array $fields, array $data, $owner = null, $persist = true, $skipIfExists = false, bool $createNew = true): ?Company
+    public function importCompany(array $fields, array $data, $owner = null, bool $persist = true, bool $skipIfExists = false, bool $createNew = true): ?Company
     {
         try {
             $duplicateCompanies = $this->companyDeduper->checkForDuplicateCompanies($this->getFieldData($fields, $data));

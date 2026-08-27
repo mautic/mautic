@@ -215,18 +215,15 @@ class LeadEventLogRepository extends CommonRepository
     }
 
     /**
-     * @param int  $campaignId
-     * @param bool $excludeScheduled
-     * @param bool $excludeNegative
-     * @param bool $all
+     * @param int $campaignId
      *
      * @throws \Doctrine\DBAL\Cache\CacheException
      */
     public function getCampaignLogCounts(
         $campaignId,
-        $excludeScheduled = false,
-        $excludeNegative = true,
-        $all = false,
+        bool $excludeScheduled = false,
+        bool $excludeNegative = true,
+        bool $all = false,
         ?\DateTimeInterface $dateFrom = null,
         ?\DateTimeInterface $dateTo = null,
         ?int $eventId = null,

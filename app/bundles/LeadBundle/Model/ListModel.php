@@ -115,11 +115,10 @@ class ListModel extends FormModel implements GlobalSearchInterface
 
     /**
      * @param LeadList $entity
-     * @param bool     $unlock
      *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function saveEntity($entity, $unlock = true): void
+    public function saveEntity($entity, bool $unlock = true): void
     {
         $isNew = !(bool) $entity->getId();
 
@@ -255,7 +254,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof LeadList) {
             throw new MethodNotAllowedHttpException(['LeadList'], 'Entity must be of class LeadList()');
@@ -377,12 +376,11 @@ class ListModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param int      $limit
-     * @param bool|int $maxLeads
+     * @param int $limit
      *
      * @throws \Exception
      */
-    public function rebuildListLeads(LeadList $leadList, $limit = 100, $maxLeads = false, ?OutputInterface $output = null): int
+    public function rebuildListLeads(LeadList $leadList, $limit = 100, int|bool|null $maxLeads = false, ?OutputInterface $output = null): int
     {
         defined('MAUTIC_REBUILDING_LEAD_LISTS') || define('MAUTIC_REBUILDING_LEAD_LISTS', 1);
 
@@ -639,14 +637,12 @@ class ListModel extends FormModel implements GlobalSearchInterface
      *
      * @param array|int|Lead $lead
      * @param array|LeadList $lists
-     * @param bool           $manuallyAdded
-     * @param bool           $batchProcess
      * @param int            $searchListLead  0 = reference, 1 = yes, -1 = known to not exist
      * @param \DateTime      $dateManipulated
      *
      * @throws \Exception
      */
-    public function addLead($lead, $lists, $manuallyAdded = false, $batchProcess = false, $searchListLead = 1, $dateManipulated = null): void
+    public function addLead($lead, $lists, bool $manuallyAdded = false, bool $batchProcess = false, $searchListLead = 1, $dateManipulated = null): void
     {
         if (null == $dateManipulated) {
             $dateManipulated = new \DateTime();
@@ -781,13 +777,9 @@ class ListModel extends FormModel implements GlobalSearchInterface
     /**
      * Remove a lead from lists.
      *
-     * @param bool $manuallyRemoved
-     * @param bool $batchProcess
-     * @param bool $skipFindOne
-     *
      * @throws \Exception
      */
-    public function removeLead($lead, $lists, $manuallyRemoved = false, $batchProcess = false, $skipFindOne = false): void
+    public function removeLead($lead, $lists, bool $manuallyRemoved = false, bool $batchProcess = false, bool $skipFindOne = false): void
     {
         if (!$lead instanceof Lead) {
             $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
@@ -939,9 +931,8 @@ class ListModel extends FormModel implements GlobalSearchInterface
      * @param int       $limit
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
-     * @param bool      $canViewOthers
      */
-    public function getTopLists($limit = 10, $dateFrom = null, $dateTo = null, $canViewOthers = true): array
+    public function getTopLists($limit = 10, $dateFrom = null, $dateTo = null, bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(t.date_added) AS leads, ll.id, ll.name, ll.alias')
@@ -1064,10 +1055,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         return $chart->render(false);
     }
 
-    /**
-     * @param bool $canViewOthers
-     */
-    public function getStagesBarChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], $canViewOthers = true): array
+    public function getStagesBarChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], bool $canViewOthers = true): array
     {
         $data['values'] = [];
         $data['labels'] = [];
@@ -1124,10 +1112,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
             ], ];
     }
 
-    /**
-     * @param bool $canViewOthers
-     */
-    public function getDeviceGranularityData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], $canViewOthers = true): array
+    public function getDeviceGranularityData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], bool $canViewOthers = true): array
     {
         $data['values'] = [];
         $data['labels'] = [];

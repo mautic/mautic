@@ -350,10 +350,9 @@ class LeadRepository extends CommonRepository
     }
 
     /**
-     * @param int  $campaignId
-     * @param bool $campaignCanBeRestarted
+     * @param int $campaignId
      */
-    public function getCountsForCampaignContactsBySegment($campaignId, ContactLimiter $limiter, $campaignCanBeRestarted = false): CountResult
+    public function getCountsForCampaignContactsBySegment($campaignId, ContactLimiter $limiter, bool $campaignCanBeRestarted = false): CountResult
     {
         if (!$segments = $this->getCampaignSegments($campaignId)) {
             return new CountResult(0, 0, 0);
@@ -371,7 +370,7 @@ class LeadRepository extends CommonRepository
             ->setParameter('segments', $segments, ArrayParameterType::INTEGER);
 
         $this->updateQueryFromContactLimiter('ll', $qb, $limiter, true);
-        $this->updateQueryWithExistingMembershipExclusion((int) $campaignId, $qb, (bool) $campaignCanBeRestarted);
+        $this->updateQueryWithExistingMembershipExclusion((int) $campaignId, $qb, $campaignCanBeRestarted);
 
         if (!$campaignCanBeRestarted) {
             $this->updateQueryWithHistoryExclusion($campaignId, $qb);
@@ -388,12 +387,11 @@ class LeadRepository extends CommonRepository
      * and the campaign setting if a contact is allowed to restart
      * a campaign.
      *
-     * @param int  $campaignId
-     * @param bool $campaignCanBeRestarted
+     * @param int $campaignId
      *
      * @return array<int|string, string>
      */
-    public function getCampaignContactsBySegments($campaignId, ContactLimiter $limiter, $campaignCanBeRestarted = false): array
+    public function getCampaignContactsBySegments($campaignId, ContactLimiter $limiter, bool $campaignCanBeRestarted = false): array
     {
         if (!$segments = $this->getCampaignSegments($campaignId)) {
             return [];
@@ -412,7 +410,7 @@ class LeadRepository extends CommonRepository
             ->orderBy('ll.lead_id');
 
         $this->updateQueryFromContactLimiter('ll', $qb, $limiter);
-        $this->updateQueryWithExistingMembershipExclusion((int) $campaignId, $qb, (bool) $campaignCanBeRestarted);
+        $this->updateQueryWithExistingMembershipExclusion((int) $campaignId, $qb, $campaignCanBeRestarted);
 
         if (!$campaignCanBeRestarted) {
             $this->updateQueryWithHistoryExclusion($campaignId, $qb);

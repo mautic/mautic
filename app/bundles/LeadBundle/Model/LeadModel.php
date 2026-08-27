@@ -367,7 +367,7 @@ class LeadModel extends FormModel
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Lead) {
             throw new MethodNotAllowedHttpException(['Lead'], 'Entity must be of class Lead()');
@@ -458,9 +458,8 @@ class LeadModel extends FormModel
 
     /**
      * @param Lead $entity
-     * @param bool $unlock
      */
-    public function saveEntity($entity, $unlock = true): void
+    public function saveEntity($entity, bool $unlock = true): void
     {
         $companyFieldMatches = [];
         $fields              = $entity->getFields();
@@ -552,13 +551,11 @@ class LeadModel extends FormModel
     /**
      * Populates custom field values for updating the lead. Also retrieves social media data.
      *
-     * @param bool|false $overwriteWithBlank
-     * @param bool|true  $fetchSocialProfiles
-     * @param bool|false $bindWithForm        Send $data through the Lead form and only use valid data (should be used with request data)
+     * @param bool|false $bindWithForm Send $data through the Lead form and only use valid data (should be used with request data)
      *
      * @throws ImportFailedException
      */
-    public function setFieldValues(Lead $lead, array $data, $overwriteWithBlank = false, $fetchSocialProfiles = true, $bindWithForm = false): void
+    public function setFieldValues(Lead $lead, array $data, bool $overwriteWithBlank = false, bool $fetchSocialProfiles = true, bool $bindWithForm = false): void
     {
         if ($fetchSocialProfiles) {
             // @todo - add a catch to NOT do social gleaning if a lead is created via a form, etc as we do not want the user to experience the wait
@@ -873,11 +870,9 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param bool $returnWithQueryFields
-     *
      * @return array{Lead, mixed[]}|Lead
      */
-    public function checkForDuplicateContact(array $queryFields, $returnWithQueryFields = false, $onlyPubliclyUpdateable = false)
+    public function checkForDuplicateContact(array $queryFields, bool $returnWithQueryFields = false, bool $onlyPubliclyUpdateable = false)
     {
         // Search for lead by request and/or update lead fields if some data were sent in the URL query
         if ([] === $this->availableLeadFields) {
@@ -934,13 +929,9 @@ class LeadModel extends FormModel
     /**
      * Get a list of segments this lead belongs to.
      *
-     * @param bool $forLists
-     * @param bool $arrayHydration
-     * @param bool $isPublic
-     *
      * @return mixed
      */
-    public function getLists(Lead $lead, $forLists = false, $arrayHydration = false, $isPublic = false, $isPreferenceCenter = false)
+    public function getLists(Lead $lead, bool $forLists = false, bool $arrayHydration = false, bool $isPublic = false, bool $isPreferenceCenter = false)
     {
         return $this->leadListRepository->getLeadLists($lead->getId(), $forLists, $arrayHydration, $isPublic, $isPreferenceCenter);
     }
@@ -960,19 +951,16 @@ class LeadModel extends FormModel
      *
      * @param array|Lead|int $lead
      * @param array|LeadList $lists
-     * @param bool           $manuallyAdded
      */
-    public function addToLists($lead, $lists, $manuallyAdded = true): void
+    public function addToLists($lead, $lists, bool $manuallyAdded = true): void
     {
         $this->leadListModel->addLead($lead, $lists, $manuallyAdded);
     }
 
     /**
      * Remove lead from lists.
-     *
-     * @param bool $manuallyRemoved
      */
-    public function removeFromLists($lead, $lists, $manuallyRemoved = true): void
+    public function removeFromLists($lead, $lists, bool $manuallyRemoved = true): void
     {
         $this->leadListModel->removeLead($lead, $lists, $manuallyRemoved);
     }
@@ -1108,7 +1096,7 @@ class LeadModel extends FormModel
      * @param array<string, mixed> $data
      * @param array<LeadList>      $leadLists
      */
-    public function setFrequencyRules(Lead $lead, array $data, array $leadLists, $persist = true): bool
+    public function setFrequencyRules(Lead $lead, array $data, array $leadLists, bool $persist = true): bool
     {
         // One query to get all the lead's current frequency rules and go ahead and create entities for them
         $frequencyRules = $lead->getFrequencyRules()->toArray();
@@ -1640,10 +1628,8 @@ class LeadModel extends FormModel
 
     /**
      * Update a leads tags.
-     *
-     * @param bool|false $removeOrphans
      */
-    public function setTags(Lead $lead, array $tags, $removeOrphans = false): void
+    public function setTags(Lead $lead, array $tags, bool $removeOrphans = false): void
     {
         /** @var Tag[] $currentTags */
         $currentTags  = $lead->getTags();
@@ -1925,13 +1911,12 @@ class LeadModel extends FormModel
     /**
      * Get bar chart data of contacts.
      *
-     * @param string    $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string    $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      * @param string    $dateFormat
-     * @param bool      $canViewOthers
      */
-    public function getLeadsLineChartData($unit, $dateFrom, $dateTo, $dateFormat = null, array $filter = [], $canViewOthers = true): array
+    public function getLeadsLineChartData($unit, $dateFrom, $dateTo, $dateFormat = null, array $filter = [], bool $canViewOthers = true): array
     {
         $flag        = null;
         $topLists    = null;
@@ -2010,9 +1995,8 @@ class LeadModel extends FormModel
      * @param string $dateFrom
      * @param string $dateTo
      * @param array  $filters
-     * @param bool   $canViewOthers
      */
-    public function getAnonymousVsIdentifiedPieChartData($dateFrom, $dateTo, $filters = [], $canViewOthers = true): array
+    public function getAnonymousVsIdentifiedPieChartData($dateFrom, $dateTo, $filters = [], bool $canViewOthers = true): array
     {
         $chart = new PieChart();
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -2036,9 +2020,8 @@ class LeadModel extends FormModel
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      * @param mixed[]   $filters
-     * @param bool      $canViewOthers
      */
-    public function getLeadMapData($dateFrom, $dateTo, $filters = [], $canViewOthers = true): array
+    public function getLeadMapData($dateFrom, $dateTo, $filters = [], bool $canViewOthers = true): array
     {
         if (!$canViewOthers) {
             $filter['owner_id'] = $this->userHelper->getUser()->getId();
@@ -2410,10 +2393,7 @@ class LeadModel extends FormModel
         }
     }
 
-    /**
-     * @param bool $persist
-     */
-    protected function createNewContact(IpAddress $ip, $persist = true): Lead
+    protected function createNewContact(IpAddress $ip, bool $persist = true): Lead
     {
         // let's create a lead
         $lead = new Lead();

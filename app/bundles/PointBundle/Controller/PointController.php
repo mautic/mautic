@@ -219,10 +219,9 @@ final class PointController extends AbstractFormController
     /**
      * Generates edit form and processes post data.
      *
-     * @param int  $objectId
-     * @param bool $ignorePost
+     * @param int $objectId
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false): Response
+    public function editAction(Request $request, $objectId, bool $ignorePost = false): Response
     {
         $entity = $this->pointModel->getEntity($objectId);
 

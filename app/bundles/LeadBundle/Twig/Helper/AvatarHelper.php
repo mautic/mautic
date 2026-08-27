@@ -87,10 +87,7 @@ final class AvatarHelper
         return $img;
     }
 
-    /**
-     * @param bool $absolute
-     */
-    public function getAvatarPath($absolute = false): string
+    public function getAvatarPath(bool $absolute = false): string
     {
         $imageDir = $this->pathsHelper->getSystemPath('images', $absolute);
 

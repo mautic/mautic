@@ -139,7 +139,7 @@ final class EventExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->eventLogger->expects($this->exactly(2))
             ->method('fetchRotationAndGenerateLogsFromContacts')
             ->willReturnCallback(
-                function (Event $event, ActionAccessor $config, ArrayCollection $contacts, $isInactiveEntry): ArrayCollection {
+                function (Event $event, ActionAccessor $config, ArrayCollection $contacts, bool $isInactiveEntry): ArrayCollection {
                     $logs = new ArrayCollection();
                     foreach ($contacts as $contact) {
                         $log = new LeadEventLog();

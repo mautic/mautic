@@ -688,11 +688,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Get full name.
      *
-     * @param bool $lastFirst
-     *
      * @return string
      */
-    public function getName($lastFirst = false)
+    public function getName(bool $lastFirst = false)
     {
         $fullName = '';
         if ($lastFirst && $this->firstname && $this->lastname) {
@@ -727,11 +725,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Get the primary identifier for the lead.
      *
-     * @param bool $lastFirst
-     *
      * @return string
      */
-    public function getPrimaryIdentifier($lastFirst = false)
+    public function getPrimaryIdentifier(bool $lastFirst = false)
     {
         if ($name = $this->getName($lastFirst)) {
             return $name;
@@ -997,11 +993,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->companyChangeLog;
     }
 
-    /**
-     * @param bool $enabled
-     * @param bool $mobile
-     */
-    public function addPushIDEntry($identifier, $enabled = true, $mobile = false): static
+    public function addPushIDEntry($identifier, bool $enabled = true, bool $mobile = false): static
     {
         $entity = new PushID();
 

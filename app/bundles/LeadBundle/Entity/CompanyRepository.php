@@ -230,12 +230,11 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     }
 
     /**
-     * @param bool   $user
      * @param string $id
      *
      * @return array|mixed
      */
-    public function getCompanies($user = false, $id = '')
+    public function getCompanies(bool $user = false, $id = '')
     {
         $q                = $this->_em->getConnection()->createQueryBuilder();
         static $companies = [];
