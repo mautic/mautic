@@ -1794,9 +1794,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
     /**
      * @param int  $reason
-     * @param bool $flush
      */
-    public function setEmailDoNotContact($email, $reason = DoNotContact::BOUNCED, ?string $comments = '', $flush = true, $leadId = null): array
+    public function setEmailDoNotContact($email, $reason = DoNotContact::BOUNCED, ?string $comments = '', bool $flush = true, $leadId = null): array
     {
         if (null === $leadId) {
             $leadId = (array) $this->leadRepository->getLeadByEmail($email, true);
