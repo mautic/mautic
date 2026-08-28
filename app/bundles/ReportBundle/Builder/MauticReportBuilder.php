@@ -256,13 +256,9 @@ final class MauticReportBuilder implements ReportBuilderInterface
             $groupByColumns     = $queryBuilder->getQueryPart('groupBy');
             $groupByColumnsKeys = array_flip($groupByColumns);
             $groupByFieldKeys   = $groupByOptions ? array_flip($groupByOptions) : [];
-            $aggregatorFieldKeys = [];
-
-            if ($groupByOptions && $aggregators) {
-                foreach ($aggregators as $aggregator) {
-                    $aggregatorFieldKeys[$aggregator['column']] = true;
-                }
-            }
+            $aggregatorFieldKeys = $groupByOptions && $aggregators
+                ? array_flip(array_column($aggregators, 'column'))
+                : [];
 
             foreach ($fields as $field) {
                 // With GROUP BY + aggregators, a column listed only for COUNT/AVG must not
