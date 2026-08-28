@@ -191,7 +191,7 @@ class CommonRepository extends ServiceEntityRepository
      *
      * @param bool $flush true by default; use false if persisting in batches
      */
-    public function deleteEntity(object $entity, $flush = true): void
+    public function deleteEntity(object $entity, bool $flush = true): void
     {
         // delete entity
         $this->_em->remove($entity);
@@ -295,11 +295,10 @@ class CommonRepository extends ServiceEntityRepository
      * Gets the properties of an ORM entity.
      *
      * @param string $entityClass
-     * @param bool   $returnColumnNames
      *
      * @return array
      */
-    public function getBaseColumns($entityClass, $returnColumnNames = false)
+    public function getBaseColumns($entityClass, bool $returnColumnNames = false)
     {
         static $baseCols = [true => [], false => []];
 
@@ -514,8 +513,6 @@ class CommonRepository extends ServiceEntityRepository
      * The Expr() sets a :now and :true parameter that must be set in the calling function.
      *
      * @param string|null $alias
-     * @param bool        $setNowParameter
-     * @param bool        $setTrueParameter
      * @param bool        $allowNullForPublishedUp Allow entities without a published up date
      *
      * @return mixed
@@ -523,9 +520,9 @@ class CommonRepository extends ServiceEntityRepository
     public function getPublishedByDateExpression(
         $q,
         $alias = null,
-        $setNowParameter = true,
-        $setTrueParameter = true,
-        $allowNullForPublishedUp = true,
+        bool $setNowParameter = true,
+        bool $setTrueParameter = true,
+        bool $allowNullForPublishedUp = true,
     ) {
         $isORM = $q instanceof QueryBuilder;
 
@@ -806,7 +803,7 @@ class CommonRepository extends ServiceEntityRepository
      *
      * @param bool $flush true by default; use false if persisting in batches
      */
-    public function saveEntity(object $entity, $flush = true): void
+    public function saveEntity(object $entity, bool $flush = true): void
     {
         $this->getEntityManager()->persist($entity);
 

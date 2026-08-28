@@ -80,11 +80,9 @@ class DashboardModel extends FormModel
     /**
      * Load widgets for the current user from database.
      *
-     * @param bool $ignorePaginator
-     *
      * @return array
      */
-    public function getWidgets($ignorePaginator = false)
+    public function getWidgets(bool $ignorePaginator = false)
     {
         return $this->getEntities([
             'orderBy' => 'w.ordering',
@@ -289,11 +287,10 @@ class DashboardModel extends FormModel
      * Create/edit entity.
      *
      * @param object $entity
-     * @param bool   $unlock
      *
      * @throws \Exception
      */
-    public function saveEntity($entity, $unlock = true): void
+    public function saveEntity($entity, bool $unlock = true): void
     {
         // Set widget name from widget type if empty
         if (!$entity->getName()) {

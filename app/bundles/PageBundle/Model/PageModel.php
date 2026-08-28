@@ -164,9 +164,8 @@ class PageModel extends FormModel implements GlobalSearchInterface
 
     /**
      * @param Page $entity
-     * @param bool $unlock
      */
-    public function saveEntity($entity, $unlock = true): void
+    public function saveEntity($entity, bool $unlock = true): void
     {
         $pageIds = $entity->getRelatedEntityIds();
 
@@ -262,7 +261,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Page) {
             throw new MethodNotAllowedHttpException(['Page']);
@@ -328,12 +327,11 @@ class PageModel extends FormModel implements GlobalSearchInterface
      * Generate URL for a page.
      *
      * @param Page  $entity
-     * @param bool  $absolute
      * @param array $clickthrough
      *
      * @return string
      */
-    public function generateUrl($entity, $absolute = true, $clickthrough = [])
+    public function generateUrl($entity, bool $absolute = true, $clickthrough = [])
     {
         // If this is a variant, then get the parent's URL
         $parent = $entity->getVariantParent();
@@ -800,11 +798,10 @@ class PageModel extends FormModel implements GlobalSearchInterface
     /**
      * Get line chart data of hits.
      *
-     * @param ?string $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param ?string $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string  $dateFormat
-     * @param bool    $canViewOthers
      */
-    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], $canViewOthers = true): array
+    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], bool $canViewOthers = true): array
     {
         $flag = null;
 
@@ -913,9 +910,8 @@ class PageModel extends FormModel implements GlobalSearchInterface
      * Get pie chart data of dwell times.
      *
      * @param array $filters
-     * @param bool  $canViewOthers
      */
-    public function getDwellTimesPieChartData(\DateTime $dateFrom, \DateTime $dateTo, $filters = [], $canViewOthers = true): array
+    public function getDwellTimesPieChartData(\DateTime $dateFrom, \DateTime $dateTo, $filters = [], bool $canViewOthers = true): array
     {
         $timesOnSite = $this->hitRepository->getDwellTimeLabels();
         $chart       = new PieChart();
@@ -938,7 +934,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
     /**
      * Get bar chart data of hits.
      */
-    public function getDeviceGranularityData(\DateTime $dateFrom, \DateTime $dateTo, $filters = [], $canViewOthers = true): array
+    public function getDeviceGranularityData(\DateTime $dateFrom, \DateTime $dateTo, $filters = [], bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
 
@@ -977,9 +973,8 @@ class PageModel extends FormModel implements GlobalSearchInterface
      *
      * @param int   $limit
      * @param array $filters
-     * @param bool  $canViewOthers
      */
-    public function getPopularPages($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], $canViewOthers = true): array
+    public function getPopularPages($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS hits, p.id, p.title, p.alias')
@@ -1006,9 +1001,8 @@ class PageModel extends FormModel implements GlobalSearchInterface
      *
      * @param int   $limit
      * @param array $filters
-     * @param bool  $canViewOthers
      */
-    public function getPageList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], $canViewOthers = true): array
+    public function getPageList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('t.id, t.title AS name, t.date_added, t.date_modified')

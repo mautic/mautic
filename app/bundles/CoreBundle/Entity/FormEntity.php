@@ -221,11 +221,8 @@ class FormEntity extends CommonEntity
 
     /**
      * Check publish status with option to check against category, publish up and down dates.
-     *
-     * @param bool $checkPublishStatus
-     * @param bool $checkCategoryStatus
      */
-    public function isPublished($checkPublishStatus = true, $checkCategoryStatus = true): bool
+    public function isPublished(bool $checkPublishStatus = true, bool $checkCategoryStatus = true): bool
     {
         if ($checkPublishStatus && method_exists($this, 'getPublishUp')) {
             $status = $this->getPublishStatus();

@@ -73,9 +73,8 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
 
     /**
      * @param object $entity
-     * @param bool   $unlock
      */
-    public function saveEntity($entity, $unlock = true): void
+    public function saveEntity($entity, bool $unlock = true): void
     {
         parent::saveEntity($entity, $unlock);
 
@@ -218,7 +217,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof DynamicContent) {
             throw new MethodNotAllowedHttpException(['Dynamic Content']);
@@ -268,11 +267,10 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
     /**
      * Get line chart data of hits.
      *
-     * @param ?string $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param ?string $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string  $dateFormat
-     * @param bool    $canViewOthers
      */
-    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], $canViewOthers = true): array
+    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], bool $canViewOthers = true): array
     {
         $flag = null;
 

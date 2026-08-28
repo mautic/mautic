@@ -471,7 +471,7 @@ final class LeadSubscriberTest extends TestCase
                 return false;
             }
 
-            public function getChanges($includePast = false): array
+            public function getChanges(bool $includePast = false): array
             {
                 return $this->fieldChanges;
             }
@@ -498,7 +498,7 @@ final class LeadSubscriberTest extends TestCase
             ) {
             }
 
-            public function getChanges($includePast = false): array
+            public function getChanges(bool $includePast = false): array
             {
                 return $this->fieldChanges;
             }

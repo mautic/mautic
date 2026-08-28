@@ -119,11 +119,9 @@ final class SubmissionModel extends CommonFormModel
     }
 
     /**
-     * @param bool $returnEvent
-     *
      * @throws ORMException
      */
-    public function saveSubmission(array $post, array $server, Form $form, Request $request, $returnEvent = false): array|false
+    public function saveSubmission(array $post, array $server, Form $form, Request $request, bool $returnEvent = false): array|false
     {
         $leadFields = array_merge($this->leadFieldModel->getFieldListWithProperties(false), $this->leadFieldModel->getSpecialLeadFields());
 
@@ -794,10 +792,9 @@ final class SubmissionModel extends CommonFormModel
     /**
      * Get line chart data of submissions.
      *
-     * @param string|null $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string|null $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string      $dateFormat
      * @param array       $filter
-     * @param bool        $canViewOthers
      */
     public function getSubmissionsLineChartData(
         ?string $unit,
@@ -805,7 +802,7 @@ final class SubmissionModel extends CommonFormModel
         \DateTime $dateTo,
         $dateFormat = null,
         $filter = [],
-        $canViewOthers = true,
+        bool $canViewOthers = true,
     ): array {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -830,9 +827,8 @@ final class SubmissionModel extends CommonFormModel
      * @param string $dateFrom
      * @param string $dateTo
      * @param array  $filters
-     * @param bool   $canViewOthers
      */
-    public function getTopSubmissionReferrers($limit = 10, $dateFrom = null, $dateTo = null, $filters = [], $canViewOthers = true): array
+    public function getTopSubmissionReferrers($limit = 10, $dateFrom = null, $dateTo = null, $filters = [], bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS submissions, t.referer')
@@ -861,9 +857,8 @@ final class SubmissionModel extends CommonFormModel
      * @param string $dateFrom
      * @param string $dateTo
      * @param array  $filters
-     * @param bool   $canViewOthers
      */
-    public function getTopSubmitters($limit = 10, $dateFrom = null, $dateTo = null, $filters = [], $canViewOthers = true): array
+    public function getTopSubmitters($limit = 10, $dateFrom = null, $dateTo = null, $filters = [], bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS submissions, t.lead_id, l.firstname, l.lastname, l.email')
@@ -936,7 +931,7 @@ final class SubmissionModel extends CommonFormModel
         $uniqueLeadFields = $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier();
 
         // Closure to get data and unique fields
-        $getData = function (array $currentFields, $uniqueOnly = false) use ($leadFields, $uniqueLeadFields): array {
+        $getData = function (array $currentFields, bool $uniqueOnly = false) use ($leadFields, $uniqueLeadFields): array {
             $uniqueFieldsWithData = $data = [];
             foreach ($leadFields as $alias => $properties) {
                 if (isset($currentFields[$alias])) {

@@ -124,18 +124,14 @@ class FocusModel extends FormModel implements GlobalSearchInterface
 
     /**
      * @param Focus $entity
-     * @param bool  $unlock
      */
-    public function saveEntity($entity, $unlock = true): void
+    public function saveEntity($entity, bool $unlock = true): void
     {
         parent::saveEntity($entity, $unlock);
         $this->generateTrackableUrl($entity);
     }
 
-    /**
-     * @param bool $isPreview
-     */
-    public function generateJavascript(Focus $focus, $isPreview = false): string
+    public function generateJavascript(Focus $focus, bool $isPreview = false): string
     {
         $lead           = $this->contactTracker->getContact();
         $focusArray     = $focus->toArray();
@@ -180,12 +176,11 @@ class FocusModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param bool   $isPreview
      * @param string $url
      *
      * @return array
      */
-    public function getContent(array $focus, $isPreview = false, $url = '#')
+    public function getContent(array $focus, bool $isPreview = false, $url = '#')
     {
         $form = (!empty($focus['form']) && 'form' === $focus['type']) ? $this->formModel->getEntity($focus['form']) : null;
 
@@ -322,7 +317,7 @@ class FocusModel extends FormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Focus) {
             throw new MethodNotAllowedHttpException(['Focus']);
@@ -359,10 +354,7 @@ class FocusModel extends FormModel implements GlobalSearchInterface
         return null;
     }
 
-    /**
-     * @param bool $canViewOthers
-     */
-    public function getStats(Focus $focus, $unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $canViewOthers = true): array
+    public function getStats(Focus $focus, $unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, bool $canViewOthers = true): array
     {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo, $unit);

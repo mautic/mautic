@@ -123,7 +123,7 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
                 /**
                  * @param string $requestedPermission
                  */
-                public function isGranted($requestedPermission, $mode = 'MATCH_ALL', $userEntity = null, $allowUnknown = false): bool
+                public function isGranted($requestedPermission, $mode = 'MATCH_ALL', $userEntity = null, bool $allowUnknown = false): bool
                 {
                     Assert::assertSame('lead:imports:create', $requestedPermission);
 
@@ -150,7 +150,7 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
                 /**
                  * @param string $requestedPermission
                  */
-                public function isGranted($requestedPermission, $mode = 'MATCH_ALL', $userEntity = null, $allowUnknown = false): bool
+                public function isGranted($requestedPermission, $mode = 'MATCH_ALL', $userEntity = null, bool $allowUnknown = false): bool
                 {
                     Assert::assertSame('lead:imports:create', $requestedPermission);
 

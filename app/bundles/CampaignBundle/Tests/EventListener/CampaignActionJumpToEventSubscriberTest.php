@@ -204,7 +204,7 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             {
             }
 
-            public function executeForContacts(Event $event, ArrayCollection $contacts, ?Counter $counter = null, $isInactiveEvent = false): void
+            public function executeForContacts(Event $event, ArrayCollection $contacts, ?Counter $counter = null, bool $isInactiveEvent = false): void
             {
                 Assert::assertSame(222, $event->getId());
                 Assert::assertCount(1, $contacts);

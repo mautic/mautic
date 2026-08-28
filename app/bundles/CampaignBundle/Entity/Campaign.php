@@ -316,7 +316,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     /**
      * Override to convert projects changes to final format.
      */
-    public function getChanges($includePast = false)
+    public function getChanges(bool $includePast = false)
     {
         $changes = parent::getChanges($includePast);
 

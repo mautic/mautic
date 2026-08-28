@@ -57,9 +57,8 @@ class FormRepository extends CommonRepository
      * @param string $search
      * @param int    $limit
      * @param int    $start
-     * @param bool   $viewOther
      */
-    public function getFormList($search = '', $limit = 10, $start = 0, $viewOther = false): array
+    public function getFormList($search = '', $limit = 10, $start = 0, bool $viewOther = false): array
     {
         $q = $this->createQueryBuilder('f');
         $q->select('partial f.{id, name, alias}');
