@@ -160,7 +160,7 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
     /**
      * @throws IntegrationNotFoundException
      */
-    private function recordFieldChanges(array $fieldChanges, ?int $objectId, string $objectType, object $object): void
+    private function recordFieldChanges(array $fieldChanges, string|intnull $objectId, string $objectType, object $object): void
     {
         $toPersist     = [];
         $changedFields = [];
