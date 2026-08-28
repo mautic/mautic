@@ -19,8 +19,11 @@ final class UntrackableUrlsEvent extends Event
         '{trackable=(.*?)}',
     ];
 
+    /**
+     * @param string|string[]|null $content
+     */
     public function __construct(
-        private readonly mixed $content,
+        private readonly string|array|null $content,
     ) {
     }
 
@@ -43,9 +46,9 @@ final class UntrackableUrlsEvent extends Event
     }
 
     /**
-     * @return string
+     * @return string|string[]|null
      */
-    public function getContent()
+    public function getContent(): string|array|null
     {
         return $this->content;
     }
