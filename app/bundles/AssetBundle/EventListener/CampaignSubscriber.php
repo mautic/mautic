@@ -8,7 +8,7 @@ use Mautic\AssetBundle\Event\AssetLoadEvent;
 use Mautic\AssetBundle\Form\Type\CampaignEventAssetDownloadType;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
-use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CampaignBundle\Event\DecisionEvent;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -54,19 +54,17 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onCampaignTriggerDecision(CampaignExecutionEvent $event): void
+    public function onCampaignTriggerDecision(DecisionEvent $event): void
     {
         $eventDetails = $event->getEventDetails();
 
         if (null == $eventDetails) {
-            $event->setResult(true);
+            $event->setAsApplicable();
 
             return;
         }
 
         if (!$eventDetails instanceof Asset) {
-            $event->setResult(false);
-
             return;
         }
 
@@ -74,11 +72,9 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         $limitToAssets = $event->getConfig()['assets'];
 
         if (!empty($limitToAssets) && !in_array($assetId, $limitToAssets)) {
-            $event->setResult(false);
-
             return;
         }
 
-        $event->setResult(true);
+        $event->setAsApplicable();
     }
 }

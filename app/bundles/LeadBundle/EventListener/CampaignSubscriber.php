@@ -6,6 +6,7 @@ use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CampaignBundle\Event\ConditionEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -509,13 +510,13 @@ final class CampaignSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onCampaignTriggerCondition(CampaignExecutionEvent $event): void
+    public function onCampaignTriggerCondition(ConditionEvent $event): void
     {
         $lead   = $event->getLead();
         $result = false;
 
         if (!$lead || !$lead->getId()) {
-            $event->setResult(false);
+            $event->fail();
 
             return;
         }
@@ -669,12 +670,12 @@ final class CampaignSubscriber implements EventSubscriberInterface
                                 $realTotalSpentTime = new \DateTime($hit['dateLeft']->format('Y-m-d H:i'))->getTimestamp() -
                                     new \DateTime($hit['dateHit']->format('Y-m-d H:i'))->getTimestamp();
                                 if ($realTotalSpentTime >= $totalSpentTime) {
-                                    $event->setResult(true);
+                                    $event->pass();
 
                                     return;
                                 }
                             } elseif (!$totalSpentTime) {
-                                $event->setResult(true);
+                                $event->pass();
 
                                 return;
                             }
@@ -686,12 +687,12 @@ final class CampaignSubscriber implements EventSubscriberInterface
                             $realTotalSpentTime = new \DateTime($hit['dateLeft']->format('Y-m-d H:i'))->getTimestamp() -
                                 new \DateTime($hit['dateHit']->format('Y-m-d H:i'))->getTimestamp();
                             if ($realTotalSpentTime >= $totalSpentTime) {
-                                $event->setResult(true);
+                                $event->pass();
 
                                 return;
                             }
                         } elseif (!$totalSpentTime) {
-                            $event->setResult(true);
+                            $event->pass();
 
                             return;
                         }
@@ -715,7 +716,11 @@ final class CampaignSubscriber implements EventSubscriberInterface
             }
         }
 
-        $event->setResult($result);
+        if ($result) {
+            $event->pass();
+        } else {
+            $event->fail();
+        }
     }
 
     /**

@@ -11,8 +11,9 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
-use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CampaignBundle\Event\ConditionEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
+use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
@@ -249,30 +250,25 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $stageIds = $this->createStages();
         $this->addStageToContacts($contacts, $stageIds[0]);
 
-        $args = [
-            'event' => [
+        foreach ($contacts as $contact) {
+            $log = $this->createStub(LeadEventLog::class);
+            $log->method('getLead')->willReturn($this->contactRepository->getEntity($contact->getId()));
+            $log->method('getEvent')->willReturn([
                 'type'       => 'lead.stages',
                 'properties' => [
                     'type'   => 'lead.stages',
                     'stages' => [0 => '1'],
                 ],
-            ],
-            'eventDetails'    => [],
-            'systemTriggered' => true,
-            'eventSettings'   => [],
-        ];
+            ]);
 
-        foreach ($contacts as $contact) {
-            $args['lead'] = $this->contactRepository->getEntity($contact->getId());
-
-            $event      = new CampaignExecutionEvent($args, true);
+            $event      = new ConditionEvent($this->createStub(AbstractEventAccessor::class), $log);
             $dispatcher = self::getContainer()->get(EventDispatcherInterface::class);
-            $result     = $dispatcher->dispatch(
+            $dispatcher->dispatch(
                 $event,
                 LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION
             );
 
-            $this->assertTrue($event->getResult());
+            $this->assertTrue($event->wasConditionSatisfied());
         }
     }
 
@@ -1095,32 +1091,26 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
         $contact = $this->contactRepository->getEntity($contact->getId());
 
-        $eventArgs = [
-            'lead'  => $contact,
-            'event' => [
-                'type'       => 'lead.field_value',
-                'eventType'  => 'condition',
-                'properties' => [
-                    'field'    => 'test_date',
-                    'value'    => $regex,
-                    'operator' => $operator,
-                ],
+        $log = $this->createStub(LeadEventLog::class);
+        $log->method('getLead')->willReturn($contact);
+        $log->method('getEvent')->willReturn([
+            'type'       => 'lead.field_value',
+            'eventType'  => 'condition',
+            'properties' => [
+                'field'    => 'test_date',
+                'value'    => $regex,
+                'operator' => $operator,
             ],
-            'eventDetails'    => [],
-            'systemTriggered' => true,
-            'eventSettings'   => [],
-        ];
+        ]);
 
-        // Required: CampaignSubscriber::onCampaignTriggerCondition only supports CampaignExecutionEvent (deprecated)
-        // @phpstan-ignore-next-line new.deprecated
-        $event = new CampaignExecutionEvent($eventArgs, true);
+        $event = new ConditionEvent($this->createStub(AbstractEventAccessor::class), $log);
 
         $dispatcher = self::getContainer()->get(EventDispatcherInterface::class);
 
         // The test passes if no exception is thrown and the result is as expected
         $dispatcher->dispatch($event, LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION);
 
-        $this->assertSame($expectedResult, $event->getResult(), 'Regex operator should not cause exception and should match as expected.');
+        $this->assertSame($expectedResult, $event->wasConditionSatisfied(), 'Regex operator should not cause exception and should match as expected.');
 
         // Clean up
         /** @var FieldModel $fieldModel */

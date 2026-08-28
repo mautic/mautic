@@ -7,8 +7,9 @@ namespace Mautic\LeadBundle\Tests\EventListener;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
-use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CampaignBundle\Event\ConditionEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
+use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -227,7 +228,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $campaignEvent->setType('lead.updatecompany');
         $campaignEvent->setProperties($this->configTo);
 
-        $leadEventLog = $this->createMock(LeadEventLog::class);
+        $leadEventLog = $this->createStub(LeadEventLog::class);
         $leadEventLog->method('getLead')->willReturn($lead);
         $leadEventLog->method('getId')->willReturn(1);
 
@@ -255,23 +256,19 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $lead = new Lead();
         $lead->setId(99);
-        $args = [
-            'lead'  => $lead,
-            'event' => [
-                'type'       => 'lead.dnc',
-                'properties' => [
-                    'reason'   => $reason,
-                    'channels' => $channels,
-                ],
+        $log = $this->createStub(LeadEventLog::class);
+        $log->method('getLead')->willReturn($lead);
+        $log->method('getEvent')->willReturn([
+            'type'       => 'lead.dnc',
+            'properties' => [
+                'reason'   => $reason,
+                'channels' => $channels,
             ],
-            'eventDetails'    => [],
-            'systemTriggered' => true,
-            'eventSettings'   => [],
-        ];
+        ]);
 
-        $event = new CampaignExecutionEvent($args, true);
+        $event = new ConditionEvent($this->createStub(AbstractEventAccessor::class), $log);
         $this->subscriber->onCampaignTriggerCondition($event);
-        $this->assertSame($expected, $event->getResult());
+        $this->assertSame($expected, $event->wasConditionSatisfied());
     }
 
     public function testOnCampaignTriggerConditionLeadLandingPageHit(): void
@@ -301,20 +298,16 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->mockLeadModel->expects($this->once())->method('getEngagements')->willReturn($leadTimeline);
 
-        $args = [
-            'lead'  => $lead,
-            'event' => [
-                'type'       => 'lead.pageHit',
-                'properties' => $this->configPageHit,
-            ],
-            'eventDetails'    => [],
-            'systemTriggered' => true,
-            'eventSettings'   => [],
-        ];
+        $log = $this->createStub(LeadEventLog::class);
+        $log->method('getLead')->willReturn($lead);
+        $log->method('getEvent')->willReturn([
+            'type'       => 'lead.pageHit',
+            'properties' => $this->configPageHit,
+        ]);
 
-        $event = new CampaignExecutionEvent($args, true);
+        $event = new ConditionEvent($this->createStub(AbstractEventAccessor::class), $log);
         $this->subscriber->onCampaignTriggerCondition($event);
-        $this->assertTrue($event->getResult());
+        $this->assertTrue($event->wasConditionSatisfied());
     }
 
     public function testOnCampaignTriggerConditionLeadPageUrlHit(): void
@@ -345,20 +338,16 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->mockLeadModel->expects($this->once())->method('getEngagements')->willReturn($leadTimeline);
 
-        $args = [
-            'lead'  => $lead,
-            'event' => [
-                'type'       => 'lead.pageHit',
-                'properties' => $this->configUrlPageHit,
-            ],
-            'eventDetails'    => [],
-            'systemTriggered' => true,
-            'eventSettings'   => [],
-        ];
+        $log = $this->createStub(LeadEventLog::class);
+        $log->method('getLead')->willReturn($lead);
+        $log->method('getEvent')->willReturn([
+            'type'       => 'lead.pageHit',
+            'properties' => $this->configUrlPageHit,
+        ]);
 
-        $event = new CampaignExecutionEvent($args, true);
+        $event = new ConditionEvent($this->createStub(AbstractEventAccessor::class), $log);
         $this->subscriber->onCampaignTriggerCondition($event);
-        $this->assertTrue($event->getResult());
+        $this->assertTrue($event->wasConditionSatisfied());
     }
 
     public function testOnCampaignTriggerConditionLeadPageUrlHitWithoutSpentTime(): void
@@ -389,20 +378,16 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->mockLeadModel->expects($this->once())->method('getEngagements')->willReturn($leadTimeline);
 
-        $args = [
-            'lead'  => $lead,
-            'event' => [
-                'type'       => 'lead.pageHit',
-                'properties' => $this->configUrlPageHitWithoutSpentTime,
-            ],
-            'eventDetails'    => [],
-            'systemTriggered' => true,
-            'eventSettings'   => [],
-        ];
+        $log = $this->createStub(LeadEventLog::class);
+        $log->method('getLead')->willReturn($lead);
+        $log->method('getEvent')->willReturn([
+            'type'       => 'lead.pageHit',
+            'properties' => $this->configUrlPageHitWithoutSpentTime,
+        ]);
 
-        $event = new CampaignExecutionEvent($args, true);
+        $event = new ConditionEvent($this->createStub(AbstractEventAccessor::class), $log);
         $this->subscriber->onCampaignTriggerCondition($event);
-        $this->assertTrue($event->getResult());
+        $this->assertTrue($event->wasConditionSatisfied());
     }
 
     public function testOnCampaignTriggerActionUpdateLead(): void

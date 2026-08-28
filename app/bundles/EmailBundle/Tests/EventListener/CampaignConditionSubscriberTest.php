@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\EventListener;
 
-use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Event\ConditionEvent;
+use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\EmailBundle\EventListener\CampaignConditionSubscriber;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Helper\EmailValidator;
@@ -45,25 +47,17 @@ final class CampaignConditionSubscriberTest extends TestCase
             ->with(null, true)
             ->willThrowException(new UnexpectedValueException(null, 'string'));
 
-        // Prepare the CampaignExecutionEvent with the lead and required event details
-        $eventArgs = [
-            'lead'            => $lead,
-            'event'           => [
-                'type' => 'email.validate.address',
-            ],
-            'eventDetails'    => [],
-            'systemTriggered' => true,
-            'eventSettings'   => [],
-        ];
+        // Prepare the ConditionEvent with the lead
+        $log = $this->createStub(LeadEventLog::class);
+        $log->method('getLead')->willReturn($lead);
 
-        // @phpstan-ignore-next-line (CampaignExecutionEvent is deprecated but needed for this test)
-        $event = new CampaignExecutionEvent($eventArgs, true);
+        $event = new ConditionEvent($this->createStub(AbstractEventAccessor::class), $log);
 
         // Call the onCampaignTriggerCondition method
         $this->subscriber->onCampaignTriggerCondition($event);
 
         // Assert that the result is false due to the exception
-        $this->assertFalse($event->getResult());
+        $this->assertFalse($event->wasConditionSatisfied());
     }
 
     public function testOnCampaignTriggerConditionReturnsFalseForInvalidEmail(): void
@@ -78,25 +72,17 @@ final class CampaignConditionSubscriberTest extends TestCase
             ->with($lead->getEmail(), true)
             ->willThrowException(new InvalidEmailException($lead->getEmail(), 'Invalid email format'));
 
-        // Prepare the CampaignExecutionEvent with the lead and required event details
-        $eventArgs = [
-            'lead'            => $lead,
-            'event'           => [
-                'type' => 'email.validate.address',
-            ],
-            'eventDetails'    => [],
-            'systemTriggered' => true,
-            'eventSettings'   => [],
-        ];
+        // Prepare the ConditionEvent with the lead
+        $log = $this->createStub(LeadEventLog::class);
+        $log->method('getLead')->willReturn($lead);
 
-        // @phpstan-ignore-next-line (CampaignExecutionEvent is deprecated but needed for this test)
-        $event = new CampaignExecutionEvent($eventArgs, true);
+        $event = new ConditionEvent($this->createStub(AbstractEventAccessor::class), $log);
 
         // Call the onCampaignTriggerCondition method
         $this->subscriber->onCampaignTriggerCondition($event);
 
         // Assert that the result is false due to the exception
-        $this->assertFalse($event->getResult());
+        $this->assertFalse($event->wasConditionSatisfied());
     }
 
     public function testOnCampaignTriggerConditionReturnsTrueForValidEmail(): void
@@ -113,24 +99,16 @@ final class CampaignConditionSubscriberTest extends TestCase
                 // Do nothing, as the method is void
             });
 
-        // Prepare the CampaignExecutionEvent with the lead and required event details
-        $eventArgs = [
-            'lead'            => $lead,
-            'event'           => [
-                'type' => 'email.validate.address',
-            ],
-            'eventDetails'    => [],
-            'systemTriggered' => true,
-            'eventSettings'   => [],
-        ];
+        // Prepare the ConditionEvent with the lead
+        $log = $this->createStub(LeadEventLog::class);
+        $log->method('getLead')->willReturn($lead);
 
-        // @phpstan-ignore-next-line (CampaignExecutionEvent is deprecated but needed for this test)
-        $event = new CampaignExecutionEvent($eventArgs, true);
+        $event = new ConditionEvent($this->createStub(AbstractEventAccessor::class), $log);
 
         // Call the onCampaignTriggerCondition method
         $this->subscriber->onCampaignTriggerCondition($event);
 
         // Assert that the result is true for a valid email
-        $this->assertTrue($event->getResult());
+        $this->assertTrue($event->wasConditionSatisfied());
     }
 }
