@@ -25,6 +25,7 @@ use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -500,13 +501,22 @@ class InstallService
      */
     public function finalMigrationStep(): void
     {
-        // Add database migrations up to this point since this is a fresh install (must be done at this point
-        // after the cache has been rebuilt
-        $input  = new ArgvInput(['console', 'doctrine:migrations:version', '--add', '--all', '--no-interaction']);
-        $output = new BufferedOutput();
-
         $application = new Application($this->kernel);
         $application->setAutoExit(false);
-        $application->run($input, $output);
+
+        $commands = [
+            // Create the metadata storage before marking migrations as applied.
+            ['console', 'doctrine:migrations:sync-metadata-storage', '--no-interaction'],
+            ['console', 'doctrine:migrations:version', '--add', '--all', '--no-interaction'],
+        ];
+
+        foreach ($commands as $arguments) {
+            $output   = new BufferedOutput();
+            $exitCode = $application->run(new ArgvInput($arguments), $output);
+
+            if (Command::SUCCESS !== $exitCode) {
+                throw new \RuntimeException(sprintf('Command "%s" failed with exit code %d: %s', $arguments[1], $exitCode, trim($output->fetch())));
+            }
+        }
     }
 }
