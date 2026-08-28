@@ -824,13 +824,20 @@ final class PublicController extends CommonFormController
             );
         }
 
+        $secretHash = $mailHash->getEmailHash($email);
+        if ($this->coreParametersHelper->get('validate_unsubscribe_emails')) {
+            $resubscribeUrl = $this->generateUrl('mautic_email_validate_email_form', ['action' => 'resubscribe', 'secretHash' => $secretHash, 'idHash' => $idHash]);
+        } else {
+            $resubscribeUrl = $this->generateUrl('mautic_email_resubscribe', ['idHash' => $idHash, 'urlEmail' => $email, 'secretHash' => $secretHash]);
+        }
+
         return str_replace(
             [
                 '|URL|',
                 '|EMAIL|',
             ],
             [
-                $this->generateUrl('mautic_email_validate_email_form', ['action' => 'resubscribe', 'secretHash' => $this->mailHashHelper->getEmailHash($email), 'idHash' => $idHash]),
+                $resubscribeUrl,
                 $email,
             ],
             $message
@@ -851,13 +858,19 @@ final class PublicController extends CommonFormController
             );
         }
 
+        if ($this->coreParametersHelper->get('validate_unsubscribe_emails')) {
+            $unsubscribeUrl = $this->generateUrl('mautic_email_validate_email_form', ['action' => 'unsubscribe', 'secretHash' => $unsubscribeHash, 'idHash' => $idHash]);
+        } else {
+            $unsubscribeUrl = $this->generateUrl('mautic_email_unsubscribe', ['idHash' => $idHash, 'urlEmail' => $emailAddress, 'secretHash' => $unsubscribeHash]);
+        }
+
         return str_replace(
             [
                 '|URL|',
                 '|EMAIL|',
             ],
             [
-                $this->generateUrl('mautic_email_validate_email_form', ['action' => 'unsubscribe', 'secretHash' => $unsubscribeHash, 'idHash' => $idHash]),
+                $unsubscribeUrl,
                 $emailAddress,
             ],
             $message

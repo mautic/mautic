@@ -92,8 +92,9 @@ final class BuilderSubscriberTest extends TestCase
 
         $unsubscribeTokenizedText = '<a href="|URL|">Unsubscribe</a> {contactfield=companyname} {contactfield=lastname}';
 
-        $this->coreParametersHelper->expects($this->exactly(7))->method('get')->willReturnMap([
+        $this->coreParametersHelper->expects($this->exactly(8))->method('get')->willReturnMap([
             ['unsubscribe_text', null, $unsubscribeTokenizedText],
+            ['validate_unsubscribe_emails', null, true],
             ['webview_text', null, 'Just a text'],
             ['default_signature_text', null, 'Default Signature'],
             ['brand_name', null, 'Brand Name'],
@@ -330,5 +331,63 @@ final class BuilderSubscriberTest extends TestCase
             '<a href="/email/validate/unsubscribe/'.$emailHash.'/hash">Unsubscribe</a> '.$company->getName().' '.$lead->getLastname(),
             $event->getTokens()['{unsubscribe_text}']
         );
+    }
+
+    public function testUnsubscribeUrlsAreDirectWhenValidationDisabled(): void
+    {
+        $lead = new Lead();
+        $lead->setId(7);
+        $lead->setEmail('test@example.com');
+
+        $leadArray = $lead->convertToArray();
+
+        $email = new Email();
+        $email->setSendToDnc(true);
+
+        $args = [
+            'lead'   => $leadArray,
+            'email'  => $email,
+            'idHash' => 'testhash',
+        ];
+        $event = new EmailSendEvent(null, $args);
+
+        $this->coreParametersHelperMock
+            ->method('get')
+            ->withConsecutive(['secret_key'], ['unsubscribe_text'], ['validate_unsubscribe_emails'], ['webview_text'], ['default_signature_text'], ['mailer_from_name'])
+            ->willReturnOnConsecutiveCalls('secret', null, false, null, null, null);
+
+        $emailHash = hash_hmac('sha256', 'test@example.com', 'secret');
+        $this->emailModelMock
+            ->method('buildUrl')
+            ->willReturnCallback(static function (string $route, array $parameters): string {
+                if ('mautic_email_unsubscribe' === $route) {
+                    return sprintf('/email/unsubscribe/%s/%s/%s', $parameters['idHash'], $parameters['urlEmail'], $parameters['secretHash']);
+                }
+
+                if ('mautic_email_resubscribe' === $route) {
+                    return sprintf('/email/resubscribe/%s/%s/%s', $parameters['idHash'], $parameters['urlEmail'], $parameters['secretHash']);
+                }
+
+                if ('mautic_email_webview' === $route) {
+                    return sprintf('/email/view/%s', $parameters['idHash']);
+                }
+
+                return '/';
+            });
+
+        $this->translatorMock
+            ->method('trans')
+            ->willReturnCallback(static function (string $id, array $parameters = []): string {
+                if ('mautic.email.unsubscribe.text' === $id) {
+                    return str_replace('%link%', $parameters['%link%'], 'Click here to unsubscribe: %link%');
+                }
+
+                return $id;
+            });
+
+        $this->builderSubscriber->onEmailGenerate($event);
+
+        $this->assertSame('/email/unsubscribe/testhash/test@example.com/'.$emailHash, $event->getTokens()['{unsubscribe_url}']);
+        $this->assertSame('/email/resubscribe/testhash/test@example.com/'.$emailHash, $event->getTokens()['{resubscribe_url}']);
     }
 }

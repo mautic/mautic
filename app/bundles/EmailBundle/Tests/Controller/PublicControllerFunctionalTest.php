@@ -65,6 +65,13 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
             $this->configParams['show_contact_segments'] = 1;
         }
 
+        switch ($this->getName()) {
+            case 'testResubscribeSuccessMessageContainsDirectUnsubscribeLinkWhenValidationDisabled':
+            case 'testUnsubscribeSuccessMessageContainsDirectResubscribeLinkWhenValidationDisabled':
+                $this->configParams['validate_unsubscribe_emails'] = false;
+                break;
+        }
+
         parent::setUp();
     }
 
@@ -999,6 +1006,62 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($segment);
 
         return $segment;
+    }
+
+    public function testResubscribeSuccessMessageContainsDirectUnsubscribeLinkWhenValidationDisabled(): void
+    {
+        $stat       = $this->getStat();
+        $email      = $stat->getEmailAddress();
+        $secretHash = $this->getSecretHash($email);
+        $idHash     = $stat->getTrackingHash();
+        $this->em->flush();
+
+        $this->client->request(
+            Request::METHOD_GET,
+            '/email/resubscribe/'.$idHash.'/'.$email.'/'.$secretHash
+        );
+
+        Assert::assertTrue($this->client->getResponse()->isOk());
+        Assert::assertStringContainsString(
+            'has been re-subscribed',
+            strip_tags((string) $this->client->getResponse()->getContent())
+        );
+        Assert::assertStringContainsString(
+            '/email/unsubscribe/'.$idHash.'/'.$email.'/'.$secretHash,
+            (string) $this->client->getResponse()->getContent()
+        );
+        Assert::assertStringNotContainsString(
+            '/email/validate/',
+            (string) $this->client->getResponse()->getContent()
+        );
+    }
+
+    public function testUnsubscribeSuccessMessageContainsDirectResubscribeLinkWhenValidationDisabled(): void
+    {
+        $stat       = $this->getStat();
+        $email      = $stat->getEmailAddress();
+        $secretHash = $this->getSecretHash($email);
+        $idHash     = $stat->getTrackingHash();
+        $this->em->flush();
+
+        $this->client->request(
+            Request::METHOD_GET,
+            '/email/unsubscribe/'.$idHash.'/'.$email.'/'.$secretHash
+        );
+
+        Assert::assertTrue($this->client->getResponse()->isOk());
+        Assert::assertStringContainsString(
+            'will no longer receive emails from us',
+            strip_tags((string) $this->client->getResponse()->getContent())
+        );
+        Assert::assertStringContainsString(
+            '/email/resubscribe/'.$idHash.'/'.$email.'/'.$secretHash,
+            (string) $this->client->getResponse()->getContent()
+        );
+        Assert::assertStringNotContainsString(
+            '/email/validate/',
+            (string) $this->client->getResponse()->getContent()
+        );
     }
 
     private function getSecretHash(string $email): string
