@@ -36,14 +36,13 @@ class AssetRepository extends CommonRepository
     }
 
     /**
-     * @param string     $search
-     * @param int        $limit
-     * @param int        $start
-     * @param bool|false $viewOther
+     * @param string $search
+     * @param int    $limit
+     * @param int    $start
      *
      * @return array
      */
-    public function getAssetList($search = '', $limit = 10, $start = 0, $viewOther = false)
+    public function getAssetList($search = '', $limit = 10, $start = 0, bool $viewOther = false)
     {
         $q = $this->createQueryBuilder('a');
         $q->select('partial a.{id, title, path, alias, language}');

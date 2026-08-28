@@ -28,10 +28,8 @@ class PermissionRepository extends CommonRepository
 
     /**
      * Retrieves array of permissions for a set role.  If $forForm, then the array will contain.
-     *
-     * @param bool $forForm
      */
-    public function getPermissionsByRole(Role $role, $forForm = false): array
+    public function getPermissionsByRole(Role $role, bool $forForm = false): array
     {
         $query = $this
             ->createQueryBuilder('p')

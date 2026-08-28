@@ -432,11 +432,9 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     }
 
     /**
-     * @param bool $includeVariants
-     *
      * @return int
      */
-    public function getSentCount($includeVariants = false)
+    public function getSentCount(bool $includeVariants = false)
     {
         return $includeVariants ? $this->getAccumulativeTranslationCount('getSentCount') : $this->sentCount;
     }

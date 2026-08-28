@@ -77,7 +77,7 @@ final class MonitoringModel extends FormModel
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Monitoring) {
             throw new MethodNotAllowedHttpException(['Monitoring']);
@@ -115,9 +115,8 @@ final class MonitoringModel extends FormModel
 
     /**
      * @param Monitoring $monitoringEntity
-     * @param bool       $unlock
      */
-    public function saveEntity($monitoringEntity, $unlock = true): void
+    public function saveEntity($monitoringEntity, bool $unlock = true): void
     {
         // we're editing an existing record
         if (!$monitoringEntity->isNew()) {

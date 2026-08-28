@@ -154,7 +154,7 @@ class WebhookModel extends FormModel
     /**
      * @param Webhook $entity
      */
-    public function saveEntity($entity, $unlock = true): void
+    public function saveEntity($entity, bool $unlock = true): void
     {
         if (null === $entity->getSecret()) {
             $entity->setSecret(EncryptionHelper::generateKey());
@@ -611,7 +611,7 @@ class WebhookModel extends FormModel
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, ?SymfonyEvent $event = null): ?SymfonyEvent
+    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?SymfonyEvent $event = null): ?SymfonyEvent
     {
         if (!$entity instanceof Webhook) {
             throw new MethodNotAllowedHttpException(['Webhook'], 'Entity must be of class Webhook()');

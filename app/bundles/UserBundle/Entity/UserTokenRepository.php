@@ -46,7 +46,7 @@ final class UserTokenRepository extends CommonRepository implements UserTokenRep
         return true;
     }
 
-    public function deleteExpired($isDryRun = false): int
+    public function deleteExpired(bool $isDryRun = false): int
     {
         $qb = $this->createQueryBuilder('ut')
             ->where('ut.expiration <= :current_datetime')
