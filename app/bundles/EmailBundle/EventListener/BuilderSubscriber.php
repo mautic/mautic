@@ -173,8 +173,13 @@ final class BuilderSubscriber implements EventSubscriberInterface
             $unsubscribeText = $this->translator->trans('mautic.email.unsubscribe.text', ['%link%' => '|URL|']);
         }
 
-        $unsubscribeUrl = $this->emailModel->buildUrl('mautic_email_validate_email_form', ['action' => 'unsubscribe', 'secretHash' => $unsubscribeHash, 'idHash' => $idHash]);
-        $resubscribeUrl = $this->emailModel->buildUrl('mautic_email_validate_email_form', ['action' => 'resubscribe', 'secretHash' => $unsubscribeHash, 'idHash' => $idHash]);
+        if ($this->coreParametersHelper->get('validate_unsubscribe_emails')) {
+            $unsubscribeUrl = $this->emailModel->buildUrl('mautic_email_validate_email_form', ['action' => 'unsubscribe', 'secretHash' => $unsubscribeHash, 'idHash' => $idHash]);
+            $resubscribeUrl = $this->emailModel->buildUrl('mautic_email_validate_email_form', ['action' => 'resubscribe', 'secretHash' => $unsubscribeHash, 'idHash' => $idHash]);
+        } else {
+            $unsubscribeUrl = $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash]);
+            $resubscribeUrl = $this->emailModel->buildUrl('mautic_email_resubscribe', ['idHash' => $idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash]);
+        }
 
         // We will replace tokens in unsubscribe text too
         $unsubscribeText = \Mautic\LeadBundle\Helper\TokenHelper::findLeadTokens($unsubscribeText, $lead, true);

@@ -597,6 +597,21 @@ final class ConfigType extends AbstractType
                 ],
             ]
         );
+
+        $builder->add(
+            'validate_unsubscribe_emails',
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'mautic.email.config.validate_unsubscribe_emails',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.config.validate_unsubscribe_emails.tooltip',
+                ],
+                'data'       => $options['data']['validate_unsubscribe_emails'] ?? true,
+                'required'   => false,
+            ]
+        );
     }
 
     public function getBlockPrefix(): string
