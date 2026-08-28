@@ -193,7 +193,7 @@ jobs:
           POSTGRES_USER: mautic
           POSTGRES_PASSWORD: mautic
         ports:
-          - 5432
+          - 5432:5432
         options: >-
           --health-cmd "pg_isready -U mautic -d mautictest"
           --health-interval 10s
@@ -271,10 +271,13 @@ jobs:
 
       - name: Prepare PostgreSQL environment
         run: |
-          export PATH="/usr/lib/postgresql/${{ matrix.postgres-versions }}/bin:$PATH"
+          # 1. Extract major version number (e.g., '19beta2-alpine' -> '19')
+          VERSION=$(echo "${{ matrix.postgres-versions }}" | sed -E 's/([0-9.]+).*/\1/' | cut -d. -f1)
+          
+          export PATH="/usr/lib/postgresql/$VERSION/bin:$PATH"
           echo "PATH=$PATH" >> $GITHUB_ENV
           pg_dump --version
-          DB_LOG_NAME="${{ matrix.postgres-versions }}"
+          DB_LOG_NAME="$VERSION"
           echo "DB_LOG_NAME=${DB_LOG_NAME/:/_}" >> $GITHUB_ENV
 
       - name: Set SYMFONY_ENV to test
@@ -312,7 +315,7 @@ jobs:
           DB_DRIVER: pdo_pgsql
           DB_CHARSET: UTF8
           DB_HOST: localhost
-          DB_PORT: 5432
+          DB_PORT: ${{ job.services.postgres.ports[5432] }}
           DB_USER: mautic
           DB_PASSWD: mautic
           DB_NAME: mautictest
