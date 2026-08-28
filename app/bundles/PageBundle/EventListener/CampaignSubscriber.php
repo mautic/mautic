@@ -4,7 +4,7 @@ namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
-use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CampaignBundle\Event\DecisionEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadDeviceType;
@@ -107,18 +107,18 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         $this->realTimeExecutioner->execute('page.devicehit', $hit, $channel, $channelId);
     }
 
-    public function onCampaignTriggerDecisionDeviceHit(CampaignExecutionEvent $event): false|CampaignExecutionEvent
+    public function onCampaignTriggerDecisionDeviceHit(DecisionEvent $event): void
     {
         $eventDetails = $event->getEventDetails();
         $config       = $event->getConfig();
         $lead         = $event->getLead();
 
         if (!$event->checkContext('page.devicehit')) {
-            return false;
+            return;
         }
 
         if (!$eventDetails instanceof Hit) {
-            return $event->setResult(false);
+            return;
         }
 
         $deviceRepo = $this->leadModel->getDeviceRepository();
@@ -150,24 +150,28 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
             }
         }
 
-        return $event->setResult($result);
+        if ($result) {
+            $event->setAsApplicable();
+        }
     }
 
-    public function onCampaignTriggerDecision(CampaignExecutionEvent $event): bool|CampaignExecutionEvent
+    public function onCampaignTriggerDecision(DecisionEvent $event): void
     {
         $eventDetails = $event->getEventDetails();
         $config       = $event->getConfig();
 
         if (!$event->checkContext('page.pagehit')) {
-            return false;
+            return;
         }
 
         if (null == $eventDetails) {
-            return true;
+            $event->setAsApplicable();
+
+            return;
         }
 
         if (!$eventDetails instanceof Hit) {
-            return $event->setResult(false);
+            return;
         }
 
         $pageHit = $eventDetails->getPage();
@@ -223,10 +227,8 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         $refererIsHit = (!empty($config['referer']) && in_array(true, $refererMatches));
 
         if ($applyToAny || $langingPageIsHit || $urlIsHit || $refererIsHit) {
-            return $event->setResult(true);
+            $event->setAsApplicable();
         }
-
-        return $event->setResult(false);
     }
 
     public function onCampaignTriggerAction(PendingEvent $event): void

@@ -4,7 +4,8 @@ namespace Mautic\FormBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
-use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CampaignBundle\Event\ConditionEvent;
+use Mautic\CampaignBundle\Event\DecisionEvent;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\FormBundle\Entity\Form;
@@ -71,19 +72,17 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         $this->realTimeExecutioner->execute('form.submit', $form, 'form', $form->getId());
     }
 
-    public function onCampaignTriggerDecision(CampaignExecutionEvent $event): void
+    public function onCampaignTriggerDecision(DecisionEvent $event): void
     {
         $eventDetails = $event->getEventDetails();
 
         if (null === $eventDetails) {
-            $event->setResult(true);
+            $event->setAsApplicable();
 
             return;
         }
 
         if (!$eventDetails instanceof Form) {
-            $event->setResult(false);
-
             return;
         }
 
@@ -91,20 +90,18 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
 
         // check against selected forms
         if (!empty($limitToForms) && !in_array($eventDetails->getId(), $limitToForms)) {
-            $event->setResult(false);
-
             return;
         }
 
-        $event->setResult(true);
+        $event->setAsApplicable();
     }
 
-    public function onCampaignTriggerCondition(CampaignExecutionEvent $event): void
+    public function onCampaignTriggerCondition(ConditionEvent $event): void
     {
         $lead = $event->getLead();
 
         if (!$lead || !$lead->getId()) {
-            $event->setResult(false);
+            $event->fail();
 
             return;
         }
@@ -113,7 +110,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         $form      = $this->formRepository->findOneById($event->getConfig()['form']);
 
         if (!$form || !$form->getId()) {
-            $event->setResult(false);
+            $event->fail();
 
             return;
         }
@@ -135,6 +132,10 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
 
         $event->setChannel('form', $form->getId());
 
-        $event->setResult($result);
+        if ($result) {
+            $event->pass();
+        } else {
+            $event->fail();
+        }
     }
 }

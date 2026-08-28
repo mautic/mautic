@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Event;
 
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -58,33 +60,5 @@ final class ConditionEvent extends CampaignExecutionEvent
     public function wasConditionSatisfied(): bool
     {
         return $this->passed;
-    }
-
-    /**
-     * @param string   $channel
-     * @param int|null $channelId
-     */
-    public function setChannel($channel, $channelId = null): void
-    {
-        $this->log->setChannel($this->channel);
-        $this->log->setChannelId($this->channelId);
-    }
-
-    /**
-     * @deprecated 2.13.0 to be removed in 3.0; BC support
-     */
-    public function getResult(): bool
-    {
-        return $this->passed;
-    }
-
-    /**
-     * @deprecated 2.13.0 to be removed in 3.0; BC support
-     */
-    public function setResult($result): static
-    {
-        $this->passed = (bool) $result;
-
-        return $this;
     }
 }

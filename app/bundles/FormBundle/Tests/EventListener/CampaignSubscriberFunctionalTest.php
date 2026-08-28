@@ -6,7 +6,9 @@ namespace Mautic\FormBundle\Tests\EventListener;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
-use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Event\ConditionEvent;
+use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\Entity\Lead;
@@ -104,16 +106,12 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->detach($campaign);
 
         $contact = $this->em->getRepository(Lead::class)->findOneBy(['email' => 'testing@ampersand.select']);
-        $event   = new CampaignExecutionEvent(
-            [
-                'lead'            => $contact,
-                'event'           => $campaignEvent,
-                'eventDetails'    => null,
-                'systemTriggered' => false,
-                'eventSettings'   => [],
-            ],
-            null
-        );
+        $this->assertInstanceOf(Lead::class, $contact);
+        $log = new LeadEventLog();
+        $log->setLead($contact);
+        $log->setEvent($campaignEvent);
+
+        $event = new ConditionEvent($this->createStub(AbstractEventAccessor::class), $log);
 
         /** @var EventDispatcherInterface $dispatcher */
         $dispatcher = self::getContainer()->get(EventDispatcherInterface::class);
@@ -121,7 +119,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $dispatcher->dispatch($event, FormEvents::ON_CAMPAIGN_TRIGGER_CONDITION);
 
         $this->assertSame('form', $event->getChannel());
-        $this->assertSame($result, $event->getResult());
+        $this->assertSame($result, $event->wasConditionSatisfied());
     }
 
     public static function valueProvider(): \Generator

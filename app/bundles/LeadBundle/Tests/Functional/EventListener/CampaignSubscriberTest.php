@@ -6,7 +6,9 @@ namespace Mautic\LeadBundle\Tests\Functional\EventListener;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
-use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Event\ConditionEvent;
+use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
@@ -74,18 +76,14 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
         $this->em->persist($entityEvent);
         $this->em->flush();
 
-        $eventProperties = [
-            'lead'            => $lead,
-            'event'           => $entityEvent,
-            'eventDetails'    => [],
-            'systemTriggered' => false,
-            'eventSettings'   => [],
-        ];
+        $log = new LeadEventLog();
+        $log->setLead($lead);
+        $log->setEvent($entityEvent);
 
-        $campaignExecutionEvent = new CampaignExecutionEvent($eventProperties, false);
+        $conditionEvent = new ConditionEvent($this->createStub(AbstractEventAccessor::class), $log);
 
-        $this->campaignSubscriber->onCampaignTriggerCondition($campaignExecutionEvent);
-        $this->assertTrue($campaignExecutionEvent->getResult());
+        $this->campaignSubscriber->onCampaignTriggerCondition($conditionEvent);
+        $this->assertTrue($conditionEvent->wasConditionSatisfied());
     }
 
     /**
@@ -137,18 +135,14 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
         $this->em->persist($entityEvent);
         $this->em->flush();
 
-        $eventProperties = [
-            'lead'            => $lead,
-            'event'           => $entityEvent,
-            'eventDetails'    => [],
-            'systemTriggered' => false,
-            'eventSettings'   => [],
-        ];
+        $log = new LeadEventLog();
+        $log->setLead($lead);
+        $log->setEvent($entityEvent);
 
-        $campaignExecutionEvent = new CampaignExecutionEvent($eventProperties, false);
+        $conditionEvent = new ConditionEvent($this->createStub(AbstractEventAccessor::class), $log);
 
-        $this->campaignSubscriber->onCampaignTriggerCondition($campaignExecutionEvent);
-        $this->assertSame($expected, $campaignExecutionEvent->getResult());
+        $this->campaignSubscriber->onCampaignTriggerCondition($conditionEvent);
+        $this->assertSame($expected, $conditionEvent->wasConditionSatisfied());
     }
 
     public function testOnCampaignTriggerConditionReturnsCorrectResultsForContactAddedContext(): void
@@ -175,19 +169,14 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
         $this->em->persist($entityEvent);
         $this->em->flush();
 
-        $eventProperties = [
-            'lead'            => $lead,
-            'event'           => $entityEvent,
-            'eventDetails'    => [],
-            'systemTriggered' => false,
-            'eventSettings'   => [],
-        ];
+        $log = new LeadEventLog();
+        $log->setLead($lead);
+        $log->setEvent($entityEvent);
 
-        $campaignExecutionEvent = new CampaignExecutionEvent($eventProperties, false); // @phpstan-ignore-line classConstant.deprecatedClass
+        $conditionEvent = new ConditionEvent($this->createStub(AbstractEventAccessor::class), $log);
 
-        $this->campaignSubscriber->onCampaignTriggerCondition($campaignExecutionEvent);
-        $this->assertInstanceOf(CampaignExecutionEvent::class, $campaignExecutionEvent); // @phpstan-ignore-line classConstant.deprecatedClass
-        $this->assertFalse($campaignExecutionEvent->getResult());
+        $this->campaignSubscriber->onCampaignTriggerCondition($conditionEvent);
+        $this->assertFalse($conditionEvent->wasConditionSatisfied());
     }
 
     /**
