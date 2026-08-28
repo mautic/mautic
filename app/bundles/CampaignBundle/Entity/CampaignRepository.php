@@ -314,20 +314,16 @@ class CampaignRepository extends CommonRepository
         $this->updateQueryFromContactLimiter('cl', $q, $limiter, true);
 
         if (count($pendingEvents) > 0) {
-            $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
-            $sq->select('null')
-                ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'e')
-                ->where(
-                    $sq->expr()->and(
-                        $sq->expr()->eq('cl.lead_id', 'e.lead_id'),
-                        $sq->expr()->eq('e.rotation', 'cl.rotation'),
-                        $sq->expr()->in('e.event_id', $pendingEvents)
-                    )
-                );
-
-            $q->andWhere(
-                sprintf('NOT EXISTS (%s)', $sq->getSQL())
-            );
+            $q->leftJoin(
+                'cl',
+                MAUTIC_TABLE_PREFIX.'campaign_lead_event_log',
+                'e',
+                $q->expr()->and(
+                    $q->expr()->eq('cl.lead_id', 'e.lead_id'),
+                    $q->expr()->eq('e.rotation', 'cl.rotation'),
+                    $q->expr()->in('e.event_id', $pendingEvents)
+                )
+            )->andWhere($q->expr()->isNull('e.lead_id'));
         }
 
         $result = $q->executeQuery()->fetchAssociative();
