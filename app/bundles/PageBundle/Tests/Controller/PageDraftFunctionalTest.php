@@ -9,6 +9,7 @@ use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\PageDraft;
 use Symfony\Component\HttpFoundation\Request;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class PageDraftFunctionalTest extends MauticMysqlTestCase
 {
     protected function setUp(): void

@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Entity\UtmTagRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class TimelineTraitTest extends TestCase
 {
     private UtmTagRepository&MockObject $repository;

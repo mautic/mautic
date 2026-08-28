@@ -9,6 +9,7 @@ use Mautic\LeadBundle\Segment\RelativeDate;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class FieldFilterTransformerTest extends \PHPUnit\Framework\TestCase
 {
     private FieldFilterTransformer $transformer;

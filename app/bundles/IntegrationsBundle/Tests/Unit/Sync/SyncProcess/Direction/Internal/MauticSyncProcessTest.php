@@ -27,6 +27,7 @@ use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\ObjectChangeGe
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class MauticSyncProcessTest extends TestCase
 {
     private const string INTEGRATION_NAME = 'Test';

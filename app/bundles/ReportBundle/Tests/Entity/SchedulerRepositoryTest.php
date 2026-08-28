@@ -11,6 +11,7 @@ use Mautic\ReportBundle\Entity\Scheduler;
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 use PHPUnit\Framework\MockObject\MockObject;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class SchedulerRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     use RepositoryConfiguratorTrait;

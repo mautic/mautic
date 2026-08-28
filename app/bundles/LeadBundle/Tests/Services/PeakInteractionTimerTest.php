@@ -31,6 +31,7 @@ final class TestablePeakInteractionTimer extends PeakInteractionTimer
     }
 }
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class PeakInteractionTimerTest extends TestCase
 {
     private MockObject&CoreParametersHelper $coreParametersHelperMock;

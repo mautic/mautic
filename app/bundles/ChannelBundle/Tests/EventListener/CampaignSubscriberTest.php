@@ -30,6 +30,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private EventDispatcher $dispatcher;

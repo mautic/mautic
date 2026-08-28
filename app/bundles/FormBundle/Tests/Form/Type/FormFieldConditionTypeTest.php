@@ -13,6 +13,7 @@ use PHPUnit\Framework\MockObject\Rule\AnyInvokedCount;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**

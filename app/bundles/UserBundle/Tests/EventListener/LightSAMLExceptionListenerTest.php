@@ -19,6 +19,7 @@ use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Routing\Router;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class LightSAMLExceptionListenerTest extends MauticMysqlTestCase
 {
     protected function setUp(): void

@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\MockObject\MockObject;
 
 #[CoversClass(AbstractFormFieldHelper::class)]
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class CompanyModelTest extends \PHPUnit\Framework\TestCase
 {
     #[TestDox('Ensure that an array value is flattened before saving')]

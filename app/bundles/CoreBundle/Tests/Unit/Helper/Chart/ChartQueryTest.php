@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class ChartQueryTest extends TestCase
 {
     private \DateTime $dateFrom;

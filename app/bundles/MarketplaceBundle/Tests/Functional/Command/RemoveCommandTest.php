@@ -10,6 +10,7 @@ use Mautic\MarketplaceBundle\Command\RemoveCommand;
 use Mautic\MarketplaceBundle\DTO\ConsoleOutput;
 use Psr\Log\LoggerInterface;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class RemoveCommandTest extends AbstractMauticTestCase
 {
     private string $packageName;

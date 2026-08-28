@@ -28,6 +28,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class SmsModelTest extends \PHPUnit\Framework\TestCase
 {
     private \PHPUnit\Framework\MockObject\Stub&EntityManagerInterface $entityManger;

@@ -12,6 +12,7 @@ use Mautic\WebhookBundle\Event\WebhookBuilderEvent;
 use Mautic\WebhookBundle\Model\WebhookModel;
 use PHPUnit\Framework\MockObject\MockObject;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**

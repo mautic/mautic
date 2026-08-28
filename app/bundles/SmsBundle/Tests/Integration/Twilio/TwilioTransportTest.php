@@ -12,6 +12,7 @@ use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class TwilioTransportTest extends TestCase
 {
     private TwilioTransport $twilioTransport;

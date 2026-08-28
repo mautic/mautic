@@ -12,6 +12,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
 
 #[CoversClass(ConnectwiseIntegration::class)]
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class ConnectwiseIntegrationTest extends AbstractIntegrationTestCase
 {
     use DataGeneratorTrait;

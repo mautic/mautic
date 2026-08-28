@@ -25,6 +25,7 @@ use Mautic\LeadBundle\Exception\ImportFailedException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Router;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class ContactObjectSubscriberTest extends TestCase
 {
     /**

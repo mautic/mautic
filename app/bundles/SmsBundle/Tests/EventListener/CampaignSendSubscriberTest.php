@@ -18,6 +18,7 @@ use Mautic\SmsBundle\Sms\TransportChain;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class CampaignSendSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private MockObject&SmsModel $smsModel;

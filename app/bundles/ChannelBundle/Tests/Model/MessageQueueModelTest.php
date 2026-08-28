@@ -22,6 +22,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
 {
     public const string DATE = '2019-07-07 15:00:00';

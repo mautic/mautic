@@ -15,6 +15,7 @@ use Mautic\ReportBundle\Tests\Fixtures;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class CsvExporterTest extends \PHPUnit\Framework\TestCase
 {
     public const string DATEONLYFORMAT = 'F j, Y';

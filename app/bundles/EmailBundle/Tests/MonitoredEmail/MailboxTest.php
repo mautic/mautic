@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class MailboxTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructWithDefaultConfig(): void

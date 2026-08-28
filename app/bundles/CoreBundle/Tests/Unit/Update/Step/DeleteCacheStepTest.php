@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Update\Step\DeleteCacheStep;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class DeleteCacheStepTest extends AbstractStepTestCase
 {
     /**

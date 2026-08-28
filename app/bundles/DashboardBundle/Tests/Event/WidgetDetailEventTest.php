@@ -11,6 +11,7 @@ use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use PHPUnit\Framework\MockObject\MockObject;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class WidgetDetailEventTest extends \PHPUnit\Framework\TestCase
 {
     private WidgetDetailEvent $widgetDetailEvent;

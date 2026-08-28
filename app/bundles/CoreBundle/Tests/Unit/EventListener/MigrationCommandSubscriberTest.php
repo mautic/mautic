@@ -18,6 +18,7 @@ use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class MigrationCommandSubscriberTest extends TestCase
 {
     private MockObject&GeneratedColumnsProviderInterface $generatedColumnsProvider;

@@ -20,6 +20,7 @@ use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
 {
     /**

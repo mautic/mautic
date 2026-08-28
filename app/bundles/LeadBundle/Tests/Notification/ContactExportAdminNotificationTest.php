@@ -16,6 +16,7 @@ use Mautic\UserBundle\Entity\UserRepository;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class ContactExportAdminNotificationTest extends TestCase
 {
     public function testRequestedNotifiesOtherPublishedAdmins(): void

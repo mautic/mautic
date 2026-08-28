@@ -23,6 +23,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class CommonApiControllerTest extends CampaignTestAbstract
 {
     public function testAddAliasIfNotPresentWithOneColumnWithoutAlias(): void

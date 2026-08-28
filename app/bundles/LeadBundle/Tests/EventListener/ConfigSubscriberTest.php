@@ -14,6 +14,7 @@ use Mautic\LeadBundle\Form\Type\SegmentConfigType;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class ConfigSubscriberTest extends TestCase
 {
     private ConfigSubscriber $configSubscriber;

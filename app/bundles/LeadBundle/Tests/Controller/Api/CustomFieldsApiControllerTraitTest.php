@@ -11,6 +11,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Form\Form;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetEntityFormOptions(): void

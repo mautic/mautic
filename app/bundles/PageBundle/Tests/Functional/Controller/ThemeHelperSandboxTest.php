@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
  * - configGetParameter() for credential/secret leakage
  * - source() for arbitrary file read
  */
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class ThemeHelperSandboxTest extends MauticMysqlTestCase
 {
     private string $themesDir;

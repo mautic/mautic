@@ -7,6 +7,7 @@ namespace Mautic\ConfigBundle\Tests\Event;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\CoreBundle\Tests\CommonMocks;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class ConfigBuilderEventTest extends CommonMocks
 {
     public function testAddForm(): void

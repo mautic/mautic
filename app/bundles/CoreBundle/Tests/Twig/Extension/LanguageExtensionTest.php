@@ -9,6 +9,7 @@ use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Security;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class LanguageExtensionTest extends TestCase
 {
     public function testGetLanguageNameReturnsEnglishForEn(): void

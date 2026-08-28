@@ -8,6 +8,7 @@ use Mautic\ApiBundle\Helper\BatchIdToEntityHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\TestCase;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class BatchIdToEntityHelperTest extends TestCase
 {
     public function testIdsAreExtractedFromIdKeyArray(): void

@@ -14,6 +14,7 @@ use PHPUnit\Framework\Attributes\TestDox;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 #[CoversClass(Fetcher::class)]
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class FetcherTest extends \PHPUnit\Framework\TestCase
 {
     /**

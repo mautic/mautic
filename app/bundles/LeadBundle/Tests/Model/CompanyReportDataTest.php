@@ -12,6 +12,7 @@ use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 #[CoversClass(CompanyReportData::class)]
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class CompanyReportDataTest extends \PHPUnit\Framework\TestCase
 {
     /**

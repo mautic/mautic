@@ -37,6 +37,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Router;
 use Twig\Environment;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class EmailControllerTest extends TestCase
 {
     public const string NEW_CATEGORY_TITLE = 'New category';

@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\Tracking404Model;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class Tracking404ModelTest extends \PHPUnit\Framework\TestCase
 {
     /**

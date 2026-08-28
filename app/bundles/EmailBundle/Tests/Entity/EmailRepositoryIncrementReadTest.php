@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class EmailRepositoryIncrementReadTest extends \PHPUnit\Framework\TestCase
 {
     use RepositoryConfiguratorTrait;

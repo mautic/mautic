@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * Test Matomo Device Detector integration with BotRatioHelper.
  */
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class BotRatioHelperMatomoTest extends TestCase
 {
     #[DataProvider('knownBotUserAgentsProvider')]

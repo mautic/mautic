@@ -12,6 +12,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class NotifyOfFailureSubscriberTest extends TestCase
 {
     private MockObject&NotificationHelper $notificationHelper;

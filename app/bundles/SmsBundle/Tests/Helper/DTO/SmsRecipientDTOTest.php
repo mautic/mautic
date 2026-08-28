@@ -11,6 +11,7 @@ use Mautic\SmsBundle\Helper\DTO\SmsRecipientDTO;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class SmsRecipientDTOTest extends TestCase
 {
     private MockObject&Lead $lead;

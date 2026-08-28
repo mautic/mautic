@@ -12,6 +12,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class IntegrationSyncSettingsObjectFieldTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**

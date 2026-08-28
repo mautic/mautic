@@ -7,6 +7,7 @@ namespace Mautic\LeadBundle\Tests\Entity;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Tests\StandardImportTestHelper;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class ImportTest extends StandardImportTestHelper
 {
     public function testSetPath(): void

@@ -38,6 +38,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\ServerBag;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class AssetModelTest extends \PHPUnit\Framework\TestCase
 {
     private AssetModel $assetModel;

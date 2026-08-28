@@ -21,6 +21,7 @@ use Mautic\UserBundle\Entity\User;
 use Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class ContactMergerTest extends \PHPUnit\Framework\TestCase
 {
     /**

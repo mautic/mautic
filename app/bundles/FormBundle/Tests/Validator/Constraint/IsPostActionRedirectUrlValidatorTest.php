@@ -20,6 +20,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[CoversClass(IsPostActionRedirectUrlValidator::class)]
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class IsPostActionRedirectUrlValidatorTest extends ConstraintValidatorTestCase
 {
     private ?MockObject $urlValidator = null;

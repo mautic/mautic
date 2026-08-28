@@ -22,6 +22,7 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     public function testHandleValidateTags(): void

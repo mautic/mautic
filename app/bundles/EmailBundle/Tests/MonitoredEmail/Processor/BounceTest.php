@@ -20,6 +20,7 @@ use Monolog\Logger;
 use PHPUnit\Framework\Attributes\TestDox;
 use Symfony\Component\Mailer\Transport\NullTransport;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class BounceTest extends \PHPUnit\Framework\TestCase
 {
     #[TestDox('Test that the transport interface processes the message appropriately')]

@@ -16,6 +16,7 @@ use Mautic\UserBundle\Model\UserModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Routing\Router;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class NotificationHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**

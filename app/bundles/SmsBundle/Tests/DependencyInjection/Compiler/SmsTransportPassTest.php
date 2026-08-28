@@ -10,6 +10,7 @@ use Mautic\SmsBundle\Sms\TransportChain;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class SmsTransportPassTest extends TestCase
 {
     public function testProcess(): void
