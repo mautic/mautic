@@ -443,7 +443,8 @@ final class InstallCommand extends Command
     private function handleInstallerErrors(OutputInterface $output, array $messages): void
     {
         foreach ($messages as $type => $message) {
-            $output->writeln("  - [{$type}] {$message}");
+            // Install translations include HTML for the web installer; strip it for CLI.
+            $output->writeln(sprintf('  - [%s] %s', $type, strip_tags($message)));
         }
     }
 }

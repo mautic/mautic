@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Loader\ParameterLoader;
 use Mautic\CoreBundle\Release\ThisRelease;
+use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 use Mautic\InstallBundle\Exception\AlreadyInstalledException;
 use Mautic\InstallBundle\Exception\DatabaseVersionTooOldException;
@@ -137,6 +138,10 @@ class InstallService
 
     /**
      * Translation messages array.
+     *
+     * @param array<int|string, string> $messages
+     *
+     * @return array<int|string, string>
      */
     private function translateMessages(array $messages): array
     {
@@ -145,10 +150,23 @@ class InstallService
         }
 
         foreach ($messages as $key => $value) {
-            $messages[$key] = $this->translator->trans($value);
+            $messages[$key] = $this->translator->trans($value, $this->getTranslationParameters($value));
         }
 
         return $messages;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function getTranslationParameters(string $messageKey): array
+    {
+        return match ($messageKey) {
+            'mautic.install.memory.limit' => [
+                '%min_memory_limit%' => CheckStep::RECOMMENDED_MEMORY_LIMIT,
+            ],
+            default => [],
+        };
     }
 
     /**
