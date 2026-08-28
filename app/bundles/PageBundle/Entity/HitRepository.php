@@ -264,11 +264,10 @@ class HitRepository extends CommonRepository
      * Get the number of bounces.
      *
      * @param array|string $pageIds
-     * @param bool         $isVariantCheck
      *
      * @return mixed[]
      */
-    public function getBounces($pageIds, ?\DateTime $fromDate = null, $isVariantCheck = false): array
+    public function getBounces($pageIds, ?\DateTime $fromDate = null, bool $isVariantCheck = false): array
     {
         $inOrEq = (!is_array($pageIds)) ? 'eq' : 'in';
 

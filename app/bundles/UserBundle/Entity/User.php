@@ -477,10 +477,8 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
 
     /**
      * Get full name.
-     *
-     * @param bool $lastFirst
      */
-    public function getName($lastFirst = false): string
+    public function getName(bool $lastFirst = false): string
     {
         return ($lastFirst) ? $this->lastName.', '.$this->firstName : $this->firstName.' '.$this->lastName;
     }

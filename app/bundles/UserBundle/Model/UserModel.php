@@ -81,7 +81,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    public function saveEntity($entity, $unlock = true): void
+    public function saveEntity($entity, bool $unlock = true): void
     {
         if (!$entity instanceof User) {
             throw new MethodNotAllowedHttpException(['User'], $this->translator->trans('mautic.user.entity.must.be.user', [], 'validators'));
@@ -108,10 +108,9 @@ class UserModel extends FormModel implements GlobalSearchInterface
     /**
      * Checks for a new password and rehashes if necessary.
      *
-     * @param string     $submittedPassword
-     * @param bool|false $validate
+     * @param string $submittedPassword
      */
-    public function checkNewPassword(User $entity, $submittedPassword, $validate = false): ?string
+    public function checkNewPassword(User $entity, $submittedPassword, bool $validate = false): ?string
     {
         if ($validate) {
             if (strlen($submittedPassword) < 6) {
@@ -175,7 +174,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof User) {
             throw new MethodNotAllowedHttpException(['User'], $this->translator->trans('mautic.user.entity.must.be.user', [], 'validators'));

@@ -524,11 +524,9 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * @param bool $includeVariants
-     *
      * @return int|mixed
      */
-    public function getHits($includeVariants = false)
+    public function getHits(bool $includeVariants = false)
     {
         return ($includeVariants) ? $this->getAccumulativeVariantCount('getHits') : $this->hits;
     }
@@ -764,17 +762,15 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * @return int
      */
-    public function getUniqueHits($includeVariants = false)
+    public function getUniqueHits(bool $includeVariants = false)
     {
         return ($includeVariants) ? $this->getAccumulativeVariantCount('getUniqueHits') : $this->uniqueHits;
     }
 
     /**
-     * @param bool $includeVariants
-     *
      * @return int|mixed
      */
-    public function getVariantHits($includeVariants = false)
+    public function getVariantHits(bool $includeVariants = false)
     {
         return ($includeVariants) ? $this->getAccumulativeVariantCount('getVariantHits') : $this->variantHits;
     }
