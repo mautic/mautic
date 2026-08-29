@@ -153,7 +153,13 @@ abstract class ModeratedCommand extends Command
         );
 
         // Check if the PID is still running
-        $fp = fopen($this->lockFile, 'c+');
+        $fp = @fopen($this->lockFile, 'c+');
+        if (false === $fp) {
+            $this->output->writeln("<error>Failed to open {$this->lockFile}. Check that the run directory exists and is writable by the user running this command.</error>");
+
+            return false;
+        }
+
         if (!flock($fp, LOCK_EX)) {
             $this->output->writeln("<error>Failed to lock {$this->lockFile}.</error>");
 

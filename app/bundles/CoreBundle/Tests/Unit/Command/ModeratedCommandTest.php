@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Tests\Unit\Command\src\FakeModeratedCommand;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -165,6 +166,58 @@ final class ModeratedCommandTest extends TestCase
 
         // Cleanup
         rmdir($runDir);
+    }
+
+    public function testPidLockReportsAnErrorWhenTheLockFileCannotBeOpened(): void
+    {
+        if (!$this->fakeModeratedCommand->isPidSupported()) {
+            $this->markTestSkipped('getmypid and/or posix_getpgid are not available');
+        }
+
+        $cacheDir = __DIR__.'/resource/cache/tmp';
+        $runDir   = $cacheDir.'/../run';
+
+        // Make the run directory non-writable so opening the lock file inside it fails. This
+        // mirrors a run directory owned by another user, e.g. one created by a console command
+        // executed as root while the scheduled commands run as the web server user.
+        if (!file_exists($runDir)) {
+            mkdir($runDir);
+        }
+        chmod($runDir, 0555);
+        clearstatcache(true, $runDir);
+
+        if (is_writable($runDir)) {
+            chmod($runDir, 0755);
+            rmdir($runDir);
+            $this->markTestSkipped('The run directory could not be made non-writable; the test is running as a privileged user or on a filesystem without POSIX permissions.');
+        }
+
+        $this->pathsHelper->expects($this->once())
+            ->method('getSystemPath')
+            ->with('cache')
+            ->willReturn($cacheDir);
+
+        $this->input->method('getOption')
+            ->willReturnCallback(
+                fn (string $name): string|false|null => match ($name) {
+                    'lock_mode'      => ModeratedCommand::MODE_PID,
+                    'bypass-locking' => false,
+                    default          => null,
+                }
+            );
+
+        $output = new BufferedOutput();
+
+        try {
+            $this->fakeModeratedCommand->run($this->input, $output);
+        } finally {
+            chmod($runDir, 0755);
+            rmdir($runDir);
+        }
+
+        // Without the guard, fopen() returns false and flock() raises a TypeError on PHP 8,
+        // so the command dies before it can report anything useful about the lock file.
+        $this->assertStringContainsString('Failed to open', $output->fetch());
     }
 
     public function testFileLock(): void
