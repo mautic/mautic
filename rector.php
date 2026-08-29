@@ -20,6 +20,7 @@ return RectorConfig::configure()
         codeQuality: true,
         symfonyCodeQuality: true,
         earlyReturn: true,
+        if: true,
     )
     ->withPhpSets(php84: true)
     ->withCache(__DIR__.'/var/cache/rector')
@@ -30,6 +31,7 @@ return RectorConfig::configure()
 
         // to be added to set
         Rector\Instanceof_\Rector\Ternary\FlipNegatedTernaryInstanceofRector::class,
+
         Rector\TypeDeclarationDocblocks\Rector\ClassMethod\NarrowArrayCollectionUnionReturnDocblockRector::class,
         UnserializeToSerializerDecodeRector::class,
 
@@ -42,11 +44,9 @@ return RectorConfig::configure()
         // handle later
         Rector\PHPUnit\PHPUnit120\Rector\Class_\AllowMockObjectsForDataProviderRector::class,
 
-        // @todo move to "twig" group
-        Rector\Php84\Rector\Class_\DeprecatedAnnotationToDeprecatedAttributeRector::class,
-
-        // handle next
-        Rector\PHPUnit\PHPUnit120\Rector\Class_\AllowMockObjectsWithoutExpectationsAttributeRector::class,
+        \Rector\Php74\Rector\If_\IfToNullCoalescingAssignRector::class,
+        \Rector\TypeDeclaration\Rector\BooleanAnd\BinaryOpNullableToInstanceofRector::class,
+        \Rector\CodeQuality\Rector\If_\ObjectExplicitBoolCompareRector::class,
 
         Rector\Symfony\CodeQuality\Rector\Class_\LoadValidatorMetadataToAttributeRector::class,
         Utils\Rector\ModelGetRepositoryToRepositoryServiceRector::class => [
