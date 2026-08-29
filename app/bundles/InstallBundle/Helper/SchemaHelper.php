@@ -254,7 +254,7 @@ final class SchemaHelper
                             $sql[] = $this->platform->getDropSequenceSQL($sequence);
                         }
                     } catch (DBALException) {
-                        // ignore, nothing todo
+                        // suppress
                     }
                 }
             }
@@ -378,7 +378,7 @@ final class SchemaHelper
                                 $sql[] = $this->platform->getDropSequenceSQL($sequence);
                             }
                         } catch (DBALException) {
-                            // ignore, nothing todo
+                            // suppress
                         }
                     }
                 }
