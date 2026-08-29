@@ -58,9 +58,7 @@ final readonly class MigrationCommandSubscriber implements EventSubscriberInterf
 
             $tableName = $generatedColumn->getTableName();
 
-            if (!isset($groupedByTableName[$tableName])) {
-                $groupedByTableName[$tableName] = [];
-            }
+            $groupedByTableName[$tableName] ??= [];
 
             $groupedByTableName[$tableName][$generatedColumn->getColumnName()] = $generatedColumn;
         }

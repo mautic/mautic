@@ -217,9 +217,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         // make sure each group key is present
         $groups = ['core', 'social', 'personal', 'professional'];
         foreach ($groups as $g) {
-            if (!isset($array[$g])) {
-                $array[$g] = [];
-            }
+            $array[$g] ??= [];
         }
 
         return $array;
@@ -251,9 +249,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         // update existing values
         foreach ($fieldValues as &$groupFields) {
             foreach ($groupFields as $alias => &$field) {
-                if (!isset($field['value'])) {
-                    $field['value'] = null;
-                }
+                $field['value'] ??= null;
                 // Only update fields that are part of the passed $data array
                 if (array_key_exists($alias, $data)) {
                     $curValue = $field['value'];

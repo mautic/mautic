@@ -70,9 +70,7 @@ final class RoleModelTest extends TestCase
 
     private function createRoleModel(CorePermissions $security, ?Translator $translator = null): RoleModel
     {
-        if (null === $translator) {
-            $translator = $this->createMock(Translator::class);
-        }
+        $translator ??= $this->createMock(Translator::class);
 
         return new RoleModel(
             $this->createStub(EntityManagerInterface::class),

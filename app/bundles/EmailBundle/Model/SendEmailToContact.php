@@ -303,9 +303,7 @@ class SendEmailToContact
     protected function upEmailSentCount($emailId): void
     {
         // Up sent counts
-        if (!isset($this->emailSentCounts[$emailId])) {
-            $this->emailSentCounts[$emailId] = 0;
-        }
+        $this->emailSentCounts[$emailId] ??= 0;
 
         ++$this->emailSentCounts[$emailId];
     }

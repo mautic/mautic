@@ -30,9 +30,7 @@ final class YearStat implements StatInterface
     {
         $key = new \DateTime("{$this->year}-{$month}-01 00:00:00")->format('Y-m');
 
-        if (!isset($this->stats[$key])) {
-            $this->stats[$key] = new MonthStat($key);
-        }
+        $this->stats[$key] ??= new MonthStat($key);
 
         return $this->stats[$key];
     }

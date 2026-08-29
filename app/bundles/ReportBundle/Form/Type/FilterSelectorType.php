@@ -43,9 +43,7 @@ final class FilterSelectorType extends AbstractType
             $data   = $formEvent->getData();
             $column = $data['column'] ?? null;
             $form   = $formEvent->getForm();
-            if (null === $column) {
-                $column = array_key_first($options['filterList']);
-            }
+            $column ??= array_key_first($options['filterList']);
             $choices = $options['operatorList'][$column] ?? [];
 
             // Build a list of condition values

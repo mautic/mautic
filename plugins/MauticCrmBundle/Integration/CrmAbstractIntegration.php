@@ -413,9 +413,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         if (!empty($socialCache)) {
             // Update the social cache
             $leadSocialCache = $lead->getSocialCache();
-            if (!isset($leadSocialCache[$this->getName()])) {
-                $leadSocialCache[$this->getName()] = [];
-            }
+            $leadSocialCache[$this->getName()] ??= [];
             $leadSocialCache[$this->getName()] = array_merge($leadSocialCache[$this->getName()], $socialCache);
 
             // Check for activity while here

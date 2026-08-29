@@ -97,9 +97,7 @@ class SmsRepository extends CommonRepository
             ->from(Sms::class, 'e');
         $results = $q->getQuery()->getSingleResult(Query::HYDRATE_ARRAY);
 
-        if (!isset($results['sent_count'])) {
-            $results['sent_count'] = 0;
-        }
+        $results['sent_count'] ??= 0;
 
         return $results;
     }

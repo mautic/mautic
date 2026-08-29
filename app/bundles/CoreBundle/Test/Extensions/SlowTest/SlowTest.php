@@ -117,9 +117,7 @@ final class SlowTest implements Extension
 
         $class = $test->className();
 
-        if (!isset($this->classes[$class])) {
-            $this->classes[$class] = 0.0;
-        }
+        $this->classes[$class] ??= 0.0;
 
         $this->classes[$class] += $time;
     }

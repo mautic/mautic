@@ -37,9 +37,7 @@ class ReportDAO
 
     public function addObject(ObjectDAO $objectDAO): static
     {
-        if (!isset($this->objects[$objectDAO->getObject()])) {
-            $this->objects[$objectDAO->getObject()] = [];
-        }
+        $this->objects[$objectDAO->getObject()] ??= [];
 
         $this->objects[$objectDAO->getObject()][$objectDAO->getObjectId()] = $objectDAO;
 
@@ -54,9 +52,7 @@ class ReportDAO
      */
     public function remapObject($oldObjectName, $oldObjectId, $newObjectName, $newObjectId = null): void
     {
-        if (null === $newObjectId) {
-            $newObjectId = $oldObjectId;
-        }
+        $newObjectId ??= $oldObjectId;
 
         $this->remappedObjects[$oldObjectId] = new RemappedObjectDAO($this->integration, $oldObjectName, $oldObjectId, $newObjectName, $newObjectId);
     }

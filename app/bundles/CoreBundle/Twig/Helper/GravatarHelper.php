@@ -46,9 +46,7 @@ final readonly class GravatarHelper
 
         $url = 'https://www.gravatar.com/avatar/'.md5(strtolower(trim($email))).'?s='.$size;
 
-        if (null === $default) {
-            $default = $localDefault;
-        }
+        $default ??= $localDefault;
 
         $default = (str_contains($default, '.') && !str_starts_with($default, 'http')) ? UrlHelper::rel2abs($default) : $default;
 

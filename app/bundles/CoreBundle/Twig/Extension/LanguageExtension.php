@@ -25,9 +25,7 @@ final readonly class LanguageExtension
     #[AsTwigFilter(name: 'language_name')]
     public function getLanguageName(string $code, ?string $displayLocale = null): string
     {
-        if (null === $displayLocale) {
-            $displayLocale = $this->getCurrentUserLocale();
-        }
+        $displayLocale ??= $this->getCurrentUserLocale();
 
         try {
             return Languages::getName($code, $displayLocale) ?: $code;

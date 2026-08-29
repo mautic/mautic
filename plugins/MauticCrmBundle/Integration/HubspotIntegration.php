@@ -206,9 +206,7 @@ class HubspotIntegration extends CrmAbstractIntegration
      */
     protected function cleanPriorityFields(array $fieldsToUpdate, $objects = null)
     {
-        if (null === $objects) {
-            $objects = ['Leads', 'Contacts'];
-        }
+        $objects ??= ['Leads', 'Contacts'];
 
         if (isset($fieldsToUpdate['leadFields'])) {
             // Pass in the whole config

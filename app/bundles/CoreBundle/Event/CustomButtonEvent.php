@@ -45,9 +45,7 @@ final class CustomButtonEvent extends AbstractCustomRequestEvent
         }
 
         foreach ($buttons as $button) {
-            if (!isset($button['priority'])) {
-                $button['priority'] = 0;
-            }
+            $button['priority'] ??= 0;
 
             $this->buttons[$this->generateButtonKey($button)] = $button;
         }
@@ -67,9 +65,7 @@ final class CustomButtonEvent extends AbstractCustomRequestEvent
             return $this;
         }
 
-        if (!isset($button['priority'])) {
-            $button['priority'] = 0;
-        }
+        $button['priority'] ??= 0;
 
         $this->buttons[$this->generateButtonKey($button)] = $button;
 

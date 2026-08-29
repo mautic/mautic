@@ -32,12 +32,10 @@ final class ConnectionBuilder
      */
     private static function addTypeConnection($key, array $event): void
     {
-        if (!isset(self::$connectionRestrictions[$key])) {
-            self::$connectionRestrictions[$key] = [
-                'source' => self::$eventTypes,
-                'target' => self::$eventTypes,
-            ];
-        }
+        self::$connectionRestrictions[$key] ??= [
+            'source' => self::$eventTypes,
+            'target' => self::$eventTypes,
+        ];
 
         if (isset($event['connectionRestrictions'])) {
             foreach ($event['connectionRestrictions'] as $restrictionType => $restrictions) {

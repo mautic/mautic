@@ -105,9 +105,7 @@ final readonly class MenuHelper
      */
     public function render($menu, array $options = [], $renderer = null): string
     {
-        if (null === $renderer) {
-            $renderer = $menu;
-        }
+        $renderer ??= $menu;
         $options['menu'] = $menu;
 
         return $this->helper->render($menu, $options, $renderer);
