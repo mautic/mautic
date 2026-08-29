@@ -158,8 +158,8 @@ final class LeadStageLogRepository extends CommonRepository
         // Step 2: Delete only the conflicting source rows
         $connection->executeStatement(
             sprintf(
-                'DELETE FROM %s 
-             WHERE stage_id = :fromStageId 
+                'DELETE FROM %s
+             WHERE stage_id = :fromStageId
                AND lead_id IN (:conflictingLeads)',
                 $table
             ),
