@@ -200,7 +200,7 @@ final class OwnerSubscriberTest extends TestCase
     {
         $mockLeadRepository = $this->createMock(LeadRepository::class);
 
-        $mockLeadRepository->expects($this->atLeast(0))->method('getLeadOwner')
+        $mockLeadRepository->method('getLeadOwner')
             ->willReturnMap(
                 [
                     [1, ['id' => 1, 'email' => 'owner1@owner.com', 'first_name' => '', 'last_name' => '', 'signature' => 'owner 1']],

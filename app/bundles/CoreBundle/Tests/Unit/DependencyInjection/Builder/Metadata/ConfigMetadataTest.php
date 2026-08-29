@@ -21,7 +21,12 @@ final class ConfigMetadataTest extends TestCase
     {
         $this->metadata = $this->getMockBuilder(BundleMetadata::class)
             ->onlyMethods(['getDirectory'])
-            ->disableOriginalConstructor()
+            ->setConstructorArgs([[
+                'directory'         => '',
+                'namespace'         => '',
+                'bundle'            => '',
+                'symfonyBundleName' => '',
+            ]])
             ->getMock();
     }
 
