@@ -55,7 +55,7 @@ final class ExportSchedulerCommand extends Command
         }
 
         try {
-            if ($exportOption->getReportId()) {
+            if ($exportOption->getReportId() !== 0) {
                 $this->reportCleanup->cleanup($exportOption->getReportId());
             } else {
                 $this->reportCleanup->cleanupAll();

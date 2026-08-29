@@ -110,7 +110,7 @@ final class ProcessWebhookQueuesCommand extends Command
             );
         }
 
-        if (!count($webhooks)) {
+        if (count($webhooks) === 0) {
             $output->writeln('There are no published webhooks to process.');
 
             return Command::SUCCESS;

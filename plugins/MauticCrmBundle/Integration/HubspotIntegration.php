@@ -158,34 +158,32 @@ class HubspotIntegration extends CrmAbstractIntegration
         }
 
         try {
-            if ($this->isAuthorized()) {
-                if (!empty($hubspotObjects) && is_array($hubspotObjects)) {
-                    foreach ($hubspotObjects as $object) {
-                        // Check the cache first
-                        $settings['cache_suffix'] = $cacheSuffix = '.'.$object;
-                        if ($fields = parent::getAvailableLeadFields($settings)) {
-                            $hubsFields[$object] = $fields;
+            if ($this->isAuthorized() && (!empty($hubspotObjects) && is_array($hubspotObjects))) {
+                foreach ($hubspotObjects as $object) {
+                    // Check the cache first
+                    $settings['cache_suffix'] = $cacheSuffix = '.'.$object;
+                    if ($fields = parent::getAvailableLeadFields($settings)) {
+                        $hubsFields[$object] = $fields;
 
-                            continue;
-                        }
+                        continue;
+                    }
 
-                        $leadFields = $this->getApiHelper()->getLeadFields($object);
-                        if (isset($leadFields)) {
-                            foreach ($leadFields as $fieldInfo) {
-                                $hubsFields[$object][$fieldInfo['name']] = [
-                                    'type'     => 'string',
-                                    'label'    => $fieldInfo['label'],
-                                    'required' => ('email' === $fieldInfo['name']),
-                                ];
-                                if (!empty($fieldInfo['readOnlyValue'])) {
-                                    $hubsFields[$object][$fieldInfo['name']]['update_mautic'] = 1;
-                                    $hubsFields[$object][$fieldInfo['name']]['readOnly']      = 1;
-                                }
+                    $leadFields = $this->getApiHelper()->getLeadFields($object);
+                    if (isset($leadFields)) {
+                        foreach ($leadFields as $fieldInfo) {
+                            $hubsFields[$object][$fieldInfo['name']] = [
+                                'type'     => 'string',
+                                'label'    => $fieldInfo['label'],
+                                'required' => ('email' === $fieldInfo['name']),
+                            ];
+                            if (!empty($fieldInfo['readOnlyValue'])) {
+                                $hubsFields[$object][$fieldInfo['name']]['update_mautic'] = 1;
+                                $hubsFields[$object][$fieldInfo['name']]['readOnly']      = 1;
                             }
                         }
-
-                        $this->cache->set('leadFields'.$cacheSuffix, $hubsFields[$object]);
                     }
+
+                    $this->cache->set('leadFields'.$cacheSuffix, $hubsFields[$object]);
                 }
             }
         } catch (\Exception $e) {

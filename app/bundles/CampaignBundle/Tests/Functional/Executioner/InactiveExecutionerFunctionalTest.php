@@ -473,9 +473,9 @@ final class InactiveExecutionerFunctionalTest extends MauticMysqlTestCase
         $event->setEventType(Event::TYPE_ACTION);
         $event->setProperties(['points' => 10]);
         $event->setTriggerMode(Event::TRIGGER_MODE_IMMEDIATE);
-        $event->setOrder($parent ? 3 : 1);
+        $event->setOrder($parent instanceof \Mautic\CampaignBundle\Entity\Event ? 3 : 1);
 
-        if ($parent) {
+        if ($parent instanceof \Mautic\CampaignBundle\Entity\Event) {
             $event->setParent($parent);
             if ($decisionPath) {
                 $event->setDecisionPath($decisionPath);
@@ -498,9 +498,9 @@ final class InactiveExecutionerFunctionalTest extends MauticMysqlTestCase
             'value'    => '',
         ]);
         $event->setTriggerMode(Event::TRIGGER_MODE_IMMEDIATE);
-        $event->setOrder($parent ? 3 : 2);
+        $event->setOrder($parent instanceof \Mautic\CampaignBundle\Entity\Event ? 3 : 2);
 
-        if ($parent) {
+        if ($parent instanceof \Mautic\CampaignBundle\Entity\Event) {
             $event->setParent($parent);
         }
 

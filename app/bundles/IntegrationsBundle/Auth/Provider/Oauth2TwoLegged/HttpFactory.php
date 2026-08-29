@@ -120,7 +120,7 @@ final class HttpFactory implements AuthProviderInterface
 
     private function getReAuthClient(): ClientInterface
     {
-        if ($this->reAuthClient) {
+        if ($this->reAuthClient instanceof \GuzzleHttp\Client) {
             return $this->reAuthClient;
         }
 
@@ -169,7 +169,7 @@ final class HttpFactory implements AuthProviderInterface
 
     private function configureMiddleware(OAuth2Middleware $oauth): void
     {
-        if (!$this->config) {
+        if (!$this->config instanceof \Mautic\IntegrationsBundle\Auth\Provider\AuthConfigInterface) {
             return;
         }
 

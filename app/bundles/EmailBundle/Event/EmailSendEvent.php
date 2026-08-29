@@ -121,11 +121,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function getContent($replaceTokens = false)
     {
-        if (null !== $this->helper) {
-            $content = $this->helper->getBody();
-        } else {
-            $content = $this->content;
-        }
+        $content = null !== $this->helper ? $this->helper->getBody() : $this->content;
 
         return ($replaceTokens) ? str_replace(array_keys($this->getTokens()), $this->getTokens(), $content) : $content;
     }

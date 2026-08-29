@@ -201,7 +201,7 @@ class ObjectChangeGenerator
             $internalField = null;
         }
 
-        if (!$internalField) {
+        if (!$internalField instanceof \Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO) {
             $newValue = $this->valueHelper->getValueForMautic(
                 $integrationInformationChangeRequest->getNewValue(),
                 $fieldState,

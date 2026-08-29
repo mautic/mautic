@@ -203,7 +203,7 @@ class SubmissionEvent extends CommonEvent
 
     public function getActionConfig(): array
     {
-        return $this->action ? $this->action->getProperties() : [];
+        return $this->action instanceof \Mautic\FormBundle\Entity\Action ? $this->action->getProperties() : [];
     }
 
     /**

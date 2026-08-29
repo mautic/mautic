@@ -845,14 +845,7 @@ class Field implements UuidInterface
                 return false;
             }
         }
-
-        if ($displayManager && $displayManager->useProgressiveProfilingLimit()) {
-            if (!$displayManager->showForField($this)) {
-                return false;
-            }
-        }
-
-        return true;
+        return !($displayManager && $displayManager->useProgressiveProfilingLimit() && !$displayManager->showForField($this));
     }
 
     /**
@@ -862,7 +855,7 @@ class Field implements UuidInterface
      */
     public function showForConditionalField(array $data): bool
     {
-        if (!$parentField = $this->findParentFieldInForm()) {
+        if (!($parentField = $this->findParentFieldInForm()) instanceof \Mautic\FormBundle\Entity\Field) {
             return true;
         }
 

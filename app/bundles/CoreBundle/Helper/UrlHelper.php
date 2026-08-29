@@ -13,11 +13,7 @@ final class UrlHelper
     {
         $query     = parse_url($url, PHP_URL_QUERY);
 
-        if ($query) {
-            $appendQueryString = '&'.$appendQueryString;
-        } else {
-            $appendQueryString = '?'.$appendQueryString;
-        }
+        $appendQueryString = $query ? '&'.$appendQueryString : '?'.$appendQueryString;
 
         $anchorParts = explode('#', $url);
         // join url without anchor + $appendQueryString
@@ -143,7 +139,7 @@ final class UrlHelper
      */
     public static function sanitizeAbsoluteUrl(string $url): string
     {
-        if (!$url) {
+        if ($url === '' || $url === '0') {
             return $url;
         }
 

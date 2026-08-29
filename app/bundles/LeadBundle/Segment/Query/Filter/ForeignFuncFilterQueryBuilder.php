@@ -51,19 +51,17 @@ final class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
             $tableAlias = $this->generateRandomParameterName();
             if ($filterAggr) {
                 // No join needed, it is placed in exist/not exists
-            } else {
-                if ('companies' == $filter->getTable()) {
-                    $relTable = $this->generateRandomParameterName();
-                    $queryBuilder->leftJoin($leadsTableAlias, MAUTIC_TABLE_PREFIX.'companies_leads', $relTable, $relTable.'.lead_id = '.$leadsTableAlias.'.id');
-                    $queryBuilder->leftJoin($relTable, $filter->getTable(), $tableAlias, $tableAlias.'.id = '.$relTable.'.company_id');
-                } else { // This should never happen
-                    $queryBuilder->leftJoin(
-                        $leadsTableAlias,
-                        $filter->getTable(),
-                        $tableAlias,
-                        sprintf('%s.id = %s.lead_id', $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'), $tableAlias)
-                    );
-                }
+            } elseif ('companies' == $filter->getTable()) {
+                $relTable = $this->generateRandomParameterName();
+                $queryBuilder->leftJoin($leadsTableAlias, MAUTIC_TABLE_PREFIX.'companies_leads', $relTable, $relTable.'.lead_id = '.$leadsTableAlias.'.id');
+                $queryBuilder->leftJoin($relTable, $filter->getTable(), $tableAlias, $tableAlias.'.id = '.$relTable.'.company_id');
+            } else { // This should never happen
+                $queryBuilder->leftJoin(
+                    $leadsTableAlias,
+                    $filter->getTable(),
+                    $tableAlias,
+                    sprintf('%s.id = %s.lead_id', $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'), $tableAlias)
+                );
             }
         }
 

@@ -202,7 +202,7 @@ class GrapesJsBuilderModel extends AbstractCommonModel
 
     public function getGrapesJsFromEmailId(?int $emailId)
     {
-        if ($email = $this->emailModel->getEntity($emailId)) {
+        if (($email = $this->emailModel->getEntity($emailId)) instanceof \Mautic\EmailBundle\Entity\Email) {
             return $this->grapesJsBuilderRepository->findOneBy(['email' => $email]);
         }
     }

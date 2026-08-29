@@ -66,7 +66,7 @@ final readonly class FixtureHelper
         $event->setTriggerInterval($interval);
         $event->setTriggerIntervalUnit($intervalUnit);
         $event->setTriggerMode('interval');
-        if ($hour) {
+        if ($hour instanceof \DateTimeInterface) {
             $event->setTriggerHour($hour->format('H:i'));
         }
         $event->setProperties(

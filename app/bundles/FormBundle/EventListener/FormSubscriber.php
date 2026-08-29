@@ -258,10 +258,8 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         } catch (ClientException|ServerException $exception) {
             $this->parseResponse($exception->getResponse(), $matchedFields);
         } catch (\Exception $exception) {
-            if ($exception instanceof ValidationException) {
-                if ($violations = $exception->getViolations()) {
-                    throw $exception;
-                }
+            if ($exception instanceof ValidationException && $violations = $exception->getViolations()) {
+                throw $exception;
             }
 
             $email = $config['failure_email'];
@@ -404,7 +402,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         $this->mailer->setBody($config['message']);
         $this->mailer->parsePlainText($config['message']);
 
-        if ($lead) {
+        if ($lead instanceof \Mautic\LeadBundle\Entity\Lead) {
             $this->mailer->setLead($lead->getProfileFields(), $internalSend);
         }
     }

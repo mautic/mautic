@@ -61,11 +61,11 @@ class ImportCommand extends Command
 
         $this->processSignalService->registerSignalHandler(fn (int $signal) => $output->writeln(sprintf('Signal %d caught.', $signal)));
 
-        if ($id) {
+        if ($id !== 0) {
             $import = $this->importModel->getEntity($id);
 
             // This specific import was not found
-            if (!$import) {
+            if (!$import instanceof \Mautic\LeadBundle\Entity\Import) {
                 $output->writeln('<error>'.$this->translator->trans('mautic.core.error.notfound', [], 'flashes').'</error>');
 
                 return Command::FAILURE;

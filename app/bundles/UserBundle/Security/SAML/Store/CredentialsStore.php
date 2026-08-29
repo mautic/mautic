@@ -26,7 +26,7 @@ final class CredentialsStore implements CredentialStoreInterface
             return [];
         }
 
-        if (!$this->credentials) {
+        if (!$this->credentials instanceof \LightSaml\Credential\X509Credential) {
             $this->delegateAndCreateCredentials();
         }
 

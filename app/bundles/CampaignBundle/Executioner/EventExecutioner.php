@@ -49,7 +49,7 @@ class EventExecutioner
      */
     public function executeForContact(Event $event, Lead $contact, ?Responses $responses = null, ?Counter $counter = null): void
     {
-        if ($responses) {
+        if ($responses instanceof \Mautic\CampaignBundle\Executioner\Result\Responses) {
             $this->responses = $responses;
         }
 
@@ -66,7 +66,7 @@ class EventExecutioner
      */
     public function executeEventsForContact(ArrayCollection $events, Lead $contact, ?Responses $responses = null, ?Counter $counter = null): void
     {
-        if ($responses) {
+        if ($responses instanceof \Mautic\CampaignBundle\Executioner\Result\Responses) {
             $this->responses = $responses;
         }
 
@@ -116,7 +116,7 @@ class EventExecutioner
 
         $config = $this->collector->getEventConfig($event);
 
-        if ($counter) {
+        if ($counter instanceof \Mautic\CampaignBundle\Executioner\Result\Counter) {
             // Must pass $counter around rather than setting it as a class property as this class is used
             // circularly to process children of parent events thus counter must be kept track separately
             $counter->advanceExecuted($logs->count());
@@ -255,7 +255,7 @@ class EventExecutioner
 
             // Check if we need to schedule this if it is not an inactivity check
             if (!$isInactive && $this->scheduler->shouldScheduleEvent($event, $executionDate, $this->executionDate)) {
-                if ($childrenCounter) {
+                if ($childrenCounter instanceof \Mautic\CampaignBundle\Executioner\Result\Counter) {
                     $childrenCounter->advanceTotalScheduled($contacts->count());
                 }
 
@@ -272,7 +272,7 @@ class EventExecutioner
 
     private function persistLogs(ArrayCollection $logs): void
     {
-        if ($this->responses) {
+        if ($this->responses instanceof \Mautic\CampaignBundle\Executioner\Result\Responses) {
             // Extract responses
             $this->responses->setFromLogs($logs);
         }
@@ -322,7 +322,7 @@ class EventExecutioner
 
         $this->executeEventsForContacts($actions, $contacts, $childrenCounter);
 
-        if ($counter) {
+        if ($counter instanceof \Mautic\CampaignBundle\Executioner\Result\Counter) {
             $counter->advanceTotalEvaluated($childrenCounter->getTotalEvaluated());
             $counter->advanceTotalExecuted($childrenCounter->getTotalExecuted());
         }
@@ -344,7 +344,7 @@ class EventExecutioner
 
         $this->executeEventsForContacts($conditions, $contacts, $childrenCounter);
 
-        if ($counter) {
+        if ($counter instanceof \Mautic\CampaignBundle\Executioner\Result\Counter) {
             $counter->advanceTotalEvaluated($childrenCounter->getTotalEvaluated());
             $counter->advanceTotalExecuted($childrenCounter->getTotalExecuted());
         }
@@ -362,7 +362,7 @@ class EventExecutioner
         $this->executePositivePathEventsForContacts($event, $contacts->getPassed(), $childrenCounter);
         $this->executeNegativePathEventsForContacts($event, $contacts->getFailed(), $childrenCounter);
 
-        if ($counter) {
+        if ($counter instanceof \Mautic\CampaignBundle\Executioner\Result\Counter) {
             $counter->advanceTotalEvaluated($childrenCounter->getTotalEvaluated());
             $counter->advanceTotalExecuted($childrenCounter->getTotalExecuted());
         }

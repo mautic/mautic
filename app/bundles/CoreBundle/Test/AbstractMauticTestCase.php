@@ -202,7 +202,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $kernel      = static::getContainer()->get(KernelInterface::class);
         $application = new Application($kernel);
 
-        if ($command) {
+        if ($command instanceof \Symfony\Component\Console\Command\Command) {
             // Register the command
             $application->addCommand($command);
         } else {

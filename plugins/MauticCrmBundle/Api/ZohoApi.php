@@ -104,11 +104,7 @@ final class ZohoApi extends CrmApi
         }
 
         if ($id) {
-            if (is_array($id)) {
-                $params['id'] = implode(';', $id);
-            } else {
-                $params['id'] = $id;
-            }
+            $params['id'] = is_array($id) ? implode(';', $id) : $id;
 
             return $this->request($object, $params, 'GET', false, $settings);
         }

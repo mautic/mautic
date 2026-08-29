@@ -124,7 +124,7 @@ class TwilioTransport implements TransportInterface, MMSTransportInterface
      */
     private function configureClient(): void
     {
-        if ($this->client) {
+        if ($this->client instanceof \Twilio\Rest\Client) {
             // Already configured
             return;
         }

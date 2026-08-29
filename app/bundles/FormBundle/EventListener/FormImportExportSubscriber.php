@@ -55,7 +55,7 @@ final readonly class FormImportExportSubscriber implements EventSubscriberInterf
         $formId       = $event->getEntityId();
 
         $form = $this->formModel->getEntity($formId);
-        if (!$form) {
+        if (!$form instanceof \Mautic\FormBundle\Entity\Form) {
             return;
         }
 

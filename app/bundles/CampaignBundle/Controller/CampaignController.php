@@ -461,16 +461,13 @@ class CampaignController extends AbstractStandardFormController
         if ($isPost) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
-                if ($valid = $this->isFormValid($form)) {
-                    if ($valid = $this->beforeEntitySave($campaign, $form, 'new')) {
-                        $campaign->setDateModified(new \DateTime());
-                        $this->campaignModel->saveEntity($campaign);
-                        $this->afterEntitySave($campaign, $form, 'new', $valid);
-
-                        $viewParameters = ['objectId' => $campaign->getId(), 'objectAction' => 'view'];
-                        $returnUrl      = $this->generateUrl('mautic_campaign_action', $viewParameters);
-                        $template       = 'Mautic\CampaignBundle\Controller\CampaignController::viewAction';
-                    }
+                if (($valid = $this->isFormValid($form)) && $valid = $this->beforeEntitySave($campaign, $form, 'new')) {
+                    $campaign->setDateModified(new \DateTime());
+                    $this->campaignModel->saveEntity($campaign);
+                    $this->afterEntitySave($campaign, $form, 'new', $valid);
+                    $viewParameters = ['objectId' => $campaign->getId(), 'objectAction' => 'view'];
+                    $returnUrl      = $this->generateUrl('mautic_campaign_action', $viewParameters);
+                    $template       = 'Mautic\CampaignBundle\Controller\CampaignController::viewAction';
                 }
 
                 $this->afterFormProcessed($valid, $campaign, $form, 'new');
@@ -535,7 +532,7 @@ class CampaignController extends AbstractStandardFormController
                     'mautic_campaign_action',
                     [
                         'objectAction' => (!empty($valid) ? 'edit' : 'new'), // valid means a new form was applied
-                        'objectId'     => ($campaign) ? $campaign->getId() : 0,
+                        'objectId'     => ($campaign instanceof \Mautic\CampaignBundle\Entity\Campaign) ? $campaign->getId() : 0,
                     ]
                 ),
                 'validationError' => $this->getFormErrorForBuilder($form),
@@ -725,11 +722,7 @@ class CampaignController extends AbstractStandardFormController
     private function setCampaignElements(string|array $campaignElements, bool $isClone = false): void
     {
         // sets the global campaignElements
-        if (is_string($campaignElements)) {
-            $this->campaignElements = json_decode($campaignElements, true);
-        } else {
-            $this->campaignElements = $campaignElements;
-        }
+        $this->campaignElements = is_string($campaignElements) ? json_decode($campaignElements, true) : $campaignElements;
 
         // set added/updated events - comes from global campaignElements which was set above
         $this->setCampaignEvents();
@@ -783,10 +776,8 @@ class CampaignController extends AbstractStandardFormController
         // Build and set Event entities
         $this->campaignModel->setEvents($entity, $this->campaignEvents, $this->connections, $this->deletedEvents);
 
-        if ('edit' === $action && null !== $this->connections) {
-            if ([] !== $this->deletedEvents) {
-                $this->eventModel->deleteEvents($entity->getEvents()->toArray(), $this->deletedEvents);
-            }
+        if ('edit' === $action && null !== $this->connections && [] !== $this->deletedEvents) {
+            $this->eventModel->deleteEvents($entity->getEvents()->toArray(), $this->deletedEvents);
         }
 
         return true;

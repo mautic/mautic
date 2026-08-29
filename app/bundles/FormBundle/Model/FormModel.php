@@ -269,12 +269,10 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
 
                 $func = 'set'.ucfirst($f);
 
-                if ('properties' == $f) {
-                    if (isset($v['mappedFields'])) {
-                        foreach ($v['mappedFields'] as $pk => $pv) {
-                            if (str_contains($pv, 'new')) {
-                                $v['mappedFields'][$pk] = $fieldIds[$pv];
-                            }
+                if ('properties' == $f && isset($v['mappedFields'])) {
+                    foreach ($v['mappedFields'] as $pk => $pv) {
+                        if (str_contains($pv, 'new')) {
+                            $v['mappedFields'][$pk] = $fieldIds[$pv];
                         }
                     }
                 }
@@ -416,7 +414,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         // Use specific template or system-wide default theme
         $theme         = $entity->getTemplate() ?? $this->coreParametersHelper->get('theme');
         $submissions   = null;
-        $lead          = ($this->requestStack->getCurrentRequest()) ? $this->contactTracker->getContact() : null;
+        $lead          = ($this->requestStack->getCurrentRequest() instanceof \Symfony\Component\HttpFoundation\Request) ? $this->contactTracker->getContact() : null;
         $style         = '';
         $styleToRender = '@MauticForm/Builder/_style.html.twig';
         $formToRender  = '@MauticForm/Builder/form.html.twig';
@@ -497,17 +495,14 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
                 $pages['open'][$openFieldId] = $pageCount;
                 $openFieldId                 = false;
                 $lastPage                    = $fieldId;
-
                 // Close the page at the next page break
                 if ($previousId) {
                     $pages['close'][$previousId] = $pageCount;
 
                     ++$pageCount;
                 }
-            } else {
-                if (!$openFieldId) {
-                    $openFieldId = $fieldId;
-                }
+            } elseif (!$openFieldId) {
+                $openFieldId = $fieldId;
             }
 
             $previousId = $fieldId;
@@ -696,10 +691,8 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         $theme          = $form->getTemplate();
         $scriptToRender = '@MauticForm/Builder/_script.html.twig';
 
-        if (!empty($theme)) {
-            if ($this->twig->getLoader()->exists('@themes/'.$theme.'/MauticForm/Builder/_script.html.twig')) {
-                $scriptToRender = '@themes/'.$theme.'/MauticForm/Builder/_script.html.twig';
-            }
+        if (!empty($theme) && $this->twig->getLoader()->exists('@themes/'.$theme.'/MauticForm/Builder/_script.html.twig')) {
+            $scriptToRender = '@themes/'.$theme.'/MauticForm/Builder/_script.html.twig';
         }
 
         $script = $this->themeHelper->renderThemeTemplate(

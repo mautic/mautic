@@ -522,13 +522,11 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         if ('lead.company' === $type) {
             $column    = 'companyname';
             $filterVal = $filter;
+        } elseif (is_array($filter)) {
+            $column    = $filter[0];
+            $filterVal = $filter[1];
         } else {
-            if (is_array($filter)) {
-                $column    = $filter[0];
-                $filterVal = $filter[1];
-            } else {
-                $column = $filter;
-            }
+            $column = $filter;
         }
 
         $expr      = new ExpressionBuilder($this->em->getConnection());
@@ -575,13 +573,11 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                 if ('lead.company' === $type) {
                     $column    = 'companyname';
                     $filterVal = $filter;
+                } elseif (is_array($filter)) {
+                    $column    = $filter[0];
+                    $filterVal = $filter[1];
                 } else {
-                    if (is_array($filter)) {
-                        $column    = $filter[0];
-                        $filterVal = $filter[1];
-                    } else {
-                        $column = $filter;
-                    }
+                    $column = $filter;
                 }
 
                 $expr      = new ExpressionBuilder($this->em->getConnection());
@@ -991,7 +987,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         $entities = [];
         foreach ($ids as $companyId) {
             $company = $this->getEntity($companyId);
-            if ($company) {
+            if ($company instanceof \Mautic\LeadBundle\Entity\Company) {
                 $entities[$companyId] = $company;
                 $this->deleteEntity($company);
             }

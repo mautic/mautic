@@ -50,7 +50,7 @@ final readonly class DetermineWinnerSubscriber implements EventSubscriberInterfa
         if (null != $startDate) {
             $counts = ('page' === $type) ? $this->downloadRepository->getDownloadCountsByPage($ids, $startDate) : $this->downloadRepository->getDownloadCountsByEmail($ids, $startDate, $parent->getVariantEndDate());
 
-            if ($counts) {
+            if ($counts !== []) {
                 $downloads  = $support  = $data  = [];
                 $hasResults = [];
 
@@ -73,12 +73,10 @@ final readonly class DetermineWinnerSubscriber implements EventSubscriberInterfa
                 }
 
                 foreach ($children as $c) {
-                    if ($c->isPublished()) {
-                        if (!in_array($c->getId(), $hasResults)) {
-                            $data[$downloadsLabel][] = 0;
-                            $data[$hitsLabel][]      = 0;
-                            $support['labels'][]     = $c->getId().':'.(('page' === $type) ? $c->getTitle() : $c->getName()).' (0%)';
-                        }
+                    if ($c->isPublished() && !in_array($c->getId(), $hasResults)) {
+                        $data[$downloadsLabel][] = 0;
+                        $data[$hitsLabel][]      = 0;
+                        $support['labels'][]     = $c->getId().':'.(('page' === $type) ? $c->getTitle() : $c->getName()).' (0%)';
                     }
                 }
                 $support['data'] = $data;

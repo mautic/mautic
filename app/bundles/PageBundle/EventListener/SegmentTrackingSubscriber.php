@@ -41,7 +41,7 @@ final readonly class SegmentTrackingSubscriber implements EventSubscriberInterfa
         }
 
         $contactId = $lead->getId();
-        if (!$contactId) {
+        if ($contactId === 0) {
             return;
         }
 

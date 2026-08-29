@@ -210,17 +210,8 @@ class ReportModel extends FormModel implements GlobalSearchInterface
                     $this->reportBuilderData[$context]['tables'] = $tables;
                     $this->reportBuilderData[$context]['graphs'] = $graphs;
                 } else {
-                    if (isset($tables[$context])) {
-                        $this->reportBuilderData[$context]['tables'] = $tables[$context];
-                    } else {
-                        $this->reportBuilderData[$context]['tables'] = $tables;
-                    }
-
-                    if (isset($graphs[$context])) {
-                        $this->reportBuilderData[$context]['graphs'] = $graphs[$context];
-                    } else {
-                        $this->reportBuilderData[$context]['graphs'] = $graphs;
-                    }
+                    $this->reportBuilderData[$context]['tables'] = $tables[$context] ?? $tables;
+                    $this->reportBuilderData[$context]['graphs'] = $graphs[$context] ?? $graphs;
                 }
             }
         }

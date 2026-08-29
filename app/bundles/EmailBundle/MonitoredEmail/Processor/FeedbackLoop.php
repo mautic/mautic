@@ -34,7 +34,7 @@ class FeedbackLoop implements ProcessorInterface
 
         try {
             $parser = new Parser($this->message);
-            if (!$contactEmail = $parser->parse()) {
+            if ((($contactEmail = $parser->parse())) === '' || (($contactEmail = $parser->parse())) === '0') {
                 // A contact email was not found in the FBL report
                 return false;
             }

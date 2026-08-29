@@ -166,7 +166,7 @@ final readonly class CampaignActionJumpToEventSubscriber implements EventSubscri
             ],
         ]);
 
-        if (count($jumpToEvent)) {
+        if (count($jumpToEvent) > 0) {
             return $jumpToEvent[0];
         }
 

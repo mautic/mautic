@@ -173,7 +173,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         foreach ($ids as $id) {
             $entity = $this->getEntity($id);
 
-            if ($entity) {
+            if ($entity instanceof \Mautic\LeadBundle\Entity\LeadList) {
                 try {
                     $this->deleteEntity($entity);
                     $deleted[$id] = $entity;
@@ -421,7 +421,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
 
         $this->logger->info('Segment QB - No new leads for segment found');
 
-        if ($output) {
+        if ($output instanceof \Symfony\Component\Console\Output\OutputInterface) {
             $output->writeln($this->translator->trans('mautic.lead.list.rebuild.to_be_added', ['%leads%' => $leadCount, '%batch%' => $limit]));
         }
 
@@ -431,10 +431,10 @@ class ListModel extends FormModel implements GlobalSearchInterface
         // Try to save some memory
         gc_enable();
 
-        if ($leadCount) {
+        if ($leadCount !== 0) {
             $maxCount = $maxLeads ?: $leadCount;
 
-            if ($output) {
+            if ($output instanceof \Symfony\Component\Console\Output\OutputInterface) {
                 $progress = ProgressBarHelper::init($output, $maxCount);
                 $progress->start();
             }
@@ -486,7 +486,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 gc_collect_cycles();
 
                 if ($maxLeads && $leadsProcessed >= $maxLeads) {
-                    if ($output) {
+                    if ($output instanceof \Symfony\Component\Console\Output\OutputInterface) {
                         $progress->finish();
                         $output->writeln('');
                     }
@@ -495,7 +495,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 }
             }
 
-            if ($output) {
+            if ($output instanceof \Symfony\Component\Console\Output\OutputInterface) {
                 $progress->finish();
                 $output->writeln('');
             }
@@ -513,14 +513,14 @@ class ListModel extends FormModel implements GlobalSearchInterface
         $start     = 0;
         $leadCount = $orphanLeadsCount[$segmentId]['count'];
 
-        if ($output) {
+        if ($output instanceof \Symfony\Component\Console\Output\OutputInterface) {
             $output->writeln($this->translator->trans('mautic.lead.list.rebuild.to_be_removed', ['%leads%' => $leadCount, '%batch%' => $limit]));
         }
 
         if ($leadCount) {
             $maxCount = $maxLeads ?: $leadCount;
 
-            if ($output) {
+            if ($output instanceof \Symfony\Component\Console\Output\OutputInterface) {
                 $progress = ProgressBarHelper::init($output, $maxCount);
                 $progress->start();
             }
@@ -567,7 +567,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 gc_collect_cycles();
 
                 if ($maxLeads && $leadsProcessed >= $maxLeads) {
-                    if ($output) {
+                    if ($output instanceof \Symfony\Component\Console\Output\OutputInterface) {
                         $progress->finish();
                         $output->writeln('');
                     }
@@ -576,7 +576,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 }
             }
 
-            if ($output) {
+            if ($output instanceof \Symfony\Component\Console\Output\OutputInterface) {
                 $progress->finish();
                 $output->writeln('');
             }
@@ -1211,11 +1211,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 // BC support for old filters where the field existed outside of properties.
                 $filter = $eachFilter['properties']['filter'] ?? $eachFilter['filter'];
                 if ($filter && 'leadlist' === $eachFilter['type'] && in_array($segmentId, $filter)) {
-                    if ($returnProperty && $value = $accessor->getValue($entity, $returnProperty)) {
-                        $dependents[] = $value;
-                    } else {
-                        $dependents[] = $entity;
-                    }
+                    $dependents[] = $returnProperty && ($value = $accessor->getValue($entity, $returnProperty)) ? $value : $entity;
                     break;
                 }
             }

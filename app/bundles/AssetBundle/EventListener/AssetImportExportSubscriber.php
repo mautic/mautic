@@ -50,7 +50,7 @@ final readonly class AssetImportExportSubscriber implements EventSubscriberInter
 
         $assetId = $event->getEntityId();
         $asset   = $this->assetModel->getEntity($assetId);
-        if (!$asset) {
+        if (!$asset instanceof \Mautic\AssetBundle\Entity\Asset) {
             return;
         }
 
@@ -65,8 +65,8 @@ final readonly class AssetImportExportSubscriber implements EventSubscriberInter
             'remote_path'            => $asset->getRemotePath(),
             'original_file_name'     => $asset->getOriginalFileName(),
             'lang'                   => $asset->getLanguage(),
-            'publish_up'             => $asset->getPublishUp() ? $asset->getPublishUp()->format(DATE_ATOM) : null,
-            'publish_down'           => $asset->getPublishDown() ? $asset->getPublishDown()->format(DATE_ATOM) : null,
+            'publish_up'             => $asset->getPublishUp() instanceof \DateTimeInterface ? $asset->getPublishUp()->format(DATE_ATOM) : null,
+            'publish_down'           => $asset->getPublishDown() instanceof \DateTimeInterface ? $asset->getPublishDown()->format(DATE_ATOM) : null,
             'extension'              => $asset->getExtension(),
             'mime'                   => $asset->getMime(),
             'size'                   => (int) $asset->getSize(),

@@ -179,7 +179,7 @@ final class ResumeStuckCampaignCommand extends Command
 
         foreach ($groupedEvents as $eventId => $dateGroups) {
             $event = $this->eventModel->getEntity($eventId);
-            if (!$event) {
+            if (!$event instanceof \Mautic\CampaignBundle\Entity\Event) {
                 $output->writeln('<error>Event with ID '.$eventId.' not found.</error>');
                 continue;
             }
@@ -289,7 +289,7 @@ final class ResumeStuckCampaignCommand extends Command
         $contacts = [];
         foreach ($eventData['contact_ids'] as $contactId) {
             $contact = $this->leadModel->getEntity($contactId);
-            if ($contact) {
+            if ($contact instanceof \Mautic\LeadBundle\Entity\Lead) {
                 $contacts[] = $contact;
             }
         }

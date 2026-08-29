@@ -136,7 +136,7 @@ final class ReportController extends FormController
     {
         $entity = $this->reportModel->getEntity($objectId);
 
-        if ($entity) {
+        if ($entity instanceof \Mautic\ReportBundle\Entity\Report) {
             if (!$this->security->isGranted('report:reports:create')
                 || !$this->security->hasEntityAccess(
                     'report:reports:viewown',
@@ -578,16 +578,13 @@ final class ReportController extends FormController
         }
 
         $dateRangeForm = $this->formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
-        if ('POST' === $request->getMethod() && $request->request->has('daterange')) {
-            if ($this->isFormValid($dateRangeForm)) {
-                $to                         = new \DateTime($dateRangeForm['date_to']->getData());
-                $dateRangeValues['date_to'] = $to->format($mysqlFormat);
-                $session->set('mautic.report.date.to', $dateRangeValues['date_to']);
-
-                $from                         = new \DateTime($dateRangeForm['date_from']->getData());
-                $dateRangeValues['date_from'] = $from->format($mysqlFormat);
-                $session->set('mautic.report.date.from', $dateRangeValues['date_from']);
-            }
+        if ('POST' === $request->getMethod() && $request->request->has('daterange') && $this->isFormValid($dateRangeForm)) {
+            $to                         = new \DateTime($dateRangeForm['date_to']->getData());
+            $dateRangeValues['date_to'] = $to->format($mysqlFormat);
+            $session->set('mautic.report.date.to', $dateRangeValues['date_to']);
+            $from                         = new \DateTime($dateRangeForm['date_from']->getData());
+            $dateRangeValues['date_from'] = $from->format($mysqlFormat);
+            $session->set('mautic.report.date.from', $dateRangeValues['date_from']);
         }
 
         // Setup dynamic filters

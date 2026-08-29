@@ -50,7 +50,7 @@ final readonly class GroupImportExportSubscriber implements EventSubscriberInter
 
         $pointGroupId = $event->getEntityId();
         $pointGroup   = $this->pointGroupModel->getEntity($pointGroupId);
-        if (!$pointGroup) {
+        if (!$pointGroup instanceof \Mautic\PointBundle\Entity\Group) {
             return;
         }
 

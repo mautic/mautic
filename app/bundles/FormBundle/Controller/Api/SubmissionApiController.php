@@ -131,7 +131,7 @@ final class SubmissionApiController extends CommonApiController
     {
         $form = $this->formModel->getEntity($formId);
 
-        if (!$form) {
+        if (!$form instanceof \Mautic\FormBundle\Entity\Form) {
             return $this->notFound();
         }
 

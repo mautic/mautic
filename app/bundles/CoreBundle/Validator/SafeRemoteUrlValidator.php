@@ -38,13 +38,14 @@ final class SafeRemoteUrlValidator extends ConstraintValidator
             return true;
         }
 
-        if (!$domain = $this->parseDomain($url)) {
+        if ((($domain = $this->parseDomain($url))) === '' || (($domain = $this->parseDomain($url))) === '0') {
             return false;
         }
 
         $allowedDomains = array_map(strtolower(...), $this->coreParametersHelper->get('allowed_remote_domains'));
+        $siteDomain = $this->parseDomain((string) $this->coreParametersHelper->get('site_url'));
 
-        if ($siteDomain = $this->parseDomain((string) $this->coreParametersHelper->get('site_url'))) {
+        if ($siteDomain !== '' && $siteDomain !== '0') {
             $allowedDomains[] = $siteDomain;
         }
 

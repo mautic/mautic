@@ -154,11 +154,7 @@ final class oAuthHelper
                     // what the server expects when creating the signature
                     $k = $key;
                 }
-                if ($encode) {
-                    $normalized[] = $this->encode($k).'="'.$this->encode($v).'"';
-                } else {
-                    $normalized[] = $k.'='.$v;
-                }
+                $normalized[] = $encode ? $this->encode($k).'="'.$this->encode($v).'"' : $k.'='.$v;
             }
         }
 

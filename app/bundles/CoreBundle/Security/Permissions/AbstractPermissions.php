@@ -110,24 +110,22 @@ abstract class AbstractPermissions
 
         if (!in_array($bundle, $permissionLevels)) {
             $permissionLevels[$bundle] = [];
-            if (isset($permissions[$bundle])) {
-                if ($this->isEnabled()) {
-                    foreach ($permissions[$bundle] as $details) {
-                        $permName    = $details['name'];
-                        $permBitwise = $details['bitwise'];
-                        // ensure the permission still exists
-                        if ($this->isSupported($permName)) {
-                            $levels = $this->permissions[$permName];
-                            // ensure that at least keys exist
-                            $permissionLevels[$bundle][$permName] = [];
-                            // $permissionLevels[$bundle][$permName]["$bundle:$permName"] = $permId;
-                            foreach ($levels as $levelName => $levelBit) {
-                                // compare bit against levels to see if it is a match
-                                if ($levelBit & $permBitwise) {
-                                    // bitwise compares so add the level
-                                    $permissionLevels[$bundle][$permName][] = $levelName;
-                                    continue;
-                                }
+            if (isset($permissions[$bundle]) && $this->isEnabled()) {
+                foreach ($permissions[$bundle] as $details) {
+                    $permName    = $details['name'];
+                    $permBitwise = $details['bitwise'];
+                    // ensure the permission still exists
+                    if ($this->isSupported($permName)) {
+                        $levels = $this->permissions[$permName];
+                        // ensure that at least keys exist
+                        $permissionLevels[$bundle][$permName] = [];
+                        // $permissionLevels[$bundle][$permName]["$bundle:$permName"] = $permId;
+                        foreach ($levels as $levelName => $levelBit) {
+                            // compare bit against levels to see if it is a match
+                            if ($levelBit & $permBitwise) {
+                                // bitwise compares so add the level
+                                $permissionLevels[$bundle][$permName][] = $levelName;
+                                continue;
                             }
                         }
                     }

@@ -27,15 +27,15 @@ trait CreateTestEntitiesTrait
         $lead = new Lead();
         $lead->setFirstname($firstName);
 
-        if ($lastName) {
+        if ($lastName !== '' && $lastName !== '0') {
             $lead->setLastname($lastName);
         }
 
-        if ($emailId) {
+        if ($emailId !== '' && $emailId !== '0') {
             $lead->setEmail($emailId);
         }
 
-        if ($createdBy) {
+        if ($createdBy instanceof \Mautic\UserBundle\Entity\User) {
             $lead->setCreatedBy($createdBy);
         }
 

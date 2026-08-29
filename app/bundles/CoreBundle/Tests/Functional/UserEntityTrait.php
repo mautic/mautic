@@ -59,7 +59,7 @@ trait UserEntityTrait
         $user->setFirstName($firstName);
         $user->setLastName($lastName);
 
-        if ($role) {
+        if ($role instanceof \Mautic\UserBundle\Entity\Role) {
             $user->setRole($role);
         }
 

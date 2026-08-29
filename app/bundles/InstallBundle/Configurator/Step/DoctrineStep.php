@@ -98,10 +98,8 @@ final class DoctrineStep implements StepInterface
 
         if (!class_exists('\PDO')) {
             $messages[] = 'mautic.install.pdo.mandatory';
-        } else {
-            if (!in_array('mysql', \PDO::getAvailableDrivers(), true)) {
-                $messages[] = 'mautic.install.pdo.drivers';
-            }
+        } elseif (!in_array('mysql', \PDO::getAvailableDrivers(), true)) {
+            $messages[] = 'mautic.install.pdo.drivers';
         }
 
         return $messages;

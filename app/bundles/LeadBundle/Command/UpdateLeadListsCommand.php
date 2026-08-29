@@ -97,7 +97,7 @@ final class UpdateLeadListsCommand extends ModeratedCommand
         if ($id) {
             $list = $this->listModel->getEntity($id);
 
-            if (!$list) {
+            if (!$list instanceof \Mautic\LeadBundle\Entity\LeadList) {
                 $output->writeln('<error>'.$this->translator->trans('mautic.lead.list.rebuild.not_found', ['%id%' => $id]).'</error>');
 
                 return Command::FAILURE;
@@ -210,7 +210,7 @@ final class UpdateLeadListsCommand extends ModeratedCommand
                     }
 
                     $dependentLeadList = $this->listModel->getEntity($dependentListId);
-                    if (!$dependentLeadList) {
+                    if (!$dependentLeadList instanceof \Mautic\LeadBundle\Entity\LeadList) {
                         continue; // Skip if the dependent segment doesn't exist - it may have been deleted
                     }
 

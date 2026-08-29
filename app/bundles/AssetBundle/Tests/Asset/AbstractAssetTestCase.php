@@ -74,7 +74,7 @@ abstract class AbstractAssetTestCase extends MauticMysqlTestCase
         if (($assetData['storage'] ?? 'local') === 'local') {
             $asset->setPath($assetData['path'] ?? basename($this->csvPath));
             $asset->setExtension($assetData['extension'] ?? pathinfo($this->csvPath, PATHINFO_EXTENSION));
-            $asset->setSize($this->csvPath ? filesize($this->csvPath) : 0);
+            $asset->setSize($this->csvPath !== '' && $this->csvPath !== '0' ? filesize($this->csvPath) : 0);
         } else {
             $asset->setRemotePath($assetData['path'] ?? '');
             $asset->setExtension($assetData['extension'] ?? '');

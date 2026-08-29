@@ -746,7 +746,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         if ($socialIdentity = $this->getFirstSocialIdentity()) {
             return $socialIdentity;
         }
-        if (count($ips = $this->ipAddresses)) {
+        if (count($ips = $this->ipAddresses) > 0) {
             return $ips->first()->getIpAddress();
         }
 
@@ -798,7 +798,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      */
     public function adjustPoints($points, $operator = self::POINTS_ADD): static
     {
-        if (!$points = (int) $points) {
+        if ((($points = (int) $points)) === 0) {
             return $this;
         }
 
@@ -906,7 +906,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $event->setDelta($pointChanges);
         $event->setIpAddress($ip);
         $event->setLead($this);
-        if ($group) {
+        if ($group instanceof \Mautic\PointBundle\Entity\Group) {
             $event->setGroup($group);
         }
         $this->addPointsChangeLog($event);

@@ -47,17 +47,15 @@ final readonly class ConfigSubscriber implements EventSubscriberInterface
                     $data['monitored_email'][$key]['password'] = $monitoredEmail[$key]['password'];
                 }
 
-                if ('general' != $key) {
-                    if (empty($monitor['host']) || empty($monitor['address']) || empty($monitor['folder'])) {
-                        // Reset to defaults
-                        $data['monitored_email'][$key]['override_settings'] = 0;
-                        $data['monitored_email'][$key]['address']           = null;
-                        $data['monitored_email'][$key]['host']              = null;
-                        $data['monitored_email'][$key]['user']              = null;
-                        $data['monitored_email'][$key]['password']          = null;
-                        $data['monitored_email'][$key]['encryption']        = '/ssl';
-                        $data['monitored_email'][$key]['port']              = '993';
-                    }
+                if ('general' != $key && (empty($monitor['host']) || empty($monitor['address']) || empty($monitor['folder']))) {
+                    // Reset to defaults
+                    $data['monitored_email'][$key]['override_settings'] = 0;
+                    $data['monitored_email'][$key]['address']           = null;
+                    $data['monitored_email'][$key]['host']              = null;
+                    $data['monitored_email'][$key]['user']              = null;
+                    $data['monitored_email'][$key]['password']          = null;
+                    $data['monitored_email'][$key]['encryption']        = '/ssl';
+                    $data['monitored_email'][$key]['port']              = '993';
                 }
             }
         }

@@ -70,7 +70,7 @@ final class PostCountModel extends AbstractCommonModel
         $postCounts = $this->postCountRepository->getEntities($args);
 
         // if there isn't anything then create it
-        if (!count($postCounts)) {
+        if (count($postCounts) === 0) {
             /** @var PostCount $postCount */
             $postCount = $this->getEntity();
             $postCount->setMonitor($monitor);

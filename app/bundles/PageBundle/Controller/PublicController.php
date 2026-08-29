@@ -124,7 +124,7 @@ final class PublicController extends AbstractFormController
             // First determine the A/B test to display if applicable
             if (!$userAccess) {
                 // Check to see if a variant should be shown versus the parent but ignore if a user is previewing
-                if (count($childrenVariants)) {
+                if (count($childrenVariants) > 0) {
                     $variants      = [];
                     $variantWeight = 0;
                     $totalHits     = $entity->getVariantHits();
@@ -228,13 +228,10 @@ final class PublicController extends AbstractFormController
                     );
                     \assert($translatedEntity instanceof Page);
 
-                    if ($translatedEntity !== $entity) {
-                        if (!$request->get('ntrd', 0)) {
-                            $url = $model->generateUrl($translatedEntity, false);
-                            $model->hitPage($entity, $request, 302, $lead, $query);
-
-                            return $this->redirect($url, Response::HTTP_FOUND);
-                        }
+                    if ($translatedEntity !== $entity && !$request->get('ntrd', 0)) {
+                        $url = $model->generateUrl($translatedEntity, false);
+                        $model->hitPage($entity, $request, 302, $lead, $query);
+                        return $this->redirect($url, Response::HTTP_FOUND);
                     }
                 }
             }
@@ -291,7 +288,7 @@ final class PublicController extends AbstractFormController
         }
 
         $contactId = (int) $request->query->get('contactId');
-        if ($contactId) {
+        if ($contactId !== 0) {
             $contact = $leadModel->getEntity($contactId);
         }
         $draftEnabled = $pageConfig->isDraftEnabled();
@@ -401,7 +398,7 @@ final class PublicController extends AbstractFormController
         return new JsonResponse(
             [
                 'success'   => 1,
-                'id'        => ($lead) ? $lead->getId() : null,
+                'id'        => ($lead instanceof \Mautic\LeadBundle\Entity\Lead) ? $lead->getId() : null,
                 'sid'       => $trackingId,
                 'device_id' => $trackingId,
                 'events'    => $event->getResponse()->all(),
@@ -476,7 +473,7 @@ final class PublicController extends AbstractFormController
                     $isHitTrackable = $pageModel->hitPage($redirect, $request, 200, $lead);
                 }
 
-                if ($lead) {
+                if ($lead instanceof \Mautic\LeadBundle\Entity\Lead) {
                     try {
                         $emailId = (int) (ClickthroughHelper::decodeArrayFromUrl($ct)['email'] ?? null);
                     } catch (InvalidDecodedStringException) {
@@ -540,7 +537,7 @@ final class PublicController extends AbstractFormController
             $trackedDevice = $trackedDeviceService->getTrackedDevice();
             $trackingId    = (null === $trackedDevice ? null : $trackedDevice->getTrackingId());
             $data          = [
-                'id'        => ($lead) ? $lead->getId() : null,
+                'id'        => ($lead instanceof \Mautic\LeadBundle\Entity\Lead) ? $lead->getId() : null,
                 'sid'       => $trackingId,
                 'device_id' => $trackingId,
             ];

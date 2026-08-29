@@ -160,11 +160,7 @@ class SendEmailToContact
      */
     public function send(): void
     {
-        if ($this->mailer->inTokenizationMode()) {
-            [$success, $errors] = $this->queueTokenizedEmail();
-        } else {
-            [$success, $errors] = $this->sendStandardEmail();
-        }
+        [$success, $errors] = $this->mailer->inTokenizationMode() ? $this->queueTokenizedEmail() : $this->sendStandardEmail();
 
         // queue or send the message
         if (!$success) {

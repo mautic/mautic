@@ -203,7 +203,7 @@ final class ResultController extends CommonFormController
     {
         $submission             = $this->submissionResultLoader->getSubmissionWithResult($submissionId);
 
-        if (!$submission) {
+        if (!$submission instanceof \Mautic\FormBundle\Entity\Submission) {
             throw $this->createNotFoundException();
         }
 

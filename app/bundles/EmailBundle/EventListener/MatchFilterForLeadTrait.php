@@ -34,10 +34,8 @@ trait MatchFilterForLeadTrait
                 if (empty($primaryCompany)) {
                     continue;
                 }
-            } else {
-                if (!array_key_exists($data['field'] ?? '', $lead)) {
-                    continue;
-                }
+            } elseif (!array_key_exists($data['field'] ?? '', $lead)) {
+                continue;
             }
 
             /*
@@ -131,18 +129,10 @@ trait MatchFilterForLeadTrait
 
             switch ($data['operator']) {
                 case '=':
-                    if ('boolean' === $data['type']) {
-                        $groups[$groupNum] = $leadVal === $filterVal;
-                    } else {
-                        $groups[$groupNum] = $leadVal == $filterVal;
-                    }
+                    $groups[$groupNum] = 'boolean' === $data['type'] ? $leadVal === $filterVal : $leadVal == $filterVal;
                     break;
                 case '!=':
-                    if ('boolean' === $data['type']) {
-                        $groups[$groupNum] = $leadVal !== $filterVal;
-                    } else {
-                        $groups[$groupNum] = $leadVal != $filterVal;
-                    }
+                    $groups[$groupNum] = 'boolean' === $data['type'] ? $leadVal !== $filterVal : $leadVal != $filterVal;
                     break;
                 case 'gt':
                     $groups[$groupNum] = $leadVal > $filterVal;

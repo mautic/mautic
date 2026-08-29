@@ -51,7 +51,7 @@ final readonly class CustomFieldImportExportSubscriber implements EventSubscribe
         $leadFieldId = $event->getEntityId();
         $leadField   = $this->fieldModel->getEntity($leadFieldId);
 
-        if (!$leadField) {
+        if (!$leadField instanceof \Mautic\LeadBundle\Entity\LeadField) {
             return;
         }
 

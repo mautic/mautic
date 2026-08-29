@@ -807,7 +807,7 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
     {
         $nonActionCount = 0;
         foreach ($logs as $log) {
-            if ((int) $log['non_action_path_taken']) {
+            if ((int) $log['non_action_path_taken'] !== 0) {
                 ++$nonActionCount;
             }
         }

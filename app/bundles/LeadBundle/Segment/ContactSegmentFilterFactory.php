@@ -59,7 +59,7 @@ final class ContactSegmentFilterFactory
                         'filter'       => $factorSegmentFilter,
                     ];
                 }
-                if ($factorSegmentFilter) {
+                if ($factorSegmentFilter instanceof \Mautic\LeadBundle\Segment\ContactSegmentFilter) {
                     $factorSegmentFilter->contactSegmentFilterCrate->setMergedProperty($mergedProperty);
                     $contactSegmentFilters->addContactSegmentFilter($factorSegmentFilter);
                 }

@@ -143,16 +143,13 @@ class BuilderEvent extends Event
      */
     public function tokensRequested($tokenKeys = null): bool
     {
-        if ($requested = $this->getRequested('tokens')) {
-            if (!empty($this->tokenFilter) && 'token' === $this->tokenFilterTarget) {
-                if (!is_array($tokenKeys)) {
-                    $tokenKeys = [$tokenKeys];
-                }
-                $found = array_any($tokenKeys, fn ($token): bool => 0 === stripos($token, $this->tokenFilter));
-
-                if (!$found) {
-                    $requested = false;
-                }
+        if (($requested = $this->getRequested('tokens')) && (!empty($this->tokenFilter) && 'token' === $this->tokenFilterTarget)) {
+            if (!is_array($tokenKeys)) {
+                $tokenKeys = [$tokenKeys];
+            }
+            $found = array_any($tokenKeys, fn ($token): bool => 0 === stripos($token, $this->tokenFilter));
+            if (!$found) {
+                $requested = false;
             }
         }
 

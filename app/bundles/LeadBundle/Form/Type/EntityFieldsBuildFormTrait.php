@@ -65,11 +65,7 @@ trait EntityFieldsBuildFormTrait
                 $attr['data-unique-identifier'] = $field['alias'];
             }
 
-            if ($isObject) {
-                $value = $fieldValues[$group][$alias]['value'] ?? $field['defaultValue'];
-            } else {
-                $value = $fieldValues[$alias] ?? '';
-            }
+            $value = $isObject ? $fieldValues[$group][$alias]['value'] ?? $field['defaultValue'] : $fieldValues[$alias] ?? '';
 
             $constraints = [];
             if ($required && empty($options['ignore_required_constraints'])) {
@@ -87,12 +83,7 @@ trait EntityFieldsBuildFormTrait
 
             switch ($type) {
                 case NumberType::class:
-                    if (empty($properties['scale'])) {
-                        $properties['scale'] = null;
-                    } // ensure default locale is used
-                    else {
-                        $properties['scale'] = (int) $properties['scale'];
-                    }
+                    $properties['scale'] = empty($properties['scale']) ? null : (int) $properties['scale'];
 
                     if ('' === $value) {
                         // Prevent transform errors

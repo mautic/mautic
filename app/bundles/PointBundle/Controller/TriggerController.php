@@ -201,39 +201,36 @@ final class TriggerController extends FormController
         // Check for a submitted form and process it
         if ('POST' === $request->getMethod()) {
             $valid = false;
-            if (!$cancelled = $this->isFormCancelled($form)) {
-                if ($valid = $this->isFormValid($form)) {
-                    // only save events that are not to be deleted
-                    $events = array_diff_key($addEvents, array_flip($deletedEvents));
+            if (!$cancelled = $this->isFormCancelled($form) && $valid = $this->isFormValid($form)) {
+                // only save events that are not to be deleted
+                $events = array_diff_key($addEvents, array_flip($deletedEvents));
+                // make sure that at least one action is selected
+                if ([] === $events) {
+                    // set the error
+                    $form->addError(new FormError(
+                        $this->translator->trans('mautic.core.value.required', [], 'validators')
+                    ));
+                    $valid = false;
+                } else {
+                    $this->triggerModel->setEvents($entity, $events);
 
-                    // make sure that at least one action is selected
-                    if ([] === $events) {
-                        // set the error
-                        $form->addError(new FormError(
-                            $this->translator->trans('mautic.core.value.required', [], 'validators')
-                        ));
-                        $valid = false;
-                    } else {
-                        $this->triggerModel->setEvents($entity, $events);
+                    $this->triggerModel->saveEntity($entity);
 
-                        $this->triggerModel->saveEntity($entity);
+                    $this->addFlashMessage('mautic.core.notice.created', [
+                        '%name%'      => $entity->getName(),
+                        '%menu_link%' => 'mautic_pointtrigger_index',
+                        '%url%'       => $this->generateUrl('mautic_pointtrigger_action', [
+                            'objectAction' => 'edit',
+                            'objectId'     => $entity->getId(),
+                        ]),
+                    ]);
 
-                        $this->addFlashMessage('mautic.core.notice.created', [
-                            '%name%'      => $entity->getName(),
-                            '%menu_link%' => 'mautic_pointtrigger_index',
-                            '%url%'       => $this->generateUrl('mautic_pointtrigger_action', [
-                                'objectAction' => 'edit',
-                                'objectId'     => $entity->getId(),
-                            ]),
-                        ]);
+                    if (!$this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
+                        // unset the clone session.
+                        $this->clearSessionComponents($request, $sessionId);
 
-                        if (!$this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
-                            // unset the clone session.
-                            $this->clearSessionComponents($request, $sessionId);
-
-                            // return edit view so that all the session stuff is loaded
-                            return $this->editAction($request, $entity->getId(), true);
-                        }
+                        // return edit view so that all the session stuff is loaded
+                        return $this->editAction($request, $entity->getId(), true);
                     }
                 }
             }
@@ -364,7 +361,7 @@ final class TriggerController extends FormController
                         $this->triggerModel->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                         // delete entities
-                        if (count($deletedEvents)) {
+                        if (count($deletedEvents) > 0) {
                             $this->triggerEventModel->deleteEntities($deletedEvents);
                         }
 

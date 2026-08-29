@@ -100,7 +100,7 @@ class LeadListRepository extends CommonRepository
                 ->setParameter('true', true, 'boolean');
         }
 
-        if ($user) {
+        if ($user instanceof \Mautic\UserBundle\Entity\User) {
             $q->andWhere($q->expr()->eq('l.isGlobal', ':true'));
             $q->orWhere('l.createdBy = :user');
             $q->setParameter('user', $user->getId());

@@ -95,7 +95,7 @@ final class IdToEntityModelTransformer implements DataTransformerInterface
             'ignore_paginator' => true,
         ]);
 
-        if (!count($entities)) {
+        if (count($entities) === 0) {
             throw new TransformationFailedException(sprintf('Entities with a/an '.$this->id.' of "%s" does not exist!', json_encode($id)));
         }
 

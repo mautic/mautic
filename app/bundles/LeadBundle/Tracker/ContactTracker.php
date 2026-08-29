@@ -52,7 +52,7 @@ class ContactTracker
             return null;
         }
 
-        if ($systemContact = $this->getSystemContact()) {
+        if (($systemContact = $this->getSystemContact()) instanceof \Mautic\LeadBundle\Entity\Lead) {
             return $systemContact;
         }
         if ($this->isUserSession()) {
@@ -64,7 +64,7 @@ class ContactTracker
             $this->generateTrackingCookies();
         }
 
-        if ($request = $this->getRequest()) {
+        if (($request = $this->getRequest()) instanceof \Symfony\Component\HttpFoundation\Request) {
             $this->logger->debug('CONTACT: Tracking session for contact ID# '.$this->trackedContact->getId().' through '.$request->getMethod().' '.$request->getRequestUri());
         }
 
@@ -108,7 +108,7 @@ class ContactTracker
         $this->trackedContact->setLastActive(new \DateTime());
 
         // If for whatever reason this contact has not been saved yet, don't generate tracking cookies
-        if (!$trackedContact->getId()) {
+        if ($trackedContact->getId() === 0) {
             // Delete existing cookies to prevent tracking as someone else
             $this->deviceTracker->clearTrackingCookies();
 
@@ -193,7 +193,7 @@ class ContactTracker
         $event = new LeadGetCurrentEvent($this->getRequest());
         $this->dispatcher->dispatch($event);
 
-        if ($contact = $event->getContact()) {
+        if (($contact = $event->getContact()) instanceof \Mautic\LeadBundle\Entity\Lead) {
             return $contact;
         }
 
@@ -272,7 +272,7 @@ class ContactTracker
         $lead = new Lead();
         $lead->setNewlyCreated(true);
 
-        if ($ip) {
+        if ($ip instanceof \Mautic\CoreBundle\Entity\IpAddress) {
             $lead->addIpAddress($ip);
         }
 
@@ -324,11 +324,9 @@ class ContactTracker
             "CONTACT: Tracking code changed from {$previouslyTrackedId} for contact ID# {$previouslyTrackedContact->getId()} to {$newTrackingId} for contact ID# {$this->trackedContact->getId()}"
         );
 
-        if (null !== $previouslyTrackedId) {
-            if ($this->dispatcher->hasListeners(LeadEvents::CURRENT_LEAD_CHANGED)) {
-                $event = new LeadChangeEvent($previouslyTrackedContact, $previouslyTrackedId, $this->trackedContact, $newTrackingId);
-                $this->dispatcher->dispatch($event, LeadEvents::CURRENT_LEAD_CHANGED);
-            }
+        if (null !== $previouslyTrackedId && $this->dispatcher->hasListeners(LeadEvents::CURRENT_LEAD_CHANGED)) {
+            $event = new LeadChangeEvent($previouslyTrackedContact, $previouslyTrackedId, $this->trackedContact, $newTrackingId);
+            $this->dispatcher->dispatch($event, LeadEvents::CURRENT_LEAD_CHANGED);
         }
     }
 

@@ -311,7 +311,7 @@ class StatRepository extends CommonRepository
                 ->setParameter('true', true, 'boolean');
         }
 
-        if ($chartQuery) {
+        if ($chartQuery instanceof \Mautic\CoreBundle\Helper\Chart\ChartQuery) {
             if ('is_read' === $column) {
                 $chartQuery->applyDateFilters($q, 'date_read', 's');
             } else {

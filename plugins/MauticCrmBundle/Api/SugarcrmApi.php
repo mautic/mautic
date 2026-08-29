@@ -369,11 +369,7 @@ final class SugarcrmApi extends CrmApi
 
                         $module_names[] = $object;
                         $module_ids[]   = $sugarId;
-                        if ('Contacts' == $object) {
-                            $link_field_names[] = 'mtc_webactivities_contacts';
-                        } else {
-                            $link_field_names[] = 'mtc_webactivities_leads';
-                        }
+                        $link_field_names[] = 'Contacts' == $object ? 'mtc_webactivities_contacts' : 'mtc_webactivities_leads';
                         ++$nbLeads;
                         foreach ($records['records'] as $record) {
                             $name_value_lists[] = [];
@@ -394,24 +390,18 @@ final class SugarcrmApi extends CrmApi
                     ];
                     $resp2 = $this->request('set_relationships', $parameters, 'POST', $object);
                 }
-            } else {
+            } elseif (!empty($resp)) {
                 // Sugar 7 set relationship
-                if (!empty($resp)) {
-                    $nbAct = 0;
-                    foreach ($activity as $sugarId => $records) {
-                        if ('Contacts' == $object) {
-                            $link_field_name = 'mtc_webactivities_contacts';
-                        } else {
-                            $link_field_name = 'mtc_webactivities_leads';
-                        }
-                        foreach ($records['records'] as $record) {
-                            if (!isset($resp[$nbAct]['contents']['id'])) {
-                                continue;
-                            } // current Web activity was not created
-                            $wa_id = $resp[$nbAct]['contents']['id'];
-                            $resp2 = $this->request("mtc_WebActivities/{$wa_id}/link/{$link_field_name}/{$sugarId}", [], 'POST');
-                            ++$nbAct;
-                        }
+                $nbAct = 0;
+                foreach ($activity as $sugarId => $records) {
+                    $link_field_name = 'Contacts' == $object ? 'mtc_webactivities_contacts' : 'mtc_webactivities_leads';
+                    foreach ($records['records'] as $record) {
+                        if (!isset($resp[$nbAct]['contents']['id'])) {
+                            continue;
+                        } // current Web activity was not created
+                        $wa_id = $resp[$nbAct]['contents']['id'];
+                        $resp2 = $this->request("mtc_WebActivities/{$wa_id}/link/{$link_field_name}/{$sugarId}", [], 'POST');
+                        ++$nbAct;
                     }
                 }
             }
@@ -452,11 +442,7 @@ final class SugarcrmApi extends CrmApi
             ];
             $data = $this->request('get_entry_list', $parameters, 'GET', 'Users');
 
-            if (isset($query['type']) && 'BYEMAIL' == $query['type']) {
-                $type = 'BYEMAIL';
-            } else {
-                $type = 'BYID';
-            }
+            $type = isset($query['type']) && 'BYEMAIL' == $query['type'] ? 'BYEMAIL' : 'BYID';
 
             $res = [];
             if (isset($data['entry_list'])) {
@@ -501,11 +487,7 @@ final class SugarcrmApi extends CrmApi
         ];
         $data = $this->request('Users/filter', $parameters, 'GET', 'Users');
 
-        if (isset($query['type']) && 'BYEMAIL' == $query['type']) {
-            $type = 'BYEMAIL';
-        } else {
-            $type = 'BYID';
-        }
+        $type = isset($query['type']) && 'BYEMAIL' == $query['type'] ? 'BYEMAIL' : 'BYID';
         $res = [];
         if (isset($data['records'])) {
             foreach ($data['records'] as $record) {
@@ -579,7 +561,6 @@ final class SugarcrmApi extends CrmApi
 
         if ('6' == $tokenData['version']) {
             $result = [];
-
             if ([] !== $fields) {
                 $qry = [];
                 if (isset($query['start'])) {
@@ -635,59 +616,56 @@ final class SugarcrmApi extends CrmApi
 
                 return $this->request('get_entry_list', $parameters, 'GET', $object);
             }
-        } else {
-            if ([] !== $fields) {
-                $q      = '';
-                $qry    = [];
-                $filter = [];
-                if (isset($query['start'])) {
-                    $filter[] = ['date_modified' => ['$gte' => $query['start']]];
-                    // $qry[] = ' '.strtolower($object).".date_modified >= '".$query['start']."' ";
-                }
-                if (isset($query['end'])) {
-                    $filter[] = ['date_modified' => ['$lte' => $query['end']]];
-                    // $qry[] = ' '.strtolower($object).".date_modified <= '".$query['end']."' ";
-                }
-                if (isset($query['email'])) {
-                    $filter[] = ['email' => ['$equals' => $query['email']]];
-                    // $qry[]    = " leads.id IN (SELECT bean_id FROM email_addr_bean_rel eabr JOIN email_addresses ea ON (eabr.email_address_id = ea.id) WHERE bean_module = 'Leads' AND ea.email_address = '".$query['email']."' AND eabr.deleted=0) ";
-                    $fields[] = 'contact_id';
-                }
-                if (isset($query['checkemail'])) {
-                    $filter[] = ['email' => ['$in' => $query['checkemail']]];
-                    $filter[] = ['deleted' => '0'];
-                    $fields   = []; // Do not need previous fields
-                    $fields[] = 'contact_id';
-                    $fields[] = 'deleted';
-                }
-                if (isset($query['checkemail_contacts'])) {
-                    $filter[] = ['email' => ['$in' => $query['checkemail_contacts']]];
-                    $filter[] = ['deleted' => '0'];
-                    $fields   = []; // Do not need previous fields
-                    $fields[] = 'deleted';
-                }
-                $fields[] = 'id';
-                $fields[] = 'date_modified';
-                $fields[] = 'date_entered';
-                $fields[] = 'assigned_user_id';
-                $fields[] = 'email1';
-                if ('Accounts' !== $object) {
-                    $fields[] = 'account_id';
-                }
-                // $filter_args = ['filter' => [['$and' => $filter]]];
-                // $fields_arg  = implode(',', $fields);
-                $parameters = [
-                    //                     'order_by'                 => '',
-                    'filter'  => [['$and' => $filter]],
-                    'offset'  => $query['offset'],
-                    'fields'  => implode(',', $fields),
-                    'max_num' => $query['max_results'],
-                    // 'deleted'     => 0,
-                    // 'favorites'   => false,
-                ];
-
-                return $this->request("{$object}/filter", $parameters, 'GET', $object);
+        } elseif ([] !== $fields) {
+            $q      = '';
+            $qry    = [];
+            $filter = [];
+            if (isset($query['start'])) {
+                $filter[] = ['date_modified' => ['$gte' => $query['start']]];
+                // $qry[] = ' '.strtolower($object).".date_modified >= '".$query['start']."' ";
             }
+            if (isset($query['end'])) {
+                $filter[] = ['date_modified' => ['$lte' => $query['end']]];
+                // $qry[] = ' '.strtolower($object).".date_modified <= '".$query['end']."' ";
+            }
+            if (isset($query['email'])) {
+                $filter[] = ['email' => ['$equals' => $query['email']]];
+                // $qry[]    = " leads.id IN (SELECT bean_id FROM email_addr_bean_rel eabr JOIN email_addresses ea ON (eabr.email_address_id = ea.id) WHERE bean_module = 'Leads' AND ea.email_address = '".$query['email']."' AND eabr.deleted=0) ";
+                $fields[] = 'contact_id';
+            }
+            if (isset($query['checkemail'])) {
+                $filter[] = ['email' => ['$in' => $query['checkemail']]];
+                $filter[] = ['deleted' => '0'];
+                $fields   = []; // Do not need previous fields
+                $fields[] = 'contact_id';
+                $fields[] = 'deleted';
+            }
+            if (isset($query['checkemail_contacts'])) {
+                $filter[] = ['email' => ['$in' => $query['checkemail_contacts']]];
+                $filter[] = ['deleted' => '0'];
+                $fields   = []; // Do not need previous fields
+                $fields[] = 'deleted';
+            }
+            $fields[] = 'id';
+            $fields[] = 'date_modified';
+            $fields[] = 'date_entered';
+            $fields[] = 'assigned_user_id';
+            $fields[] = 'email1';
+            if ('Accounts' !== $object) {
+                $fields[] = 'account_id';
+            }
+            // $filter_args = ['filter' => [['$and' => $filter]]];
+            // $fields_arg  = implode(',', $fields);
+            $parameters = [
+                //                     'order_by'                 => '',
+                'filter'  => [['$and' => $filter]],
+                'offset'  => $query['offset'],
+                'fields'  => implode(',', $fields),
+                'max_num' => $query['max_results'],
+                // 'deleted'     => 0,
+                // 'favorites'   => false,
+            ];
+            return $this->request("{$object}/filter", $parameters, 'GET', $object);
         }
     }
 }

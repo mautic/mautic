@@ -213,10 +213,10 @@ class FocusModel extends FormModel implements GlobalSearchInterface
 
         // Form has to be generated outside of the content or else the form src
         // will be converted to clickables
-        $fields             = $form ? $form->getFields()->toArray() : [];
+        $fields             = $form instanceof \Mautic\FormBundle\Entity\Form ? $form->getFields()->toArray() : [];
         [$pages, $lastPage] = $this->formModel->getPages($fields);
         $displayManager     = $viewOnlyFields = null;
-        if ($form) {
+        if ($form instanceof \Mautic\FormBundle\Entity\Form) {
             $viewOnlyFields = $this->formModel->getCustomComponents()['viewOnlyFields'];
             $displayManager = new DisplayManager($form, !empty($viewOnlyFields) ? $viewOnlyFields : []);
         }
@@ -236,7 +236,7 @@ class FocusModel extends FormModel implements GlobalSearchInterface
             ]
         ) : '';
 
-        if ($form) {
+        if ($form instanceof \Mautic\FormBundle\Entity\Form) {
             $formName = $form->generateFormName("{$form->getName()}_focus", ['_']);
             $this->formModel->populateValuesWithLead($form, $formContent, $formName);
         }
@@ -432,7 +432,7 @@ class FocusModel extends FormModel implements GlobalSearchInterface
             $this->trackableModel->getTrackableByUrl($linkUrl, 'focus', $focus->getId()),
             [
                 'channel' => ['focus', $focus->getId()],
-                'lead'    => $lead ? $lead->getId() : null,
+                'lead'    => $lead instanceof \Mautic\LeadBundle\Entity\Lead ? $lead->getId() : null,
             ],
             false,
             $focus->getUtmTags()

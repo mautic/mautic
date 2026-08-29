@@ -94,69 +94,67 @@ final class FieldController extends CommonFormController
         }
 
         // Check for a submitted form and process it
-        if ('POST' === $method) {
-            if (!$cancelled = $this->isFormCancelled($form)) {
-                if ($valid = $this->isFormValid($form)) {
-                    $success = 1;
+        if ('POST' === $method && !$cancelled = $this->isFormCancelled($form)) {
+            if ($valid = $this->isFormValid($form)) {
+                $success = 1;
 
-                    // form is valid so process the data
-                    $keyId = 'new'.hash('sha1', uniqid(mt_rand()));
+                // form is valid so process the data
+                $keyId = 'new'.hash('sha1', uniqid(mt_rand()));
 
-                    // save the properties to session
-                    $fields          = $session->get('mautic.form.'.$formId.'.fields.modified', []);
-                    $formData        = $form->getData();
-                    $formField       = array_merge($formField, $formData);
-                    $formField['id'] = $keyId;
+                // save the properties to session
+                $fields          = $session->get('mautic.form.'.$formId.'.fields.modified', []);
+                $formData        = $form->getData();
+                $formField       = array_merge($formField, $formData);
+                $formField['id'] = $keyId;
 
-                    // Get aliases in order to generate a new one for the new field
-                    $aliases = [];
-                    foreach ($fields as $f) {
-                        $aliases[] = $f['alias'];
+                // Get aliases in order to generate a new one for the new field
+                $aliases = [];
+                foreach ($fields as $f) {
+                    $aliases[] = $f['alias'];
+                }
+
+                // Generate or ensure a unique alias
+                $alias          = empty($formField['alias']) ? $formField['label'] : $formField['alias'];
+                $formField['alias'] = $this->formFieldModel->generateAlias($alias, $aliases);
+
+                // Force required for captcha if not a honeypot
+                if ('captcha' == $formField['type']) {
+                    $formField['isRequired'] = !empty($formField['properties']['captcha']);
+                }
+
+                // Add field before the submit button
+                if (count($fields) > 0) {
+                    $submitKey   = null;
+                    $submitField = null;
+
+                    foreach ($fields as $key => $field) {
+                        if (isset($field['type']) && 'button' === $field['type']) {
+                            $submitKey   = $key;
+                            $submitField = $field;
+                            break;
+                        }
                     }
 
-                    // Generate or ensure a unique alias
-                    $alias          = empty($formField['alias']) ? $formField['label'] : $formField['alias'];
-                    $formField['alias'] = $this->formFieldModel->generateAlias($alias, $aliases);
-
-                    // Force required for captcha if not a honeypot
-                    if ('captcha' == $formField['type']) {
-                        $formField['isRequired'] = !empty($formField['properties']['captcha']);
-                    }
-
-                    // Add field before the submit button
-                    if (count($fields)) {
-                        $submitKey   = null;
-                        $submitField = null;
-
-                        foreach ($fields as $key => $field) {
-                            if (isset($field['type']) && 'button' === $field['type']) {
-                                $submitKey   = $key;
-                                $submitField = $field;
-                                break;
-                            }
-                        }
-
-                        if ($submitKey) {
-                            // Remove submit button, add new field, re-add submit button at the end
-                            unset($fields[$submitKey]);
-                            $fields[$keyId]     = $formField;
-                            $fields[$submitKey] = $submitField;
-                        } else {
-                            $fields[$keyId] = $formField;
-                        }
+                    if ($submitKey) {
+                        // Remove submit button, add new field, re-add submit button at the end
+                        unset($fields[$submitKey]);
+                        $fields[$keyId]     = $formField;
+                        $fields[$submitKey] = $submitField;
                     } else {
                         $fields[$keyId] = $formField;
                     }
-
-                    $session->set('mautic.form.'.$formId.'.fields.modified', $fields);
-
-                    // Keep track of used lead fields
-                    if (!empty($formField['mappedObject']) && !empty($formField['mappedField']) && empty($formData['parent'])) {
-                        $this->alreadyMappedFieldCollector->addField($formId, $formField['mappedObject'], $formField['mappedField']);
-                    }
                 } else {
-                    $success = 0;
+                    $fields[$keyId] = $formField;
                 }
+
+                $session->set('mautic.form.'.$formId.'.fields.modified', $fields);
+
+                // Keep track of used lead fields
+                if (!empty($formField['mappedObject']) && !empty($formField['mappedField']) && empty($formData['parent'])) {
+                    $this->alreadyMappedFieldCollector->addField($formId, $formField['mappedObject'], $formField['mappedField']);
+                }
+            } else {
+                $success = 0;
             }
         }
 
@@ -249,47 +247,45 @@ final class FieldController extends CommonFormController
             $form = $this->getFieldForm($formId, $formField);
 
             // Check for a submitted form and process it
-            if ('POST' === $method) {
-                if (!$cancelled = $this->isFormCancelled($form)) {
-                    if ($valid = $this->isFormValid($form)) {
-                        $success = 1;
+            if ('POST' === $method && !$cancelled = $this->isFormCancelled($form)) {
+                if ($valid = $this->isFormValid($form)) {
+                    $success = 1;
 
-                        // form is valid so process the data
+                    // form is valid so process the data
 
-                        // save the properties to session
-                        $session  = $request->getSession();
-                        $fields   = $session->get('mautic.form.'.$formId.'.fields.modified');
-                        $formData = $form->getData();
+                    // save the properties to session
+                    $session  = $request->getSession();
+                    $fields   = $session->get('mautic.form.'.$formId.'.fields.modified');
+                    $formData = $form->getData();
 
-                        // overwrite with updated data
-                        $formField = array_merge($fields[$objectId], $formData);
+                    // overwrite with updated data
+                    $formField = array_merge($fields[$objectId], $formData);
 
-                        if (str_contains((string) $objectId, 'new')) {
-                            // Get aliases in order to generate update for this one
-                            $aliases = [];
-                            foreach ($fields as $k => $f) {
-                                if ($k != $objectId) {
-                                    $aliases[] = $f['alias'];
-                                }
+                    if (str_contains((string) $objectId, 'new')) {
+                        // Get aliases in order to generate update for this one
+                        $aliases = [];
+                        foreach ($fields as $k => $f) {
+                            if ($k != $objectId) {
+                                $aliases[] = $f['alias'];
                             }
-                            $formField['alias'] = $this->formFieldModel->generateAlias(
-                                $formField['alias'] ?? $formField['label'] ?? '',
-                                $aliases
-                            );
                         }
+                        $formField['alias'] = $this->formFieldModel->generateAlias(
+                            $formField['alias'] ?? $formField['label'] ?? '',
+                            $aliases
+                        );
+                    }
 
-                        // Force required for captcha if not a honeypot
-                        if ('captcha' == $formField['type']) {
-                            $formField['isRequired'] = !empty($formField['properties']['captcha']);
-                        }
+                    // Force required for captcha if not a honeypot
+                    if ('captcha' == $formField['type']) {
+                        $formField['isRequired'] = !empty($formField['properties']['captcha']);
+                    }
 
-                        $fields[$objectId] = $formField;
-                        $session->set('mautic.form.'.$formId.'.fields.modified', $fields);
+                    $fields[$objectId] = $formField;
+                    $session->set('mautic.form.'.$formId.'.fields.modified', $fields);
 
-                        // Keep track of used lead fields
-                        if (!empty($formField['mappedObject']) && !empty($formField['mappedField']) && empty($formData['parent'])) {
-                            $this->alreadyMappedFieldCollector->addField($formId, $formField['mappedObject'], $formField['mappedField']);
-                        }
+                    // Keep track of used lead fields
+                    if (!empty($formField['mappedObject']) && !empty($formField['mappedField']) && empty($formData['parent'])) {
+                        $this->alreadyMappedFieldCollector->addField($formId, $formField['mappedObject'], $formField['mappedField']);
                     }
                 }
             }

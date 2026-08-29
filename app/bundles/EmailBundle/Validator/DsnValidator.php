@@ -31,7 +31,7 @@ final class DsnValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, DsnConstraint::class);
         }
 
-        if (!$value) {
+        if ($value === '' || $value === '0') {
             return;
         }
 

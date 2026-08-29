@@ -68,7 +68,7 @@ class RelationsHelper
         $relObject        = $this->findInternalObject($mappingManualDao, $relationObject->getRelObjectName(), $relObjectDao);
         $internalObjectId = (int) $relObject->getObjectId();
 
-        if ($internalObjectId) {
+        if ($internalObjectId !== 0) {
             return $internalObjectId;
         }
 

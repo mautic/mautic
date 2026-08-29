@@ -132,7 +132,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
             $fixed
         );
 
-        if (!$fixed) {
+        if ($fixed === 0) {
             $content = str_replace('</head>', "<title>{$subject}</title></head>", $content);
         }
 
@@ -206,11 +206,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
         // In owner-mailer mode, use the owner's signature for display/send generation.
         if ($email && $email->getUseOwnerAsMailer() && is_array($lead)) {
             $this->fromEmailHelper->getFromAddressConsideringOwner($this->fromEmailHelper->getFrom($email), $lead, $email);
-            if ($this->fromEmailHelper->hasSignature()) {
-                $signatureText = $this->fromEmailHelper->getSignature();
-            } else {
-                $signatureText = '';
-            }
+            $signatureText = $this->fromEmailHelper->hasSignature() ? $this->fromEmailHelper->getSignature() : '';
         } else {
             $fromName      = $this->coreParametersHelper->get('mailer_from_name') ?? '';
             $signatureText = str_replace('|FROM_NAME|', $fromName, nl2br($signatureText));
@@ -303,10 +299,10 @@ final class BuilderSubscriber implements EventSubscriberInterface
         [$content, $trackables] = $this->convertedContent[$cacheKey];
         [$html, $text]          = $content;
 
-        if ($html) {
+        if ($html !== '' && $html !== '0') {
             $event->setContent($html);
         }
-        if ($text) {
+        if ($text !== '' && $text !== '0') {
             $event->setPlainText($text);
         }
 

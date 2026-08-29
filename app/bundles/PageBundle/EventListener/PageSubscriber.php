@@ -118,15 +118,12 @@ final readonly class PageSubscriber implements EventSubscriberInterface
 
         // Get scripts to insert before a custom tag
         $params = $event->getParams();
-        if (count($params) > 0) {
-            if (isset($params['custom_tag']) && $customTag = $params['custom_tag']) {
-                ob_start();
-                $this->assetsHelper->outputScripts('customTag');
-                $bodyCustomTag = ob_get_clean();
-
-                if ($bodyCustomTag) {
-                    $content = str_ireplace($customTag, $bodyCustomTag."\n".$customTag, $content);
-                }
+        if (count($params) > 0 && (isset($params['custom_tag']) && $customTag = $params['custom_tag'])) {
+            ob_start();
+            $this->assetsHelper->outputScripts('customTag');
+            $bodyCustomTag = ob_get_clean();
+            if ($bodyCustomTag) {
+                $content = str_ireplace($customTag, $bodyCustomTag."\n".$customTag, $content);
             }
         }
 

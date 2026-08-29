@@ -203,32 +203,30 @@ final class TagController extends FormController
         }
 
         $valid = false;
-        if (!$cancelled = $this->isFormCancelled($form)) {
-            if ($valid = $this->isFormValid($form)) {
-                // form is valid so process the data
-                $found = $this->tagRepository->countOccurrences($tag->getTag());
-                if (0 !== $found) {
-                    $valid = false;
-                    $this->addFlashMessage('mautic.core.notice.updated', [
-                        '%name%'      => $tag->getTag(),
-                        '%menu_link%' => 'mautic_tagmanager_index',
-                        '%url%'       => $this->generateUrl('mautic_tagmanager_action', [
-                            'objectAction' => 'edit',
-                            'objectId'     => $tag->getId(),
-                        ]),
-                    ]);
-                } else {
-                    $this->tagManagerModel->saveEntity($tag);
+        if (!$cancelled = $this->isFormCancelled($form) && $valid = $this->isFormValid($form)) {
+            // form is valid so process the data
+            $found = $this->tagRepository->countOccurrences($tag->getTag());
+            if (0 !== $found) {
+                $valid = false;
+                $this->addFlashMessage('mautic.core.notice.updated', [
+                    '%name%'      => $tag->getTag(),
+                    '%menu_link%' => 'mautic_tagmanager_index',
+                    '%url%'       => $this->generateUrl('mautic_tagmanager_action', [
+                        'objectAction' => 'edit',
+                        'objectId'     => $tag->getId(),
+                    ]),
+                ]);
+            } else {
+                $this->tagManagerModel->saveEntity($tag);
 
-                    $this->addFlashMessage('mautic.core.notice.created', [
-                        '%name%'      => $tag->getTag(),
-                        '%menu_link%' => 'mautic_tagmanager_index',
-                        '%url%'       => $this->generateUrl('mautic_tagmanager_action', [
-                            'objectAction' => 'edit',
-                            'objectId'     => $tag->getId(),
-                        ]),
-                    ]);
-                }
+                $this->addFlashMessage('mautic.core.notice.created', [
+                    '%name%'      => $tag->getTag(),
+                    '%menu_link%' => 'mautic_tagmanager_index',
+                    '%url%'       => $this->generateUrl('mautic_tagmanager_action', [
+                        'objectAction' => 'edit',
+                        'objectId'     => $tag->getId(),
+                    ]),
+                ]);
             }
         }
 
@@ -409,7 +407,7 @@ final class TagController extends FormController
         $tag = $this->leadTagModel->getEntity($tagId);
 
         // Check if exists
-        if (!$tag) {
+        if (!$tag instanceof \Mautic\LeadBundle\Entity\Tag) {
             throw new EntityNotFoundException(sprintf('Tag with id %d not found.', $tagId));
         }
 

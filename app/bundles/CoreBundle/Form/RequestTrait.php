@@ -120,7 +120,7 @@ trait RequestTrait
                     // Prevent zero based date placeholders
                     $dateTest = (int) str_replace(['/', '-', ' '], '', $params[$name]);
 
-                    if (!$dateTest) {
+                    if ($dateTest === 0) {
                         // Date placeholder was used so just ignore it to allow import of the field
                         unset($params[$name]);
                         break;
@@ -189,7 +189,7 @@ trait RequestTrait
             case 'time':
                 // Prevent zero based date placeholders
                 $dateTest = (int) str_replace(['/', '-', ' '], '', $fieldData[$leadField['alias']]);
-                if (!$dateTest) {
+                if ($dateTest === 0) {
                     // Date placeholder was used so just ignore it to allow import of the field
                     unset($fieldData[$leadField['alias']]);
                 } else {

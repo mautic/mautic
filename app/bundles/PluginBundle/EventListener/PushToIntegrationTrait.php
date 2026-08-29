@@ -50,21 +50,17 @@ trait PushToIntegrationTrait
             }
 
             $personIds = null;
-            if (method_exists($service, 'pushLead')) {
-                if (!$personIds = $service->resetLastIntegrationError()->pushLead($lead, $config)) {
-                    $success = false;
-                    if ($error = $service->getLastIntegrationError()) {
-                        $errors[] = $error;
-                    }
+            if (method_exists($service, 'pushLead') && !$personIds = $service->resetLastIntegrationError()->pushLead($lead, $config)) {
+                $success = false;
+                if ($error = $service->getLastIntegrationError()) {
+                    $errors[] = $error;
                 }
             }
 
-            if ($success && $integrationCampaign && method_exists($service, 'pushLeadToCampaign')) {
-                if (!$service->resetLastIntegrationError()->pushLeadToCampaign($lead, $integrationCampaign, $integrationMemberStatus)) {
-                    $success = false;
-                    if ($error = $service->getLastIntegrationError()) {
-                        $errors[] = $error;
-                    }
+            if ($success && $integrationCampaign && method_exists($service, 'pushLeadToCampaign') && !$service->resetLastIntegrationError()->pushLeadToCampaign($lead, $integrationCampaign, $integrationMemberStatus)) {
+                $success = false;
+                if ($error = $service->getLastIntegrationError()) {
+                    $errors[] = $error;
                 }
             }
         }

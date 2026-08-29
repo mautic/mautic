@@ -44,7 +44,7 @@ final readonly class DetermineWinnerSubscriber implements EventSubscriberInterfa
             // get their bounce rates
             $counts = $this->statRepository->getOpenedRates($ids, $startDate, $parent->getVariantEndDate());
 
-            if ($counts) {
+            if ($counts !== []) {
                 $rates      = $support      = $data      = [];
                 $hasResults = [];
 
@@ -71,13 +71,11 @@ final readonly class DetermineWinnerSubscriber implements EventSubscriberInterfa
                 }
 
                 foreach ($children as $c) {
-                    if ($c->isPublished()) {
-                        if (!in_array($c->getId(), $hasResults)) {
-                            // make sure that parent and published children are included
-                            $support['labels'][]                                            = $c->getName().' (0%)';
-                            $data[$this->translator->trans('mautic.email.abtest.label.opened')][] = 0;
-                            $data[$this->translator->trans('mautic.email.abtest.label.sent')][]   = 0;
-                        }
+                    if ($c->isPublished() && !in_array($c->getId(), $hasResults)) {
+                        // make sure that parent and published children are included
+                        $support['labels'][]                                            = $c->getName().' (0%)';
+                        $data[$this->translator->trans('mautic.email.abtest.label.opened')][] = 0;
+                        $data[$this->translator->trans('mautic.email.abtest.label.sent')][]   = 0;
                     }
                 }
                 $support['data'] = $data;
@@ -135,7 +133,7 @@ final readonly class DetermineWinnerSubscriber implements EventSubscriberInterfa
             $clickthroughCounts = $this->hitRepository->getEmailClickthroughHitCount($ids, $startDate, 200, $parent->getVariantEndDate());
             $sentCounts         = $this->statRepository->getSentCounts($ids, $startDate, $parent->getVariantEndDate());
 
-            if ($clickthroughCounts) {
+            if ($clickthroughCounts !== []) {
                 $rates      = $support      = $data      = [];
                 $hasResults = [];
 
@@ -167,13 +165,11 @@ final readonly class DetermineWinnerSubscriber implements EventSubscriberInterfa
                 }
 
                 foreach ($children as $c) {
-                    if ($c->isPublished()) {
-                        if (!in_array($c->getId(), $hasResults)) {
-                            // make sure that parent and published children are included
-                            $support['labels'][]                                                  = $c->getName().' (0%)';
-                            $data[$this->translator->trans('mautic.email.abtest.label.clickthrough')][] = 0;
-                            $data[$this->translator->trans('mautic.email.abtest.label.opened')][]       = 0;
-                        }
+                    if ($c->isPublished() && !in_array($c->getId(), $hasResults)) {
+                        // make sure that parent and published children are included
+                        $support['labels'][]                                                  = $c->getName().' (0%)';
+                        $data[$this->translator->trans('mautic.email.abtest.label.clickthrough')][] = 0;
+                        $data[$this->translator->trans('mautic.email.abtest.label.opened')][]       = 0;
                     }
                 }
                 $support['data'] = $data;

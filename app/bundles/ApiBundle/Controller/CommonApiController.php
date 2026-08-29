@@ -207,11 +207,7 @@ class CommonApiController extends FetchCommonApiController
 
             $this->processBatchForm($request, $key, $entity, $params, $method, $errors, $entities);
 
-            if (isset($errors[$key])) {
-                $statusCodes[$key] = $errors[$key]['code'];
-            } else {
-                $statusCodes[$key] = $statusCode;
-            }
+            $statusCodes[$key] = isset($errors[$key]) ? $errors[$key]['code'] : $statusCode;
         }
 
         $payload = [
@@ -510,20 +506,13 @@ class CommonApiController extends FetchCommonApiController
 
         // Check if user has access to publish
         if (
-            (
-                array_key_exists('isPublished', $parameters)
-                || array_key_exists('publishUp', $parameters)
-                || array_key_exists('publishDown', $parameters)
-            )
-            && $this->security->checkPermissionExists($this->permissionBase.':publish')) {
-            if ($this->security->checkPermissionExists($this->permissionBase.':publishown')) {
-                if (!$this->checkEntityAccess($entity, 'publish')) {
-                    if ('new' === $action) {
-                        $parameters['isPublished'] = 0;
-                        unset($parameters['publishUp'], $parameters['publishDown']);
-                    } else {
-                        unset($parameters['isPublished'], $parameters['publishUp'], $parameters['publishDown']);
-                    }
+            (array_key_exists('isPublished', $parameters) || array_key_exists('publishUp', $parameters) || array_key_exists('publishDown', $parameters)) && $this->security->checkPermissionExists($this->permissionBase.':publish') && $this->security->checkPermissionExists($this->permissionBase.':publishown')) {
+            if (!$this->checkEntityAccess($entity, 'publish')) {
+                if ('new' === $action) {
+                    $parameters['isPublished'] = 0;
+                    unset($parameters['publishUp'], $parameters['publishDown']);
+                } else {
+                    unset($parameters['isPublished'], $parameters['publishUp'], $parameters['publishDown']);
                 }
             }
         }
@@ -596,7 +585,7 @@ class CommonApiController extends FetchCommonApiController
             $formErrorCodes = $this->getFormErrorCodes($form);
             $msg            = $this->getFormErrorMessage($formErrors);
 
-            if (!$msg) {
+            if ($msg === '' || $msg === '0') {
                 $msg = $this->translator->trans('mautic.core.error.badrequest', [], 'flashes');
             }
 

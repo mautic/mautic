@@ -55,7 +55,7 @@ class ContactRequestHelper
         }
 
         $dateTime  = new \DateTime();
-        $userAgent = $request ? $request->server->get('HTTP_USER_AGENT') : '';
+        $userAgent = $request instanceof \Symfony\Component\HttpFoundation\Request ? $request->server->get('HTTP_USER_AGENT') : '';
         if (!empty($queryFields['ct'])) {
             $queryFields['ct'] = (is_array($queryFields['ct'])) ? $queryFields['ct'] : ClickthroughHelper::decodeArrayFromUrl($queryFields['ct']);
         }
@@ -78,11 +78,11 @@ class ContactRequestHelper
         } catch (ContactNotFoundException) {
         }
 
-        if (!$this->trackedContact) {
+        if (!$this->trackedContact instanceof \Mautic\LeadBundle\Entity\Lead) {
             $this->trackedContact = $this->contactTracker->getContact();
         }
 
-        if (!$this->trackedContact) {
+        if (!$this->trackedContact instanceof \Mautic\LeadBundle\Entity\Lead) {
             return null;
         }
 
@@ -133,11 +133,9 @@ class ContactRequestHelper
                 }
             }
 
-            if (null === $this->trackedContact || $foundContact->getId() !== $this->trackedContact->getId()) {
-                // A contact was found by a publicly updatable field
-                if (!$foundContact->isNew()) {
-                    return $foundContact;
-                }
+            // A contact was found by a publicly updatable field
+            if ((null === $this->trackedContact || $foundContact->getId() !== $this->trackedContact->getId()) && !$foundContact->isNew()) {
+                return $foundContact;
             }
         }
 
@@ -156,7 +154,7 @@ class ContactRequestHelper
         $event = new ContactIdentificationEvent($clickthrough);
         $this->eventDispatcher->dispatch($event, LeadEvents::ON_CLICKTHROUGH_IDENTIFICATION);
 
-        if ($contact = $event->getIdentifiedContact()) {
+        if (($contact = $event->getIdentifiedContact()) instanceof \Mautic\LeadBundle\Entity\Lead) {
             $this->logger->debug("LEAD: Contact ID# {$contact->getId()} tracked through clickthrough query by the ".$event->getIdentifier().' channel');
 
             // Merge tracked visitor into the clickthrough contact

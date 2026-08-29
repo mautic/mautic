@@ -474,10 +474,8 @@ final class LeadController extends FormController
         $companies     = $this->companyRepository->getCompaniesByLeadId($objectId);
         // Set the social profile templates
         foreach ($socialProfiles as $integration => &$details) {
-            if ($integrationObject = $integrationHelper->getIntegrationObject($integration)) {
-                if ($template = $integrationObject->getSocialProfileTemplate()) {
-                    $details['social_profile_template'] = $template;
-                }
+            if (($integrationObject = $integrationHelper->getIntegrationObject($integration)) && $template = $integrationObject->getSocialProfileTemplate()) {
+                $details['social_profile_template'] = $template;
             }
 
             if (!isset($details['social_profile_template'])) {
@@ -610,11 +608,9 @@ final class LeadController extends FormController
 
                     // Upload avatar if applicable
                     $image = $form['preferred_profile_image']->getData();
-                    if ('custom' === $image) {
-                        // Check for a file
-                        if ($form['custom_avatar']->getData()) {
-                            $this->uploadAvatar($request, $avatarHelper, $lead);
-                        }
+                    // Check for a file
+                    if ('custom' === $image && $form['custom_avatar']->getData()) {
+                        $this->uploadAvatar($request, $avatarHelper, $lead);
                     }
 
                     $identifier = $this->translator->trans($lead->getPrimaryIdentifier());
@@ -1003,46 +999,42 @@ final class LeadController extends FormController
 
         if ('POST' === $request->getMethod()) {
             $valid = true;
-            if (!$this->isFormCancelled($form)) {
-                if ($valid = $this->isFormValid($form)) {
-                    $data      = $form->getData();
-                    $secLeadId = $data['lead_to_merge'];
-                    $secLead   = $this->leadModel->getEntity($secLeadId);
-
-                    if (null === $secLead) {
-                        return $this->postActionRedirect(
-                            array_merge(
-                                $postActionVars,
-                                [
-                                    'flashes' => [
-                                        [
-                                            'type'    => 'error',
-                                            'msg'     => 'mautic.lead.lead.error.notfound',
-                                            'msgVars' => ['%id%' => $secLeadId],
-                                        ],
+            if (!$this->isFormCancelled($form) && $valid = $this->isFormValid($form)) {
+                $data      = $form->getData();
+                $secLeadId = $data['lead_to_merge'];
+                $secLead   = $this->leadModel->getEntity($secLeadId);
+                if (null === $secLead) {
+                    return $this->postActionRedirect(
+                        array_merge(
+                            $postActionVars,
+                            [
+                                'flashes' => [
+                                    [
+                                        'type'    => 'error',
+                                        'msg'     => 'mautic.lead.lead.error.notfound',
+                                        'msgVars' => ['%id%' => $secLeadId],
                                     ],
-                                ]
-                            )
-                        );
-                    }
-                    if (
-                        !$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $mainLead->getPermissionUser())
-                        || !$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $secLead->getPermissionUser())
-                    ) {
-                        $this->throwAccessDenied();
-                    } elseif ($this->leadModel->isLocked($mainLead)) {
-                        // deny access if the entity is locked
-                        return $this->isLocked($postActionVars, $secLead, 'lead');
-                    } elseif ($this->leadModel->isLocked($secLead)) {
-                        // deny access if the entity is locked
-                        return $this->isLocked($postActionVars, $secLead, 'lead');
-                    }
-
-                    // Both leads are good so now we merge them
-                    try {
-                        $mainLead = $contactMerger->merge($mainLead, $secLead);
-                    } catch (SameContactException) {
-                    }
+                                ],
+                            ]
+                        )
+                    );
+                }
+                if (
+                    !$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $mainLead->getPermissionUser())
+                    || !$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $secLead->getPermissionUser())
+                ) {
+                    $this->throwAccessDenied();
+                } elseif ($this->leadModel->isLocked($mainLead)) {
+                    // deny access if the entity is locked
+                    return $this->isLocked($postActionVars, $secLead, 'lead');
+                } elseif ($this->leadModel->isLocked($secLead)) {
+                    // deny access if the entity is locked
+                    return $this->isLocked($postActionVars, $secLead, 'lead');
+                }
+                // Both leads are good so now we merge them
+                try {
+                    $mainLead = $contactMerger->merge($mainLead, $secLead);
+                } catch (SameContactException) {
                 }
             }
 
@@ -1472,84 +1464,73 @@ final class LeadController extends FormController
 
         if ('POST' === $request->getMethod()) {
             $valid = false;
-            if (!$cancelled = $this->isFormCancelled($form)) {
-                if ($valid = $this->isFormValid($form)) {
-                    $email = $form->getData();
+            if (!$cancelled = $this->isFormCancelled($form) && $valid = $this->isFormValid($form)) {
+                $email = $form->getData();
+                $mailer      = $mailHelper->getMailer();
+                $emailEntity = null;
+                $subject     = $email['subject'];
+                // Set default settings for email.
+                $mailer->setReplyTo($email['from']);
+                $mailer->setBody($email['body']);
+                $mailer->parsePlainText($email['body']);
+                $mailer->setLead($leadFields);
+                $mailer->setIdHash();
+                $mailer->setSubject($subject);
+                // Set the email entity template so the email configuration like preheader would apply.
+                if ($email['templates']) {
+                    $emailEntity = $this->emailRepository->find($email['templates']);
+                }
+                // Overwrite the mailer with the values from the form.
+                $mailer->addTo($leadEmail, $leadName);
+                if (!empty($email[EmailType::REPLY_TO_ADDRESS])) {
+                    $emailEntity ??= new Email();
+                    $emailEntity->setReplyToAddress($email[EmailType::REPLY_TO_ADDRESS]);
+                }
+                if (!empty($email['from'])) {
+                    $emailEntity ??= new Email();
+                    $emailEntity->setFromAddress($email['from']);
+                }
+                if (!empty($email['fromname'])) {
+                    $emailEntity ??= new Email();
+                    $emailEntity->setFromName($email['fromname']);
+                }
+                if ($emailEntity) {
+                    $emailEntity->setSubject($subject);
+                    $emailEntity->setCustomHtml($email['body']);
+                    $emailEntity->setSendToDnc(true);
+                    $mailer->setEmail($emailEntity);
+                }
+                if ($mailer->send(true, false)) {
+                    $mailer->createEmailStat();
+                    $this->addFlashMessage(
+                        'mautic.lead.email.notice.sent',
+                        [
+                            '%subject%' => $subject,
+                            '%email%'   => $leadEmail,
+                        ]
+                    );
+                } else {
+                    $errors = $mailer->getErrors();
 
-                    $mailer      = $mailHelper->getMailer();
-                    $emailEntity = null;
-                    $subject     = $email['subject'];
-
-                    // Set default settings for email.
-                    $mailer->setReplyTo($email['from']);
-                    $mailer->setBody($email['body']);
-                    $mailer->parsePlainText($email['body']);
-                    $mailer->setLead($leadFields);
-                    $mailer->setIdHash();
-                    $mailer->setSubject($subject);
-
-                    // Set the email entity template so the email configuration like preheader would apply.
-                    if ($email['templates']) {
-                        $emailEntity = $this->emailRepository->find($email['templates']);
+                    // Unset the array of failed email addresses
+                    if (isset($errors['failures'])) {
+                        unset($errors['failures']);
                     }
 
-                    // Overwrite the mailer with the values from the form.
-                    $mailer->addTo($leadEmail, $leadName);
-
-                    if (!empty($email[EmailType::REPLY_TO_ADDRESS])) {
-                        $emailEntity ??= new Email();
-                        $emailEntity->setReplyToAddress($email[EmailType::REPLY_TO_ADDRESS]);
-                    }
-
-                    if (!empty($email['from'])) {
-                        $emailEntity ??= new Email();
-                        $emailEntity->setFromAddress($email['from']);
-                    }
-
-                    if (!empty($email['fromname'])) {
-                        $emailEntity ??= new Email();
-                        $emailEntity->setFromName($email['fromname']);
-                    }
-
-                    if ($emailEntity) {
-                        $emailEntity->setSubject($subject);
-                        $emailEntity->setCustomHtml($email['body']);
-                        $emailEntity->setSendToDnc(true);
-                        $mailer->setEmail($emailEntity);
-                    }
-
-                    if ($mailer->send(true, false)) {
-                        $mailer->createEmailStat();
-                        $this->addFlashMessage(
-                            'mautic.lead.email.notice.sent',
-                            [
-                                '%subject%' => $subject,
-                                '%email%'   => $leadEmail,
-                            ]
-                        );
-                    } else {
-                        $errors = $mailer->getErrors();
-
-                        // Unset the array of failed email addresses
-                        if (isset($errors['failures'])) {
-                            unset($errors['failures']);
-                        }
-
-                        $form->addError(
-                            new FormError(
-                                $this->translator->trans(
-                                    'mautic.lead.email.error.failed',
-                                    [
-                                        '%subject%' => $subject,
-                                        '%email%'   => $leadEmail,
-                                        '%error%'   => implode('<br />', $errors),
-                                    ],
-                                    'flashes'
-                                )
+                    $form->addError(
+                        new FormError(
+                            $this->translator->trans(
+                                'mautic.lead.email.error.failed',
+                                [
+                                    '%subject%' => $subject,
+                                    '%email%'   => $leadEmail,
+                                    '%error%'   => implode('<br />', $errors),
+                                ],
+                                'flashes'
                             )
-                        );
-                        $valid = false;
-                    }
+                        )
+                    );
+                    $valid = false;
                 }
             }
         }
@@ -1637,7 +1618,7 @@ final class LeadController extends FormController
             $add    = (!empty($data['add'])) ? $data['add'] : [];
             $remove = (!empty($data['remove'])) ? $data['remove'] : [];
 
-            if ($count = count($entities)) {
+            if (($count = count($entities)) !== 0) {
                 $campaigns = $this->campaignModel->getEntities(
                     [
                         'filter' => [
@@ -1745,7 +1726,7 @@ final class LeadController extends FormController
 
             $count = count($entities);
 
-            if ($count) {
+            if ($count !== 0) {
                 foreach ($entities as $lead) {
                     if ($this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
                         $doNotContact->addDncForContact($lead->getId(), 'email', DoNotContact::MANUAL, $data['reason']);
@@ -2418,60 +2399,58 @@ final class LeadController extends FormController
             'point_groups' => $pointGroups,
         ]);
 
-        if (Request::METHOD_POST === $request->getMethod()) {
-            if (!$this->isFormCancelled($form)) {
-                if ($this->isFormValid($form)) {
-                    $leadUpdated = false;
-                    $postData    = $form->getData();
-                    foreach ($pointGroups as $group) {
-                        $scoreKey = ContactGroupPointsType::getFieldKey($group->getId());
-                        $oldScore = $initData[$scoreKey] ?? null;
-                        $newScore = $postData[$scoreKey];
-                        if (null !== $oldScore && null === $newScore) {
-                            // set 0 when the new score is not present, but the record exists
-                            $newScore = 0;
-                        }
-
-                        if (null !== $newScore && $newScore !== $oldScore) {
-                            $pointGroupModel->adjustPoints($lead, $group, $newScore, Lead::POINTS_SET);
-                            $delta = $newScore - ($oldScore ?? 0);
-
-                            // add a lead point change log
-                            $log = new PointsChangeLog();
-                            $log->setDelta($delta);
-                            $log->setLead($lead);
-                            $log->setType('manual');
-                            $log->setEventName($this->translator->trans('mautic.point.event.manual_change'));
-                            $log->setActionName('');
-                            $log->setIpAddress($ipLookupHelper->getIpAddress());
-                            $log->setDateAdded(new \DateTime());
-                            $log->setGroup($group);
-                            $lead->addPointsChangeLog($log);
-                            $leadUpdated = true;
-                        }
+        if (Request::METHOD_POST === $request->getMethod() && !$this->isFormCancelled($form)) {
+            if ($this->isFormValid($form)) {
+                $leadUpdated = false;
+                $postData    = $form->getData();
+                foreach ($pointGroups as $group) {
+                    $scoreKey = ContactGroupPointsType::getFieldKey($group->getId());
+                    $oldScore = $initData[$scoreKey] ?? null;
+                    $newScore = $postData[$scoreKey];
+                    if (null !== $oldScore && null === $newScore) {
+                        // set 0 when the new score is not present, but the record exists
+                        $newScore = 0;
                     }
 
-                    if ($leadUpdated) {
-                        $model->saveEntity($lead);
-                    }
+                    if (null !== $newScore && $newScore !== $oldScore) {
+                        $pointGroupModel->adjustPoints($lead, $group, $newScore, Lead::POINTS_SET);
+                        $delta = $newScore - ($oldScore ?? 0);
 
-                    return $this->postActionRedirect(
-                        [
-                            'returnUrl' => $this->generateUrl('mautic_contact_action', [
-                                'objectId'     => $lead->getId(),
-                                'objectAction' => 'view',
-                            ]),
-                            'viewParameters'  => [
-                                'objectId'     => $lead->getId(),
-                                'objectAction' => 'view',
-                            ],
-                            'contentTemplate' => 'Mautic\LeadBundle\Controller\LeadController::viewAction',
-                            'passthroughVars' => [
-                                'closeModal' => 1,
-                            ],
-                        ]
-                    );
+                        // add a lead point change log
+                        $log = new PointsChangeLog();
+                        $log->setDelta($delta);
+                        $log->setLead($lead);
+                        $log->setType('manual');
+                        $log->setEventName($this->translator->trans('mautic.point.event.manual_change'));
+                        $log->setActionName('');
+                        $log->setIpAddress($ipLookupHelper->getIpAddress());
+                        $log->setDateAdded(new \DateTime());
+                        $log->setGroup($group);
+                        $lead->addPointsChangeLog($log);
+                        $leadUpdated = true;
+                    }
                 }
+
+                if ($leadUpdated) {
+                    $model->saveEntity($lead);
+                }
+
+                return $this->postActionRedirect(
+                    [
+                        'returnUrl' => $this->generateUrl('mautic_contact_action', [
+                            'objectId'     => $lead->getId(),
+                            'objectAction' => 'view',
+                        ]),
+                        'viewParameters'  => [
+                            'objectId'     => $lead->getId(),
+                            'objectAction' => 'view',
+                        ],
+                        'contentTemplate' => 'Mautic\LeadBundle\Controller\LeadController::viewAction',
+                        'passthroughVars' => [
+                            'closeModal' => 1,
+                        ],
+                    ]
+                );
             }
         }
 

@@ -44,13 +44,11 @@ class FormModel extends AbstractCommonModel
     public function lockEntity($entity): void
     {
         // lock the row if applicable
-        if (method_exists($entity, 'setCheckedOut') && method_exists($entity, 'getId') && $entity->getId()) {
-            if ($this->userHelper->getUser()->getId()) {
-                $entity->setCheckedOut(new \DateTime());
-                $entity->setCheckedOutBy($this->userHelper->getUser());
-                $this->em->persist($entity);
-                $this->em->flush();
-            }
+        if (method_exists($entity, 'setCheckedOut') && method_exists($entity, 'getId') && $entity->getId() && $this->userHelper->getUser()->getId()) {
+            $entity->setCheckedOut(new \DateTime());
+            $entity->setCheckedOutBy($this->userHelper->getUser());
+            $this->em->persist($entity);
+            $this->em->flush();
         }
     }
 
@@ -478,7 +476,7 @@ class FormModel extends AbstractCommonModel
         }
 
         // Trim if applicable
-        if ($maxLength) {
+        if ($maxLength !== 0) {
             $alias = substr($alias, 0, $maxLength);
         }
 

@@ -155,7 +155,7 @@ class NotificationModel extends FormModel
         }
 
         $showNewIndicator = false;
-        $userId           = ($this->userHelper->getUser()) ? $this->userHelper->getUser()->getId() : 0;
+        $userId           = ($this->userHelper->getUser() instanceof \Mautic\UserBundle\Entity\User) ? $this->userHelper->getUser()->getId() : 0;
 
         $notifications = $this->notificationRepository->getNotifications($userId, $afterId, $includeRead, null, $limit);
 

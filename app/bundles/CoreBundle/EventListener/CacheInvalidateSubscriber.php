@@ -65,7 +65,7 @@ final readonly class CacheInvalidateSubscriber
 
         $cache = ResultCacheHelper::getCache($this->ormConfiguration);
 
-        if (!$cache) {
+        if (!$cache instanceof \Doctrine\Common\Cache\CacheProvider) {
             return;
         }
 

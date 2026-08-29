@@ -183,7 +183,7 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $segment->setAlias($alias);
         $segment->setLastBuiltTime($lastBuildTime);
 
-        if ($user) {
+        if ($user instanceof \Mautic\UserBundle\Entity\User) {
             $segment->setCreatedBy($user);
             $segment->setCreatedByUser($user->getName());
         }

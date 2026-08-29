@@ -110,7 +110,7 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
     private function fetchCampaignData(int $campaignId): array
     {
         $campaign = $this->campaignModel->getEntity($campaignId);
-        if (!$campaign) {
+        if (!$campaign instanceof \Mautic\CampaignBundle\Entity\Campaign) {
             $this->logger->warning("Campaign not found for ID: {$campaignId}");
 
             return [];
@@ -187,7 +187,9 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
             $isNew  = !$object;
 
             $object ??= new Campaign();
-            $isNew && $object->setDateAdded(new \DateTime());
+            if ($isNew) {
+                $object->setDateAdded(new \DateTime());
+            }
             $object->setUuid($campaignData['uuid']);
             $object->setDateModified(new \DateTime());
 
@@ -337,7 +339,7 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
         }
 
         $user = $this->userModel->getEntity($userId);
-        if (!$user) {
+        if (!$user instanceof \Mautic\UserBundle\Entity\User) {
             $this->logger->warning("User ID {$userId} not found. Campaigns will not have a created_by_user field set.");
 
             return '';
@@ -440,11 +442,9 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
                                 }
                             }
                             unset($subKey);
-                        } else {
+                        } elseif (isset($idMap[$dependency[$key]])) {
                             // If it's a single value, update it normally
-                            if (isset($idMap[$dependency[$key]])) {
-                                $dependency[$key] = $idMap[$dependency[$key]];
-                            }
+                            $dependency[$key] = $idMap[$dependency[$key]];
                         }
                     }
                 }
@@ -597,10 +597,8 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
 
         foreach ($data[$entity] as &$item) {
             foreach ($formDependencies as $dependency) {
-                if (isset($dependency[$entity]) && isset($item['id']) && $item['id'] === $dependency[$entity]) {
-                    if (isset($item['form']) && isset($dependency[Form::ENTITY_NAME])) {
-                        $item['form'] = $dependency[Form::ENTITY_NAME];
-                    }
+                if (isset($dependency[$entity]) && isset($item['id']) && $item['id'] === $dependency[$entity] && (isset($item['form']) && isset($dependency[Form::ENTITY_NAME]))) {
+                    $item['form'] = $dependency[Form::ENTITY_NAME];
                 }
             }
         }

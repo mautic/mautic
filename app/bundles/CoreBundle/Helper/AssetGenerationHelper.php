@@ -251,7 +251,7 @@ final readonly class AssetGenerationHelper
 
         $modifiedLast = [];
 
-        if (count($directories)) {
+        if (count($directories) > 0) {
             foreach ($directories as $directory) {
                 $group = $directory->getBasename();
 

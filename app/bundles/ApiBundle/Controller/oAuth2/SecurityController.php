@@ -30,10 +30,8 @@ final class SecurityController extends CommonController
             $this->addFlashMessage($msg, [], 'error', null, false);
         }
 
-        if ($session->has('_security.target_path')) {
-            if (str_contains($session->get('_security.target_path'), $this->generateUrl('fos_oauth_server_authorize'))) {
-                $session->set('_fos_oauth_server.ensure_logout', true);
-            }
+        if ($session->has('_security.target_path') && str_contains($session->get('_security.target_path'), $this->generateUrl('fos_oauth_server_authorize'))) {
+            $session->set('_fos_oauth_server.ensure_logout', true);
         }
 
         return $this->render(

@@ -323,11 +323,7 @@ final class ReportSubscriber implements EventSubscriberInterface
                     foreach ($filters as $filter) {
                         if (in_array($filter['column'], $subsetFilters)) {
                             $filterParam = $event->createParameterName();
-                            if (isset($filter['formula'])) {
-                                $x = "({$filter['formula']}) as {$alias}_{$filter['column']}";
-                            } else {
-                                $x = $alias.$filter['column'];
-                            }
+                            $x = isset($filter['formula']) ? "({$filter['formula']}) as {$alias}_{$filter['column']}" : $alias.$filter['column'];
 
                             $expr = $expr->with(
                                 $expr->{$filter['operator']}($x, ":{$filterParam}")

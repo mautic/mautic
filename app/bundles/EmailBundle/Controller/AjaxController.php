@@ -198,7 +198,7 @@ final class AjaxController extends CommonAjaxController
 
         $data = [];
         foreach ($ids as $id) {
-            if ($email = $this->emailModel->getEntity($id)) {
+            if (($email = $this->emailModel->getEntity($id)) instanceof \Mautic\EmailBundle\Entity\Email) {
                 $pending = $this->emailModel->getPendingLeads($email, null, true);
                 $queued  = $this->emailModel->getQueuedCounts($email);
 
@@ -208,7 +208,7 @@ final class AjaxController extends CommonAjaxController
                         'mautic.email.stat.leadcount',
                         ['%count%' => $pending]
                     ) : 0,
-                    'queued'      => ($queued) ? $this->translator->trans('mautic.email.stat.queued', ['%count%' => $queued]) : 0,
+                    'queued'      => ($queued !== 0) ? $this->translator->trans('mautic.email.stat.queued', ['%count%' => $queued]) : 0,
                     'sentCount'   => $this->translator->trans('mautic.email.stat.sentcount', ['%count%' => $email->getSentCount(true)]),
                     'readCount'   => $this->translator->trans('mautic.email.stat.readcount', ['%count%' => $email->getReadCount(true)]),
                     'readPercent' => $this->translator->trans('mautic.email.stat.readpercent', ['%count%' => $email->getReadPercentage(true)]),
@@ -217,14 +217,10 @@ final class AjaxController extends CommonAjaxController
         }
 
         // Support for legacy calls
-        if ($request->get('id') && !empty($data[0])) {
-            $data = $data[0];
-        } else {
-            $data = [
-                'success' => 1,
-                'stats'   => $data,
-            ];
-        }
+        $data = $request->get('id') && !empty($data[0]) ? $data[0] : [
+            'success' => 1,
+            'stats'   => $data,
+        ];
 
         return new JsonResponse($data);
     }

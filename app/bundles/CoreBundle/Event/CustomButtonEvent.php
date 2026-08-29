@@ -97,10 +97,8 @@ final class CustomButtonEvent extends AbstractCustomRequestEvent
 
     public function checkLocationContext($location): bool
     {
-        if (null !== $location) {
-            if ((is_array($location) && !in_array($this->location, $location)) || (is_string($location) && $location !== $this->location)) {
-                return false;
-            }
+        if (null !== $location && (is_array($location) && !in_array($this->location, $location) || is_string($location) && $location !== $this->location)) {
+            return false;
         }
 
         return true;

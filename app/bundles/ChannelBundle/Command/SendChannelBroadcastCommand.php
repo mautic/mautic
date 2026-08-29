@@ -121,12 +121,9 @@ final class SendChannelBroadcastCommand extends ModeratedCommand
             $maxThreads = (int) $maxThreads;
         }
 
-        if ($threadId && $maxThreads) {
-            if ((int) $threadId > (int) $maxThreads) {
-                $output->writeln('--thread-id cannot be larger than --max-thread');
-
-                return Command::FAILURE;
-            }
+        if ($threadId && $maxThreads && (int) $threadId > (int) $maxThreads) {
+            $output->writeln('--thread-id cannot be larger than --max-thread');
+            return Command::FAILURE;
         }
 
         if (!$this->checkRunStatus($input, $output, $key)) {

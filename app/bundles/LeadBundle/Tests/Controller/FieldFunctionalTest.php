@@ -246,7 +246,9 @@ final class FieldFunctionalTest extends MauticMysqlTestCase
             $field->setCharLengthLimit($charLength);
         }
         $field->setObject('lead');
-        isset($parameters['properties']) && $field->setProperties($parameters['properties']);
+        if (isset($parameters['properties'])) {
+            $field->setProperties($parameters['properties']);
+        }
 
         return $field;
     }

@@ -37,7 +37,7 @@ class EventRedirectionHelper
         $visited       = [];
         $redirectEvent = $this->findRedirectEventInCampaign($event, $visited, 1);
 
-        if (!$redirectEvent) {
+        if (!$redirectEvent instanceof \Mautic\CampaignBundle\Entity\Event) {
             return $event;
         }
 
@@ -103,7 +103,7 @@ class EventRedirectionHelper
         $visited[]     = $event->getId();
         $redirectEvent = $event->getRedirectEvent();
 
-        if (!$redirectEvent) {
+        if (!$redirectEvent instanceof \Mautic\CampaignBundle\Entity\Event) {
             return null;
         }
 

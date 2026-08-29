@@ -59,7 +59,7 @@ class FullObjectReportBuilder
                     $this->objectProvider->getObjectByName($requestedObjectDAO->getObject())
                 );
 
-                if ($requestDAO->getInputOptionsDAO()->getMauticObjectIds()) {
+                if ($requestDAO->getInputOptionsDAO()->getMauticObjectIds() instanceof \Mautic\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO) {
                     $idChunks = array_chunk($requestDAO->getInputOptionsDAO()->getMauticObjectIds()->getObjectIdsFor($requestedObjectDAO->getObject()), $limit);
                     $idChunk  = $idChunks[$requestDAO->getSyncIteration() - 1] ?? [];
                     $event->setIds($idChunk);

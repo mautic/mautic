@@ -270,7 +270,7 @@ class EmailRepository extends CommonRepository
             $segmentQb->setParameter('max_date', $maxDate, Types::DATETIME_MUTABLE);
         }
 
-        if ($sendStopDate) {
+        if ($sendStopDate instanceof \DateTimeInterface) {
             $segmentQb->andWhere($segmentQb->expr()->lt('ll.date_added', ':sendStopDate'));
             $q->setParameter('sendStopDate', new DateTimeHelper($sendStopDate)->toUtcString());
         }
@@ -297,7 +297,7 @@ class EmailRepository extends CommonRepository
 
         $excludedListQb = $this->getExcludedListQuery((int) $emailId);
 
-        if ($excludedListQb) {
+        if ($excludedListQb instanceof \Doctrine\DBAL\Query\QueryBuilder) {
             $q->andWhere(sprintf('l.id NOT IN (%s)', $excludedListQb->getSQL()));
             $this->copyParams($excludedListQb, $q);
         }
@@ -316,12 +316,10 @@ class EmailRepository extends CommonRepository
             )
         );
 
-        if ($threadId && $maxThreads) {
-            if ($threadId <= $maxThreads) {
-                $q->andWhere('MOD((l.id + :threadShift), :maxThreads) = 0')
-                        ->setParameter('threadShift', $threadId - 1, ParameterType::INTEGER)
-                        ->setParameter('maxThreads', $maxThreads, ParameterType::INTEGER);
-            }
+        if ($threadId && $maxThreads && $threadId <= $maxThreads) {
+            $q->andWhere('MOD((l.id + :threadShift), :maxThreads) = 0')
+                    ->setParameter('threadShift', $threadId - 1, ParameterType::INTEGER)
+                    ->setParameter('maxThreads', $maxThreads, ParameterType::INTEGER);
         }
 
         if (!empty($limit)) {

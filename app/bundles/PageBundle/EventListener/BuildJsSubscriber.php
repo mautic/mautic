@@ -216,11 +216,7 @@ JS_WRAP;
                 $gtagSettings['user_id'] = $lead->getId();
             }
 
-            if (count($gtagSettings) > 0) {
-                $gtagSettings = ', '.json_encode($gtagSettings);
-            } else {
-                $gtagSettings = '';
-            }
+            $gtagSettings = count($gtagSettings) > 0 ? ', '.json_encode($gtagSettings) : '';
 
             $js .= <<<JS
 a = document.createElement('script');

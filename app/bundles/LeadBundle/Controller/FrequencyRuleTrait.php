@@ -59,10 +59,8 @@ trait FrequencyRuleTrait
         if (!empty($viewParameters['idHash'])) {
             $emailModel = $this->getModel('email');
             \assert($emailModel instanceof EmailModel);
-            if ($stat = $emailModel->getEmailStatus($viewParameters['idHash'])) {
-                if ($email = $stat->getEmail()) {
-                    $currentChannelId = $email->getId();
-                }
+            if (($stat = $emailModel->getEmailStatus($viewParameters['idHash'])) && $email = $stat->getEmail()) {
+                $currentChannelId = $email->getId();
             }
         }
 
@@ -85,13 +83,11 @@ trait FrequencyRuleTrait
         $request = $this->requestStack->getCurrentRequest();
         \assert(null !== $request);
         $method = $request->getMethod();
-        if ('GET' !== $method) {
-            if (!$this->isFormCancelled($form)) {
-                if ($this->isFormValid($form)) {
-                    $this->persistFrequencyRuleFormData($lead, $form->getData(), $allChannels, $leadChannels, $currentChannelId);
+        if ('GET' !== $method && !$this->isFormCancelled($form)) {
+            if ($this->isFormValid($form)) {
+                $this->persistFrequencyRuleFormData($lead, $form->getData(), $allChannels, $leadChannels, $currentChannelId);
 
-                    return true;
-                }
+                return true;
             }
         }
 

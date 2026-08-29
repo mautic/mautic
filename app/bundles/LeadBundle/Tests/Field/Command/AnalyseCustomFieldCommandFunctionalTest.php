@@ -173,7 +173,7 @@ final class AnalyseCustomFieldCommandFunctionalTest extends MauticMysqlTestCase
         $text = [];
         $size = 0;
         while ($size < $chars) {
-            $word   = ($size ? ' ' : '').$words[array_rand($words)];
+            $word   = ($size !== 0 ? ' ' : '').$words[array_rand($words)];
             $text[] = $word;
 
             $size += strlen($word);

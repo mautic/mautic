@@ -61,19 +61,16 @@ final class AjaxController extends CommonAjaxController
 
         $dataArray = ['success' => 0, 'date' => $originalDate];
 
-        if (!empty($eventId) && !empty($contactId) && !empty($newDate)) {
-            if ($log = $this->getContactEventLog($eventId, $contactId)) {
-                $newDate = new \DateTime($newDate);
+        if (!empty($eventId) && !empty($contactId) && !empty($newDate) && $log = $this->getContactEventLog($eventId, $contactId)) {
+            $newDate = new \DateTime($newDate);
+            if ($newDate >= new \DateTime()) {
+                $log->setTriggerDate($newDate, 'Manual date change via AJAX');
+                $this->eventLogModel->saveEntity($log);
 
-                if ($newDate >= new \DateTime()) {
-                    $log->setTriggerDate($newDate, 'Manual date change via AJAX');
-                    $this->eventLogModel->saveEntity($log);
-
-                    $dataArray = [
-                        'success' => 1,
-                        'date'    => $newDate->format('Y-m-d H:i:s'),
-                    ];
-                }
+                $dataArray = [
+                    'success' => 1,
+                    'date'    => $newDate->format('Y-m-d H:i:s'),
+                ];
             }
         }
 
@@ -89,19 +86,16 @@ final class AjaxController extends CommonAjaxController
 
         $eventId   = (int) $request->request->get('eventId');
         $contactId = (int) $request->request->get('contactId');
-        if (!empty($eventId) && !empty($contactId)) {
-            if ($log = $this->getContactEventLog($eventId, $contactId)) {
-                $log->setIsScheduled(false);
-                $metadata           = $log->getMetadata();
-                $metadata['errors'] = $this->translator->trans(
-                    'mautic.campaign.event.cancelled.time',
-                    ['%date%' => $log->getTriggerDate()->format('Y-m-d H:i:s')]
-                );
-                $log->setMetadata($metadata);
-                $this->leadEventLogRepository->saveEntity($log);
-
-                $dataArray = ['success' => 1];
-            }
+        if (!empty($eventId) && !empty($contactId) && $log = $this->getContactEventLog($eventId, $contactId)) {
+            $log->setIsScheduled(false);
+            $metadata           = $log->getMetadata();
+            $metadata['errors'] = $this->translator->trans(
+                'mautic.campaign.event.cancelled.time',
+                ['%date%' => $log->getTriggerDate()->format('Y-m-d H:i:s')]
+            );
+            $log->setMetadata($metadata);
+            $this->leadEventLogRepository->saveEntity($log);
+            $dataArray = ['success' => 1];
         }
 
         return $this->sendJsonResponse($dataArray);
@@ -113,21 +107,18 @@ final class AjaxController extends CommonAjaxController
     private function getContactEventLog(int $eventId, int $contactId)
     {
         $contact = $this->leadModel->getEntity($contactId);
-        if ($contact) {
-            if ($this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $contact->getPermissionUser())) {
-                /** @var LeadEventLog $log */
-                $log = $this->leadEventLogRepository
-                                ->findOneBy(
-                                    [
-                                        'lead'  => $contactId,
-                                        'event' => $eventId,
-                                    ],
-                                    ['dateTriggered' => 'desc']
-                                );
-
-                if ($log && ($log->getTriggerDate() > new \DateTime())) {
-                    return $log;
-                }
+        if ($contact instanceof \Mautic\LeadBundle\Entity\Lead && $this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $contact->getPermissionUser())) {
+            /** @var LeadEventLog $log */
+            $log = $this->leadEventLogRepository
+                            ->findOneBy(
+                                [
+                                    'lead'  => $contactId,
+                                    'event' => $eventId,
+                                ],
+                                ['dateTriggered' => 'desc']
+                            );
+            if ($log && ($log->getTriggerDate() > new \DateTime())) {
+                return $log;
             }
         }
 

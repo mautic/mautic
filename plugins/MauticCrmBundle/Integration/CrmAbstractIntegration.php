@@ -195,7 +195,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             'excludeEvents' => [],
         ];
 
-        if ($startDate) {
+        if ($startDate instanceof \DateTime) {
             $filters['dateFrom'] = $startDate;
             $filters['dateTo']   = $endDate;
         }
@@ -434,12 +434,9 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         }
 
         // Update the owner if it matches (needs to be set by the integration) when fetching the data
-        if (isset($data['owner_email']) && isset($config['updateOwner']) && isset($config['updateOwner'][0])
-            && 'updateOwner' == $config['updateOwner'][0]
+        if (isset($data['owner_email']) && isset($config['updateOwner']) && isset($config['updateOwner'][0]) && 'updateOwner' == $config['updateOwner'][0] && $mauticUser = $this->userRepository->findOneBy(['email' => $data['owner_email']])
         ) {
-            if ($mauticUser = $this->userRepository->findOneBy(['email' => $data['owner_email']])) {
-                $lead->setOwner($mauticUser);
-            }
+            $lead->setOwner($mauticUser);
         }
 
         if ($persist && !empty($lead->getChanges(true))) {

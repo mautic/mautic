@@ -380,10 +380,10 @@ final class EmailType extends AbstractType
                 'email_type'     => 'list',
                 'placeholder'    => 'mautic.core.form.translation_parent.empty',
                 'top_level'      => 'translation',
-                'variant_parent' => $variantParent ? $variantParent->getId() : null,
+                'variant_parent' => $variantParent instanceof \Mautic\CoreBundle\Entity\VariantEntityInterface ? $variantParent->getId() : null,
                 'ignore_ids'     => [(int) $emailEntity->getId()],
                 'mapped'         => false,
-                'data'           => $translationParent ? $translationParent->getId() : null,
+                'data'           => $translationParent instanceof \Mautic\CoreBundle\Entity\TranslationEntityInterface ? $translationParent->getId() : null,
             ]
         );
 
@@ -401,11 +401,11 @@ final class EmailType extends AbstractType
                 'multiple'       => false,
                 'placeholder'    => 'mautic.core.form.translation_parent.empty',
                 'top_level'      => 'translation',
-                'variant_parent' => $variantParent ? $variantParent->getId() : null,
+                'variant_parent' => $variantParent instanceof \Mautic\CoreBundle\Entity\VariantEntityInterface ? $variantParent->getId() : null,
                 'email_type'     => 'template',
                 'ignore_ids'     => [(int) $emailEntity->getId()],
                 'mapped'         => false,
-                'data'           => $translationParent ? $translationParent->getId() : null,
+                'data'           => $translationParent instanceof \Mautic\CoreBundle\Entity\TranslationEntityInterface ? $translationParent->getId() : null,
             ]
         );
 

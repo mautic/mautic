@@ -53,11 +53,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
         {
             if ($debugLogger = self::$handler->getDebugLogger()) {
                 if (!is_array($context)) {
-                    if (null === $context) {
-                        $context = ['null'];
-                    } else {
-                        $context = (array) $context;
-                    }
+                    $context = null === $context ? ['null'] : (array) $context;
                 }
 
                 if (is_array($log)) {
@@ -121,7 +117,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
         public function handleError($level, $message, $file = 'unknown', $line = 0, array $context = []): bool
         {
             $errorReporting = ('dev' === self::$environment) ? -1 : error_reporting();
-            if ($level & $errorReporting) {
+            if (($level & $errorReporting) !== 0) {
                 switch (true) {
                     case $level & E_NOTICE:
                     case $level & E_USER_NOTICE:
@@ -191,32 +187,28 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
             if (null !== $error) {
                 $name = $this->getErrorName($error['type']);
-                if ($error['type'] & (E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR)) {
-                    if (!$handlingFatal) {
-                        // Prevent fatal loop
-                        $handlingFatal = true;
-                        $this->log(LogLevel::ERROR, "PHP {$name}: {$error['message']} - in file {$error['file']} - at line {$error['line']}");
-
-                        if (str_starts_with($error['message'], 'Allowed memory') || str_starts_with($error['message'], 'Out of memory')) {
-                            $exception = new OutOfMemoryError(
-                                $this->getErrorName($error['type']).': '.$error['message'],
-                                0,
-                                $error,
-                                2,
-                                false
-                            );
-                        } else {
-                            $exception = new FatalError(
-                                $this->getErrorName($error['type']).': '.$error['message'],
-                                0,
-                                $error,
-                                2,
-                                true
-                            );
-                        }
-
-                        $this->handleException($exception);
+                if (($error['type'] & (E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR)) !== 0 && !$handlingFatal) {
+                    // Prevent fatal loop
+                    $handlingFatal = true;
+                    $this->log(LogLevel::ERROR, "PHP {$name}: {$error['message']} - in file {$error['file']} - at line {$error['line']}");
+                    if (str_starts_with($error['message'], 'Allowed memory') || str_starts_with($error['message'], 'Out of memory')) {
+                        $exception = new OutOfMemoryError(
+                            $this->getErrorName($error['type']).': '.$error['message'],
+                            0,
+                            $error,
+                            2,
+                            false
+                        );
+                    } else {
+                        $exception = new FatalError(
+                            $this->getErrorName($error['type']).': '.$error['message'],
+                            0,
+                            $error,
+                            2,
+                            true
+                        );
                     }
+                    $this->handleException($exception);
                 }
             }
 
@@ -247,7 +239,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 $showExceptionDetails = true;
                 $message              = $exception->getMessage();
 
-                if ($previous = $exception->getPrevious()) {
+                if (($previous = $exception->getPrevious()) instanceof \Throwable) {
                     $exception  = $previous;
                     $logMessage = $exception->getMessage();
 
@@ -274,10 +266,8 @@ namespace Mautic\CoreBundle\ErrorHandler {
                     : '<strong>'.$exception->getClass().':</strong> '.$exception->getMessage();
             }
 
-            if ($previous = $exception->getPrevious()) {
-                if ($previous = self::prepareExceptionForOutput($previous)) {
-                    $previous['isPrevious'] = true;
-                }
+            if (($previous = $exception->getPrevious()) instanceof \Symfony\Component\ErrorHandler\Exception\FlattenException && $previous = self::prepareExceptionForOutput($previous)) {
+                $previous['isPrevious'] = true;
             }
 
             $context = (method_exists($exception, 'getContext')) ? $exception->getContext() : [];
@@ -400,24 +390,20 @@ namespace Mautic\CoreBundle\ErrorHandler {
         private function generateResponse(array $error, bool $inTemplate = false): string|false
         {
             // Get a trace
-            if ('dev' == self::$environment) {
-                if (empty($error['trace'])) {
-                    ob_start();
-                    debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-                    $trace = ob_get_contents();
-                    ob_end_clean();
-
-                    // Remove first item from backtrace as it's this function which
-                    // is redundant.
-                    $error['trace'] = preg_replace('/^#0\s+'.__FUNCTION__."[^\n]*\n/", '', $trace, 1);
-
-                    // Renumber backtrace items.
-                    $error['trace'] = preg_replace_callback(
-                        '/^#(\d+)/m',
-                        fn ($matches): string => '#'.($matches[1] + 1).'&nbsp;&nbsp;',
-                        $error['trace']
-                    );
-                }
+            if ('dev' == self::$environment && empty($error['trace'])) {
+                ob_start();
+                debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+                $trace = ob_get_contents();
+                ob_end_clean();
+                // Remove first item from backtrace as it's this function which
+                // is redundant.
+                $error['trace'] = preg_replace('/^#0\s+'.__FUNCTION__."[^\n]*\n/", '', $trace, 1);
+                // Renumber backtrace items.
+                $error['trace'] = preg_replace_callback(
+                    '/^#(\d+)/m',
+                    fn ($matches): string => '#'.($matches[1] + 1).'&nbsp;&nbsp;',
+                    $error['trace']
+                );
             }
 
             $isAjax = (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && 'XMLHttpRequest' == $_SERVER['HTTP_X_REQUESTED_WITH'])
@@ -486,10 +472,8 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 include self::$root.'/app/config/paths.php';
 
                 $assetPrefix = $paths['asset_prefix'];
-                if (!empty($assetPrefix)) {
-                    if (str_ends_with($assetPrefix, '/')) {
-                        $assetPrefix = substr($assetPrefix, 0, -1);
-                    }
+                if (!empty($assetPrefix) && str_ends_with($assetPrefix, '/')) {
+                    $assetPrefix = substr($assetPrefix, 0, -1);
                 }
                 $mediaBase          = $assetPrefix.$base.$paths['media'];
                 $error['mediaBase'] = $mediaBase;

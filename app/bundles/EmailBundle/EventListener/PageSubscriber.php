@@ -43,22 +43,18 @@ final readonly class PageSubscriber implements EventSubscriberInterface
                 $stat = $this->emailModel->getEmailStatus($clickthrough['stat']);
             }
 
-            if (empty($stat)) {
-                if ($lead = $hit->getLead()) {
-                    // Try searching by email and lead IDs
-                    $stats = $this->emailModel->getEmailStati($hit->getSourceId(), $lead->getId());
-                    if (count($stats)) {
-                        $stat = $stats[0];
-                    }
+            if (empty($stat) && $lead = $hit->getLead()) {
+                // Try searching by email and lead IDs
+                $stats = $this->emailModel->getEmailStati($hit->getSourceId(), $lead->getId());
+                if (count($stats)) {
+                    $stat = $stats[0];
                 }
             }
 
-            if (!empty($stat)) {
-                // Check to see if it has been marked as opened
-                if (!$stat->isRead()) {
-                    // Mark it as read
-                    $this->emailModel->hitEmail($stat, $this->requestStack->getCurrentRequest() ?: $event->getRequest());
-                }
+            // Check to see if it has been marked as opened
+            if (!empty($stat) && !$stat->isRead()) {
+                // Mark it as read
+                $this->emailModel->hitEmail($stat, $this->requestStack->getCurrentRequest() ?: $event->getRequest());
             }
         }
     }

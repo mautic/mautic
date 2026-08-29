@@ -22,7 +22,7 @@ final class UTCDateTimeType extends DateTimeType
             return null;
         }
 
-        if (!self::$utc) {
+        if (!self::$utc instanceof \DateTimeZone) {
             self::$utc = new \DateTimeZone('UTC');
         }
 
@@ -51,7 +51,7 @@ final class UTCDateTimeType extends DateTimeType
             return null;
         }
 
-        if (!self::$utc) {
+        if (!self::$utc instanceof \DateTimeZone) {
             self::$utc = new \DateTimeZone('UTC');
         }
 

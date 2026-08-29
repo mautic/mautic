@@ -47,12 +47,10 @@ final readonly class FinalizeUpdateStep implements StepInterface
 
         // Check for a post install message from migrations
         $request = $this->requestStack->getCurrentRequest();
-        if ($request && $request->hasSession()) {
-            if ($postMessage = $this->requestStack->getSession()->get('post_upgrade_message')) {
-                $postMessage = strip_tags($postMessage);
-                $this->requestStack->getSession()->remove('post_upgrade_message');
-                $output->writeln("\n\n<info>{$postMessage}</info>");
-            }
+        if ($request && $request->hasSession() && $postMessage = $this->requestStack->getSession()->get('post_upgrade_message')) {
+            $postMessage = strip_tags($postMessage);
+            $this->requestStack->getSession()->remove('post_upgrade_message');
+            $output->writeln("\n\n<info>{$postMessage}</info>");
         }
     }
 }

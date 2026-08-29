@@ -44,7 +44,7 @@ final class PointEntityValidationTest extends MauticMysqlTestCase
 
         $response = $this->client->getResponse();
 
-        if ($errorMessage) {
+        if ($errorMessage !== '' && $errorMessage !== '0') {
             self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
             $this->assertStringContainsString('error', (string) $response->getContent());
             $this->assertStringContainsString($errorMessage, (string) $response->getContent());

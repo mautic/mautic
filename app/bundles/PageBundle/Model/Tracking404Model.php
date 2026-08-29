@@ -33,12 +33,6 @@ class Tracking404Model
             return true;
         }
         // already tracked and identified contact
-        if ($lead = $this->contactTracker->getContactByTrackedDevice()) {
-            if (!$lead->isAnonymous()) {
-                return true;
-            }
-        }
-
-        return false;
+        return ($lead = $this->contactTracker->getContactByTrackedDevice()) && !$lead->isAnonymous();
     }
 }

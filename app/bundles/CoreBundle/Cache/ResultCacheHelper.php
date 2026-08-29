@@ -22,7 +22,7 @@ final class ResultCacheHelper
     {
         $cache = self::getCache($query->getEntityManager()->getConfiguration());
 
-        if (!$cache) {
+        if (!$cache instanceof \Doctrine\Common\Cache\CacheProvider) {
             return false;
         }
 
@@ -38,7 +38,7 @@ final class ResultCacheHelper
     {
         $cache = self::getCache($connection->getConfiguration());
 
-        if (!$cache) {
+        if (!$cache instanceof \Doctrine\Common\Cache\CacheProvider) {
             return $queryBuilder->executeQuery();
         }
 
@@ -54,7 +54,7 @@ final class ResultCacheHelper
     {
         $cache = $configuration->getResultCache();
 
-        if (!$cache) {
+        if (!$cache instanceof \Psr\Cache\CacheItemPoolInterface) {
             return null;
         }
 

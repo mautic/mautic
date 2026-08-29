@@ -49,7 +49,7 @@ final readonly class DynamicContentImportExportSubscriber implements EventSubscr
         }
 
         $object = $this->dynamicContentModel->getEntity($event->getEntityId());
-        if (!$object) {
+        if (!$object instanceof \Mautic\DynamicContentBundle\Entity\DynamicContent) {
             return;
         }
 

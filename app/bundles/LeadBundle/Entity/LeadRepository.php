@@ -1104,7 +1104,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      */
     public function getLeadOwner(int $ownerId): ?array
     {
-        if (!$ownerId) {
+        if ($ownerId === 0) {
             return null;
         }
 

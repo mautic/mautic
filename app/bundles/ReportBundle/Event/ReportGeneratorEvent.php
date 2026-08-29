@@ -383,7 +383,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
 
     private function setDateRangeQueryFilters(QueryBuilder $queryBuilder, string $tablePrefix, bool $dateOnly, string $dateColumn, string $dateOnlyFilter, string $dateTimeFilter): void
     {
-        if ($tablePrefix) {
+        if ($tablePrefix !== '' && $tablePrefix !== '0') {
             $tablePrefix .= '.';
         }
 

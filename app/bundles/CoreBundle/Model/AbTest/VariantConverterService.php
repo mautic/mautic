@@ -110,7 +110,7 @@ class VariantConverterService
             return;
         }
 
-        if ($child->getVariantParent()) {
+        if ($child->getVariantParent() instanceof \Mautic\CoreBundle\Entity\VariantEntityInterface) {
             $child->getVariantParent()->removeVariantChild($child);
         }
 

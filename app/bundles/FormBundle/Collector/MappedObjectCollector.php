@@ -18,7 +18,7 @@ final readonly class MappedObjectCollector implements MappedObjectCollectorInter
         $mappedObjectCollection = new MappedObjectCollection();
 
         foreach ($objects as $object) {
-            if ($object) {
+            if ($object !== '' && $object !== '0') {
                 $mappedObjectCollection->offsetSet($object, $this->fieldCollector->getFields($object));
             }
         }

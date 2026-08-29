@@ -919,7 +919,7 @@ final class SubmissionModel extends CommonFormModel
 
         if (!$inKioskMode) {
             // Default to currently tracked lead
-            if ($currentLead = $this->contactTracker->getContact()) {
+            if (($currentLead = $this->contactTracker->getContact()) instanceof \Mautic\LeadBundle\Entity\Lead) {
                 $lead          = $currentLead;
                 $leadId        = $lead->getId();
                 $currentFields = $lead->getProfileFields();
@@ -981,10 +981,8 @@ final class SubmissionModel extends CommonFormModel
 
             $conflicts = [];
             foreach ($potentialConflicts as $field) {
-                if (!empty($fieldSet1[$field]) && !empty($fieldSet2[$field])) {
-                    if (strtolower($fieldSet1[$field]) !== strtolower($fieldSet2[$field])) {
-                        $conflicts[] = $field;
-                    }
+                if (!empty($fieldSet1[$field]) && !empty($fieldSet2[$field]) && strtolower($fieldSet1[$field]) !== strtolower($fieldSet2[$field])) {
+                    $conflicts[] = $field;
                 }
             }
 
@@ -1022,7 +1020,7 @@ final class SubmissionModel extends CommonFormModel
                 // Use the found lead without merging because there is some sort of conflict with unique identifiers or in kiosk mode and thus should not merge
                 $lead = $foundLead;
 
-                if ($hasConflict) {
+                if ($hasConflict !== 0) {
                     $this->logger->debug('FORM: Conflicts found in '.implode(', ', $conflicts).' so not merging');
                 } else {
                     $this->logger->debug('FORM: In kiosk mode so not merging');
@@ -1053,7 +1051,7 @@ final class SubmissionModel extends CommonFormModel
             $this->logger->debug(
                 'FORM: Submitted unique contact fields '.implode(', ', array_keys($uniqueFieldsWithData)).' = '.implode(', ', $uniqueFieldsWithData)
             );
-            if ($hasConflict) {
+            if ($hasConflict !== 0) {
                 // There's a conflict so create a new lead
                 $lead = new Lead();
                 $lead->setNewlyCreated(true);

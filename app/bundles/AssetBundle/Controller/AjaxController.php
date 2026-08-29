@@ -57,7 +57,7 @@ final class AjaxController extends CommonAjaxController
         $event = new RemoteAssetBrowseEvent($integration);
         $this->dispatcher->dispatch($event, $name);
 
-        if (!$adapter = $event->getAdapter()) {
+        if (!($adapter = $event->getAdapter()) instanceof \Gaufrette\Adapter) {
             return $this->sendJsonResponse([
                 'success' => 0,
                 'message' => $event->getFailureMessage() ?? null,

@@ -141,11 +141,11 @@ final readonly class DynamicContentSubscriber implements EventSubscriberInterfac
 
     public function decodeTokens(PageDisplayEvent $event): void
     {
-        if (!$lead = $event->getLead()) {
+        if (!($lead = $event->getLead()) instanceof \Mautic\LeadBundle\Entity\Lead) {
             $lead = $this->security->isAnonymous() ? $this->contactTracker->getContact() : null;
         }
 
-        if (!$lead) {
+        if (!$lead instanceof \Mautic\LeadBundle\Entity\Lead) {
             return;
         }
 

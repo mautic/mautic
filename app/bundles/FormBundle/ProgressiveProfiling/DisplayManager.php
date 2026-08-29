@@ -46,10 +46,8 @@ final readonly class DisplayManager
             }
 
             /** @var Field $fieldFromArray */
-            if ($field->getId() === $fieldFromArray->getId()) {
-                if (($this->displayCounter->getDisplayFields() + ($this->displayCounter->getAlwaysDisplayFields() - $this->displayCounter->getAlreadyAlwaysDisplayed())) >= $this->form->getProgressiveProfilingLimit()) {
-                    return false;
-                }
+            if ($field->getId() === $fieldFromArray->getId() && $this->displayCounter->getDisplayFields() + ($this->displayCounter->getAlwaysDisplayFields() - $this->displayCounter->getAlreadyAlwaysDisplayed()) >= $this->form->getProgressiveProfilingLimit()) {
+                return false;
             }
         }
 

@@ -141,7 +141,7 @@ class Summary
     {
         $this->event = $event;
 
-        if (!$this->campaign) {
+        if (!$this->campaign instanceof \Mautic\CampaignBundle\Entity\Campaign) {
             $this->setCampaign($event->getCampaign());
         }
     }

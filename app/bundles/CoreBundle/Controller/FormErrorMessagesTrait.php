@@ -18,7 +18,7 @@ trait FormErrorMessagesTrait
                 continue;
             }
 
-            if ($msg) {
+            if ($msg !== '' && $msg !== '0') {
                 $msg .= ', ';
             }
 

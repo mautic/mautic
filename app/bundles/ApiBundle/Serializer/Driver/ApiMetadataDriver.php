@@ -112,7 +112,7 @@ final class ApiMetadataDriver implements DriverInterface
 
         $this->properties[$name]->serializedName = $serializedName ?? $name;
 
-        if ($this->defaultVersion) {
+        if ($this->defaultVersion !== '' && $this->defaultVersion !== '0') {
             // Set the default version
             $this->setSinceVersion($this->defaultVersion);
         }

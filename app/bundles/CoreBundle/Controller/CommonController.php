@@ -183,11 +183,7 @@ class CommonController extends AbstractController implements MauticController
         }
 
         if (!isset($args['viewParameters']['mauticContent'])) {
-            if (isset($args['passthroughVars']['mauticContent'])) {
-                $mauticContent = $args['passthroughVars']['mauticContent'];
-            } else {
-                $mauticContent = $bundle;
-            }
+            $mauticContent = $args['passthroughVars']['mauticContent'] ?? $bundle;
             $args['viewParameters']['mauticContent'] = $mauticContent;
         }
 

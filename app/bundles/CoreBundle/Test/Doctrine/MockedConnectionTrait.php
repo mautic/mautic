@@ -26,7 +26,7 @@ trait MockedConnectionTrait
 
     private function passThrough(MockObject $object, string $class, string $method, ?InvocationOrder $invocationRule = null): void
     {
-        if (!$invocationRule) {
+        if (!$invocationRule instanceof \PHPUnit\Framework\MockObject\Rule\InvocationOrder) {
             $invocationRule = new AnyInvokedCount();
         }
 

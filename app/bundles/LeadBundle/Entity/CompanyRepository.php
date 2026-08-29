@@ -195,7 +195,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             $expr = $queryBuilder->expr()->like($this->getTableAlias().".{$command}", ":{$unique}");
         }
 
-        if ($this->dispatcher) {
+        if ($this->dispatcher instanceof \Symfony\Component\EventDispatcher\EventDispatcherInterface) {
             $event = new CompanyBuildSearchEvent($filter->string, $filter->command, $unique, $filter->not, $queryBuilder);
             $this->dispatcher->dispatch($event, LeadEvents::COMPANY_BUILD_SEARCH_COMMANDS);
             if ($event->isSearchDone()) {
@@ -451,11 +451,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
         // Get the label column if necessary
         if (null == $labelColumn) {
-            if ($reflection->hasMethod('getTitle')) {
-                $labelColumn = 'title';
-            } else {
-                $labelColumn = 'name';
-            }
+            $labelColumn = $reflection->hasMethod('getTitle') ? 'title' : 'name';
         }
 
         $labelExpression = $prefix.' companyname as label';

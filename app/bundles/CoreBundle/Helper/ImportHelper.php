@@ -99,14 +99,12 @@ class ImportHelper
                     $zip->close();
                     throw new \RuntimeException(sprintf('Failed to create directory: %s', $dirPath));
                 }
-
                 // Stream extract file to prevent zip bomb
                 $fp = $zip->getStream($filename);
                 if (!$fp) {
                     $zip->close();
                     throw new \RuntimeException('Failed to open file stream from ZIP.');
                 }
-
                 $currentSize = 0;
                 $fileHandle  = fopen($sourcePath, 'wb');
                 if (!$fileHandle) {
@@ -114,7 +112,6 @@ class ImportHelper
                     $zip->close();
                     throw new \RuntimeException('Failed to create file: '.$sourcePath);
                 }
-
                 while (!feof($fp)) {
                     $data = fread($fp, $readLength);
                     if (false === $data) {
@@ -145,15 +142,12 @@ class ImportHelper
 
                     fwrite($fileHandle, $data);
                 }
-
                 fclose($fileHandle);
                 fclose($fp);
-            } else {
+            } elseif (!is_dir($sourcePath) && !mkdir($sourcePath, 0755, true) && !is_dir($sourcePath)) {
                 // Create directory
-                if (!is_dir($sourcePath) && !mkdir($sourcePath, 0755, true) && !is_dir($sourcePath)) {
-                    $zip->close();
-                    throw new \RuntimeException(sprintf('Failed to create directory: %s', $sourcePath));
-                }
+                $zip->close();
+                throw new \RuntimeException(sprintf('Failed to create directory: %s', $sourcePath));
             }
         }
 

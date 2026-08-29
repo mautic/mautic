@@ -114,7 +114,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         $notificationId = $event->getEvent()->getProperties()['notification'] ?? null;
         $notification   = $notificationId ? $this->notificationModel->getEntity((int) $notificationId) : null;
 
-        if (!$notification) {
+        if (!$notification instanceof \Mautic\NotificationBundle\Entity\Notification) {
             $event->passAllWithError($this->translator->trans('mautic.notification.campaign.failed.missing_entity'));
 
             return;

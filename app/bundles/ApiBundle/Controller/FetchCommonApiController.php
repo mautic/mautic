@@ -175,10 +175,8 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
             ];
         }
 
-        if ($minimal) {
-            if (isset($this->serializerGroups[0])) {
-                $this->serializerGroups[0] = str_replace('Details', 'List', $this->serializerGroups[0]);
-            }
+        if ($minimal && isset($this->serializerGroups[0])) {
+            $this->serializerGroups[0] = str_replace('Details', 'List', $this->serializerGroups[0]);
         }
 
         /** @var int $defaultPagelimit */
@@ -262,7 +260,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      */
     protected function addAliasIfNotPresent(string $columns, string $alias): string
     {
-        if (!$columns) {
+        if ($columns === '' || $columns === '0') {
             return $columns;
         }
 
@@ -675,7 +673,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         );
 
         // Only include first level of children/parents
-        if ($this->parentChildrenLevelDepth) {
+        if ($this->parentChildrenLevelDepth !== 0) {
             $context->addExclusionStrategy(
                 new ParentChildrenExclusionStrategy($this->parentChildrenLevelDepth)
             );

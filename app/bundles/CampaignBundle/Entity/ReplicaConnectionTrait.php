@@ -18,13 +18,8 @@ trait ReplicaConnectionTrait
     {
         /** @var Connection $connection */
         $connection = $this->getEntityManager()->getConnection();
-        if ($connection instanceof PrimaryReadReplicaConnection) {
-            if (
-                !$limiter
-                || !$limiter->getContactId() && !$limiter->getContactIdList()
-            ) {
-                $connection->ensureConnectedToReplica();
-            }
+        if ($connection instanceof PrimaryReadReplicaConnection && (!$limiter || !$limiter->getContactId() && !$limiter->getContactIdList())) {
+            $connection->ensureConnectedToReplica();
         }
 
         return $connection;

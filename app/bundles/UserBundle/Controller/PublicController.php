@@ -41,38 +41,31 @@ final class PublicController extends FormController
         $form   = $this->formFactory->create(PasswordResetType::class, $data, ['action' => $action]);
 
         // /Check for a submitted form and process it
-        if ('POST' === $request->getMethod()) {
-            if ($isValid = $this->isFormValid($form)) {
-                // find the user
-                $data = $form->getData();
-                $user = $this->userRepository->findByIdentifier($data['identifier']);
-
-                /**
-                 * Calculation of time to standardize fix response for vulnerability
-                 * Users enumeration - forgot password. Constant response time is 1s.
-                 */
-                $desiredTime = 1.0;
-                $startTime   = microtime(true);
-
-                try {
-                    if (null !== $user) {
-                        $this->userModel->sendResetEmail($user);
-                    }
-                    $this->addFlashMessage('mautic.user.user.notice.passwordreset');
-                } catch (\RuntimeException $e) {
-                    $logger->error($this->translator->trans('mautic.user.password.reset.email.failed', [], 'messages').': '.$e->getMessage());
-                    $this->addFlashMessage('mautic.user.user.notice.passwordreset.error', [], 'error');
+        if ('POST' === $request->getMethod() && $isValid = $this->isFormValid($form)) {
+            // find the user
+            $data = $form->getData();
+            $user = $this->userRepository->findByIdentifier($data['identifier']);
+            /**
+             * Calculation of time to standardize fix response for vulnerability
+             * Users enumeration - forgot password. Constant response time is 1s.
+             */
+            $desiredTime = 1.0;
+            $startTime   = microtime(true);
+            try {
+                if (null !== $user) {
+                    $this->userModel->sendResetEmail($user);
                 }
-
-                $endTime       = microtime(true);
-                $executionTime = $endTime - $startTime;
-
-                if ($executionTime < $desiredTime) {
-                    usleep((int) (($desiredTime - $executionTime) * 1000000));
-                }
-
-                return $this->redirectToRoute('login');
+                $this->addFlashMessage('mautic.user.user.notice.passwordreset');
+            } catch (\RuntimeException $e) {
+                $logger->error($this->translator->trans('mautic.user.password.reset.email.failed', [], 'messages').': '.$e->getMessage());
+                $this->addFlashMessage('mautic.user.user.notice.passwordreset.error', [], 'error');
             }
+            $endTime       = microtime(true);
+            $executionTime = $endTime - $startTime;
+            if ($executionTime < $desiredTime) {
+                usleep((int) (($desiredTime - $executionTime) * 1000000));
+            }
+            return $this->redirectToRoute('login');
         }
 
         return $this->delegateView([
@@ -98,11 +91,9 @@ final class PublicController extends FormController
         }
 
         // /Check for a submitted form and process it
-        if ('POST' === $request->getMethod()) {
-            if ($isValid = $this->isFormValid($form)) {
-                $data     = $form->getData();
-                $response = $this->handlePasswordResetConfirm($request, $data);
-            }
+        if ('POST' === $request->getMethod() && $isValid = $this->isFormValid($form)) {
+            $data     = $form->getData();
+            $response = $this->handlePasswordResetConfirm($request, $data);
         }
 
         return $response ?? $this->renderPasswordResetConfirmForm($form, $action);

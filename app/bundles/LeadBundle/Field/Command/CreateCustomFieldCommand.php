@@ -59,7 +59,7 @@ class CreateCustomFieldCommand extends ModeratedCommand
         $leadFieldId = (int) $input->getOption('id');
         $userId      = (int) $input->getOption('user');
 
-        if ($leadFieldId) {
+        if ($leadFieldId !== 0) {
             return $this->addColumn($leadFieldId, $userId, $input, $output);
         }
 

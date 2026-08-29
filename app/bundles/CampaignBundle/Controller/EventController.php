@@ -120,28 +120,26 @@ final class EventController extends CommonFormController
         $form->get('campaignId')->setData($campaignId);
 
         // Check for a submitted form and process it
-        if ('1' === $request->request->get('submit')) {
-            if (!$cancelled = $this->isFormCancelled($form)) {
-                if ($valid = $this->isFormValid($form)) {
-                    $success = 1;
+        if ('1' === $request->request->get('submit') && !$cancelled = $this->isFormCancelled($form)) {
+            if ($valid = $this->isFormValid($form)) {
+                $success = 1;
 
-                    // form is valid so process the data
-                    $keyId = 'new'.bin2hex(random_bytes(32));
+                // form is valid so process the data
+                $keyId = 'new'.bin2hex(random_bytes(32));
 
-                    // save the properties to return with request
-                    $modifiedEvents = $this->modifiedEvents;
-                    $formData       = $form->getData();
-                    $event          = array_merge($event, $formData);
-                    $event['id']    = $event['tempId']    = $keyId;
-                    if (empty($event['name'])) {
-                        // set it to the event default
-                        $event['name'] = $this->translator->trans($event['settings']['label']);
-                    }
-                    $modifiedEvents[$keyId] = $event;
-                    $this->modifiedEvents   = $modifiedEvents;
-                } else {
-                    $success = 0;
+                // save the properties to return with request
+                $modifiedEvents = $this->modifiedEvents;
+                $formData       = $form->getData();
+                $event          = array_merge($event, $formData);
+                $event['id']    = $event['tempId']    = $keyId;
+                if (empty($event['name'])) {
+                    // set it to the event default
+                    $event['name'] = $this->translator->trans($event['settings']['label']);
                 }
+                $modifiedEvents[$keyId] = $event;
+                $this->modifiedEvents   = $modifiedEvents;
+            } else {
+                $success = 0;
             }
         }
 
@@ -283,18 +281,16 @@ final class EventController extends CommonFormController
         $modifiedEvents = $this->modifiedEvents;
 
         // Check for a submitted form and process it
-        if ('1' === $request->request->get('submit')) {
-            if (!$cancelled = $this->isFormCancelled($form)) {
-                if ($valid = $this->isFormValid($form)) {
-                    $formData = $form->getData();
-                    $event    = array_merge($event, $formData);
+        if ('1' === $request->request->get('submit') && !$cancelled = $this->isFormCancelled($form)) {
+            if ($valid = $this->isFormValid($form)) {
+                $formData = $form->getData();
+                $event    = array_merge($event, $formData);
 
-                    // Set the name to the event default if not known.
-                    if (empty($event['name'])) {
-                        $event['name'] = $event['settings']['label'];
-                    }
-                    $modifiedEvents[$objectId] = $event;
+                // Set the name to the event default if not known.
+                if (empty($event['name'])) {
+                    $event['name'] = $event['settings']['label'];
                 }
+                $modifiedEvents[$objectId] = $event;
             }
         }
 
@@ -505,8 +501,8 @@ final class EventController extends CommonFormController
                 'eventName'     => $event['name'],
                 'eventType'     => $event['eventType'],
                 'type'          => $event['type'],
-                'campaignId'    => $campaign ? $campaign->getId() : $campaignId,
-                'campaignName'  => $campaign ? $campaign->getName() : $this->translator->trans('mautic.campaign.event.clone.new.campaign'),
+                'campaignId'    => $campaign instanceof \Mautic\CampaignBundle\Entity\Campaign ? $campaign->getId() : $campaignId,
+                'campaignName'  => $campaign instanceof \Mautic\CampaignBundle\Entity\Campaign ? $campaign->getName() : $this->translator->trans('mautic.campaign.event.clone.new.campaign'),
             ];
         } else {
             $dataArray = ['success' => 0];

@@ -154,17 +154,14 @@ final class PublicController extends CommonFormController
             if ('mautic_code_mode' === $template) {
                 $template = null; // Use system default
             }
-
             /** @var \Mautic\FormBundle\Entity\Form $unsubscribeForm */
             $unsubscribeForm = $email->getUnsubscribeForm();
             if (null != $unsubscribeForm && $unsubscribeForm->isPublished()) {
                 $formTemplate = $unsubscribeForm->getTemplate();
                 $formContent  = '<div class="mautic-unsubscribeform">'.$formModel->getContent($unsubscribeForm).'</div>';
             }
-        } else {
-            if ($isOneClickUnsubscribe) {
-                return new Response($this->translator->trans('mautic.email.stat_record.not_found'), Response::HTTP_NOT_FOUND);
-            }
+        } elseif ($isOneClickUnsubscribe) {
+            return new Response($this->translator->trans('mautic.email.stat_record.not_found'), Response::HTTP_NOT_FOUND);
         }
 
         if (empty($template) && empty($formTemplate)) {
@@ -781,7 +778,7 @@ final class PublicController extends CommonFormController
 
     private function oneClickUnsubscribe(EmailModel $model, ?Stat $stat): Response
     {
-        if (!$stat) {
+        if (!$stat instanceof \Mautic\EmailBundle\Entity\Stat) {
             $statsNotFount = $this->translator->trans('mautic.email.stat_record.not_found');
 
             return new Response($statsNotFount, Response::HTTP_NOT_FOUND);

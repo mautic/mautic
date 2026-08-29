@@ -99,7 +99,7 @@ class StatsEvent extends Event
     public function isLookingForTable($table, ?CommonRepository $repository = null): bool
     {
         $this->tables[] = $table = str_replace(MAUTIC_TABLE_PREFIX, '', $table);
-        if ($repository) {
+        if ($repository instanceof \Mautic\CoreBundle\Entity\CommonRepository) {
             $this->tableColumns[$table] = $repository->getTableColumns();
         }
 

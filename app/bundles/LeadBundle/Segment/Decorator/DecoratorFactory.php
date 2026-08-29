@@ -27,7 +27,7 @@ class DecoratorFactory
         $decoratorEvent = new LeadListFiltersDecoratorDelegateEvent($contactSegmentFilterCrate);
 
         $this->eventDispatcher->dispatch($decoratorEvent, LeadEvents::SEGMENT_ON_DECORATOR_DELEGATE);
-        if ($decorator = $decoratorEvent->getDecorator()) {
+        if (($decorator = $decoratorEvent->getDecorator()) instanceof \Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface) {
             return $decorator;
         }
 

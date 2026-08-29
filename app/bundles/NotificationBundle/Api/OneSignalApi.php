@@ -77,10 +77,8 @@ class OneSignalApi extends AbstractNotificationApi
 
         $data['contents'] = $message;
 
-        if (!empty($title)) {
-            if (!is_array($title)) {
-                $title = ['en' => $title];
-            }
+        if (!empty($title) && !is_array($title)) {
+            $title = ['en' => $title];
         }
 
         $data['headings'] = $title;
@@ -91,14 +89,11 @@ class OneSignalApi extends AbstractNotificationApi
 
         if ($notification->isMobile()) {
             $this->addMobileData($data, $notification->getMobileSettings());
-
             if ($button) {
                 $data['buttons'][] = ['id' => $buttonId, 'text' => $button];
             }
-        } else {
-            if ($button && $url) {
-                $data['web_buttons'][] = ['id' => $buttonId, 'text' => $button, 'url' => $url];
-            }
+        } elseif ($button && $url) {
+            $data['web_buttons'][] = ['id' => $buttonId, 'text' => $button, 'url' => $url];
         }
 
         return $this->send('/notifications', $data);

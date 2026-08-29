@@ -60,7 +60,7 @@ final class NotificationApiController extends CommonApiController
     {
         $osid = $request->get('osid');
         if ($osid) {
-            if ($currentLead = $this->contactTracker->getContact()) {
+            if (($currentLead = $this->contactTracker->getContact()) instanceof \Mautic\LeadBundle\Entity\Lead) {
                 $currentLead->addPushIDEntry($osid);
                 $this->leadModel->saveEntity($currentLead);
             }

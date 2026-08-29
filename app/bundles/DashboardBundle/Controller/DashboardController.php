@@ -261,7 +261,7 @@ final class DashboardController extends AbstractFormController
         $success = 0;
         $entity = $this->dashboardModel->getEntity($objectId);
 
-        if ($entity) {
+        if ($entity instanceof \Mautic\DashboardBundle\Entity\Widget) {
             $this->dashboardModel->deleteEntity($entity);
             $name      = $entity->getName();
             $flashes[] = [
@@ -432,28 +432,26 @@ final class DashboardController extends AbstractFormController
         $action = $this->generateUrl('mautic_dashboard_action', ['objectAction' => 'import']);
         $form   = $this->createForm(UploadType::class, [], ['action' => $action]);
 
-        if ($request->isMethod(Request::METHOD_POST)) {
-            if (!$this->isFormCancelled($form)) {
-                if ($this->isFormValid($form)) {
-                    $fileData = $form['file']->getData();
-                    if (!empty($fileData)) {
-                        $extension = pathinfo($fileData->getClientOriginalName(), PATHINFO_EXTENSION);
-                        if ('json' === $extension) {
-                            $fileData->move($directories['user'], $fileData->getClientOriginalName());
-                        } else {
-                            $form->addError(
-                                new FormError(
-                                    $this->translator->trans('mautic.core.not.allowed.file.extension', ['%extension%' => $extension], 'validators')
-                                )
-                            );
-                        }
+        if ($request->isMethod(Request::METHOD_POST) && !$this->isFormCancelled($form)) {
+            if ($this->isFormValid($form)) {
+                $fileData = $form['file']->getData();
+                if (!empty($fileData)) {
+                    $extension = pathinfo($fileData->getClientOriginalName(), PATHINFO_EXTENSION);
+                    if ('json' === $extension) {
+                        $fileData->move($directories['user'], $fileData->getClientOriginalName());
                     } else {
                         $form->addError(
                             new FormError(
-                                $this->translator->trans('mautic.dashboard.upload.filenotfound', [], 'validators')
+                                $this->translator->trans('mautic.core.not.allowed.file.extension', ['%extension%' => $extension], 'validators')
                             )
                         );
                     }
+                } else {
+                    $form->addError(
+                        new FormError(
+                            $this->translator->trans('mautic.dashboard.upload.filenotfound', [], 'validators')
+                        )
+                    );
                 }
             }
         }

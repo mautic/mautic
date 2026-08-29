@@ -252,7 +252,7 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
             ->method('getUnHealthySince')
             ->willReturn(new \DateTimeImmutable());
 
-        if ($sentToAuthor) {
+        if ($sentToAuthor !== 0) {
             $this->owner
                 ->expects($this->once())
                 ->method('getEmail')

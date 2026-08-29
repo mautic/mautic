@@ -47,7 +47,7 @@ final readonly class Reply implements ProcessorInterface
 
         $hashId = $repliedEmail->getStatHash();
         $result = $this->contactFinder->findByHash($hashId);
-        if (!$stat = $result->getStat()) {
+        if (!($stat = $result->getStat()) instanceof \Mautic\EmailBundle\Entity\Stat) {
             // No stat found so bail as we won't consider this a reply
             $this->logger->debug('MONITORED EMAIL: Stat not found');
 

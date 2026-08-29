@@ -71,7 +71,7 @@ class FailedLeadEventLog
     {
         $this->log = $log;
 
-        if ($log) {
+        if ($log instanceof \Mautic\CampaignBundle\Entity\LeadEventLog) {
             $log->setFailedLog($this);
         }
 

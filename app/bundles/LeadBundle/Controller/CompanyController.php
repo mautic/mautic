@@ -226,42 +226,38 @@ final class CompanyController extends FormController
         // /Check for a submitted form and process it
         if ('POST' === $request->getMethod()) {
             $valid = false;
-            if (!$cancelled = $this->isFormCancelled($form)) {
-                if ($valid = $this->isFormValid($form)) {
-                    // form is valid so process the data
-                    // get custom field values
-                    $data = $request->request->all()['company'] ?? [];
-                    // pull the data from the form in order to apply the form's formatting
-                    foreach ($form as $f) {
-                        $data[$f->getName()] = $f->getData();
-                    }
-                    $this->companyModel->setFieldValues($entity, $data, true);
-                    // form is valid so process the data
-                    $this->companyModel->saveEntity($entity);
-
-                    $this->addFlashMessage(
-                        'mautic.core.notice.created',
-                        [
-                            '%name%'      => $entity->getName(),
-                            '%menu_link%' => 'mautic_company_index',
-                            '%url%'       => $this->generateUrl(
-                                'mautic_company_action',
-                                [
-                                    'objectAction' => 'edit',
-                                    'objectId'     => $entity->getId(),
-                                ]
-                            ),
-                        ]
-                    );
-
-                    if ($this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
-                        $viewParameters = ['objectAction' => 'view', 'objectId' => $entity->getId()];
-                        $returnUrl      = $this->generateUrl('mautic_company_action', $viewParameters);
-                        $template       = 'Mautic\LeadBundle\Controller\CompanyController::viewAction';
-                    } else {
-                        // return edit view so that all the session stuff is loaded
-                        return $this->editAction($request, $entity->getId(), true);
-                    }
+            if (!$cancelled = $this->isFormCancelled($form) && $valid = $this->isFormValid($form)) {
+                // form is valid so process the data
+                // get custom field values
+                $data = $request->request->all()['company'] ?? [];
+                // pull the data from the form in order to apply the form's formatting
+                foreach ($form as $f) {
+                    $data[$f->getName()] = $f->getData();
+                }
+                $this->companyModel->setFieldValues($entity, $data, true);
+                // form is valid so process the data
+                $this->companyModel->saveEntity($entity);
+                $this->addFlashMessage(
+                    'mautic.core.notice.created',
+                    [
+                        '%name%'      => $entity->getName(),
+                        '%menu_link%' => 'mautic_company_index',
+                        '%url%'       => $this->generateUrl(
+                            'mautic_company_action',
+                            [
+                                'objectAction' => 'edit',
+                                'objectId'     => $entity->getId(),
+                            ]
+                        ),
+                    ]
+                );
+                if ($this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
+                    $viewParameters = ['objectAction' => 'view', 'objectId' => $entity->getId()];
+                    $returnUrl      = $this->generateUrl('mautic_company_action', $viewParameters);
+                    $template       = 'Mautic\LeadBundle\Controller\CompanyController::viewAction';
+                } else {
+                    // return edit view so that all the session stuff is loaded
+                    return $this->editAction($request, $entity->getId(), true);
                 }
             }
 

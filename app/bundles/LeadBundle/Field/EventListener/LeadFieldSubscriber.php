@@ -35,7 +35,7 @@ final readonly class LeadFieldSubscriber implements EventSubscriberInterface
         $field    = $event->getField();
         $segments = $this->fieldModel->getFieldSegments($field);
 
-        if (count($segments)) {
+        if (count($segments) > 0) {
             $url = $this->router->generate(
                 'mautic_segment_index',
                 ['search' => 'filters_field:'.$field->getAlias()]

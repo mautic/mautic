@@ -85,11 +85,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 
     protected function setUp(): void
     {
-        if ('testUpdatesContactCampaignActionWithBooleanFields' === $this->name()) {
-            $this->useCleanupRollback = false;
-        } else {
-            $this->useCleanupRollback = true;
-        }
+        $this->useCleanupRollback = 'testUpdatesContactCampaignActionWithBooleanFields' !== $this->name();
 
         parent::setUp();
 
@@ -647,7 +643,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $contact->setFirstname($firstname);
         $contact->setLastname($lastname);
 
-        if ($points) {
+        if ($points !== 0) {
             $contact->setPoints($points);
         }
 

@@ -944,20 +944,17 @@ abstract class AbstractStandardFormController extends AbstractFormController
         if ($isPost) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
-                if ($valid = $this->isFormValid($form)) {
-                    if ($valid = $this->beforeEntitySave($entity, $form, 'new')) {
-                        $model->saveEntity($entity);
-                        $this->afterEntitySave($entity, $form, 'new', $valid);
-
-                        if (method_exists($this, 'viewAction')) {
-                            $viewParameters = ['objectId' => $entity->getId(), 'objectAction' => 'view'];
-                            $returnUrl      = $this->generateUrl($this->getActionRoute(), $viewParameters);
-                            $template       = $this->getControllerBase().'::viewAction';
-                        } else {
-                            $viewParameters = ['page' => $page];
-                            $returnUrl      = $this->generateUrl($this->getIndexRoute(), $viewParameters);
-                            $template       = $this->getControllerBase().'::'.$this->getPostActionControllerAction('new').'Action';
-                        }
+                if (($valid = $this->isFormValid($form)) && $valid = $this->beforeEntitySave($entity, $form, 'new')) {
+                    $model->saveEntity($entity);
+                    $this->afterEntitySave($entity, $form, 'new', $valid);
+                    if (method_exists($this, 'viewAction')) {
+                        $viewParameters = ['objectId' => $entity->getId(), 'objectAction' => 'view'];
+                        $returnUrl      = $this->generateUrl($this->getActionRoute(), $viewParameters);
+                        $template       = $this->getControllerBase().'::viewAction';
+                    } else {
+                        $viewParameters = ['page' => $page];
+                        $returnUrl      = $this->generateUrl($this->getIndexRoute(), $viewParameters);
+                        $template       = $this->getControllerBase().'::'.$this->getPostActionControllerAction('new').'Action';
                     }
                 }
 
@@ -1176,7 +1173,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
         $version = (int) $form->get($entity->getVersionField())
             ->getData();
 
-        if (!$version) {
+        if ($version === 0) {
             throw new \LogicException(sprintf('A version is required for entities that implement "%s"', OptimisticLockInterface::class));
         }
 

@@ -65,11 +65,11 @@ final class BuilderSubscriber implements EventSubscriberInterface
 
     public function onPageDisplay(PageDisplayEvent $event): void
     {
-        if (!$lead = $event->getLead()) {
+        if (!($lead = $event->getLead()) instanceof \Mautic\LeadBundle\Entity\Lead) {
             $lead = $this->security->isAnonymous() ? $this->contactTracker->getContact() : null;
         }
 
-        $leadId  = $lead ? $lead->getId() : null;
+        $leadId  = $lead instanceof \Mautic\LeadBundle\Entity\Lead ? $lead->getId() : null;
         $page    = $event->getPage();
         $tokens  = $this->generateTokensFromContent($event, $leadId, ['page', $page->getId()]);
         $content = $event->getContent();

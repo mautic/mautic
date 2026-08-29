@@ -229,13 +229,11 @@ class FormEntity extends CommonEntity
     {
         if ($checkPublishStatus && method_exists($this, 'getPublishUp')) {
             $status = $this->getPublishStatus();
-            if ('published' === $status) {
-                // check to see if there is a category to check
-                if ($checkCategoryStatus && method_exists($this, 'getCategory')) {
-                    $category = $this->getCategory();
-                    if (null !== $category && !$category->isPublished()) {
-                        return false;
-                    }
+            // check to see if there is a category to check
+            if ('published' === $status && ($checkCategoryStatus && method_exists($this, 'getCategory'))) {
+                $category = $this->getCategory();
+                if (null !== $category && !$category->isPublished()) {
+                    return false;
                 }
             }
 

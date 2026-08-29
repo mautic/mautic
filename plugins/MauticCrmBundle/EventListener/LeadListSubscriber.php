@@ -106,10 +106,8 @@ final readonly class LeadListSubscriber implements EventSubscriberInterface
                         continue;
                     }
 
-                    if (method_exists($integrationObject, 'getCampaignMembers')) {
-                        if ($integrationObject->getCampaignMembers($campaignId)) {
-                            $success = true;
-                        }
+                    if (method_exists($integrationObject, 'getCampaignMembers') && $integrationObject->getCampaignMembers($campaignId)) {
+                        $success = true;
                     }
                 }
             }

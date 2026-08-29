@@ -132,7 +132,7 @@ final class MailchimpType extends AbstractType
                     'error_bubbling'       => false,
                 ]);
 
-                if ($error) {
+                if ($error !== '' && $error !== '0') {
                     $form->addError(new FormError($error));
                 }
             };

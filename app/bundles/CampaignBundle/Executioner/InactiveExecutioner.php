@@ -76,7 +76,7 @@ class InactiveExecutioner implements ExecutionerInterface
         } catch (NoEventsFoundException) {
             $this->logger->debug('CAMPAIGN: No events to process');
         } finally {
-            if ($this->progressBar) {
+            if ($this->progressBar instanceof \Symfony\Component\Console\Helper\ProgressBar) {
                 $this->progressBar->finish();
             }
         }
@@ -109,7 +109,7 @@ class InactiveExecutioner implements ExecutionerInterface
         } catch (NoEventsFoundException) {
             $this->logger->debug('CAMPAIGN: No events to process');
         } finally {
-            if ($this->progressBar) {
+            if ($this->progressBar instanceof \Symfony\Component\Console\Helper\ProgressBar) {
                 $this->progressBar->finish();
             }
         }
@@ -165,7 +165,7 @@ class InactiveExecutioner implements ExecutionerInterface
                 )
             );
 
-            if (!$totalContacts) {
+            if ($totalContacts === 0) {
                 throw new NoContactsFoundException();
             }
         }

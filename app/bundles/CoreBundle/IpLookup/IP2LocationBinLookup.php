@@ -56,7 +56,7 @@ final class IP2LocationBinLookup extends AbstractLocalDataLookup
                 $this->timezone  = $record['timeZone'];
             }
         } catch (\Exception $exception) {
-            if ($this->logger) {
+            if ($this->logger instanceof \Psr\Log\LoggerInterface) {
                 $this->logger->warning('IP LOOKUP: '.$exception->getMessage());
             }
         }

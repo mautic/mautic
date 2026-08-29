@@ -87,11 +87,7 @@ class AbTestSettingsService
     private function setGeneralSettings(VariantEntityInterface $parentVariant): void
     {
         $parentSettings = $parentVariant->getVariantSettings();
-        if (isset($parentSettings['totalWeight'])) {
-            $this->totalWeight = $parentSettings['totalWeight'];
-        } else {
-            $this->totalWeight = self::DEFAULT_TOTAL_WEIGHT;
-        }
+        $this->totalWeight = $parentSettings['totalWeight'] ?? self::DEFAULT_TOTAL_WEIGHT;
 
         if (isset($parentSettings['sendWinnerDelay'])) {
             $this->sendWinnerDelay = $parentSettings['sendWinnerDelay'];

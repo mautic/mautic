@@ -112,10 +112,8 @@ final class ParameterLoader
         }
 
         // We need this for the file manager
-        if (isset($paths['local_root'])) {
-            if ($updateDefaultParameters) {
-                self::$defaultParameters['local_root'] = $paths['local_root'];
-            }
+        if (isset($paths['local_root']) && $updateDefaultParameters) {
+            self::$defaultParameters['local_root'] = $paths['local_root'];
         }
 
         return $paths['local_config'];

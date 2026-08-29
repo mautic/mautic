@@ -65,11 +65,7 @@ final readonly class ProcessUnsubscribeSubscriber implements EventSubscriberInte
             $existing         = $headers['List-Unsubscribe'] ?? '';
             $unsubscribeEmail = "<mailto:{$unsubscribeEmail}>";
             if ($existing) {
-                if (!str_contains($existing, $unsubscribeEmail)) {
-                    $updatedHeader = $existing.', '.$unsubscribeEmail;
-                } else {
-                    $updatedHeader = $existing;
-                }
+                $updatedHeader = !str_contains($existing, $unsubscribeEmail) ? $existing.', '.$unsubscribeEmail : $existing;
             } else {
                 $updatedHeader = $unsubscribeEmail;
             }

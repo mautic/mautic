@@ -248,11 +248,7 @@ final class FieldType extends AbstractType
                 case 'multiselect':
                     $cleaningRules['defaultValue'] = 'raw';
 
-                    if (is_array($data)) {
-                        $properties = $data['properties'] ?? [];
-                    } else {
-                        $properties = $data->getProperties();
-                    }
+                    $properties = is_array($data) ? $data['properties'] ?? [] : $data->getProperties();
 
                     $propertiesList['list'] = isset($properties['list']) && 'lookup' === $type ? array_flip(array_filter($properties['list'])) : $properties['list'];
 

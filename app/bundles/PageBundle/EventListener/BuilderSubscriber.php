@@ -276,7 +276,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
 
         $content = trim($this->twig->render($templateName, $templateParams));
 
-        if ($wrapperTemplate) {
+        if ($wrapperTemplate !== '' && $wrapperTemplate !== '0') {
             // If the content is not empty, ensure that the $wrapperTemplate contains a place to put it.
             if (!empty($content) && !str_contains($wrapperTemplate, '{templateContent}')) {
                 throw new \InvalidArgumentException('Your $wrapperTemplate must contain the string {templateContent} where you want to insert the rendered template content.');

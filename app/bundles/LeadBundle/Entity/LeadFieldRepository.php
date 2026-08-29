@@ -285,12 +285,7 @@ class LeadFieldRepository extends CommonRepository
             )
               ->setParameter('lead', (int) $lead);
         } elseif ('regexp' === $operatorExpr || 'notRegexp' === $operatorExpr) {
-            if ('regexp' === $operatorExpr) {
-                $where = $property.' REGEXP  :value';
-            } else {
-                $where = $property.' NOT REGEXP  :value';
-            }
-
+            $where = 'regexp' === $operatorExpr ? $property.' REGEXP  :value' : $property.' NOT REGEXP  :value';
             $q->where(
                 $q->expr()->and(
                     $q->expr()->eq('l.id', ':lead'),

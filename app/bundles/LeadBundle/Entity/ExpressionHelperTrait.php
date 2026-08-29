@@ -34,7 +34,7 @@ trait ExpressionHelperTrait
             $expr = $q->expr()->{$operator}($column, $parameter);
         }
 
-        if ($appendTo) {
+        if ($appendTo instanceof \Doctrine\DBAL\Query\Expression\CompositeExpression) {
             return $appendTo->with($expr);
         }
 

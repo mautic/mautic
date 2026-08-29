@@ -57,7 +57,7 @@ final readonly class PointSubscriber implements EventSubscriberInterface
      */
     public function onPageHit(Events\PageHitEvent $event): void
     {
-        if ($event->getPage()) {
+        if ($event->getPage() instanceof \Mautic\PageBundle\Entity\Page) {
             // Mautic Landing Page was hit
             $this->pointModel->triggerAction('page.hit', $event->getHit(), null, $event->getLead());
         } else {

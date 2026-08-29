@@ -56,12 +56,10 @@ final readonly class PreAuthorizationEventListener implements EventSubscriberInt
     {
         $client = $event->getClient();
 
-        if ($event->isAuthorizedClient() && $client instanceof Client) {
-            if ($user = $this->getUser($event)) {
-                $client->addUser($user);
-                $this->em->persist($client);
-                $this->em->flush();
-            }
+        if ($event->isAuthorizedClient() && $client instanceof Client && $user = $this->getUser($event)) {
+            $client->addUser($user);
+            $this->em->persist($client);
+            $this->em->flush();
         }
     }
 

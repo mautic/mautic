@@ -72,7 +72,7 @@ final class DeduplicateCommand extends Command
         $duplicateCount  = $this->contactDeduper->countDuplicatedContacts(array_keys($uniqueFields));
         $stopwatch       = new Stopwatch();
 
-        if (!$duplicateCount) {
+        if ($duplicateCount === 0) {
             $output->writeln('<error>No contacts to deduplicate.</error>');
 
             return Command::FAILURE;

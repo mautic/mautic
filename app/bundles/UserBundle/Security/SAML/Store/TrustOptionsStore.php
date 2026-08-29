@@ -18,7 +18,7 @@ final class TrustOptionsStore implements TrustOptionsStoreInterface
 
     public function get($entityId): TrustOptions
     {
-        if ($this->trustOptions) {
+        if ($this->trustOptions instanceof \LightSaml\Meta\TrustOptions\TrustOptions) {
             return $this->trustOptions;
         }
 

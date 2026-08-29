@@ -51,7 +51,7 @@ final readonly class DateTimeToken
             default    => $modifier ?: $defaultDatetimeFormat,
         };
 
-        if ($relativeDate) {
+        if ($relativeDate !== '' && $relativeDate !== '0') {
             $dateTime->modify($relativeDate);
         }
 

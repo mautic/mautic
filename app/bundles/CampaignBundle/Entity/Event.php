@@ -244,7 +244,7 @@ class Event implements ChannelInterface, UuidInterface
         $this->children          = new ArrayCollection();
         $this->redirectingEvents = new ArrayCollection();
 
-        if ($dateAdded) {
+        if ($dateAdded instanceof \DateTime) {
             $this->setDateAdded($dateAdded);
             $this->setDateLinked($dateAdded);
         } else {
@@ -706,7 +706,7 @@ class Event implements ChannelInterface, UuidInterface
 
         $log = $this->log->matching($criteria);
 
-        if (count($log)) {
+        if (count($log) > 0) {
             return $log->first();
         }
 

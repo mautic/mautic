@@ -225,7 +225,7 @@ class MembershipManager
 
     private function advanceProgressBar(): void
     {
-        if ($this->progressBar) {
+        if ($this->progressBar instanceof \Symfony\Component\Console\Helper\ProgressBar) {
             $this->progressBar->advance();
         }
     }

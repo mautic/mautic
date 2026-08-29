@@ -350,7 +350,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         $this->metadata['triggerDateLog'] ??= [];
         $this->metadata['triggerDateLog'][] = [
             'date'      => new \DateTime()->format(DateTimeHelper::FORMAT_DB),
-            'changedTo' => $newTriggerDate ? $newTriggerDate->format(DateTimeHelper::FORMAT_DB) : null,
+            'changedTo' => $newTriggerDate instanceof \DateTimeInterface ? $newTriggerDate->format(DateTimeHelper::FORMAT_DB) : null,
             'note'      => $note,
         ];
     }

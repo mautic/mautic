@@ -77,11 +77,7 @@ final class AvatarHelper
 
         if (empty($img)) {
             // Default to gravatar if others failed
-            if (!empty($leadEmail)) {
-                $img = $this->gravatarHelper->getImage($leadEmail);
-            } else {
-                $img = $this->defaultAvatarHelper->getDefaultAvatar();
-            }
+            return !empty($leadEmail) ? $this->gravatarHelper->getImage($leadEmail) : $this->defaultAvatarHelper->getDefaultAvatar();
         }
 
         return $img;

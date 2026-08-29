@@ -226,11 +226,7 @@ class AjaxController extends CommonController
 
         $post = $request->request->all();
         unset($post['model'], $post['id'], $post['action']);
-        if ([] !== $post) {
-            $extra = http_build_query($post);
-        } else {
-            $extra = '';
-        }
+        $extra = [] !== $post ? http_build_query($post) : '';
 
         $entity = $model->getEntity($id);
         if (null !== $entity) {
@@ -402,35 +398,30 @@ class AjaxController extends CommonController
 
             if ($ipService instanceof AbstractLookup) {
                 $dataArray['attribution'] = $ipService->getAttribution();
-                if ($ipService instanceof IpLookupFormInterface) {
-                    if ($formType = $ipService->getConfigFormService()) {
-                        $themes   = $ipService->getConfigFormThemes();
-                        $themes[] = '@MauticCore/FormTheme/Config/config_layout.html.twig';
-
-                        $form = $this->createFormBuilder()
-                            ->add(
-                                'ip_lookup_config',
-                                $formType,
-                                [
-                                    'label'             => false,
-                                    'ip_lookup_service' => $ipService,
-                                    'csrf_protection'   => false,
-                                ]
-                            )
-                            ->getForm();
-
-                        $html = $this->renderView(
-                            '@MauticCore/Default/ajax_form.html.twig',
+                if ($ipService instanceof IpLookupFormInterface && $formType = $ipService->getConfigFormService()) {
+                    $themes   = $ipService->getConfigFormThemes();
+                    $themes[] = '@MauticCore/FormTheme/Config/config_layout.html.twig';
+                    $form = $this->createFormBuilder()
+                        ->add(
+                            'ip_lookup_config',
+                            $formType,
                             [
-                                'form'       => $form->createView(),
-                                'formThemes' => $themes,
+                                'label'             => false,
+                                'ip_lookup_service' => $ipService,
+                                'csrf_protection'   => false,
                             ]
-                        );
-
-                        $html              = str_replace($formType.'_', 'config_coreconfig_ip_lookup_config_', $html);
-                        $html              = str_replace($formType, 'config[coreconfig][ip_lookup_config]', $html);
-                        $dataArray['html'] = $html;
-                    }
+                        )
+                        ->getForm();
+                    $html = $this->renderView(
+                        '@MauticCore/Default/ajax_form.html.twig',
+                        [
+                            'form'       => $form->createView(),
+                            'formThemes' => $themes,
+                        ]
+                    );
+                    $html              = str_replace($formType.'_', 'config_coreconfig_ip_lookup_config_', $html);
+                    $html              = str_replace($formType, 'config[coreconfig][ip_lookup_config]', $html);
+                    $dataArray['html'] = $html;
                 }
             }
         }

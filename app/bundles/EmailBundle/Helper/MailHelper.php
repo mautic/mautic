@@ -650,7 +650,7 @@ class MailHelper
         // Body
         $body         = $message->getHtmlBody();
         $bodyReplaced = str_ireplace($search, $replace, (string) $body, $updated);
-        if ($updated) {
+        if ($updated !== 0) {
             $message->html($bodyReplaced);
         }
         unset($body, $bodyReplaced);
@@ -659,7 +659,7 @@ class MailHelper
         $subject      = $message->getSubject();
         $bodyReplaced = str_ireplace($search, $replace, $subject, $updated);
 
-        if ($updated) {
+        if ($updated !== 0) {
             $message->subject($bodyReplaced);
         }
         unset($subject, $bodyReplaced);
@@ -716,7 +716,7 @@ class MailHelper
         if (!$asset instanceof Asset) {
             $asset = $this->assetModel->getEntity($asset);
 
-            if (!$asset) {
+            if (!$asset instanceof \Mautic\AssetBundle\Entity\Asset) {
                 return;
             }
         }
@@ -1441,14 +1441,12 @@ class MailHelper
      */
     public function parsePlainText($content = null): void
     {
-        if (null == $content) {
-            if (!$content = $this->message->getHtmlBody()) {
-                $content = $this->body['content'];
-            }
+        if (null == $content && !$content = $this->message->getHtmlBody()) {
+            $content = $this->body['content'];
         }
 
         $request = $this->requestStack->getCurrentRequest();
-        $baseUrl = $request ? $request->getSchemeAndHttpHost().$request->getBasePath() : $this->coreParametersHelper->get('site_url');
+        $baseUrl = $request instanceof \Symfony\Component\HttpFoundation\Request ? $request->getSchemeAndHttpHost().$request->getBasePath() : $this->coreParametersHelper->get('site_url');
         $parser  = new PlainTextHelper(['base_url' => $baseUrl]);
 
         $this->plainText = $parser->setHtml($content)->getText();
@@ -1927,7 +1925,7 @@ class MailHelper
     private function setDefaultReplyTo(?string $systemReplyToEmail = null, ?AddressDTO $systemFromEmail = null): void
     {
         $fromEmail = null;
-        if ($systemFromEmail) {
+        if ($systemFromEmail instanceof \Mautic\EmailBundle\Helper\DTO\AddressDTO) {
             $fromEmail = $systemFromEmail->getEmail();
         }
 
@@ -2039,7 +2037,7 @@ class MailHelper
     private function getSystemReplyTo(): string
     {
         if (!$this->systemReplyTo) {
-            $fromEmailAddress    = $this->from ? $this->from->getEmail() : null;
+            $fromEmailAddress    = $this->from instanceof \Mautic\EmailBundle\Helper\DTO\AddressDTO ? $this->from->getEmail() : null;
             $this->systemReplyTo = $this->coreParametersHelper->get('mailer_reply_to_email') ?? $fromEmailAddress ?? $this->getSystemFrom()->getEmail();
         }
 

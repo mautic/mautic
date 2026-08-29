@@ -35,7 +35,7 @@ final class EntityMetadata
 
         foreach ($finder as $file) {
             // Check to see if entities are organized by subfolder
-            $subFolder = $file->getRelativePath() ? $file->getRelativePath().'\\' : '';
+            $subFolder = $file->getRelativePath() !== '' && $file->getRelativePath() !== '0' ? $file->getRelativePath().'\\' : '';
             $fileName  = basename($file->getFilename(), '.php');
 
             // Just check first file for the loadMetadata function

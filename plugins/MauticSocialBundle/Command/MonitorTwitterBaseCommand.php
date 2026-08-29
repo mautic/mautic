@@ -141,7 +141,7 @@ abstract class MonitorTwitterBaseCommand extends Command
         // get the mid from the cli
         $mid = (int) $input->getOption('mid');
 
-        if (!$mid) {
+        if ($mid === 0) {
             $this->output->writeln($this->translator->trans('mautic.social.monitoring.twitter.mid.empty'));
 
             return Command::FAILURE;
@@ -190,7 +190,7 @@ abstract class MonitorTwitterBaseCommand extends Command
             return 0;
         }
 
-        if (count($results['statuses'])) {
+        if (count($results['statuses']) > 0) {
             $this->twitterCommandHelper->createLeadsFromStatuses($results['statuses'], $monitor);
         } else {
             $this->output->writeln($this->translator->trans('mautic.social.monitoring.twitter.no.new.tweets'));

@@ -51,30 +51,28 @@ final class LookupHelper
             return;
         }
 
-        if ($clearbit = $this->getClearbit()) {
-            if (!$checkAuto || $this->integration->shouldAutoUpdate()) {
-                try {
-                    [$cacheId, $webhookId, $cache] = $this->getCache($lead, $notify);
+        if (($clearbit = $this->getClearbit()) && (!$checkAuto || $this->integration->shouldAutoUpdate())) {
+            try {
+                [$cacheId, $webhookId, $cache] = $this->getCache($lead, $notify);
 
-                    if (!array_key_exists($cacheId, $cache['clearbit'])) {
-                        $clearbit->setWebhookId($webhookId);
-                        $res = $clearbit->lookupByEmail($lead->getEmail());
-                        // Prevent from filling up the cache
-                        $cache['clearbit'] = [
-                            $cacheId => serialize($res),
-                            'nonce'  => $cache['clearbit']['nonce'],
-                        ];
-                        $lead->setSocialCache($cache);
+                if (!array_key_exists($cacheId, $cache['clearbit'])) {
+                    $clearbit->setWebhookId($webhookId);
+                    $res = $clearbit->lookupByEmail($lead->getEmail());
+                    // Prevent from filling up the cache
+                    $cache['clearbit'] = [
+                        $cacheId => serialize($res),
+                        'nonce'  => $cache['clearbit']['nonce'],
+                    ];
+                    $lead->setSocialCache($cache);
 
-                        if ($checkAuto) {
-                            $this->leadRepository->saveEntity($lead);
-                        } else {
-                            $this->leadModel->saveEntity($lead);
-                        }
+                    if ($checkAuto) {
+                        $this->leadRepository->saveEntity($lead);
+                    } else {
+                        $this->leadModel->saveEntity($lead);
                     }
-                } catch (\Exception $ex) {
-                    $this->logger->log('error', 'Error while using Clearbit to lookup '.$lead->getEmail().': '.$ex->getMessage());
                 }
+            } catch (\Exception $ex) {
+                $this->logger->log('error', 'Error while using Clearbit to lookup '.$lead->getEmail().': '.$ex->getMessage());
             }
         }
     }
@@ -89,30 +87,28 @@ final class LookupHelper
             return;
         }
 
-        if ($clearbit = $this->getClearbit(false)) {
-            if (!$checkAuto || $this->integration->shouldAutoUpdate()) {
-                try {
-                    $parse                             = parse_url($company->getFieldValue('companywebsite'));
-                    [$cacheId, $webhookId, $cache]     = $this->getCache($company, $notify);
+        if (($clearbit = $this->getClearbit(false)) && (!$checkAuto || $this->integration->shouldAutoUpdate())) {
+            try {
+                $parse                             = parse_url($company->getFieldValue('companywebsite'));
+                [$cacheId, $webhookId, $cache]     = $this->getCache($company, $notify);
 
-                    if (isset($parse['host']) && !array_key_exists($cacheId, $cache['clearbit'])) {
-                        $clearbit->setWebhookId($webhookId);
-                        $res = $clearbit->lookupByDomain($parse['host']);
-                        // Prevent from filling up the cache
-                        $cache['clearbit'] = [
-                            $cacheId => serialize($res),
-                            'nonce'  => $cache['clearbit']['nonce'],
-                        ];
-                        $company->setSocialCache($cache);
-                        if ($checkAuto) {
-                            $this->companyRepository->saveEntity($company);
-                        } else {
-                            $this->companyModel->saveEntity($company);
-                        }
+                if (isset($parse['host']) && !array_key_exists($cacheId, $cache['clearbit'])) {
+                    $clearbit->setWebhookId($webhookId);
+                    $res = $clearbit->lookupByDomain($parse['host']);
+                    // Prevent from filling up the cache
+                    $cache['clearbit'] = [
+                        $cacheId => serialize($res),
+                        'nonce'  => $cache['clearbit']['nonce'],
+                    ];
+                    $company->setSocialCache($cache);
+                    if ($checkAuto) {
+                        $this->companyRepository->saveEntity($company);
+                    } else {
+                        $this->companyModel->saveEntity($company);
                     }
-                } catch (\Exception $ex) {
-                    $this->logger->log('error', 'Error while using Clearbit to lookup '.$parse['host'].': '.$ex->getMessage());
                 }
+            } catch (\Exception $ex) {
+                $this->logger->log('error', 'Error while using Clearbit to lookup '.$parse['host'].': '.$ex->getMessage());
             }
         }
     }

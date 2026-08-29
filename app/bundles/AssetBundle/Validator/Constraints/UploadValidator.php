@@ -58,9 +58,10 @@ final class UploadValidator extends ConstraintValidator
                 ->addViolation();
         }
 
-        $this->validateExtensionAndMimeType($asset->getExtension(), $asset->loadFile())
-            && $this->validateExtensionAndMimeType($this->parseExtension($asset->getTempName()), $asset->loadFile(true))
-            && $this->validateExtensionAndMimeType($this->parseExtension($asset->getOriginalFileName()), null);
+        if ($this->validateExtensionAndMimeType($asset->getExtension(), $asset->loadFile())
+            && $this->validateExtensionAndMimeType($this->parseExtension($asset->getTempName()), $asset->loadFile(true))) {
+            $this->validateExtensionAndMimeType($this->parseExtension($asset->getOriginalFileName()), null);
+        }
     }
 
     private function validateRemote(Asset $asset): void
@@ -71,8 +72,9 @@ final class UploadValidator extends ConstraintValidator
                 ->addViolation();
         }
 
-        $this->validateMimeType($asset->getRemoteMimeTypeFromHeader())
-            && $this->validateMimeType($asset->getRemoteMimeTypeFromMagicBytes());
+        if ($this->validateMimeType($asset->getRemoteMimeTypeFromHeader())) {
+            $this->validateMimeType($asset->getRemoteMimeTypeFromMagicBytes());
+        }
     }
 
     private function parseExtension(?string $fileName): ?string
@@ -121,7 +123,7 @@ final class UploadValidator extends ConstraintValidator
 
     private function validateMimeType(string $mimeType): bool
     {
-        if (!$mimeType) {
+        if ($mimeType === '' || $mimeType === '0') {
             $this->context->buildViolation('mautic.asset.asset.error.remote.mimetype.not.resolved')
                 ->atPath('file')
                 ->addViolation();

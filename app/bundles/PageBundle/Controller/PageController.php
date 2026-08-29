@@ -212,7 +212,7 @@ final class PageController extends FormController
         $properties              = [];
         $variantError            = false;
         $weight                  = 0;
-        if (count($children)) {
+        if (count($children) > 0) {
             foreach ($children as $c) {
                 $variantSettings = $c->getVariantSettings();
 
@@ -243,26 +243,21 @@ final class PageController extends FormController
 
         $abTestResults = [];
         $criteria      = $model->getBuilderComponents($activePage, 'abTestWinnerCriteria');
-        if (!empty($lastCriteria) && empty($variantError)) {
-            // there is a criteria to compare the pages against so let's shoot the page over to the criteria function to do its thing
-            if (isset($criteria['criteria'][$lastCriteria])) {
-                $testSettings = $criteria['criteria'][$lastCriteria];
-
-                $args = [
-                    'page'       => $activePage,
-                    'parent'     => $parent,
-                    'children'   => $children,
-                    'properties' => $properties,
-                ];
-
-                $event = new DetermineWinnerEvent($args);
-                $this->dispatcher->dispatch(
-                    $event,
-                    $testSettings['event']
-                );
-
-                $abTestResults = $event->getAbTestResults();
-            }
+        // there is a criteria to compare the pages against so let's shoot the page over to the criteria function to do its thing
+        if (!empty($lastCriteria) && empty($variantError) && isset($criteria['criteria'][$lastCriteria])) {
+            $testSettings = $criteria['criteria'][$lastCriteria];
+            $args = [
+                'page'       => $activePage,
+                'parent'     => $parent,
+                'children'   => $children,
+                'properties' => $properties,
+            ];
+            $event = new DetermineWinnerEvent($args);
+            $this->dispatcher->dispatch(
+                $event,
+                $testSettings['event']
+            );
+            $abTestResults = $event->getAbTestResults();
         }
 
         // Init the date range filter form
@@ -636,7 +631,7 @@ final class PageController extends FormController
         $error = $this->getFormErrorForBuilder($form);
         $data  = ['version' => $error ? $form['version']->getData() : $entity->getVersion()];
 
-        if ($optimizedResponse = $this->returnOptimizedResponse($request, $form, '#mautic_page_index', 'page', $route, $data)) {
+        if (($optimizedResponse = $this->returnOptimizedResponse($request, $form, '#mautic_page_index', 'page', $route, $data)) instanceof \Symfony\Component\HttpFoundation\JsonResponse) {
             return $optimizedResponse;
         }
 
@@ -880,7 +875,7 @@ final class PageController extends FormController
     {
         $entity = $model->getEntity($objectId);
 
-        if (!$entity) {
+        if (!$entity instanceof \Mautic\PageBundle\Entity\Page) {
             return $this->notFound();
         }
 

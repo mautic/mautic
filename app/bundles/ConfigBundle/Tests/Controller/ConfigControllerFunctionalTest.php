@@ -72,7 +72,7 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
         // Check for a flash error
         $response = $this->client->getResponse()->getContent();
-        $message  = $crawler->filterXPath("//div[@id='flashes']//span")->count()
+        $message  = $crawler->filterXPath("//div[@id='flashes']//span")->count() !== 0
             ?
             $crawler->filterXPath("//div[@id='flashes']//span")->first()->text()
             :

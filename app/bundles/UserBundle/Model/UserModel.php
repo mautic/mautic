@@ -113,10 +113,8 @@ class UserModel extends FormModel implements GlobalSearchInterface
      */
     public function checkNewPassword(User $entity, $submittedPassword, $validate = false): ?string
     {
-        if ($validate) {
-            if (strlen($submittedPassword) < 6) {
-                throw new \InvalidArgumentException($this->translator->trans('mautic.user.user.password.minlength', [], 'validators'));
-            }
+        if ($validate && strlen($submittedPassword) < 6) {
+            throw new \InvalidArgumentException($this->translator->trans('mautic.user.user.password.minlength', [], 'validators'));
         }
 
         if (!empty($submittedPassword)) {
@@ -523,7 +521,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
 
     private function logInvalidInvite(string $reason, ?UserInvite $invite = null, ?string $selector = null): void
     {
-        if ($invite) {
+        if ($invite instanceof \Mautic\UserBundle\Entity\UserInvite) {
             $context = [
                 'invite_id' => $invite->getId(),
                 'email'     => $invite->getEmail(),

@@ -104,14 +104,10 @@ final class CoreHelpersExtension extends AbstractExtension
             return 'href="javascript:void(0);"';
         }
 
-        if ($jsCallback) {
+        if ($jsCallback !== '' && $jsCallback !== '0') {
             if ([] !== $jsArguments) {
                 foreach ($jsArguments as $key => $argument) {
-                    if (is_array($argument)) {
-                        $jsArguments[$key] = json_encode($argument);
-                    } else {
-                        $jsArguments[$key] = "\"{$jsArguments[$key]}\"";
-                    }
+                    $jsArguments[$key] = is_array($argument) ? json_encode($argument) : "\"{$jsArguments[$key]}\"";
                 }
 
                 return 'href="javascript:void(0);"'." onclick='".$jsCallback.'('.implode(',', $jsArguments).", {$page}, this);'";

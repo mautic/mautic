@@ -24,7 +24,7 @@ final class DebugLogger
      */
     public static function log($integration, $message, $loggedFrom = null, array $context = [], $urgency = LogLevel::DEBUG): void
     {
-        if (!self::$logger) {
+        if (!self::$logger instanceof \Psr\Log\LoggerInterface) {
             return;
         }
 

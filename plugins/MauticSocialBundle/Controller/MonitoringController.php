@@ -166,40 +166,34 @@ final class MonitoringController extends FormController
             $viewParameters = ['page' => $page];
             $template       = 'MauticPlugin\MauticSocialBundle\Controller\MonitoringController::indexAction';
             $valid          = false;
-            if (!$cancelled = $this->isFormCancelled($form)) {
-                if ($valid = $this->isFormValid($form)) {
-                    // form is valid so process the data
-                    $model->saveEntity($entity);
-
-                    // update the audit log
-                    $this->updateAuditLog($entity, $ipLookupHelper, 'create');
-
-                    $this->addFlashMessage(
-                        'mautic.core.notice.created',
-                        [
-                            '%name%'      => $entity->getTitle(),
-                            '%menu_link%' => 'mautic_social_index',
-                            '%url%'       => $this->generateUrl(
-                                'mautic_social_action',
-                                [
-                                    'objectAction' => 'edit',
-                                    'objectId'     => $entity->getId(),
-                                ]
-                            ),
-                        ]
-                    );
-
-                    if (!$this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
-                        // return edit view so that all the session stuff is loaded
-                        return $this->editAction($request, $ipLookupHelper, $entity->getId(), true);
-                    }
-
-                    $viewParameters = [
-                        'objectAction' => 'view',
-                        'objectId'     => $entity->getId(),
-                    ];
-                    $template = 'MauticPlugin\MauticSocialBundle\Controller\MonitoringController::viewAction';
+            if (!$cancelled = $this->isFormCancelled($form) && $valid = $this->isFormValid($form)) {
+                // form is valid so process the data
+                $model->saveEntity($entity);
+                // update the audit log
+                $this->updateAuditLog($entity, $ipLookupHelper, 'create');
+                $this->addFlashMessage(
+                    'mautic.core.notice.created',
+                    [
+                        '%name%'      => $entity->getTitle(),
+                        '%menu_link%' => 'mautic_social_index',
+                        '%url%'       => $this->generateUrl(
+                            'mautic_social_action',
+                            [
+                                'objectAction' => 'edit',
+                                'objectId'     => $entity->getId(),
+                            ]
+                        ),
+                    ]
+                );
+                if (!$this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
+                    // return edit view so that all the session stuff is loaded
+                    return $this->editAction($request, $ipLookupHelper, $entity->getId(), true);
                 }
+                $viewParameters = [
+                    'objectAction' => 'view',
+                    'objectId'     => $entity->getId(),
+                ];
+                $template = 'MauticPlugin\MauticSocialBundle\Controller\MonitoringController::viewAction';
             }
             $returnUrl = $this->generateUrl('mautic_social_index', $viewParameters);
 

@@ -141,10 +141,8 @@ final class WidgetApiController extends CommonApiController
             } elseif (isset($data['raw'])) {
                 $data = $data['raw'];
             }
-        } else {
-            if (isset($data['raw'])) {
-                unset($data['raw']);
-            }
+        } elseif (isset($data['raw'])) {
+            unset($data['raw']);
         }
 
         $response['cached']         = $widget->isCached();

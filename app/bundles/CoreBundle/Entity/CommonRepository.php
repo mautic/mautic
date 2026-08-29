@@ -109,21 +109,19 @@ class CommonRepository extends ServiceEntityRepository
         }
 
         // check order by
-        if (isset($args['order'])) {
-            if (is_array($args['order'])) {
-                foreach ($args['order'] as &$o) {
-                    $alias = '';
-                    if (str_contains($o, '.')) {
-                        [$alias, $o] = explode('.', $o);
-                    }
-
-                    if (in_array($o, $properties)) {
-                        $o = preg_replace('/(?<=\\w)(?=[A-Z])/', '_$1', $o);
-                        $o = strtolower($o);
-                    }
-
-                    $o = (!empty($alias)) ? $alias.'.'.$o : $o;
+        if (isset($args['order']) && is_array($args['order'])) {
+            foreach ($args['order'] as &$o) {
+                $alias = '';
+                if (str_contains($o, '.')) {
+                    [$alias, $o] = explode('.', $o);
                 }
+
+                if (in_array($o, $properties)) {
+                    $o = preg_replace('/(?<=\\w)(?=[A-Z])/', '_$1', $o);
+                    $o = strtolower($o);
+                }
+
+                $o = (!empty($alias)) ? $alias.'.'.$o : $o;
             }
         }
 
@@ -1090,10 +1088,8 @@ class CommonRepository extends ServiceEntityRepository
         $unique = $this->generateRandomParameterName(); // ensure that the string has a unique parameter identifier
         $string = $filter->string;
 
-        if (!$filter->strict) {
-            if (!str_contains($string, '%')) {
-                $string = "%{$string}%";
-            }
+        if (!$filter->strict && !str_contains($string, '%')) {
+            $string = "%{$string}%";
         }
 
         $ormQb = true;
@@ -1206,10 +1202,8 @@ class CommonRepository extends ServiceEntityRepository
             $parameters = [];
         } else {
             $string = $filter->string;
-            if (!$filter->strict) {
-                if (!str_contains($string, '%')) {
-                    $string = "{$string}%";
-                }
+            if (!$filter->strict && !str_contains($string, '%')) {
+                $string = "{$string}%";
             }
 
             $parameters = ["{$unique}" => $string];
@@ -1377,11 +1371,9 @@ class CommonRepository extends ServiceEntityRepository
                         $columns    = array_map($this->sanitize(...), $columns);
                         $partials[] = 'partial '.$alias.'.{'.implode(',', $columns).'}';
                     }
-                } else {
-                    if ($columns = array_intersect($columns, $dbalColumns)) {
-                        foreach ($columns as $column) {
-                            $partials[] = $alias.'.'.$this->sanitize($column);
-                        }
+                } elseif ($columns = array_intersect($columns, $dbalColumns)) {
+                    foreach ($columns as $column) {
+                        $partials[] = $alias.'.'.$this->sanitize($column);
                     }
                 }
             }
@@ -1391,14 +1383,12 @@ class CommonRepository extends ServiceEntityRepository
                 $select    = ($isOrm) ? $q->getDQLPart('select') : $q->getQueryPart('select');
                 if ($isOrm) {
                     $q->select($newSelect);
-                } else {
-                    if (!$select || $this->getTableAlias() === $select || $this->getTableAlias().'.*' === $select) {
-                        $q->select($newSelect);
-                    } elseif (is_string($select) && str_contains($select, $this->getTableAlias().',')) {
-                        $q->select(str_replace($this->getTableAlias().',', $newSelect.',', $select));
-                    } elseif (is_string($select) && str_contains($select, $this->getTableAlias().'.*,')) {
-                        $q->select(str_replace($this->getTableAlias().'.*,', $newSelect.',', $select));
-                    }
+                } elseif (!$select || $this->getTableAlias() === $select || $this->getTableAlias().'.*' === $select) {
+                    $q->select($newSelect);
+                } elseif (is_string($select) && str_contains($select, $this->getTableAlias().',')) {
+                    $q->select(str_replace($this->getTableAlias().',', $newSelect.',', $select));
+                } elseif (is_string($select) && str_contains($select, $this->getTableAlias().'.*,')) {
+                    $q->select(str_replace($this->getTableAlias().'.*,', $newSelect.',', $select));
                 }
             }
         }
@@ -1407,10 +1397,8 @@ class CommonRepository extends ServiceEntityRepository
             if (!$q->getDQLPart('select')) {
                 $q->select($this->getTableAlias());
             }
-        } else {
-            if (!$q->getQueryPart('select')) {
-                $q->select($this->getTableAlias().'.*');
-            }
+        } elseif (!$q->getQueryPart('select')) {
+            $q->select($this->getTableAlias().'.*');
         }
     }
 

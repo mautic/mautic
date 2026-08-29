@@ -418,7 +418,7 @@ final class LeadApiController extends CommonApiController
         }
 
         $channelId = (int) $request->request->get('channelId');
-        if ($channelId) {
+        if ($channelId !== 0) {
             $channel = [$channel => $channelId];
         }
 
@@ -582,7 +582,7 @@ final class LeadApiController extends CommonApiController
                     $entity = $this->contactMerger->merge($entity, $existingEntity);
                 } catch (SameContactException) {
                 }
-            } elseif ($existingEntity->getId()) {
+            } elseif ($existingEntity->getId() !== 0) {
                 $entity = $existingEntity;
             }
         }
@@ -667,7 +667,7 @@ final class LeadApiController extends CommonApiController
                 $formErrors = $this->getFormErrorMessages($frequencyForm);
                 $msg        = $this->getFormErrorMessage($formErrors);
 
-                if (!$msg) {
+                if ($msg === '' || $msg === '0') {
                     $msg = $this->translator->trans('mautic.core.error.badrequest', [], 'flashes');
                 }
 

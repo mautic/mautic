@@ -29,7 +29,7 @@ class ContactFinder
         // We have a return path email so let's figure out who it originated to
         if ($returnPathEmail && $hash = Address::parseAddressForStatHash($returnPathEmail)) {
             $result = $this->findByHash($hash);
-            if ($result->getStat()) {
+            if ($result->getStat() instanceof \Mautic\EmailBundle\Entity\Stat) {
                 // A stat was found so need to search by email
                 return $result;
             }

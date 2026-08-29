@@ -399,7 +399,7 @@ class EventScheduler
         $rescheduleDate = new \DateTime();
         $logInterval    = $leadEventLog->getRescheduleInterval();
 
-        if ($logInterval) {
+        if ($logInterval instanceof \DateInterval) {
             return $rescheduleDate->add($logInterval);
         }
 

@@ -62,7 +62,7 @@ final class InstallCommand extends Command
         if (0 !== $result->exitCode) {
             $output->writeln('<error>Error while installing this plugin.</error>');
 
-            if ($result->output) {
+            if ($result->output !== '' && $result->output !== '0') {
                 $output->writeln($result->output);
             } else {
                 // If the output is empty then tell the user where to find more details.

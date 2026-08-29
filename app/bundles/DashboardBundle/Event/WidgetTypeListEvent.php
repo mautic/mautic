@@ -26,7 +26,7 @@ final class WidgetTypeListEvent extends CommonEvent
         $bundle         = 'mautic.'.$bundle.'.dashboard.widgets';
         $widgetTypeName = 'mautic.widget.'.$widgetType;
 
-        if ($this->translator) {
+        if ($this->translator instanceof \Symfony\Contracts\Translation\TranslatorInterface) {
             $bundle         = $this->translator->trans($bundle);
             $widgetTypeName = $this->translator->trans($widgetTypeName);
         }
@@ -59,7 +59,7 @@ final class WidgetTypeListEvent extends CommonEvent
      */
     public function hasPermissions(array $permissions): bool
     {
-        if (!$this->security) {
+        if (!$this->security instanceof \Mautic\CoreBundle\Security\Permissions\CorePermissions) {
             return true;
         }
         $perm = $this->security->isGranted($permissions, 'RETURN_ARRAY');

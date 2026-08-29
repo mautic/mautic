@@ -345,7 +345,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
                 if ($page->isVariant()) {
                     // Get a summation of weights
                     $parent   = $page->getVariantParent();
-                    $children = $parent ? $parent->getVariantChildren() : $page->getVariantChildren();
+                    $children = $parent instanceof \Mautic\CoreBundle\Entity\VariantEntityInterface ? $parent->getVariantChildren() : $page->getVariantChildren();
 
                     $total = 0;
                     foreach ($children as $child) {

@@ -52,7 +52,7 @@ final class DeleteCustomFieldCommand extends Command
         $userId      = (int) $input->getOption('user');
 
         // Field ID wasn't provided. Try to find a field that is marked for deletion.
-        if (!$leadFieldId) {
+        if ($leadFieldId === 0) {
             /** @var ?LeadField $field */
             $field = $this->leadFieldRepository->findOneBy(['columnIsNotRemoved' => true]);
 

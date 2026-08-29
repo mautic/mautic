@@ -202,7 +202,7 @@ class HitRepository extends CommonRepository
 
         $query->select('count(h.code) as visitors');
 
-        if ($seconds) {
+        if ($seconds !== 0) {
             $query->where($query->expr()->gte('h.dateHit', ':date'))
                 ->setParameter('date', $now);
         }
@@ -316,7 +316,7 @@ class HitRepository extends CommonRepository
 
         foreach ($results as $p) {
             $return[$p['page_id']]['bounces'] = (int) $p['bounces'];
-            $return[$p['page_id']]['rate']    = ($return[$p['page_id']]['totalHits']) ? round(
+            $return[$p['page_id']]['rate']    = ($return[$p['page_id']]['totalHits'] !== 0) ? round(
                 ($p['bounces'] / $return[$p['page_id']]['totalHits']) * 100,
                 2
             ) : 0;

@@ -161,7 +161,7 @@ final class ImportController extends FormController
         $fullPath    = $this->getFullCsvPath($object);
         $import      = $this->importModel->getEntity($this->requestStack->getSession()->get('mautic.lead.import.id'));
 
-        if ($import) {
+        if ($import instanceof \Mautic\LeadBundle\Entity\Import) {
             $import->setStatus($import::QUEUED);
             $this->importModel->saveEntity($import);
         }
@@ -266,7 +266,7 @@ final class ImportController extends FormController
 
                     $import = $this->importModel->getEntity($this->requestStack->getSession()->get('mautic.'.$object.'.import.id'));
 
-                    if (!$import->getDateStarted()) {
+                    if (!$import->getDateStarted() instanceof \DateTimeInterface) {
                         $import->setDateStarted(new \DateTime());
                     }
 

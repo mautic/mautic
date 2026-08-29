@@ -59,7 +59,7 @@ final class CategoryController extends AbstractFormController
         $categoryType = (string) $session->get('mautic.category.type', $bundle);
         $bundle = $request->query->get('bundle', $categoryType);
 
-        if ($bundle) {
+        if ($bundle !== '' && $bundle !== '0') {
             $session->set('mautic.category.type', $bundle);
         }
 
@@ -230,7 +230,7 @@ final class CategoryController extends AbstractFormController
         $closeModal = ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked()));
 
         if ($closeModal) {
-            if ($inForm) {
+            if ($inForm !== 0) {
                 return new JsonResponse([
                     'mauticContent' => 'category',
                     'closeModal'    => 1,
@@ -366,7 +366,7 @@ final class CategoryController extends AbstractFormController
         $closeModal = ($closeModal || $cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked()));
 
         if ($closeModal) {
-            if ($inForm) {
+            if ($inForm !== 0) {
                 $response = new JsonResponse(
                     [
                         'mauticContent' => 'category',

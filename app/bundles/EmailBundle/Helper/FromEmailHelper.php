@@ -86,7 +86,7 @@ class FromEmailHelper
         // Reset last owner
         $this->lastOwner = null;
 
-        if ($email) {
+        if ($email instanceof \Mautic\EmailBundle\Entity\Email) {
             if (!$email->getUseOwnerAsMailer()) {
                 throw new OwnerNotFoundException("mailer_is_owner is not enabled for this email ({$email->getId()})");
             }
@@ -176,7 +176,7 @@ class FromEmailHelper
         try {
             $name = $address->isNameTokenized() ? $address->getNameTokenValue($contact) : $address->getName();
         } catch (TokenNotFoundOrEmptyException) {
-            $name = $this->defaultFrom ? $this->defaultFrom->getName() : $this->getSystemDefaultFrom()->getName();
+            $name = $this->defaultFrom instanceof \Mautic\EmailBundle\Helper\DTO\AddressDTO ? $this->defaultFrom->getName() : $this->getSystemDefaultFrom()->getName();
         }
 
         try {
@@ -206,7 +206,7 @@ class FromEmailHelper
             $emailAddress = '';
         }
 
-        if (!$emailAddress) {
+        if ($emailAddress === '' || $emailAddress === '0') {
             // Token had no value and no default — fall back to raw system default
             return $this->getSystemDefaultFrom();
         }

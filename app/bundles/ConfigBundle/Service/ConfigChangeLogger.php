@@ -91,11 +91,7 @@ class ConfigChangeLogger
 
         $normData = [];
         foreach ($data as $values) {
-            if (array_key_exists($key, $values)) {
-                $normData = array_merge($normData, $values[$key]);
-            } else {
-                $normData = array_merge($normData, $values);
-            }
+            $normData = array_key_exists($key, $values) ? array_merge($normData, $values[$key]) : array_merge($normData, $values);
         }
 
         return $normData;

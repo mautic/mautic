@@ -49,15 +49,13 @@ final class LoadLeadData extends Fixture implements OrderedFixtureInterface
 
             // Assign to companies in a predictable way
             $lastCharacter = (int) substr($count, -1, 1);
-            if ($lastCharacter <= 3) {
-                if ($this->hasReference('company-'.$lastCharacter)) {
-                    $companyLead = new CompanyLead();
-                    $companyLead->setLead($lead);
-                    $companyLead->setCompany($this->getReference('company-'.$lastCharacter));
-                    $companyLead->setDateAdded($today);
-                    $companyLead->setPrimary(true);
-                    $this->companyLeadRepository->saveEntity($companyLead);
-                }
+            if ($lastCharacter <= 3 && $this->hasReference('company-'.$lastCharacter)) {
+                $companyLead = new CompanyLead();
+                $companyLead->setLead($lead);
+                $companyLead->setCompany($this->getReference('company-'.$lastCharacter));
+                $companyLead->setDateAdded($today);
+                $companyLead->setPrimary(true);
+                $this->companyLeadRepository->saveEntity($companyLead);
             }
         }
     }

@@ -42,7 +42,7 @@ final class Progress
     {
         $this->total = (int) $total;
 
-        if ($this->output) {
+        if ($this->output instanceof \Symfony\Component\Console\Output\OutputInterface) {
             $this->bar = ProgressBarHelper::init($this->output, $this->total);
             $this->bar->start();
         }
@@ -65,7 +65,7 @@ final class Progress
     {
         $this->done = (int) $done;
 
-        if ($this->bar) {
+        if ($this->bar instanceof \Symfony\Component\Console\Helper\ProgressBar) {
             $this->bar->setProgress($this->done);
 
             if ($this->isFinished()) {
@@ -129,6 +129,6 @@ final class Progress
      */
     public function toPercent(): float|int
     {
-        return ($this->total) ? ceil(($this->done / $this->total) * 100) : 100;
+        return ($this->total !== 0) ? ceil(($this->done / $this->total) * 100) : 100;
     }
 }

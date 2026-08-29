@@ -65,26 +65,24 @@ final class TriggerEventController extends CommonFormController
         $triggerEvent['settings'] = $events[$eventType];
 
         // Check for a submitted form and process it
-        if ('POST' === $method) {
-            if (!$cancelled = $this->isFormCancelled($form)) {
-                if ($valid = $this->isFormValid($form)) {
-                    $success = 1;
+        if ('POST' === $method && !$cancelled = $this->isFormCancelled($form)) {
+            if ($valid = $this->isFormValid($form)) {
+                $success = 1;
 
-                    // form is valid so process the data
-                    $keyId = 'new'.hash('sha1', uniqid(mt_rand()));
+                // form is valid so process the data
+                $keyId = 'new'.hash('sha1', uniqid(mt_rand()));
 
-                    // save the properties to session
-                    $actions            = $session->get('mautic.point.'.$triggerId.'.triggerevents.modified');
-                    $formData           = $form->getData();
-                    $triggerEvent       = array_merge($triggerEvent, $formData);
-                    $triggerEvent['id'] = $keyId;
-                    if (empty($triggerEvent['name'])) {
-                        // set it to the event default
-                        $triggerEvent['name'] = $this->translator->trans($triggerEvent['settings']['label']);
-                    }
-                    $actions[$keyId] = $triggerEvent;
-                    $session->set('mautic.point.'.$triggerId.'.triggerevents.modified', $actions);
+                // save the properties to session
+                $actions            = $session->get('mautic.point.'.$triggerId.'.triggerevents.modified');
+                $formData           = $form->getData();
+                $triggerEvent       = array_merge($triggerEvent, $formData);
+                $triggerEvent['id'] = $keyId;
+                if (empty($triggerEvent['name'])) {
+                    // set it to the event default
+                    $triggerEvent['name'] = $this->translator->trans($triggerEvent['settings']['label']);
                 }
+                $actions[$keyId] = $triggerEvent;
+                $session->set('mautic.point.'.$triggerId.'.triggerevents.modified', $actions);
             }
         }
 
@@ -177,30 +175,28 @@ final class TriggerEventController extends CommonFormController
             ]);
             $form->get('triggerId')->setData($triggerId);
             // Check for a submitted form and process it
-            if ('POST' === $method) {
-                if (!$cancelled = $this->isFormCancelled($form)) {
-                    if ($valid = $this->isFormValid($form)) {
-                        $success = 1;
+            if ('POST' === $method && !$cancelled = $this->isFormCancelled($form)) {
+                if ($valid = $this->isFormValid($form)) {
+                    $success = 1;
 
-                        // form is valid so process the data
+                    // form is valid so process the data
 
-                        // save the properties to session
-                        $session  = $request->getSession();
-                        $events   = $session->get('mautic.point.'.$triggerId.'.triggerevents.modified');
-                        /** @var array<mixed> $formData */
-                        $formData = $form->getData();
-                        // overwrite with updated data
-                        $triggerEvent = array_merge($events[$objectId], $formData);
-                        if (empty($triggerEvent['name'])) {
-                            // set it to the event default
-                            $triggerEvent['name'] = $this->translator->trans($triggerEvent['settings']['label']);
-                        }
-                        $events[$objectId] = $triggerEvent;
-                        $session->set('mautic.point.'.$triggerId.'.triggerevents.modified', $events);
-
-                        // generate HTML for the field
-                        $keyId = $objectId;
+                    // save the properties to session
+                    $session  = $request->getSession();
+                    $events   = $session->get('mautic.point.'.$triggerId.'.triggerevents.modified');
+                    /** @var array<mixed> $formData */
+                    $formData = $form->getData();
+                    // overwrite with updated data
+                    $triggerEvent = array_merge($events[$objectId], $formData);
+                    if (empty($triggerEvent['name'])) {
+                        // set it to the event default
+                        $triggerEvent['name'] = $this->translator->trans($triggerEvent['settings']['label']);
                     }
+                    $events[$objectId] = $triggerEvent;
+                    $session->set('mautic.point.'.$triggerId.'.triggerevents.modified', $events);
+
+                    // generate HTML for the field
+                    $keyId = $objectId;
                 }
             }
 

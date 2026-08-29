@@ -167,7 +167,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (!$contact = $this->contactTracker->getContact()) {
+        if (!($contact = $this->contactTracker->getContact()) instanceof \Mautic\LeadBundle\Entity\Lead) {
             return;
         }
 
@@ -211,7 +211,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (!$contact = $this->contactTracker->getContact()) {
+        if (!($contact = $this->contactTracker->getContact()) instanceof \Mautic\LeadBundle\Entity\Lead) {
             return;
         }
 
@@ -234,7 +234,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (!$contact = $this->contactTracker->getContact()) {
+        if (!($contact = $this->contactTracker->getContact()) instanceof \Mautic\LeadBundle\Entity\Lead) {
             return;
         }
 
@@ -251,7 +251,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (!$contact = $this->contactTracker->getContact()) {
+        if (!($contact = $this->contactTracker->getContact()) instanceof \Mautic\LeadBundle\Entity\Lead) {
             return;
         }
 
@@ -291,7 +291,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (!$contact = $this->contactTracker->getContact()) {
+        if (!($contact = $this->contactTracker->getContact()) instanceof \Mautic\LeadBundle\Entity\Lead) {
             return;
         }
 
@@ -336,7 +336,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (!$lead = $this->contactTracker->getContact()) {
+        if (!($lead = $this->contactTracker->getContact()) instanceof \Mautic\LeadBundle\Entity\Lead) {
             return;
         }
 

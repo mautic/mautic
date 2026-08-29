@@ -40,7 +40,7 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
             return null;
         }
 
-        if ($this->trackedDevice) {
+        if ($this->trackedDevice instanceof \Mautic\LeadBundle\Entity\LeadDevice) {
             return $this->trackedDevice;
         }
 
@@ -103,7 +103,7 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
             return null;
         }
 
-        if ($this->trackedDevice) {
+        if ($this->trackedDevice instanceof \Mautic\LeadBundle\Entity\LeadDevice) {
             // Use the device tracked in case the cookies were just created
             return $this->trackedDevice->getTrackingId();
         }

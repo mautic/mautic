@@ -294,7 +294,7 @@ class Asset extends FormEntity implements UuidInterface
         if ($this->isLocal() && !$this->file instanceof File) {
             $tempFile = $this->loadFile(true);
 
-            if ($tempFile) {
+            if ($tempFile instanceof \Symfony\Component\HttpFoundation\File\File) {
                 $this->setFile($tempFile);
             }
         }
@@ -581,11 +581,7 @@ class Asset extends FormEntity implements UuidInterface
      */
     public function removeUpload(bool $temp = false): void
     {
-        if ($temp) {
-            $file = $this->getAbsoluteTempPath();
-        } else {
-            $file = $this->getAbsolutePath();
-        }
+        $file = $temp ? $this->getAbsoluteTempPath() : $this->getAbsolutePath();
 
         if ($file && file_exists($file)) {
             unlink($file);
@@ -763,7 +759,7 @@ class Asset extends FormEntity implements UuidInterface
     {
         $fileType = strtolower($this->getFileType());
 
-        if (!$fileType) {
+        if ($fileType === '' || $fileType === '0') {
             return false;
         }
 
@@ -858,11 +854,7 @@ class Asset extends FormEntity implements UuidInterface
      */
     public function loadFile(bool $temp = false): ?File
     {
-        if ($temp) {
-            $path = $this->getAbsoluteTempPath();
-        } else {
-            $path = $this->getAbsolutePath();
-        }
+        $path = $temp ? $this->getAbsoluteTempPath() : $this->getAbsolutePath();
 
         if (!$path || !file_exists($path)) {
             return null;

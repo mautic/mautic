@@ -23,7 +23,7 @@ final class EntityDescriptorProviderFactory
 
         return new SimpleEntityDescriptorBuilder(
             $ownEntityId,
-            $route ? sprintf('%s%s', $ownEntityId, $route) : '',
+            $route !== '' && $route !== '0' ? sprintf('%s%s', $ownEntityId, $route) : '',
             '',
             $arrOwnCredentials[0]->getCertificate()
         );

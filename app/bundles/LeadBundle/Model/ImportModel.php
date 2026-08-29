@@ -646,7 +646,7 @@ class ImportModel extends FormModel
     protected function logDebug($msg, ?Import $import = null): void
     {
         if (MAUTIC_ENV === 'dev') {
-            $importId = $import ? '('.$import->getId().')' : '';
+            $importId = $import instanceof \Mautic\LeadBundle\Entity\Import ? '('.$import->getId().')' : '';
             $this->logger->debug(sprintf('IMPORT%s: %s', $importId, $msg));
         }
     }

@@ -42,15 +42,15 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
             ->willReturn(Event::TRIGGER_MODE_INTERVAL);
         $event->method('getCampaign')
             ->willReturn($campaign);
-        if ($startTime) {
+        if ($startTime instanceof \DateTime) {
             $event->method('getTriggerRestrictedStartHour')
                 ->willReturn($startTime);
         }
-        if ($endTime) {
+        if ($endTime instanceof \DateTime) {
             $event->method('getTriggerRestrictedStopHour')
                 ->willReturn($endTime);
         }
-        if ($specifiedHour) {
+        if ($specifiedHour instanceof \DateTime) {
             $event->method('getTriggerHour')
                 ->willReturn($specifiedHour);
         }
@@ -121,15 +121,15 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
             ->willReturn($triggerInterval);
         $event->method('getTriggerIntervalUnit')
             ->willReturn($intervalUnit);
-        if ($startTime) {
+        if ($startTime instanceof \DateTime) {
             $event->method('getTriggerRestrictedStartHour')
                 ->willReturn($startTime);
         }
-        if ($endTime) {
+        if ($endTime instanceof \DateTime) {
             $event->method('getTriggerRestrictedStopHour')
                 ->willReturn($endTime);
         }
-        if ($specifiedHour) {
+        if ($specifiedHour instanceof \DateTime) {
             $event->method('getTriggerHour')
                 ->willReturn($specifiedHour);
         }

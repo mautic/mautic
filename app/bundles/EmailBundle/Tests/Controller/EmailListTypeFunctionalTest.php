@@ -98,10 +98,10 @@ final class EmailListTypeFunctionalTest extends MauticMysqlTestCase
         $email->setName($name);
         $email->setSubject($name);
         $email->setEmailType('template');
-        if ($variantParent) {
+        if ($variantParent instanceof \Mautic\EmailBundle\Entity\Email) {
             $email->setVariantParent($variantParent);
         }
-        if ($translationParent) {
+        if ($translationParent instanceof \Mautic\EmailBundle\Entity\Email) {
             $email->setTranslationParent($translationParent);
         }
         $this->em->persist($email);

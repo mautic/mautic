@@ -483,7 +483,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         $this->em->persist($hit);
         $this->em->flush();
 
-        if ($hit->getId()) {
+        if ($hit->getId() !== 0) {
             $this->cookieHelper->setCookie(
                 name: 'mautic_referer_id',
                 value: $hit->getId(),
@@ -550,10 +550,8 @@ class PageModel extends FormModel implements GlobalSearchInterface
                 $hit->setSourceId($clickthrough['source'][1]);
             }
 
-            if (!empty($clickthrough['email'])) {
-                if ($emailEntity = $this->emailRepository->getEntity($clickthrough['email'])) {
-                    $hit->setEmail($emailEntity);
-                }
+            if (!empty($clickthrough['email']) && $emailEntity = $this->emailRepository->getEntity($clickthrough['email'])) {
+                $hit->setEmail($emailEntity);
             }
         }
 
@@ -715,25 +713,23 @@ class PageModel extends FormModel implements GlobalSearchInterface
             $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_HIT);
         }
 
-        if (null !== $hitDate) {
-            if (null === $lead->getLastActive() || $lead->getLastActive() < $hitDate) {
-                try {
-                    $this->leadRepository->updateLastActive($lead->getId(), $hitDate);
-                } catch (\Exception $e) {
-                    $data = [
-                        'unique'             => ($isUnique ? 'true' : 'false'),
-                        'lead'               => $lead->getId(),
-                        'page'               => $page->getId(),
-                        'hit'                => $hit->getId(),
-                        'lastActiveOriginal' => $lead->getLastActive(),
-                        'newLastActive'      => $hitDate,
-                    ];
+        if (null !== $hitDate && (null === $lead->getLastActive() || $lead->getLastActive() < $hitDate)) {
+            try {
+                $this->leadRepository->updateLastActive($lead->getId(), $hitDate);
+            } catch (\Exception $e) {
+                $data = [
+                    'unique'             => ($isUnique ? 'true' : 'false'),
+                    'lead'               => $lead->getId(),
+                    'page'               => $page->getId(),
+                    'hit'                => $hit->getId(),
+                    'lastActiveOriginal' => $lead->getLastActive(),
+                    'newLastActive'      => $hitDate,
+                ];
 
-                    $this->logger->error(
-                        'Failed to update event time due to '.$e->getMessage(),
-                        ['context' => $data, 'exception' => (array) $e]
-                    );
-                }
+                $this->logger->error(
+                    'Failed to update event time due to '.$e->getMessage(),
+                    ['context' => $data, 'exception' => (array) $e]
+                );
             }
         }
     }
@@ -1171,28 +1167,20 @@ class PageModel extends FormModel implements GlobalSearchInterface
                         }
                     }
 
-                    if (isset($query['page_referrer'])) {
-                        if (!$decoded) {
-                            $query['page_referrer'] = urldecode($query['page_referrer']);
-                        }
+                    if (isset($query['page_referrer']) && !$decoded) {
+                        $query['page_referrer'] = urldecode($query['page_referrer']);
                     }
 
-                    if (isset($query['page_language'])) {
-                        if (!$decoded) {
-                            $query['page_language'] = urldecode($query['page_language']);
-                        }
+                    if (isset($query['page_language']) && !$decoded) {
+                        $query['page_language'] = urldecode($query['page_language']);
                     }
 
-                    if (isset($query['page_title'])) {
-                        if (!$decoded) {
-                            $query['page_title'] = urldecode($query['page_title']);
-                        }
+                    if (isset($query['page_title']) && !$decoded) {
+                        $query['page_title'] = urldecode($query['page_title']);
                     }
 
-                    if (isset($query['tags'])) {
-                        if (!$decoded) {
-                            $query['tags'] = urldecode($query['tags']);
-                        }
+                    if (isset($query['tags']) && !$decoded) {
+                        $query['tags'] = urldecode($query['tags']);
                     }
                 }
             }

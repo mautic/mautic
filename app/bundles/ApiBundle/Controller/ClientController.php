@@ -197,33 +197,31 @@ final class ClientController extends AbstractStandardFormController
         // /Check for a submitted form and process it
         if ('POST' === $request->getMethod()) {
             $valid = false;
-            if (!$cancelled = $this->isFormCancelled($form)) {
-                if ($valid = $this->isFormValid($form)) {
-                    // form is valid so process the data
-                    // If the admin is creating API credentials, enable 'Client Credential' grant type
-                    /** @var User $user */
-                    $user = $this->getUser();
-                    if (ClientModel::API_MODE_OAUTH2 == $apiMode && $user->getRole()->isAdmin()) {
-                        $client->addGrantType(OAuth2::GRANT_TYPE_CLIENT_CREDENTIALS);
-                    }
-                    $client->setRole($user->getRole());
-                    $this->clientModel->saveEntity($client);
-                    $this->addFlashMessage(
-                        'mautic.api.client.notice.created',
-                        [
-                            '%name%'         => $client->getName(),
-                            '%clientId%'     => $client->getPublicId(),
-                            '%clientSecret%' => $client->getSecret(),
-                            '%url%'          => $this->generateUrl(
-                                'mautic_client_action',
-                                [
-                                    'objectAction' => 'edit',
-                                    'objectId'     => $client->getId(),
-                                ]
-                            ),
-                        ]
-                    );
+            if (!$cancelled = $this->isFormCancelled($form) && $valid = $this->isFormValid($form)) {
+                // form is valid so process the data
+                // If the admin is creating API credentials, enable 'Client Credential' grant type
+                /** @var User $user */
+                $user = $this->getUser();
+                if (ClientModel::API_MODE_OAUTH2 == $apiMode && $user->getRole()->isAdmin()) {
+                    $client->addGrantType(OAuth2::GRANT_TYPE_CLIENT_CREDENTIALS);
                 }
+                $client->setRole($user->getRole());
+                $this->clientModel->saveEntity($client);
+                $this->addFlashMessage(
+                    'mautic.api.client.notice.created',
+                    [
+                        '%name%'         => $client->getName(),
+                        '%clientId%'     => $client->getPublicId(),
+                        '%clientSecret%' => $client->getSecret(),
+                        '%url%'          => $this->generateUrl(
+                            'mautic_client_action',
+                            [
+                                'objectAction' => 'edit',
+                                'objectId'     => $client->getId(),
+                            ]
+                        ),
+                    ]
+                );
             }
 
             if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {

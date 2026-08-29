@@ -59,7 +59,7 @@ final readonly class SyncService implements SyncServiceInterface
             sprintf(
                 'Starting %s sync from %s date/time',
                 $inputOptionsDAO->isFirstTimeSync() ? 'first time' : 'subsequent',
-                $inputOptionsDAO->getStartDateTime() ? $inputOptionsDAO->getStartDateTime()->format('Y-m-d H:i:s') : 'yet to be determined'
+                $inputOptionsDAO->getStartDateTime() instanceof \DateTimeInterface ? $inputOptionsDAO->getStartDateTime()->format('Y-m-d H:i:s') : 'yet to be determined'
             ),
             self::class.':'.__FUNCTION__
         );

@@ -95,7 +95,7 @@ final class FetchLeadsCommand extends Command
         $startDate = !$startDate ? date('c', strtotime('-'.$interval)) : date('c', strtotime($startDate));
         $endDate   = !$endDate ? date('c') : date('c', strtotime($endDate));
 
-        if (!$endDate) {
+        if ($endDate === '0') {
             $output->writeln(sprintf('<info>Invalid date rage given %s -> %s</info>', $startDate, $endDate));
 
             return 255;
@@ -175,7 +175,7 @@ final class FetchLeadsCommand extends Command
 
                 $output->writeln('');
 
-                if ($processed) {
+                if ($processed !== 0) {
                     $output->writeln(
                         '<comment>'.$this->translator->trans('mautic.plugin.command.fetch.leads.events_executed', ['%events%' => $processed])
                         .'</comment>'."\n"
@@ -210,7 +210,7 @@ final class FetchLeadsCommand extends Command
                     $processed += (int) $results;
                 }
                 $output->writeln('');
-                if ($processed) {
+                if ($processed !== 0) {
                     $output->writeln(
                         '<comment>'.$this->translator->trans('mautic.plugin.command.fetch.companies.events_executed', ['%events%' => $processed])
                         .'</comment>'."\n"

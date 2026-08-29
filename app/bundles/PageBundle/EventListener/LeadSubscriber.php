@@ -73,28 +73,23 @@ final class LeadSubscriber implements EventSubscriberInterface
                 $template = '@MauticPage/SubscribedEvents/Timeline/index.html.twig';
                 $icon     = 'ri-link';
 
-                if (!empty($hit['source'])) {
-                    if ($channelModel = $this->getChannelModel($hit['source'])) {
-                        if ($channelModel instanceof ChannelTimelineInterface) {
-                            if ($overrideTemplate = $channelModel->getChannelTimelineTemplate($eventTypeKey, $hit)) {
-                                $template = $overrideTemplate;
-                            }
-
-                            if ($overrideEventTypeName = $channelModel->getChannelTimelineLabel($eventTypeKey, $hit)) {
-                                $eventTypeName = $overrideEventTypeName;
-                            }
-
-                            if ($overrideIcon = $channelModel->getChannelTimelineIcon($eventTypeKey, $hit)) {
-                                $icon = $overrideIcon;
-                            }
+                if (!empty($hit['source']) && $channelModel = $this->getChannelModel($hit['source'])) {
+                    if ($channelModel instanceof ChannelTimelineInterface) {
+                        if ($overrideTemplate = $channelModel->getChannelTimelineTemplate($eventTypeKey, $hit)) {
+                            $template = $overrideTemplate;
                         }
 
-                        if (!empty($hit['sourceId'])) {
-                            if ($source = $this->getChannelEntityName($hit['source'], $hit['sourceId'], true)) {
-                                $hit['sourceName']  = $source['name'];
-                                $hit['sourceRoute'] = $source['url'];
-                            }
+                        if ($overrideEventTypeName = $channelModel->getChannelTimelineLabel($eventTypeKey, $hit)) {
+                            $eventTypeName = $overrideEventTypeName;
                         }
+
+                        if ($overrideIcon = $channelModel->getChannelTimelineIcon($eventTypeKey, $hit)) {
+                            $icon = $overrideIcon;
+                        }
+                    }
+                    if (!empty($hit['sourceId']) && $source = $this->getChannelEntityName($hit['source'], $hit['sourceId'], true)) {
+                        $hit['sourceName']  = $source['name'];
+                        $hit['sourceRoute'] = $source['url'];
                     }
                 }
 

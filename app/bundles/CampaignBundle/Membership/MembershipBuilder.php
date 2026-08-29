@@ -69,7 +69,7 @@ class MembershipBuilder
     {
         $contactsProcessed = 0;
 
-        if ($this->output) {
+        if ($this->output instanceof \Symfony\Component\Console\Output\OutputInterface) {
             $countResult = $this->campaignLeadRepository->getCountsForCampaignContactsBySegment(
                 $this->campaign->getId(),
                 $this->contactLimiter,
@@ -140,7 +140,7 @@ class MembershipBuilder
     {
         $contactsProcessed = 0;
 
-        if ($this->output) {
+        if ($this->output instanceof \Symfony\Component\Console\Output\OutputInterface) {
             $countResult = $this->campaignLeadRepository->getCountsForOrphanedContactsBySegments($this->campaign->getId(), $this->contactLimiter);
 
             $this->output->writeln(
@@ -191,7 +191,7 @@ class MembershipBuilder
 
     private function startProgressBar(int $total): void
     {
-        if (!$this->output) {
+        if (!$this->output instanceof \Symfony\Component\Console\Output\OutputInterface) {
             $this->progressBar = null;
             $this->manager->setProgressBar($this->progressBar);
 
@@ -207,7 +207,7 @@ class MembershipBuilder
 
     private function finishProgressBar(): void
     {
-        if ($this->progressBar) {
+        if ($this->progressBar instanceof \Symfony\Component\Console\Helper\ProgressBar) {
             $this->progressBar->finish();
             $this->output->writeln('');
         }

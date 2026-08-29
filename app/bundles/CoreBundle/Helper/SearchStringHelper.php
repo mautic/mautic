@@ -87,10 +87,8 @@ final class SearchStringHelper
         if (!empty($command)) {
             if (!isset($filters->commands[$command])) {
                 $filters->commands[$command] = ($mergeFilter->not) ? self::COMMAND_NEGATE : self::COMMAND_POSIT;
-            } else {
-                if (($mergeFilter->not && self::COMMAND_POSIT === $filters->commands[$command]) || !$mergeFilter->not && self::COMMAND_NEGATE === $filters->commands[$command]) {
-                    $filters->commands[$command] = self::COMMAND_NEUTRAL;
-                }
+            } elseif (($mergeFilter->not && self::COMMAND_POSIT === $filters->commands[$command]) || !$mergeFilter->not && self::COMMAND_NEGATE === $filters->commands[$command]) {
+                $filters->commands[$command] = self::COMMAND_NEUTRAL;
             }
         }
     }

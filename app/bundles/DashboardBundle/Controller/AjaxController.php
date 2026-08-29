@@ -91,7 +91,7 @@ final class AjaxController extends CommonAjaxController
         $objectId  = $request->request->get('widget');
         $dataArray = ['success' => 0];
         $entity = $this->dashboardModel->getEntity($objectId);
-        if ($entity) {
+        if ($entity instanceof \Mautic\DashboardBundle\Entity\Widget) {
             $this->dashboardModel->deleteEntity($entity);
             $name                 = $entity->getName();
             $dataArray['success'] = 1;

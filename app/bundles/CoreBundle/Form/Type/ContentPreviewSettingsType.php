@@ -97,7 +97,7 @@ final class ContentPreviewSettingsType extends AbstractType
         array $variants,
         int $objectId,
     ): void {
-        if (!count($variants['children'])) {
+        if (count($variants['children']) === 0) {
             return;
         }
 

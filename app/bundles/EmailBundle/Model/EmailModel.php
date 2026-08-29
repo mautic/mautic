@@ -457,11 +457,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
         $email = $stat->getEmail();
 
-        if ((int) $stat->isRead()) {
-            if ($viaBrowser && !$stat->getViewedInBrowser()) {
-                // opened via browser so note it
-                $stat->setViewedInBrowser($viaBrowser);
-            }
+        if ((int) $stat->isRead() !== 0 && ($viaBrowser && !$stat->getViewedInBrowser())) {
+            // opened via browser so note it
+            $stat->setViewedInBrowser($viaBrowser);
         }
 
         $stat->setLastOpened($readDateTime->getDateTime());
@@ -713,7 +711,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      */
     public function getEmailListStats($email, $includeVariants = false, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null): array
     {
-        $dateTo = $dateTo ? (clone $dateTo)->setTime(23, 59, 59) : null;
+        $dateTo = $dateTo instanceof \DateTime ? (clone $dateTo)->setTime(23, 59, 59) : null;
 
         if (!$email instanceof Email) {
             $email = $this->getEntity($email);
@@ -772,7 +770,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             }
         }
 
-        if ($listCount) {
+        if ($listCount !== 0) {
             $combined = [
                 $statRepo->getSentCount($emailIds, null, $query),
                 $statRepo->getReadCount($emailIds, null, $query),
@@ -1250,7 +1248,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
                 // get a list of variants for A/B testing
                 $childrenVariant = $email->getVariantChildren();
 
-                if (count($childrenVariant)) {
+                if (count($childrenVariant) > 0) {
                     $totalSent      = $emailSettings[$email->getId()]['variantCount'];
                     $abTestSettings = $this->abTestSettingsService->getAbTestSettings($email);
 
@@ -1449,11 +1447,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $this->getContactCompanies($sendTo);
 
         foreach ($emailSettings as $eid => $details) {
-            if (isset($details['send_weight'])) {
-                $emailSettings[$eid]['limit'] = ceil($count * $details['send_weight']);
-            } else {
-                $emailSettings[$eid]['limit'] = $count;
-            }
+            $emailSettings[$eid]['limit'] = isset($details['send_weight']) ? ceil($count * $details['send_weight']) : $count;
         }
 
         // Randomize the contacts for statistic purposes

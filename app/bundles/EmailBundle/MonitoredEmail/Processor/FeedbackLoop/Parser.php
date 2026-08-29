@@ -35,10 +35,8 @@ final readonly class Parser
 
     private function searchMessage(string $pattern, string $content): ?string
     {
-        if (preg_match('/'.$pattern.'/i', $content, $match)) {
-            if ($parsedAddressList = Address::parseList($match[1])) {
-                return key($parsedAddressList);
-            }
+        if (preg_match('/'.$pattern.'/i', $content, $match) && $parsedAddressList = Address::parseList($match[1])) {
+            return key($parsedAddressList);
         }
 
         return null;

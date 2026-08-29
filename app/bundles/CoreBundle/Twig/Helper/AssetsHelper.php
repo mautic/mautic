@@ -540,7 +540,7 @@ final class AssetsHelper
         foreach ((array) $protocols as $protocol) {
             $text = match ($protocol) {
                 'http', 'https' => preg_replace_callback('~(?:(https?)://([^\s<]+)|(www\.[^\s<]+?\.[^\s<]+))(?<![\.,:])~i', function ($match) use ($protocol, &$links, $attr): string {
-                    if ($match[1]) {
+                    if ($match[1] !== '' && $match[1] !== '0') {
                         $protocol = $match[1];
                     }
                     $link = $this->escape($match[2] ?: $match[3]);
@@ -656,6 +656,6 @@ final class AssetsHelper
             return $path;
         }
 
-        return rtrim($path, $querySeparator).($query ? $argumentSeparator : $querySeparator).$versionArgument;
+        return rtrim($path, $querySeparator).($query !== '' && $query !== '0' ? $argumentSeparator : $querySeparator).$versionArgument;
     }
 }

@@ -168,10 +168,8 @@ final class ZohoIntegration extends CrmAbstractIntegration
                         } else {
                             $newMatchedFields = $matchedFields;
                         }
-                        if (!isset($newMatchedFields['companyname'])) {
-                            if (isset($newMatchedFields['companywebsite'])) {
-                                $newMatchedFields['companyname'] = $newMatchedFields['companywebsite'];
-                            }
+                        if (!isset($newMatchedFields['companyname']) && isset($newMatchedFields['companywebsite'])) {
+                            $newMatchedFields['companyname'] = $newMatchedFields['companywebsite'];
                         }
 
                         // update values if already empty
@@ -584,8 +582,9 @@ final class ZohoIntegration extends CrmAbstractIntegration
                 .'&response_type=code'
                 .'&redirect_uri='.urlencode($callback)
                 .'&state='.$state.'&prompt=consent&access_type=offline';
+            $scope = $this->getAuthScope();
 
-            if ($scope = $this->getAuthScope()) {
+            if ($scope !== '' && $scope !== '0') {
                 $url .= '&scope='.urlencode($scope);
             }
 
@@ -709,43 +708,41 @@ final class ZohoIntegration extends CrmAbstractIntegration
         }
 
         try {
-            if ($this->isAuthorized()) {
-                if (!empty($zohoObjects) && is_array($zohoObjects)) {
-                    foreach ($zohoObjects as $zohoObject) {
-                        // Check the cache first
-                        $settings['cache_suffix'] = $cacheSuffix = '.'.$zohoObject;
-                        if ($fields = parent::getAvailableLeadFields($settings)) {
-                            $zohoFields[$zohoObject] = $fields;
+            if ($this->isAuthorized() && (!empty($zohoObjects) && is_array($zohoObjects))) {
+                foreach ($zohoObjects as $zohoObject) {
+                    // Check the cache first
+                    $settings['cache_suffix'] = $cacheSuffix = '.'.$zohoObject;
+                    if ($fields = parent::getAvailableLeadFields($settings)) {
+                        $zohoFields[$zohoObject] = $fields;
+                        continue;
+                    }
+                    $leadObject = $this->getApiHelper()->getLeadFields($zohoObject);
+
+                    if (null === $leadObject || (isset($leadObject['status']) && 'error' === $leadObject['status'])) {
+                        return [];
+                    }
+
+                    /** @var array $opts */
+                    $opts = $leadObject['fields'];
+                    foreach ($opts as $field) {
+                        if (true == $field['read_only']) {
                             continue;
                         }
-                        $leadObject = $this->getApiHelper()->getLeadFields($zohoObject);
 
-                        if (null === $leadObject || (isset($leadObject['status']) && 'error' === $leadObject['status'])) {
-                            return [];
+                        $is_required = false;
+                        if (true == $field['system_mandatory']) {
+                            $is_required = true;
                         }
 
-                        /** @var array $opts */
-                        $opts = $leadObject['fields'];
-                        foreach ($opts as $field) {
-                            if (true == $field['read_only']) {
-                                continue;
-                            }
-
-                            $is_required = false;
-                            if (true == $field['system_mandatory']) {
-                                $is_required = true;
-                            }
-
-                            $zohoFields[$zohoObject][$field['api_name']] = [
-                                'type'     => 'string',
-                                'label'    => $field['display_label'],
-                                'api_name' => $field['api_name'],
-                                'required' => $is_required,
-                            ];
-                        }
-                        if (empty($settings['ignore_field_cache'])) {
-                            $this->cache->set('leadFields'.$cacheSuffix, $zohoFields[$zohoObject]);
-                        }
+                        $zohoFields[$zohoObject][$field['api_name']] = [
+                            'type'     => 'string',
+                            'label'    => $field['display_label'],
+                            'api_name' => $field['api_name'],
+                            'required' => $is_required,
+                        ];
+                    }
+                    if (empty($settings['ignore_field_cache'])) {
+                        $this->cache->set('leadFields'.$cacheSuffix, $zohoFields[$zohoObject]);
                     }
                 }
             }
@@ -808,13 +805,11 @@ final class ZohoIntegration extends CrmAbstractIntegration
         $totalToCreate = is_array($totalToCreate) ? count($totalToCreate) : $totalToCreate;
         $totalCount    = $totalToCreate + $totalToUpdate;
 
-        if (defined('IN_MAUTIC_CONSOLE')) {
-            // start with update
-            if ($totalToUpdate + $totalToCreate) {
-                $output = new ConsoleOutput();
-                $output->writeln("About {$totalToUpdate} to update and about {$totalToCreate} to create/update");
-                $progress = new ProgressBar($output, $totalCount);
-            }
+        // start with update
+        if (defined('IN_MAUTIC_CONSOLE') && $totalToUpdate + $totalToCreate) {
+            $output = new ConsoleOutput();
+            $output->writeln("About {$totalToUpdate} to update and about {$totalToCreate} to create/update");
+            $progress = new ProgressBar($output, $totalCount);
         }
 
         // Start with contacts so we know who is a contact when we go to process converted leads

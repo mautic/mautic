@@ -119,7 +119,7 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
 
                 // check if the event is a condition or decision event
                 $eventEntity = $this->getConditionOrDecisionEvent($log['event_id']);
-                if ($eventEntity) {
+                if ($eventEntity instanceof \Mautic\CampaignBundle\Entity\Event) {
                     $extra['eventDetails'] = $this->getCampaignEventDetails($log);
 
                     $toolTipClass = 'yes' === $extra['eventDetails']['path'] ? 'text-success' : 'text-danger';

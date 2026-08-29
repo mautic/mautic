@@ -70,17 +70,15 @@ final class VariantType extends AbstractType
             $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($criteria): void {
                 $form = $event->getForm();
                 $data = $event->getData();
-                if (isset($data['winnerCriteria'])) {
-                    if (!empty($criteria[$data['winnerCriteria']]['formType'])) {
-                        $formTypeOptions = [
-                            'required' => false,
-                            'label'    => false,
-                        ];
-                        if (!empty($criteria[$data]['formTypeOptions'])) {
-                            $formTypeOptions = array_merge($formTypeOptions, $criteria[$data]['formTypeOptions']);
-                        }
-                        $form->add('properties', $criteria[$data]['formType'], $formTypeOptions);
+                if (isset($data['winnerCriteria']) && !empty($criteria[$data['winnerCriteria']]['formType'])) {
+                    $formTypeOptions = [
+                        'required' => false,
+                        'label'    => false,
+                    ];
+                    if (!empty($criteria[$data]['formTypeOptions'])) {
+                        $formTypeOptions = array_merge($formTypeOptions, $criteria[$data]['formTypeOptions']);
                     }
+                    $form->add('properties', $criteria[$data]['formType'], $formTypeOptions);
                 }
             });
         }

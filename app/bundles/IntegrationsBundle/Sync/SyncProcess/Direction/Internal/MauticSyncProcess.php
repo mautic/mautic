@@ -45,7 +45,7 @@ class MauticSyncProcess
     public function getSyncReport(int $syncIteration): ReportDAO
     {
         $internalRequestDAO     = new RequestDAO($this->mappingManualDAO->getIntegration(), $syncIteration, $this->inputOptionsDAO);
-        $mauticObjectTypes      = $internalRequestDAO->getInputOptionsDAO()->getMauticObjectIds() ?
+        $mauticObjectTypes      = $internalRequestDAO->getInputOptionsDAO()->getMauticObjectIds() instanceof \Mautic\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO ?
             $internalRequestDAO->getInputOptionsDAO()->getMauticObjectIds()->getObjectTypes() : [];
         $hasMauticObjectIDs = 0 < count($mauticObjectTypes);
 

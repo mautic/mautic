@@ -435,7 +435,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
                ->setIsPublished(true)
                ->setDir('/tmp')
                ->setFile('test.csv');
-        if ($createdBy) {
+        if ($createdBy instanceof \Mautic\UserBundle\Entity\User) {
             $import->setCreatedBy($createdBy);
         }
         $this->em->persist($import);

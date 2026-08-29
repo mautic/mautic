@@ -29,7 +29,7 @@ final class TransifexFactory
      */
     public function getTransifex(): TransifexInterface
     {
-        if (!$this->transifex) {
+        if (!$this->transifex instanceof \Mautic\Transifex\TransifexInterface) {
             $this->transifex = $this->create($this->coreParametersHelper->get('transifex_api_token') ?? '');
         }
 

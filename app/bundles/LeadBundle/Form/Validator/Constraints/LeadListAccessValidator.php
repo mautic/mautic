@@ -23,7 +23,7 @@ final class LeadListAccessValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, LeadListAccess::class);
         }
 
-        if (count($value)) {
+        if (count($value) > 0) {
             $lists = $this->segmentModel->getUserLists();
             foreach ($value as $l) {
                 if (!isset($lists[$l->getId()])) {

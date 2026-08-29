@@ -192,7 +192,7 @@ final class Interval implements ScheduleModeInterface
             sprintf('CAMPAIGN: Comparing calculated executed time for event ID %s and contact ID %s with %s', $eventId, $contact->getId(), $compareFromDateTime->format('Y-m-d H:i:s e'))
         );
 
-        if ($hour) {
+        if ($hour instanceof \DateTimeInterface) {
             $this->logger->debug(
                 sprintf('CAMPAIGN: Scheduling event ID %s for contact ID %s based on hour of %s', $eventId, $contact->getId(), $hour->format('H:i e'))
             );
@@ -313,7 +313,7 @@ final class Interval implements ScheduleModeInterface
 
     private function getDefaultTimezone(): \DateTimeZone
     {
-        if ($this->defaultTimezone) {
+        if ($this->defaultTimezone instanceof \DateTimeZone) {
             return $this->defaultTimezone;
         }
 

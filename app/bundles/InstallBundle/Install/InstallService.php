@@ -375,11 +375,7 @@ class InstallService
             $existingUser = null;
         }
 
-        if (null !== $existingUser) {
-            $user = $existingUser;
-        } else {
-            $user = new User();
-        }
+        $user = $existingUser ?? new User();
 
         $required = [
             'firstname',

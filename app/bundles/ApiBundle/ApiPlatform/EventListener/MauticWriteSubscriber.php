@@ -47,14 +47,14 @@ final readonly class MauticWriteSubscriber implements EventSubscriberInterface
 
         if ($entity->isNew()) {
             $entity->setDateAdded($now->getUtcDateTime());
-            if ($user) {
+            if ($user instanceof \Mautic\UserBundle\Entity\User) {
                 $entity->setCreatedBy($user);
                 $entity->setCreatedByUser($user->getName());
             }
         }
 
         $entity->setDateModified($now->getUtcDateTime());
-        if ($user) {
+        if ($user instanceof \Mautic\UserBundle\Entity\User) {
             $entity->setModifiedBy($user);
             $entity->setModifiedByUser($user->getName());
         }

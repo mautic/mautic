@@ -142,58 +142,55 @@ final class FieldController extends FormController
         // /Check for a submitted form and process it
         if ('POST' === $request->getMethod()) {
             $valid = false;
-            if (!$cancelled = $this->isFormCancelled($form)) {
-                if ($valid = $this->isFormValid($form)) {
-                    $requestData = $request->request->all();
-                    if (isset($requestData['leadfield']['properties'])) {
-                        $result = $this->fieldModel->setFieldProperties($field, $requestData['leadfield']['properties']);
-                        if (true !== $result) {
-                            // set the error
-                            $form->get('properties')->addError(
-                                new FormError(
-                                    $this->translator->trans($result, [], 'validators')
-                                )
-                            );
-                            $valid = false;
-                        }
-                    }
-
-                    if ($valid) {
-                        $flashMessage = 'mautic.core.notice.created';
-                        try {
-                            // form is valid so process the data
-                            $this->fieldModel->saveEntity($field);
-                        } catch (\Doctrine\DBAL\Exception $ee) {
-                            $flashMessage = $ee->getMessage();
-                        } catch (AbortColumnCreateException) {
-                            $flashMessage = $this->translator->trans('mautic.lead.field.pushed_to_background');
-                        } catch (SchemaException $e) {
-                            $flashMessage = $e->getMessage();
-                            $form['alias']->addError(new FormError($e->getMessage()));
-                            $valid = false;
-                        } catch (\Exception $e) {
-                            $form['alias']->addError(
-                                new FormError(
-                                    $this->translator->trans('mautic.lead.field.failed', ['%error%' => $e->getMessage()], 'validators')
-                                )
-                            );
-                            $valid = false;
-                        }
-                        $this->addFlashMessage(
-                            $flashMessage,
-                            [
-                                '%name%'      => $field->getLabel(),
-                                '%menu_link%' => 'mautic_contactfield_index',
-                                '%url%'       => $this->generateUrl(
-                                    'mautic_contactfield_action',
-                                    [
-                                        'objectAction' => 'edit',
-                                        'objectId'     => $field->getId(),
-                                    ]
-                                ),
-                            ]
+            if (!$cancelled = $this->isFormCancelled($form) && $valid = $this->isFormValid($form)) {
+                $requestData = $request->request->all();
+                if (isset($requestData['leadfield']['properties'])) {
+                    $result = $this->fieldModel->setFieldProperties($field, $requestData['leadfield']['properties']);
+                    if (true !== $result) {
+                        // set the error
+                        $form->get('properties')->addError(
+                            new FormError(
+                                $this->translator->trans($result, [], 'validators')
+                            )
                         );
+                        $valid = false;
                     }
+                }
+                if ($valid) {
+                    $flashMessage = 'mautic.core.notice.created';
+                    try {
+                        // form is valid so process the data
+                        $this->fieldModel->saveEntity($field);
+                    } catch (\Doctrine\DBAL\Exception $ee) {
+                        $flashMessage = $ee->getMessage();
+                    } catch (AbortColumnCreateException) {
+                        $flashMessage = $this->translator->trans('mautic.lead.field.pushed_to_background');
+                    } catch (SchemaException $e) {
+                        $flashMessage = $e->getMessage();
+                        $form['alias']->addError(new FormError($e->getMessage()));
+                        $valid = false;
+                    } catch (\Exception $e) {
+                        $form['alias']->addError(
+                            new FormError(
+                                $this->translator->trans('mautic.lead.field.failed', ['%error%' => $e->getMessage()], 'validators')
+                            )
+                        );
+                        $valid = false;
+                    }
+                    $this->addFlashMessage(
+                        $flashMessage,
+                        [
+                            '%name%'      => $field->getLabel(),
+                            '%menu_link%' => 'mautic_contactfield_index',
+                            '%url%'       => $this->generateUrl(
+                                'mautic_contactfield_action',
+                                [
+                                    'objectAction' => 'edit',
+                                    'objectId'     => $field->getId(),
+                                ]
+                            ),
+                        ]
+                    );
                 }
             }
 
@@ -371,7 +368,7 @@ final class FieldController extends FormController
     {
         $entity = $fieldModel->getEntity($objectId);
 
-        if (!$entity) {
+        if (!$entity instanceof \Mautic\LeadBundle\Entity\LeadField) {
             throw $this->createNotFoundException('Entity not found');
         }
 
@@ -495,7 +492,7 @@ final class FieldController extends FormController
             if ([] !== $deleteIds) {
                 try {
                     $entities = $this->fieldModel->deleteEntities($deleteIds);
-                    if ($entities) {
+                    if ($entities !== []) {
                         $flashes[] = [
                             'type'    => 'notice',
                             'msg'     => 'mautic.lead.field.notice.batch_deleted',

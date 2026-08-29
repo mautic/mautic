@@ -250,11 +250,9 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
                     if ($this->isAuthorized()) {
                         // Check the cache first
                         $settings['cache_suffix'] = $cacheSuffix = '.'.$sObject;
-                        if ($fields = parent::getAvailableLeadFields($settings)) {
-                            if (('company' === $sObject && isset($fields['id'])) || isset($fields['id__'.$sObject])) {
-                                $sugarFields[$sObject] = $fields;
-                                continue;
-                            }
+                        if (($fields = parent::getAvailableLeadFields($settings)) && ('company' === $sObject && isset($fields['id']) || isset($fields['id__'.$sObject]))) {
+                            $sugarFields[$sObject] = $fields;
+                            continue;
                         }
                         if (!isset($sugarFields[$sObject])) {
                             $fields = $this->getApiHelper()->getLeadFields($sObject);
@@ -684,10 +682,8 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
                                 $assignedUserIds[] = $item['value'];
                             }
                         }
-                    } else {
-                        if (isset($record['assigned_user_id']) && '' != $record['assigned_user_id']) {
-                            $assignedUserIds[] = $record['assigned_user_id'];
-                        }
+                    } elseif (isset($record['assigned_user_id']) && '' != $record['assigned_user_id']) {
+                        $assignedUserIds[] = $record['assigned_user_id'];
                     }
                 }
             }
@@ -707,10 +703,8 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
                             }
                         }
                     }
-                } else {
-                    if (isset($record['email1']) && '' != $record['email1']) {
-                        $checkEmailsInSugar[] = $record['email1'];
-                    }
+                } elseif (isset($record['email1']) && '' != $record['email1']) {
+                    $checkEmailsInSugar[] = $record['email1'];
                 }
             }
             if ([] !== $checkEmailsInSugar) {
@@ -724,10 +718,8 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
                                     $sugarRejectedLeads[] = $item['value'];
                                 }
                             }
-                        } else {
-                            if (isset($record['email1']) && '' != $record['email1']) {
-                                $sugarRejectedLeads[] = $record['email1'];
-                            }
+                        } elseif (isset($record['email1']) && '' != $record['email1']) {
+                            $sugarRejectedLeads[] = $record['email1'];
                         }
                     }
                 }
@@ -736,11 +728,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
             foreach ($data[$RECORDS_LIST_NAME] as $record) {
                 $integrationEntities = [];
                 $dataObject          = [];
-                if (isset($record[$MODULE_FIELD_NAME]) && 'Accounts' == $record[$MODULE_FIELD_NAME]) {
-                    $newName = '';
-                } else {
-                    $newName = '__'.$object;
-                }
+                $newName = isset($record[$MODULE_FIELD_NAME]) && 'Accounts' == $record[$MODULE_FIELD_NAME] ? '' : '__'.$object;
                 if ('6' === $SUGAR_VERSION) {
                     foreach ($record['name_value_list'] as $item) {
                         if ($this->checkIfSugarCrmMultiSelectString($item['value'])) {

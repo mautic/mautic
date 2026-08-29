@@ -161,7 +161,7 @@ final class EventType extends AbstractType
                         'data-format'  => 'H:i',
                         'autocomplete' => 'off',
                     ],
-                    'data'  => ($data) ? $data->format('H:i') : $data,
+                    'data'  => ($data instanceof \DateTime) ? $data->format('H:i') : $data,
                 ]
             );
 
@@ -177,7 +177,7 @@ final class EventType extends AbstractType
                         'data-format'  => 'H:i',
                         'autocomplete' => 'off',
                     ],
-                    'data'  => ($data) ? $data->format('H:i') : $data,
+                    'data'  => ($data instanceof \DateTime) ? $data->format('H:i') : $data,
                 ]
             );
 
@@ -193,7 +193,7 @@ final class EventType extends AbstractType
                         'data-format'  => 'H:i',
                         'autocomplete' => 'off',
                     ],
-                    'data'  => ($data) ? $data->format('H:i') : $data,
+                    'data'  => ($data instanceof \DateTime) ? $data->format('H:i') : $data,
                 ]
             );
 

@@ -91,7 +91,7 @@ final class PointActionFunctionalTest extends MauticMysqlTestCase
         $pointAction->setName('Read email action');
         $pointAction->setDelta($delta);
         $pointAction->setType('email.open');
-        if ($group) {
+        if ($group instanceof \Mautic\PointBundle\Entity\Group) {
             $pointAction->setGroup($group);
         }
         $this->em->persist($pointAction);

@@ -249,12 +249,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     $sfObject = trim($sfObject);
                     // Check the cache first
                     $settings['cache_suffix'] = $cacheSuffix = '.'.$sfObject;
-                    if ($fields = parent::getAvailableLeadFields($settings)) {
-                        if (('company' === $sfObject && isset($fields['Id'])) || isset($fields['Id__'.$sfObject])) {
-                            $salesFields[$sfObject] = $fields;
-
-                            continue;
-                        }
+                    if (($fields = parent::getAvailableLeadFields($settings)) && ('company' === $sfObject && isset($fields['Id']) || isset($fields['Id__'.$sfObject]))) {
+                        $salesFields[$sfObject] = $fields;
+                        continue;
                     }
 
                     if ($this->isAuthorized()) {
@@ -365,18 +362,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 }
 
                 $dataObject = [];
-                if (isset($record['attributes']['type']) && 'Account' == $record['attributes']['type']) {
-                    $newName = '';
-                } else {
-                    $newName = '__'.$object;
-                }
+                $newName = isset($record['attributes']['type']) && 'Account' == $record['attributes']['type'] ? '' : '__'.$object;
 
                 foreach ($record as $key => $item) {
-                    if (is_bool($item)) {
-                        $dataObject[$key.$newName] = (int) $item;
-                    } else {
-                        $dataObject[$key.$newName] = $item;
-                    }
+                    $dataObject[$key.$newName] = is_bool($item) ? (int) $item : $item;
                 }
 
                 if ([] !== $dataObject) {
@@ -890,7 +879,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     $query['nextUrl'] = $nextUrl;
                 }
 
-                if ($progress) {
+                if ($progress instanceof \Symfony\Component\Console\Helper\ProgressBar) {
                     $progress->finish();
                 }
             }
@@ -1146,21 +1135,15 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $totalToCreate = is_array($totalToCreate) ? count($totalToCreate) : $totalToCreate;
         $totalCount    = $totalToProcess = $totalToCreate + $totalToUpdate;
 
-        if (defined('IN_MAUTIC_CONSOLE')) {
-            // start with update
-            if ($totalToUpdate + $totalToCreate) {
-                $output = new ConsoleOutput();
-                $output->writeln("About {$totalToUpdate} to update and about {$totalToCreate} to create/update");
-                $progress = new ProgressBar($output, $totalCount);
-            }
+        // start with update
+        if (defined('IN_MAUTIC_CONSOLE') && $totalToUpdate + $totalToCreate) {
+            $output = new ConsoleOutput();
+            $output->writeln("About {$totalToUpdate} to update and about {$totalToCreate} to create/update");
+            $progress = new ProgressBar($output, $totalCount);
         }
 
         // Start with contacts so we know who is a contact when we go to process converted leads
-        if (count($supportedObjects) > 1) {
-            $sfObject = 'Contact';
-        } else {
-            $sfObject = array_key_first($supportedObjects);
-        }
+        $sfObject = count($supportedObjects) > 1 ? 'Contact' : array_key_first($supportedObjects);
         $noMoreUpdates   = false;
         $trackedContacts = [
             'Contact' => [],
@@ -1226,7 +1209,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 } catch (ApiErrorException $exception) {
                     $this->cleanupFromSync($leadsToSync, $exception);
                 }
-            } elseif ($checkEmailsInSF) {
+            } elseif ($checkEmailsInSF !== []) {
                 $sfEntityRecords = $this->getSalesforceObjectsByEmails($sfObject, $checkEmailsInSF, implode(',', array_keys($fieldMapping[$sfObject]['create'])));
 
                 if (!isset($sfEntityRecords['records'])) {
@@ -1297,14 +1280,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
     {
         $config                = $this->mergeConfigToFeatureSettings([]);
 
-        if (isset($config['objects'])) {
-            // try searching for lead as this has been changed before in updated done to the plugin
-            if (in_array('Contact', $config['objects'])) {
-                $resultContact = $this->integrationEntityRepository->getIntegrationsEntityId('Salesforce', 'Contact', 'lead', $lead->getId());
-
-                if ($resultContact) {
-                    return $resultContact;
-                }
+        // try searching for lead as this has been changed before in updated done to the plugin
+        if (isset($config['objects']) && in_array('Contact', $config['objects'])) {
+            $resultContact = $this->integrationEntityRepository->getIntegrationsEntityId('Salesforce', 'Contact', 'lead', $lead->getId());
+            if ($resultContact !== []) {
+                return $resultContact;
             }
         }
 
@@ -1737,7 +1717,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     if (!$accountId) {
                         // company was not found so create a new company in Salesforce
                         $lead = $this->leadModel->getEntity($entity['internal_entity_id']);
-                        if ($lead) {
+                        if ($lead instanceof \Mautic\LeadBundle\Entity\Lead) {
                             $companies = $this->leadModel->getCompanies($lead);
                             if ([] !== $companies) {
                                 foreach ($companies as $companyData) {
@@ -1745,7 +1725,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                         $company = $this->companyModel->getEntity($companyData['company_id']);
                                     }
                                 }
-                                if ($company) {
+                                if ($company instanceof \Mautic\LeadBundle\Entity\Company) {
                                     $sfCompany = $this->pushCompany($company);
                                     if ($sfCompany) {
                                         $entity['company'] = key($sfCompany);
@@ -1970,11 +1950,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 } elseif (!empty($item['body']['success'])) {
                     if (201 === $item['httpStatusCode']) {
                         // New object created
-                        if ('CampaignMember' === $object) {
-                            $internal = ['Id' => $item['body']['id']];
-                        } else {
-                            $internal = [];
-                        }
+                        $internal = 'CampaignMember' === $object ? ['Id' => $item['body']['id']] : [];
                         $this->salesforceIdMapping[$contactId] = $item['body']['id'];
                         $this->persistIntegrationEntities[]    = $this->createIntegrationEntity(
                             $object,
@@ -2684,13 +2660,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $totalToCreate = is_array($totalToCreate) ? count($totalToCreate) : $totalToCreate;
         $totalCount    = $totalToProcess = $totalToCreate + $totalToUpdate;
 
-        if (defined('IN_MAUTIC_CONSOLE')) {
-            // start with update
-            if ($totalToUpdate + $totalToCreate) {
-                $output = new ConsoleOutput();
-                $output->writeln("About {$totalToUpdate} to update and about {$totalToCreate} to create/update");
-                $progress = new ProgressBar($output, $totalCount);
-            }
+        // start with update
+        if (defined('IN_MAUTIC_CONSOLE') && $totalToUpdate + $totalToCreate) {
+            $output = new ConsoleOutput();
+            $output->writeln("About {$totalToUpdate} to update and about {$totalToCreate} to create/update");
+            $progress = new ProgressBar($output, $totalCount);
         }
 
         $noMoreUpdates = false;

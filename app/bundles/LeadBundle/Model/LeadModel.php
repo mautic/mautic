@@ -326,13 +326,11 @@ class LeadModel extends FormModel
 
         $entity = parent::getEntity($id);
 
-        if (null === $entity) {
-            // Check if this contact was merged into another and if so, return the new contact
-            if ($entity = $this->mergeRecordRepository->findMergedContact($id)) {
-                // Hydrate fields with custom field data
-                $fields = $this->getRepository()->getFieldValues($entity->getId());
-                $entity->setFields($fields);
-            }
+        // Check if this contact was merged into another and if so, return the new contact
+        if (null === $entity && $entity = $this->mergeRecordRepository->findMergedContact($id)) {
+            // Hydrate fields with custom field data
+            $fields = $this->getRepository()->getFieldValues($entity->getId());
+            $entity->setFields($fields);
         }
 
         return $entity;
@@ -350,22 +348,17 @@ class LeadModel extends FormModel
         $counter = count($contactIds);
         for ($i = 0; $i < $counter; ++$i) {
             $contactId = (int) $contactIds[$i];
-            if (empty($entities[$contactId])) {
-                if ($entity = $this->mergeRecordRepository->findMergedContact($contactId)) {
-                    $entity->setPreviousId($contactId);
-
-                    if (isset($entities[$entity->getId()])) {
-                        // The entity is already in the array, so skip the field hydration.
-                        continue;
-                    }
-
-                    // Hydrate fields with custom field data
-                    $fields = $this->getRepository()->getFieldValues($entity->getId());
-                    $entity->setFields($fields);
-
-                    // Add the entity to the array to the right place.
-                    $entities = array_slice($entities, $i, 0, true) + [$entity->getId() => $entity] + $entities;
+            if (empty($entities[$contactId]) && $entity = $this->mergeRecordRepository->findMergedContact($contactId)) {
+                $entity->setPreviousId($contactId);
+                if (isset($entities[$entity->getId()])) {
+                    // The entity is already in the array, so skip the field hydration.
+                    continue;
                 }
+                // Hydrate fields with custom field data
+                $fields = $this->getRepository()->getFieldValues($entity->getId());
+                $entity->setFields($fields);
+                // Add the entity to the array to the right place.
+                $entities = array_slice($entities, $i, 0, true) + [$entity->getId() => $entity] + $entities;
             }
         }
 
@@ -651,12 +644,12 @@ class LeadModel extends FormModel
             // Submit the data
             $form->submit($data);
 
-            if ($form->getErrors()->count()) {
+            if ($form->getErrors()->count() !== 0) {
                 $this->logger->debug('LEAD: form validation failed with an error of '.$form->getErrors());
             }
             foreach ($form as $field => $formField) {
                 if (isset($data[$field])) {
-                    if ($formField->getErrors()->count()) {
+                    if ($formField->getErrors()->count() !== 0) {
                         $this->logger->debug('LEAD: '.$field.' failed form validation with an error of '.$formField->getErrors());
                         // Don't save bad data
                         unset($data[$field]);
@@ -1173,10 +1166,8 @@ class LeadModel extends FormModel
                 $results[$category->getId()] = $leadCategory;
             }
 
-            if ($dispatchEvent) {
-                if ($this->dispatcher->hasListeners(LeadEvents::LEAD_CATEGORY_CHANGE)) {
-                    $this->dispatcher->dispatch(new CategoryChangeEvent($lead, $category), LeadEvents::LEAD_CATEGORY_CHANGE);
-                }
+            if ($dispatchEvent && $this->dispatcher->hasListeners(LeadEvents::LEAD_CATEGORY_CHANGE)) {
+                $this->dispatcher->dispatch(new CategoryChangeEvent($lead, $category), LeadEvents::LEAD_CATEGORY_CHANGE);
             }
         }
 
@@ -1550,7 +1541,7 @@ class LeadModel extends FormModel
 
         $lead->imported = true;
 
-        if ($eventLog) {
+        if ($eventLog instanceof \Mautic\LeadBundle\Entity\LeadEventLog) {
             $action = $merged ? 'updated' : 'inserted';
             $eventLog->setAction($action);
         }
@@ -1573,7 +1564,7 @@ class LeadModel extends FormModel
                 $this->setPrimaryCompany($company->getId(), $lead->getId());
             }
 
-            if ($eventLog) {
+            if ($eventLog instanceof \Mautic\LeadBundle\Entity\LeadEventLog) {
                 $lead->addEventLog($eventLog);
             }
         }
@@ -1783,7 +1774,7 @@ class LeadModel extends FormModel
                     $tagToBeAdded = $foundTags[$tag];
                 }
 
-                if ($tagToBeAdded) {
+                if ($tagToBeAdded instanceof \Mautic\LeadBundle\Entity\Tag) {
                     $lead->addTag($tagToBeAdded);
                     $tagsModified = true;
                     $this->logger->debug('CONTACT: Added '.$tag);
@@ -2374,7 +2365,7 @@ class LeadModel extends FormModel
             $lead->setFields($fields);
         }
 
-        if ($leadId = $lead->getId()) {
+        if (($leadId = $lead->getId()) !== 0) {
             $this->logger->debug("LEAD: New lead created with ID# {$leadId}.");
         }
 

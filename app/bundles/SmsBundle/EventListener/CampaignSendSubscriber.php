@@ -52,9 +52,9 @@ final readonly class CampaignSendSubscriber implements EventSubscriberInterface
     public function onCampaignTriggerBatchAction(PendingEvent $event): void
     {
         $smsId = (int) $event->getEvent()->getProperties()['sms'];
-        $sms   = $smsId ? $this->smsModel->getEntity($smsId) : null;
+        $sms   = $smsId !== 0 ? $this->smsModel->getEntity($smsId) : null;
 
-        if (!$sms) {
+        if (!$sms instanceof \Mautic\SmsBundle\Entity\Sms) {
             $event->passAllWithError($this->translator->trans('mautic.sms.campaign.failed.missing_entity'));
 
             return;

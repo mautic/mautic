@@ -61,28 +61,26 @@ final class ActionController extends CommonFormController
         $formAction['settings'] = $customComponents['actions'][$actionType];
 
         // Check for a submitted form and process it
-        if ('POST' === $method) {
-            if (!$cancelled = $this->isFormCancelled($form)) {
-                if ($valid = $this->isFormValid($form)) {
-                    $success = 1;
+        if ('POST' === $method && !$cancelled = $this->isFormCancelled($form)) {
+            if ($valid = $this->isFormValid($form)) {
+                $success = 1;
 
-                    // form is valid so process the data
-                    $keyId = 'new'.hash('sha1', uniqid(mt_rand()));
+                // form is valid so process the data
+                $keyId = 'new'.hash('sha1', uniqid(mt_rand()));
 
-                    // save the properties to session
-                    $actions          = $session->get('mautic.form.'.$formId.'.actions.modified', []);
-                    $formData         = $form->getData();
-                    $formAction       = array_merge($formAction, $formData);
-                    $formAction['id'] = $keyId;
-                    if (empty($formAction['name'])) {
-                        // set it to the event default
-                        $formAction['name'] = $this->translator->trans($formAction['settings']['label']);
-                    }
-                    $actions[$keyId] = $formAction;
-                    $session->set('mautic.form.'.$formId.'.actions.modified', $actions);
-                } else {
-                    $success = 0;
+                // save the properties to session
+                $actions          = $session->get('mautic.form.'.$formId.'.actions.modified', []);
+                $formData         = $form->getData();
+                $formAction       = array_merge($formAction, $formData);
+                $formAction['id'] = $keyId;
+                if (empty($formAction['name'])) {
+                    // set it to the event default
+                    $formAction['name'] = $this->translator->trans($formAction['settings']['label']);
                 }
+                $actions[$keyId] = $formAction;
+                $session->set('mautic.form.'.$formId.'.actions.modified', $actions);
+            } else {
+                $success = 0;
             }
         }
 
@@ -176,42 +174,40 @@ final class ActionController extends CommonFormController
             $form->get('formId')->setData($formId);
 
             // Check for a submitted form and process it
-            if ('POST' === $method) {
-                if (!$cancelled = $this->isFormCancelled($form)) {
-                    if ($valid = $this->isFormValid($form)) {
-                        $success = 1;
+            if ('POST' === $method && !$cancelled = $this->isFormCancelled($form)) {
+                if ($valid = $this->isFormValid($form)) {
+                    $success = 1;
 
-                        // form is valid so process the data
+                    // form is valid so process the data
 
-                        // save the properties to session
-                        $session  = $request->getSession();
-                        $actions  = $session->get('mautic.form.'.$formId.'.actions.modified');
-                        $formData = $form->getData();
-                        // overwrite with updated data
-                        $formAction = array_merge($actions[$objectId], $formData);
-                        if (empty($formAction['name'])) {
-                            // set it to the event default
-                            $formAction['name'] = $this->translator->trans($formAction['settings']['label']);
-                        }
-                        $actions[$objectId] = $formAction;
-                        $session->set('mautic.form.'.$formId.'.actions.modified', $actions);
+                    // save the properties to session
+                    $session  = $request->getSession();
+                    $actions  = $session->get('mautic.form.'.$formId.'.actions.modified');
+                    $formData = $form->getData();
+                    // overwrite with updated data
+                    $formAction = array_merge($actions[$objectId], $formData);
+                    if (empty($formAction['name'])) {
+                        // set it to the event default
+                        $formAction['name'] = $this->translator->trans($formAction['settings']['label']);
+                    }
+                    $actions[$objectId] = $formAction;
+                    $session->set('mautic.form.'.$formId.'.actions.modified', $actions);
 
-                        // generate HTML for the field
-                        $keyId = $objectId;
+                    // generate HTML for the field
+                    $keyId = $objectId;
 
-                        // take note if this is a submit button or not
-                        if ('button' == $actionType) {
-                            $submits = $session->get('mautic.formactions.submits', []);
-                            if ('submit' == $formAction['properties']['type'] && !in_array($keyId, $submits)) {
-                                // button type updated to submit
-                                $submits[] = $keyId;
-                                $session->set('mautic.formactions.submits', $submits);
-                            } elseif ('submit' != $formAction['properties']['type'] && in_array($keyId, $submits)) {
-                                // button type updated to something other than submit
-                                $key = array_search($keyId, $submits);
-                                unset($submits[$key]);
-                                $session->set('mautic.formactions.submits', $submits);
-                            }
+                    // take note if this is a submit button or not
+                    if ('button' == $actionType) {
+                        $submits = $session->get('mautic.formactions.submits', []);
+                        if ('submit' == $formAction['properties']['type'] && !in_array($keyId, $submits)) {
+                            // button type updated to submit
+                            $submits[] = $keyId;
+                            $session->set('mautic.formactions.submits', $submits);
+                        } elseif ('submit' != $formAction['properties']['type'] && in_array($keyId, $submits)) {
+                            // button type updated to something other than submit
+                            $key = array_search($keyId, $submits);
+                            unset($submits[$key]);
+                            $session->set('mautic.formactions.submits', $submits);
                         }
                     }
                 }

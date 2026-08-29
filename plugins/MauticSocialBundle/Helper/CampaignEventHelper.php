@@ -31,7 +31,7 @@ final class CampaignEventHelper
         $channelId   = $event->getChannelId();
         $tweetEntity = $this->tweetModel->getEntity(null !== $channelId ? (int) $channelId : null);
 
-        if (!$tweetEntity) {
+        if (!$tweetEntity instanceof \MauticPlugin\MauticSocialBundle\Entity\Tweet) {
             return ['failed' => 1, 'response' => 'Tweet entity '.$channelId.' not found'];
         }
 

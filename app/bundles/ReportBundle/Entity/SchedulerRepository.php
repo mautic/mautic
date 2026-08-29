@@ -31,7 +31,7 @@ class SchedulerRepository extends CommonRepository
         $qb->andWhere('scheduler.scheduleDate <= :scheduleDate')
             ->setParameter('scheduleDate', $date);
 
-        if ($exportOption->getReportId()) {
+        if ($exportOption->getReportId() !== 0) {
             $qb->andWhere('report.id = :id')
                 ->setParameter('id', $exportOption->getReportId());
         }

@@ -85,7 +85,7 @@ final class ThemeApiController extends CommonApiController
             return $this->returnError($e->getMessage());
         }
 
-        if (!$themeZip) {
+        if ($themeZip === '' || $themeZip === '0') {
             return $this->returnError(
                 $this->translator->trans(
                     'mautic.core.dir.not.accesssible',

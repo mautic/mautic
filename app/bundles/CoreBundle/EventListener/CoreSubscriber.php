@@ -286,10 +286,8 @@ final readonly class CoreSubscriber implements EventSubscriberInterface
             }
         }
         if ('api' === $type) {
-            if (str_contains($details['path'], '{id}')) {
-                if (!isset($requirements['page'])) {
-                    $requirements['id'] = '\d+';
-                }
+            if (str_contains($details['path'], '{id}') && !isset($requirements['page'])) {
+                $requirements['id'] = '\d+';
             }
 
             if (preg_match_all('/\{(.*?Id)\}/', $details['path'], $matches)) {

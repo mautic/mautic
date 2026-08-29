@@ -45,7 +45,7 @@ final class DeleteLeadListsCommand extends Command
 
         // single entity
         if (!empty($listId)) {
-            if ($list = $this->listModel->getSoftDeletedEntity($listId)) {
+            if (($list = $this->listModel->getSoftDeletedEntity($listId)) instanceof \Mautic\LeadBundle\Entity\LeadList) {
                 $this->deleteLeadList($list);
                 $output->writeln("<info>segment {$listId} has been deleted.</info>");
 

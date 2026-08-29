@@ -45,7 +45,7 @@ final class AjaxController extends CommonAjaxController
 
         $data = [];
         foreach ($ids as $id) {
-            if ($sms = $this->smsModel->getEntity($id)) {
+            if (($sms = $this->smsModel->getEntity($id)) instanceof \Mautic\SmsBundle\Entity\Sms) {
                 if ('list' !== $sms->getSmsType()) {
                     continue;
                 }
@@ -66,14 +66,10 @@ final class AjaxController extends CommonAjaxController
         }
 
         // Support for legacy calls
-        if ($request->get('id')) {
-            $data = $data[0];
-        } else {
-            $data = [
-                'success' => 1,
-                'stats'   => $data,
-            ];
-        }
+        $data = $request->get('id') ? $data[0] : [
+            'success' => 1,
+            'stats'   => $data,
+        ];
 
         return new JsonResponse($data);
     }

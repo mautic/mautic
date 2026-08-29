@@ -246,7 +246,7 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
         $lead = new Lead();
         $lead->setPoints(100);
 
-        if ($email) {
+        if ($email !== '' && $email !== '0') {
             $lead->setEmail($email);
         }
 

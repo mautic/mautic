@@ -219,31 +219,27 @@ final class PublicController extends FormController
             $this->leadModel->setFieldValues($lead, $data);
             $this->leadRepository->saveEntity($lead);
 
-            if ($notify && (!$lead->imported)) {
-                if ($user = $this->userModel->getEntity($notify)) {
-                    $this->addNewNotification(
-                        sprintf($this->translator->trans('mautic.plugin.fullcontact.contact_retrieved'), $lead->getEmail()),
-                        'FullContact Plugin',
-                        'ri-search-line',
-                        $user
-                    );
-                }
+            if ($notify && !$lead->imported && $user = $this->userModel->getEntity($notify)) {
+                $this->addNewNotification(
+                    sprintf($this->translator->trans('mautic.plugin.fullcontact.contact_retrieved'), $lead->getEmail()),
+                    'FullContact Plugin',
+                    'ri-search-line',
+                    $user
+                );
             }
         } catch (\Exception $ex) {
             try {
-                if ($notify && $lead && (!$lead->imported)) {
-                    if ($user = $this->userModel->getEntity($notify)) {
-                        $this->addNewNotification(
-                            sprintf(
-                                $this->translator->trans('mautic.plugin.fullcontact.unable'),
-                                $lead->getEmail(),
-                                $ex->getMessage()
-                            ),
-                            'FullContact Plugin',
-                            'ri-error-warning-line',
-                            $user
-                        );
-                    }
+                if ($notify && $lead && !$lead->imported && $user = $this->userModel->getEntity($notify)) {
+                    $this->addNewNotification(
+                        sprintf(
+                            $this->translator->trans('mautic.plugin.fullcontact.unable'),
+                            $lead->getEmail(),
+                            $ex->getMessage()
+                        ),
+                        'FullContact Plugin',
+                        'ri-error-warning-line',
+                        $user
+                    );
                 }
             } catch (\Exception $ex2) {
                 $mauticLogger->log('error', 'FullContact: '.$ex2->getMessage());
@@ -373,31 +369,27 @@ final class PublicController extends FormController
             $this->companyModel->setFieldValues($company, $data);
             $this->companyRepository->saveEntity($company);
 
-            if ($notify) {
-                if ($user = $this->userModel->getEntity($notify)) {
-                    $this->addNewNotification(
-                        sprintf($this->translator->trans('mautic.plugin.fullcontact.company_retrieved'), $company->getName()),
-                        'FullContact Plugin',
-                        'ri-search-line',
-                        $user
-                    );
-                }
+            if ($notify && $user = $this->userModel->getEntity($notify)) {
+                $this->addNewNotification(
+                    sprintf($this->translator->trans('mautic.plugin.fullcontact.company_retrieved'), $company->getName()),
+                    'FullContact Plugin',
+                    'ri-search-line',
+                    $user
+                );
             }
         } catch (\Exception $ex) {
             try {
-                if ($notify && $company) {
-                    if ($user = $this->userModel->getEntity($notify)) {
-                        $this->addNewNotification(
-                            sprintf(
-                                $this->translator->trans('mautic.plugin.fullcontact.unable'),
-                                $company->getName(),
-                                $ex->getMessage()
-                            ),
-                            'FullContact Plugin',
-                            'ri-error-warning-line',
-                            $user
-                        );
-                    }
+                if ($notify && $company && $user = $this->userModel->getEntity($notify)) {
+                    $this->addNewNotification(
+                        sprintf(
+                            $this->translator->trans('mautic.plugin.fullcontact.unable'),
+                            $company->getName(),
+                            $ex->getMessage()
+                        ),
+                        'FullContact Plugin',
+                        'ri-error-warning-line',
+                        $user
+                    );
                 }
             } catch (\Exception $ex2) {
                 $mauticLogger->log('error', 'FullContact: '.$ex2->getMessage());

@@ -188,7 +188,7 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
     {
         $requestStack = new RequestStack();
 
-        if ($request) {
+        if ($request instanceof \Symfony\Component\HttpFoundation\Request) {
             $requestStack->push($request);
         }
 

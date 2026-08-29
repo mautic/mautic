@@ -79,17 +79,9 @@ trait FieldsTypeTrait
                 ksort($optionalFields, SORT_NATURAL);
 
                 $sortFieldsFunction = function ($a, $b): int {
-                    if (is_array($a)) {
-                        $aLabel = $a['optionLabel'] ?? $a['label'];
-                    } else {
-                        $aLabel = $a;
-                    }
+                    $aLabel = is_array($a) ? $a['optionLabel'] ?? $a['label'] : $a;
 
-                    if (is_array($b)) {
-                        $bLabel = $b['optionLabel'] ?? $b['label'];
-                    } else {
-                        $bLabel = $b;
-                    }
+                    $bLabel = is_array($b) ? $b['optionLabel'] ?? $b['label'] : $b;
 
                     return strnatcasecmp($aLabel, $bLabel);
                 };

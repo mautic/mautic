@@ -43,7 +43,7 @@ final class InfiniteLoopValidatorFunctionalTest extends MauticMysqlTestCase
         $responseData = json_decode($response->getContent(), true);
         $this->assertSame($success, $responseData['success'], (string) $response->getContent());
 
-        if ($expectedString) {
+        if ($expectedString !== '' && $expectedString !== '0') {
             $this->assertStringContainsString($expectedString, (string) $responseData['newContent']);
         }
     }
@@ -197,13 +197,13 @@ final class InfiniteLoopValidatorFunctionalTest extends MauticMysqlTestCase
             ],
         ];
 
-        $expectedStatusCode = $success ? 201 : 422;
+        $expectedStatusCode = $success !== 0 ? 201 : 422;
 
         $this->client->request(Request::METHOD_POST, '/api/campaigns/new', $payload);
         $response = $this->client->getResponse();
         self::assertResponseStatusCodeSame($expectedStatusCode, $response->getContent());
 
-        if ($expectedString) {
+        if ($expectedString !== '' && $expectedString !== '0') {
             $this->assertStringContainsString($expectedString, (string) $response->getContent());
         }
     }

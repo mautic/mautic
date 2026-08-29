@@ -50,7 +50,7 @@ final readonly class PageImportExportSubscriber implements EventSubscriberInterf
 
         $pageId = $event->getEntityId();
         $page   = $this->pageModel->getEntity($pageId);
-        if (!$page) {
+        if (!$page instanceof \Mautic\PageBundle\Entity\Page) {
             return;
         }
 

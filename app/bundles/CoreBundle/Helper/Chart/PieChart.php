@@ -57,7 +57,7 @@ final class PieChart extends AbstractChart implements ChartInterface
      */
     public function buildFullLabel($label, $value)
     {
-        if (!$this->totalCount) {
+        if ($this->totalCount === 0) {
             return $label;
         }
         $percentage = round($value / $this->totalCount * 100, 2);

@@ -105,7 +105,7 @@ class LeadEventLogRepository extends CommonRepository
             ->select('*')
             ->from(MAUTIC_TABLE_PREFIX.'lead_event_log', $alias);
 
-        if ($contact) {
+        if ($contact instanceof \Mautic\LeadBundle\Entity\Lead) {
             $qb->andWhere($alias.'.lead_id = :lead')
                 ->setParameter('lead', $contact->getId());
         }

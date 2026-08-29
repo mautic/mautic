@@ -133,20 +133,18 @@ trait LeadDetailsTrait
         $places = [];
         if ($lead->getIpAddresses()->count() > 0) {
             foreach ($lead->getIpAddresses() as $ip) {
-                if ($details = $ip->getIpDetails()) {
-                    if (!empty($details['latitude']) && !empty($details['longitude'])) {
-                        $name = 'N/A';
-                        if (!empty($details['city'])) {
-                            $name = $details['city'];
-                        } elseif (!empty($details['region'])) {
-                            $name = $details['region'];
-                        }
-                        $place = [
-                            'latLng' => [$details['latitude'], $details['longitude']],
-                            'name'   => $name,
-                        ];
-                        $places[] = $place;
+                if (($details = $ip->getIpDetails()) && (!empty($details['latitude']) && !empty($details['longitude']))) {
+                    $name = 'N/A';
+                    if (!empty($details['city'])) {
+                        $name = $details['city'];
+                    } elseif (!empty($details['region'])) {
+                        $name = $details['region'];
                     }
+                    $place = [
+                        'latLng' => [$details['latitude'], $details['longitude']],
+                        'name'   => $name,
+                    ];
+                    $places[] = $place;
                 }
             }
         }

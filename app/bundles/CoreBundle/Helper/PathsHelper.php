@@ -188,7 +188,7 @@ class PathsHelper
                     return $globalPath;
                 }
 
-                if (!$userPath = $this->dashboardUserImportDir) {
+                if ((($userPath = $this->dashboardUserImportDir)) === '' || (($userPath = $this->dashboardUserImportDir)) === '0') {
                     $userPath = $globalPath;
                 }
 

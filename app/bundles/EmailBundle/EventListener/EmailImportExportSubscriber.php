@@ -59,7 +59,7 @@ final readonly class EmailImportExportSubscriber implements EventSubscriberInter
 
         $emailId = $event->getEntityId();
         $email   = $this->emailModel->getEntity($emailId);
-        if (!$email) {
+        if (!$email instanceof \Mautic\EmailBundle\Entity\Email) {
             return;
         }
 

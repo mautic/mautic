@@ -330,20 +330,17 @@ final class ListController extends FormController
         // Check for a submitted form and process it
         if (!$ignorePost && Request::METHOD_POST === $request->getMethod()) {
             $valid = false;
-            if (!$cancelled = $this->isFormCancelled($form)) {
-                if ($valid = $this->isFormValid($form)) {
-                    // form is valid so process the data
-                    $segmentModel->saveEntity($segment);
-
-                    $this->addFlashMessage('mautic.core.notice.created', [
-                        '%name%'      => $segment->getName().' ('.$segment->getAlias().')',
-                        '%menu_link%' => 'mautic_segment_index',
-                        '%url%'       => $this->generateUrl('mautic_segment_action', [
-                            'objectAction' => 'edit',
-                            'objectId'     => $segment->getId(),
-                        ]),
-                    ]);
-                }
+            if (!$cancelled = $this->isFormCancelled($form) && $valid = $this->isFormValid($form)) {
+                // form is valid so process the data
+                $segmentModel->saveEntity($segment);
+                $this->addFlashMessage('mautic.core.notice.created', [
+                    '%name%'      => $segment->getName().' ('.$segment->getAlias().')',
+                    '%menu_link%' => 'mautic_segment_index',
+                    '%url%'       => $this->generateUrl('mautic_segment_action', [
+                        'objectAction' => 'edit',
+                        'objectId'     => $segment->getId(),
+                    ]),
+                ]);
             }
 
             if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {

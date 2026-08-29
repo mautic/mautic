@@ -521,17 +521,15 @@ final class ConfigType extends AbstractType
             $form = $event->getForm();
 
             $ipServiceName = $data['ip_lookup_service'] ?? null;
-            if ($ipServiceName && $lookupService = $ipLookupFactory->getService($ipServiceName)) {
-                if ($lookupService instanceof IpLookupFormInterface && $formType = $lookupService->getConfigFormService()) {
-                    $form->add(
-                        'ip_lookup_config',
-                        $formType,
-                        [
-                            'label'             => false,
-                            'ip_lookup_service' => $lookupService,
-                        ]
-                    );
-                }
+            if ($ipServiceName && ($lookupService = $ipLookupFactory->getService($ipServiceName)) && ($lookupService instanceof IpLookupFormInterface && $formType = $lookupService->getConfigFormService())) {
+                $form->add(
+                    'ip_lookup_config',
+                    $formType,
+                    [
+                        'label'             => false,
+                        'ip_lookup_service' => $lookupService,
+                    ]
+                );
             }
         };
 

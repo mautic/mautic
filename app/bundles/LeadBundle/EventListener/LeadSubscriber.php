@@ -557,28 +557,23 @@ final class LeadSubscriber implements EventSubscriberInterface
                 $template = '@MauticLead/SubscribedEvents/Timeline/donotcontact.html.twig';
                 $icon     = 'ri-prohibited-line';
 
-                if (!empty($row['channel'])) {
-                    if ($channelModel = $this->getChannelModel($row['channel'])) {
-                        if ($channelModel instanceof ChannelTimelineInterface) {
-                            if ($overrideTemplate = $channelModel->getChannelTimelineTemplate($eventTypeKey, $row)) {
-                                $template = $overrideTemplate;
-                            }
-
-                            if ($overrideEventTypeName = $channelModel->getChannelTimelineLabel($eventTypeKey, $row)) {
-                                $eventTypeName = $overrideEventTypeName;
-                            }
-
-                            if ($overrideIcon = $channelModel->getChannelTimelineIcon($eventTypeKey, $row)) {
-                                $icon = $overrideIcon;
-                            }
+                if (!empty($row['channel']) && $channelModel = $this->getChannelModel($row['channel'])) {
+                    if ($channelModel instanceof ChannelTimelineInterface) {
+                        if ($overrideTemplate = $channelModel->getChannelTimelineTemplate($eventTypeKey, $row)) {
+                            $template = $overrideTemplate;
                         }
 
-                        if (!empty($row['channel_id'])) {
-                            if ($item = $this->getChannelEntityName($row['channel'], $row['channel_id'], true)) {
-                                $row['itemName']  = $item['name'];
-                                $row['itemRoute'] = $item['url'];
-                            }
+                        if ($overrideEventTypeName = $channelModel->getChannelTimelineLabel($eventTypeKey, $row)) {
+                            $eventTypeName = $overrideEventTypeName;
                         }
+
+                        if ($overrideIcon = $channelModel->getChannelTimelineIcon($eventTypeKey, $row)) {
+                            $icon = $overrideIcon;
+                        }
+                    }
+                    if (!empty($row['channel_id']) && $item = $this->getChannelEntityName($row['channel'], $row['channel_id'], true)) {
+                        $row['itemName']  = $item['name'];
+                        $row['itemRoute'] = $item['url'];
                     }
                 }
                 $contactId = $row['lead_id'];

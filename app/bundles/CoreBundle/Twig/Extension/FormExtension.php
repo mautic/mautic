@@ -33,7 +33,7 @@ final readonly class FormExtension
     #[AsTwigFunction(name: 'formContainsErrors', isSafe: ['all'])]
     public function containsErrors(FormView $form, array $excluding = []): bool
     {
-        if (count($form->vars['errors'])) {
+        if (count($form->vars['errors']) > 0) {
             return true;
         }
         foreach ($form->children as $key => $child) {

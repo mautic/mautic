@@ -54,16 +54,13 @@ final readonly class ProcessReplySubscriber implements EventSubscriberInterface
 
     public function onEmailParse(ParseEmailEvent $event): void
     {
-        if ($event->isApplicable(self::BUNDLE, self::FOLDER_KEY)) {
-            // Process the messages
-            if ($messages = $event->getMessages()) {
-                foreach ($messages as $message) {
-                    $this->replier->process($message);
-                }
-
-                // Store the last UID
-                $this->cache->getSimpleCache()->set(self::CACHE_KEY, $message->id);
+        // Process the messages
+        if ($event->isApplicable(self::BUNDLE, self::FOLDER_KEY) && $messages = $event->getMessages()) {
+            foreach ($messages as $message) {
+                $this->replier->process($message);
             }
+            // Store the last UID
+            $this->cache->getSimpleCache()->set(self::CACHE_KEY, $message->id);
         }
     }
 }

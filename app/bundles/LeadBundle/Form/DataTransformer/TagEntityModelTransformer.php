@@ -89,7 +89,7 @@ final class TagEntityModelTransformer implements DataTransformerInterface
             'ignore_paginator' => true,
         ]);
 
-        if (!count($entities)) {
+        if (count($entities) === 0) {
             throw new TransformationFailedException(sprintf('Tags for "%s" does not exist!', implode(', ', $id)));
         }
 

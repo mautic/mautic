@@ -29,7 +29,7 @@ final readonly class SubmissionSubscriber
      */
     public function postPersist(LifecycleEventArgs $args): void
     {
-        if (!$form = $this->getSubmissionForm($args)) {
+        if (!($form = $this->getSubmissionForm($args)) instanceof \Mautic\FormBundle\Entity\Form) {
             return;
         }
 
@@ -38,7 +38,7 @@ final readonly class SubmissionSubscriber
 
     public function postRemove(LifecycleEventArgs $args): void
     {
-        if (!$form = $this->getSubmissionForm($args)) {
+        if (!($form = $this->getSubmissionForm($args)) instanceof \Mautic\FormBundle\Entity\Form) {
             return;
         }
 

@@ -49,11 +49,7 @@ class PointActionHelper
 
         if (isset($action['properties']['first_time']) && true === $action['properties']['first_time']) {
             $hitStats = $this->hitRepository->getDwellTimesForUrl($urlWithSqlWC, ['leadId' => $lead->getId()]);
-            if (isset($hitStats['count']) && $hitStats['count']) {
-                $changePoints['first_time'] = false;
-            } else {
-                $changePoints['first_time'] = true;
-            }
+            $changePoints['first_time'] = isset($hitStats['count']) && $hitStats['count'] ? false : true;
         }
         $now = new \DateTime();
 
@@ -70,11 +66,7 @@ class PointActionHelper
             }
 
             if (isset($hitStats['sum'])) {
-                if ($action['properties']['accumulative_time'] <= $hitStats['sum']) {
-                    $changePoints['accumulative_time'] = true;
-                } else {
-                    $changePoints['accumulative_time'] = false;
-                }
+                $changePoints['accumulative_time'] = $action['properties']['accumulative_time'] <= $hitStats['sum'];
             } else {
                 $changePoints['accumulative_time'] = false;
             }

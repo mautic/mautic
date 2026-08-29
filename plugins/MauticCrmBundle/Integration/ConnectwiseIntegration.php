@@ -264,33 +264,30 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             );
         }
 
-        if ('integration' == $formArea) {
-            if ($this->isAuthorized()) {
-                $builder->add(
-                    'push_activities',
-                    YesNoButtonGroupType::class,
-                    [
-                        'label'      => 'mautic.plugin.config.push.activities',
-                        'label_attr' => ['class' => 'control-label'],
-                        'attr'       => [
-                            'class' => 'form-control',
-                        ],
-                        'data'     => (!isset($data['push_activities'])) ? true : $data['push_activities'],
-                        'required' => false,
-                    ]
-                );
-
-                $builder->add(
-                    'campaign_task',
-                    IntegrationCampaignsTaskType::class,
-                    [
-                        'label' => false,
-                        'attr'  => [
-                            'data-hide-on' => '{"campaignevent_properties_config_push_activities_0":"checked"}',
-                        ],
-                        'data' => $data['campaign_task'] ?? [],
-                    ]);
-            }
+        if ('integration' == $formArea && $this->isAuthorized()) {
+            $builder->add(
+                'push_activities',
+                YesNoButtonGroupType::class,
+                [
+                    'label'      => 'mautic.plugin.config.push.activities',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class' => 'form-control',
+                    ],
+                    'data'     => (!isset($data['push_activities'])) ? true : $data['push_activities'],
+                    'required' => false,
+                ]
+            );
+            $builder->add(
+                'campaign_task',
+                IntegrationCampaignsTaskType::class,
+                [
+                    'label' => false,
+                    'attr'  => [
+                        'data-hide-on' => '{"campaignevent_properties_config_push_activities_0":"checked"}',
+                    ],
+                    'data' => $data['campaign_task'] ?? [],
+                ]);
         }
     }
 
@@ -493,11 +490,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         if (empty($data)) {
             return $fieldsValues;
         }
-        if ('Contact' == $object) {
-            $fields = $this->getContactFields();
-        } else {
-            $fields = $this->getCompanyFields();
-        }
+        $fields = 'Contact' == $object ? $this->getContactFields() : $this->getCompanyFields();
 
         foreach ($data as $key => $field) {
             if (isset($fields[$key])) {
@@ -656,11 +649,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      */
     public function populateLeadData($lead, $config = []): array
     {
-        if ($lead instanceof Lead) {
-            $fields = $lead->getFields(true);
-        } else {
-            $fields = $lead;
-        }
+        $fields = $lead instanceof Lead ? $lead->getFields(true) : $lead;
 
         $leadFields = $config['leadFields'];
         if (empty($leadFields)) {

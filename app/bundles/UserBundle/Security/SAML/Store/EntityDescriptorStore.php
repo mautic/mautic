@@ -17,7 +17,7 @@ final class EntityDescriptorStore implements EntityDescriptorStoreInterface
 
     public function get($entityId): ?EntityDescriptor
     {
-        if ($this->entityDescriptor) {
+        if ($this->entityDescriptor instanceof \LightSaml\Model\Metadata\EntityDescriptor) {
             return $this->entityDescriptor;
         }
 
@@ -48,7 +48,7 @@ final class EntityDescriptorStore implements EntityDescriptorStoreInterface
      */
     public function all(): array
     {
-        if (!$this->entityDescriptor) {
+        if (!$this->entityDescriptor instanceof \LightSaml\Model\Metadata\EntityDescriptor) {
             $this->createEntityDescriptor();
         }
 

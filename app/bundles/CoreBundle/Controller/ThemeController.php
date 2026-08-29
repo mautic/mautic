@@ -35,46 +35,44 @@ final class ThemeController extends FormController
         $action = $this->generateUrl('mautic_themes_index');
         $form   = $this->formFactory->create(ThemeUploadType::class, [], ['action' => $action]);
 
-        if ('POST' === $request->getMethod()) {
-            if (!$this->isFormCancelled($form)) {
-                if ($this->isFormValid($form)) {
-                    $fileData = $form['file']->getData();
+        if ('POST' === $request->getMethod() && !$this->isFormCancelled($form)) {
+            if ($this->isFormValid($form)) {
+                $fileData = $form['file']->getData();
 
-                    if (!$fileData) {
-                        $form->addError(
-                            new FormError(
-                                $this->translator->trans('mautic.core.theme.upload.empty', [], 'validators')
-                            )
-                        );
-                    } else {
-                        $fileName  = InputHelper::filename($fileData->getClientOriginalName());
-                        $themeName = basename($fileName, '.zip');
+                if (!$fileData) {
+                    $form->addError(
+                        new FormError(
+                            $this->translator->trans('mautic.core.theme.upload.empty', [], 'validators')
+                        )
+                    );
+                } else {
+                    $fileName  = InputHelper::filename($fileData->getClientOriginalName());
+                    $themeName = basename($fileName, '.zip');
 
-                        $extension = pathinfo($fileName, PATHINFO_EXTENSION);
+                    $extension = pathinfo($fileName, PATHINFO_EXTENSION);
 
-                        if ('zip' === $extension) {
-                            try {
-                                $fileData->move($dir, $fileName);
-                                $themeHelper->install($dir.'/'.$fileName);
-                                $this->addFlashMessage('mautic.core.theme.installed', ['%name%' => $themeName]);
-                            } catch (\Exception $e) {
-                                $form->addError(
-                                    new FormError(
-                                        $this->translator->trans($e->getMessage(), [], 'validators')
-                                    )
-                                );
-                            }
-                        } else {
+                    if ('zip' === $extension) {
+                        try {
+                            $fileData->move($dir, $fileName);
+                            $themeHelper->install($dir.'/'.$fileName);
+                            $this->addFlashMessage('mautic.core.theme.installed', ['%name%' => $themeName]);
+                        } catch (\Exception $e) {
                             $form->addError(
                                 new FormError(
-                                    $this->translator->trans('mautic.core.not.allowed.file.extension', ['%extension%' => $extension], 'validators')
+                                    $this->translator->trans($e->getMessage(), [], 'validators')
                                 )
                             );
                         }
+                    } else {
+                        $form->addError(
+                            new FormError(
+                                $this->translator->trans('mautic.core.not.allowed.file.extension', ['%extension%' => $extension], 'validators')
+                            )
+                        );
                     }
-                } else {
-                    $form->addError(new FormError($form->getErrors(true)));
                 }
+            } else {
+                $form->addError(new FormError($form->getErrors(true)));
             }
         }
 

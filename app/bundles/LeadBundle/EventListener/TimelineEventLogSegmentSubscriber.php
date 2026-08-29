@@ -39,7 +39,7 @@ final class TimelineEventLogSegmentSubscriber implements EventSubscriberInterfac
 
     public function onChange(ListChangeEvent $event): void
     {
-        if (!$contact = $event->getLead()) {
+        if (!($contact = $event->getLead()) instanceof \Mautic\LeadBundle\Entity\Lead) {
             return;
         }
 
@@ -105,7 +105,7 @@ final class TimelineEventLogSegmentSubscriber implements EventSubscriberInterfac
                     ]
                 );
 
-            if ($date) {
+            if ($date instanceof \DateTime) {
                 $log->setDateAdded($date);
             }
 

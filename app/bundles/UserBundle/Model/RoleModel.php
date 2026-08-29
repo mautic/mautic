@@ -65,7 +65,7 @@ final class RoleModel extends FormModel implements GlobalSearchInterface
 
         $isNew = ($entity->getId()) ? 0 : 1;
 
-        if (!$isNew) {
+        if ($isNew === 0) {
             // delete all existing
             $this->permissionRepository->purgeRolePermissions($entity);
         }
@@ -106,7 +106,7 @@ final class RoleModel extends FormModel implements GlobalSearchInterface
         }
 
         $users = $this->userRepository->findByRole($entity);
-        if (count($users)) {
+        if (count($users) > 0) {
             throw new PreconditionRequiredHttpException($this->translator->trans('mautic.user.role.error.deletenotallowed', ['%name%' => $entity->getName()], 'flashes'));
         }
 

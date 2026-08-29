@@ -106,7 +106,7 @@ final readonly class WebhookNotificationSender
         $sendToAuthor = $this->coreParametersHelper->get('webhook_send_notification_to_author', 1);
         if ($sendToAuthor) {
             $this->mailer->setTo($emailsArr);
-            if ($ccToUser) {
+            if ($ccToUser instanceof \Mautic\UserBundle\Entity\User) {
                 $this->mailer->setCc([$ccToUser->getEmail()]);
             }
         } else {

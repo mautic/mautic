@@ -128,16 +128,14 @@ class ChartQuery extends AbstractChart
     public function applyDateFilters(&$query, $dateColumn, $tablePrefix = 't'): void
     {
         // Check if the date filters have already been applied
-        if ($parameters = $query->getParameters()) {
-            if (array_key_exists('dateTo', $parameters) || array_key_exists('dateFrom', $parameters)) {
-                return;
-            }
+        if (($parameters = $query->getParameters()) && (array_key_exists('dateTo', $parameters) || array_key_exists('dateFrom', $parameters))) {
+            return;
         }
 
         if ($dateColumn) {
             $generatedColumn = $this->getGeneratedColumnForDateColumn($query, (string) $dateColumn, (string) $tablePrefix);
 
-            if ($generatedColumn) {
+            if ($generatedColumn instanceof \Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn) {
                 $dateColumn = $generatedColumn->getFilterDateColumn() ?: $dateColumn;
             }
 
@@ -576,7 +574,7 @@ class ChartQuery extends AbstractChart
     {
         $generatedColumn = $this->getGeneratedColumnForDateColumn($query, (string) $column, (string) $tablePrefix);
 
-        if ($generatedColumn) {
+        if ($generatedColumn instanceof \Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn) {
             return $tablePrefix.'.'.$generatedColumn->getColumnName();
         }
 
@@ -590,7 +588,7 @@ class ChartQuery extends AbstractChart
 
     private function getGeneratedColumnForDateColumn(QueryBuilder $query, string $dateColumn, string $tablePrefix): ?GeneratedColumn
     {
-        if (!$this->generatedColumnProvider) {
+        if (!$this->generatedColumnProvider instanceof \Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface) {
             return null;
         }
 

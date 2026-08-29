@@ -172,7 +172,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
         // Build WHERE clause
         if (!empty($standardFilters)) {
-            if (!$filterExpr = $event->getFilterExpression()) {
+            if (!($filterExpr = $event->getFilterExpression()) instanceof \Doctrine\DBAL\Query\Expression\ExpressionBuilder) {
                 $this->applyFilters($standardFilters, $queryBuilder, $options['filters']);
             } else {
                 $queryBuilder->andWhere($filterExpr);
@@ -258,15 +258,13 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
                     if (array_key_exists('channelData', $fieldOptions)) {
                         $selectText = $this->buildCaseSelect($fieldOptions['channelData']);
-                    } else {
+                    } elseif (isset($fieldOptions['groupByFormula']) && isset($groupByColumnsKeys[$fieldOptions['groupByFormula']])) {
                         // If there is a group by, and this field has groupByFormula
-                        if (isset($fieldOptions['groupByFormula']) && isset($groupByColumnsKeys[$fieldOptions['groupByFormula']])) {
-                            $selectText = $fieldOptions['groupByFormula'];
-                        } elseif (isset($fieldOptions['formula'])) {
-                            $selectText = $fieldOptions['formula'];
-                        } else {
-                            $selectText = $this->sanitizeColumnName($field);
-                        }
+                        $selectText = $fieldOptions['groupByFormula'];
+                    } elseif (isset($fieldOptions['formula'])) {
+                        $selectText = $fieldOptions['formula'];
+                    } else {
+                        $selectText = $this->sanitizeColumnName($field);
                     }
 
                     // support for prefix and suffix to value in query
@@ -355,11 +353,9 @@ final class MauticReportBuilder implements ReportBuilderInterface
                     continue;
                 }
 
-                if (array_key_exists('glue', $filter) && 'or' === $filter['glue']) {
-                    if ([] !== $andGroup) {
-                        $orGroups[] = CompositeExpression::and(...$andGroup);
-                        $andGroup   = [];
-                    }
+                if (array_key_exists('glue', $filter) && 'or' === $filter['glue'] && [] !== $andGroup) {
+                    $orGroups[] = CompositeExpression::and(...$andGroup);
+                    $andGroup   = [];
                 }
 
                 $tagCondition = $this->getTagCondition($filter);

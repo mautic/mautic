@@ -96,7 +96,7 @@ final class TokenPersistence implements TokenPersistenceInterface
      */
     private function getIntegration(): Integration
     {
-        if ($this->integration) {
+        if ($this->integration instanceof \Mautic\PluginBundle\Entity\Integration) {
             return $this->integration;
         }
 

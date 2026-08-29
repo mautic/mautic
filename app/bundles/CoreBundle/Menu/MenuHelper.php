@@ -44,11 +44,7 @@ final class MenuHelper
 
             // Set ID to route name
             if (!isset($i['id'])) {
-                if (!empty($i['route'])) {
-                    $i['id'] = $i['route'];
-                } else {
-                    $i['id'] = 'menu-item-'.uniqid();
-                }
+                $i['id'] = !empty($i['route']) ? $i['route'] : 'menu-item-'.uniqid();
             }
 
             // Set link attributes

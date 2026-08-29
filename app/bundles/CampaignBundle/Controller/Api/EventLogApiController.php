@@ -248,10 +248,10 @@ final class EventLogApiController extends FetchCommonApiController
 
     protected function view($data = null, ?int $statusCode = null, array $headers = []): View
     {
-        if ($this->campaign) {
+        if ($this->campaign instanceof \Mautic\CampaignBundle\Entity\Campaign) {
             $data['campaign'] = $this->campaign;
 
-            if ($this->contact) {
+            if ($this->contact instanceof \Mautic\LeadBundle\Entity\Lead) {
                 [$data['membership'], $ignore] = $this->prepareEntitiesForView($this->campaign->getContactMembership($this->contact));
             }
         }

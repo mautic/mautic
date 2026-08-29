@@ -47,7 +47,7 @@ class IntegrationSyncProcess
     {
         $integrationRequestDAO   = new RequestDAO(MauticSyncDataExchange::NAME, $syncIteration, $this->inputOptionsDAO);
         $integrationObjectsNames = $this->mappingManualDAO->getIntegrationObjectNames();
-        $mauticObjectTypes       = $integrationRequestDAO->getInputOptionsDAO()->getMauticObjectIds() ?
+        $mauticObjectTypes       = $integrationRequestDAO->getInputOptionsDAO()->getMauticObjectIds() instanceof \Mautic\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO ?
             $integrationRequestDAO->getInputOptionsDAO()->getMauticObjectIds()->getObjectTypes() : [];
         $hasMauticObjectIDs = 0 < count($mauticObjectTypes);
 

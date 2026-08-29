@@ -109,11 +109,7 @@ final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
                     $this->formatChoices($extraChoices);
                     foreach ($extraChoices as $k => $v) {
                         if (is_array($v)) {
-                            if (!isset($choices[$k])) {
-                                $choices[$k] = $v;
-                            } else {
-                                $choices[$k] = array_replace($choices[$k], $v);
-                            }
+                            $choices[$k] = !isset($choices[$k]) ? $v : array_replace($choices[$k], $v);
                         } else {
                             $choices[$k] = $v;
                         }
@@ -213,7 +209,7 @@ final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
             $composite = null;
 
             $limit = 100;
-            if ($data) {
+            if ($data !== []) {
                 $composite = CompositeExpression::and(
                     $expr->in($alias.'.id', ':dataIds')
                 );

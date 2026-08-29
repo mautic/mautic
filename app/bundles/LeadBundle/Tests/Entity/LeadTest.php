@@ -71,8 +71,8 @@ final class LeadTest extends TestCase
                 ->setFrequencyNumber($rule['frequencyNumber'])
                 ->setFrequencyTime($rule['frequencyTime'])
                 ->setChannel($channel)
-                ->setPauseFromDate(($rule['pauseFromDate']) ? new \DateTime($rule['pauseFromDate']) : null)
-                ->setPauseToDate(($rule['pauseToDate']) ? new \DateTime($rule['pauseToDate']) : null);
+                ->setPauseFromDate(($rule['pauseFromDate'] !== '' && $rule['pauseFromDate'] !== '0') ? new \DateTime($rule['pauseFromDate']) : null)
+                ->setPauseToDate(($rule['pauseToDate'] !== '' && $rule['pauseToDate'] !== '0') ? new \DateTime($rule['pauseToDate']) : null);
 
             $lead->addFrequencyRule($frequencyRule);
         }

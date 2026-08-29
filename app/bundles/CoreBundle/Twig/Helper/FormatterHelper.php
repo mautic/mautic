@@ -50,11 +50,7 @@ final readonly class FormatterHelper
                         $stringParts[] = InputHelper::clean($v);
                     }
                 }
-                if (1 === $round) {
-                    $string = implode('; ', $stringParts);
-                } else {
-                    $string = implode(', ', $stringParts);
-                }
+                $string = 1 === $round ? implode('; ', $stringParts) : implode(', ', $stringParts);
                 break;
             case 'datetime':
                 $string = $this->dateHelper->toFullConcat($val, 'utc');

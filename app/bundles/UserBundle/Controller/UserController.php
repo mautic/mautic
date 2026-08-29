@@ -128,7 +128,7 @@ final class UserController extends FormController
                     'edit'   => $this->security->isGranted('user:users:editother'),
                     'delete' => $this->security->isGranted('user:users:deleteother'),
                 ],
-                'inviteForm'    => $inviteForm ? $inviteForm->createView() : null,
+                'inviteForm'    => $inviteForm instanceof \Symfony\Component\Form\FormInterface ? $inviteForm->createView() : null,
             ],
             'contentTemplate' => '@MauticUser/User/list.html.twig',
             'passthroughVars' => [
@@ -556,48 +556,41 @@ final class UserController extends FormController
             $returnUrl = $formUrl ? urldecode($formUrl) : $this->generateUrl('mautic_dashboard_index');
             $valid     = false;
 
-            if (!$cancelled = $this->isFormCancelled($form)) {
-                if ($valid = $this->isFormValid($form)) {
-                    $subject = InputHelper::clean($form->get('msg_subject')->getData());
-                    $body    = InputHelper::clean($form->get('msg_body')->getData());
-
-                    $mailer->setFrom($currentUser->getEmail(), $currentUser->getName());
-                    $mailer->setSubject($subject);
-                    $mailer->setTo($user->getEmail(), $user->getName());
-                    $mailer->setBody($body);
-                    $mailer->send();
-
-                    $reEntity = $form->get('entity')->getData();
-                    if (empty($reEntity)) {
-                        $bundle   = $object   = 'user';
-                        $entityId = $user->getId();
-                    } else {
-                        $bundle = $object = $reEntity;
-                        if (strpos($reEntity, ':')) {
-                            [$bundle, $object] = explode(':', $reEntity);
-                        }
-                        $entityId = $form->get('id')->getData();
+            if (!$cancelled = $this->isFormCancelled($form) && $valid = $this->isFormValid($form)) {
+                $subject = InputHelper::clean($form->get('msg_subject')->getData());
+                $body    = InputHelper::clean($form->get('msg_body')->getData());
+                $mailer->setFrom($currentUser->getEmail(), $currentUser->getName());
+                $mailer->setSubject($subject);
+                $mailer->setTo($user->getEmail(), $user->getName());
+                $mailer->setBody($body);
+                $mailer->send();
+                $reEntity = $form->get('entity')->getData();
+                if (empty($reEntity)) {
+                    $bundle   = $object   = 'user';
+                    $entityId = $user->getId();
+                } else {
+                    $bundle = $object = $reEntity;
+                    if (strpos($reEntity, ':')) {
+                        [$bundle, $object] = explode(':', $reEntity);
                     }
-
-                    $details = $serializer->serialize([
-                        'from'    => $currentUser->getName(),
-                        'to'      => $user->getName(),
-                        'subject' => $subject,
-                        'message' => $body,
-                    ], 'json');
-
-                    $log = [
-                        'bundle'    => $bundle,
-                        'object'    => $object,
-                        'objectId'  => $entityId,
-                        'action'    => 'communication',
-                        'details'   => $details,
-                        'ipAddress' => $ipLookupHelper->getIpAddressFromRequest(),
-                    ];
-                    $this->auditLogModel->writeToLog($log);
-
-                    $this->addFlashMessage('mautic.user.user.notice.messagesent', ['%name%' => $user->getName()]);
+                    $entityId = $form->get('id')->getData();
                 }
+                $details = $serializer->serialize([
+                    'from'    => $currentUser->getName(),
+                    'to'      => $user->getName(),
+                    'subject' => $subject,
+                    'message' => $body,
+                ], 'json');
+                $log = [
+                    'bundle'    => $bundle,
+                    'object'    => $object,
+                    'objectId'  => $entityId,
+                    'action'    => 'communication',
+                    'details'   => $details,
+                    'ipAddress' => $ipLookupHelper->getIpAddressFromRequest(),
+                ];
+                $this->auditLogModel->writeToLog($log);
+                $this->addFlashMessage('mautic.user.user.notice.messagesent', ['%name%' => $user->getName()]);
             }
             if ($cancelled || $valid) {
                 return $this->redirect($returnUrl);

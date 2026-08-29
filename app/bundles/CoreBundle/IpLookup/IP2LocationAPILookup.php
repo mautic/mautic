@@ -28,7 +28,7 @@ final class IP2LocationAPILookup extends AbstractRemoteDataLookup
                 $this->zipcode = $record->zip_code;
             }
         } catch (\Exception $exception) {
-            if ($this->logger) {
+            if ($this->logger instanceof \Psr\Log\LoggerInterface) {
                 $this->logger->warning('IP LOOKUP: '.$exception->getMessage());
             }
         }

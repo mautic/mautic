@@ -490,7 +490,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                 if ($email->isVariant()) {
                     // Get a summation of weights
                     $parent   = $email->getVariantParent();
-                    $children = $parent ? $parent->getVariantChildren() : $email->getVariantChildren();
+                    $children = $parent instanceof \Mautic\CoreBundle\Entity\VariantEntityInterface ? $parent->getVariantChildren() : $email->getVariantChildren();
 
                     $total = 0;
                     foreach ($children as $child) {
@@ -1375,7 +1375,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     public function isWinner(): bool
     {
-        $variantSettings = $this->getVariantParent() ? $this->getVariantParent()->getVariantSettings() : $this->getVariantSettings();
+        $variantSettings = $this->getVariantParent() instanceof \Mautic\CoreBundle\Entity\VariantEntityInterface ? $this->getVariantParent()->getVariantSettings() : $this->getVariantSettings();
 
         return (bool) ($variantSettings['enableAbTest'] ?? false) && 100 === (int) ($variantSettings['totalWeight'] ?? null);
     }

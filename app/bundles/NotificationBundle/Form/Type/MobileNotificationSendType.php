@@ -65,10 +65,8 @@ final class MobileNotificationSendType extends AbstractType
                 ]
             );
 
-            if (array_key_exists('data', $options)) {
-                if (is_array($options['data']) && array_key_exists('notification', $options['data'])) {
-                    $notification = $options['data']['notification'];
-                }
+            if (array_key_exists('data', $options) && (is_array($options['data']) && array_key_exists('notification', $options['data']))) {
+                $notification = $options['data']['notification'];
             }
 
             // create button edit notification

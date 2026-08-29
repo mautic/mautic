@@ -115,7 +115,7 @@ abstract class ModeratedCommand extends Command
      */
     protected function completeRun(): void
     {
-        if ($this->lock) {
+        if ($this->lock instanceof \Symfony\Component\Lock\LockInterface) {
             $this->lock->release();
         }
 

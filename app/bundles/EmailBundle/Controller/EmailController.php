@@ -895,7 +895,7 @@ final class EmailController extends FormController
         $error = $this->getFormErrorForBuilder($form);
         $data  = ['version' => $error ? $form['version']->getData() : $entity->getVersion()];
 
-        if ($optimizedResponse = $this->returnOptimizedResponse($request, $form, '#mautic_email_index', 'email', $route, $data)) {
+        if (($optimizedResponse = $this->returnOptimizedResponse($request, $form, '#mautic_email_index', 'email', $route, $data)) instanceof \Symfony\Component\HttpFoundation\JsonResponse) {
             return $optimizedResponse;
         }
 
@@ -936,7 +936,7 @@ final class EmailController extends FormController
     {
         $emailEntity  = $model->getEntity($objectId);
         $entity       = null;
-        if ($emailEntity) {
+        if ($emailEntity instanceof \Mautic\EmailBundle\Entity\Email) {
             $entity       = clone $emailEntity;
         }
         $method  = $request->getMethod();
@@ -1477,7 +1477,7 @@ final class EmailController extends FormController
         }
 
         // Check that the parent is getting sent
-        if ($variantParent = $entity->getVariantParent()) {
+        if (($variantParent = $entity->getVariantParent()) instanceof \Mautic\CoreBundle\Entity\VariantEntityInterface) {
             return $this->redirectToRoute('mautic_email_action', [
                 'objectAction' => 'send',
                 'objectId'     => $variantParent->getId(),

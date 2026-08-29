@@ -21,11 +21,10 @@ trait VariantModelTrait
     {
         $isVariant = $entity->isVariant();
 
-        if (!$isVariant && $entity instanceof TranslationEntityInterface) {
-            // Translations could be assigned to a variant and thus applicable to be reset
-            if ($translationParent = $entity->getTranslationParent()) {
-                $isVariant = $translationParent->isVariant(); /** @phpstan-ignore-line @todo for M6, extend the TranslationEntityInterface from The VariantEntityInterface */
-            }
+        // Translations could be assigned to a variant and thus applicable to be reset
+        if (!$isVariant && $entity instanceof TranslationEntityInterface && $translationParent = $entity->getTranslationParent()) {
+            $isVariant = $translationParent->isVariant();
+            /** @phpstan-ignore-line @todo for M6, extend the TranslationEntityInterface from The VariantEntityInterface */
         }
 
         if ($isVariant) {
@@ -65,7 +64,7 @@ trait VariantModelTrait
     protected function postVariantSaveEntity(VariantEntityInterface $entity, $resetVariants = false, $relatedIds = [], ?\DateTime $variantStartDate = null): void
     {
         // If parent, add this entity as a child of the parent so that it populates the list in the tab (due to Doctrine hanging on to entities in memory)
-        if ($parent = $entity->getVariantParent()) {
+        if (($parent = $entity->getVariantParent()) instanceof \Mautic\CoreBundle\Entity\VariantEntityInterface) {
             $parent->addVariantChild($entity);
         }
 

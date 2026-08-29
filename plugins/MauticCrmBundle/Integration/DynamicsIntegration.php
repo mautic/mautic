@@ -223,53 +223,51 @@ final class DynamicsIntegration extends CrmAbstractIntegration
             $dynamicsObjects = $settings['objects'] ?? ['contacts'];
         }
         try {
-            if ($this->isAuthorized()) {
-                if (!empty($dynamicsObjects) && is_array($dynamicsObjects)) {
-                    foreach ($dynamicsObjects as $dynamicsObject) {
-                        // Check the cache first
-                        $settings['cache_suffix'] = $cacheSuffix = '.'.$dynamicsObject;
-                        if ($fields = parent::getAvailableLeadFields($settings)) {
-                            $dynamicsFields[$dynamicsObject] = $fields;
+            if ($this->isAuthorized() && (!empty($dynamicsObjects) && is_array($dynamicsObjects))) {
+                foreach ($dynamicsObjects as $dynamicsObject) {
+                    // Check the cache first
+                    $settings['cache_suffix'] = $cacheSuffix = '.'.$dynamicsObject;
+                    if ($fields = parent::getAvailableLeadFields($settings)) {
+                        $dynamicsFields[$dynamicsObject] = $fields;
+                        continue;
+                    }
+                    $leadObject = $this->getApiHelper()->getLeadFields($dynamicsObject);
+                    if (null === $leadObject || !array_key_exists('value', $leadObject)) {
+                        return [];
+                    }
+                    $fields = $leadObject['value'];
+                    foreach ($fields as $field) {
+                        $type      = 'string';
+                        $fieldType = $field['AttributeTypeName']['Value'];
+                        if (in_array($fieldType, [
+                            'LookupType',
+                            'OwnerType',
+                            'PicklistType',
+                            'StateType',
+                            'StatusType',
+                            'UniqueidentifierType',
+                        ], true)) {
                             continue;
                         }
-                        $leadObject = $this->getApiHelper()->getLeadFields($dynamicsObject);
-                        if (null === $leadObject || !array_key_exists('value', $leadObject)) {
-                            return [];
+                        if (in_array($fieldType, [
+                            'DoubleType',
+                            'IntegerType',
+                            'MoneyType',
+                        ], true)) {
+                            $type = 'int';
+                        } elseif ('Boolean' === $fieldType) {
+                            $type = 'boolean';
+                        } elseif ('DateTimeType' === $fieldType) {
+                            $type = 'datetime';
                         }
-                        $fields = $leadObject['value'];
-                        foreach ($fields as $field) {
-                            $type      = 'string';
-                            $fieldType = $field['AttributeTypeName']['Value'];
-                            if (in_array($fieldType, [
-                                'LookupType',
-                                'OwnerType',
-                                'PicklistType',
-                                'StateType',
-                                'StatusType',
-                                'UniqueidentifierType',
-                            ], true)) {
-                                continue;
-                            }
-                            if (in_array($fieldType, [
-                                'DoubleType',
-                                'IntegerType',
-                                'MoneyType',
-                            ], true)) {
-                                $type = 'int';
-                            } elseif ('Boolean' === $fieldType) {
-                                $type = 'boolean';
-                            } elseif ('DateTimeType' === $fieldType) {
-                                $type = 'datetime';
-                            }
-                            $dynamicsFields[$dynamicsObject][$field['LogicalName']] = [
-                                'type'     => $type,
-                                'label'    => $field['DisplayName']['UserLocalizedLabel']['Label'],
-                                'dv'       => $field['LogicalName'],
-                                'required' => 'ApplicationRequired' === $field['RequiredLevel']['Value'],
-                            ];
-                        }
-                        $this->cache->set('leadFields'.$cacheSuffix, $dynamicsFields[$dynamicsObject]);
+                        $dynamicsFields[$dynamicsObject][$field['LogicalName']] = [
+                            'type'     => $type,
+                            'label'    => $field['DisplayName']['UserLocalizedLabel']['Label'],
+                            'dv'       => $field['LogicalName'],
+                            'required' => 'ApplicationRequired' === $field['RequiredLevel']['Value'],
+                        ];
                     }
+                    $this->cache->set('leadFields'.$cacheSuffix, $dynamicsFields[$dynamicsObject]);
                 }
             }
         } catch (ApiErrorException $exception) {
@@ -526,10 +524,8 @@ final class DynamicsIntegration extends CrmAbstractIntegration
                         } else {
                             $newMatchedFields = $matchedFields;
                         }
-                        if (!isset($newMatchedFields['companyname'])) {
-                            if (isset($newMatchedFields['companywebsite'])) {
-                                $newMatchedFields['companyname'] = $newMatchedFields['companywebsite'];
-                            }
+                        if (!isset($newMatchedFields['companyname']) && isset($newMatchedFields['companywebsite'])) {
+                            $newMatchedFields['companyname'] = $newMatchedFields['companywebsite'];
                         }
 
                         // update values if already empty
@@ -709,14 +705,12 @@ final class DynamicsIntegration extends CrmAbstractIntegration
         $totalToCreate = is_array($totalToCreate) ? count($totalToCreate) : $totalToCreate;
         $totalCount    = $totalToCreate + $totalToUpdate;
 
-        if (defined('IN_MAUTIC_CONSOLE')) {
-            // start with update
-            if ($totalToUpdate + $totalToCreate) {
-                $output = new ConsoleOutput();
-                $output->writeln("About {$totalToUpdate} to update and about {$totalToCreate} to create/update");
-                $output->writeln('<info>This could take some time. Please wait until the process is completed</info>');
-                $progress = new ProgressBar($output, $totalCount);
-            }
+        // start with update
+        if (defined('IN_MAUTIC_CONSOLE') && $totalToUpdate + $totalToCreate) {
+            $output = new ConsoleOutput();
+            $output->writeln("About {$totalToUpdate} to update and about {$totalToCreate} to create/update");
+            $output->writeln('<info>This could take some time. Please wait until the process is completed</info>');
+            $progress = new ProgressBar($output, $totalCount);
         }
 
         // Start with contacts so we know who is a contact when we go to process converted leads
@@ -779,11 +773,9 @@ final class DynamicsIntegration extends CrmAbstractIntegration
             // Match that data with mapped lead fields
             foreach ($fieldsToUpdate[$object] as $k => $v) {
                 foreach ($lead as $dk => $dv) {
-                    if ($v === $dk) {
-                        if ($dv) {
-                            if (isset($availableFields[$object][$k])) {
-                                $mappedData[$availableFields[$object][$k]['dv']] = $dv;
-                            }
+                    if ($v === $dk && $dv) {
+                        if (isset($availableFields[$object][$k])) {
+                            $mappedData[$availableFields[$object][$k]['dv']] = $dv;
                         }
                     }
                 }
@@ -814,11 +806,9 @@ final class DynamicsIntegration extends CrmAbstractIntegration
             // Match that data with mapped lead fields
             foreach ($config['leadFields'] as $k => $v) {
                 foreach ($lead as $dk => $dv) {
-                    if ($v === $dk) {
-                        if ($dv) {
-                            if (isset($availableFields[$object][$k])) {
-                                $mappedData[$availableFields[$object][$k]['dv']] = $dv;
-                            }
+                    if ($v === $dk && $dv) {
+                        if (isset($availableFields[$object][$k])) {
+                            $mappedData[$availableFields[$object][$k]['dv']] = $dv;
                         }
                     }
                 }

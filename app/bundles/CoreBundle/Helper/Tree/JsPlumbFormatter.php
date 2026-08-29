@@ -43,7 +43,7 @@ final class JsPlumbFormatter implements NodeFormatterInterface
      */
     private function addNodeAndEdges(NodeInterface $parentNode, array $data, int $depth): array
     {
-        $parentParentId = $parentNode->getParent() ? $parentNode->getParent()->getValue() : 0;
+        $parentParentId = $parentNode->getParent() instanceof \Mautic\CoreBundle\Helper\Tree\NodeInterface ? $parentNode->getParent()->getValue() : 0;
         $id             = "{$parentParentId}-{$parentNode->getValue()}";
         $node           = [
             'id'   => $id,

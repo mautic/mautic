@@ -169,18 +169,13 @@ class IpLookupHelper
             }
 
             $details = $ipAddress->getIpDetails();
-            if ($ipAddress->isTrackable() && !$isIpAnonymizationEnabled && empty($details['city'])) {
-                // Get the IP lookup service
-
-                // Fetch the data
-                if ($this->ipLookup) {
-                    $details = $this->getIpDetails($ip);
-
-                    $ipAddress->setIpDetails($details);
-
-                    // Save new details
-                    $saveIp = true;
-                }
+            // Get the IP lookup service
+            // Fetch the data
+            if ($ipAddress->isTrackable() && !$isIpAnonymizationEnabled && empty($details['city']) && $this->ipLookup) {
+                $details = $this->getIpDetails($ip);
+                $ipAddress->setIpDetails($details);
+                // Save new details
+                $saveIp = true;
             }
 
             if ($saveIp) {
@@ -200,7 +195,7 @@ class IpLookupHelper
      */
     public function getIpDetails($ip)
     {
-        if ($this->ipLookup) {
+        if ($this->ipLookup instanceof \Mautic\CoreBundle\IpLookup\AbstractLookup) {
             return $this->ipLookup->setIpAddress($ip)->getDetails();
         }
 

@@ -149,7 +149,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         $entities = [];
         foreach ($campaignIds as $campaignId) {
             $campaign = $this->getEntity($campaignId);
-            if ($campaign) {
+            if ($campaign instanceof \Mautic\CampaignBundle\Entity\Campaign) {
                 $entities[$campaignId] = $campaign;
                 $this->deleteEntity($campaign);
             }
@@ -924,7 +924,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         $this->em->beginTransaction();
         $result = $this->getRepository()->getCampaignPublishAndVersionData($campaign->getId());
 
-        if (!(int) $result['is_published']) {
+        if ((int) $result['is_published'] === 0) {
             $this->em->commit();
             throw new CampaignAlreadyUnpublishedException('Campaign is unpublished!');
         }

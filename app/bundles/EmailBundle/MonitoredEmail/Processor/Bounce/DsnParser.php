@@ -55,12 +55,9 @@ final class DsnParser
         // ======= parse $dsnReport ======
         // get the recipient email
         if (
-            preg_match('/Original-Recipient: rfc822;(.*)/i', $dsnReport, $match)
-            || preg_match('/Final-Recipient:\s?rfc822;(.*)/i', $dsnReport, $match)
+            (preg_match('/Original-Recipient: rfc822;(.*)/i', $dsnReport, $match) || preg_match('/Final-Recipient:\s?rfc822;(.*)/i', $dsnReport, $match)) && $parsedAddressList = Address::parseList($match[1])
         ) {
-            if ($parsedAddressList = Address::parseList($match[1])) {
-                $result['email'] = key($parsedAddressList);
-            }
+            $result['email'] = key($parsedAddressList);
         }
 
         if (preg_match('/Action: (.+)/i', $dsnReport, $match)) {

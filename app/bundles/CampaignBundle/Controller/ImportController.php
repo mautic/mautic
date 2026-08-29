@@ -139,10 +139,8 @@ final class ImportController extends AbstractFormController
                     new Filesystem()->mkdir($importDir, 0755);
 
                     // Remove existing file if it exists
-                    if (file_exists($fullPath)) {
-                        if (!unlink($fullPath)) {
-                            $this->logger->error("Failed to delete existing file before new upload: {$fullPath}");
-                        }
+                    if (file_exists($fullPath) && !unlink($fullPath)) {
+                        $this->logger->error("Failed to delete existing file before new upload: {$fullPath}");
                     }
 
                     // Move uploaded file

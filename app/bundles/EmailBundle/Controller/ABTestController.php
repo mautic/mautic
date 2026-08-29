@@ -20,7 +20,7 @@ final class ABTestController extends AbstractFormController
 
     public function generateABTestAction(Request $request, EmailModel $emailModel, int $objectId): Response
     {
-        if (!$parent = $emailModel->getEntity($objectId)) {
+        if (!($parent = $emailModel->getEntity($objectId)) instanceof \Mautic\EmailBundle\Entity\Email) {
             return $this->notFound();
         }
 

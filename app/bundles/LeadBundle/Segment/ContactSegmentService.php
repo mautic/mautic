@@ -29,7 +29,7 @@ readonly class ContactSegmentService
     {
         $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment, $batchLimiters);
 
-        if (!count($segmentFilters)) {
+        if (count($segmentFilters) === 0) {
             $this->logger->debug('Segment QB: Segment has no filters', ['segmentId' => $segment->getId()]);
 
             return [
@@ -66,7 +66,7 @@ readonly class ContactSegmentService
     {
         $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
 
-        if (!count($segmentFilters)) {
+        if (count($segmentFilters) === 0) {
             $this->logger->debug('Segment QB: Segment has no filters', ['segmentId' => $segment->getId()]);
 
             return [

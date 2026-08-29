@@ -160,7 +160,7 @@ final class FullContactController extends FormController
         }
 
         $lookupEmails = [];
-        if ($count = count($entities)) {
+        if (($count = count($entities)) !== 0) {
             /** @var Lead $lead */
             foreach ($entities as $lead) {
                 if ($this->security->hasEntityAccess(
@@ -238,7 +238,7 @@ final class FullContactController extends FormController
         if ('POST' === $request->getMethod()) {
             $notify = array_key_exists('notify', $data);
             foreach ($lookupEmails as $id => $lookupEmail) {
-                if ($lead = $this->leadModel->getEntity($id)) {
+                if (($lead = $this->leadModel->getEntity($id)) instanceof \Mautic\LeadBundle\Entity\Lead) {
                     try {
                         $lookupHelper->lookupContact($lead, $notify);
                     } catch (\Exception $ex) {
@@ -252,7 +252,7 @@ final class FullContactController extends FormController
                 }
             }
 
-            if ($count) {
+            if ($count !== 0) {
                 $this->addFlashMessage(
                     'mautic.lead.batch_leads_affected',
                     [
@@ -403,7 +403,7 @@ final class FullContactController extends FormController
         }
 
         $lookupWebsites = [];
-        if ($count = count($entities)) {
+        if (($count = count($entities)) !== 0) {
             /** @var Company $company */
             foreach ($entities as $company) {
                 if ($company->getFieldValue('companywebsite')) {
@@ -480,7 +480,7 @@ final class FullContactController extends FormController
         if ('POST' === $request->getMethod()) {
             $notify = array_key_exists('notify', $data);
             foreach ($lookupWebsites as $id => $lookupWebsite) {
-                if ($company = $this->companyModel->getEntity($id)) {
+                if (($company = $this->companyModel->getEntity($id)) instanceof \Mautic\LeadBundle\Entity\Company) {
                     try {
                         $lookupHelper->lookupCompany($company, $notify);
                     } catch (\Exception $ex) {
@@ -494,7 +494,7 @@ final class FullContactController extends FormController
                 }
             }
 
-            if ($count) {
+            if ($count !== 0) {
                 $this->addFlashMessage(
                     'mautic.company.batch_companies_affected',
                     [

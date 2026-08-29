@@ -48,7 +48,7 @@ final class LeadType extends AbstractType
             ];
 
             $cache = $options['data']->getSocialCache() ?? [];
-            if (count($cache)) {
+            if (count($cache) > 0) {
                 foreach ($cache as $key => $data) {
                     $imageChoices[$key] = $key;
                 }

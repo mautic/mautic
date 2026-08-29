@@ -375,11 +375,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
 
         $pass = [];
         foreach ($reflection->getParameters() as $param) {
-            if (isset($args[$param->getName()])) {
-                $pass[] = $args[$param->getName()];
-            } else {
-                $pass[] = null;
-            }
+            $pass[] = $args[$param->getName()] ?? null;
         }
 
         return $reflection->invokeArgs($this, $pass);

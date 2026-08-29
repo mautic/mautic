@@ -481,11 +481,7 @@ final class PlainTextHelper
     {
         $str = html_entity_decode($str, ENT_COMPAT, self::ENCODING);
 
-        if (function_exists('mb_strtoupper')) {
-            $str = mb_strtoupper($str, self::ENCODING);
-        } else {
-            $str = strtoupper($str);
-        }
+        $str = function_exists('mb_strtoupper') ? mb_strtoupper($str, self::ENCODING) : strtoupper($str);
 
         return htmlspecialchars($str, ENT_COMPAT, self::ENCODING);
     }

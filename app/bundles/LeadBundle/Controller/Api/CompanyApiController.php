@@ -63,7 +63,7 @@ final class CompanyApiController extends CommonApiController
     public function getNewEntity(array $params)
     {
         [$company, $companyEntities] = IdentifyCompanyHelper::findCompany($params, $this->companyModel);
-        if (count($companyEntities)) {
+        if (count($companyEntities) > 0) {
             return $this->model->getEntity($company['id']);
         }
 

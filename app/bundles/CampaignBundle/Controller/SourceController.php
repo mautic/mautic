@@ -79,14 +79,12 @@ class SourceController extends CommonFormController
 
         $modifiedSources = $this->modifiedSources;
         // Check for a submitted form and process it
-        if ('1' === $request->request->get('submit')) {
-            if (!$cancelled = $this->isFormCancelled($form)) {
-                if ($valid = $this->isFormValid($form)) {
-                    $success                      = 1;
-                    $modifiedSources[$sourceType] = $this->buildSubmittedSourceMap($form[$sourceType]->getData());
-                } else {
-                    $success = 0;
-                }
+        if ('1' === $request->request->get('submit') && !$cancelled = $this->isFormCancelled($form)) {
+            if ($valid = $this->isFormValid($form)) {
+                $success                      = 1;
+                $modifiedSources[$sourceType] = $this->buildSubmittedSourceMap($form[$sourceType]->getData());
+            } else {
+                $success = 0;
             }
         }
 
@@ -179,16 +177,14 @@ class SourceController extends CommonFormController
         );
 
         // Check for a submitted form and process it
-        if ('1' === $request->request->get('submit')) {
-            if (!$cancelled = $this->isFormCancelled($form)) {
-                if ($valid = $this->isFormValid($form)) {
-                    $success = 1;
+        if ('1' === $request->request->get('submit') && !$cancelled = $this->isFormCancelled($form)) {
+            if ($valid = $this->isFormValid($form)) {
+                $success = 1;
 
-                    // save the properties to session
-                    $modifiedSources[$sourceType] = $this->buildSubmittedSourceMap($form[$sourceType]->getData());
-                } else {
-                    $success = 0;
-                }
+                // save the properties to session
+                $modifiedSources[$sourceType] = $this->buildSubmittedSourceMap($form[$sourceType]->getData());
+            } else {
+                $success = 0;
             }
         }
 

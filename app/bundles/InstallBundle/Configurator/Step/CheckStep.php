@@ -166,7 +166,7 @@ final class CheckStep implements StepInterface
         }
 
         // We set a default timezone in the app bootstrap, but advise the user if their PHP config is missing it
-        if (!ini_get('date.timezone')) {
+        if (ini_get('date.timezone') === '' || ini_get('date.timezone') === '0') {
             $messages[] = 'mautic.install.date.timezone.not.set';
         }
 
@@ -190,10 +190,8 @@ final class CheckStep implements StepInterface
             $messages[] = 'mautic.install.ssl.certificate';
         }
 
-        if (!defined('PHP_WINDOWS_VERSION_BUILD')) {
-            if (!function_exists('posix_isatty')) {
-                $messages[] = 'mautic.install.function.posix.enable';
-            }
+        if (!defined('PHP_WINDOWS_VERSION_BUILD') && !function_exists('posix_isatty')) {
+            $messages[] = 'mautic.install.function.posix.enable';
         }
 
         $memoryLimit    = FileHelper::convertPHPSizeToBytes(ini_get('memory_limit'));

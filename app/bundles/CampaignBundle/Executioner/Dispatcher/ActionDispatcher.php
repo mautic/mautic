@@ -33,7 +33,7 @@ final readonly class ActionDispatcher
      */
     public function dispatchEvent(ActionAccessor $config, Event $event, ArrayCollection $logs, ?PendingEvent $pendingEvent = null): PendingEvent
     {
-        if (!$pendingEvent) {
+        if (!$pendingEvent instanceof \Mautic\CampaignBundle\Event\PendingEvent) {
             $pendingEvent = new PendingEvent($config, $event, $logs);
         }
 

@@ -86,14 +86,11 @@ final class PublicController extends FormController
                 $lead       = $validatedRequest['entity'];
                 $currFields = $lead->getFields(true);
                 $mauticLogger->log('debug', 'CURRFIELDS: '.var_export($currFields, true));
-
                 $loc = [];
                 if (array_key_exists('geo', $result)) {
                     $loc = $result['geo'];
                 }
-
                 $data = [];
-
                 foreach ([
                     'facebook' => 'http://www.facebook.com/',
                     'linkedin' => 'http://www.linkedin.com/',
@@ -106,7 +103,6 @@ final class PublicController extends FormController
                         }
                     }
                 }
-
                 if (array_key_exists('name', $result)
                     && array_key_exists(
                         'familyName',
@@ -116,7 +112,6 @@ final class PublicController extends FormController
                 ) {
                     $data['lastname'] = $result['name']['familyName'];
                 }
-
                 if (array_key_exists('name', $result)
                     && array_key_exists(
                         'givenName',
@@ -126,11 +121,9 @@ final class PublicController extends FormController
                 ) {
                     $data['firstname'] = $result['name']['givenName'];
                 }
-
                 if (array_key_exists('site', $result) && empty($currFields['website']['value'])) {
                     $data['website'] = $result['site'];
                 }
-
                 if (array_key_exists('employment', $result)
                     && array_key_exists(
                         'name',
@@ -140,7 +133,6 @@ final class PublicController extends FormController
                 ) {
                     $data['company'] = $result['employment']['name'];
                 }
-
                 if (array_key_exists('employment', $result)
                     && array_key_exists(
                         'title',
@@ -150,141 +142,112 @@ final class PublicController extends FormController
                 ) {
                     $data['position'] = $result['employment']['title'];
                 }
-
                 if (array_key_exists('city', $loc) && empty($currFields['city']['value'])) {
                     $data['city'] = $loc['city'];
                 }
                 if (array_key_exists('state', $loc) && empty($currFields['state']['value'])) {
                     $data['state'] = $loc['state'];
                 }
-
                 if (array_key_exists('country', $loc) && empty($currFields['country']['value'])) {
                     $data['country'] = $loc['country'];
                 }
-
                 $mauticLogger->log('debug', 'SETTING FIELDS: '.print_r($data, true));
-
                 // Unset the nonce so that it's not used again
                 $socialCache = $lead->getSocialCache();
                 unset($socialCache['clearbit']['nonce']);
                 $lead->setSocialCache($socialCache);
-
                 $this->leadModel->setFieldValues($lead, $data);
                 $this->leadModel->saveEntity($lead);
-
-                if ($notify && (!$lead->imported)) {
-                    if ($user = $this->userModel->getEntity($notify)) {
-                        $this->addNewNotification(
-                            sprintf($this->translator->trans('mautic.plugin.clearbit.contact_retrieved'), $lead->getEmail()),
-                            'Clearbit Plugin',
-                            'ri-search-line',
-                            $user
-                        );
-                    }
+                if ($notify && !$lead->imported && $user = $this->userModel->getEntity($notify)) {
+                    $this->addNewNotification(
+                        sprintf($this->translator->trans('mautic.plugin.clearbit.contact_retrieved'), $lead->getEmail()),
+                        'Clearbit Plugin',
+                        'ri-search-line',
+                        $user
+                    );
                 }
-            } else {
+            } elseif ('company' === $request->request->get('type')) {
                 /*  COMPANY STUFF */
-
-                if ('company' === $request->request->get('type')) {
-                    /** @var Company $company */
-                    $company    = $validatedRequest['entity'];
-                    $currFields = $company->getFields(true);
-
-                    $loc = [];
-                    if (array_key_exists('geo', $result)) {
-                        $loc = $result['geo'];
-                    }
-
-                    $data = [];
-
-                    if (array_key_exists('streetNumber', $loc)
-                        && array_key_exists(
-                            'streetName',
-                            $loc
-                        )
-                        && empty($currFields['companyaddress1']['value'])
-                    ) {
-                        $data['companyaddress1'] = $loc['streetNumber'].' '.$loc['streetName'];
-                    }
-
-                    if (array_key_exists('city', $loc) && empty($currFields['companycity']['value'])) {
-                        $data['companycity'] = $loc['city'];
-                    }
-
-                    if (array_key_exists('metrics', $result)
-                        && array_key_exists(
-                            'employees',
-                            $result['metrics']
-                        )
-                        && empty($currFields['companynumber_of_employees']['value'])
-                    ) {
-                        $data['companynumber_of_employees'] = $result['metrics']['employees'];
-                    }
-
-                    if (array_key_exists('description', $result) && empty($currFields['companydescription']['value'])) {
-                        $data['companydescription'] = $result['description'];
-                    }
-
-                    if (array_key_exists('phone', $result) && empty($currFields['companyphone']['value'])) {
-                        $data['companyphone'] = $result['phone'];
-                    }
-
-                    if (array_key_exists('site', $result)
-                        && array_key_exists(
-                            'emailAddresses',
-                            $result['site']
-                        )
-                        && count($result['site']['emailAddresses'])
-                        && empty($currFields['companyemail']['value'])
-                    ) {
-                        $data['companyemail'] = $result['site']['emailAddresses'][0];
-                    }
-
-                    if (array_key_exists('country', $loc) && empty($currFields['companycountry']['value'])) {
-                        $data['companycountry'] = $loc['country'];
-                    }
-
-                    if (array_key_exists('state', $loc) && empty($currFields['companystate']['value'])) {
-                        $data['companystate'] = $loc['state'];
-                    }
-
-                    $mauticLogger->log('debug', 'SETTING FIELDS: '.print_r($data, true));
-
-                    // Unset the nonce so that it's not used again
-                    $socialCache = $company->getSocialCache();
-                    unset($socialCache['clearbit']['nonce']);
-                    $company->setSocialCache($socialCache);
-
-                    $this->companyModel->setFieldValues($company, $data);
-                    $this->companyModel->saveEntity($company);
-
-                    if ($notify) {
-                        if ($user = $this->userModel->getEntity($notify)) {
-                            $this->addNewNotification(
-                                sprintf($this->translator->trans('mautic.plugin.clearbit.company_retrieved'), $company->getName()),
-                                'Clearbit Plugin',
-                                'ri-search-line',
-                                $user
-                            );
-                        }
-                    }
+                /** @var Company $company */
+                $company    = $validatedRequest['entity'];
+                $currFields = $company->getFields(true);
+                $loc = [];
+                if (array_key_exists('geo', $result)) {
+                    $loc = $result['geo'];
+                }
+                $data = [];
+                if (array_key_exists('streetNumber', $loc)
+                    && array_key_exists(
+                        'streetName',
+                        $loc
+                    )
+                    && empty($currFields['companyaddress1']['value'])
+                ) {
+                    $data['companyaddress1'] = $loc['streetNumber'].' '.$loc['streetName'];
+                }
+                if (array_key_exists('city', $loc) && empty($currFields['companycity']['value'])) {
+                    $data['companycity'] = $loc['city'];
+                }
+                if (array_key_exists('metrics', $result)
+                    && array_key_exists(
+                        'employees',
+                        $result['metrics']
+                    )
+                    && empty($currFields['companynumber_of_employees']['value'])
+                ) {
+                    $data['companynumber_of_employees'] = $result['metrics']['employees'];
+                }
+                if (array_key_exists('description', $result) && empty($currFields['companydescription']['value'])) {
+                    $data['companydescription'] = $result['description'];
+                }
+                if (array_key_exists('phone', $result) && empty($currFields['companyphone']['value'])) {
+                    $data['companyphone'] = $result['phone'];
+                }
+                if (array_key_exists('site', $result)
+                    && array_key_exists(
+                        'emailAddresses',
+                        $result['site']
+                    )
+                    && count($result['site']['emailAddresses'])
+                    && empty($currFields['companyemail']['value'])
+                ) {
+                    $data['companyemail'] = $result['site']['emailAddresses'][0];
+                }
+                if (array_key_exists('country', $loc) && empty($currFields['companycountry']['value'])) {
+                    $data['companycountry'] = $loc['country'];
+                }
+                if (array_key_exists('state', $loc) && empty($currFields['companystate']['value'])) {
+                    $data['companystate'] = $loc['state'];
+                }
+                $mauticLogger->log('debug', 'SETTING FIELDS: '.print_r($data, true));
+                // Unset the nonce so that it's not used again
+                $socialCache = $company->getSocialCache();
+                unset($socialCache['clearbit']['nonce']);
+                $company->setSocialCache($socialCache);
+                $this->companyModel->setFieldValues($company, $data);
+                $this->companyModel->saveEntity($company);
+                if ($notify && $user = $this->userModel->getEntity($notify)) {
+                    $this->addNewNotification(
+                        sprintf($this->translator->trans('mautic.plugin.clearbit.company_retrieved'), $company->getName()),
+                        'Clearbit Plugin',
+                        'ri-search-line',
+                        $user
+                    );
                 }
             }
         } catch (\Exception $ex) {
             $mauticLogger->log('error', 'ERROR on Clearbit callback: '.$ex->getMessage());
             try {
-                if ($notify) {
-                    if ($user = $this->userModel->getEntity($notify)) {
-                        $this->addNewNotification(
-                            sprintf(
-                                $this->translator->trans('mautic.plugin.clearbit.unable'),
-                                $ex->getMessage()
-                            ),
-                            'Clearbit Plugin',
-                            'ri-error-warning-line',
-                            $user
-                        );
-                    }
+                if ($notify && $user = $this->userModel->getEntity($notify)) {
+                    $this->addNewNotification(
+                        sprintf(
+                            $this->translator->trans('mautic.plugin.clearbit.unable'),
+                            $ex->getMessage()
+                        ),
+                        'Clearbit Plugin',
+                        'ri-error-warning-line',
+                        $user
+                    );
                 }
             } catch (\Exception $ex2) {
                 $mauticLogger->log('error', 'Clearbit: '.$ex2->getMessage());

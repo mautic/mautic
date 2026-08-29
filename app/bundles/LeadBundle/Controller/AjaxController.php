@@ -229,18 +229,16 @@ final class AjaxController extends CommonAjaxController
                     $dataArray['socialCount'] = $socialCount;
                 } else {
                     foreach ($socialProfiles as $name => $details) {
-                        if ($integrationObject = $integrationHelper->getIntegrationObject($name)) {
-                            if ($template = $integrationObject->getSocialProfileTemplate()) {
-                                $integrations[$name]['newContent'] = $this->renderView(
-                                    $template,
-                                    [
-                                        'lead'              => $lead,
-                                        'details'           => $details,
-                                        'integrationName'   => $name,
-                                        'socialProfileUrls' => $socialProfileUrls,
-                                    ]
-                                );
-                            }
+                        if (($integrationObject = $integrationHelper->getIntegrationObject($name)) && $template = $integrationObject->getSocialProfileTemplate()) {
+                            $integrations[$name]['newContent'] = $this->renderView(
+                                $template,
+                                [
+                                    'lead'              => $lead,
+                                    'details'           => $details,
+                                    'integrationName'   => $name,
+                                    'socialProfileUrls' => $socialProfileUrls,
+                                ]
+                            );
                         }
                     }
                     $dataArray['profiles'] = $integrations;
@@ -754,7 +752,7 @@ final class AjaxController extends CommonAjaxController
         $id = (int) InputHelper::clean($request->get('id'));
 
         $leadList = $model->getEntity($id);
-        if (!$leadList) {
+        if (!$leadList instanceof \Mautic\LeadBundle\Entity\LeadList) {
             return new JsonResponse($this->prepareJsonResponse(0, false), Response::HTTP_NOT_FOUND);
         }
 
@@ -774,7 +772,7 @@ final class AjaxController extends CommonAjaxController
         $id      = (int) $request->get('id');
         $segment = $model->getEntity($id);
 
-        if (!$segment) {
+        if (!$segment instanceof \Mautic\LeadBundle\Entity\LeadList) {
             return new JsonResponse(['message' => "Segment {$id} could not be found."], Response::HTTP_NOT_FOUND);
         }
 

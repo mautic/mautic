@@ -30,7 +30,7 @@ class PublishStateService
         $unpublishDateRanges = $this->generateUnpublishDateRanges($campaign);
         $lastPublishDate     = $this->getLastPublishDate($campaign);
 
-        if (!$lastPublishDate) {
+        if (!$lastPublishDate instanceof \DateTimeInterface) {
             return 0; // The campaign is not published, so nothing to count
         }
 

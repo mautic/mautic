@@ -93,7 +93,7 @@ class DoNotContactRepository extends CommonRepository
             }
         }
 
-        if ($chartQuery) {
+        if ($chartQuery instanceof \Mautic\CoreBundle\Helper\Chart\ChartQuery) {
             $chartQuery->applyDateFilters($q, 'date_added', 'dnc');
         }
 

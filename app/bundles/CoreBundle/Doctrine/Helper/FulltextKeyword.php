@@ -58,7 +58,7 @@ final readonly class FulltextKeyword implements \Stringable
 
         // append phrase search with a higher rank
         if ($this->booleanMode && $value) {
-            return sprintf('%s"%s"', $return ? '('.$return.') >' : '', trim(str_replace('"', "'", $value)));
+            return sprintf('%s"%s"', $return !== '' && $return !== '0' ? '('.$return.') >' : '', trim(str_replace('"', "'", $value)));
         }
 
         return $return;

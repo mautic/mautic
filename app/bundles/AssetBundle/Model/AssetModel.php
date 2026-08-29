@@ -170,10 +170,8 @@ class AssetModel extends FormModel implements GlobalSearchInterface
                     $download->setSourceId($clickthrough['source'][1]);
                 }
 
-                if (!empty($clickthrough['email'])) {
-                    if ($emailEntity = $this->emailRepository->getEntity($clickthrough['email'])) {
-                        $download->setEmail($emailEntity);
-                    }
+                if (!empty($clickthrough['email']) && $emailEntity = $this->emailRepository->getEntity($clickthrough['email'])) {
+                    $download->setEmail($emailEntity);
                 }
             }
 
@@ -477,7 +475,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
 
         $size = $this->assetRepository->getAssetSize($assets);
 
-        if ($size) {
+        if ($size !== 0) {
             return Asset::convertBytesToHumanReadable($size);
         }
 

@@ -419,7 +419,7 @@ final class InputHelper
                 $value = "{$doctype[0]}{$value}";
             }
 
-            if ($cdataCount) {
+            if ($cdataCount !== 0) {
                 $value = str_replace(['<mcdata>', '</mcdata>'], ['<![CDATA[', ']]>'], $value);
             }
 
@@ -429,18 +429,18 @@ final class InputHelper
                 $value = preg_replace("/<mcondition><mif>(.*?)<\/mif>(.*?)<\/mcondition>/is", '<!--[if$1]>$2<![endif]-->', $value);
             }
 
-            if ($commentCount) {
+            if ($commentCount !== 0) {
                 $value = str_replace(['<mcomment>', '</mcomment>'], ['<!--', '-->'], $value);
             }
 
-            if ($needsDecoding) {
+            if ($needsDecoding !== 0) {
                 $value = preg_replace_callback(
                     "/<mencoded>(.*?)<\/mencoded>/is",
                     fn ($matches): string => htmlspecialchars_decode($matches[1]),
                     $value);
             }
 
-            if ($needsScriptDecoding) {
+            if ($needsScriptDecoding !== 0) {
                 $value = preg_replace_callback(
                     "/<mscript>(.*?)<\/mscript>/is",
                     fn ($matches): string => base64_decode($matches[1]),

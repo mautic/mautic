@@ -153,25 +153,21 @@ final class RoleController extends FormController
         // /Check for a submitted form and process it
         if ('POST' === $request->getMethod()) {
             $valid = false;
-            if (!$cancelled = $this->isFormCancelled($form)) {
-                if ($valid = $this->isFormValid($form)) {
-                    // set the permissions
-                    $role        = $request->request->all()['role'] ?? [];
-                    $permissions = $role['permissions'] ?? null;
-                    $this->roleModel->setRolePermissions($entity, $permissions);
-
-                    // form is valid so process the data
-                    $this->roleModel->saveEntity($entity);
-
-                    $this->addFlashMessage('mautic.core.notice.created', [
-                        '%name%'              => $entity->getName(),
-                        self::FLASH_MENU_LINK => 'mautic_role_index',
-                        self::FLASH_URL       => $this->generateUrl('mautic_role_action', [
-                            'objectAction' => 'edit',
-                            'objectId'     => $entity->getId(),
-                        ]),
-                    ]);
-                }
+            if (!$cancelled = $this->isFormCancelled($form) && $valid = $this->isFormValid($form)) {
+                // set the permissions
+                $role        = $request->request->all()['role'] ?? [];
+                $permissions = $role['permissions'] ?? null;
+                $this->roleModel->setRolePermissions($entity, $permissions);
+                // form is valid so process the data
+                $this->roleModel->saveEntity($entity);
+                $this->addFlashMessage('mautic.core.notice.created', [
+                    '%name%'              => $entity->getName(),
+                    self::FLASH_MENU_LINK => 'mautic_role_index',
+                    self::FLASH_URL       => $this->generateUrl('mautic_role_action', [
+                        'objectAction' => 'edit',
+                        'objectId'     => $entity->getId(),
+                    ]),
+                ]);
             }
 
             if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
@@ -593,7 +589,7 @@ final class RoleController extends FormController
                         'msg'     => 'mautic.user.role.error.notfound',
                         'msgVars' => ['%id%' => $objectId],
                     ];
-                } elseif (count($users)) {
+                } elseif (count($users) > 0) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.user.role.error.deletenotallowed',

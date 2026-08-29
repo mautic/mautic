@@ -117,7 +117,7 @@ final class PeakInteractionTimerTest extends TestCase
     {
         $contactTimezone = $contactTimezone ?: $this->defaultTimezone;
         $contactMock     = $this->createMock(Lead::class);
-        if ($contactTimezone) {
+        if ($contactTimezone !== '' && $contactTimezone !== '0') {
             $contactMock->method('getTimezone')->willReturn($contactTimezone);
         }
 
@@ -163,7 +163,7 @@ final class PeakInteractionTimerTest extends TestCase
     {
         $contactTimezone = $contactTimezone ?: $this->defaultTimezone;
         $contactMock     = $this->createMock(Lead::class);
-        if ($contactTimezone) {
+        if ($contactTimezone !== '' && $contactTimezone !== '0') {
             $contactMock->method('getTimezone')->willReturn($contactTimezone);
         }
 

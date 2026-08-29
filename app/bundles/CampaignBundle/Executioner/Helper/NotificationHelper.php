@@ -127,10 +127,8 @@ class NotificationHelper
         }
 
         // If the contact doesn't have an owner, notify the one that created the campaign
-        if ($campaignCreator = $event->getCampaign()->getCreatedBy()) {
-            if ($owner = $this->userModel->getEntity($campaignCreator)) {
-                return $owner;
-            }
+        if (($campaignCreator = $event->getCampaign()->getCreatedBy()) && $owner = $this->userModel->getEntity($campaignCreator)) {
+            return $owner;
         }
 
         // If all else fails, notifiy a system admins

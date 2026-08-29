@@ -58,7 +58,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         $focusId = (int) $event->getEvent()->getProperties()['focus'];
 
         foreach ($event->getPending() as $log) {
-            if (!$focusId) {
+            if ($focusId === 0) {
                 $event->fail($log, 'Focus is not configured.');
 
                 continue;

@@ -34,11 +34,7 @@ final class FormFieldSelectType extends AbstractType
             ]
         );
 
-        if (!empty($options['parentData'])) {
-            $default = !empty($options['parentData']['properties']['multiple']);
-        } else {
-            $default = false;
-        }
+        $default = !empty($options['parentData']) && !empty($options['parentData']['properties']['multiple']);
         $builder->add(
             'multiple',
             YesNoButtonGroupType::class,

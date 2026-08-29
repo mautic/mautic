@@ -72,7 +72,7 @@ final class KickoffExecutioner implements ExecutionerInterface
         } catch (NoEventsFoundException) {
             $this->logger->debug('CAMPAIGN: No events to process');
         } finally {
-            if ($this->progressBar) {
+            if ($this->progressBar instanceof \Symfony\Component\Console\Helper\ProgressBar) {
                 $this->progressBar->finish();
             }
             if ($this->coreParametersHelper->get('campaign_use_summary')) {
@@ -111,7 +111,7 @@ final class KickoffExecutioner implements ExecutionerInterface
                 )
             );
 
-            if (!$totalKickoffEvents) {
+            if ($totalKickoffEvents === 0) {
                 throw new NoEventsFoundException();
             }
         }

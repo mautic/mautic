@@ -61,7 +61,7 @@ class InactiveContactFinder
         // Fetch entity objects for the found contacts
         $contacts = $this->leadRepository->getContactCollection($campaignContacts);
 
-        if (!count($contacts)) {
+        if (count($contacts) === 0) {
             // Just a precaution in case non-existent contacts are lingering in the campaign leads table
             $this->logger->debug('CAMPAIGN: No contact entities found.');
 

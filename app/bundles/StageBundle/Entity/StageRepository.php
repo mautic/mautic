@@ -160,7 +160,7 @@ class StageRepository extends CommonRepository
 
     public function getStageByName(string $stageName): ?Stage
     {
-        if (!$stageName) {
+        if ($stageName === '' || $stageName === '0') {
             return null;
         }
 

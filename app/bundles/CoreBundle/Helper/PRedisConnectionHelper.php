@@ -59,7 +59,7 @@ final class PRedisConnectionHelper
     {
         $redisOptions = [];
 
-        if ($prefix) {
+        if ($prefix !== '' && $prefix !== '0') {
             $redisOptions['prefix'] = $prefix;
         }
 

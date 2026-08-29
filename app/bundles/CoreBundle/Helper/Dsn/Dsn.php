@@ -95,7 +95,7 @@ final class Dsn implements \Stringable
 
         $query = http_build_query($this->options);
 
-        if ($query) {
+        if ($query !== '' && $query !== '0') {
             $dsn .= '?'.$query;
         }
 

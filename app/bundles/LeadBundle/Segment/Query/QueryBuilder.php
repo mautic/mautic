@@ -388,13 +388,11 @@ class QueryBuilder extends BaseQueryBuilder
             } else {
                 $this->andWhere($expression);
             }
-        } else {
+        } elseif ($this->hasLogicStack()) {
             //  Glue is AND
-            if ($this->hasLogicStack()) {
-                $this->addLogicStack($expression);
-            } else {
-                $this->andWhere($expression);
-            }
+            $this->addLogicStack($expression);
+        } else {
+            $this->andWhere($expression);
         }
     }
 

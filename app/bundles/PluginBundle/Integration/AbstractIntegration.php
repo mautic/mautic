@@ -621,11 +621,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                 $errors = [];
                 foreach ($response['errors'] as $err) {
                     if (is_array($err)) {
-                        if (isset($err['message'])) {
-                            $errors[] = $err['message'];
-                        } else {
-                            $errors[] = implode(', ', $err);
-                        }
+                        $errors[] = $err['message'] ?? implode(', ', $err);
                     } else {
                         $errors[] = $err;
                     }
@@ -724,13 +720,11 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                 if ('oauth1a' == $authType) {
                     $parameters = http_build_query($parameters);
                 }
-                if (!empty($settings['encode_parameters'])) {
-                    if ('json' == $settings['encode_parameters']) {
-                        // encode the arguments as JSON
-                        $parameters = json_encode($parameters);
-                        if (empty($settings['encoding_headers_set'])) {
-                            $headers[] = 'Content-Type: application/json';
-                        }
+                if (!empty($settings['encode_parameters']) && 'json' == $settings['encode_parameters']) {
+                    // encode the arguments as JSON
+                    $parameters = json_encode($parameters);
+                    if (empty($settings['encoding_headers_set'])) {
+                        $headers[] = 'Content-Type: application/json';
                     }
                 }
             } elseif (isset($settings['post_data'])) {
@@ -1102,7 +1096,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                 $settings['include_verifier'] = true;
 
                 // Get request token returned from Twitter and submit it to get access_token
-                $settings['request_token'] = ($this->request) ? $this->request->get('oauth_token') : '';
+                $settings['request_token'] = ($this->request instanceof \Symfony\Component\HttpFoundation\Request) ? $this->request->get('oauth_token') : '';
 
                 break;
         }
@@ -1337,7 +1331,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     protected function getRefererUrl(): ?string
     {
-        return ($this->request) ? $this->request->getRequestUri() : null;
+        return ($this->request instanceof \Symfony\Component\HttpFoundation\Request) ? $this->request->getRequestUri() : null;
     }
 
     /**
@@ -1347,7 +1341,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     protected function getUserAgent()
     {
-        return ($this->request) ? $this->request->server->get('HTTP_USER_AGENT') : null;
+        return ($this->request instanceof \Symfony\Component\HttpFoundation\Request) ? $this->request->server->get('HTTP_USER_AGENT') : null;
     }
 
     /**
@@ -1433,13 +1427,11 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         };
 
         if ($submittedObjects) {
-            if (in_array('company', $submittedObjects)) {
-                // special handling for company fields
-                if (isset($availableIntegrationFields['company'])) {
-                    $cleanup($submittedCompanyFields, $availableIntegrationFields['company'], $mauticCompanyFields, 'companyFields');
-                    $featureSettings['companyFields'] = $submittedCompanyFields;
-                    unset($availableIntegrationFields['company']);
-                }
+            // special handling for company fields
+            if (in_array('company', $submittedObjects) && isset($availableIntegrationFields['company'])) {
+                $cleanup($submittedCompanyFields, $availableIntegrationFields['company'], $mauticCompanyFields, 'companyFields');
+                $featureSettings['companyFields'] = $submittedCompanyFields;
+                unset($availableIntegrationFields['company']);
             }
 
             // Rest of the objects are merged and assumed to be leadFields
@@ -1488,11 +1480,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                 ) {
                     $requiredFields[$field] = $field;
                 }
-            } else {
-                if (is_array($details) && !empty($details['required'])
-                ) {
-                    $requiredFields[$field] = $field;
-                }
+            } elseif (is_array($details) && !empty($details['required'])) {
+                $requiredFields[$field] = $field;
             }
         }
 
@@ -1529,11 +1518,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         $leadFields      = $config['leadFields'];
         $availableFields = $this->getAvailableLeadFields($config);
 
-        if ($object) {
-            $availableFields = $availableFields[$config['object']];
-        } else {
-            $availableFields = $availableFields[0] ?? $availableFields;
-        }
+        $availableFields = $object ? $availableFields[$config['object']] : $availableFields[0] ?? $availableFields;
 
         $unknown = $this->translator->trans('mautic.integration.form.lead.unknown');
         $matched = [];
@@ -1591,11 +1576,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             }
         }
 
-        if ($entity instanceof Lead) {
-            $fields = $entity->getPrimaryCompany();
-        } else {
-            $fields = $entity['primaryCompany'];
-        }
+        $fields = $entity instanceof Lead ? $entity->getPrimaryCompany() : $entity['primaryCompany'];
 
         $companyFields   = $config['companyFields'];
         $availableFields = $this->getAvailableLeadFields($config)['company'];
@@ -2369,7 +2350,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     public function getLeadDoNotContact($leadId, $channel = 'email')
     {
         $isDoNotContact = 0;
-        if ($lead = $this->leadModel->getEntity($leadId)) {
+        if (($lead = $this->leadModel->getEntity($leadId)) instanceof \Mautic\LeadBundle\Entity\Lead) {
             $isContactableReason = $this->doNotContact->isContactable($lead, $channel);
             if (DoNotContact::IS_CONTACTABLE !== $isContactableReason) {
                 $isDoNotContact = 1;

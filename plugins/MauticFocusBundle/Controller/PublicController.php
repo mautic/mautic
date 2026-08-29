@@ -30,7 +30,7 @@ final class PublicController extends CommonController
         defined('MAUTIC_NON_TRACKABLE_REQUEST') || define('MAUTIC_NON_TRACKABLE_REQUEST', 1);
         $focus = $this->focusModel->getEntity($id);
 
-        if ($focus) {
+        if ($focus instanceof \MauticPlugin\MauticFocusBundle\Entity\Focus) {
             if (!$focus->isPublished()) {
                 return new Response('', Response::HTTP_NOT_FOUND);
             }

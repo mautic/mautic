@@ -307,7 +307,7 @@ class CorePermissions implements ResetInterface
     {
         $user = $this->userHelper->getUser();
 
-        if (!$user) {
+        if (!$user instanceof \Mautic\UserBundle\Entity\User) {
             return false;
         }
 
@@ -359,17 +359,8 @@ class CorePermissions implements ResetInterface
             $own   = $permissions[$ownPermission];
             $other = $permissions[$otherPermission];
         } else {
-            if (!is_bool($ownPermission)) {
-                $own = $this->isGranted($ownPermission);
-            } else {
-                $own = $ownPermission;
-            }
-
-            if (!is_bool($otherPermission)) {
-                $other = $this->isGranted($otherPermission);
-            } else {
-                $other = $otherPermission;
-            }
+            $own = !is_bool($ownPermission) ? $this->isGranted($ownPermission) : $ownPermission;
+            $other = !is_bool($otherPermission) ? $this->isGranted($otherPermission) : $otherPermission;
         }
 
         $ownerId = (int) $ownerId;

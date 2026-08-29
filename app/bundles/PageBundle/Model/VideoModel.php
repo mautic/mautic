@@ -82,7 +82,7 @@ final class VideoModel extends FormModel
         $lead = $this->contactTracker->getContact();
         $guid = $request->get('guid');
 
-        $hit = ($lead) ? $this->getHitForLeadByGuid($lead, $guid) : new VideoHit();
+        $hit = ($lead instanceof \Mautic\LeadBundle\Entity\Lead) ? $this->getHitForLeadByGuid($lead, $guid) : new VideoHit();
 
         $hit->setGuid($guid);
         $hit->setDateHit(new \DateTime());
@@ -100,7 +100,7 @@ final class VideoModel extends FormModel
         unset($query['d']);
         $hit->setQuery($query);
 
-        if ($lead) {
+        if ($lead instanceof \Mautic\LeadBundle\Entity\Lead) {
             $hit->setLead($lead);
         }
 

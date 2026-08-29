@@ -74,12 +74,10 @@ final readonly class DetermineWinnerSubscriber implements EventSubscriberInterfa
                 }
 
                 foreach ($children as $c) {
-                    if ($c->isPublished()) {
-                        if (!in_array($c->getId(), $hasResults)) {
-                            $data[$submissionLabel][] = 0;
-                            $data[$hitLabel][]        = 0;
-                            $support['labels'][]      = (('page' === $type) ? $c->getTitle() : $c->getName()).' (0%)';
-                        }
+                    if ($c->isPublished() && !in_array($c->getId(), $hasResults)) {
+                        $data[$submissionLabel][] = 0;
+                        $data[$hitLabel][]        = 0;
+                        $support['labels'][]      = (('page' === $type) ? $c->getTitle() : $c->getName()).' (0%)';
                     }
                 }
                 $support['data'] = $data;

@@ -301,7 +301,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
                 $pointsChangeLog->setActionName($pointsLogActionName);
                 $pointsChangeLog->setIpAddress($this->ipLookupHelper->getIpAddress());
                 $pointsChangeLog->setDateAdded(new \DateTime());
-                if ($pointGroup) {
+                if ($pointGroup instanceof \Mautic\PointBundle\Entity\Group) {
                     $pointsChangeLog->setGroup($pointGroup);
                 }
                 $lead->addPointsChangeLog($pointsChangeLog);
@@ -608,17 +608,11 @@ final class CampaignSubscriber implements EventSubscriberInterface
             foreach ($channels as $channel) {
                 $isLeadDNC = $this->doNotContact->isContactable($lead, $channel);
                 if (!empty($reason)) {
-                    if ($isLeadDNC === $reason) {
-                        $result = true;
-                    } else {
-                        $result = false;
-                    }
+                    $result = $isLeadDNC === $reason;
+                } elseif (0 !== $isLeadDNC) {
+                    $result = true;
                 } else {
-                    if (0 !== $isLeadDNC) {
-                        $result = true;
-                    } else {
-                        $result = false;
-                    }
+                    $result = false;
                 }
             }
         } elseif ($event->checkContext('lead.pageHit')) {

@@ -57,7 +57,7 @@ final readonly class SegmentImportExportSubscriber implements EventSubscriberInt
 
         $leadListId = $event->getEntityId();
         $leadList   = $this->leadListModel->getEntity($leadListId);
-        if (!$leadList) {
+        if (!$leadList instanceof \Mautic\LeadBundle\Entity\LeadList) {
             return;
         }
         $segmentData = [

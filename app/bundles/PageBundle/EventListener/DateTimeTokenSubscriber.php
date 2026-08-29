@@ -39,7 +39,7 @@ final readonly class DateTimeTokenSubscriber implements EventSubscriberInterface
         $content   = $event->getContent();
         $contact   = $this->security->isAnonymous() ? $this->contactTracker->getContact() : null;
 
-        $tokenList = $this->dateTokenHelper->getTokens($content, $contact ? $contact->getTimezone() : null);
+        $tokenList = $this->dateTokenHelper->getTokens($content, $contact instanceof \Mautic\LeadBundle\Entity\Lead ? $contact->getTimezone() : null);
         $event->setContent(str_replace(array_keys($tokenList), $tokenList, $content));
     }
 }

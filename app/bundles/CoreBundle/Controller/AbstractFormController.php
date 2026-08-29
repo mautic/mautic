@@ -174,11 +174,7 @@ abstract class AbstractFormController extends CommonController
      */
     protected function canEdit($entity = null)
     {
-        if ($this->permissionBase) {
-            $permissionBase = $this->permissionBase;
-        } else {
-            $permissionBase = $this->getPermissionBase();
-        }
+        $permissionBase = $this->permissionBase ?: $this->getPermissionBase();
 
         if ($permissionBase) {
             if ($entity && $this->security->checkPermissionExists($permissionBase.':editown')) {

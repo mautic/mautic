@@ -37,7 +37,7 @@ class SyncDateHelper
 
     public function getSyncFromDateTime(string $integration, string $object): \DateTimeInterface
     {
-        if ($this->syncFromDateTime) {
+        if ($this->syncFromDateTime instanceof \DateTimeInterface) {
             // The command requested a specific start date so use it
 
             return $this->syncFromDateTime;
@@ -63,7 +63,7 @@ class SyncDateHelper
 
     public function getSyncToDateTime(): ?\DateTimeInterface
     {
-        if ($this->syncToDateTime) {
+        if ($this->syncToDateTime instanceof \DateTimeInterface) {
             return $this->syncToDateTime;
         }
 
@@ -120,7 +120,7 @@ class SyncDateHelper
 
     public function setInternalSyncStartDateTime(): void
     {
-        if ($this->internalSyncStartDateTime) {
+        if ($this->internalSyncStartDateTime instanceof \DateTimeInterface) {
             return;
         }
 
@@ -131,7 +131,7 @@ class SyncDateHelper
     {
         $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
         // If there is no syncToDateTime value use "now"
-        if (!$this->getSyncToDateTime()) {
+        if (!$this->getSyncToDateTime() instanceof \DateTimeInterface) {
             return $now;
         }
 

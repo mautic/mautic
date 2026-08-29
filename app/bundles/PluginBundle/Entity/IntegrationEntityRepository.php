@@ -170,11 +170,7 @@ class IntegrationEntityRepository extends CommonRepository
         $integrationEntity = ['Contact', 'Lead'],
         $excludeIntegrationIds = [],
     ): array {
-        if ('company' == $internalEntity) {
-            $joinTable = 'companies';
-        } else {
-            $joinTable = 'leads';
-        }
+        $joinTable = 'company' == $internalEntity ? 'companies' : 'leads';
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'integration_entity', 'i')
             ->join('i', MAUTIC_TABLE_PREFIX.$joinTable, 'l', 'l.id = i.internal_entity_id');
@@ -306,11 +302,7 @@ class IntegrationEntityRepository extends CommonRepository
      */
     public function findLeadsToCreate($integration, $leadFields, $limit = 25, $fromDate = null, $toDate = null, $internalEntity = 'lead'): int|array
     {
-        if ('company' == $internalEntity) {
-            $joinTable = 'companies';
-        } else {
-            $joinTable = 'leads';
-        }
+        $joinTable = 'company' == $internalEntity ? 'companies' : 'leads';
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.$joinTable, 'l');
 

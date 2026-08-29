@@ -27,7 +27,7 @@ class TokenHelper
 
                 $page = $this->model->getEntity($pageId);
 
-                if (!$page) {
+                if (!$page instanceof \Mautic\PageBundle\Entity\Page) {
                     continue;
                 }
 

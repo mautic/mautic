@@ -19,6 +19,7 @@ return RectorConfig::configure()
         privatization: true,
         codeQuality: true,
         symfonyCodeQuality: true,
+        if: true,
         earlyReturn: true,
     )
     ->withPhpSets(php84: true)

@@ -61,7 +61,6 @@ final readonly class ButtonSubscriber implements EventSubscriberInterface
                 ],
                 ButtonHelper::LOCATION_BULK_ACTIONS
             );
-
             if ($event->getItem()) {
                 $lookupContactButton = [
                     'attr' => [
@@ -92,54 +91,51 @@ final readonly class ButtonSubscriber implements EventSubscriberInterface
                     'mautic_contact_index'
                 );
             }
-        } else {
-            if (str_starts_with($event->getRoute(), 'mautic_company_')) {
-                $event->addButton(
-                    [
-                        'attr' => [
-                            'class'       => 'btn btn-ghost btn-sm btn-nospin',
-                            'data-toggle' => 'ajaxmodal',
-                            'data-target' => '#MauticSharedModal',
-                            'onclick'     => 'this.href=\''.
-                                $this->router->generate(
-                                    'mautic_plugin_clearbit_action',
-                                    ['objectAction' => 'batchLookupCompany']
-                                ).
-                                '?\' + mQuery.param({\'clearbit_batch_lookup\':{\'ids\':JSON.parse(Mautic.getCheckedListIds(false, true))}});return true;',
-                            'data-header' => $this->translator->trans(
-                                'mautic.plugin.clearbit.button.caption'
-                            ),
-                        ],
-                        'btnText'   => $this->translator->trans('mautic.plugin.clearbit.button.caption'),
-                        'iconClass' => 'ri-search-line',
-                    ],
-                    ButtonHelper::LOCATION_BULK_ACTIONS
-                );
-
-                if ($event->getItem()) {
-                    $lookupCompanyButton = [
-                        'attr' => [
-                            'data-toggle' => 'ajaxmodal',
-                            'data-target' => '#MauticSharedModal',
-                            'data-header' => $this->translator->trans(
-                                'mautic.plugin.clearbit.lookup.header',
-                                ['%item%' => $event->getItem()->getName()]
-                            ),
-                            'href' => $this->router->generate(
+        } elseif (str_starts_with($event->getRoute(), 'mautic_company_')) {
+            $event->addButton(
+                [
+                    'attr' => [
+                        'class'       => 'btn btn-ghost btn-sm btn-nospin',
+                        'data-toggle' => 'ajaxmodal',
+                        'data-target' => '#MauticSharedModal',
+                        'onclick'     => 'this.href=\''.
+                            $this->router->generate(
                                 'mautic_plugin_clearbit_action',
-                                ['objectId' => $event->getItem()->getId(), 'objectAction' => 'lookupCompany']
-                            ),
-                        ],
-                        'btnText'   => $this->translator->trans('mautic.plugin.clearbit.button.caption'),
-                        'iconClass' => 'ri-search-line',
-                    ];
+                                ['objectAction' => 'batchLookupCompany']
+                            ).
+                            '?\' + mQuery.param({\'clearbit_batch_lookup\':{\'ids\':JSON.parse(Mautic.getCheckedListIds(false, true))}});return true;',
+                        'data-header' => $this->translator->trans(
+                            'mautic.plugin.clearbit.button.caption'
+                        ),
+                    ],
+                    'btnText'   => $this->translator->trans('mautic.plugin.clearbit.button.caption'),
+                    'iconClass' => 'ri-search-line',
+                ],
+                ButtonHelper::LOCATION_BULK_ACTIONS
+            );
+            if ($event->getItem()) {
+                $lookupCompanyButton = [
+                    'attr' => [
+                        'data-toggle' => 'ajaxmodal',
+                        'data-target' => '#MauticSharedModal',
+                        'data-header' => $this->translator->trans(
+                            'mautic.plugin.clearbit.lookup.header',
+                            ['%item%' => $event->getItem()->getName()]
+                        ),
+                        'href' => $this->router->generate(
+                            'mautic_plugin_clearbit_action',
+                            ['objectId' => $event->getItem()->getId(), 'objectAction' => 'lookupCompany']
+                        ),
+                    ],
+                    'btnText'   => $this->translator->trans('mautic.plugin.clearbit.button.caption'),
+                    'iconClass' => 'ri-search-line',
+                ];
 
-                    $event->addButton(
-                        $lookupCompanyButton,
-                        ButtonHelper::LOCATION_LIST_ACTIONS,
-                        'mautic_company_index'
-                    );
-                }
+                $event->addButton(
+                    $lookupCompanyButton,
+                    ButtonHelper::LOCATION_LIST_ACTIONS,
+                    'mautic_company_index'
+                );
             }
         }
     }

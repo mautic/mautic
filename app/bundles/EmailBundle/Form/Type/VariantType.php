@@ -128,17 +128,15 @@ final class VariantType extends AbstractType
                 $form = $event->getForm();
                 $data = $event->getData();
 
-                if (isset($data['winnerCriteria'])) {
-                    if (!empty($criteria[$data['winnerCriteria']]['formType'])) {
-                        $formTypeOptions = [
-                            'required' => false,
-                            'label'    => false,
-                        ];
-                        if (!empty($criteria[$data['winnerCriteria']]['formTypeOptions'])) {
-                            $formTypeOptions = array_merge($formTypeOptions, $criteria[$data['winnerCriteria']]['formTypeOptions']);
-                        }
-                        $form->add('properties', $criteria[$data['winnerCriteria']]['formType'], $formTypeOptions);
+                if (isset($data['winnerCriteria']) && !empty($criteria[$data['winnerCriteria']]['formType'])) {
+                    $formTypeOptions = [
+                        'required' => false,
+                        'label'    => false,
+                    ];
+                    if (!empty($criteria[$data['winnerCriteria']]['formTypeOptions'])) {
+                        $formTypeOptions = array_merge($formTypeOptions, $criteria[$data['winnerCriteria']]['formTypeOptions']);
                     }
+                    $form->add('properties', $criteria[$data['winnerCriteria']]['formType'], $formTypeOptions);
                 }
             });
         }

@@ -24,7 +24,7 @@ trait TranslationModelTrait
 
         $leadPreference = $chosenLanguage = null;
 
-        if (count($translationChildren)) {
+        if (count($translationChildren) > 0) {
             if ($translationParent) {
                 $translationChildren = $translationParent->getTranslationChildren();
             } else {
@@ -125,7 +125,7 @@ trait TranslationModelTrait
     public function postTranslationEntitySave(TranslationEntityInterface $entity): void
     {
         // If parent, add this entity as a child of the parent so that it populates the list in the tab (due to Doctrine hanging on to entities in memory)
-        if ($translationParent = $entity->getTranslationParent()) {
+        if (($translationParent = $entity->getTranslationParent()) instanceof \Mautic\CoreBundle\Entity\TranslationEntityInterface) {
             $translationParent->addTranslationChild($entity);
         }
     }

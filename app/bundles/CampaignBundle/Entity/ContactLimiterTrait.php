@@ -42,13 +42,11 @@ trait ContactLimiterTrait
                 ->setParameter('maxContactId', $maxContactId, ParameterType::INTEGER);
         }
 
-        if ($threadId = $contactLimiter->getThreadId()) {
-            if ($maxThreads = $contactLimiter->getMaxThreads()) {
-                if ($threadId <= $maxThreads) {
-                    $qb->andWhere("MOD(({$alias}.lead_id + :threadShift), :maxThreads) = 0")
-                        ->setParameter('threadShift', $threadId - 1, ParameterType::INTEGER)
-                        ->setParameter('maxThreads', $maxThreads, ParameterType::INTEGER);
-                }
+        if (($threadId = $contactLimiter->getThreadId()) && $maxThreads = $contactLimiter->getMaxThreads()) {
+            if ($threadId <= $maxThreads) {
+                $qb->andWhere("MOD(({$alias}.lead_id + :threadShift), :maxThreads) = 0")
+                    ->setParameter('threadShift', $threadId - 1, ParameterType::INTEGER)
+                    ->setParameter('maxThreads', $maxThreads, ParameterType::INTEGER);
             }
         }
 
@@ -89,12 +87,10 @@ trait ContactLimiterTrait
                 ->setParameter('maxContactId', $maxContactId, ParameterType::INTEGER);
         }
 
-        if ($threadId = $contactLimiter->getThreadId()) {
-            if ($maxThreads = $contactLimiter->getMaxThreads()) {
-                $qb->andWhere("MOD((IDENTITY({$alias}.lead) + :threadShift), :maxThreads) = 0")
-                    ->setParameter('threadShift', $threadId - 1, ParameterType::INTEGER)
-                    ->setParameter('maxThreads', $maxThreads, ParameterType::INTEGER);
-            }
+        if (($threadId = $contactLimiter->getThreadId()) && $maxThreads = $contactLimiter->getMaxThreads()) {
+            $qb->andWhere("MOD((IDENTITY({$alias}.lead) + :threadShift), :maxThreads) = 0")
+                ->setParameter('threadShift', $threadId - 1, ParameterType::INTEGER)
+                ->setParameter('maxThreads', $maxThreads, ParameterType::INTEGER);
         }
 
         if (!$isCount && $limit = $contactLimiter->getBatchLimit()) {

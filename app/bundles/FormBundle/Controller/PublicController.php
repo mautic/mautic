@@ -550,11 +550,7 @@ final class PublicController extends CommonFormController
             $theme = $themeHelper->getTheme($template);
             if ($theme->getTheme() != $template) {
                 $config = $theme->getConfig();
-                if (in_array('form', $config['features'])) {
-                    $template = $theme->getTheme();
-                } else {
-                    $template = null;
-                }
+                $template = in_array('form', $config['features']) ? $theme->getTheme() : null;
             }
         }
 
