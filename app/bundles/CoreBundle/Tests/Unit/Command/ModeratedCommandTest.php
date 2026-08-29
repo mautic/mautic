@@ -183,7 +183,7 @@ final class ModeratedCommandTest extends TestCase
         // mirrors a run directory owned by another user, e.g. one created by a console command
         // executed as root while the scheduled commands run as the web server user.
         mkdir($runDir);
-        chmod($runDir, 0555);
+        chmod($runDir, 0500);
         clearstatcache(true, $runDir);
 
         if (is_writable($runDir)) {
@@ -216,7 +216,7 @@ final class ModeratedCommandTest extends TestCase
         try {
             $this->fakeModeratedCommand->run($this->input, $this->output);
         } finally {
-            chmod($runDir, 0755);
+            chmod($runDir, 0700);
             rmdir($runDir);
             rmdir($cacheDir);
             rmdir($baseDir);
