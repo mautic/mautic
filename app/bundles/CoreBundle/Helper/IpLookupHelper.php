@@ -108,7 +108,9 @@ class IpLookupHelper
     {
         $isIpAnonymizationEnabled = (bool) $this->coreParametersHelper->get('anonymize_ip');
 
-        $ip ??= $this->getIpAddressFromRequest();
+        if (null === $ip) {
+            $ip = $this->getIpAddressFromRequest();
+        }
 
         if (empty($ip) || !$this->ipIsValid($ip)) {
             // assume local as the ip is empty

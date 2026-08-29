@@ -172,7 +172,9 @@ class DoNotContactRepository extends CommonRepository
         $dnc = [];
         foreach ($results as $r) {
             if (isset($r['lead_id'])) {
-                $dnc[$r['lead_id']] ??= [];
+                if (!isset($dnc[$r['lead_id']])) {
+                    $dnc[$r['lead_id']] = [];
+                }
 
                 $dnc[$r['lead_id']][$r['channel']] = $r['reason'];
             } else {

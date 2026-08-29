@@ -106,7 +106,9 @@ final class FieldValidator implements FieldValidatorInterface
      */
     private function getFieldSchema(string $object, string $alias): array
     {
-        $this->fieldSchemaData[$object] ??= $this->leadFieldRepository->getFieldSchemaData($object);
+        if (!isset($this->fieldSchemaData[$object])) {
+            $this->fieldSchemaData[$object] = $this->leadFieldRepository->getFieldSchemaData($object);
+        }
 
         if (!isset($this->fieldSchemaData[$object][$alias])) {
             throw new FieldSchemaNotFoundException($object, $alias);

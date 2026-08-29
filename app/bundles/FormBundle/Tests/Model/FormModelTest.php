@@ -68,7 +68,9 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $_ENV['MAUTIC_UPLOAD_DIR'] ??= sys_get_temp_dir();
+        if (!isset($_ENV['MAUTIC_UPLOAD_DIR'])) {
+            $_ENV['MAUTIC_UPLOAD_DIR'] = sys_get_temp_dir();
+        }
         $this->contactTracker        = $this->createMock(ContactTracker::class);
         $this->fieldHelper           = $this->createMock(FormFieldHelper::class);
         $this->primaryCompanyHelper  = $this->createMock(PrimaryCompanyHelper::class);

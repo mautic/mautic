@@ -49,7 +49,9 @@ final class ObjectIdsDAO
 
     public function addObjectId(string $objectType, string $id): void
     {
-        $this->objects[$objectType] ??= [];
+        if (!isset($this->objects[$objectType])) {
+            $this->objects[$objectType] = [];
+        }
 
         $this->objects[$objectType][] = $id;
     }

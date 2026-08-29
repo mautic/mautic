@@ -31,7 +31,9 @@ final class WidgetTypeListEvent extends CommonEvent
             $widgetTypeName = $this->translator->trans($widgetTypeName);
         }
 
-        $this->widgetTypes[$bundle] ??= [];
+        if (!isset($this->widgetTypes[$bundle])) {
+            $this->widgetTypes[$bundle] = [];
+        }
 
         $this->widgetTypes[$bundle][$widgetType] = $widgetTypeName;
     }

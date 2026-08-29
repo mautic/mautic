@@ -319,7 +319,9 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
             return false;
         }
 
-        $lead ??= $this->contactTracker->getContact();
+        if (null === $lead) {
+            $lead = $this->contactTracker->getContact();
+        }
 
         if (!$force) {
             // get a list of events that has already been performed on this lead

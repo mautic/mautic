@@ -586,7 +586,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
                 }
             }
         } elseif ('frequencyRules' == $prop) {
-            $this->changes['frequencyRules'] ??= [];
+            if (!isset($this->changes['frequencyRules'])) {
+                $this->changes['frequencyRules'] = [];
+            }
 
             if ($val instanceof FrequencyRule) {
                 $channel = $val->getChannel();
@@ -828,7 +830,11 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
                 throw new \UnexpectedValueException('Invalid operator');
         }
 
-        $this->pointChanges[$operator] ??= 0;
+        // Keep track of point changes to make a direct DB query
+        // Ignoring Aunt Sally here (PEMDAS)
+        if (!isset($this->pointChanges[$operator])) {
+            $this->pointChanges[$operator] = 0;
+        }
         $this->pointChanges[$operator] += $points;
 
         $this->isChanged('points', (int) $this->updatedPoints, (int) $oldPoints);

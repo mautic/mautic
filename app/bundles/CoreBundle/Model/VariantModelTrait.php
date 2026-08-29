@@ -88,7 +88,9 @@ trait VariantModelTrait
                 $relatedIds[] = $entity->getId();
             }
 
-            $variantStartDate ??= new \DateTime();
+            if (null === $variantStartDate) {
+                $variantStartDate = new \DateTime();
+            }
 
             // Ensure UTC since we're saving directly to the DB
             $variantStartDate->setTimezone(new \DateTimeZone('UTC'));

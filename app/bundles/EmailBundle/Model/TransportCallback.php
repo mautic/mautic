@@ -71,7 +71,9 @@ final readonly class TransportCallback
         }
 
         $openDetails = $stat->getOpenDetails();
-        $openDetails['bounces'] ??= [];
+        if (!isset($openDetails['bounces'])) {
+            $openDetails['bounces'] = [];
+        }
         $dtHelper                 = new DateTimeHelper();
         $openDetails['bounces'][] = [
             'datetime' => $dtHelper->toUtcString(),

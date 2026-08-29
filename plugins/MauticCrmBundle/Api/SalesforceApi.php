@@ -419,7 +419,9 @@ final class SalesforceApi extends CrmApi
         // Mautic IntegrationEntity objects
         $this->requestSettings['headers']['Sforce-Query-Options'] = 'batchSize=200';
 
-        $queryUrl ??= $this->integration->getQueryUrl().'/query';
+        if (null === $queryUrl) {
+            $queryUrl = $this->integration->getQueryUrl().'/query';
+        }
 
         $query = "Select CampaignId, ContactId, LeadId, isDeleted from CampaignMember where CampaignId = '".trim($campaignId)."'";
         if ($modifiedSince) {

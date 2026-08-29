@@ -28,12 +28,14 @@ final class DncFormatterHelper
      */
     public function getDncReasons(): array
     {
-        $this->dncReasons ??= [
-            DoNotContact::IS_CONTACTABLE => $this->translator->trans('mautic.lead.report.dnc_contactable'),
-            DoNotContact::UNSUBSCRIBED   => $this->translator->trans('mautic.lead.report.dnc_unsubscribed'),
-            DoNotContact::BOUNCED        => $this->translator->trans('mautic.lead.report.dnc_bounced'),
-            DoNotContact::MANUAL         => $this->translator->trans('mautic.lead.report.dnc_manual'),
-        ];
+        if (null === $this->dncReasons) {
+            $this->dncReasons = [
+                DoNotContact::IS_CONTACTABLE => $this->translator->trans('mautic.lead.report.dnc_contactable'),
+                DoNotContact::UNSUBSCRIBED   => $this->translator->trans('mautic.lead.report.dnc_unsubscribed'),
+                DoNotContact::BOUNCED        => $this->translator->trans('mautic.lead.report.dnc_bounced'),
+                DoNotContact::MANUAL         => $this->translator->trans('mautic.lead.report.dnc_manual'),
+            ];
+        }
 
         return $this->dncReasons;
     }

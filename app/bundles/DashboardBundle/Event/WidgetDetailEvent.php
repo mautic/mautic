@@ -114,13 +114,22 @@ class WidgetDetailEvent extends CommonEvent
 
         $params = $widget->getParams();
 
-        $params['timeUnit'] ??= null;
+        // Set required params if undefined
+        if (!isset($params['timeUnit'])) {
+            $params['timeUnit'] = null;
+        }
 
-        $params['amount'] ??= null;
+        if (!isset($params['amount'])) {
+            $params['amount'] = null;
+        }
 
-        $params['dateFormat'] ??= null;
+        if (!isset($params['dateFormat'])) {
+            $params['dateFormat'] = null;
+        }
 
-        $params['filter'] ??= [];
+        if (!isset($params['filter'])) {
+            $params['filter'] = [];
+        }
 
         $widget->setParams($params);
 

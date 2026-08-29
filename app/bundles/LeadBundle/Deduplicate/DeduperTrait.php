@@ -42,14 +42,16 @@ trait DeduperTrait
      */
     private function getAvailableFields()
     {
-        $this->availableFields ??= $this->fieldList->getFieldList(
-            false,
-            false,
-            [
-                'isPublished' => true,
-                'object'      => $this->object,
-            ]
-        );
+        if (null === $this->availableFields) {
+            $this->availableFields = $this->fieldList->getFieldList(
+                false,
+                false,
+                [
+                    'isPublished' => true,
+                    'object'      => $this->object,
+                ]
+            );
+        }
 
         return $this->availableFields;
     }

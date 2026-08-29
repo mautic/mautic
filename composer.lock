@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0ec718c0df375467259855230e4b618c",
+    "content-hash": "7894d4d8ebbbc73913f8bcce85e9cfb6",
     "packages": [
         {
             "name": "api-platform/core",
@@ -17864,16 +17864,16 @@
         },
         {
             "name": "rector/rector",
-            "version": "2.6.4",
+            "version": "dev-main",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rectorphp/rector.git",
-                "reference": "6ff008471683591224951526247b7a2b86980ba9"
+                "reference": "cafd5682622b055999892e8241d7fe9eb52000c5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rectorphp/rector/zipball/6ff008471683591224951526247b7a2b86980ba9",
-                "reference": "6ff008471683591224951526247b7a2b86980ba9",
+                "url": "https://api.github.com/repos/rectorphp/rector/zipball/cafd5682622b055999892e8241d7fe9eb52000c5",
+                "reference": "cafd5682622b055999892e8241d7fe9eb52000c5",
                 "shasum": ""
             },
             "require": {
@@ -17886,9 +17886,7 @@
                 "rector/rector-phpunit": "*",
                 "rector/rector-symfony": "*"
             },
-            "suggest": {
-                "ext-dom": "To manipulate phpunit.xml via the custom-rule command"
-            },
+            "default-branch": true,
             "bin": [
                 "bin/rector"
             ],
@@ -17912,7 +17910,7 @@
             ],
             "support": {
                 "issues": "https://github.com/rectorphp/rector/issues",
-                "source": "https://github.com/rectorphp/rector/tree/2.6.4"
+                "source": "https://github.com/rectorphp/rector/tree/main"
             },
             "funding": [
                 {
@@ -17920,7 +17918,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-08-27T09:20:34+00:00"
+            "time": "2026-08-29T17:42:55+00:00"
         },
         {
             "name": "rector/type-perfect",
@@ -19779,7 +19777,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {},
+    "stability-flags": {
+        "rector/rector": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {},

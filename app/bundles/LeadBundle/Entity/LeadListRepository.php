@@ -318,7 +318,9 @@ class LeadListRepository extends CommonRepository
 
         // Ensure lists without leads have a value
         foreach ($listIds as $l) {
-            $return[$l] ??= 0;
+            if (!isset($return[$l])) {
+                $return[$l] = 0;
+            }
         }
 
         return (1 === $countListIds) ? $return[$listIds[0]] : $return;

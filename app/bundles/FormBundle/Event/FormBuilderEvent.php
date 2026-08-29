@@ -201,7 +201,9 @@ final class FormBuilderEvent extends Event
 
         foreach ($this->validators as $validator) {
             if (isset($validator['fieldType'])) {
-                $fieldValidators[$validator['fieldType']] ??= [];
+                if (!isset($fieldValidators[$validator['fieldType']])) {
+                    $fieldValidators[$validator['fieldType']] = [];
+                }
 
                 $fieldValidators[$validator['fieldType']] = $validator['eventName'];
             } else {

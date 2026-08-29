@@ -19,7 +19,9 @@ final class ZohoApi extends CrmApi
 
         $url = sprintf('%s/%s', $tokenData['api_domain'].'/crm/v2', $operation);
 
-        $settings['headers'] ??= [];
+        if (!isset($settings['headers'])) {
+            $settings['headers'] = [];
+        }
         $settings['headers']['Authorization'] = 'Zoho-oauthtoken '.$tokenData['access_token'];
 
         if ($json) {
@@ -121,7 +123,9 @@ final class ZohoApi extends CrmApi
      */
     public function getCompanies(array $params, $id = null)
     {
-        $params['selectColumns'] ??= 'All';
+        if (!isset($params['selectColumns'])) {
+            $params['selectColumns'] = 'All';
+        }
 
         $settings = [];
         if ($params['lastModifiedTime']) {

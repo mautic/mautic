@@ -142,11 +142,13 @@ class CampaignRepository extends CommonRepository
 
         $campaigns = [];
         foreach ($results as $result) {
-            $campaigns[$result['id']] ??= [
-                'id'    => $result['id'],
-                'name'  => $result['name'],
-                'lists' => [],
-            ];
+            if (!isset($campaigns[$result['id']])) {
+                $campaigns[$result['id']] = [
+                    'id'    => $result['id'],
+                    'name'  => $result['name'],
+                    'lists' => [],
+                ];
+            }
 
             $campaigns[$result['id']]['lists'][$result['list_id']] = [
                 'id' => $result['list_id'],

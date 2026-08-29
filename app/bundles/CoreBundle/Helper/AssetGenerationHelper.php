@@ -149,7 +149,9 @@ final readonly class AssetGenerationHelper
                 $fileTypes = ['css', 'js'];
                 foreach ($bundles as $bundle) {
                     foreach ($fileTypes as $ft) {
-                        $modifiedLast[$ft] ??= [];
+                        if (!isset($modifiedLast[$ft])) {
+                            $modifiedLast[$ft] = [];
+                        }
                         $dir = "{$bundle['directory']}/Assets/{$ft}";
                         if (file_exists($dir)) {
                             $modifiedLast[$ft] = array_merge($modifiedLast[$ft], $this->findAssets($dir, $ft, $env, $assets));

@@ -10,7 +10,9 @@ final class StatDAO
 
     public function addStat($key, $value): static
     {
-        $this->stats[$key] ??= 0;
+        if (!isset($this->stats[$key])) {
+            $this->stats[$key] = 0;
+        }
 
         $this->stats[$key] += $value;
 

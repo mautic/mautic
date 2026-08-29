@@ -77,7 +77,9 @@ class FormFieldHelper extends AbstractFormFieldHelper
     {
         $this->translator = $translator;
 
-        $validator ??= Validation::createValidator();
+        if (null === $validator) {
+            $validator = Validation::createValidator();
+        }
         $this->validator = $validator;
 
         parent::__construct();

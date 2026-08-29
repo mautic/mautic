@@ -831,7 +831,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
                 // List doesn't matter
                 $stats[$result['device']] = $result['count'];
             } elseif (null !== $result['list_id']) {
-                $stats[$result['list_id']] ??= [];
+                if (!isset($stats[$result['list_id']])) {
+                    $stats[$result['list_id']] = [];
+                }
 
                 if (!isset($stats[$result['list_id']][$result['device']])) {
                     $stats[$result['list_id']][$result['device']] = (int) $result['count'];
@@ -871,7 +873,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
                     $listStat    = (!isset($stats[$id][$device])) ? 0 : $stats[$id][$device];
                     $listStats[] = $listStat;
 
-                    $combined[$device] ??= 0;
+                    if (!isset($combined[$device])) {
+                        $combined[$device] = 0;
+                    }
 
                     $combined[$device] += $listStat;
                 }
@@ -1234,7 +1238,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
                             $language = 'unknown';
                         }
                         $core = $this->getTranslationLocaleCore($language);
-                        $emailSettings[$email->getId()]['languages'][$core] ??= [];
+                        if (!isset($emailSettings[$email->getId()]['languages'][$core])) {
+                            $emailSettings[$email->getId()]['languages'][$core] = [];
+                        }
                         $emailSettings[$email->getId()]['languages'][$core][$language] = $translation->getId();
                     }
                 }
@@ -1282,7 +1288,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
                                             $language = 'unknown';
                                         }
                                         $core = $this->getTranslationLocaleCore($language);
-                                        $emailSettings[$child->getId()]['languages'][$core] ??= [];
+                                        if (!isset($emailSettings[$child->getId()]['languages'][$core])) {
+                                            $emailSettings[$child->getId()]['languages'][$core] = [];
+                                        }
                                         $emailSettings[$child->getId()]['languages'][$core][$language] = $translation->getId();
                                     }
                                 }
@@ -1610,7 +1618,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         }
 
         $mailer            = $this->mailHelper->getMailer();
-        $lead['companies'] ??= $this->companyRepository->getCompaniesByLeadId($lead['id']);
+        if (!isset($lead['companies'])) {
+            $lead['companies'] = $this->companyRepository->getCompaniesByLeadId($lead['id']);
+        }
         $mailer->setLead($lead, true);
         $mailer->setTokens($tokens);
         $mailer->setEmail($email, false, $assetAttachments, !$saveStat);

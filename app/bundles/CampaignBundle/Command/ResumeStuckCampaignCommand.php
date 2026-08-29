@@ -210,10 +210,12 @@ final class ResumeStuckCampaignCommand extends Command
             $contactId          = $event['contact_id'];
             $parentExecutedDate = $event['last_executed_date'];
 
-            $eventMap[$eventId][$parentExecutedDate] ??= [
-                'event_id'    => $eventId,
-                'contact_ids' => [],
-            ];
+            if (!isset($eventMap[$eventId][$parentExecutedDate])) {
+                $eventMap[$eventId][$parentExecutedDate] = [
+                    'event_id'    => $eventId,
+                    'contact_ids' => [],
+                ];
+            }
 
             $eventMap[$eventId][$parentExecutedDate]['contact_ids'][] = $contactId;
         }

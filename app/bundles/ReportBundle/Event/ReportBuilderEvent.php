@@ -61,10 +61,12 @@ class ReportBuilderEvent extends AbstractReportEvent
 
         foreach ($data['columns'] as $column => &$d) {
             $d['label'] = null !== $d['label'] ? $this->translator->trans($d['label']) : '';
-            $d['alias'] ??= substr(
-                $column,
-                false !== ($pos = strpos($column, '.')) ? $pos + 1 : 0
-            );
+            if (!isset($d['alias'])) {
+                $d['alias'] = substr(
+                    $column,
+                    false !== ($pos = strpos($column, '.')) ? $pos + 1 : 0
+                );
+            }
         }
 
         uasort($data['columns'], fn ($a, $b): int => strnatcmp((string) $a['label'], (string) $b['label']));
@@ -72,10 +74,12 @@ class ReportBuilderEvent extends AbstractReportEvent
         if (isset($data['filters'])) {
             foreach ($data['filters'] as $column => &$d) {
                 $d['label'] = $this->translator->trans($d['label']);
-                $d['alias'] ??= substr(
-                    $column,
-                    false !== ($pos = strpos($column, '.')) ? $pos + 1 : 0
-                );
+                if (!isset($d['alias'])) {
+                    $d['alias'] = substr(
+                        $column,
+                        false !== ($pos = strpos($column, '.')) ? $pos + 1 : 0
+                    );
+                }
             }
 
             uasort($data['filters'], fn ($a, $b): int => strnatcmp((string) $a['label'], (string) $b['label']));

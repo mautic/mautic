@@ -16,9 +16,13 @@ final class UpdateFieldController extends CommonController
         $session       = $request->getSession();
         $updatedFields = $session->get(sprintf('%s-fields', $integration), []);
 
-        $updatedFields[$object] ??= [];
+        if (!isset($updatedFields[$object])) {
+            $updatedFields[$object] = [];
+        }
 
-        $updatedFields[$object][$field] ??= [];
+        if (!isset($updatedFields[$object][$field])) {
+            $updatedFields[$object][$field] = [];
+        }
 
         if ($mappedField = $request->request->get('mappedField')) {
             $updatedFields[$object][$field]['mappedField'] = $mappedField;

@@ -189,7 +189,9 @@ class ChartQuery extends AbstractChart
      */
     public function translateTimeUnit($unit = null)
     {
-        $unit ??= $this->unit;
+        if (null === $unit) {
+            $unit = $this->unit;
+        }
 
         if (!isset($this->mysqlTimeUnits[$unit])) {
             throw new \UnexpectedValueException('Date/Time unit "'.$unit.'" is not available for MySql.');

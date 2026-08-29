@@ -99,7 +99,9 @@ final class CampaignSubscriber implements EventSubscriberInterface
         // Set channel for the event logs
         $pendingEvent->setChannel('channel.message', $id);
 
-        $this->messageChannels[$id] ??= $this->messageModel->getMessageChannels($id);
+        if (!isset($this->messageChannels[$id])) {
+            $this->messageChannels[$id] = $this->messageModel->getMessageChannels($id);
+        }
 
         // organize into preferred channels
         $preferenceBuilder = new PreferenceBuilder($this->mmLogs, $this->pseudoEvent, $this->messageChannels[$id], $this->logger);

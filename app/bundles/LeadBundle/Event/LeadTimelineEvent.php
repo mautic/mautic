@@ -116,11 +116,15 @@ final class LeadTimelineEvent extends Event
                 $count = $this->chartQuery->completeTimeData($countData);
                 $this->addToCounter($data['event'], $count);
             } else {
-                $this->totalEvents[$data['event']] ??= 0;
+                if (!isset($this->totalEvents[$data['event']])) {
+                    $this->totalEvents[$data['event']] = 0;
+                }
                 ++$this->totalEvents[$data['event']];
             }
         } else {
-            $this->events[$data['event']] ??= [];
+            if (!isset($this->events[$data['event']])) {
+                $this->events[$data['event']] = [];
+            }
 
             if (!$this->forTimeline) {
                 // standardize the payload
@@ -384,7 +388,9 @@ final class LeadTimelineEvent extends Event
     {
         // BC support for old formats
         foreach ($this->events as $type => $events) {
-            $this->totalEvents[$type] ??= count($events);
+            if (!isset($this->totalEvents[$type])) {
+                $this->totalEvents[$type] = count($events);
+            }
         }
 
         $counter = [
@@ -405,7 +411,9 @@ final class LeadTimelineEvent extends Event
      */
     public function addToCounter($eventType, $count): void
     {
-        $this->totalEvents[$eventType] ??= 0;
+        if (!isset($this->totalEvents[$eventType])) {
+            $this->totalEvents[$eventType] = 0;
+        }
 
         if (is_array($count)) {
             if (isset($count['total'])) {
@@ -413,7 +421,9 @@ final class LeadTimelineEvent extends Event
             } elseif ($this->countOnly && $this->groupUnit) {
                 // Group counts across events by unit
                 foreach ($count as $key => $data) {
-                    $this->totalEventsByUnit[$key] ??= 0;
+                    if (!isset($this->totalEventsByUnit[$key])) {
+                        $this->totalEventsByUnit[$key] = 0;
+                    }
                     $this->totalEventsByUnit[$key] += (int) $data;
                     $this->totalEvents[$eventType] += (int) $data;
                 }

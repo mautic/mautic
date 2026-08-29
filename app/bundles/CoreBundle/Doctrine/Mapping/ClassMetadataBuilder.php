@@ -399,7 +399,9 @@ final class ClassMetadataBuilder extends OrmClassMetadataBuilder
     {
         $cm = $this->getClassMetadata();
 
-        $cm->table['indexes'] ??= [];
+        if (!isset($cm->table['indexes'])) {
+            $cm->table['indexes'] = [];
+        }
 
         $definition = ['columns' => $columns];
 

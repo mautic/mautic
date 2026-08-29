@@ -144,7 +144,9 @@ class IntegrationHelper
                         // Sort by feature and plugin for later
                         $features = $settings->getSupportedFeatures();
                         foreach ($features as $feature) {
-                            $this->byFeatureList[$feature] ??= [];
+                            if (!isset($this->byFeatureList[$feature])) {
+                                $this->byFeatureList[$feature] = [];
+                            }
                             $this->byFeatureList[$feature][] = $integrationName;
                         }
                         $this->byPlugin[$id][] = $integrationName;
@@ -438,7 +440,9 @@ class IntegrationHelper
                     }
 
                     if (!empty($profile['profile']) || !empty($profile['activity'])) {
-                        $socialCache[$integration] ??= [];
+                        if (!isset($socialCache[$integration])) {
+                            $socialCache[$integration] = [];
+                        }
 
                         $socialCache[$integration]['profile']     = (!empty($profile['profile'])) ? $profile['profile'] : [];
                         $socialCache[$integration]['activity']    = (!empty($profile['activity'])) ? $profile['activity'] : [];

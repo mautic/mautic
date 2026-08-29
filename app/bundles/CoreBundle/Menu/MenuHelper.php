@@ -94,9 +94,13 @@ final class MenuHelper
 
             // Determine if this item needs to be listed in a bundle outside it's own
             if (isset($i['parent'])) {
-                $this->orphans[$type] ??= [];
+                if (!isset($this->orphans[$type])) {
+                    $this->orphans[$type] = [];
+                }
 
-                $this->orphans[$type][$i['parent']] ??= [];
+                if (!isset($this->orphans[$type][$i['parent']])) {
+                    $this->orphans[$type][$i['parent']] = [];
+                }
 
                 $this->orphans[$type][$i['parent']][$k] = $i;
 
@@ -137,9 +141,13 @@ final class MenuHelper
             if (isset($this->orphans[$type]) && isset($this->orphans[$type][$key])) {
                 $priority = $items['priority'] ?? 9999;
                 foreach ($this->orphans[$type][$key] as &$orphan) {
-                    $orphan['extras'] ??= [];
+                    if (!isset($orphan['extras'])) {
+                        $orphan['extras'] = [];
+                    }
                     $orphan['extras']['depth'] = $depth;
-                    $orphan['priority'] ??= $priority;
+                    if (!isset($orphan['priority'])) {
+                        $orphan['priority'] = $priority;
+                    }
                 }
 
                 $items['children'] =

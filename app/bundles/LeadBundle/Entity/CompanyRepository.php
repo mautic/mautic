@@ -307,7 +307,9 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
         // Ensure lists without leads have a value
         foreach ($companyIds as $l) {
-            $return[$l] ??= 0;
+            if (!isset($return[$l])) {
+                $return[$l] = 0;
+            }
         }
 
         return ($returnArray) ? $return : $return[$companyIds[0]];
@@ -377,7 +379,9 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         // Group companies per contact
         $contactCompanies = [];
         foreach ($companies as $company) {
-            $contactCompanies[$company['lead_id']] ??= [];
+            if (!isset($contactCompanies[$company['lead_id']])) {
+                $contactCompanies[$company['lead_id']] = [];
+            }
 
             $contactCompanies[$company['lead_id']][] = $company;
         }

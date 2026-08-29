@@ -174,7 +174,9 @@ final class LookupHelper
         $webhookId = $cacheId.'#'.$user->getId().'#'.$nonce;
 
         $cache = $entity->getSocialCache();
-        $cache['clearbit'] ??= [];
+        if (!isset($cache['clearbit'])) {
+            $cache['clearbit'] = [];
+        }
 
         $cache['clearbit']['nonce'] = $nonce;
 

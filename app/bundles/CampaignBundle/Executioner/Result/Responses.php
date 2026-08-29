@@ -38,11 +38,15 @@ final class Responses
     {
         switch ($event->getEventType()) {
             case Event::TYPE_ACTION:
-                $this->actionResponses[$event->getType()] ??= [];
+                if (!isset($this->actionResponses[$event->getType()])) {
+                    $this->actionResponses[$event->getType()] = [];
+                }
                 $this->actionResponses[$event->getType()][$event->getId()] = $response;
                 break;
             case Event::TYPE_CONDITION:
-                $this->conditionResponses[$event->getType()] ??= [];
+                if (!isset($this->conditionResponses[$event->getType()])) {
+                    $this->conditionResponses[$event->getType()] = [];
+                }
                 $this->conditionResponses[$event->getType()][$event->getId()] = $response;
                 break;
         }

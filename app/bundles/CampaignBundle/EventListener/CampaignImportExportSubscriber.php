@@ -307,11 +307,13 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
             $mainStatus = $mainEvent->getStatus();
 
             foreach ($subStatus[$type] as $entityName => $statusData) {
-                $mainStatus[$type][$entityName] ??= [
-                    'names' => [],
-                    'ids'   => [],
-                    'count' => 0,
-                ];
+                if (!isset($mainStatus[$type][$entityName])) {
+                    $mainStatus[$type][$entityName] = [
+                        'names' => [],
+                        'ids'   => [],
+                        'count' => 0,
+                    ];
+                }
 
                 $mainStatus[$type][$entityName]['names'] = array_merge(
                     $mainStatus[$type][$entityName]['names'],

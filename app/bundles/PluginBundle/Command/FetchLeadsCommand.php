@@ -117,7 +117,9 @@ final class FetchLeadsCommand extends Command
 
         defined('MAUTIC_CONSOLE_VERBOSITY') || define('MAUTIC_CONSOLE_VERBOSITY', $output->getVerbosity());
 
-        $config['objects'] ??= [];
+        if (!isset($config['objects'])) {
+            $config['objects'] = [];
+        }
 
         $params['start']    = $startDate;
         $params['end']      = $endDate;

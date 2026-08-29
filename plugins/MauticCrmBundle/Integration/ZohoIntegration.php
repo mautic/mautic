@@ -1203,7 +1203,9 @@ final class ZohoIntegration extends CrmAbstractIntegration
      */
     protected function cleanPriorityFields(array $fieldsToUpdate, $objects = null)
     {
-        $objects ??= ['Leads', 'Contacts'];
+        if (null === $objects) {
+            $objects = ['Leads', 'Contacts'];
+        }
 
         if (isset($fieldsToUpdate['leadFields'])) {
             // Pass in the whole config
@@ -1225,7 +1227,9 @@ final class ZohoIntegration extends CrmAbstractIntegration
     public function prepareFieldsForSync($fields, $keys, $object = null)
     {
         $leadFields = [];
-        $object ??= 'Leads';
+        if (null === $object) {
+            $object = 'Leads';
+        }
 
         $objects = (!is_array($object)) ? [$object] : $object;
         if (is_string($object) && 'Accounts' === $object) {
@@ -1238,7 +1242,9 @@ final class ZohoIntegration extends CrmAbstractIntegration
         }
 
         foreach ($objects as $obj) {
-            $leadFields[$obj] ??= [];
+            if (!isset($leadFields[$obj])) {
+                $leadFields[$obj] = [];
+            }
 
             foreach ($keys as $key) {
                 $leadFields[$obj][$key] = $fields[$key];

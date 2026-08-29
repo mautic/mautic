@@ -40,7 +40,9 @@ final class BarChart extends AbstractChart implements ChartInterface
             'data'  => $data,
         ];
 
-        $order ??= count($this->datasets);
+        if (null === $order) {
+            $order = count($this->datasets);
+        }
 
         $this->datasets[$order] = array_merge($baseData, $this->generateColors($datasetId));
 

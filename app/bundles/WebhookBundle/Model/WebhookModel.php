@@ -506,7 +506,10 @@ class WebhookModel extends FormModel
             $event = $queueItem->getEvent();
             $type  = $event->getEventType();
 
-            $payload[$type] ??= [];
+            // create new array level for each unique event type
+            if (!isset($payload[$type])) {
+                $payload[$type] = [];
+            }
 
             $queuePayload              = json_decode($queueItem->getPayload(), true);
             $queuePayload['timestamp'] = $queueItem->getDateAdded()->format('c');

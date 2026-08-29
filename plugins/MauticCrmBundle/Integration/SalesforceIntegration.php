@@ -635,7 +635,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
     public function prepareFieldsForSync($fields, $keys, $object = null)
     {
         $leadFields = [];
-        $object ??= 'Lead';
+        if (null === $object) {
+            $object = 'Lead';
+        }
 
         $objects = (!is_array($object)) ? [$object] : $object;
         if (is_string($object) && 'Account' === $object) {
@@ -648,7 +650,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         foreach ($objects as $obj) {
-            $leadFields[$obj] ??= [];
+            if (!isset($leadFields[$obj])) {
+                $leadFields[$obj] = [];
+            }
 
             foreach ($keys as $key) {
                 if (strpos($key, '__'.$obj)) {
@@ -2334,7 +2338,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     protected function cleanPriorityFields(array $fieldsToUpdate, $objects = null)
     {
-        $objects ??= ['Lead', 'Contact'];
+        if (null === $objects) {
+            $objects = ['Lead', 'Contact'];
+        }
 
         if (isset($fieldsToUpdate['leadFields'])) {
             // Pass in the whole config

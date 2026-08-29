@@ -41,7 +41,9 @@ final class FieldMergerHelper
 
     private function removeNonExistentFieldMappings(string $object): void
     {
-        $this->currentFieldMappings[$object] ??= [];
+        if (!isset($this->currentFieldMappings[$object])) {
+            $this->currentFieldMappings[$object] = [];
+        }
 
         // Remove any fields that no longer exist
         $this->currentFieldMappings[$object] = array_intersect_key($this->currentFieldMappings[$object], $this->allFields);

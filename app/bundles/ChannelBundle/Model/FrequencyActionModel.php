@@ -42,7 +42,9 @@ final readonly class FrequencyActionModel
         $channels       = $this->contactModel->getPreferenceChannels();
 
         foreach ($channels as $channel) {
-            $preferredChannel ??= $channel;
+            if (null === $preferredChannel) {
+                $preferredChannel = $channel;
+            }
 
             $frequencyRule = $frequencyRules[$channel] ?? new FrequencyRule();
             $frequencyRule->setChannel($channel);

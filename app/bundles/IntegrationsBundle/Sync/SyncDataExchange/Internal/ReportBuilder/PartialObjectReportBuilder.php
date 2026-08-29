@@ -45,7 +45,9 @@ class PartialObjectReportBuilder
 
         foreach ($requestedObjects as $objectDAO) {
             try {
-                $this->lastProcessedTrackedId[$objectDAO->getObject()] ??= 0;
+                if (!isset($this->lastProcessedTrackedId[$objectDAO->getObject()])) {
+                    $this->lastProcessedTrackedId[$objectDAO->getObject()] = 0;
+                }
 
                 $fieldsChanges = $this->fieldChangeRepository->findChangesBefore(
                     $requestDAO->getSyncToIntegration(),

@@ -59,7 +59,13 @@ trait MatchFilterForLeadTrait
                 continue;
             }
 
-            $groups[$groupNum] ??= false;
+            /*
+             * If we are checking the first filter in a group
+             * assume that the group will not match.
+             */
+            if (null === $groups[$groupNum]) {
+                $groups[$groupNum] = false;
+            }
 
             $leadVal   = ($isCompanyField ? $primaryCompany[$data['field']] : $lead[$data['field']]);
             $filterVal = $data['filter'];

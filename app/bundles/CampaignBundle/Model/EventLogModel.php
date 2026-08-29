@@ -209,7 +209,10 @@ final class EventLogModel extends AbstractCommonModel
     public function saveEntity(LeadEventLog $entity): void
     {
         $triggerDate = $entity->getTriggerDate();
-        $triggerDate ??= new \DateTime();
+        if (null === $triggerDate) {
+            // Reschedule for now
+            $triggerDate = new \DateTime();
+        }
 
         $this->eventScheduler->rescheduleLogs(new ArrayCollection([$entity]), $triggerDate);
     }

@@ -309,7 +309,9 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
      */
     public function setIsScheduled($isScheduled): static
     {
-        $this->previousScheduledState ??= $this->isScheduled;
+        if (null === $this->previousScheduledState) {
+            $this->previousScheduledState = $this->isScheduled;
+        }
 
         $this->isScheduled = $isScheduled;
 

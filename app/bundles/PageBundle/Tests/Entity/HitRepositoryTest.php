@@ -186,7 +186,9 @@ final class HitRepositoryTest extends MauticMysqlTestCase
 
     private function getIpAddress(): IpAddress
     {
-        $this->ipAddress ??= new IpAddress('127.0.0.1');
+        if (!isset($this->ipAddress)) {
+            $this->ipAddress = new IpAddress('127.0.0.1');
+        }
 
         return $this->ipAddress;
     }

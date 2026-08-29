@@ -27,7 +27,9 @@ final class ChannelPreferences
     {
         $priority = (int) $priority;
 
-        $this->organizedByPriority[$priority] ??= new ArrayCollection();
+        if (!isset($this->organizedByPriority[$priority])) {
+            $this->organizedByPriority[$priority] = new ArrayCollection();
+        }
 
         return $this;
     }

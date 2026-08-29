@@ -75,7 +75,9 @@ class EventLogger
         $log->setEvent($event);
         $log->setCampaign($campaign = $event->getCampaign());
 
-        $contact ??= $this->contactTracker->getContact();
+        if (null === $contact) {
+            $contact = $this->contactTracker->getContact();
+        }
         $log->setLead($contact);
 
         if ($isInactiveEvent) {

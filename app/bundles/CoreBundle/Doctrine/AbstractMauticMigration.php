@@ -193,7 +193,9 @@ abstract class AbstractMauticMigration extends AbstractMigration
      */
     protected function getPrefixedTableName(?string $tableName = null): string
     {
-        $tableName ??= static::TABLE_NAME;
+        if (null === $tableName) {
+            $tableName = static::TABLE_NAME;
+        }
 
         return $this->prefix.$tableName;
     }

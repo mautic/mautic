@@ -59,9 +59,13 @@ final class UserSummaryNotificationHelper
 
     public function storeSummaryNotification(string $integrationDisplayName, string $objectDisplayName, int $id): void
     {
-        $this->userNotifications[$integrationDisplayName] ??= [];
+        if (!isset($this->userNotifications[$integrationDisplayName])) {
+            $this->userNotifications[$integrationDisplayName] = [];
+        }
 
-        $this->userNotifications[$integrationDisplayName][$objectDisplayName] ??= [];
+        if (!isset($this->userNotifications[$integrationDisplayName][$objectDisplayName])) {
+            $this->userNotifications[$integrationDisplayName][$objectDisplayName] = [];
+        }
 
         $this->userNotifications[$integrationDisplayName][$objectDisplayName][$id] = $id;
     }
@@ -78,7 +82,9 @@ final class UserSummaryNotificationHelper
         // Group by owner ID.
         foreach ($results as $result) {
             $ownerId = $result['owner_id'];
-            $owners[$ownerId] ??= [];
+            if (!isset($owners[$ownerId])) {
+                $owners[$ownerId] = [];
+            }
 
             $owners[$ownerId][] = (int) $result['id'];
         }

@@ -1767,7 +1767,10 @@ final class EmailController extends FormController
                     $fields = $model->enrichedContactWithCompanies($fields);
                 }
 
-                $fields ??= $fakeLeadHelper->prepareFakeContactWithPrimaryCompany();
+                if (!isset($fields)) {
+                    // Prepare a fake contact
+                    $fields = $fakeLeadHelper->prepareFakeContactWithPrimaryCompany();
+                }
 
                 $errors = [];
                 foreach ($emails as $email) {

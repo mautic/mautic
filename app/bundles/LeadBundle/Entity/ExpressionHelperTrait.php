@@ -20,7 +20,10 @@ trait ExpressionHelperTrait
             $parameter = ":{$parameter}";
         }
 
-        $includeIsNull ??= in_array($operator, ['neq', 'notLike', 'notIn']);
+        if (null === $includeIsNull) {
+            // Auto determine based on negate operators
+            $includeIsNull = in_array($operator, ['neq', 'notLike', 'notIn']);
+        }
 
         if ($includeIsNull) {
             $expr = $q->expr()->or(

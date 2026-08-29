@@ -189,7 +189,9 @@ final class LookupHelper
         $webhookId = $cacheId.'#'.$user->getId().'#'.$nonce;
 
         $cache = $entity->getSocialCache();
-        $cache['fullcontact'] ??= [];
+        if (!isset($cache['fullcontact'])) {
+            $cache['fullcontact'] = [];
+        }
 
         $cache['fullcontact']['nonce'] = $nonce;
 

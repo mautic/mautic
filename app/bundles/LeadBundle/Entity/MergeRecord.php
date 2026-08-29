@@ -87,7 +87,9 @@ class MergeRecord
 
     public function setDateAdded(?\DateTime $dateAdded = null): static
     {
-        $dateAdded ??= new \DateTime();
+        if (null === $dateAdded) {
+            $dateAdded = new \DateTime();
+        }
 
         $this->dateAdded = $dateAdded;
 

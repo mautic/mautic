@@ -122,7 +122,9 @@ final class Interval implements ScheduleModeInterface
                 $daysOfWeek
             );
             $key = $groupExecutionDate->format(DateTimeHelper::FORMAT_DB);
-            $groupedExecutionDates[$key] ??= new GroupExecutionDateDAO($groupExecutionDate);
+            if (!isset($groupedExecutionDates[$key])) {
+                $groupedExecutionDates[$key] = new GroupExecutionDateDAO($groupExecutionDate);
+            }
 
             $groupedExecutionDates[$key]->addContact($contact);
         }

@@ -144,7 +144,9 @@ final readonly class DetermineWinnerSubscriber implements EventSubscriberInterfa
                     if ($id !== $parentId && !array_key_exists($id, $children)) {
                         continue;
                     }
-                    $sentCounts[$id] ??= 0;
+                    if (!isset($sentCounts[$id])) {
+                        $sentCounts[$id] = 0;
+                    }
 
                     $rates[$id] = $sentCounts[$id] ? round(($count / $sentCounts[$id]) * 100, 2) : 0;
 

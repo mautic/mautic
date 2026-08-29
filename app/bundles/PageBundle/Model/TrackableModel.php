@@ -98,7 +98,9 @@ class TrackableModel extends AbstractCommonModel
         $shortenUrl = false,
         $utmTags = [],
     ) {
-        $clickthrough['channel'] ??= [$trackable->getChannel() => $trackable->getChannelId()];
+        if (!isset($clickthrough['channel'])) {
+            $clickthrough['channel'] = [$trackable->getChannel() => $trackable->getChannelId()];
+        }
 
         $redirect = $trackable->getRedirect();
 

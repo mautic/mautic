@@ -48,7 +48,9 @@ final class LocalFileAdapterService extends LocalFilesystemAdapter
 
         // Explicitly set visibility to ensure correct permissions via chmod()
         $visibility = $config->get(Config::OPTION_VISIBILITY, $config->get(Config::OPTION_DIRECTORY_VISIBILITY));
-        $visibility ??= Visibility::PUBLIC;
+        if (null === $visibility) {
+            $visibility = Visibility::PUBLIC;
+        }
 
         $this->setVisibility($dirname, $visibility);
     }

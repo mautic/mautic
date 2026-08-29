@@ -79,7 +79,9 @@ final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 
     private function getChoices(?array $data = null, bool $includeNew = false): array
     {
-        $data ??= $this->selected;
+        if (null === $data) {
+            $data = $this->selected;
+        }
 
         // Ensure we only work with scalar numeric IDs to prevent array-to-string conversions
         $data = $this->sanitizeIds($data);

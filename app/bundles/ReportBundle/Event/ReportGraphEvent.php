@@ -35,7 +35,9 @@ class ReportGraphEvent extends AbstractReportEvent
      */
     public function setGraph($graph, $data): void
     {
-        $this->requestedGraphs[$graph]['data'] ??= [];
+        if (!isset($this->requestedGraphs[$graph]['data'])) {
+            $this->requestedGraphs[$graph]['data'] = [];
+        }
         $this->requestedGraphs[$graph]['data'] = $data;
     }
 
@@ -58,7 +60,9 @@ class ReportGraphEvent extends AbstractReportEvent
      */
     public function setOption($graph, $key, $value): void
     {
-        $this->requestedGraphs[$graph]['options'] ??= [];
+        if (!isset($this->requestedGraphs[$graph]['options'])) {
+            $this->requestedGraphs[$graph]['options'] = [];
+        }
         $this->requestedGraphs[$graph]['options'][$key] = $value;
     }
 

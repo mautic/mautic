@@ -43,8 +43,12 @@ final class NotificationRepository extends CommonRepository
             ->from(Notification::class, 'e');
         $results = $q->getQuery()->getSingleResult(Query::HYDRATE_ARRAY);
 
-        $results['sent_count'] ??= 0;
-        $results['read_count'] ??= 0;
+        if (!isset($results['sent_count'])) {
+            $results['sent_count'] = 0;
+        }
+        if (!isset($results['read_count'])) {
+            $results['read_count'] = 0;
+        }
 
         return $results;
     }

@@ -49,7 +49,9 @@ trait FieldsTypeTrait
                     $groupName = '0default';
                     if (is_array($details)) {
                         if (isset($details['group'])) {
-                            $choices[$details['group']] ??= [];
+                            if (!isset($choices[$details['group']])) {
+                                $choices[$details['group']] = [];
+                            }
                             $label           = $details['optionLabel'] ?? $details['label'];
                             $group[$field]   = $groupName = $details['group'];
                             $choices[$field] = $label;

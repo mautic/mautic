@@ -12,7 +12,9 @@ class RemovedContactTracker
      */
     public function addRemovedContact($campaignId, $contactId): void
     {
-        $this->removedContacts[$campaignId] ??= [];
+        if (!isset($this->removedContacts[$campaignId])) {
+            $this->removedContacts[$campaignId] = [];
+        }
 
         $this->removedContacts[$campaignId][$contactId] = $contactId;
     }

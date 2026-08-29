@@ -218,7 +218,9 @@ final class PageController extends FormController
 
                 if (is_array($variantSettings) && isset($variantSettings['winnerCriteria'])) {
                     if ($c->isPublished()) {
-                        $lastCriteria ??= $variantSettings['winnerCriteria'];
+                        if (!isset($lastCriteria)) {
+                            $lastCriteria = $variantSettings['winnerCriteria'];
+                        }
 
                         // make sure all the variants are configured with the same criteria
                         if ($lastCriteria != $variantSettings['winnerCriteria']) {

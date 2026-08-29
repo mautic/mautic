@@ -91,7 +91,9 @@ class NotificationModel extends FormModel
         ?string $deduplicateValue = null,
         ?\DateTime $deduplicateDateTimeFrom = null,
     ): void {
-        $user ??= $this->userHelper->getUser();
+        if (null === $user) {
+            $user = $this->userHelper->getUser();
+        }
 
         if (null === $user || !$user->getId()) {
             // ensure notifications aren't written for non users

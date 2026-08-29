@@ -28,7 +28,9 @@ final class MonthStat implements StatInterface
     {
         $key = new \DateTime("{$this->month}-{$day} 00:00:00")->format('Y-m-d');
 
-        $this->stats[$key] ??= new DayStat($key);
+        if (!isset($this->stats[$key])) {
+            $this->stats[$key] = new DayStat($key);
+        }
 
         return $this->stats[$key];
     }

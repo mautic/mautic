@@ -268,12 +268,22 @@ final readonly class CoreSubscriber implements EventSubscriberInterface
 
         // Set some very commonly used defaults and requirements
         if (str_contains($details['path'], '{page}')) {
-            $defaults['page'] ??= 0;
-            $requirements['page'] ??= '\d+';
+            if (!isset($defaults['page'])) {
+                $defaults['page'] = 0;
+            }
+            if (!isset($requirements['page'])) {
+                $requirements['page'] = '\d+';
+            }
         }
         if (str_contains($details['path'], '{objectId}')) {
-            $defaults['objectId'] ??= 0;
-            $requirements['objectId'] ??= '[a-zA-Z0-9_-]+';
+            if (!isset($defaults['objectId'])) {
+                // Set default to 0 for the "new" actions
+                $defaults['objectId'] = 0;
+            }
+            if (!isset($requirements['objectId'])) {
+                // Only allow alphanumeric and _- for objectId
+                $requirements['objectId'] = '[a-zA-Z0-9_-]+';
+            }
         }
         if ('api' === $type) {
             if (str_contains($details['path'], '{id}')) {
@@ -285,7 +295,9 @@ final readonly class CoreSubscriber implements EventSubscriberInterface
             if (preg_match_all('/\{(.*?Id)\}/', $details['path'], $matches)) {
                 // Force digits for IDs
                 foreach ($matches[1] as $match) {
-                    $requirements[$match] ??= '\d+';
+                    if (!isset($requirements[$match])) {
+                        $requirements[$match] = '\d+';
+                    }
                 }
             }
         }

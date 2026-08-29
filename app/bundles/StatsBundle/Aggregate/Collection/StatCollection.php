@@ -85,7 +85,9 @@ final class StatCollection
 
     public function getCalculator(\DateTime $fromDateTime, \DateTime $toDateTime): Calculator
     {
-        $this->calculator ??= new Calculator($this->stats, $fromDateTime, $toDateTime);
+        if (null === $this->calculator) {
+            $this->calculator = new Calculator($this->stats, $fromDateTime, $toDateTime);
+        }
 
         return $this->calculator;
     }

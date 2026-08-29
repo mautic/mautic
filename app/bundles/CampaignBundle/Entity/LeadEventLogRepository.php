@@ -315,10 +315,12 @@ class LeadEventLogRepository extends CommonRepository
         // group by event id
         foreach ($results as $l) {
             if (!$excludeNegative) {
-                $return[$l['event_id']] ??= [
-                    0 => 0,
-                    1 => 0,
-                ];
+                if (!isset($return[$l['event_id']])) {
+                    $return[$l['event_id']] = [
+                        0 => 0,
+                        1 => 0,
+                    ];
+                }
 
                 $key                          = (int) $l['non_action_path_taken'] ? 0 : 1;
                 $return[$l['event_id']][$key] = (int) $l['lead_count'];

@@ -132,7 +132,9 @@ class OrderDAO
         $integrationObjectId,
         ?\DateTimeInterface $objectModifiedDate = null,
     ): void {
-        $objectModifiedDate ??= new \DateTime();
+        if (null === $objectModifiedDate) {
+            $objectModifiedDate = new \DateTime();
+        }
 
         $objectMapping = new ObjectMapping();
         $objectMapping->setIntegration($this->integration)
@@ -155,7 +157,9 @@ class OrderDAO
      */
     public function remapObject($oldObjectName, $oldObjectId, $newObjectName, $newObjectId = null): void
     {
-        $newObjectId ??= $oldObjectId;
+        if (null === $newObjectId) {
+            $newObjectId = $oldObjectId;
+        }
 
         $this->remappedObjects[$oldObjectId] = new RemappedObjectDAO($this->integration, $oldObjectName, $oldObjectId, $newObjectName, $newObjectId);
     }
@@ -165,7 +169,9 @@ class OrderDAO
      */
     public function updateLastSyncDate(ObjectChangeDAO $objectChangeDAO, ?\DateTimeInterface $objectModifiedDate = null): void
     {
-        $objectModifiedDate ??= new \DateTime();
+        if (null === $objectModifiedDate) {
+            $objectModifiedDate = new \DateTime();
+        }
 
         $this->updatedObjectMappings[] = new UpdatedObjectMappingDAO(
             $this->integration,
@@ -189,7 +195,9 @@ class OrderDAO
      */
     public function retrySyncLater(ObjectChangeDAO $objectChangeDAO): void
     {
-        $this->retryTheseLater[$objectChangeDAO->getMappedObject()] ??= [];
+        if (!isset($this->retryTheseLater[$objectChangeDAO->getMappedObject()])) {
+            $this->retryTheseLater[$objectChangeDAO->getMappedObject()] = [];
+        }
 
         $this->retryTheseLater[$objectChangeDAO->getMappedObject()][$objectChangeDAO->getMappedObjectId()] = $objectChangeDAO;
     }

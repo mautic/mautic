@@ -39,7 +39,10 @@ final class MatchFilterForLeadTraitTest extends TestCase
     {
         $this->matchFilterForLeadTrait = new MatchFilterForLeadTraitTestable();
 
-        $_ENV['MAUTIC_UPLOAD_DIR'] ??= '/tmp';
+        // Set required environment variable for FormFieldHelper
+        if (!isset($_ENV['MAUTIC_UPLOAD_DIR'])) {
+            $_ENV['MAUTIC_UPLOAD_DIR'] = '/tmp';
+        }
     }
 
     /**

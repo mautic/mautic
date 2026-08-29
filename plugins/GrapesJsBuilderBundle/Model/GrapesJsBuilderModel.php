@@ -96,7 +96,9 @@ class GrapesJsBuilderModel extends AbstractCommonModel
 
         $emailForm  = $request->request->all('emailform');
         $customHtml = is_array($emailForm) ? ($emailForm['customHtml'] ?? null) : null;
-        $customHtml ??= $request->request->get('customHtml') ?? null;
+        if (null === $customHtml) {
+            $customHtml = $request->request->get('customHtml') ?? null;
+        }
 
         $entity->setCustomHtml($customHtml);
         $this->emailRepository->saveEntity($entity);

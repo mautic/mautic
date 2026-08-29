@@ -376,7 +376,10 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
 
         $sugarObject           = 'Accounts';
         $params['max_results'] = 100;
-        $params['offset'] ??= 0;
+        if (!isset($params['offset'])) {
+            // First call
+            $params['offset'] = 0;
+        }
 
         $query = $params;
 
@@ -512,7 +515,10 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
     {
         $params['max_results'] = 100;
 
-        $params['offset'] ??= 0;
+        if (!isset($params['offset'])) {
+            // First call
+            $params['offset'] = 0;
+        }
         $query = $params;
 
         try {
@@ -1558,7 +1564,9 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
      */
     protected function cleanPriorityFields(array $fieldsToUpdate, $objects = null)
     {
-        $objects ??= ['Leads', 'Contacts'];
+        if (null === $objects) {
+            $objects = ['Leads', 'Contacts'];
+        }
 
         if (isset($fieldsToUpdate['leadFields'])) {
             // Pass in the whole config
@@ -1580,7 +1588,9 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
     public function prepareFieldsForSync($fields, $keys, $object = null)
     {
         $leadFields = [];
-        $object ??= 'Lead';
+        if (null === $object) {
+            $object = 'Lead';
+        }
 
         $objects = (!is_array($object)) ? [$object] : $object;
         if (is_string($object) && 'Accounts' === $object) {
@@ -1593,7 +1603,9 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
         }
 
         foreach ($objects as $obj) {
-            $leadFields[$obj] ??= [];
+            if (!isset($leadFields[$obj])) {
+                $leadFields[$obj] = [];
+            }
 
             foreach ($keys as $key) {
                 if (strpos($key, '__'.$obj)) {

@@ -210,7 +210,9 @@ trait FilterTrait
                 if ($customOptions['multiple']) {
                     array_unshift($customOptions['choices'], ['' => '']);
 
-                    $data['filter'] ??= [];
+                    if (!isset($data['filter'])) {
+                        $data['filter'] = [];
+                    }
                 }
 
                 break;

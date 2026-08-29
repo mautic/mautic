@@ -31,7 +31,9 @@ final readonly class RestrictionHelper
      */
     public function applyRestrictions(FormInterface $childType, FormInterface $parentType, ?array $restrictedFields = null): void
     {
-        $restrictedFields ??= $this->restrictedFields;
+        if (null === $restrictedFields) {
+            $restrictedFields = $this->restrictedFields;
+        }
 
         $fieldName = $childType->getName();
         if (array_key_exists($fieldName, $restrictedFields)) {

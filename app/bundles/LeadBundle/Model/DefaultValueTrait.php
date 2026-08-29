@@ -20,7 +20,9 @@ trait DefaultValueTrait
             return;
         }
 
-        $this->cachedDefaultFields[$object] ??= $this->leadFieldModel->getFieldListWithProperties($object);
+        if (!isset($this->cachedDefaultFields[$object])) {
+            $this->cachedDefaultFields[$object] = $this->leadFieldModel->getFieldListWithProperties($object);
+        }
 
         foreach ($this->cachedDefaultFields[$object] as $alias => $field) {
             // Prevent defaults from overwriting values already set
