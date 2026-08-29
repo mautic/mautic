@@ -32,10 +32,10 @@ jobs:
             db-types: 'mariadb:11.4'
           - php-versions: '8.6'
             db-types: 'mysql:26.7' # 'mysql:9.7'
-            experimental: true
+            experimental: false
           - php-versions: '8.6'
             db-types: 'mariadb:13.0-rc' # 'mariadb:12.3'
-            experimental: true
+            experimental: false
 
     name: PHPUnit ${{ matrix.php-versions }} ${{ matrix.db-types }}
 
@@ -181,7 +181,7 @@ jobs:
             postgres-versions: '18'
           - php-versions: '8.6'
             postgres-versions: '19beta3-alpine'
-            experimental: true
+            experimental: false
 
     name: PHPUnit ${{ matrix.php-versions }} postgres:${{ matrix.postgres-versions }}
 
