@@ -68,9 +68,7 @@ final class DashboardSubscriber extends MainDashboardSubscriber
 
                     if (isset($reportData['graphs'][$graph])) {
                         $graphData = $reportData['graphs'][$graph];
-                        if (!isset($graphData['data'])) {
-                            $graphData['data'] = $reportData['data'];
-                        }
+                        $graphData['data'] ??= $reportData['data'];
 
                         $templateData = $this->prepareTemplateData($graphData, $widget, $report, $params, $reportData['columns']);
                         $event->setTemplateData($templateData);

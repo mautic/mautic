@@ -161,9 +161,7 @@ class RoleRepository extends CommonRepository
 
         // Ensure lists without leads have a value
         foreach ($roleIds as $r) {
-            if (!isset($return[$r])) {
-                $return[$r] = 0;
-            }
+            $return[$r] ??= 0;
         }
 
         return ($returnArray) ? $return : $return[$roleIds[0]];

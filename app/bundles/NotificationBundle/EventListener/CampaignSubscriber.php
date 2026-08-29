@@ -302,12 +302,10 @@ class CampaignSubscriber implements EventSubscriberInterface
             $sendNotification = $this->buildNotificationToSend($notification, $log->getLead());
             $uniqueKey        = md5(sprintf('[%s][%s]', $sendNotification->getHeading(), $sendNotification->getMessage()));
 
-            if (!isset($batches[$uniqueKey])) {
-                $batches[$uniqueKey] = [
-                    'sendNotification' => $sendNotification,
-                    'playerIds'        => [],
-                ];
-            }
+            $batches[$uniqueKey] ??= [
+                'sendNotification' => $sendNotification,
+                'playerIds'        => [],
+            ];
 
             foreach ($playerIds as $playerId) {
                 $batches[$uniqueKey]['playerIds'][$playerId] = $log;

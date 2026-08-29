@@ -135,9 +135,7 @@ final class PhpUnitConfigCommand extends Command
             foreach ($extraChunk as $extraChunkTest) {
                 foreach ($unit as $index => $unitFilename) {
                     if ($this->getClassName($unitFilename) === $extraChunkTest) {
-                        if (!isset($chunks[$extraChunkIndex])) {
-                            $chunks[$extraChunkIndex] = [];
-                        }
+                        $chunks[$extraChunkIndex] ??= [];
 
                         $chunks[$extraChunkIndex][] = $unitFilename;
                         unset($unit[$index]);
@@ -145,9 +143,7 @@ final class PhpUnitConfigCommand extends Command
                 }
                 foreach ($functional as $index => $functionalFilename) {
                     if ($this->getClassName($functionalFilename) === $extraChunkTest) {
-                        if (!isset($chunks[$extraChunkIndex])) {
-                            $chunks[$extraChunkIndex] = [];
-                        }
+                        $chunks[$extraChunkIndex] ??= [];
 
                         $chunks[$extraChunkIndex][] = $functionalFilename;
                         unset($functional[$index]);

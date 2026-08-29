@@ -155,10 +155,7 @@ trait RequestTrait
             }
         }
 
-        if (!isset($masks['description'])) {
-            // Add description to support strict HTML
-            $masks['description'] = 'strict_html';
-        }
+        $masks['description'] ??= 'strict_html';
 
         if (!isset($masks['content'])) {
             // Assume HTML

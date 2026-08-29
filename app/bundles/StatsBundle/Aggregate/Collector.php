@@ -20,9 +20,7 @@ final readonly class Collector
      */
     public function fetchStats($statName, \DateTime $fromDateTime, \DateTime $toDateTime, ?FetchOptions $fetchOptions = null): StatCollection
     {
-        if (null === $fetchOptions) {
-            $fetchOptions = new FetchOptions();
-        }
+        $fetchOptions ??= new FetchOptions();
 
         $event = new AggregateStatRequestEvent($statName, $fromDateTime, $toDateTime, $fetchOptions);
 

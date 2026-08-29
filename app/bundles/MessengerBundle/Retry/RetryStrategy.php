@@ -30,14 +30,12 @@ final class RetryStrategy implements RetryStrategyInterface
 
     private function getRetryStrategy(): RetryStrategyInterface
     {
-        if (!isset($this->retryStrategy)) {
-            $this->retryStrategy = new MultiplierRetryStrategy(
-                (int) $this->parametersHelper->get('messenger_retry_strategy_max_retries'),
-                (int) $this->parametersHelper->get('messenger_retry_strategy_delay'),
-                (float) $this->parametersHelper->get('messenger_retry_strategy_multiplier'),
-                (int) $this->parametersHelper->get('messenger_retry_strategy_max_delay'),
-            );
-        }
+        $this->retryStrategy ??= new MultiplierRetryStrategy(
+            (int) $this->parametersHelper->get('messenger_retry_strategy_max_retries'),
+            (int) $this->parametersHelper->get('messenger_retry_strategy_delay'),
+            (float) $this->parametersHelper->get('messenger_retry_strategy_multiplier'),
+            (int) $this->parametersHelper->get('messenger_retry_strategy_max_delay'),
+        );
 
         return $this->retryStrategy;
     }

@@ -17,9 +17,7 @@ final class VersionProvider implements VersionProviderInterface
 
     public function getVersion(): string
     {
-        if (null === $this->version) {
-            $this->version = $this->fetchVersionFromDb();
-        }
+        $this->version ??= $this->fetchVersionFromDb();
 
         return $this->version;
     }

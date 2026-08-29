@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7894d4d8ebbbc73913f8bcce85e9cfb6",
+    "content-hash": "0ec718c0df375467259855230e4b618c",
     "packages": [
         {
             "name": "api-platform/core",
@@ -17864,16 +17864,25 @@
         },
         {
             "name": "rector/rector",
-            "version": "dev-main",
+            "version": "2.6.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rectorphp/rector.git",
+<<<<<<< HEAD
                 "reference": "b00041d490deb1ed46f3d370249714ce2cc6d4bc"
             },
             "dist": {
                 "type": "zip",
                 "url": "https://api.github.com/repos/rectorphp/rector/zipball/b00041d490deb1ed46f3d370249714ce2cc6d4bc",
                 "reference": "b00041d490deb1ed46f3d370249714ce2cc6d4bc",
+=======
+                "reference": "6ff008471683591224951526247b7a2b86980ba9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/rectorphp/rector/zipball/6ff008471683591224951526247b7a2b86980ba9",
+                "reference": "6ff008471683591224951526247b7a2b86980ba9",
+>>>>>>> 81e71afc61 (null array)
                 "shasum": ""
             },
             "require": {
@@ -17889,7 +17898,10 @@
             "suggest": {
                 "ext-dom": "To manipulate phpunit.xml via the custom-rule command"
             },
+<<<<<<< HEAD
             "default-branch": true,
+=======
+>>>>>>> 81e71afc61 (null array)
             "bin": [
                 "bin/rector"
             ],
@@ -17913,7 +17925,7 @@
             ],
             "support": {
                 "issues": "https://github.com/rectorphp/rector/issues",
-                "source": "https://github.com/rectorphp/rector/tree/main"
+                "source": "https://github.com/rectorphp/rector/tree/2.6.4"
             },
             "funding": [
                 {
@@ -17921,7 +17933,11 @@
                     "type": "github"
                 }
             ],
+<<<<<<< HEAD
             "time": "2026-08-11T09:33:44+00:00"
+=======
+            "time": "2026-08-27T09:20:34+00:00"
+>>>>>>> 81e71afc61 (null array)
         },
         {
             "name": "rector/type-perfect",
@@ -19780,9 +19796,7 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "rector/rector": 20
-    },
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {},

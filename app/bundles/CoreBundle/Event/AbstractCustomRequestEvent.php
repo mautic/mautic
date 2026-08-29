@@ -35,9 +35,7 @@ abstract class AbstractCustomRequestEvent extends Event
                 $this->routeParams = $this->request->attributes->get('_route_params');
             }
 
-            if (null === $this->routeParams) {
-                $this->routeParams = [];
-            }
+            $this->routeParams ??= [];
         }
     }
 

@@ -132,9 +132,7 @@ class CorePermissions implements ResetInterface
         $bundles = array_keys($objects);
 
         foreach ($bundles as $bundle) {
-            if (!isset($bundlePermissions[$bundle])) {
-                $bundlePermissions[$bundle] = [];
-            }
+            $bundlePermissions[$bundle] ??= [];
         }
 
         // do a first round to give bundles a chance to update everything and give an opportunity to require a second round
@@ -203,9 +201,7 @@ class CorePermissions implements ResetInterface
         // Initialize all permission classes if
         $this->getPermissionObjects();
 
-        if (null === $userEntity) {
-            $userEntity = $this->userHelper->getUser();
-        }
+        $userEntity ??= $this->userHelper->getUser();
 
         if (!is_array($requestedPermission)) {
             $requestedPermission = [$requestedPermission];

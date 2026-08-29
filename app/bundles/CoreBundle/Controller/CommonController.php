@@ -588,9 +588,7 @@ class CommonController extends AbstractController implements MauticController
      */
     protected function getNotificationContent(?Request $request = null): array
     {
-        if (null === $request) {
-            $request = $this->getCurrentRequest();
-        }
+        $request ??= $this->getCurrentRequest();
 
         $afterId = $request->get('mauticLastNotificationId');
 

@@ -168,9 +168,7 @@ class ImportModel extends FormModel
      */
     public function beginImport(Import $import, Progress $progress, $limit = 0, ?float $start = null): void
     {
-        if (null === $start) {
-            $start = microtime(true);
-        }
+        $start ??= microtime(true);
 
         $this->setGhostImportsAsFailed();
 

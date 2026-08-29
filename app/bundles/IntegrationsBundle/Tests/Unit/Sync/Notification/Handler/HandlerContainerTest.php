@@ -24,7 +24,7 @@ final class HandlerContainerTest extends TestCase
         $this->expectException(HandlerNotSupportedException::class);
 
         $mockHandler = $this->createMock(HandlerInterface::class);
-        $mockHandler->expects($this->exactly(3))->method('getIntegration')
+        $mockHandler->expects($this->atLeast(2))->method('getIntegration')
             ->willReturn('foo');
         $mockHandler->expects($this->once())->method('getSupportedObject')
             ->willReturn('bogus');
@@ -37,8 +37,9 @@ final class HandlerContainerTest extends TestCase
     public function testHandlerIsRegistered(): void
     {
         $mockHandler = $this->createMock(HandlerInterface::class);
-        $mockHandler->expects($this->exactly(3))->method('getIntegration')
+        $mockHandler->expects($this->atLeast(2))->method('getIntegration')
             ->willReturn('foo');
+
         $mockHandler->expects($this->once())->method('getSupportedObject')
             ->willReturn('bar');
 

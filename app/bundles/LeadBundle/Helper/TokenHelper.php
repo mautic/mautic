@@ -174,9 +174,7 @@ final class TokenHelper
      */
     private static function getParameter(string $parameter)
     {
-        if (null === self::$parameters) {
-            self::$parameters = new ParamsLoaderHelper()->getParameters();
-        }
+        self::$parameters ??= new ParamsLoaderHelper()->getParameters();
 
         return self::$parameters[$parameter];
     }

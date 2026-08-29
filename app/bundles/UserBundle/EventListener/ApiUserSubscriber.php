@@ -57,9 +57,7 @@ final readonly class ApiUserSubscriber implements EventSubscriberInterface
             }
 
             $accessToken = $accessTokenBadge->getAccessToken();
-            if (null === $user) {
-                $user = $this->tokenPermissions->setActivePermissionsOnAuthToken($accessToken);
-            }
+            $user ??= $this->tokenPermissions->setActivePermissionsOnAuthToken($accessToken);
 
             if (null === $user) {
                 return null;

@@ -86,9 +86,7 @@ class Translator implements TranslatorInterface, WarmableInterface, TranslatorBa
      */
     public function hasId(string $id, ?string $domain = null, ?string $locale = null): bool
     {
-        if (null === $domain) {
-            $domain = 'messages';
-        }
+        $domain ??= 'messages';
 
         return $this->getCatalogue($locale)->has($id, $domain);
     }

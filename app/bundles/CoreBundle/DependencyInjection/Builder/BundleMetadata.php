@@ -39,13 +39,9 @@ class BundleMetadata
     {
         $this->metadata = $metadata;
 
-        if (!isset($this->metadata['permissionClasses'])) {
-            $this->metadata['permissionClasses'] = [];
-        }
+        $this->metadata['permissionClasses'] ??= [];
 
-        if (!isset($this->metadata['config'])) {
-            $this->metadata['config'] = [];
-        }
+        $this->metadata['config'] ??= [];
 
         $this->directory  = $metadata['directory'];
         $this->namespace  = $metadata['namespace'];

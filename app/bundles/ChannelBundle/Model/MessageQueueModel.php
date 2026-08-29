@@ -238,12 +238,8 @@ class MessageQueueModel extends FormModel
                 $messageChannelId = 0;
             }
 
-            if (!isset($byChannel[$messageChannel])) {
-                $byChannel[$messageChannel] = [];
-            }
-            if (!isset($byChannel[$messageChannel][$messageChannelId])) {
-                $byChannel[$messageChannel][$messageChannelId] = [];
-            }
+            $byChannel[$messageChannel] ??= [];
+            $byChannel[$messageChannel][$messageChannelId] ??= [];
 
             $byChannel[$messageChannel][$messageChannelId][] = $message;
         }

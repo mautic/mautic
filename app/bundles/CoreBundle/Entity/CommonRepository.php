@@ -426,9 +426,7 @@ class CommonRepository extends ServiceEntityRepository
 
     public function getExpressionBuilder(): ExpressionBuilder
     {
-        if (null === $this->expressionBuilder) {
-            $this->expressionBuilder = new ExpressionBuilder();
-        }
+        $this->expressionBuilder ??= new ExpressionBuilder();
 
         return $this->expressionBuilder;
     }
@@ -531,9 +529,7 @@ class CommonRepository extends ServiceEntityRepository
     ) {
         $isORM = $q instanceof QueryBuilder;
 
-        if (null === $alias) {
-            $alias = $this->getTableAlias();
-        }
+        $alias ??= $this->getTableAlias();
 
         if ($setNowParameter) {
             $now = new \DateTime();
@@ -1361,9 +1357,7 @@ class CommonRepository extends ServiceEntityRepository
                     $alias = $this->getTableAlias();
                 }
 
-                if (!isset($selects[$alias])) {
-                    $selects[$alias] = [];
-                }
+                $selects[$alias] ??= [];
 
                 $selects[$alias][] = $select;
             }

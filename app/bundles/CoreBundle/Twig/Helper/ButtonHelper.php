@@ -254,9 +254,7 @@ final class ButtonHelper
             $this->wrapClosingTag = "</li>\n";
         }
 
-        if (!isset($button['attr'])) {
-            $button['attr'] = [];
-        }
+        $button['attr'] ??= [];
 
         // Add or remove button classes based on group type
         if (self::TYPE_GROUP === $this->groupType || (self::TYPE_BUTTON_DROPDOWN === $this->groupType && $buttonCount < $this->listMarker)) {
@@ -272,9 +270,7 @@ final class ButtonHelper
                 "{$this->wrapClosingTag}\n";
         } else {
             // Default `data-toggle` for buttons
-            if (!isset($button['attr']['data-toggle'])) {
-                $button['attr']['data-toggle'] = 'ajax';
-            }
+            $button['attr']['data-toggle'] ??= 'ajax';
 
             // Generate tooltip and other attributes
             $btnTextAttr = $this->generateTextAttributes($button);
