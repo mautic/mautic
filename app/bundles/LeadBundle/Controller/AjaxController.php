@@ -573,19 +573,33 @@ final class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($data);
     }
 
+    /**
+     * @param array<int, string> $tags
+     *
+     * @return array<int, Tag>
+     */
+    private function getNewLeadTags(array $tags, LeadModel $leadModel): array
+    {
+        $newTags     = [];
+        $tagRepository = $leadModel->getTagRepository();
+
+        foreach ($tags as $tag) {
+            $existingTag = is_numeric($tag) ? $tagRepository->find((int) $tag) : null;
+            if (!$existingTag) {
+                $newTags[] = $tagRepository->getTagByNameOrCreateNewOne($tag);
+            }
+        }
+
+        return $newTags;
+    }
+
     public function addLeadTagsAction(Request $request, LeadModel $leadModel): JsonResponse
     {
         $tags = $request->request->get('tags');
         $tags = json_decode($tags, true);
 
         if (is_array($tags)) {
-            $newTags = [];
-
-            foreach ($tags as $tag) {
-                if (!is_numeric($tag)) {
-                    $newTags[] = $leadModel->getTagRepository()->getTagByNameOrCreateNewOne($tag);
-                }
-            }
+            $newTags = $this->getNewLeadTags($tags, $leadModel);
 
             if ([] !== $newTags) {
                 $leadModel->getTagRepository()->saveEntities($newTags);
