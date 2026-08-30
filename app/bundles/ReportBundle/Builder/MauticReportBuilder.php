@@ -391,6 +391,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
             // 4. Add missing non-aggregated columns to groupByColumns
             $groupByColumns = array_merge($groupByColumns, $nonAggregatedColumns);
+            $queryBuilder->resetQueryPart('groupBy'); // Clear existing GROUP BY
             if ($groupByColumns) {
                 $queryBuilder->addGroupBy($groupByColumns); // Add updated GROUP BY
             }
