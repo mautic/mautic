@@ -28,9 +28,8 @@ class BundleMetadata
      * @param array<string, mixed> $metadata
      */
     public function __construct(
-        private array $metadata
-    )
-    {
+        private array $metadata,
+    ) {
         $this->metadata['permissionClasses'] ??= [];
 
         $this->metadata['config'] ??= [];
