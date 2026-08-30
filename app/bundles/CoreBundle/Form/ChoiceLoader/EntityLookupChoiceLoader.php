@@ -211,7 +211,7 @@ final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
             $composite = null;
 
             $limit = 100;
-            if ($data) {
+            if ($data !== []) {
                 $composite = CompositeExpression::and(
                     $expr->in($alias.'.id', ':dataIds')
                 );

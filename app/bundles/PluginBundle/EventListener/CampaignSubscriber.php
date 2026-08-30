@@ -51,7 +51,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
                 continue;
             }
 
-            $event->fail($log, $errors ? implode('<br />', $errors) : 'Integration push failed.');
+            $event->fail($log, $errors !== [] ? implode('<br />', $errors) : 'Integration push failed.');
         }
     }
 }

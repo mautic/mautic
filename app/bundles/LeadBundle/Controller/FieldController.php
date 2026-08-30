@@ -495,7 +495,7 @@ final class FieldController extends FormController
             if ([] !== $deleteIds) {
                 try {
                     $entities = $this->fieldModel->deleteEntities($deleteIds);
-                    if ($entities) {
+                    if ($entities !== []) {
                         $flashes[] = [
                             'type'    => 'notice',
                             'msg'     => 'mautic.lead.field.notice.batch_deleted',
