@@ -26,8 +26,11 @@ return RectorConfig::configure()
     ->withRules([
         Utils\Rector\AssertTrueResponseIsOkToAssertResponseIsSuccessfulRector::class,
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
         Rector\Php74\Rector\If_\IfToNullCoalescingAssignRector::class,
+=======
+>>>>>>> 83ebeeaf52 (cleanup)
 
 >>>>>>> 81788f95a6 ([php 7.4] coal assign)
         Rector\PHPUnit\CodeQuality\Rector\ClassMethod\AssertClassToThisAssertRector::class,
