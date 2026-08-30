@@ -25,14 +25,6 @@ return RectorConfig::configure()
     ->withCache(__DIR__.'/var/cache/rector')
     ->withRules([
         Utils\Rector\AssertTrueResponseIsOkToAssertResponseIsSuccessfulRector::class,
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-        Rector\Php74\Rector\If_\IfToNullCoalescingAssignRector::class,
-=======
->>>>>>> 83ebeeaf52 (cleanup)
-
->>>>>>> 81788f95a6 ([php 7.4] coal assign)
         Rector\PHPUnit\CodeQuality\Rector\ClassMethod\AssertClassToThisAssertRector::class,
         Rector\TypeDeclarationDocblocks\Rector\Property\MergePhpstanDocTagIntoNativeRector::class,
 

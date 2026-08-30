@@ -17868,21 +17868,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/rectorphp/rector.git",
-<<<<<<< HEAD
                 "reference": "b00041d490deb1ed46f3d370249714ce2cc6d4bc"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/rectorphp/rector/zipball/b00041d490deb1ed46f3d370249714ce2cc6d4bc",
-                "reference": "b00041d490deb1ed46f3d370249714ce2cc6d4bc",
-=======
-                "reference": "6ff008471683591224951526247b7a2b86980ba9"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/rectorphp/rector/zipball/6ff008471683591224951526247b7a2b86980ba9",
-                "reference": "6ff008471683591224951526247b7a2b86980ba9",
->>>>>>> 81e71afc61 (null array)
                 "shasum": ""
             },
             "require": {
@@ -17898,10 +17884,7 @@
             "suggest": {
                 "ext-dom": "To manipulate phpunit.xml via the custom-rule command"
             },
-<<<<<<< HEAD
             "default-branch": true,
-=======
->>>>>>> 81e71afc61 (null array)
             "bin": [
                 "bin/rector"
             ],

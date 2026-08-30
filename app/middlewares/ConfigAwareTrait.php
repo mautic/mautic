@@ -11,10 +11,7 @@ trait ConfigAwareTrait
      */
     protected $config = [];
 
-    /**
-     * @return array
-     */
-    public function getConfig()
+    public function getConfig(): array
     {
         // Include paths
         $root          = realpath(__DIR__.'/..');
