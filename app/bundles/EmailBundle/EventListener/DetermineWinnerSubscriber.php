@@ -44,7 +44,7 @@ final readonly class DetermineWinnerSubscriber implements EventSubscriberInterfa
             // get their bounce rates
             $counts = $this->statRepository->getOpenedRates($ids, $startDate, $parent->getVariantEndDate());
 
-            if ($counts !== []) {
+            if ([] !== $counts) {
                 $rates      = $support      = $data      = [];
                 $hasResults = [];
 
@@ -135,7 +135,7 @@ final readonly class DetermineWinnerSubscriber implements EventSubscriberInterfa
             $clickthroughCounts = $this->hitRepository->getEmailClickthroughHitCount($ids, $startDate, 200, $parent->getVariantEndDate());
             $sentCounts         = $this->statRepository->getSentCounts($ids, $startDate, $parent->getVariantEndDate());
 
-            if ($clickthroughCounts !== []) {
+            if ([] !== $clickthroughCounts) {
                 $rates      = $support      = $data      = [];
                 $hasResults = [];
 
