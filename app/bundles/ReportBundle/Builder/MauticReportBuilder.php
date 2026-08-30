@@ -183,27 +183,37 @@ final class MauticReportBuilder implements ReportBuilderInterface
         }
 
         // Build ORDER BY clause
+        $orderByColumns = [];
         if (!empty($options['order'])) {
             if (is_array($options['order'])) {
                 if (isset($options['order']['column'])) {
                     $queryBuilder->orderBy($options['order']['column'], $options['order']['direction']);
+                    $orderByColumns[] = $options['order']['column'];
                 } elseif (!empty($options['order'][0][1])) {
                     [$column, $dir] = $options['order'];
                     $queryBuilder->orderBy($column, $dir);
+                    $orderByColumns[] = $column;
                 } else {
                     foreach ($options['order'] as $order) {
                         $queryBuilder->orderBy($order);
+
+                        if (is_string($order)) {
+                            $orderByColumns[] = $order;
+                        }
                     }
                 }
             } else {
                 $queryBuilder->orderBy($options['order']);
+                $orderByColumns[] = $options['order'];
             }
         } elseif ($order = $this->entity->getTableOrder()) {
             foreach ($order as $o) {
                 if (!empty($options['columns'][$o['column']]['formula'])) {
                     $queryBuilder->orderBy($options['columns'][$o['column']]['formula'], $o['direction']);
+                    $orderByColumns[] = $options['columns'][$o['column']]['formula'];
                 } elseif (!empty($o['column'])) {
                     $queryBuilder->orderBy($o['column'], $o['direction']);
+                    $orderByColumns[] = $o['column'];
                 }
             }
         }
@@ -247,18 +257,19 @@ final class MauticReportBuilder implements ReportBuilderInterface
             }
         }
 
-        $selectColumns = [];
-        $aggregators     = $this->entity->getAggregators();
+        $selectColumns          = [];
+        $aggregators            = $this->entity->getAggregators();
+        $groupByColumns         = $queryBuilder->getQueryPart('groupBy') ?? [];
+        $groupByColumnsKeys     = array_flip($groupByColumns);
+        $aggregatorFieldKeys    = $groupByOptions && $aggregators
+            ? array_flip(array_column($aggregators, 'column'))
+            : [];
+        $ungroupedSelectColumns = [];
 
         // Build SELECT clause
         if (!$event->getSelectColumns()) {
-            $fields             = $this->entity->getColumns();
-            $groupByColumns     = $queryBuilder->getQueryPart('groupBy');
-            $groupByColumnsKeys = array_flip($groupByColumns);
-            $groupByFieldKeys   = $groupByOptions ? array_flip($groupByOptions) : [];
-            $aggregatorFieldKeys = $groupByOptions && $aggregators
-                ? array_flip(array_column($aggregators, 'column'))
-                : [];
+            $fields           = $this->entity->getColumns();
+            $groupByFieldKeys = $groupByOptions ? array_flip($groupByOptions) : [];
 
             foreach ($fields as $field) {
                 // With GROUP BY + aggregators, a column listed only for COUNT/AVG must not
@@ -281,7 +292,8 @@ final class MauticReportBuilder implements ReportBuilderInterface
                         } elseif (isset($fieldOptions['formula'])) {
                             $selectText = $fieldOptions['formula'];
                         } else {
-                            $selectText = $this->sanitizeColumnName($field);
+                            $selectText                = $this->sanitizeColumnName($field);
+                            $ungroupedSelectColumns[] = $field;
                         }
                     }
 
@@ -298,6 +310,33 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
                     $selectColumns[] = $selectText;
                 }
+            }
+        }
+
+        // Complete GROUP BY with explicitly selected or ordered columns that are not
+        // aggregated, so grouped reports stay valid under ONLY_FULL_GROUP_BY (and on
+        // engines without functional-dependency detection) without silently dropping
+        // columns the user asked for. Aggregator targets are deliberately excluded:
+        // they appear in SELECT only as the aggregate expression.
+        if ($groupByColumns && ($ungroupedSelectColumns || $orderByColumns)) {
+            $missingGroupBy = [];
+
+            foreach (array_merge($ungroupedSelectColumns, $orderByColumns) as $column) {
+                if (str_contains($column, '{{count}}')) {
+                    continue;
+                }
+
+                if (isset($groupByColumnsKeys[$column]) || isset($aggregatorFieldKeys[$column])) {
+                    continue;
+                }
+
+                $groupByColumns[]            = $column;
+                $groupByColumnsKeys[$column] = true;
+                $missingGroupBy[]            = $column;
+            }
+
+            if ($missingGroupBy) {
+                $queryBuilder->addGroupBy(...$missingGroupBy);
             }
         }
 

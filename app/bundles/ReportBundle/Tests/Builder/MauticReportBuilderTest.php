@@ -185,6 +185,92 @@ final class MauticReportBuilderTest extends TestCase
         $this->assertStringNotContainsString('`ph`.`id`', $query->getSql());
     }
 
+    public function testGroupByCompletesMissingSelectColumnInsteadOfDroppingIt(): void
+    {
+        $report = new Report();
+        $report->setColumns(['ph.url', 'p.title']);
+        $report->setGroupBy(['ph.url']);
+
+        $builder = $this->buildBuilder($report);
+        $query   = $builder->getQuery([
+            'columns' => [
+                'ph.url'  => [],
+                'p.title' => [],
+            ],
+            'groupBy' => ['ph.url'],
+        ]);
+
+        $this->assertSame(trim(preg_replace('/\s{2,}/', ' ', '
+            SELECT `ph`.`url`, `p`.`title` GROUP BY ph.url, p.title
+        ')), $query->getSql());
+    }
+
+    public function testGroupByCompletesFunctionallyDependentSelectColumn(): void
+    {
+        $report = new Report();
+        $report->setColumns(['e.id', 'e.subject']);
+        $report->setGroupBy(['e.id']);
+
+        $builder = $this->buildBuilder($report);
+        $query   = $builder->getQuery([
+            'columns' => [
+                'e.id'      => [],
+                'e.subject' => [],
+            ],
+            'groupBy' => ['e.id'],
+        ]);
+
+        $this->assertSame(trim(preg_replace('/\s{2,}/', ' ', '
+            SELECT `e`.`id`, `e`.`subject` GROUP BY e.id, e.subject
+        ')), $query->getSql());
+    }
+
+    public function testGroupByCompletesMissingOrderByColumn(): void
+    {
+        $report = new Report();
+        $report->setColumns(['ph.url']);
+        $report->setGroupBy(['ph.url']);
+
+        $builder = $this->buildBuilder($report);
+        $query   = $builder->getQuery([
+            'columns' => [
+                'ph.url' => [],
+            ],
+            'order'   => ['p.title', 'DESC'],
+            'groupBy' => ['ph.url'],
+        ]);
+
+        $this->assertSame(trim(preg_replace('/\s{2,}/', ' ', '
+            SELECT `ph`.`url` GROUP BY ph.url, p.title ORDER BY p.title DESC
+        ')), $query->getSql());
+    }
+
+    public function testGroupByKeepsAggregatorTargetOutOfGroupByWhenOrdered(): void
+    {
+        $report = new Report();
+        $report->setColumns(['ph.url']);
+        $report->setGroupBy(['ph.url']);
+        $report->setAggregators([
+            [
+                'column'   => 'ph.id',
+                'function' => 'COUNT',
+            ],
+        ]);
+
+        $builder = $this->buildBuilder($report);
+        $query   = $builder->getQuery([
+            'columns' => [
+                'ph.url' => [],
+            ],
+            'order'   => ['ph.id', 'DESC'],
+            'groupBy' => ['ph.url'],
+        ]);
+
+        $this->assertSame(trim(preg_replace('/\s{2,}/', ' ', '
+            SELECT `ph`.`url`, COUNT(ph.id) AS \'COUNT ph.id\' GROUP BY ph.url ORDER BY ph.id DESC
+        ')), $query->getSql());
+    }
+
     public function testReportWithPreciseAvg(): void
     {
         $report = new Report();
