@@ -25,28 +25,20 @@ class BundleMetadata
     private $bundleName;
 
     /**
-     * @var array<string, mixed>
-     */
-    private array $metadata = [
-        'config'            => [],
-        'permissionClasses' => [],
-    ];
-
-    /**
      * @param array<string, mixed> $metadata
      */
-    public function __construct(array $metadata)
+    public function __construct(
+        private array $metadata
+    )
     {
-        $this->metadata = $metadata;
-
         $this->metadata['permissionClasses'] ??= [];
 
         $this->metadata['config'] ??= [];
 
-        $this->directory  = $metadata['directory'];
-        $this->namespace  = $metadata['namespace'];
-        $this->baseName   = $metadata['bundle'];
-        $this->bundleName = $metadata['symfonyBundleName'];
+        $this->directory  = $this->metadata['directory'];
+        $this->namespace  = $this->metadata['namespace'];
+        $this->baseName   = $this->metadata['bundle'];
+        $this->bundleName = $this->metadata['symfonyBundleName'];
     }
 
     public function getDirectory(): string

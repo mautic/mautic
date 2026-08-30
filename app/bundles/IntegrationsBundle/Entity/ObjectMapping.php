@@ -246,10 +246,7 @@ class ObjectMapping
         return $this->lastSyncDate;
     }
 
-    /**
-     * @param \DateTimeInterface|null $lastSyncDate
-     */
-    public function setLastSyncDate($lastSyncDate): static
+    public function setLastSyncDate(?\DateTimeInterface $lastSyncDate): static
     {
         $lastSyncDate ??= new \DateTime();
 

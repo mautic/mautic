@@ -101,9 +101,8 @@ final readonly class MenuHelper
      *
      * @param ItemInterface|string|array<ItemInterface|string> $menu
      * @param array<string, mixed>                             $options
-     * @param string                                           $renderer
      */
-    public function render($menu, array $options = [], $renderer = null): string
+    public function render($menu, array $options = [], ?string $renderer = null): string
     {
         $renderer ??= $menu;
         $options['menu'] = $menu;

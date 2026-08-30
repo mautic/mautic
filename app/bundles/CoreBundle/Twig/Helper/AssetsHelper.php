@@ -144,10 +144,8 @@ final class AssetsHelper
      *
      * If changing the context from app, it's important to reset the context back to app after
      * injecting/fetching assets for a different context.
-     *
-     * @param string $context
      */
-    public function setContext($context = self::CONTEXT_APP): self
+    public function setContext(string $context = self::CONTEXT_APP): self
     {
         $this->context = $context;
         $this->assets[$context] ??= [];

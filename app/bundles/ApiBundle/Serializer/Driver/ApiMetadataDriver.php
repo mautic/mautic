@@ -82,7 +82,7 @@ final class ApiMetadataDriver implements DriverInterface
     /**
      * Create a new property.
      */
-    public function createProperty($name): static
+    public function createProperty(?string $name): static
     {
         $this->properties[$name] ??= new PropertyMetadata($this->metadata->name, $name);
 

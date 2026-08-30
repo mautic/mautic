@@ -17,7 +17,7 @@ final class ParamsLoaderHelper
      */
     public function getParameters(): array
     {
-        if (empty($this->parameters)) {
+        if ([] === $this->parameters) {
             $this->parameters = $this->getConfig();
         }
 
