@@ -61,7 +61,7 @@ final class ContactExportAdminNotificationsDisabledTest extends MauticMysqlTestC
             's/contacts/batchExport',
             ['filetype' => 'csv']
         );
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         /** @var ContactExportScheduler $contactExportScheduler */
         $contactExportScheduler   = $this->checkContactExportScheduler(1)[0];
