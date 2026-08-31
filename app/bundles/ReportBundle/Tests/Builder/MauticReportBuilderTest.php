@@ -401,6 +401,74 @@ final class MauticReportBuilderTest extends TestCase
         ")), $query->getSql());
     }
 
+    public function testGroupByIgnoresDoubleQuotedStringLiteralsInFormulas(): void
+    {
+        $report = new Report();
+        $report->setColumns(['e.id', 'focus_views']);
+        $report->setGroupBy(['e.id']);
+
+        // Shape of the FocusBundle report columns: a CASE expression whose
+        // condition compares a column to a double-quoted string literal.
+        $formula = 'CASE WHEN fs.type = "view" THEN 1 ELSE 0 END';
+
+        $builder = $this->buildBuilder($report);
+        $query   = $builder->getQuery([
+            'columns' => [
+                'e.id'        => [],
+                'focus_views' => ['formula' => $formula],
+            ],
+            'groupBy' => ['e.id'],
+        ]);
+
+        // The contents of the double-quoted literal ("view") are a string, not
+        // a column: only the CASE's real column reference may be completed into
+        // the outer GROUP BY.
+        $this->assertSame(trim(preg_replace('/\s{2,}/', ' ', "
+            SELECT `e`.`id`, $formula GROUP BY e.id, fs.type
+        ")), $query->getSql());
+    }
+
+    public function testGroupByStripDoesNotSwallowSubqueryAfterDoubleQuotedLiteral(): void
+    {
+        $report = new Report();
+        $report->setColumns(['e.id', 'hit_count']);
+        $report->setGroupBy(['e.id']);
+
+        // Shape of the FocusBundle hit_count column: the CASE condition's
+        // double-quoted literal is followed by a parenthesized subquery that
+        // itself contains GROUP BY. A strip pattern that spans from one
+        // double-quoted literal to the next would swallow the subquery's
+        // opening parenthesis, and its GROUP BY keywords would then leak into
+        // the outer GROUP BY as identifiers (invalid SQL).
+        $formula = 'CASE WHEN fs.type = "view" THEN (
+                        SELECT COUNT(fs2.id)
+                        FROM test_focus_stats fs2
+                        WHERE fs2.type = "view"
+                        AND fs2.focus_id = fs.focus_id
+                        GROUP BY fs2.focus_id
+                    ) ELSE MAX(fs.hits) END';
+
+        $builder = $this->buildBuilder($report);
+        $query   = $builder->getQuery([
+            'columns' => [
+                'e.id'       => [],
+                'hit_count'  => ['formula' => $formula],
+            ],
+            'groupBy' => ['e.id'],
+        ]);
+
+        $sql = $query->getSql();
+        $this->assertStringNotContainsString('fs2.focus_id, GROUP', $sql);
+        $this->assertStringNotContainsString('GROUP BY GROUP', $sql);
+        // The CASE's base column is completed; nothing from the subquery scope is.
+        $this->assertSame(
+            trim(preg_replace('/\s{2,}/', ' ', "
+            SELECT `e`.`id`, $formula GROUP BY e.id, fs.type
+        ")),
+            trim(preg_replace('/\s{2,}/', ' ', $sql))
+        );
+    }
+
     public function testReportWithPreciseAvg(): void
     {
         $report = new Report();

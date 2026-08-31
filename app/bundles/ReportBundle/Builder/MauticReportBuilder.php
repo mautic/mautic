@@ -349,7 +349,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         // listener are merged in rather than appended a second time.
         if ($groupByColumns) {
             $normalizedAggregatorKeys = array_flip(array_map(
-                fn (string $column): string => $this->normalizeColumnIdentifier($column),
+                $this->normalizeColumnIdentifier(...),
                 array_keys($aggregatorFieldKeys)
             ));
             $normalizedGroupBy = [];
@@ -462,8 +462,15 @@ final class MauticReportBuilder implements ReportBuilderInterface
      */
     private function extractBaseColumns(string $expression): array
     {
-        // Strip string literals so their contents are never scanned.
-        $expression = preg_replace("/'(?:[^'\\\\]|\\\\.|'')*'/", "''", $expression) ?? '';
+        // Strip string literals so their contents are never scanned. MySQL
+        // treats both single- and double-quoted strings as literals (FocusBundle
+        // and several channel subscribers write conditions like fs.type = "view").
+        // A doubled-quote alternative in the pattern would let one match span
+        // from a literal's closing quote to the next literal's opening quote,
+        // swallowing everything between them (including subquery parens), so
+        // escapes are handled by the \\. branch instead.
+        $expression = preg_replace("/'(?:\\\\.|[^'\\\\])*'/", "''", $expression) ?? '';
+        $expression = preg_replace('/"(?:\\\\.|[^"\\\\])*"/', '""', $expression) ?? '';
 
         // Remove subqueries and aggregate-function calls, arguments included:
         // those identifiers are aggregated or belong to another query scope.
