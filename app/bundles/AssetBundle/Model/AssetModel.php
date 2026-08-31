@@ -259,9 +259,9 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         $download->setReferer($request->server->get('HTTP_REFERER'));
 
         // Dispatch event
-        if ($this->dispatcher->hasListeners(AssetEvents::ASSET_ON_LOAD)) {
+        if ($this->dispatcher->hasListeners(AssetLoadEvent::class)) {
             $event = new AssetLoadEvent($download, $isUnique);
-            $this->dispatcher->dispatch($event, AssetEvents::ASSET_ON_LOAD);
+            $this->dispatcher->dispatch($event);
         }
 
         // Wrap in a try/catch to prevent deadlock errors on busy servers

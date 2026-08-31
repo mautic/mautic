@@ -265,6 +265,18 @@
      }
     ```
 
+- AssetBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\AssetBundle\AssetEvents` string constants. This covers the `ASSET_ON_LOAD` (`AssetLoadEvent`) and `ASSET_ON_REMOTE_BROWSE` (`RemoteAssetBrowseEvent`) events; the `AssetEvent` CRUD/toggle group (`ASSET_ON_UPLOAD`, `ASSET_PRE_SAVE`, `ASSET_POST_SAVE`, `ASSET_PRE_DELETE`, `ASSET_POST_DELETE`) keeps its string constants because one event object is reused under several names. Update any subscriber or listener that keys on a converted constant to key on the event class instead:
+
+    ```diff
+     public static function getSubscribedEvents(): array
+     {
+         return [
+    -        AssetEvents::ASSET_ON_LOAD => ['onAssetDownload', 0],
+    +        AssetLoadEvent::class => ['onAssetDownload', 0],
+         ];
+     }
+    ```
+
     Dispatching drops the redundant second argument, e.g. `$dispatcher->dispatch($event, PluginEvents::ON_PLUGIN_INSTALL)` becomes `$dispatcher->dispatch($event)`. The `Mautic\PluginBundle\PluginEvents` constants are kept for backwards compatibility but are no longer used internally for the events below. Constants that share an event class (e.g. the `PLUGIN_ON_INTEGRATION_KEYS_ENCRYPT` / `_KEYS_DECRYPT` / `_KEYS_MERGE` group and the `PLUGIN_ON_INTEGRATION_REQUEST` / `_RESPONSE` pair) are unchanged.
 
     Full mapping of the converted constants to their event class (all in the `Mautic\PluginBundle\Event` namespace):
