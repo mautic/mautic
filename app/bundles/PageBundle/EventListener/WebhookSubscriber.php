@@ -8,7 +8,6 @@ use Mautic\PageBundle\Event\PageHitEvent;
 use Mautic\PageBundle\PageEvents;
 use Mautic\WebhookBundle\Event\WebhookBuilderEvent;
 use Mautic\WebhookBundle\Model\WebhookModel;
-use Mautic\WebhookBundle\WebhookEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class WebhookSubscriber implements EventSubscriberInterface
@@ -21,8 +20,8 @@ final readonly class WebhookSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            WebhookEvents::WEBHOOK_ON_BUILD => ['onWebhookBuild', 0],
-            PageEvents::PAGE_ON_HIT         => ['onPageHit', 0],
+            WebhookBuilderEvent::class => ['onWebhookBuild', 0],
+            PageEvents::PAGE_ON_HIT    => ['onPageHit', 0],
         ];
     }
 

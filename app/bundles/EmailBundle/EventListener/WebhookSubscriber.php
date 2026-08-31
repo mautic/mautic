@@ -8,7 +8,6 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\WebhookBundle\Event\WebhookBuilderEvent;
 use Mautic\WebhookBundle\Event\WebhookQueueEvent;
 use Mautic\WebhookBundle\Model\WebhookModel;
-use Mautic\WebhookBundle\WebhookEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class WebhookSubscriber implements EventSubscriberInterface
@@ -24,8 +23,8 @@ final readonly class WebhookSubscriber implements EventSubscriberInterface
         return [
             EmailEvents::EMAIL_ON_SEND          => ['onEmailSend', 0],
             EmailEvents::EMAIL_ON_OPEN          => ['onEmailOpen', 0],
-            WebhookEvents::WEBHOOK_ON_BUILD     => ['onWebhookBuild', 0],
-            WebhookEvents::WEBHOOK_QUEUE_ON_ADD => ['onWebhookQueueOnAdd', 0],
+            WebhookBuilderEvent::class          => ['onWebhookBuild', 0],
+            WebhookQueueEvent::class            => ['onWebhookQueueOnAdd', 0],
         ];
     }
 

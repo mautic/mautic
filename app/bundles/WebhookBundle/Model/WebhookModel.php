@@ -211,7 +211,7 @@ class WebhookModel extends FormModel
             // build them
             $events = [];
             $event  = new Events\WebhookBuilderEvent($this->translator);
-            $this->dispatcher->dispatch($event, WebhookEvents::WEBHOOK_ON_BUILD);
+            $this->dispatcher->dispatch($event);
             $events = $event->getEvents();
         }
 
@@ -274,9 +274,9 @@ class WebhookModel extends FormModel
         $queue->setPayload($serializedPayload);
 
         // fire events for when the queues are created
-        if ($this->dispatcher->hasListeners(WebhookEvents::WEBHOOK_QUEUE_ON_ADD)) {
+        if ($this->dispatcher->hasListeners(Events\WebhookQueueEvent::class)) {
             $webhookQueueEvent = $event = new Events\WebhookQueueEvent($queue, $webhook, true);
-            $this->dispatcher->dispatch($webhookQueueEvent, WebhookEvents::WEBHOOK_QUEUE_ON_ADD);
+            $this->dispatcher->dispatch($webhookQueueEvent);
         }
 
         return $queue;
