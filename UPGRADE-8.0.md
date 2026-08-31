@@ -356,6 +356,7 @@
     | `PageEvents::REDIRECT_DO_NOT_TRACK` | `UntrackableUrlsEvent` |
     | `PageEvents::ON_REDIRECT_GENERATE` | `RedirectGenerationEvent` |
     | `PageEvents::ON_CONTACT_TRACKED` | `TrackingEvent` |
+- The `Mautic\NotificationBundle\Event\NotificationSendEvent` (`NotificationEvents::NOTIFICATION_ON_SEND`) is now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `mautic.notification_on_send` string constant. Update any listener that keys on `NotificationEvents::NOTIFICATION_ON_SEND` to key on `NotificationSendEvent::class` instead. The constant is kept for backwards compatibility but is no longer used internally. The `NotificationEvent` CRUD events (`NOTIFICATION_PRE_SAVE` / `POST_SAVE` / `PRE_DELETE` / `POST_DELETE`) share one event object and are still dispatched under their string names.
 
 - `Mautic\CoreBundle\Factory\ModelFactory` now builds its service locator from a `defaultIndexMethod` on the `mautic.model` tag, replacing the removed `Mautic\CoreBundle\DependencyInjection\Compiler\ModelPass`. Every model (a service implementing `Mautic\CoreBundle\Model\MauticModelInterface`) declares its `ModelFactory::getModel()` lookup key via a static `getName()` method:
 
