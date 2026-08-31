@@ -49,20 +49,6 @@ final class CoreEvents
     public const string FETCH_ICONS = 'mautic.on_fetch_icons';
 
     /**
-     * The mautic.pre_upgrade is dispatched before an upgrade.
-     *
-     * The event listener receives a Mautic\CoreBundle\Event\UpgradeEvent instance.
-     */
-    public const string PRE_UPGRADE = 'mautic.pre_upgrade';
-
-    /**
-     * The mautic.post_upgrade is dispatched after an upgrade.
-     *
-     * The event listener receives a Mautic\CoreBundle\Event\UpgradeEvent instance.
-     */
-    public const string POST_UPGRADE = 'mautic.post_upgrade';
-
-    /**
      * The mautic.build_embeddable_js event is dispatched to allow plugins to extend the mautic tracking js.
      *
      * The event listener receives a Mautic\CoreBundle\Event\BuildJsEvent instance.
