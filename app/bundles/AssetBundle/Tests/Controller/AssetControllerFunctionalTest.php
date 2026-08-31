@@ -6,6 +6,7 @@ namespace Mautic\AssetBundle\Tests\Controller;
 
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Tests\Asset\AbstractAssetTestCase;
+use Mautic\AssetBundle\Tests\RemoteFileServerTrait;
 use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
 use Mautic\PageBundle\Tests\Controller\PageControllerTest;
 use Mautic\ProjectBundle\Entity\Project;
@@ -23,6 +24,7 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 {
     use ControllerTrait;
+    use RemoteFileServerTrait;
 
     private const string SALES_USER = 'sales';
 
@@ -39,7 +41,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
             $this->configParams['allowed_remote_domains']  = [
                 'first-allowed.tld',
                 'second-allowed.tld',
-                'fastly.picsum.photos',
+                '127.0.0.1',
             ];
         }
 
@@ -49,7 +51,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
     public function testCreateAndEditRemoteImageAssetWithQueryString(): void
     {
         $title   = 'Remote image asset with query string';
-        $fileUrl = 'https://fastly.picsum.photos/id/13/2500/1667.jpg?hmac=SoX9UoHhN8HyklRA4A3vcCWJMVtiBXUg0W4ljWTor7s';
+        $fileUrl = $this->serveRemoteFile('image.jpg').'?hmac=SoX9UoHhN8HyklRA4A3vcCWJMVtiBXUg0W4ljWTor7s';
 
         $crawlerCreate = $this->client->request(Request::METHOD_GET, '/s/assets/new');
         $createForm    = $crawlerCreate->selectButton('Save')->form();
