@@ -13,21 +13,21 @@ use Mautic\EmailBundle\MonitoredEmail\Exception\ReplyNotFound;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Reply\Parser;
 use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
-use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class Reply implements ProcessorInterface
+final readonly class Reply implements ProcessorInterface
 {
     public function __construct(
         private EmailStatModel $emailStatModel,
         private ContactFinder $contactFinder,
-        private LeadModel $leadModel,
         private EventDispatcherInterface $dispatcher,
         private LoggerInterface $logger,
         private ContactTracker $contactTracker,
         private EmailAddressHelper $addressHelper,
+        private LeadRepository $leadRepository,
     ) {
     }
 
@@ -69,7 +69,7 @@ class Reply implements ProcessorInterface
         $this->dispatchEvent($stat);
 
         if (null !== $stat->getLead()) {
-            $this->leadModel->getRepository()->detachEntity($stat->getLead());
+            $this->leadRepository->detachEntity($stat->getLead());
         }
         $this->emailStatModel->getRepository()->detachEntity($stat);
     }
@@ -105,7 +105,7 @@ class Reply implements ProcessorInterface
     /**
      * @param string $messageId
      */
-    protected function createReply(Stat $stat, $messageId)
+    private function createReply(Stat $stat, $messageId): void
     {
         $replies = $stat->getReplies()->filter(
             fn (EmailReply $reply): bool => $reply->getMessageId() === $messageId

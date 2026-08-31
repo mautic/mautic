@@ -6,7 +6,7 @@ namespace Mautic\WebhookBundle\Tests\Unit\Entity;
 
 use Mautic\WebhookBundle\Entity\Log;
 
-class LogTest extends \PHPUnit\Framework\TestCase
+final class LogTest extends \PHPUnit\Framework\TestCase
 {
     public function testSetNote(): void
     {

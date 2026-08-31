@@ -10,10 +10,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
-class SegmentUsedInCampaignsValidator extends ConstraintValidator
+final class SegmentUsedInCampaignsValidator extends ConstraintValidator
 {
-    public function __construct(private InternalValidator $internalValidator)
-    {
+    public function __construct(
+        private readonly InternalValidator $internalValidator,
+    ) {
     }
 
     public function validate(mixed $segment, Constraint $constraint): void

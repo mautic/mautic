@@ -26,18 +26,27 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Widget>
  */
-class WidgetApiController extends CommonApiController
+final class WidgetApiController extends CommonApiController
 {
     /**
      * @var DashboardModel|null
      */
     protected $model;
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper)
-    {
-        $dashboardModel = $modelFactory->getModel('dashboard');
-        \assert($dashboardModel instanceof DashboardModel);
-
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        DashboardModel $dashboardModel,
+    ) {
         $this->model            = $dashboardModel;
         $this->entityClass      = Widget::class;
         $this->entityNameOne    = 'widget';
@@ -49,15 +58,12 @@ class WidgetApiController extends CommonApiController
 
     /**
      * Obtains a list of available widget types.
-     *
-     * @return Response
      */
-    public function getTypesAction()
+    public function getTypesAction(): Response
     {
-        $dispatcher = $this->dispatcher;
-        $event      = new WidgetTypeListEvent();
+        $event = new WidgetTypeListEvent();
         $event->setTranslator($this->translator);
-        $dispatcher->dispatch($event, DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE);
+        $this->dispatcher->dispatch($event, DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE);
         $view = $this->view(['success' => 1, 'types' => $event->getTypes()], Response::HTTP_OK);
 
         return $this->handleView($view);
@@ -67,16 +73,14 @@ class WidgetApiController extends CommonApiController
      * Obtains a list of available widget types.
      *
      * @param string $type of the widget
-     *
-     * @return Response
      */
-    public function getDataAction(Request $request, $type)
+    public function getDataAction(Request $request, string $type): Response
     {
         $start      = microtime(true);
-        $timezone   = InputHelper::clean($request->get('timezone', null));
-        $from       = InputHelper::clean($request->get('dateFrom', null));
-        $to         = InputHelper::clean($request->get('dateTo', null));
-        $dataFormat = InputHelper::clean($request->get('dataFormat', null));
+        $timezone   = InputHelper::clean($request->get('timezone'));
+        $from       = InputHelper::clean($request->get('dateFrom'));
+        $to         = InputHelper::clean($request->get('dateTo'));
+        $dataFormat = InputHelper::clean($request->get('dataFormat'));
         $unit       = InputHelper::clean($request->get('timeUnit', 'Y'));
         $dataset    = InputHelper::clean($request->query->all()['dataset'] ?? $request->request->all()['dataset'] ?? []);
         $response   = ['success' => 0];
@@ -97,10 +101,10 @@ class WidgetApiController extends CommonApiController
 
         $params = [
             'timeUnit'   => InputHelper::clean($request->get('timeUnit', 'Y')),
-            'dateFormat' => InputHelper::clean($request->get('dateFormat', null)),
+            'dateFormat' => InputHelper::clean($request->get('dateFormat')),
             'dateFrom'   => $fromDate,
             'dateTo'     => $toDate,
-            'limit'      => (int) $request->get('limit', null),
+            'limit'      => (int) $request->get('limit'),
             'filter'     => InputHelper::clean($request->query->all()['filter'] ?? $request->request->all()['filter'] ?? []),
             'dataset'    => $dataset,
         ];

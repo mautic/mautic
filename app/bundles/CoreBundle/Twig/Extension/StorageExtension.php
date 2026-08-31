@@ -13,18 +13,18 @@ use Twig\TwigFunction;
  * This is a workaround as Twig doesn't support passing back variables
  * from child to parent templates.
  */
-class StorageExtension extends AbstractExtension
+final class StorageExtension extends AbstractExtension
 {
     /**
      * @var array<string,mixed>
      */
-    protected array $storage = [];
+    private array $storage = [];
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
-            new TwigFunction('save', [$this, 'save'], ['needs_context' => true]),
-            new TwigFunction('restore', [$this, 'restore'], ['needs_context' => true]),
+            new TwigFunction('save', $this->save(...), ['needs_context' => true]),
+            new TwigFunction('restore', $this->restore(...), ['needs_context' => true]),
         ];
     }
 

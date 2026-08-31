@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Entity\Lead;
 
 final class LeadEvent extends CommonEvent
 {
-    protected bool $alreadyProcessedInBatch = false;
+    private bool $alreadyProcessedInBatch = false;
 
     public function __construct(
         Lead $lead,

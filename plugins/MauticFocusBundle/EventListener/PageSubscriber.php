@@ -10,17 +10,18 @@ use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-class PageSubscriber implements EventSubscriberInterface
+final class PageSubscriber implements EventSubscriberInterface
 {
     private string $regex = '{focus=(.*?)}';
 
     public function __construct(
-        private CorePermissions $security,
-        private FocusModel $model,
-        private RouterInterface $router,
-        private BuilderTokenHelperFactory $builderTokenHelperFactory,
+        private readonly CorePermissions $security,
+        private readonly FocusModel $model,
+        private readonly RouterInterface $router,
+        private readonly BuilderTokenHelperFactory $builderTokenHelperFactory,
     ) {
     }
 
@@ -45,7 +46,7 @@ class PageSubscriber implements EventSubscriberInterface
                 TokenFormatOptions::simplePrefix('mautic.focus.focus_item'),
                 'label' === $tokenFilter['target'] ? $tokenFilter['filter'] : '',
             );
-            if ($tokens) {
+            if ([] !== $tokens) {
                 $event->addTokens($tokens);
             }
         }
@@ -71,7 +72,7 @@ class PageSubscriber implements EventSubscriberInterface
                         )
                     )
                 ) {
-                    $script = '<script src="'.$this->router->generate('mautic_focus_generate', ['id' => $id], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL)
+                    $script = '<script src="'.$this->router->generate('mautic_focus_generate', ['id' => $id], UrlGeneratorInterface::ABSOLUTE_URL)
                         .'" type="text/javascript" charset="utf-8" async="async"></script>';
                     $content = preg_replace('#{focus='.$id.'}#', $script, $content);
                 } else {

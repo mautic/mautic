@@ -5,7 +5,7 @@
     {% set projectPopover %}
         <header class="project-popover__header mt-xs">
             <span class="project-popover__icon" aria-hidden="true"><i class="ri-archive-stack-line"></i></span>
-            <h2 class="project-popover__title type-heading-02 text-interactive">{{ project.name }}</h2>
+            <h2 class="project-popover__title type-heading-02 text-interactive">{{ project.name|striptags }}</h2>
         </header>
 
         <div class="project-popover__meta mb-md">
@@ -17,7 +17,7 @@
         </div>
 
         <p class="project-popover__description type-body-compact-01 mb-md">
-            {{ project.description|striptags|slice(0, 150) ~ (project.description|length > 150 ? '...' : '') }}
+            {{ project.description|striptags|u.truncate(150, '...') }}
         </p>
 
         <div class="project-popover__actions">

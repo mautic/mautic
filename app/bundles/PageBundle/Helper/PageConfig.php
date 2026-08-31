@@ -6,10 +6,11 @@ namespace Mautic\PageBundle\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
-final class PageConfig implements PageConfigInterface
+final readonly class PageConfig implements PageConfigInterface
 {
-    public function __construct(private CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private CoreParametersHelper $coreParametersHelper,
+    ) {
     }
 
     public function isDraftEnabled(): bool

@@ -7,7 +7,7 @@ namespace Mautic\CampaignBundle\Tests\Controller;
 use Mautic\CampaignBundle\Controller\CampaignController;
 use PHPUnit\Framework\TestCase;
 
-class CampaignControllerUnitTest extends TestCase
+final class CampaignControllerUnitTest extends TestCase
 {
     public function testNormalizeCampaignSourcesSkipsNonArrayAndNonNumericEntries(): void
     {

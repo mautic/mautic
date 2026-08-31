@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'name'        => 'Zapier Integration',
     'description' => 'Zapier lets you connect Mautic with 1100+ other apps

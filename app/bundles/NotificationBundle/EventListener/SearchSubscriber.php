@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Service\GlobalSearch;
 use Mautic\NotificationBundle\Model\NotificationModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class SearchSubscriber implements EventSubscriberInterface
+final readonly class SearchSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private NotificationModel $model,
@@ -47,7 +47,7 @@ class SearchSubscriber implements EventSubscriberInterface
             '@MauticNotification/SubscribedEvents/Search/global-web.html.twig'
         );
 
-        if (!empty($results)) {
+        if ([] !== $results) {
             $event->addResults('mautic.notification.notification.header', $results);
         }
     }
@@ -70,7 +70,7 @@ class SearchSubscriber implements EventSubscriberInterface
             '@MauticNotification/SubscribedEvents/Search/global-mobile.html.twig'
         );
 
-        if (!empty($results)) {
+        if ([] !== $results) {
             $event->addResults('mautic.notification.mobile_notification.header', $results);
         }
     }

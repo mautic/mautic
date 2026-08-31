@@ -1,16 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ConfigBundle\Tests\Mapper\Helper;
 
 use Mautic\ConfigBundle\Mapper\Helper\RestrictionHelper;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\TestDox;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(RestrictionHelper::class)]
-class RestrictionHelperTest extends \PHPUnit\Framework\TestCase
+#[CoversClass(RestrictionHelper::class)]
+final class RestrictionHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var array
+     * @var array<int|string, mixed>
      */
-    private $restrictedFields = [
+    private array $restrictedFields = [
         'db_host',
         'db_user',
         'monitored_email' => [
@@ -21,7 +25,7 @@ class RestrictionHelperTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Ensure a mixed numeric/string keyed array is formatted to all string based keys')]
+    #[TestDox('Ensure a mixed numeric/string keyed array is formatted to all string based keys')]
     public function testRestrictedConfigArrayIsFormattedCorrectly(): void
     {
         $expected = [
@@ -35,10 +39,10 @@ class RestrictionHelperTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $this->assertEquals($expected, RestrictionHelper::prepareRestrictions($this->restrictedFields));
+        $this->assertSame($expected, RestrictionHelper::prepareRestrictions($this->restrictedFields));
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Ensure a restrictions are recursively applied')]
+    #[TestDox('Ensure a restrictions are recursively applied')]
     public function testApplyingRestrictionsToConfigArray(): void
     {
         $config = [

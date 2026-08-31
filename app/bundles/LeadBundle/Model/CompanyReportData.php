@@ -9,8 +9,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class CompanyReportData
 {
     public function __construct(
-        private FieldModel $fieldModel,
-        private TranslatorInterface $translator,
+        private readonly FieldModel $fieldModel,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -66,9 +66,8 @@ class CompanyReportData
 
     /**
      * @param LeadField[] $fields
-     * @param string      $prefix
      */
-    private function getFieldColumns($fields, $prefix): array
+    private function getFieldColumns($fields, string $prefix): array
     {
         $columns = [];
         foreach ($fields as $f) {

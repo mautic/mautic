@@ -8,15 +8,15 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\PluginBundle\Entity\Plugin;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class PluginInstallEvent extends Event
+final class PluginInstallEvent extends Event
 {
     /**
      * @param array<class-string, ClassMetadata>|null $metadata
      */
     public function __construct(
-        private Plugin $plugin,
-        private ?array $metadata,
-        private ?bool $installedSchema,
+        private readonly Plugin $plugin,
+        private readonly ?array $metadata,
+        private readonly ?bool $installedSchema,
     ) {
     }
 

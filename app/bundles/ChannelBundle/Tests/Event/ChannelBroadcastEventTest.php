@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ChannelBundle\Tests\Event;
 
 use Mautic\ChannelBundle\Event\ChannelBroadcastEvent;
@@ -7,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ChannelBroadcastEventTest extends TestCase
+final class ChannelBroadcastEventTest extends TestCase
 {
     private string $channel;
 

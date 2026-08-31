@@ -7,7 +7,7 @@ use LightSaml\Model\Protocol\Response;
 use LightSaml\SpBundle\Security\User\UsernameMapperInterface;
 use Mautic\UserBundle\Entity\User;
 
-class UserMapper implements UsernameMapperInterface
+final readonly class UserMapper implements UsernameMapperInterface
 {
     /**
      * @param array<string, mixed> $attributes
@@ -28,7 +28,7 @@ class UserMapper implements UsernameMapperInterface
         return $user;
     }
 
-    public function getUsername(Response $response): ?string
+    public function getUsername(Response $response): string
     {
         $user = $this->getUser($response);
 

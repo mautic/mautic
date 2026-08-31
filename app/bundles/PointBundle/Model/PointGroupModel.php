@@ -13,19 +13,29 @@ use Mautic\PointBundle\Entity\GroupRepository;
 use Mautic\PointBundle\Event as Events;
 use Mautic\PointBundle\Form\Type\GroupType;
 use Mautic\PointBundle\PointGroupEvents;
-use Symfony\Component\Form\FormFactory;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends CommonFormModel<Group>
  */
 class PointGroupModel extends CommonFormModel implements GlobalSearchInterface
 {
+    private GroupRepository $groupRepository;
+
+    #[Required]
+    public function autowirePointGroupModel(
+        GroupRepository $groupRepository,
+    ): void {
+        $this->groupRepository = $groupRepository;
+    }
+
     public function getRepository(): GroupRepository
     {
-        return $this->em->getRepository(Group::class);
+        return $this->groupRepository;
     }
 
     public function getPermissionBase(): string
@@ -35,13 +45,12 @@ class PointGroupModel extends CommonFormModel implements GlobalSearchInterface
 
     /**
      * @param object               $entity
-     * @param FormFactory          $formFactory
      * @param string|null          $action
      * @param array<string,string> $options
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = []): FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Group) {
             throw new MethodNotAllowedHttpException(['Group']);
@@ -95,7 +104,7 @@ class PointGroupModel extends CommonFormModel implements GlobalSearchInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new Events\GroupEvent($entity);
             }
             $this->dispatcher->dispatch($event, $name);
@@ -110,7 +119,7 @@ class PointGroupModel extends CommonFormModel implements GlobalSearchInterface
     {
         $contactScore = $contact->getGroupScore($group);
 
-        if (empty($contactScore)) {
+        if (!$contactScore instanceof GroupContactScore) {
             $contactScore = new GroupContactScore();
             $contactScore->setContact($contact);
             $contactScore->setGroup($group);

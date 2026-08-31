@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Lead;
 
-class PointsChangeEvent extends CommonEvent
+final class PointsChangeEvent extends CommonEvent
 {
-    protected int $old;
+    private readonly int $old;
 
-    protected int $new;
+    private readonly int $new;
 
     public function __construct(Lead &$lead, $old, $new)
     {

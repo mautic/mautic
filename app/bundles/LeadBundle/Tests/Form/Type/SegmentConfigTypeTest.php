@@ -15,7 +15,7 @@ final class SegmentConfigTypeTest extends TestCase
     private SegmentConfigType $segmentConfigType;
 
     /**
-     * @var FormBuilderInterface<FormBuilderInterface>&MockObject
+     * @var MockObject&FormBuilderInterface
      */
     private MockObject $formBuilderInterface;
 
@@ -61,7 +61,7 @@ final class SegmentConfigTypeTest extends TestCase
         $matcher = $this->exactly(2);
 
         $this->formBuilderInterface->expects($matcher)
-            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher, $rebuildParameters, $buildParameters) {
+            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher, $rebuildParameters, $buildParameters): MockObject {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('segment_rebuild_time_warning', $parameters[0]);
                     $this->assertSame(NumberType::class, $parameters[1]);

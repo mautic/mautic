@@ -3,12 +3,14 @@
 namespace Mautic\LeadBundle\Helper;
 
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Model\FieldModel;
 
 class FieldAliasHelper
 {
     public function __construct(
-        private FieldModel $fieldModel,
+        private readonly FieldModel $fieldModel,
+        private readonly LeadFieldRepository $leadFieldRepository,
     ) {
     }
 
@@ -29,9 +31,8 @@ class FieldAliasHelper
         $alias = $this->fieldModel->cleanAlias($alias, 'f_', 25);
 
         // make sure alias is not already taken
-        $repo      = $this->fieldModel->getRepository();
         $testAlias = $alias;
-        $aliases   = $repo->getAliases($field->getId(), false, true, null);
+        $aliases   = $this->leadFieldRepository->getAliases($field->getId(), false, true, null);
         $count     = (int) in_array($testAlias, $aliases);
         $aliasTag  = $count;
 

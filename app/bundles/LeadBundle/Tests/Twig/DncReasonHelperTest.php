@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Twig;
 
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -7,12 +9,12 @@ use Mautic\LeadBundle\Exception\UnknownDncReasonException;
 use Mautic\LeadBundle\Twig\Helper\DncReasonHelper;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DncReasonHelperTest extends \PHPUnit\Framework\TestCase
+final class DncReasonHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var array<int, string>
      */
-    private $reasonTo = [
+    private array $reasonTo = [
         DoNotContact::IS_CONTACTABLE => 'mautic.lead.event.donotcontact_contactable',
         DoNotContact::UNSUBSCRIBED   => 'mautic.lead.event.donotcontact_unsubscribed',
         DoNotContact::BOUNCED        => 'mautic.lead.event.donotcontact_bounced',
@@ -22,7 +24,7 @@ class DncReasonHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @var array<string, string>
      */
-    private $translations = [
+    private array $translations = [
         'mautic.lead.event.donotcontact_contactable'  => 'a',
         'mautic.lead.event.donotcontact_unsubscribed' => 'b',
         'mautic.lead.event.donotcontact_bounced'      => 'c',
@@ -53,7 +55,7 @@ class DncReasonHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetName(): void
     {
-        $translator      = $this->createMock(TranslatorInterface::class);
+        $translator      = $this->createStub(TranslatorInterface::class);
         $dncReasonHelper = new DncReasonHelper($translator);
         $this->assertSame('lead_dnc_reason', $dncReasonHelper->getName());
     }

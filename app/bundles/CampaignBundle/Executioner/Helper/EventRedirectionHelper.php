@@ -18,7 +18,7 @@ class EventRedirectionHelper
     private const MAX_DEPTH = 20;
 
     public function __construct(
-        private LoggerInterface $logger,
+        private readonly LoggerInterface $logger,
     ) {
     }
 

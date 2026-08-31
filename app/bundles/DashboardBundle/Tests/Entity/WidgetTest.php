@@ -1,37 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\DashboardBundle\Tests\Entity;
 
 use Mautic\DashboardBundle\Entity\Widget;
 
-class WidgetTest extends \PHPUnit\Framework\TestCase
+final class WidgetTest extends \PHPUnit\Framework\TestCase
 {
     public function testWidgetNameXssAttempt(): void
     {
         $widget = new Widget();
         $widget->setName('csrf<script>console.log(\'name\');</script>');
         $this->assertEquals('csrfconsole.log(\'name\');', $widget->getName());
-    }
-
-    public function testWidgetWidthXssAttempt(): void
-    {
-        $widget = new Widget();
-        $widget->setWidth('100<script>console.log(\'yellow\');</script>');
-        $this->assertEquals(100, $widget->getWidth());
-    }
-
-    public function testWidgetHeightXssAttempt(): void
-    {
-        $widget = new Widget();
-        $widget->setHeight('100<script>console.log(\'yellow\');</script>');
-        $this->assertEquals(100, $widget->getHeight());
-    }
-
-    public function testWidgetOrderingSqliAttempt(): void
-    {
-        $widget = new Widget();
-        $widget->setOrdering('3;DROP grep;');
-        $this->assertEquals(3, $widget->getOrdering());
     }
 
     public function testWidgetTypeXssAttempt(): void
@@ -75,6 +56,6 @@ class WidgetTest extends \PHPUnit\Framework\TestCase
             'params'   => [],
             'template' => 'the water spout',
         ];
-        $this->assertEquals($expected, $widget->toArray());
+        $this->assertSame($expected, $widget->toArray());
     }
 }

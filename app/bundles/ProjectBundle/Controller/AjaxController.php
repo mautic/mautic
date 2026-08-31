@@ -52,7 +52,7 @@ final class AjaxController extends CommonAjaxController
     public function addProjectsAction(Request $request, ProjectModel $projectModel, ProjectRepository $projectRepository, CorePermissions $corePermissions): JsonResponse
     {
         if (!$corePermissions->isGranted(ProjectPermissions::CAN_ASSOCIATE)) {
-            $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $existingProjectIds = json_decode($request->request->get('existingProjectIds'), true);
@@ -72,8 +72,10 @@ final class AjaxController extends CommonAjaxController
         $projectOptions = '';
 
         foreach ($allProjects as $project) {
+            $value    = htmlspecialchars((string) $project['value'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+            $label    = htmlspecialchars((string) $project['label'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
             $selected = in_array($project['value'], $existingProjectIds) ? ' selected="selected"' : '';
-            $projectOptions .= '<option'.$selected.' value="'.$project['value'].'">'.$project['label'].'</option>';
+            $projectOptions .= "<option{$selected} value=\"{$value}\">{$label}</option>";
         }
 
         return $this->sendJsonResponse(['projects' => $projectOptions]);

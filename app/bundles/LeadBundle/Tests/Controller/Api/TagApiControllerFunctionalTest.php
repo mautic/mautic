@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -7,7 +9,7 @@ use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
 use Symfony\Component\HttpFoundation\Response;
 
-class TagApiControllerFunctionalTest extends MauticMysqlTestCase
+final class TagApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testTagWorkflow(): void
     {
@@ -112,7 +114,6 @@ class TagApiControllerFunctionalTest extends MauticMysqlTestCase
         // Sending an empty payload should return a 500 server error
         // TODO ensure that the server sends back a 400 status code instead
         $this->client->request('POST', '/api/tags/new', []);
-        $clientResponse = $this->client->getResponse();
 
         $this->assertResponseStatusCodeSame(500);
     }
@@ -120,7 +121,7 @@ class TagApiControllerFunctionalTest extends MauticMysqlTestCase
     public function testSearchMatchesTagDescription(): void
     {
         $tagRepository = $this->em->getRepository(Tag::class);
-        \assert($tagRepository instanceof TagRepository);
+        $this->assertInstanceOf(TagRepository::class, $tagRepository);
 
         $matchingTag = (new Tag('alpha_tag'))->setDescription('Contains the test keyword.');
         $otherTag    = (new Tag('beta_tag'))->setDescription('No relevant text here.');

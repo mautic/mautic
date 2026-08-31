@@ -9,31 +9,31 @@ use Mautic\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use PHPUnit\Framework\TestCase;
 
-class MappingManualDAOTest extends TestCase
+final class MappingManualDAOTest extends TestCase
 {
-    private $integrationName       = 'Test';
+    private string $integrationName       = 'Test';
 
-    private $integrationObjectName = 'Contact';
+    private string $integrationObjectName = 'Contact';
 
     public function testMappedIntegrationNamesAreReturnedBasedOnInternalObjectName(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             [$this->integrationObjectName],
-            $this->getMappingManualDAO()->getIntegrationObjectNames(Contact::NAME)
+            $this->getMappingManualDAO()->getIntegrationObjectNames()
         );
     }
 
     public function testMappedInternalNamesAreReturnedBasedOnIntegrationObjectName(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             [Contact::NAME],
-            $this->getMappingManualDAO()->getInternalObjectNames($this->integrationObjectName)
+            $this->getMappingManualDAO()->getInternalObjectNames()
         );
     }
 
     public function testThatOneWayInternalObjectFieldsAreNotReturnedWhenNotRequired(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'email',    // required and bidirectional
                 'country',  // bidirectional
@@ -45,7 +45,7 @@ class MappingManualDAOTest extends TestCase
 
     public function testThatRequiredInternalObjectFieldsAreReturned(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             ['email'],
             $this->getMappingManualDAO()->getInternalObjectRequiredFieldNames(Contact::NAME)
         );
@@ -53,7 +53,7 @@ class MappingManualDAOTest extends TestCase
 
     public function testThatOneWayIntegrationObjectFieldsAreNotReturnedWhenNotRequired(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'email',    // required and bidirectional
                 'country',  // bidirectional
@@ -65,7 +65,7 @@ class MappingManualDAOTest extends TestCase
 
     public function testThatRequiredIntegrationObjectFieldsAreReturned(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             ['email'],
             $this->getMappingManualDAO()->getIntegrationObjectRequiredFieldNames($this->integrationObjectName)
         );
@@ -73,7 +73,7 @@ class MappingManualDAOTest extends TestCase
 
     public function testMappedIntegrationFieldIsReturned(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             'last_name',
             $this->getMappingManualDAO()->getIntegrationMappedField(
                 $this->integrationObjectName,
@@ -85,7 +85,7 @@ class MappingManualDAOTest extends TestCase
 
     public function testMappedInternalFieldIsReturned(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             'lastname',
             $this->getMappingManualDAO()->getInternalMappedField(
                 Contact::NAME,
@@ -95,7 +95,7 @@ class MappingManualDAOTest extends TestCase
         );
     }
 
-    private function getMappingManualDAO()
+    private function getMappingManualDAO(): MappingManualDAO
     {
         $mappingManual = new MappingManualDAO($this->integrationName);
         $objectMapping = new ObjectMappingDAO(Contact::NAME, $this->integrationObjectName);

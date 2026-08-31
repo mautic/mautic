@@ -410,8 +410,27 @@ export const normalizationMixin = {
       return;
     }
 
+    const wordStylePropertyPattern = /^(mso-|tab-stops$|layout-grid-mode$|text-autospace$|text-underline-position$)/i;
+
     root.querySelectorAll('p[style], span[style], h1[style], h2[style], h3[style], h4[style], h5[style], h6[style]').forEach(element => {
-      element.removeAttribute('style');
+      const style = element.style;
+      if (!style) {
+        return;
+      }
+
+      const propertiesToRemove = [];
+      for (let index = 0; index < style.length; index += 1) {
+        const property = style[index];
+        if (wordStylePropertyPattern.test(property)) {
+          propertiesToRemove.push(property);
+        }
+      }
+
+      propertiesToRemove.forEach(property => {
+        style.removeProperty(property);
+      });
+
+      this.tidyStyleAttribute(element);
     });
   },
 

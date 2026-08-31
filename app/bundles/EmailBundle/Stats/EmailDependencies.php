@@ -11,7 +11,7 @@ use Mautic\PointBundle\Model\PointModel;
 use Mautic\PointBundle\Model\TriggerEventModel;
 use Mautic\ReportBundle\Model\ReportModel;
 
-class EmailDependencies
+final readonly class EmailDependencies
 {
     public function __construct(
         private CampaignModel $campaignModel,

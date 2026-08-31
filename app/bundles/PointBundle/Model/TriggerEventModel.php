@@ -7,19 +7,27 @@ use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\PointBundle\Entity\TriggerEventRepository;
 use Mautic\PointBundle\Form\Type\TriggerEventType;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends CommonFormModel<TriggerEvent>
  */
 class TriggerEventModel extends CommonFormModel
 {
-    /**
-     * @return TriggerEventRepository
-     */
-    public function getRepository()
+    private TriggerEventRepository $triggerEventRepository;
+
+    #[Required]
+    public function autowireTriggerEventModel(
+        TriggerEventRepository $triggerEventRepository,
+    ): void {
+        $this->triggerEventRepository = $triggerEventRepository;
+    }
+
+    public function getRepository(): TriggerEventRepository
     {
-        return $this->em->getRepository(TriggerEvent::class);
+        return $this->triggerEventRepository;
     }
 
     public function getPermissionBase(): string
@@ -39,7 +47,7 @@ class TriggerEventModel extends CommonFormModel
     /**
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof TriggerEvent) {
             throw new MethodNotAllowedHttpException(['Trigger']);

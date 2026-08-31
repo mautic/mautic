@@ -9,10 +9,10 @@ use Twig\TwigFilter;
 
 final class PurifyExtension extends AbstractExtension
 {
-    public function getFilters()
+    public function getFilters(): array
     {
         return [
-            new TwigFilter('purify_allow_target_blank', [$this, 'purifyAllowTargetBlank'], ['is_safe' => ['html']]),
+            new TwigFilter('purify_allow_target_blank', $this->purifyAllowTargetBlank(...), ['is_safe' => ['html']]),
         ];
     }
 

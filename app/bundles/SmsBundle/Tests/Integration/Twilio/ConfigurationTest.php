@@ -1,24 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\SmsBundle\Tests\Integration\Twilio;
 
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\SmsBundle\Integration\Twilio\Configuration;
+use PHPUnit\Framework\MockObject\MockObject;
 use Twilio\Exceptions\ConfigurationException;
 
-class ConfigurationTest extends \PHPUnit\Framework\TestCase
+final class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var IntegrationHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $integrationHelper;
+    private MockObject&IntegrationHelper $integrationHelper;
 
-    /**
-     * @var AbstractIntegration|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $integrationObject;
+    private MockObject&AbstractIntegration $integrationObject;
 
     protected function setUp(): void
     {
@@ -27,6 +24,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
         $integrationSettings = new Integration();
         $integrationSettings->setIsPublished(true);
         $integrationSettings->setFeatureSettings(['messaging_service_sid' => '123']);
+        /** @phpstan-ignore classConstant.deprecatedClass */
         $this->integrationObject = $this->createMock(AbstractIntegration::class);
         $this->integrationObject->method('getIntegrationSettings')
             ->willReturn($integrationSettings);
@@ -121,10 +119,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->getConfiguration()->getMessagingServiceSid();
     }
 
-    /**
-     * @return Configuration
-     */
-    private function getConfiguration()
+    private function getConfiguration(): Configuration
     {
         return new Configuration($this->integrationHelper);
     }

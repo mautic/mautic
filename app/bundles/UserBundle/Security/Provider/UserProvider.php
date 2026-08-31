@@ -31,10 +31,7 @@ class UserProvider implements UserProviderInterface
     ) {
     }
 
-    /**
-     * @param string $username
-     */
-    public function loadUserByUsername($username): User
+    public function loadUserByUsername(string $username): User
     {
         return $this->loadUserByIdentifier($username);
     }
