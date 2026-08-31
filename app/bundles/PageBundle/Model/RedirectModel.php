@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Shortener\Shortener;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Event\RedirectGenerationEvent;
-use Mautic\PageBundle\PageEvents;
 use Symfony\Contracts\Service\Attribute\Required;
 
 /**
@@ -58,9 +57,9 @@ class RedirectModel extends FormModel
         Redirect $redirect,
         $clickthrough = [],
     ) {
-        if ($this->dispatcher->hasListeners(PageEvents::ON_REDIRECT_GENERATE)) {
+        if ($this->dispatcher->hasListeners(RedirectGenerationEvent::class)) {
             $event = new RedirectGenerationEvent($redirect, $clickthrough);
-            $this->dispatcher->dispatch($event, PageEvents::ON_REDIRECT_GENERATE);
+            $this->dispatcher->dispatch($event);
 
             $clickthrough = $event->getClickthrough();
         }

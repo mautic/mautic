@@ -4,7 +4,6 @@ namespace Mautic\NotificationBundle\EventListener;
 
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\PageBundle\Event\PageDisplayEvent;
-use Mautic\PageBundle\PageEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -19,7 +18,7 @@ final readonly class PageSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            PageEvents::PAGE_ON_DISPLAY => ['onPageDisplay', 0],
+            PageDisplayEvent::class => ['onPageDisplay', 0],
         ];
     }
 

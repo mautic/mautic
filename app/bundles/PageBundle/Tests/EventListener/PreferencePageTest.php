@@ -12,7 +12,6 @@ use Mautic\LeadBundle\Form\Type\ContactFrequencyType;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
-use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -202,7 +201,7 @@ final class PreferencePageTest extends MauticMysqlTestCase
     private function dispatchEvent(Page $page, array $params): string
     {
         $event = new PageDisplayEvent($page->getCustomHtml(), $page, $params);
-        $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
+        $this->dispatcher->dispatch($event);
 
         return strip_tags($event->getContent());
     }

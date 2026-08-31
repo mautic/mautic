@@ -5,7 +5,6 @@ namespace Mautic\EmailBundle\EventListener;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\PageBundle\Event as Events;
-use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -21,7 +20,7 @@ final readonly class PageSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            PageEvents::PAGE_ON_HIT => ['onPageHit', 0],
+            Events\PageHitEvent::class => ['onPageHit', 0],
         ];
     }
 

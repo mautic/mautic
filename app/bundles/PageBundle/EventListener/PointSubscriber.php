@@ -6,7 +6,6 @@ use Mautic\PageBundle\Event as Events;
 use Mautic\PageBundle\Form\Type\PointActionPageHitType;
 use Mautic\PageBundle\Form\Type\PointActionUrlHitType;
 use Mautic\PageBundle\Helper\PointActionHelper;
-use Mautic\PageBundle\PageEvents;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Model\PointModel;
 use Mautic\PointBundle\PointEvents;
@@ -24,7 +23,7 @@ final readonly class PointSubscriber implements EventSubscriberInterface
     {
         return [
             PointEvents::POINT_ON_BUILD => ['onPointBuild', 0],
-            PageEvents::PAGE_ON_HIT     => ['onPageHit', 0],
+            Events\PageHitEvent::class     => ['onPageHit', 0],
         ];
     }
 

@@ -11,7 +11,6 @@ use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Event\UntrackableUrlsEvent;
-use Mautic\PageBundle\PageEvents;
 use Symfony\Contracts\Service\Attribute\Required;
 
 /**
@@ -221,8 +220,7 @@ class TrackableModel extends AbstractCommonModel
     {
         /** @var UntrackableUrlsEvent $event */
         $event = $this->dispatcher->dispatch(
-            new UntrackableUrlsEvent($content),
-            PageEvents::REDIRECT_DO_NOT_TRACK
+            new UntrackableUrlsEvent($content)
         );
 
         return $event->getDoNotTrackList();

@@ -30,7 +30,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
     {
         return [
             CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            PageEvents::PAGE_ON_HIT                  => ['onPageHit', 0],
+            PageHitEvent::class                  => ['onPageHit', 0],
             PageEvents::ON_CAMPAIGN_TRIGGER_DECISION => [
                 ['onCampaignTriggerDecision', 0],
                 ['onCampaignTriggerDecisionDeviceHit', 1],

@@ -25,7 +25,7 @@ final readonly class DateTimeTokenSubscriber implements EventSubscriberInterface
     {
         return [
             PageEvents::PAGE_ON_BUILD                     => ['onPageBuild', 0],
-            PageEvents::PAGE_ON_DISPLAY                   => ['onPageDisplay', 0],
+            PageDisplayEvent::class                   => ['onPageDisplay', 0],
         ];
     }
 

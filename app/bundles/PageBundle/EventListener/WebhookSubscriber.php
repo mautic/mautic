@@ -22,7 +22,7 @@ final readonly class WebhookSubscriber implements EventSubscriberInterface
     {
         return [
             WebhookEvents::WEBHOOK_ON_BUILD => ['onWebhookBuild', 0],
-            PageEvents::PAGE_ON_HIT         => ['onPageHit', 0],
+            PageHitEvent::class         => ['onPageHit', 0],
         ];
     }
 

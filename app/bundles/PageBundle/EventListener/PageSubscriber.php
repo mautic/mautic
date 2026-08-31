@@ -33,7 +33,7 @@ final readonly class PageSubscriber implements EventSubscriberInterface
         return [
             PageEvents::PAGE_POST_SAVE      => ['onPagePostSave', 0],
             PageEvents::PAGE_POST_DELETE    => ['onPageDelete', 0],
-            PageEvents::PAGE_ON_DISPLAY     => ['onPageDisplay', -255], // We want this to run last
+            Events\PageDisplayEvent::class     => ['onPageDisplay', -255], // We want this to run last
             PageEditSubmitEvent::class      => ['managePageDraft'],
         ];
     }

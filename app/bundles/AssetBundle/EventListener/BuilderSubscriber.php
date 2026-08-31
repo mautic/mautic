@@ -33,7 +33,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
             EmailEvents::EMAIL_ON_SEND    => ['onEmailGenerate', 0],
             EmailEvents::EMAIL_ON_DISPLAY => ['onEmailGenerate', 0],
             PageEvents::PAGE_ON_BUILD     => ['onBuilderBuild', 0],
-            PageEvents::PAGE_ON_DISPLAY   => ['onPageDisplay', 0],
+            PageDisplayEvent::class   => ['onPageDisplay', 0],
         ];
     }
 
