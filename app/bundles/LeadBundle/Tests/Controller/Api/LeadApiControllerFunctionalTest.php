@@ -1500,6 +1500,15 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful($response->getContent());
+
+        $payload = json_decode($response->getContent(), true);
+        $note    = reset($payload['notes']);
+
+        $this->assertSame($owner->getId(), $note['createdBy']);
+        $this->assertSame($owner->getName(), $note['createdByUser']);
+        $this->assertSame($owner->getId(), $note['modifiedBy']);
+        $this->assertSame($owner->getName(), $note['modifiedByUser']);
+        $this->assertSame('2026-08-29T00:00:00+00:00', $note['dateModified']);
     }
 
     public function testGetContactNotesActionReturnsForbiddenWithoutNoteViewPermissions(): void
@@ -1528,6 +1537,8 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $note->setLead($contact);
         $note->setText($text);
         $note->setCreatedBy($owner);
+        $note->setModifiedBy($owner);
+        $note->setDateModified(new \DateTime('2026-08-29 00:00:00', new \DateTimeZone('UTC')));
         $this->em->persist($note);
         $this->em->flush();
 
