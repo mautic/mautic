@@ -356,6 +356,26 @@
     | `PageEvents::REDIRECT_DO_NOT_TRACK` | `UntrackableUrlsEvent` |
     | `PageEvents::ON_REDIRECT_GENERATE` | `RedirectGenerationEvent` |
     | `PageEvents::ON_CONTACT_TRACKED` | `TrackingEvent` |
+- DashboardBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\DashboardBundle\DashboardEvents` string constants. Update any subscriber or listener that keys on one of the converted `DashboardEvents::*` constants to key on the event class instead:
+
+    ```diff
+     public static function getSubscribedEvents(): array
+     {
+         return [
+    -        DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE => ['onWidgetListGenerate', 0],
+    +        WidgetTypeListEvent::class => ['onWidgetListGenerate', 0],
+         ];
+     }
+    ```
+
+    Dispatching drops the redundant second argument, e.g. `$dispatcher->dispatch($event, DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE)` becomes `$dispatcher->dispatch($event)`. The `Mautic\DashboardBundle\DashboardEvents` constants are kept for backwards compatibility but are no longer used internally for the events below. The `DASHBOARD_ON_MODULE_DETAIL_GENERATE` / `DASHBOARD_ON_MODULE_DETAIL_PRE_LOAD` pair share the `WidgetDetailEvent` class and are unchanged.
+
+    Full mapping of the converted constants to their event class (all in the `Mautic\DashboardBundle\Event` namespace):
+
+    | `DashboardEvents` constant | New event class |
+    | --- | --- |
+    | `DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE` | `WidgetTypeListEvent` |
+    | `DashboardEvents::DASHBOARD_ON_MODULE_FORM_GENERATE` | `WidgetFormEvent` |
 
 - `Mautic\CoreBundle\Factory\ModelFactory` now builds its service locator from a `defaultIndexMethod` on the `mautic.model` tag, replacing the removed `Mautic\CoreBundle\DependencyInjection\Compiler\ModelPass`. Every model (a service implementing `Mautic\CoreBundle\Model\MauticModelInterface`) declares its `ModelFactory::getModel()` lookup key via a static `getName()` method:
 
