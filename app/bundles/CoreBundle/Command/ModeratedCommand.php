@@ -159,11 +159,7 @@ abstract class ModeratedCommand extends Command
             // This needs to throw an exception in order to not silently fail when there is an issue.
             // Returning false here would report a permanent misconfiguration as ordinary lock
             // contention, which every caller maps to a successful exit code.
-            throw new \RuntimeException(sprintf(
-                '%s could not be opened (%s). Check that the run directory is writable by the user running this command.',
-                $this->lockFile,
-                error_get_last()['message'] ?? 'reason unknown'
-            ));
+            throw new \RuntimeException(sprintf('%s could not be opened (%s). Check that the run directory is writable by the user running this command.', $this->lockFile, error_get_last()['message'] ?? 'reason unknown'));
         }
 
         if (!flock($fp, LOCK_EX)) {
