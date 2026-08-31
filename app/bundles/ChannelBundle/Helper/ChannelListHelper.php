@@ -2,7 +2,6 @@
 
 namespace Mautic\ChannelBundle\Helper;
 
-use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\ChannelEvent;
 use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -105,7 +104,7 @@ class ChannelListHelper
             return;
         }
 
-        $event                 = $this->dispatcher->dispatch(new ChannelEvent(), ChannelEvents::ADD_CHANNEL);
+        $event                 = $this->dispatcher->dispatch(new ChannelEvent());
         $this->channels        = $event->getChannelConfigs();
         $this->featureChannels = $event->getFeatureChannels();
         unset($event);

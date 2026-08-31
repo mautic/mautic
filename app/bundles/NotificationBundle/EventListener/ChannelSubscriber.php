@@ -2,7 +2,6 @@
 
 namespace Mautic\NotificationBundle\EventListener;
 
-use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\ChannelEvent;
 use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\NotificationBundle\Entity\Notification;
@@ -21,7 +20,7 @@ final readonly class ChannelSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            ChannelEvents::ADD_CHANNEL => ['onAddChannel', 70],
+            ChannelEvent::class => ['onAddChannel', 70],
         ];
     }
 

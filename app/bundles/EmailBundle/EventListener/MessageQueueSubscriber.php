@@ -2,7 +2,6 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Event\MessageQueueBatchProcessEvent;
 use Mautic\EmailBundle\Helper\MailHelper;
@@ -19,7 +18,7 @@ final readonly class MessageQueueSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            ChannelEvents::PROCESS_MESSAGE_QUEUE_BATCH => ['onProcessMessageQueueBatch', 0],
+            MessageQueueBatchProcessEvent::class => ['onProcessMessageQueueBatch', 0],
         ];
     }
 
