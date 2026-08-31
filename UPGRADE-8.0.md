@@ -265,7 +265,7 @@
      }
     ```
 
-- AssetBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\AssetBundle\AssetEvents` string constants. This covers the `ASSET_ON_LOAD` (`AssetLoadEvent`) and `ASSET_ON_REMOTE_BROWSE` (`RemoteAssetBrowseEvent`) events; the `AssetEvent` CRUD/toggle group (`ASSET_ON_UPLOAD`, `ASSET_PRE_SAVE`, `ASSET_POST_SAVE`, `ASSET_PRE_DELETE`, `ASSET_POST_DELETE`) keeps its string constants because one event object is reused under several names. Update any subscriber or listener that keys on a converted constant to key on the event class instead:
+- AssetBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\AssetBundle\AssetEvents` string constants. This covers `ASSET_ON_LOAD` (`AssetLoadEvent`), `ASSET_ON_REMOTE_BROWSE` (`RemoteAssetBrowseEvent`) and the CRUD group `ASSET_PRE_SAVE` (`AssetPreSaveEvent`), `ASSET_POST_SAVE` (`AssetPostSaveEvent`), `ASSET_PRE_DELETE` (`AssetPreDeleteEvent`), `ASSET_POST_DELETE` (`AssetPostDeleteEvent`). The CRUD group previously reused one `AssetEvent` object under four names; each action now dispatches its own `AssetEvent` subclass, so `AssetEvent` is no longer `final`. The dead `ASSET_ON_UPLOAD` constant (never dispatched or listened to) has been removed. Update any subscriber or listener that keys on a converted constant to key on the event class instead:
 
     ```diff
      public static function getSubscribedEvents(): array

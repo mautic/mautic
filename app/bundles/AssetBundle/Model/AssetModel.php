@@ -5,13 +5,15 @@ namespace Mautic\AssetBundle\Model;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\PersistentCollection;
-use Mautic\AssetBundle\AssetEvents;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\AssetRepository;
 use Mautic\AssetBundle\Entity\Download;
 use Mautic\AssetBundle\Entity\DownloadRepository;
-use Mautic\AssetBundle\Event\AssetEvent;
 use Mautic\AssetBundle\Event\AssetLoadEvent;
+use Mautic\AssetBundle\Event\AssetPostDeleteEvent;
+use Mautic\AssetBundle\Event\AssetPostSaveEvent;
+use Mautic\AssetBundle\Event\AssetPreDeleteEvent;
+use Mautic\AssetBundle\Event\AssetPreSaveEvent;
 use Mautic\AssetBundle\Form\Type\AssetType;
 use Mautic\CategoryBundle\Entity\CategoryRepository;
 use Mautic\CategoryBundle\Model\CategoryModel;
@@ -342,30 +344,25 @@ class AssetModel extends FormModel implements GlobalSearchInterface
             throw new MethodNotAllowedHttpException(['Asset']);
         }
 
-        switch ($action) {
-            case 'pre_save':
-                $name = AssetEvents::ASSET_PRE_SAVE;
-                break;
-            case 'post_save':
-                $name = AssetEvents::ASSET_POST_SAVE;
-                break;
-            case 'pre_delete':
-                $name = AssetEvents::ASSET_PRE_DELETE;
-                break;
-            case 'post_delete':
-                $name = AssetEvents::ASSET_POST_DELETE;
-                break;
-            default:
-                return null;
+        $eventClass = match ($action) {
+            'pre_save'    => AssetPreSaveEvent::class,
+            'post_save'   => AssetPostSaveEvent::class,
+            'pre_delete'  => AssetPreDeleteEvent::class,
+            'post_delete' => AssetPostDeleteEvent::class,
+            default       => null,
+        };
+
+        if (null === $eventClass) {
+            return null;
         }
 
-        if ($this->dispatcher->hasListeners($name)) {
-            if (!$event instanceof Event) {
-                $event = new AssetEvent($entity, $isNew);
+        if ($this->dispatcher->hasListeners($eventClass)) {
+            if (!$event instanceof $eventClass) {
+                $event = new $eventClass($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($event, $name);
+            $this->dispatcher->dispatch($event);
 
             return $event;
         }
