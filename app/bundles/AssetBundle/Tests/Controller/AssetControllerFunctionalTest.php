@@ -61,7 +61,8 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
         $crawlerAfterSubmit = $this->client->submit($createForm);
         $this->assertResponseIsSuccessful();
-        $this->assertCount(0, $crawlerAfterSubmit->filter('div.has-error'), 'Expected no validation errors for valid remote image URL with query string');
+        $createErrors = $crawlerAfterSubmit->filter('div.has-error')->each(static fn ($node): string => trim($node->text()));
+        $this->assertCount(0, $createErrors, 'Expected no validation errors for valid remote image URL with query string, got: '.implode(' | ', $createErrors));
 
         $asset = $this->em->getRepository(Asset::class)->findOneBy(['title' => $title]);
         $this->assertInstanceOf(Asset::class, $asset, 'Asset should be created successfully');
