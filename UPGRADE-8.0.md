@@ -356,6 +356,7 @@
     | `PageEvents::REDIRECT_DO_NOT_TRACK` | `UntrackableUrlsEvent` |
     | `PageEvents::ON_REDIRECT_GENERATE` | `RedirectGenerationEvent` |
     | `PageEvents::ON_CONTACT_TRACKED` | `TrackingEvent` |
+- StageBundle now dispatches its stage-builder event by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\StageBundle\StageEvents::STAGE_ON_BUILD` string constant. Update any subscriber or listener that keys on `StageEvents::STAGE_ON_BUILD` (or the raw string `mautic.stage_on_build`) to key on `Mautic\StageBundle\Event\StageBuilderEvent::class` instead, and drop the redundant second argument when dispatching, e.g. `$dispatcher->dispatch($event, StageEvents::STAGE_ON_BUILD)` becomes `$dispatcher->dispatch($event)`. The `StageEvents` constants are kept for backwards compatibility. The `STAGE_PRE_SAVE` / `STAGE_POST_SAVE` / `STAGE_PRE_DELETE` / `STAGE_POST_DELETE` group (all sharing the `StageEvent` class) and `ON_CAMPAIGN_BATCH_ACTION` (a `PendingEvent`) are unchanged.
 
 - `Mautic\CoreBundle\Factory\ModelFactory` now builds its service locator from a `defaultIndexMethod` on the `mautic.model` tag, replacing the removed `Mautic\CoreBundle\DependencyInjection\Compiler\ModelPass`. Every model (a service implementing `Mautic\CoreBundle\Model\MauticModelInterface`) declares its `ModelFactory::getModel()` lookup key via a static `getName()` method:
 
