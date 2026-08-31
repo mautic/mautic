@@ -21,14 +21,12 @@ final class ThemeHelper
     private $config;
 
     /**
-     * @param string $theme
-     *
      * @throws BadConfigurationException
      * @throws FileNotFoundException
      */
     public function __construct(
         PathsHelper $pathsHelper,
-        private $theme,
+        private readonly string $theme,
     ) {
         $this->themeDir  = $pathsHelper->getSystemPath('themes').'/'.$this->theme;
         $this->themePath = $pathsHelper->getSystemPath('themes_root').'/'.$this->themeDir;
@@ -62,10 +60,8 @@ final class ThemeHelper
 
     /**
      * Returns the theme folder name.
-     *
-     * @return string
      */
-    public function getTheme()
+    public function getTheme(): string
     {
         return $this->theme;
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ApiBundle\Serializer\Exclusion;
 
 /**
@@ -7,10 +9,7 @@ namespace Mautic\ApiBundle\Serializer\Exclusion;
  */
 final class ParentChildrenExclusionStrategy extends FieldExclusionStrategy
 {
-    /**
-     * @param int $level
-     */
-    public function __construct($level = 3)
+    public function __construct(int $level = 3)
     {
         parent::__construct(
             [

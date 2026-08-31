@@ -217,7 +217,7 @@ class TrackableModel extends AbstractCommonModel
      *
      * @param string|string[]|null $content
      */
-    public function getDoNotTrackList($content): array
+    public function getDoNotTrackList(string|array|null $content): array
     {
         /** @var UntrackableUrlsEvent $event */
         $event = $this->dispatcher->dispatch(

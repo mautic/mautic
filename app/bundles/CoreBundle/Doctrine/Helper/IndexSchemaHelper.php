@@ -46,12 +46,9 @@ class IndexSchemaHelper
      */
     protected $dropIndexes = [];
 
-    /**
-     * @param string $prefix
-     */
     public function __construct(
         protected Connection $db,
-        protected $prefix,
+        protected ?string $prefix,
     ) {
         $this->sm = $this->db->createSchemaManager();
     }

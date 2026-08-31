@@ -9,10 +9,7 @@ use Mautic\UserBundle\Entity\User;
 
 final class UserEvent extends CommonEvent
 {
-    /**
-     * @param bool $isNew
-     */
-    public function __construct(User &$user, $isNew = false)
+    public function __construct(User &$user, bool $isNew = false)
     {
         $this->entity = &$user;
         $this->isNew  = $isNew;

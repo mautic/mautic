@@ -23,7 +23,7 @@ BODY;
 
         $replyEmail = $parser->parse();
 
-        $this->assertEquals('123abc', $replyEmail->getStatHash());
+        $this->assertSame('123abc', $replyEmail->getStatHash());
     }
 
     #[TestDox('Test that an email is found inside a feedback report')]
@@ -38,7 +38,7 @@ BODY;
 
         $replyEmail = $parser->parse();
 
-        $this->assertEquals('5c897694957a7581067884', $replyEmail->getStatHash());
+        $this->assertSame('5c897694957a7581067884', $replyEmail->getStatHash());
     }
 
     #[TestDox('Test that an exeption is thrown if the hash is not found')]

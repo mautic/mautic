@@ -14,12 +14,9 @@ final class BatchIdToEntityHelper
 
     private bool $isAssociative = false;
 
-    /**
-     * @param string $idKey
-     */
     public function __construct(
         array $parameters,
-        private $idKey = 'id',
+        private readonly string $idKey = 'id',
     ) {
         $this->extractIds($parameters);
     }

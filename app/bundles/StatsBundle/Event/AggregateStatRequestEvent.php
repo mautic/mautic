@@ -10,11 +10,8 @@ final class AggregateStatRequestEvent extends Event
 {
     private readonly StatCollection $statCollection;
 
-    /**
-     * @param string $statName
-     */
     public function __construct(
-        private $statName,
+        private readonly string $statName,
         private readonly \DateTimeInterface $fromDateTime,
         private readonly \DateTimeInterface $toDateTime,
         private readonly FetchOptions $options,
@@ -30,10 +27,7 @@ final class AggregateStatRequestEvent extends Event
         $this->stopPropagation();
     }
 
-    /**
-     * @return string
-     */
-    public function getStatName()
+    public function getStatName(): string
     {
         return $this->statName;
     }

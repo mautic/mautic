@@ -13,11 +13,8 @@ final class Installer
 
     private readonly Filesystem $filesystem;
 
-    /**
-     * @param string $translationsDirectory
-     */
     public function __construct(
-        private $translationsDirectory,
+        private readonly string $translationsDirectory,
     ) {
         $this->filesystem            = new Filesystem();
     }

@@ -24,16 +24,6 @@ class StatsEvent extends Event
     protected $select;
 
     /**
-     * The page where to start with.
-     */
-    protected int $start;
-
-    /**
-     * The rows per page limit.
-     */
-    protected int $limit;
-
-    /**
      * Database tables which the subscribers already asked for.
      *
      * @var array
@@ -73,21 +63,21 @@ class StatsEvent extends Event
      */
     protected $repository;
 
-    /**
-     * @param int $start
-     * @param int $limit
-     */
     public function __construct(
         $table,
-        $start,
-        $limit,
+        /**
+         * The page where to start with.
+         */
+        protected int $start,
+        /**
+         * The rows per page limit.
+         */
+        protected int $limit,
         protected array $order,
         array $where,
         protected User $user,
     ) {
         $this->table = strtolower(trim(str_replace(MAUTIC_TABLE_PREFIX, '', strip_tags($table))));
-        $this->start = (int) $start;
-        $this->limit = (int) $limit;
         $this->where = $where;
     }
 

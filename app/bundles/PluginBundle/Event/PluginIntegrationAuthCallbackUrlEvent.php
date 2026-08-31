@@ -8,28 +8,19 @@ use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
 final class PluginIntegrationAuthCallbackUrlEvent extends AbstractPluginIntegrationEvent
 {
-    /**
-     * @param string $callbackUrl
-     */
     public function __construct(
         UnifiedIntegrationInterface $integration,
-        private $callbackUrl,
+        private string $callbackUrl,
     ) {
         $this->integration = $integration;
     }
 
-    /**
-     * @return string
-     */
-    public function getCallbackUrl()
+    public function getCallbackUrl(): string
     {
         return $this->callbackUrl;
     }
 
-    /**
-     * @param string $callbackUrl
-     */
-    public function setCallbackUrl($callbackUrl): void
+    public function setCallbackUrl(string $callbackUrl): void
     {
         $this->callbackUrl = $callbackUrl;
 

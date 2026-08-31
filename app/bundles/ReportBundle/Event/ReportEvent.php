@@ -9,10 +9,7 @@ use Mautic\ReportBundle\Entity\Report;
 
 final class ReportEvent extends CommonEvent
 {
-    /**
-     * @param bool $isNew
-     */
-    public function __construct(Report $report, $isNew = false)
+    public function __construct(Report $report, bool $isNew = false)
     {
         $this->entity = $report;
         $this->isNew  = $isNew;

@@ -21,8 +21,6 @@ final class SegmentContactsLineChartQuery extends ChartQuery
     private ?array $removedEventLogStats = null;
 
     /**
-     * @param string|null $unit
-     *
      * @throws SegmentNotFoundException
      */
     public function __construct(
@@ -30,7 +28,7 @@ final class SegmentContactsLineChartQuery extends ChartQuery
         \DateTime $dateFrom,
         \DateTime $dateTo,
         private readonly array $filters = [],
-        $unit = null,
+        ?string $unit = null,
     ) {
         $this->connection = $connection;
         $this->dateFrom   = $dateFrom;

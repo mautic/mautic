@@ -59,14 +59,12 @@ class ChartQuery extends AbstractChart
      * Possible values are 'd'/'H'/'i'/'i'/'W'/'m'/'Y'.
      *
      * @see DateRangeUnitTrait::getTimeUnitFromDateRange()
-     *
-     * @param string|null $unit
      */
     public function __construct(
         protected Connection $connection,
         \DateTime $dateFrom,
         \DateTime $dateTo,
-        $unit = null,
+        ?string $unit = null,
     ) {
         $this->dateTimeHelper = new DateTimeHelper();
         $this->unit           = $unit ?? $this->getTimeUnitFromDateRange($dateFrom, $dateTo);

@@ -11,13 +11,12 @@ class PluginToken extends AbstractToken
     private ?string $providerKey;
 
     /**
-     * @param UserInterface|string|null $user
-     * @param array<string>             $roles
+     * @param array<string> $roles
      */
     public function __construct(
         ?string $providerKey,
         private ?string $authenticatingService = null,
-        $user = null,
+        UserInterface|string|null $user = null,
         private string $credentials = '',
         array $roles = [],
         private readonly ?Response $response = null,

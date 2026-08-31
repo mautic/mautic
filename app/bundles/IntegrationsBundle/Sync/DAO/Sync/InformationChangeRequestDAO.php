@@ -12,13 +12,10 @@ final class InformationChangeRequestDAO
 
     private ?\DateTimeInterface $certainChangeDateTime = null;
 
-    /**
-     * @param mixed $objectId
-     */
     public function __construct(
         private readonly string $integration,
         private readonly string $objectName,
-        private $objectId,
+        private readonly string|int|null $objectId,
         private readonly string $field,
         private readonly NormalizedValueDAO $newValue,
     ) {
@@ -29,10 +26,7 @@ final class InformationChangeRequestDAO
         return $this->integration;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getObjectId()
+    public function getObjectId(): string|int|null
     {
         return $this->objectId;
     }

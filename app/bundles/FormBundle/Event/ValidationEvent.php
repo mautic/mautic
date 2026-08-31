@@ -13,12 +13,9 @@ final class ValidationEvent extends CommonEvent
 
     private string $invalidReason = '';
 
-    /**
-     * @param mixed $value
-     */
     public function __construct(
         private readonly Field $field,
-        private $value,
+        private readonly mixed $value,
     ) {
     }
 

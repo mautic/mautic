@@ -57,14 +57,10 @@ class OrderDAO
      */
     private array $notifications = [];
 
-    /**
-     * @param bool   $isFirstTimeSync
-     * @param string $integration
-     */
     public function __construct(
         private readonly \DateTimeInterface $syncDateTime,
-        private $isFirstTimeSync,
-        private $integration,
+        private readonly bool $isFirstTimeSync,
+        private readonly string $integration,
         private readonly array $options = [],
     ) {
     }

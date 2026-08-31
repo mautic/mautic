@@ -18,19 +18,13 @@ class ReportDAO
 
     private readonly RelationsDAO $relationsDAO;
 
-    /**
-     * @param string $integration
-     */
     public function __construct(
-        private $integration,
+        private readonly string $integration,
     ) {
         $this->relationsDAO    = new RelationsDAO();
     }
 
-    /**
-     * @return string
-     */
-    public function getIntegration()
+    public function getIntegration(): string
     {
         return $this->integration;
     }

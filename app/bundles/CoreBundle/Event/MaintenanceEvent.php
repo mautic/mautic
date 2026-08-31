@@ -15,25 +15,21 @@ class MaintenanceEvent extends Event
      */
     protected $stats = [];
 
-    protected bool $dryRun;
-
-    protected bool $gdpr;
-
     /**
      * @var array
      */
     protected $debug = [];
 
     /**
-     * @param int  $daysOld
-     * @param bool $dryRun
+     * @param int $daysOld
      */
-    public function __construct($daysOld, $dryRun, $gdpr)
-    {
+    public function __construct(
+        $daysOld,
+        protected bool $dryRun,
+        protected bool $gdpr,
+    ) {
         $this->daysOld = (int) $daysOld;
-        $this->dryRun  = (bool) $dryRun;
         $this->date    = new \DateTime("{$daysOld} days ago", new \DateTimeZone('UTC'));
-        $this->gdpr    = (bool) $gdpr;
     }
 
     /**

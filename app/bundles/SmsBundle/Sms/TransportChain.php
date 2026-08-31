@@ -16,11 +16,8 @@ class TransportChain
      */
     private array $transports = [];
 
-    /**
-     * @param string $primaryTransport
-     */
     public function __construct(
-        private $primaryTransport,
+        private readonly string $primaryTransport,
         private readonly IntegrationHelper $integrationHelper,
     ) {
     }

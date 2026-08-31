@@ -36,12 +36,9 @@ class ColumnSchemaHelper
 
     private $columns;
 
-    /**
-     * @param string $prefix
-     */
     public function __construct(
         protected Connection $db,
-        protected $prefix,
+        protected ?string $prefix,
     ) {
         $this->sm = $db->createSchemaManager();
     }

@@ -4,18 +4,14 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\DAO\Mapping;
 
-final class RemappedObjectDAO
+final readonly class RemappedObjectDAO
 {
-    /**
-     * @param mixed $oldObjectId
-     * @param mixed $newObjectId
-     */
     public function __construct(
-        private readonly string $integration,
-        private readonly string $oldObjectName,
-        private $oldObjectId,
-        private readonly string $newObjectName,
-        private $newObjectId,
+        private string $integration,
+        private string $oldObjectName,
+        private string|int|null $oldObjectId,
+        private string $newObjectName,
+        private string|int|null $newObjectId,
     ) {
     }
 
@@ -29,10 +25,7 @@ final class RemappedObjectDAO
         return $this->oldObjectName;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getOldObjectId()
+    public function getOldObjectId(): string|int|null
     {
         return $this->oldObjectId;
     }
@@ -42,10 +35,7 @@ final class RemappedObjectDAO
         return $this->newObjectName;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getNewObjectId()
+    public function getNewObjectId(): string|int|null
     {
         return $this->newObjectId;
     }

@@ -4,6 +4,7 @@ namespace Mautic\CoreBundle\Event;
 
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class BuilderEvent extends Event
 {
@@ -19,7 +20,7 @@ class BuilderEvent extends Event
     protected string $tokenFilterTarget;
 
     public function __construct(
-        protected $translator,
+        protected TranslatorInterface $translator,
         protected $entity = null,
         protected $requested = 'all',
         protected string $tokenFilter = '',

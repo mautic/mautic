@@ -15,8 +15,8 @@ final class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
      * @param mixed[] $operators Please refer to ListModel.php, inside getChoiceFields method, for default operators availabled.
      */
     public function __construct(
-        private $choices,
-        private $operators,
+        private array $choices,
+        private readonly array $operators,
         private readonly TranslatorInterface $translator,
         ?Request $request = null,
         private readonly string $search = '',
@@ -27,7 +27,7 @@ final class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
     /**
      * @return mixed[]
      */
-    public function getChoices()
+    public function getChoices(): array
     {
         return $this->choices;
     }
@@ -35,7 +35,7 @@ final class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
     /**
      * @return mixed[]
      */
-    public function getOperators()
+    public function getOperators(): array
     {
         return $this->operators;
     }
