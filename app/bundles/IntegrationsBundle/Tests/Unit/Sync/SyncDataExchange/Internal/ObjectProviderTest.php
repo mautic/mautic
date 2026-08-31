@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange\Internal;
 
 use Mautic\IntegrationsBundle\Event\InternalObjectEvent;
-use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
@@ -32,10 +31,7 @@ final class ObjectProviderTest extends TestCase
     {
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(
-                $this->isInstanceOf(InternalObjectEvent::class),
-                IntegrationEvents::INTEGRATION_COLLECT_INTERNAL_OBJECTS
-            );
+            ->with($this->isInstanceOf(InternalObjectEvent::class));
 
         $this->expectException(ObjectNotFoundException::class);
         $this->objectProvider->getObjectByName('Unicorn');
@@ -52,8 +48,7 @@ final class ObjectProviderTest extends TestCase
                     $e->addObject($contact);
 
                     return true;
-                }),
-                IntegrationEvents::INTEGRATION_COLLECT_INTERNAL_OBJECTS
+                })
             );
 
         $this->assertSame($contact, $this->objectProvider->getObjectByName(Contact::NAME));
@@ -63,10 +58,7 @@ final class ObjectProviderTest extends TestCase
     {
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(
-                $this->isInstanceOf(InternalObjectEvent::class),
-                IntegrationEvents::INTEGRATION_COLLECT_INTERNAL_OBJECTS,
-            );
+            ->with($this->isInstanceOf(InternalObjectEvent::class));
 
         $this->expectException(ObjectNotFoundException::class);
         $this->objectProvider->getObjectByEntityName('Unicorn');
@@ -83,8 +75,7 @@ final class ObjectProviderTest extends TestCase
                     $e->addObject($contact);
 
                     return true;
-                }),
-                IntegrationEvents::INTEGRATION_COLLECT_INTERNAL_OBJECTS
+                })
             );
 
         $this->assertSame($contact, $this->objectProvider->getObjectByEntityName(Lead::class));

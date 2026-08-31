@@ -6,7 +6,6 @@ namespace Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper;
 
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\IntegrationsBundle\Event\MauticSyncFieldsLoadEvent;
-use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\EncodedValueDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
@@ -105,7 +104,7 @@ class FieldHelper
 
         // Dispatch event to add possibility to add field from some listener
         $event                                     = new MauticSyncFieldsLoadEvent($objectName, $this->syncFields[$objectName]);
-        $event                                     = $this->eventDispatcher->dispatch($event, IntegrationEvents::INTEGRATION_MAUTIC_SYNC_FIELDS_LOAD);
+        $event                                     = $this->eventDispatcher->dispatch($event);
         $this->syncFields[$event->getObjectName()] = $event->getFields();
 
         // Add ID as a read only field

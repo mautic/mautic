@@ -175,6 +175,38 @@
 
 ## Changed code
 
+- IntegrationsBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\IntegrationsBundle\IntegrationEvents` string constants. Update any subscriber or listener that keys on one of the converted `IntegrationEvents::*` constants to key on the event class instead:
+
+    ```diff
+     public static function getSubscribedEvents(): array
+     {
+         return [
+    -        IntegrationEvents::INTEGRATION_COLLECT_INTERNAL_OBJECTS => ['collectInternalObjects', 0],
+    +        InternalObjectEvent::class => ['collectInternalObjects', 0],
+         ];
+     }
+    ```
+
+    Dispatching drops the redundant second argument, e.g. `$dispatcher->dispatch($event, IntegrationEvents::INTEGRATION_COLLECT_INTERNAL_OBJECTS)` becomes `$dispatcher->dispatch($event)`. The `Mautic\IntegrationsBundle\IntegrationEvents` constants are kept for backwards compatibility but are no longer used internally for the events below.
+
+    Full mapping of the converted constants to their event class (all in the `Mautic\IntegrationsBundle\Event` namespace):
+
+    | `IntegrationEvents` constant | New event class |
+    | --- | --- |
+    | `IntegrationEvents::INTEGRATION_POST_EXECUTE` | `SyncEvent` |
+    | `IntegrationEvents::INTEGRATION_CONFIG_FORM_LOAD` | `FormLoadEvent` |
+    | `IntegrationEvents::INTEGRATION_CONFIG_ON_GENERATE_AUTH_URL` | `ConfigAuthUrlEvent` |
+    | `IntegrationEvents::INTEGRATION_API_KEYS_BEFORE_SAVE` | `KeysSaveEvent` |
+    | `IntegrationEvents::INTEGRATION_KEYS_BEFORE_ENCRYPTION` | `KeysEncryptionEvent` |
+    | `IntegrationEvents::INTEGRATION_KEYS_AFTER_DECRYPTION` | `KeysDecryptionEvent` |
+    | `IntegrationEvents::INTEGRATION_MAUTIC_SYNC_FIELDS_LOAD` | `MauticSyncFieldsLoadEvent` |
+    | `IntegrationEvents::INTEGRATION_COLLECT_INTERNAL_OBJECTS` | `InternalObjectEvent` |
+    | `IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS` | `InternalObjectCreateEvent` |
+    | `IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS` | `InternalObjectUpdateEvent` |
+    | `IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORD` | `InternalObjectFindByIdEvent` |
+    | `IntegrationEvents::INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE` | `InternalObjectRouteEvent` |
+    | `IntegrationEvents::INTEGRATION_OBJECT_TOKEN_EVENT` | `MappedIntegrationObjectTokenEvent` |
+
 - `Mautic\CoreBundle\Factory\ModelFactory` now builds its service locator from a `defaultIndexMethod` on the `mautic.model` tag, replacing the removed `Mautic\CoreBundle\DependencyInjection\Compiler\ModelPass`. Every model (a service implementing `Mautic\CoreBundle\Model\MauticModelInterface`) declares its `ModelFactory::getModel()` lookup key via a static `getName()` method:
 
     ```php

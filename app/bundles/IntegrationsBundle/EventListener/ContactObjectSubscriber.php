@@ -29,17 +29,17 @@ final readonly class ContactObjectSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            IntegrationEvents::INTEGRATION_COLLECT_INTERNAL_OBJECTS    => ['collectInternalObjects', 0],
-            IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS     => ['updateContacts', 0],
-            IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS     => ['createContacts', 0],
-            IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS       => [
+            InternalObjectEvent::class                           => ['collectInternalObjects', 0],
+            InternalObjectUpdateEvent::class                     => ['updateContacts', 0],
+            InternalObjectCreateEvent::class                     => ['createContacts', 0],
+            IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS => [
                 ['findContactsByIds', 0],
                 ['findContactsByDateRange', 0],
                 ['findContactsByFieldValues', 0],
             ],
-            IntegrationEvents::INTEGRATION_FIND_OWNER_IDS              => ['findOwnerIdsForContacts', 0],
-            IntegrationEvents::INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE => ['buildContactRoute', 0],
-            IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORD        => ['findContactById', 0],
+            IntegrationEvents::INTEGRATION_FIND_OWNER_IDS        => ['findOwnerIdsForContacts', 0],
+            InternalObjectRouteEvent::class                      => ['buildContactRoute', 0],
+            InternalObjectFindByIdEvent::class                   => ['findContactById', 0],
         ];
     }
 

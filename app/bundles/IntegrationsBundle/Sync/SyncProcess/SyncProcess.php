@@ -70,10 +70,7 @@ final class SyncProcess
         }
 
         // Tell listeners sync is done
-        $this->eventDispatcher->dispatch(
-            new SyncEvent($this->inputOptionsDAO),
-            IntegrationEvents::INTEGRATION_POST_EXECUTE
-        );
+        $this->eventDispatcher->dispatch(new SyncEvent($this->inputOptionsDAO));
     }
 
     private function executeIntegrationSync(): void
