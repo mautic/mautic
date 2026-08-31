@@ -24,6 +24,8 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\StagesChangeLog;
 use Mautic\LeadBundle\Entity\StagesChangeLogRepository;
+use Mautic\LeadBundle\Entity\Tag;
+use Mautic\LeadBundle\Entity\TagRepository;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\SaveBatchLeadsEvent;
 use Mautic\LeadBundle\Exception\ImportFailedException;
@@ -438,6 +440,35 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $mockLeadModel->expects($this->once())->method('modifyTags')->willReturn(true);
 
         $mockLeadModel->import(['tag' => 'tags'], ['tag' => 'Test 1|Test 2|Test 3']);
+    }
+
+    public function testModifyTagsUsesManagedReferenceForExistingTag(): void
+    {
+        $lead        = new Lead();
+        $detachedTag = new Tag('import-tag');
+        $managedTag  = new Tag('import-tag');
+        $this->setProperty($detachedTag, Tag::class, 'id', 123);
+        $this->setProperty($managedTag, Tag::class, 'id', 123);
+
+        $tagRepository = $this->createMock(TagRepository::class);
+        $tagRepository->expects($this->once())
+            ->method('getTagsByName')
+            ->with(['import-tag'])
+            ->willReturn(['import-tag' => $detachedTag]);
+
+        $this->entityManagerMock->expects($this->once())
+            ->method('getRepository')
+            ->with(Tag::class)
+            ->willReturn($tagRepository);
+        $this->entityManagerMock->expects($this->once())
+            ->method('getReference')
+            ->with(Tag::class, 123)
+            ->willReturn($managedTag);
+
+        $this->leadModel->modifyTags($lead, ['import-tag'], null, false);
+
+        $this->assertTrue($lead->getTags()->contains($managedTag));
+        $this->assertFalse($lead->getTags()->contains($detachedTag));
     }
 
     /**

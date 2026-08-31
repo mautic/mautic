@@ -1785,7 +1785,9 @@ class LeadModel extends FormModel
                 if (!array_key_exists($tag, $foundTags)) {
                     $tagToBeAdded = new Tag($tag, false);
                 } elseif (!$leadTags->contains($foundTags[$tag])) {
-                    $tagToBeAdded = $foundTags[$tag];
+                    // Import batches may hold an entity returned before Doctrine
+                    // detached it. Always attach the existing tag to this manager.
+                    $tagToBeAdded = $this->em->getReference(Tag::class, $foundTags[$tag]->getId());
                 }
 
                 if ($tagToBeAdded) {
