@@ -44,10 +44,7 @@ class DynamicContentControllerTest extends MauticMysqlTestCase
         $this->dwc = $dwc;
     }
 
-    /**
-     * Get company's edit page.
-     */
-    public function testEditingCompanyWithTagFilters(): void
+    public function testEditingDwcWithTagFilters(): void
     {
         $tag1 = $this->createTag('tag1');
 
