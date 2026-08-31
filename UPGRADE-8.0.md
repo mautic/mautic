@@ -356,6 +356,29 @@
     | `PageEvents::REDIRECT_DO_NOT_TRACK` | `UntrackableUrlsEvent` |
     | `PageEvents::ON_REDIRECT_GENERATE` | `RedirectGenerationEvent` |
     | `PageEvents::ON_CONTACT_TRACKED` | `TrackingEvent` |
+- SmsBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\SmsBundle\SmsEvents` string constants. Update any subscriber or listener that keys on one of the converted `SmsEvents::*` constants to key on the event class instead:
+
+    ```diff
+     public static function getSubscribedEvents(): array
+     {
+         return [
+    -        SmsEvents::DNC_FILTER_CONTACTS_ON_SEND => ['dncFilter', 0],
+    +        DncEvent::class => ['dncFilter', 0],
+         ];
+     }
+    ```
+
+    Dispatching drops the redundant second argument, e.g. `$dispatcher->dispatch($event, SmsEvents::SMS_ON_SEND)` becomes `$dispatcher->dispatch($event)`. The `Mautic\SmsBundle\SmsEvents` constants are kept for backwards compatibility but are no longer used internally for the events below. Constants that share an event class stay unchanged: the `SMS_PRE_SAVE` / `SMS_POST_SAVE` / `SMS_PRE_DELETE` / `SMS_POST_DELETE` group (`SmsEvent`) and the `ON_REPLY` / `ON_CAMPAIGN_REPLY` pair (`ReplyEvent`). The webhook-type identifiers `TOKEN_REPLACEMENT` (shared `CoreBundle` event) and the campaign trigger constants also stay as strings.
+
+    Full mapping of the converted constants to their event class (all in the `Mautic\SmsBundle\Event` namespace):
+
+    | `SmsEvents` constant | New event class |
+    | --- | --- |
+    | `SmsEvents::SMS_ON_SEND` | `SmsSendEvent` |
+    | `SmsEvents::ON_SMS_TOKENS_BUILD` | `TokensBuildEvent` |
+    | `SmsEvents::DNC_FILTER_CONTACTS_ON_SEND` | `DncEvent` |
+    | `SmsEvents::QUEUE_FILTER_CONTACTS_ON_SEND` | `QueueEvent` |
+    | `SmsEvents::FILTER_CONTACTS_ON_SEND` | `FilterEvent` |
 
 - `Mautic\CoreBundle\Factory\ModelFactory` now builds its service locator from a `defaultIndexMethod` on the `mautic.model` tag, replacing the removed `Mautic\CoreBundle\DependencyInjection\Compiler\ModelPass`. Every model (a service implementing `Mautic\CoreBundle\Model\MauticModelInterface`) declares its `ModelFactory::getModel()` lookup key via a static `getName()` method:
 

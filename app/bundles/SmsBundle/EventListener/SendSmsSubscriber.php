@@ -11,7 +11,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\SmsBundle\Event\DncEvent;
 use Mautic\SmsBundle\Event\FilterEvent;
 use Mautic\SmsBundle\Event\QueueEvent;
-use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class SendSmsSubscriber implements EventSubscriberInterface
@@ -28,9 +27,9 @@ final readonly class SendSmsSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            SmsEvents::DNC_FILTER_CONTACTS_ON_SEND   => ['dncFilter', 0],
-            SmsEvents::QUEUE_FILTER_CONTACTS_ON_SEND => ['queueFilter', 0],
-            SmsEvents::FILTER_CONTACTS_ON_SEND       => ['genericFilter', 0],
+            DncEvent::class    => ['dncFilter', 0],
+            QueueEvent::class  => ['queueFilter', 0],
+            FilterEvent::class => ['genericFilter', 0],
         ];
     }
 

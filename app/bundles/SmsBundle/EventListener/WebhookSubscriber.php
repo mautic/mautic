@@ -20,7 +20,7 @@ final readonly class WebhookSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            SmsEvents::SMS_ON_SEND     => 'onSend',
+            SmsSendEvent::class        => 'onSend',
             WebhookBuilderEvent::class => 'onWebhookBuild',
         ];
     }
