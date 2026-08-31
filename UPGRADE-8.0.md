@@ -280,6 +280,30 @@
     | `PluginEvents::ON_PLUGIN_INSTALL` | `PluginInstallEvent` |
     | `PluginEvents::PLUGIN_IS_PUBLISHED_STATE_CHANGING` | `PluginIsPublishedEvent` |
 
+- ChannelBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\ChannelBundle\ChannelEvents` string constants. Update any subscriber or listener that keys on one of the converted `ChannelEvents::*` constants to key on the event class instead:
+
+    ```diff
+     public static function getSubscribedEvents(): array
+     {
+         return [
+    -        ChannelEvents::ADD_CHANNEL => ['onAddChannel', 0],
+    +        ChannelEvent::class => ['onAddChannel', 0],
+         ];
+     }
+    ```
+
+    Dispatching drops the redundant second argument, e.g. `$dispatcher->dispatch($event, ChannelEvents::CHANNEL_BROADCAST)` becomes `$dispatcher->dispatch($event)`. The `Mautic\ChannelBundle\ChannelEvents` constants are kept for backwards compatibility but are no longer used internally for the events below. Constants that share an event class are unchanged: the `MESSAGE_PRE_SAVE` / `MESSAGE_POST_SAVE` / `MESSAGE_PRE_DELETE` / `MESSAGE_POST_DELETE` group on `MessageEvent`, and `ON_CAMPAIGN_BATCH_ACTION` on the shared `Mautic\CampaignBundle\Event\PendingEvent`.
+
+    Full mapping of the converted constants to their event class (all in the `Mautic\ChannelBundle\Event` namespace):
+
+    | `ChannelEvents` constant | New event class |
+    | --- | --- |
+    | `ChannelEvents::ADD_CHANNEL` | `ChannelEvent` |
+    | `ChannelEvents::CHANNEL_BROADCAST` | `ChannelBroadcastEvent` |
+    | `ChannelEvents::MESSAGE_QUEUED` | `MessageQueueEvent` |
+    | `ChannelEvents::PROCESS_MESSAGE_QUEUE` | `MessageQueueProcessEvent` |
+    | `ChannelEvents::PROCESS_MESSAGE_QUEUE_BATCH` | `MessageQueueBatchProcessEvent` |
+
 - `Mautic\CoreBundle\Factory\ModelFactory` now builds its service locator from a `defaultIndexMethod` on the `mautic.model` tag, replacing the removed `Mautic\CoreBundle\DependencyInjection\Compiler\ModelPass`. Every model (a service implementing `Mautic\CoreBundle\Model\MauticModelInterface`) declares its `ModelFactory::getModel()` lookup key via a static `getName()` method:
 
     ```php

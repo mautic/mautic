@@ -2,7 +2,6 @@
 
 namespace Mautic\ChannelBundle\Command;
 
-use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\ChannelBroadcastEvent;
 use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -159,7 +158,7 @@ final class SendChannelBroadcastCommand extends ModeratedCommand
             $event->setMaxThreads((int) $maxThreads);
         }
 
-        $this->dispatcher->dispatch($event, ChannelEvents::CHANNEL_BROADCAST);
+        $this->dispatcher->dispatch($event);
 
         $results = $event->getResults();
 

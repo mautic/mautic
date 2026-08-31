@@ -5,7 +5,6 @@ namespace Mautic\ChannelBundle\Controller\Api;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
-use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Entity\Message;
 use Mautic\ChannelBundle\Event\ChannelEvent;
 use Mautic\ChannelBundle\Model\MessageModel;
@@ -79,7 +78,7 @@ final class MessageApiController extends CommonApiController
      */
     protected function preSerializeEntity(object $entity, string $action = 'view'): void
     {
-        $event = $this->dispatcher->dispatch(new ChannelEvent(), ChannelEvents::ADD_CHANNEL);
+        $event = $this->dispatcher->dispatch(new ChannelEvent());
 
         foreach ($entity->getChannels() as $channel) {
             $repository = $event->getRepositoryName($channel->getChannel());

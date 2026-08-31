@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\ChannelEvent;
 use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\EmailBundle\Form\Type\EmailListType;
@@ -24,7 +23,7 @@ final class ChannelSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            ChannelEvents::ADD_CHANNEL => ['onAddChannel', 100],
+            ChannelEvent::class => ['onAddChannel', 100],
         ];
     }
 
