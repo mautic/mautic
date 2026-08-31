@@ -165,7 +165,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         $this->dispatchEvent('pre_delete', $entity);
         $this->getRepository()->setCampaignAsDeleted($entity->getId());
 
-        $this->dispatcher->dispatch(new Events\DeleteCampaign($entity), CampaignEvents::ON_CAMPAIGN_DELETE);
+        $this->dispatcher->dispatch(new Events\DeleteCampaign($entity));
     }
 
     public function deleteCampaign(Campaign $campaign): void

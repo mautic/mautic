@@ -3,7 +3,6 @@
 namespace Mautic\DynamicContentBundle\EventListener;
 
 use Mautic\CacheBundle\Cache\CacheProvider;
-use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\DecisionEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
@@ -31,7 +30,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CampaignEvents::CAMPAIGN_ON_BUILD                  => ['onCampaignBuild', 0],
+            CampaignBuilderEvent::class => ['onCampaignBuild', 0],
             DynamicContentEvents::ON_CAMPAIGN_TRIGGER_DECISION => ['onCampaignTriggerDecision', 0],
             DynamicContentEvents::ON_CAMPAIGN_BATCH_ACTION     => ['onCampaignTriggerAction', 0],
         ];

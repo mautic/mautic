@@ -3,7 +3,6 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Doctrine\ORM\ORMException;
-use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\DecisionEvent;
@@ -49,7 +48,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CampaignEvents::CAMPAIGN_ON_BUILD        => ['onCampaignBuild', 0],
+            CampaignBuilderEvent::class => ['onCampaignBuild', 0],
             EventPreview::class                      => ['onEventPreviewRequest', 0],
             EmailEvents::EMAIL_ON_OPEN               => ['onEmailOpen', 0],
             EmailEvents::ON_CAMPAIGN_BATCH_ACTION    => [

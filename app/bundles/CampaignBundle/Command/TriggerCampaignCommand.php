@@ -3,7 +3,6 @@
 namespace Mautic\CampaignBundle\Command;
 
 use Exception;
-use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Event\CampaignTriggerEvent;
@@ -285,11 +284,10 @@ final class TriggerCampaignCommand extends ModeratedCommand
      */
     private function dispatchTriggerEvent(Campaign $campaign)
     {
-        if ($this->dispatcher->hasListeners(CampaignEvents::CAMPAIGN_ON_TRIGGER)) {
+        if ($this->dispatcher->hasListeners(CampaignTriggerEvent::class)) {
             /** @var CampaignTriggerEvent $event */
             $event = $this->dispatcher->dispatch(
-                new CampaignTriggerEvent($campaign),
-                CampaignEvents::CAMPAIGN_ON_TRIGGER
+                new CampaignTriggerEvent($campaign)
             );
 
             return $event->shouldTrigger();

@@ -2,7 +2,6 @@
 
 namespace Mautic\CampaignBundle\EventCollector;
 
-use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
@@ -74,7 +73,7 @@ class EventCollector
     {
         // build them
         $event  = new CampaignBuilderEvent($this->translator);
-        $this->dispatcher->dispatch($event, CampaignEvents::CAMPAIGN_ON_BUILD);
+        $this->dispatcher->dispatch($event);
 
         $this->eventsArray[Event::TYPE_ACTION]    = $event->getActions();
         $this->eventsArray[Event::TYPE_CONDITION] = $event->getConditions();

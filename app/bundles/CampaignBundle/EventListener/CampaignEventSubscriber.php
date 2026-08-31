@@ -49,8 +49,8 @@ final readonly class CampaignEventSubscriber implements EventSubscriberInterface
     {
         return [
             CampaignEvents::CAMPAIGN_PRE_SAVE        => ['onCampaignPreSave', 0],
-            CampaignEvents::ON_EVENT_FAILED          => ['onEventFailed', 0],
-            CampaignEvents::ON_EVENT_EXECUTED        => ['onEventExecuted', 0],
+            FailedEvent::class                       => ['onEventFailed', 0],
+            ExecutedEvent::class                     => ['onEventExecuted', 0],
             EventPreview::class                      => ['onEventPreviewRequest', 0],
         ];
     }
@@ -114,10 +114,9 @@ final readonly class CampaignEventSubscriber implements EventSubscriberInterface
         $contactCount  = $campaign->getLeads()->count();
         $failedPercent = $contactCount ? ($failedCount / $contactCount) : 1;
 
-        if ($this->eventDispatcher->hasListeners(CampaignEvents::ON_CAMPAIGN_FAILURE_NOTIFY)) {
+        if ($this->eventDispatcher->hasListeners(NotifyOfFailureEvent::class)) {
             $this->eventDispatcher->dispatch(
-                new NotifyOfFailureEvent($lead, $failedEvent),
-                CampaignEvents::ON_CAMPAIGN_FAILURE_NOTIFY
+                new NotifyOfFailureEvent($lead, $failedEvent)
             );
         }
 
@@ -131,10 +130,9 @@ final readonly class CampaignEventSubscriber implements EventSubscriberInterface
                 return;
             }
 
-            if ($this->eventDispatcher->hasListeners(CampaignEvents::ON_CAMPAIGN_UNPUBLISH_NOTIFY)) {
+            if ($this->eventDispatcher->hasListeners(NotifyOfUnpublishEvent::class)) {
                 $this->eventDispatcher->dispatch(
-                    new NotifyOfUnpublishEvent($failedEvent),
-                    CampaignEvents::ON_CAMPAIGN_UNPUBLISH_NOTIFY
+                    new NotifyOfUnpublishEvent($failedEvent)
                 );
             }
         }

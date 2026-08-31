@@ -46,7 +46,7 @@ final class NotifyOfFailureSubscriberTest extends TestCase
     public function testGetSubscribedEvents(): void
     {
         $events = NotifyOfFailureSubscriber::getSubscribedEvents();
-        $this->assertArrayHasKey('mautic.campaign_failure_notify', $events);
-        $this->assertEquals('notifyOfFailure', $events['mautic.campaign_failure_notify']);
+        $this->assertArrayHasKey(NotifyOfFailureEvent::class, $events);
+        $this->assertEquals('notifyOfFailure', $events[NotifyOfFailureEvent::class]);
     }
 }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\EventListener;
 
-use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
@@ -46,7 +45,7 @@ final class CampaignEventSubscriberFunctionalTest extends MauticMysqlTestCase
         $unpublishEvent = new NotifyOfUnpublishEvent($failedEvent);
         /** @var EventDispatcherInterface $dispatcher */
         $dispatcher = self::getContainer()->get(EventDispatcherInterface::class);
-        $dispatcher->dispatch($unpublishEvent, CampaignEvents::ON_CAMPAIGN_UNPUBLISH_NOTIFY);
+        $dispatcher->dispatch($unpublishEvent);
 
         // Check for notifications - use a more general query
         $notifications = $this->em->getRepository(Notification::class)
@@ -60,7 +59,7 @@ final class CampaignEventSubscriberFunctionalTest extends MauticMysqlTestCase
 
         // Let's try dispatching the event again and verify that we have a second notification
         // (verifying that notifications aren't deduplicated)
-        $dispatcher->dispatch($unpublishEvent, CampaignEvents::ON_CAMPAIGN_UNPUBLISH_NOTIFY);
+        $dispatcher->dispatch($unpublishEvent);
 
         // Query for all notifications
         $notifications = $this->em->getRepository(Notification::class)

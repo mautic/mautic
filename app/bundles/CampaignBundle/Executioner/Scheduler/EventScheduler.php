@@ -3,7 +3,6 @@
 namespace Mautic\CampaignBundle\Executioner\Scheduler;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Enum\RepublishBehavior;
@@ -333,8 +332,7 @@ class EventScheduler
     private function dispatchScheduledEvent(AbstractEventAccessor $config, LeadEventLog $log, bool $isReschedule = false): void
     {
         $this->dispatcher->dispatch(
-            new ScheduledEvent($config, $log, $isReschedule),
-            CampaignEvents::ON_EVENT_SCHEDULED
+            new ScheduledEvent($config, $log, $isReschedule)
         );
     }
 
@@ -345,8 +343,7 @@ class EventScheduler
         }
 
         $this->dispatcher->dispatch(
-            new ScheduledBatchEvent($config, $event, $logs, $isReschedule),
-            CampaignEvents::ON_EVENT_SCHEDULED_BATCH
+            new ScheduledBatchEvent($config, $event, $logs, $isReschedule)
         );
     }
 

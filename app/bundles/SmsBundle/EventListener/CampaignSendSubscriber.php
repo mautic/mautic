@@ -2,7 +2,6 @@
 
 namespace Mautic\SmsBundle\EventListener;
 
-use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\SmsBundle\Entity\Sms;
@@ -25,7 +24,7 @@ final readonly class CampaignSendSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CampaignEvents::CAMPAIGN_ON_BUILD           => ['onCampaignBuild', 0],
+            CampaignBuilderEvent::class => ['onCampaignBuild', 0],
             SmsEvents::ON_CAMPAIGN_TRIGGER_BATCH_ACTION => ['onCampaignTriggerBatchAction', 0],
         ];
     }

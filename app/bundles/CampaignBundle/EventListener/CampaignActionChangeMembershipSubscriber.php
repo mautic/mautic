@@ -26,7 +26,7 @@ final readonly class CampaignActionChangeMembershipSubscriber implements EventSu
     public static function getSubscribedEvents(): array
     {
         return [
-            CampaignEvents::CAMPAIGN_ON_BUILD                    => ['addAction', 0],
+            CampaignBuilderEvent::class                          => ['addAction', 0],
             CampaignEvents::ON_CAMPAIGN_ACTION_CHANGE_MEMBERSHIP => ['changeMembership', 0],
             EntityValidateEvent::class                           => ['validateInfiniteLoop', 0],
         ];

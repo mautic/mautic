@@ -43,7 +43,7 @@ final class NotifyOfUnpublishSubscriberTest extends TestCase
     public function testGetSubscribedEvents(): void
     {
         $events = NotifyOfUnpublishSubscriber::getSubscribedEvents();
-        $this->assertArrayHasKey('mautic.campaign_unpublish_notify', $events);
-        $this->assertEquals('notifyOfUnpublish', $events['mautic.campaign_unpublish_notify']);
+        $this->assertArrayHasKey(NotifyOfUnpublishEvent::class, $events);
+        $this->assertEquals('notifyOfUnpublish', $events[NotifyOfUnpublishEvent::class]);
     }
 }
