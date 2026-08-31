@@ -106,9 +106,7 @@ trait CustomFieldRepositoryTrait
 
                 // make sure each group key is present
                 foreach ($groups as $g) {
-                    if (!isset($fieldValues[$id][$g])) {
-                        $fieldValues[$id][$g] = [];
-                    }
+                    $fieldValues[$id][$g] ??= [];
                 }
             }
 
@@ -353,9 +351,7 @@ trait CustomFieldRepositoryTrait
             // make sure each group key is present
             $groups = $this->getFieldGroups();
             foreach ($groups as $g) {
-                if (!isset($fieldValues[$g])) {
-                    $fieldValues[$g] = [];
-                }
+                $fieldValues[$g] ??= [];
             }
         }
 

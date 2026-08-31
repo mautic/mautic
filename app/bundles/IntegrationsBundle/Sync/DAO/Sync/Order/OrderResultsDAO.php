@@ -121,9 +121,7 @@ final class OrderResultsDAO
     private function groupNewObjectMappingsByObjectName(array $objectMappings): void
     {
         foreach ($objectMappings as $objectMapping) {
-            if (!isset($this->newObjectMappings[$objectMapping->getIntegrationObjectName()])) {
-                $this->newObjectMappings[$objectMapping->getIntegrationObjectName()] = [];
-            }
+            $this->newObjectMappings[$objectMapping->getIntegrationObjectName()] ??= [];
 
             $this->newObjectMappings[$objectMapping->getIntegrationObjectName()][] = $objectMapping;
         }
@@ -135,9 +133,7 @@ final class OrderResultsDAO
     private function groupUpdatedObjectMappingsByObjectName(array $objectMappings): void
     {
         foreach ($objectMappings as $objectMapping) {
-            if (!isset($this->updatedObjectMappings[$objectMapping->getIntegrationObjectName()])) {
-                $this->updatedObjectMappings[$objectMapping->getIntegrationObjectName()] = [];
-            }
+            $this->updatedObjectMappings[$objectMapping->getIntegrationObjectName()] ??= [];
 
             $this->updatedObjectMappings[$objectMapping->getIntegrationObjectName()][] = $objectMapping;
         }
@@ -149,9 +145,7 @@ final class OrderResultsDAO
     private function groupRemappedObjectsByObjectName(array $remappedObjects): void
     {
         foreach ($remappedObjects as $remappedObject) {
-            if (!isset($this->remappedObjects[$remappedObject->getNewObjectName()])) {
-                $this->remappedObjects[$remappedObject->getNewObjectName()] = [];
-            }
+            $this->remappedObjects[$remappedObject->getNewObjectName()] ??= [];
 
             $this->remappedObjects[$remappedObject->getNewObjectName()][] = $remappedObject;
         }
@@ -163,9 +157,7 @@ final class OrderResultsDAO
     private function groupDeletedObjectsByObjectName(array $deletedObjects): void
     {
         foreach ($deletedObjects as $deletedObject) {
-            if (!isset($this->deletedObjects[$deletedObject->getObject()])) {
-                $this->deletedObjects[$deletedObject->getObject()] = [];
-            }
+            $this->deletedObjects[$deletedObject->getObject()] ??= [];
 
             $this->deletedObjects[$deletedObject->getObject()][] = $deletedObject;
         }

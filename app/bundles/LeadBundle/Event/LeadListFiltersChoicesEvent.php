@@ -60,9 +60,7 @@ final class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
      */
     public function addChoice($object, $choiceKey, $choiceConfig): void
     {
-        if (!isset($this->choices[$object])) {
-            $this->choices[$object] = [];
-        }
+        $this->choices[$object] ??= [];
         if (!array_key_exists($choiceKey, $this->choices[$object])) {
             $this->choices[$object][$choiceKey] = $choiceConfig;
         }
@@ -73,9 +71,7 @@ final class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
      */
     public function setChoice(string $object, string $choiceKey, array $choiceConfig): void
     {
-        if (!isset($this->choices[$object])) {
-            $this->choices[$object] = [];
-        }
+        $this->choices[$object] ??= [];
 
         $this->choices[$object][$choiceKey] = $choiceConfig;
     }

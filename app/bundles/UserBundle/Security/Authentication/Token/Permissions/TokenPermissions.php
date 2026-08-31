@@ -29,9 +29,7 @@ class TokenPermissions
      */
     public function setActivePermissionsOnAuthToken(TokenInterface|OAuthTokenInterface|null $token = null): ?UserInterface
     {
-        if (null === $token) {
-            $token = $this->tokenStorage->getToken();
-        }
+        $token ??= $this->tokenStorage->getToken();
 
         if (null === $token) {
             return null;

@@ -65,9 +65,7 @@ class PointActionHelper
         }
 
         if ($action['properties']['accumulative_time']) {
-            if (!isset($hitStats)) {
-                $hitStats = $this->hitRepository->getDwellTimesForUrl($urlWithSqlWC, ['leadId' => $lead->getId()]);
-            }
+            $hitStats ??= $this->hitRepository->getDwellTimesForUrl($urlWithSqlWC, ['leadId' => $lead->getId()]);
 
             if (isset($hitStats['sum'])) {
                 if ($action['properties']['accumulative_time'] <= $hitStats['sum']) {
@@ -80,9 +78,7 @@ class PointActionHelper
             }
         }
         if ($action['properties']['page_hits']) {
-            if (!isset($hitStats)) {
-                $hitStats = $this->hitRepository->getDwellTimesForUrl($urlWithSqlWC, ['leadId' => $lead->getId()]);
-            }
+            $hitStats ??= $this->hitRepository->getDwellTimesForUrl($urlWithSqlWC, ['leadId' => $lead->getId()]);
             if (isset($hitStats['count']) && $hitStats['count'] >= $action['properties']['page_hits']) {
                 $changePoints['page_hits'] = true;
             } else {

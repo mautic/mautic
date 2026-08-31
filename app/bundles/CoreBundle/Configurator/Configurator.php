@@ -65,9 +65,7 @@ class Configurator
      */
     public function addStep(StepInterface $step, $priority = 0): void
     {
-        if (!isset($this->steps[$priority])) {
-            $this->steps[$priority] = [];
-        }
+        $this->steps[$priority] ??= [];
 
         $this->steps[$priority][] = $step;
         $this->sortedSteps        = [];

@@ -421,12 +421,10 @@ final class ImportController extends AbstractFormController
                         continue;
                     }
                     foreach ($entities as $entityName => $info) {
-                        if (!isset($mergedSummary[$status][$entityName])) {
-                            $mergedSummary[$status][$entityName] = [
-                                'names'   => [],
-                                'uuids'   => [],
-                            ];
-                        }
+                        $mergedSummary[$status][$entityName] ??= [
+                            'names'   => [],
+                            'uuids'   => [],
+                        ];
 
                         $mergedSummary[$status][$entityName]['names'] = array_merge(
                             $mergedSummary[$status][$entityName]['names'],

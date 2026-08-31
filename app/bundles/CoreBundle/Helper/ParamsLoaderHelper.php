@@ -10,16 +10,14 @@ final class ParamsLoaderHelper
 {
     use ConfigAwareTrait;
 
-    private $parameters = [];
+    private array $parameters = [];
 
     /**
      * Get parameters for static method.
-     *
-     * @return array
      */
-    public function getParameters()
+    public function getParameters(): array
     {
-        if (empty($this->parameters)) {
+        if ([] === $this->parameters) {
             $this->parameters = $this->getConfig();
         }
 

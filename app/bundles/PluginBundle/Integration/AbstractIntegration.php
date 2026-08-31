@@ -672,9 +672,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             $parameters = $event->getParameters();
         }
 
-        if (!isset($settings['query'])) {
-            $settings['query'] = [];
-        }
+        $settings['query'] ??= [];
 
         if (isset($parameters['append_to_query'])) {
             $settings['query'] = array_merge(
@@ -1419,10 +1417,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
             // Check that the remaining fields have an updateKey set
             foreach ($mappedFields as $field => $mauticField) {
-                if (!isset($featureSettings[$updateKey][$field])) {
-                    // Assume it's mapped to Mautic
-                    $featureSettings[$updateKey][$field] = 1;
-                }
+                $featureSettings[$updateKey][$field] ??= 1;
             }
 
             // Check if required fields are missing
@@ -1723,9 +1718,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
         // Update the social cache
         $leadSocialCache = $lead->getSocialCache();
-        if (!isset($leadSocialCache[$this->getName()])) {
-            $leadSocialCache[$this->getName()] = [];
-        }
+        $leadSocialCache[$this->getName()] ??= [];
 
         if (null !== $socialCache) {
             $leadSocialCache[$this->getName()] = array_merge($leadSocialCache[$this->getName()], $socialCache);
@@ -1921,21 +1914,19 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     public function logIntegrationError(\Exception $e, ?Lead $contact = null): void
     {
         if ($e instanceof ApiErrorException) {
-            if (null === $this->adminUsers) {
-                $this->adminUsers = $this->userRepository->getEntities(
-                    [
-                        'filter' => [
-                            'force' => [
-                                [
-                                    'column' => 'r.isAdmin',
-                                    'expr'   => 'eq',
-                                    'value'  => true,
-                                ],
+            $this->adminUsers ??= $this->userRepository->getEntities(
+                [
+                    'filter' => [
+                        'force' => [
+                            [
+                                'column' => 'r.isAdmin',
+                                'expr'   => 'eq',
+                                'value'  => true,
                             ],
                         ],
-                    ]
-                );
-            }
+                    ],
+                ]
+            );
 
             $errorMessage = $e->getMessage();
             $errorHeader  = $this->translator->trans(

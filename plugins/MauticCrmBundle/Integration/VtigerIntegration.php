@@ -160,9 +160,7 @@ class VtigerIntegration extends CrmAbstractIntegration
                         }
 
                         // Create the array if it doesn't exist to prevent PHP notices
-                        if (!isset($vTigerFields[$object])) {
-                            $vTigerFields[$object] = [];
-                        }
+                        $vTigerFields[$object] ??= [];
 
                         $leadFields = $this->getApiHelper()->getLeadFields($object);
                         if (isset($leadFields['fields'])) {

@@ -333,9 +333,7 @@ final class FormApiController extends CommonApiController
      */
     protected function processForm(Request $request, $entity, $parameters = null, $method = 'PUT')
     {
-        if (!isset($parameters['postAction'])) {
-            $parameters['postAction'] = 'return';
-        }
+        $parameters['postAction'] ??= 'return';
 
         return parent::processForm($request, $entity, $parameters, $method);
     }

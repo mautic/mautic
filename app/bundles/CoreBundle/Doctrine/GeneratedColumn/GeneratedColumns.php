@@ -33,13 +33,9 @@ final class GeneratedColumns implements GeneratedColumnsInterface
 
         $tableName = $generatedColumn->getTableName();
 
-        if (!isset($this->dateColumnIndex[$tableName])) {
-            $this->dateColumnIndex[$tableName] = [];
-        }
+        $this->dateColumnIndex[$tableName] ??= [];
 
-        if (!isset($this->dateColumnIndex[$tableName][$originalDateColumn])) {
-            $this->dateColumnIndex[$tableName][$originalDateColumn] = [];
-        }
+        $this->dateColumnIndex[$tableName][$originalDateColumn] ??= [];
 
         $this->dateColumnIndex[$tableName][$originalDateColumn][$timeUnit] = $generatedColumn;
     }

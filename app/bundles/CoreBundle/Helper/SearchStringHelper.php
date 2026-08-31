@@ -236,12 +236,8 @@ final class SearchStringHelper
                 $string = strtolower($string);
             }
 
-            if (!isset($filters->{$baseName}[$keyCount]->strict)) {
-                $filters->{$baseName}[$keyCount]->strict = 0;
-            }
-            if (!isset($filters->{$baseName}[$keyCount]->not)) {
-                $filters->{$baseName}[$keyCount]->not = 0;
-            }
+            $filters->{$baseName}[$keyCount]->strict ??= 0;
+            $filters->{$baseName}[$keyCount]->not ??= 0;
 
             $strictPos = strpos($string, '+');
             $notPos    = strpos($string, '!');

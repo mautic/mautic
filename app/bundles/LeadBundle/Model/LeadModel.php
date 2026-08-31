@@ -674,9 +674,7 @@ class LeadModel extends FormModel
             }
 
             foreach ($groupFields as $alias => &$field) {
-                if (!isset($field['value'])) {
-                    $field['value'] = null;
-                }
+                $field['value'] ??= null;
 
                 // Only update fields that are part of the passed $data array
                 if (array_key_exists($alias, $data)) {
@@ -866,9 +864,7 @@ class LeadModel extends FormModel
         // make sure each group key is present
         $groups = ['core', 'social', 'personal', 'professional'];
         foreach ($groups as $g) {
-            if (!isset($array[$g])) {
-                $array[$g] = [];
-            }
+            $array[$g] ??= [];
         }
 
         return $array;
