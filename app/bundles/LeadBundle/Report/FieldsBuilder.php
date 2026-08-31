@@ -19,10 +19,7 @@ class FieldsBuilder
     ) {
     }
 
-    /**
-     * @param string $prefix
-     */
-    public function getLeadFieldsColumns($prefix): array
+    public function getLeadFieldsColumns(string $prefix): array
     {
         $baseColumns  = $this->getBaseLeadColumns();
         $leadFields   = $this->fieldModel->getLeadFields();
@@ -97,10 +94,7 @@ class FieldsBuilder
         return $filters;
     }
 
-    /**
-     * @param string $prefix
-     */
-    public function getCompanyFieldsColumns($prefix): array
+    public function getCompanyFieldsColumns(string $prefix): array
     {
         $baseColumns   = $this->getBaseCompanyColumns();
         $companyFields = $this->fieldModel->getCompanyFields();
@@ -192,9 +186,8 @@ class FieldsBuilder
 
     /**
      * @param LeadField[] $fields
-     * @param string      $prefix
      */
-    private function getFieldColumns($fields, $prefix): array
+    private function getFieldColumns($fields, string $prefix): array
     {
         $prefix = $this->sanitizePrefix($prefix);
 
@@ -219,10 +212,7 @@ class FieldsBuilder
         return $columns;
     }
 
-    /**
-     * @param string $prefix
-     */
-    private function sanitizePrefix($prefix): string
+    private function sanitizePrefix(string $prefix): string
     {
         if (!str_contains($prefix, '.')) {
             $prefix .= '.';

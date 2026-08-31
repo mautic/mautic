@@ -62,7 +62,7 @@ class CompanyReportData
     /**
      * @param LeadField[] $fields
      */
-    private function getFieldColumns($fields, string $prefix): array
+    private function getFieldColumns(iterable $fields, string $prefix): array
     {
         $columns = [];
         foreach ($fields as $f) {

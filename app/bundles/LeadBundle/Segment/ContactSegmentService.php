@@ -283,13 +283,11 @@ readonly class ContactSegmentService
     }
 
     /**
-     * @param int $segmentId
-     *
      * @return mixed
      *
      * @throws \Exception
      */
-    private function timedFetch(QueryBuilder $qb, $segmentId)
+    private function timedFetch(QueryBuilder $qb, ?int $segmentId)
     {
         try {
             $start = microtime(true);
@@ -314,13 +312,11 @@ readonly class ContactSegmentService
     }
 
     /**
-     * @param int $segmentId
-     *
      * @return mixed
      *
      * @throws \Exception
      */
-    private function timedFetchAll(QueryBuilder $qb, $segmentId)
+    private function timedFetchAll(QueryBuilder $qb, ?int $segmentId)
     {
         try {
             $start  = microtime(true);

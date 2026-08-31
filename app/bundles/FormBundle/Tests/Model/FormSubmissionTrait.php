@@ -109,7 +109,7 @@ trait FormSubmissionTrait
      *
      * @return mixed[]
      */
-    private function createForm($payload): array
+    private function createForm(array $payload): array
     {
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
         $clientResponse = $this->client->getResponse();
@@ -146,7 +146,7 @@ trait FormSubmissionTrait
     /**
      * @param array<string, string|int|mixed> $values
      */
-    private function submitForm(int $formId, string $formAlias, $values): void
+    private function submitForm(int $formId, string $formAlias, array $values): void
     {
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
         $formCrawler = $crawler->filter('form[id=mauticform_'.$formAlias.']');

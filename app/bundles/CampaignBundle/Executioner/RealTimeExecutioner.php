@@ -46,16 +46,14 @@ class RealTimeExecutioner
     }
 
     /**
-     * @param mixed       $passthrough
-     * @param string|null $channel
-     * @param int|null    $channelId
+     * @param mixed $passthrough
      *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function execute(string $type, $passthrough = null, $channel = null, $channelId = null): ?Responses
+    public function execute(string $type, $passthrough = null, ?string $channel = null, ?int $channelId = null): ?Responses
     {
         $this->responses = new Responses();
         $now             = new \DateTime();
@@ -144,14 +142,12 @@ class RealTimeExecutioner
     }
 
     /**
-     * @param mixed       $passthrough
-     * @param string|null $channel
-     * @param int|null    $channelId
+     * @param mixed $passthrough
      *
      * @throws DecisionNotApplicableException
      * @throws Exception\CannotProcessEventException
      */
-    private function evaluateDecisionForContact(Event $event, $passthrough = null, $channel = null, $channelId = null): void
+    private function evaluateDecisionForContact(Event $event, $passthrough = null, ?string $channel = null, ?int $channelId = null): void
     {
         $this->logger->debug('CAMPAIGN: Executing '.$event->getType().' ID '.$event->getId().' for contact ID '.$this->contact->getId());
 

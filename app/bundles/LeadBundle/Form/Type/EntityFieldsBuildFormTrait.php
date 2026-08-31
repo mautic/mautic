@@ -34,7 +34,7 @@ trait EntityFieldsBuildFormTrait
     /**
      * @return array<string, 'html'|'raw'>
      */
-    private function getFormFields(FormBuilderInterface $builder, array $options, $object = 'lead'): array
+    private function getFormFields(FormBuilderInterface $builder, array $options, string $object = 'lead'): array
     {
         $cleaningRules = [];
         $fieldValues   = [];

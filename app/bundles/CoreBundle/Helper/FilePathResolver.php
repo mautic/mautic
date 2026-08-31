@@ -16,11 +16,9 @@ class FilePathResolver
     }
 
     /**
-     * @param string $uploadDir
-     *
      * @throws FilePathException
      */
-    public function getUniqueFileName($uploadDir, UploadedFile $file): string
+    public function getUniqueFileName(string $uploadDir, UploadedFile $file): string
     {
         $fullName          = $file->getClientOriginalName();
         $fullNameSanitized = $this->inputHelper::filename($fullName);
@@ -79,10 +77,7 @@ class FilePathResolver
         $this->filesystem->rename($originPath, $targetPath);
     }
 
-    /**
-     * @param string $uploadDir
-     */
-    private function getFilePath($uploadDir, string $fileName, string $ext): string
+    private function getFilePath(string $uploadDir, string $fileName, string $ext): string
     {
         return $uploadDir.DIRECTORY_SEPARATOR.$fileName.$ext;
     }

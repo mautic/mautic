@@ -38,11 +38,9 @@ final class Version20190410143658 extends AbstractMauticMigration
     }
 
     /**
-     * @param string $tableName
-     *
      * @return string
      */
-    private function getOldIndexName($tableName)
+    private function getOldIndexName(string $tableName)
     {
         return $this->generatePropertyName($tableName, 'idx', ['lead_id']);
     }

@@ -325,7 +325,7 @@ final readonly class AssetGenerationHelper
     /**
      * Find asset overrides in the template.
      */
-    private function findOverrides($env, array &$assets): array
+    private function findOverrides(string $env, array &$assets): array
     {
         $rootPath      = $this->pathsHelper->getSystemPath('assets_root');
         $currentTheme  = $this->pathsHelper->getSystemPath('current_theme');
@@ -347,7 +347,7 @@ final readonly class AssetGenerationHelper
                         'relPath'  => $relPath,
                     ];
 
-                    if ('prod' == $env) {
+                    if ('prod' === $env) {
                         $lastModified = filemtime($fullPath);
                         if (!isset($modifiedLast[$ext][$group]) || $lastModified > $modifiedLast[$ext][$group]) {
                             $modifiedLast[$ext][$group] = $lastModified;

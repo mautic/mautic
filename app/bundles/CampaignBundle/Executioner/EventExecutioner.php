@@ -229,13 +229,11 @@ class EventExecutioner
     }
 
     /**
-     * @param bool $isInactive
-     *
      * @return ArrayCollection
      *
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    private function scheduleEvents(ArrayCollection $events, ArrayCollection $contacts, ?Counter $childrenCounter = null, $isInactive = false)
+    private function scheduleEvents(ArrayCollection $events, ArrayCollection $contacts, ?Counter $childrenCounter = null, bool $isInactive = false)
     {
         $events = clone $events;
 
