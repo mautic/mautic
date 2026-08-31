@@ -7,7 +7,6 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Event\PluginInstallEvent;
 use Mautic\PluginBundle\Event\PluginUpdateEvent;
-use Mautic\PluginBundle\PluginEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -82,7 +81,7 @@ final readonly class ReloadHelper
 
                     $event = new PluginUpdateEvent($plugin, $oldVersion, $metadata, $installedSchema);
 
-                    $this->eventDispatcher->dispatch($event, PluginEvents::ON_PLUGIN_UPDATE);
+                    $this->eventDispatcher->dispatch($event);
 
                     unset($metadata, $installedSchema);
 
@@ -116,7 +115,7 @@ final readonly class ReloadHelper
 
                 $event = new PluginInstallEvent($entity, $metadata, $installedSchema);
 
-                $this->eventDispatcher->dispatch($event, PluginEvents::ON_PLUGIN_INSTALL);
+                $this->eventDispatcher->dispatch($event);
 
                 $installedPlugins[$entity->getBundle()] = $entity;
             }

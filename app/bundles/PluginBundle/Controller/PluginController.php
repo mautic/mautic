@@ -13,7 +13,6 @@ use Mautic\PluginBundle\Form\Type\DetailsType;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\PluginBundle\Model\PluginModel;
-use Mautic\PluginBundle\PluginEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -254,14 +253,14 @@ final class PluginController extends FormController
 
                     if ($valid || $authorize) {
                         $mauticLogger->info('Dispatching integration config save event.');
-                        if ($this->dispatcher->hasListeners(PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE)) {
+                        if ($this->dispatcher->hasListeners(PluginIntegrationEvent::class)) {
                             $mauticLogger->info('Event dispatcher has integration config save listeners.');
                             if (!$valid && !$existingPublishedState) {
                                 $integrationObject->getIntegrationSettings()->setIsPublished(false);
                             }
                             $event = new PluginIntegrationEvent($integrationObject);
 
-                            $this->dispatcher->dispatch($event, PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE);
+                            $this->dispatcher->dispatch($event);
 
                             $entity = $event->getEntity();
                         }
@@ -277,8 +276,7 @@ final class PluginController extends FormController
                             new PluginIntegrationAuthRedirectEvent(
                                 $integrationObject,
                                 $integrationObject->getAuthLoginUrl()
-                            ),
-                            PluginEvents::PLUGIN_ON_INTEGRATION_AUTH_REDIRECT
+                            )
                         );
                         $oauthUrl = $event->getAuthUrl();
 

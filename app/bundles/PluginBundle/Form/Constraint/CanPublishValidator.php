@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\PluginBundle\Form\Constraint;
 
 use Mautic\PluginBundle\Event\PluginIsPublishedEvent;
-use Mautic\PluginBundle\PluginEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -27,7 +26,7 @@ final class CanPublishValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, CanPublish::class);
         }
         $event = new PluginIsPublishedEvent($value, $constraint->integrationName);
-        $event = $this->eventDispatcher->dispatch($event, PluginEvents::PLUGIN_IS_PUBLISHED_STATE_CHANGING);
+        $event = $this->eventDispatcher->dispatch($event);
 
         if (!$event->isCanPublish()) {
             $this->context->buildViolation($event->getMessage())

@@ -1051,8 +1051,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
         /** @var PluginIntegrationAuthCallbackUrlEvent $event */
         $event = $this->dispatcher->dispatch(
-            new PluginIntegrationAuthCallbackUrlEvent($this, $defaultUrl),
-            PluginEvents::PLUGIN_ON_INTEGRATION_GET_AUTH_CALLBACK_URL
+            new PluginIntegrationAuthCallbackUrlEvent($this, $defaultUrl)
         );
 
         return $event->getCallbackUrl();
@@ -2034,8 +2033,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     public function modifyForm($builder, $options): void
     {
         $this->dispatcher->dispatch(
-            new PluginIntegrationFormBuildEvent($this, $builder, $options),
-            PluginEvents::PLUGIN_ON_INTEGRATION_FORM_BUILD
+            new PluginIntegrationFormBuildEvent($this, $builder, $options)
         );
     }
 
@@ -2075,8 +2073,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     {
         /** @var PluginIntegrationFormDisplayEvent $event */
         $event = $this->dispatcher->dispatch(
-            new PluginIntegrationFormDisplayEvent($this, $this->getFormSettings()),
-            PluginEvents::PLUGIN_ON_INTEGRATION_FORM_DISPLAY
+            new PluginIntegrationFormDisplayEvent($this, $this->getFormSettings())
         );
 
         return $event->getSettings();

@@ -10,7 +10,6 @@ use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Event\PluginInstallEvent;
 use Mautic\PluginBundle\Event\PluginUpdateEvent;
 use Mautic\PluginBundle\Helper\ReloadHelper;
-use Mautic\PluginBundle\PluginEvents;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -127,7 +126,7 @@ final class ReloadHelperTest extends \PHPUnit\Framework\TestCase
             $this->sampleMetaData['MauticPlugin\MauticZapierBundle'],
             $this->sampleSchemas['MauticPlugin\MauticZapierBundle']
         );
-        $this->eventDispatcher->expects($this->once())->method('dispatch')->with($event, PluginEvents::ON_PLUGIN_UPDATE);
+        $this->eventDispatcher->expects($this->once())->method('dispatch')->with($event);
         $updatedPlugins = $this->helper->updatePlugins($this->sampleAllPlugins, $sampleInstalledPlugins, $this->sampleMetaData, $this->sampleSchemas);
 
         $this->assertCount(1, $updatedPlugins);
@@ -146,7 +145,7 @@ final class ReloadHelperTest extends \PHPUnit\Framework\TestCase
             $this->sampleMetaData['MauticPlugin\MauticZapierBundle'],
             null
         );
-        $this->eventDispatcher->expects($this->once())->method('dispatch')->with($event, PluginEvents::ON_PLUGIN_INSTALL);
+        $this->eventDispatcher->expects($this->once())->method('dispatch')->with($event);
 
         $installedPlugins = $this->helper->installPlugins($this->sampleAllPlugins, $sampleInstalledPlugins, $this->sampleMetaData, $this->sampleSchemas);
 
