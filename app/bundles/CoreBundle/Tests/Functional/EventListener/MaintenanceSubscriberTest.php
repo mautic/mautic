@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Functional\EventListener;
 
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -52,7 +51,7 @@ final class MaintenanceSubscriberTest extends MauticMysqlTestCase
         /** @var EventDispatcherInterface $dispatcher */
         $dispatcher = self::getContainer()->get(EventDispatcherInterface::class);
 
-        $event = $dispatcher->dispatch(new MaintenanceEvent(2, false, false), CoreEvents::MAINTENANCE_CLEANUP_DATA);
+        $event = $dispatcher->dispatch(new MaintenanceEvent(2, false, false));
         $stats = $event->getStats();
 
         $this->assertArrayHasKey($translator->trans('mautic.maintenance.audit_log'), $stats);

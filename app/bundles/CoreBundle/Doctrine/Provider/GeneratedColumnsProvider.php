@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Doctrine\Provider;
 
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns;
 use Mautic\CoreBundle\Event\GeneratedColumnsEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -34,9 +33,9 @@ final class GeneratedColumnsProvider implements GeneratedColumnsProviderInterfac
     {
         if ($this->generatedColumnsAreSupported()
             && 0 === $this->generatedColumns->count()
-            && $this->dispatcher->hasListeners(CoreEvents::ON_GENERATED_COLUMNS_BUILD)
+            && $this->dispatcher->hasListeners(GeneratedColumnsEvent::class)
         ) {
-            $event                  = $this->dispatcher->dispatch(new GeneratedColumnsEvent(), CoreEvents::ON_GENERATED_COLUMNS_BUILD);
+            $event                  = $this->dispatcher->dispatch(new GeneratedColumnsEvent());
             $this->generatedColumns = $event->getGeneratedColumns();
         }
 

@@ -2,7 +2,6 @@
 
 namespace Mautic\CoreBundle\Controller;
 
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomTemplateEvent;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Exception\RecordCanNotUnpublishException;
@@ -141,7 +140,7 @@ class AjaxController extends CommonController
         $request->getSession()->set('mautic.global_search', $searchStr);
 
         $event = new GlobalSearchEvent($searchStr, $this->translator);
-        $this->dispatcher->dispatch($event, CoreEvents::GLOBAL_SEARCH);
+        $this->dispatcher->dispatch($event);
 
         $dataArray['newContent'] = $this->renderView(
             '@MauticCore/GlobalSearch/results.html.twig',
@@ -443,10 +442,7 @@ class AjaxController extends CommonController
      */
     protected function renderView(string $view, array $parameters = []): string
     {
-        $event = $this->dispatcher->dispatch(
-            new CustomTemplateEvent($this->getCurrentRequest(), $view, $parameters),
-            CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE
-        );
+        $event = $this->dispatcher->dispatch(new CustomTemplateEvent($this->getCurrentRequest(), $view, $parameters));
 
         return parent::renderView($event->getTemplate(), $event->getVars());
     }

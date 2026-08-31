@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\EventListener;
 
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\BuildJsEvent;
 use Mautic\CoreBundle\Event\BuildJsScope;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -14,7 +13,7 @@ final class BuildJsSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CoreEvents::BUILD_MAUTIC_JS => ['onBuildJs', 1000],
+            BuildJsEvent::class => ['onBuildJs', 1000],
         ];
     }
 

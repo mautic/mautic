@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\EventListener;
 
 use Mautic\CampaignBundle\Entity\Campaign;
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomContentEvent;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -25,7 +24,7 @@ final readonly class CampaignInjectCustomContentSubscriber implements EventSubsc
     public static function getSubscribedEvents(): array
     {
         return [
-            CoreEvents::VIEW_INJECT_CUSTOM_CONTENT => ['injectViewCustomContent', 0],
+            CustomContentEvent::class => ['injectViewCustomContent', 0],
         ];
     }
 

@@ -2,7 +2,6 @@
 
 namespace Mautic\CoreBundle\Loader;
 
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\RouteEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\Config\Loader\Loader;
@@ -28,7 +27,7 @@ final class RouteLoader extends Loader
     {
         // Public
         $event = new RouteEvent($this, 'public');
-        $this->dispatcher->dispatch($event, CoreEvents::BUILD_ROUTE);
+        $this->dispatcher->dispatch($event);
         $collection = $event->getCollection();
 
         // Force all links to be SSL if the site_url parameter is SSL
@@ -45,7 +44,7 @@ final class RouteLoader extends Loader
 
         // Secured area - Default
         $event = new RouteEvent($this);
-        $this->dispatcher->dispatch($event, CoreEvents::BUILD_ROUTE);
+        $this->dispatcher->dispatch($event);
         $secureCollection = $event->getCollection();
 
         // OneupUploader (added behind our secure /s)
@@ -56,7 +55,7 @@ final class RouteLoader extends Loader
 
         // API
         $event = new RouteEvent($this, 'api');
-        $this->dispatcher->dispatch($event, CoreEvents::BUILD_ROUTE);
+        $this->dispatcher->dispatch($event);
         $apiCollection = $event->getCollection();
         $apiCollection->addPrefix('/api');
 
@@ -74,7 +73,7 @@ final class RouteLoader extends Loader
 
         // Catch all
         $event = new RouteEvent($this, 'catchall');
-        $this->dispatcher->dispatch($event, CoreEvents::BUILD_ROUTE);
+        $this->dispatcher->dispatch($event);
         $lastCollection = $event->getCollection();
 
         if ($forceSSL) {

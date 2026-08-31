@@ -3,7 +3,6 @@
 namespace Mautic\LeadBundle\EventListener;
 
 use Doctrine\DBAL\Connection;
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -19,7 +18,7 @@ final readonly class MaintenanceSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CoreEvents::MAINTENANCE_CLEANUP_DATA => ['onDataCleanup', 0],
+            MaintenanceEvent::class => ['onDataCleanup', 0],
         ];
     }
 

@@ -2,7 +2,6 @@
 
 namespace Mautic\DynamicContentBundle\EventListener;
 
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\BuildJsEvent;
 use Mautic\CoreBundle\Event\BuildJsScope;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
@@ -25,7 +24,7 @@ final readonly class BuildJsSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CoreEvents::BUILD_MAUTIC_JS => ['onBuildJs', 200],
+            BuildJsEvent::class => ['onBuildJs', 200],
         ];
     }
 

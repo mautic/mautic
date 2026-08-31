@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\EventListener;
 
 use Mautic\CampaignBundle\Entity\Campaign;
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomTemplateEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -22,7 +21,7 @@ final readonly class PublishToggleSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE => ['onTemplateRender', 0],
+            CustomTemplateEvent::class => ['onTemplateRender', 0],
         ];
     }
 

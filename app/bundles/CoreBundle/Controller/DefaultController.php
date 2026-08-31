@@ -2,7 +2,6 @@
 
 namespace Mautic\CoreBundle\Controller;
 
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\PageBundle\Model\PageModel;
@@ -55,7 +54,7 @@ final class DefaultController extends CommonController
 
         if (!empty($searchStr)) {
             $event = new GlobalSearchEvent($searchStr, $this->translator);
-            $this->dispatcher->dispatch($event, CoreEvents::GLOBAL_SEARCH);
+            $this->dispatcher->dispatch($event);
             $results = $event->getResults();
         } else {
             $results = [];

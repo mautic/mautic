@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\MarketplaceBundle\EventListener;
 
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MenuEvent;
 use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
 use Mautic\MarketplaceBundle\Service\Config;
@@ -21,7 +20,7 @@ final readonly class MenuSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CoreEvents::BUILD_MENU => ['onBuildMenu', 9999],
+            MenuEvent::class => ['onBuildMenu', 9999],
         ];
     }
 

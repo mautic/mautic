@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\EventListener;
 
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomButtonEvent;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Twig\Helper\ButtonHelper;
@@ -24,7 +23,7 @@ final readonly class ButtonSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CoreEvents::VIEW_INJECT_CUSTOM_BUTTONS => ['injectViewButtons', 0],
+            CustomButtonEvent::class => ['injectViewButtons', 0],
         ];
     }
 

@@ -2,7 +2,6 @@
 
 namespace MauticPlugin\MauticFullContactBundle\EventListener;
 
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomButtonEvent;
 use Mautic\CoreBundle\Twig\Helper\ButtonHelper;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
@@ -23,7 +22,7 @@ final readonly class ButtonSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CoreEvents::VIEW_INJECT_CUSTOM_BUTTONS => ['injectViewButtons', 0],
+            CustomButtonEvent::class => ['injectViewButtons', 0],
         ];
     }
 

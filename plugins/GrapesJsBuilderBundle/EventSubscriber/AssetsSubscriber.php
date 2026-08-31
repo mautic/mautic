@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\GrapesJsBuilderBundle\EventSubscriber;
 
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomAssetsEvent;
 use Mautic\InstallBundle\Install\InstallService;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
@@ -28,7 +27,7 @@ final readonly class AssetsSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CoreEvents::VIEW_INJECT_CUSTOM_ASSETS => ['injectAssets', 0],
+            CustomAssetsEvent::class => ['injectAssets', 0],
         ];
     }
 

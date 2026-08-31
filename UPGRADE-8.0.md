@@ -177,6 +177,7 @@
 
 - CampaignBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\CampaignBundle\CampaignEvents` string constants. Update any subscriber or listener that keys on one of the converted `CampaignEvents::*` constants (or the raw string name such as `mautic.campaign_on_build`) to key on the event class instead:
 - IntegrationsBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\IntegrationsBundle\IntegrationEvents` string constants. Update any subscriber or listener that keys on one of the converted `IntegrationEvents::*` constants to key on the event class instead:
+- CoreBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\CoreBundle\CoreEvents` string constants. Update any subscriber or listener that keys on a `CoreEvents::*` constant (or the raw string name such as `mautic.build_menu`) to key on the event class instead:
 
     ```diff
      public static function getSubscribedEvents(): array
@@ -207,6 +208,8 @@
     | `mautic.campaign_unpublish_notify` | `CampaignEvents::ON_CAMPAIGN_UNPUBLISH_NOTIFY` | `NotifyOfUnpublishEvent` |
     -        IntegrationEvents::INTEGRATION_COLLECT_INTERNAL_OBJECTS => ['collectInternalObjects', 0],
     +        InternalObjectEvent::class => ['collectInternalObjects', 0],
+    -        CoreEvents::BUILD_MENU => ['onBuildMenu', 9999],
+    +        MenuEvent::class => ['onBuildMenu', 9999],
          ];
      }
     ```
@@ -230,6 +233,25 @@
     | `IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORD` | `InternalObjectFindByIdEvent` |
     | `IntegrationEvents::INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE` | `InternalObjectRouteEvent` |
     | `IntegrationEvents::INTEGRATION_OBJECT_TOKEN_EVENT` | `MappedIntegrationObjectTokenEvent` |
+    Dispatching drops the redundant second argument, e.g. `$dispatcher->dispatch($event, CoreEvents::BUILD_MENU)` becomes `$dispatcher->dispatch($event)`. The `Mautic\CoreBundle\CoreEvents` constants are kept for backwards compatibility but are no longer used internally. Note that listeners for the icon event (`Mautic\CoreBundle\Event\IconEvent`) must now be keyed on `IconEvent::class`, as that event was already dispatched by object.
+
+    Full mapping of old event name to new event class (all in the `Mautic\CoreBundle\Event` namespace):
+
+    | Old event name | `CoreEvents` constant | New event class |
+    | --- | --- | --- |
+    | `mautic.build_menu` | `CoreEvents::BUILD_MENU` | `MenuEvent` |
+    | `mautic.build_route` | `CoreEvents::BUILD_ROUTE` | `RouteEvent` |
+    | `mautic.global_search` | `CoreEvents::GLOBAL_SEARCH` | `GlobalSearchEvent` |
+    | `mautic.list_stats` | `CoreEvents::LIST_STATS` | `StatsEvent` |
+    | `mautic.build_command_list` | `CoreEvents::BUILD_COMMAND_LIST` | `CommandListEvent` |
+    | `mautic.on_fetch_icons` | `CoreEvents::FETCH_ICONS` | `IconEvent` |
+    | `mautic.build_embeddable_js` | `CoreEvents::BUILD_MAUTIC_JS` | `BuildJsEvent` |
+    | `mautic.maintenance_cleanup_data` | `CoreEvents::MAINTENANCE_CLEANUP_DATA` | `MaintenanceEvent` |
+    | `mautic.view_inject_custom_buttons` | `CoreEvents::VIEW_INJECT_CUSTOM_BUTTONS` | `CustomButtonEvent` |
+    | `mautic.view_inject_custom_content` | `CoreEvents::VIEW_INJECT_CUSTOM_CONTENT` | `CustomContentEvent` |
+    | `mautic.view_inject_custom_template` | `CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE` | `CustomTemplateEvent` |
+    | `mautic.view_inject_custom_assets` | `CoreEvents::VIEW_INJECT_CUSTOM_ASSETS` | `CustomAssetsEvent` |
+    | `mautic.on_generated_columns_build` | `CoreEvents::ON_GENERATED_COLUMNS_BUILD` | `GeneratedColumnsEvent` |
 
 - PluginBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\PluginBundle\PluginEvents` string constants. Update any subscriber or listener that keys on one of the converted `PluginEvents::*` constants to key on the event class instead:
 

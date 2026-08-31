@@ -8,7 +8,6 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
 use Mautic\CoreBundle\EventListener\MaintenanceSubscriber;
 use Mautic\UserBundle\Entity\UserTokenRepositoryInterface;
@@ -26,7 +25,7 @@ final class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testGetSubscribedEvents(): void
     {
         $this->assertSame(
-            [CoreEvents::MAINTENANCE_CLEANUP_DATA => ['onDataCleanup', -50]],
+            [MaintenanceEvent::class => ['onDataCleanup', -50]],
             $this->subscriber->getSubscribedEvents()
         );
     }

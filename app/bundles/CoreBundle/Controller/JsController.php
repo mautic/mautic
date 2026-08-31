@@ -2,7 +2,6 @@
 
 namespace Mautic\CoreBundle\Controller;
 
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\BuildJsEvent;
 use Mautic\CoreBundle\Event\BuildJsScope;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -45,8 +44,8 @@ final class JsController extends CommonController
 
         $event = new BuildJsEvent($this->getJsHeader(), $kernelDebug, $acceptedScopes);
 
-        if ($this->dispatcher->hasListeners(CoreEvents::BUILD_MAUTIC_JS)) {
-            $this->dispatcher->dispatch($event, CoreEvents::BUILD_MAUTIC_JS);
+        if ($this->dispatcher->hasListeners(BuildJsEvent::class)) {
+            $this->dispatcher->dispatch($event);
         }
 
         return new Response($event->getJs(), Response::HTTP_OK, ['Content-Type' => 'application/javascript']);

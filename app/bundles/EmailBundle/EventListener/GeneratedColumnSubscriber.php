@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Event\GeneratedColumnsEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -14,7 +13,7 @@ final class GeneratedColumnSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CoreEvents::ON_GENERATED_COLUMNS_BUILD => ['onGeneratedColumnsBuild', 0],
+            GeneratedColumnsEvent::class => ['onGeneratedColumnsBuild', 0],
         ];
     }
 

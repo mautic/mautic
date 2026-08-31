@@ -2,7 +2,6 @@
 
 namespace Mautic\CoreBundle\EventListener;
 
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\IconEvent;
 use Mautic\CoreBundle\Event\MenuEvent;
 use Mautic\CoreBundle\Event\RouteEvent;
@@ -40,9 +39,9 @@ final readonly class CoreSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CoreEvents::BUILD_MENU            => ['onBuildMenu', 9999],
-            CoreEvents::BUILD_ROUTE           => ['onBuildRoute', 0],
-            CoreEvents::FETCH_ICONS           => ['onFetchIcons', 9999],
+            MenuEvent::class                  => ['onBuildMenu', 9999],
+            RouteEvent::class                 => ['onBuildRoute', 0],
+            IconEvent::class                  => ['onFetchIcons', 9999],
             SecurityEvents::INTERACTIVE_LOGIN => ['onSecurityInteractiveLogin', 0],
         ];
     }

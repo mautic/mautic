@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticClearbitBundle\Tests\Unit\EventListener;
 
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomButtonEvent;
 use Mautic\CoreBundle\Twig\Helper\ButtonHelper;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
@@ -44,7 +43,7 @@ final class ButtonSubscriberTest extends TestCase
     public function testGetSubscribedEvents(): void
     {
         $this->assertSame(
-            [CoreEvents::VIEW_INJECT_CUSTOM_BUTTONS => ['injectViewButtons', 0]],
+            [CustomButtonEvent::class => ['injectViewButtons', 0]],
             ButtonSubscriber::getSubscribedEvents()
         );
     }

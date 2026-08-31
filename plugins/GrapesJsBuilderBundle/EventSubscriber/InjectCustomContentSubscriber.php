@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\GrapesJsBuilderBundle\EventSubscriber;
 
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomContentEvent;
 use Mautic\EmailBundle\Entity\Email;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder;
@@ -32,7 +31,7 @@ final readonly class InjectCustomContentSubscriber implements EventSubscriberInt
     public static function getSubscribedEvents(): array
     {
         return [
-            CoreEvents::VIEW_INJECT_CUSTOM_CONTENT => ['injectViewCustomContent', 0],
+            CustomContentEvent::class => ['injectViewCustomContent', 0],
         ];
     }
 

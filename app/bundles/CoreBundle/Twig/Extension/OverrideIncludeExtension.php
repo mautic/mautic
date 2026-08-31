@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Twig\Extension;
 
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomTemplateEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -84,9 +83,6 @@ final class OverrideIncludeExtension extends AbstractExtension
      */
     private function dispatchCustomTemplateEvent(string $template, array $variables): CustomTemplateEvent
     {
-        return $this->eventDispatcher->dispatch(
-            new CustomTemplateEvent($this->requestStack->getCurrentRequest(), $template, $variables),
-            CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE
-        );
+        return $this->eventDispatcher->dispatch(new CustomTemplateEvent($this->requestStack->getCurrentRequest(), $template, $variables));
     }
 }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\EventListener;
 
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomAssetsEvent;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -29,11 +28,8 @@ final readonly class AssetsSubscriber implements EventSubscriberInterface
 
     public function fetchCustomAssets(RequestEvent $event): void
     {
-        if ($event->isMainRequest() && $this->dispatcher->hasListeners(CoreEvents::VIEW_INJECT_CUSTOM_ASSETS)) {
-            $this->dispatcher->dispatch(
-                new CustomAssetsEvent($this->assetsHelper),
-                CoreEvents::VIEW_INJECT_CUSTOM_ASSETS
-            );
+        if ($event->isMainRequest() && $this->dispatcher->hasListeners(CustomAssetsEvent::class)) {
+            $this->dispatcher->dispatch(new CustomAssetsEvent($this->assetsHelper));
         }
     }
 }

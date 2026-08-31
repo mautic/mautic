@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\PointBundle\EventListener;
 
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\DTO\GlobalSearchFilterDTO;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -28,12 +27,12 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CoreEvents::GLOBAL_SEARCH => [
+            MauticEvents\GlobalSearchEvent::class => [
                 ['onGlobalSearchPointActions', 0],
                 ['onGlobalSearchPointTriggers', 0],
                 ['onGlobalSearchPointGroup', 0],
             ],
-            CoreEvents::BUILD_COMMAND_LIST => ['onBuildCommandList', 0],
+            MauticEvents\CommandListEvent::class  => ['onBuildCommandList', 0],
         ];
     }
 
