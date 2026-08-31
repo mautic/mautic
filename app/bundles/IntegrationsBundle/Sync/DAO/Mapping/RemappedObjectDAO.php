@@ -9,9 +9,9 @@ final readonly class RemappedObjectDAO
     public function __construct(
         private string $integration,
         private string $oldObjectName,
-        private mixed $oldObjectId,
+        private string|int|null $oldObjectId,
         private string $newObjectName,
-        private mixed $newObjectId,
+        private string|int|null $newObjectId,
     ) {
     }
 
@@ -25,10 +25,7 @@ final readonly class RemappedObjectDAO
         return $this->oldObjectName;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getOldObjectId()
+    public function getOldObjectId(): string|int|null
     {
         return $this->oldObjectId;
     }
@@ -38,10 +35,7 @@ final readonly class RemappedObjectDAO
         return $this->newObjectName;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getNewObjectId()
+    public function getNewObjectId(): string|int|null
     {
         return $this->newObjectId;
     }
