@@ -71,7 +71,8 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
         $crawlerAfterEdit = $this->client->submit($editForm);
         $this->assertResponseIsSuccessful();
-        $this->assertCount(0, $crawlerAfterEdit->filter('div.has-error'), 'Expected no validation errors when re-saving edited remote asset URL with query string');
+        $editErrors = $crawlerAfterEdit->filter('div.has-error')->each(static fn ($node): string => trim($node->text()));
+        $this->assertCount(0, $editErrors, 'Expected no validation errors when re-saving edited remote asset URL with query string, got: '.implode(' | ', $editErrors));
 
         $this->em->clear();
         $editedAsset = $this->em->find(Asset::class, $asset->getId());
