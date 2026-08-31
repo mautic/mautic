@@ -60,7 +60,7 @@ final class ConfigController extends AbstractFormController
         }
 
         $event = new FormLoadEvent($this->integrationConfiguration);
-        $this->dispatcher->dispatch($event, IntegrationEvents::INTEGRATION_CONFIG_FORM_LOAD);
+        $this->dispatcher->dispatch($event);
 
         // Create the form
         $form = $this->getForm();
@@ -99,7 +99,7 @@ final class ConfigController extends AbstractFormController
         $form->handleRequest($request);
 
         $configEvent = new KeysSaveEvent($this->integrationConfiguration, $oldApiKeys);
-        $this->dispatcher->dispatch($configEvent, IntegrationEvents::INTEGRATION_API_KEYS_BEFORE_SAVE);
+        $this->dispatcher->dispatch($configEvent);
 
         if ($this->integrationObject instanceof ConfigFormSyncInterface) {
             $integration   = $this->integrationObject->getName();
@@ -245,7 +245,7 @@ final class ConfigController extends AbstractFormController
             // Dispatch event to allow listeners to extract information and/or manipulate the URL
             $authUrl      = $this->integrationObject->getAuthorizationUrl();
             $authUrlEvent = new ConfigAuthUrlEvent($this->integrationConfiguration, $authUrl);
-            $this->dispatcher->dispatch($authUrlEvent, IntegrationEvents::INTEGRATION_CONFIG_ON_GENERATE_AUTH_URL);
+            $this->dispatcher->dispatch($authUrlEvent);
 
             $response['authUrl'] = $authUrlEvent->getAuthUrl();
         }

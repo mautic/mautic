@@ -14,12 +14,9 @@ final class ReplyEvent extends \Symfony\Contracts\EventDispatcher\Event
 
     private ?LeadEventLog $eventLog = null;
 
-    /**
-     * @param string $message
-     */
     public function __construct(
         private readonly Lead $contact,
-        private $message,
+        private readonly string $message,
     ) {
     }
 
@@ -28,10 +25,7 @@ final class ReplyEvent extends \Symfony\Contracts\EventDispatcher\Event
         return $this->contact;
     }
 
-    /**
-     * @return string
-     */
-    public function getMessage()
+    public function getMessage(): string
     {
         return $this->message;
     }

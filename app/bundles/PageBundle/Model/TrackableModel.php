@@ -98,9 +98,7 @@ class TrackableModel extends AbstractCommonModel
         $shortenUrl = false,
         $utmTags = [],
     ) {
-        if (!isset($clickthrough['channel'])) {
-            $clickthrough['channel'] = [$trackable->getChannel() => $trackable->getChannelId()];
-        }
+        $clickthrough['channel'] ??= [$trackable->getChannel() => $trackable->getChannelId()];
 
         $redirect = $trackable->getRedirect();
 
@@ -219,7 +217,7 @@ class TrackableModel extends AbstractCommonModel
      *
      * @param string|string[]|null $content
      */
-    public function getDoNotTrackList($content): array
+    public function getDoNotTrackList(string|array|null $content): array
     {
         /** @var UntrackableUrlsEvent $event */
         $event = $this->dispatcher->dispatch(

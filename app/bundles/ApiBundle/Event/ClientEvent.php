@@ -11,7 +11,7 @@ final class ClientEvent extends CommonEvent
 {
     private readonly string $apiMode;
 
-    public function __construct(Client $client, $isNew = false)
+    public function __construct(Client $client, bool $isNew = false)
     {
         $this->apiMode = 'oauth2';
         $this->entity  = $client;

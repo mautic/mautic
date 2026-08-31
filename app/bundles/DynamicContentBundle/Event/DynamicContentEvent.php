@@ -9,10 +9,7 @@ use Mautic\DynamicContentBundle\Entity\DynamicContent;
 
 final class DynamicContentEvent extends CommonEvent
 {
-    /**
-     * @param bool $isNew
-     */
-    public function __construct(DynamicContent $entity, $isNew = false)
+    public function __construct(DynamicContent $entity, bool $isNew = false)
     {
         $this->entity = $entity;
         $this->isNew  = $isNew;

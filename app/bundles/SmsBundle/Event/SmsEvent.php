@@ -9,10 +9,7 @@ use Mautic\SmsBundle\Entity\Sms;
 
 final class SmsEvent extends CommonEvent
 {
-    /**
-     * @param bool $isNew
-     */
-    public function __construct(Sms $sms, $isNew = false)
+    public function __construct(Sms $sms, bool $isNew = false)
     {
         $this->entity = $sms;
         $this->isNew  = $isNew;

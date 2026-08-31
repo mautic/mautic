@@ -96,9 +96,7 @@ final class FieldPaginationController extends CommonController
     {
         $fields = $featureSettings['sync']['fieldMappings'] ?? [];
 
-        if (!isset($fields[$object])) {
-            $fields[$object] = [];
-        }
+        $fields[$object] ??= [];
 
         // Pull those changed from session
         $session       = $request->getSession();

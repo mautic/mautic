@@ -14,9 +14,9 @@ trait DeduperTrait
     private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier;
 
     /**
-     * @var array
+     * @var array<mixed>|null
      */
-    private $availableFields;
+    private ?array $availableFields = null;
 
     public function getUniqueData(array $queryFields): array
     {
@@ -37,21 +37,16 @@ trait DeduperTrait
         return $uniqueLeadFieldData;
     }
 
-    /**
-     * @return array
-     */
-    private function getAvailableFields()
+    private function getAvailableFields(): array
     {
-        if (null === $this->availableFields) {
-            $this->availableFields = $this->fieldList->getFieldList(
-                false,
-                false,
-                [
-                    'isPublished' => true,
-                    'object'      => $this->object,
-                ]
-            );
-        }
+        $this->availableFields ??= $this->fieldList->getFieldList(
+            false,
+            false,
+            [
+                'isPublished' => true,
+                'object'      => $this->object,
+            ]
+        );
 
         return $this->availableFields;
     }

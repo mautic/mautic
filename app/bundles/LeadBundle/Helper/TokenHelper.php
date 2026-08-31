@@ -12,10 +12,7 @@ final class TokenHelper
 
     private const string DATETIME_REGEX = '/({|%7B)datetime=(.*?)(}|%7D)/';
 
-    /**
-     * @var array
-     */
-    private static $parameters;
+    private static ?array $parameters = null;
 
     /**
      * @param string $content
@@ -174,7 +171,7 @@ final class TokenHelper
      */
     private static function getParameter(string $parameter)
     {
-        if (null === self::$parameters) {
+        if ([] === self::$parameters) {
             self::$parameters = new ParamsLoaderHelper()->getParameters();
         }
 

@@ -20,10 +20,10 @@ final class UntrackableUrlsEvent extends Event
     ];
 
     /**
-     * @param mixed $content
+     * @param string|string[]|null $content
      */
     public function __construct(
-        private $content,
+        private readonly string|array|null $content,
     ) {
     }
 
@@ -46,9 +46,9 @@ final class UntrackableUrlsEvent extends Event
     }
 
     /**
-     * @return string
+     * @return string|string[]|null
      */
-    public function getContent()
+    public function getContent(): string|array|null
     {
         return $this->content;
     }

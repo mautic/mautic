@@ -9,7 +9,6 @@ use Mautic\IntegrationsBundle\Event\KeysEncryptionEvent;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Facade\EncryptionService;
 use Mautic\IntegrationsBundle\Integration\Interfaces\IntegrationInterface;
-use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\IntegrationRepository;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
@@ -68,7 +67,7 @@ class IntegrationsHelper
 
         // Dispatch event before encryption
         $encryptionEvent = new KeysEncryptionEvent($configuration, $decryptedApiKeys);
-        $this->eventDispatcher->dispatch($encryptionEvent, IntegrationEvents::INTEGRATION_KEYS_BEFORE_ENCRYPTION);
+        $this->eventDispatcher->dispatch($encryptionEvent);
 
         // Encrypt and store the keys
         $encryptedApiKeys = $this->encryptionService->encrypt($encryptionEvent->getKeys());
@@ -105,7 +104,7 @@ class IntegrationsHelper
 
             // Dispatch event after decryption
             $decryptionEvent = new KeysDecryptionEvent($configuration, $decryptedApiKeys);
-            $this->eventDispatcher->dispatch($decryptionEvent, IntegrationEvents::INTEGRATION_KEYS_AFTER_DECRYPTION);
+            $this->eventDispatcher->dispatch($decryptionEvent);
 
             $configuration->setApiKeys($decryptionEvent->getKeys());
 

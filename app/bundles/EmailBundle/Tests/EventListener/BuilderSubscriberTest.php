@@ -60,6 +60,8 @@ final class BuilderSubscriberTest extends TestCase
 
     public function testOwnerSignatureIsUsedOnEmailGenerate(): void
     {
+        $this->emailModel->method('buildUrl')->willReturn('https://some.url');
+
         $email = new Email();
         $email->setUseOwnerAsMailer(true);
 

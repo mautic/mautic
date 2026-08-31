@@ -126,9 +126,7 @@ class PluginModel extends FormModel
 
             if (str_contains($namespace, 'MauticPlugin')) {
                 $bundleName = preg_replace('/\\\Entity$/', '', $namespace);
-                if (!isset($pluginsMetadata[$bundleName])) {
-                    $pluginsMetadata[$bundleName] = [];
-                }
+                $pluginsMetadata[$bundleName] ??= [];
                 $pluginsMetadata[$bundleName][$meta->getName()] = $meta;
             }
         }
@@ -152,9 +150,7 @@ class PluginModel extends FormModel
             foreach ($pluginMetadata as $meta) {
                 $table = $meta->getTableName();
 
-                if (!isset($installedPluginsTables[$bundleName])) {
-                    $installedPluginsTables[$bundleName] = [];
-                }
+                $installedPluginsTables[$bundleName] ??= [];
 
                 if ($currentSchema->hasTable($table)) {
                     $installedPluginsTables[$bundleName][] = $currentSchema->getTable($table);

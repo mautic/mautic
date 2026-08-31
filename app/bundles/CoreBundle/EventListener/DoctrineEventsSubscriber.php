@@ -18,12 +18,9 @@ final class DoctrineEventsSubscriber
 {
     private array $deprecatedEntityTables = [];
 
-    /**
-     * @param string $tablePrefix
-     */
     public function __construct(
         #[Autowire(param: 'mautic.db_table_prefix')]
-        private $tablePrefix,
+        private ?string $tablePrefix,
     ) {
     }
 

@@ -8,28 +8,19 @@ use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
 final class PluginIntegrationAuthRedirectEvent extends AbstractPluginIntegrationEvent
 {
-    /**
-     * @param string $authUrl
-     */
     public function __construct(
         UnifiedIntegrationInterface $integration,
-        private $authUrl,
+        private string $authUrl,
     ) {
         $this->integration = $integration;
     }
 
-    /**
-     * @return string
-     */
-    public function getAuthUrl()
+    public function getAuthUrl(): string
     {
         return $this->authUrl;
     }
 
-    /**
-     * @param string $authUrl
-     */
-    public function setAuthUrl($authUrl): void
+    public function setAuthUrl(string $authUrl): void
     {
         $this->authUrl = $authUrl;
 

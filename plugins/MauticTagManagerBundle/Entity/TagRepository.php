@@ -74,9 +74,7 @@ final class TagRepository extends BaseTagRepository
 
         // Ensure lists without leads have a value
         foreach ($tagIds as $l) {
-            if (!isset($return[$l])) {
-                $return[$l] = 0;
-            }
+            $return[$l] ??= 0;
         }
 
         return ($returnArray) ? $return : $return[$tagIds[0]];

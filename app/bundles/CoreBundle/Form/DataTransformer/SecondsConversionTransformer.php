@@ -9,10 +9,10 @@ use Symfony\Component\Form\DataTransformerInterface;
 /**
  * @implements DataTransformerInterface<string, string>
  */
-final class SecondsConversionTransformer implements DataTransformerInterface
+final readonly class SecondsConversionTransformer implements DataTransformerInterface
 {
     public function __construct(
-        private $viewFormat = 'H',
+        private string $viewFormat = 'H',
     ) {
     }
 

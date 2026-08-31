@@ -52,7 +52,7 @@ final class MaintenanceSubscriberTest extends MauticMysqlTestCase
         /** @var EventDispatcherInterface $dispatcher */
         $dispatcher = self::getContainer()->get(EventDispatcherInterface::class);
 
-        $event = $dispatcher->dispatch(new MaintenanceEvent(2, false, 0), CoreEvents::MAINTENANCE_CLEANUP_DATA);
+        $event = $dispatcher->dispatch(new MaintenanceEvent(2, false, false), CoreEvents::MAINTENANCE_CLEANUP_DATA);
         $stats = $event->getStats();
 
         $this->assertArrayHasKey($translator->trans('mautic.maintenance.audit_log'), $stats);

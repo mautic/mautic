@@ -16,7 +16,7 @@ final class ColorHelper
     /**
      * @param string $hex in format #xxxxxx or #xxx
      */
-    public function __construct($hex = null)
+    public function __construct(?string $hex = null)
     {
         if ($hex) {
             $this->setHex($hex);

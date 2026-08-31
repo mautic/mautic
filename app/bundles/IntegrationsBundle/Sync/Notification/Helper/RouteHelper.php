@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Sync\Notification\Helper;
 
 use Mautic\IntegrationsBundle\Event\InternalObjectRouteEvent;
-use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
@@ -32,7 +31,7 @@ class RouteHelper
             throw new ObjectNotSupportedException(MauticSyncDataExchange::NAME, $object);
         }
 
-        $this->dispatcher->dispatch($event, IntegrationEvents::INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE);
+        $this->dispatcher->dispatch($event);
 
         return $event->getRoute();
     }

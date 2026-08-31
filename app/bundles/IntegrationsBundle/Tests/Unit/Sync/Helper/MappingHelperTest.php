@@ -80,7 +80,7 @@ final class MappingHelperTest extends TestCase
         $internalObjectName  = 'Contact';
         $foundInternalObject = $this->mappingHelper->findMauticObject($mappingManual, $internalObjectName, $integrationObjectDAO);
 
-        $this->assertEquals($internalObjectName, $foundInternalObject->getObject());
+        $this->assertSame($internalObjectName, $foundInternalObject->getObject());
         $this->assertEquals($internalObjectDAO['internal_object_id'], $foundInternalObject->getObjectId());
         $this->assertEquals($internalObjectDAO['last_sync_date'], $foundInternalObject->getChangeDateTime()->format('Y-m-d H:i:s'));
     }
@@ -97,7 +97,7 @@ final class MappingHelperTest extends TestCase
 
         $foundInternalObject = $this->mappingHelper->findMauticObject($mappingManual, $internalObjectName, $integrationObjectDAO);
 
-        $this->assertEquals($internalObjectName, $foundInternalObject->getObject());
+        $this->assertSame($internalObjectName, $foundInternalObject->getObject());
         $this->assertEquals(null, $foundInternalObject->getObjectId());
     }
 
@@ -143,7 +143,7 @@ final class MappingHelperTest extends TestCase
 
         $foundInternalObject = $this->mappingHelper->findMauticObject($mappingManual, $internalObjectName, $integrationObjectDAO);
 
-        $this->assertEquals($internalObjectName, $foundInternalObject->getObject());
+        $this->assertSame($internalObjectName, $foundInternalObject->getObject());
         $this->assertEquals(null, $foundInternalObject->getObjectId());
     }
 
@@ -202,7 +202,7 @@ final class MappingHelperTest extends TestCase
 
         $foundInternalObject = $this->mappingHelper->findMauticObject($mappingManual, $internalObjectName, $integrationObjectDAO);
 
-        $this->assertEquals($internalObjectName, $foundInternalObject->getObject());
+        $this->assertSame($internalObjectName, $foundInternalObject->getObject());
         $this->assertEquals(3, $foundInternalObject->getObjectId());
     }
 
@@ -265,7 +265,7 @@ final class MappingHelperTest extends TestCase
             $integrationObjectDAO
         );
 
-        $this->assertEquals($internalObjectName, $foundInternalObject->getObject());
+        $this->assertSame($internalObjectName, $foundInternalObject->getObject());
         $this->assertEquals(3, $foundInternalObject->getObjectId());
     }
 
@@ -287,7 +287,7 @@ final class MappingHelperTest extends TestCase
 
         $foundIntegrationObject = $this->mappingHelper->findIntegrationObject('Test', $objectName, new ObjectDAO('Contact', 1));
 
-        $this->assertEquals($objectName, $foundIntegrationObject->getObject());
+        $this->assertSame($objectName, $foundIntegrationObject->getObject());
         $this->assertEquals($objectId, $foundIntegrationObject->getObjectId());
         $this->assertEquals($changeDateTime, $foundIntegrationObject->getChangeDateTime()->format('Y-m-d H:i:s'));
     }
@@ -301,7 +301,7 @@ final class MappingHelperTest extends TestCase
 
         $foundIntegrationObject = $this->mappingHelper->findIntegrationObject('Test', $objectName, new ObjectDAO('Contact', 1));
 
-        $this->assertEquals($objectName, $foundIntegrationObject->getObject());
+        $this->assertSame($objectName, $foundIntegrationObject->getObject());
         $this->assertEquals(null, $foundIntegrationObject->getObjectId());
         $this->assertEquals(null, $foundIntegrationObject->getChangeDateTime());
     }

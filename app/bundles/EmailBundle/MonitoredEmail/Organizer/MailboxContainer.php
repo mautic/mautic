@@ -19,9 +19,7 @@ final class MailboxContainer
 
     public function addCriteria($criteria, $mailbox): void
     {
-        if (!isset($this->criteria[$criteria])) {
-            $this->criteria[$criteria] = [];
-        }
+        $this->criteria[$criteria] ??= [];
 
         $this->criteria[$criteria][] = $mailbox;
     }

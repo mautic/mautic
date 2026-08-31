@@ -111,7 +111,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
             ['filetype' => 'csv']
         );
 
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         /** @var ContactExportScheduler $contactExportScheduler */
         $contactExportScheduler = $this->checkContactExportScheduler(1)[0];
@@ -184,7 +184,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
             self::BATCH_EXPORT_PATH,
             ['filetype' => 'csv']
         );
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         /** @var ContactExportScheduler $contactExportScheduler */
         $contactExportScheduler = $this->checkContactExportScheduler(1)[0];

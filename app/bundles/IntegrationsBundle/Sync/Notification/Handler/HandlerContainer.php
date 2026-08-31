@@ -25,9 +25,7 @@ final class HandlerContainer
 
     private function registerHandler(HandlerInterface $handler): void
     {
-        if (!isset($this->handlers[$handler->getIntegration()])) {
-            $this->handlers[$handler->getIntegration()] = [];
-        }
+        $this->handlers[$handler->getIntegration()] ??= [];
 
         $this->handlers[$handler->getIntegration()][$handler->getSupportedObject()] = $handler;
     }

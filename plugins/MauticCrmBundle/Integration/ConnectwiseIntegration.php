@@ -763,9 +763,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      */
     protected function cleanPriorityFields(array $fieldsToUpdate, $objects = null)
     {
-        if (null === $objects) {
-            $objects = ['Leads', 'Contacts'];
-        }
+        $objects ??= ['Leads', 'Contacts'];
         if (isset($fieldsToUpdate['leadFields']) && is_array($objects)) {
             // Pass in the whole config
             $fields = $fieldsToUpdate['leadFields'];

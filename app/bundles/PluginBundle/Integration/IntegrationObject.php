@@ -4,30 +4,20 @@ declare(strict_types=1);
 
 namespace Mautic\PluginBundle\Integration;
 
-final class IntegrationObject
+final readonly class IntegrationObject
 {
-    /**
-     * @param string $type
-     * @param string $internalType
-     */
     public function __construct(
-        private $type,
-        private $internalType,
+        private string $type,
+        private string $internalType,
     ) {
     }
 
-    /**
-     * @return string
-     */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
 
-    /**
-     * @return string
-     */
-    public function getInternalType()
+    public function getInternalType(): string
     {
         return $this->internalType;
     }

@@ -33,12 +33,9 @@ class TableSchemaHelper
      */
     protected array $addTables = [];
 
-    /**
-     * @param string $prefix
-     */
     public function __construct(
         protected Connection $db,
-        protected $prefix,
+        protected ?string $prefix,
         protected ColumnSchemaHelper $columnHelper,
     ) {
         $this->sm = $db->createSchemaManager();

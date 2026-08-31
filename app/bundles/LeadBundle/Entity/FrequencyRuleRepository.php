@@ -81,9 +81,7 @@ class FrequencyRuleRepository extends CommonRepository
 
         foreach ($results as $result) {
             if ($groupByLeads) {
-                if (!isset($frequencyRules[$result['lead_id']])) {
-                    $frequencyRules[$result['lead_id']] = [];
-                }
+                $frequencyRules[$result['lead_id']] ??= [];
 
                 $frequencyRules[$result['lead_id']][$result['channel']] = $result;
             } else {

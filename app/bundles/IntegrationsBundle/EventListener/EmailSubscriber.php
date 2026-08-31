@@ -12,7 +12,6 @@ use Mautic\IntegrationsBundle\DTO\IntegrationObjectToken as Token;
 use Mautic\IntegrationsBundle\Entity\ObjectMappingRepository;
 use Mautic\IntegrationsBundle\Event\MappedIntegrationObjectTokenEvent;
 use Mautic\IntegrationsBundle\Helper\TokenParser;
-use Mautic\IntegrationsBundle\IntegrationEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -43,10 +42,7 @@ final readonly class EmailSubscriber implements EventSubscriberInterface
         $tokens = [];
 
         $mappedObjectTokens = new MappedIntegrationObjectTokenEvent();
-        $this->eventDispatcher->dispatch(
-            $mappedObjectTokens,
-            IntegrationEvents::INTEGRATION_OBJECT_TOKEN_EVENT
-        );
+        $this->eventDispatcher->dispatch($mappedObjectTokens);
 
         foreach ($mappedObjectTokens->getTokens() as $integration => $t) {
             foreach ($t as $integrationObject => $objectData) {

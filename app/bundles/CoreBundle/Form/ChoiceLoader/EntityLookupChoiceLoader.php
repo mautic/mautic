@@ -29,7 +29,7 @@ final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         private readonly ModelFactory $modelFactory,
         private readonly TranslatorInterface $translator,
         private readonly Connection $connection,
-        private $options = [],
+        private Options|array $options = [],
     ) {
         if (is_array($options)) {
             $options = new OptionsResolver()->setDefaults($options);
@@ -41,7 +41,7 @@ final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     /**
      * @param Options<array<mixed>>|array<mixed> $options
      */
-    public function setOptions($options): void
+    public function setOptions(Options|array $options): void
     {
         $this->options = $options;
     }
@@ -79,9 +79,7 @@ final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 
     private function getChoices(?array $data = null, bool $includeNew = false): array
     {
-        if (null === $data) {
-            $data = $this->selected;
-        }
+        $data ??= $this->selected;
 
         // Ensure we only work with scalar numeric IDs to prevent array-to-string conversions
         $data = $this->sanitizeIds($data);

@@ -64,6 +64,7 @@ final class PreviewSettingsFunctionalTest extends MauticMysqlTestCase
         $emailVariant->setLanguage('en');
 
         // Add variant relationship to main page
+        $emailMain->setVariantSettings(['winnerCriteria' => 'email.openrate']);
         $emailMain->addVariantChild($emailVariant);
 
         $this->em->persist($emailMain);

@@ -17,10 +17,7 @@ abstract class AbstractCustomRequestEvent extends Event
      */
     protected $route;
 
-    /**
-     * @var array
-     */
-    protected $routeParams = [];
+    protected ?array $routeParams = [];
 
     public function __construct(?Request $request = null)
     {
@@ -35,9 +32,7 @@ abstract class AbstractCustomRequestEvent extends Event
                 $this->routeParams = $this->request->attributes->get('_route_params');
             }
 
-            if (null === $this->routeParams) {
-                $this->routeParams = [];
-            }
+            $this->routeParams ??= [];
         }
     }
 

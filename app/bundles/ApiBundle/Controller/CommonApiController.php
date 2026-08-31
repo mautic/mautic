@@ -450,10 +450,7 @@ class CommonApiController extends FetchCommonApiController
     {
         $categoryId = null;
 
-        if (null === $parameters) {
-            // get from request
-            $parameters = $request->request->all();
-        }
+        $parameters ??= $request->request->all();
 
         // Store the original parameters from the request so that callbacks can have access to them as needed
         $this->entityRequestParameters = $parameters;

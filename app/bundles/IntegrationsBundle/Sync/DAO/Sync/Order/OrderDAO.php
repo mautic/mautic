@@ -57,14 +57,10 @@ class OrderDAO
      */
     private array $notifications = [];
 
-    /**
-     * @param bool   $isFirstTimeSync
-     * @param string $integration
-     */
     public function __construct(
         private readonly \DateTimeInterface $syncDateTime,
-        private $isFirstTimeSync,
-        private $integration,
+        private readonly bool $isFirstTimeSync,
+        private readonly string $integration,
         private readonly array $options = [],
     ) {
     }
@@ -132,9 +128,7 @@ class OrderDAO
         $integrationObjectId,
         ?\DateTimeInterface $objectModifiedDate = null,
     ): void {
-        if (null === $objectModifiedDate) {
-            $objectModifiedDate = new \DateTime();
-        }
+        $objectModifiedDate ??= new \DateTime();
 
         $objectMapping = new ObjectMapping();
         $objectMapping->setIntegration($this->integration)
@@ -157,9 +151,7 @@ class OrderDAO
      */
     public function remapObject($oldObjectName, $oldObjectId, $newObjectName, $newObjectId = null): void
     {
-        if (null === $newObjectId) {
-            $newObjectId = $oldObjectId;
-        }
+        $newObjectId ??= $oldObjectId;
 
         $this->remappedObjects[$oldObjectId] = new RemappedObjectDAO($this->integration, $oldObjectName, $oldObjectId, $newObjectName, $newObjectId);
     }
@@ -169,9 +161,7 @@ class OrderDAO
      */
     public function updateLastSyncDate(ObjectChangeDAO $objectChangeDAO, ?\DateTimeInterface $objectModifiedDate = null): void
     {
-        if (null === $objectModifiedDate) {
-            $objectModifiedDate = new \DateTime();
-        }
+        $objectModifiedDate ??= new \DateTime();
 
         $this->updatedObjectMappings[] = new UpdatedObjectMappingDAO(
             $this->integration,
@@ -195,9 +185,7 @@ class OrderDAO
      */
     public function retrySyncLater(ObjectChangeDAO $objectChangeDAO): void
     {
-        if (!isset($this->retryTheseLater[$objectChangeDAO->getMappedObject()])) {
-            $this->retryTheseLater[$objectChangeDAO->getMappedObject()] = [];
-        }
+        $this->retryTheseLater[$objectChangeDAO->getMappedObject()] ??= [];
 
         $this->retryTheseLater[$objectChangeDAO->getMappedObject()][$objectChangeDAO->getMappedObjectId()] = $objectChangeDAO;
     }

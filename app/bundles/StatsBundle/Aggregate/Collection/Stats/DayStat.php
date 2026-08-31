@@ -13,7 +13,7 @@ final class DayStat implements StatInterface
      * @param string $day "2019-11-07" format
      */
     public function __construct(
-        private $day,
+        private readonly string $day,
     ) {
     }
 
@@ -28,9 +28,7 @@ final class DayStat implements StatInterface
     {
         $key = new \DateTime("{$this->day} {$hour}:00:00")->format('Y-m-d H');
 
-        if (!isset($this->stats[$key])) {
-            $this->stats[$key] = new HourStat($key);
-        }
+        $this->stats[$key] ??= new HourStat($key);
 
         return $this->stats[$key];
     }

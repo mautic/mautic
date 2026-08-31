@@ -89,12 +89,9 @@ class IpAddress
             ->build();
     }
 
-    /**
-     * @param string|null $ipAddress
-     */
     public function __construct(
         #[Groups(['ipaddress:read', 'ipaddress:write', 'download:read'])]
-        private $ipAddress = null,
+        private ?string $ipAddress = null,
     ) {
     }
 
@@ -106,17 +103,14 @@ class IpAddress
         return $this->id;
     }
 
-    public function setIpAddress($ipAddress): static
+    public function setIpAddress(?string $ipAddress): static
     {
         $this->ipAddress = $ipAddress;
 
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getIpAddress()
+    public function getIpAddress(): ?string
     {
         return $this->ipAddress;
     }

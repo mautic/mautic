@@ -9,12 +9,9 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 final class ReportScheduleSendEvent extends Event
 {
-    /**
-     * @param string $file
-     */
     public function __construct(
         private readonly Scheduler $scheduler,
-        private $file,
+        private readonly string $file,
     ) {
     }
 
@@ -23,10 +20,7 @@ final class ReportScheduleSendEvent extends Event
         return $this->scheduler;
     }
 
-    /**
-     * @return string
-     */
-    public function getFile()
+    public function getFile(): string
     {
         return $this->file;
     }

@@ -22,12 +22,11 @@ final class CampaignLeadChangeEvent extends Event
 
     /**
      * @param Lead|Lead[] $leads
-     * @param ?string     $action
      */
     public function __construct(
         private readonly Campaign $campaign,
         $leads,
-        private $action,
+        private readonly ?string $action,
     ) {
         if (is_array($leads)) {
             $this->leads = $leads;
@@ -66,10 +65,8 @@ final class CampaignLeadChangeEvent extends Event
 
     /**
      * Returns added or removed.
-     *
-     * @return string|null
      */
-    public function getAction()
+    public function getAction(): ?string
     {
         return $this->action;
     }

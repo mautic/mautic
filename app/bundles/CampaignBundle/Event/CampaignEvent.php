@@ -9,10 +9,7 @@ use Mautic\CoreBundle\Event\CommonEvent;
 
 final class CampaignEvent extends CommonEvent
 {
-    /**
-     * @param bool $isNew
-     */
-    public function __construct(Campaign &$campaign, $isNew = false)
+    public function __construct(Campaign &$campaign, bool $isNew = false)
     {
         $this->entity = &$campaign;
         $this->isNew  = $isNew;

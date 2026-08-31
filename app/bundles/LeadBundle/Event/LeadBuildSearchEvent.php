@@ -22,12 +22,11 @@ class LeadBuildSearchEvent extends CommonEvent
     /**
      * @param string $string
      * @param string $command
-     * @param string $alias
      */
     public function __construct(
         protected $string,
         protected $command,
-        protected $alias,
+        protected string $alias,
         protected bool $negate,
         protected QueryBuilder $queryBuilder,
     ) {
@@ -49,10 +48,7 @@ class LeadBuildSearchEvent extends CommonEvent
         return $this->command;
     }
 
-    /**
-     * @return string
-     */
-    public function getAlias()
+    public function getAlias(): string
     {
         return $this->alias;
     }

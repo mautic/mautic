@@ -161,9 +161,7 @@ final class ObjectChangeDAO
 
     public function setChangeDateTime(?\DateTimeInterface $changeDateTime = null): static
     {
-        if (null === $changeDateTime) {
-            $changeDateTime = new \DateTime();
-        }
+        $changeDateTime ??= new \DateTime();
 
         $this->changeDateTime = $changeDateTime;
 

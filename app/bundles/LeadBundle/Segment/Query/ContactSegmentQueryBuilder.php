@@ -249,9 +249,7 @@ final class ContactSegmentQueryBuilder
     {
         $seen[] = $segmentId;
 
-        if (!isset($this->dependencyMap[$segmentId])) {
-            $this->dependencyMap[$segmentId] = $this->getSegmentEdges($segmentId);
-        }
+        $this->dependencyMap[$segmentId] ??= $this->getSegmentEdges($segmentId);
 
         $edges = $this->dependencyMap[$segmentId];
 

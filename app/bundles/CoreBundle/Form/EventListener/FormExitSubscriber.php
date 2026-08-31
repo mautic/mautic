@@ -9,13 +9,9 @@ use Symfony\Component\Form\FormEvents;
 
 final class FormExitSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @param string $model
-     * @param array  $options
-     */
     public function __construct(
-        private $model,
-        private $options = [],
+        private readonly string $model,
+        private array $options = [],
     ) {
     }
 

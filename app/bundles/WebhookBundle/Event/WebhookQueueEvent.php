@@ -10,13 +10,10 @@ use Mautic\WebhookBundle\Entity\WebhookQueue;
 
 final class WebhookQueueEvent extends CommonEvent
 {
-    /**
-     * @param bool $isNew
-     */
     public function __construct(
         WebhookQueue $webhookQueue,
         private Webhook $webhook,
-        $isNew = false,
+        bool $isNew = false,
     ) {
         $this->entity  = $webhookQueue;
         $this->isNew   = $isNew;

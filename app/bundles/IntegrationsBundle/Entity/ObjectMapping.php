@@ -125,9 +125,7 @@ class ObjectMapping
 
     public function __construct(?\DateTime $dateCreated = null)
     {
-        if (null === $dateCreated) {
-            $dateCreated = new \DateTime();
-        }
+        $dateCreated ??= new \DateTime();
 
         $this->dateCreated  = $dateCreated;
         $this->lastSyncDate = $dateCreated;
@@ -248,14 +246,9 @@ class ObjectMapping
         return $this->lastSyncDate;
     }
 
-    /**
-     * @param \DateTimeInterface|null $lastSyncDate
-     */
-    public function setLastSyncDate($lastSyncDate): static
+    public function setLastSyncDate(?\DateTimeInterface $lastSyncDate): static
     {
-        if (null === $lastSyncDate) {
-            $lastSyncDate = new \DateTime();
-        }
+        $lastSyncDate ??= new \DateTime();
 
         $this->lastSyncDate = $lastSyncDate;
 

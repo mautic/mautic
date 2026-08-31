@@ -9,14 +9,9 @@ final class YearStat implements StatInterface
      */
     private array $stats = [];
 
-    private readonly int $year;
-
-    /**
-     * @param int $year
-     */
-    public function __construct($year)
-    {
-        $this->year = (int) $year;
+    public function __construct(
+        private readonly int $year,
+    ) {
     }
 
     /**
@@ -30,9 +25,7 @@ final class YearStat implements StatInterface
     {
         $key = new \DateTime("{$this->year}-{$month}-01 00:00:00")->format('Y-m');
 
-        if (!isset($this->stats[$key])) {
-            $this->stats[$key] = new MonthStat($key);
-        }
+        $this->stats[$key] ??= new MonthStat($key);
 
         return $this->stats[$key];
     }

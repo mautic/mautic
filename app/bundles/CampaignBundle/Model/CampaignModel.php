@@ -371,9 +371,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
      */
     public function setCanvasSettings(Campaign $entity, array $settings, bool $persist = true, $events = null): array
     {
-        if (null === $events) {
-            $events = $entity->getEvents();
-        }
+        $events ??= $entity->getEvents();
 
         $tempIds = [];
 
@@ -385,9 +383,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
             }
         }
 
-        if (!isset($settings['nodes'])) {
-            $settings['nodes'] = [];
-        }
+        $settings['nodes'] ??= [];
 
         foreach ($settings['nodes'] as &$node) {
             if (str_contains($node['id'], 'new')) {
@@ -396,9 +392,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
             }
         }
 
-        if (!isset($settings['connections'])) {
-            $settings['connections'] = [];
-        }
+        $settings['connections'] ??= [];
 
         foreach ($settings['connections'] as &$connection) {
             // Check source
@@ -588,9 +582,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     {
         static $campaigns = [];
 
-        if (null === $lead) {
-            $lead = $this->contactTracker->getContact();
-        }
+        $lead ??= $this->contactTracker->getContact();
 
         if (!isset($campaigns[$lead->getId()])) {
             $repo   = $this->getRepository();

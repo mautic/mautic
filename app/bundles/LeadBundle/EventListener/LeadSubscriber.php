@@ -66,7 +66,7 @@ final class LeadSubscriber implements EventSubscriberInterface
         private readonly DoNotContactRepository $doNotContactRepository,
         ModelFactory $modelFactory,
         private readonly AuditLogRepository $auditLogRepository,
-        private $isTest = false,
+        private bool $isTest = false,
     ) {
         $this->setModelFactory($modelFactory);
     }

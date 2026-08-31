@@ -26,16 +26,15 @@ final class LineChart extends AbstractChart implements ChartInterface
     /**
      * Defines the basic chart values, generates the time axe labels from it.
      *
-     * @param string|null $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string|null $unit     {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param \DateTime   $dateFrom
      * @param \DateTime   $dateTo
-     * @param string      $dateFormat
      */
     public function __construct(
         ?string $unit = null,
         ?\DateTimeInterface $dateFrom = null,
         ?\DateTimeInterface $dateTo = null,
-        private $dateFormat = null,
+        private readonly ?string $dateFormat = null,
     ) {
         $this->unit       = $unit ?? $this->getTimeUnitFromDateRange($dateFrom, $dateTo);
         $this->isTimeUnit = in_array($this->unit, ['H', 'i', 's']);

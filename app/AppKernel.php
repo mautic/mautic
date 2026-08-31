@@ -33,7 +33,7 @@ class AppKernel extends Kernel
      *
      * @api
      */
-    public function __construct($environment, $debug)
+    public function __construct(string $environment, bool $debug)
     {
         $metadata = ThisRelease::getMetadata();
 

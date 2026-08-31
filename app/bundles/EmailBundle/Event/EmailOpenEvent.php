@@ -11,14 +11,10 @@ final class EmailOpenEvent extends CommonEvent
 {
     private readonly ?Email $email;
 
-    /**
-     * @param Request $request
-     * @param bool    $firstTime
-     */
     public function __construct(
         Stat $stat,
-        private $request,
-        private $firstTime = false,
+        private readonly Request $request,
+        private readonly bool $firstTime = false,
     ) {
         $this->entity    = $stat;
         $this->email     = $stat->getEmail();
@@ -34,10 +30,8 @@ final class EmailOpenEvent extends CommonEvent
 
     /**
      * Get email request.
-     *
-     * @return string
      */
-    public function getRequest()
+    public function getRequest(): Request
     {
         return $this->request;
     }
@@ -52,10 +46,8 @@ final class EmailOpenEvent extends CommonEvent
 
     /**
      * Returns if this is first time the email is read.
-     *
-     * @return bool
      */
-    public function isFirstTime()
+    public function isFirstTime(): bool
     {
         return $this->firstTime;
     }
