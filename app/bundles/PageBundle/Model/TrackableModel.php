@@ -568,7 +568,7 @@ class TrackableModel extends AbstractCommonModel
         // Check for tokens in the query
         if (!empty($urlParts['query'])) {
             [$tokenizedParams, $untokenizedParams] = $this->parseTokenizedQuery($urlParts['query']);
-            if ($tokenizedParams) {
+            if ([] !== $tokenizedParams) {
                 // Rebuild the query without the tokenized query params for now
                 $urlParts['query'] = $this->httpBuildQuery($untokenizedParams);
             }

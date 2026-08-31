@@ -1222,7 +1222,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 } catch (ApiErrorException $exception) {
                     $this->cleanupFromSync($leadsToSync, $exception);
                 }
-            } elseif ($checkEmailsInSF) {
+            } elseif ([] !== $checkEmailsInSF) {
                 $sfEntityRecords = $this->getSalesforceObjectsByEmails($sfObject, $checkEmailsInSF, implode(',', array_keys($fieldMapping[$sfObject]['create'])));
 
                 if (!isset($sfEntityRecords['records'])) {
@@ -1298,7 +1298,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             if (in_array('Contact', $config['objects'])) {
                 $resultContact = $this->integrationEntityRepository->getIntegrationsEntityId('Salesforce', 'Contact', 'lead', $lead->getId());
 
-                if ($resultContact) {
+                if ([] !== $resultContact) {
                     return $resultContact;
                 }
             }

@@ -445,7 +445,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         $fields = $entity->getFields()->toArray();
 
         // Ensure the correct order in case this is generated right after a form save with new fields
-        uasort($fields, fn (Field $a, Field $b): int => $this->compareFieldOrder($a, $b));
+        uasort($fields, $this->compareFieldOrder(...));
 
         $viewOnlyFields     = $this->getCustomComponents()['viewOnlyFields'];
         $displayManager     = new DisplayManager($entity, !empty($viewOnlyFields) ? $viewOnlyFields : []);

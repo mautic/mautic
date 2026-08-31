@@ -187,7 +187,9 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
             $isNew  = !$object;
 
             $object ??= new Campaign();
-            $isNew && $object->setDateAdded(new \DateTime());
+            if ($isNew) {
+                $object->setDateAdded(new \DateTime());
+            }
             $object->setUuid($campaignData['uuid']);
             $object->setDateModified(new \DateTime());
 
