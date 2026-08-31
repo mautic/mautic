@@ -555,12 +555,13 @@ var t,e;t=this,e=function(){"use strict";function t(t,e){var n=Object.keys(t);if
 
                     var elId              = 'mauticform_' + formId;
                     var theForm           = document.getElementById(elId);
-                    var formValid         = Form.customCallbackHandler(formId, 'onValidate');
                     var firstInvalidField = false;
 
                     if (submitForm && validator.isSubmitting(theForm)) {
                         return false;
                     }
+
+                    var formValid = Form.customCallbackHandler(formId, 'onValidate');
 
                     validator.disableSubmitButton();
 
