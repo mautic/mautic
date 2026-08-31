@@ -20,7 +20,7 @@ final class SummaryModelFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->summaryModel = static::getContainer()->get(SummaryModel::class);
+        $this->summaryModel = self::getContainer()->get(SummaryModel::class);
     }
 
     public function testPersistSummariesGeneratesStableHourlyRowsPerEvent(): void
