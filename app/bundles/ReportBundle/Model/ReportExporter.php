@@ -7,7 +7,6 @@ use Mautic\ReportBundle\Adapter\ReportDataAdapter;
 use Mautic\ReportBundle\Entity\Scheduler;
 use Mautic\ReportBundle\Event\ReportScheduleSendEvent;
 use Mautic\ReportBundle\Exception\FileIOException;
-use Mautic\ReportBundle\ReportEvents;
 use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -84,7 +83,7 @@ final readonly class ReportExporter
 
             $file  = $this->reportFileWriter->getFilePath($scheduler);
             $event = new ReportScheduleSendEvent($scheduler, $file);
-            $this->eventDispatcher->dispatch($event, ReportEvents::REPORT_SCHEDULE_SEND);
+            $this->eventDispatcher->dispatch($event);
         }
 
         $this->schedulerModel->reportWasScheduled($report);

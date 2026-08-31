@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\ReportBundle\Helper;
 
 use Mautic\ReportBundle\Event\ColumnCollectEvent;
-use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final readonly class ReportHelper
@@ -117,7 +116,7 @@ final readonly class ReportHelper
     public function getMappedObjectColumns(string $object, array $properties = []): array
     {
         $event = new ColumnCollectEvent($object, $properties);
-        $this->dispatcher->dispatch($event, ReportEvents::REPORT_ON_COLUMN_COLLECT);
+        $this->dispatcher->dispatch($event);
 
         return array_map(
             function (array $item): array {

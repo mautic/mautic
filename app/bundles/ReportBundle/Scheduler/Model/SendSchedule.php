@@ -7,7 +7,6 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\ReportBundle\Entity\Scheduler;
 use Mautic\ReportBundle\Event\PermanentReportFileCreatedEvent;
 use Mautic\ReportBundle\Exception\FileTooBigException;
-use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SendSchedule
@@ -48,7 +47,7 @@ class SendSchedule
                 $this->fileHandler->moveZipToPermanentLocation($report, $zipFilePath);
                 $message = $this->messageSchedule->getMessageForLinkedFile($report);
                 $event   = new PermanentReportFileCreatedEvent($report);
-                $this->eventDispatcher->dispatch($event, ReportEvents::REPORT_PERMANENT_FILE_CREATED);
+                $this->eventDispatcher->dispatch($event);
             }
         }
 

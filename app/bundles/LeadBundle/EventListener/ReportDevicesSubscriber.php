@@ -9,7 +9,6 @@ use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
-use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class ReportDevicesSubscriber implements EventSubscriberInterface
@@ -25,9 +24,9 @@ final readonly class ReportDevicesSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            ReportEvents::REPORT_ON_BUILD    => ['onReportBuilder', 0],
-            ReportEvents::REPORT_ON_GENERATE => ['onReportGenerate', 0],
-            ReportEvents::REPORT_ON_DISPLAY  => ['onReportDisplay', 0],
+            ReportBuilderEvent::class   => ['onReportBuilder', 0],
+            ReportGeneratorEvent::class => ['onReportGenerate', 0],
+            ReportDataEvent::class      => ['onReportDisplay', 0],
         ];
     }
 

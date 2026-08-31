@@ -5,7 +5,6 @@ namespace Mautic\LeadBundle\EventListener;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Helper\CustomFieldValueHelper;
 use Mautic\ReportBundle\Event\ReportDataEvent;
-use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class ReportNormalizeSubscriber implements EventSubscriberInterface
@@ -18,7 +17,7 @@ final readonly class ReportNormalizeSubscriber implements EventSubscriberInterfa
     public static function getSubscribedEvents(): array
     {
         return [
-            ReportEvents::REPORT_ON_DISPLAY => ['onReportDisplay', 0],
+            ReportDataEvent::class => ['onReportDisplay', 0],
         ];
     }
 

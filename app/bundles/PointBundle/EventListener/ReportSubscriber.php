@@ -9,7 +9,6 @@ use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\GroupContactScore;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
-use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class ReportSubscriber implements EventSubscriberInterface
@@ -53,8 +52,8 @@ final class ReportSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            ReportEvents::REPORT_ON_BUILD          => ['onReportBuilder', -10],
-            ReportEvents::REPORT_ON_GENERATE       => ['onReportGenerate', -10],
+            ReportBuilderEvent::class   => ['onReportBuilder', -10],
+            ReportGeneratorEvent::class => ['onReportGenerate', -10],
         ];
     }
 
