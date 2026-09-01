@@ -124,17 +124,43 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
 
     public function onGenerateSegmentFiltersAddStaticFields(LeadListFiltersChoicesEvent $event): void
     {
-        $this->setIncludeExcludeOperatorsToTextFilters($event);
-        $staticFields = [
-            'leadlist' => [
+        $event->addChoice(
+            'lead',
+            'leadlist',
+            [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lists'),
                 'properties' => [
                     'type' => 'leadlist',
                     'list' => $this->fieldChoicesProvider->getChoicesForField('multiselect', 'leadlist', $event->getSearch()),
                 ],
-                'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
-                'object'    => 'lead',
-            ],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
+                'object'     => 'lead',
+                'iconClass'  => $this->getSegmentFilterIcon('leadlist'),
+            ]
+        );
+
+        $event->addChoice(
+            'lead',
+            'tags',
+            [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.tags'),
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
+                'object'     => 'lead',
+                'properties' => [
+                    'type' => 'tags',
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('multiselect', 'tags'),
+                ],
+            ]
+        );
+
+
+        // Only show for segments and not dynamic content addressed by https://github.com/mautic/mautic/pull/9260
+        if (!$event->isForSegmentation()) {
+            return;
+        }
+
+        $this->setIncludeExcludeOperatorsToTextFilters($event);
+        $staticFields = [
             'date_added' => [
                 'label'      => $this->translator->trans('mautic.core.date.added'),
                 'properties' => ['type' => 'datetime'],
@@ -182,15 +208,6 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 ],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
                 'object'     => 'lead',
-            ],
-            'tags' => [
-                'label'      => $this->translator->trans('mautic.lead.list.filter.tags'),
-                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
-                'object'     => 'lead',
-                'properties' => [
-                    'type' => 'tags',
-                    'list' => $this->fieldChoicesProvider->getChoicesForField('multiselect', 'tags'),
-                ],
             ],
             'device_type' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.device_type'),
@@ -345,6 +362,11 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
 
     public function onGenerateSegmentFiltersAddBehaviors(LeadListFiltersChoicesEvent $event): void
     {
+        // Only show for segments and not dynamic content addressed by https://github.com/mautic/mautic/pull/9260
+        if (!$event->isForSegmentation()) {
+            return;
+        }
+
         $this->setIncludeExcludeOperatorsToTextFilters($event);
         $choices = [
             'lead_asset_download' => [
