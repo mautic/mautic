@@ -86,22 +86,40 @@ final class MauticReportBuilder implements ReportBuilderInterface
      * SQL tokens that may appear inside report expressions but are never column
      * references; used by extractBaseColumns(). Function names are already
      * excluded by the not-followed-by-parenthesis check.
+     *
+     * Includes both MySQL and PostgreSQL tokens so the same builder works on
+     * either platform without treating keywords as column names.
      */
     private const SQL_KEYWORD_TOKENS = [
+        // Common
         'SELECT', 'FROM', 'WHERE', 'CASE', 'WHEN', 'THEN', 'ELSE', 'END', 'AND',
         'OR', 'NOT', 'NULL', 'IS', 'IN', 'LIKE', 'BETWEEN', 'EXISTS', 'DISTINCT',
         'AS', 'ASC', 'DESC', 'INTERVAL', 'DAY', 'DAYOFWEEK', 'DAYOFMONTH',
         'DAYOFYEAR', 'HOUR', 'MINUTE', 'SECOND', 'WEEK', 'MONTH', 'QUARTER',
         'YEAR', 'TRUE', 'FALSE',
+        // PostgreSQL
+        'ILIKE', 'SIMILAR', 'OVERLAPS', 'EXTRACT', 'FILTER', 'WITHIN',
+        'GROUPING', 'CURRENT_DATE', 'CURRENT_TIME', 'CURRENT_TIMESTAMP',
+        'LOCALTIME', 'LOCALTIMESTAMP', 'AT', 'TIME', 'ZONE', 'EPOCH',
+        'CENTURY', 'DECADE', 'DOW', 'DOY', 'ISODOW', 'ISOYEAR', 'MICROSECONDS',
+        'MILLISECONDS', 'MILLENNIUM', 'TIMEZONE', 'TIMEZONE_HOUR', 'TIMEZONE_MINUTE',
     ];
 
     /**
      * Aggregate functions whose arguments never need to appear in GROUP BY.
+     *
+     * Covers MySQL and PostgreSQL names used in report formulas.
      */
     private const AGGREGATE_FUNCTIONS = [
+        // Common / MySQL
         'COUNT', 'SUM', 'AVG', 'MIN', 'MAX', 'GROUP_CONCAT', 'BIT_AND',
         'BIT_OR', 'BIT_XOR', 'JSON_ARRAYAGG', 'JSON_OBJECTAGG', 'STD',
         'STDDEV', 'VARIANCE',
+        // PostgreSQL
+        'STRING_AGG', 'ARRAY_AGG', 'BOOL_AND', 'BOOL_OR', 'EVERY',
+        'JSON_AGG', 'JSONB_AGG', 'JSON_OBJECT_AGG', 'JSONB_OBJECT_AGG',
+        'XMLAGG', 'STDDEV_POP', 'STDDEV_SAMP', 'VAR_POP', 'VAR_SAMP',
+        'MODE', 'PERCENTILE_CONT', 'PERCENTILE_DISC',
     ];
 
     private ?string $contentTemplate = null;
@@ -389,10 +407,10 @@ final class MauticReportBuilder implements ReportBuilderInterface
                     }
 
                     $normalizedGroupBy[] = $normalized;
-                    // Quote simple table.column identifiers for PostgreSQL/MySQL safety
-                    $dedupedGroupBy[] = str_contains($baseColumn, '.')
-                        ? DatabasePlatform::quoteColumn($platform, $baseColumn)
-                        : $baseColumn;
+                    // Match upstream: completion candidates stay unquoted so the
+                    // generated SQL matches existing tests and MySQL behaviour.
+                    // PostgreSQL accepts unquoted lower-case identifiers.
+                    $dedupedGroupBy[] = $baseColumn;
                 }
             }
 
@@ -428,15 +446,13 @@ final class MauticReportBuilder implements ReportBuilderInterface
                     $columnSelect = $aggregator['column'];
                 }
 
-                // Sanitize simple column references for the platform
+                // Quote column refs and apply PG-specific AVG casting
                 $innerExpression = $this->sanitizeExpression($columnSelect);
-
-                $selectText = DatabasePlatform::getAggregatorExpression(
+                $selectText      = DatabasePlatform::getAggregatorExpression(
                     $platform,
                     $aggregator['function'],
                     $innerExpression
                 );
-
                 $alias              = sprintf('%s %s', $aggregator['function'], $aggregator['column']);
                 $quotedAlias        = DatabasePlatform::quoteIdentifier($platform, $alias);
                 $aggregatorSelect[] = sprintf('%s AS %s', $selectText, $quotedAlias);
