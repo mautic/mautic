@@ -4,7 +4,6 @@ namespace Mautic\UserBundle\EventListener;
 
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\UserBundle\Event\LogoutEvent;
-use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final readonly class LogoutListener implements \Symfony\Component\EventDispatcher\EventSubscriberInterface
@@ -22,9 +21,9 @@ final readonly class LogoutListener implements \Symfony\Component\EventDispatche
     {
         $request = $logoutEvent->getRequest();
         $session = $request->getSession();
-        if ($this->dispatcher->hasListeners(UserEvents::USER_LOGOUT)) {
+        if ($this->dispatcher->hasListeners(LogoutEvent::class)) {
             $mauticEvent = new LogoutEvent($this->user, $request);
-            $this->dispatcher->dispatch($mauticEvent, UserEvents::USER_LOGOUT);
+            $this->dispatcher->dispatch($mauticEvent);
             $sessionItems = $mauticEvent->getPostSessionItems();
             foreach ($sessionItems as $key => $value) {
                 $session->set($key, $value);
