@@ -6,7 +6,9 @@ namespace Mautic\DynamicContentBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\LeadBundle\Entity\Tag;
+use Mautic\LeadBundle\Model\TagModel;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -38,7 +40,7 @@ final class DynamicContentControllerTest extends MauticMysqlTestCase
             ->setSlotName('slot Name')
             ->setFilters($filters);
 
-        $model = self::getContainer()->get('mautic.dynamicContent.model.dynamicContent');
+        $model = self::getContainer()->get(DynamicContentModel::class);
         $model->saveEntity($dwc);
 
         $this->dwc = $dwc;
@@ -59,10 +61,10 @@ final class DynamicContentControllerTest extends MauticMysqlTestCase
         $this->client->submit($dwcForm);
 
         $clientResponse         = $this->client->getResponse();
-        $model                  = self::getContainer()->get('mautic.dynamicContent.model.dynamicContent');
+        $model                  = self::getContainer()->get(DynamicContentModel::class);
         $dynamicContent         = $model->getEntity($this->dwc->getId());
-        Assert::assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
-        Assert::assertContains((string) $tag1->getId(), $dynamicContent->getFilters()[0]['filter']);
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertContains((string) $tag1->getId(), $dynamicContent->getFilters()[0]['filter']);
     }
 
     private function createTag(string $tagName): Tag
@@ -70,7 +72,7 @@ final class DynamicContentControllerTest extends MauticMysqlTestCase
         $tag = new Tag();
         $tag->setTag($tagName);
 
-        $tagModel = self::getContainer()->get('mautic.lead.model.tag');
+        $tagModel = self::getContainer()->get(TagModel::class);
         $tagModel->saveEntity($tag);
 
         return $tag;
