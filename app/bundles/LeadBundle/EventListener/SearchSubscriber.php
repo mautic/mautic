@@ -14,7 +14,6 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\LeadBuildSearchEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
@@ -48,7 +47,7 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
                 ['onGlobalSearchForSegments', 0],
             ],
             CommandListEvent::class                => ['onBuildCommandList', 0],
-            LeadEvents::LEAD_BUILD_SEARCH_COMMANDS => ['onBuildSearchCommands', 0],
+            LeadBuildSearchEvent::class => ['onBuildSearchCommands', 0],
         ];
     }
 

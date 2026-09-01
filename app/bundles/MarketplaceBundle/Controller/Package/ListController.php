@@ -11,6 +11,7 @@ use Mautic\MarketplaceBundle\Service\Config;
 use Mautic\MarketplaceBundle\Service\PluginCollector;
 use Mautic\MarketplaceBundle\Service\RouteProvider;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
 final class ListController extends CommonController
@@ -32,6 +33,13 @@ final class ListController extends CommonController
         $this->config          = $config;
     }
 
+    #[Route(
+        '/s/marketplace/{page}',
+        name: 'mautic_marketplace_list',
+        requirements: ['page' => '\d+'],
+        defaults: ['page' => 1],
+        methods: ['GET', 'POST'],
+    )]
     public function listAction(int $page = 1): Response
     {
         if (!$this->config->marketplaceIsEnabled()) {

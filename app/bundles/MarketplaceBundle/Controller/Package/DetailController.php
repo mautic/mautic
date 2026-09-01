@@ -12,6 +12,7 @@ use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
 use Mautic\MarketplaceBundle\Service\Config;
 use Mautic\MarketplaceBundle\Service\RouteProvider;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
 final class DetailController extends CommonController
@@ -37,6 +38,11 @@ final class DetailController extends CommonController
         $this->composer      = $composer;
     }
 
+    #[Route(
+        '/s/marketplace/detail/{vendor}/{package}',
+        name: 'mautic_marketplace_detail',
+        methods: ['GET'],
+    )]
     public function viewAction(string $vendor, string $package): Response
     {
         if (!$this->config->marketplaceIsEnabled()) {

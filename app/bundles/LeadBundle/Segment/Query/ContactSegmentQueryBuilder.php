@@ -204,12 +204,12 @@ final class ContactSegmentQueryBuilder
 
     public function queryBuilderGenerated(LeadList $segment, QueryBuilder $queryBuilder): void
     {
-        if (!$this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_QUERYBUILDER_GENERATED)) {
+        if (!$this->dispatcher->hasListeners(LeadListQueryBuilderGeneratedEvent::class)) {
             return;
         }
 
         $event = new LeadListQueryBuilderGeneratedEvent($segment, $queryBuilder);
-        $this->dispatcher->dispatch($event, LeadEvents::LIST_FILTERS_QUERYBUILDER_GENERATED);
+        $this->dispatcher->dispatch($event);
     }
 
     /**

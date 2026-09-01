@@ -7,7 +7,6 @@ namespace Mautic\LeadBundle\Provider;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Event\FieldOperatorsEvent;
 use Mautic\LeadBundle\Event\TypeOperatorsEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class TypeOperatorProvider implements TypeOperatorProviderInterface
@@ -79,7 +78,7 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
         if ([] === $this->cachedTypeOperators) {
             $event = new TypeOperatorsEvent($this->context);
 
-            $this->dispatcher->dispatch($event, LeadEvents::COLLECT_OPERATORS_FOR_FIELD_TYPE);
+            $this->dispatcher->dispatch($event);
 
             $this->cachedTypeOperators = $event->getOperatorsForAllFieldTypes();
         }
@@ -102,7 +101,7 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
             $this->getOperatorsForFieldType($type)
         );
 
-        $this->dispatcher->dispatch($event, LeadEvents::COLLECT_OPERATORS_FOR_FIELD);
+        $this->dispatcher->dispatch($event);
 
         return $event->getOperators();
     }

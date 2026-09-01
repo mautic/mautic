@@ -3,19 +3,6 @@
 declare(strict_types=1);
 
 return [
-    'routes' => [
-        'main' => [
-            'mautic_config_action' => [
-                'path'       => '/config/{objectAction}/{objectId}',
-                'controller' => 'Mautic\ConfigBundle\Controller\ConfigController::executeAction',
-            ],
-            'mautic_sysinfo_index' => [
-                'path'       => '/sysinfo',
-                'controller' => 'Mautic\ConfigBundle\Controller\SysinfoController::indexAction',
-            ],
-        ],
-    ],
-
     'menu' => [
         'admin' => [
             'mautic.config.menu.index' => [

@@ -10,6 +10,7 @@ use Mautic\PointBundle\Model\TriggerModel;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
 final class TriggerController extends FormController
@@ -27,6 +28,23 @@ final class TriggerController extends FormController
         $this->triggerModel      = $triggerModel;
     }
 
+    #[Route(
+        '/s/points/triggers/{objectAction}/{objectId}',
+        name: 'mautic_pointtrigger_action',
+        requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
+        defaults: ['objectId' => 0],
+    )]
+    public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
+    {
+        return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
+    }
+
+    #[Route(
+        '/s/points/triggers/{page}',
+        name: 'mautic_pointtrigger_index',
+        requirements: ['page' => '\d+'],
+        defaults: ['page' => 0],
+    )]
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
     {
         // set some permissions

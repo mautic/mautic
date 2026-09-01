@@ -5,6 +5,7 @@ namespace Mautic\ConfigBundle\Controller;
 use Mautic\ConfigBundle\Model\SysinfoModel;
 use Mautic\CoreBundle\Controller\FormController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
 final class SysinfoController extends FormController
@@ -18,6 +19,10 @@ final class SysinfoController extends FormController
         $this->sysinfoModel = $sysinfoModel;
     }
 
+    #[Route(
+        '/s/sysinfo',
+        name: 'mautic_sysinfo_index',
+    )]
     public function indexAction(): Response
     {
         if (!$this->user->isAdmin() || $this->coreParametersHelper->get('sysinfo_disabled')) {

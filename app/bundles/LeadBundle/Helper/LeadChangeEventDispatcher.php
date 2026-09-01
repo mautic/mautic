@@ -68,7 +68,7 @@ class LeadChangeEventDispatcher
         }
 
         $utmTagsEvent = new Events\LeadUtmTagsEvent($this->lead, $this->changes['utmtags']);
-        $this->dispatcher->dispatch($utmTagsEvent, LeadEvents::LEAD_UTMTAGS_ADD);
+        $this->dispatcher->dispatch($utmTagsEvent);
     }
 
     private function dispatchDncChangeEvent(): void
@@ -82,7 +82,7 @@ class LeadChangeEventDispatcher
             $newStatus = $status['reason'];
 
             $event = new Events\ChannelSubscriptionChange($this->lead, $channel, $oldStatus, $newStatus);
-            $this->dispatcher->dispatch($event, LeadEvents::CHANNEL_SUBSCRIPTION_CHANGED);
+            $this->dispatcher->dispatch($event);
         }
     }
 }

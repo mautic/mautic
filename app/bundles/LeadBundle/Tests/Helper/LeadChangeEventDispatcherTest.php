@@ -138,8 +138,7 @@ final class LeadChangeEventDispatcherTest extends \PHPUnit\Framework\TestCase
         $dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                $utmTagsEvent,
-                LeadEvents::LEAD_UTMTAGS_ADD
+                $utmTagsEvent
             );
 
         $leadEventDispatcher = new LeadChangeEventDispatcher($dispatcher);
@@ -160,8 +159,7 @@ final class LeadChangeEventDispatcherTest extends \PHPUnit\Framework\TestCase
         $dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                $dncEvent,
-                LeadEvents::CHANNEL_SUBSCRIPTION_CHANGED
+                $dncEvent
             );
 
         $leadEventDispatcher = new LeadChangeEventDispatcher($dispatcher);

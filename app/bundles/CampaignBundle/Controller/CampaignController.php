@@ -42,6 +42,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
 class CampaignController extends AbstractStandardFormController
 {
@@ -140,6 +141,17 @@ class CampaignController extends AbstractStandardFormController
             ],
             'RETURN_ARRAY'
         );
+    }
+
+    #[Route(
+        '/s/campaigns/{objectAction}/{objectId}',
+        name: 'mautic_campaign_action',
+        requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
+        defaults: ['objectId' => 0],
+    )]
+    public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
+    {
+        return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
     }
 
     public function batchDeleteAction(Request $request): JsonResponse|RedirectResponse
@@ -287,6 +299,12 @@ class CampaignController extends AbstractStandardFormController
      * @param int        $page
      * @param int|null   $count
      */
+    #[Route(
+        '/s/campaigns/view/{objectId}/contact/{page}',
+        name: 'mautic_campaign_contacts',
+        requirements: ['page' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'],
+        defaults: ['page' => 0, 'objectId' => 0],
+    )]
     public function contactsAction(
         Request $request,
         PageHelperFactoryInterface $pageHelperFactory,
@@ -328,7 +346,13 @@ class CampaignController extends AbstractStandardFormController
         );
     }
 
-    public function EventStatsAction(int $objectId, string $dateFromValue, string $dateToValue): JsonResponse
+    #[Route(
+        '/s/campaigns/event/stats/{objectId}/{dateFromValue}/{dateToValue}',
+        name: 'mautic_campaign_event_stats',
+        requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
+        defaults: ['objectId' => 0],
+    )]
+    public function eventStatsAction(int $objectId, string $dateFromValue, string $dateToValue): JsonResponse
     {
         $response        = [];
         // CRITICAL: Always include deleted events in individual tabs by setting ignoreDeleted=false
@@ -379,7 +403,13 @@ class CampaignController extends AbstractStandardFormController
         return new JsonResponse(array_filter($response));
     }
 
-    public function GraphAction(Request $request, int $objectId, string $dateFrom, string $dateTo): Response
+    #[Route(
+        '/s/campaigns/graph/{objectId}/{dateFrom}/{dateTo}',
+        name: 'mautic_campaign_graph',
+        requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
+        defaults: ['objectId' => 0],
+    )]
+    public function graphAction(Request $request, int $objectId, string $dateFrom, string $dateTo): Response
     {
         $dateRangeValues = ['date_from' => $dateFrom, 'date_to' => $dateTo];
         $action          = $this->generateUrl('mautic_campaign_action', ['objectAction' => 'view', 'objectId' => $objectId]);
@@ -421,6 +451,12 @@ class CampaignController extends AbstractStandardFormController
     /**
      * @param int $page
      */
+    #[Route(
+        '/s/campaigns/{page}',
+        name: 'mautic_campaign_index',
+        requirements: ['page' => '\d+'],
+        defaults: ['page' => 0],
+    )]
     public function indexAction(Request $request, $page = null): Response
     {
         return $this->indexStandard($request, $page);

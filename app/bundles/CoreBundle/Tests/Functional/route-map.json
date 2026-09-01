@@ -3926,6 +3926,8 @@
         "methods": [],
         "defaults": {
             "_controller": "Mautic\\CampaignBundle\\Controller\\CampaignMapStatsController::viewAction",
+            "dateFrom": "",
+            "dateTo": "",
             "objectId": 0
         },
         "requirements": {
@@ -3937,6 +3939,8 @@
         "methods": [],
         "defaults": {
             "_controller": "Mautic\\CampaignBundle\\Controller\\CampaignMetricsController::emailHoursAction",
+            "dateFrom": "",
+            "dateTo": "",
             "objectId": 0
         },
         "requirements": {
@@ -3948,6 +3952,8 @@
         "methods": [],
         "defaults": {
             "_controller": "Mautic\\CampaignBundle\\Controller\\CampaignMetricsController::emailWeekdaysAction",
+            "dateFrom": "",
+            "dateTo": "",
             "objectId": 0
         },
         "requirements": {
@@ -4190,7 +4196,8 @@
         "path": "/s/contacts/export/download/{fileName}",
         "methods": [],
         "defaults": {
-            "_controller": "Mautic\\LeadBundle\\Controller\\LeadController::downloadExportAction"
+            "_controller": "Mautic\\LeadBundle\\Controller\\LeadController::downloadExportAction",
+            "fileName": ""
         },
         "requirements": []
     },
@@ -4253,6 +4260,7 @@
         "methods": [],
         "defaults": {
             "_controller": "Mautic\\LeadBundle\\Controller\\NoteController::executeNoteAction",
+            "leadId": 0,
             "objectId": 0
         },
         "requirements": {
@@ -4507,6 +4515,8 @@
         "methods": [],
         "defaults": {
             "_controller": "Mautic\\EmailBundle\\Controller\\EmailGraphStatsController::viewAction",
+            "dateFrom": null,
+            "dateTo": null,
             "objectId": 0
         },
         "requirements": {
@@ -4529,6 +4539,8 @@
         "methods": [],
         "defaults": {
             "_controller": "Mautic\\EmailBundle\\Controller\\EmailMapStatsController::viewAction",
+            "dateFrom": "",
+            "dateTo": "",
             "objectId": 0
         },
         "requirements": {

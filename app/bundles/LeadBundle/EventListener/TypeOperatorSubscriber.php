@@ -19,7 +19,6 @@ use Mautic\LeadBundle\Event\TypeOperatorsEvent;
 use Mautic\LeadBundle\Form\Type\GlobalCategoryType;
 use Mautic\LeadBundle\Form\Validator\Constraints\DbRegex;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Segment\OperatorOptions;
@@ -52,9 +51,9 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            LeadEvents::COLLECT_OPERATORS_FOR_FIELD_TYPE           => ['onTypeOperatorsCollect', 0],
-            LeadEvents::COLLECT_FILTER_CHOICES_FOR_LIST_FIELD_TYPE => ['onTypeListCollect', 0],
-            LeadEvents::ADJUST_FILTER_FORM_TYPE_FOR_FIELD          => [
+            TypeOperatorsEvent::class => ['onTypeOperatorsCollect', 0],
+            ListFieldChoicesEvent::class => ['onTypeListCollect', 0],
+            FormAdjustmentEvent::class => [
                 ['onSegmentFilterFormHandleTags', 1000],
                 ['onSegmentFilterFormHandleLookupId', 800],
                 ['onSegmentFilterFormHandleLookup', 600],

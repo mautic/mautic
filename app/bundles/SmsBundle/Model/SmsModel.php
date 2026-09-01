@@ -230,7 +230,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         }
 
         $dncEvent = new DncEvent($contacts);
-        $this->dispatcher->dispatch($dncEvent, SmsEvents::DNC_FILTER_CONTACTS_ON_SEND);
+        $this->dispatcher->dispatch($dncEvent);
 
         foreach ($dncEvent->getRemovedContacts() as $contactId) {
             $results[$contactId] = [
@@ -247,7 +247,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         }
 
         $queueEvent = new QueueEvent($contacts, array_merge($options, ['sms_id' => $sms->getId()]));
-        $this->dispatcher->dispatch($queueEvent, SmsEvents::QUEUE_FILTER_CONTACTS_ON_SEND);
+        $this->dispatcher->dispatch($queueEvent);
 
         foreach ($queueEvent->getQueuedContacts() as $contactId) {
             $results[$contactId] = [
@@ -264,7 +264,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         }
 
         $filterEvent = new FilterEvent($contacts);
-        $this->dispatcher->dispatch($filterEvent, SmsEvents::FILTER_CONTACTS_ON_SEND);
+        $this->dispatcher->dispatch($filterEvent);
 
         foreach ($filterEvent->getRemovedContacts() as $contactId) {
             $results[$contactId] = [
@@ -294,7 +294,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
 
             $smsEvent = new SmsSendEvent($translatedSms->getMessage(), $contact);
             $smsEvent->setSmsId($translatedSms->getId());
-            $this->dispatcher->dispatch($smsEvent, SmsEvents::SMS_ON_SEND);
+            $this->dispatcher->dispatch($smsEvent);
 
             $tokenEvent = $this->dispatcher->dispatch(
                 new TokenReplacementEvent(

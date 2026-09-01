@@ -3,18 +3,6 @@
 declare(strict_types=1);
 
 return [
-    'routes' => [
-        'main' => [
-            'mautic_project_index' => [
-                'path'       => '/projects/{page}',
-                'controller' => 'Mautic\ProjectBundle\Controller\ProjectController::indexAction',
-            ],
-            'mautic_project_action' => [
-                'path'       => '/projects/{objectAction}/{objectId}',
-                'controller' => 'Mautic\ProjectBundle\Controller\ProjectController::executeAction',
-            ],
-        ],
-    ],
     'menu' => [
         'main' => [
             'project.menu.index' => [

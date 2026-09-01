@@ -9,12 +9,21 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
 final class AuthController extends FormController
 {
     /**
      * @param string $integration
      */
+    #[Route(
+        '/s/plugins/integrations/authcallback/{integration}',
+        name: 'mautic_integration_auth_callback_secure',
+    )]
+    #[Route(
+        '/plugins/integrations/authcallback/{integration}',
+        name: 'mautic_integration_auth_callback',
+    )]
     public function authCallbackAction(Request $request, IntegrationHelper $integrationHelper, $integration): JsonResponse|RedirectResponse
     {
         $isAjax  = $request->isXmlHttpRequest();
@@ -66,6 +75,14 @@ final class AuthController extends FormController
         return new RedirectResponse($this->generateUrl('mautic_integration_auth_postauth', ['integration' => $integration]));
     }
 
+    #[Route(
+        '/s/plugins/integrations/authstatus/{integration}',
+        name: 'mautic_integration_auth_postauth_secure',
+    )]
+    #[Route(
+        '/plugins/integrations/authstatus/{integration}',
+        name: 'mautic_integration_auth_postauth',
+    )]
     public function authStatusAction(Request $request, $integration): Response
     {
         $postAuthTemplate = '@MauticPlugin/Auth/postauth.html.twig';
@@ -92,6 +109,10 @@ final class AuthController extends FormController
         return $this->render($postAuthTemplate, ['message' => $message, 'alert' => $alert, 'data' => $userData]);
     }
 
+    #[Route(
+        '/plugins/integrations/authuser/{integration}',
+        name: 'mautic_integration_auth_user',
+    )]
     public function authUserAction(IntegrationHelper $integrationHelper, $integration): RedirectResponse
     {
         $integrationObject = $integrationHelper->getIntegrationObject($integration);

@@ -14,7 +14,6 @@ use Mautic\LeadBundle\Event\ImportValidateEvent;
 use Mautic\LeadBundle\Form\Type\LeadImportFieldType;
 use Mautic\LeadBundle\Form\Type\LeadImportType;
 use Mautic\LeadBundle\Helper\Progress;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ImportModel;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
@@ -29,6 +28,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -65,9 +65,26 @@ final class ImportController extends FormController
         $this->importRepository = $importRepository;
     }
 
+    #[Route(
+        '/s/{object}/import/{objectAction}/{objectId}',
+        name: 'mautic_import_action',
+        requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
+        defaults: ['objectId' => 0],
+    )]
+    public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
+    {
+        return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
+    }
+
     /**
      * @param int $page
      */
+    #[Route(
+        '/s/{object}/import/{page}',
+        name: 'mautic_import_index',
+        requirements: ['page' => '\d+'],
+        defaults: ['page' => 0],
+    )]
     public function indexAction(Request $request, $page = 1): Response
     {
         $initEvent = $this->dispatchImportOnInit();
@@ -225,8 +242,7 @@ final class ImportController extends FormController
                 break;
             case self::STEP_MATCH_FIELDS:
                 $mappingEvent = $this->dispatcher->dispatch(
-                    new ImportMappingEvent($request->get('object')),
-                    LeadEvents::IMPORT_ON_FIELD_MAPPING
+                    new ImportMappingEvent($request->get('object'))
                 );
 
                 try {
@@ -382,7 +398,7 @@ final class ImportController extends FormController
                 case self::STEP_MATCH_FIELDS:
                     $validateEvent = new ImportValidateEvent($request->get('object'), $form);
 
-                    $this->dispatcher->dispatch($validateEvent, LeadEvents::IMPORT_ON_VALIDATE);
+                    $this->dispatcher->dispatch($validateEvent);
 
                     if ($validateEvent->hasErrors()) {
                         break;
@@ -732,7 +748,7 @@ final class ImportController extends FormController
         $request = $this->getCurrentRequest();
         $event   = new ImportInitEvent($request->get('object'));
 
-        $this->dispatcher->dispatch($event, LeadEvents::IMPORT_ON_INITIALIZE);
+        $this->dispatcher->dispatch($event);
 
         return $event;
     }

@@ -17,7 +17,6 @@ use Mautic\LeadBundle\Event\ImportProcessEvent;
 use Mautic\LeadBundle\Exception\ImportDelayedException;
 use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Helper\Progress;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\ImportModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -65,8 +64,7 @@ final class ImportModelTest extends StandardImportTestHelper
                     $event->setWasMerged(false);
 
                     return true;
-                }),
-                LeadEvents::IMPORT_ON_PROCESS
+                })
             );
 
         $entity->start();
@@ -398,8 +396,7 @@ final class ImportModelTest extends StandardImportTestHelper
                     $event->addWarning('test warning message');
 
                     return true;
-                }),
-                LeadEvents::IMPORT_ON_PROCESS
+                })
             );
 
         $entity->start();
@@ -465,8 +462,7 @@ final class ImportModelTest extends StandardImportTestHelper
                     $event->setWasMerged(false);
 
                     return true;
-                }),
-                LeadEvents::IMPORT_ON_PROCESS,
+                })
             );
 
         $importModel = new ImportModel(

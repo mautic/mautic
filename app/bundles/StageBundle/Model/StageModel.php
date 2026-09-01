@@ -127,7 +127,7 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
     }
 
     /**
-     * Gets array of custom actions from bundles subscribed StageEvents::STAGE_ON_BUILD.
+     * Gets array of custom actions from bundles subscribed to StageBuilderEvent.
      *
      * @return mixed
      */
@@ -139,7 +139,7 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
             // build them
             $actions = [];
             $event   = new StageBuilderEvent($this->translator);
-            $this->dispatcher->dispatch($event, StageEvents::STAGE_ON_BUILD);
+            $this->dispatcher->dispatch($event);
             $actions['actions'] = $event->getActions();
             $actions['list']    = $event->getActionList();
             $actions['choices'] = $event->getActionChoices();

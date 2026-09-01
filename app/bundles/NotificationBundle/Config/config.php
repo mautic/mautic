@@ -4,62 +4,10 @@ declare(strict_types=1);
 
 return [
     'routes' => [
-        'main' => [
-            'mautic_notification_index' => [
-                'path'       => '/notifications/{page}',
-                'controller' => 'Mautic\NotificationBundle\Controller\NotificationController::indexAction',
-            ],
-            'mautic_notification_action' => [
-                'path'       => '/notifications/{objectAction}/{objectId}',
-                'controller' => 'Mautic\NotificationBundle\Controller\NotificationController::executeAction',
-            ],
-            'mautic_notification_contacts' => [
-                'path'       => '/notifications/view/{objectId}/contact/{page}',
-                'controller' => 'Mautic\NotificationBundle\Controller\NotificationController::contactsAction',
-            ],
-            'mautic_mobile_notification_index' => [
-                'path'       => '/mobile_notifications/{page}',
-                'controller' => 'Mautic\NotificationBundle\Controller\MobileNotificationController::indexAction',
-            ],
-            'mautic_mobile_notification_action' => [
-                'path'       => '/mobile_notifications/{objectAction}/{objectId}',
-                'controller' => 'Mautic\NotificationBundle\Controller\MobileNotificationController::executeAction',
-            ],
-            'mautic_mobile_notification_contacts' => [
-                'path'       => '/mobile_notifications/view/{objectId}/contact/{page}',
-                'controller' => 'Mautic\NotificationBundle\Controller\MobileNotificationController::contactsAction',
-            ],
-        ],
         'public' => [
             'mautic_receive_notification' => [
                 'path'       => '/notification/receive',
                 'controller' => 'Mautic\NotificationBundle\Controller\Api\NotificationApiController::receiveAction',
-            ],
-            'mautic_subscribe_notification' => [
-                'path'       => '/notification/subscribe',
-                'controller' => 'Mautic\NotificationBundle\Controller\Api\NotificationApiController::subscribeAction',
-            ],
-            'mautic_notification_popup' => [
-                'path'       => '/notification',
-                'controller' => 'Mautic\NotificationBundle\Controller\PopupController::indexAction',
-            ],
-
-            // JS / Manifest URL's
-            'mautic_onesignal_worker' => [
-                'path'       => '/OneSignalSDKWorker.js',
-                'controller' => 'Mautic\NotificationBundle\Controller\JsController::workerAction',
-            ],
-            'mautic_onesignal_updater' => [
-                'path'       => '/OneSignalSDKUpdaterWorker.js',
-                'controller' => 'Mautic\NotificationBundle\Controller\JsController::updaterAction',
-            ],
-            'mautic_onesignal_manifest' => [
-                'path'       => '/manifest.json',
-                'controller' => 'Mautic\NotificationBundle\Controller\JsController::manifestAction',
-            ],
-            'mautic_app_notification' => [
-                'path'       => '/notification/appcallback',
-                'controller' => 'Mautic\NotificationBundle\Controller\AppCallbackController::indexAction',
             ],
         ],
         'api' => [

@@ -4,28 +4,6 @@ declare(strict_types=1);
 
 return [
     'routes' => [
-        'main' => [
-            'mautic_message_index' => [
-                'path'       => '/messages/{page}',
-                'controller' => 'Mautic\ChannelBundle\Controller\MessageController::indexAction',
-            ],
-            'mautic_message_contacts' => [
-                'path'       => '/messages/contacts/{objectId}/{channel}/{page}',
-                'controller' => 'Mautic\ChannelBundle\Controller\MessageController::contactsAction',
-            ],
-            'mautic_message_action' => [
-                'path'       => '/messages/{objectAction}/{objectId}',
-                'controller' => 'Mautic\ChannelBundle\Controller\MessageController::executeAction',
-            ],
-            'mautic_channel_batch_contact_set' => [
-                'path'       => '/channels/batch/contact/set',
-                'controller' => 'Mautic\ChannelBundle\Controller\BatchContactController::setAction',
-            ],
-            'mautic_channel_batch_contact_view' => [
-                'path'       => '/channels/batch/contact/view',
-                'controller' => 'Mautic\ChannelBundle\Controller\BatchContactController::indexAction',
-            ],
-        ],
         'api' => [
             'mautic_api_messagetandard' => [
                 'standard_entity' => true,

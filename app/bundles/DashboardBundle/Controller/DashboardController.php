@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 use Twig\Environment;
@@ -36,9 +37,24 @@ final class DashboardController extends AbstractFormController
         $this->dashboardModel = $dashboardModel;
     }
 
+    #[Route(
+        '/s/dashboard/{objectAction}/{objectId}',
+        name: 'mautic_dashboard_action',
+        requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
+        defaults: ['objectId' => 0],
+    )]
+    public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
+    {
+        return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
+    }
+
     /**
      * Generates the default view.
      */
+    #[Route(
+        '/s/dashboard',
+        name: 'mautic_dashboard_index',
+    )]
     public function indexAction(Request $request, WidgetService $widget, PathsHelper $pathsHelper, RouterInterface $urlGenerator): Response
     {
         $widgets = $this->dashboardModel->getWidgets();
@@ -101,6 +117,10 @@ final class DashboardController extends AbstractFormController
         ]);
     }
 
+    #[Route(
+        '/s/dashboard/widget/{widgetId}',
+        name: 'mautic_dashboard_widget',
+    )]
     public function widgetAction(Request $request, WidgetService $widgetService, Environment $twig, $widgetId): JsonResponse
     {
         if (!$request->isXmlHttpRequest()) {

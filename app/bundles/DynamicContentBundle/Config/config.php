@@ -21,26 +21,6 @@ return [
         ],
     ],
     'routes' => [
-        'main' => [
-            'mautic_dynamicContent_index' => [
-                'path'       => '/dwc/{page}',
-                'controller' => 'Mautic\DynamicContentBundle\Controller\DynamicContentController::indexAction',
-            ],
-            'mautic_dynamicContent_action' => [
-                'path'       => '/dwc/{objectAction}/{objectId}',
-                'controller' => 'Mautic\DynamicContentBundle\Controller\DynamicContentController::executeAction',
-            ],
-        ],
-        'public' => [
-            'mautic_api_dynamicContent_index' => [
-                'path'       => '/dwc',
-                'controller' => 'Mautic\DynamicContentBundle\Controller\DynamicContentApiController::getAction',
-            ],
-            'mautic_api_dynamicContent_action' => [
-                'path'       => '/dwc/{objectAlias}',
-                'controller' => 'Mautic\DynamicContentBundle\Controller\DynamicContentApiController::processAction',
-            ],
-        ],
         'api' => [
             'mautic_api_dynamicContent_standard' => [
                 'standard_entity' => true,

@@ -8,7 +8,6 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Event\CompanyBuildSearchEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -197,7 +196,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
         if ($this->dispatcher) {
             $event = new CompanyBuildSearchEvent($filter->string, $filter->command, $unique, $filter->not, $queryBuilder);
-            $this->dispatcher->dispatch($event, LeadEvents::COMPANY_BUILD_SEARCH_COMMANDS);
+            $this->dispatcher->dispatch($event);
             if ($event->isSearchDone()) {
                 $returnParameter = $event->getReturnParameters();
                 $filter->strict  = $event->getStrict();

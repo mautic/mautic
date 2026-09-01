@@ -27,10 +27,6 @@ return [
 
     'routes' => [
         'main' => [
-            'login' => [
-                'path'       => '/login',
-                'controller' => 'Mautic\UserBundle\Controller\SecurityController::loginAction',
-            ],
             'mautic_user_logincheck' => [
                 'path'       => '/login_check',
                 'controller' => 'Mautic\UserBundle\Controller\SecurityController::loginCheckAction',
@@ -38,40 +34,12 @@ return [
             'mautic_user_logout' => [
                 'path' => '/logout',
             ],
-            'mautic_sso_login' => [
-                'path'       => '/sso_login/{integration}',
-                'controller' => 'Mautic\UserBundle\Controller\SecurityController::ssoLoginAction',
-            ],
-            'mautic_sso_login_check' => [
-                'path'       => '/sso_login_check/{integration}',
-                'controller' => 'Mautic\UserBundle\Controller\SecurityController::ssoLoginCheckAction',
-            ],
             'lightsaml_sp.login' => [
                 'path'       => '/saml/login',
                 'controller' => 'LightSaml\SpBundle\Controller\DefaultController::loginAction',
             ],
             'lightsaml_sp.login_check' => [
                 'path' => '/saml/login_check',
-            ],
-            'mautic_user_index' => [
-                'path'       => '/users/{page}',
-                'controller' => 'Mautic\UserBundle\Controller\UserController::indexAction',
-            ],
-            'mautic_user_action' => [
-                'path'       => '/users/{objectAction}/{objectId}',
-                'controller' => 'Mautic\UserBundle\Controller\UserController::executeAction',
-            ],
-            'mautic_role_index' => [
-                'path'       => '/roles/{page}',
-                'controller' => 'Mautic\UserBundle\Controller\RoleController::indexAction',
-            ],
-            'mautic_role_action' => [
-                'path'       => '/roles/{objectAction}/{objectId}',
-                'controller' => 'Mautic\UserBundle\Controller\RoleController::executeAction',
-            ],
-            'mautic_user_account' => [
-                'path'       => '/account',
-                'controller' => 'Mautic\UserBundle\Controller\ProfileController::indexAction',
             ],
         ],
 
@@ -103,18 +71,6 @@ return [
             ],
         ],
         'public' => [
-            'mautic_user_passwordreset' => [
-                'path'       => '/passwordreset',
-                'controller' => 'Mautic\UserBundle\Controller\PublicController::passwordResetAction',
-            ],
-            'mautic_user_passwordresetconfirm' => [
-                'path'       => '/passwordresetconfirm',
-                'controller' => 'Mautic\UserBundle\Controller\PublicController::passwordResetConfirmAction',
-            ],
-            'mautic_user_invite_register' => [
-                'path'       => '/invite/{token}',
-                'controller' => 'Mautic\UserBundle\Controller\PublicController::inviteAction',
-            ],
             'lightsaml_sp.metadata' => [
                 'path'       => '/saml/metadata.xml',
                 'controller' => 'LightSaml\SpBundle\Controller\DefaultController::metadataAction',
@@ -122,10 +78,6 @@ return [
             'lightsaml_sp.discovery' => [
                 'path'       => '/saml/discovery',
                 'controller' => 'LightSaml\SpBundle\Controller\DefaultController::discoveryAction',
-            ],
-            'mautic_saml_login_retry' => [
-                'path'       => '/saml/login_retry',
-                'controller' => 'Mautic\UserBundle\Controller\SecurityController::samlLoginRetryAction',
             ],
         ],
     ],

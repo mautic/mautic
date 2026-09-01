@@ -4,26 +4,6 @@ declare(strict_types=1);
 
 return [
     'routes' => [
-        'main' => [
-            'mautic_sms_index' => [
-                'path'       => '/sms/{page}',
-                'controller' => 'Mautic\SmsBundle\Controller\SmsController::indexAction',
-            ],
-            'mautic_sms_action' => [
-                'path'       => '/sms/{objectAction}/{objectId}',
-                'controller' => 'Mautic\SmsBundle\Controller\SmsController::executeAction',
-            ],
-            'mautic_sms_contacts' => [
-                'path'       => '/sms/view/{objectId}/contact/{page}',
-                'controller' => 'Mautic\SmsBundle\Controller\SmsController::contactsAction',
-            ],
-        ],
-        'public' => [
-            'mautic_sms_callback' => [
-                'path'       => '/sms/{transport}/callback',
-                'controller' => 'Mautic\SmsBundle\Controller\ReplyController::callbackAction',
-            ],
-        ],
         'api' => [
             'mautic_api_smsesstandard' => [
                 'standard_entity' => true,

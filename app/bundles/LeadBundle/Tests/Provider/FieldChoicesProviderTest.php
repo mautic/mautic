@@ -6,7 +6,6 @@ namespace Mautic\LeadBundle\Tests\Provider;
 
 use Mautic\LeadBundle\Event\ListFieldChoicesEvent;
 use Mautic\LeadBundle\Exception\ChoicesNotFoundException;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Provider\FieldChoicesProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -33,8 +32,7 @@ final class FieldChoicesProviderTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                $this->callback($this->setSomeChoicesLikeASubscriber()),
-                LeadEvents::COLLECT_FILTER_CHOICES_FOR_LIST_FIELD_TYPE
+                $this->callback($this->setSomeChoicesLikeASubscriber())
             );
 
         $this->expectException(ChoicesNotFoundException::class);
@@ -46,8 +44,7 @@ final class FieldChoicesProviderTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                $this->callback($this->setSomeChoicesLikeASubscriber()),
-                LeadEvents::COLLECT_FILTER_CHOICES_FOR_LIST_FIELD_TYPE
+                $this->callback($this->setSomeChoicesLikeASubscriber())
             );
 
         // Calling it twice to ensure the cache is working and the event is triggered only once.
@@ -62,8 +59,7 @@ final class FieldChoicesProviderTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                $this->callback($this->setSomeChoicesLikeASubscriber()),
-                LeadEvents::COLLECT_FILTER_CHOICES_FOR_LIST_FIELD_TYPE
+                $this->callback($this->setSomeChoicesLikeASubscriber())
             );
 
         // Calling it twice to ensure the cache is working and the event is triggered only once.

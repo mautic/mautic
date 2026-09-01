@@ -36,7 +36,7 @@ final class OwnerSubscriber implements EventSubscriberInterface
             EmailEvents::EMAIL_ON_BUILD    => ['onEmailBuild', 0],
             EmailEvents::EMAIL_ON_SEND     => ['onEmailGenerate', 0],
             EmailEvents::EMAIL_ON_DISPLAY  => ['onEmailDisplay', 0],
-            SmsEvents::ON_SMS_TOKENS_BUILD => ['onSmsTokensBuild', 0],
+            TokensBuildEvent::class        => ['onSmsTokensBuild', 0],
             SmsEvents::TOKEN_REPLACEMENT   => ['onSmsTokenReplacement', 0],
             UrlTokenReplaceEvent::class    => ['onUrlTokenReplace', 0],
         ];

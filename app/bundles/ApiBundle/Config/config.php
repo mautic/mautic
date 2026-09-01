@@ -11,32 +11,6 @@ return [
                 'controller' => 'fos_oauth_server.controller.token::tokenAction',
                 'method'     => 'GET|POST',
             ],
-            'fos_oauth_server_authorize' => [
-                'path'       => '/oauth/v2/authorize',
-                'controller' => 'Mautic\ApiBundle\Controller\oAuth2\AuthorizeController::authorizeAction',
-                'method'     => 'GET|POST',
-            ],
-            'mautic_oauth2_server_auth_login' => [
-                'path'       => '/oauth/v2/authorize_login',
-                'controller' => 'Mautic\ApiBundle\Controller\oAuth2\SecurityController::loginAction',
-                'method'     => 'GET|POST',
-            ],
-            'mautic_oauth2_server_auth_login_check' => [
-                'path'       => '/oauth/v2/authorize_login_check',
-                'controller' => 'Mautic\ApiBundle\Controller\oAuth2\SecurityController::loginCheckAction',
-                'method'     => 'GET|POST',
-            ],
-        ],
-        'main' => [
-            // Clients
-            'mautic_client_index' => [
-                'path'       => '/credentials/{page}',
-                'controller' => 'Mautic\ApiBundle\Controller\ClientController::indexAction',
-            ],
-            'mautic_client_action' => [
-                'path'       => '/credentials/{objectAction}/{objectId}',
-                'controller' => 'Mautic\ApiBundle\Controller\ClientController::executeAction',
-            ],
         ],
     ],
 

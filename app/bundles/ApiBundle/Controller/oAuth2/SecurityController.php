@@ -5,11 +5,17 @@ namespace Mautic\ApiBundle\Controller\oAuth2;
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Exception;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 final class SecurityController extends CommonController
 {
+    #[Route(
+        '/oauth/v2/authorize_login',
+        name: 'mautic_oauth2_server_auth_login',
+        methods: ['GET', 'POST'],
+    )]
     public function loginAction(Request $request): Response
     {
         $session = $request->getSession();
@@ -45,6 +51,11 @@ final class SecurityController extends CommonController
         );
     }
 
+    #[Route(
+        '/oauth/v2/authorize_login_check',
+        name: 'mautic_oauth2_server_auth_login_check',
+        methods: ['GET', 'POST'],
+    )]
     public function loginCheckAction(): Response
     {
         return new Response('', Response::HTTP_BAD_REQUEST);

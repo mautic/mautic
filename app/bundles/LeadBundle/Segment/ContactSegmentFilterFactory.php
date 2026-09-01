@@ -4,7 +4,6 @@ namespace Mautic\LeadBundle\Segment;
 
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Event\LeadListMergeFiltersEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\Decorator\DecoratorFactory;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
@@ -39,7 +38,7 @@ final class ContactSegmentFilterFactory
 
         $filters = $this->mergeFilters($leadList->getFilters());
         $event   = new LeadListMergeFiltersEvent($filters);
-        $this->eventDispatcher->dispatch($event, LeadEvents::LIST_FILTERS_MERGE);
+        $this->eventDispatcher->dispatch($event);
         $filters = $event->getFilters();
 
         foreach ($filters as $filter) {

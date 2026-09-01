@@ -4,6 +4,7 @@ namespace Mautic\NotificationBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
 final class JsController extends CommonController
 {
@@ -11,6 +12,10 @@ final class JsController extends CommonController
      * We can't user JsonResponse here, because
      * it improperly encodes the data array.
      */
+    #[Route(
+        '/manifest.json',
+        name: 'mautic_onesignal_manifest',
+    )]
     public function manifestAction(): Response
     {
         $gcmSenderId = $this->coreParametersHelper->get('gcm_sender_id', '446150739532');
@@ -29,6 +34,10 @@ final class JsController extends CommonController
         );
     }
 
+    #[Route(
+        '/OneSignalSDKWorker.js',
+        name: 'mautic_onesignal_worker',
+    )]
     public function workerAction(): Response
     {
         return new Response(
@@ -41,6 +50,10 @@ final class JsController extends CommonController
         );
     }
 
+    #[Route(
+        '/OneSignalSDKUpdaterWorker.js',
+        name: 'mautic_onesignal_updater',
+    )]
     public function updaterAction(): Response
     {
         return new Response(
