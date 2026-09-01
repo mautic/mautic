@@ -26,18 +26,12 @@ final class AssetEvents
     public const string ASSET_ON_REMOTE_BROWSE = 'mautic.asset_on_remote_browse';
 
     /**
-     * The mautic.asset_on_upload event is dispatched before uploading a file.
-     *
-     * The event listener receives a
-     * Mautic\AssetBundle\Event\AssetEvent instance.
-     */
-    public const string ASSET_ON_UPLOAD = 'mautic.asset_on_upload';
-
-    /**
      * The mautic.asset_pre_save event is dispatched right before a asset is persisted.
      *
      * The event listener receives a
-     * Mautic\AssetBundle\Event\AssetEvent instance.
+     * Mautic\AssetBundle\Event\AssetPreSaveEvent instance.
+     *
+     * @deprecated dispatched by the Mautic\AssetBundle\Event\AssetPreSaveEvent class name
      */
     public const string ASSET_PRE_SAVE = 'mautic.asset_pre_save';
 
@@ -45,7 +39,9 @@ final class AssetEvents
      * The mautic.asset_post_save event is dispatched right after a asset is persisted.
      *
      * The event listener receives a
-     * Mautic\AssetBundle\Event\AssetEvent instance.
+     * Mautic\AssetBundle\Event\AssetPostSaveEvent instance.
+     *
+     * @deprecated dispatched by the Mautic\AssetBundle\Event\AssetPostSaveEvent class name
      */
     public const string ASSET_POST_SAVE = 'mautic.asset_post_save';
 
@@ -53,7 +49,9 @@ final class AssetEvents
      * The mautic.asset_pre_delete event is dispatched prior to when a asset is deleted.
      *
      * The event listener receives a
-     * Mautic\AssetBundle\Event\AssetEvent instance.
+     * Mautic\AssetBundle\Event\AssetPreDeleteEvent instance.
+     *
+     * @deprecated dispatched by the Mautic\AssetBundle\Event\AssetPreDeleteEvent class name
      */
     public const string ASSET_PRE_DELETE = 'mautic.asset_pre_delete';
 
@@ -61,7 +59,9 @@ final class AssetEvents
      * The mautic.asset_post_delete event is dispatched after a asset is deleted.
      *
      * The event listener receives a
-     * Mautic\AssetBundle\Event\AssetEvent instance.
+     * Mautic\AssetBundle\Event\AssetPostDeleteEvent instance.
+     *
+     * @deprecated dispatched by the Mautic\AssetBundle\Event\AssetPostDeleteEvent class name
      */
     public const string ASSET_POST_DELETE = 'mautic.asset_post_delete';
 

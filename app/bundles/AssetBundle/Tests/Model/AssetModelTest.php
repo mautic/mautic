@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Mautic\AssetBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\AssetBundle\AssetEvents;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\AssetRepository;
 use Mautic\AssetBundle\Entity\Download;
 use Mautic\AssetBundle\Entity\DownloadRepository;
+use Mautic\AssetBundle\Event\AssetLoadEvent;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CategoryBundle\Entity\CategoryRepository;
@@ -253,7 +253,7 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
 
         $this->eventDispatcher->expects($this->once())
             ->method('hasListeners')
-            ->with(AssetEvents::ASSET_ON_LOAD)
+            ->with(AssetLoadEvent::class)
             ->willReturn(false);
 
         /** @var ?Download $download */

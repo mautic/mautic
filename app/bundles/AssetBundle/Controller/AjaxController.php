@@ -3,7 +3,6 @@
 namespace Mautic\AssetBundle\Controller;
 
 use Gaufrette\Filesystem;
-use Mautic\AssetBundle\AssetEvents;
 use Mautic\AssetBundle\Event\RemoteAssetBrowseEvent;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
@@ -46,8 +45,7 @@ final class AjaxController extends CommonAjaxController
     {
         $provider   = InputHelper::string($request->request->get('provider'));
         $path       = InputHelper::string($request->request->get('path', ''));
-        $name       = AssetEvents::ASSET_ON_REMOTE_BROWSE;
-        if (!$this->dispatcher->hasListeners($name)) {
+        if (!$this->dispatcher->hasListeners(RemoteAssetBrowseEvent::class)) {
             return $this->sendJsonResponse(['success' => 0]);
         }
 
@@ -55,7 +53,7 @@ final class AjaxController extends CommonAjaxController
         $integration = $integrationHelper->getIntegrationObject($provider);
 
         $event = new RemoteAssetBrowseEvent($integration);
-        $this->dispatcher->dispatch($event, $name);
+        $this->dispatcher->dispatch($event);
 
         if (!$adapter = $event->getAdapter()) {
             return $this->sendJsonResponse([

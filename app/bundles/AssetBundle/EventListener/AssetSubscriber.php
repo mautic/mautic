@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\AssetBundle\EventListener;
 
-use Mautic\AssetBundle\AssetEvents;
-use Mautic\AssetBundle\Event as Events;
+use Mautic\AssetBundle\Event\AssetPostDeleteEvent;
+use Mautic\AssetBundle\Event\AssetPostSaveEvent;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -21,15 +21,15 @@ final readonly class AssetSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            AssetEvents::ASSET_POST_SAVE   => ['onAssetPostSave', 0],
-            AssetEvents::ASSET_POST_DELETE => ['onAssetDelete', 0],
+            AssetPostSaveEvent::class   => ['onAssetPostSave', 0],
+            AssetPostDeleteEvent::class => ['onAssetDelete', 0],
         ];
     }
 
     /**
      * Add an entry to the audit log.
      */
-    public function onAssetPostSave(Events\AssetEvent $event): void
+    public function onAssetPostSave(AssetPostSaveEvent $event): void
     {
         $asset = $event->getAsset();
         if ($details = $event->getChanges()) {
@@ -48,7 +48,7 @@ final readonly class AssetSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
-    public function onAssetDelete(Events\AssetEvent $event): void
+    public function onAssetDelete(AssetPostDeleteEvent $event): void
     {
         $asset = $event->getAsset();
         $log   = [

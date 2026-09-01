@@ -2,7 +2,6 @@
 
 namespace MauticPlugin\MauticCloudStorageBundle\EventListener;
 
-use Mautic\AssetBundle\AssetEvents;
 use Mautic\AssetBundle\Event as Events;
 use MauticPlugin\MauticCloudStorageBundle\Exception\InvalidCredentialConfigurationException;
 use MauticPlugin\MauticCloudStorageBundle\Integration\CloudStorageIntegration;
@@ -13,7 +12,7 @@ final class RemoteAssetBrowseSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            AssetEvents::ASSET_ON_REMOTE_BROWSE => ['onAssetRemoteBrowse', 0],
+            Events\RemoteAssetBrowseEvent::class => ['onAssetRemoteBrowse', 0],
         ];
     }
 

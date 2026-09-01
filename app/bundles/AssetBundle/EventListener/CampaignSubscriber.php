@@ -22,7 +22,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
     {
         return [
             CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            AssetEvents::ASSET_ON_LOAD                => ['onAssetDownload', 0],
+            AssetLoadEvent::class                     => ['onAssetDownload', 0],
             AssetEvents::ON_CAMPAIGN_TRIGGER_DECISION => ['onCampaignTriggerDecision', 0],
         ];
     }

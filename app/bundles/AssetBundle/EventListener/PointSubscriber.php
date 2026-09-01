@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\AssetBundle\EventListener;
 
-use Mautic\AssetBundle\AssetEvents;
 use Mautic\AssetBundle\Event\AssetLoadEvent;
 use Mautic\AssetBundle\Form\Type\PointActionAssetDownloadType;
 use Mautic\AssetBundle\Helper\PointActionHelper;
@@ -24,7 +23,7 @@ final readonly class PointSubscriber implements EventSubscriberInterface
     {
         return [
             PointEvents::POINT_ON_BUILD => ['onPointBuild', 0],
-            AssetEvents::ASSET_ON_LOAD  => ['onAssetDownload', 0],
+            AssetLoadEvent::class       => ['onAssetDownload', 0],
         ];
     }
 
