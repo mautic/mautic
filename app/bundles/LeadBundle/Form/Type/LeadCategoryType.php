@@ -13,10 +13,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class LeadCategoryType extends AbstractType
+final class LeadCategoryType extends AbstractType
 {
     public function __construct(
-        private CategoryModel $categoryModel,
+        private readonly CategoryModel $categoryModel,
     ) {
     }
 
@@ -38,7 +38,7 @@ class LeadCategoryType extends AbstractType
         ]);
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return ChoiceType::class;
     }

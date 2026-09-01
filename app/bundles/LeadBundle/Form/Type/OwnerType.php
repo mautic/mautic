@@ -12,7 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class OwnerType extends AbstractType
+final class OwnerType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

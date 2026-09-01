@@ -242,7 +242,7 @@ class Mailbox
      */
     public function isGmail()
     {
-        return $this->isGmail();
+        return $this->isGmail;
     }
 
     /**
@@ -258,7 +258,7 @@ class Mailbox
         $this->imapFullPath = $paths['full'];
     }
 
-    public function getImapPath($settings): array
+    public function getImapPath(array $settings): array
     {
         if (!isset($settings['encryption'])) {
             $settings['encryption'] = (!empty($settings['ssl'])) ? '/ssl' : '';
@@ -441,8 +441,6 @@ class Mailbox
     }
 
     /**
-     * Gets listing the folders.
-     *
      * This function returns an object containing listing the folders.
      * The object has the following properties: messages, recent, unseen, uidnext, and uidvalidity.
      *
@@ -658,7 +656,7 @@ class Mailbox
      *
      * @return array
      */
-    public function getMailsInfo(array $mailsIds)
+    public function getMailsInfo(array $mailsIds): array|false
     {
         $mails = imap_fetch_overview($this->getImapStream(), implode(',', $mailsIds), FT_UID);
         if (is_array($mails) && count($mails)) {
@@ -790,7 +788,7 @@ class Mailbox
                 if (!empty($to->mailbox) && !empty($to->host)) {
                     $toEmail            = strtolower($to->mailbox.'@'.$to->host);
                     $toName             = isset($to->personal) ? $this->decodeMimeStr($to->personal, $this->serverEncoding) : null;
-                    $toStrings[]        = $toName ? "$toName <$toEmail>" : $toEmail;
+                    $toStrings[]        = $toName ? "{$toName} <{$toEmail}>" : $toEmail;
                     $mail->to[$toEmail] = $toName;
                 }
             }
@@ -854,7 +852,7 @@ class Mailbox
      * @param bool|false $isDsn
      * @param bool|false $isFbl
      */
-    protected function initMailPart(Message $mail, $partStructure, $partNum, $markAsSeen = true, $isDsn = false, $isFbl = false)
+    protected function initMailPart(Message $mail, $partStructure, $partNum, $markAsSeen = true, $isDsn = false, $isFbl = false): void
     {
         $options = FT_UID;
         if (!$markAsSeen) {
@@ -938,7 +936,7 @@ class Mailbox
                         break;
                     case TYPEMULTIPART:
                         if (
-                            'report' != $subtype
+                            'report' !== $subtype
                             || empty($params['report-type'])
                         ) {
                             break;
@@ -958,9 +956,9 @@ class Mailbox
                         }
                         break;
                     case TYPEMESSAGE:
-                        if ($isDsn || ('delivery-status' == $subtype)) {
+                        if ($isDsn || ('delivery-status' === $subtype)) {
                             $mail->dsnReport = $data;
-                        } elseif ($isFbl || ('feedback-report' == $subtype)) {
+                        } elseif ($isFbl || ('feedback-report' === $subtype)) {
                             $mail->fblReport = $data;
                         } else {
                             $mail->textPlain .= trim($data);
@@ -1011,7 +1009,8 @@ class Mailbox
     {
         $newString = '';
         $elements  = imap_mime_header_decode($string);
-        for ($i = 0; $i < count($elements); ++$i) {
+        $counter = count($elements);
+        for ($i = 0; $i < $counter; ++$i) {
             if ('default' == $elements[$i]->charset) {
                 $elements[$i]->charset = 'iso-8859-1';
             }
@@ -1072,7 +1071,7 @@ class Mailbox
     /**
      * Close IMAP connection.
      */
-    protected function disconnect()
+    protected function disconnect(): void
     {
         if ($this->isConnected()) {
             // Prevent these from throwing notices such as "SECURITY PROBLEM: insecure server advertised"

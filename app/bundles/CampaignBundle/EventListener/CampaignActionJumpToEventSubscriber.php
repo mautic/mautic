@@ -15,7 +15,7 @@ use Mautic\CampaignBundle\Form\Type\CampaignEventJumpToEventType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
+final readonly class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
 {
     public const EVENT_NAME = 'campaign.jump_to_event';
 

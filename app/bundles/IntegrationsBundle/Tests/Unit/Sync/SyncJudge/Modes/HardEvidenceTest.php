@@ -10,7 +10,7 @@ use Mautic\IntegrationsBundle\Sync\Exception\ConflictUnresolvedException;
 use Mautic\IntegrationsBundle\Sync\SyncJudge\Modes\HardEvidence;
 use PHPUnit\Framework\TestCase;
 
-class HardEvidenceTest extends TestCase
+final class HardEvidenceTest extends TestCase
 {
     public function testLeftWinner(): void
     {

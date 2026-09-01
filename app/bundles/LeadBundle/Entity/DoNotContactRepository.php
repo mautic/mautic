@@ -31,10 +31,8 @@ class DoNotContactRepository extends CommonRepository
      * @param int|null                            $reason
      * @param array<int,int|string>|int|true|null $listId
      * @param bool                                $combined
-     *
-     * @return array|int
      */
-    public function getCount($channel = null, $ids = null, $reason = null, $listId = null, ?ChartQuery $chartQuery = null, $combined = false)
+    public function getCount($channel = null, $ids = null, $reason = null, $listId = null, ?ChartQuery $chartQuery = null, $combined = false): array|int
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -46,8 +44,9 @@ class DoNotContactRepository extends CommonRepository
                 $ids = [(int) $ids];
             }
             $q->where(
-                $q->expr()->in('dnc.channel_id', $ids)
-            );
+                $q->expr()->in('dnc.channel_id', ':channelIds')
+            )
+            ->setParameter('channelIds', $ids, ArrayParameterType::INTEGER);
         }
 
         if ($channel) {
@@ -64,7 +63,7 @@ class DoNotContactRepository extends CommonRepository
             if (!$combined) {
                 $q->innerJoin('dnc', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'cs', 'cs.lead_id = dnc.lead_id');
 
-                if (true === $listId && !$combined) {
+                if (true === $listId) {
                     $q->addSelect('cs.leadlist_id')
                         ->groupBy('cs.leadlist_id');
                 } elseif (is_array($listId)) {
@@ -72,7 +71,7 @@ class DoNotContactRepository extends CommonRepository
                         $q->expr()->in('cs.leadlist_id', ':segmentIds')
                     );
 
-                    $q->setParameter('segmentIds', $listId, ArrayParameterType::INTEGER);
+                    $q->setParameter('segmentIds', array_map(intval(...), $listId), ArrayParameterType::INTEGER);
 
                     $q->addSelect('cs.leadlist_id')
                         ->groupBy('cs.leadlist_id');
@@ -88,7 +87,7 @@ class DoNotContactRepository extends CommonRepository
                         $q->expr()->in('list.leadlist_id', ':segmentIds')
                     );
 
-                $q->setParameter('segmentIds', $listId, ArrayParameterType::INTEGER);
+                $q->setParameter('segmentIds', array_map(intval(...), $listId), ArrayParameterType::INTEGER);
 
                 $q->innerJoin('dnc', sprintf('(%s)', $subQ->getSQL()), 'cs', 'cs.lead_id = dnc.lead_id');
             }
@@ -110,7 +109,7 @@ class DoNotContactRepository extends CommonRepository
             return $byList;
         }
 
-        return (isset($results[0])) ? $results[0]['dnc_count'] : 0;
+        return (isset($results[0])) ? (int) $results[0]['dnc_count'] : 0;
     }
 
     /**
@@ -145,7 +144,7 @@ class DoNotContactRepository extends CommonRepository
     public function getChannelList($channel, ?array $contacts = null): array
     {
         // If no contacts are sent then stop querying for all of the DNC records as it leads to the out of memory error.
-        if (is_array($contacts) && empty($contacts)) {
+        if ([] === $contacts) {
             return [];
         }
 
@@ -163,8 +162,9 @@ class DoNotContactRepository extends CommonRepository
 
         if ($contacts) {
             $q->andWhere(
-                $q->expr()->in('l.id', $contacts)
-            );
+                $q->expr()->in('l.id', ':ids')
+            )
+                ->setParameter('ids', $contacts, ArrayParameterType::INTEGER);
         }
 
         $results = $q->executeQuery()->fetchAllAssociative();

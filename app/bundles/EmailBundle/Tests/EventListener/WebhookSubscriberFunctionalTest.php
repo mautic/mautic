@@ -16,10 +16,9 @@ use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\WebhookQueue;
 use Mautic\WebhookBundle\Model\WebhookModel;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-class WebhookSubscriberFunctionalTest extends MauticMysqlTestCase
+final class WebhookSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {
@@ -34,15 +33,15 @@ class WebhookSubscriberFunctionalTest extends MauticMysqlTestCase
         $webHookQueues = $this->triggerWebHooks();
 
         $payloadData = $this->getWebHookPayload($webHookQueues[0]);
-        Assert::assertArrayHasKey('content', $payloadData);
-        Assert::assertArrayHasKey('tokens', $payloadData);
+        $this->assertArrayHasKey('content', $payloadData);
+        $this->assertArrayHasKey('tokens', $payloadData);
         $this->assertHasEmailDetailData($payloadData);
 
         $payloadData = $this->getWebHookPayload($webHookQueues[1]);
-        Assert::assertArrayHasKey('stat', $payloadData);
+        $this->assertArrayHasKey('stat', $payloadData);
 
         $statData = $payloadData['stat'];
-        Assert::assertIsArray($statData);
+        $this->assertIsArray($statData);
         $this->assertHasEmailDetailData($statData);
     }
 
@@ -51,15 +50,15 @@ class WebhookSubscriberFunctionalTest extends MauticMysqlTestCase
         $webHookQueues = $this->triggerWebHooks();
 
         $payloadData = $this->getWebHookPayload($webHookQueues[0]);
-        Assert::assertArrayNotHasKey('content', $payloadData);
-        Assert::assertArrayNotHasKey('tokens', $payloadData);
+        $this->assertArrayNotHasKey('content', $payloadData);
+        $this->assertArrayNotHasKey('tokens', $payloadData);
         $this->assertNotHasEmailDetailData($payloadData);
 
         $payloadData = $this->getWebHookPayload($webHookQueues[1]);
-        Assert::assertArrayHasKey('stat', $payloadData);
+        $this->assertArrayHasKey('stat', $payloadData);
 
         $statData = $payloadData['stat'];
-        Assert::assertIsArray($statData);
+        $this->assertIsArray($statData);
         $this->assertNotHasEmailDetailData($statData);
     }
 
@@ -110,7 +109,7 @@ class WebhookSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         /** @var EmailModel $emailModel */
-        $emailModel = static::getContainer()->get('mautic.email.model.email');
+        $emailModel = self::getContainer()->get(EmailModel::class);
         $emailModel->sendEmailToLists($email);
 
         $stat = $this->em->getRepository(Stat::class)->findOneBy([]);
@@ -118,7 +117,7 @@ class WebhookSubscriberFunctionalTest extends MauticMysqlTestCase
 
         $webHookQueues = $this->em->getRepository(WebhookQueue::class)->findAll();
 
-        Assert::assertCount(2, $webHookQueues);
+        $this->assertCount(2, $webHookQueues);
 
         return $webHookQueues;
     }
@@ -129,10 +128,10 @@ class WebhookSubscriberFunctionalTest extends MauticMysqlTestCase
     private function getWebHookPayload(WebhookQueue $webhookQueue): array
     {
         $payload = $webhookQueue->getPayload();
-        Assert::assertJson($payload);
+        $this->assertJson($payload);
 
         $payloadData = json_decode($payload, true);
-        Assert::assertIsArray($payloadData);
+        $this->assertIsArray($payloadData);
 
         return $payloadData;
     }
@@ -142,12 +141,12 @@ class WebhookSubscriberFunctionalTest extends MauticMysqlTestCase
      */
     private function assertHasEmailDetailData(array $data): void
     {
-        Assert::assertArrayHasKey('email', $data);
+        $this->assertArrayHasKey('email', $data);
 
         $emailData = $data['email'];
-        Assert::assertIsArray($emailData);
-        Assert::assertArrayHasKey('customHtml', $emailData);
-        Assert::assertArrayHasKey('plainText', $emailData);
+        $this->assertIsArray($emailData);
+        $this->assertArrayHasKey('customHtml', $emailData);
+        $this->assertArrayHasKey('plainText', $emailData);
     }
 
     /**
@@ -155,11 +154,11 @@ class WebhookSubscriberFunctionalTest extends MauticMysqlTestCase
      */
     private function assertNotHasEmailDetailData(array $data): void
     {
-        Assert::assertArrayHasKey('email', $data);
+        $this->assertArrayHasKey('email', $data);
 
         $emailData = $data['email'];
-        Assert::assertIsArray($emailData);
-        Assert::assertArrayNotHasKey('customHtml', $emailData);
-        Assert::assertArrayNotHasKey('plainText', $emailData);
+        $this->assertIsArray($emailData);
+        $this->assertArrayNotHasKey('customHtml', $emailData);
+        $this->assertArrayNotHasKey('plainText', $emailData);
     }
 }

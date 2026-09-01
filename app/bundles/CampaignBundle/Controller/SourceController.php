@@ -9,9 +9,19 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class SourceController extends CommonFormController
 {
+    private CampaignModel $campaignModel;
+
+    #[Required]
+    public function autowireSourceController(
+        CampaignModel $campaignModel,
+    ): void {
+        $this->campaignModel = $campaignModel;
+    }
+
     /**
      * @var string[]
      */
@@ -24,10 +34,8 @@ class SourceController extends CommonFormController
 
     /**
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function newAction(Request $request, $objectId = 0)
+    public function newAction(Request $request, $objectId = 0): JsonResponse|Response
     {
         $success = 0;
         $valid   = $cancelled   = false;
@@ -59,10 +67,7 @@ class SourceController extends CommonFormController
         ) {
             return $this->modalAccessDenied();
         }
-
-        $campaignModel = $this->getModel('campaign');
-        \assert($campaignModel instanceof CampaignModel);
-        $sourceList = $campaignModel->getSourceLists($sourceType);
+        $sourceList = $this->campaignModel->getSourceLists($sourceType, false, true);
         $form       = $this->formFactory->create(
             CampaignLeadSourceType::class,
             $source,
@@ -78,7 +83,7 @@ class SourceController extends CommonFormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $success                      = 1;
-                    $modifiedSources[$sourceType] = array_flip($form[$sourceType]->getData());
+                    $modifiedSources[$sourceType] = $this->buildSubmittedSourceMap($form[$sourceType]->getData());
                 } else {
                     $success = 0;
                 }
@@ -112,27 +117,23 @@ class SourceController extends CommonFormController
             $passthroughVars['closeModal'] = 1;
 
             return new JsonResponse($passthroughVars);
-        } else {
-            $viewParams = [
-                'sourceType' => $sourceType,
-                'form'       => $form->createView(),
-            ];
-
-            return $this->ajaxAction(
-                $request,
-                [
-                    'contentTemplate' => '@MauticCampaign/Source/form.html.twig',
-                    'viewParameters'  => $viewParams,
-                    'passthroughVars' => $passthroughVars,
-                ]
-            );
         }
+        $viewParams = [
+            'sourceType' => $sourceType,
+            'form'       => $form->createView(),
+        ];
+
+        return $this->ajaxAction(
+            $request,
+            [
+                'contentTemplate' => '@MauticCampaign/Source/form.html.twig',
+                'viewParameters'  => $viewParams,
+                'passthroughVars' => $passthroughVars,
+            ]
+        );
     }
 
-    /**
-     * @return Response
-     */
-    public function editAction(Request $request, $objectId)
+    public function editAction(Request $request, $objectId): JsonResponse|Response
     {
         $this->setCampaignElements($request->request);
         $modifiedSources = $this->modifiedSources;
@@ -167,10 +168,7 @@ class SourceController extends CommonFormController
         ) {
             return $this->modalAccessDenied();
         }
-
-        $campaignModel = $this->getModel('campaign');
-        \assert($campaignModel instanceof CampaignModel);
-        $sourceList = $campaignModel->getSourceLists($sourceType);
+        $sourceList = $this->campaignModel->getSourceLists($sourceType, false, true);
         $form       = $this->formFactory->create(
             CampaignLeadSourceType::class,
             $source,
@@ -187,7 +185,7 @@ class SourceController extends CommonFormController
                     $success = 1;
 
                     // save the properties to session
-                    $modifiedSources[$sourceType] = array_flip($form[$sourceType]->getData());
+                    $modifiedSources[$sourceType] = $this->buildSubmittedSourceMap($form[$sourceType]->getData());
                 } else {
                     $success = 0;
                 }
@@ -222,29 +220,26 @@ class SourceController extends CommonFormController
             $passthroughVars['closeModal'] = 1;
 
             return new JsonResponse($passthroughVars);
-        } else {
-            $viewParams = [
-                'sourceType' => $sourceType,
-                'form'       => $form->createView(),
-            ];
-
-            return $this->ajaxAction(
-                $request,
-                [
-                    'contentTemplate' => '@MauticCampaign/Source/form.html.twig',
-                    'viewParameters'  => $viewParams,
-                    'passthroughVars' => $passthroughVars,
-                ]
-            );
         }
+        $viewParams = [
+            'sourceType' => $sourceType,
+            'form'       => $form->createView(),
+        ];
+
+        return $this->ajaxAction(
+            $request,
+            [
+                'contentTemplate' => '@MauticCampaign/Source/form.html.twig',
+                'viewParameters'  => $viewParams,
+                'passthroughVars' => $passthroughVars,
+            ]
+        );
     }
 
     /**
      * Deletes the entity.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): JsonResponse
     {
         $this->setCampaignElements($request->request);
         $modifiedSources = $this->modifiedSources;
@@ -260,10 +255,10 @@ class SourceController extends CommonFormController
                 'MATCH_ONE'
             )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
-        if ('POST' == $request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             // Add the field to the delete list
             if (isset($modifiedSources[$sourceType])) {
                 unset($modifiedSources[$sourceType]);
@@ -289,5 +284,15 @@ class SourceController extends CommonFormController
         if ($request->get('modifiedSources')) {
             $this->modifiedSources = json_decode($request->get('modifiedSources'), true);
         }
+    }
+
+    /**
+     * @param array<int, int|string> $submittedSources
+     *
+     * @return array<int, bool>
+     */
+    private function buildSubmittedSourceMap(array $submittedSources): array
+    {
+        return array_fill_keys($submittedSources, true);
     }
 }

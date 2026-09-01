@@ -9,12 +9,14 @@ use DeviceDetector\Parser\OperatingSystem;
 use Doctrine\ORM\EntityManager;
 use Mautic\DynamicContentBundle\DynamicContent\TypeList;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use Mautic\DynamicContentBundle\Form\Type\DwcEntryFiltersType;
 use Mautic\DynamicContentBundle\Form\Type\DynamicContentListType;
 use Mautic\DynamicContentBundle\Form\Type\DynamicContentType;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Segment\RelativeDate;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -22,24 +24,21 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DynamicContentTypeTest extends TestCase
+final class DynamicContentTypeTest extends TestCase
 {
     public function testFormBuild(): void
     {
-        $entityManagerMock       = $this->createMock(EntityManager::class);
+        $entityManagerMock       = $this->createStub(EntityManager::class);
         $listModelMock           = $this->createMock(ListModel::class);
-        $translatorInterfaceMock = $this->createMock(TranslatorInterface::class);
+        $translatorInterfaceMock = $this->createStub(TranslatorInterface::class);
         $leadModelMock           = $this->createMock(LeadModel::class);
+        $relativeDateMock        = $this->createStub(RelativeDate::class);
 
         $listModelMock->expects($this->once())
             ->method('getChoiceFields')
             ->willReturn($this->getMockChoiceFields());
 
         $leadRepositoryMock = $this->createMock(LeadRepository::class);
-
-        $leadModelMock->expects($this->once())
-            ->method('getRepository')
-            ->willReturn($leadRepositoryMock);
 
         $leadRepositoryMock->expects($this->once())
             ->method('getCustomFieldList')
@@ -57,6 +56,8 @@ class DynamicContentTypeTest extends TestCase
             $translatorInterfaceMock,
             $leadModelMock,
             new TypeList(),
+            $relativeDateMock,
+            $leadRepositoryMock,
         );
 
         $formBuilderInterfaceMock = $this->createMock(FormBuilderInterface::class);
@@ -70,7 +71,7 @@ class DynamicContentTypeTest extends TestCase
         $matcher = $this->exactly(2);
 
         $formBuilderInterfaceMock->expects($matcher)
-            ->method('create')->willReturnCallback(function (...$parameters) use ($matcher, $tagChoices, $formBuilderInterfaceMock) {
+            ->method('create')->willReturnCallback(function (...$parameters) use ($matcher, $tagChoices, $formBuilderInterfaceMock): \PHPUnit\Framework\MockObject\MockObject {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('translationParent', $parameters[0]);
                     $this->assertSame(DynamicContentListType::class, $parameters[1]);
@@ -92,7 +93,7 @@ class DynamicContentTypeTest extends TestCase
                     $this->assertSame('filters', $parameters[0]);
                     $this->assertSame(CollectionType::class, $parameters[1]);
                     $this->assertSame([
-                        'entry_type'     => \Mautic\DynamicContentBundle\Form\Type\DwcEntryFiltersType::class,
+                        'entry_type'     => DwcEntryFiltersType::class,
                         'entry_options'  => [
                             'countries'    => FormFieldHelper::getCountryChoices(),
                             'regions'      => FormFieldHelper::getRegionChoices(),
@@ -122,10 +123,10 @@ class DynamicContentTypeTest extends TestCase
         $matcher = $this->exactly(3);
 
         $formBuilderInterfaceMock->expects($matcher)
-            ->method('addEventListener')->willReturnCallback(function (...$parameters) use ($matcher, $formBuilderInterfaceMock) {
+            ->method('addEventListener')->willReturnCallback(function (...$parameters) use ($matcher, $formBuilderInterfaceMock): \PHPUnit\Framework\MockObject\MockObject {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(FormEvents::PRE_SUBMIT, $parameters[0]);
-                    $callback = function ($listener) {
+                    $callback = function ($listener): bool {
                         $reflection = new \ReflectionFunction($listener);
                         $parameters = $reflection->getParameters();
 
@@ -135,7 +136,7 @@ class DynamicContentTypeTest extends TestCase
                 }
                 if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame(FormEvents::PRE_SET_DATA, $parameters[0]);
-                    $callback = function ($listener) {
+                    $callback = function ($listener): bool {
                         $reflection = new \ReflectionFunction($listener);
                         $parameters = $reflection->getParameters();
 
@@ -145,7 +146,7 @@ class DynamicContentTypeTest extends TestCase
                 }
                 if (3 === $matcher->numberOfInvocations()) {
                     $this->assertSame(FormEvents::POST_SUBMIT, $parameters[0]);
-                    $callback = function ($listener) {
+                    $callback = function ($listener): bool {
                         $reflection = new \ReflectionFunction($listener);
                         $parameters = $reflection->getParameters();
 

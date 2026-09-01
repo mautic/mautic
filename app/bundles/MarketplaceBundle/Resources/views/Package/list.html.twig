@@ -108,6 +108,18 @@
                         'text'       : 'marketplace.favers',
                     }
                 ) -}}
+                {{- include(
+                    '@MauticCore/Helper/tableheader.html.twig',
+                    {
+                        'text'       : 'marketplace.average.rating',
+                    }
+                ) -}}
+                {{- include(
+                    '@MauticCore/Helper/tableheader.html.twig',
+                    {
+                        'text'       : 'marketplace.reviews',
+                    }
+                ) -}}
             </tr>
             </thead>
             <tbody>
@@ -141,6 +153,8 @@
                     <td class="vendor-name">{{ item.getVendorName()|escape }}</td>
                     <td class="downloads">{{ item.downloads|escape }}</td>
                     <td class="favers">{{ item.favers|escape }}</td>
+                    <td class="average-rating">{{ item.averageRating|escape }}</td>
+                    <td class="review-count">{{ item.reviewCount|escape }}</td>
                 </tr>
             {% endfor %}
             </tbody>

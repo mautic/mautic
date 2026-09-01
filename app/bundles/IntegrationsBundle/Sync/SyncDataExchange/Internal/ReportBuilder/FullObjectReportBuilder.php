@@ -27,9 +27,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class FullObjectReportBuilder
 {
     public function __construct(
-        private FieldBuilder $fieldBuilder,
-        private ObjectProvider $objectProvider,
-        private EventDispatcherInterface $dispatcher,
+        private readonly FieldBuilder $fieldBuilder,
+        private readonly ObjectProvider $objectProvider,
+        private readonly EventDispatcherInterface $dispatcher,
     ) {
     }
 

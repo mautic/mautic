@@ -19,11 +19,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class IntegrationSyncSettingsObjectFieldMappingType extends AbstractType
+final class IntegrationSyncSettingsObjectFieldMappingType extends AbstractType
 {
     public function __construct(
-        private TranslatorInterface $translator,
-        private FieldHelper $fieldHelper,
+        private readonly TranslatorInterface $translator,
+        private readonly FieldHelper $fieldHelper,
     ) {
     }
 

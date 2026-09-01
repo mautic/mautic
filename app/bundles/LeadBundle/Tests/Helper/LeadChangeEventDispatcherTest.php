@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Helper;
 
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -10,11 +12,12 @@ use Mautic\LeadBundle\Event\LeadUtmTagsEvent;
 use Mautic\LeadBundle\Event\PointsChangeEvent;
 use Mautic\LeadBundle\Helper\LeadChangeEventDispatcher;
 use Mautic\LeadBundle\LeadEvents;
+use PHPUnit\Framework\Attributes\TestDox;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class LeadChangeEventDispatcherTest extends \PHPUnit\Framework\TestCase
+final class LeadChangeEventDispatcherTest extends \PHPUnit\Framework\TestCase
 {
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that date identified change dispatches correct event')]
+    #[TestDox('Test that date identified change dispatches correct event')]
     public function testDateIdentifiedEventIsDispatched(): void
     {
         $dispatcher = $this->createMock(EventDispatcher::class);
@@ -34,7 +37,7 @@ class LeadChangeEventDispatcherTest extends \PHPUnit\Framework\TestCase
         $leadEventDispatcher->dispatchEvents($event, ['dateIdentified' => ['foo', 'bar']]);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that point changes dispatches correct event')]
+    #[TestDox('Test that point changes dispatches correct event')]
     public function testPointChangeEventIsDispatched(): void
     {
         $dispatcher = $this->createMock(EventDispatcher::class);
@@ -54,7 +57,7 @@ class LeadChangeEventDispatcherTest extends \PHPUnit\Framework\TestCase
         $leadEventDispatcher->dispatchEvents($event, ['points' => [10, 20]]);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that points change event is not dispatched if we did an import')]
+    #[TestDox('Test that points change event is not dispatched if we did an import')]
     public function testPointChangeEventIsNotDispatchedWithImport(): void
     {
         $dispatcher = $this->createMock(EventDispatcher::class);
@@ -72,7 +75,7 @@ class LeadChangeEventDispatcherTest extends \PHPUnit\Framework\TestCase
         $leadEventDispatcher->dispatchEvents($event, ['points' => [10, 20]]);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that points change event is not dispatched if points are empty (false positive)')]
+    #[TestDox('Test that points change event is not dispatched if points are empty (false positive)')]
     public function testPointChangeEventIsNotDispatchedWithEmptyPoints(): void
     {
         $dispatcher = $this->createMock(EventDispatcher::class);
@@ -88,7 +91,7 @@ class LeadChangeEventDispatcherTest extends \PHPUnit\Framework\TestCase
         $leadEventDispatcher->dispatchEvents($event, ['points' => [0, 0]]);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that points change event is dispatched if points are changed from something to nothing')]
+    #[TestDox('Test that points change event is dispatched if points are changed from something to nothing')]
     public function testPointChangeEventIsDispatchedWithPointsChangedToZero(): void
     {
         $dispatcher = $this->createMock(EventDispatcher::class);
@@ -108,7 +111,7 @@ class LeadChangeEventDispatcherTest extends \PHPUnit\Framework\TestCase
         $leadEventDispatcher->dispatchEvents($event, ['points' => [10, 0]]);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that points change event is not dispatched if this is a new Lead')]
+    #[TestDox('Test that points change event is not dispatched if this is a new Lead')]
     public function testPointChangeEventIsNotDispatchedWithNewContact(): void
     {
         $dispatcher = $this->createMock(EventDispatcher::class);
@@ -123,7 +126,7 @@ class LeadChangeEventDispatcherTest extends \PHPUnit\Framework\TestCase
         $leadEventDispatcher->dispatchEvents($event, ['points' => [10, 0]]);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that utm event is dispatched')]
+    #[TestDox('Test that utm event is dispatched')]
     public function testUtmTagsChangeEventIsDispatched(): void
     {
         $dispatcher = $this->createMock(EventDispatcher::class);
@@ -144,7 +147,7 @@ class LeadChangeEventDispatcherTest extends \PHPUnit\Framework\TestCase
         $leadEventDispatcher->dispatchEvents($event, $changes);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that channel subscription changes are dispatched')]
+    #[TestDox('Test that channel subscription changes are dispatched')]
     public function testChannelSubscriptionChangeEventIsDispatched(): void
     {
         $dispatcher = $this->createMock(EventDispatcher::class);

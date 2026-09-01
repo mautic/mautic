@@ -5,6 +5,7 @@ namespace Mautic\AssetBundle\EventListener;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Mautic\AssetBundle\Entity\Asset;
+use Mautic\AssetBundle\Entity\AssetRepository;
 use Mautic\AssetBundle\Form\Type\FormSubmitActionDownloadFileType;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -18,18 +19,17 @@ use Mautic\FormBundle\FormEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Twig\Environment;
 
-class FormSubscriber implements EventSubscriberInterface
+final readonly class FormSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private AssetModel $assetModel,
-        protected TranslatorInterface $translator,
+        private TranslatorInterface $translator,
         private AnalyticsHelper $analyticsHelper,
         private AssetsHelper $assetsHelper,
         private ThemeHelperInterface $themeHelper,
-        private Environment $twig,
         private CoreParametersHelper $coreParametersHelper,
+        private AssetRepository $assetRepository,
     ) {
     }
 
@@ -56,7 +56,6 @@ class FormSubscriber implements EventSubscriberInterface
             'formType'           => FormSubmitActionDownloadFileType::class,
             'formTypeCleanMasks' => ['message' => 'html'],
             'eventName'          => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
-            'allowCampaignForm'  => true,
             'template'           => '@MauticAsset/Action/asset.html.twig',
         ]);
     }
@@ -76,7 +75,7 @@ class FormSubscriber implements EventSubscriberInterface
             $asset = $this->assetModel->getEntity($assetId);
         } elseif (null !== $categoryId) {
             try {
-                $asset = $this->assetModel->getRepository()->getLatestAssetForCategory($categoryId);
+                $asset = $this->assetRepository->getLatestAssetForCategory($categoryId);
             } catch (NoResultException|NonUniqueResultException) {
                 $asset = null;
             }
@@ -139,7 +138,7 @@ class FormSubscriber implements EventSubscriberInterface
         }
 
         $event->setPostSubmitResponse(new Response(
-            $this->twig->render(
+            $this->themeHelper->renderThemeTemplate(
                 $this->themeHelper->checkForTwigTemplate('@themes/'.$this->coreParametersHelper->get('theme').'/html/message.html.twig'),
                 [
                     'message'  => $msg,

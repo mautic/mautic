@@ -21,18 +21,14 @@ trait TranslationEntityTrait
     public $languageSlug;
 
     /**
-     * @var Collection
-     *
-     * @phpstan-var Collection<int, T>
-     **/
+     * @var Collection<int, T>
+     */
     #[Groups(['page:read', 'page:write', 'download:read', 'download:write', 'email:read', 'email:write', 'dynamicContent:read', 'dynamicContent:write'])]
     private $translationChildren;
 
     /**
-     * @var TranslationEntityInterface|null
-     *
-     * @phpstan-var T|null
-     **/
+     * @var T|null
+     */
     #[Groups(['page:read', 'page:write', 'download:read', 'download:write', 'email:read', 'email:write', 'dynamicContent:read', 'dynamicContent:write'])]
     private $translationParent;
 
@@ -130,9 +126,9 @@ trait TranslationEntityTrait
 
         if ($isChild) {
             return null !== $parent;
-        } else {
-            return !empty($parent) || ($children && count($children));
         }
+
+        return $parent instanceof TranslationEntityInterface || ($children && count($children));
     }
 
     /**
@@ -160,7 +156,7 @@ trait TranslationEntityTrait
     {
         $parent = $this->getTranslationParent();
 
-        if (empty($parent)) {
+        if (!$parent instanceof TranslationEntityInterface) {
             $parent = $this;
         }
 
@@ -193,12 +189,12 @@ trait TranslationEntityTrait
 
         [$parent, $children] = $this->getTranslations();
         if ($variantParent != $parent) {
-            $count = $parent->$getter();
+            $count = $parent->{$getter}();
         }
 
         foreach ($children as $translation) {
             if ($variantParent != $translation) {
-                $count += $translation->$getter();
+                $count += $translation->{$getter}();
             }
         }
 

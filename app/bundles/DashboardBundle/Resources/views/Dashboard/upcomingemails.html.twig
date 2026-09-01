@@ -1,15 +1,10 @@
 {% if upcomingEmails %}
-    <ul class="list-group mb-0 bdr-w-0">
+    <ul class="list-group list-unstyled mb-0 bdr-w-0">
         {% for email in upcomingEmails %}
-            <li class="mb-md">
+            <li class="media bdr-b wrapper-sm">
                 <div class="box-layout">
-                    {% if icons.email is defined and icons.email is not empty %}
-                        <div class="col-md-1 va-m">
-                            <h3><span class="fa {{ icons.email }} fw-sb text-success"></span></h3>
-                        </div>
-                    {% endif %}
-                    <div class="col-md-8 va-m">
-                        <h5 class="fw-sb text-primary">
+                    <div class="col-md-9 va-m">
+                        <h5 class="fw-sb text-primary mt-0 mb-sm">
                             <a href="{{ path('mautic_campaign_action', {'objectAction': 'view', 'objectId': email.campaign_id}) }}" data-toggle="ajax">
                                 {{ email.campaign_name }}
                             </a>
@@ -33,7 +28,7 @@
                             } %}
                         </span>
                     </div>
-                    <div class="col-md-4 va-m text-right small">
+                    <div class="col-md-3 va-m text-right small">
                         {{ dateToFull(email.trigger_date) }}
                     </div>
                 </div>

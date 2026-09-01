@@ -8,33 +8,30 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\MockObject\MockBuilder;
+use PHPUnit\Framework\MockObject\Rule\AnyInvokedCount;
+use PHPUnit\Framework\TestCase;
 
-class DBALMocker
+final class DBALMocker
 {
-    protected $testCase;
+    private ?\PHPUnit\Framework\MockObject\MockObject $mockEm = null;
 
-    protected $mockEm;
+    private ?\PHPUnit\Framework\MockObject\MockObject $mockConnection = null;
 
-    protected $mockConnection;
+    private ?\PHPUnit\Framework\MockObject\MockObject $mockQueryBuilder = null;
 
-    protected $mockQueryBuilder;
+    private $queryResponse;
 
-    protected $queryResponse;
-
-    protected $connectionUpdated;
-
-    protected $connectionInserted;
-
-    protected $queryParts = [
+    private array $queryParts = [
         'select'     => [],
         'from'       => [],
         'where'      => [],
         'parameters' => [],
     ];
 
-    public function __construct(\PHPUnit\Framework\TestCase $testCase)
-    {
-        $this->testCase = $testCase;
+    public function __construct(
+        private readonly TestCase $testCase,
+    ) {
     }
 
     public function setQueryResponse($queryResponse): void
@@ -42,7 +39,7 @@ class DBALMocker
         $this->queryResponse = $queryResponse;
     }
 
-    public function getQueryParts()
+    public function getQueryParts(): array
     {
         return $this->queryParts;
     }
@@ -68,12 +65,10 @@ class DBALMocker
 
     public function resetUpdated(): void
     {
-        $this->connectionUpdated = [];
     }
 
     public function resetInserted(): void
     {
-        $this->connectionInserted = [];
     }
 
     public function reset(): void
@@ -83,11 +78,12 @@ class DBALMocker
         $this->resetInserted();
     }
 
-    public function getMockEm()
+    public function getMockEm(): \PHPUnit\Framework\MockObject\MockObject
     {
         if (null === $this->mockEm) {
-            $mock = $this->testCase->getMockBuilder(EntityManager::class)
-                ->disableOriginalConstructor()
+            $entityManagerMockBuilder = new MockBuilder($this->testCase, EntityManager::class);
+
+            $mock = $entityManagerMockBuilder->disableOriginalConstructor()
                 ->onlyMethods(
                     [
                         'getConnection',
@@ -96,17 +92,15 @@ class DBALMocker
                 )
                 ->getMock();
 
-            $mock->expects($this->testCase->any())
+            $mock->expects(new AnyInvokedCount())
                 ->method('getConnection')
                 ->willReturn($this->getMockConnection());
 
-            $mock->expects($this->testCase->any())
+            $mock->expects(new AnyInvokedCount())
                 ->method('getReference')
-                ->willReturnCallback(function () {
-                    switch (func_get_arg(0)) {
-                        case Lead::class:
-                            $entity = new Lead();
-                            break;
+                ->willReturnCallback(function (): Lead {
+                    if (Lead::class === func_get_arg(0)) {
+                        $entity = new Lead();
                     }
 
                     $entity->setId(func_get_arg(1));
@@ -120,11 +114,12 @@ class DBALMocker
         return $this->mockEm;
     }
 
-    public function getMockConnection()
+    public function getMockConnection(): \PHPUnit\Framework\MockObject\MockObject
     {
         if (null === $this->mockConnection) {
-            $mock = $this->testCase->getMockBuilder(Connection::class)
-                ->disableOriginalConstructor()
+            $connectionMockBuilder = new MockBuilder($this->testCase, Connection::class);
+
+            $mock = $connectionMockBuilder->disableOriginalConstructor()
                 ->onlyMethods([
                     'createQueryBuilder',
                     'quote',
@@ -133,25 +128,19 @@ class DBALMocker
                 ])
                 ->getMock();
 
-            $mock->expects($this->testCase->any())
+            $mock->expects(new AnyInvokedCount())
                 ->method('createQueryBuilder')
                 ->willReturn($this->getMockQueryBuilder());
 
-            $mock->expects($this->testCase->any())
+            $mock->expects(new AnyInvokedCount())
                 ->method('quote')
                 ->willReturnArgument(0);
 
-            $mock->expects($this->testCase->any())
-                ->method('update')
-                ->willReturnCallback(function (): void {
-                    $this->connectionUpdated[] = func_get_args();
-                });
+            $mock->expects(new AnyInvokedCount())
+                ->method('update');
 
-            $mock->expects($this->testCase->any())
-                ->method('insert')
-                ->willReturnCallback(function (): void {
-                    $this->connectionInserted[] = func_get_args();
-                });
+            $mock->expects(new AnyInvokedCount())
+                ->method('insert');
 
             $this->mockConnection = $mock;
         }
@@ -159,11 +148,12 @@ class DBALMocker
         return $this->mockConnection;
     }
 
-    public function getMockQueryBuilder()
+    public function getMockQueryBuilder(): \PHPUnit\Framework\MockObject\MockObject
     {
         if (null === $this->mockQueryBuilder) {
-            $mock = $this->testCase->getMockBuilder(QueryBuilder::class)
-                ->disableOriginalConstructor()
+            $queryBuilderMockBuilder = new MockBuilder($this->testCase, QueryBuilder::class);
+
+            $mock = $queryBuilderMockBuilder->disableOriginalConstructor()
                 ->onlyMethods(
                     [
                         'select',
@@ -177,65 +167,65 @@ class DBALMocker
                 )
                 ->getMock();
 
-            $mock->expects($this->testCase->any())
+            $mock->expects(new AnyInvokedCount())
                 ->method('select')
                 ->willReturnCallback(
-                    function () use ($mock) {
+                    function () use ($mock): \PHPUnit\Framework\MockObject\MockObject {
                         $this->queryParts['select'][] = func_get_args();
 
                         return $mock;
                     }
                 );
 
-            $mock->expects($this->testCase->any())
+            $mock->expects(new AnyInvokedCount())
                 ->method('from')
                 ->willReturnCallback(
-                    function () use ($mock) {
+                    function () use ($mock): \PHPUnit\Framework\MockObject\MockObject {
                         $this->queryParts['from'][] = func_get_args();
 
                         return $mock;
                     }
                 );
 
-            $mock->expects($this->testCase->any())
+            $mock->expects(new AnyInvokedCount())
                 ->method('expr')
                 ->willReturnCallback(
-                    fn () => new ExpressionBuilder($this->getMockConnection())
+                    fn (): ExpressionBuilder => new ExpressionBuilder($this->getMockConnection())
                 );
 
-            $mock->expects($this->testCase->any())
+            $mock->expects(new AnyInvokedCount())
                 ->method('where')
                 ->willReturnCallback(
-                    function () use ($mock) {
+                    function () use ($mock): \PHPUnit\Framework\MockObject\MockObject {
                         $this->queryParts['where'][] = func_get_args();
 
                         return $mock;
                     }
                 );
 
-            $mock->expects($this->testCase->any())
+            $mock->expects(new AnyInvokedCount())
                 ->method('andWhere')
                 ->willReturnCallback(
-                    function () use ($mock) {
+                    function () use ($mock): \PHPUnit\Framework\MockObject\MockObject {
                         $this->queryParts['where'][] = func_get_args();
 
                         return $mock;
                     }
                 );
 
-            $mock->expects($this->testCase->any())
+            $mock->expects(new AnyInvokedCount())
                 ->method('setParameter')
                 ->willReturnCallback(
-                    function () use ($mock) {
+                    function () use ($mock): \PHPUnit\Framework\MockObject\MockObject {
                         $this->queryParts['parameters'][] = func_get_args();
 
                         return $mock;
                     }
                 );
 
-            $mock->expects($this->testCase->any())
+            $mock->expects(new AnyInvokedCount())
                 ->method('executeQuery')
-                ->willReturnCallback([$this, 'getMockResultStatement']);
+                ->willReturnCallback($this->getMockResultStatement(...));
 
             $this->mockQueryBuilder = $mock;
         }
@@ -245,8 +235,9 @@ class DBALMocker
 
     public function getMockResultStatement()
     {
-        $mock = $this->testCase->getMockBuilder(Result::class)
-            ->disableOriginalConstructor()
+        $resultMockBuilder = new MockBuilder($this->testCase, Result::class);
+
+        $mock = $resultMockBuilder->disableOriginalConstructor()
             ->onlyMethods([
                 'fetchNumeric',
                 'fetchAssociative',
@@ -261,19 +252,19 @@ class DBALMocker
             ->getMock();
 
         $mock->method('columnCount')
-            ->willReturnCallback(function () {
+            ->willReturnCallback(function (): int {
                 if (isset($this->queryResponse[0]) && is_array($this->queryResponse[0])) {
                     return count($this->queryResponse[0]);
-                } else {
-                    return count($this->queryResponse);
                 }
+
+                return count($this->queryResponse);
             });
 
-        $mock->expects($this->testCase->any())
+        $mock->expects(new AnyInvokedCount())
             ->method('fetchOne')
             ->willReturn($this->queryResponse);
 
-        $mock->expects($this->testCase->any())
+        $mock->expects(new AnyInvokedCount())
             ->method('fetchAllAssociative')
             ->willReturn($this->queryResponse);
 

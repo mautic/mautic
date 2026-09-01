@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
@@ -17,11 +17,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class LeadImportFieldType extends AbstractType
+final class LeadImportFieldType extends AbstractType
 {
     public function __construct(
-        private TranslatorInterface $translator,
-        private EntityManager $entityManager,
+        private readonly TranslatorInterface $translator,
+        private readonly EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -101,17 +101,19 @@ class LeadImportFieldType extends AbstractType
             );
         }
 
-        $builder->add(
-            'skip_if_exists',
-            YesNoButtonGroupType::class,
-            [
-                'label'       => 'mautic.lead.import.skip_if_exists',
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => ['class' => 'form-control'],
-                'required'    => false,
-                'data'        => false,
-            ]
-        );
+        if (in_array($options['object'], ['lead', 'company'])) {
+            $builder->add(
+                'skip_if_exists',
+                YesNoButtonGroupType::class,
+                [
+                    'label'      => 'mautic.lead.import.skip_if_exists',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => ['class' => 'form-control'],
+                    'required'   => false,
+                    'data'       => false,
+                ]
+            );
+        }
 
         $buttons = ['cancel_icon' => 'ri-close-line'];
 

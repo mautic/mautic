@@ -16,6 +16,11 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * This trait is consumed dynamically by multiple form types at runtime.
+ *
+ * @phpstan-ignore-next-line trait.unused
+ */
 trait FilterTrait
 {
     use RegexTrait;
@@ -46,7 +51,7 @@ trait FilterTrait
         }
 
         $fieldType   = $data['type'];
-        $fieldName   = $data['field'];
+        $fieldName   = $data['field'] ?? '';
         $type        = TextType::class;
         $attr        = ['class' => 'form-control filter-value'];
         $displayType = HiddenType::class;
@@ -56,8 +61,8 @@ trait FilterTrait
 
         if (isset($options['fields']['behaviors'][$fieldName])) {
             $field = $options['fields']['behaviors'][$fieldName];
-        } elseif (isset($data['object']) && isset($options['fields'][$data['object']][$fieldName])) {
-            $field = $options['fields'][$data['object']][$fieldName];
+        } elseif (isset($data['object']) && isset($options['fields'][$data['object'] ?? ''][$fieldName])) {
+            $field = $options['fields'][$data['object'] ?? ''][$fieldName];
         }
 
         $customOptions = [];
@@ -305,9 +310,7 @@ trait FilterTrait
             $attr['disabled'] = 'disabled';
         } elseif ($operator) {
             $customOptions['constraints'][] = new NotBlank(
-                [
-                    'message' => 'mautic.core.value.required',
-                ]
+                message: 'mautic.core.value.required'
             );
 
             if (in_array($operator, ['regexp', '!regexp']) && $this->connection) {

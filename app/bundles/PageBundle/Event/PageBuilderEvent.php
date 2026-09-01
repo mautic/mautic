@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PageBundle\Event;
 
 use Mautic\CoreBundle\Event\BuilderEvent;
 use Mautic\PageBundle\Entity\Page;
 
-class PageBuilderEvent extends BuilderEvent
+final class PageBuilderEvent extends BuilderEvent
 {
     /**
      * @return Page|null

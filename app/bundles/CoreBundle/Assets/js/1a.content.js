@@ -318,6 +318,8 @@ Mautic.processPageContent = function (response) {
  * Initiate various functions on page load, manual or ajax
  */
 Mautic.onPageLoad = function (container, response, inModal) {
+    mQuery(container).trigger('mautic:onPageLoad:before', [container, response, inModal]);
+
     Mautic.initDateRangePicker(container + ' #daterange_date_from', container + ' #daterange_date_to');
 
     //initiate links
@@ -723,6 +725,8 @@ Mautic.onPageLoad = function (container, response, inModal) {
             }
         }, false));
     }
+
+    mQuery(container).trigger('mautic:onPageLoad:after', [container, response, inModal]);
 };
 
 Mautic.setDynamicContentEditors = function(container) {
@@ -1164,7 +1168,7 @@ Mautic.activateMultiSelect = function(el) {
 
             var isSortable = mQuery(el).data('sortable');
             if (isSortable) {
-                mQuery(el).parent('.choice-wrapper').find('.ms-selection').first().sortable({
+                mQuery(el).parent().find('.ms-selection').first().sortable({
                     items: '.ms-elem-selection',
                     helper: 'clone',
                     axis: 'y',
@@ -1241,7 +1245,7 @@ Mautic.activateModalEmbeddedForms = function(container) {
         mQuery(modal).on('show.bs.modal', function () {
             // Don't allow submitting with enter key
             mQuery(this).on("keydown.embeddedForm", ":input:not(textarea)", function(event) {
-                if (event.keyCode == 13) {
+                if (Mautic.Keyboard.isEnter(Mautic.Keyboard.getKey(event))) {
                     event.preventDefault();
                     if (event.metaKey || event.ctrlKey) {
                         // Submit the modal
@@ -1318,6 +1322,490 @@ Mautic.activateDateTimeInputs = function(el, type) {
 };
 
 /**
+ * Apply parsed scope state to the search input and optional scope dropdown.
+ */
+Mautic.applySearchScopeState = function (searchEl, searchString) {
+    const searchInput = mQuery(searchEl);
+    if (!searchInput.length) {
+        return;
+    }
+
+    const searchId = searchInput.attr('id');
+    const scopeSelect = mQuery("select[data-livesearch-scope-for='" + searchId + "']");
+    const initialSearch = (searchString || '').trim();
+
+    const setSearchInputValue = function (value) {
+        Mautic.suppressLiveSearch = true;
+        searchInput.val(value);
+        // Only sync typeahead when it is already initialized (bundle OnLoad runs later).
+        if (searchInput.parent('.twitter-typeahead').length) {
+            searchInput.typeahead('val', value);
+        }
+        Mautic.suppressLiveSearch = false;
+    };
+
+    if (!scopeSelect.length) {
+        setSearchInputValue(initialSearch);
+        Mautic.updateLiveSearchButton(searchId, initialSearch);
+
+        return;
+    }
+
+    let scopeCommands = [];
+    try {
+        scopeCommands = JSON.parse(scopeSelect.attr('data-scopes') || '[]');
+    } catch (parseError) {
+        console.warn('Invalid search scope JSON', parseError);
+        scopeCommands = [];
+    }
+
+    const parsed = Mautic.parseScopedSearchValue(initialSearch, scopeCommands);
+    scopeSelect.val(parsed.command);
+    if ((null === scopeSelect.val() || '' === scopeSelect.val()) && parsed.command === '') {
+        scopeSelect.find('option[value=""]:not(:disabled)').first().prop('selected', true);
+    } else if (null === scopeSelect.val() && parsed.command !== '') {
+        scopeSelect.find('option[value=""]:not(:disabled)').first().prop('selected', true);
+        setSearchInputValue(initialSearch);
+        Mautic.refreshSearchScopeChosen(scopeSelect);
+
+        return;
+    }
+
+    // Complete commands (is:published, …) keep an empty visible input — the scope
+    // dropdown holds the filter. Suppress livesearch so clearing the input does
+    // not immediately re-request an unfiltered list.
+    const visibleValue = parsed.command ? parsed.value : initialSearch;
+    setSearchInputValue(visibleValue);
+    Mautic.refreshSearchScopeChosen(scopeSelect);
+    Mautic.updateLiveSearchButton(searchId, initialSearch);
+};
+
+/**
+ * Update the compact mobile scope trigger tooltip and active state.
+ */
+Mautic.updateSearchScopeMobileTrigger = function (scopeSelect) {
+    const $select = mQuery(scopeSelect);
+    const $wrapper = $select.closest('.search-scope-wrapper');
+    const $trigger = $wrapper.find('.search-scope-mobile-trigger');
+    if (!$trigger.length) {
+        return;
+    }
+
+    const selectedOption = $select.find('option:selected').first();
+    const scopeLabel = (selectedOption.text() || '').trim();
+    const command = $select.val() || '';
+    const filteringByTemplate = $trigger.attr('data-filtering-by') || 'Filtering by: __LABEL__';
+    const tooltipTitle = command ? filteringByTemplate.replace('__LABEL__', scopeLabel) : scopeLabel;
+
+    $trigger
+        .attr('title', tooltipTitle)
+        .attr('aria-expanded', $select.next('.chosen-container').hasClass('chosen-with-drop') ? 'true' : 'false')
+        .toggleClass('search-scope-mobile-trigger--active', command !== '');
+
+    if ($trigger.data('bs.tooltip')) {
+        $trigger.attr('data-original-title', tooltipTitle).tooltip('fixTitle');
+    }
+};
+
+/**
+ * Wire the compact mobile scope icon to open the existing Chosen dropdown.
+ */
+Mautic.activateSearchScopeMobileTrigger = function (scopeSelect) {
+    const $select = mQuery(scopeSelect);
+    const $wrapper = $select.closest('.search-scope-wrapper');
+    const $trigger = $wrapper.find('.search-scope-mobile-trigger');
+    if (!$trigger.length) {
+        return;
+    }
+
+    if (!$trigger.data('bs.tooltip')) {
+        $trigger.tooltip({container: 'body'});
+    }
+
+    $trigger.off('click.searchScopeMobile').on('click.searchScopeMobile', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (!$select.next('.chosen-container').length) {
+            return;
+        }
+
+        $select.trigger('chosen:open');
+        $trigger.attr('aria-expanded', 'true');
+    });
+
+    $select
+        .off('chosen:showing_dropdown.searchScopeMobile chosen:hiding_dropdown.searchScopeMobile')
+        .on('chosen:showing_dropdown.searchScopeMobile', function () {
+            $trigger.attr('aria-expanded', 'true');
+        })
+        .on('chosen:hiding_dropdown.searchScopeMobile', function () {
+            $trigger.attr('aria-expanded', 'false');
+        });
+
+    Mautic.updateSearchScopeMobileTrigger(scopeSelect);
+};
+
+/**
+ * Initialize the Chosen-enhanced search scope dropdown (same UX as segment filter picker).
+ */
+Mautic.activateSearchScopeChosen = function (scopeSelect) {
+    const $select = mQuery(scopeSelect);
+    if (!$select.length) {
+        return;
+    }
+
+    if ($select.next('.chosen-container').length) {
+        return;
+    }
+
+    $select.chosen({
+        placeholder_text_single: mauticLang['chosenChooseOne'],
+        no_results_text: mauticLang['chosenNoResults'],
+        width: '100%',
+        allow_single_deselect: false,
+        include_group_label_in_selected: false,
+        search_contains: true,
+    });
+
+    $select.on('chosen:showing_dropdown.searchScope', function () {
+        const $container = $select.next('.chosen-container');
+        const $drop = $container.find('.chosen-drop');
+        const searchPlaceholder = $select.attr('data-scope-search-placeholder');
+        const scopeHint = $select.attr('data-scope-hint');
+
+        if (searchPlaceholder) {
+            $container.find('.chosen-search input').attr('placeholder', searchPlaceholder);
+        }
+
+        $drop.find('.search-scope-tip').remove();
+        if (scopeHint) {
+            $drop.prepend(mQuery('<div class="search-scope-tip" role="note"></div>').text(scopeHint));
+        }
+    });
+};
+
+/**
+ * Refresh Chosen after programmatic scope selection changes.
+ */
+Mautic.refreshSearchScopeChosen = function (scopeSelect) {
+    const $select = mQuery(scopeSelect);
+    if (!$select.length || !$select.next('.chosen-container').length) {
+        return;
+    }
+
+    $select.trigger('chosen:updated');
+    Mautic.updateSearchScopeMobileTrigger(scopeSelect);
+};
+
+/**
+ * Whether a scope command is self-contained and needs no input value (e.g. is:published).
+ */
+Mautic.isSearchScopeCompleteCommand = function (command) {
+    command = command || '';
+
+    return command.indexOf(':') > 0;
+};
+
+/**
+ * True when the search input only mirrors a complete-scope option label/command.
+ */
+Mautic.isSearchScopeLabelInInput = function (scopeSelect, inputValue) {
+    inputValue = (inputValue || '').trim();
+    if (!inputValue) {
+        return false;
+    }
+
+    let matches = false;
+    mQuery(scopeSelect).find('option').each(function () {
+        const command = mQuery(this).val() || '';
+        if (!Mautic.isSearchScopeCompleteCommand(command)) {
+            return;
+        }
+
+        const label = mQuery.trim(mQuery(this).text().replace(/\u00a0/g, ' '));
+        if (inputValue === label || inputValue === command) {
+            matches = true;
+
+            return false;
+        }
+    });
+
+    return matches;
+};
+
+/**
+ * Drop complete-scope labels from the visible input before composing a search string.
+ */
+Mautic.normalizeSearchScopeInputValue = function (scopeSelect, inputValue) {
+    inputValue = (inputValue || '').trim();
+    if (scopeSelect && scopeSelect.length && Mautic.isSearchScopeLabelInInput(scopeSelect, inputValue)) {
+        return '';
+    }
+
+    return inputValue;
+};
+
+/**
+ * Compose a scoped list-search string from dropdown command + visible input value.
+ */
+Mautic.composeScopedSearchValue = function (command, value) {
+    value = (value || '').trim();
+    command = command || '';
+
+    if (!command) {
+        return value;
+    }
+
+    // Flag-style commands are complete alone; optional free-text / extra commands follow.
+    if (Mautic.isSearchScopeCompleteCommand(command)) {
+        return value ? (command + ' ' + value) : command;
+    }
+
+    if (!value) {
+        return '';
+    }
+
+    const parts = Mautic.splitSearchScopeTermAndExtra(value);
+    if (!parts.term) {
+        // Input is only extra commands (e.g. "ids:5") — do not wrap as name:ids:5.
+        return parts.extra;
+    }
+
+    let composed = command + ':' + parts.term;
+    if (parts.extra) {
+        composed += ' ' + parts.extra;
+    }
+
+    return composed;
+};
+
+/**
+ * Split visible input into the scope term and trailing search commands.
+ * Example: "pepa ids:5" → {term: "pepa", extra: "ids:5"}.
+ */
+Mautic.splitSearchScopeTermAndExtra = function (value) {
+    value = (value || '').trim();
+    if (!value) {
+        return {term: '', extra: ''};
+    }
+
+    if (value.indexOf(':') === -1) {
+        return {term: value, extra: ''};
+    }
+
+    const tokens = value.match(/"[^"]*"|\S+/g) || [];
+    const termTokens = [];
+    const extraTokens = [];
+    let inExtra = false;
+
+    tokens.forEach(function (token) {
+        if (!inExtra && Mautic.searchScopeTokenLooksLikeCommand(token)) {
+            inExtra = true;
+        }
+
+        if (inExtra) {
+            extraTokens.push(token);
+        } else {
+            termTokens.push(token);
+        }
+    });
+
+    return {
+        term: termTokens.join(' '),
+        extra: extraTokens.join(' ')
+    };
+};
+
+Mautic.searchScopeTokenLooksLikeCommand = function (token) {
+    token = (token || '').replace(/^"|"$/g, '');
+
+    return /^!?[\w.-]+:/u.test(token);
+};
+
+/**
+ * Split a stored search string into scope command + user-visible term.
+ */
+Mautic.parseScopedSearchValue = function (searchValue, scopeCommands) {
+    searchValue = (searchValue || '').trim();
+    scopeCommands = scopeCommands || [];
+
+    if (!searchValue) {
+        return {command: '', value: ''};
+    }
+
+    const sorted = scopeCommands.slice().sort(function (a, b) {
+        return b.length - a.length;
+    });
+
+    for (let i = 0; i < sorted.length; i++) {
+        const command = sorted[i];
+        if (!command) {
+            continue;
+        }
+
+        if (command === searchValue) {
+            return {command: command, value: ''};
+        }
+
+        // Flag-style commands combine with free-text via a space.
+        if (Mautic.isSearchScopeCompleteCommand(command)) {
+            const spaced = command + ' ';
+            if (searchValue.indexOf(spaced) === 0) {
+                return {
+                    command: command,
+                    value: searchValue.substring(spaced.length)
+                };
+            }
+
+            continue;
+        }
+
+        const prefix = command + ':';
+        if (searchValue.indexOf(prefix) === 0) {
+            return {
+                command: command,
+                value: searchValue.substring(prefix.length)
+            };
+        }
+    }
+
+    return {command: '', value: searchValue};
+};
+
+/**
+ * Compose the effective list-search string from scope dropdown + visible input.
+ */
+Mautic.getLiveSearchFilterValue = function (elId) {
+    const el = mQuery('#' + elId);
+    if (!el.length) {
+        return '';
+    }
+
+    const scopeSelect = mQuery("select[data-livesearch-scope-for='" + elId + "']");
+    let value = el.val().trim();
+
+    if (!scopeSelect.length) {
+        return value;
+    }
+
+    if (!Mautic.filterCommands || Mautic.filterCommands.length === 0) {
+        Mautic.initFilterCommands();
+    }
+
+    const filterCommands = Mautic.getActiveFilterCommands(value);
+    let scopedInputValue = Mautic.removeFilterCommands(value);
+    scopedInputValue = Mautic.normalizeSearchScopeInputValue(scopeSelect, scopedInputValue);
+    value = Mautic.composeScopedSearchValue(scopeSelect.val(), scopedInputValue);
+
+    if (filterCommands.length) {
+        value = (value + ' ' + filterCommands.join(' ')).trim();
+    }
+
+    return value;
+};
+
+/**
+ * Toggle the livesearch button between search and clear (eraser) icons.
+ */
+Mautic.updateLiveSearchButton = function (elId, filterValue) {
+    const btn = mQuery("button[data-livesearch-parent='" + elId + "']");
+    if (!btn.length) {
+        return;
+    }
+
+    filterValue = (filterValue || '').trim();
+    const icon = btn.children('i').first();
+
+    if (filterValue) {
+        btn.attr('data-livesearch-action', 'clear');
+        icon.removeClass('ri-search-line').addClass('ri-eraser-line');
+    } else {
+        btn.attr('data-livesearch-action', 'search');
+        icon.removeClass('ri-eraser-line').addClass('ri-search-line');
+    }
+};
+
+/**
+ * Apply the selected search scope immediately (used by the scope dropdown).
+ */
+Mautic.submitSearchScopeChange = function (scopeSelect, searchInput, searchId) {
+    const command = scopeSelect.val() || '';
+    const inputValue = Mautic.normalizeSearchScopeInputValue(scopeSelect, searchInput.val());
+    const scopedValue = Mautic.composeScopedSearchValue(command, inputValue);
+
+    // Value-requiring scope without a term yet — wait for the user to type,
+    // but still clear an active complete-command filter (e.g. is:unpublished).
+    if (command && !Mautic.isSearchScopeCompleteCommand(command) && !inputValue) {
+        if ((MauticVars.lastSearchStr || '').trim() !== scopedValue) {
+            MauticVars.lastSearchStr = scopedValue;
+
+            const scopeChangeEvent = mQuery.Event('keyup', {which: 13});
+            scopeChangeEvent.data = {livesearch: true, scopeChange: true};
+            Mautic.filterList(
+                scopeChangeEvent,
+                searchId,
+                searchInput.attr('data-action'),
+                searchInput.attr('data-target'),
+                'liveCache'
+            );
+            Mautic.updateLiveSearchButton(searchId, scopedValue);
+        }
+
+        searchInput.trigger('focus');
+
+        return;
+    }
+
+    if (scopedValue === MauticVars.lastSearchStr) {
+        return;
+    }
+
+    MauticVars.lastSearchStr = scopedValue;
+
+    const scopeChangeEvent = mQuery.Event('keyup', {which: 13});
+    scopeChangeEvent.data = {livesearch: true, scopeChange: true};
+    Mautic.filterList(
+        scopeChangeEvent,
+        searchId,
+        searchInput.attr('data-action'),
+        searchInput.attr('data-target'),
+        'liveCache'
+    );
+    Mautic.updateLiveSearchButton(searchId, scopedValue);
+};
+
+/**
+ * Wire the optional field-scope dropdown to a livesearch input.
+ */
+Mautic.activateSearchScope = function (searchEl) {
+    const searchInput = mQuery(searchEl);
+    if (!searchInput.length) {
+        return;
+    }
+
+    const searchId = searchInput.attr('id');
+    const scopeSelect = mQuery("select[data-livesearch-scope-for='" + searchId + "']");
+    if (!scopeSelect.length) {
+        return;
+    }
+
+    const initialSearch = (scopeSelect.attr('data-initial-search') || searchInput.val() || '').trim();
+    // Keep lastSearchStr in sync before mutating the input so typeahead/Chosen
+    // init cannot trigger a redundant live-search that briefly empties the list.
+    MauticVars.lastSearchStr = initialSearch;
+    Mautic.applySearchScopeState(searchInput, initialSearch);
+
+    Mautic.activateSearchScopeChosen(scopeSelect);
+    Mautic.activateSearchScopeMobileTrigger(scopeSelect);
+
+    scopeSelect.off('change.searchScope').on('change.searchScope', function () {
+        Mautic.updateSearchScopeMobileTrigger(scopeSelect);
+        Mautic.submitSearchScopeChange(scopeSelect, searchInput, searchId);
+    });
+};
+
+/**
  * Activates Typeahead.js command lists for search boxes
  * @param elId
  * @param modelName
@@ -1349,6 +1837,68 @@ Mautic.activateSearchAutocomplete = function (elId, modelName) {
     }
 };
 
+Mautic.Keyboard = {
+    /**
+     * Extract the key from a keyboard event safely.
+     * @param {KeyboardEvent} event
+     * @returns {string|number}
+     */
+    getKey: function (event) {
+        return event.key || event.which || event.keyCode;
+    },
+
+    isEnter: function (key) {
+        return key === 'Enter' || key === 13;
+    },
+
+    isEscape: function (key) {
+        return key === 'Escape' || key === 'Esc' || key === 27;
+    },
+
+    isArrowDown: function (key) {
+        return key === 'ArrowDown' || key === 40;
+    },
+
+    isArrowUp: function (key) {
+        return key === 'ArrowUp' || key === 38;
+    },
+
+    isTab: function (key) {
+        return key === 'Tab' || key === 9;
+    },
+
+    isSpace: function (key) {
+        return key === ' ' || key === 'Spacebar' || key === 'Space' || key === 32;
+    },
+
+    isBackspace: function (key) {
+        return key === 'Backspace' || key === 8;
+    },
+
+    /**
+     * Check whether the key event is a navigation key
+     * that should not trigger live search.
+     *
+     * @param {KeyboardEvent} event
+     * @returns {boolean}
+     */
+    isLiveSearchNavigation: function (event) {
+        const key = this.getKey(event);
+
+        return (
+            this.isArrowDown(key) ||
+            this.isArrowUp(key)   ||
+            this.isTab(key)       ||
+            this.isEscape(key)
+        );
+    }
+};
+
+Mautic.isGlobalSearchInput = function (el) {
+    return mQuery(el).attr('id') === 'globalSearchInput';
+};
+
+
 /**
  * Activate live search feature
  *
@@ -1361,18 +1911,31 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
         return;
     }
 
+    let activeIndex = -1;
+
     //find associated button
     var btn = "button[data-livesearch-parent='" + mQuery(el).attr('id') + "']";
 
     mQuery(el).on('focus', function () {
         Mautic.currentSearchString = mQuery(this).val().trim();
     });
+
     mQuery(el).on('change keyup paste', {}, function (event) {
+        if (Mautic.suppressLiveSearch) {
+            return;
+        }
+
+        // Prevent LiveSearch from re-triggering on navigation keys
+        if (Mautic.Keyboard.isLiveSearchNavigation(event)) {
+            return;
+        }
+
         var searchStr = mQuery(el).val().trim();
 
-        var spaceKeyPressed = (event.which == 32 || event.keyCode == 32);
-        var enterKeyPressed = (event.which == 13 || event.keyCode == 13);
-        var deleteKeyPressed = (event.which == 8 || event.keyCode == 8);
+        const key = Mautic.Keyboard.getKey(event);
+        const spaceKeyPressed = Mautic.Keyboard.isSpace(key);
+        const enterKeyPressed = Mautic.Keyboard.isEnter(key);
+        const deleteKeyPressed = Mautic.Keyboard.isBackspace(key);
 
         if (!enterKeyPressed && Mautic.currentSearchString && Mautic.currentSearchString == searchStr) {
             return;
@@ -1402,8 +1965,11 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
             });
         }
 
+        let overlay = null;
         if (!deleteKeyPressed && overlayEnabled) {
-            var overlay = mQuery('<div />', {"class": "content-overlay"}).html(mQuery(el).attr('data-overlay-text'));
+            overlay = mQuery('<div />', {"class": "content-overlay"})
+                .html(mQuery(el).attr('data-overlay-text'));
+
             if (mQuery(el).attr('data-overlay-background')) {
                 overlay.css('background', mQuery(el).attr('data-overlay-background'));
             }
@@ -1412,12 +1978,22 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
             }
         }
 
-        //searchStr in MauticVars[liveCacheVar] ||
-        if ((!searchStr && MauticVars[searchStrVar].length) || diff >= 3 || spaceKeyPressed || enterKeyPressed) {
+        if ((!searchStr && MauticVars[searchStrVar].length)
+            || diff >= 3
+            || spaceKeyPressed
+            || enterKeyPressed
+        ) {
             MauticVars[searchStrVar] = searchStr;
             event.data.livesearch = true;
 
-            Mautic.filterList(event,
+            // Reset active index for global search
+            if (Mautic.isGlobalSearchInput(el)) {
+                activeIndex = -1;
+                mQuery('.gsearch--results-item', el).removeClass('active');
+            }
+
+            Mautic.filterList(
+                event,
                 mQuery(el).attr('id'),
                 mQuery(el).attr('data-action'),
                 target,
@@ -1425,7 +2001,7 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
                 overlayEnabled,
                 overlayTarget
             );
-        } else if (overlayEnabled) {
+        } else if (overlayEnabled && overlay) {
             if (!mQuery(overlayTarget + ' .content-overlay').length) {
                 mQuery(overlayTarget).prepend(overlay);
             }
@@ -1438,7 +2014,9 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
             MauticVars[searchStrVar] = searchStr;
 
             Mautic.filterButtonClicked = true;
-            Mautic.filterList(event,
+
+            Mautic.filterList(
+                event,
                 event.data.parent,
                 mQuery('#' + event.data.parent).attr('data-action'),
                 mQuery('#' + event.data.parent).attr('data-target'),
@@ -1447,14 +2025,70 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
             );
         });
 
-        if (mQuery(el).val()) {
-            mQuery(btn).attr('data-livesearch-action', 'clear');
-            mQuery(btn + ' i').removeClass('ri-search-line').addClass('ri-eraser-line');
-        } else {
-            mQuery(btn).attr('data-livesearch-action', 'search');
-            mQuery(btn + ' i').removeClass('ri-eraser-line').addClass('ri-search-line');
-        }
+        Mautic.updateLiveSearchButton(mQuery(el).attr('id'), Mautic.getLiveSearchFilterValue(mQuery(el).attr('id')));
     }
+
+    if (Mautic.isGlobalSearchInput(el)) {
+        mQuery(el).off('keydown.globalSearchNav');
+
+        mQuery(el).on('keydown.globalSearchNav', function (e) {
+            const key = Mautic.Keyboard.getKey(e);
+
+            if (Mautic.Keyboard.isEscape(key)) {
+                mQuery('#gsearchModal').modal('hide');
+                return;
+            }
+
+            const items = mQuery('#globalSearchResults .gsearch--results-item');
+            if (!items.length) return;
+
+            switch (true) {
+                case Mautic.Keyboard.isArrowDown(key):
+                case Mautic.Keyboard.isTab(key) && !e.shiftKey:
+                    e.preventDefault();
+                    activeIndex = (activeIndex + 1) % items.length;
+                    break;
+
+                case Mautic.Keyboard.isArrowUp(key):
+                case Mautic.Keyboard.isTab(key) && e.shiftKey:
+                    e.preventDefault();
+                    activeIndex = activeIndex <= 0 ? items.length - 1 : activeIndex - 1;
+                    break;
+
+                case Mautic.Keyboard.isEnter(key): {
+                    if (activeIndex < 0 || activeIndex >= items.length) {
+                        return;
+                    }
+
+                    const link = items.eq(activeIndex).find('a').get(0);
+                    if (link) {
+                        link.click();
+                    }
+                    return;
+                }
+
+                default:
+                    return;
+            }
+
+            items.removeClass('active');
+
+            items.eq(activeIndex)
+                .addClass('active')
+                .get(0)
+                .scrollIntoView({ block: 'nearest' });
+        });
+
+        // Reset index on input change
+        mQuery(el).off('input.globalSearchNav');
+
+        mQuery(el).on('input.globalSearchNav', function () {
+            activeIndex = -1;
+            mQuery('#globalSearchResults .gsearch--results-item').removeClass('active');
+        });
+    }
+
+    Mautic.activateSearchScope(el);
 };
 
 /**
@@ -1623,10 +2257,31 @@ Mautic.activateTypeahead = function (el, options) {
 
     var noRrecordMessage = (options.noRrecordMessage) ? options.noRrecordMessage : mQuery(el).data('no-record-message');
     var theName = el.replace(/[^a-z0-9\s]/gi, '').replace(/[-\s]/g, '_');
+    const bloodhoundSource = (typeof theBloodhound != 'undefined') ? theBloodhound.ttAdapter() : substringMatcher(lookupOptions, lookupKeys);
+    let lastFullQuery = '';
+
+    let datasetSource = bloodhoundSource;
+    if (options.multiple) {
+        // Stock typeahead has no real multi-token mode — match/replace only the
+        // current token after the last space so "pepa nam" can still suggest "name:".
+        datasetSource = function (query, sync, async) {
+            lastFullQuery = mQuery(el).val() || query || '';
+            const tokenQuery = Mautic.getTypeaheadCurrentToken(lastFullQuery);
+
+            if (tokenQuery.length < options.minLength) {
+                sync([]);
+
+                return;
+            }
+
+            return bloodhoundSource(tokenQuery, sync, async);
+        };
+    }
+
     var dataset = {
         name: theName,
         displayKey: options.displayKey,
-        source: (typeof theBloodhound != 'undefined') ? theBloodhound.ttAdapter() : substringMatcher(lookupOptions, lookupKeys)
+        source: datasetSource
     };
 
     if (noRrecordMessage) {
@@ -1637,14 +2292,14 @@ Mautic.activateTypeahead = function (el, options) {
 
     var theTypeahead = mQuery(el).typeahead(
         {
-            hint: true,
+            hint: !options.multiple,
             highlight: true,
             minLength: options.minLength,
             multiple: options.multiple
         },
         dataset
     ).on('keypress', function (event) {
-        if ((event.keyCode || event.which) == 13) {
+        if (Mautic.Keyboard.isEnter(Mautic.Keyboard.getKey(event))) {
             mQuery(el).typeahead('close');
         }
     }).on('focus', function() {
@@ -1653,7 +2308,53 @@ Mautic.activateTypeahead = function (el, options) {
         }
     });
 
+    if (options.multiple) {
+        mQuery(el).on('typeahead:selected.typeaheadMultiple typeahead:autocompleted.typeaheadMultiple', function (event, datum) {
+            const suggestion = (datum && datum[options.displayKey] !== undefined) ? datum[options.displayKey] : datum;
+            const fullQuery = lastFullQuery || mQuery(el).val() || '';
+            const replaced = Mautic.replaceTypeaheadCurrentToken(fullQuery, suggestion);
+            mQuery(el).typeahead('val', replaced);
+            lastFullQuery = replaced;
+        });
+    }
+
     return theTypeahead;
+};
+
+/**
+ * Current token used for multi-token search typeahead (text after the last space).
+ */
+Mautic.getTypeaheadCurrentToken = function (value) {
+    value = value || '';
+    if (/\s$/.test(value)) {
+        return '';
+    }
+
+    const parts = value.split(/\s+/);
+
+    return parts[parts.length - 1] || '';
+};
+
+/**
+ * Replace the current (last) token in a multi-token search string.
+ */
+Mautic.replaceTypeaheadCurrentToken = function (value, suggestion) {
+    suggestion = suggestion || '';
+    value = value || '';
+
+    if (!value || /\s$/.test(value)) {
+        return value + suggestion;
+    }
+
+    const parts = value.split(/(\s+)/);
+    for (let i = parts.length - 1; i >= 0; i--) {
+        if (parts[i].trim() !== '') {
+            parts[i] = suggestion;
+            break;
+        }
+    }
+
+    return parts.join('');
 };
 
 /**
@@ -1831,17 +2532,20 @@ Mautic.applyFilters = function () {
     currentSearchValue = Mautic.removeFilterCommands(currentSearchValue);
 
     const activeFilters = document.querySelectorAll('.label.active');
-    let filterCommands = Array.from(activeFilters).map(function (filterElement) {
+    const searchCommands = Array.from(activeFilters).map(function (filterElement) {
         return filterElement.dataset.filter;
     });
 
     const selectFields = document.querySelectorAll('.popover-content select');
+    const selectedFilterValues = [];
     selectFields.forEach(function (selectElement) {
         const selectedOptions = Array.from(selectElement.selectedOptions).map(option => option.value);
-        filterCommands.push(...selectedOptions);
+        selectedFilterValues.push(...selectedOptions);
     });
 
-    const newSearchValue = (currentSearchValue + ' ' + filterCommands.join(' ')).trim();
+    searchInput.dataset.filters = JSON.stringify(selectedFilterValues);
+
+    const newSearchValue = (currentSearchValue + ' ' + searchCommands.concat(selectedFilterValues).join(' ')).trim();
     searchInput.value = newSearchValue;
 
     // Properly destroy and reinitialize popover
@@ -1869,6 +2573,22 @@ Mautic.resetFilters = function () {
     let currentSearchValue = searchInput.value || '';
     currentSearchValue = Mautic.removeFilterCommands(currentSearchValue);
     searchInput.value = currentSearchValue.trim();
+    searchInput.dataset.filters = JSON.stringify([]);
+
+    const scopeSelect = document.querySelector("select[data-livesearch-scope-for='list-search']");
+    if (scopeSelect) {
+        const standardOption = scopeSelect.querySelector('option[value=""]:not(:disabled)');
+        if (standardOption) {
+            standardOption.selected = true;
+        }
+        if (typeof mQuery !== 'undefined') {
+            Mautic.refreshSearchScopeChosen(scopeSelect);
+        }
+    }
+
+    if (typeof mQuery !== 'undefined') {
+        Mautic.updateLiveSearchButton('list-search', '');
+    }
 
     const activeFilters = document.querySelectorAll('.label.active');
     activeFilters.forEach(function (filterElement) {
@@ -1922,12 +2642,14 @@ Mautic.removeFilterCommands = function (searchValue) {
  *
  * @returns {Array<string>}
  */
-Mautic.getActiveFilterCommands = function () {
-    const searchInput = document.getElementById('list-search');
-    if (!searchInput) {
-        return []; // Return an empty array if there's no search input
+Mautic.getActiveFilterCommands = function (searchValue) {
+    if (searchValue === undefined || searchValue === null) {
+        const searchInput = document.getElementById('list-search');
+        if (!searchInput) {
+            return [];
+        }
+        searchValue = searchInput.value || '';
     }
-    const searchValue = searchInput.value || '';
 
     if (!Mautic.filterCommands || Mautic.filterCommands.length === 0) {
         Mautic.initFilterCommands();
@@ -1943,6 +2665,26 @@ Mautic.getActiveFilterCommands = function () {
     return matches ? matches : [];
 };
 
+Mautic.getSelectedPopoverFilters = function () {
+    const searchInput = document.getElementById('list-search');
+    if (!searchInput) {
+        return [];
+    }
+
+    const serializedFilters = searchInput.dataset.filters;
+    if (!serializedFilters) {
+        return [];
+    }
+
+    try {
+        const filters = JSON.parse(serializedFilters);
+
+        return Array.isArray(filters) ? filters : [];
+    } catch {
+        return [];
+    }
+};
+
 /**
  * Initializes the active states of filter labels based on the current search input.
  *
@@ -1950,6 +2692,8 @@ Mautic.getActiveFilterCommands = function () {
  */
 Mautic.initializePopoverFilters = function (popoverElement) {
     const activeFilterCommands = Mautic.getActiveFilterCommands();
+    const selectedPopoverFilters = Mautic.getSelectedPopoverFilters();
+    const selectFields = popoverElement.querySelectorAll('select');
 
     // Handle regular filter labels
     activeFilterCommands.forEach(function (filterCommand) {
@@ -1957,28 +2701,22 @@ Mautic.initializePopoverFilters = function (popoverElement) {
         if (label) {
             label.classList.add('active');
         }
+    });
 
-        // Handle select fields
-        const selectFields = popoverElement.querySelectorAll('select');
-        selectFields.forEach(function (selectElement) {
-            // Check if the value matches either the raw value or a category format
-            Array.from(selectElement.options).forEach(function (option) {
-                const isSelected = activeFilterCommands.some(cmd =>
-                    cmd === option.value ||
-                    cmd === `category:${option.value}`
-                );
-                option.selected = isSelected;
-            });
-
-            // Initialize chosen
-            mQuery(selectElement).chosen({
-                width: '100%',
-                allow_single_deselect: true
-            });
-
-            // Update the UI
-            mQuery(selectElement).trigger('chosen:updated');
+    selectFields.forEach(function (selectElement) {
+        Array.from(selectElement.options).forEach(function (option) {
+            const isSelected = selectedPopoverFilters.includes(option.value);
+            option.selected = isSelected;
         });
+
+        // Initialize chosen
+        mQuery(selectElement).chosen({
+            width: '100%',
+            allow_single_deselect: true
+        });
+
+        // Update the UI
+        mQuery(selectElement).trigger('chosen:updated');
     });
 };
 

@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticTagManagerBundle\Tests\Unit\Integration;
 
 use MauticPlugin\MauticTagManagerBundle\Integration\TagManagerIntegration;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class TagManagerIntegrationTest extends TestCase
+final class TagManagerIntegrationTest extends TestCase
 {
     private TagManagerIntegration $tagManagerIntegration;
 
@@ -14,28 +15,23 @@ class TagManagerIntegrationTest extends TestCase
     {
         parent::setUp();
 
-        $this->tagManagerIntegration = new class extends TagManagerIntegration {
-            public function __construct()
-            {
-            }
-        };
+        $this->tagManagerIntegration = new TagManagerIntegration();
     }
 
     public function testGetNameReturnsName(): void
     {
         $name = $this->tagManagerIntegration->getName();
-        Assert::assertSame(TagManagerIntegration::PLUGIN_NAME, $name);
+        $this->assertSame(TagManagerIntegration::PLUGIN_NAME, $name);
     }
 
     public function testGetDisplayNameReturnsName(): void
     {
         $displayName = $this->tagManagerIntegration->getDisplayName();
-        Assert::assertNotEmpty($displayName);
+        $this->assertNotEmpty($displayName);
     }
 
-    public function testGetAuthenticationTypeReturnsNonEmptyValue(): void
+    public function testGetIconReturnsExpectedPath(): void
     {
-        $authenticationType = $this->tagManagerIntegration->getAuthenticationType();
-        Assert::assertNotEmpty($authenticationType);
+        $this->assertSame('plugins/MauticTagManagerBundle/Assets/img/tagmanager.png', $this->tagManagerIntegration->getIcon());
     }
 }

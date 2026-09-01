@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Test;
 
 use Doctrine\Common\DataFixtures\Executor\AbstractExecutor;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Liip\TestFixturesBundle\Services\DatabaseToolCollection;
 use Liip\TestFixturesBundle\Services\DatabaseTools\AbstractDatabaseTool;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
@@ -18,9 +20,12 @@ use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\RawMessage;
 use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 abstract class AbstractMauticTestCase extends WebTestCase
 {
@@ -93,6 +98,16 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $this->databaseTool = static::getContainer()->get(DatabaseToolCollection::class)->get();
     }
 
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        // The kernel boot registers an exception handler that is not removed on shutdown.
+        // PHPUnit 11.5 fails the test if a leaked handler remains on the stack.
+        // @see https://github.com/sebastianbergmann/phpunit/issues/5721
+        restore_exception_handler();
+    }
+
     protected function setUpSymfony(array $defaultConfigOptions = []): void
     {
         putenv('MAUTIC_CONFIG_PARAMETERS='.json_encode($defaultConfigOptions));
@@ -103,10 +118,9 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $this->client->disableReboot();
         $this->client->followRedirects(true);
 
-        $this->em = static::getContainer()->get('doctrine')->getManager();
-        \assert($this->em instanceof EntityManagerInterface);
+        $this->em = static::getContainer()->get(ManagerRegistry::class)->getManager();
         $this->connection = $this->em->getConnection();
-        $this->router     = static::getContainer()->get('router');
+        $this->router     = static::getContainer()->get(RouterInterface::class);
         $scheme           = $this->router->getContext()->getScheme();
         $secure           = 0 === strcasecmp($scheme, 'https');
 
@@ -145,7 +159,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $input  = new ArgvInput(['console', 'doctrine:migrations:version', '--add', '--all', '--no-interaction']);
         $output = new BufferedOutput();
 
-        $application = new Application(static::getContainer()->get('kernel'));
+        $application = new Application(static::getContainer()->get(KernelInterface::class));
         $application->setAutoExit(false);
         $application->run($input, $output);
     }
@@ -165,7 +179,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
      */
     protected function getCsrfToken(string $intention): string
     {
-        return $this->client->getContainer()->get('security.csrf.token_manager')->refreshToken($intention)->getValue();
+        return $this->client->getContainer()->get(CsrfTokenManagerInterface::class)->refreshToken($intention)->getValue();
     }
 
     /**
@@ -185,7 +199,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
      */
     protected function testSymfonyCommand(string $name, array $params = [], ?Command $command = null): CommandTester
     {
-        $kernel      = static::getContainer()->get('kernel');
+        $kernel      = static::getContainer()->get(KernelInterface::class);
         $application = new Application($kernel);
 
         if ($command) {
@@ -198,7 +212,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $bypassLockingOption = 'bypass-locking';
 
         if ($command->getDefinition()->hasOption($bypassLockingOption)) {
-            $params["--$bypassLockingOption"] = true;
+            $params["--{$bypassLockingOption}"] = true;
         }
 
         $command       = $application->find($name);

@@ -13,7 +13,7 @@ use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Tests\PageTestAbstract;
 use Symfony\Component\HttpFoundation\Request;
 
-class PageModelTest extends PageTestAbstract
+final class PageModelTest extends PageTestAbstract
 {
     public function testUtf8CharsInTitleWithTransletirationEnabled(): void
     {
@@ -62,7 +62,7 @@ class PageModelTest extends PageTestAbstract
         $this->router->expects($this->once())
             ->method('generate')
             ->willReturnCallback(
-                function (string $route, array $routeParams, int $referenceType) {
+                function (string $route, array $routeParams, int $referenceType): string {
                     $this->assertSame('mautic_page_public', $route);
                     $this->assertSame(['slug' => 'this-is-a-test'], $routeParams);
                     $this->assertSame(0, $referenceType);
@@ -100,8 +100,7 @@ class PageModelTest extends PageTestAbstract
         $pageModel           = $this->getPageModel();
         $pageModelReflection = new \ReflectionClass($pageModel::class);
         $cleanQueryMethod    = $pageModelReflection->getMethod('cleanQuery');
-        $cleanQueryMethod->setAccessible(true);
-        $res = $cleanQueryMethod->invokeArgs($pageModel, [
+        $res                 = $cleanQueryMethod->invokeArgs($pageModel, [
             [
                 'page_title'    => 'Mautic & PHP',
                 'page_url'      => 'http://mautic.com/page/test?hello=world&lorem=ipsum&q=this%20has%20spaces',
@@ -129,6 +128,29 @@ class PageModelTest extends PageTestAbstract
             $query = $pageModel->getHitQuery($request);
             $this->assertUtmQuery($query);
         }
+    }
+
+    public function testTimezoneQueryProcessPageHit(): void
+    {
+        $hit           = new Hit();
+        $page          = new Page();
+        $request       = new Request();
+        $contact       = new Lead();
+        $pageModel     = $this->getPageModel(false);
+
+        $hit->setIpAddress(new IpAddress());
+        $timezone = 'Europe/Paris';
+        $hit->setQuery(['timezone' => $timezone, 'timezone_offset' => -120]);
+
+        $pageModel->processPageHit($hit, $page, $request, $contact, false);
+        $this->assertSame($timezone, $contact->getTimezone());
+
+        $hit->setQuery(['timezone_offset' => -120]);
+
+        $contact       = new Lead();
+        $pageModel->processPageHit($hit, $page, $request, $contact, false);
+
+        $this->assertSame('Europe/Helsinki', $contact->getTimezone());
     }
 
     /**
@@ -171,9 +193,12 @@ class PageModelTest extends PageTestAbstract
             ->willReturn(null);
 
         $result = $pageModel->hitPage($redirect, new Request());
-        self::assertFalse($result);
+        $this->assertFalse($result);
     }
 
+    /**
+     * @param array<string, string> $query
+     */
     private function assertUtmQuery(array $query): void
     {
         $this->assertArrayHasKey('utm_source', $query, 'utm_source not found');
@@ -183,11 +208,14 @@ class PageModelTest extends PageTestAbstract
         // evaluate all utm tags that they contain the key name in the value
         foreach ($query as $key => $value) {
             if (str_contains($key, 'utm_')) {
-                $this->assertNotFalse(strpos($value, (string) $key), sprintf('%s not found in %s', $key, $value));
+                $this->assertStringContainsString($key, $value, sprintf('%s not found in %s', $key, $value));
             }
         }
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     private function getQueryParams(): array
     {
         $utm = [
@@ -212,7 +240,7 @@ class PageModelTest extends PageTestAbstract
         ];
         $ct      = ClickthroughHelper::encodeArrayForUrl($ctParams);
 
-        $params = [[
+        return [[
             'page_title'      => 'Testpage',
             'page_language'   => 'en-GB',
             'page_referrer'   => '',
@@ -252,7 +280,5 @@ class PageModelTest extends PageTestAbstract
             'adblock'         => false,
             'fingerprint'     => 'fec25ab2d659c4153c7f1d5724841132',
         ]];
-
-        return $params;
     }
 }

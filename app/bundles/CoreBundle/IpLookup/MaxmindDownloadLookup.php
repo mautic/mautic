@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\IpLookup;
 
 use GeoIp2\Database\Reader;
 
-class MaxmindDownloadLookup extends AbstractLocalDataLookup
+final class MaxmindDownloadLookup extends AbstractLocalDataLookup
 {
     public function getAttribution(): string
     {
@@ -16,38 +16,41 @@ class MaxmindDownloadLookup extends AbstractLocalDataLookup
         return $this->getDataDir().'/GeoLite2-City.mmdb';
     }
 
-    /**
-     * @return string
-     */
-    public function getRemoteDateStoreDownloadUrl()
+    public function getRemoteDateStoreDownloadUrl(): string
     {
-        if (!empty($this->getLicenceKey())) {
-            $data                = [];
-            $data['license_key'] = $this->getLicenceKey();
-            $data['edition_id']  = 'GeoLite2-City';
-            $data['suffix']      = 'tar.gz';
-            $queryString         = http_build_query($data);
+        $baseAuth = $this->getLicenceKey();
 
-            return 'https://download.maxmind.com/app/geoip_download?'.$queryString;
-        } else {
+        if (null === $baseAuth || '' === $baseAuth) {
             $this->logger->warning('MaxMind license key is required.');
+
+            return '';
         }
+
+        $data = [
+            'suffix' => 'tar.gz',
+        ];
+        $queryString = http_build_query($data);
+
+        return 'https://'.$baseAuth.'@download.maxmind.com/geoip/databases/GeoLite2-City/download?'.$queryString;
     }
 
-    private function getLicenceKey(): string
+    private function getLicenceKey(): ?string
     {
-        $auth = explode(':', $this->auth, 2);
-        if (array_key_exists(1, $auth)) {
-            return $auth[1];
+        if (null === $this->auth) {
+            return null;
         }
 
-        return '';
+        if (1 !== preg_match('/^\d+:[a-z0-9_]+$/i', $this->auth)) {
+            return '';
+        }
+
+        return $this->auth;
     }
 
     /**
      * Extract the IP from the local database.
      */
-    protected function lookup()
+    protected function lookup(): void
     {
         try {
             $reader = new Reader($this->getLocalDataStoreFilepath());

@@ -8,7 +8,7 @@ namespace Mautic\IntegrationsBundle\DTO;
  * This class represents tokens which provide links to objects which have been
  * synced from integrations into Mautic.
  */
-class IntegrationObjectToken
+final class IntegrationObjectToken
 {
     /**
      * @var string
@@ -33,7 +33,7 @@ class IntegrationObjectToken
     private $baseURL;
 
     public function __construct(
-        private string $token,
+        private readonly string $token,
     ) {
     }
 
@@ -74,10 +74,7 @@ class IntegrationObjectToken
         return $this->integration;
     }
 
-    /**
-     * @param string $defaultValue
-     */
-    public function setDefaultValue($defaultValue): void
+    public function setDefaultValue(string $defaultValue): void
     {
         $this->defaultValue = $defaultValue;
     }

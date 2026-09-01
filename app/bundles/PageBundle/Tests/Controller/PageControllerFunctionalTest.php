@@ -9,10 +9,9 @@ use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\ProjectBundle\Entity\Project;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-class PageControllerFunctionalTest extends MauticMysqlTestCase
+final class PageControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testPagePreview(): void
     {
@@ -35,8 +34,8 @@ class PageControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, sprintf('/%s', $page->getAlias()));
         $response = $this->client->getResponse();
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertStringContainsString('Test Html', $response->getContent());
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('Test Html', (string) $response->getContent());
     }
 
     private function createSegment(): LeadList
@@ -102,6 +101,7 @@ class PageControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $savedPage = $this->em->find(Page::class, $page->getId());
+        $this->assertInstanceOf(Page::class, $savedPage);
         $this->assertSame($project->getId(), $savedPage->getProjects()->first()->getId());
     }
 
@@ -129,6 +129,34 @@ class PageControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->em->clear();
 
-        Assert::assertEquals('New Page', $this->em->find(Page::class, $pageId)->getTitle());
+        $this->assertEquals('New Page', $this->em->find(Page::class, $pageId)->getTitle());
+    }
+
+    public function testOptimisticLock(): void
+    {
+        $version = 1;
+        $page    = $this->createPage();
+        $this->em->flush();
+        $this->assertPageVersion($page->getId(), $version);
+
+        $crawler = $this->client->request('GET', '/s/pages/edit/'.$page->getId());
+        $form    = $crawler->selectButton('Save')->form();
+        $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+        $this->assertPageVersion($page->getId(), ++$version, 'The version should be incremented after submitting the form.');
+
+        $form    = $crawler->selectButton('Save')->form();
+        $crawler = $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+        $this->assertPageVersion($page->getId(), $version, 'The version should stay the same as there was an optimistic lock error.');
+        $this->assertStringContainsString('The record you are updating has been changed by someone else in the meantime. Please refresh the browser window and re-submit your changes.', $crawler->text(), 'There should be an optimistic error as the form was not refreshed after the previous submission.');
+    }
+
+    private function assertPageVersion(int $id, int $expectedVersion, string $message = ''): void
+    {
+        $this->em->clear();
+        $page = $this->em->find(Page::class, $id);
+        $this->assertInstanceOf(Page::class, $page);
+        $this->assertSame($expectedVersion, $page->getVersion(), $message);
     }
 }

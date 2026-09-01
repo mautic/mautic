@@ -13,7 +13,7 @@
                 <div class="row">
 
                     {% if form.webroot is defined %}
-                    <div class="col-xs-12">{{ form_row(form.webroot) }}</div>
+                    <div class="col-xs-12">{{ formRowIfExists(form, 'webroot') }}</div>
                     {% endif %}
 
                     {% if form['404_page'] is defined %}
@@ -22,27 +22,27 @@
 
                     {% set technicalPathsContent %}
                     {% if form.site_url is defined %}
-                        {{ form_row(form.site_url) }}
+                        {{ formRowIfExists(form, 'site_url') }}
                     {% endif %}
 
                     {% if form.cache_path is defined %}
-                        {{ form_row(form.cache_path) }}
+                        {{ formRowIfExists(form, 'cache_path') }}
                     {% endif %}
 
                     {% if form.log_path is defined %}
-                        {{ form_row(form.log_path) }}
+                        {{ formRowIfExists(form, 'log_path') }}
                     {% endif %}
 
                     {% if form.theme is defined %}
-                        {{ form_row(form.theme) }}
+                        {{ formRowIfExists(form, 'theme') }}
                     {% endif %}
 
                     {% if form.image_path is defined %}
-                        {{ form_row(form.image_path) }}
+                        {{ formRowIfExists(form, 'image_path') }}
                     {% endif %}
 
                     {% if form.last_shown_tab is defined %}
-                        {{ form_row(form.last_shown_tab) }}
+                        {{ formRowIfExists(form, 'last_shown_tab') }}
                     {% endif %}
                 {% endset %}
 
@@ -72,43 +72,43 @@
                 <div class="row">
 
                     {% if form.locale is defined %}
-                    <div class="col-xs-12">{{ form_row(form.locale) }}</div>
+                    <div class="col-xs-12">{{ formRowIfExists(form, 'locale') }}</div>
                     {% endif %}
 
                     {% if form.default_timezone is defined %}
-                    <div class="col-xs-12">{{ form_row(form.default_timezone) }}</div>
+                    <div class="col-xs-12">{{ formRowIfExists(form, 'default_timezone') }}</div>
                     {% endif %}
 
                     <div class="mt-lg">
                         {% set paginationContent %}
                             {% if form.default_pagelimit is defined %}
-                                {{ form_row(form.default_pagelimit) }}
+                                {{ formRowIfExists(form, 'default_pagelimit') }}
                             {% endif %}
 
                             {% if form.cached_data_timeout is defined %}
-                                {{ form_row(form.cached_data_timeout) }}
+                                {{ formRowIfExists(form, 'cached_data_timeout') }}
                             {% endif %}
 
                             {% if form.default_daterange_filter is defined %}
-                                {{ form_row(form.default_daterange_filter) }}
+                                {{ formRowIfExists(form, 'default_daterange_filter') }}
                             {% endif %}
                         {% endset %}
 
                         {% set dateFormatsContent %}
                             {% if form.date_format_full is defined %}
-                                {{ form_row(form.date_format_full) }}
+                                {{ formRowIfExists(form, 'date_format_full') }}
                             {% endif %}
 
                             {% if form.date_format_short is defined %}
-                                {{ form_row(form.date_format_short) }}
+                                {{ formRowIfExists(form, 'date_format_short') }}
                             {% endif %}
 
                             {% if form.date_format_dateonly is defined %}
-                                {{ form_row(form.date_format_dateonly) }}
+                                {{ formRowIfExists(form, 'date_format_dateonly') }}
                             {% endif %}
 
                             {% if form.date_format_timeonly is defined %}
-                                {{ form_row(form.date_format_timeonly) }}
+                                {{ formRowIfExists(form, 'date_format_timeonly') }}
                             {% endif %}
 
                             {% include '@MauticCore/FormTheme/Config/_config_coreconfig_widget--dateformat.html.twig' %}
@@ -144,40 +144,40 @@
                 <div class="row">
 
                     {% if form.cors_restrict_domains is defined %}
-                        <div class="col-xs-12">{{ form_row(form.cors_restrict_domains) }}</div>
+                        <div class="col-xs-12">{{ formRowIfExists(form, 'cors_restrict_domains') }}</div>
                     {% endif %}
 
                     {% if form.cors_valid_domains is defined %}
-                        <div class="col-xs-12">{{ form_row(form.cors_valid_domains) }}</div>
+                        <div class="col-xs-12">{{ formRowIfExists(form, 'cors_valid_domains') }}</div>
                     {% endif %}
 
                     <hr>
 
                     {% if form.trusted_hosts is defined %}
-                        <div class="col-xs-12">{{ form_row(form.trusted_hosts) }}</div>
+                        <div class="col-xs-12">{{ formRowIfExists(form, 'trusted_hosts') }}</div>
                     {% endif %}
 
                     {% set trustSettingsContent %}
                         {% if form.trusted_proxies is defined %}
-                            {{ form_row(form.trusted_proxies) }}
+                            {{ formRowIfExists(form, 'trusted_proxies') }}
                         {% endif %}
                     {% endset %}
 
                     {% set responseHeadersContent %}
                     {% if form.headers_sts is defined %}
-                        {{ form_row(form.headers_sts) }}
+                        {{ formRowIfExists(form, 'headers_sts') }}
                     {% endif %}
 
                     {% if form.headers_sts_subdomains is defined %}
-                        {{ form_row(form.headers_sts_subdomains) }}
+                        {{ formRowIfExists(form, 'headers_sts_subdomains') }}
                     {% endif %}
 
                     {% if form.headers_sts_preload is defined %}
-                        {{ form_row(form.headers_sts_preload) }}
+                        {{ formRowIfExists(form, 'headers_sts_preload') }}
                     {% endif %}
 
                     {% if form.headers_sts_expire_time is defined %}
-                        {{ form_row(form.headers_sts_expire_time) }}
+                        {{ formRowIfExists(form, 'headers_sts_expire_time') }}
                     {% endif %}
 
                     {% endset %}
@@ -211,29 +211,29 @@
                 <div class="row">
 
                     {% if form.max_entity_lock_time is defined %}
-                        <div class="col-xs-12">{{ form_row(form.max_entity_lock_time) }}</div>
+                        <div class="col-xs-12">{{ formRowIfExists(form, 'max_entity_lock_time') }}</div>
                     {% endif %}
 
                     {% if form.transliterate_page_title is defined %}
-                        <div class="col-xs-12">{{ form_row(form.transliterate_page_title) }}</div>
+                        <div class="col-xs-12">{{ formRowIfExists(form, 'transliterate_page_title') }}</div>
                     {% endif %}
 
                     {% set ipLookupContent %}
                         {% if form.ip_lookup_service is defined %}
-                            {{ form_row(form.ip_lookup_service) }}
+                            {{ formRowIfExists(form, 'ip_lookup_service') }}
                         {% endif %}
 
                         {% if form.ip_lookup_auth is defined %}
-                            {{ form_row(form.ip_lookup_auth) }}
+                            {{ formRowIfExists(form, 'ip_lookup_auth') }}
                         {% endif %}
 
                         {% if form.ip_lookup_create_organization is defined %}
-                            {{ form_row(form.ip_lookup_create_organization) }}
+                            {{ formRowIfExists(form, 'ip_lookup_create_organization') }}
                         {% endif %}
 
                         <div id="ip_lookup_config_container">
                             {% if form.ip_lookup_config is defined %}
-                                {{ form_row(form.ip_lookup_config) }}
+                                {{ formRowIfExists(form, 'ip_lookup_config') }}
                             {% endif %}
                         </div>
                         <div class="row">
@@ -243,11 +243,11 @@
 
                     {% set trackingContent %}
                         {% if form.do_not_track_ips is defined %}
-                            {{ form_row(form.do_not_track_ips) }}
+                            {{ formRowIfExists(form, 'do_not_track_ips') }}
                         {% endif %}
 
                         {% if form.do_not_track_bots is defined %}
-                            {{ form_row(form.do_not_track_bots) }}
+                            {{ formRowIfExists(form, 'do_not_track_bots') }}
                         {% endif %}
                     {% endset %}
 
@@ -266,16 +266,22 @@
                                 {% if form.shortener_service.vars.choices|length > 0 %}
                                     {% if form.shortener_email_enable is defined %}
                                         <div class="col-md-3">
-                                            {{ form_row(form.shortener_email_enable) }}
+                                            {{ formRowIfExists(form, 'shortener_email_enable') }}
                                         </div>
                                     {% endif %}
                                     {% if form.shortener_sms_enable is defined %}
                                         <div class="col-md-3">
-                                            {{ form_row(form.shortener_sms_enable) }}
+                                            {{ formRowIfExists(form, 'shortener_sms_enable') }}
                                         </div>
                                     {% endif %}
                                 {% endif %}
 
+                        {% endif %}
+                    {% endset %}
+
+                    {% set allowedRemoteDomainsContent %}
+                        {% if form.allowed_remote_domains is defined %}
+                            {{ formRowIfExists(form, 'allowed_remote_domains') }}
                         {% endif %}
                     {% endset %}
 
@@ -293,6 +299,10 @@
                                 'title': 'mautic.core.config.link_shorteners',
                                 'padding_inline': false,
                                 'content': shortenerContent
+                            },
+                            {
+                                'title': 'mautic.core.config.allowed.remote.domains.title',
+                                'content': allowedRemoteDomainsContent
                             }
                         ]
                     } %}
@@ -313,13 +323,13 @@
                 <div class="row">
 
                     {% if form.update_stability is defined %}
-                        <div class="col-xs-12">{{ form_row(form.update_stability) }}</div>
+                        <div class="col-xs-12">{{ formRowIfExists(form, 'update_stability') }}</div>
                     {% endif %}
 
                     {% if form.composer_updates is defined %}
 
                         <div class="col-xs-12">
-                            {{ form_row(form.composer_updates) }}
+                            {{ formRowIfExists(form, 'composer_updates') }}
                             <div class="alert alert-danger" role="alert">
                                 {{ 'mautic.core.config.form.update.composer.warning'|trans({
                                     '%url_start%': '<a href="https://mau.tc/switch-to-composer" target="_blank" style="color: red; text-decoration: underline">',

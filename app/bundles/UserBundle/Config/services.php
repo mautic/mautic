@@ -8,11 +8,13 @@ use Mautic\UserBundle\Security\Authentication\Token\Permissions\TokenPermissions
 use Mautic\UserBundle\Security\Authenticator\PluginAuthenticator;
 use Mautic\UserBundle\Security\Authenticator\SsoAuthenticator;
 use Mautic\UserBundle\Security\EntryPoint\MainEntryPoint;
+use Mautic\UserBundle\Security\Provider\UserProvider;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\abstract_arg;
 
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
+use function Symfony\Component\DependencyInjection\Loader\Configurator\param;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 return function (ContainerConfigurator $configurator): void {
@@ -57,6 +59,9 @@ return function (ContainerConfigurator $configurator): void {
     $services->set(Mautic\UserBundle\Security\SAML\Helper::class);
     $services->set('security.token.permissions', TokenPermissions::class);
 
+    $services->set(UserProvider::class);
+    $services->alias('mautic.user.provider', UserProvider::class);
+
     $services->load('Mautic\\UserBundle\\Security\\EntryPoint\\', '../Security/EntryPoint/*.php');
     $services->load('Mautic\\UserBundle\\Security\\Authentication\\Token\\Permissions\\', '../Security/Authentication/Token/Permissions/*.php');
 
@@ -81,6 +86,51 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias(LightSaml\SymfonyBridgeBundle\Bridge\Container\BuildContainer::class, 'lightsaml.container.build');
     $services->load('LightSaml\\SpBundle\\Controller\\', '%kernel.project_dir%/vendor/javer/sp-bundle/src/LightSaml/SpBundle/Controller/*.php')
         ->tag('controller.service_arguments');
+
+    $services->set(Mautic\UserBundle\EventListener\LogoutListener::class);
+
+    $services->set('mautic.security.saml.username_mapper', Mautic\UserBundle\Security\SAML\User\UserMapper::class)
+        ->arg('$attributes', ['email' => param('mautic.saml_idp_email_attribute'), 'username' => param('mautic.saml_idp_username_attribute'), 'firstname' => param('mautic.saml_idp_firstname_attribute'), 'lastname' => param('mautic.saml_idp_lastname_attribute')]);
+    $services->alias(Mautic\UserBundle\Security\SAML\User\UserMapper::class, 'mautic.security.saml.username_mapper');
+    $services->set('mautic.user.manager', Doctrine\ORM\EntityManager::class)
+        ->factory([service('doctrine'), 'getManagerForClass'])
+        ->args([Mautic\UserBundle\Entity\User::class]);
+    $services->alias(Doctrine\ORM\EntityManager::class, 'mautic.user.manager');
+    $services->set('mautic.permission.manager', Doctrine\ORM\EntityManager::class)
+        ->factory([service('doctrine'), 'getManagerForClass'])
+        ->args([Mautic\UserBundle\Entity\Permission::class]);
+    $services->alias(Doctrine\ORM\EntityManager::class, 'mautic.permission.manager');
+    $services->set('mautic.security.saml.entity_descriptor_provider', LightSaml\Builder\EntityDescriptor\SimpleEntityDescriptorBuilder::class)
+        ->factory([Mautic\UserBundle\Security\SAML\EntityDescriptorProviderFactory::class, 'build'])
+        ->args([param('lightsaml.own.entity_id'), service('router'), param('lightsaml.route.login_check'), service('lightsaml.own.credential_store')]);
+    $services->alias(LightSaml\Builder\EntityDescriptor\SimpleEntityDescriptorBuilder::class, 'mautic.security.saml.entity_descriptor_provider');
+    $services->set('mautic.user.fixture.role', Mautic\UserBundle\DataFixtures\ORM\LoadRoleData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
+    $services->alias(Mautic\UserBundle\DataFixtures\ORM\LoadRoleData::class, 'mautic.user.fixture.role');
+    $services->set('mautic.user.fixture.user', Mautic\UserBundle\DataFixtures\ORM\LoadUserData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
+    $services->alias(Mautic\UserBundle\DataFixtures\ORM\LoadUserData::class, 'mautic.user.fixture.user');
+    $services->set('mautic.security.saml.credential_store', Mautic\UserBundle\Security\SAML\Store\CredentialsStore::class)
+        ->arg('$entityId', param('mautic.saml_idp_entity_id'))
+        ->tag('lightsaml.own_credential_store');
+    $services->alias(Mautic\UserBundle\Security\SAML\Store\CredentialsStore::class, 'mautic.security.saml.credential_store');
+    $services->set('mautic.security.saml.trust_store', Mautic\UserBundle\Security\SAML\Store\TrustOptionsStore::class)
+        ->arg('$entityId', param('mautic.saml_idp_entity_id'))
+        ->tag('lightsaml.trust_options_store');
+    $services->alias(Mautic\UserBundle\Security\SAML\Store\TrustOptionsStore::class, 'mautic.security.saml.trust_store');
+    $services->set('mautic.security.saml.user_creator', Mautic\UserBundle\Security\SAML\User\UserCreator::class)
+        ->arg('$defaultRole', param('mautic.saml_idp_default_role'));
+    $services->alias(Mautic\UserBundle\Security\SAML\User\UserCreator::class, 'mautic.security.saml.user_creator');
+
+    $services->set(Mautic\UserBundle\Security\Authentication\AuthenticationHandler::class);
+    $services->alias('mautic.security.authentication_handler', Mautic\UserBundle\Security\Authentication\AuthenticationHandler::class);
+
+    $services->set('mautic.security.saml.entity_descriptor_store', Mautic\UserBundle\Security\SAML\Store\EntityDescriptorStore::class)->tag('lightsaml.idp_entity_store');
+
+    $services->set('mautic.security.saml.id_store', Mautic\UserBundle\Security\SAML\Store\IdStore::class);
+
+    $services->set(Mautic\UserBundle\Security\UserTokenSetter::class);
+
+    $services->set('mautic.user.model.user_token_service', Mautic\UserBundle\Model\UserToken\UserTokenService::class);
+
     // Decorate the form_login class to ensure no user enumeration can
     // happen via timing attacks.
     $services->set('mautic.security.authenticator.form_login.decorator', Mautic\UserBundle\Security\TimingSafeFormLoginAuthenticator::class)

@@ -19,12 +19,12 @@ class DynamicContentHelper
     use MatchFilterForLeadTrait;
 
     /**
-     * @const DYNAMIC_CONTENT_REGEX
+     * @var string
      */
     public const DYNAMIC_CONTENT_REGEX = '/{(dynamiccontent)=(\w+)(?:\/}|}(?:([^{]*(?:{(?!\/\1})[^{]*)*){\/\1})?)/is';
 
     /**
-     * @const DYNAMIC_WEB_CONTENT_REGEX
+     * @var string
      */
     public const DYNAMIC_WEB_CONTENT_REGEX = '/{dwc=(.*?)}/';
 
@@ -37,12 +37,9 @@ class DynamicContentHelper
     }
 
     /**
-     * @param string     $slot
-     * @param Lead|array $lead
-     *
      * @return string
      */
-    public function getDynamicContentForLead($slot, $lead)
+    public function getDynamicContentForLead(string $slot, Lead|array|null $lead)
     {
         // Attempt campaign slots first
         $dwcActionResponse = $this->realTimeExecutioner->execute('dwc.decision', $slot, 'dynamicContent')->getActionResponses('dwc.push_content');
@@ -86,7 +83,7 @@ class DynamicContentHelper
                 continue;
             }
             if ($lead && $this->filtersMatchContact($dwc->getFilters(), $leadArray)) {
-                return $lead ? $this->getRealDynamicContent($dwc->getSlotName(), $lead, $dwc) : '';
+                return $this->getRealDynamicContent($dwc->getSlotName(), $lead, $dwc);
             }
         }
 
@@ -94,12 +91,11 @@ class DynamicContentHelper
     }
 
     /**
-     * @param string     $content
-     * @param Lead|array $lead
+     * @param string $content
      *
      * @return string Content with the {content} tokens replaced with dynamic content
      */
-    public function replaceTokensInContent($content, $lead)
+    public function replaceTokensInContent($content, Lead|array|null $lead)
     {
         // Find all dynamic content tags
         preg_match_all(self::DYNAMIC_CONTENT_REGEX, $content, $matches, PREG_SET_ORDER);
@@ -161,7 +157,7 @@ class DynamicContentHelper
      *
      * @return string
      */
-    public function getRealDynamicContent($slot, $lead, DynamicContent $dwc)
+    public function getRealDynamicContent($slot, Lead|array|null $lead, DynamicContent $dwc)
     {
         $content = $dwc->getContent();
         // Determine a translation based on contact's preferred locale

@@ -32,7 +32,7 @@ use Mautic\IntegrationsBundle\Exception\PluginNotConfiguredException;
  *
  * @see https://github.com/kamermans/guzzle-oauth2-subscriber
  */
-class HttpFactory implements AuthProviderInterface
+final class HttpFactory implements AuthProviderInterface
 {
     public const NAME = 'oauth2_two_legged';
 
@@ -100,11 +100,7 @@ class HttpFactory implements AuthProviderInterface
             return false;
         }
 
-        if ($credentials instanceof PasswordCredentialsGrantInterface && (empty($credentials->getUsername()) || empty($credentials->getPassword()))) {
-            return false;
-        }
-
-        return true;
+        return !$credentials instanceof PasswordCredentialsGrantInterface || !empty($credentials->getUsername()) && !empty($credentials->getPassword());
     }
 
     private function getStackHandler(): HandlerStack

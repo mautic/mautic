@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Controller;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Form\Type\CampaignImportType;
@@ -12,29 +11,26 @@ use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Event\EntityImportAnalyzeEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Event\EntityImportUndoEvent;
-use Mautic\CoreBundle\Factory\ModelFactory;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\ImportHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
 final class ImportController extends AbstractFormController
 {
@@ -45,27 +41,35 @@ final class ImportController extends AbstractFormController
 
     public const STEP_IMPORT_FROM_ZIP = 3;
 
-    public function __construct(
-        ManagerRegistry $doctrine,
-        CoreParametersHelper $coreParametersHelper,
-        ModelFactory $modelFactory,
-        private UserHelper $userHelper,
-        EventDispatcherInterface $dispatcher,
-        Translator $translator,
-        FlashBag $flashBag,
-        private RequestStack $requestStack,
-        CorePermissions $security,
-        private LoggerInterface $logger,
-        private PathsHelper $pathsHelper,
-        private FormFactoryInterface $formFactory,
-    ) {
-        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    private UserHelper $userHelper;
+
+    private RequestStack $requestStack;
+
+    private LoggerInterface $logger;
+
+    private PathsHelper $pathsHelper;
+
+    private FormFactoryInterface $formFactory;
+
+    #[Required]
+    public function autowireImportController(
+        UserHelper $userHelper,
+        RequestStack $requestStack,
+        LoggerInterface $logger,
+        PathsHelper $pathsHelper,
+        FormFactoryInterface $formFactory,
+    ): void {
+        $this->userHelper   = $userHelper;
+        $this->requestStack = $requestStack;
+        $this->logger       = $logger;
+        $this->pathsHelper  = $pathsHelper;
+        $this->formFactory  = $formFactory;
     }
 
     public function newAction(): Response
     {
         if (!$this->security->isGranted('campaign:imports:create')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $session  = $this->requestStack->getSession();
@@ -94,7 +98,7 @@ final class ImportController extends AbstractFormController
     public function uploadAction(Request $request): Response
     {
         if (!$this->security->isGranted('campaign:imports:create')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $fullPath = $this->pathsHelper->getImportCampaignsPath().'/'.$this->getImportFileName();
@@ -177,10 +181,10 @@ final class ImportController extends AbstractFormController
     /**
      * Cancels import by removing the uploaded file.
      */
-    public function cancelAction(): Response
+    public function cancelAction(): RedirectResponse
     {
         if (!$this->security->isGranted('campaign:imports:create')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $filePath = $this->requestStack->getSession()->get('mautic.campaign.import.file');
@@ -253,7 +257,7 @@ final class ImportController extends AbstractFormController
         if (self::STEP_PROGRESS_BAR === $step) {
             $analyzeSummary = $this->analyzeData($importHelper, $fullPath);
 
-            if (empty($analyzeSummary)) {
+            if ([] === $analyzeSummary) {
                 $this->addFlashMessage('mautic.campaign.import.nofile', [], FlashBag::LEVEL_ERROR, 'validators');
                 $this->removeImportFile($fullPath);
                 $this->resetImport();
@@ -271,109 +275,108 @@ final class ImportController extends AbstractFormController
                 ],
                 'contentTemplate' => '@MauticCampaign/Import/progress.html.twig',
             ]);
-        } else {
-            try {
-                $fileData      = $importHelper->readZipFile($fullPath);
-                $userId        = $this->userHelper->getUser()->getId();
-                $importSummary = [];
+        }
+        try {
+            $fileData      = $importHelper->readZipFile($fullPath);
+            $userId        = $this->userHelper->getUser()->getId();
+            $importSummary = [];
 
-                $importActions = $this->requestStack->getCurrentRequest()->get('importAction', []);
+            $importActions = $this->requestStack->getCurrentRequest()->get('importAction', []);
 
-                $importHelper->recursiveRemoveEmailaddress($fileData);
+            $importHelper->recursiveRemoveEmailaddress($fileData);
 
-                // Loop through importActions and clean UUIDs for 'create' actions
-                foreach ($fileData as &$group) {
-                    foreach ($importActions as $entityType => $entities) {
-                        if (in_array($entityType, [Event::ENTITY_NAME, Field::ENTITY_NAME, Action::ENTITY_NAME], true)) {
+            // Loop through importActions and clean UUIDs for 'create' actions
+            foreach ($fileData as &$group) {
+                foreach ($importActions as $entityType => $entities) {
+                    if (in_array($entityType, [Event::ENTITY_NAME, Field::ENTITY_NAME, Action::ENTITY_NAME], true)) {
+                        continue;
+                    }
+                    if (!isset($group[$entityType])) {
+                        continue;
+                    }
+
+                    foreach ($entities as $entityUuid => $action) {
+                        if ('create' !== $action) {
                             continue;
                         }
-                        if (!isset($group[$entityType])) {
-                            continue;
-                        }
 
-                        foreach ($entities as $entityUuid => $action) {
-                            if ('create' !== $action) {
-                                continue;
-                            }
-
-                            foreach ($group[$entityType] as &$item) {
-                                if (isset($item['uuid']) && (int) $item['uuid'] === (int) $entityUuid) {
-                                    if (Campaign::ENTITY_NAME == $entityType) {
-                                        foreach ($group[Event::ENTITY_NAME] as &$eventItem) {
-                                            $eventItem['uuid'] = '';
-                                        }
+                        foreach ($group[$entityType] as &$item) {
+                            if (isset($item['uuid']) && (int) $item['uuid'] === (int) $entityUuid) {
+                                if (Campaign::ENTITY_NAME == $entityType) {
+                                    foreach ($group[Event::ENTITY_NAME] as &$eventItem) {
+                                        $eventItem['uuid'] = '';
                                     }
-                                    if (Form::ENTITY_NAME == $entityType) {
-                                        if (isset($group[Field::ENTITY_NAME])) {
-                                            foreach ($group[Field::ENTITY_NAME] as &$fieldItem) {
-                                                $fieldItem['uuid'] = '';
-                                            }
-                                        }
-                                        if (isset($group[Action::ENTITY_NAME])) {
-                                            foreach ($group[Action::ENTITY_NAME] as &$actionItem) {
-                                                $actionItem['uuid'] = '';
-                                            }
-                                        }
-                                    }
-                                    $item['uuid'] = '';
-                                    break;
                                 }
+                                if (Form::ENTITY_NAME == $entityType) {
+                                    if (isset($group[Field::ENTITY_NAME])) {
+                                        foreach ($group[Field::ENTITY_NAME] as &$fieldItem) {
+                                            $fieldItem['uuid'] = '';
+                                        }
+                                    }
+                                    if (isset($group[Action::ENTITY_NAME])) {
+                                        foreach ($group[Action::ENTITY_NAME] as &$actionItem) {
+                                            $actionItem['uuid'] = '';
+                                        }
+                                    }
+                                }
+                                $item['uuid'] = '';
+                                break;
                             }
                         }
                     }
                 }
-
-                foreach ($fileData as $entity) {
-                    $event  = new EntityImportEvent(Campaign::ENTITY_NAME, $entity, $userId);
-                    $this->dispatcher->dispatch($event);
-                    $summary = $event->getStatus();
-                    if (!empty($summary)) {
-                        $importSummary[] = $summary;
-                    }
-                }
-
-                foreach ($importSummary as $summary) {
-                    foreach ([EntityImportEvent::NEW, EntityImportEvent::UPDATE] as $status) {
-                        if (!isset($summary[$status][Campaign::ENTITY_NAME])) {
-                            continue;
-                        }
-
-                        $campaignData    = $summary[$status][Campaign::ENTITY_NAME];
-                        $campaignName    = $campaignData['names'][0] ?? 'Unknown';
-                        $campaignId      = $campaignData['ids'][0] ?? 0;
-
-                        $this->addFlashMessage(
-                            'mautic.campaign.notice.import.finished',
-                            [
-                                '%id%'   => $campaignId,
-                                '%name%' => htmlspecialchars($campaignName, ENT_QUOTES, 'UTF-8'),
-                            ]
-                        );
-                    }
-                }
-
-                $this->removeImportFile($fullPath);
-                $session->set('mautic.campaign.import.summary', $importSummary);
-                $this->resetImport();
-            } catch (\RuntimeException $e) {
-                $this->logger->error($e->getMessage());
-                $this->addFlashMessage('mautic.campaign.import.nofile', [], FlashBag::LEVEL_ERROR, 'validators');
-
-                $this->removeImportFile($fullPath);
-                $importSummary = [
-                    EntityImportEvent::ERRORS => [$e->getMessage()],
-                ];
             }
 
-            return $this->delegateView([
-                'viewParameters' => [
-                    'importProgress'  => 100,
-                    'importSummary'   => $importSummary,
-                    'mauticContent'   => 'campaignImport',
-                ],
-                'contentTemplate' => '@MauticCampaign/Import/progress.html.twig',
-            ]);
+            foreach ($fileData as $entity) {
+                $event  = new EntityImportEvent(Campaign::ENTITY_NAME, $entity, $userId);
+                $this->dispatcher->dispatch($event);
+                $summary = $event->getStatus();
+                if ([] !== $summary) {
+                    $importSummary[] = $summary;
+                }
+            }
+
+            foreach ($importSummary as $summary) {
+                foreach ([EntityImportEvent::NEW, EntityImportEvent::UPDATE] as $status) {
+                    if (!isset($summary[$status][Campaign::ENTITY_NAME])) {
+                        continue;
+                    }
+
+                    $campaignData    = $summary[$status][Campaign::ENTITY_NAME];
+                    $campaignName    = $campaignData['names'][0] ?? 'Unknown';
+                    $campaignId      = $campaignData['ids'][0] ?? 0;
+
+                    $this->addFlashMessage(
+                        'mautic.campaign.notice.import.finished',
+                        [
+                            '%id%'   => $campaignId,
+                            '%name%' => htmlspecialchars($campaignName, ENT_QUOTES, 'UTF-8'),
+                        ]
+                    );
+                }
+            }
+
+            $this->removeImportFile($fullPath);
+            $session->set('mautic.campaign.import.summary', $importSummary);
+            $this->resetImport();
+        } catch (\RuntimeException $e) {
+            $this->logger->error($e->getMessage());
+            $this->addFlashMessage('mautic.campaign.import.nofile', [], FlashBag::LEVEL_ERROR, 'validators');
+
+            $this->removeImportFile($fullPath);
+            $importSummary = [
+                EntityImportEvent::ERRORS => [$e->getMessage()],
+            ];
         }
+
+        return $this->delegateView([
+            'viewParameters' => [
+                'importProgress'  => 100,
+                'importSummary'   => $importSummary,
+                'mauticContent'   => 'campaignImport',
+            ],
+            'contentTemplate' => '@MauticCampaign/Import/progress.html.twig',
+        ]);
     }
 
     /**
@@ -436,7 +439,7 @@ final class ImportController extends AbstractFormController
                     }
                 }
             }
-            if (!empty($mergedSummary)) {
+            if ([] !== $mergedSummary) {
                 $allData[] = $mergedSummary;
             }
         }
@@ -447,7 +450,7 @@ final class ImportController extends AbstractFormController
     public function undoAction(): JsonResponse
     {
         if (!$this->security->isGranted('campaign:imports:delete')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $session         = $this->requestStack->getSession();

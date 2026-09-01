@@ -5,11 +5,23 @@
     <div class="panel panel-default mb-md">
         <div class="panel-body">
             <div class="row">
-                {% for child in form.children %}
                 <div class="col-xs-12">
-                    {{ form_row(child) }}
+                    {{ form_row(form.company_unique_identifiers_operator) }}
                 </div>
-                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.config.tab.company.list.settings'|trans }}</h4>
+<div class="text-muted small pb-md">{{ 'mautic.core.config.header.company.list.settings.description'|trans }}</div>
+<div class="row">
+    <div class="panel panel-default mb-md">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-xs-12">
+                    {{ form_row(form.company_columns) }}
+                </div>
             </div>
         </div>
     </div>

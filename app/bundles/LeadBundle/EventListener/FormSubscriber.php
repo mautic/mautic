@@ -30,13 +30,13 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PointBundle\Model\PointGroupModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class FormSubscriber implements EventSubscriberInterface
+final readonly class FormSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        protected LeadModel $leadModel,
-        protected ContactTracker $contactTracker,
-        protected IpLookupHelper $ipLookupHelper,
-        protected LeadFieldRepository $leadFieldRepository,
+        private LeadModel $leadModel,
+        private ContactTracker $contactTracker,
+        private IpLookupHelper $ipLookupHelper,
+        private LeadFieldRepository $leadFieldRepository,
         private PointGroupModel $groupModel,
         private DoNotContact $doNotContact,
         private FieldModel $leadFieldModel,
@@ -87,32 +87,29 @@ class FormSubscriber implements EventSubscriberInterface
         ]);
 
         $event->addSubmitAction('lead.changetags', [
-            'group'             => 'mautic.lead.lead.submitaction',
-            'label'             => 'mautic.lead.lead.events.changetags',
-            'description'       => 'mautic.lead.lead.events.changetags_descr',
-            'formType'          => ModifyLeadTagsType::class,
-            'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
-            'allowCampaignForm' => true,
-            'template'          => '@MauticLead/Action/tags.html.twig',
+            'group'       => 'mautic.lead.lead.submitaction',
+            'label'       => 'mautic.lead.lead.events.changetags',
+            'description' => 'mautic.lead.lead.events.changetags_descr',
+            'formType'    => ModifyLeadTagsType::class,
+            'eventName'   => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+            'template'    => '@MauticLead/Action/tags.html.twig',
         ]);
 
         $event->addSubmitAction('lead.addutmtags', [
-            'group'             => 'mautic.lead.lead.submitaction',
-            'label'             => 'mautic.lead.lead.events.addutmtags',
-            'description'       => 'mautic.lead.lead.events.addutmtags_descr',
-            'formType'          => ActionAddUtmTagsType::class,
-            'formTheme'         => '@MauticLead/FormTheme/FormActionAddUtmTags/_formaction_properties_row.html.twig',
-            'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
-            'allowCampaignForm' => true,
+            'group'       => 'mautic.lead.lead.submitaction',
+            'label'       => 'mautic.lead.lead.events.addutmtags',
+            'description' => 'mautic.lead.lead.events.addutmtags_descr',
+            'formType'    => ActionAddUtmTagsType::class,
+            'formTheme'   => '@MauticLead/FormTheme/FormActionAddUtmTags/_formaction_properties_row.html.twig',
+            'eventName'   => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         ]);
 
         $event->addSubmitAction('lead.remove_do_not_contact', [
-            'group'             => 'mautic.lead.lead.submitaction',
-            'label'             => 'mautic.lead.lead.events.removedonotcontact',
-            'description'       => 'mautic.lead.lead.events.removedonotcontact_descr',
-            'formType'          => ActionRemoveDoNotContact::class,
-            'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
-            'allowCampaignForm' => true,
+            'group'       => 'mautic.lead.lead.submitaction',
+            'label'       => 'mautic.lead.lead.events.removedonotcontact',
+            'description' => 'mautic.lead.lead.events.removedonotcontact_descr',
+            'formType'    => ActionRemoveDoNotContact::class,
+            'eventName'   => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         ]);
 
         $event->addSubmitAction('lead.scorecontactscompanies', [
@@ -192,7 +189,7 @@ class FormSubscriber implements EventSubscriberInterface
         $pointGroup   = $pointGroupId ? $this->groupModel->getEntity($pointGroupId) : null;
         $points       = $properties['points'];
 
-        if (!empty($pointGroup)) {
+        if ($pointGroup instanceof \Mautic\PointBundle\Entity\Group) {
             $this->groupModel->adjustPoints($contact, $pointGroup, $points, $operator);
         } else {
             $contact->adjustPoints($points, $operator);
@@ -349,7 +346,7 @@ class FormSubscriber implements EventSubscriberInterface
 
         $mergedValues = array_merge($actionValues, array_filter(
             $contactFieldMatches,
-            static fn ($value) => '' !== $value && null !== $value
+            static fn ($value): bool => '' !== $value && null !== $value
         ));
 
         $processedValues = [];

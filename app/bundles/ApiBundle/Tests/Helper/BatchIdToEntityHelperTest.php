@@ -1,37 +1,38 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ApiBundle\Tests\Helper;
 
 use Mautic\ApiBundle\Helper\BatchIdToEntityHelper;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class BatchIdToEntityHelperTest extends TestCase
+final class BatchIdToEntityHelperTest extends TestCase
 {
     public function testIdsAreExtractedFromIdKeyArray(): void
     {
         $parameters = ['ids' => [1, 2, 3]];
         $helper     = new BatchIdToEntityHelper($parameters);
-        $this->assertEquals([1, 2, 3], $helper->getIds());
+        $this->assertSame([1, 2, 3], $helper->getIds());
 
         $parameters = ['ids' => [1 => 1, 2 => 2, 3 => 3]];
         $helper     = new BatchIdToEntityHelper($parameters);
-        $this->assertEquals([1, 2, 3], $helper->getIds());
+        $this->assertSame([1, 2, 3], $helper->getIds());
     }
 
     public function testIdsAreExtractedFromIdKeyCSVString(): void
     {
         $parameters = ['ids' => '1,2,3'];
         $helper     = new BatchIdToEntityHelper($parameters);
-        $this->assertEquals([1, 2, 3], $helper->getIds());
+        $this->assertSame(['1', '2', '3'], $helper->getIds());
     }
 
     public function testIdIsExtractedFromIdKeyWithNumericValue(): void
     {
         $parameters = ['ids' => '12'];
         $helper     = new BatchIdToEntityHelper($parameters);
-        $this->assertEquals([12], $helper->getIds());
+        $this->assertSame(['12'], $helper->getIds());
     }
 
     public function testErrorSetForIdKeyThatsNotRecognized(): void
@@ -39,20 +40,20 @@ class BatchIdToEntityHelperTest extends TestCase
         $parameters = ['ids' => 'foo'];
 
         $helper = new BatchIdToEntityHelper($parameters);
-        $this->assertEquals([], $helper->getIds());
+        $this->assertSame([], $helper->getIds());
         $this->assertTrue($helper->hasErrors());
-        $this->assertEquals(['mautic.api.call.id_missing'], $helper->getErrors());
+        $this->assertSame(['mautic.api.call.id_missing'], $helper->getErrors());
     }
 
     public function testIdsAreExtractedFromSimpleArray(): void
     {
         $parameters = [1, 2, 3];
         $helper     = new BatchIdToEntityHelper($parameters);
-        $this->assertEquals([1, 2, 3], $helper->getIds());
+        $this->assertSame([1, 2, 3], $helper->getIds());
 
         $parameters = [1 => 1, 2 => 2, 3 => 3];
         $helper     = new BatchIdToEntityHelper($parameters);
-        $this->assertEquals([1, 2, 3], $helper->getIds());
+        $this->assertSame([1, 2, 3], $helper->getIds());
     }
 
     public function testIdsAreExtractedFromAssociativeArray(): void
@@ -63,7 +64,7 @@ class BatchIdToEntityHelperTest extends TestCase
             ['id' => 3, 'foo' => 'bar'],
         ];
         $helper = new BatchIdToEntityHelper($parameters);
-        $this->assertEquals([1, 2, 3], $helper->getIds());
+        $this->assertSame([1, 2, 3], $helper->getIds());
 
         $parameters = [
             1 => ['id' => 1, 'foo' => 'bar'],
@@ -71,7 +72,7 @@ class BatchIdToEntityHelperTest extends TestCase
             3 => ['id' => 3, 'foo' => 'bar'],
         ];
         $helper = new BatchIdToEntityHelper($parameters);
-        $this->assertEquals([1, 2, 3], $helper->getIds());
+        $this->assertSame([1, 2, 3], $helper->getIds());
     }
 
     public function testErrorsSetForAssociativeArrayWhenIdKeyIsNotFound(): void
@@ -82,10 +83,10 @@ class BatchIdToEntityHelperTest extends TestCase
             ['id'  => 3, 'foo' => 'bar'],
         ];
         $helper = new BatchIdToEntityHelper($parameters);
-        $this->assertEquals([1, 3], $helper->getIds());
+        $this->assertSame([1, 3], $helper->getIds());
 
         $this->assertTrue($helper->hasErrors());
-        $this->assertEquals([1 => 'mautic.api.call.id_missing'], $helper->getErrors());
+        $this->assertSame([1 => 'mautic.api.call.id_missing'], $helper->getErrors());
     }
 
     public function testOriginalKeyOrderingForIdKeyArray(): void
@@ -108,12 +109,12 @@ class BatchIdToEntityHelperTest extends TestCase
         $parameters      = ['ids' => [1, 2, 3, 4]];
         $helper          = new BatchIdToEntityHelper($parameters);
         $orderedEntities = $helper->orderByOriginalKey($entities);
-        $this->assertEquals([0, 1, 2], array_keys($orderedEntities));
+        $this->assertSame([0, 1, 2], array_keys($orderedEntities));
 
         $parameters      = ['ids' => [1 => 1, 2 => 2, 3 => 3, 4 => 4]];
         $helper          = new BatchIdToEntityHelper($parameters);
         $orderedEntities = $helper->orderByOriginalKey($entities);
-        $this->assertEquals([1, 2, 4], array_keys($orderedEntities));
+        $this->assertSame([1, 2, 4], array_keys($orderedEntities));
     }
 
     public function testOriginalKeyOrderingForIdKeyCSVString(): void
@@ -133,7 +134,7 @@ class BatchIdToEntityHelperTest extends TestCase
         $parameters      = ['ids' => '1,2,3,4'];
         $helper          = new BatchIdToEntityHelper($parameters);
         $orderedEntities = $helper->orderByOriginalKey($entities);
-        $this->assertEquals([0, 1, 2], array_keys($orderedEntities));
+        $this->assertSame([0, 1, 2], array_keys($orderedEntities));
     }
 
     public function testOriginalKeyOrderingForSimpleArray(): void
@@ -156,12 +157,12 @@ class BatchIdToEntityHelperTest extends TestCase
         $parameters      = [1, 2, 3, 4];
         $helper          = new BatchIdToEntityHelper($parameters);
         $orderedEntities = $helper->orderByOriginalKey($entities);
-        $this->assertEquals([0, 1, 2], array_keys($orderedEntities));
+        $this->assertSame([0, 1, 2], array_keys($orderedEntities));
 
         $parameters      = [1 => 1, 2 => 2, 3 => 3, 4 => 4];
         $helper          = new BatchIdToEntityHelper($parameters);
         $orderedEntities = $helper->orderByOriginalKey($entities);
-        $this->assertEquals([1, 2, 4], array_keys($orderedEntities));
+        $this->assertSame([1, 2, 4], array_keys($orderedEntities));
     }
 
     public function testOriginalKeyOrderingForAssociativeArray(): void
@@ -189,7 +190,7 @@ class BatchIdToEntityHelperTest extends TestCase
         ];
         $helper          = new BatchIdToEntityHelper($parameters);
         $orderedEntities = $helper->orderByOriginalKey($entities);
-        $this->assertEquals([0, 1, 2], array_keys($orderedEntities));
+        $this->assertSame([0, 1, 2], array_keys($orderedEntities));
 
         $parameters = [
             1 => ['id' => 1, 'foo' => 'bar'],
@@ -199,7 +200,7 @@ class BatchIdToEntityHelperTest extends TestCase
         ];
         $helper          = new BatchIdToEntityHelper($parameters);
         $orderedEntities = $helper->orderByOriginalKey($entities);
-        $this->assertEquals([1, 2, 4], array_keys($orderedEntities));
+        $this->assertSame([1, 2, 4], array_keys($orderedEntities));
     }
 
     public function testOriginalKeyOrderingForFullAssociativeArray(): void
@@ -230,9 +231,9 @@ class BatchIdToEntityHelperTest extends TestCase
         ];
         $helper          = new BatchIdToEntityHelper($parameters);
         $orderedEntities = $helper->orderByOriginalKey($entities);
-        $this->assertEquals([0, 1, 2, 3], array_keys($orderedEntities));
+        $this->assertSame([0, 1, 2, 3], array_keys($orderedEntities));
         foreach ($parameters as $key => $contact) {
-            Assert::assertEquals($orderedEntities[$key]->getId(), $entities[$key]->getId());
+            $this->assertEquals($orderedEntities[$key]->getId(), $entities[$key]->getId());
         }
 
         $parameters = [
@@ -243,6 +244,6 @@ class BatchIdToEntityHelperTest extends TestCase
         ];
         $helper          = new BatchIdToEntityHelper($parameters);
         $orderedEntities = $helper->orderByOriginalKey($entities);
-        $this->assertEquals([1, 2, 3, 4], array_keys($orderedEntities));
+        $this->assertSame([1, 2, 3, 4], array_keys($orderedEntities));
     }
 }

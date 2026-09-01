@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Event as Events;
 use Mautic\FormBundle\Exception\ValidationException;
 use Mautic\FormBundle\Form\Type\SubmitActionEmailType;
@@ -22,7 +23,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FormSubscriber implements EventSubscriberInterface
+final readonly class FormSubscriber implements EventSubscriberInterface
 {
     private MailHelper $mailer;
 
@@ -67,7 +68,7 @@ class FormSubscriber implements EventSubscriberInterface
             ];
             $this->auditLogModel->writeToLog($log);
         }
-        if (!array_key_exists($form->getLanguage(), $this->languageHelper->getSupportedLanguages())) {
+        if (!array_key_exists($form->getLanguage() ?? '', $this->languageHelper->getSupportedLanguages())) {
             $this->languageHelper->extractLanguagePackage($form->getLanguage());
         }
     }
@@ -103,9 +104,8 @@ class FormSubscriber implements EventSubscriberInterface
             'formTypeCleanMasks' => [
                 'message' => 'raw',
             ],
-            'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
-            'allowCampaignForm' => true,
-            'template'          => '@MauticForm/Action/form_email.html.twig',
+            'eventName' => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+            'template'  => '@MauticForm/Action/form_email.html.twig',
         ]);
 
         $event->addSubmitAction('form.repost', [
@@ -119,8 +119,7 @@ class FormSubscriber implements EventSubscriberInterface
                 'failure_email'        => 'string',
                 'authorization_header' => 'string',
             ],
-            'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
-            'allowCampaignForm' => true,
+            'eventName' => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         ]);
     }
 
@@ -182,7 +181,7 @@ class FormSubscriber implements EventSubscriberInterface
         }
 
         $owner = null !== $lead ? $lead->getOwner() : null;
-        if (!empty($config['email_to_owner']) && $config['email_to_owner'] && null !== $owner) {
+        if (!empty($config['email_to_owner']) && null !== $owner) {
             // Send copy to owner
             $this->setMailer($config, $tokens, [$owner->getEmail() => null], $lead);
 
@@ -273,7 +272,7 @@ class FormSubscriber implements EventSubscriberInterface
                     if (in_array($key, ['messenger', 'submit', 'formId', 'formid', 'formName', 'return'])) {
                         unset($post[$key]);
                     }
-                    if (isset($fieldTypes[$key]) && in_array($fieldTypes[$key], ['password'])) {
+                    if (isset($fieldTypes[$key]) && 'password' == $fieldTypes[$key]) {
                         $post[$key] = '*********';
                     }
                 }
@@ -282,7 +281,7 @@ class FormSubscriber implements EventSubscriberInterface
 
                 $results    = $this->postToHtml($post);
                 $submission = $event->getSubmission();
-                $emails     = $emails     = $this->getEmailsFromString($email);
+                $emails     = $this->getEmailsFromString($email);
                 $this->mailer->setTo($emails);
                 $this->mailer->setSubject(
                     $this->translator->trans('mautic.form.action.repost.failed_subject', ['%form%' => $submission->getForm()->getName()])
@@ -322,7 +321,7 @@ class FormSubscriber implements EventSubscriberInterface
             $body = $json;
         } else {
             parse_str($body, $output);
-            if ($output) {
+            if ([] !== $output) {
                 $body = $output;
             }
         }
@@ -363,11 +362,11 @@ class FormSubscriber implements EventSubscriberInterface
         return $redirect;
     }
 
-    private function postToHtml($post): string
+    private function postToHtml(array $post): string
     {
         $output = '<table>';
         foreach ($post as $key => $row) {
-            $output .= "<tr><td style='vertical-align: top'><strong>$key</strong></td><td>";
+            $output .= "<tr><td style='vertical-align: top'><strong>{$key}</strong></td><td>";
             if (is_array($row)) {
                 $output .= $this->postToHtml($row);
             } else {
@@ -382,9 +381,9 @@ class FormSubscriber implements EventSubscriberInterface
     /**
      * @return array<string, null>
      */
-    private function getEmailsFromString($emailString): array
+    private function getEmailsFromString(?string $emailString): array
     {
-        return (!empty($emailString)) ? array_fill_keys(array_map('trim', explode(',', $emailString)), null) : [];
+        return (!empty($emailString)) ? array_fill_keys(array_map(trim(...), explode(',', $emailString)), null) : [];
     }
 
     /**

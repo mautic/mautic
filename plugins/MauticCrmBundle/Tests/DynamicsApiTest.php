@@ -1,15 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticCrmBundle\Tests;
 
 use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticCrmBundle\Api\DynamicsApi;
 use MauticPlugin\MauticCrmBundle\Integration\DynamicsIntegration;
 
-class DynamicsApiTest extends AbstractIntegrationTestCase
+final class DynamicsApiTest extends AbstractIntegrationTestCase
 {
-    private DynamicsApi $api;
-
     private DynamicsIntegration $integration;
 
     protected function setUp(): void
@@ -35,7 +35,8 @@ class DynamicsApiTest extends AbstractIntegrationTestCase
             $this->fieldsWithUniqueIdentifier
         );
 
-        $this->api = new DynamicsApi($this->integration);
+        /** @phpstan-ignore new.resultUnused */
+        new DynamicsApi($this->integration);
     }
 
     public function testIntegration(): void

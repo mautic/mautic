@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\Serializer;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class FormatterHelper
+final readonly class FormatterHelper
 {
     public const FLOAT_PRECISION = 4;
 
@@ -77,7 +77,7 @@ final class FormatterHelper
                 $string = strval((int) $val);
                 break;
             case 'float':
-                $string = number_format((float) $val, FormatterHelper::FLOAT_PRECISION);
+                $string = number_format((float) $val, self::FLOAT_PRECISION);
                 break;
             case 'html':
                 $string = InputHelper::strict_html($val);
@@ -132,7 +132,7 @@ final class FormatterHelper
     {
         $pairs = [];
         foreach ($array as $key => $value) {
-            $pairs[] = "$key: $value";
+            $pairs[] = "{$key}: {$value}";
         }
 
         return implode($delimeter, $pairs);

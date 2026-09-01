@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Entity;
 
 use Doctrine\DBAL\Connection;
@@ -10,10 +12,12 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\MockObject\MockObject;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(CommonRepository::class)]
-class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
+#[CoversClass(CommonRepository::class)]
+final class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&CommonRepository<object>
@@ -23,7 +27,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
     private QueryBuilder $qb;
 
     /**
-     * @var MockObject|Connection
+     * @var MockObject&Connection
      */
     private MockObject $connectionMock;
 
@@ -41,10 +45,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
         /** @var ManagerRegistry&MockObject $managerRegistry */
         $managerRegistry = $this->createMock(ManagerRegistry::class);
         $managerRegistry->method('getManagerForClass')->willReturn($emMock);
-
-        /** @var ClassMetadata<object>&MockObject $classMetadata */
-        $classMetadata = $this->createMock(ClassMetadata::class);
-        $emMock->method('getClassMetadata')->willReturn($classMetadata);
+        $emMock->method('getClassMetadata')->willReturn($this->createStub(ClassMetadata::class));
 
         $this->repo = $this->getMockBuilder(CommonRepository::class)
             ->setConstructorArgs([$managerRegistry, Lead::class])
@@ -56,14 +57,14 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new ExpressionBuilder($this->connectionMock));
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Check that the query is being build without providing any order statements')]
+    #[TestDox('Check that the query is being build without providing any order statements')]
     public function testBuildingQueryWithUndefinedOrder(): void
     {
         $this->callProtectedMethod('buildClauses', [$this->qb, []]);
         $this->assertSame('SELECT e', (string) $this->qb);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Check that providing orderBy and orderByDir builds the query correctly')]
+    #[TestDox('Check that providing orderBy and orderByDir builds the query correctly')]
     public function testBuildingQueryWithBasicOrder(): void
     {
         $args = [
@@ -74,7 +75,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('SELECT e ORDER BY e.someCol DESC', (string) $this->qb);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Check that array of ORDER statements is correct')]
+    #[TestDox('Check that array of ORDER statements is correct')]
     public function testBuildingQueryWithOrderArray(): void
     {
         $args = [
@@ -91,7 +92,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('SELECT e ORDER BY e.someCol DESC', (string) $this->qb);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Check that order by validation will allow dots in the column name')]
+    #[TestDox('Check that order by validation will allow dots in the column name')]
     public function testValidateOrderByClauseWithColContainingAliasWillNotRemoveTheDot(): void
     {
         $provided = [
@@ -108,7 +109,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Check that order validation will remove funky characters that can be used in an attack')]
+    #[TestDox('Check that order validation will remove funky characters that can be used in an attack')]
     public function testValidateOrderByClauseWillRemoveFunkyChars(): void
     {
         $provided = [
@@ -124,7 +125,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Check that order validation will throw an exception if column name is missing')]
+    #[TestDox('Check that order validation will throw an exception if column name is missing')]
     public function testValidateOrderByClauseWithMissingCol(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -180,27 +181,23 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
         ];
 
         foreach ($expectedValues as $expectedValue) {
-            self::assertSame($expectedValue, $this->repo->generateRandomParameterName());
+            $this->assertSame($expectedValue, $this->repo->generateRandomParameterName());
         }
     }
 
     /**
      * Calls a protected method from CommonRepository with provided argumetns.
      *
-     * @param string $method name
-     * @param array  $args   added to the method
-     *
-     * @return mixed result of the method
+     * @param array<int, mixed> $args
      *
      * @throws \ReflectionException
      */
-    private function callProtectedMethod($method, $args)
+    private function callProtectedMethod(string $method, array $args): mixed
     {
         $reflection = new \ReflectionClass(CommonRepository::class);
-        $method     = $reflection->getMethod($method);
-        $method->setAccessible(true);
+        $methodRef  = $reflection->getMethod($method);
 
-        return $method->invokeArgs($this->repo, $args);
+        return $methodRef->invokeArgs($this->repo, $args);
     }
 
     public function testArgumentCSVArray(): void
@@ -214,7 +211,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
             ],
         ];
         $matchArgs = explode(',', $args[0]['val']);
-        array_walk($matchArgs, function (&$element): void { $element = trim($element, '"'); });
+        array_walk($matchArgs, function (string &$element): void { $element = trim($element, '"'); });
 
         $this->callBuildWhereClauseFromArray($qb, $args);
 
@@ -231,7 +228,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
             ],
         ];
         $matchArgs = explode(',', $args[0]['val']);
-        array_walk($matchArgs, function (&$element): void { $element = trim($element, '"'); });
+        array_walk($matchArgs, function (string &$element): void { $element = trim($element, '"'); });
 
         $this->callBuildWhereClauseFromArray($qb, $args);
 
@@ -251,7 +248,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
             ],
         ];
         $matchArgs = explode(',', $args[0]['val']);
-        array_walk($matchArgs, function (&$element): void { $element = trim($element, '"'); });
+        array_walk($matchArgs, function (string &$element): void { $element = trim($element, '"'); });
 
         $this->callBuildWhereClauseFromArray($qb, $args);
 
@@ -269,7 +266,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
             ],
         ];
         $matchArgs = explode(',', $args[0]['val']);
-        array_walk($matchArgs, function (&$element): void { $element = trim($element, '"'); });
+        array_walk($matchArgs, function (string &$element): void { $element = trim($element, '"'); });
 
         $this->callBuildWhereClauseFromArray($qb, $args);
 
@@ -290,7 +287,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
             ],
         ];
         $matchArgs = explode(',', $args[0]['val']);
-        array_walk($matchArgs, function (&$element): void { $element = trim($element, '"'); });
+        array_walk($matchArgs, function (string &$element): void { $element = trim($element, '"'); });
 
         $this->callBuildWhereClauseFromArray($qb, $args);
 
@@ -308,7 +305,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
             ],
         ];
         $matchArgs = explode(',', $args[0]['val']);
-        array_walk($matchArgs, function (&$element): void { $element = trim($element, '"'); });
+        array_walk($matchArgs, function (string &$element): void { $element = trim($element, '"'); });
 
         $this->callBuildWhereClauseFromArray($qb, $args);
 
@@ -351,11 +348,13 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(trim($args[0]['val'], '"'), array_shift($parameters));
     }
 
-    private function callBuildWhereClauseFromArray($qb, $args)
+    /**
+     * @param array<int, mixed> $args
+     */
+    private function callBuildWhereClauseFromArray(\Doctrine\DBAL\Query\QueryBuilder $qb, array $args): mixed
     {
         $reflection = new \ReflectionClass(CommonRepository::class);
         $method     = $reflection->getMethod('buildWhereClauseFromArray');
-        $method->setAccessible(true);
 
         return $method->invokeArgs($this->repo, [$qb, $args]);
     }

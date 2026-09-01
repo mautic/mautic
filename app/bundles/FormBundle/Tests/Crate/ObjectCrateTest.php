@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\Tests\Crate;
 
 use Mautic\FormBundle\Crate\ObjectCrate;
-use PHPUnit\Framework\Assert;
 
 final class ObjectCrateTest extends \PHPUnit\Framework\TestCase
 {
@@ -13,7 +12,7 @@ final class ObjectCrateTest extends \PHPUnit\Framework\TestCase
     {
         $field = new ObjectCrate('contact', 'Contact');
 
-        Assert::assertSame('contact', $field->getKey());
-        Assert::assertSame('Contact', $field->getName());
+        $this->assertSame('contact', $field->getKey());
+        $this->assertSame('Contact', $field->getName());
     }
 }

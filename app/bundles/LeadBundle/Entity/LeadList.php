@@ -31,10 +31,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(uriTemplate: '/segments', security: "is_granted('lead:lists:viewown')"),
         new Post(uriTemplate: '/segments', security: "is_granted('lead:lists:create')"),
-        new Get(uriTemplate: '/segments/{id}', security: "is_granted('lead:lists:viewown')"),
-        new Put(uriTemplate: '/segments/{id}', security: "is_granted('lead:lists:editown')"),
-        new Patch(uriTemplate: '/segments/{id}', security: "is_granted('lead:lists:editother')"),
-        new Delete(uriTemplate: '/segments/{id}', security: "is_granted('lead:lists:deleteown')"),
+        new Get(uriTemplate: '/segments/{id}', security: "is_granted('lead:lists:viewown', object)"),
+        new Put(uriTemplate: '/segments/{id}', security: "is_granted('lead:lists:editown', object)"),
+        new Patch(uriTemplate: '/segments/{id}', security: "is_granted('lead:lists:editother', object)"),
+        new Delete(uriTemplate: '/segments/{id}', security: "is_granted('lead:lists:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['segment:read'],
@@ -53,6 +53,7 @@ class LeadList extends FormEntity implements UuidInterface
     use ProjectTrait;
 
     public const TABLE_NAME  = 'lead_lists';
+
     public const ENTITY_NAME = 'lists';
 
     /**
@@ -75,7 +76,7 @@ class LeadList extends FormEntity implements UuidInterface
 
     /**
      * @var Category|null
-     **/
+     */
     #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
     private $category;
 
@@ -114,17 +115,14 @@ class LeadList extends FormEntity implements UuidInterface
      */
     private $leads;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
-    private $lastBuiltDate;
+    private \DateTime|\DateTimeInterface|null $lastBuiltDate = null;
 
-    /**
-     * @var float|null
-     */
     #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
-    private $lastBuiltTime;
+    private ?float $lastBuiltTime = null;
+
+    #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
+    private ?\DateTimeInterface $deleted = null;
 
     public function __construct()
     {
@@ -138,7 +136,8 @@ class LeadList extends FormEntity implements UuidInterface
 
         $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(LeadListRepository::class)
-            ->addIndex(['alias'], 'lead_list_alias');
+            ->addIndex(['alias'], 'lead_list_alias')
+            ->addIndex(['deleted'], 'segment_deleted');
 
         $builder->addIdColumns();
 
@@ -176,13 +175,15 @@ class LeadList extends FormEntity implements UuidInterface
             ->build();
 
         self::addProjectsField($builder, 'lead_list_projects_xref', 'leadlist_id');
+        $builder->addNullableField('deleted', 'datetime');
+
         static::addUuidField($builder);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(
-            ['message' => 'mautic.core.name.required']
+            message: 'mautic.core.name.required'
         ));
 
         $metadata->addConstraint(new UniqueUserAlias([
@@ -230,12 +231,15 @@ class LeadList extends FormEntity implements UuidInterface
         return $this->id;
     }
 
+    public function setId(?int $id): void
+    {
+        $this->id = $id;
+    }
+
     /**
      * @param string|null $name
-     *
-     * @return LeadList
      */
-    public function setName($name)
+    public function setName($name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -253,10 +257,8 @@ class LeadList extends FormEntity implements UuidInterface
 
     /**
      * @param string|null $description
-     *
-     * @return LeadList
      */
-    public function setDescription($description)
+    public function setDescription($description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -272,7 +274,7 @@ class LeadList extends FormEntity implements UuidInterface
         return $this->description;
     }
 
-    public function setCategory(?Category $category = null): LeadList
+    public function setCategory(?Category $category = null): self
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -286,8 +288,6 @@ class LeadList extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get publicName.
-     *
      * @return string|null
      */
     public function getPublicName()
@@ -297,10 +297,8 @@ class LeadList extends FormEntity implements UuidInterface
 
     /**
      * @param string|null $publicName
-     *
-     * @return LeadList
      */
-    public function setPublicName($publicName)
+    public function setPublicName($publicName): static
     {
         $this->isChanged('publicName', $publicName);
         $this->publicName = $publicName;
@@ -308,10 +306,7 @@ class LeadList extends FormEntity implements UuidInterface
         return $this;
     }
 
-    /**
-     * @return LeadList
-     */
-    public function setFilters(array $filters)
+    public function setFilters(array $filters): static
     {
         $this->isChanged('filters', $filters);
         $this->filters = $filters;
@@ -339,14 +334,11 @@ class LeadList extends FormEntity implements UuidInterface
         }
 
         // A segment with filters requires rebuild if it was changed since the last build date, or was never built
-        if (null === $this->getLastBuiltDate()) {
-            return true;
-        }
-        if (null !== $this->getDateModified() && $this->getDateModified()->getTimestamp() >= $this->getLastBuiltDate()->getTimestamp()) {
+        if (null === $this->lastBuiltDate) {
             return true;
         }
 
-        return false;
+        return null !== $this->getDateModified() && $this->getDateModified()->getTimestamp() >= $this->lastBuiltDate->getTimestamp();
     }
 
     public function hasFilterTypeOf(string $type): bool
@@ -362,10 +354,8 @@ class LeadList extends FormEntity implements UuidInterface
 
     /**
      * @param bool $isGlobal
-     *
-     * @return LeadList
      */
-    public function setIsGlobal($isGlobal)
+    public function setIsGlobal($isGlobal): static
     {
         $this->isChanged('isGlobal', (bool) $isGlobal);
         $this->isGlobal = (bool) $isGlobal;
@@ -388,15 +378,13 @@ class LeadList extends FormEntity implements UuidInterface
      */
     public function isGlobal()
     {
-        return $this->getIsGlobal();
+        return $this->isGlobal;
     }
 
     /**
      * @param string|null $alias
-     *
-     * @return LeadList
      */
-    public function setAlias($alias)
+    public function setAlias($alias): static
     {
         $this->isChanged('alias', $alias);
         $this->alias = $alias;
@@ -505,6 +493,16 @@ class LeadList extends FormEntity implements UuidInterface
         $this->lastBuiltTime = $lastBuiltTime;
     }
 
+    public function setDeleted(?\DateTimeInterface $deletedDate): void
+    {
+        $this->deleted = $deletedDate;
+    }
+
+    public function getDeleted(): ?\DateTimeInterface
+    {
+        return $this->deleted;
+    }
+
     /**
      * @param mixed[] $filters
      *
@@ -518,5 +516,10 @@ class LeadList extends FormEntity implements UuidInterface
         }
 
         return $filters;
+    }
+
+    public function isDeleted(): bool
+    {
+        return null !== $this->deleted;
     }
 }

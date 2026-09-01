@@ -2,17 +2,19 @@
 
 namespace Mautic\PageBundle\Helper;
 
-use Doctrine\ORM\EntityManagerInterface;
+use Mautic\EmailBundle\Helper\UrlMatcher;
 use Mautic\PageBundle\Entity\Hit;
+use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\Page;
 
 class PointActionHelper
 {
-    public function __construct(private EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        private readonly HitRepository $hitRepository,
+    ) {
     }
 
-    public static function validatePageHit($eventDetails, $action): bool
+    public static function validatePageHit($eventDetails, array $action): bool
     {
         $pageHit = $eventDetails->getPage();
 
@@ -29,31 +31,26 @@ class PointActionHelper
             $limitToPages = $action['properties']['pages'];
         }
 
-        if (!empty($limitToPages) && !in_array($pageHitId, $limitToPages)) {
-            // no points change
-            return false;
-        }
-
-        return true;
+        // no points change
+        return empty($limitToPages) || in_array($pageHitId, $limitToPages);
     }
 
-    public function validateUrlHit($eventDetails, $action): bool
+    public function validateUrlHit($eventDetails, array $action): bool
     {
         $changePoints = [];
         $url          = $eventDetails->getUrl();
         $limitToUrl   = html_entity_decode(trim($action['properties']['page_url']));
 
-        if (!$limitToUrl || !fnmatch($limitToUrl, $url)) {
+        if (!$limitToUrl || !UrlMatcher::hasMatch([$limitToUrl], $url)) {
             // no points change
             return false;
         }
 
-        $hitRepository = $this->entityManager->getRepository(Hit::class);
         $lead          = $eventDetails->getLead();
-        $urlWithSqlWC  = str_replace('*', '%', $limitToUrl);
+        $urlWithSqlWC  = $this->getSqlLikePattern($limitToUrl);
 
         if (isset($action['properties']['first_time']) && true === $action['properties']['first_time']) {
-            $hitStats = $hitRepository->getDwellTimesForUrl($urlWithSqlWC, ['leadId' => $lead->getId()]);
+            $hitStats = $this->hitRepository->getDwellTimesForUrl($urlWithSqlWC, ['leadId' => $lead->getId()]);
             if (isset($hitStats['count']) && $hitStats['count']) {
                 $changePoints['first_time'] = false;
             } else {
@@ -64,14 +61,14 @@ class PointActionHelper
 
         if ($action['properties']['returns_within'] || $action['properties']['returns_after']) {
             // get the latest hit only when it's needed
-            $latestHit = $hitRepository->getLatestHit(['leadId' => $lead->getId(), 'urls' => [$urlWithSqlWC], 'second_to_last' => $eventDetails->getId()]);
+            $latestHit = $this->hitRepository->getLatestHit(['leadId' => $lead->getId(), 'urls' => [$urlWithSqlWC], 'second_to_last' => $eventDetails->getId()]);
         } else {
             $latestHit = null;
         }
 
         if ($action['properties']['accumulative_time']) {
             if (!isset($hitStats)) {
-                $hitStats = $hitRepository->getDwellTimesForUrl($urlWithSqlWC, ['leadId' => $lead->getId()]);
+                $hitStats = $this->hitRepository->getDwellTimesForUrl($urlWithSqlWC, ['leadId' => $lead->getId()]);
             }
 
             if (isset($hitStats['sum'])) {
@@ -86,7 +83,7 @@ class PointActionHelper
         }
         if ($action['properties']['page_hits']) {
             if (!isset($hitStats)) {
-                $hitStats = $hitRepository->getDwellTimesForUrl($urlWithSqlWC, ['leadId' => $lead->getId()]);
+                $hitStats = $this->hitRepository->getDwellTimesForUrl($urlWithSqlWC, ['leadId' => $lead->getId()]);
             }
             if (isset($hitStats['count']) && $hitStats['count'] >= $action['properties']['page_hits']) {
                 $changePoints['page_hits'] = true;
@@ -103,5 +100,16 @@ class PointActionHelper
 
         // return true only if all configured options are true
         return !in_array(false, $changePoints);
+    }
+
+    private function getSqlLikePattern(string $url): string
+    {
+        $url = \addcslashes($url, '\\_%');
+
+        if (false !== \strpbrk($url, '*?')) {
+            return \str_replace(['*', '?'], ['%', '_'], $url);
+        }
+
+        return '%'.$url.'%';
     }
 }

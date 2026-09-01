@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Entity\Scheduler;
 use Mautic\ReportBundle\Entity\SchedulerRepository;
@@ -11,16 +13,19 @@ use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 
 class ScheduleModel
 {
-    /**
-     * @var SchedulerRepository
-     */
-    private \Doctrine\ORM\EntityRepository $schedulerRepository;
-
     public function __construct(
-        private EntityManager $entityManager,
-        private SchedulerPlanner $schedulerPlanner,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly SchedulerPlanner $schedulerPlanner,
+        private readonly SchedulerRepository $schedulerRepository,
     ) {
-        $this->schedulerRepository = $entityManager->getRepository(Scheduler::class);
+    }
+
+    /**
+     * Avoid the default AbstractCommonModel::getRepository() as it caches it to a static property.
+     */
+    public function getRepository(): SchedulerRepository
+    {
+        return $this->schedulerRepository;
     }
 
     /**

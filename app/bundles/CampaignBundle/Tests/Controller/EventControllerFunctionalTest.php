@@ -6,14 +6,17 @@ namespace Mautic\CampaignBundle\Tests\Controller;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
+use Mautic\CoreBundle\Twig\Helper\DateHelper;
+use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
 final class EventControllerFunctionalTest extends MauticMysqlTestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('fieldAndValueProvider')]
+    #[DataProvider('fieldAndValueProvider')]
     public function testCreateContactConditionOnStateField(string $field, string $value): void
     {
         // Fetch the campaign condition form.
@@ -44,9 +47,9 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $responseData = json_decode($response->getContent(), true);
-        Assert::assertSame(1, $responseData['success'], print_r(json_decode($response->getContent(), true), true));
+        $this->assertSame(1, $responseData['success'], print_r(json_decode($response->getContent(), true), true));
 
-        $actualEventData = array_filter($responseData['event'], fn ($value) => in_array($value, [
+        $actualEventData = array_filter($responseData['event'], fn ($value): bool => in_array($value, [
             'name',
             'type',
             'eventType',
@@ -65,19 +68,18 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('condition', $responseData['eventType']);
         $this->assertSame('campaignEvent', $responseData['mauticContent']);
         $this->assertSame(1, $responseData['closeModal']);
+        $this->assertTrue($responseData['formSubmitted'], $response->getContent());
     }
 
     /**
-     * @return string[][]
+     * @return \Iterator<(int|string), array<string>>
      */
-    public static function fieldAndValueProvider(): array
+    public static function fieldAndValueProvider(): \Iterator
     {
-        return [
-            'country'  => ['country', 'India'],
-            'region'   => ['state', 'Arizona'],
-            'timezone' => ['timezone', 'Marigot'],
-            'locale'   => ['preferred_locale', 'af'],
-        ];
+        yield 'country' => ['country', 'India'];
+        yield 'region' => ['state', 'Arizona'];
+        yield 'timezone' => ['timezone', 'Marigot'];
+        yield 'locale' => ['preferred_locale', 'af'];
     }
 
     public function testActionAtSpecificTimeWorkflow(): void
@@ -247,6 +249,8 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertTrue($responseData['clearCloneStorage']);
         $this->assertNotEquals($eventId, $responseData['eventId']);
         $this->assertNotEmpty($responseData['eventHtml']);
+        $this->assertArrayHasKey('modifiedEvents', $responseData);
+        $this->assertNotEmpty($responseData['modifiedEvents']);
     }
 
     public function testEmailSendTypeDefaultSetting(): void
@@ -263,7 +267,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $form         = $crawler->filterXPath('//form[@name="campaignevent"]')->form();
 
         // Assert the field email_type === "marketing"
-        Assert::assertEquals('marketing', $form['campaignevent[properties][email_type]']->getValue(), 'The default email type should be "marketing"');
+        $this->assertSame('marketing', $form['campaignevent[properties][email_type]']->getValue(), 'The default email type should be "marketing"');
     }
 
     public function testEventsAreNotAccessibleWithXhr(): void
@@ -282,10 +286,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
 
         $response = $this->client->getResponse();
         $response = json_decode($response->getContent(), true);
-        Assert::assertSame(
-            'You do not have access to the requested area/action.',
-            $response['error']
-        );
+        $this->assertSame('You do not have access to the requested area/action.', $response['error']);
     }
 
     public function testEventsAreAccessible(): void
@@ -304,14 +305,9 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
 
         $response = $this->client->getResponse();
         $response = json_decode($response->getContent(), true);
-        Assert::assertSame(
-            $event1->getId(),
-            $response['eventId']
-        );
-        Assert::assertSame(
-            $event1->getName(),
-            $response['event']['name']
-        );
+        $this->assertSame($event1->getId(), $response['eventId']);
+        $this->assertSame($event1->getName(), $response['event']['name']);
+        $this->assertFalse($response['formSubmitted'], $this->client->getResponse()->getContent());
     }
 
     public function testEventsAreDeleted(): void
@@ -338,22 +334,19 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
 
         $response = $this->client->getResponse();
         $response = json_decode($response->getContent(), true);
-        Assert::assertSame(
-            1,
-            $response['success']
-        );
+        $this->assertSame(1, $response['success']);
 
         // Check that the deleted event is in the response
         $eventFound = false;
         foreach ($response['deletedEvents'] as $deletedEvent) {
             if (isset($deletedEvent['id']) && $deletedEvent['id'] === (string) $event1->getId()) {
                 $eventFound = true;
-                Assert::assertArrayHasKey('redirectEvent', $deletedEvent);
-                Assert::assertNull($deletedEvent['redirectEvent']);
+                $this->assertArrayHasKey('redirectEvent', $deletedEvent);
+                $this->assertNull($deletedEvent['redirectEvent']);
                 break;
             }
         }
-        Assert::assertTrue($eventFound, 'Deleted event not found in response');
+        $this->assertTrue($eventFound, 'Deleted event not found in response');
     }
 
     public function testEventsAreDeletedWithRedirectId(): void
@@ -378,19 +371,19 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
 
         $response = $this->client->getResponse();
         $response = json_decode($response->getContent(), true);
-        Assert::assertSame(1, $response['success']);
+        $this->assertSame(1, $response['success']);
 
         // Check that the deleted event with redirect ID is properly stored
         $eventFound = false;
         foreach ($response['deletedEvents'] as $deletedEvent) {
             if (isset($deletedEvent['id']) && $deletedEvent['id'] === (string) $event1->getId()) {
                 $eventFound = true;
-                Assert::assertArrayHasKey('redirectEvent', $deletedEvent);
-                Assert::assertNotNull($deletedEvent['redirectEvent'], 'redirectEvent should not be null');
+                $this->assertArrayHasKey('redirectEvent', $deletedEvent);
+                $this->assertNotNull($deletedEvent['redirectEvent'], 'redirectEvent should not be null');
                 break;
             }
         }
-        Assert::assertTrue($eventFound, 'Deleted event with redirect ID not found in response');
+        $this->assertTrue($eventFound, 'Deleted event with redirect ID not found in response');
     }
 
     public function testEventsAreUndeleted(): void
@@ -416,7 +409,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
 
         $deleteResponse = $this->client->getResponse();
         $deleteResponse = json_decode($deleteResponse->getContent(), true);
-        Assert::assertSame(1, $deleteResponse['success']);
+        $this->assertSame(1, $deleteResponse['success']);
 
         // Now undelete the event, passing the deletedEvents from the previous response
         $this->client->request(
@@ -434,7 +427,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
 
         $undeleteResponse = $this->client->getResponse();
         $undeleteResponse = json_decode($undeleteResponse->getContent(), true);
-        Assert::assertSame(1, $undeleteResponse['success']);
+        $this->assertSame(1, $undeleteResponse['success']);
 
         // Verify the event is no longer in the deletedEvents list
         $eventStillExists = false;
@@ -444,7 +437,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
                 break;
             }
         }
-        Assert::assertFalse($eventStillExists, 'Event should no longer be in the deletedEvents list');
+        $this->assertFalse($eventStillExists, 'Event should no longer be in the deletedEvents list');
     }
 
     public function testEventsAreDeletedWithRedirectIdInPostRequest(): void
@@ -471,19 +464,162 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
 
         $response = $this->client->getResponse();
         $response = json_decode($response->getContent(), true);
-        Assert::assertSame(1, $response['success']);
+        $this->assertSame(1, $response['success']);
 
         // Check that the deleted event with redirect ID is properly stored
         $eventFound = false;
         foreach ($response['deletedEvents'] as $deletedEvent) {
             if (isset($deletedEvent['id']) && $deletedEvent['id'] === (string) $event1->getId()) {
                 $eventFound = true;
-                Assert::assertArrayHasKey('redirectEvent', $deletedEvent);
-                Assert::assertNotNull($deletedEvent['redirectEvent'], 'redirectEvent should not be null');
+                $this->assertArrayHasKey('redirectEvent', $deletedEvent);
+                $this->assertNotNull($deletedEvent['redirectEvent'], 'redirectEvent should not be null');
                 break;
             }
         }
-        Assert::assertTrue($eventFound, 'Deleted event with redirect ID from POST data not found in response');
+        $this->assertTrue($eventFound, 'Deleted event with redirect ID from POST data not found in response');
+    }
+
+    public function testScheduledTriggerDateDoesNotShiftWithNonUtcUserTimezone(): void
+    {
+        $userTimezone = 'Europe/Berlin';
+        $wallClock    = '2026-12-15 19:00';
+
+        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $user);
+        $user->setTimezone($userTimezone);
+        $this->em->persist($user);
+        $this->em->flush();
+        $this->loginUser($user);
+
+        // loginUser() does not go through CoreSubscriber's interactive login timezone bootstrap.
+        $this->client->request(Request::METHOD_GET, '/s/dashboard');
+        $this->client->getRequest()->getSession()->set('_timezone', $userTimezone);
+
+        $campaign = $this->createCampaign();
+        $event    = $this->createEvent('Scheduled email', $campaign);
+        $event->setType('lead.changepoints');
+        $this->em->persist($event);
+        $this->em->flush();
+
+        $modifiedEvents = $this->submitDateTriggeredEvent($campaign, $event, $wallClock);
+        $firstPayload   = $this->extractTriggerDatePayload($modifiedEvents, (string) $event->getId());
+
+        // Re-submit the same wall-clock time (reopen + save) — payload must not drift.
+        $modifiedEvents = $this->submitDateTriggeredEvent($campaign, $event, $wallClock, $modifiedEvents);
+        $secondPayload  = $this->extractTriggerDatePayload($modifiedEvents, (string) $event->getId());
+        $this->assertSame($firstPayload, $secondPayload, 'Event AJAX payload triggerDate shifted between saves');
+
+        // Persist like CampaignController: JSON round-trip of modifiedEvents into setEvents().
+        $eventId       = $event->getId();
+        $campaignId    = $campaign->getId();
+        $roundTripped  = json_decode(json_encode($modifiedEvents, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR);
+        $campaignModel = self::getContainer()->get(CampaignModel::class);
+
+        $this->em->clear();
+        $campaign = $this->em->find(Campaign::class, $campaignId);
+        $this->assertInstanceOf(Campaign::class, $campaign);
+        $campaignModel->setEvents($campaign, $roundTripped, ['connections' => []], []);
+        $this->em->flush();
+        $this->em->clear();
+
+        $reloaded = $this->em->find(Event::class, $eventId);
+        $this->assertInstanceOf(Event::class, $reloaded);
+        $this->assertSame(Event::TRIGGER_MODE_DATE, $reloaded->getTriggerMode());
+        $reloadedTriggerDate = $reloaded->getTriggerDate();
+        $this->assertInstanceOf(\DateTime::class, $reloadedTriggerDate);
+        $firstUtc = (clone $reloadedTriggerDate)->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d H:i:s');
+
+        // Second persist cycle: DB → array → DateHelper label formatting → JSON → setEvents.
+        // Before the fix, DateHelper mutated triggerDate to system TZ and each save shifted the instant.
+        $asArray = $reloaded->convertToArray();
+        unset($asArray['campaign'], $asArray['children'], $asArray['parent'], $asArray['log']);
+        $dateHelper = self::getContainer()->get(DateHelper::class);
+        $dateHelper->toFull($asArray['triggerDate']);
+        $roundTripped2 = json_decode(json_encode([$eventId => $asArray], JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR);
+
+        $campaign = $this->em->find(Campaign::class, $campaignId);
+        $this->assertInstanceOf(Campaign::class, $campaign);
+        $campaignModel->setEvents($campaign, $roundTripped2, ['connections' => []], []);
+        $this->em->flush();
+        $this->em->clear();
+
+        $reloadedAgain = $this->em->find(Event::class, $eventId);
+        $this->assertInstanceOf(Event::class, $reloadedAgain);
+        $reloadedAgainTriggerDate = $reloadedAgain->getTriggerDate();
+        $this->assertInstanceOf(\DateTime::class, $reloadedAgainTriggerDate);
+        $secondUtc = (clone $reloadedAgainTriggerDate)->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d H:i:s');
+        $this->assertSame($firstUtc, $secondUtc, 'Persisted triggerDate shifted after DateHelper formatting + save cycle');
+    }
+
+    /**
+     * @param array<string|int, mixed> $modifiedEvents
+     *
+     * @return array<string|int, mixed>
+     */
+    private function submitDateTriggeredEvent(
+        Campaign $campaign,
+        Event $event,
+        string $triggerDate,
+        array $modifiedEvents = [],
+    ): array {
+        $uri = sprintf(
+            '/s/campaigns/events/edit/%d?campaignId=%d',
+            $event->getId(),
+            $campaign->getId()
+        );
+
+        $this->client->xmlHttpRequest('GET', $uri, ['modifiedEvents' => json_encode($modifiedEvents)]);
+        $this->assertResponseIsSuccessful();
+
+        $responseData = json_decode($this->client->getResponse()->getContent(), true);
+        $crawler      = new Crawler($responseData['newContent'], $this->client->getInternalRequest()->getUri());
+        $form         = $crawler->filterXPath('//form[@name="campaignevent"]')->form();
+        $form->setValues(
+            [
+                'campaignevent[name]'                => 'Scheduled action',
+                'campaignevent[triggerMode]'         => 'date',
+                'campaignevent[triggerDate]'         => $triggerDate,
+                'campaignevent[triggerInterval]'     => '1',
+                'campaignevent[triggerIntervalUnit]' => 'd',
+                'campaignevent[properties][points]'  => '1',
+                'campaignevent[properties][group]'   => '',
+                'campaignevent[type]'                => 'lead.changepoints',
+                'campaignevent[eventType]'           => 'action',
+                'campaignevent[campaignId]'          => (string) $campaign->getId(),
+            ]
+        );
+
+        $formData                   = $form->getPhpValues();
+        $formData['modifiedEvents'] = json_encode($modifiedEvents);
+        $formData['submit']         = '1';
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest($form->getMethod(), $form->getUri(), $formData);
+        $this->assertResponseIsSuccessful();
+
+        $responseData = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertNotEmpty($responseData['success'], print_r($responseData, true));
+        $this->assertArrayHasKey('modifiedEvents', $responseData);
+
+        return $responseData['modifiedEvents'];
+    }
+
+    /**
+     * @param array<string|int, mixed> $modifiedEvents
+     *
+     * @return array{date: string, timezone: string}
+     */
+    private function extractTriggerDatePayload(array $modifiedEvents, string $eventId): array
+    {
+        $this->assertArrayHasKey($eventId, $modifiedEvents);
+        $triggerDate = $modifiedEvents[$eventId]['triggerDate'] ?? null;
+        $this->assertIsArray($triggerDate);
+        $this->assertArrayHasKey('date', $triggerDate);
+        $this->assertArrayHasKey('timezone', $triggerDate);
+
+        return [
+            'date'     => (string) $triggerDate['date'],
+            'timezone' => (string) $triggerDate['timezone'],
+        ];
     }
 
     private function createCampaign(): Campaign

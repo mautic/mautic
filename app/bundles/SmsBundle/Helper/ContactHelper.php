@@ -6,15 +6,16 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Helper\PhoneNumberHelper;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\SmsBundle\Exception\NumberNotFoundException;
 
 class ContactHelper
 {
     public function __construct(
-        private LeadRepository $leadRepository,
-        private Connection $connection,
-        private PhoneNumberHelper $phoneNumberHelper,
+        private readonly LeadRepository $leadRepository,
+        private readonly Connection $connection,
+        private readonly PhoneNumberHelper $phoneNumberHelper,
     ) {
     }
 

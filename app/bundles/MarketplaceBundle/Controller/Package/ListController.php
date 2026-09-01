@@ -4,41 +4,33 @@ declare(strict_types=1);
 
 namespace Mautic\MarketplaceBundle\Controller\Package;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\CommonController;
-use Mautic\CoreBundle\Factory\ModelFactory;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Service\FlashBag;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\MarketplaceBundle\Enum\PackageType;
 use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
 use Mautic\MarketplaceBundle\Service\Config;
 use Mautic\MarketplaceBundle\Service\PluginCollector;
 use Mautic\MarketplaceBundle\Service\RouteProvider;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class ListController extends CommonController
+final class ListController extends CommonController
 {
-    public function __construct(
-        private PluginCollector $pluginCollector,
-        private RouteProvider $routeProvider,
-        ManagerRegistry $doctrine,
-        private Config $config,
-        ModelFactory $modelFactory,
-        UserHelper $userHelper,
-        CoreParametersHelper $coreParametersHelper,
-        EventDispatcherInterface $dispatcher,
-        Translator $translator,
-        FlashBag $flashBag,
-        RequestStack $requestStack,
-        CorePermissions $security,
-    ) {
-        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    private PluginCollector $pluginCollector;
+
+    private RouteProvider $routeProvider;
+
+    private Config $config;
+
+    #[Required]
+    public function autowireListController(
+        PluginCollector $pluginCollector,
+        RouteProvider $routeProvider,
+        Config $config,
+    ): void {
+        $this->pluginCollector = $pluginCollector;
+        $this->routeProvider   = $routeProvider;
+        $this->config          = $config;
     }
 
     public function listAction(int $page = 1): Response
@@ -48,7 +40,7 @@ class ListController extends CommonController
         }
 
         if (!$this->security->isGranted(MarketplacePermissions::CAN_VIEW_PACKAGES)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $this->setListFilters();

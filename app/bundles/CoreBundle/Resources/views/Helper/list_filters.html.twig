@@ -14,7 +14,7 @@
                     {% if groupFilter.options is defined %}
                     {% for value, label in groupFilter.options %}
                         {% if label is iterable %}
-                            {% set value = label.value|default(label.id) %}
+                            {% set value = label.value|default(label.alias) %}
                             {% set label = label.label|default(label.title|default(label.name)) %}
                         {% endif %}
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\MessengerBundle\Message;
 
-class TestFailed
+final class TestFailed
 {
     public function __construct(
         public int $userId,

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\Tests\Validator;
 
 use Mautic\CoreBundle\Exception\FileInvalidException;
@@ -8,14 +10,16 @@ use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Exception\FileValidationException;
 use Mautic\FormBundle\Exception\NoFileGivenException;
 use Mautic\FormBundle\Validator\UploadFieldValidator;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\TestDox;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\FileBag;
 use Symfony\Component\HttpFoundation\Request;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(UploadFieldValidator::class)]
-class UploadFieldValidatorTest extends \PHPUnit\Framework\TestCase
+#[CoversClass(UploadFieldValidator::class)]
+final class UploadFieldValidatorTest extends \PHPUnit\Framework\TestCase
 {
-    #[\PHPUnit\Framework\Attributes\TestDox('No Files given')]
+    #[TestDox('No Files given')]
     public function testNoFilesGiven(): void
     {
         $fileUploadValidatorMock = $this->createMock(FileUploadValidator::class);
@@ -42,7 +46,7 @@ class UploadFieldValidatorTest extends \PHPUnit\Framework\TestCase
         $fileUploadValidator->processFileValidation($field, $request);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Exception should be thrown when validation fails')]
+    #[TestDox('Exception should be thrown when validation fails')]
     public function testValidationFailed(): void
     {
         $fileUploadValidatorMock = $this->createMock(FileUploadValidator::class);
@@ -53,7 +57,7 @@ class UploadFieldValidatorTest extends \PHPUnit\Framework\TestCase
 
         $parameterBagMock = $this->createMock(FileBag::class);
 
-        $fileMock = $this->createMock(UploadedFile::class);
+        $fileMock = $this->createStub(UploadedFile::class);
 
         $files = [
             'file' => $fileMock,
@@ -82,7 +86,7 @@ class UploadFieldValidatorTest extends \PHPUnit\Framework\TestCase
         $fileUploadValidator->processFileValidation($field, $request);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('No validation error')]
+    #[TestDox('No validation error')]
     public function testFileIsValid(): void
     {
         $fileUploadValidatorMock = $this->createMock(FileUploadValidator::class);
@@ -92,7 +96,7 @@ class UploadFieldValidatorTest extends \PHPUnit\Framework\TestCase
 
         $parameterBagMock = $this->createMock(FileBag::class);
 
-        $fileMock = $this->createMock(UploadedFile::class);
+        $fileMock = $this->createStub(UploadedFile::class);
 
         $files = [
             'file' => $fileMock,

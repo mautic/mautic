@@ -11,11 +11,20 @@ use Symfony\Component\HttpFoundation\Response;
 final class FileManagerControllerFunctionalTest extends MauticMysqlTestCase
 {
     private const ASSETS_ENDPOINT = '/s/grapesjsbuilder/media';
+
     private const UPLOAD_ENDPOINT = '/s/grapesjsbuilder/upload';
+
     private const DELETE_ENDPOINT = '/s/grapesjsbuilder/delete';
+
     private const IMAGE_COUNT     = 3;
 
-    /** @var array<string> */
+    private const SVG_WIDTH       = 120;
+
+    private const SVG_HEIGHT      = 80;
+
+    /**
+     * @var array<string>
+     */
     private array $tempFilePaths = [];
 
     protected function beforeTearDown(): void
@@ -31,7 +40,7 @@ final class FileManagerControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertUploadSuccessful($uploadedFiles);
 
         $newAssetCount = $this->getAssetCount();
-        $this->assertEquals($initialAssetCount + self::IMAGE_COUNT, $newAssetCount);
+        $this->assertSame($initialAssetCount + self::IMAGE_COUNT, $newAssetCount);
 
         $this->testPagination($newAssetCount);
         $this->testRecentlyAddedFilesAppearFirst($uploadedFiles);
@@ -39,7 +48,41 @@ final class FileManagerControllerFunctionalTest extends MauticMysqlTestCase
         $this->deleteUploadedFiles($uploadedFiles);
 
         $finalAssetCount = $this->getAssetCount();
-        $this->assertEquals($initialAssetCount, $finalAssetCount);
+        $this->assertSame($initialAssetCount, $finalAssetCount);
+    }
+
+    public function testUploadedSvgIsReturnedInMediaList(): void
+    {
+        $svgFile  = $this->createTempSvgFile();
+        $response = $this->makeRequest('POST', self::UPLOAD_ENDPOINT, [], ['files' => [$svgFile]]);
+        $content  = $this->getJsonResponse($response);
+
+        $this->assertArrayHasKey('data', $content);
+        $this->assertCount(1, $content['data']);
+
+        $uploadedFiles = $content['data'];
+        $uploadedName  = $this->getFileNameFromUrl($uploadedFiles[0]);
+        $asset         = $this->findAssetByFileName($uploadedName);
+
+        $this->assertNotNull($asset);
+        $this->assertArrayHasKey('type', $asset);
+        $this->assertArrayHasKey('width', $asset);
+        $this->assertArrayHasKey('height', $asset);
+        $this->assertSame('image', $asset['type']);
+        $this->assertSame(self::SVG_WIDTH, (int) $asset['width']);
+        $this->assertSame(self::SVG_HEIGHT, (int) $asset['height']);
+
+        // Attempt to delete via the API endpoint first.
+        $this->deleteUploadedFiles($uploadedFiles);
+
+        // Ensure the uploaded SVG is also removed from the filesystem in case the
+        // delete endpoint refuses SVGs (for example, due to exif_imagetype).
+        $projectRoot = \dirname(__DIR__, 5);
+        $svgPath     = $projectRoot.'/media/images/'.$uploadedName;
+
+        if (\is_file($svgPath)) {
+            @\unlink($svgPath);
+        }
     }
 
     private function getAssetCount(): int
@@ -112,7 +155,7 @@ final class FileManagerControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertNotEmpty($content['data']);
 
         $assetList         = $content['data'];
-        $uploadedFileNames = array_map([$this, 'getFileNameFromUrl'], $uploadedFiles);
+        $uploadedFileNames = array_map($this->getFileNameFromUrl(...), $uploadedFiles);
 
         // Check if the first 'IMAGE_COUNT' assets in the list are the recently uploaded files
         for ($i = 0; $i < self::IMAGE_COUNT; ++$i) {
@@ -154,7 +197,29 @@ final class FileManagerControllerFunctionalTest extends MauticMysqlTestCase
     {
         $image = imagecreatetruecolor(100, 100);
         imagepng($image, $path);
-        imagedestroy($image);
+    }
+
+    private function createTempSvgFile(): UploadedFile
+    {
+        $fileName = sprintf('test-image-svg-%s.svg', uniqid('', true));
+        $filePath = sys_get_temp_dir().'/'.$fileName;
+        $this->createSvgImage($filePath);
+        $this->tempFilePaths[] = $filePath;
+
+        return new UploadedFile($filePath, $fileName, 'image/svg+xml', null, true);
+    }
+
+    private function createSvgImage(string $path): void
+    {
+        $svg = sprintf(
+            '<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" viewBox="0 0 %d %d"><rect width="100%%" height="100%%" fill="#ff6f61"/></svg>',
+            self::SVG_WIDTH,
+            self::SVG_HEIGHT,
+            self::SVG_WIDTH,
+            self::SVG_HEIGHT,
+        );
+
+        file_put_contents($path, $svg);
     }
 
     /**
@@ -184,6 +249,34 @@ final class FileManagerControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
+     * @return array<string, mixed>|null
+     */
+    private function findAssetByFileName(string $fileName): ?array
+    {
+        $page  = 1;
+        $limit = 50;
+
+        do {
+            $response = $this->makeRequest('GET', self::ASSETS_ENDPOINT."?limit={$limit}&page={$page}");
+            $content  = $this->getJsonResponse($response);
+
+            foreach ($content['data'] as $asset) {
+                if (!isset($asset['src'])) {
+                    continue;
+                }
+
+                if ($this->getFileNameFromUrl($asset['src']) === $fileName) {
+                    return $asset;
+                }
+            }
+
+            ++$page;
+        } while ($content['hasNextPage']);
+
+        return null;
+    }
+
+    /**
      * @param array<string, mixed> $parameters
      * @param array<string, mixed> $files
      */
@@ -191,7 +284,7 @@ final class FileManagerControllerFunctionalTest extends MauticMysqlTestCase
     {
         $this->client->request($method, $endpoint, $parameters, $files);
         $response = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertResponseIsSuccessful();
 
         return $response;
     }

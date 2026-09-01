@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticTagManagerBundle\Security\Permissions;
 
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
@@ -7,11 +9,14 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class TagManagerPermissions extends AbstractPermissions
 {
-    public function __construct($params)
+    /**
+     * @param mixed[] $params
+     */
+    public function __construct(array $params)
     {
         parent::__construct($params);
 
-        $this->addStandardPermissions('tagManager', false);
+        $this->addStandardPermissions(['tagManager'], false);
     }
 
     public function getName(): string

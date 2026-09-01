@@ -102,7 +102,7 @@ class LegacyEventDispatcher
             $this->scheduler->rescheduleFailures($rescheduleFailures);
         }
 
-        $this->contactTracker->setSystemContact(null);
+        $this->contactTracker->setSystemContact();
     }
 
     /**
@@ -144,7 +144,7 @@ class LegacyEventDispatcher
         }
     }
 
-    private function dispatchEventName($eventName, array $settings, LeadEventLog $log): CampaignExecutionEvent
+    private function dispatchEventName(?string $eventName, array $settings, LeadEventLog $log): CampaignExecutionEvent
     {
         @trigger_error('eventName is deprecated. Convert to using batchEventName.', E_USER_DEPRECATED);
 
@@ -212,7 +212,7 @@ class LegacyEventDispatcher
         }
     }
 
-    private function dispatchExecutionEvent(AbstractEventAccessor $config, LeadEventLog $log, $result): void
+    private function dispatchExecutionEvent(AbstractEventAccessor $config, LeadEventLog $log, mixed $result): void
     {
         $eventArray = $this->getEventArray($log->getEvent());
 
@@ -256,7 +256,7 @@ class LegacyEventDispatcher
         );
     }
 
-    private function isFailed($result): bool
+    private function isFailed(mixed $result): bool
     {
         return
             false === $result

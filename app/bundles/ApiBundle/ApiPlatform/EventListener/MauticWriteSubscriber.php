@@ -13,13 +13,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-final class MauticWriteSubscriber implements EventSubscriberInterface
+final readonly class MauticWriteSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private UserHelper $userHelper)
-    {
+    public function __construct(
+        private UserHelper $userHelper,
+    ) {
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::VIEW => ['addData', EventPriorities::PRE_WRITE],

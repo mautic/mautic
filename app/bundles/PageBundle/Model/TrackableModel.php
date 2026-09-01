@@ -2,23 +2,17 @@
 
 namespace Mautic\PageBundle\Model;
 
-use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Psr7\Uri;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
+use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Event\UntrackableUrlsEvent;
 use Mautic\PageBundle\PageEvents;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends AbstractCommonModel<Trackable>
@@ -47,6 +41,11 @@ class TrackableModel extends AbstractCommonModel
     protected $contentReplacements = [];
 
     /**
+     * Indicates whether first-pass replacements were collected while parsing content.
+     */
+    protected bool $hasFirstPassReplacements = false;
+
+    /**
      * Used to rebuild correct URLs when the tokenized URL contains query parameters.
      *
      * @var bool
@@ -55,53 +54,62 @@ class TrackableModel extends AbstractCommonModel
 
     private ?array $contactFieldUrlTokens = null;
 
-    public function __construct(
-        protected RedirectModel $redirectModel,
-        private LeadFieldRepository $leadFieldRepository,
-        EntityManagerInterface $em,
-        CorePermissions $security,
-        EventDispatcherInterface $dispatcher,
-        UrlGeneratorInterface $router,
-        Translator $translator,
-        UserHelper $userHelper,
-        LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper,
-    ) {
-        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
+    protected RedirectModel $redirectModel;
+
+    private LeadFieldRepository $leadFieldRepository;
+
+    private TrackableRepository $trackableRepository;
+
+    #[Required]
+    public function autowireTrackableModel(
+        RedirectModel $redirectModel,
+        LeadFieldRepository $leadFieldRepository,
+        TrackableRepository $trackableRepository,
+    ): void {
+        $this->redirectModel        = $redirectModel;
+        $this->leadFieldRepository  = $leadFieldRepository;
+        $this->trackableRepository  = $trackableRepository;
     }
 
-    /**
-     * @return \Mautic\PageBundle\Entity\TrackableRepository
-     */
-    public function getRepository()
+    public function getRepository(): TrackableRepository
     {
-        return $this->em->getRepository(Trackable::class);
+        return $this->trackableRepository;
     }
 
-    /**
-     * @return RedirectModel
-     */
-    protected function getRedirectModel()
+    protected function getRedirectModel(): RedirectModel
     {
         return $this->redirectModel;
     }
 
     /**
-     * @param array      $clickthrough
-     * @param bool|false $shortenUrl   If true, use the configured shortener service to shorten the URLs
+     * @param bool|false $shortenUrl If true, use the configured shortener service to shorten the URLs
      * @param array      $utmTags
      *
      * @return string
      */
-    public function generateTrackableUrl(Trackable $trackable, $clickthrough = [], $shortenUrl = false, $utmTags = [])
-    {
+    public function generateTrackableUrl(
+        Trackable $trackable,
+        array $clickthrough = [],
+        $shortenUrl = false,
+        $utmTags = [],
+    ) {
         if (!isset($clickthrough['channel'])) {
             $clickthrough['channel'] = [$trackable->getChannel() => $trackable->getChannelId()];
         }
 
         $redirect = $trackable->getRedirect();
 
-        return $this->getRedirectModel()->generateRedirectUrl($redirect, $clickthrough, $shortenUrl, $utmTags);
+        $trackedUrl = $this->redirectModel->generateRedirectUrl($redirect, $clickthrough);
+
+        if ([] !== $utmTags) {
+            $trackedUrl = $this->redirectModel->applyUtmTags($trackedUrl, $utmTags);
+        }
+
+        if ($shortenUrl) {
+            $trackedUrl = $this->redirectModel->shortenUrl($trackedUrl);
+        }
+
+        return $trackedUrl;
     }
 
     /**
@@ -118,11 +126,11 @@ class TrackableModel extends AbstractCommonModel
         // Ensure the URL saved to the database does not have encoded ampersands
         $url = UrlHelper::decodeAmpersands($url);
 
-        $trackable = $this->getRepository()->findByUrl($url, $channel, $channelId);
+        $trackable = $this->trackableRepository->findByUrl($url, $channel, $channelId);
         if (null == $trackable) {
             $trackable = $this->createTrackableEntity($url, $channel, $channelId);
-            $this->getRepository()->saveEntity($trackable->getRedirect());
-            $this->getRepository()->saveEntity($trackable);
+            $this->trackableRepository->saveEntity($trackable->getRedirect());
+            $this->trackableRepository->saveEntity($trackable);
         }
 
         return $trackable;
@@ -139,7 +147,7 @@ class TrackableModel extends AbstractCommonModel
             array_values($urls)
         );
 
-        $trackables = $this->getRepository()->findByUrls(
+        $trackables = $this->trackableRepository->findByUrls(
             $uniqueUrls,
             $channel,
             $channelId
@@ -180,10 +188,10 @@ class TrackableModel extends AbstractCommonModel
 
         // Save new entities
         if (count($newRedirects)) {
-            $this->getRepository()->saveEntities($newRedirects);
+            $this->trackableRepository->saveEntities($newRedirects);
         }
         if (count($newTrackables)) {
-            $this->getRepository()->saveEntities($newTrackables);
+            $this->trackableRepository->saveEntities($newTrackables);
         }
 
         unset($trackables, $newRedirects, $newTrackables, $byUrl);
@@ -198,7 +206,7 @@ class TrackableModel extends AbstractCommonModel
      */
     public function getTrackableList($channel, $channelId): array
     {
-        return $this->getRepository()->findByChannel($channel, $channelId);
+        return $this->trackableRepository->findByChannel($channel, $channelId);
     }
 
     /**
@@ -222,15 +230,13 @@ class TrackableModel extends AbstractCommonModel
      *
      * @param string|string[] $content
      * @param string[]        $contentTokens
-     * @param ?string         $channel
-     * @param ?int            $channelId
      * @param bool            $usingClickthrough Set to false if not using a clickthrough parameter.
      *                                           This is to ensure that URLs are built correctly with ? or & for
      *                                           URLs tracked that include query parameters
      *
      * @return array{string|string[],Redirect[]|Trackable[]}
      */
-    public function parseContentForTrackables($content, array $contentTokens = [], $channel = null, $channelId = null, $usingClickthrough = true): array
+    public function parseContentForTrackables($content, array $contentTokens = [], ?string $channel = null, int|string|null $channelId = null, $usingClickthrough = true): array
     {
         $this->usingClickthrough = $usingClickthrough;
 
@@ -284,10 +290,8 @@ class TrackableModel extends AbstractCommonModel
      *
      * @param string $content
      * @param string $type    html|text
-     *
-     * @return string
      */
-    protected function prepareContentWithTrackableTokens($content, $type)
+    protected function prepareContentWithTrackableTokens($content, $type): string
     {
         if (empty($content)) {
             return '';
@@ -301,15 +305,16 @@ class TrackableModel extends AbstractCommonModel
         // Sort longer to shorter strings to ensure that URLs that share the same base are appropriately replaced
         uksort($this->contentReplacements['second_pass'], fn ($a, $b): int => strlen($b) - strlen($a));
 
-        if ('html' == $type) {
-            // For HTML, replace only the links; leaving the link text (if a URL) intact
+        if ('html' === $type) {
+            // Hours spent trying to handle through \DomDocument: 9h. The issue is that tokens "{token}" is replaced
+            // by the \DomDocument::save will encode those on all doc, but here we need to replace only `href`.
             foreach ($this->contentReplacements['second_pass'] as $search => $replace) {
                 // Make the search regular expression match both "&" and "&amp;".
                 $search  = preg_quote($search, '/');
                 $search  = str_replace('&amp;', '&', $search);
                 $search  = str_replace('&', '(?:&|&amp;)', $search);
                 $content = preg_replace(
-                    '/<(.*?) href=(["\'])'.$search.'(.*?)\\2(.*?)>/i',
+                    '/<(.*?) href=(["\'])(?:\R|)(?:\s*)'.$search.'(.*?)(?:\s*)(?:\R|)\\2(.*?)>/i',
                     '<$1 href=$2'.$replace.'$3$2$4>',
                     $content
                 );
@@ -325,6 +330,8 @@ class TrackableModel extends AbstractCommonModel
     }
 
     /**
+     * @phpstan-impure
+     *
      * @return array
      */
     protected function extractTrackablesFromContent($content)
@@ -386,12 +393,9 @@ class TrackableModel extends AbstractCommonModel
         return $trackableUrls;
     }
 
-    /**
-     * Create a Trackable entity.
-     */
     protected function createTrackableEntity($url, $channel, $channelId): Trackable
     {
-        $redirect = $this->getRedirectModel()->createRedirectEntity($url);
+        $redirect = $this->redirectModel->createRedirectEntity($url);
 
         $trackable = new Trackable();
         $trackable->setChannel($channel)
@@ -404,9 +408,9 @@ class TrackableModel extends AbstractCommonModel
     /**
      * Validate and parse link for tracking.
      *
-     * @return bool|non-empty-array<mixed, mixed>
+     * @return false|array{0: string, 1: string}
      */
-    protected function prepareUrlForTracking(string $url)
+    protected function prepareUrlForTracking(string $url): false|array
     {
         // Ensure it's clean
         $url = trim($url);
@@ -439,6 +443,7 @@ class TrackableModel extends AbstractCommonModel
             if ($token === $tokenizedHost && $scheme = (!empty($urlParts['scheme'])) ? $urlParts['scheme'] : false) {
                 // Token has a schema so let's get rid of it before replacing tokens
                 $this->contentReplacements['first_pass'][$scheme.'://'.$tokenizedHost] = $tokenizedHost;
+                $this->hasFirstPassReplacements                                        = true;
                 unset($urlParts['scheme']);
             }
 
@@ -453,11 +458,16 @@ class TrackableModel extends AbstractCommonModel
                 $trackableKey = $trackableUrl;
 
                 // Replace the URL token with the actual URL
-                $this->contentReplacements['first_pass'][$url] = $trackableUrl;
+                $this->contentReplacements['first_pass'][$url]  = $trackableUrl;
+                $this->hasFirstPassReplacements                 = true;
             }
         } else {
             // Regular URL without a tokenized host
-            $trackableUrl = $this->httpBuildUrl($urlParts);
+            try {
+                $trackableUrl = $this->httpBuildUrl($urlParts);
+            } catch (\InvalidArgumentException) {
+                return false;
+            }
 
             if ($this->isInDoNotTrack($trackableUrl)) {
                 return false;
@@ -514,11 +524,7 @@ class TrackableModel extends AbstractCommonModel
             return $this->isValidUrl($url, false);
         }
 
-        if (!$this->isValidUrl($tokenValue)) {
-            return false;
-        }
-
-        return true;
+        return $this->isValidUrl($tokenValue);
     }
 
     /**
@@ -534,26 +540,18 @@ class TrackableModel extends AbstractCommonModel
         }
 
         // Ensure a valid scheme
-        if (($forceScheme && !isset($urlParts['scheme']))
-            || (isset($urlParts['scheme'])
-                && !in_array(
-                    $urlParts['scheme'],
-                    ['http', 'https', 'ftp', 'ftps', 'mailto']
-                ))) {
-            return false;
-        }
-
-        return true;
+        return (!$forceScheme || isset($urlParts['scheme'])) && (!isset($urlParts['scheme']) || in_array(
+            $urlParts['scheme'],
+            ['http', 'https', 'ftp', 'ftps', 'mailto']
+        ));
     }
 
     /**
      * Find and extract tokens from the URL as this have to be processed outside of tracking tokens.
      *
-     * @param $urlParts Array from parse_url
-     *
-     * @return array|false
+     * @param array<string, mixed> $urlParts from parse_url
      */
-    protected function extractTokensFromQuery(&$urlParts)
+    protected function extractTokensFromQuery(array &$urlParts): array|false
     {
         $tokenizedParams = false;
 
@@ -620,7 +618,7 @@ class TrackableModel extends AbstractCommonModel
         }
 
         // Simple redirects
-        return $this->getRedirectModel()->getRedirectsByUrls($trackableUrls);
+        return $this->redirectModel->getRedirectsByUrls($trackableUrls);
     }
 
     /**
@@ -639,10 +637,8 @@ class TrackableModel extends AbstractCommonModel
 
     /**
      * Build query string while accounting for tokens that include an equal sign.
-     *
-     * @return mixed|string
      */
-    protected function httpBuildQuery(array $queryParts)
+    protected function httpBuildQuery(array $queryParts): ?string
     {
         $query = http_build_query($queryParts);
 
@@ -656,18 +652,18 @@ class TrackableModel extends AbstractCommonModel
         return $query;
     }
 
-    private function isContactFieldToken($token): bool
+    private function isContactFieldToken(string $token): bool
     {
-        return str_contains($token, '{contactfield') || str_contains($token, '{leadfield');
+        return str_contains($token, '{contactfield') || str_contains($token, '{leadfield') || str_contains($token, '{ownerfield');
     }
 
     /**
      * @param array<int|string, Redirect|Trackable> $trackableTokens
-     *
-     * @return string
      */
-    private function parseContent($content, $channel, $channelId, array &$trackableTokens)
+    private function parseContent(string $content, ?string $channel, ?int $channelId, array &$trackableTokens): string
     {
+        $this->hasFirstPassReplacements = false;
+
         // Reset content replacement arrays
         $this->contentReplacements = [
             // PHPSTAN reported duplicate keys in this array. I can't determine which is the right one.
@@ -702,18 +698,15 @@ class TrackableModel extends AbstractCommonModel
 
             // Replace URLs in content with tokens
             $content = $this->prepareContentWithTrackableTokens($content, $contentType);
-        } elseif (!empty($this->contentReplacements['first_pass'])) {
-            // Replace URLs in content with tokens
+        } elseif ($this->hasFirstPassReplacements) {
+            // Apply first-pass replacements even when no trackables are created.
             $content = $this->prepareContentWithTrackableTokens($content, $contentType);
         }
 
         return $content;
     }
 
-    /**
-     * @return array
-     */
-    protected function getContactFieldUrlTokens()
+    protected function getContactFieldUrlTokens(): array
     {
         if (null !== $this->contactFieldUrlTokens) {
             return $this->contactFieldUrlTokens;
@@ -740,12 +733,8 @@ class TrackableModel extends AbstractCommonModel
     {
         $trackableUrls = [];
         /** @var \DOMElement $link */
-        foreach ($links as $link) {
+        foreach ($this->extractHrefs($links) as $link) {
             $url = $link->getAttribute('href');
-
-            if ('' === $url) {
-                continue;
-            }
 
             // Check for a do not track
             // @deprecated since 7.x — Will be removed in 8.0. Use data-mautic-disable-tracking.
@@ -767,5 +756,22 @@ class TrackableModel extends AbstractCommonModel
         }
 
         return $trackableUrls;
+    }
+
+    /**
+     * @return \Generator<int, \DOMElement>
+     */
+    private function extractHrefs(\DOMNodeList $elements): \Generator
+    {
+        /** @var \DOMElement $element */
+        foreach ($elements as $element) {
+            $url = $element->getAttribute('href');
+
+            if ('' === $url) {
+                continue;
+            }
+
+            yield $element;
+        }
     }
 }

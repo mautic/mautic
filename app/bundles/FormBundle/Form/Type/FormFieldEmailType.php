@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
@@ -11,10 +13,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class FormFieldEmailType extends AbstractType
+final class FormFieldEmailType extends AbstractType
 {
     public function __construct(
-        private TranslatorInterface $translator,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -40,6 +42,33 @@ class FormFieldEmailType extends AbstractType
                     'data-show-on' => '{"formfield_validation_donotsubmit_1": "checked"}',
                 ],
                 'data'     => $options['data']['donotsubmit_validationmsg'] ?? $this->translator->trans('mautic.form.submission.email.donotsubmit.invalid', [], 'validators'),
+                'required' => false,
+            ]
+        );
+
+        $builder->add(
+            'blockfreeemail',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.form.field.type.blockfreeemail',
+                'attr'  => [
+                    'tooltip' => 'mautic.form.field.type.blockfreeemail.tooltip',
+                ],
+                'data'  => $options['data']['blockfreeemail'] ?? false,
+            ]
+        );
+
+        $builder->add(
+            'blockfreeemail_validationmsg',
+            TextType::class,
+            [
+                'label'      => 'mautic.form.field.form.validationmsg',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'        => 'form-control',
+                    'data-show-on' => '{"formfield_validation_blockfreeemail_1": "checked"}',
+                ],
+                'data'     => $options['data']['blockfreeemail_validationmsg'] ?? $this->translator->trans('mautic.form.submission.email.freeproviders.invalid', [], 'validators'),
                 'required' => false,
             ]
         );

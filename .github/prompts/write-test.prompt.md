@@ -1,7 +1,5 @@
 ---
-mode: 'agent'
-tools: ['testFailure', 'usages']
-description: 'Generate a functional test for highlighted code'
+description: Generate a functional test for highlighted code
 ---
 Generate a new or update an existing functional test for the highlighted code. The test should cover the following aspects:
 
@@ -22,11 +20,18 @@ Good practices:
 - Provide property, param and return types. If not possible to use native types you can always specify the types in the docblock. Mautic uses PHPSTAN so be sure to add types so the PHPSTAN won't fail.
 - Use `$this->assertResponseIsSuccessful();` to assert successful requests.
 - Use PHPUNIT's data providers to test multiple scenarios in a single test method.
+- Use PHP attributes for PHPUnit annotations (e.g., `#[\PHPUnit\Framework\Attributes\DataProvider('methodName')]` instead of `@dataProvider`).
 
 Suggestions for AI:
 - Do not modify the production code unless requested. Always just modify the test code.
 - Make the simplest test possible. The human will suggest improvements if needed.
 
-You can take an inspiration of existing functional tests. They all extend the `MauticMysqlTestCase` class and are located in the `app/bundles/*Bundle/Tests` or `plugins/*Bundle/Tests` directory. The tests are written in PHPUNIT. You can read the version in the `composer.json` file.
+You can take an inspiration of existing functional tests. They all extend the `MauticMysqlTestCase` class and are located in the app/bundles or plugins directories under Tests folders. The tests are written in PHPUNIT. You can read the version in the `composer.json` file.
+
+When testing commands, use the `testSymfonyCommand()` method inherited from `MauticMysqlTestCase`:
+- Always call `$this->em->clear()` before running commands to ensure clean entity state
+- Example: `$output = $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $id]);`
+- Check the output string for errors or expected messages
+- Do not use Application/ArrayInput/BufferedOutput manually
 
 To execute a test you have to run it in DDEV. Example: `ddev exec composer test app/bundles/ExampleBundle/tests/ExampleTest.php`.

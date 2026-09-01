@@ -14,9 +14,9 @@ use Psr\Log\LoggerInterface;
 class CustomFieldIndex
 {
     public function __construct(
-        private IndexSchemaHelper $indexSchemaHelper,
-        private LoggerInterface $logger,
-        private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
+        private readonly IndexSchemaHelper $indexSchemaHelper,
+        private readonly LoggerInterface $logger,
+        private readonly FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
     ) {
     }
 
@@ -30,7 +30,6 @@ class CustomFieldIndex
     public function addIndexOnColumn(LeadField $leadField): void
     {
         try {
-            /** @var IndexSchemaHelper $modifySchema */
             $modifySchema = $this->indexSchemaHelper->setName($leadField->getCustomFieldObject());
 
             $alias = $leadField->getAlias();
@@ -60,7 +59,6 @@ class CustomFieldIndex
     public function dropIndexOnColumn(LeadField $leadField): void
     {
         try {
-            /** @var IndexSchemaHelper $modifySchema */
             $modifySchema = $this->indexSchemaHelper->setName($leadField->getCustomFieldObject());
 
             $alias = $leadField->getAlias();
@@ -89,11 +87,7 @@ class CustomFieldIndex
             return true;
         }
 
-        if (!$this->hasMatchingUniqueIdentifierIndex($leadField)) {
-            return true;
-        }
-
-        return false;
+        return !$this->hasMatchingUniqueIdentifierIndex($leadField);
     }
 
     /**
@@ -126,11 +120,10 @@ class CustomFieldIndex
             return;
         }
 
-        /** @var IndexSchemaHelper $modifySchema */
         $modifySchema = $this->indexSchemaHelper->setName($leadField->getCustomFieldObject());
 
         $indexColumns = $this->getUniqueIdentifierIndexColumns($leadField->getObject());
-        if (!$indexColumns) {
+        if ([] === $indexColumns) {
             $this->dropIndexForUniqueIdentifiers($leadField);
 
             return;
@@ -150,7 +143,6 @@ class CustomFieldIndex
             return;
         }
 
-        /** @var IndexSchemaHelper $modifySchema */
         $modifySchema = $this->indexSchemaHelper->setName($leadField->getCustomFieldObject());
 
         $indexColumns = $this->getUniqueIdentifierIndexColumns($leadField->getObject());

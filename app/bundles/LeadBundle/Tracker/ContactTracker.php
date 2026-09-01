@@ -46,10 +46,7 @@ class ContactTracker
     ) {
     }
 
-    /**
-     * @return Lead|null
-     */
-    public function getContact()
+    public function getContact(): ?Lead
     {
         if (null !== $this->getRequest() && $this->getRequest()->cookies->get('Blocked-Tracking')) {
             return null;
@@ -57,11 +54,12 @@ class ContactTracker
 
         if ($systemContact = $this->getSystemContact()) {
             return $systemContact;
-        } elseif ($this->isUserSession()) {
+        }
+        if ($this->isUserSession()) {
             return null;
         }
 
-        if (empty($this->trackedContact)) {
+        if (!$this->trackedContact instanceof Lead) {
             $this->trackedContact = $this->getCurrentContact();
             $this->generateTrackingCookies();
         }
@@ -94,7 +92,7 @@ class ContactTracker
         }
 
         // Take note of previously tracked in order to dispatched change event
-        $previouslyTrackedContact = (is_null($this->trackedContact)) ? null : $this->trackedContact;
+        $previouslyTrackedContact = $this->trackedContact ?? null;
         $previouslyTrackedId      = $this->getTrackingId();
 
         // Set the newly tracked contact
@@ -120,7 +118,7 @@ class ContactTracker
         // Generate cookies for the newly tracked contact
         $this->generateTrackingCookies();
 
-        if ($previouslyTrackedContact && $previouslyTrackedContact->getId() != $this->trackedContact->getId()) {
+        if ($previouslyTrackedContact && $previouslyTrackedContact->getId() !== $this->trackedContact->getId()) {
             $this->dispatchContactChangeEvent($previouslyTrackedContact, $previouslyTrackedId);
         }
     }
@@ -172,10 +170,7 @@ class ContactTracker
         $this->ipLookupHelper->reset();
     }
 
-    /**
-     * @return Lead|null
-     */
-    private function getSystemContact()
+    private function getSystemContact(): ?Lead
     {
         if ($this->useSystemContact() && $this->systemContact) {
             $this->logger->debug('CONTACT: System lead is being used');
@@ -202,6 +197,10 @@ class ContactTracker
             return $contact;
         }
 
+        if ($event->isSkipContactLastActiveLogged()) {
+            $this->contactLastActiveLogged = true;
+        }
+
         if ($lead = $this->getContactByTrackedDevice()) {
             return $lead;
         }
@@ -216,9 +215,8 @@ class ContactTracker
     {
         $lead = null;
 
-        // Return null for leads that are from a non-trackable IP, prevent anonymous lead with a non-trackable IP to be tracked
-        $ip = $this->ipLookupHelper->getIpAddress();
-        if ($ip && !$ip->isTrackable()) {
+        // Return null for leads that are from a non-trackable request (IP, bot, privacy signal, prefetch checks)
+        if (!$this->ipLookupHelper->isRequestTrackable()) {
             return $lead;
         }
 
@@ -249,8 +247,8 @@ class ContactTracker
     {
         $ip = $this->ipLookupHelper->getIpAddress();
         // if no trackingId cookie set the lead is not tracked yet so create a new one
-        if ($ip && !$ip->isTrackable()) {
-            // Don't save leads that are from a non-trackable IP by default
+        // Don't save leads from non-trackable requests (IP, bot, privacy signal, prefetch checks)
+        if (!$this->ipLookupHelper->isRequestTrackable()) {
             return $this->createNewContact($ip, false);
         }
 
@@ -268,10 +266,7 @@ class ContactTracker
         return $this->createNewContact($ip);
     }
 
-    /**
-     * @param bool $persist
-     */
-    private function createNewContact(?IpAddress $ip = null, $persist = true): Lead
+    private function createNewContact(?IpAddress $ip = null, bool $persist = true): Lead
     {
         // let's create a lead
         $lead = new Lead();
@@ -322,11 +317,11 @@ class ContactTracker
         return !$this->security->isAnonymous();
     }
 
-    private function dispatchContactChangeEvent(Lead $previouslyTrackedContact, $previouslyTrackedId): void
+    private function dispatchContactChangeEvent(Lead $previouslyTrackedContact, ?string $previouslyTrackedId): void
     {
         $newTrackingId = $this->getTrackingId();
         $this->logger->debug(
-            "CONTACT: Tracking code changed from $previouslyTrackedId for contact ID# {$previouslyTrackedContact->getId()} to $newTrackingId for contact ID# {$this->trackedContact->getId()}"
+            "CONTACT: Tracking code changed from {$previouslyTrackedId} for contact ID# {$previouslyTrackedContact->getId()} to {$newTrackingId} for contact ID# {$this->trackedContact->getId()}"
         );
 
         if (null !== $previouslyTrackedId) {

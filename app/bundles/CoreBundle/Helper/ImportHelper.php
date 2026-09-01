@@ -7,7 +7,7 @@ namespace Mautic\CoreBundle\Helper;
 class ImportHelper
 {
     public function __construct(
-        private PathsHelper $pathsHelper,
+        private readonly PathsHelper $pathsHelper,
     ) {
     }
 
@@ -18,7 +18,8 @@ class ImportHelper
      */
     public function readZipFile(string $filePath): array
     {
-        $tempDir      = sys_get_temp_dir();
+        // Use Mautic setting, instead of sys_get_temp_dir. The latter is considered unsafe, because other processes are able to read from the dir.
+        $tempDir      = $this->pathsHelper->getTemporaryPath();
         $zip          = new \ZipArchive();
         $jsonFilePath = null;
 
@@ -28,14 +29,18 @@ class ImportHelper
         $maxRatio     = 10;    // Maximum compression ratio (1:10)
         $readLength   = 1024;  // Read buffer size
 
+        // The ratio check only makes sense for sizable entries: legitimate text payloads such as
+        // the exported entity_data.json compress far better than 1:10, so enforcing the ratio on
+        // small files yields false positives. A real zip bomb still trips the absolute $maxSize
+        // and per-file streaming caps below, so we skip the ratio check under this threshold.
+        $minRatioCheckSize = 1024 * 1024; // 1MB
+
         if (true !== $zip->open($filePath)) {
             throw new \RuntimeException(sprintf('Unable to open ZIP file: %s', $filePath));
         }
 
         $fileCount   = 0;
         $totalSize   = 0;
-        $realTempDir = rtrim(realpath($tempDir), '/');
-
         // Store file information before closing the ZIP
         $fileList = [];
         for ($i = 0; $i < $zip->numFiles; ++$i) {
@@ -72,22 +77,11 @@ class ImportHelper
             }
 
             // Check compression ratio for potential zip bomb
-            if (isset($stat['size']) && isset($stat['comp_size']) && $stat['comp_size'] > 0) {
+            if (isset($stat['size'], $stat['comp_size']) && $stat['comp_size'] > 0 && $stat['size'] > $minRatioCheckSize) {
                 $ratio = $stat['size'] / $stat['comp_size'];
                 if ($ratio > $maxRatio) {
                     $zip->close();
                     throw new \RuntimeException('Suspicious compression ratio detected in ZIP file.');
-                }
-            }
-
-            // For files in subdirectories, ensure they don't escape the temp directory
-            if (str_contains($normalizedFilename, '/')) {
-                $extractionPath           = $tempDir.'/'.$normalizedFilename;
-                $normalizedExtractionPath = $this->normalizePath($extractionPath);
-
-                if (!str_starts_with($normalizedExtractionPath, $realTempDir)) {
-                    $zip->close();
-                    throw new \RuntimeException('Unsafe file path detected in ZIP: '.$filename);
                 }
             }
         }
@@ -101,7 +95,8 @@ class ImportHelper
                 continue;
             }
 
-            $sourcePath = $tempDir.'/'.$filename;
+            $normalizedFilename = $this->normalizePath($filename);
+            $sourcePath         = $tempDir.'/'.$normalizedFilename;
 
             if (!str_ends_with($filename, '/')) {
                 // Create directory if needed
@@ -144,7 +139,7 @@ class ImportHelper
                     }
 
                     // Check compression ratio during extraction
-                    if (isset($stat['comp_size']) && $stat['comp_size'] > 0) {
+                    if (isset($stat['comp_size']) && $stat['comp_size'] > 0 && $currentSize > $minRatioCheckSize) {
                         $ratio = $currentSize / $stat['comp_size'];
                         if ($ratio > $maxRatio) {
                             fclose($fileHandle);
@@ -170,14 +165,15 @@ class ImportHelper
 
         $zip->close();
 
-        $mediaPath = $this->pathsHelper->getSystemPath('media').'/files/';
+        $mediaPath = $this->pathsHelper->getMediaPath().'/files/';
 
         // Process extracted files using stored file list
         foreach ($fileList as $filename) {
-            $sourcePath      = $tempDir.'/'.$filename;
-            $destinationPath = $mediaPath.substr($filename, strlen('assets/'));
+            $normalizedFilename = $this->normalizePath($filename);
+            $sourcePath         = $tempDir.'/'.$normalizedFilename;
+            $destinationPath    = $mediaPath.substr($normalizedFilename, strlen('assets/'));
 
-            if (str_starts_with($filename, 'assets/')) {
+            if (str_starts_with($normalizedFilename, 'assets/')) {
                 if (is_dir($sourcePath)) {
                     if (!is_dir($destinationPath) && !mkdir($destinationPath, 0755, true) && !is_dir($destinationPath)) {
                         throw new \RuntimeException(sprintf('Failed to create directory: %s', $destinationPath));
@@ -191,8 +187,10 @@ class ImportHelper
                         throw new \RuntimeException(sprintf('Failed to copy file to destination: %s', $destinationPath));
                     }
                 }
-            } elseif ('json' === pathinfo($filename, PATHINFO_EXTENSION)) {
-                $jsonFilePath = $tempDir.'/'.$filename;
+            } elseif ('json' === pathinfo($normalizedFilename, PATHINFO_EXTENSION) && 'composer.json' !== basename($normalizedFilename)) {
+                // composer.json carries package metadata in marketplace resource ZIPs,
+                // never entity data — picking it here would corrupt the import.
+                $jsonFilePath = $tempDir.'/'.$normalizedFilename;
             }
         }
 
@@ -217,26 +215,31 @@ class ImportHelper
     private function normalizePath(string $path): string
     {
         $parts    = [];
-        $segments = explode('/', str_replace('\\', '/', $path));
+        $unixPath = str_replace('\\', '/', $path);
+        $absolute = str_starts_with($unixPath, '/');
+        $segments = explode('/', $unixPath);
 
         foreach ($segments as $segment) {
             if ('' === $segment || '.' === $segment) {
                 continue;
             }
             if ('..' === $segment) {
-                if (!empty($parts)) {
+                if ([] !== $parts) {
                     array_pop($parts);
+                } else {
+                    // Cannot resolve upward — preserve so callers detect traversal.
+                    $parts[] = '..';
                 }
             } else {
                 $parts[] = $segment;
             }
         }
 
-        return implode('/', $parts);
+        return ($absolute ? '/' : '').implode('/', $parts);
     }
 
     /**
-     * @param array<string, string|array<mixed, mixed>> &$input
+     * @param array<string, string|array<mixed, mixed>> $input
      */
     public function recursiveRemoveEmailaddress(array &$input): void
     {

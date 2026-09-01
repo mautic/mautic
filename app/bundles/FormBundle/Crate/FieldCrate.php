@@ -6,7 +6,7 @@ namespace Mautic\FormBundle\Crate;
 
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 
-final class FieldCrate
+final readonly class FieldCrate
 {
     /**
      * @param mixed[] $properties
@@ -44,9 +44,9 @@ final class FieldCrate
 
     public function isListType(): bool
     {
-        $isListType    = in_array($this->getType(), FormFieldHelper::getListTypes());
-        $hasList       = !empty($this->getProperties()['list']);
-        $hasOptionList = !empty($this->getProperties()['optionlist']);
+        $isListType    = in_array($this->type, FormFieldHelper::getListTypes());
+        $hasList       = !empty($this->properties['list']);
+        $hasOptionList = !empty($this->properties['optionlist']);
 
         return $isListType || $hasList || $hasOptionList;
     }

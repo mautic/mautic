@@ -10,13 +10,11 @@ use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 
-class EmailRepositoryIncrementReadTest extends \PHPUnit\Framework\TestCase
+final class EmailRepositoryIncrementReadTest extends \PHPUnit\Framework\TestCase
 {
     use RepositoryConfiguratorTrait;
 
     private QueryBuilder $queryBuilder;
-
-    private QueryBuilder $subQueryBuilder;
 
     /**
      * @var EmailRepository|object
@@ -28,10 +26,10 @@ class EmailRepositoryIncrementReadTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
         $this->repo             = $this->configureRepository(Email::class);
         $this->queryBuilder     = new QueryBuilder($this->connection);
-        $this->subQueryBuilder  = new QueryBuilder($this->connection);
+        $subQueryBuilder        = new QueryBuilder($this->connection);
         $this->connection->method('createQueryBuilder')->willReturnOnConsecutiveCalls(
             $this->queryBuilder,
-            $this->subQueryBuilder
+            $subQueryBuilder
         );
     }
 
@@ -84,7 +82,7 @@ class EmailRepositoryIncrementReadTest extends \PHPUnit\Framework\TestCase
         $this->connection
             ->expects($this->exactly(3))
             ->method('executeStatement')
-            ->will($this->throwException(new DBALException()));
+            ->willThrowException(new DBALException());
 
         $this->expectException(DBALException::class);
         $this->repo->incrementRead(45, '616');

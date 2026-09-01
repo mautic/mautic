@@ -8,9 +8,8 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\WebhookQueue;
-use PHPUnit\Framework\Assert;
 
-class WebhookQueueFunctionalTest extends MauticMysqlTestCase
+final class WebhookQueueFunctionalTest extends MauticMysqlTestCase
 {
     public function testPayloadCompressed(): void
     {
@@ -19,18 +18,19 @@ class WebhookQueueFunctionalTest extends MauticMysqlTestCase
         $payload  = 'Compressed payload';
         $webhookQueue->setPayload($payload);
 
-        Assert::assertSame($payload, $webhookQueue->getPayload());
+        $this->assertSame($payload, $webhookQueue->getPayload());
 
         $this->em->flush();
 
         $payloadDbValues = $this->fetchPayloadDbValues($webhookQueue);
-        Assert::assertSame($payload, gzuncompress($payloadDbValues['payload_compressed']));
+        $this->assertSame($payload, gzuncompress($payloadDbValues['payload_compressed']));
 
         $this->em->clear();
         $webhookQueue = $this->em->getRepository(WebhookQueue::class)
             ->find($webhookQueue->getId());
+        $this->assertInstanceOf(WebhookQueue::class, $webhookQueue);
 
-        Assert::assertSame($payload, $webhookQueue->getPayload());
+        $this->assertSame($payload, $webhookQueue->getPayload());
     }
 
     private function createWebhookQueue(): WebhookQueue
@@ -59,7 +59,7 @@ class WebhookQueueFunctionalTest extends MauticMysqlTestCase
      */
     private function fetchPayloadDbValues(WebhookQueue $webhookQueue): array
     {
-        $prefix = static::getContainer()->getParameter('mautic.db_table_prefix');
+        $prefix = self::getContainer()->getParameter('mautic.db_table_prefix');
         $query  = sprintf('SELECT payload_compressed FROM %swebhook_queue WHERE id = ?', $prefix);
 
         return $this->connection->executeQuery($query, [$webhookQueue->getId()])

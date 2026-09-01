@@ -28,57 +28,40 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
+final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     use MockedConnectionTrait;
+
     /**
      * @var MockObject|Connection
      */
     private MockObject $connectionMock;
 
     /**
-     * @var MockObject|CompanyReportData
+     * @var MockObject&CompanyReportData
      */
     private MockObject $companyReportDataMock;
 
     /**
-     * @var MockObject|StatRepository
-     */
-    private MockObject $statRepository;
-
-    /**
-     * @var MockObject|EmailRepository
+     * @var MockObject&EmailRepository
      */
     private MockObject $emailRepository;
 
     /**
-     * @var MockObject&GeneratedColumnsProviderInterface
-     */
-    private MockObject $generatedColumnsProvider;
-
-    /**
-     * @var MockObject|Report
+     * @var MockObject&Report
      */
     private MockObject $report;
 
     private ChannelListHelper $channelListHelper;
 
-    /**
-     * @var MockObject|QueryBuilder
-     */
     private QueryBuilder $queryBuilder;
 
     private ReportSubscriber $subscriber;
 
     /**
-     * @var MockObject|FieldsBuilder
+     * @var MockObject&FieldsBuilder
      */
     private MockObject $fieldsBuilderMock;
-
-    /**
-     * @var MockObject|DncReportService
-     */
-    private MockObject $dncReportService;
 
     protected function setUp(): void
     {
@@ -86,23 +69,20 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->connectionMock            = $this->getMockedConnection();
         $this->companyReportDataMock     = $this->createMock(CompanyReportData::class);
-        $this->statRepository            = $this->createMock(StatRepository::class);
         $this->emailRepository           = $this->createMock(EmailRepository::class);
-        $this->generatedColumnsProvider  = $this->createMock(GeneratedColumnsProviderInterface::class);
         $this->fieldsBuilderMock         = $this->createMock(FieldsBuilder::class);
-        $this->dncReportService          = $this->createMock(DncReportService::class);
         $this->subscriber                = new ReportSubscriber(
             $this->connectionMock,
             $this->companyReportDataMock,
-            $this->statRepository,
+            $this->createStub(StatRepository::class),
             $this->emailRepository,
-            $this->generatedColumnsProvider,
+            $this->createStub(GeneratedColumnsProviderInterface::class),
             $this->fieldsBuilderMock,
-            $this->dncReportService,
+            $this->createStub(DncReportService::class),
         );
 
         $this->report             = $this->createMock(Report::class);
-        $this->channelListHelper  = new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class));
+        $this->channelListHelper  = new ChannelListHelper($this->createStub(EventDispatcherInterface::class), $this->createStub(Translator::class));
         $this->queryBuilder       = new QueryBuilder($this->connectionMock);
     }
 
@@ -112,7 +92,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getSource')
             ->willReturn(ReportSubscriber::CONTEXT_EMAIL_STATS);
 
-        $this->report->expects($this->any())
+        $this->report
             ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
             ->willReturn([
                 'es.email_address',
@@ -141,7 +121,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getSource')
             ->willReturn(ReportSubscriber::CONTEXT_EMAIL_STATS);
 
-        $this->report->expects($this->any())
+        $this->report
             ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
             ->willReturn(['vp.subject']);
 
@@ -166,20 +146,16 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getSource')
             ->willReturn(ReportSubscriber::CONTEXT_EMAIL_STATS);
 
-        $this->report->expects($this->any())
+        $this->report
             ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
             ->willReturn(['unique_hits']);
 
-        $this->report->expects($this->any())
+        $this->report
             ->method('getFilters')
             ->willReturn([]);
 
         $this->connectionMock->expects($this->exactly(2))
-            ->method('createQueryBuilder')
-            ->willReturnOnConsecutiveCalls(
-                new QueryBuilder($this->connectionMock),
-                new QueryBuilder($this->connectionMock)
-            );
+            ->method('createQueryBuilder')->willReturn(new QueryBuilder($this->connectionMock));
 
         $event = new ReportGeneratorEvent(
             $this->report,
@@ -202,20 +178,16 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getSource')
             ->willReturn(ReportSubscriber::CONTEXT_EMAIL_STATS);
 
-        $this->report->expects($this->any())
+        $this->report
             ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
             ->willReturn(['cmp.name']);
 
-        $this->report->expects($this->any())
+        $this->report
             ->method('getFilters')
             ->willReturn([]);
 
         $this->connectionMock->expects($this->exactly(2))
-            ->method('createQueryBuilder')
-            ->willReturnOnConsecutiveCalls(
-                new QueryBuilder($this->connectionMock),
-                new QueryBuilder($this->connectionMock)
-            );
+            ->method('createQueryBuilder')->willReturn(new QueryBuilder($this->connectionMock));
 
         $event = new ReportGeneratorEvent(
             $this->report,
@@ -236,9 +208,9 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $eventMock         = $this->createMock(ReportGraphEvent::class);
         $queryBuilderMock  = $this->createMock(QueryBuilder::class);
-        $chartQueryMock    = $this->createMock(ChartQuery::class);
+        $chartQueryMock    = $this->createStub(ChartQuery::class);
         $resultMock        = $this->createMock(Result::class);
-        $translatorMock    = $this->createMock(TranslatorInterface::class);
+        $translatorMock    = $this->createStub(TranslatorInterface::class);
 
         $queryBuilderMock->method('executeQuery')->willReturn($resultMock);
         $resultMock->method('fetchOne')->willReturn([]);
@@ -248,7 +220,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn(['mautic.email.graph.pie.read.ingored.unsubscribed.bounced']);
         $matcher = $this->any();
 
-        $eventMock->expects($matcher)->method('checkContext')->willReturnCallback(function (...$parameters) use ($matcher) {
+        $eventMock->expects($matcher)->method('checkContext')->willReturnCallback(function (...$parameters) use ($matcher): true {
             if (1 === $matcher->numberOfInvocations()) {
                 $this->assertSame(['email.stats', 'emails'], $parameters[0]);
             }
@@ -294,14 +266,14 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnReportGraphGenerateForEmailContextWithEmailMultiSieriesPieGraph(): void
     {
-        $queryBuilderMock  = $this->createMock(QueryBuilder::class);
+        $queryBuilderMock  = $this->createStub(QueryBuilder::class);
         $eventMock         = $this->createMock(ReportGraphEvent::class);
-        $chartQueryMock    = $this->createMock(ChartQuery::class);
-        $translatorMock    = $this->createMock(TranslatorInterface::class);
+        $chartQueryMock    = $this->createStub(ChartQuery::class);
+        $translatorMock    = $this->createStub(TranslatorInterface::class);
         $matcher           = $this->any();
 
         $eventMock->expects($matcher)
-            ->method('checkContext')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('checkContext')->willReturnCallback(function (...$parameters) use ($matcher): true {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(['email.stats', 'emails'], $parameters[0]);
                 }
@@ -347,9 +319,9 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $eventMock         = $this->createMock(ReportGraphEvent::class);
         $queryBuilderMock  = $this->createMock(QueryBuilder::class);
-        $chartQueryMock    = $this->createMock(ChartQuery::class);
+        $chartQueryMock    = $this->createStub(ChartQuery::class);
         $resultMock        = $this->createMock(Result::class);
-        $translatorMock    = $this->createMock(TranslatorInterface::class);
+        $translatorMock    = $this->createStub(TranslatorInterface::class);
 
         $queryBuilderMock->method('executeQuery')->willReturn($resultMock);
         $resultMock->method('fetchOne')->willReturn([]);
@@ -405,11 +377,10 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnReportBuilderWithEmailSentContext(): void
     {
-        $translatorMock     = $this->createMock(TranslatorInterface::class);
-        $reportHelper       = new ReportHelper($this->createMock(EventDispatcherInterface::class));
+        $translatorMock     = $this->createStub(TranslatorInterface::class);
+        $reportHelper       = new ReportHelper($this->createStub(EventDispatcherInterface::class));
 
         $this->companyReportDataMock
-            ->expects($this->any())
             ->method('getCompanyData')
             ->willReturn([
                 'comp.companyname' => [
@@ -419,7 +390,6 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ]);
 
         $this->fieldsBuilderMock
-            ->expects($this->any())
             ->method('getLeadFilter')
             ->willReturn([
                 'tag' => [
@@ -663,7 +633,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                 'alias'   => 'unsubscribed',
                 'label'   => '',
                 'type'    => 'string',
-                'formula' => 'IFNULL((SELECT ROUND(SUM(IF(dnc.id IS NOT NULL AND dnc.channel_id=e.id AND dnc.reason=1 , 1, 0)), 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), 0)',
+                'formula' => 'IFNULL((SELECT SUM(IF(dnc.id IS NOT NULL AND dnc.channel_id=e.id AND dnc.reason=1 , 1, 0)) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), 0)',
             ],
             'unsubscribed_ratio' => [
                 'alias'   => 'unsubscribed_ratio',
@@ -676,7 +646,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                 'alias'   => 'bounced',
                 'label'   => '',
                 'type'    => 'string',
-                'formula' => 'IFNULL((SELECT ROUND(SUM(IF(dnc.id IS NOT NULL AND dnc.channel_id=e.id AND dnc.reason=2 , 1, 0)), 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), 0)',
+                'formula' => 'IFNULL((SELECT SUM(IF(dnc.id IS NOT NULL AND dnc.channel_id=e.id AND dnc.reason=2 , 1, 0)) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), 0)',
             ],
             'bounced_ratio' => [
                 'alias'   => 'bounced_ratio',

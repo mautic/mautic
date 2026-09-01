@@ -2,7 +2,7 @@
 
 namespace Mautic\PluginBundle\Integration;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\CurlHandler;
 use GuzzleHttp\HandlerStack;
@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
@@ -34,9 +35,12 @@ use Mautic\PluginBundle\Helper\Cleaner;
 use Mautic\PluginBundle\Helper\oAuthHelper;
 use Mautic\PluginBundle\Model\IntegrationEntityModel;
 use Mautic\PluginBundle\PluginEvents;
+use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -74,7 +78,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Used for notifications.
      *
-     * @var \Doctrine\ORM\Tools\Pagination\Paginator<\Mautic\UserBundle\Entity\User>
+     * @var \Doctrine\ORM\Tools\Pagination\Paginator<User>
      */
     protected ?\Doctrine\ORM\Tools\Pagination\Paginator $adminUsers = null;
 
@@ -91,12 +95,30 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     protected array $persistIntegrationEntities = [];
 
     protected array $commandParameters = [];
+
     private \Closure $clientFactory;
+
+    protected IntegrationEntityRepository $integrationEntityRepository;
+
+    protected LeadRepository $leadRepository;
+
+    protected UserRepository $userRepository;
+
+    #[Required]
+    public function autowireAbstractIntegration(
+        IntegrationEntityRepository $integrationEntityRepository,
+        LeadRepository $leadRepository,
+        UserRepository $userRepository,
+    ): void {
+        $this->integrationEntityRepository = $integrationEntityRepository;
+        $this->leadRepository              = $leadRepository;
+        $this->userRepository              = $userRepository;
+    }
 
     public function __construct(
         protected EventDispatcherInterface $dispatcher,
         CacheStorageHelper $cacheStorageHelper,
-        protected EntityManager $em,
+        protected EntityManagerInterface $em,
         protected RequestStack $requestStack,
         protected RouterInterface $router,
         protected TranslatorInterface $translator,
@@ -328,15 +350,12 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * Merge api keys.
-     *
      * @param bool|false $return Returns the key array rather than setting them
      *
      * @return void|array
      */
     public function mergeApiKeys($mergeKeys, $withKeys = [], $return = false)
     {
-        $settings = $this->settings;
         if (empty($withKeys)) {
             $withKeys = $this->keys;
         }
@@ -358,12 +377,11 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             );
 
             return $this->keys;
-        } else {
-            $this->encryptAndSetApiKeys($withKeys, $settings);
-
-            // reset for events that depend on rebuilding auth objects
-            $this->setIntegrationSettings($settings);
         }
+        $this->encryptAndSetApiKeys($withKeys, $this->settings);
+
+        // reset for events that depend on rebuilding auth objects
+        $this->setIntegrationSettings($this->settings);
     }
 
     /**
@@ -404,9 +422,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     {
         static $decryptedKeys = [];
 
-        if (!$entity) {
-            $entity = $this->settings;
-        }
+        $entity = $entity ?: $this->settings;
 
         $keys = $entity->getApiKeys();
 
@@ -416,7 +432,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             if (0 !== count($keys) && 0 === count($decrypted)) {
                 $decrypted = $this->decryptApiKeys($keys);
                 $this->encryptAndSetApiKeys($decrypted, $entity);
-                $this->em->flush($entity);
+                $this->em->flush();
             }
             $decryptedKeys[$serialized] = $this->dispatchIntegrationKeyEvent(
                 PluginEvents::PLUGIN_ON_INTEGRATION_KEYS_DECRYPT,
@@ -428,8 +444,6 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * Encrypts API keys.
-     *
      * @return array
      */
     public function encryptApiKeys(array $keys)
@@ -445,8 +459,6 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * Decrypts API keys.
-     *
      * @param bool $mainDecryptOnly
      *
      * @return array
@@ -591,25 +603,25 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                 }
 
                 return implode('; ', $errors);
-            } elseif (!empty($response->error->message)) {
-                return $response->error->message;
-            } else {
-                return (string) $response;
             }
-        } elseif (is_array($response)) {
+            if (!empty($response->error->message)) {
+                return $response->error->message;
+            }
+
+            return (string) $response;
+        }
+        if (is_array($response)) {
             if (isset($response['error_description'])) {
                 return $response['error_description'];
-            } elseif (isset($response['error'])) {
+            }
+            if (isset($response['error'])) {
                 if (is_array($response['error'])) {
-                    if (isset($response['error']['message'])) {
-                        return $response['error']['message'];
-                    } else {
-                        return implode(', ', $response['error']);
-                    }
-                } else {
-                    return $response['error'];
+                    return $response['error']['message'] ?? implode(', ', $response['error']);
                 }
-            } elseif (isset($response['errors'])) {
+
+                return $response['error'];
+            }
+            if (isset($response['errors'])) {
                 $errors = [];
                 foreach ($response['errors'] as $err) {
                     if (is_array($err)) {
@@ -627,9 +639,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             }
 
             return $response;
-        } else {
-            return $response;
         }
+
+        return $response;
     }
 
     /**
@@ -692,7 +704,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             ];
         }
 
-        if ('GET' == $method && !empty($parameters)) {
+        if ('GET' === $method && !empty($parameters)) {
             $parameters = array_merge($settings['query'], $parameters);
             $query      = http_build_query($parameters);
             $url .= (!str_contains($url, '?')) ? '?'.$query : '&'.$query;
@@ -797,14 +809,14 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         } catch (\GuzzleHttp\Exception\RequestException $exception) {
             if (!empty($settings['return_raw'])) {
                 return $exception->getResponse();
-            } else {
-                return [
-                    'error' => [
-                        'message' => $exception->getResponse()->getBody()->getContents(),
-                        'code'    => $exception->getCode(),
-                    ],
-                ];
             }
+
+            return [
+                'error' => [
+                    'message' => $exception->getResponse()->getBody()->getContents(),
+                    'code'    => $exception->getCode(),
+                ],
+            ];
         }
         if (empty($settings['ignore_event_dispatch'])) {
             $event->setResponse($result);
@@ -815,9 +827,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         }
         if (!empty($settings['return_raw'])) {
             return $result;
-        } else {
-            return $this->parseCallbackResponse($result->getBody(), !empty($settings['authorize_session']));
         }
+
+        return $this->parseCallbackResponse($result->getBody(), !empty($settings['authorize_session']));
     }
 
     /**
@@ -844,7 +856,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             ->setInternalEntityId($internalEntityId);
 
         if ($persist) {
-            $this->em->getRepository(IntegrationEntity::class)->saveEntity($entity);
+            $this->integrationEntityRepository->saveEntity($entity);
         }
 
         return $entity;
@@ -855,7 +867,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     public function getIntegrationEntityRepository()
     {
-        return $this->em->getRepository(IntegrationEntity::class);
+        return $this->integrationEntityRepository;
     }
 
     /**
@@ -959,7 +971,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                         }
 
                         $headers = [
-                            "oauth-token: $authTokenKey",
+                            "oauth-token: {$authTokenKey}",
                             "Authorization: OAuth {$authToken}",
                         ];
                     }
@@ -1002,12 +1014,12 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             }
 
             return $url;
-        } else {
-            return $this->router->generate(
-                'mautic_integration_auth_callback',
-                ['integration' => $this->getName()]
-            );
         }
+
+        return $this->router->generate(
+            'mautic_integration_auth_callback',
+            ['integration' => $this->getName()]
+        );
     }
 
     /**
@@ -1324,7 +1336,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Get an array of public data.
      *
-     * @return mixed[]|void
+     * @return mixed[]|ResponseInterface|void
      */
     public function getUserData($identifier, &$socialCache)
     {
@@ -1398,7 +1410,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
          * @param $mauticFields
          * @param $fieldType
          */
-        $cleanup = function (&$mappedFields, $integrationFields, $mauticFields, $fieldType) use (&$missingRequiredFields, &$featureSettings): void {
+        $cleanup = function (array &$mappedFields, array $integrationFields, $mauticFields, $fieldType) use (&$missingRequiredFields, &$featureSettings): void {
             $updateKey    = ('companyFields' === $fieldType) ? 'update_mautic_company' : 'update_mautic';
             $removeFields = array_keys(array_diff_key($mappedFields, $integrationFields));
 
@@ -1457,7 +1469,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             $leadFields = $availableIntegrationFields;
         }
 
-        if (!empty($leadFields)) {
+        if ([] !== $leadFields) {
             $cleanup($submittedFields, $leadFields, $mauticLeadFields, 'leadFields');
             $featureSettings['leadFields'] = $submittedFields;
         }
@@ -1481,7 +1493,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             if ('leadFields' === $fieldType) {
                 if ((is_array($details) && !empty($details['required'])) || 'email' === $field
                     || (isset($details['optionLabel'])
-                        && 'email' == strtolower(
+                        && 'email' === strtolower(
                             $details['optionLabel']
                         ))
                 ) {
@@ -1697,8 +1709,6 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         }
 
         // Find unique identifier fields used by the integration
-        /** @var LeadModel $leadModel */
-        $leadModel           = $this->leadModel;
         $uniqueLeadFields    = $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier();
         $uniqueLeadFieldData = [];
 
@@ -1713,15 +1723,14 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         $lead->setNewlyCreated(true);
 
         if (count($uniqueLeadFieldData)) {
-            $existingLeads = $this->em->getRepository(Lead::class)
-                ->getLeadsByUniqueFields($uniqueLeadFieldData);
+            $existingLeads = $this->leadRepository->getLeadsByUniqueFields($uniqueLeadFieldData);
 
             if (!empty($existingLeads)) {
                 $lead = array_shift($existingLeads);
             }
         }
 
-        $leadModel->setFieldValues($lead, $matchedFields, false, false);
+        $this->leadModel->setFieldValues($lead, $matchedFields, false, false);
 
         // Update the social cache
         $leadSocialCache = $lead->getSocialCache();
@@ -1756,7 +1765,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                     null,
                     $this->getDisplayName()
                 ));
-                $leadModel->saveEntity($lead, false);
+                $this->leadModel->saveEntity($lead, false);
             } catch (\Exception $exception) {
                 $this->logger->warning($exception->getMessage());
 
@@ -1839,16 +1848,14 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                 if (!isset($data[$field])) {
                     $info[$field] = '';
                     continue;
-                } else {
-                    $values = $data[$field];
                 }
+                $values = $data[$field];
             } else {
-                if (!isset($data->$field)) {
+                if (!isset($data->{$field})) {
                     $info[$field] = '';
                     continue;
-                } else {
-                    $values = $data->$field;
                 }
+                $values = $data->{$field};
             }
 
             switch ($fieldDetails['type']) {
@@ -1858,10 +1865,10 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                     break;
                 case 'object':
                     foreach ($fieldDetails['fields'] as $f) {
-                        if (isset($values->$f)) {
+                        if (isset($values->{$f})) {
                             $fn = $this->matchFieldName($field, $f);
 
-                            $info[$fn] = $values->$f;
+                            $info[$fn] = $values->{$f};
                         }
                     }
                     break;
@@ -1926,11 +1933,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     public function logIntegrationError(\Exception $e, ?Lead $contact = null): void
     {
-        $logger = $this->logger;
-
         if ($e instanceof ApiErrorException) {
             if (null === $this->adminUsers) {
-                $this->adminUsers = $this->em->getRepository(\Mautic\UserBundle\Entity\User::class)->getEntities(
+                $this->adminUsers = $this->userRepository->getEntities(
                     [
                         'filter' => [
                             'force' => [
@@ -1994,7 +1999,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             }
         }
 
-        $logger->error('INTEGRATION ERROR: '.$this->getName().' - '.(('dev' == MAUTIC_ENV) ? (string) $e : $e->getMessage()));
+        $this->logger->error('INTEGRATION ERROR: '.$this->getName().' - '.(('dev' == MAUTIC_ENV) ? (string) $e : $e->getMessage()));
     }
 
     /**
@@ -2024,9 +2029,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     {
         if ('leadfield_match' == $section) {
             return ['mautic.integration.form.field_match_notes', 'info'];
-        } else {
-            return ['', 'info'];
         }
+
+        return ['', 'info'];
     }
 
     /**
@@ -2156,7 +2161,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return array
      */
-    protected function dispatchIntegrationKeyEvent($eventName, $keys = [])
+    protected function dispatchIntegrationKeyEvent(?string $eventName, $keys = [])
     {
         /** @var PluginIntegrationKeyEvent $event */
         $event = $this->dispatcher->dispatch(
@@ -2226,26 +2231,25 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             $this->mauticDuplicates = [];
         }
 
-        $integrationEntityRepo = $this->getIntegrationEntityRepository();
         if (!empty($leadsToSync)) {
             // Let's only sync thos that have actual changes to prevent a loop
-            $integrationEntityRepo->saveEntities($leadsToSync);
-            $integrationEntityRepo->deleteEntity($leadsToSync);
+            $this->integrationEntityRepository->saveEntities($leadsToSync);
+            $this->integrationEntityRepository->deleteEntity($leadsToSync);
             $leadsToSync = [];
         }
 
         // Persist updated entities if applicable
         if ($this->persistIntegrationEntities) {
-            $integrationEntityRepo->saveEntities($this->persistIntegrationEntities);
+            $this->integrationEntityRepository->saveEntities($this->persistIntegrationEntities);
             $this->persistIntegrationEntities = [];
         }
 
         // If there are any deleted, mark it as so to prevent them from being queried over and over or recreated
         if ($this->deleteIntegrationEntities) {
-            $integrationEntityRepo->deleteEntities($this->deleteIntegrationEntities);
+            $this->integrationEntityRepository->deleteEntities($this->deleteIntegrationEntities);
             $this->deleteIntegrationEntities = [];
         }
-        $integrationEntityRepo->deleteEntities($this->deleteIntegrationEntities);
+        $this->integrationEntityRepository->deleteEntities($this->deleteIntegrationEntities);
 
         if ($error) {
             if ($error instanceof \Exception) {
@@ -2264,8 +2268,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     protected function buildIntegrationEntities(array $mapping, $integrationEntity, $internalEntity, $params = [])
     {
-        $integrationEntityRepo = $this->getIntegrationEntityRepository();
-        $integrationEntities   = $integrationEntityRepo->getIntegrationEntities(
+        $integrationEntities = $this->integrationEntityRepository->getIntegrationEntities(
             $this->getName(),
             $integrationEntity,
             $internalEntity,
@@ -2300,8 +2303,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             }
         }
 
-        $integrationEntityRepo->saveEntities($integrationEntities);
-        $integrationEntityRepo->detachEntities($integrationEntities);
+        $this->integrationEntityRepository->saveEntities($integrationEntities);
+        $this->integrationEntityRepository->detachEntities($integrationEntities);
     }
 
     /**
@@ -2370,7 +2373,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             }
         }
 
-        if (!empty($formattedFields)) {
+        if ([] !== $formattedFields) {
             $fields = $formattedFields;
         }
 
@@ -2414,14 +2417,14 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * @return bool
      */
-    public function isCompoundMauticField($fieldName)
+    public function isCompoundMauticField(string $fieldName)
     {
         $compoundFields = [
             'mauticContactTimelineLink' => 'mauticContactTimelineLink',
             'mauticContactId'           => 'mauticContactId',
         ];
 
-        if (true === $this->updateDncByDate()) {
+        if ($this->updateDncByDate()) {
             $compoundFields['mauticContactIsContactableByEmail'] = 'mauticContactIsContactableByEmail';
         }
 

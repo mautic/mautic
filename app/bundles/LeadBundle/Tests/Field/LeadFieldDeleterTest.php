@@ -9,27 +9,18 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Exception\NoListenerException;
 use Mautic\LeadBundle\Field\Dispatcher\FieldDeleteDispatcher;
-use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
 use Mautic\LeadBundle\Field\LeadFieldDeleter;
+use Mautic\LeadBundle\Field\Settings\BackgroundSettings;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 final class LeadFieldDeleterTest extends TestCase
 {
-    /**
-     * @var MockObject&LeadFieldRepository
-     */
-    private MockObject $leadFieldRepositoryMock;
+    private MockObject&LeadFieldRepository $leadFieldRepositoryMock;
 
-    /**
-     * @var MockObject&FieldDeleteDispatcher
-     */
-    private MockObject $fieldDeleteDispatcherMock;
+    private MockObject&FieldDeleteDispatcher $fieldDeleteDispatcherMock;
 
-    /**
-     * @var MockObject&UserHelper
-     */
-    private MockObject $userHelperMock;
+    private MockObject&BackgroundSettings $backgroundSettingsMock;
 
     private LeadFieldDeleter $leadFieldDeleter;
 
@@ -37,36 +28,35 @@ final class LeadFieldDeleterTest extends TestCase
     {
         $this->leadFieldRepositoryMock   = $this->createMock(LeadFieldRepository::class);
         $this->fieldDeleteDispatcherMock = $this->createMock(FieldDeleteDispatcher::class);
-        $this->userHelperMock            = $this->createMock(UserHelper::class);
+        $this->backgroundSettingsMock    = $this->createMock(BackgroundSettings::class);
         $this->leadFieldDeleter          = new LeadFieldDeleter(
             $this->leadFieldRepositoryMock,
             $this->fieldDeleteDispatcherMock,
-            $this->userHelperMock,
+            $this->createStub(UserHelper::class),
+            $this->backgroundSettingsMock,
         );
     }
 
     public function testDeleteLeadFieldEntityNoBackground(): void
     {
         $leadField = new LeadField();
-        $this->fieldDeleteDispatcherMock
+        $this->backgroundSettingsMock
             ->expects($this->once())
-            ->method('dispatchPreDeleteEvent')
-            ->with($leadField)
-            ->willThrowException(new AbortColumnUpdateException());
+            ->method('shouldProcessColumnChangeInBackground')
+            ->willReturn(true);
         $this->leadFieldRepositoryMock
             ->expects($this->never())
             ->method('deleteEntity');
-        $this->leadFieldDeleter->deleteLeadFieldEntity($leadField, false);
+        $this->leadFieldDeleter->deleteLeadFieldEntity($leadField);
     }
 
     public function testDeleteLeadFieldEntityInBackground(): void
     {
         $leadField = new LeadField();
-        $this->fieldDeleteDispatcherMock
+        $this->backgroundSettingsMock
             ->expects($this->once())
-            ->method('dispatchPreDeleteEvent')
-            ->with($leadField)
-            ->willThrowException(new AbortColumnUpdateException());
+            ->method('shouldProcessColumnChangeInBackground')
+            ->willReturn(true);
         $this->leadFieldRepositoryMock
             ->expects($this->once())
             ->method('deleteEntity')

@@ -68,6 +68,18 @@ if (!isset($args['repackage'])) {
         exit;
     }
 
+    // Compile the GrapesJs builder assets. They are generated (not tracked in git), so
+    // they are absent from the git archive and must be built here into the packaging space.
+    system('cd '.__DIR__.'/packaging/plugins/GrapesJsBuilderBundle && npm ci && npm run build', $result);
+    if (0 !== $result) {
+        exit;
+    }
+
+    // Drop the build-only deps and cache so they don't ship in the packages. The nested plugin
+    // node_modules isn't caught by the root-anchored node_modules/* exclude, and the whole plugin
+    // dir is added to the update package, so remove them explicitly.
+    system('rm -rf '.__DIR__.'/packaging/plugins/GrapesJsBuilderBundle/node_modules '.__DIR__.'/packaging/plugins/GrapesJsBuilderBundle/.parcel-cache');
+
     // Common steps
     include_once __DIR__.'/processfiles.php';
 
@@ -89,9 +101,26 @@ if (!isset($args['repackage'])) {
 
     // Ensure the generated media files don't end up in the deleted files by explicitly adding them to the release files.
     foreach (['css', 'js', 'libraries/ckeditor', 'libraries/ckeditor/translations'] as $dir) {
-        $files = array_diff(scandir(__DIR__.'/packaging/media/'.$dir), ['..', '.']);
+        $path = __DIR__.'/packaging/media/'.$dir;
+        if (!is_dir($path)) {
+            continue;
+        }
+        $files = array_diff(scandir($path), ['..', '.']);
         array_walk($files, function (&$item) use ($dir) { $item = 'media/'.$dir.'/'.$item; });
         $releaseFiles = array_merge($releaseFiles, $files);
+    }
+
+    // The GrapesJs builder assets are generated during packaging and not tracked in git. Add them
+    // to $releaseFiles (so old names aren't flagged deleted) and $modifiedFiles (so they ship in
+    // the update package). Mirrors the media files above.
+    $grapesJsDistDir = 'plugins/GrapesJsBuilderBundle/Assets/library/js/dist';
+    if (is_dir(__DIR__.'/packaging/'.$grapesJsDistDir)) {
+        $files = array_diff(scandir(__DIR__.'/packaging/'.$grapesJsDistDir), ['..', '.']);
+        array_walk($files, function (&$item) use ($grapesJsDistDir) { $item = $grapesJsDistDir.'/'.$item; });
+        $releaseFiles = array_merge($releaseFiles, $files);
+        foreach ($files as $file) {
+            $modifiedFiles[$file] = true;
+        }
     }
 
     // Create a flag to check if the vendors changed
@@ -129,9 +158,11 @@ if (!isset($args['repackage'])) {
 
     // Include assets just in case they weren't
     $assetFiles = [
-        'media/css/'       => true,
-        'media/js/'        => true,
-        'media/libraries/' => true,
+        'media/css/'                                  => true,
+        'media/js/'                                   => true,
+        'media/libraries/'                            => true,
+        'media/bundles/'                              => true,
+        'app/bundles/CoreBundle/Assets/pictograms/'   => true,
     ];
     $modifiedFiles = $modifiedFiles + $assetFiles;
 

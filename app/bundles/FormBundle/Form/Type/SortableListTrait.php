@@ -12,7 +12,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 trait SortableListTrait
 {
-    public function addSortableList(FormBuilderInterface $builder, $options, $listName = 'list', $listData = null, $formName = 'formfield'): void
+    public function addSortableList(FormBuilderInterface $builder, array $options, $listName = 'list', $listData = null, $formName = 'formfield'): void
     {
         $listOptions = [
             'with_labels' => true,

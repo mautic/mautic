@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Command\CleanupExportedFilesCommand;
 use Mautic\LeadBundle\Command\ContactScheduledExportCommand;
 use Mautic\LeadBundle\Entity\ContactExportScheduler;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
+use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\HttpFoundation\Request;
 
 final class CleanupExportedFilesCommandFunctionalTest extends MauticMysqlTestCase
@@ -31,7 +31,7 @@ final class CleanupExportedFilesCommandFunctionalTest extends MauticMysqlTestCas
         $filePath = $this->exportContactToCsvFile();
 
         $this->testSymfonyCommand(CleanupExportedFilesCommand::COMMAND_NAME);
-        Assert::assertFileDoesNotExist($filePath);
+        $this->assertFileDoesNotExist($filePath);
     }
 
     private function exportContactToCsvFile(): string
@@ -42,18 +42,18 @@ final class CleanupExportedFilesCommandFunctionalTest extends MauticMysqlTestCas
             's/contacts/batchExport',
             ['filetype' => 'csv']
         );
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
         $contactExportSchedulerRows = $this->checkContactExportScheduler(1);
         /** @var ContactExportScheduler $contactExportScheduler */
         $contactExportScheduler     = $contactExportSchedulerRows[0];
         $this->testSymfonyCommand(ContactScheduledExportCommand::COMMAND_NAME, ['--ids' => $contactExportScheduler->getId()]);
 
         /** @var CoreParametersHelper $coreParametersHelper */
-        $coreParametersHelper    = self::getContainer()->get('mautic.helper.core_parameters');
+        $coreParametersHelper    = self::getContainer()->get(CoreParametersHelper::class);
         $zipFileName             = 'contacts_export_'.$contactExportScheduler->getScheduledDateTime()
                 ->format('Y_m_d_H_i_s').'.zip';
         $filePath = $coreParametersHelper->get('contact_export_dir').'/'.$zipFileName;
-        Assert::assertFileExists($filePath);
+        $this->assertFileExists($filePath);
 
         return $filePath;
     }
@@ -71,7 +71,8 @@ final class CleanupExportedFilesCommandFunctionalTest extends MauticMysqlTestCas
             $contacts[] = $contact;
         }
 
-        $leadModel = self::getContainer()->get('mautic.lead.model.lead');
+        /** @var LeadModel $leadModel */
+        $leadModel = self::getContainer()->get(LeadModel::class);
         $leadModel->saveEntities($contacts);
     }
 
@@ -82,7 +83,7 @@ final class CleanupExportedFilesCommandFunctionalTest extends MauticMysqlTestCas
     {
         $repo    = $this->em->getRepository(ContactExportScheduler::class);
         $allRows = $repo->findAll();
-        Assert::assertCount($count, $allRows);
+        $this->assertCount($count, $allRows);
 
         return $allRows;
     }

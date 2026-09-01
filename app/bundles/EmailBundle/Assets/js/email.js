@@ -81,6 +81,10 @@ Mautic.emailOnLoad = function (container, response) {
         });
     }
 
+    if (mQuery('#content_preview_frame').length && Mautic.contentPreviewUrlGenerator) {
+        Mautic.contentPreviewUrlGenerator.init();
+    }
+
     var $loadDeliveredElements = mQuery('[data-email-stat-delivered-for]');
     if ($loadDeliveredElements.length) {
         $loadDeliveredElements.each(function(i, el) {
@@ -157,6 +161,12 @@ Mautic.submitSendForm = function () {
     Mautic.dismissConfirmation();
     mQuery('.btn-send').prop('disabled', true);
     mQuery('form[name=\'batch_send\']').submit();
+};
+
+Mautic.submitAbSendForm = function () {
+    Mautic.dismissConfirmation();
+    mQuery('.btn-send').prop('disabled', true);
+    mQuery('form[name=\'ab_test_send\']').submit();
 };
 
 Mautic.emailSendOnLoad = function (container, response) {
@@ -236,10 +246,12 @@ Mautic.selectEmailType = function(emailType) {
         mQuery('#segmentTranslationParent').removeClass('hide');
         mQuery('#templateTranslationParent').addClass('hide');
         mQuery('.page-header h3').text(mauticLang.newListEmail);
+        // Hide scheduling options for Segment Email
+        mQuery('#scheduleOptions').addClass('hide');
     } else {
         mQuery('#segmentTranslationParent').addClass('hide');
         mQuery('#templateTranslationParent').removeClass('hide');
-        mQuery('#leadList').addClass('hide');
+        mQuery('#leadList,#ab-test').addClass('hide');
         mQuery('.page-header h3').text(mauticLang.newTemplateEmail);
     }
 
@@ -289,13 +301,41 @@ Mautic.disabledEmailAction = function(opener, origin) {
         opener = window;
     }
     var email = opener.mQuery(origin);
-    if (email.length == 0) return;
+    if (email.length == 0){
+        mQuery('#email_send_to_dnc_status').addClass('hide');
+        return;
+    }
     var emailId = email.val();
     var disabled = emailId === '' || emailId === null;
 
     opener.mQuery('[id$=_editEmailButton]').prop('disabled', disabled);
     opener.mQuery('[id$=_previewEmailButton]').prop('disabled', disabled);
+    if (disabled) {
+        mQuery('#email_send_to_dnc_status, .queue_hide').addClass('hide');
+    } else {
+        Mautic.setEmailSendToDncStatus(emailId);
+    }
 };
+
+Mautic.setEmailSendToDncStatus = function (emailId) {
+    const dnc_status = mQuery('#email_send_to_dnc_status');
+    if (emailId && dnc_status.length > 0) {
+        Mautic.ajaxActionRequest('email:getEmailSendToDncStatus', {id: emailId}, function(response) {
+            if (typeof response.sendToDncStatus != "undefined") {
+                dnc_status.removeClass('hide')
+                dnc_status.find('span.dnc-status-text')
+                    .removeClass('label-danger label-primary')
+                    .addClass(response.sendToDncStatus ? 'label-danger' : 'label-primary')
+                    .text(response.sendToDncText);
+
+                mQuery('.queue_hide').toggleClass('hide', response.sendToDncStatus);
+            } else {
+                dnc_status.addClass('hide');
+                mQuery('.queue_hide').addClass('hide');
+            }
+        }, false, false, "GET");
+    }
+}
 
 Mautic.initEmailDynamicContent = function() {
     if (mQuery('#dynamic-content-container').length) {
@@ -466,15 +506,7 @@ Mautic.initDynamicContentItem = function (tabId, jQueryVariant, tokenName) {
         }
     }
 
-    $el.find('a.remove-selected').on('click', function() {
-        mQuery(this).closest('.panel').animate(
-            {'opacity': 0},
-            'fast',
-            function () {
-                mQuery(this).remove();
-            }
-        );
-    });
+    Mautic.initRemoveEvents($el.find('button.remove-selected'), mQuery);
 
     $el.find('select[data-mautic="available_filters"]').on('change', function() {
         var $this = mQuery(this);
@@ -643,7 +675,7 @@ Mautic.addDynamicContentFilter = function (selectedFilter, jQueryVariant) {
 
     activeDynamicContentFilterContainer.append(prototype);
 
-    Mautic.initRemoveEvents(activeDynamicContentFilterContainer.find("a.remove-selected"), mQuery);
+    Mautic.initRemoveEvents(activeDynamicContentFilterContainer.find("button.remove-selected"), mQuery);
 
     var filter = '#' + filterIdBase + '_filter';
 
@@ -752,4 +784,28 @@ Mautic.loadEmailUsages = function($el) {
         var usagesHtml = response.usagesHtml;
         $el.html(usagesHtml);
     }, false, true, "GET");
+};
+
+Mautic.setSendToDncOnModelLoad = function(el) {
+    mQuery(el).trigger('change');
+};
+
+Mautic.showSendToDncConfirmation = function (el) {
+    const element = mQuery(el);
+
+    if (element.val() === '1' && element.prop('checked')) {
+        Mautic.showConfirmation(element);
+    }
+};
+
+Mautic.setSendToDncToNo = function(el) {
+    Mautic.dismissConfirmation();
+    const noButton   = mQuery(el).parent('.btn-yes').siblings('.btn-no').children('input');
+    const noButtonId = mQuery(noButton).attr('id');
+
+    if (noButtonId !== undefined) {
+        mQuery('#' + noButtonId).trigger('click');
+        mQuery(el).parent('.btn-yes').removeClass('active');
+        mQuery(el).parent('.btn-yes').siblings('.btn-no').addClass('active');
+    }
 };

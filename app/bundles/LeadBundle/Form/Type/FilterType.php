@@ -4,6 +4,8 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Provider\FormAdjustmentsProviderInterface;
+use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
+use Mautic\LeadBundle\Segment\OperatorOptions;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -17,12 +19,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class FilterType extends AbstractType
+final class FilterType extends AbstractType
 {
     public function __construct(
-        private FormAdjustmentsProviderInterface $formAdjustmentsProvider,
-        private ListModel $listModel,
+        private readonly FormAdjustmentsProviderInterface $formAdjustmentsProvider,
+        private readonly ListModel $listModel,
+        TypeOperatorProviderInterface $typeOperatorProvider,
     ) {
+        $typeOperatorProvider->setContext('segment');
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -48,7 +52,7 @@ class FilterType extends AbstractType
         $formModifier = function (FormEvent $event) use ($fieldChoices): void {
             $data        = (array) $event->getData();
             $form        = $event->getForm();
-            $fieldAlias  = $data['field'] ?? null;
+            $fieldAlias  = $data['field'] ?? '';
             $fieldObject = $data['object'] ?? 'behaviors';
             // Looking for behaviors for BC reasons as some filters were moved from 'lead' to 'behaviors'.
             $field       = $fieldChoices[$fieldObject][$fieldAlias] ?? $fieldChoices['behaviors'][$fieldAlias] ?? null;
@@ -57,6 +61,18 @@ class FilterType extends AbstractType
 
             if ($operators && !$operator) {
                 $operator = array_key_first($operators);
+            }
+
+            // Keep legacy operators available for existing saved segments, but not for new filters.
+            // @see https://github.com/mautic/mautic/pull/16012
+            $legacyOperators  = [OperatorOptions::INCLUDING_ALL, OperatorOptions::EXCLUDING_ALL];
+            $isLegacyOperator = null !== $operator && in_array($operator, $legacyOperators, true);
+
+            if ($isLegacyOperator && !in_array($operator, $operators, true)) {
+                $deprecatedOperatorTypes = $this->listModel->getOperatorsForFieldType([
+                    'include' => $legacyOperators,
+                ]);
+                $operators += array_filter($deprecatedOperatorTypes, static fn ($v): bool => $v === $operator);
             }
 
             $form->add(

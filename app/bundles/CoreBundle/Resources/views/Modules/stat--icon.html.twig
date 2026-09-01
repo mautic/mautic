@@ -9,15 +9,15 @@
                         <i class="ri-information-line ml-3" data-toggle="tooltip" title="{{ stat.tooltip|trans }}"></i>
                     {% endif %}
                 </span>
+                {% if stat.desc is defined %}
+                    <span class="text-secondary small mb-sm ellipsis">{{ stat.desc|trans }}</span>
+                {% endif %}
                 <span class="d-flex lh-1 ai-center jc-space-between fs-40">
                     <div class="fw-b {% if stat.link is defined and stat.value != 0 and stat.value != '0%' %}text-interactive{% endif %}" {% if stat.value_attr is defined %}{{ stat.value_attr|raw }}{% endif %}>{% if stat.value == 0 or stat.value == '0%' %}--{% else %}{{ stat.value|raw }}{% endif %}</div>
                     {% if stat.icon is defined and stat.icon and (stat.link is not defined or stat.value == 0) %}
                         <i class="{{ stat.icon }} fs-22" aria-hidden="true"></i>
                     {% endif %}
                 </span>
-                {% if stat.desc is defined %}
-                    <span class="text-secondary small mt-md ellipsis">{{ stat.desc|trans }}</span>
-                {% endif %}
             </div>  
         {% endset %}
 

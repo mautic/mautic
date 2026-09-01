@@ -2,7 +2,7 @@
 
 namespace Page\Acceptance;
 
-class ContactPage
+final class ContactPage
 {
     public static $URL = '/s/contacts';
 
@@ -40,8 +40,6 @@ class ContactPage
     public static $chooseFileButton       = '#lead_import_file';
     public static $uploadButton           = '#lead_import_start';
     public static $importModal            = '#app-content > div > div.row.animation--slide-in-up > div > div > div.row > div > div';
-    public static $importForm             = '#app-content > div > div.ml-lg.mr-lg.mt-md.pa-lg > form > div:nth-child(2) > div.panel-body';
-    public static $importFormFields       = '#app-content > div > div.ml-lg.mr-lg.mt-md.pa-lg > form > div:nth-child(2) > div.panel-body > div:nth-child(1) > div > div > label';
     public static $firstName              = '#lead_field_import_firstname_chosen';
     public static $lastName               = '#lead_field_import_lastname_chosen';
     public static $email                  = '#lead_field_import_email_chosen';
@@ -51,10 +49,10 @@ class ContactPage
     public static $importProgressComplete = '#leadImportProgressComplete';
 
     // Campaigns
-    public static $campaignsModalAddOption     = '//*[@id="lead_batch_add_chosen"]/ul/li/input';
-    public static $campaignsModalRemoveOption  = '//*[@id="lead_batch_remove_chosen"]/ul/li/input';
-    public static $firstCampaignFromAddList    = '#lead_batch_add_chosen > div > ul > li';
-    public static $firstCampaignFromRemoveList = '#lead_batch_remove_chosen > div > ul > li';
+    public static $campaignsModalAddOption     = '//*[@id="MauticSharedModal"]//*[@id="lead_batch_add_chosen"]/ul/li/input';
+    public static $campaignsModalRemoveOption  = '//*[@id="MauticSharedModal"]//*[@id="lead_batch_remove_chosen"]/ul/li/input';
+    public static $firstCampaignFromAddList    = '#MauticSharedModal #lead_batch_add_chosen > div > ul > li';
+    public static $firstCampaignFromRemoveList = '#MauticSharedModal #lead_batch_remove_chosen > div > ul > li';
     public static $campaignsModalSaveButton    = '#MauticSharedModal > div > div > div.modal-footer > div > button.btn.btn-save.btn-copy';
 
     // Change Owner From
@@ -94,7 +92,7 @@ class ContactPage
     /**
      * @var \AcceptanceTester;
      */
-    protected $acceptanceTester;
+    private $acceptanceTester;
 
     public function __construct(\AcceptanceTester $I)
     {

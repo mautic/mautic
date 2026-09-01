@@ -13,30 +13,20 @@ use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\EventListener\DoctrineGeneratedColumnsListener;
 use Psr\Log\LoggerInterface;
 
-class DoctrineGeneratedColumnsListenerTest extends \PHPUnit\Framework\TestCase
+final class DoctrineGeneratedColumnsListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var GeneratedColumnsProviderInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $generatedColumnsProvider;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $logger;
-
-    /**
-     * @var GenerateSchemaEventArgs|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&GenerateSchemaEventArgs
      */
     private \PHPUnit\Framework\MockObject\MockObject $event;
 
     /**
-     * @var Schema|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&Schema
      */
     private \PHPUnit\Framework\MockObject\MockObject $schema;
 
     /**
-     * @var Table|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&Table
      */
     private \PHPUnit\Framework\MockObject\MockObject $table;
 
@@ -46,19 +36,18 @@ class DoctrineGeneratedColumnsListenerTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->generatedColumnsProvider = $this->createMock(GeneratedColumnsProviderInterface::class);
-        $this->logger                   = $this->createMock(LoggerInterface::class);
+        $generatedColumnsProvider       = $this->createMock(GeneratedColumnsProviderInterface::class);
         $this->event                    = $this->createMock(GenerateSchemaEventArgs::class);
         $this->schema                   = $this->createMock(Schema::class);
         $this->table                    = $this->createMock(Table::class);
-        $this->listener                 = new DoctrineGeneratedColumnsListener($this->generatedColumnsProvider, $this->logger);
+        $this->listener                 = new DoctrineGeneratedColumnsListener($generatedColumnsProvider, $this->createStub(LoggerInterface::class));
 
         $generatedColumn  = new GeneratedColumn('page_hits', 'generated_hit_date', 'DATE', 'not important');
         $generatedColumns = new GeneratedColumns();
 
         $generatedColumns->add($generatedColumn);
 
-        $this->generatedColumnsProvider->method('getGeneratedColumns')->willReturn($generatedColumns);
+        $generatedColumnsProvider->method('getGeneratedColumns')->willReturn($generatedColumns);
         $this->event->method('getSchema')->willReturn($this->schema);
     }
 

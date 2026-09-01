@@ -3,13 +3,16 @@
 namespace Mautic\CampaignBundle\Model;
 
 use Doctrine\DBAL\Exception;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\PersistentCollection;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
+use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Event as Events;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
@@ -27,17 +30,19 @@ use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
-use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -49,11 +54,11 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     public function __construct(
         protected ListModel $leadListModel,
         protected FormModel $formModel,
-        private EventCollector $eventCollector,
-        private MembershipBuilder $membershipBuilder,
-        private ContactTracker $contactTracker,
-        private GeneratedColumnsProviderInterface $generatedColumnsProvider,
-        EntityManager $em,
+        private readonly EventCollector $eventCollector,
+        private readonly MembershipBuilder $membershipBuilder,
+        private readonly ContactTracker $contactTracker,
+        private readonly GeneratedColumnsProviderInterface $generatedColumnsProvider,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,
@@ -61,43 +66,36 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly CampaignRepository $campaignRepository,
+        private readonly EventRepository $eventRepository,
+        private readonly LeadRepository $leadRepository,
+        private readonly LeadEventLogRepository $leadEventLogRepository,
+        private readonly StatRepository $statRepository,
+        private readonly FormRepository $formRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return \Mautic\CampaignBundle\Entity\CampaignRepository
-     */
-    public function getRepository()
+    public function getRepository(): CampaignRepository
     {
-        $repo = $this->em->getRepository(Campaign::class);
-        $repo->setCurrentUser($this->userHelper->getUser());
+        $this->campaignRepository->setCurrentUser($this->userHelper->getUser());
 
-        return $repo;
+        return $this->campaignRepository;
     }
 
-    /**
-     * @return \Mautic\CampaignBundle\Entity\EventRepository
-     */
-    public function getEventRepository()
+    public function getEventRepository(): EventRepository
     {
-        return $this->em->getRepository(Event::class);
+        return $this->eventRepository;
     }
 
-    /**
-     * @return \Mautic\CampaignBundle\Entity\LeadRepository
-     */
-    public function getCampaignLeadRepository()
+    public function getCampaignLeadRepository(): LeadRepository
     {
-        return $this->em->getRepository(CampaignLead::class);
+        return $this->leadRepository;
     }
 
-    /**
-     * @return LeadEventLogRepository
-     */
-    public function getCampaignLeadEventLogRepository()
+    public function getCampaignLeadEventLogRepository(): LeadEventLogRepository
     {
-        return $this->em->getRepository(\Mautic\CampaignBundle\Entity\LeadEventLog::class);
+        return $this->leadEventLogRepository;
     }
 
     public function getPermissionBase(): string
@@ -110,7 +108,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
      * @param string|null $action
      * @param array       $options
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Campaign) {
             throw new MethodNotAllowedHttpException(['Campaign']);
@@ -159,7 +157,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     public function deleteEntity($entity): void
     {
         // Null all the event parents for this campaign to avoid database constraints
-        $this->getEventRepository()->nullEventParents($entity->getId());
+        $this->eventRepository->nullEventParents($entity->getId());
         $this->dispatchEvent('pre_delete', $entity);
         $this->getRepository()->setCampaignAsDeleted($entity->getId());
 
@@ -204,19 +202,22 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof \Symfony\Contracts\EventDispatcher\Event) {
                 $event = new Events\CampaignEvent($entity, $isNew);
             }
 
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
-    public function setEvents(Campaign $entity, $sessionEvents, $sessionConnections, $deletedEvents): array
+    /**
+     * @param mixed[] $deletedEvents
+     */
+    public function setEvents(Campaign $entity, $sessionEvents, array $sessionConnections, array $deletedEvents): array
     {
         $existingEvents = $entity->getEvents()->toArray();
         $events         = [];
@@ -224,7 +225,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
 
         foreach ($sessionEvents as $properties) {
             $isNew = (!empty($properties['id']) && isset($existingEvents[$properties['id']])) ? false : true;
-            $event = !$isNew ? $existingEvents[$properties['id']] : new Event();
+            $event = !$isNew ? $existingEvents[$properties['id']] : new Event(new \DateTime());
 
             foreach ($properties as $f => $v) {
                 if ('id' == $f && str_starts_with($v, 'new')) {
@@ -232,7 +233,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
                     $event->setTempId($v);
                 }
 
-                if (in_array($f, ['id', 'parent', 'campaign'])) {
+                if (in_array($f, ['id', 'parent', 'campaign', 'dateAdded', 'dateLinked'])) {
                     continue;
                 }
 
@@ -243,7 +244,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
 
                 $func = 'set'.ucfirst($f);
                 if (method_exists($event, $func)) {
-                    $event->$func($v);
+                    $event->{$func}($v);
                 }
             }
 
@@ -351,7 +352,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
 
         // Persist events if campaign is being edited
         if ($entity->getId()) {
-            $this->getEventRepository()->saveEntities($events);
+            $this->eventRepository->saveEntities($events);
 
             $this->handleDeletedEventsWithRedirect($deletedEvents);
         }
@@ -360,11 +361,11 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param bool $persist
+     * @param array<string, mixed> $settings
      *
-     * @return array
+     * @return mixed[]
      */
-    public function setCanvasSettings($entity, $settings, $persist = true, $events = null)
+    public function setCanvasSettings(Campaign $entity, array $settings, bool $persist = true, $events = null): array
     {
         if (null === $events) {
             $events = $entity->getEvents();
@@ -374,9 +375,9 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
 
         foreach ($events as $e) {
             if ($e instanceof Event) {
-                $tempIds[$e->getTempId()] = $e->getId();
+                $tempIds[$e->getTempId() ?? ''] = $e->getId();
             } else {
-                $tempIds[$e['tempId']] = $e['id'];
+                $tempIds[$e['tempId'] ?? ''] = $e['id'] ?? '';
             }
         }
 
@@ -387,7 +388,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         foreach ($settings['nodes'] as &$node) {
             if (str_contains($node['id'], 'new')) {
                 // Find the real one and update the node
-                $node['id'] = str_replace($node['id'], $tempIds[$node['id']], $node['id']);
+                $node['id'] = str_replace($node['id'], $tempIds[$node['id'] ?? ''] ?? '', $node['id']);
             }
         }
 
@@ -456,10 +457,16 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
             foreach ($sources as $id => $label) {
                 switch ($type) {
                     case 'lists':
-                        $entity->addList($this->em->getReference(\Mautic\LeadBundle\Entity\LeadList::class, $id));
+                        $list = $this->getLeadListSource($id);
+                        if ($list instanceof LeadList) {
+                            $entity->addList($list);
+                        }
                         break;
                     case 'forms':
-                        $entity->addForm($this->em->getReference(Form::class, $id));
+                        $form = $this->getFormSource($id);
+                        if ($form instanceof Form) {
+                            $entity->addForm($form);
+                        }
                         break;
                     default:
                         break;
@@ -471,10 +478,16 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
             foreach ($sources as $id => $label) {
                 switch ($type) {
                     case 'lists':
-                        $entity->removeList($this->em->getReference(\Mautic\LeadBundle\Entity\LeadList::class, $id));
+                        $list = $this->getLeadListSource($id);
+                        if ($list instanceof LeadList) {
+                            $entity->removeList($list);
+                        }
                         break;
                     case 'forms':
-                        $entity->removeForm($this->em->getReference(Form::class, $id));
+                        $form = $this->getFormSource($id);
+                        if ($form instanceof Form) {
+                            $entity->removeForm($form);
+                        }
                         break;
                     default:
                         break;
@@ -483,13 +496,35 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         }
     }
 
+    private function getLeadListSource(int|string $identifier): ?LeadList
+    {
+        if (!ctype_digit((string) $identifier)) {
+            return null;
+        }
+
+        $list = $this->em->find(LeadList::class, (int) $identifier);
+
+        return $list instanceof LeadList ? $list : null;
+    }
+
+    private function getFormSource(int|string $identifier): ?Form
+    {
+        if (!ctype_digit((string) $identifier)) {
+            return null;
+        }
+
+        $form = $this->em->find(Form::class, (int) $identifier);
+
+        return $form instanceof Form ? $form : null;
+    }
+
     /**
      * Get a list of source choices.
      *
      * @param string $sourceType
      * @param bool   $globalOnly
      */
-    public function getSourceLists($sourceType = null, $globalOnly = false): array
+    public function getSourceLists($sourceType = null, $globalOnly = false, bool $useIdsForLists = false): array
     {
         $choices = [];
         switch ($sourceType) {
@@ -500,7 +535,8 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
 
                 if ($lists) {
                     foreach ($lists as $list) {
-                        $choices['lists'][$list['id']] = $list['name'];
+                        $identifier                    = $useIdsForLists ? $list['id'] : $list['alias'];
+                        $choices['lists'][$identifier] = $list['name'];
                     }
                 }
 
@@ -509,10 +545,9 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
             case null:
                 $choices['forms'] = [];
                 $viewOther        = $this->security->isGranted('form:forms:viewother');
-                $repo             = $this->formModel->getRepository();
-                $repo->setCurrentUser($this->userHelper->getUser());
+                $this->formRepository->setCurrentUser($this->userHelper->getUser());
 
-                $forms = $repo->getFormList('', 0, 0, $viewOther, 'campaign');
+                $forms = $this->formRepository->getFormList('', 0, 0, $viewOther);
 
                 foreach ($forms as $form) {
                     $choices['forms'][$form['id']] = $form['name'];
@@ -595,7 +630,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     public function saveCampaignLead(CampaignLead $campaignLead): bool
     {
         try {
-            $this->getCampaignLeadRepository()->saveEntity($campaignLead);
+            $this->leadRepository->saveEntity($campaignLead);
 
             return true;
         } catch (\Exception $exception) {
@@ -607,10 +642,8 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
 
     /**
      * Get details of leads in a campaign.
-     *
-     * @return mixed
      */
-    public function getLeadDetails($campaign, $leads = null)
+    public function getLeadDetails($campaign, $leads = null): array
     {
         $campaignId = ($campaign instanceof Campaign) ? $campaign->getId() : $campaign;
 
@@ -618,7 +651,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
             $leads = array_keys($leads->toArray());
         }
 
-        return $this->em->getRepository(CampaignLead::class)->getLeadDetails($campaignId, $leads);
+        return $this->leadRepository->getLeadDetails($campaignId, $leads);
     }
 
     /**
@@ -634,7 +667,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         $campaignId = ($campaign instanceof Campaign) ? $campaign->getId() : $campaign;
         $eventId    = (is_array($event) && isset($event['id'])) ? $event['id'] : $event;
 
-        return $this->em->getRepository(CampaignLead::class)->getLeads($campaignId, $eventId);
+        return $this->leadRepository->getLeads($campaignId, $eventId);
     }
 
     public function getCampaignListIds($id): array
@@ -673,9 +706,8 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
      *
      * @param string|null $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string      $dateFormat
-     * @param array       $filter
      */
-    public function getCampaignMetricsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = []): array
+    public function getCampaignMetricsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = []): array
     {
         $events = [];
         $chart  = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
@@ -686,7 +718,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         $chart->setDataset($this->translator->trans('mautic.campaign.campaign.leads'), $contacts);
 
         if (isset($filter['campaign_id'])) {
-            $rawEvents = $this->getEventRepository()->getCampaignEvents($filter['campaign_id']);
+            $rawEvents = $this->eventRepository->getCampaignEvents($filter['campaign_id']);
 
             // Group events by type
             foreach ($rawEvents as $event) {
@@ -697,7 +729,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
                 }
             }
 
-            if ($events) {
+            if ([] !== $events) {
                 foreach ($events as $type => $eventIds) {
                     $filter['event_id'] = $eventIds;
 
@@ -737,21 +769,20 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
      * @param string   $root
      * @param int      $order
      */
-    protected function buildOrder($hierarchy, &$events, $entity, $root = 'null', $order = 1)
+    protected function buildOrder(array $hierarchy, array &$events, $entity, $root = 'null', $order = 1): void
     {
         $count = count($hierarchy);
         if (1 === $count && 'null' === array_unique(array_values($hierarchy))[0]) {
             // no parents so leave order as is
 
             return;
-        } else {
-            foreach ($hierarchy as $eventId => $parent) {
-                if ($parent == $root || 1 === $count) {
-                    $events[$eventId]->setOrder($order);
-                    unset($hierarchy[$eventId]);
-                    if (count($hierarchy)) {
-                        $this->buildOrder($hierarchy, $events, $entity, $eventId, $order + 1);
-                    }
+        }
+        foreach ($hierarchy as $eventId => $parent) {
+            if ($parent == $root || 1 === $count) {
+                $events[$eventId]->setOrder($order);
+                unset($hierarchy[$eventId]);
+                if (count($hierarchy)) {
+                    $this->buildOrder($hierarchy, $events, $entity, $eventId, $order + 1);
                 }
             }
         }
@@ -806,7 +837,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
      */
     public function getCampaignIdsWithDependenciesOnTagName(string $tagName): array
     {
-        $entities = $this->getEventRepository()->getEntities(
+        $entities = $this->eventRepository->getEntities(
             [
                 'filter' => [
                     'force'  => [
@@ -846,8 +877,6 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
      */
     public function getCountryStats(Campaign $entity, \DateTimeImmutable $dateFrom, \DateTimeImmutable $dateTo): array
     {
-        /** @var StatRepository $statRepo */
-        $statRepo            = $this->em->getRepository(Stat::class);
         $results['contacts'] =  $this->getCampaignMembersGroupByCountry($entity, $dateFrom, $dateTo);
 
         if ($entity->isEmailCampaign()) {
@@ -859,7 +888,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
                 $emailIds[] = $event->getChannelId();
             }
 
-            $emailStats            = $statRepo->getStatsSummaryByCountry($dateFrom, $dateTo, $emailIds, 'campaign', $eventsIds);
+            $emailStats            = $this->statRepository->getStatsSummaryByCountry($dateFrom, $dateTo, $emailIds, 'campaign', $eventsIds);
             $results['read_count'] = $results['clicked_through_count'] = [];
 
             foreach ($emailStats as $e) {
@@ -878,7 +907,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
      */
     public function getCampaignMembersGroupByCountry(Campaign $campaign, \DateTimeImmutable $dateFromObject, \DateTimeImmutable $dateToObject): array
     {
-        return $this->em->getRepository(CampaignLead::class)->getCampaignMembersGroupByCountry($campaign, $dateFromObject, $dateToObject);
+        return $this->leadRepository->getCampaignMembersGroupByCountry($campaign, $dateFromObject, $dateToObject);
     }
 
     /**
@@ -912,7 +941,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
      */
     private function handleDeletedEventsWithRedirect(array $deletedEvents): void
     {
-        if (empty($deletedEvents)) {
+        if ([] === $deletedEvents) {
             return;
         }
 
@@ -935,10 +964,10 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
             ];
         }
 
-        if ($deletedIds) {
-            $this->getEventRepository()->nullEventRelationships($deletedIds);
+        if ([] !== $deletedIds) {
+            $this->eventRepository->nullEventRelationships($deletedIds);
 
-            $this->getEventRepository()->setEventsAsDeletedWithRedirect($deletedData);
+            $this->eventRepository->setEventsAsDeletedWithRedirect($deletedData);
         }
     }
 
@@ -949,7 +978,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         }
 
         if (is_numeric($redirectEventValue) || is_string($redirectEventValue)) {
-            $redirectEvent = $this->getEventRepository()->find($redirectEventValue);
+            $redirectEvent = $this->eventRepository->find($redirectEventValue);
             if ($redirectEvent) {
                 $event->setRedirectEvent($redirectEvent);
             }
