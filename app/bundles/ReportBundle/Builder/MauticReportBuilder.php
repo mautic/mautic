@@ -15,6 +15,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class MauticReportBuilder implements ReportBuilderInterface
 {
+    public const IDENTIFIER_PATTERN =  '/([`"]?[a-z_][a-z0-9_]*[`"]?\.[`"]?[a-z_][a-z0-9_]*[`"]?)/i';
+
     /**
      * @var array
      */
@@ -86,22 +88,42 @@ final class MauticReportBuilder implements ReportBuilderInterface
      * SQL tokens that may appear inside report expressions but are never column
      * references; used by extractBaseColumns(). Function names are already
      * excluded by the not-followed-by-parenthesis check.
+     *
+     * Covers both MySQL and PostgreSQL so the same builder works on either platform.
      */
     private const SQL_KEYWORD_TOKENS = [
+        // Common
         'SELECT', 'FROM', 'WHERE', 'CASE', 'WHEN', 'THEN', 'ELSE', 'END', 'AND',
         'OR', 'NOT', 'NULL', 'IS', 'IN', 'LIKE', 'BETWEEN', 'EXISTS', 'DISTINCT',
         'AS', 'ASC', 'DESC', 'INTERVAL', 'DAY', 'DAYOFWEEK', 'DAYOFMONTH',
         'DAYOFYEAR', 'HOUR', 'MINUTE', 'SECOND', 'WEEK', 'MONTH', 'QUARTER',
         'YEAR', 'TRUE', 'FALSE',
+        // PostgreSQL
+        'ILIKE', 'SIMILAR', 'LIMIT', 'OFFSET', 'FETCH', 'ONLY', 'LATERAL',
+        'WINDOW', 'OVER', 'PARTITION', 'ROWS', 'RANGE', 'UNBOUNDED',
+        'PRECEDING', 'FOLLOWING', 'CURRENT', 'ROW', 'FILTER', 'WITHIN',
+        'GROUP', 'ORDER', 'COLLATE', 'USING', 'RETURNING', 'COALESCE',
+        'NULLIF', 'GREATEST', 'LEAST', 'UNKNOWN',
     ];
 
     /**
      * Aggregate functions whose arguments never need to appear in GROUP BY.
+     * Includes MySQL and PostgreSQL names used in report formulas.
      */
     private const AGGREGATE_FUNCTIONS = [
-        'COUNT', 'SUM', 'AVG', 'MIN', 'MAX', 'GROUP_CONCAT', 'BIT_AND',
-        'BIT_OR', 'BIT_XOR', 'JSON_ARRAYAGG', 'JSON_OBJECTAGG', 'STD',
-        'STDDEV', 'VARIANCE',
+        // Common
+        'COUNT', 'SUM', 'AVG', 'MIN', 'MAX',
+        // MySQL
+        'GROUP_CONCAT', 'BIT_AND', 'BIT_OR', 'BIT_XOR',
+        'JSON_ARRAYAGG', 'JSON_OBJECTAGG',
+        'STD', 'STDDEV', 'VARIANCE',
+        // PostgreSQL
+        'STRING_AGG', 'ARRAY_AGG', 'BOOL_AND', 'BOOL_OR', 'EVERY',
+        'XMLAGG', 'JSON_AGG', 'JSONB_AGG', 'JSON_OBJECT_AGG', 'JSONB_OBJECT_AGG',
+        'MODE', 'PERCENTILE_CONT', 'PERCENTILE_DISC',
+        'STDDEV_POP', 'STDDEV_SAMP', 'VAR_POP', 'VAR_SAMP',
+        'CORR', 'COVAR_POP', 'COVAR_SAMP',
+        'REGR_SLOPE', 'REGR_INTERCEPT', 'REGR_COUNT', 'REGR_R2',
     ];
 
     private ?string $contentTemplate = null;
@@ -617,7 +639,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
         // If it's a simple label/alias (no function, no parentheses, no SELECT), leave it as-is
         if (!$this->isComplexExpression($trimmed)) {
-            if (str_contains($trimmed, '.')) {
+            if (preg_match(self::IDENTIFIER_PATTERN, $trimmed)) {
                 return DatabasePlatform::quoteColumn($platform, $trimmed);
             }
 
@@ -626,7 +648,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
         // Recursively sanitize all column references inside the expression
         return (string) preg_replace_callback(
-            '/([`"]?[a-z_][a-z0-9_]*[`"]?\.[`"]?[a-z_][a-z0-9_]*[`"]?)/i',
+            self::IDENTIFIER_PATTERN,
             fn ($matches): string => DatabasePlatform::quoteColumn($platform, $matches[1]),
             $trimmed
         );

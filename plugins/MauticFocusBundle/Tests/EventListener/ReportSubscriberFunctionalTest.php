@@ -54,7 +54,7 @@ final class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->assertEqualsCanonicalizing([
             ['FocusItem1', 'doesAbc', 'link', 'modal', 'click', '1', '1', self::EXAMPLE_URL_1],
             ['FocusItem1', 'doesAbc', 'link', 'modal', 'view', '3', '2', self::EXAMPLE_URL_1],
-            ['FocusItem2', 'doesAbcd', 'link', 'modal', 'view', '1', '1', self::EXAMPLE_URL_2],
+            ['FocusItem2', 'doesAbcd', 'link', 'modal', 'click', '1', '1', self::EXAMPLE_URL_2],
             ['FocusItem2', 'doesAbcd', 'link', 'modal', 'view', '1', '1', self::EXAMPLE_URL_2],
         ], $table);
     }
