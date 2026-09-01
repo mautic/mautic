@@ -14,7 +14,6 @@ use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Event\RedirectGenerationEvent;
 use Mautic\PageBundle\Model\RedirectModel;
-use Mautic\PageBundle\PageEvents;
 use Mautic\PageBundle\Tests\PageTestAbstract;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
@@ -81,7 +80,7 @@ final class RedirectModelTest extends PageTestAbstract
 
         // Add the listener to append something else to the CT
         $dispatcher->addListener(
-            PageEvents::ON_REDIRECT_GENERATE,
+            RedirectGenerationEvent::class,
             function (RedirectGenerationEvent $event): void {
                 $event->setInClickthrough('bar', 'foo');
             }

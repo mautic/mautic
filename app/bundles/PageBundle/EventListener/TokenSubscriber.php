@@ -3,7 +3,6 @@
 namespace Mautic\PageBundle\EventListener;
 
 use Mautic\PageBundle\Event\PageDisplayEvent;
-use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class TokenSubscriber implements EventSubscriberInterface
@@ -11,7 +10,7 @@ final class TokenSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            PageEvents::PAGE_ON_DISPLAY => ['decodeTokens', 254],
+            PageDisplayEvent::class => ['decodeTokens', 254],
         ];
     }
 

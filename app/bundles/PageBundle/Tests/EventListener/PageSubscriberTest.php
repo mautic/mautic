@@ -22,7 +22,6 @@ use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\EventListener\PageSubscriber;
 use Mautic\PageBundle\Model\PageDraftModel;
 use Mautic\PageBundle\Model\PageModel;
-use Mautic\PageBundle\PageEvents;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\Packages;
@@ -60,7 +59,7 @@ EOF;
 
         $dispatcher->addSubscriber($subscriber);
 
-        $dispatcher->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
+        $dispatcher->dispatch($event);
 
         $this->assertSame(
             <<<EOF

@@ -9,7 +9,6 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Entity\VideoHit;
 use Mautic\PageBundle\Entity\VideoHitRepository;
 use Mautic\PageBundle\Event\VideoHitEvent;
-use Mautic\PageBundle\PageEvents;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Service\Attribute\Required;
 
@@ -148,9 +147,9 @@ final class VideoModel extends FormModel
             );
         }
 
-        if ($this->dispatcher->hasListeners(PageEvents::VIDEO_ON_HIT)) {
+        if ($this->dispatcher->hasListeners(VideoHitEvent::class)) {
             $event = new VideoHitEvent($hit, $request, $code);
-            $this->dispatcher->dispatch($event, PageEvents::VIDEO_ON_HIT);
+            $this->dispatcher->dispatch($event);
         }
     }
 }

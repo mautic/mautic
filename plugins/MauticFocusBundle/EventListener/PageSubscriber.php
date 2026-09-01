@@ -28,7 +28,7 @@ final class PageSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            PageEvents::PAGE_ON_DISPLAY => ['onPageDisplay', 0],
+            PageDisplayEvent::class => ['onPageDisplay', 0],
             PageEvents::PAGE_ON_BUILD   => ['onPageBuild', 0],
         ];
     }

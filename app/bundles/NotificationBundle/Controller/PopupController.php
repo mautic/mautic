@@ -6,7 +6,6 @@ use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
-use Mautic\PageBundle\PageEvents;
 use Symfony\Component\HttpFoundation\Response;
 
 final class PopupController extends CommonController
@@ -25,7 +24,7 @@ final class PopupController extends CommonController
         $content = $response->getContent();
 
         $event = new PageDisplayEvent($content, new Page());
-        $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
+        $this->dispatcher->dispatch($event);
         $content = $event->getContent();
 
         return $response->setContent($content);
