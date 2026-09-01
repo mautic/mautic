@@ -147,6 +147,54 @@ final class ReportModelTest extends MauticMysqlTestCase
         $this->assertSame(3, $this->invokeGetTotalCount($reportModel, $queryBuilder, $debugData));
     }
 
+    public function testGetTotalCountPreservesHavingForGroupedReports(): void
+    {
+        $form = new Form();
+        $form->setName('Grouped Report Having Test Form');
+        $form->setAlias('grouped_report_having_test_form');
+
+        $ip = new IpAddress('127.0.0.4');
+
+        $this->em->persist($ip);
+        $this->em->persist($form);
+        $this->em->flush();
+
+        $timezone = new \DateTimeZone('UTC');
+        $this->em->persist($this->makeSubmission($form, $ip, new \DateTime('2026-03-01 10:00:00', $timezone)));
+        $this->em->persist($this->makeSubmission($form, $ip, new \DateTime('2026-03-01 11:00:00', $timezone)));
+        $this->em->persist($this->makeSubmission($form, $ip, new \DateTime('2026-03-02 10:00:00', $timezone)));
+        $this->em->flush();
+
+        $connection      = $this->em->getConnection();
+        $originalSqlMode = (string) $connection->executeQuery('SELECT @@SESSION.sql_mode')->fetchOne();
+
+        try {
+            $sqlModes = array_filter(explode(',', $originalSqlMode));
+            if (!in_array('ONLY_FULL_GROUP_BY', $sqlModes, true)) {
+                $sqlModes[] = 'ONLY_FULL_GROUP_BY';
+                $connection->executeStatement('SET SESSION sql_mode = ?', [implode(',', $sqlModes)]);
+            }
+
+            $queryBuilder = $connection->createQueryBuilder();
+            $queryBuilder->select('fs.id', 'fs.date_submitted')
+                ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 'fs')
+                ->where('fs.form_id = :formId')
+                ->setParameter('formId', $form->getId())
+                ->groupBy('DATE(fs.date_submitted)')
+                ->having('COUNT(fs.id) > 1')
+                ->orderBy('fs.id', 'DESC')
+                ->setMaxResults(1);
+
+            /** @var ReportModel $reportModel */
+            $reportModel = self::getContainer()->get(ReportModel::class);
+            $debugData   = [];
+
+            $this->assertSame(1, $this->invokeGetTotalCount($reportModel, $queryBuilder, $debugData));
+        } finally {
+            $connection->executeStatement('SET SESSION sql_mode = ?', [$originalSqlMode]);
+        }
+    }
+
     private function makeSubmission(Form $form, IpAddress $ipAddress, \DateTime $dateSubmitted): Submission
     {
         $submission = new Submission();
