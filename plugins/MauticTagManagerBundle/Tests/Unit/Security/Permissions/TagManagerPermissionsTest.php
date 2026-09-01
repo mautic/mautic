@@ -31,11 +31,13 @@ final class TagManagerPermissionsTest extends TestCase
     {
         $options = ['someOption'];
         $data    = ['someData'];
+        // buildForm() takes the builder by reference, so a variable is required — passing
+        // the stub call result directly raises "Only variables should be passed by reference".
+        $builder = $this->createStub(FormBuilderInterface::class);
         $this->tagManagerPermissions->expects($this->once())
             ->method('addStandardFormFields')
             ->with('tagManager', 'tagManager', $this->createStub(FormBuilderInterface::class), $data);
 
-        $formBuilderSTub = $this->createStub(FormBuilderInterface::class);
-        $this->tagManagerPermissions->buildForm($formBuilderSTub, $options, $data);
+        $this->tagManagerPermissions->buildForm($builder, $options, $data);
     }
 }
