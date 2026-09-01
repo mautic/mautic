@@ -696,7 +696,7 @@ final class PublicController extends CommonFormController
     #[Route(
         '/plugin/{integration}/tracking.gif',
         name: 'mautic_plugin_tracker',
-        requirements: ['integration' => '.+'],
+        requirements: ['integration' => \Symfony\Component\Routing\Requirement\Requirement::CATCH_ALL],
         priority: -220
     )]
     public function pluginTrackingGifAction(Request $request, IntegrationHelper $integrationHelper, MailHelper $mailer, string $integration): Response

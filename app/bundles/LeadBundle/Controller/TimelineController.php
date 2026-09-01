@@ -74,7 +74,7 @@ final class TimelineController extends CommonController
     #[Route(
         '/s/plugin/{integration}/timeline/{page}',
         name: 'mautic_plugin_timeline_index',
-        requirements: ['integration' => '.+', 'page' => '\d+'],
+        requirements: ['integration' => \Symfony\Component\Routing\Requirement\Requirement::CATCH_ALL, 'page' => '\d+'],
         defaults: ['page' => 0],
         priority: -680
     )]
@@ -143,7 +143,7 @@ final class TimelineController extends CommonController
     #[Route(
         '/s/plugin/{integration}/timeline/view/{leadId}/{page}',
         name: 'mautic_plugin_timeline_view',
-        requirements: ['integration' => '.+', 'leadId' => '\d+', 'page' => '\d+'],
+        requirements: ['integration' => \Symfony\Component\Routing\Requirement\Requirement::CATCH_ALL, 'leadId' => '\d+', 'page' => '\d+'],
         defaults: ['page' => 0],
         priority: -681
     )]
