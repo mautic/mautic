@@ -561,10 +561,15 @@ final class FilterOperatorSubscriberTest extends TestCase
 
         $choices = $event->getChoices();
 
+        // Only custom fields should be shown
         $this->assertArrayHasKey('lead', $choices);
         $this->assertArrayHasKey('test_select', $choices['lead']);
-        $this->assertArrayHasKey('utm_source', $choices['lead']);
-        $this->assertArrayHasKey('behaviors', $choices);
+
+        // Static fields should not be included
+        $this->assertArrayNotHasKey('utm_source', $choices['lead']);
+
+        // Behaviors should not be included
+        $this->assertArrayNotHasKey('behaviors', $choices);
     }
 
     public function testOnGenerateSegmentFiltersAddCustomFieldsForTextTypesForValueAjaxRequest(): void
