@@ -356,6 +356,51 @@
     | `PageEvents::REDIRECT_DO_NOT_TRACK` | `UntrackableUrlsEvent` |
     | `PageEvents::ON_REDIRECT_GENERATE` | `RedirectGenerationEvent` |
     | `PageEvents::ON_CONTACT_TRACKED` | `TrackingEvent` |
+- The `Mautic\NotificationBundle\Event\NotificationSendEvent` (`NotificationEvents::NOTIFICATION_ON_SEND`) is now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `mautic.notification_on_send` string constant. Update any listener that keys on `NotificationEvents::NOTIFICATION_ON_SEND` to key on `NotificationSendEvent::class` instead. The constant is kept for backwards compatibility but is no longer used internally. The `NotificationEvent` CRUD events (`NOTIFICATION_PRE_SAVE` / `POST_SAVE` / `PRE_DELETE` / `POST_DELETE`) share one event object and are still dispatched under their string names.
+- DashboardBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\DashboardBundle\DashboardEvents` string constants. Update any subscriber or listener that keys on one of the converted `DashboardEvents::*` constants to key on the event class instead:
+
+    ```diff
+     public static function getSubscribedEvents(): array
+     {
+         return [
+    -        DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE => ['onWidgetListGenerate', 0],
+    +        WidgetTypeListEvent::class => ['onWidgetListGenerate', 0],
+         ];
+     }
+    ```
+
+    Dispatching drops the redundant second argument, e.g. `$dispatcher->dispatch($event, DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE)` becomes `$dispatcher->dispatch($event)`. The `Mautic\DashboardBundle\DashboardEvents` constants are kept for backwards compatibility but are no longer used internally for the events below. The `DASHBOARD_ON_MODULE_DETAIL_GENERATE` / `DASHBOARD_ON_MODULE_DETAIL_PRE_LOAD` pair share the `WidgetDetailEvent` class and are unchanged.
+
+    Full mapping of the converted constants to their event class (all in the `Mautic\DashboardBundle\Event` namespace):
+
+    | `DashboardEvents` constant | New event class |
+    | --- | --- |
+    | `DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE` | `WidgetTypeListEvent` |
+    | `DashboardEvents::DASHBOARD_ON_MODULE_FORM_GENERATE` | `WidgetFormEvent` |
+- StageBundle now dispatches its stage-builder event by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\StageBundle\StageEvents::STAGE_ON_BUILD` string constant. Update any subscriber or listener that keys on `StageEvents::STAGE_ON_BUILD` (or the raw string `mautic.stage_on_build`) to key on `Mautic\StageBundle\Event\StageBuilderEvent::class` instead, and drop the redundant second argument when dispatching, e.g. `$dispatcher->dispatch($event, StageEvents::STAGE_ON_BUILD)` becomes `$dispatcher->dispatch($event)`. The `StageEvents` constants are kept for backwards compatibility. The `STAGE_PRE_SAVE` / `STAGE_POST_SAVE` / `STAGE_PRE_DELETE` / `STAGE_POST_DELETE` group (all sharing the `StageEvent` class) and `ON_CAMPAIGN_BATCH_ACTION` (a `PendingEvent`) are unchanged.
+- SmsBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\SmsBundle\SmsEvents` string constants. Update any subscriber or listener that keys on one of the converted `SmsEvents::*` constants to key on the event class instead:
+
+    ```diff
+     public static function getSubscribedEvents(): array
+     {
+         return [
+    -        SmsEvents::DNC_FILTER_CONTACTS_ON_SEND => ['dncFilter', 0],
+    +        DncEvent::class => ['dncFilter', 0],
+         ];
+     }
+    ```
+
+    Dispatching drops the redundant second argument, e.g. `$dispatcher->dispatch($event, SmsEvents::SMS_ON_SEND)` becomes `$dispatcher->dispatch($event)`. The `Mautic\SmsBundle\SmsEvents` constants are kept for backwards compatibility but are no longer used internally for the events below. Constants that share an event class stay unchanged: the `SMS_PRE_SAVE` / `SMS_POST_SAVE` / `SMS_PRE_DELETE` / `SMS_POST_DELETE` group (`SmsEvent`) and the `ON_REPLY` / `ON_CAMPAIGN_REPLY` pair (`ReplyEvent`). The webhook-type identifiers `TOKEN_REPLACEMENT` (shared `CoreBundle` event) and the campaign trigger constants also stay as strings.
+
+    Full mapping of the converted constants to their event class (all in the `Mautic\SmsBundle\Event` namespace):
+
+    | `SmsEvents` constant | New event class |
+    | --- | --- |
+    | `SmsEvents::SMS_ON_SEND` | `SmsSendEvent` |
+    | `SmsEvents::ON_SMS_TOKENS_BUILD` | `TokensBuildEvent` |
+    | `SmsEvents::DNC_FILTER_CONTACTS_ON_SEND` | `DncEvent` |
+    | `SmsEvents::QUEUE_FILTER_CONTACTS_ON_SEND` | `QueueEvent` |
+    | `SmsEvents::FILTER_CONTACTS_ON_SEND` | `FilterEvent` |
 
 - `Mautic\CoreBundle\Factory\ModelFactory` now builds its service locator from a `defaultIndexMethod` on the `mautic.model` tag, replacing the removed `Mautic\CoreBundle\DependencyInjection\Compiler\ModelPass`. Every model (a service implementing `Mautic\CoreBundle\Model\MauticModelInterface`) declares its `ModelFactory::getModel()` lookup key via a static `getName()` method:
 

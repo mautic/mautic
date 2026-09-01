@@ -10,7 +10,6 @@ use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\SmsBundle\Broadcast\BroadcastQuery;
 use Mautic\SmsBundle\Event\TokensBuildEvent;
 use Mautic\SmsBundle\Model\SmsModel;
-use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -84,7 +83,7 @@ final class AjaxController extends CommonAjaxController
 
         $tokens = $this->getBuilderTokens($query);
         $event  = new TokensBuildEvent($tokens);
-        $eventDispatcher->dispatch($event, SmsEvents::ON_SMS_TOKENS_BUILD);
+        $eventDispatcher->dispatch($event);
         $sortedTokens = $tokenSorter->sortTokens($event->getTokens());
 
         return $this->sendJsonResponse(['tokens' => $sortedTokens]);
