@@ -15,8 +15,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class MauticReportBuilder implements ReportBuilderInterface
 {
-    public const IDENTIFIER_PATTERN =  '/([`"]?[a-z_][a-z0-9_]*[`"]?\.[`"]?[a-z_][a-z0-9_]*[`"]?)/i';
-
     /**
      * @var array
      */
@@ -356,7 +354,10 @@ final class MauticReportBuilder implements ReportBuilderInterface
                     }
 
                     if (isset($fieldOptions['alias'])) {
-                        $selectText .= ' AS '.DatabasePlatform::quoteIdentifier($platform, $fieldOptions['alias']);
+                        // Match upstream: do not quote the alias. Quoted aliases
+                        // change result-column keys on some drivers and break
+                        // report table mapping (Focus functional tests).
+                        $selectText .= ' AS '.$fieldOptions['alias'];
                     }
 
                     $selectColumns[] = $selectText;
@@ -409,9 +410,6 @@ final class MauticReportBuilder implements ReportBuilderInterface
                     }
 
                     $normalizedGroupBy[] = $normalized;
-                    // Match upstream: completion candidates stay unquoted so the
-                    // generated SQL matches existing tests and MySQL behaviour.
-                    // PostgreSQL accepts unquoted lower-case identifiers.
                     $dedupedGroupBy[] = $baseColumn;
                 }
             }
@@ -448,16 +446,15 @@ final class MauticReportBuilder implements ReportBuilderInterface
                     $columnSelect = $aggregator['column'];
                 }
 
-                // Quote column refs and apply PG-specific AVG casting
-                $innerExpression = $this->sanitizeExpression($columnSelect);
-                $selectText      = DatabasePlatform::getAggregatorExpression(
-                    $platform,
+                $selectText = DatabasePlatform::getAggregatorExpression(
+                    $this->db->getDatabasePlatform(),
                     $aggregator['function'],
-                    $innerExpression
+                    $columnSelect
                 );
-                $alias              = sprintf('%s %s', $aggregator['function'], $aggregator['column']);
-                $quotedAlias        = DatabasePlatform::quoteIdentifier($platform, $alias);
-                $aggregatorSelect[] = sprintf('%s AS %s', $selectText, $quotedAlias);
+
+                $alias               = sprintf('%s %s', $aggregator['function'], $aggregator['column']);
+                $quotedAlias         = DatabasePlatform::quoteIdentifier($platform, $alias);
+                $aggregatorSelect[]  = sprintf('%s AS %s', $selectText, $quotedAlias);
             }
 
             $queryBuilder->addSelect($aggregatorSelect);
@@ -520,13 +517,10 @@ final class MauticReportBuilder implements ReportBuilderInterface
         // so only their arguments are scanned for column references.
         $expression = (string) preg_replace('/\b[A-Za-z_][A-Za-z0-9_]*\s*(?=\()/', ' ', $expression);
 
-        // Match optionally qualified, optionally backtick- or double-quote-quoted identifiers.
-        // Accepts both MySQL-style backticks and PostgreSQL-style double quotes.
-        if (!preg_match_all(
-            '/(?:[`"]?)([A-Za-z_][A-Za-z0-9_]*)(?:[`"]?)(?:\.(?:[`"]?)([A-Za-z_][A-Za-z0-9_]*)(?:[`"]?))?/',
-            $expression,
-            $matches
-        )) {
+        // Match optionally qualified, optionally backtick-quoted identifiers (upstream pattern).
+        // Double-quote stripping above already removed string literals; remaining
+        // identifiers may still use MySQL backticks. Bare table.column is also matched.
+        if (!preg_match_all('/`?([A-Za-z_][A-Za-z0-9_]*)`?(?:\.`?([A-Za-z_][A-Za-z0-9_]*)`?)?/', $expression, $matches)) {
             return [];
         }
 
@@ -536,7 +530,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                 continue;
             }
 
-            $columns[] = '' !== ($matches[2][$index] ?? '')
+            $columns[] = '' !== $matches[2][$index]
                 ? $matches[1][$index].'.'.$matches[2][$index]
                 : $matches[1][$index];
         }
@@ -620,45 +614,6 @@ final class MauticReportBuilder implements ReportBuilderInterface
     private function normalizeColumnIdentifier(string $column): string
     {
         return strtolower((string) preg_replace('/[`"\s]+/', '', $column));
-    }
-
-    /**
-     * Sanitizes expressions recursively.
-     * - If the expression starts with a function (AVG(, IF(, ROUND(, etc.) or contains SELECT,
-     *   it recurses into the arguments and sanitizes only real column references (table.column).
-     * - Simple labels/aliases that are not expressions are left untouched.
-     */
-    private function sanitizeExpression(string $expression): string
-    {
-        $trimmed  = trim($expression);
-        $platform = $this->db->getDatabasePlatform();
-
-        // If it's a simple label/alias (no function, no parentheses, no SELECT), leave it as-is
-        if (!$this->isComplexExpression($trimmed)) {
-            if (preg_match(self::IDENTIFIER_PATTERN, $trimmed)) {
-                return DatabasePlatform::quoteColumn($platform, $trimmed);
-            }
-
-            return $trimmed;
-        }
-
-        // Recursively sanitize all column references inside the expression
-        return (string) preg_replace_callback(
-            self::IDENTIFIER_PATTERN,
-            fn ($matches): string => DatabasePlatform::quoteColumn($platform, $matches[1]),
-            $trimmed
-        );
-    }
-
-    /**
-     * Returns true if the string looks like a complex SQL expression (function call or SELECT).
-     */
-    private function isComplexExpression(string $expression): bool
-    {
-        $expr = trim($expression);
-
-        // Starts with a function name followed by '(' or contains SELECT
-        return (bool) preg_match('/^\w+\s*\(/i', $expr) || 0 === stripos($expr, 'SELECT');
     }
 
     private function applyFilters(array $filters, QueryBuilder $queryBuilder, array $filterDefinitions): void
