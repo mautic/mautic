@@ -4,7 +4,6 @@ namespace Mautic\EmailBundle\MonitoredEmail\Processor;
 
 use Doctrine\ORM\EntityNotFoundException;
 use Mautic\CoreBundle\Helper\EmailAddressHelper;
-use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\EmailReply;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailReplyEvent;
@@ -120,11 +119,11 @@ final readonly class Reply implements ProcessorInterface
 
     private function dispatchEvent(Stat $stat): void
     {
-        if ($this->dispatcher->hasListeners(EmailEvents::EMAIL_ON_REPLY)) {
+        if ($this->dispatcher->hasListeners(EmailReplyEvent::class)) {
             $this->contactTracker->setTrackedContact($stat->getLead());
 
             $event = new EmailReplyEvent($stat);
-            $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_REPLY);
+            $this->dispatcher->dispatch($event);
             unset($event);
         }
     }

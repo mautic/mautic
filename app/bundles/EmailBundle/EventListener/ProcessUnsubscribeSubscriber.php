@@ -20,7 +20,7 @@ final readonly class ProcessUnsubscribeSubscriber implements EventSubscriberInte
     public static function getSubscribedEvents(): array
     {
         return [
-            EmailEvents::MONITORED_EMAIL_CONFIG => ['onEmailConfig', 0],
+            MonitoredEmailEvent::class => ['onEmailConfig', 0],
             EmailEvents::EMAIL_PARSE            => ['onEmailParse', 0],
             EmailEvents::EMAIL_ON_SEND          => ['onEmailSend', 0],
         ];

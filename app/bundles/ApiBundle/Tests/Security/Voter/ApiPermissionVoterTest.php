@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\ApiBundle\Tests\Security\Voter;
 
-use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Event\ApiPlatformPermissionContextEvent;
 use Mautic\ApiBundle\Security\Voter\ApiPermissionVoter;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -32,7 +31,7 @@ final class ApiPermissionVoterTest extends TestCase
             public static function getSubscribedEvents(): array
             {
                 return [
-                    ApiEvents::API_PLATFORM_PERMISSION_CONTEXT => ['onApiPlatformPermissionContext', 0],
+                    ApiPlatformPermissionContextEvent::class => ['onApiPlatformPermissionContext', 0],
                 ];
             }
 

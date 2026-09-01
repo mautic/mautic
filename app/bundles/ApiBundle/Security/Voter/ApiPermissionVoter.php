@@ -2,7 +2,6 @@
 
 namespace Mautic\ApiBundle\Security\Voter;
 
-use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Event\ApiPlatformPermissionContextEvent;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -32,7 +31,7 @@ final class ApiPermissionVoter extends Voter
             $attribute,
             $subject,
         );
-        $this->dispatcher->dispatch($permissionContextEvent, ApiEvents::API_PLATFORM_PERMISSION_CONTEXT);
+        $this->dispatcher->dispatch($permissionContextEvent);
 
         $attribute = $permissionContextEvent->getPermission();
         $subject   = $permissionContextEvent->getRequestObject();

@@ -50,13 +50,13 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         return [
             CampaignBuilderEvent::class => ['onCampaignBuild', 0],
             EventPreview::class                      => ['onEventPreviewRequest', 0],
-            EmailEvents::EMAIL_ON_OPEN               => ['onEmailOpen', 0],
+            EmailOpenEvent::class                    => ['onEmailOpen', 0],
             EmailEvents::ON_CAMPAIGN_BATCH_ACTION    => [
                 ['onCampaignTriggerActionSendEmailToContact', 0],
                 ['onCampaignTriggerActionSendEmailToUser', 1],
             ],
             EmailEvents::ON_CAMPAIGN_TRIGGER_DECISION => ['onCampaignTriggerDecision', 0],
-            EmailEvents::EMAIL_ON_REPLY               => ['onEmailReply', 0],
+            EmailReplyEvent::class                    => ['onEmailReply', 0],
         ];
     }
 

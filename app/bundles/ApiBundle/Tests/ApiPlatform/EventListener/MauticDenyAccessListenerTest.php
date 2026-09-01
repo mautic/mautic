@@ -8,7 +8,6 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
-use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\ApiPlatform\EventListener\MauticDenyAccessListener;
 use Mautic\ApiBundle\Event\ApiPlatformPermissionContextEvent;
 use Mautic\CoreBundle\Entity\FormEntity;
@@ -49,7 +48,7 @@ final class MauticDenyAccessListenerTest extends TestCase
             public static function getSubscribedEvents(): array
             {
                 return [
-                    ApiEvents::API_PLATFORM_PERMISSION_CONTEXT => ['onApiPlatformPermissionContext', 0],
+                    ApiPlatformPermissionContextEvent::class => ['onApiPlatformPermissionContext', 0],
                 ];
             }
 

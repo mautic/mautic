@@ -7,7 +7,6 @@ namespace Mautic\ApiBundle\ApiPlatform\EventListener;
 use ApiPlatform\Metadata\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\Util\RequestAttributesExtractor;
-use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Event\ApiPlatformPermissionContextEvent;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -59,7 +58,7 @@ final readonly class MauticDenyAccessListener
             $request,
             $attributes,
         );
-        $this->dispatcher->dispatch($permissionContextEvent, ApiEvents::API_PLATFORM_PERMISSION_CONTEXT);
+        $this->dispatcher->dispatch($permissionContextEvent);
 
         $permission    = $permissionContextEvent->getPermission();
         $requestObject = $permissionContextEvent->getRequestObject();

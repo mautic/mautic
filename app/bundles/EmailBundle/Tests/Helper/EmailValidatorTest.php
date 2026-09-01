@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Helper;
 
-use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailValidationEvent;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Helper\EmailValidator;
@@ -52,7 +51,7 @@ final class EmailValidatorTest extends \PHPUnit\Framework\TestCase
     {
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with($this->isInstanceOf(EmailValidationEvent::class), EmailEvents::ON_EMAIL_VALIDATION)
+            ->with($this->isInstanceOf(EmailValidationEvent::class))
             ->willReturn($this->event);
 
         $this->event->expects($this->once())
@@ -66,7 +65,7 @@ final class EmailValidatorTest extends \PHPUnit\Framework\TestCase
     {
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with($this->isInstanceOf(EmailValidationEvent::class), EmailEvents::ON_EMAIL_VALIDATION)
+            ->with($this->isInstanceOf(EmailValidationEvent::class))
             ->willReturn($this->event);
 
         $this->event->expects($this->once())
@@ -80,7 +79,7 @@ final class EmailValidatorTest extends \PHPUnit\Framework\TestCase
     {
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with($this->isInstanceOf(EmailValidationEvent::class), EmailEvents::ON_EMAIL_VALIDATION)
+            ->with($this->isInstanceOf(EmailValidationEvent::class))
             ->willReturn($this->event);
 
         $this->event->expects($this->once())
@@ -94,7 +93,7 @@ final class EmailValidatorTest extends \PHPUnit\Framework\TestCase
     {
         $this->dispatcher->expects($this->once())
         ->method('dispatch')
-        ->with($this->isInstanceOf(EmailValidationEvent::class), EmailEvents::ON_EMAIL_VALIDATION)
+        ->with($this->isInstanceOf(EmailValidationEvent::class))
         ->willReturn($this->event);
 
         $this->event->expects($this->once())

@@ -2,7 +2,6 @@
 
 namespace Mautic\EmailBundle\Helper;
 
-use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailValidationEvent;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -83,8 +82,7 @@ class EmailValidator
     public function doPluginValidation($address): void
     {
         $event = $this->dispatcher->dispatch(
-            new EmailValidationEvent($address),
-            EmailEvents::ON_EMAIL_VALIDATION
+            new EmailValidationEvent($address)
         );
 
         if (!$event->isValid()) {

@@ -6,7 +6,6 @@ namespace Mautic\PointBundle\EventListener;
 
 use Mautic\PointBundle\Event\GroupScoreChangeEvent;
 use Mautic\PointBundle\Model\TriggerModel;
-use Mautic\PointBundle\PointGroupEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class GroupScoreSubscriber implements EventSubscriberInterface
@@ -19,7 +18,7 @@ final readonly class GroupScoreSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            PointGroupEvents::SCORE_CHANGE     => ['onGroupScoreChange', 0],
+            GroupScoreChangeEvent::class => ['onGroupScoreChange', 0],
         ];
     }
 

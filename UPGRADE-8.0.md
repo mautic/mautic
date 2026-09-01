@@ -423,6 +423,21 @@
     | `ReportEvents::REPORT_ON_COLUMN_COLLECT` | `ColumnCollectEvent` |
     | `ReportEvents::REPORT_PERMANENT_FILE_CREATED` | `PermanentReportFileCreatedEvent` |
 
+- Several more bundles now dispatch their convertible events by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the bundle's `*Events` string constants. The constants are kept for backwards compatibility but are no longer used internally for the events below. Update any subscriber or listener that keys on a converted constant to key on the event class instead. Constants whose event object is shared across several names (CRUD / pre-post groups) or whose events cross bundle boundaries stay as string constants and are unchanged. Each new event class lives in its bundle's `Event` namespace.
+
+    | Bundle | `*Events` constant | New event class |
+    | --- | --- | --- |
+    | EmailBundle | `EmailEvents::EMAIL_ON_OPEN` | `EmailOpenEvent` |
+    | EmailBundle | `EmailEvents::EMAIL_ON_REPLY` | `EmailReplyEvent` |
+    | EmailBundle | `EmailEvents::ON_TRANSPORT_WEBHOOK` | `TransportWebhookEvent` |
+    | EmailBundle | `EmailEvents::ON_EMAIL_VALIDATION` | `EmailValidationEvent` |
+    | EmailBundle | `EmailEvents::MONITORED_EMAIL_CONFIG` | `MonitoredEmailEvent` |
+    | PointBundle | `PointEvents::POINT_ON_ACTION` | `PointActionEvent` |
+    | PointBundle | `PointGroupEvents::SCORE_CHANGE` | `GroupScoreChangeEvent` |
+    | UserBundle | `UserEvents::USER_LOGOUT` | `LogoutEvent` |
+    | UserBundle | `UserEvents::USER_PASSWORD_STRENGTH_VALIDATION` | `PasswordStrengthValidateEvent` |
+    | ApiBundle | `ApiEvents::API_PLATFORM_PERMISSION_CONTEXT` | `ApiPlatformPermissionContextEvent` |
+    | CategoryBundle | `CategoryEvents::CATEGORY_ON_BUNDLE_LIST_BUILD` | `CategoryTypesEvent` |
 - LeadBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\LeadBundle\LeadEvents` string constants. Update any subscriber or listener that keys on one of the converted `LeadEvents::*` constants to key on the event class instead:
 
     ```diff

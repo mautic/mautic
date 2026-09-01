@@ -7,7 +7,6 @@ namespace Mautic\EmailBundle\Tests\Controller;
 use Doctrine\ORM\ORMException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\TransportWebhookEvent;
@@ -76,7 +75,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testMailerCallbackWhenTransportDoesNotProccessIt(): void
     {
-        self::getContainer()->get(EventDispatcherInterface::class)->addListener(EmailEvents::ON_TRANSPORT_WEBHOOK, fn (): null => null /* exists but does nothing */);
+        self::getContainer()->get(EventDispatcherInterface::class)->addListener(TransportWebhookEvent::class, fn (): null => null /* exists but does nothing */);
         $this->client->request(Request::METHOD_POST, '/mailer/callback');
 
         self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
@@ -85,7 +84,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testMailerCallbackWhenTransportProccessesIt(): void
     {
-        self::getContainer()->get(EventDispatcherInterface::class)->addListener(EmailEvents::ON_TRANSPORT_WEBHOOK, fn (TransportWebhookEvent $event) => $event->setResponse(new Response('OK')));
+        self::getContainer()->get(EventDispatcherInterface::class)->addListener(TransportWebhookEvent::class, fn (TransportWebhookEvent $event) => $event->setResponse(new Response('OK')));
         $this->client->request(Request::METHOD_POST, '/mailer/callback');
 
         self::assertResponseIsSuccessful();

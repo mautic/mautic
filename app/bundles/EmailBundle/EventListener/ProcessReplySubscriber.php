@@ -21,7 +21,7 @@ final readonly class ProcessReplySubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            EmailEvents::MONITORED_EMAIL_CONFIG => ['onEmailConfig', 0],
+            MonitoredEmailEvent::class => ['onEmailConfig', 0],
             EmailEvents::EMAIL_PRE_FETCH        => ['onEmailPreFetch', 0],
             EmailEvents::EMAIL_PARSE            => ['onEmailParse', 1],
         ];

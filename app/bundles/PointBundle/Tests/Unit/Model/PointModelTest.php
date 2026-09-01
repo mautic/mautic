@@ -139,7 +139,7 @@ final class PointModelTest extends TestCase
 
         $this->dispatcher->expects($this->exactly(2))
             ->method('dispatch')
-            ->willReturnCallback(function (Event $event, string $eventName) use ($pointActionHelper, $type, $lead, $point): Event {
+            ->willReturnCallback(function (Event $event, ?string $eventName = null) use ($pointActionHelper, $type, $lead, $point): Event {
                 if (PointEvents::POINT_ON_BUILD === $eventName) {
                     $this->assertInstanceOf(PointBuilderEvent::class, $event);
                     $this->assertEquals(new PointBuilderEvent($this->translator), $event);
@@ -158,14 +158,14 @@ final class PointModelTest extends TestCase
                     return $event;
                 }
 
-                if (PointEvents::POINT_ON_ACTION === $eventName) {
+                if ($event instanceof PointActionEvent) {
                     $pointActionEvent = new PointActionEvent($point, $lead);
                     $this->assertEquals($pointActionEvent, $event);
 
                     return $pointActionEvent;
                 }
 
-                self::fail('Unknown event called: '.$eventName);
+                self::fail('Unknown event called: '.($eventName ?? $event::class));
             });
 
         $this->leadModel->expects($this->once())
