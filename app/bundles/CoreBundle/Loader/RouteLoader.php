@@ -123,7 +123,8 @@ final class RouteLoader extends Loader
             $static        = 0;
             $placeholders  = 0;
             $lastStaticPos = -1;
-            foreach (array_values(array_filter(explode('/', $route->getPath()), 'strlen')) as $pos => $segment) {
+            $segments = array_values(array_filter(explode('/', $route->getPath()), static fn (string $s): bool => '' !== $s));
+            foreach ($segments as $pos => $segment) {
                 if (str_contains($segment, '{')) {
                     ++$placeholders;
                 } else {
