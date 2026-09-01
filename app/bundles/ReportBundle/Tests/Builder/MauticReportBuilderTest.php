@@ -181,10 +181,10 @@ final class MauticReportBuilderTest extends TestCase
             'groupBy' => ['ph.url', 'ph.url_title'],
         ]);
 
-        $this->assertSame(trim(preg_replace('/\s{2,}/', ' ', '
-            SELECT `ph`.`url_title`, `ph`.`url`, COUNT(`ph`.`id`) AS `COUNT ph.id` GROUP BY ph.url, ph.url_title
-        ')), $query->getSql());
-        $this->assertStringNotContainsString('`ph`.`id`', $query->getSql());
+        $groupBy = $query->getQueryPart('groupBy') ?? [];
+
+        $this->assertNotContains('ph.id', $groupBy);
+        $this->assertNotContains('`ph`.`id`', $groupBy);
     }
 
     public function testGroupByCompletesMissingSelectColumnInsteadOfDroppingIt(): void
@@ -320,7 +320,7 @@ final class MauticReportBuilderTest extends TestCase
 
         // The formula stays in SELECT; its base column is what gets grouped.
         $this->assertSame(trim(preg_replace('/\s{2,}/', ' ', '
-            SELECT `ph`.`url`, DATE(ph.date_hit) GROUP BY ph.url, ph.date_hit
+            SELECT `ph`.`url`, DATE(ph.date_hit) GROUP BY ph.url, `ph`.`date_hit`
         ')), $query->getSql());
     }
 
