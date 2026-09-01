@@ -113,6 +113,22 @@ final class LeadImportFieldType extends AbstractType
                     'data'       => false,
                 ]
             );
+
+            $createNewLabel = 'lead' === $options['object']
+                ? 'mautic.lead.import.create_new'
+                : 'mautic.company.import.create_new';
+
+            $builder->add(
+                'create_new',
+                YesNoButtonGroupType::class,
+                [
+                    'label'      => $createNewLabel,
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => ['class' => 'form-control'],
+                    'required'   => false,
+                    'data'       => true,
+                ]
+            );
         }
 
         $buttons = ['cancel_icon' => 'ri-close-line'];
