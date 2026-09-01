@@ -15,14 +15,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class MauticReportBuilder implements ReportBuilderInterface
 {
-    public const IDENTIFIER_PATTERN =  '/([`"]?[a-z_][a-z0-9_]*[`"]?\.[`"]?[a-z_][a-z0-9_]*[`"]?)/i';
-
-    /**
-     * @SuppressWarnings("php:S5843")
-     * Reason: This regex is intentionally complex to handle most basic cases
-     */
-    public const LITERAL_AGGREGATE_PATTERN = '/^\s*((\d+\.?\d*)|(COUNT|SUM|AVG|MIN|MAX|SELECT)\s*\(\s*(\*|\d+)\s*\))\s*$/ix';
-
     /**
      * @var array
      */
@@ -89,6 +81,28 @@ final class MauticReportBuilder implements ReportBuilderInterface
     public const CHANNEL_COLUMN_CREATED_BY      = 'channel.created_by';
 
     public const CHANNEL_COLUMN_CREATED_BY_USER = 'channel.created_by_user';
+
+    /**
+     * SQL tokens that may appear inside report expressions but are never column
+     * references; used by extractBaseColumns(). Function names are already
+     * excluded by the not-followed-by-parenthesis check.
+     */
+    private const SQL_KEYWORD_TOKENS = [
+        'SELECT', 'FROM', 'WHERE', 'CASE', 'WHEN', 'THEN', 'ELSE', 'END', 'AND',
+        'OR', 'NOT', 'NULL', 'IS', 'IN', 'LIKE', 'BETWEEN', 'EXISTS', 'DISTINCT',
+        'AS', 'ASC', 'DESC', 'INTERVAL', 'DAY', 'DAYOFWEEK', 'DAYOFMONTH',
+        'DAYOFYEAR', 'HOUR', 'MINUTE', 'SECOND', 'WEEK', 'MONTH', 'QUARTER',
+        'YEAR', 'TRUE', 'FALSE',
+    ];
+
+    /**
+     * Aggregate functions whose arguments never need to appear in GROUP BY.
+     */
+    private const AGGREGATE_FUNCTIONS = [
+        'COUNT', 'SUM', 'AVG', 'MIN', 'MAX', 'GROUP_CONCAT', 'BIT_AND',
+        'BIT_OR', 'BIT_XOR', 'JSON_ARRAYAGG', 'JSON_OBJECTAGG', 'STD',
+        'STDDEV', 'VARIANCE',
+    ];
 
     private ?string $contentTemplate = null;
 
@@ -194,8 +208,8 @@ final class MauticReportBuilder implements ReportBuilderInterface
             }
         }
 
-        $orderByColumns = [];
         // Build ORDER BY clause
+        $orderByColumns = [];
         if (!empty($options['order'])) {
             if (is_array($options['order'])) {
                 if (isset($options['order']['column'])) {
@@ -208,7 +222,10 @@ final class MauticReportBuilder implements ReportBuilderInterface
                 } else {
                     foreach ($options['order'] as $order) {
                         $queryBuilder->orderBy($order);
-                        $orderByColumns[] = $order;
+
+                        if (is_string($order)) {
+                            $orderByColumns[] = $order;
+                        }
                     }
                 }
             } else {
@@ -219,7 +236,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
             foreach ($order as $o) {
                 if (!empty($options['columns'][$o['column']]['formula'])) {
                     $queryBuilder->orderBy($options['columns'][$o['column']]['formula'], $o['direction']);
-                    $orderByColumns[] = $o['column'];
+                    $orderByColumns[] = $options['columns'][$o['column']]['formula'];
                 } elseif (!empty($o['column'])) {
                     $queryBuilder->orderBy($o['column'], $o['direction']);
                     $orderByColumns[] = $o['column'];
@@ -228,8 +245,9 @@ final class MauticReportBuilder implements ReportBuilderInterface
         }
 
         // Build GROUP BY
-        $groupByColumns = [];
         if ($groupByOptions = $this->entity->getGroupBy()) {
+            $groupByColumns = [];
+
             foreach ($groupByOptions as $groupBy) {
                 if (isset($options['columns'][$groupBy])) {
                     $fieldOptions = $options['columns'][$groupBy];
@@ -249,10 +267,6 @@ final class MauticReportBuilder implements ReportBuilderInterface
             $queryBuilder->addGroupBy($options['groupby']);
         }
 
-        // Get any existing GROUP BY columns from the query builder
-        $existingGroupBy = $queryBuilder->getQueryPart('groupBy') ?: [];
-        $groupByColumns  = array_merge($groupByColumns, (array) $existingGroupBy);
-
         // Build LIMIT clause
         if (!empty($options['limit'])) {
             $queryBuilder->setFirstResult($options['start'])
@@ -269,44 +283,122 @@ final class MauticReportBuilder implements ReportBuilderInterface
             }
         }
 
-        $selectColumns = [];
+        $selectColumns            = [];
+        $aggregators              = $this->entity->getAggregators();
+        $groupByColumns           = $queryBuilder->getQueryPart('groupBy') ?? [];
+        $groupByColumnsKeys       = array_flip($groupByColumns);
+        $aggregatorFieldKeys      = $groupByOptions && $aggregators
+            ? array_flip(array_column($aggregators, 'column'))
+            : [];
+        $ungroupedSelectColumns   = [];
+        $expressionSelectColumns  = [];
 
         // Build SELECT clause
         if (!$event->getSelectColumns()) {
-            $fields             = $this->entity->getColumns();
-            $groupByColumns     = $queryBuilder->getQueryPart('groupBy');
-            $groupByColumnsKeys = array_flip($groupByColumns);
+            $fields           = $this->entity->getColumns();
+            $groupByFieldKeys = $groupByOptions ? array_flip($groupByOptions) : [];
 
             foreach ($fields as $field) {
+                // With GROUP BY + aggregators, a column listed only for COUNT/AVG must not
+                // also appear as a raw SELECT (ONLY_FULL_GROUP_BY rejects ph.id when grouped
+                // by ph.url). Columns not in groupBy but functionally dependent (e.g. e.subject
+                // when grouped by e.id) must remain in SELECT.
+                if ($groupByOptions && !isset($groupByFieldKeys[$field]) && isset($aggregatorFieldKeys[$field])) {
+                    continue;
+                }
+
                 if (isset($options['columns'][$field])) {
                     $fieldOptions = $options['columns'][$field];
 
                     if (array_key_exists('channelData', $fieldOptions)) {
                         $selectText = $this->buildCaseSelect($fieldOptions['channelData']);
+                        $expressionSelectColumns[] = $selectText;
                     } else {
                         // If there is a group by, and this field has groupByFormula
                         if (isset($fieldOptions['groupByFormula']) && isset($groupByColumnsKeys[$fieldOptions['groupByFormula']])) {
                             $selectText = $fieldOptions['groupByFormula'];
                         } elseif (isset($fieldOptions['formula'])) {
                             $selectText = $fieldOptions['formula'];
+                            // The expression itself is not a groupable column; the
+                            // completion pass below groups its base columns instead.
+                            $expressionSelectColumns[] = $selectText;
                         } else {
-                            $selectText = DatabasePlatform::quoteColumn($platform, $field);
+                            $selectText               = DatabasePlatform::quoteColumn($platform, $field);
+                            $ungroupedSelectColumns[] = $field;
                         }
                     }
 
                     // support for prefix and suffix to value in query
-                    $prefix     = $fieldOptions['prefix'] ?? '';
-                    $suffix     = $fieldOptions['suffix'] ?? '';
+                    $prefix = $fieldOptions['prefix'] ?? '';
+                    $suffix = $fieldOptions['suffix'] ?? '';
                     if ($prefix || $suffix) {
                         $selectText = 'CONCAT(\''.$prefix.'\', '.$selectText.',\''.$suffix.'\')';
                     }
 
                     if (isset($fieldOptions['alias'])) {
-                        $selectText .= ' AS '.$this->db->quoteIdentifier($fieldOptions['alias']);
+                        $selectText .= ' AS '.DatabasePlatform::quoteIdentifier($platform, $fieldOptions['alias']);
                     }
 
                     $selectColumns[] = $selectText;
                 }
+            }
+        }
+
+        // Complete GROUP BY with every non-aggregated column that ends up in SELECT or
+        // ORDER BY, so grouped reports stay valid under ONLY_FULL_GROUP_BY (and on
+        // engines without functional-dependency detection) without silently dropping
+        // columns the user asked for. Aggregator targets are deliberately excluded:
+        // they appear in SELECT only as the aggregate expression. The GROUP BY part is
+        // rebuilt from a normalized, deduplicated list so columns pre-registered by a
+        // listener are merged in rather than appended a second time.
+        if ($groupByColumns) {
+            $normalizedAggregatorKeys = array_flip(array_map(
+                $this->normalizeColumnIdentifier(...),
+                array_keys($aggregatorFieldKeys)
+            ));
+            $normalizedGroupBy = [];
+            $dedupedGroupBy    = [];
+
+            // Existing part entries (options, listeners) are already valid GROUP BY
+            // expressions; deduplicate them as-is. Only the new completion candidates
+            // go through base-column extraction.
+            foreach ($groupByColumns as $column) {
+                $normalized = $this->normalizeColumnIdentifier($column);
+
+                if ('' === $normalized || in_array($normalized, $normalizedGroupBy, true)) {
+                    continue;
+                }
+
+                $normalizedGroupBy[] = $normalized;
+                $dedupedGroupBy[]    = $column;
+            }
+
+            foreach ([...$ungroupedSelectColumns, ...$expressionSelectColumns, ...$orderByColumns] as $column) {
+                if (str_contains($column, '{{count}}')) {
+                    continue;
+                }
+
+                foreach ($this->extractBaseColumns($column) as $baseColumn) {
+                    $normalized = $this->normalizeColumnIdentifier($baseColumn);
+
+                    if ('' === $normalized
+                        || in_array($normalized, $normalizedGroupBy, true)
+                        || isset($normalizedAggregatorKeys[$normalized])
+                    ) {
+                        continue;
+                    }
+
+                    $normalizedGroupBy[] = $normalized;
+                    // Quote simple table.column identifiers for PostgreSQL/MySQL safety
+                    $dedupedGroupBy[] = str_contains($baseColumn, '.')
+                        ? DatabasePlatform::quoteColumn($platform, $baseColumn)
+                        : $baseColumn;
+                }
+            }
+
+            if ($dedupedGroupBy !== $groupByColumns) {
+                $queryBuilder->resetQueryPart('groupBy');
+                $queryBuilder->addGroupBy(...$dedupedGroupBy);
             }
         }
 
@@ -326,9 +418,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         $queryBuilder->addSelect($selectColumns);
 
         // Add Aggregators
-        $aggregators       = $this->entity->getAggregators();
-        $aggregatorSelect  = [];
-        $aggregatedColumns = [];
+        $aggregatorSelect = [];
 
         if ($aggregators && $groupByOptions) {
             foreach ($aggregators as $aggregator) {
@@ -338,63 +428,21 @@ final class MauticReportBuilder implements ReportBuilderInterface
                     $columnSelect = $aggregator['column'];
                 }
 
-                // Recursively sanitize inner column references
+                // Sanitize simple column references for the platform
                 $innerExpression = $this->sanitizeExpression($columnSelect);
 
                 $selectText = DatabasePlatform::getAggregatorExpression(
-                    $this->db->getDatabasePlatform(),
+                    $platform,
                     $aggregator['function'],
                     $innerExpression
                 );
 
-                $alias               = sprintf('%s %s', $aggregator['function'], $aggregator['column']);
-                $quotedAlias         = DatabasePlatform::quoteIdentifier($platform, $alias);
-                $aggregatorSelect[]  = sprintf('%s AS %s', $selectText, $quotedAlias);
-                $aggregatedColumns[] = $columnSelect; // Track aggregated columns
+                $alias              = sprintf('%s %s', $aggregator['function'], $aggregator['column']);
+                $quotedAlias        = DatabasePlatform::quoteIdentifier($platform, $alias);
+                $aggregatorSelect[] = sprintf('%s AS %s', $selectText, $quotedAlias);
             }
 
             $queryBuilder->addSelect($aggregatorSelect);
-        }
-
-        // Ensure all non-aggregated SELECT/ORDER columns are in GROUP BY
-        $allSelectColumns = array_merge(array_merge($selectColumns, $event->getSelectColumns()), $orderByColumns);
-        if ($allSelectColumns && ($groupByColumns || $existingGroupBy || $aggregators)) {
-            $nonAggregatedColumns = [];
-
-            // 1. Normalize GROUP BY columns
-            $normalizedGroupBy = array_map(
-                fn (string $col): string => DatabasePlatform::unquoteIdentifier($platform, $col),
-                (array) $groupByColumns
-            );
-
-            // 2. Normalize aggregated columns
-            $normalizedAggregated = array_map(
-                fn (string $col): string => DatabasePlatform::unquoteIdentifier($platform, $col),
-                $aggregatedColumns
-            );
-            // 3. Extract base column names from selectColumns
-            foreach ($allSelectColumns as $select) {
-                $columns = $this->extractColumnsFromSelect($select);
-
-                foreach ($columns as $column) {
-                    // Normalize for comparison
-                    $normalizedColumn = DatabasePlatform::unquoteIdentifier($platform, $column);
-
-                    // Skip if already in GROUP BY or aggregated (using normalized comparison)
-                    if (in_array($normalizedColumn, $normalizedGroupBy) || in_array($normalizedColumn, $normalizedAggregated)) {
-                        continue;
-                    }
-
-                    $nonAggregatedColumns[] = $column;  // Add the original (usually sanitized) version
-                }
-            }
-
-            // 4. Add missing non-aggregated columns to groupByColumns
-            $groupByColumns = array_merge($groupByColumns, $nonAggregatedColumns);
-            $queryBuilder->resetQueryPart('groupBy'); // Clear existing GROUP BY
-            if ($groupByColumns) {
-                $queryBuilder->addGroupBy($groupByColumns); // Add updated GROUP BY
-            }
         }
 
         return $queryBuilder;
@@ -414,6 +462,185 @@ final class MauticReportBuilder implements ReportBuilderInterface
         }
 
         return $case.' ELSE NULL END ';
+    }
+
+    /**
+     * Returns the outer-level column references contained in a SELECT/ORDER BY
+     * expression (e.g. ph.date_hit inside DATE(ph.date_hit)), so the GROUP BY
+     * completion can group them individually instead of appending the whole
+     * expression as an opaque string.
+     *
+     * String literals, aggregate-function arguments and subquery contents are
+     * skipped: those identifiers are aggregated or belong to another query scope
+     * and must never be pulled into the outer GROUP BY.
+     *
+     * @return string[]
+     */
+    private function extractBaseColumns(string $expression): array
+    {
+        // Strip string literals so their contents are never scanned. MySQL
+        // treats both single- and double-quoted strings as literals (FocusBundle
+        // and several channel subscribers write conditions like fs.type = "view").
+        // A doubled-quote alternative in the pattern would let one match span
+        // from a literal's closing quote to the next literal's opening quote,
+        // swallowing everything between them (including subquery parens), so
+        // escapes are handled by the \\. branch instead.
+        $expression = preg_replace("/'(?:\\\\.|[^'\\\\])*'/", "''", $expression) ?? '';
+        $expression = preg_replace('/"(?:\\\\.|[^"\\\\])*"/', '""', $expression) ?? '';
+
+        // Remove subqueries and aggregate-function calls, arguments included:
+        // those identifiers are aggregated or belong to another query scope.
+        // Each pass may reveal new candidates, hence the loop.
+        $previous = null;
+        while ($previous !== $expression) {
+            $previous   = $expression;
+            $expression = $this->removeSubqueries($expression);
+            $expression = $this->removeAggregateCalls($expression);
+        }
+
+        // Remove the names of the remaining scalar function calls (DATE, CONCAT, …)
+        // so only their arguments are scanned for column references.
+        $expression = (string) preg_replace('/\b[A-Za-z_][A-Za-z0-9_]*\s*(?=\()/', ' ', $expression);
+
+        // Match optionally qualified, optionally backtick- or double-quote-quoted identifiers.
+        // Accepts both MySQL-style backticks and PostgreSQL-style double quotes.
+        if (!preg_match_all(
+            '/(?:[`"]?)([A-Za-z_][A-Za-z0-9_]*)(?:[`"]?)(?:\.(?:[`"]?)([A-Za-z_][A-Za-z0-9_]*)(?:[`"]?))?/',
+            $expression,
+            $matches
+        )) {
+            return [];
+        }
+
+        $columns = [];
+        foreach ($matches[0] as $index => $match) {
+            if (in_array(strtoupper($matches[1][$index]), self::SQL_KEYWORD_TOKENS, true)) {
+                continue;
+            }
+
+            $columns[] = '' !== ($matches[2][$index] ?? '')
+                ? $matches[1][$index].'.'.$matches[2][$index]
+                : $matches[1][$index];
+        }
+
+        return array_values(array_unique($columns));
+    }
+
+    /**
+     * Removes every parenthesized group whose content starts with SELECT
+     * (subqueries at any nesting depth); identifiers inside them belong to the
+     * subquery's own scope, not to the outer GROUP BY.
+     */
+    private function removeSubqueries(string $expression): string
+    {
+        $pos = 0;
+        while (false !== ($open = strpos($expression, '(', $pos))) {
+            $close = $this->findMatchingParenthesis($expression, $open);
+            if (-1 === $close) {
+                break;
+            }
+
+            if (preg_match('/^\s*SELECT\b/i', substr($expression, $open + 1, $close - $open - 1))) {
+                $expression = substr($expression, 0, $open).' '.substr($expression, $close + 1);
+                $pos        = $open;
+            } else {
+                $pos = $open + 1;
+            }
+        }
+
+        return $expression;
+    }
+
+    /**
+     * Removes aggregate-function calls together with their arguments.
+     */
+    private function removeAggregateCalls(string $expression): string
+    {
+        $pattern = '/\b(?:'.implode('|', self::AGGREGATE_FUNCTIONS).')\s*\(/i';
+        if (!preg_match_all($pattern, $expression, $matches, PREG_OFFSET_CAPTURE)) {
+            return $expression;
+        }
+
+        // Remove from rightmost to leftmost so the offsets stay valid.
+        foreach (array_reverse($matches[0]) as [$call, $offset]) {
+            $open  = $offset + strlen($call) - 1;
+            $close = $this->findMatchingParenthesis($expression, $open);
+            if (-1 !== $close) {
+                $expression = substr($expression, 0, $offset).' '.substr($expression, $close + 1);
+            }
+        }
+
+        return $expression;
+    }
+
+    /**
+     * Returns the index of the closing parenthesis matching the one at $open,
+     * or -1 when unbalanced.
+     */
+    private function findMatchingParenthesis(string $expression, int $open): int
+    {
+        $length = strlen($expression);
+        $depth  = 0;
+        for ($i = $open; $i < $length; ++$i) {
+            if ('(' === $expression[$i]) {
+                ++$depth;
+            } elseif (')' === $expression[$i]) {
+                --$depth;
+                if (0 === $depth) {
+                    return $i;
+                }
+            }
+        }
+
+        return -1;
+    }
+
+    /**
+     * Reduces a column reference to a comparable key: quoting, whitespace and
+     * letter case are ignored, so `ph`.`url` / "ph"."url" matches ph.URL.
+     */
+    private function normalizeColumnIdentifier(string $column): string
+    {
+        return strtolower((string) preg_replace('/[`"\s]+/', '', $column));
+    }
+
+    /**
+     * Sanitizes expressions recursively.
+     * - If the expression starts with a function (AVG(, IF(, ROUND(, etc.) or contains SELECT,
+     *   it recurses into the arguments and sanitizes only real column references (table.column).
+     * - Simple labels/aliases that are not expressions are left untouched.
+     */
+    private function sanitizeExpression(string $expression): string
+    {
+        $trimmed  = trim($expression);
+        $platform = $this->db->getDatabasePlatform();
+
+        // If it's a simple label/alias (no function, no parentheses, no SELECT), leave it as-is
+        if (!$this->isComplexExpression($trimmed)) {
+            if (str_contains($trimmed, '.')) {
+                return DatabasePlatform::quoteColumn($platform, $trimmed);
+            }
+
+            return $trimmed;
+        }
+
+        // Recursively sanitize all column references inside the expression
+        return (string) preg_replace_callback(
+            '/([`"]?[a-z_][a-z0-9_]*[`"]?\.[`"]?[a-z_][a-z0-9_]*[`"]?)/i',
+            fn ($matches): string => DatabasePlatform::quoteColumn($platform, $matches[1]),
+            $trimmed
+        );
+    }
+
+    /**
+     * Returns true if the string looks like a complex SQL expression (function call or SELECT).
+     */
+    private function isComplexExpression(string $expression): bool
+    {
+        $expr = trim($expression);
+
+        // Starts with a function name followed by '(' or contains SELECT
+        return (bool) preg_match('/^\w+\s*\(/i', $expr) || 0 === stripos($expr, 'SELECT');
     }
 
     private function applyFilters(array $filters, QueryBuilder $queryBuilder, array $filterDefinitions): void
@@ -647,183 +874,6 @@ final class MauticReportBuilder implements ReportBuilderInterface
         $operator = 'in' === $filter['condition'] ? 'IN' : 'NOT IN';
 
         return sprintf('l.id %s (%s)', $operator, $dncSubQuery->getSQL());
-    }
-
-    /**
-     * Extracts qualified column references (table.column) from a SELECT expression.
-     *
-     * - Preserves original quoting (backticks for MySQL, double quotes for PostgreSQL, or unquoted).
-     * - Handles simple columns: e.subject, `e`.`subject`, "e"."subject"
-     * - Handles columns inside common functions: CONCAT, IFNULL, IF, ROUND, CASE, etc.
-     * - Skips pure aggregates/constants with no real columns: COUNT(*), SUM(1), 'literal', 123
-     * - Completely skips any column references that appear inside subqueries (including correlated references like e.id inside a scalar subquery)
-     * - Handles nested parentheses and multiple subqueries correctly
-     * - Returns array of unique matched column strings (with original quoting preserved), in order of first appearance.
-     *
-     * @param string $selectExpression The raw SELECT part
-     *
-     * @return array<string>
-     */
-    private function extractColumnsFromSelect(string $selectExpression): array
-    {
-        $expr = preg_replace('/\s+AS\s+.*$/i', '', trim($selectExpression));
-
-        if (preg_match(self::LITERAL_AGGREGATE_PATTERN, $expr)) {
-            return [];
-        }
-
-        $subqueryRanges = $this->getSubqueryRanges($expr);
-
-        $columns = [];
-        if (preg_match_all(self::IDENTIFIER_PATTERN, $expr, $matches, PREG_OFFSET_CAPTURE)) {
-            $columns = $this->filterTopLevelIdentifiers($matches[1], $subqueryRanges);
-        }
-
-        return array_values(array_unique($columns));
-    }
-
-    /**
-     * Scans the expression to find the start and end positions of all top-level subqueries.
-     *
-     * @param string $expr The SQL expression to scan
-     *
-     * @return array<int, array{int, int}> A list of [start, end] offsets
-     */
-    private function getSubqueryRanges(string $expr): array
-    {
-        $ranges = [];
-        $length = strlen($expr);
-        $offset = 0;
-
-        while ($offset < $length) {
-            if ('(' === $expr[$offset] && $this->isSubqueryStart($expr, $offset + 1)) {
-                $closingPos = $this->findMatchingParenthesis($expr, $offset);
-                if (null !== $closingPos) {
-                    $ranges[] = [$offset, $closingPos];
-                    $offset   = $closingPos + 1;
-                    continue;
-                }
-            }
-            ++$offset;
-        }
-
-        return $ranges;
-    }
-
-    /**
-     * Determines if the content following an opening parenthesis is a SELECT statement.
-     *
-     * @param string $expr   The SQL expression
-     * @param int    $offset The position immediately after the opening parenthesis
-     */
-    private function isSubqueryStart(string $expr, int $offset): bool
-    {
-        $remaining = substr($expr, $offset);
-
-        return (bool) preg_match('/^\s*SELECT/i', $remaining);
-    }
-
-    /**
-     * Finds the offset of the matching closing parenthesis for an opening one,
-     * accounting for nested parentheses.
-     *
-     * @param string $expr    The SQL expression
-     * @param int    $openPos The position of the opening parenthesis
-     *
-     * @return int|null The position of the matching parenthesis, or null if unbalanced
-     */
-    private function findMatchingParenthesis(string $expr, int $openPos): ?int
-    {
-        $level  = 0;
-        $length = strlen($expr);
-
-        for ($i = $openPos; $i < $length; ++$i) {
-            if ('(' === $expr[$i]) {
-                ++$level;
-            } elseif (')' === $expr[$i]) {
-                --$level;
-            }
-
-            if (0 === $level) {
-                return $i;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Filters out identifiers that are located within identified subquery ranges.
-     *
-     * @param array<int, array{0: string, 1: int}> $matches Matches from PREG_OFFSET_CAPTURE
-     * @param array<int, array{0: int, 1: int}>    $ranges  List of [start, end] subquery offsets
-     *
-     * @return array<int, string> Columns outside of subqueries
-     */
-    private function filterTopLevelIdentifiers(array $matches, array $ranges): array
-    {
-        $filtered = [];
-        foreach ($matches as [$col, $pos]) {
-            if (!$this->isPositionInsideRanges($pos, $ranges)) {
-                $filtered[] = $col;
-            }
-        }
-
-        return $filtered;
-    }
-
-    /**
-     * @param int                               $pos    The position to check
-     * @param array<int, array{0: int, 1: int}> $ranges List of [start, end] subquery offsets
-     */
-    private function isPositionInsideRanges(int $pos, array $ranges): bool
-    {
-        foreach ($ranges as [$start, $end]) {
-            if ($pos >= $start && $pos <= $end) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Sanitizes expressions recursively.
-     * - If the expression starts with a function (AVG(, IF(, ROUND(, etc.) or contains SELECT,
-     *   it recurses into the arguments and sanitizes only real column references (table.column).
-     * - Simple labels/aliases that are not expressions are left untouched.
-     */
-    private function sanitizeExpression(string $expression): string
-    {
-        $trimmed  = trim($expression);
-        $platform = $this->db->getDatabasePlatform();
-
-        // If it's a simple label/alias (no function, no parentheses, no SELECT), leave it as-is
-        if (!$this->isComplexExpression($trimmed)) {
-            if (preg_match(self::IDENTIFIER_PATTERN, $trimmed)) {
-                return DatabasePlatform::quoteColumn($platform, $trimmed); // if its simple column, we sanitize it, otherwise its inner query
-            }
-
-            return $trimmed;
-        }
-
-        // Recursively sanitize all column references inside the expression
-        return preg_replace_callback(
-            self::IDENTIFIER_PATTERN,
-            fn ($matches): string => DatabasePlatform::quoteColumn($platform, $matches[1]),
-            $trimmed
-        );
-    }
-
-    /**
-     * Returns true if the string looks like a complex SQL expression (function call or SELECT).
-     */
-    private function isComplexExpression(string $expression): bool
-    {
-        $expr = trim($expression);
-
-        // Starts with a function name followed by '(' or contains SELECT
-        return preg_match('/^\w+\s*\(/i', $expr) || 0 === stripos($expr, 'SELECT');
     }
 
     /**
