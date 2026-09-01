@@ -289,7 +289,7 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
                     );
 
                     $event = new PointActionEvent($action, $lead);
-                    $this->dispatcher->dispatch($event, PointEvents::POINT_ON_ACTION);
+                    $this->dispatcher->dispatch($event);
 
                     if (!$action->getRepeatable()) {
                         $log = new LeadPointLog();

@@ -146,7 +146,7 @@ class PointGroupModel extends CommonFormModel implements GlobalSearchInterface
         $this->em->flush();
 
         $scoreChangeEvent = new Events\GroupScoreChangeEvent($contactScore, $oldScore, $newScore);
-        $this->dispatcher->dispatch($scoreChangeEvent, PointGroupEvents::SCORE_CHANGE);
+        $this->dispatcher->dispatch($scoreChangeEvent);
 
         return $contact;
     }
