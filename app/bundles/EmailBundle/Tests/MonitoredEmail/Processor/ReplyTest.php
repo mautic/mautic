@@ -7,7 +7,6 @@ namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityNotFoundException;
 use Mautic\CoreBundle\Helper\EmailAddressHelper;
-use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailReply;
 use Mautic\EmailBundle\Entity\Stat;
@@ -187,7 +186,7 @@ BODY;
 
         $this->dispatcher->expects($this->once())
             ->method('hasListeners')
-            ->with(EmailEvents::EMAIL_ON_REPLY)
+            ->with(EmailReplyEvent::class)
             ->willReturn(true);
 
         $this->contactTracker->expects($this->once())
@@ -196,7 +195,7 @@ BODY;
 
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with($this->isInstanceOf(EmailReplyEvent::class), EmailEvents::EMAIL_ON_REPLY);
+            ->with($this->isInstanceOf(EmailReplyEvent::class));
 
         $this->processor->createReplyByHash($trackingHash, 'api-msg1d');
     }

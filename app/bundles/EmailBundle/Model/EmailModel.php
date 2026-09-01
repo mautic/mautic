@@ -497,9 +497,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
         $stat->setIpAddress($ipAddress);
 
-        if ($this->dispatcher->hasListeners(EmailEvents::EMAIL_ON_OPEN)) {
+        if ($this->dispatcher->hasListeners(EmailOpenEvent::class)) {
             $event = new EmailOpenEvent($stat, $request, $firstTime);
-            $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_OPEN);
+            $this->dispatcher->dispatch($event);
         }
 
         // Only up counts if associated with both an email and lead

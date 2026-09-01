@@ -22,7 +22,7 @@ final readonly class WebhookSubscriber implements EventSubscriberInterface
     {
         return [
             EmailEvents::EMAIL_ON_SEND          => ['onEmailSend', 0],
-            EmailEvents::EMAIL_ON_OPEN          => ['onEmailOpen', 0],
+            EmailOpenEvent::class               => ['onEmailOpen', 0],
             WebhookBuilderEvent::class          => ['onWebhookBuild', 0],
             WebhookQueueEvent::class            => ['onWebhookQueueOnAdd', 0],
         ];

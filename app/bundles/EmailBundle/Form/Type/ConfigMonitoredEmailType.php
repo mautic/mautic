@@ -2,7 +2,6 @@
 
 namespace Mautic\EmailBundle\Form\Type;
 
-use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\MonitoredEmailEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\AbstractType;
@@ -27,7 +26,7 @@ final class ConfigMonitoredEmailType extends AbstractType
             // Default email bundles
             $event->addFolder('general', '', 'mautic.email.config.monitored_email.general');
 
-            $this->dispatcher->dispatch($event, EmailEvents::MONITORED_EMAIL_CONFIG);
+            $this->dispatcher->dispatch($event);
 
             $folderSettings = $event->getFolders();
             foreach ($folderSettings as $key => $settings) {
