@@ -6,7 +6,6 @@ namespace Mautic\MarketplaceBundle\Service;
 
 use Mautic\MarketplaceBundle\Api\Connection;
 use Mautic\MarketplaceBundle\Collection\PackageCollection;
-use Mautic\MarketplaceBundle\Enum\PackageType;
 
 final class PluginCollector
 {
@@ -19,7 +18,7 @@ final class PluginCollector
 
     public function collectPackages(int $page, int $limit, string $query = '', ?string $type = null): PackageCollection
     {
-        $payload = $this->connection->getPlugins($page, $limit, $query, $type ?? PackageType::PLUGIN->value);
+        $payload = $this->connection->getPlugins($page, $limit, $query, $type);
 
         $this->total = (int) $payload['total'];
 

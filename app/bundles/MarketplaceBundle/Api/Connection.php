@@ -23,16 +23,19 @@ class Connection
     /**
      * @throws ApiException
      */
-    public function getPlugins(int $page, int $limit, string $query = '', string $type = 'mautic-plugin'): array
+    public function getPlugins(int $page, int $limit, string $query = '', ?string $type = null): array
     {
         $queryParams = [
             'page'  => $page,
             'limit' => $limit,
-            'type'  => $type,
         ];
 
         if ('' !== $query) {
             $queryParams['query'] = $query;
+        }
+
+        if (null !== $type && '' !== $type) {
+            $queryParams['type'] = $type;
         }
 
         $url = $this->config->getRegistryUrl().'/api/registry/v1/packages?'.http_build_query($queryParams);
