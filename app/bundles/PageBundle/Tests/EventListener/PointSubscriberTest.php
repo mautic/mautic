@@ -22,7 +22,7 @@ final class PointSubscriberTest extends TestCase
     {
         $this->assertSame([
             'mautic.point_on_build' => ['onPointBuild', 0],
-            'mautic.page_on_hit'    => ['onPageHit', 0],
+            PageHitEvent::class    => ['onPageHit', 0],
         ], PointSubscriber::getSubscribedEvents());
     }
 

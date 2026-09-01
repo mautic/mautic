@@ -35,7 +35,6 @@ use Mautic\PageBundle\Helper\TrackingHelper;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\Tracking404Model;
-use Mautic\PageBundle\PageEvents;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -445,7 +444,7 @@ final class PublicControllerTest extends TestCase
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->with($event, PageEvents::ON_CONTACT_TRACKED)
+            ->with($event)
             ->willReturnCallback(
                 function (TrackingEvent $event): TrackingEvent {
                     $contact  = $event->getContact()->getEmail();

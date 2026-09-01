@@ -29,7 +29,6 @@ use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\Tracking404Model;
 use Mautic\PageBundle\Model\VideoModel;
-use Mautic\PageBundle\PageEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -259,7 +258,7 @@ final class PublicController extends AbstractFormController
             );
 
             $event = new PageDisplayEvent((string) $content, $entity);
-            $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
+            $this->dispatcher->dispatch($event);
             $content = $event->getContent();
 
             $isHitTrackable = $model->hitPage($entity, $request, Response::HTTP_OK, $lead, $query);
@@ -347,12 +346,12 @@ final class PublicController extends AbstractFormController
             $content = str_replace('</head>', $analytics."\n</head>", $content);
         }
 
-        if ($this->dispatcher->hasListeners(PageEvents::PAGE_ON_DISPLAY)) {
+        if ($this->dispatcher->hasListeners(PageDisplayEvent::class)) {
             $event = new PageDisplayEvent($content, $page, $this->getPreferenceCenterConfig());
             if (isset($contact) && $contact instanceof Lead) {
                 $event->setLead($contact);
             }
-            $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
+            $this->dispatcher->dispatch($event);
             $content = $event->getContent();
         }
 
@@ -396,7 +395,7 @@ final class PublicController extends AbstractFormController
         $sessionValue   = $trackingHelper->getCacheItem(true);
 
         $event = new TrackingEvent($lead, $request, $sessionValue);
-        $this->dispatcher->dispatch($event, PageEvents::ON_CONTACT_TRACKED);
+        $this->dispatcher->dispatch($event);
 
         return new JsonResponse(
             [

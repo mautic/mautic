@@ -30,7 +30,6 @@ use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\EventListener\BuilderSubscriber;
 use Mautic\PageBundle\Model\PageModel;
-use Mautic\PageBundle\PageEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\FormView;
@@ -315,7 +314,7 @@ final class PublicController extends CommonFormController
         );
 
         $event = new PageDisplayEvent($html, $prefCenter, $eventParameters);
-        $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
+        $this->dispatcher->dispatch($event);
 
         $request->getSession()->remove($successSessionName);
         $pageModel->hitPage($prefCenter, $request, 200, $lead);

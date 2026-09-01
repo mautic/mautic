@@ -304,6 +304,30 @@
     | `ChannelEvents::PROCESS_MESSAGE_QUEUE` | `MessageQueueProcessEvent` |
     | `ChannelEvents::PROCESS_MESSAGE_QUEUE_BATCH` | `MessageQueueBatchProcessEvent` |
 - DynamicContentBundle's `ON_CONTACTS_FILTER_EVALUATE` event is now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\DynamicContentBundle\DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE` string constant. Update any subscriber or listener that keys on that constant to key on `Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent::class` instead, e.g. `$dispatcher->dispatch($event, DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE)` becomes `$dispatcher->dispatch($event)`. The constant is kept for backwards compatibility but is no longer used internally. The `DynamicContentEvent` CRUD group (`PRE_SAVE` / `POST_SAVE` / `PRE_DELETE` / `POST_DELETE`) shares one event class under four names and is unchanged, as are the cross-bundle `CategoryEvent`, `TokenReplacementEvent` and campaign event constants.
+- PageBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\PageBundle\PageEvents` string constants. Update any subscriber or listener that keys on one of the converted `PageEvents::*` constants (or the raw string name such as `mautic.page_on_hit`) to key on the event class instead:
+
+    ```diff
+     public static function getSubscribedEvents(): array
+     {
+         return [
+    -        PageEvents::PAGE_ON_DISPLAY => ['onPageDisplay', 0],
+    +        PageDisplayEvent::class => ['onPageDisplay', 0],
+         ];
+     }
+    ```
+
+    Dispatching drops the redundant second argument, e.g. `$dispatcher->dispatch($event, PageEvents::PAGE_ON_DISPLAY)` becomes `$dispatcher->dispatch($event)`. The `Mautic\PageBundle\PageEvents` constants are kept for backwards compatibility but are no longer used internally for the events below. Constants that share an event class stay as string constants: the `PageEvent` group (`PAGE_ON_BUILD`, `PAGE_PRE_SAVE`, `PAGE_POST_SAVE`, `PAGE_PRE_DELETE`, `PAGE_POST_DELETE`, `PAGE_ON_TOGGLE_PUBLISH`) and the `DetermineWinnerEvent` pair (`ON_DETERMINE_BOUNCE_RATE_WINNER`, `ON_DETERMINE_DWELL_TIME_WINNER`) are unchanged, as are the campaign constants (`ON_CAMPAIGN_TRIGGER_DECISION`, `ON_CAMPAIGN_BATCH_ACTION`) whose events are shared across bundles.
+
+    Full mapping of the converted constants to their event class (all in the `Mautic\PageBundle\Event` namespace):
+
+    | `PageEvents` constant | New event class |
+    | --- | --- |
+    | `PageEvents::VIDEO_ON_HIT` | `VideoHitEvent` |
+    | `PageEvents::PAGE_ON_HIT` | `PageHitEvent` |
+    | `PageEvents::PAGE_ON_DISPLAY` | `PageDisplayEvent` |
+    | `PageEvents::REDIRECT_DO_NOT_TRACK` | `UntrackableUrlsEvent` |
+    | `PageEvents::ON_REDIRECT_GENERATE` | `RedirectGenerationEvent` |
+    | `PageEvents::ON_CONTACT_TRACKED` | `TrackingEvent` |
 
 - `Mautic\CoreBundle\Factory\ModelFactory` now builds its service locator from a `defaultIndexMethod` on the `mautic.model` tag, replacing the removed `Mautic\CoreBundle\DependencyInjection\Compiler\ModelPass`. Every model (a service implementing `Mautic\CoreBundle\Model\MauticModelInterface`) declares its `ModelFactory::getModel()` lookup key via a static `getName()` method:
 

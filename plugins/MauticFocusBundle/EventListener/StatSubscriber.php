@@ -5,7 +5,6 @@ namespace MauticPlugin\MauticFocusBundle\EventListener;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\PageBundle\Event\PageHitEvent;
-use Mautic\PageBundle\PageEvents;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -22,7 +21,7 @@ final readonly class StatSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            PageEvents::PAGE_ON_HIT    => ['onPageHit', 0],
+            PageHitEvent::class    => ['onPageHit', 0],
             FormEvents::FORM_ON_SUBMIT => ['onFormSubmit', 0],
         ];
     }

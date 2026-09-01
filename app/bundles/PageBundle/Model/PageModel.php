@@ -710,9 +710,9 @@ class PageModel extends FormModel implements GlobalSearchInterface
             );
         }
 
-        if ($this->dispatcher->hasListeners(PageEvents::PAGE_ON_HIT)) {
+        if ($this->dispatcher->hasListeners(PageHitEvent::class)) {
             $event = new PageHitEvent($hit, $request, $hit->getCode(), $clickthrough, $isUnique);
-            $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_HIT);
+            $this->dispatcher->dispatch($event);
         }
 
         if (null !== $hitDate) {

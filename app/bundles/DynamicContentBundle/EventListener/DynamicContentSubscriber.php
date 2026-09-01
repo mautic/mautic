@@ -22,7 +22,6 @@ use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
-use Mautic\PageBundle\PageEvents;
 use MauticPlugin\MauticFocusBundle\Helper\TokenHelper as FocusTokenHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -51,7 +50,7 @@ final readonly class DynamicContentSubscriber implements EventSubscriberInterfac
             DynamicContentEvents::POST_SAVE         => ['onPostSave', 0],
             DynamicContentEvents::POST_DELETE       => ['onDelete', 0],
             DynamicContentEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', 0],
-            PageEvents::PAGE_ON_DISPLAY             => ['decodeTokens', 254],
+            PageDisplayEvent::class             => ['decodeTokens', 254],
         ];
     }
 
