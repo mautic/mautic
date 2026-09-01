@@ -14,6 +14,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 trait NotificationTrait
 {
+    private const REST_API_ID = 'restApiID';
+
+    private const API_ID = 'apiID';
+
     private MockHandler $transportMock;
 
     protected function setUp(): void

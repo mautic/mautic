@@ -542,7 +542,6 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
 
                 // no break
             case 'forms':
-            case null:
                 $choices['forms'] = [];
                 $viewOther        = $this->security->isGranted('form:forms:viewother');
                 $this->formRepository->setCurrentUser($this->userHelper->getUser());

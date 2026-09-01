@@ -16,8 +16,12 @@ use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\MarketplaceBundle\Controller\AjaxController;
 use Mautic\MarketplaceBundle\DTO\ConsoleOutput;
+use Mautic\MarketplaceBundle\DTO\PackageDetail;
+use Mautic\MarketplaceBundle\Model\PackageModel;
 use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
 use Mautic\MarketplaceBundle\Service\Config;
+use Mautic\MarketplaceBundle\Service\ResourceInstallerInterface;
+use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -41,10 +45,18 @@ final class AjaxControllerTest extends AbstractMauticTestCase
      */
     private MockObject $requestStack;
 
+    private MockObject&PackageModel $packageModel;
+
+    private MockObject&ResourceInstallerInterface $resourceInstaller;
+
     public function testInstallPackageAction(): void
     {
         $request    = new Request([], [], [], [], [], [], '{"vendor":"mautic","package":"test-plugin-bundle"}');
         $controller = $this->generateController(false);
+
+        $this->packageModel->method('getPackageDetail')
+            ->with('mautic/test-plugin-bundle')
+            ->willReturn($this->getPluginPackageDetail());
 
         $this->marketplaceConfig->method('marketplaceIsEnabled')->willReturn(true);
         $this->marketplaceConfig->method('isComposerEnabled')->willReturn(true);
@@ -55,7 +67,7 @@ final class AjaxControllerTest extends AbstractMauticTestCase
 
         $response = $controller->installPackageAction($request);
 
-        $this->assertSame('{"success":true}', $response->getContent());
+        $this->assertSame('[]', $response->getContent());
         $this->assertSame(200, $response->getStatusCode());
     }
 
@@ -63,6 +75,10 @@ final class AjaxControllerTest extends AbstractMauticTestCase
     {
         $request    = new Request([], [], [], [], [], [], '{"vendor":"mautic","package":"test-plugin-bundle"}');
         $controller = $this->generateController(true);
+
+        $this->packageModel->method('getPackageDetail')
+            ->with('mautic/test-plugin-bundle')
+            ->willReturn($this->getPluginPackageDetail());
 
         $this->marketplaceConfig->method('marketplaceIsEnabled')->willReturn(true);
         $this->marketplaceConfig->method('isComposerEnabled')->willReturn(true);
@@ -73,8 +89,109 @@ final class AjaxControllerTest extends AbstractMauticTestCase
 
         $response = $controller->removePackageAction($request);
 
-        $this->assertSame('{"success":true}', $response->getContent());
+        $this->assertSame('[]', $response->getContent());
         $this->assertSame(200, $response->getStatusCode());
+    }
+
+    public function testInstallResourcePackageAction(): void
+    {
+        $request    = new Request([], [], [], [], [], [], '{"vendor":"vukovicpredrag","package":"mautic-test-campaign-template"}');
+        $controller = $this->generateController(false);
+
+        $this->packageModel->method('getPackageDetail')
+            ->with('vukovicpredrag/mautic-test-campaign-template')
+            ->willReturn($this->getResourcePackageDetail());
+
+        $this->resourceInstaller->method('isInstalled')
+            ->with('vukovicpredrag/mautic-test-campaign-template')
+            ->willReturn(false);
+
+        $this->resourceInstaller->method('install')
+            ->willReturn(['success' => true, 'summary' => [], 'errors' => []]);
+
+        $this->marketplaceConfig->method('marketplaceIsEnabled')->willReturn(true);
+        $this->security
+            ->method('isGranted')
+            ->with(MarketplacePermissions::CAN_INSTALL_PACKAGES)
+            ->willReturn(true);
+
+        $response = $controller->installPackageAction($request);
+
+        $this->assertSame('[]', $response->getContent());
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
+    public function testInstallResourcePackageAlreadyInstalled(): void
+    {
+        $request    = new Request([], [], [], [], [], [], '{"vendor":"vukovicpredrag","package":"mautic-test-campaign-template"}');
+        $controller = $this->generateController(false);
+
+        $this->packageModel->method('getPackageDetail')
+            ->with('vukovicpredrag/mautic-test-campaign-template')
+            ->willReturn($this->getResourcePackageDetail());
+
+        $this->resourceInstaller->method('isInstalled')
+            ->with('vukovicpredrag/mautic-test-campaign-template')
+            ->willReturn(true);
+
+        $this->marketplaceConfig->method('marketplaceIsEnabled')->willReturn(true);
+        $this->security
+            ->method('isGranted')
+            ->with(MarketplacePermissions::CAN_INSTALL_PACKAGES)
+            ->willReturn(true);
+
+        $response = $controller->installPackageAction($request);
+
+        $this->assertSame(400, $response->getStatusCode());
+    }
+
+    public function testRemoveResourcePackageAction(): void
+    {
+        $request    = new Request([], [], [], [], [], [], '{"vendor":"vukovicpredrag","package":"mautic-test-campaign-template"}');
+        $controller = $this->generateController(false);
+
+        $this->packageModel->method('getPackageDetail')
+            ->with('vukovicpredrag/mautic-test-campaign-template')
+            ->willReturn($this->getResourcePackageDetail());
+
+        $this->resourceInstaller->method('isInstalled')
+            ->with('vukovicpredrag/mautic-test-campaign-template')
+            ->willReturn(true);
+
+        $this->marketplaceConfig->method('marketplaceIsEnabled')->willReturn(true);
+        $this->security
+            ->method('isGranted')
+            ->with(MarketplacePermissions::CAN_REMOVE_PACKAGES)
+            ->willReturn(true);
+
+        $response = $controller->removePackageAction($request);
+
+        $this->assertSame('[]', $response->getContent());
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
+    public function testRemoveResourcePackageNotInstalled(): void
+    {
+        $request    = new Request([], [], [], [], [], [], '{"vendor":"vukovicpredrag","package":"mautic-test-campaign-template"}');
+        $controller = $this->generateController(false);
+
+        $this->packageModel->method('getPackageDetail')
+            ->with('vukovicpredrag/mautic-test-campaign-template')
+            ->willReturn($this->getResourcePackageDetail());
+
+        $this->resourceInstaller->method('isInstalled')
+            ->with('vukovicpredrag/mautic-test-campaign-template')
+            ->willReturn(false);
+
+        $this->marketplaceConfig->method('marketplaceIsEnabled')->willReturn(true);
+        $this->security
+            ->method('isGranted')
+            ->with(MarketplacePermissions::CAN_REMOVE_PACKAGES)
+            ->willReturn(true);
+
+        $response = $controller->removePackageAction($request);
+
+        $this->assertSame(400, $response->getStatusCode());
     }
 
     private function generateController(bool $isPackageInstalled): AjaxController
@@ -86,14 +203,24 @@ final class AjaxControllerTest extends AbstractMauticTestCase
 
         $cacheHelper = $this->createMock(CacheHelper::class);
         $cacheHelper->method('clearSymfonyCache')->willReturn(0);
+
+        $userHelper = $this->createMock(UserHelper::class);
+        $user       = $this->createMock(User::class);
+        $user->method('getId')->willReturn(1);
+        $userHelper->method('getUser')->willReturn($user);
+
         $this->requestStack      = $this->createMock(RequestStack::class);
         $this->security          = $this->createMock(CorePermissions::class);
         $this->marketplaceConfig = $this->createMock(Config::class);
+        $this->resourceInstaller = $this->createMock(ResourceInstallerInterface::class);
+        $this->packageModel      = $this->createMock(PackageModel::class);
 
+        // The controller takes its own dependencies through #[Required] autowiring, so only
+        // CommonController's constructor arguments go here.
         $controller = new AjaxController(
             $this->createStub(ManagerRegistry::class),
             $this->createStub(ModelFactory::class),
-            $this->createStub(UserHelper::class),
+            $userHelper,
             $this->createStub(CoreParametersHelper::class),
             $this->createStub(EventDispatcherInterface::class),
             $this->createStub(Translator::class),
@@ -105,10 +232,26 @@ final class AjaxControllerTest extends AbstractMauticTestCase
             $composer,
             $cacheHelper,
             $this->createStub(LoggerInterface::class),
-            $this->marketplaceConfig
+            $this->marketplaceConfig,
+            $this->resourceInstaller,
+            $this->packageModel
         );
         $controller->setContainer(self::getContainer());
 
         return $controller;
+    }
+
+    private function getPluginPackageDetail(): PackageDetail
+    {
+        $payload = json_decode(file_get_contents(__DIR__.'/../../ApiResponse/detail.json'), true);
+
+        return PackageDetail::fromArray($payload['package']);
+    }
+
+    private function getResourcePackageDetail(): PackageDetail
+    {
+        $payload = json_decode(file_get_contents(__DIR__.'/../../ApiResponse/detail_resource.json'), true);
+
+        return PackageDetail::fromArray($payload['package']);
     }
 }
