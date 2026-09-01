@@ -92,18 +92,23 @@ final class MauticReportBuilder implements ReportBuilderInterface
      * Covers both MySQL and PostgreSQL so the same builder works on either platform.
      */
     private const SQL_KEYWORD_TOKENS = [
-        // Common
+        // Core SQL
         'SELECT', 'FROM', 'WHERE', 'CASE', 'WHEN', 'THEN', 'ELSE', 'END', 'AND',
         'OR', 'NOT', 'NULL', 'IS', 'IN', 'LIKE', 'BETWEEN', 'EXISTS', 'DISTINCT',
-        'AS', 'ASC', 'DESC', 'INTERVAL', 'DAY', 'DAYOFWEEK', 'DAYOFMONTH',
-        'DAYOFYEAR', 'HOUR', 'MINUTE', 'SECOND', 'WEEK', 'MONTH', 'QUARTER',
-        'YEAR', 'TRUE', 'FALSE',
-        // PostgreSQL
-        'ILIKE', 'SIMILAR', 'LIMIT', 'OFFSET', 'FETCH', 'ONLY', 'LATERAL',
-        'WINDOW', 'OVER', 'PARTITION', 'ROWS', 'RANGE', 'UNBOUNDED',
-        'PRECEDING', 'FOLLOWING', 'CURRENT', 'ROW', 'FILTER', 'WITHIN',
-        'GROUP', 'ORDER', 'COLLATE', 'USING', 'RETURNING', 'COALESCE',
-        'NULLIF', 'GREATEST', 'LEAST', 'UNKNOWN',
+        'AS', 'ASC', 'DESC', 'GROUP', 'ORDER', 'BY', 'HAVING', 'LIMIT', 'OFFSET',
+        'FETCH', 'ONLY', 'UNION', 'ALL', 'INTERSECT', 'EXCEPT',
+        // Window / analytic
+        'OVER', 'PARTITION', 'ROWS', 'RANGE', 'UNBOUNDED', 'PRECEDING',
+        'FOLLOWING', 'CURRENT', 'ROW', 'FILTER', 'WITHIN',
+        // Date / time parts (used in INTERVAL and extract expressions)
+        'INTERVAL', 'DAY', 'DAYOFWEEK', 'DAYOFMONTH', 'DAYOFYEAR',
+        'HOUR', 'MINUTE', 'SECOND', 'WEEK', 'MONTH', 'QUARTER', 'YEAR',
+        // Literals / null-handling
+        'TRUE', 'FALSE', 'UNKNOWN', 'COALESCE', 'NULLIF', 'GREATEST', 'LEAST',
+        // Collation / casting helpers that can appear as bare tokens
+        'COLLATE', 'USING',
+        // PostgreSQL-specific
+        'ILIKE', 'SIMILAR', 'LATERAL', 'RETURNING',
     ];
 
     /**
@@ -522,12 +527,12 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
         // Remove the names of the remaining scalar function calls (DATE, CONCAT, …)
         // so only their arguments are scanned for column references.
-        $expression = (string) preg_replace('/\b[A-Za-z_][A-Za-z0-9_]*\s*(?=\()/', ' ', $expression);
+        $expression = (string) preg_replace('/\b[A-Za-z_]\w*\s*(?=\()/', ' ', $expression);
 
         // Match optionally qualified, optionally backtick- or double-quote-quoted identifiers.
         // Accepts both MySQL-style backticks and PostgreSQL-style double quotes.
         if (!preg_match_all(
-            '/(?:[`"]?)([A-Za-z_][A-Za-z0-9_]*)(?:[`"]?)(?:\.(?:[`"]?)([A-Za-z_][A-Za-z0-9_]*)(?:[`"]?))?/',
+            '/(?:[`"]?)([A-Za-z_]\w*)(?:[`"]?)(?:\.(?:[`"]?)([A-Za-z_]\w*)(?:[`"]?))?/',
             $expression,
             $matches
         )) {
