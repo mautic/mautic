@@ -7,7 +7,6 @@ namespace Mautic\LeadBundle\EventListener;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\ORM\Query\Expr;
 use Mautic\LeadBundle\Event\SegmentOperatorQueryBuilderEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -16,7 +15,7 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            LeadEvents::LIST_FILTERS_OPERATOR_QUERYBUILDER_ON_GENERATE => [
+            SegmentOperatorQueryBuilderEvent::class => [
                 ['onEmptyOperator', 0],
                 ['onNotEmptyOperator', 0],
                 ['onNegativeOperators', 0],

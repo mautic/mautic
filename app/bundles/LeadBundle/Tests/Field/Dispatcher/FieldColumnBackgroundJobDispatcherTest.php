@@ -12,7 +12,6 @@ use Mautic\LeadBundle\Field\Event\DeleteColumnBackgroundEvent;
 use Mautic\LeadBundle\Field\Event\UpdateColumnBackgroundEvent;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
-use Mautic\LeadBundle\LeadEvents;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -74,7 +73,6 @@ final class FieldColumnBackgroundJobDispatcherTest extends \PHPUnit\Framework\Te
         $this->dispatcher->expects($this->once())->method('hasListeners')->willReturn(true);
         $this->dispatcher->expects($this->once())->method('dispatch')->with(
             $this->isInstanceOf(AddColumnBackgroundEvent::class),
-            LeadEvents::LEAD_FIELD_PRE_ADD_COLUMN_BACKGROUND_JOB,
         );
 
         $fieldColumnBackgroundJobDispatcher = new FieldColumnBackgroundJobDispatcher($this->dispatcher);
@@ -86,7 +84,6 @@ final class FieldColumnBackgroundJobDispatcherTest extends \PHPUnit\Framework\Te
         $this->dispatcher->expects($this->once())->method('hasListeners')->willReturn(true);
         $this->dispatcher->expects($this->once())->method('dispatch')->with(
             $this->isInstanceOf(UpdateColumnBackgroundEvent::class),
-            LeadEvents::LEAD_FIELD_PRE_UPDATE_COLUMN_BACKGROUND_JOB,
         );
 
         $fieldColumnBackgroundJobDispatcher = new FieldColumnBackgroundJobDispatcher($this->dispatcher);
@@ -98,7 +95,6 @@ final class FieldColumnBackgroundJobDispatcherTest extends \PHPUnit\Framework\Te
         $this->dispatcher->expects($this->once())->method('hasListeners')->willReturn(true);
         $this->dispatcher->expects($this->once())->method('dispatch')->with(
             $this->isInstanceOf(DeleteColumnBackgroundEvent::class),
-            LeadEvents::LEAD_FIELD_PRE_DELETE_COLUMN_BACKGROUND_JOB,
         );
 
         $fieldColumnBackgroundJobDispatcher = new FieldColumnBackgroundJobDispatcher($this->dispatcher);
@@ -114,7 +110,6 @@ final class FieldColumnBackgroundJobDispatcherTest extends \PHPUnit\Framework\Te
 
                 return true;
             }),
-            LeadEvents::LEAD_FIELD_PRE_ADD_COLUMN_BACKGROUND_JOB,
         );
 
         $fieldColumnBackgroundJobDispatcher = new FieldColumnBackgroundJobDispatcher($this->dispatcher);
@@ -134,7 +129,6 @@ final class FieldColumnBackgroundJobDispatcherTest extends \PHPUnit\Framework\Te
 
                 return true;
             }),
-            LeadEvents::LEAD_FIELD_PRE_UPDATE_COLUMN_BACKGROUND_JOB,
         );
 
         $fieldColumnBackgroundJobDispatcher = new FieldColumnBackgroundJobDispatcher($this->dispatcher);
@@ -154,7 +148,6 @@ final class FieldColumnBackgroundJobDispatcherTest extends \PHPUnit\Framework\Te
 
                 return true;
             }),
-            LeadEvents::LEAD_FIELD_PRE_DELETE_COLUMN_BACKGROUND_JOB,
         );
 
         $fieldColumnBackgroundJobDispatcher = new FieldColumnBackgroundJobDispatcher($this->dispatcher);

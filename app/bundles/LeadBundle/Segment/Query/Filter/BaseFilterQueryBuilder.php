@@ -3,7 +3,6 @@
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
 use Mautic\LeadBundle\Event\SegmentOperatorQueryBuilderEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
@@ -39,7 +38,7 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
         }
 
         $event = new SegmentOperatorQueryBuilderEvent($queryBuilder, $filter, $filter->getParameterHolder($parameters));
-        $this->dispatcher->dispatch($event, LeadEvents::LIST_FILTERS_OPERATOR_QUERYBUILDER_ON_GENERATE);
+        $this->dispatcher->dispatch($event);
 
         if (!$event->wasOperatorHandled()) {
             throw new \Exception('Dunno how to handle operator "'.$filter->getOperator().'"');

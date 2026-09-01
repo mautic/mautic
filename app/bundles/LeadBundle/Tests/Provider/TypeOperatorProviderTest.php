@@ -6,7 +6,6 @@ namespace Mautic\LeadBundle\Tests\Provider;
 
 use Mautic\LeadBundle\Event\FieldOperatorsEvent;
 use Mautic\LeadBundle\Event\TypeOperatorsEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use Mautic\LeadBundle\Provider\TypeOperatorProvider;
 use Mautic\LeadBundle\Segment\OperatorOptions;
@@ -121,8 +120,7 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
                     ]);
 
                     return true;
-                }),
-                LeadEvents::COLLECT_OPERATORS_FOR_FIELD_TYPE
+                })
             );
 
         $this->assertSame(
@@ -170,7 +168,6 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
                         ]);
                     };
                     $callback($parameters[0]);
-                    $this->assertSame(LeadEvents::COLLECT_OPERATORS_FOR_FIELD_TYPE, $parameters[1]);
                 }
                 if (2 === $matcher->numberOfInvocations()) {
                     $callback = function (FieldOperatorsEvent $event): void {
@@ -182,7 +179,6 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
                         $event->addOperator(OperatorOptions::STARTS_WITH);
                     };
                     $callback($parameters[0]);
-                    $this->assertSame(LeadEvents::COLLECT_OPERATORS_FOR_FIELD, $parameters[1]);
                 }
 
                 return $parameters[0];

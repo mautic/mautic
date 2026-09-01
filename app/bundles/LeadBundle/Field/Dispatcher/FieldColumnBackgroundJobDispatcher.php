@@ -11,7 +11,6 @@ use Mautic\LeadBundle\Field\Event\DeleteColumnBackgroundEvent;
 use Mautic\LeadBundle\Field\Event\UpdateColumnBackgroundEvent;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
-use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class FieldColumnBackgroundJobDispatcher
@@ -27,15 +26,13 @@ class FieldColumnBackgroundJobDispatcher
      */
     public function dispatchPreAddColumnEvent(LeadField $leadField): void
     {
-        $action = LeadEvents::LEAD_FIELD_PRE_ADD_COLUMN_BACKGROUND_JOB;
-
-        if (!$this->dispatcher->hasListeners($action)) {
+        if (!$this->dispatcher->hasListeners(AddColumnBackgroundEvent::class)) {
             throw new NoListenerException('There is no Listener for this event');
         }
 
         $event = new AddColumnBackgroundEvent($leadField);
 
-        $this->dispatcher->dispatch($event, $action);
+        $this->dispatcher->dispatch($event);
 
         if ($event->isPropagationStopped()) {
             throw new AbortColumnCreateException('Column cannot be created now');
@@ -48,15 +45,13 @@ class FieldColumnBackgroundJobDispatcher
      */
     public function dispatchPreUpdateColumnEvent(LeadField $leadField): void
     {
-        $action = LeadEvents::LEAD_FIELD_PRE_UPDATE_COLUMN_BACKGROUND_JOB;
-
-        if (!$this->dispatcher->hasListeners($action)) {
+        if (!$this->dispatcher->hasListeners(UpdateColumnBackgroundEvent::class)) {
             throw new NoListenerException('There is no Listener for this event');
         }
 
         $event = new UpdateColumnBackgroundEvent($leadField);
 
-        $this->dispatcher->dispatch($event, $action);
+        $this->dispatcher->dispatch($event);
 
         if ($event->isPropagationStopped()) {
             throw new AbortColumnUpdateException('Column cannot be updated now');
@@ -69,15 +64,13 @@ class FieldColumnBackgroundJobDispatcher
      */
     public function dispatchPreDeleteColumnEvent(LeadField $leadField): void
     {
-        $action = LeadEvents::LEAD_FIELD_PRE_DELETE_COLUMN_BACKGROUND_JOB;
-
-        if (!$this->dispatcher->hasListeners($action)) {
+        if (!$this->dispatcher->hasListeners(DeleteColumnBackgroundEvent::class)) {
             throw new NoListenerException('There is no Listener for this event');
         }
 
         $event = new DeleteColumnBackgroundEvent($leadField);
 
-        $this->dispatcher->dispatch($event, $action);
+        $this->dispatcher->dispatch($event);
 
         if ($event->isPropagationStopped()) {
             throw new AbortColumnUpdateException('Column cannot be deleted now');

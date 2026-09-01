@@ -69,7 +69,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            LeadEvents::LIST_FILTERS_OPERATORS_ON_GENERATE => ['onListOperatorsGenerate', 0],
+            LeadListFiltersOperatorsEvent::class => ['onListOperatorsGenerate', 0],
             LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE   => [
                 ['onGenerateSegmentFiltersAddStaticFields', 0],
                 ['onGenerateSegmentFiltersAddCustomFields', 0],

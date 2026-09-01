@@ -12,7 +12,6 @@ use Mautic\LeadBundle\Field\Event\UpdateColumnEvent;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
 use Mautic\LeadBundle\Field\Settings\BackgroundSettings;
-use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class FieldColumnDispatcher
@@ -31,7 +30,7 @@ class FieldColumnDispatcher
         $shouldProcessInBackground = $this->backgroundSettings->shouldProcessColumnChangeInBackground();
         $event                     = new AddColumnEvent($leadField, $shouldProcessInBackground);
 
-        $this->dispatcher->dispatch($event, LeadEvents::LEAD_FIELD_PRE_ADD_COLUMN);
+        $this->dispatcher->dispatch($event);
 
         if ($shouldProcessInBackground) {
             throw new AbortColumnCreateException('Column change will be processed in background job');
@@ -44,16 +43,14 @@ class FieldColumnDispatcher
      */
     public function dispatchPreUpdateColumnEvent(LeadField $leadField): void
     {
-        $action = LeadEvents::LEAD_FIELD_PRE_UPDATE_COLUMN;
-
-        if (!$this->dispatcher->hasListeners($action)) {
+        if (!$this->dispatcher->hasListeners(UpdateColumnEvent::class)) {
             throw new NoListenerException('There is no Listener for this event');
         }
 
         $shouldProcessInBackground = $this->backgroundSettings->shouldProcessColumnChangeInBackground();
         $event                     = new UpdateColumnEvent($leadField, $shouldProcessInBackground);
 
-        $this->dispatcher->dispatch($event, $action);
+        $this->dispatcher->dispatch($event);
 
         if ($event->shouldProcessInBackground()) {
             throw new AbortColumnUpdateException('Column change will be processed in background job');
@@ -66,9 +63,7 @@ class FieldColumnDispatcher
      */
     public function dispatchPreDeleteColumnEvent(LeadField $leadField): void
     {
-        $action = LeadEvents::LEAD_FIELD_PRE_DELETE_COLUMN;
-
-        if (!$this->dispatcher->hasListeners($action)) {
+        if (!$this->dispatcher->hasListeners(DeleteColumnEvent::class)) {
             throw new NoListenerException('There is no Listener for this event');
         }
 
@@ -76,7 +71,7 @@ class FieldColumnDispatcher
 
         $event = new DeleteColumnEvent($leadField, $shouldProcessInBackground);
 
-        $this->dispatcher->dispatch($event, $action);
+        $this->dispatcher->dispatch($event);
 
         if ($event->shouldProcessInBackground()) {
             throw new AbortColumnUpdateException('Column delete will be processed in background job');

@@ -6,7 +6,6 @@ namespace Mautic\LeadBundle\Provider;
 
 use Mautic\LeadBundle\Event\ListFieldChoicesEvent;
 use Mautic\LeadBundle\Exception\ChoicesNotFoundException;
-use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class FieldChoicesProvider implements FieldChoicesProviderInterface
@@ -70,7 +69,7 @@ final class FieldChoicesProvider implements FieldChoicesProviderInterface
         if ([] === $this->cachedTypeChoices) {
             $event = new ListFieldChoicesEvent();
             $event->setSearchTerm($search);
-            $this->dispatcher->dispatch($event, LeadEvents::COLLECT_FILTER_CHOICES_FOR_LIST_FIELD_TYPE);
+            $this->dispatcher->dispatch($event);
 
             $this->cachedTypeChoices  = $event->getChoicesForAllListFieldTypes();
             $this->cachedAliasChoices = $event->getChoicesForAllListFieldAliases();

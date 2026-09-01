@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Segment\Decorator;
 
 use Mautic\LeadBundle\Event\LeadListFiltersDecoratorDelegateEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\BaseDecorator;
 use Mautic\LeadBundle\Segment\Decorator\CompanyDecorator;
@@ -94,8 +93,7 @@ final class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
 
                         return true;
                     }
-                ),
-                LeadEvents::SEGMENT_ON_DECORATOR_DELEGATE
+                )
             );
 
         $this->assertSame(
@@ -124,8 +122,7 @@ final class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
 
                         return true;
                     }
-                ),
-                LeadEvents::SEGMENT_ON_DECORATOR_DELEGATE
+                )
             );
 
         $this->assertSame(

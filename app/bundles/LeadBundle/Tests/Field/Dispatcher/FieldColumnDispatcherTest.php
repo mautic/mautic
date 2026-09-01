@@ -30,7 +30,6 @@ final class FieldColumnDispatcherTest extends \PHPUnit\Framework\TestCase
             ->method('dispatch')
             ->with(
                 $this->isInstanceOf(AddColumnEvent::class),
-                'mautic.lead_field_pre_add_column',
             );
 
         $fieldColumnDispatcher = new FieldColumnDispatcher($dispatcher, $backgroundSettings);
@@ -52,7 +51,6 @@ final class FieldColumnDispatcherTest extends \PHPUnit\Framework\TestCase
             ->method('dispatch')
             ->with(
                 $this->isInstanceOf(AddColumnEvent::class),
-                'mautic.lead_field_pre_add_column'
             );
 
         $fieldColumnDispatcher = new FieldColumnDispatcher($dispatcher, $backgroundSettings);
@@ -85,7 +83,6 @@ final class FieldColumnDispatcherTest extends \PHPUnit\Framework\TestCase
             ->method('dispatch')
             ->with(
                 $this->isInstanceOf(UpdateColumnEvent::class),
-                'mautic.lead_field_pre_update_column'
             );
 
         $fieldColumnDispatcher = new FieldColumnDispatcher($dispatcher, $backgroundSettings);
@@ -114,7 +111,6 @@ final class FieldColumnDispatcherTest extends \PHPUnit\Framework\TestCase
             ->method('dispatch')
             ->with(
                 $this->isInstanceOf(DeleteColumnEvent::class),
-                'mautic.lead_field_pre_delete_column',
             );
 
         $fieldColumnDispatcher = new FieldColumnDispatcher($dispatcher, $backgroundSettings);

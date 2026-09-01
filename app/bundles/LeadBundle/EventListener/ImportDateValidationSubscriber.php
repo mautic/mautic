@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Event\ImportProcessEvent;
 use Mautic\LeadBundle\Exception\ImportRowFailedException;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -31,7 +30,7 @@ final class ImportDateValidationSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            LeadEvents::IMPORT_ON_PROCESS => ['onImportProcess', 100],
+            ImportProcessEvent::class => ['onImportProcess', 100],
         ];
     }
 

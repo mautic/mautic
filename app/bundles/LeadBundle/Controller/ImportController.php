@@ -14,7 +14,6 @@ use Mautic\LeadBundle\Event\ImportValidateEvent;
 use Mautic\LeadBundle\Form\Type\LeadImportFieldType;
 use Mautic\LeadBundle\Form\Type\LeadImportType;
 use Mautic\LeadBundle\Helper\Progress;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ImportModel;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
@@ -225,8 +224,7 @@ final class ImportController extends FormController
                 break;
             case self::STEP_MATCH_FIELDS:
                 $mappingEvent = $this->dispatcher->dispatch(
-                    new ImportMappingEvent($request->get('object')),
-                    LeadEvents::IMPORT_ON_FIELD_MAPPING
+                    new ImportMappingEvent($request->get('object'))
                 );
 
                 try {
@@ -382,7 +380,7 @@ final class ImportController extends FormController
                 case self::STEP_MATCH_FIELDS:
                     $validateEvent = new ImportValidateEvent($request->get('object'), $form);
 
-                    $this->dispatcher->dispatch($validateEvent, LeadEvents::IMPORT_ON_VALIDATE);
+                    $this->dispatcher->dispatch($validateEvent);
 
                     if ($validateEvent->hasErrors()) {
                         break;
@@ -732,7 +730,7 @@ final class ImportController extends FormController
         $request = $this->getCurrentRequest();
         $event   = new ImportInitEvent($request->get('object'));
 
-        $this->dispatcher->dispatch($event, LeadEvents::IMPORT_ON_INITIALIZE);
+        $this->dispatcher->dispatch($event);
 
         return $event;
     }

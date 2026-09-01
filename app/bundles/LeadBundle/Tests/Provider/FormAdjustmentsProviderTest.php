@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Provider;
 
 use Mautic\LeadBundle\Event\FormAdjustmentEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Provider\FormAdjustmentsProvider;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -48,8 +47,7 @@ final class FormAdjustmentsProviderTest extends \PHPUnit\Framework\TestCase
                     $this->assertSame('text', $event->getFieldType());
 
                     return true;
-                }),
-                LeadEvents::ADJUST_FILTER_FORM_TYPE_FOR_FIELD
+                })
             );
 
         $this->provider->adjustForm(

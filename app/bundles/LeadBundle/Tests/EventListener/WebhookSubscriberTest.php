@@ -146,7 +146,7 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->addSubscriber($webhookSubscriber);
 
         $event = new ChannelSubscriptionChange($lead, $channel, DoNotContact::IS_CONTACTABLE, DoNotContact::UNSUBSCRIBED);
-        $this->dispatcher->dispatch($event, LeadEvents::CHANNEL_SUBSCRIPTION_CHANGED);
+        $this->dispatcher->dispatch($event);
     }
 
     #[TestDox('Test that webhook is queued for lead company changes')]
