@@ -423,6 +423,53 @@
     | `ReportEvents::REPORT_ON_COLUMN_COLLECT` | `ColumnCollectEvent` |
     | `ReportEvents::REPORT_PERMANENT_FILE_CREATED` | `PermanentReportFileCreatedEvent` |
 
+- LeadBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\LeadBundle\LeadEvents` string constants. Update any subscriber or listener that keys on one of the converted `LeadEvents::*` constants to key on the event class instead:
+
+    ```diff
+     public static function getSubscribedEvents(): array
+     {
+         return [
+    -        LeadEvents::LEAD_BUILD_SEARCH_COMMANDS => ['onBuildSearchCommands', 0],
+    +        LeadBuildSearchEvent::class => ['onBuildSearchCommands', 0],
+         ];
+     }
+    ```
+
+    Dispatching drops the redundant second argument, e.g. `$dispatcher->dispatch($event, LeadEvents::LEAD_BUILD_SEARCH_COMMANDS)` becomes `$dispatcher->dispatch($event)`. The `Mautic\LeadBundle\LeadEvents` constants are kept for backwards compatibility but are no longer used internally for the events below.
+
+    Full mapping of the converted constants to their event class (in `Mautic\LeadBundle\Event`, except the `LEAD_FIELD_PRE_*_COLUMN*` events which live in `Mautic\LeadBundle\Field\Event`):
+
+    | `LeadEvents` constant | New event class |
+    | --- | --- |
+    | `LeadEvents::LEAD_UTMTAGS_ADD` | `LeadUtmTagsEvent` |
+    | `LeadEvents::LEAD_CATEGORY_CHANGE` | `CategoryChangeEvent` |
+    | `LeadEvents::CHANNEL_SUBSCRIPTION_CHANGED` | `ChannelSubscriptionChange` |
+    | `LeadEvents::LEAD_BUILD_SEARCH_COMMANDS` | `LeadBuildSearchEvent` |
+    | `LeadEvents::COMPANY_BUILD_SEARCH_COMMANDS` | `CompanyBuildSearchEvent` |
+    | `LeadEvents::ADJUST_FILTER_FORM_TYPE_FOR_FIELD` | `FormAdjustmentEvent` |
+    | `LeadEvents::COLLECT_OPERATORS_FOR_FIELD_TYPE` | `TypeOperatorsEvent` |
+    | `LeadEvents::COLLECT_OPERATORS_FOR_FIELD` | `FieldOperatorsEvent` |
+    | `LeadEvents::COLLECT_FILTER_CHOICES_FOR_LIST_FIELD_TYPE` | `ListFieldChoicesEvent` |
+    | `LeadEvents::SEGMENT_ON_DECORATOR_DELEGATE` | `LeadListFiltersDecoratorDelegateEvent` |
+    | `LeadEvents::LIST_FILTERS_MERGE` | `LeadListMergeFiltersEvent` |
+    | `LeadEvents::LIST_FILTERS_OPERATORS_ON_GENERATE` | `LeadListFiltersOperatorsEvent` |
+    | `LeadEvents::LIST_FILTERS_OPERATOR_QUERYBUILDER_ON_GENERATE` | `SegmentOperatorQueryBuilderEvent` |
+    | `LeadEvents::LIST_FILTERS_QUERYBUILDER_GENERATED` | `LeadListQueryBuilderGeneratedEvent` |
+    | `LeadEvents::IMPORT_ON_INITIALIZE` | `ImportInitEvent` |
+    | `LeadEvents::IMPORT_ON_FIELD_MAPPING` | `ImportMappingEvent` |
+    | `LeadEvents::IMPORT_ON_PROCESS` | `ImportProcessEvent` |
+    | `LeadEvents::IMPORT_ON_VALIDATE` | `ImportValidateEvent` |
+    | `LeadEvents::LEAD_FIELD_PRE_ADD_COLUMN` | `Field\Event\AddColumnEvent` |
+    | `LeadEvents::LEAD_FIELD_PRE_ADD_COLUMN_BACKGROUND_JOB` | `Field\Event\AddColumnBackgroundEvent` |
+    | `LeadEvents::LEAD_FIELD_PRE_UPDATE_COLUMN` | `Field\Event\UpdateColumnEvent` |
+    | `LeadEvents::LEAD_FIELD_PRE_UPDATE_COLUMN_BACKGROUND_JOB` | `Field\Event\UpdateColumnBackgroundEvent` |
+    | `LeadEvents::LEAD_FIELD_PRE_DELETE_COLUMN` | `Field\Event\DeleteColumnEvent` |
+    | `LeadEvents::LEAD_FIELD_PRE_DELETE_COLUMN_BACKGROUND_JOB` | `Field\Event\DeleteColumnBackgroundEvent` |
+
+    `LeadEvents::CHANNEL_SUBSCRIPTION_CHANGED` is still used as the webhook type identifier (its string value) in `WebhookSubscriber`, so the constant remains referenced there even though the event is dispatched and subscribed by class.
+
+    Constants that share an event class keep their string names and are unchanged. This covers the CRUD/toggle groups that reuse a single event object under several names - the `LeadEvent` group (`LEAD_PRE_SAVE`, `LEAD_POST_SAVE`, `LEAD_PRE_DELETE`, `LEAD_POST_DELETE`, `LEAD_IDENTIFIED`), `LeadListEvent` (`LIST_*`), `LeadFieldEvent` (`FIELD_*`, `NOTE_*`, `DEVICE_*`), `CompanyEvent` (`COMPANY_PRE_SAVE`, `COMPANY_POST_SAVE`, `COMPANY_PRE_DELETE`, `COMPANY_POST_DELETE`, `COMPANY_SOFT_DELETE`), `ImportEvent` (`IMPORT_PRE_SAVE`, `IMPORT_POST_SAVE`, `IMPORT_PRE_DELETE`, `IMPORT_POST_DELETE`, `IMPORT_BATCH_PROCESSED`), `TagEvent` (`TAG_*`), `ContactExportSchedulerEvent` (the `*_CONTACT_EXPORT*` group) - and the before/after pairs `LeadMergeEvent`, `CompanyMergeEvent`, `TagMergeEvent` and `SaveBatchLeadsEvent`. The `LeadListFilteringEvent` shared by `LIST_FILTERS_ON_FILTERING` and `LIST_PRE_PROCESS_LIST` also stays a string. Constants dispatched or subscribed outside LeadBundle (e.g. `LEAD_POINTS_CHANGE`, `LEAD_COMPANY_CHANGE`, `LEAD_LIST_CHANGE`, `LEAD_LIST_BATCH_CHANGE`, `CURRENT_LEAD_CHANGED`, `TIMELINE_ON_GENERATE`, `LIST_FILTERS_CHOICES_ON_GENERATE`, `SEGMENT_DICTIONARY_ON_GENERATE`, `ON_CLICKTHROUGH_IDENTIFICATION`) and the campaign action/condition constants (whose generic event classes are shared across bundles) are unchanged.
+
 - `Mautic\CoreBundle\Factory\ModelFactory` now builds its service locator from a `defaultIndexMethod` on the `mautic.model` tag, replacing the removed `Mautic\CoreBundle\DependencyInjection\Compiler\ModelPass`. Every model (a service implementing `Mautic\CoreBundle\Model\MauticModelInterface`) declares its `ModelFactory::getModel()` lookup key via a static `getName()` method:
 
     ```php

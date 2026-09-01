@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Provider;
 
 use Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -30,7 +29,7 @@ final class FilterOperatorProvider implements FilterOperatorProviderInterface
         if ([] === $this->cachedOperators) {
             $event = new LeadListFiltersOperatorsEvent();
 
-            $this->dispatcher->dispatch($event, LeadEvents::LIST_FILTERS_OPERATORS_ON_GENERATE);
+            $this->dispatcher->dispatch($event);
 
             $this->cachedOperators = $this->translateOperatorLabels($event->getOperators());
         }

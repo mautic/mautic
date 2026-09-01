@@ -31,7 +31,7 @@ final readonly class WebhookSubscriber implements EventSubscriberInterface
             LeadEvents::LEAD_POST_SAVE               => ['onLeadNewUpdate', 0],
             LeadEvents::LEAD_POINTS_CHANGE           => ['onLeadPointChange', 0],
             LeadEvents::LEAD_POST_DELETE             => ['onLeadDelete', 0],
-            LeadEvents::CHANNEL_SUBSCRIPTION_CHANGED => ['onChannelSubscriptionChange', 0],
+            ChannelSubscriptionChange::class => ['onChannelSubscriptionChange', 0],
             LeadEvents::LEAD_COMPANY_CHANGE          => ['onLeadCompanyChange', 0],
             LeadEvents::COMPANY_POST_SAVE            => ['onCompanySave', 0],
             LeadEvents::COMPANY_POST_DELETE          => ['onCompanyDelete', 0],

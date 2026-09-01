@@ -1170,8 +1170,8 @@ class LeadModel extends FormModel
             }
 
             if ($dispatchEvent) {
-                if ($this->dispatcher->hasListeners(LeadEvents::LEAD_CATEGORY_CHANGE)) {
-                    $this->dispatcher->dispatch(new CategoryChangeEvent($lead, $category), LeadEvents::LEAD_CATEGORY_CHANGE);
+                if ($this->dispatcher->hasListeners(CategoryChangeEvent::class)) {
+                    $this->dispatcher->dispatch(new CategoryChangeEvent($lead, $category));
                 }
             }
         }
@@ -1198,8 +1198,8 @@ class LeadModel extends FormModel
 
             $unsubscribedCats[] = $category;
 
-            if ($this->dispatcher->hasListeners(LeadEvents::LEAD_CATEGORY_CHANGE)) {
-                $this->dispatcher->dispatch(new CategoryChangeEvent($category->getLead(), $category->getCategory(), false), LeadEvents::LEAD_CATEGORY_CHANGE);
+            if ($this->dispatcher->hasListeners(CategoryChangeEvent::class)) {
+                $this->dispatcher->dispatch(new CategoryChangeEvent($category->getLead(), $category->getCategory(), false));
             }
         }
 
@@ -1217,15 +1217,15 @@ class LeadModel extends FormModel
                 $category     = $this->leadCategoryRepository->getEntity($key);
                 $deleteCats[] = $category;
 
-                if ($this->dispatcher->hasListeners(LeadEvents::LEAD_CATEGORY_CHANGE)) {
-                    $this->dispatcher->dispatch(new CategoryChangeEvent($category->getLead(), $category->getCategory(), false), LeadEvents::LEAD_CATEGORY_CHANGE);
+                if ($this->dispatcher->hasListeners(CategoryChangeEvent::class)) {
+                    $this->dispatcher->dispatch(new CategoryChangeEvent($category->getLead(), $category->getCategory(), false));
                 }
             }
         } elseif ($categories instanceof LeadCategory) {
             $deleteCats[] = $categories;
 
-            if ($this->dispatcher->hasListeners(LeadEvents::LEAD_CATEGORY_CHANGE)) {
-                $this->dispatcher->dispatch(new CategoryChangeEvent($categories->getLead(), $categories->getCategory(), false), LeadEvents::LEAD_CATEGORY_CHANGE);
+            if ($this->dispatcher->hasListeners(CategoryChangeEvent::class)) {
+                $this->dispatcher->dispatch(new CategoryChangeEvent($categories->getLead(), $categories->getCategory(), false));
             }
         }
 

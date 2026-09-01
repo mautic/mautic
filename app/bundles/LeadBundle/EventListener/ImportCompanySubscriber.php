@@ -11,7 +11,6 @@ use Mautic\LeadBundle\Event\ImportMappingEvent;
 use Mautic\LeadBundle\Event\ImportProcessEvent;
 use Mautic\LeadBundle\Event\ImportValidateEvent;
 use Mautic\LeadBundle\Field\FieldList;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormError;
@@ -31,10 +30,10 @@ final readonly class ImportCompanySubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            LeadEvents::IMPORT_ON_INITIALIZE    => ['onImportInit'],
-            LeadEvents::IMPORT_ON_FIELD_MAPPING => ['onFieldMapping'],
-            LeadEvents::IMPORT_ON_PROCESS       => ['onImportProcess'],
-            LeadEvents::IMPORT_ON_VALIDATE      => ['onValidateImport'],
+            ImportInitEvent::class => ['onImportInit'],
+            ImportMappingEvent::class => ['onFieldMapping'],
+            ImportProcessEvent::class => ['onImportProcess'],
+            ImportValidateEvent::class => ['onValidateImport'],
         ];
     }
 

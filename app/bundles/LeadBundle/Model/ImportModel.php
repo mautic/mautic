@@ -325,7 +325,7 @@ class ImportModel extends FormModel
                 $data  = array_combine($headers, $data);
                 $event = new ImportProcessEvent($import, $eventLog, $data);
                 try {
-                    $this->dispatcher->dispatch($event, LeadEvents::IMPORT_ON_PROCESS);
+                    $this->dispatcher->dispatch($event);
 
                     if ($event->wasMerged()) {
                         $this->logDebug('Entity on line '.$lineNumber.' has been updated', $import);

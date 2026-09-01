@@ -13,7 +13,6 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
 use Mautic\LeadBundle\Controller\ListController;
 use Mautic\LeadBundle\Event\LeadBuildSearchEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentQueryBuilder;
 use Mautic\PointBundle\Model\TriggerModel;
@@ -992,7 +991,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
 
         $event = new LeadBuildSearchEvent($filter->string, $filter->command, $unique, $filter->not, $queryBuilder);
-        $this->dispatcher->dispatch($event, LeadEvents::LEAD_BUILD_SEARCH_COMMANDS);
+        $this->dispatcher->dispatch($event);
         if ($event->isSearchDone()) {
             $returnParameter = $event->getReturnParameters();
             $filter->strict  = $event->getStrict();
