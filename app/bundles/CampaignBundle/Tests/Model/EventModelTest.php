@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
@@ -110,7 +109,7 @@ final class EventModelTest extends TestCase
         $this->dispatcherMock
             ->expects($this->once())
             ->method('dispatch')
-            ->with(new DeleteEvent([$idToDelete]), CampaignEvents::ON_EVENT_DELETE);
+            ->with(new DeleteEvent([$idToDelete]));
 
         $this->eventModel->deleteEvents($currentEvents, $deletedEvents);
     }
@@ -148,7 +147,7 @@ final class EventModelTest extends TestCase
         $this->dispatcherMock
             ->expects($this->once())
             ->method('dispatch')
-            ->with(new DeleteEvent(['old1']), CampaignEvents::ON_EVENT_DELETE);
+            ->with(new DeleteEvent(['old1']));
 
         $this->eventModel->deleteEvents($currentEvents, $deletedEvents);
     }
