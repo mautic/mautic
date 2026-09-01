@@ -9,7 +9,6 @@ use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\TagModel;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Response;
 
 final class DynamicContentControllerTest extends MauticMysqlTestCase
