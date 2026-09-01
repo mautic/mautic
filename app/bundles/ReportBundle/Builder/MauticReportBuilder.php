@@ -15,6 +15,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class MauticReportBuilder implements ReportBuilderInterface
 {
+    public const IDENTIFIER_PATTERN =  '/([`"]?[a-z_][a-z0-9_]*[`"]?\.[`"]?[a-z_][a-z0-9_]*[`"]?)/i';
+
     /**
      * @var array
      */
@@ -410,6 +412,9 @@ final class MauticReportBuilder implements ReportBuilderInterface
                     }
 
                     $normalizedGroupBy[] = $normalized;
+                    // Match upstream: completion candidates stay unquoted so the
+                    // generated SQL matches existing tests and MySQL behaviour.
+                    // PostgreSQL accepts unquoted lower-case identifiers.
                     $dedupedGroupBy[] = $baseColumn;
                 }
             }
@@ -446,10 +451,12 @@ final class MauticReportBuilder implements ReportBuilderInterface
                     $columnSelect = $aggregator['column'];
                 }
 
+                $innerExpression = $this->sanitizeExpression($columnSelect);
+
                 $selectText = DatabasePlatform::getAggregatorExpression(
                     $this->db->getDatabasePlatform(),
                     $aggregator['function'],
-                    $columnSelect
+                    $innerExpression
                 );
 
                 $alias               = sprintf('%s %s', $aggregator['function'], $aggregator['column']);
@@ -614,6 +621,45 @@ final class MauticReportBuilder implements ReportBuilderInterface
     private function normalizeColumnIdentifier(string $column): string
     {
         return strtolower((string) preg_replace('/[`"\s]+/', '', $column));
+    }
+
+    /**
+     * Sanitizes expressions recursively.
+     * - If the expression starts with a function (AVG(, IF(, ROUND(, etc.) or contains SELECT,
+     *   it recurses into the arguments and sanitizes only real column references (table.column).
+     * - Simple labels/aliases that are not expressions are left untouched.
+     */
+    private function sanitizeExpression(string $expression): string
+    {
+        $trimmed  = trim($expression);
+        $platform = $this->db->getDatabasePlatform();
+
+        // If it's a simple label/alias (no function, no parentheses, no SELECT), leave it as-is
+        if (!$this->isComplexExpression($trimmed)) {
+            if (preg_match(self::IDENTIFIER_PATTERN, $trimmed)) {
+                return DatabasePlatform::quoteColumn($platform, $trimmed);
+            }
+
+            return $trimmed;
+        }
+
+        // Recursively sanitize all column references inside the expression
+        return (string) preg_replace_callback(
+            '/([`"]?[a-z_][a-z0-9_]*[`"]?\.[`"]?[a-z_][a-z0-9_]*[`"]?)/i',
+            fn ($matches): string => DatabasePlatform::quoteColumn($platform, $matches[1]),
+            $trimmed
+        );
+    }
+
+    /**
+     * Returns true if the string looks like a complex SQL expression (function call or SELECT).
+     */
+    private function isComplexExpression(string $expression): bool
+    {
+        $expr = trim($expression);
+
+        // Starts with a function name followed by '(' or contains SELECT
+        return (bool) preg_match('/^\w+\s*\(/i', $expr) || 0 === stripos($expr, 'SELECT');
     }
 
     private function applyFilters(array $filters, QueryBuilder $queryBuilder, array $filterDefinitions): void
