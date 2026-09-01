@@ -13,7 +13,6 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\WebhookBundle\Event\WebhookBuilderEvent;
 use Mautic\WebhookBundle\Model\WebhookModel;
-use Mautic\WebhookBundle\WebhookEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class WebhookSubscriber implements EventSubscriberInterface
@@ -28,7 +27,7 @@ final readonly class WebhookSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            WebhookEvents::WEBHOOK_ON_BUILD          => ['onWebhookBuild', 0],
+            WebhookBuilderEvent::class               => ['onWebhookBuild', 0],
             LeadEvents::LEAD_POST_SAVE               => ['onLeadNewUpdate', 0],
             LeadEvents::LEAD_POINTS_CHANGE           => ['onLeadPointChange', 0],
             LeadEvents::LEAD_POST_DELETE             => ['onLeadDelete', 0],

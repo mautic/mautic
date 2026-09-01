@@ -304,12 +304,28 @@
     | `ChannelEvents::PROCESS_MESSAGE_QUEUE` | `MessageQueueProcessEvent` |
     | `ChannelEvents::PROCESS_MESSAGE_QUEUE_BATCH` | `MessageQueueBatchProcessEvent` |
 - DynamicContentBundle's `ON_CONTACTS_FILTER_EVALUATE` event is now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\DynamicContentBundle\DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE` string constant. Update any subscriber or listener that keys on that constant to key on `Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent::class` instead, e.g. `$dispatcher->dispatch($event, DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE)` becomes `$dispatcher->dispatch($event)`. The constant is kept for backwards compatibility but is no longer used internally. The `DynamicContentEvent` CRUD group (`PRE_SAVE` / `POST_SAVE` / `PRE_DELETE` / `POST_DELETE`) shares one event class under four names and is unchanged, as are the cross-bundle `CategoryEvent`, `TokenReplacementEvent` and campaign event constants.
+- WebhookBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\WebhookBundle\WebhookEvents` string constants. Update any subscriber or listener that keys on one of the converted `WebhookEvents::*` constants to key on the event class instead:
 - PageBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\PageBundle\PageEvents` string constants. Update any subscriber or listener that keys on one of the converted `PageEvents::*` constants (or the raw string name such as `mautic.page_on_hit`) to key on the event class instead:
 
     ```diff
      public static function getSubscribedEvents(): array
      {
          return [
+    -        WebhookEvents::WEBHOOK_ON_BUILD => ['onWebhookBuild', 0],
+    +        WebhookBuilderEvent::class => ['onWebhookBuild', 0],
+         ];
+     }
+    ```
+
+    Dispatching drops the redundant second argument, e.g. `$dispatcher->dispatch($event, WebhookEvents::WEBHOOK_ON_BUILD)` becomes `$dispatcher->dispatch($event)`. The `Mautic\WebhookBundle\WebhookEvents` constants are kept for backwards compatibility but are no longer used internally for the events below.
+
+    | `WebhookEvents` constant | New event class (in `Mautic\WebhookBundle\Event`) |
+    | --- | --- |
+    | `WebhookEvents::WEBHOOK_ON_BUILD` | `WebhookBuilderEvent` |
+    | `WebhookEvents::WEBHOOK_QUEUE_ON_ADD` | `WebhookQueueEvent` |
+    | `WebhookEvents::WEBHOOK_ON_REQUEST` | `WebhookRequestEvent` |
+
+    The CRUD constants (`WEBHOOK_PRE_SAVE` / `WEBHOOK_POST_SAVE` / `WEBHOOK_PRE_DELETE` / `WEBHOOK_POST_DELETE`) and `WEBHOOK_KILL` all share the `WebhookEvent` class, so they keep their string names and are unchanged.
     -        PageEvents::PAGE_ON_DISPLAY => ['onPageDisplay', 0],
     +        PageDisplayEvent::class => ['onPageDisplay', 0],
          ];

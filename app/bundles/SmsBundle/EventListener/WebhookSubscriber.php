@@ -8,7 +8,6 @@ use Mautic\SmsBundle\Event\SmsSendEvent;
 use Mautic\SmsBundle\SmsEvents;
 use Mautic\WebhookBundle\Event\WebhookBuilderEvent;
 use Mautic\WebhookBundle\Model\WebhookModel;
-use Mautic\WebhookBundle\WebhookEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class WebhookSubscriber implements EventSubscriberInterface
@@ -21,8 +20,8 @@ final readonly class WebhookSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            SmsEvents::SMS_ON_SEND          => 'onSend',
-            WebhookEvents::WEBHOOK_ON_BUILD => 'onWebhookBuild',
+            SmsEvents::SMS_ON_SEND     => 'onSend',
+            WebhookBuilderEvent::class => 'onWebhookBuild',
         ];
     }
 

@@ -10,7 +10,6 @@ use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\WebhookBundle\Event\WebhookRequestEvent;
-use Mautic\WebhookBundle\WebhookEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class CampaignHelper
@@ -37,7 +36,7 @@ final class CampaignHelper
         $url     = rawurldecode(TokenHelper::findLeadTokens($config['url'], $this->getContactValues($contact), true));
 
         $webhookRequestEvent = new WebhookRequestEvent($contact, $url, $headers, $payload);
-        $this->dispatcher->dispatch($webhookRequestEvent, WebhookEvents::WEBHOOK_ON_REQUEST);
+        $this->dispatcher->dispatch($webhookRequestEvent);
 
         $this->makeRequest(
             $webhookRequestEvent->getUrl(),

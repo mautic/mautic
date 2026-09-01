@@ -28,10 +28,10 @@ use Mautic\WebhookBundle\Entity\LogRepository;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
 use Mautic\WebhookBundle\Entity\WebhookRepository;
+use Mautic\WebhookBundle\Event\WebhookQueueEvent;
 use Mautic\WebhookBundle\Http\Client;
 use Mautic\WebhookBundle\Model\WebhookModel;
 use Mautic\WebhookBundle\Service\WebhookService;
-use Mautic\WebhookBundle\WebhookEvents;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -217,7 +217,7 @@ final class WebhookControllerTest extends TestCase
         $dispatcher->expects($this->exactly(3))
             ->method('hasListeners')
             ->willReturnMap([
-                [WebhookEvents::WEBHOOK_QUEUE_ON_ADD, false],
+                [WebhookQueueEvent::class, false],
                 ['mautic.webhook_pre_save', false],
                 ['mautic.webhook_post_save', false],
             ])
