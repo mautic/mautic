@@ -7,7 +7,6 @@ namespace Mautic\IntegrationsBundle\Sync\Helper;
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use Mautic\IntegrationsBundle\Entity\ObjectMappingRepository;
 use Mautic\IntegrationsBundle\Event\InternalObjectFindEvent;
-use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\RemappedObjectDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
@@ -86,10 +85,7 @@ class MappingHelper
 
         $event->setFieldValues($identifiers);
 
-        $this->dispatcher->dispatch(
-            $event,
-            IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS,
-        );
+        $this->dispatcher->dispatch($event);
 
         $foundObjects = $event->getFoundObjects();
 

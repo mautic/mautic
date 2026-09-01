@@ -13,7 +13,6 @@ use Mautic\IntegrationsBundle\Event\InternalObjectOwnerEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectRouteEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectUpdateEvent;
 use Mautic\IntegrationsBundle\EventListener\ContactObjectSubscriber;
-use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\DAO\DateRange;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
@@ -56,17 +55,17 @@ final class ContactObjectSubscriberTest extends TestCase
     {
         $this->assertSame(
             [
-                InternalObjectEvent::class                           => ['collectInternalObjects', 0],
-                InternalObjectUpdateEvent::class                     => ['updateContacts', 0],
-                InternalObjectCreateEvent::class                     => ['createContacts', 0],
-                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS => [
+                InternalObjectEvent::class         => ['collectInternalObjects', 0],
+                InternalObjectUpdateEvent::class   => ['updateContacts', 0],
+                InternalObjectCreateEvent::class   => ['createContacts', 0],
+                InternalObjectFindEvent::class     => [
                     ['findContactsByIds', 0],
                     ['findContactsByDateRange', 0],
                     ['findContactsByFieldValues', 0],
                 ],
-                IntegrationEvents::INTEGRATION_FIND_OWNER_IDS => ['findOwnerIdsForContacts', 0],
-                InternalObjectRouteEvent::class               => ['buildContactRoute', 0],
-                InternalObjectFindByIdEvent::class            => ['findContactById', 0],
+                InternalObjectOwnerEvent::class    => ['findOwnerIdsForContacts', 0],
+                InternalObjectRouteEvent::class    => ['buildContactRoute', 0],
+                InternalObjectFindByIdEvent::class => ['findContactById', 0],
             ],
             ContactObjectSubscriber::getSubscribedEvents()
         );

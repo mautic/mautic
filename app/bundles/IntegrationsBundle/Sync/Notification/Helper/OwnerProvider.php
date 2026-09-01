@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Sync\Notification\Helper;
 
 use Mautic\IntegrationsBundle\Event\InternalObjectOwnerEvent;
-use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
@@ -40,7 +39,7 @@ class OwnerProvider
 
         $event = new InternalObjectOwnerEvent($object, $objectIds);
 
-        $this->dispatcher->dispatch($event, IntegrationEvents::INTEGRATION_FIND_OWNER_IDS);
+        $this->dispatcher->dispatch($event);
 
         return $event->getOwners();
     }

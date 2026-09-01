@@ -33,7 +33,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
     {
         return [
             CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            FormEvents::FORM_ON_SUBMIT                => ['onFormSubmit', 0],
+            SubmissionEvent::class                    => ['onFormSubmit', 0],
             FormEvents::ON_CAMPAIGN_TRIGGER_DECISION  => ['onCampaignTriggerDecision', 0],
             FormEvents::ON_CAMPAIGN_TRIGGER_CONDITION => ['onCampaignTriggerCondition', 0],
         ];

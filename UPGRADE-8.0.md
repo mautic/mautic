@@ -233,6 +233,8 @@
     | `IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORD` | `InternalObjectFindByIdEvent` |
     | `IntegrationEvents::INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE` | `InternalObjectRouteEvent` |
     | `IntegrationEvents::INTEGRATION_OBJECT_TOKEN_EVENT` | `MappedIntegrationObjectTokenEvent` |
+    | `IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS` | `InternalObjectFindEvent` |
+    | `IntegrationEvents::INTEGRATION_FIND_OWNER_IDS` | `InternalObjectOwnerEvent` |
     Dispatching drops the redundant second argument, e.g. `$dispatcher->dispatch($event, CoreEvents::BUILD_MENU)` becomes `$dispatcher->dispatch($event)`. The `Mautic\CoreBundle\CoreEvents` constants are kept for backwards compatibility but are no longer used internally. Note that listeners for the icon event (`Mautic\CoreBundle\Event\IconEvent`) must now be keyed on `IconEvent::class`, as that event was already dispatched by object.
 
     Full mapping of old event name to new event class (all in the `Mautic\CoreBundle\Event` namespace):
@@ -484,6 +486,33 @@
     `LeadEvents::CHANNEL_SUBSCRIPTION_CHANGED` is still used as the webhook type identifier (its string value) in `WebhookSubscriber`, so the constant remains referenced there even though the event is dispatched and subscribed by class.
 
     Constants that share an event class keep their string names and are unchanged. This covers the CRUD/toggle groups that reuse a single event object under several names - the `LeadEvent` group (`LEAD_PRE_SAVE`, `LEAD_POST_SAVE`, `LEAD_PRE_DELETE`, `LEAD_POST_DELETE`, `LEAD_IDENTIFIED`), `LeadListEvent` (`LIST_*`), `LeadFieldEvent` (`FIELD_*`, `NOTE_*`, `DEVICE_*`), `CompanyEvent` (`COMPANY_PRE_SAVE`, `COMPANY_POST_SAVE`, `COMPANY_PRE_DELETE`, `COMPANY_POST_DELETE`, `COMPANY_SOFT_DELETE`), `ImportEvent` (`IMPORT_PRE_SAVE`, `IMPORT_POST_SAVE`, `IMPORT_PRE_DELETE`, `IMPORT_POST_DELETE`, `IMPORT_BATCH_PROCESSED`), `TagEvent` (`TAG_*`), `ContactExportSchedulerEvent` (the `*_CONTACT_EXPORT*` group) - and the before/after pairs `LeadMergeEvent`, `CompanyMergeEvent`, `TagMergeEvent` and `SaveBatchLeadsEvent`. The `LeadListFilteringEvent` shared by `LIST_FILTERS_ON_FILTERING` and `LIST_PRE_PROCESS_LIST` also stays a string. Constants dispatched or subscribed outside LeadBundle (e.g. `LEAD_POINTS_CHANGE`, `LEAD_COMPANY_CHANGE`, `LEAD_LIST_CHANGE`, `LEAD_LIST_BATCH_CHANGE`, `CURRENT_LEAD_CHANGED`, `TIMELINE_ON_GENERATE`, `LIST_FILTERS_CHOICES_ON_GENERATE`, `SEGMENT_DICTIONARY_ON_GENERATE`, `ON_CLICKTHROUGH_IDENTIFICATION`) and the campaign action/condition constants (whose generic event classes are shared across bundles) are unchanged.
+
+- FormBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\FormBundle\FormEvents` string constants. Update any subscriber or listener that keys on one of the converted `FormEvents::*` constants to key on the event class instead:
+
+    ```diff
+     public static function getSubscribedEvents(): array
+     {
+         return [
+    -        FormEvents::FORM_ON_BUILD => ['onFormBuilder', 0],
+    +        FormBuilderEvent::class   => ['onFormBuilder', 0],
+         ];
+     }
+    ```
+
+    Dispatching drops the redundant second argument, e.g. `$dispatcher->dispatch($event, FormEvents::FORM_ON_BUILD)` becomes `$dispatcher->dispatch($event)`. The `Mautic\FormBundle\FormEvents` constants are kept for backwards compatibility but are no longer used internally for the events below.
+
+    Full mapping of the converted constants to their event class (all in the `Mautic\FormBundle\Event` namespace):
+
+    | `FormEvents` constant | New event class |
+    | --- | --- |
+    | `FormEvents::FORM_ON_SUBMIT` | `SubmissionEvent` |
+    | `FormEvents::FORM_ON_BUILD` | `FormBuilderEvent` |
+    | `FormEvents::ON_OBJECT_COLLECT` | `ObjectCollectEvent` |
+    | `FormEvents::ON_FIELD_COLLECT` | `FieldCollectEvent` |
+
+    `FormEvents::FORM_ON_SUBMIT` is still used as the webhook type identifier (its string value) in `WebhookSubscriber`, so the constant remains referenced there even though the event is dispatched and subscribed by class. Constants that share an event object across several names (the `FORM_*` CRUD group, `ON_EXECUTE_SUBMIT_ACTION`, `ON_FORM_VALIDATE`, and the campaign action/condition constants whose generic event classes are shared across bundles) are unchanged.
+
+- MauticFocusBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `MauticPlugin\MauticFocusBundle\FocusEvents` string constant. The `FOCUS_ON_VIEW` event now dispatches and is subscribed by `MauticPlugin\MauticFocusBundle\Event\FocusViewEvent`; update any listener keyed on `FocusEvents::FOCUS_ON_VIEW` to key on `FocusViewEvent::class`. Dispatching drops the redundant second argument, e.g. `$dispatcher->dispatch($event, FocusEvents::FOCUS_ON_VIEW)` becomes `$dispatcher->dispatch($event)`. The `FocusEvents` constant is kept for backwards compatibility. Note `MauticPlugin\MauticFocusBundle\FocusEventTypes::FOCUS_ON_VIEW` is a separate stat-type identifier and is unchanged.
 
 - `Mautic\CoreBundle\Factory\ModelFactory` now builds its service locator from a `defaultIndexMethod` on the `mautic.model` tag, replacing the removed `Mautic\CoreBundle\DependencyInjection\Compiler\ModelPass`. Every model (a service implementing `Mautic\CoreBundle\Model\MauticModelInterface`) declares its `ModelFactory::getModel()` lookup key via a static `getName()` method:
 

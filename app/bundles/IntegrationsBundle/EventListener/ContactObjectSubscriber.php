@@ -11,7 +11,6 @@ use Mautic\IntegrationsBundle\Event\InternalObjectFindEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectOwnerEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectRouteEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectUpdateEvent;
-use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
 use Mautic\LeadBundle\Exception\ImportFailedException;
@@ -29,17 +28,17 @@ final readonly class ContactObjectSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            InternalObjectEvent::class                           => ['collectInternalObjects', 0],
-            InternalObjectUpdateEvent::class                     => ['updateContacts', 0],
-            InternalObjectCreateEvent::class                     => ['createContacts', 0],
-            IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS => [
+            InternalObjectEvent::class         => ['collectInternalObjects', 0],
+            InternalObjectUpdateEvent::class   => ['updateContacts', 0],
+            InternalObjectCreateEvent::class   => ['createContacts', 0],
+            InternalObjectFindEvent::class     => [
                 ['findContactsByIds', 0],
                 ['findContactsByDateRange', 0],
                 ['findContactsByFieldValues', 0],
             ],
-            IntegrationEvents::INTEGRATION_FIND_OWNER_IDS        => ['findOwnerIdsForContacts', 0],
-            InternalObjectRouteEvent::class                      => ['buildContactRoute', 0],
-            InternalObjectFindByIdEvent::class                   => ['findContactById', 0],
+            InternalObjectOwnerEvent::class    => ['findOwnerIdsForContacts', 0],
+            InternalObjectRouteEvent::class    => ['buildContactRoute', 0],
+            InternalObjectFindByIdEvent::class => ['findContactById', 0],
         ];
     }
 

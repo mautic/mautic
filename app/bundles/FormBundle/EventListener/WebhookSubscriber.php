@@ -21,7 +21,7 @@ final readonly class WebhookSubscriber implements EventSubscriberInterface
     {
         return [
             WebhookBuilderEvent::class => ['onWebhookBuild', 0],
-            FormEvents::FORM_ON_SUBMIT => ['onFormSubmit', 0],
+            SubmissionEvent::class     => ['onFormSubmit', 0],
         ];
     }
 

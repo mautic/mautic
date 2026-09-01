@@ -13,7 +13,6 @@ use Mautic\IntegrationsBundle\Event\InternalObjectOwnerEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectRouteEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectUpdateEvent;
 use Mautic\IntegrationsBundle\EventListener\CompanyObjectSubscriber;
-use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\DAO\DateRange;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
@@ -56,17 +55,17 @@ final class CompanyObjectSubscriberTest extends TestCase
     {
         $this->assertSame(
             [
-                InternalObjectEvent::class                           => ['collectInternalObjects', 0],
-                InternalObjectUpdateEvent::class                     => ['updateCompanies', 0],
-                InternalObjectCreateEvent::class                     => ['createCompanies', 0],
-                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS => [
+                InternalObjectEvent::class         => ['collectInternalObjects', 0],
+                InternalObjectUpdateEvent::class   => ['updateCompanies', 0],
+                InternalObjectCreateEvent::class   => ['createCompanies', 0],
+                InternalObjectFindEvent::class     => [
                     ['findCompaniesByIds', 0],
                     ['findCompaniesByDateRange', 0],
                     ['findCompaniesByFieldValues', 0],
                 ],
-                IntegrationEvents::INTEGRATION_FIND_OWNER_IDS => ['findOwnerIdsForCompanies', 0],
-                InternalObjectRouteEvent::class               => ['buildCompanyRoute', 0],
-                InternalObjectFindByIdEvent::class            => ['findCompanyById', 0],
+                InternalObjectOwnerEvent::class    => ['findOwnerIdsForCompanies', 0],
+                InternalObjectRouteEvent::class    => ['buildCompanyRoute', 0],
+                InternalObjectFindByIdEvent::class => ['findCompanyById', 0],
             ],
             CompanyObjectSubscriber::getSubscribedEvents()
         );

@@ -5,7 +5,6 @@ namespace Mautic\LeadBundle\EventListener;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\Form\Type\FormFieldFileType;
-use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Twig\Helper\AvatarHelper;
@@ -23,7 +22,7 @@ final readonly class SetContactAvatarFormSubscriber implements EventSubscriberIn
     public static function getSubscribedEvents(): array
     {
         return [
-            FormEvents::FORM_ON_SUBMIT => ['onFormSubmit', 0],
+            SubmissionEvent::class => ['onFormSubmit', 0],
         ];
     }
 

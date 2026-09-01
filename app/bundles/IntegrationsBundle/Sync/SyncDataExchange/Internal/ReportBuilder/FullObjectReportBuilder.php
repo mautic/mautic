@@ -74,10 +74,7 @@ class FullObjectReportBuilder
                     $event->setLimit($limit);
                 }
 
-                $this->dispatcher->dispatch(
-                    $event,
-                    IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS
-                );
+                $this->dispatcher->dispatch($event);
 
                 $foundObjects = $event->getFoundObjects();
 
