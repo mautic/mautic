@@ -37,6 +37,36 @@ final class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($report);
         $this->em->flush();
 
+        // ---------- DEBUG ----------
+        $reportModel   = static::getContainer()->get(\Mautic\ReportBundle\Model\ReportModel::class);
+        $tableDetails  = $reportModel->getTableData($report->getSource());
+
+        $generator = new \Mautic\ReportBundle\Generator\ReportGenerator(
+            static::getContainer()->get('event_dispatcher'),
+            $this->em->getConnection(),
+            $report,
+            static::getContainer()->get(\Mautic\ChannelBundle\Helper\ChannelListHelper::class)
+        );
+
+        $qb = $generator->getQuery([
+            'columns' => $tableDetails['columns'],
+            'filters' => $tableDetails['filters'] ?? $tableDetails['columns'],
+        ]);
+
+        $sql     = $qb->getSQL();
+        $groupBy = $qb->getQueryPart('groupBy');
+        $params  = $qb->getParameters();
+        $rows    = $qb->executeQuery()->fetchAllAssociative();
+
+        // This forces the whole dump into the CI log
+        self::fail(
+            "=== SQL ===\n{$sql}\n\n"
+            ."=== GROUP BY ===\n".print_r($groupBy, true)."\n"
+            ."=== PARAMS ===\n".print_r($params, true)."\n"
+            .'=== ROWS ('.count($rows).") ===\n".print_r($rows, true)
+        );
+        // ---------- END DEBUG ----------
+
         $crawler      = $this->client->request(Request::METHOD_GET, "/s/reports/view/{$report->getId()}");
         $this->assertResponseIsSuccessful();
         // get table with id=reportTable
