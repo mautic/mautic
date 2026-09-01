@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\EventListener;
 
-use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
+use Mautic\EmailBundle\Event\EmailOnBuildEvent;
 use Mautic\FormBundle\FormEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -14,7 +14,7 @@ final class EmailSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            EmailEvents::EMAIL_ON_BUILD => ['onEmailBuild', 0],
+            EmailOnBuildEvent::class => ['onEmailBuild', 0],
         ];
     }
 

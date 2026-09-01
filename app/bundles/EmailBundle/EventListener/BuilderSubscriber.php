@@ -8,6 +8,7 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailDisplayEvent;
+use Mautic\EmailBundle\Event\EmailOnBuildEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Helper\FromEmailHelper;
 use Mautic\EmailBundle\Helper\MailHashHelper;
@@ -45,14 +46,14 @@ final class BuilderSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            EmailEvents::EMAIL_ON_BUILD => ['onEmailBuild', 0],
-            EmailSendEvent::class       => [
+            EmailOnBuildEvent::class => ['onEmailBuild', 0],
+            EmailSendEvent::class    => [
                 ['fixEmailAccessibility', 10000],
                 ['onEmailGenerate', 0],
                 // Ensure this is done last in order to catch all tokenized URLs
                 ['convertUrlsToTokens', -9999],
             ],
-            EmailDisplayEvent::class    => [
+            EmailDisplayEvent::class => [
                 ['fixEmailAccessibility', 10000],
                 ['onEmailGenerate', 0],
                 // Ensure this is done last in order to catch all tokenized URLs

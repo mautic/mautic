@@ -6,6 +6,6 @@ namespace Mautic\EmailBundle\Event;
 
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 
-class OnEmailAddressTokenReplacementEvent extends TokenReplacementEvent
+final class OnEmailAddressTokenReplacementEvent extends TokenReplacementEvent
 {
 }

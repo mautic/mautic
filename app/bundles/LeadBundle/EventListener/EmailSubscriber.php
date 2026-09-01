@@ -5,9 +5,9 @@ namespace Mautic\LeadBundle\EventListener;
 use Mautic\CoreBundle\Event\BuilderEvent;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
-use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailDisplayEvent;
+use Mautic\EmailBundle\Event\EmailOnBuildEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Event\OnEmailAddressTokenReplacementEvent;
 use Mautic\LeadBundle\Helper\TokenHelper;
@@ -27,7 +27,7 @@ final class EmailSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            EmailEvents::EMAIL_ON_BUILD                => ['onEmailBuild', 0],
+            EmailOnBuildEvent::class                   => ['onEmailBuild', 0],
             EmailSendEvent::class                      => ['onEmailGenerate', 0],
             EmailDisplayEvent::class                   => ['onEmailDisplay', 0],
             OnEmailAddressTokenReplacementEvent::class => ['onEmailAddressReplacement', 0],

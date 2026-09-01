@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailEvent;
+use Mautic\EmailBundle\Event\EmailPreSaveEvent;
 use Mautic\EmailBundle\Helper\EmailDefaultsHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -19,7 +19,7 @@ final readonly class EmailDefaultsSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            EmailEvents::EMAIL_PRE_SAVE => ['onEmailPreSave', 0],
+            EmailPreSaveEvent::class => ['onEmailPreSave', 0],
         ];
     }
 

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\EventListener;
 
 use Doctrine\ORM\EntityNotFoundException;
-use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailDisplayEvent;
+use Mautic\EmailBundle\Event\EmailOnBuildEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\IntegrationsBundle\DTO\IntegrationObjectToken as Token;
 use Mautic\IntegrationsBundle\Entity\ObjectMappingRepository;
@@ -32,7 +32,7 @@ final readonly class EmailSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            EmailEvents::EMAIL_ON_BUILD   => ['onEmailBuild', 0],
+            EmailOnBuildEvent::class      => ['onEmailBuild', 0],
             EmailSendEvent::class         => ['decodeTokens', 0],
             EmailDisplayEvent::class      => ['decodeTokens', 0],
         ];

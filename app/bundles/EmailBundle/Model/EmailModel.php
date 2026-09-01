@@ -32,7 +32,6 @@ use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
-use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\CopyRepository;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
@@ -40,10 +39,14 @@ use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatDevice;
 use Mautic\EmailBundle\Entity\StatDeviceRepository;
 use Mautic\EmailBundle\Entity\StatRepository;
-use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailDisplayEvent;
-use Mautic\EmailBundle\Event\EmailEvent;
+use Mautic\EmailBundle\Event\EmailOnBuildEvent;
+use Mautic\EmailBundle\Event\EmailOnTogglePublishEvent;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
+use Mautic\EmailBundle\Event\EmailPostDeleteEvent;
+use Mautic\EmailBundle\Event\EmailPostSaveEvent;
+use Mautic\EmailBundle\Event\EmailPreDeleteEvent;
+use Mautic\EmailBundle\Event\EmailPreSaveEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
 use Mautic\EmailBundle\Exception\FailedToSendToContactException;
@@ -386,33 +389,26 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             throw new MethodNotAllowedHttpException(['Email']);
         }
 
-        switch ($action) {
-            case 'pre_save':
-                $name = EmailEvents::EMAIL_PRE_SAVE;
-                break;
-            case 'post_save':
-                $name = EmailEvents::EMAIL_POST_SAVE;
-                break;
-            case 'pre_delete':
-                $name = EmailEvents::EMAIL_PRE_DELETE;
-                break;
-            case 'post_delete':
-                $name = EmailEvents::EMAIL_POST_DELETE;
-                break;
-            case 'on_toggle_publish':
-                $name = EmailEvents::EMAIL_ON_TOGGLE_PUBLISH;
-                break;
-            default:
-                return null;
+        $eventClass = match ($action) {
+            'pre_save'          => EmailPreSaveEvent::class,
+            'post_save'         => EmailPostSaveEvent::class,
+            'pre_delete'        => EmailPreDeleteEvent::class,
+            'post_delete'       => EmailPostDeleteEvent::class,
+            'on_toggle_publish' => EmailOnTogglePublishEvent::class,
+            default             => null,
+        };
+
+        if (null === $eventClass) {
+            return null;
         }
 
-        if ($this->dispatcher->hasListeners($name)) {
-            if (!$event instanceof Event) {
-                $event = new EmailEvent($entity, $isNew);
+        if ($this->dispatcher->hasListeners($eventClass)) {
+            if (!$event instanceof $eventClass) {
+                $event = new $eventClass($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($event, $name);
+            $this->dispatcher->dispatch($event);
 
             return $event;
         }
@@ -568,8 +564,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      */
     public function getBuilderComponents(?Email $email = null, $requestedComponents = 'all', string $tokenFilter = '')
     {
-        $event = new EmailBuilderEvent($this->translator, $email, $requestedComponents, $tokenFilter);
-        $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_BUILD);
+        $event = new EmailOnBuildEvent($this->translator, $email, $requestedComponents, $tokenFilter);
+        $this->dispatcher->dispatch($event);
 
         return $this->getCommonBuilderComponents($requestedComponents, $event);
     }
