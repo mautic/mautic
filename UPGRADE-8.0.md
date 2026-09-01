@@ -18,6 +18,29 @@
 - Deprecated form type removed from `Mautic\FormBundle\Entity\Form`. Form types were no longer used, so the `$formType` property, the `getFormType()` method, the `form_type` ORM mapping and the `formType` API field are gone. The `form_type` database column is dropped by a migration. The `formType`/`form_type` key is no longer read from or written to the API, and is dropped from form export payloads.
 - Deprecated Mautic v1 theme fallback removed from `Mautic\PageBundle\Controller\PublicController::indexAction()`. Public pages are now rendered solely from `Page::getCustomHtml()`; the legacy path that rendered `Page::getContent()` through a `@themes/<template>/html/page.html.twig` theme template (used when `customHtml` was empty) is gone. The unused `ThemeHelper` argument was dropped from `indexAction()`.
 - Deprecated method `Mautic\LeadBundle\Model\LeadModel::isContactable()` removed. Use `Mautic\LeadBundle\Model\DoNotContact::isContactable()` instead.
+- Removed `Mautic\EmailBundle\EmailEvents` constants for events that now dispatch by class name (Symfony 4.3+): dispatch the event object alone and key any subscriber or listener on the event class instead of the string constant. The removed constants and their event class (all in `Mautic\EmailBundle\Event` unless noted):
+
+  | Removed `EmailEvents` constant | Event class |
+  | --- | --- |
+  | `TOKEN_REPLACEMENT` | `Mautic\CoreBundle\Event\TokenReplacementEvent` |
+  | `ON_EMAIL_ADDRESS_TOKEN_REPLACEMENT` | `OnEmailAddressTokenReplacementEvent` |
+  | `EMAIL_PRE_SEND` | `EmailPreSendEvent` |
+  | `EMAIL_ON_DISPLAY` | `EmailDisplayEvent` |
+  | `EMAIL_ON_BUILD` | `EmailOnBuildEvent` |
+  | `EMAIL_ON_TOGGLE_PUBLISH` | `EmailOnTogglePublishEvent` |
+  | `EMAIL_PRE_SAVE` | `EmailPreSaveEvent` |
+  | `EMAIL_POST_SAVE` | `EmailPostSaveEvent` |
+  | `EMAIL_PRE_DELETE` | `EmailPreDeleteEvent` |
+  | `EMAIL_POST_DELETE` | `EmailPostDeleteEvent` |
+  | `ON_EMAIL_STAT_PRE_SAVE` | `EmailStatEvent` |
+  | `ON_EMAIL_STAT_POST_SAVE` | `EmailStatPostSaveEvent` |
+  | `ON_EMAIL_EDIT_SUBMIT` | `EmailEditSubmitEvent` |
+  | `MONITORED_EMAIL_CONFIG` | `MonitoredEmailEvent` |
+  | `EMAIL_ON_REPLY` | `EmailReplyEvent` |
+  | `ON_EMAIL_VALIDATION` | `EmailValidationEvent` |
+  | `ON_TRANSPORT_WEBHOOK` | `TransportWebhookEvent` |
+
+  `EMAIL_ON_SEND` and `EMAIL_ON_OPEN` are kept, since they double as webhook type identifiers. Constants whose event object is shared under several names or crosses bundle boundaries stay as strings and are unchanged: `EMAIL_PARSE` / `EMAIL_PRE_FETCH` (one reused `ParseEmailEvent`), and the `ON_CAMPAIGN_*`, `ON_SENT_EMAIL_TO_USER` and `ON_DETERMINE_*` registration constants.
 - Redundant string service aliases removed; reference the service by its class name instead. Affected ids: `mautic.user.provider` (`Mautic\UserBundle\Security\Provider\UserProvider`), `mautic.security.authentication_handler` (`Mautic\UserBundle\Security\Authentication\AuthenticationHandler`), `mautic.security.saml.username_mapper` (`Mautic\UserBundle\Security\SAML\User\UserMapper`), `mautic.security.saml.entity_descriptor_provider` (`LightSaml\Builder\EntityDescriptor\SimpleEntityDescriptorBuilder`), `mautic.monolog.handler` (`Mautic\CoreBundle\Monolog\Handler\FileLogHandler`), `mautic.helper.paths` (`Mautic\CoreBundle\Helper\PathsHelper`), `mautic.helper.assetgeneration` (`Mautic\CoreBundle\Helper\AssetGenerationHelper`), `mautic.helper.token_builder` (`Mautic\CoreBundle\Helper\BuilderTokenHelper`), `mautic.helper.update_checks` (`Mautic\CoreBundle\Helper\PreUpdateCheckHelper`), `mautic.update.step_provider` (`Mautic\CoreBundle\Update\StepProvider`), `mautic.core.service.local_file_adapter` (`Mautic\CoreBundle\Service\LocalFileAdapterService`), `mautic.asset.upload.error.handler` (`Mautic\AssetBundle\ErrorHandler\DropzoneErrorHandler`), `mautic.cache.adapter.filesystem` / `mautic.cache.adapter.redis` / `mautic.cache.adapter.redis_tag_aware` (the matching `Mautic\CacheBundle\Cache\Adapter\*` classes), `mautic.sms.callback_handler_container` (`Mautic\SmsBundle\Callback\HandlerContainer`), the `mautic.integrations.helper*` ids (the matching `Mautic\IntegrationsBundle\Helper\*` classes), `mautic.integrations.sync.notification.handler_container` (`Mautic\IntegrationsBundle\Sync\Notification\Handler\HandlerContainer`), and the unused `mautic.lead.model.lead_segment_*` / `mautic.lead.model.relative_date` / `mautic.lead.model.random_parameter_name` ids (the matching `Mautic\LeadBundle\Segment\*` classes). Custom cache adapters configured via the `cache_adapter` / `cache_adapter_tag_aware` parameters must now use the adapter's class name as the service id.
 - Deprecated method `Mautic\CampaignBundle\EventCollector\Builder\ConnectionBuilder::addDeprecatedAnchorRestrictions()` removed. With it, the campaign event keys `associatedActions`, `associatedDecisions` and `anchorRestrictions` are no longer read. Use the `connectionRestrictions` key instead:
 

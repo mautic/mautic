@@ -3,7 +3,6 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\Helper\DateTime\DateTimeToken;
-use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailDisplayEvent;
 use Mautic\EmailBundle\Event\EmailOnBuildEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -27,7 +26,7 @@ final readonly class DateTimeTokenSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onEmailBuild(EmailBuilderEvent $event): void
+    public function onEmailBuild(EmailOnBuildEvent $event): void
     {
         $event->addToken('{today}', $this->translator->trans('mautic.core.token.group.other').': '.$this->translator->trans('mautic.email.token.today'));
     }
