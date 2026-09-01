@@ -532,7 +532,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         // Match optionally qualified, optionally backtick- or double-quote-quoted identifiers.
         // Accepts both MySQL-style backticks and PostgreSQL-style double quotes.
         if (!preg_match_all(
-            '/[`"]?([A-Za-z_]\w*)(?:[`"]?)(?:\.[`"]?([A-Za-z_]\w*)[`"]?)?/',
+            '/[`"]?([A-Za-z_]\w*)[`"]?(?:\.[`"]?([A-Za-z_]\w*)[`"]?)?/',
             $expression,
             $matches
         )) {
