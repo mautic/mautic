@@ -9,7 +9,6 @@ use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
-use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class MauticReportBuilder implements ReportBuilderInterface
@@ -124,7 +123,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         $event = new ReportGeneratorEvent($this->entity, $options, $this->db->createQueryBuilder(), $this->channelListHelper);
 
         // Trigger the REPORT_ON_GENERATE event to initialize the QueryBuilder
-        $this->dispatcher->dispatch($event, ReportEvents::REPORT_ON_GENERATE);
+        $this->dispatcher->dispatch($event);
 
         // Build the QUERY
         $queryBuilder = $event->getQueryBuilder();

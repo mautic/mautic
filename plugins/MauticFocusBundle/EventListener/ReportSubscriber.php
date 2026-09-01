@@ -6,7 +6,6 @@ namespace MauticPlugin\MauticFocusBundle\EventListener;
 
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
-use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class ReportSubscriber implements EventSubscriberInterface
@@ -32,8 +31,8 @@ final class ReportSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            ReportEvents::REPORT_ON_BUILD    => ['onReportBuilder', 0],
-            ReportEvents::REPORT_ON_GENERATE => ['onReportGenerate', 0],
+            ReportBuilderEvent::class   => ['onReportBuilder', 0],
+            ReportGeneratorEvent::class => ['onReportGenerate', 0],
         ];
     }
 

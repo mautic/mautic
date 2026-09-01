@@ -201,7 +201,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
                 $eventContext = ('all' == $context) ? '' : $context;
 
                 $event = new ReportBuilderEvent($this->translator, $this->channelListHelper, $eventContext, $this->fieldModel->getPublishedFieldArrays(), $this->reportHelper, $reportSource);
-                $this->dispatcher->dispatch($event, ReportEvents::REPORT_ON_BUILD);
+                $this->dispatcher->dispatch($event);
 
                 $tables = $event->getTables();
                 $graphs = $event->getGraphs();
@@ -564,7 +564,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
                 }
 
                 $event = new ReportGraphEvent($entity, $eventGraphs, $query);
-                $this->dispatcher->dispatch($event, ReportEvents::REPORT_ON_GRAPH_GENERATE);
+                $this->dispatcher->dispatch($event);
                 $graphs = $event->getGraphs();
 
                 unset($defaultGraphOptions);
@@ -579,7 +579,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
 
         // Allow plugin to manipulate the query
         $event = new ReportQueryEvent($entity, $query, $totalResults, $dataOptions);
-        $this->dispatcher->dispatch($event, ReportEvents::REPORT_QUERY_PRE_EXECUTE);
+        $this->dispatcher->dispatch($event);
         $query = $event->getQuery();
 
         if (empty($options['ignoreTableData']) && !empty($selectedColumns)) {
@@ -627,7 +627,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
 
             // Allow plugin to manipulate the data
             $event = new ReportDataEvent($entity, $data, $totalResults, $dataOptions);
-            $this->dispatcher->dispatch($event, ReportEvents::REPORT_ON_DISPLAY);
+            $this->dispatcher->dispatch($event);
             $data        = $event->getData();
             $dataOptions = $event->getOptions();
         }

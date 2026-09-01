@@ -33,6 +33,7 @@ use Mautic\LeadBundle\EventListener\ReportDNCSubscriber;
 use Mautic\LeadBundle\EventListener\ReportUtmTagSubscriber;
 use Mautic\LeadBundle\EventListener\SegmentLogReportSubscriber;
 use Mautic\LeadBundle\EventListener\SegmentReportSubscriber;
+use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\SmsBundle\EventListener\CampaignReplySubscriber;
 use Mautic\SmsBundle\EventListener\CampaignSendSubscriber;
 use Mautic\UserBundle\Controller\SecurityController;
@@ -123,7 +124,7 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
             \Mautic\StageBundle\EventListener\CampaignSubscriber::class,
             \Mautic\WebhookBundle\EventListener\CampaignSubscriber::class,
         ],
-        'mautic.report_on_build' => [
+        ReportBuilderEvent::class => [
             FocusSubscriber::class,
             \MauticPlugin\MauticFocusBundle\EventListener\ReportSubscriber::class,
             \Mautic\AssetBundle\EventListener\ReportSubscriber::class,
