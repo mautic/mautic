@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Entity\Tag;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Response;
 
-class DynamicContentControllerTest extends MauticMysqlTestCase
+final class DynamicContentControllerTest extends MauticMysqlTestCase
 {
     private DynamicContent $dwc;
 
