@@ -15,8 +15,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class MauticReportBuilder implements ReportBuilderInterface
 {
-    public const IDENTIFIER_PATTERN =  '/([`"]?[a-z_][a-z0-9_]*[`"]?\.[`"]?[a-z_][a-z0-9_]*[`"]?)/i';
-
     /**
      * @var array
      */
@@ -88,40 +86,22 @@ final class MauticReportBuilder implements ReportBuilderInterface
      * SQL tokens that may appear inside report expressions but are never column
      * references; used by extractBaseColumns(). Function names are already
      * excluded by the not-followed-by-parenthesis check.
-     *
-     * Includes both MySQL and PostgreSQL tokens so the same builder works on
-     * either platform without treating keywords as column names.
      */
     private const SQL_KEYWORD_TOKENS = [
-        // Common
         'SELECT', 'FROM', 'WHERE', 'CASE', 'WHEN', 'THEN', 'ELSE', 'END', 'AND',
         'OR', 'NOT', 'NULL', 'IS', 'IN', 'LIKE', 'BETWEEN', 'EXISTS', 'DISTINCT',
         'AS', 'ASC', 'DESC', 'INTERVAL', 'DAY', 'DAYOFWEEK', 'DAYOFMONTH',
         'DAYOFYEAR', 'HOUR', 'MINUTE', 'SECOND', 'WEEK', 'MONTH', 'QUARTER',
         'YEAR', 'TRUE', 'FALSE',
-        // PostgreSQL
-        'ILIKE', 'SIMILAR', 'OVERLAPS', 'EXTRACT', 'FILTER', 'WITHIN',
-        'GROUPING', 'CURRENT_DATE', 'CURRENT_TIME', 'CURRENT_TIMESTAMP',
-        'LOCALTIME', 'LOCALTIMESTAMP', 'AT', 'TIME', 'ZONE', 'EPOCH',
-        'CENTURY', 'DECADE', 'DOW', 'DOY', 'ISODOW', 'ISOYEAR', 'MICROSECONDS',
-        'MILLISECONDS', 'MILLENNIUM', 'TIMEZONE', 'TIMEZONE_HOUR', 'TIMEZONE_MINUTE',
     ];
 
     /**
      * Aggregate functions whose arguments never need to appear in GROUP BY.
-     *
-     * Covers MySQL and PostgreSQL names used in report formulas.
      */
     private const AGGREGATE_FUNCTIONS = [
-        // Common / MySQL
         'COUNT', 'SUM', 'AVG', 'MIN', 'MAX', 'GROUP_CONCAT', 'BIT_AND',
         'BIT_OR', 'BIT_XOR', 'JSON_ARRAYAGG', 'JSON_OBJECTAGG', 'STD',
         'STDDEV', 'VARIANCE',
-        // PostgreSQL
-        'STRING_AGG', 'ARRAY_AGG', 'BOOL_AND', 'BOOL_OR', 'EVERY',
-        'JSON_AGG', 'JSONB_AGG', 'JSON_OBJECT_AGG', 'JSONB_OBJECT_AGG',
-        'XMLAGG', 'STDDEV_POP', 'STDDEV_SAMP', 'VAR_POP', 'VAR_SAMP',
-        'MODE', 'PERCENTILE_CONT', 'PERCENTILE_DISC',
     ];
 
     private ?string $contentTemplate = null;
@@ -356,10 +336,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                     }
 
                     if (isset($fieldOptions['alias'])) {
-                        // Match upstream: do not quote the alias. Quoted aliases
-                        // change result-column keys on some drivers and break
-                        // report table mapping (Focus functional tests).
-                        $selectText .= ' AS '.$fieldOptions['alias'];
+                        $selectText .= ' AS '.DatabasePlatform::quoteIdentifier($platform, $fieldOptions['alias']);
                     }
 
                     $selectColumns[] = $selectText;
@@ -412,10 +389,10 @@ final class MauticReportBuilder implements ReportBuilderInterface
                     }
 
                     $normalizedGroupBy[] = $normalized;
-                    // Match upstream: completion candidates stay unquoted so the
-                    // generated SQL matches existing tests and MySQL behaviour.
-                    // PostgreSQL accepts unquoted lower-case identifiers.
-                    $dedupedGroupBy[] = $baseColumn;
+                    // Quote simple table.column identifiers for PostgreSQL/MySQL safety
+                    $dedupedGroupBy[] = str_contains($baseColumn, '.')
+                        ? DatabasePlatform::quoteColumn($platform, $baseColumn)
+                        : $baseColumn;
                 }
             }
 
@@ -451,17 +428,18 @@ final class MauticReportBuilder implements ReportBuilderInterface
                     $columnSelect = $aggregator['column'];
                 }
 
+                // Sanitize simple column references for the platform
                 $innerExpression = $this->sanitizeExpression($columnSelect);
 
                 $selectText = DatabasePlatform::getAggregatorExpression(
-                    $this->db->getDatabasePlatform(),
+                    $platform,
                     $aggregator['function'],
                     $innerExpression
                 );
 
-                $alias               = sprintf('%s %s', $aggregator['function'], $aggregator['column']);
-                $quotedAlias         = DatabasePlatform::quoteIdentifier($platform, $alias);
-                $aggregatorSelect[]  = sprintf('%s AS %s', $selectText, $quotedAlias);
+                $alias              = sprintf('%s %s', $aggregator['function'], $aggregator['column']);
+                $quotedAlias        = DatabasePlatform::quoteIdentifier($platform, $alias);
+                $aggregatorSelect[] = sprintf('%s AS %s', $selectText, $quotedAlias);
             }
 
             $queryBuilder->addSelect($aggregatorSelect);
@@ -524,10 +502,13 @@ final class MauticReportBuilder implements ReportBuilderInterface
         // so only their arguments are scanned for column references.
         $expression = (string) preg_replace('/\b[A-Za-z_][A-Za-z0-9_]*\s*(?=\()/', ' ', $expression);
 
-        // Match optionally qualified, optionally backtick-quoted identifiers (upstream pattern).
-        // Double-quote stripping above already removed string literals; remaining
-        // identifiers may still use MySQL backticks. Bare table.column is also matched.
-        if (!preg_match_all('/`?([A-Za-z_][A-Za-z0-9_]*)`?(?:\.`?([A-Za-z_][A-Za-z0-9_]*)`?)?/', $expression, $matches)) {
+        // Match optionally qualified, optionally backtick- or double-quote-quoted identifiers.
+        // Accepts both MySQL-style backticks and PostgreSQL-style double quotes.
+        if (!preg_match_all(
+            '/(?:[`"]?)([A-Za-z_][A-Za-z0-9_]*)(?:[`"]?)(?:\.(?:[`"]?)([A-Za-z_][A-Za-z0-9_]*)(?:[`"]?))?/',
+            $expression,
+            $matches
+        )) {
             return [];
         }
 
@@ -537,7 +518,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                 continue;
             }
 
-            $columns[] = '' !== $matches[2][$index]
+            $columns[] = '' !== ($matches[2][$index] ?? '')
                 ? $matches[1][$index].'.'.$matches[2][$index]
                 : $matches[1][$index];
         }
@@ -636,7 +617,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
         // If it's a simple label/alias (no function, no parentheses, no SELECT), leave it as-is
         if (!$this->isComplexExpression($trimmed)) {
-            if (preg_match(self::IDENTIFIER_PATTERN, $trimmed)) {
+            if (str_contains($trimmed, '.')) {
                 return DatabasePlatform::quoteColumn($platform, $trimmed);
             }
 

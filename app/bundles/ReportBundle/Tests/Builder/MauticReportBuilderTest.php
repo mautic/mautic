@@ -182,7 +182,7 @@ final class MauticReportBuilderTest extends TestCase
         ]);
 
         $this->assertSame(trim(preg_replace('/\s{2,}/', ' ', '
-            SELECT `ph`.`url_title`, `ph`.`url`, COUNT(ph.id) AS \'COUNT ph.id\' GROUP BY ph.url, ph.url_title
+            SELECT `ph`.`url_title`, `ph`.`url`, COUNT(`ph`.`id`) AS `COUNT ph.id` GROUP BY ph.url, ph.url_title
         ')), $query->getSql());
         $this->assertStringNotContainsString('`ph`.`id`', $query->getSql());
     }
@@ -203,7 +203,7 @@ final class MauticReportBuilderTest extends TestCase
         ]);
 
         $this->assertSame(trim(preg_replace('/\s{2,}/', ' ', '
-            SELECT `ph`.`url`, `p`.`title` GROUP BY ph.url, p.title
+            SELECT `ph`.`url`, `p`.`title` GROUP BY ph.url, `p`.`title`
         ')), $query->getSql());
     }
 
@@ -223,7 +223,7 @@ final class MauticReportBuilderTest extends TestCase
         ]);
 
         $this->assertSame(trim(preg_replace('/\s{2,}/', ' ', '
-            SELECT `e`.`id`, `e`.`subject` GROUP BY e.id, e.subject
+            SELECT `e`.`id`, `e`.`subject` GROUP BY e.id, `e`.`subject`
         ')), $query->getSql());
     }
 
@@ -243,7 +243,7 @@ final class MauticReportBuilderTest extends TestCase
         ]);
 
         $this->assertSame(trim(preg_replace('/\s{2,}/', ' ', '
-            SELECT `ph`.`url` GROUP BY ph.url, p.title ORDER BY p.title DESC
+            SELECT `ph`.`url` GROUP BY ph.url, `p`.`title` ORDER BY p.title DESC
         ')), $query->getSql());
     }
 
@@ -269,7 +269,7 @@ final class MauticReportBuilderTest extends TestCase
         ]);
 
         $this->assertSame(trim(preg_replace('/\s{2,}/', ' ', '
-            SELECT `ph`.`url`, COUNT(ph.id) AS \'COUNT ph.id\' GROUP BY ph.url ORDER BY ph.id DESC
+            SELECT `ph`.`url`, COUNT(`ph`.`id`) AS `COUNT ph.id` GROUP BY ph.url ORDER BY ph.id DESC
         ')), $query->getSql());
     }
 
@@ -370,7 +370,7 @@ final class MauticReportBuilderTest extends TestCase
         // MAX(t.hits) is already aggregated, so t.hits must not be grouped; the
         // COUNT(ph.id) sort column is an aggregator expression, not a column.
         $this->assertSame(trim(preg_replace('/\s{2,}/', ' ', '
-            SELECT `ph`.`url`, MAX(t.hits), COUNT(ph.id) AS \'COUNT ph.id\' GROUP BY ph.url ORDER BY COUNT(ph.id) DESC
+            SELECT `ph`.`url`, MAX(t.hits), COUNT(`ph`.`id`) AS `COUNT ph.id` GROUP BY ph.url ORDER BY COUNT(ph.id) DESC
         ')), $query->getSql());
     }
 
@@ -424,7 +424,7 @@ final class MauticReportBuilderTest extends TestCase
         // a column: only the CASE's real column reference may be completed into
         // the outer GROUP BY.
         $this->assertSame(trim(preg_replace('/\s{2,}/', ' ', "
-            SELECT `e`.`id`, $formula GROUP BY e.id, fs.type
+            SELECT `e`.`id`, $formula GROUP BY e.id, `fs`.`type`
         ")), $query->getSql());
     }
 
@@ -463,7 +463,7 @@ final class MauticReportBuilderTest extends TestCase
         // The CASE's base column is completed; nothing from the subquery scope is.
         $this->assertSame(
             trim(preg_replace('/\s{2,}/', ' ', "
-            SELECT `e`.`id`, $formula GROUP BY e.id, fs.type
+            SELECT `e`.`id`, $formula GROUP BY e.id, `fs`.`type`
         ")),
             trim(preg_replace('/\s{2,}/', ' ', $sql))
         );
