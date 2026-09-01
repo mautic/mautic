@@ -13,6 +13,7 @@ use Mautic\CampaignBundle\Entity\SummaryRepository;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber;
 use Mautic\CampaignBundle\Form\Type\CampaignShareType;
+use Mautic\CampaignBundle\Helper\CampaignSearchScopeProvider;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CampaignBundle\Service\CampaignShareService;
@@ -98,6 +99,11 @@ class CampaignController extends AbstractStandardFormController
     protected $modifiedEvents = [];
 
     protected $sessionId;
+
+    /**
+     * @var list<array{command: string, label: string, suffix?: string, default?: bool, translate?: bool}>|null
+     */
+    private ?array $indexSearchScopes = null;
 
     public function __construct(
         FormFactoryInterface $formFactory,
@@ -579,8 +585,10 @@ class CampaignController extends AbstractStandardFormController
     /**
      * @param int $page
      */
-    public function indexAction(Request $request, $page = null): Response
+    public function indexAction(Request $request, CampaignSearchScopeProvider $campaignSearchScopeProvider, $page = null): Response
     {
+        $this->indexSearchScopes = $campaignSearchScopeProvider->getScopes();
+
         return $this->indexStandard($request, $page);
     }
 
@@ -1180,6 +1188,10 @@ class CampaignController extends AbstractStandardFormController
                         null,
                         true));
                 $args['viewParameters']['enableExportPermission'] = $this->security->isAdmin() || $this->security->isGranted('campaign:export:enable', 'MATCH_ONE');
+                if (null !== $this->indexSearchScopes) {
+                    $args['viewParameters']['searchScopes'] = $this->indexSearchScopes;
+                    $this->indexSearchScopes                = null;
+                }
                 break;
             case 'view':
                 /** @var Campaign $entity */

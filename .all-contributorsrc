@@ -1796,6 +1796,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "vaibhav8a",
+      "name": "Vaibhav Srivastava",
+      "avatar_url": "https://avatars.githubusercontent.com/u/173471846?v=4",
+      "profile": "http://vaibhavsrivastava.me",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,

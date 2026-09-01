@@ -87,7 +87,9 @@
                     'tooltip': 'mautic.campaign.campaign.searchcommand.ispending.description',
                     'icon': 'ri-timer-line'
                 }
-            ]
+            ],
+            'searchScopes': searchScopes|default([]),
+            'searchScopeHint': searchScopeHint|default(''),
         }) -}}
         <div class="page-list">
             {{- customContent('content.above', _context) -}}
