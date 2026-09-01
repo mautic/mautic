@@ -153,7 +153,6 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
             ]
         );
 
-
         // Only show for segments and not dynamic content addressed by https://github.com/mautic/mautic/pull/9260
         if (!$event->isForSegmentation()) {
             return;
