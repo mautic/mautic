@@ -75,7 +75,7 @@ final class ListControllerTest extends MauticMysqlTestCase
         );
 
         /** @var Allowlist $allowlist */
-        $allowlist = static::getContainer()->get('marketplace.service.allowlist');
+        $allowlist = self::getContainer()->get('marketplace.service.allowlist');
         $allowlist->clearCache();
 
         $crawler = $this->client->request('GET', 's/marketplace?search=koco');
@@ -85,7 +85,7 @@ final class ListControllerTest extends MauticMysqlTestCase
         Assert::assertSame(
             ['KocoCaptcha'],
             array_map(
-                fn (string $dirtyPackageName) => trim($dirtyPackageName),
+                trim(...),
                 $crawler->filter('#marketplace-packages-table .package-name a')->extract(['_text'])
             )
         );
@@ -104,7 +104,7 @@ final class ListControllerTest extends MauticMysqlTestCase
         );
 
         /** @var Allowlist $allowlist */
-        $allowlist = static::getContainer()->get('marketplace.service.allowlist');
+        $allowlist = self::getContainer()->get('marketplace.service.allowlist');
         $allowlist->clearCache();
 
         $crawler = $this->client->request('GET', 's/marketplace?search='.$searchCommand);
@@ -114,21 +114,19 @@ final class ListControllerTest extends MauticMysqlTestCase
         Assert::assertSame(
             [$expectedPackage],
             array_map(
-                fn (string $dirtyPackageName) => trim($dirtyPackageName),
+                trim(...),
                 $crawler->filter('#marketplace-packages-table .package-name a')->extract(['_text'])
             )
         );
     }
 
     /**
-     * @return array<string, array{string, string}>
+     * @return \Iterator<string, array{string, string}>
      */
-    public static function typeFilterProvider(): array
+    public static function typeFilterProvider(): \Iterator
     {
-        return [
-            'plugin'   => ['is:plugin', 'KocoCaptcha'],
-            'theme'    => ['is:theme', 'Mautic Referrals Bundle'],
-            'campaign' => ['is:campaign', 'Welcome Campaign'],
-        ];
+        yield 'plugin' => ['is:plugin', 'KocoCaptcha'];
+        yield 'theme' => ['is:theme', 'Mautic Referrals Bundle'];
+        yield 'campaign' => ['is:campaign', 'Welcome Campaign'];
     }
 }
