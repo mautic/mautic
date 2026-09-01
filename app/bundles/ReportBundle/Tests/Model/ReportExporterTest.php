@@ -15,7 +15,6 @@ use Mautic\ReportBundle\Model\ReportExporter;
 use Mautic\ReportBundle\Model\ReportExportOptions;
 use Mautic\ReportBundle\Model\ReportFileWriter;
 use Mautic\ReportBundle\Model\ScheduleModel;
-use Mautic\ReportBundle\ReportEvents;
 use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 use Mautic\ReportBundle\Tests\Fixtures;
@@ -119,12 +118,11 @@ final class ReportExporterTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->atLeast(3);
 
         $eventDispatcher->expects($matcher)
-            ->method('dispatch')->willReturnCallback(function (ReportScheduleSendEvent|JobExtendTimeEvent $event, ?string $eventName) use ($matcher, $scheduler1, $scheduler2, $schedulerNow): JobExtendTimeEvent|\Mautic\ReportBundle\Event\ReportScheduleSendEvent {
+            ->method('dispatch')->willReturnCallback(function (ReportScheduleSendEvent|JobExtendTimeEvent $event) use ($matcher, $scheduler1, $scheduler2, $schedulerNow): JobExtendTimeEvent|\Mautic\ReportBundle\Event\ReportScheduleSendEvent {
                 if ($event instanceof JobExtendTimeEvent) {
                     return $event;
                 }
 
-                $this->assertSame(ReportEvents::REPORT_SCHEDULE_SEND, $eventName);
                 $this->assertSame('my-path', $event->getFile());
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($event->getScheduler(), $scheduler1);

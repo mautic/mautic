@@ -358,6 +358,7 @@
     | `PageEvents::ON_CONTACT_TRACKED` | `TrackingEvent` |
 - The `Mautic\NotificationBundle\Event\NotificationSendEvent` (`NotificationEvents::NOTIFICATION_ON_SEND`) is now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `mautic.notification_on_send` string constant. Update any listener that keys on `NotificationEvents::NOTIFICATION_ON_SEND` to key on `NotificationSendEvent::class` instead. The constant is kept for backwards compatibility but is no longer used internally. The `NotificationEvent` CRUD events (`NOTIFICATION_PRE_SAVE` / `POST_SAVE` / `PRE_DELETE` / `POST_DELETE`) share one event object and are still dispatched under their string names.
 - DashboardBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\DashboardBundle\DashboardEvents` string constants. Update any subscriber or listener that keys on one of the converted `DashboardEvents::*` constants to key on the event class instead:
+- ReportBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\ReportBundle\ReportEvents` string constants. Update any subscriber or listener that keys on one of the converted `ReportEvents::*` constants to key on the event class instead:
 
     ```diff
      public static function getSubscribedEvents(): array
@@ -401,6 +402,26 @@
     | `SmsEvents::DNC_FILTER_CONTACTS_ON_SEND` | `DncEvent` |
     | `SmsEvents::QUEUE_FILTER_CONTACTS_ON_SEND` | `QueueEvent` |
     | `SmsEvents::FILTER_CONTACTS_ON_SEND` | `FilterEvent` |
+    -        ReportEvents::REPORT_ON_BUILD => ['onReportBuilder', 0],
+    +        ReportBuilderEvent::class => ['onReportBuilder', 0],
+         ];
+     }
+    ```
+
+    Dispatching drops the redundant second argument, e.g. `$dispatcher->dispatch($event, ReportEvents::REPORT_ON_BUILD)` becomes `$dispatcher->dispatch($event)`. The `Mautic\ReportBundle\ReportEvents` constants are kept for backwards compatibility but are no longer used internally for the events below. The CRUD constants that share one `ReportEvent` object (`REPORT_PRE_SAVE` / `REPORT_POST_SAVE` / `REPORT_PRE_DELETE` / `REPORT_POST_DELETE`) are unchanged.
+
+    Full mapping of the converted constants to their event class (all in the `Mautic\ReportBundle\Event` namespace):
+
+    | `ReportEvents` constant | New event class |
+    | --- | --- |
+    | `ReportEvents::REPORT_ON_BUILD` | `ReportBuilderEvent` |
+    | `ReportEvents::REPORT_ON_GENERATE` | `ReportGeneratorEvent` |
+    | `ReportEvents::REPORT_QUERY_PRE_EXECUTE` | `ReportQueryEvent` |
+    | `ReportEvents::REPORT_ON_DISPLAY` | `ReportDataEvent` |
+    | `ReportEvents::REPORT_ON_GRAPH_GENERATE` | `ReportGraphEvent` |
+    | `ReportEvents::REPORT_SCHEDULE_SEND` | `ReportScheduleSendEvent` |
+    | `ReportEvents::REPORT_ON_COLUMN_COLLECT` | `ColumnCollectEvent` |
+    | `ReportEvents::REPORT_PERMANENT_FILE_CREATED` | `PermanentReportFileCreatedEvent` |
 
 - `Mautic\CoreBundle\Factory\ModelFactory` now builds its service locator from a `defaultIndexMethod` on the `mautic.model` tag, replacing the removed `Mautic\CoreBundle\DependencyInjection\Compiler\ModelPass`. Every model (a service implementing `Mautic\CoreBundle\Model\MauticModelInterface`) declares its `ModelFactory::getModel()` lookup key via a static `getName()` method:
 

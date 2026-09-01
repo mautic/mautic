@@ -13,7 +13,6 @@ use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
-use Mautic\ReportBundle\ReportEvents;
 use MauticPlugin\MauticFocusBundle\Event\FocusEvent;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
@@ -45,7 +44,7 @@ final readonly class FocusSubscriber implements EventSubscriberInterface
             FocusEvents::POST_SAVE         => ['onFocusPostSave', 0],
             FocusEvents::POST_DELETE       => ['onFocusDelete', 0],
             FocusEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', 0],
-            ReportEvents::REPORT_ON_BUILD  => ['onReportBuild', -10],
+            ReportBuilderEvent::class => ['onReportBuild', -10],
         ];
     }
 
