@@ -15,6 +15,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class MauticReportBuilder implements ReportBuilderInterface
 {
+    public const IDENTIFIER_PATTERN =  '/([`"]?[a-z_][a-z0-9_]*[`"]?\.[`"]?[a-z_][a-z0-9_]*[`"]?)/i';
+
     /**
      * @var array
      */
@@ -633,7 +635,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
         // If it's a simple label/alias (no function, no parentheses, no SELECT), leave it as-is
         if (!$this->isComplexExpression($trimmed)) {
-            if (str_contains($trimmed, '.')) {
+            if (preg_match(self::IDENTIFIER_PATTERN, $trimmed)) {
                 return DatabasePlatform::quoteColumn($platform, $trimmed);
             }
 
@@ -642,7 +644,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
         // Recursively sanitize all column references inside the expression
         return (string) preg_replace_callback(
-            '/([`"]?[a-z_][a-z0-9_]*[`"]?\.[`"]?[a-z_][a-z0-9_]*[`"]?)/i',
+            self::IDENTIFIER_PATTERN,
             fn ($matches): string => DatabasePlatform::quoteColumn($platform, $matches[1]),
             $trimmed
         );
