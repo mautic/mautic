@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Event\BuilderEvent;
 use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Event\EmailDisplayEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Event\PageDisplayEvent;
@@ -30,8 +31,8 @@ final class BuilderSubscriber implements EventSubscriberInterface
     {
         return [
             EmailEvents::EMAIL_ON_BUILD   => ['onBuilderBuild', 0],
-            EmailEvents::EMAIL_ON_SEND    => ['onEmailGenerate', 0],
-            EmailEvents::EMAIL_ON_DISPLAY => ['onEmailGenerate', 0],
+            EmailSendEvent::class         => ['onEmailGenerate', 0],
+            EmailDisplayEvent::class      => ['onEmailGenerate', 0],
             PageEvents::PAGE_ON_BUILD     => ['onBuilderBuild', 0],
             PageDisplayEvent::class   => ['onPageDisplay', 0],
         ];

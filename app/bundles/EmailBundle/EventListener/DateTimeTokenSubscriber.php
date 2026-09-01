@@ -5,6 +5,7 @@ namespace Mautic\EmailBundle\EventListener;
 use Mautic\CoreBundle\Helper\DateTime\DateTimeToken;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
+use Mautic\EmailBundle\Event\EmailDisplayEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -21,8 +22,8 @@ final readonly class DateTimeTokenSubscriber implements EventSubscriberInterface
     {
         return [
             EmailEvents::EMAIL_ON_BUILD                     => ['onEmailBuild', 0],
-            EmailEvents::EMAIL_ON_SEND                      => ['onEmailGenerate', 0],
-            EmailEvents::EMAIL_ON_DISPLAY                   => ['onEmailDisplay', 0],
+            EmailSendEvent::class                           => ['onEmailGenerate', 0],
+            EmailDisplayEvent::class                        => ['onEmailDisplay', 0],
         ];
     }
 

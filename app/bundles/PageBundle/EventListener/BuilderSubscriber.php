@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
+use Mautic\EmailBundle\Event\EmailDisplayEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event as Events;
@@ -76,8 +77,8 @@ final class BuilderSubscriber implements EventSubscriberInterface
             Events\PageDisplayEvent::class   => ['onPageDisplay', 0],
             PageEvents::PAGE_ON_BUILD     => ['onPageBuild', 0],
             EmailEvents::EMAIL_ON_BUILD   => ['onEmailBuild', 0],
-            EmailEvents::EMAIL_ON_SEND    => ['onEmailGenerate', 0],
-            EmailEvents::EMAIL_ON_DISPLAY => ['onEmailGenerate', 0],
+            EmailSendEvent::class         => ['onEmailGenerate', 0],
+            EmailDisplayEvent::class      => ['onEmailGenerate', 0],
         ];
     }
 

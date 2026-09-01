@@ -9,8 +9,10 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Event as Events;
+use Mautic\EmailBundle\Event\EmailDisplayEvent;
 use Mautic\EmailBundle\Event\EmailEditSubmitEvent;
 use Mautic\EmailBundle\Event\EmailEvent;
+use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Model\EmailDraftModel;
 use Mautic\EmailBundle\Model\EmailModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -45,8 +47,8 @@ final readonly class EmailSubscriber implements EventSubscriberInterface
         return [
             EmailEvents::EMAIL_PRE_SAVE       => ['cloneParentEmailDataForVariant', 0],
             EmailEvents::EMAIL_POST_SAVE      => ['onEmailPostSave', 0],
-            EmailEvents::EMAIL_ON_SEND        => ['onEmailSendAddPreheaderText', 200],
-            EmailEvents::EMAIL_ON_DISPLAY     => ['onEmailSendAddPreheaderText', 200],
+            EmailSendEvent::class             => ['onEmailSendAddPreheaderText', 200],
+            EmailDisplayEvent::class          => ['onEmailSendAddPreheaderText', 200],
             EmailEvents::EMAIL_POST_DELETE    => ['onEmailDelete', 0],
             EmailEvents::EMAIL_FAILED         => ['onEmailFailed', 0],
             EmailEvents::EMAIL_RESEND         => ['onEmailResend', 0],
@@ -85,7 +87,7 @@ final readonly class EmailSubscriber implements EventSubscriberInterface
     /**
      * Add preheader text to email body.
      */
-    public function onEmailSendAddPreheaderText(Events\EmailSendEvent $event): void
+    public function onEmailSendAddPreheaderText(EmailSendEvent $event): void
     {
         $email = $event->getEmail();
         $html  = $event->getContent();

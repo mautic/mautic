@@ -7,7 +7,9 @@ use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
+use Mautic\EmailBundle\Event\EmailDisplayEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\EmailBundle\Event\OnEmailAddressTokenReplacementEvent;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -25,10 +27,10 @@ final class EmailSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            EmailEvents::EMAIL_ON_BUILD                     => ['onEmailBuild', 0],
-            EmailEvents::EMAIL_ON_SEND                      => ['onEmailGenerate', 0],
-            EmailEvents::EMAIL_ON_DISPLAY                   => ['onEmailDisplay', 0],
-            EmailEvents::ON_EMAIL_ADDRESS_TOKEN_REPLACEMENT => ['onEmailAddressReplacement', 0],
+            EmailEvents::EMAIL_ON_BUILD                => ['onEmailBuild', 0],
+            EmailSendEvent::class                      => ['onEmailGenerate', 0],
+            EmailDisplayEvent::class                   => ['onEmailDisplay', 0],
+            OnEmailAddressTokenReplacementEvent::class => ['onEmailAddressReplacement', 0],
         ];
     }
 

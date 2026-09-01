@@ -6,7 +6,6 @@ namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
-use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\PointBundle\Entity\Point;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -52,6 +51,6 @@ final class PointSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->assertInstanceOf(EventDispatcherInterface::class, $dispatcher);
         $this->assertSame($deletedLeadId, $event->getLead()['id']);
 
-        $dispatcher->dispatch($event, EmailEvents::EMAIL_ON_SEND);
+        $dispatcher->dispatch($event);
     }
 }

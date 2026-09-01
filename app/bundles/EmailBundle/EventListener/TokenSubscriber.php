@@ -3,8 +3,8 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
-use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Event\EmailDisplayEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadListRepository;
@@ -26,9 +26,9 @@ readonly class TokenSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            EmailEvents::EMAIL_ON_SEND     => ['decodeTokens', 254],
-            EmailEvents::EMAIL_ON_DISPLAY  => ['decodeTokens', 254],
-            EmailEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', -254],
+            EmailSendEvent::class          => ['decodeTokens', 254],
+            EmailDisplayEvent::class       => ['decodeTokens', 254],
+            TokenReplacementEvent::class   => ['onTokenReplacement', -254],
         ];
     }
 
@@ -65,7 +65,7 @@ readonly class TokenSubscriber implements EventSubscriberInterface
                 $email,
                 $event->isInternalSend()
             );
-            $this->dispatcher->dispatch($tokenEvent, EmailEvents::TOKEN_REPLACEMENT);
+            $this->dispatcher->dispatch($tokenEvent);
             $event->addTokens($tokenEvent->getTokens());
         }
     }
@@ -100,7 +100,7 @@ readonly class TokenSubscriber implements EventSubscriberInterface
             }
 
             // Replace lead tokens in dynamic content (but no recurrence on dynamic content to avoid infinite loop)
-            $emailSendEvent = new EmailSendEvent(
+            $emailSendEvent = new EmailDisplayEvent(
                 null,
                 [
                     'content' => $filterContent,
@@ -112,7 +112,7 @@ readonly class TokenSubscriber implements EventSubscriberInterface
                 true
             );
 
-            $this->dispatcher->dispatch($emailSendEvent, EmailEvents::EMAIL_ON_DISPLAY);
+            $this->dispatcher->dispatch($emailSendEvent);
 
             $untokenizedContent = $emailSendEvent->getContent(!$event->isInternalSend());
 

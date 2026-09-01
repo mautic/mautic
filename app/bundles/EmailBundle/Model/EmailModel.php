@@ -41,6 +41,7 @@ use Mautic\EmailBundle\Entity\StatDevice;
 use Mautic\EmailBundle\Entity\StatDeviceRepository;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
+use Mautic\EmailBundle\Event\EmailDisplayEvent;
 use Mautic\EmailBundle\Event\EmailEvent;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -1735,7 +1736,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      */
     public function dispatchEmailSendEvent(Email $email, array $leadFields = [], $idHash = null, array $tokens = []): EmailSendEvent
     {
-        $event = new EmailSendEvent(
+        $event = new EmailDisplayEvent(
             null,
             [
                 'content'      => $email->getCustomHtml(),
@@ -1747,7 +1748,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             ]
         );
 
-        $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_DISPLAY);
+        $this->dispatcher->dispatch($event);
 
         return $event;
     }
@@ -2225,7 +2226,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         }
 
         // Generate and replace tokens
-        $event = new EmailSendEvent(
+        $event = new EmailDisplayEvent(
             null,
             [
                 'content'      => $email->getCustomHtml(),
@@ -2236,7 +2237,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
                 'lead'         => $leadFields,
             ]
         );
-        $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_DISPLAY);
+        $this->dispatcher->dispatch($event);
 
         $mailer = $this->mailHelper->getMailer(true);
         $mailer->setLead($leadFields, true);

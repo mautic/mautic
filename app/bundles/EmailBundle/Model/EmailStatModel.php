@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Model;
 
-use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Event\EmailStatEvent;
+use Mautic\EmailBundle\Event\EmailStatPostSaveEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class EmailStatModel
@@ -28,13 +28,11 @@ class EmailStatModel
      */
     public function saveEntities(array $stats): void
     {
-        $event = new EmailStatEvent($stats);
-
-        $this->dispatcher->dispatch($event, EmailEvents::ON_EMAIL_STAT_PRE_SAVE);
+        $this->dispatcher->dispatch(new EmailStatEvent($stats));
 
         $this->statRepository->saveEntities($stats);
 
-        $this->dispatcher->dispatch($event, EmailEvents::ON_EMAIL_STAT_POST_SAVE);
+        $this->dispatcher->dispatch(new EmailStatPostSaveEvent($stats));
     }
 
     public function getRepository(): StatRepository

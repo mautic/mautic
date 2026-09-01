@@ -7,10 +7,9 @@ use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
-use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
-use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\EmailBundle\Event\EmailDisplayEvent;
 use Mautic\EmailBundle\Event\TransportWebhookEvent;
 use Mautic\EmailBundle\Helper\EmailConfig;
 use Mautic\EmailBundle\Helper\EmailDefaultsHelper;
@@ -572,7 +571,7 @@ final class PublicController extends CommonFormController
             $contact = $fakeLeadHelper->prepareFakeContactWithPrimaryCompany();
         }
         // Generate and replace tokens
-        $event = new EmailSendEvent(
+        $event = new EmailDisplayEvent(
             null,
             [
                 'content'      => $content,
@@ -583,7 +582,7 @@ final class PublicController extends CommonFormController
                 'lead'         => $contact,
             ]
         );
-        $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_DISPLAY);
+        $this->dispatcher->dispatch($event);
 
         $content = $event->getContent(true);
 
