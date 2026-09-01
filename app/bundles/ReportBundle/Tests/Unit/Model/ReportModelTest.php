@@ -11,6 +11,7 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Model\ReportModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -67,132 +68,80 @@ final class ReportModelTest extends MauticMysqlTestCase
         $this->assertCount(1, $reportData['data']);
     }
 
-    public function testGetTotalCountUsesStrictModeCompatibleQueryForGroupedReports(): void
-    {
-        $form = new Form();
-        $form->setName('Grouped Report Test Form');
-        $form->setAlias('grouped_report_test_form');
-
-        $ip = new IpAddress('127.0.0.2');
-
-        $this->em->persist($ip);
-        $this->em->persist($form);
-        $this->em->flush();
-
-        $timezone = new \DateTimeZone('UTC');
-        $this->em->persist($this->makeSubmission($form, $ip, new \DateTime('2026-01-01 10:00:00', $timezone)));
-        $this->em->persist($this->makeSubmission($form, $ip, new \DateTime('2026-01-01 11:00:00', $timezone)));
-        $this->em->persist($this->makeSubmission($form, $ip, new \DateTime('2026-01-02 10:00:00', $timezone)));
-        $this->em->flush();
-
-        $connection      = $this->em->getConnection();
-        $originalSqlMode = (string) $connection->executeQuery('SELECT @@SESSION.sql_mode')->fetchOne();
-
-        try {
-            $sqlModes = array_filter(explode(',', $originalSqlMode));
-            if (!in_array('ONLY_FULL_GROUP_BY', $sqlModes, true)) {
-                $sqlModes[] = 'ONLY_FULL_GROUP_BY';
-                $connection->executeStatement('SET SESSION sql_mode = ?', [implode(',', $sqlModes)]);
-            }
-
-            $queryBuilder = $connection->createQueryBuilder();
-            $queryBuilder->select('fs.id', 'fs.date_submitted')
-                ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 'fs')
-                ->where('fs.form_id = :formId')
-                ->setParameter('formId', $form->getId())
-                ->groupBy('DATE(fs.date_submitted)')
-                ->orderBy('fs.id', 'DESC')
-                ->setMaxResults(1);
-
+    /**
+     * @param list<string> $submittedAt
+     */
+    #[DataProvider('totalCountQueryProvider')]
+    public function testGetTotalCountBuildsCompatibleCountQuery(
+        string $alias,
+        string $ipAddress,
+        array $submittedAt,
+        bool $useOnlyFullGroupBy,
+        bool $grouped,
+        ?string $having,
+        int $expectedTotal,
+    ): void {
+        $form = $this->createFormWithSubmissions('Report Count Test Form', $alias, $ipAddress, $submittedAt);
+        $test = function () use ($form, $grouped, $having, $expectedTotal): void {
             /** @var ReportModel $reportModel */
             $reportModel = self::getContainer()->get(ReportModel::class);
             $debugData   = [];
+            $query       = $this->createReportQuery($form, $grouped, $having);
 
-            $this->assertSame(2, $this->invokeGetTotalCount($reportModel, $queryBuilder, $debugData));
-        } finally {
-            $connection->executeStatement('SET SESSION sql_mode = ?', [$originalSqlMode]);
+            $this->assertSame($expectedTotal, $this->invokeGetTotalCount($reportModel, $query, $debugData));
+        };
+
+        if ($useOnlyFullGroupBy) {
+            $this->withOnlyFullGroupBy($test);
+
+            return;
         }
+
+        $test();
     }
 
-    public function testGetTotalCountSupportsNonGroupedReports(): void
+    /**
+     * @return iterable<string, array{
+     *     alias: string,
+     *     ipAddress: string,
+     *     submittedAt: list<string>,
+     *     useOnlyFullGroupBy: bool,
+     *     grouped: bool,
+     *     having: string|null,
+     *     expectedTotal: int
+     * }>
+     */
+    public static function totalCountQueryProvider(): iterable
     {
-        $form = new Form();
-        $form->setName('Non Grouped Report Test Form');
-        $form->setAlias('non_grouped_report_test_form');
+        yield 'grouped report with strict group-by mode' => [
+            'alias'              => 'grouped_report_test_form',
+            'ipAddress'          => '127.0.0.2',
+            'submittedAt'        => ['2026-01-01 10:00:00', '2026-01-01 11:00:00', '2026-01-02 10:00:00'],
+            'useOnlyFullGroupBy' => true,
+            'grouped'            => true,
+            'having'             => null,
+            'expectedTotal'      => 2,
+        ];
 
-        $ip = new IpAddress('127.0.0.3');
+        yield 'non-grouped report' => [
+            'alias'              => 'non_grouped_report_test_form',
+            'ipAddress'          => '127.0.0.3',
+            'submittedAt'        => ['2026-02-01 10:00:00', '2026-02-01 11:00:00', '2026-02-02 10:00:00'],
+            'useOnlyFullGroupBy' => false,
+            'grouped'            => false,
+            'having'             => null,
+            'expectedTotal'      => 3,
+        ];
 
-        $this->em->persist($ip);
-        $this->em->persist($form);
-        $this->em->flush();
-
-        $timezone = new \DateTimeZone('UTC');
-        $this->em->persist($this->makeSubmission($form, $ip, new \DateTime('2026-02-01 10:00:00', $timezone)));
-        $this->em->persist($this->makeSubmission($form, $ip, new \DateTime('2026-02-01 11:00:00', $timezone)));
-        $this->em->persist($this->makeSubmission($form, $ip, new \DateTime('2026-02-02 10:00:00', $timezone)));
-        $this->em->flush();
-
-        $queryBuilder = $this->em->getConnection()->createQueryBuilder();
-        $queryBuilder->select('fs.id', 'fs.date_submitted')
-            ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 'fs')
-            ->where('fs.form_id = :formId')
-            ->setParameter('formId', $form->getId())
-            ->orderBy('fs.id', 'DESC')
-            ->setMaxResults(1);
-
-        /** @var ReportModel $reportModel */
-        $reportModel = self::getContainer()->get(ReportModel::class);
-        $debugData   = [];
-
-        $this->assertSame(3, $this->invokeGetTotalCount($reportModel, $queryBuilder, $debugData));
-    }
-
-    public function testGetTotalCountPreservesHavingForGroupedReports(): void
-    {
-        $form = new Form();
-        $form->setName('Grouped Report Having Test Form');
-        $form->setAlias('grouped_report_having_test_form');
-
-        $ip = new IpAddress('127.0.0.4');
-
-        $this->em->persist($ip);
-        $this->em->persist($form);
-        $this->em->flush();
-
-        $timezone = new \DateTimeZone('UTC');
-        $this->em->persist($this->makeSubmission($form, $ip, new \DateTime('2026-03-01 10:00:00', $timezone)));
-        $this->em->persist($this->makeSubmission($form, $ip, new \DateTime('2026-03-01 11:00:00', $timezone)));
-        $this->em->persist($this->makeSubmission($form, $ip, new \DateTime('2026-03-02 10:00:00', $timezone)));
-        $this->em->flush();
-
-        $connection      = $this->em->getConnection();
-        $originalSqlMode = (string) $connection->executeQuery('SELECT @@SESSION.sql_mode')->fetchOne();
-
-        try {
-            $sqlModes = array_filter(explode(',', $originalSqlMode));
-            if (!in_array('ONLY_FULL_GROUP_BY', $sqlModes, true)) {
-                $sqlModes[] = 'ONLY_FULL_GROUP_BY';
-                $connection->executeStatement('SET SESSION sql_mode = ?', [implode(',', $sqlModes)]);
-            }
-
-            $queryBuilder = $connection->createQueryBuilder();
-            $queryBuilder->select('fs.id', 'fs.date_submitted')
-                ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 'fs')
-                ->where('fs.form_id = :formId')
-                ->setParameter('formId', $form->getId())
-                ->groupBy('DATE(fs.date_submitted)')
-                ->having('COUNT(fs.id) > 1')
-                ->orderBy('fs.id', 'DESC')
-                ->setMaxResults(1);
-
-            /** @var ReportModel $reportModel */
-            $reportModel = self::getContainer()->get(ReportModel::class);
-            $debugData   = [];
-
-            $this->assertSame(1, $this->invokeGetTotalCount($reportModel, $queryBuilder, $debugData));
-        } finally {
-            $connection->executeStatement('SET SESSION sql_mode = ?', [$originalSqlMode]);
-        }
+        yield 'grouped report with having and strict group-by mode' => [
+            'alias'              => 'grouped_report_having_test_form',
+            'ipAddress'          => '127.0.0.4',
+            'submittedAt'        => ['2026-03-01 10:00:00', '2026-03-01 11:00:00', '2026-03-02 10:00:00'],
+            'useOnlyFullGroupBy' => true,
+            'grouped'            => true,
+            'having'             => 'COUNT(fs.id) > 1',
+            'expectedTotal'      => 1,
+        ];
     }
 
     private function makeSubmission(Form $form, IpAddress $ipAddress, \DateTime $dateSubmitted): Submission
@@ -204,6 +153,70 @@ final class ReportModelTest extends MauticMysqlTestCase
         $submission->setReferer('');
 
         return $submission;
+    }
+
+    /**
+     * @param list<string> $submittedAt
+     */
+    private function createFormWithSubmissions(string $name, string $alias, string $ipAddress, array $submittedAt): Form
+    {
+        $form = new Form();
+        $form->setName($name);
+        $form->setAlias($alias);
+
+        $ip = new IpAddress($ipAddress);
+
+        $this->em->persist($ip);
+        $this->em->persist($form);
+        $this->em->flush();
+
+        $timezone = new \DateTimeZone('UTC');
+        foreach ($submittedAt as $dateSubmitted) {
+            $this->em->persist($this->makeSubmission($form, $ip, new \DateTime($dateSubmitted, $timezone)));
+        }
+
+        $this->em->flush();
+
+        return $form;
+    }
+
+    private function withOnlyFullGroupBy(callable $callback): void
+    {
+        $connection      = $this->em->getConnection();
+        $originalSqlMode = (string) $connection->executeQuery('SELECT @@SESSION.sql_mode')->fetchOne();
+
+        try {
+            $sqlModes = array_filter(explode(',', $originalSqlMode));
+            if (!in_array('ONLY_FULL_GROUP_BY', $sqlModes, true)) {
+                $sqlModes[] = 'ONLY_FULL_GROUP_BY';
+                $connection->executeStatement('SET SESSION sql_mode = ?', [implode(',', $sqlModes)]);
+            }
+
+            $callback();
+        } finally {
+            $connection->executeStatement('SET SESSION sql_mode = ?', [$originalSqlMode]);
+        }
+    }
+
+    private function createReportQuery(Form $form, bool $grouped = false, ?string $having = null): QueryBuilder
+    {
+        $queryBuilder = $this->em->getConnection()->createQueryBuilder();
+        $queryBuilder->select('fs.id', 'fs.date_submitted')
+            ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 'fs')
+            ->where('fs.form_id = :formId')
+            ->setParameter('formId', $form->getId())
+            ->orderBy('fs.id', 'DESC')
+            ->setMaxResults(1);
+
+        if ($grouped) {
+            $queryBuilder->groupBy('DATE(fs.date_submitted)');
+        }
+
+        if (null !== $having) {
+            $queryBuilder->having($having);
+        }
+
+        return $queryBuilder;
     }
 
     private function invokeGetTotalCount(ReportModel $reportModel, QueryBuilder $queryBuilder, array &$debugData): int
