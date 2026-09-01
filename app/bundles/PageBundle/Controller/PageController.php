@@ -42,7 +42,6 @@ final class PageController extends FormController
         name: 'mautic_page_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
-        priority: -719
     )]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
@@ -54,7 +53,6 @@ final class PageController extends FormController
         name: 'mautic_page_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
-        priority: -718
     )]
     public function indexAction(Request $request, PageConfig $pageConfig, PageHelperFactoryInterface $pageHelperFactory, PageModel $model, int $page = 1): Response
     {
@@ -1002,7 +1000,6 @@ final class PageController extends FormController
         name: 'mautic_page_results',
         requirements: ['page' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['page' => 0, 'objectId' => 0],
-        priority: -720
     )]
     public function resultsAction(Request $request, PageModel $pageModel, SubmissionModel $submissionModel, $objectId, $page = 1): Response
     {
@@ -1147,7 +1144,6 @@ final class PageController extends FormController
         name: 'mautic_page_export',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['format' => 'csv', 'objectId' => 0],
-        priority: -721
     )]
     public function exportAction(Request $request, PageModel $pageModel, SubmissionModel $submissionModel, $objectId, $format = 'csv'): Response
     {

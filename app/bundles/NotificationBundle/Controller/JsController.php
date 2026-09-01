@@ -15,7 +15,6 @@ final class JsController extends CommonController
     #[Route(
         '/manifest.json',
         name: 'mautic_onesignal_manifest',
-        priority: -248
     )]
     public function manifestAction(): Response
     {
@@ -38,7 +37,6 @@ final class JsController extends CommonController
     #[Route(
         '/OneSignalSDKWorker.js',
         name: 'mautic_onesignal_worker',
-        priority: -246
     )]
     public function workerAction(): Response
     {
@@ -55,7 +53,6 @@ final class JsController extends CommonController
     #[Route(
         '/OneSignalSDKUpdaterWorker.js',
         name: 'mautic_onesignal_updater',
-        priority: -247
     )]
     public function updaterAction(): Response
     {

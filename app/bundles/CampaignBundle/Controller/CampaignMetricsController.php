@@ -31,7 +31,6 @@ final class CampaignMetricsController extends AbstractController
         name: 'mautic_campaign_metrics_email_weekdays',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
-        priority: -640
     )]
     public function emailWeekdaysAction(
         EmailPeriodMetrics $emailPeriodMetrics,
@@ -78,7 +77,6 @@ final class CampaignMetricsController extends AbstractController
         name: 'mautic_campaign_metrics_email_hours',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
-        priority: -641
     )]
     public function emailHoursAction(
         EmailPeriodMetrics $emailPeriodMetrics,
@@ -129,7 +127,6 @@ final class CampaignMetricsController extends AbstractController
         name: 'mautic_campaign_metrics_event_details',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
-        priority: -644
     )]
     public function eventDetailsAction(
         EventDispatcherInterface $eventDispatcher,

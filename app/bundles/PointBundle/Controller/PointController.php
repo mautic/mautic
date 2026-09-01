@@ -27,7 +27,6 @@ final class PointController extends AbstractFormController
         name: 'mautic_point_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
-        priority: -736
     )]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
@@ -39,7 +38,6 @@ final class PointController extends AbstractFormController
         name: 'mautic_point_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
-        priority: -735
     )]
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
     {

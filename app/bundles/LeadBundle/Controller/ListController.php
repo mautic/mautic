@@ -59,7 +59,6 @@ final class ListController extends FormController
         name: 'mautic_segment_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
-        priority: -685
     )]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
@@ -78,7 +77,6 @@ final class ListController extends FormController
         name: 'mautic_segment_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
-        priority: -684
     )]
     public function indexAction(Request $request, $page = 1): Response
     {
@@ -951,7 +949,6 @@ final class ListController extends FormController
         name: 'mautic_segment_contacts',
         requirements: ['page' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['page' => 0, 'objectId' => 0],
-        priority: -704
     )]
     public function contactsAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $objectId, $page = 1): Response
     {

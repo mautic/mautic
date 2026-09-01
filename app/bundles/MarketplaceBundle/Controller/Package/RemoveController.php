@@ -35,8 +35,7 @@ final class RemoveController extends CommonController
     #[Route(
         '/s/marketplace/remove/{vendor}/{package}',
         name: 'mautic_marketplace_remove',
-        methods: ['GET|POST'],
-        priority: -710
+        methods: ['GET', 'POST'],
     )]
     public function viewAction(string $vendor, string $package): Response
     {

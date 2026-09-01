@@ -58,7 +58,6 @@ final class SecurityController extends CommonController implements EventSubscrib
     #[Route(
         '/s/login',
         name: 'login',
-        priority: -751
     )]
     public function loginAction(Request $request, AuthenticationUtils $authenticationUtils, IntegrationHelper $integrationHelper, TranslatorInterface $translator): Response
     {
@@ -108,7 +107,6 @@ final class SecurityController extends CommonController implements EventSubscrib
     #[Route(
         '/s/sso_login/{integration}',
         name: 'mautic_sso_login',
-        priority: -754
     )]
     public function ssoLoginAction($integration): RedirectResponse
     {
@@ -121,7 +119,6 @@ final class SecurityController extends CommonController implements EventSubscrib
     #[Route(
         '/s/sso_login_check/{integration}',
         name: 'mautic_sso_login_check',
-        priority: -755
     )]
     public function ssoLoginCheckAction($integration): RedirectResponse
     {
@@ -133,7 +130,6 @@ final class SecurityController extends CommonController implements EventSubscrib
     #[Route(
         '/saml/login_retry',
         name: 'mautic_saml_login_retry',
-        priority: -265
     )]
     public function samlLoginRetryAction(SAMLHelper $samlHelper, SessionInterface $session): Response
     {

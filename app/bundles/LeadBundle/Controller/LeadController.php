@@ -144,7 +144,6 @@ final class LeadController extends FormController
         name: 'mautic_contact_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
-        priority: -698
     )]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
@@ -159,7 +158,6 @@ final class LeadController extends FormController
         name: 'mautic_contact_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
-        priority: -688
     )]
     public function indexAction(
         Request $request,
@@ -2297,7 +2295,6 @@ final class LeadController extends FormController
         '/s/contacts/contact/export/{contactId}',
         name: 'mautic_contact_export_action',
         requirements: ['contactId' => '\d+'],
-        priority: -695
     )]
     public function contactExportAction(Request $request, ExportHelper $exportHelper, EventDispatcherInterface $dispatcher, $contactId): Response|\Symfony\Component\HttpFoundation\StreamedResponse
     {
@@ -2347,7 +2344,6 @@ final class LeadController extends FormController
     #[Route(
         '/s/contacts/export/download/{fileName}',
         name: 'mautic_contact_export_download',
-        priority: -706
     )]
     public function downloadExportAction(string $fileName = ''): Response
     {
@@ -2393,7 +2389,6 @@ final class LeadController extends FormController
         name: 'mautic_contact_stats',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
-        priority: -705
     )]
     public function contactStatsAction(int $objectId): Response
     {

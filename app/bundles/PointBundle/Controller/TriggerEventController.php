@@ -28,7 +28,6 @@ final class TriggerEventController extends CommonFormController
         name: 'mautic_pointtriggerevent_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
-        priority: -728
     )]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {

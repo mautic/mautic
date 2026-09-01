@@ -42,7 +42,6 @@ final class DetailController extends CommonController
         '/s/marketplace/detail/{vendor}/{package}',
         name: 'mautic_marketplace_detail',
         methods: ['GET'],
-        priority: -708
     )]
     public function viewAction(string $vendor, string $package): Response
     {

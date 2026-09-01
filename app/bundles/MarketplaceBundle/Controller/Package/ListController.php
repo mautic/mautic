@@ -38,8 +38,7 @@ final class ListController extends CommonController
         name: 'mautic_marketplace_list',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 1],
-        methods: ['GET|POST'],
-        priority: -707
+        methods: ['GET', 'POST'],
     )]
     public function listAction(int $page = 1): Response
     {

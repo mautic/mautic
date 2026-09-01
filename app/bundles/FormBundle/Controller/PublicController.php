@@ -55,7 +55,6 @@ final class PublicController extends CommonFormController
     #[Route(
         '/form/submit',
         name: 'mautic_form_postresults',
-        priority: -230
     )]
     public function submitAction(
         Request $request,
@@ -499,7 +498,6 @@ final class PublicController extends CommonFormController
     #[Route(
         '/form/message',
         name: 'mautic_form_postmessage',
-        priority: -232
     )]
     public function messageAction(Request $request, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, ThemeHelper $themeHelper): Response
     {
@@ -534,7 +532,6 @@ final class PublicController extends CommonFormController
         '/form/{id}',
         name: 'mautic_form_preview',
         defaults: ['id' => '0'],
-        priority: -233
     )]
     public function previewAction(Request $request, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, ThemeHelper $themeHelper, int $id = 0): Response
     {
@@ -604,7 +601,6 @@ final class PublicController extends CommonFormController
     #[Route(
         '/form/generate.js',
         name: 'mautic_form_generateform',
-        priority: -231
     )]
     public function generateAction(Request $request): Response
     {
@@ -633,7 +629,6 @@ final class PublicController extends CommonFormController
     #[Route(
         '/form/embed/{id}',
         name: 'mautic_form_embed',
-        priority: -234
     )]
     public function embedAction(Request $request): Response
     {
@@ -690,7 +685,6 @@ final class PublicController extends CommonFormController
         '/form/company-lookup/autocomplete',
         name: 'mautic_form_company_lookup',
         methods: ['POST'],
-        priority: -236
     )]
     public function lookupCompanyAction(Request $request, FieldModel $fieldModel, CompanyModel $companyModel): JsonResponse
     {

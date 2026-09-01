@@ -37,7 +37,6 @@ final class NotificationController extends AbstractFormController
         name: 'mautic_notification_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
-        priority: -713
     )]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
@@ -52,7 +51,6 @@ final class NotificationController extends AbstractFormController
         name: 'mautic_notification_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
-        priority: -712
     )]
     public function indexAction(Request $request, $page = 1): Response
     {
@@ -736,7 +734,6 @@ final class NotificationController extends AbstractFormController
         name: 'mautic_notification_contacts',
         requirements: ['page' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['page' => 0, 'objectId' => 0],
-        priority: -714
     )]
     public function contactsAction(
         Request $request,

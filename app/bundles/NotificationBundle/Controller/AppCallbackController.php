@@ -34,7 +34,6 @@ final class AppCallbackController extends CommonController
     #[Route(
         '/notification/appcallback',
         name: 'mautic_app_notification',
-        priority: -249
     )]
     public function indexAction(Request $request): JsonResponse
     {

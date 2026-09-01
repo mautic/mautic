@@ -28,7 +28,6 @@ final class EmailGraphStatsController extends AbstractController
         name: 'mautic_email_graph_stats',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
-        priority: -664
     )]
     public function viewAction(
         Request $request,

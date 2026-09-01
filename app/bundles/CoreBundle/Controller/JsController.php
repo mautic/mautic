@@ -13,7 +13,6 @@ final class JsController extends CommonController
     #[Route(
         '/mtc.js',
         name: 'mautic_js',
-        priority: -206
     )]
     public function indexAction(
         #[Autowire(param: 'kernel.debug')]
@@ -25,7 +24,6 @@ final class JsController extends CommonController
     #[Route(
         '/mautic-essential.js',
         name: 'mautic_essential_js',
-        priority: -207
     )]
     public function essentialAction(
         #[Autowire(param: 'kernel.debug')]
@@ -37,7 +35,6 @@ final class JsController extends CommonController
     #[Route(
         '/mautic-tracking.js',
         name: 'mautic_tracking_js',
-        priority: -208
     )]
     public function trackingAction(
         #[Autowire(param: 'kernel.debug')]

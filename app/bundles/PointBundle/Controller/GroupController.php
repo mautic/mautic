@@ -24,7 +24,6 @@ final class GroupController extends AbstractStandardFormController
         name: 'mautic_point.group_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
-        priority: -732
     )]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
@@ -36,7 +35,6 @@ final class GroupController extends AbstractStandardFormController
         name: 'mautic_point.group_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
-        priority: -731
     )]
     public function indexAction(Request $request, $page = 1): Response
     {

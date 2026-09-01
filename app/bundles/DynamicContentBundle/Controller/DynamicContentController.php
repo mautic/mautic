@@ -60,7 +60,6 @@ final class DynamicContentController extends FormController
         name: 'mautic_dynamicContent_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
-        priority: -660
     )]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
@@ -72,7 +71,6 @@ final class DynamicContentController extends FormController
         name: 'mautic_dynamicContent_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
-        priority: -659
     )]
     public function indexAction(Request $request, $page = 1): Response
     {

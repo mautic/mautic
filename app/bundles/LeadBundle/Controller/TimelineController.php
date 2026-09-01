@@ -20,7 +20,6 @@ final class TimelineController extends CommonController
         name: 'mautic_contacttimeline_action',
         requirements: ['leadId' => '\d+', 'page' => '\d+'],
         defaults: ['page' => 0],
-        priority: -691
     )]
     public function indexAction(Request $request, $leadId, int $page = 1): Response
     {
@@ -76,7 +75,6 @@ final class TimelineController extends CommonController
         name: 'mautic_plugin_timeline_index',
         requirements: ['integration' => \Symfony\Component\Routing\Requirement\Requirement::CATCH_ALL, 'page' => '\d+'],
         defaults: ['page' => 0],
-        priority: -680
     )]
     public function pluginIndexAction(Request $request, $integration, int $page = 1): Response
     {
@@ -145,7 +143,6 @@ final class TimelineController extends CommonController
         name: 'mautic_plugin_timeline_view',
         requirements: ['integration' => \Symfony\Component\Routing\Requirement\Requirement::CATCH_ALL, 'leadId' => '\d+', 'page' => '\d+'],
         defaults: ['page' => 0],
-        priority: -681
     )]
     public function pluginViewAction(Request $request, $integration, $leadId, int $page = 1): Response
     {
@@ -213,7 +210,6 @@ final class TimelineController extends CommonController
         '/s/contacts/timeline/batchExport/{leadId}',
         name: 'mautic_contact_timeline_export_action',
         requirements: ['leadId' => '\d+'],
-        priority: -692
     )]
     public function batchExportAction(Request $request, DateHelper $dateHelper, ExportHelper $exportHelper, $leadId): Response
     {

@@ -70,7 +70,6 @@ final class ImportController extends AbstractFormController
     #[Route(
         '/s/campaign/import/{objectAction}',
         name: 'mautic_campaign_import_action',
-        priority: -643
     )]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {

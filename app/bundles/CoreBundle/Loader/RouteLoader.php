@@ -84,6 +84,7 @@ final class RouteLoader extends Loader
             foreach (glob(dirname(__DIR__, 2).'/*/Controller', GLOB_ONLYDIR) as $controllerDir) {
                 $attributeCollection->addCollection($this->import($controllerDir, 'attribute'));
             }
+            $attributeCollection = $this->sortBySpecificity($attributeCollection);
             if ($forceSSL) {
                 $attributeCollection->setSchemes('https');
             }
@@ -107,5 +108,39 @@ final class RouteLoader extends Loader
     public function supports(mixed $resource, ?string $type = null): bool
     {
         return 'mautic' === $type;
+    }
+
+    // Native attributes load in class-scan order, not the legacy config order, so a
+    // greedy {objectAction}/{objectId} route can shadow a more specific one on the same
+    // prefix. Order each route by, in turn: most static segments, deepest static segment
+    // (a literal like /import beats a {placeholder} at the same depth), then fewest
+    // placeholders. The specific route always wins over the greedy fallback.
+    private function sortBySpecificity(RouteCollection $routes): RouteCollection
+    {
+        $entries = [];
+        $order   = 0;
+        foreach ($routes->all() as $name => $route) {
+            $static        = 0;
+            $placeholders  = 0;
+            $lastStaticPos = -1;
+            foreach (array_values(array_filter(explode('/', $route->getPath()), 'strlen')) as $pos => $segment) {
+                if (str_contains($segment, '{')) {
+                    ++$placeholders;
+                } else {
+                    ++$static;
+                    $lastStaticPos = $pos;
+                }
+            }
+            $entries[] = [$name, $route, $static, $lastStaticPos, $placeholders, $order++];
+        }
+
+        usort($entries, fn (array $a, array $b): int => $b[2] <=> $a[2] ?: $b[3] <=> $a[3] ?: $a[4] <=> $b[4] ?: $a[5] <=> $b[5]);
+
+        $sorted = new RouteCollection();
+        foreach ($entries as [$name, $route]) {
+            $sorted->add($name, $route);
+        }
+
+        return $sorted;
     }
 }

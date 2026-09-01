@@ -25,7 +25,6 @@ final class ReplyController extends AbstractController
     #[Route(
         '/sms/{transport}/callback',
         name: 'mautic_sms_callback',
-        priority: -259
     )]
     public function callbackAction(Request $request, $transport): Response
     {

@@ -38,7 +38,6 @@ final class MessageController extends AbstractStandardFormController
         name: 'mautic_message_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
-        priority: -651
     )]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
@@ -71,7 +70,6 @@ final class MessageController extends AbstractStandardFormController
         name: 'mautic_message_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
-        priority: -649
     )]
     public function indexAction(Request $request, $page = 1): Response
     {
@@ -236,7 +234,6 @@ final class MessageController extends AbstractStandardFormController
         name: 'mautic_message_contacts',
         requirements: ['page' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['page' => 0, 'objectId' => 0],
-        priority: -650
     )]
     public function contactsAction(
         Request $request,

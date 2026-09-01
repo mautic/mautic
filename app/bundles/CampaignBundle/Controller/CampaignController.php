@@ -148,7 +148,6 @@ class CampaignController extends AbstractStandardFormController
         name: 'mautic_campaign_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
-        priority: -634
     )]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
@@ -305,7 +304,6 @@ class CampaignController extends AbstractStandardFormController
         name: 'mautic_campaign_contacts',
         requirements: ['page' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['page' => 0, 'objectId' => 0],
-        priority: -635
     )]
     public function contactsAction(
         Request $request,
@@ -353,7 +351,6 @@ class CampaignController extends AbstractStandardFormController
         name: 'mautic_campaign_event_stats',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
-        priority: -636
     )]
     public function eventStatsAction(int $objectId, string $dateFromValue, string $dateToValue): JsonResponse
     {
@@ -411,7 +408,6 @@ class CampaignController extends AbstractStandardFormController
         name: 'mautic_campaign_graph',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
-        priority: -637
     )]
     public function graphAction(Request $request, int $objectId, string $dateFrom, string $dateTo): Response
     {
@@ -460,7 +456,6 @@ class CampaignController extends AbstractStandardFormController
         name: 'mautic_campaign_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
-        priority: -633
     )]
     public function indexAction(Request $request, $page = null): Response
     {

@@ -28,7 +28,6 @@ final class DynamicContentApiController extends CommonController
     #[Route(
         '/dwc/{objectAlias}',
         name: 'mautic_api_dynamicContent_action',
-        priority: -219
     )]
     public function processAction(Request $request, $objectAlias): Response
     {
@@ -52,7 +51,6 @@ final class DynamicContentApiController extends CommonController
     #[Route(
         '/dwc',
         name: 'mautic_api_dynamicContent_index',
-        priority: -218
     )]
     public function getAction(
         Request $request,

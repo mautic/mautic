@@ -14,7 +14,6 @@ final class PopupController extends CommonController
     #[Route(
         '/notification',
         name: 'mautic_notification_popup',
-        priority: -245
     )]
     public function indexAction(AssetsHelper $assetsHelper): Response
     {

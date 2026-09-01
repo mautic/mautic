@@ -38,7 +38,6 @@ final class BatchContactController extends AbstractFormController
     #[Route(
         '/s/channels/batch/contact/set',
         name: 'mautic_channel_batch_contact_set',
-        priority: -652
     )]
     public function setAction(Request $request): JsonResponse
     {
@@ -71,7 +70,6 @@ final class BatchContactController extends AbstractFormController
     #[Route(
         '/s/channels/batch/contact/view',
         name: 'mautic_channel_batch_contact_view',
-        priority: -653
     )]
     public function indexAction(): Response
     {

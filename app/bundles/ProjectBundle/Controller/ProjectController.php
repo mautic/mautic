@@ -37,7 +37,6 @@ final class ProjectController extends AbstractFormController
         name: 'mautic_project_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
-        priority: -738
     )]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
@@ -49,7 +48,6 @@ final class ProjectController extends AbstractFormController
         name: 'mautic_project_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
-        priority: -737
     )]
     public function indexAction(Request $request, ProjectModel $projectModel, CorePermissions $corePermissions, ProjectEntityLoaderService $entityLoader, int $page = 1): Response
     {

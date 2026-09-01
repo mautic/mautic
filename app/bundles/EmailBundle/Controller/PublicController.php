@@ -68,7 +68,6 @@ final class PublicController extends CommonFormController
     #[Route(
         '/email/view/{idHash}',
         name: 'mautic_email_webview',
-        priority: -222
     )]
     public function indexAction(Request $request, AnalyticsHelper $analyticsHelper, $idHash): Response
     {
@@ -119,7 +118,6 @@ final class PublicController extends CommonFormController
     #[Route(
         '/email/{idHash}.gif',
         name: 'mautic_email_tracker',
-        priority: -221
     )]
     public function trackingImageAction(
         Request $request,
@@ -146,7 +144,6 @@ final class PublicController extends CommonFormController
         '/email/unsubscribe/{idHash}/{urlEmail}/{secretHash}',
         name: 'mautic_email_unsubscribe',
         defaults: ['urlEmail' => null, 'secretHash' => null],
-        priority: -223
     )]
     public function unsubscribeAction(Request $request, ContactTracker $contactTracker, EmailModel $model, LeadModel $leadModel, FormModel $formModel, PageModel $pageModel, MailHashHelper $mailHash, ThemeHelper $themeHelper, EmailDefaultsHelper $emailDefaultsHelper, $idHash, ?string $urlEmail = null, ?string $secretHash = null): Response
     {
@@ -347,7 +344,6 @@ final class PublicController extends CommonFormController
         '/email/dnc/{idHash}/{urlEmail}/{secretHash}',
         name: 'mautic_email_unsubscribe_all',
         defaults: ['urlEmail' => null, 'secretHash' => null],
-        priority: -224
     )]
     public function unsubscribeAllAction(Request $request, string $idHash, ?string $urlEmail = null, ?string $secretHash = null): Response
     {
@@ -368,7 +364,6 @@ final class PublicController extends CommonFormController
     #[Route(
         '/email/resubscribe/{idHash}',
         name: 'mautic_email_resubscribe',
-        priority: -225
     )]
     public function resubscribeAction(ContactTracker $contactTracker, EmailModel $model, MailHashHelper $mailHash, ThemeHelper $themeHelper, AssetsHelper $assetsHelper, AnalyticsHelper $analyticsHelper, $idHash): Response
     {
@@ -463,7 +458,6 @@ final class PublicController extends CommonFormController
     #[Route(
         '/mailer/callback',
         name: 'mautic_mailer_transport_callback',
-        priority: -226
     )]
     public function mailerCallbackAction(Request $request): Response
     {
@@ -481,7 +475,6 @@ final class PublicController extends CommonFormController
         name: 'mautic_email_preview',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectType' => null, 'objectId' => 0],
-        priority: -227
     )]
     public function previewAction(
         AnalyticsHelper $analyticsHelper,
@@ -697,7 +690,6 @@ final class PublicController extends CommonFormController
         '/plugin/{integration}/tracking.gif',
         name: 'mautic_plugin_tracker',
         requirements: ['integration' => \Symfony\Component\Routing\Requirement\Requirement::CATCH_ALL],
-        priority: -220
     )]
     public function pluginTrackingGifAction(Request $request, IntegrationHelper $integrationHelper, MailHelper $mailer, string $integration): Response
     {

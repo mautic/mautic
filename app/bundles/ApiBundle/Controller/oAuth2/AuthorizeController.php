@@ -47,8 +47,7 @@ final class AuthorizeController extends \FOS\OAuthServerBundle\Controller\Author
     #[Route(
         '/oauth/v2/authorize',
         name: 'fos_oauth_server_authorize',
-        methods: ['GET|POST'],
-        priority: -214
+        methods: ['GET', 'POST'],
     )]
     public function authorizeAction(Request $request, AuthorizeFormHandler $formHandler, Environment $twig): Response
     {

@@ -22,7 +22,6 @@ final class BatchEmailController extends AbstractFormController
     #[Route(
         '/s/emails/batch/categories/set',
         name: 'mautic_email_batch_categories_set',
-        priority: -662
     )]
     public function execAction(Request $request, EmailActionModel $actionModel, CategoryModel $categoryModel): JsonResponse
     {
@@ -60,7 +59,6 @@ final class BatchEmailController extends AbstractFormController
     #[Route(
         '/s/emails/batch/categories/view',
         name: 'mautic_email_batch_categories_view',
-        priority: -661
     )]
     public function indexAction(): Response
     {

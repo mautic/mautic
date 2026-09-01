@@ -33,7 +33,6 @@ final class BatchSegmentController extends AbstractFormController
     #[Route(
         '/s/segments/batch/contact/set',
         name: 'mautic_segment_batch_contact_set',
-        priority: -682
     )]
     public function setAction(Request $request): JsonResponse
     {
@@ -71,7 +70,6 @@ final class BatchSegmentController extends AbstractFormController
     #[Route(
         '/s/segments/batch/contact/view',
         name: 'mautic_segment_batch_contact_view',
-        priority: -683
     )]
     public function indexAction(): Response
     {

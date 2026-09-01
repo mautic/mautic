@@ -31,7 +31,6 @@ final class CacheController extends CommonController
         '/s/marketplace/clear/cache',
         name: 'mautic_marketplace_clear_cache',
         methods: ['GET'],
-        priority: -711
     )]
     public function clearAction(): Response
     {

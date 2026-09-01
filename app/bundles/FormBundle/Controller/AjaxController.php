@@ -139,7 +139,6 @@ final class AjaxController extends CommonAjaxController
     #[Route(
         '/form/submit/ajax',
         name: 'mautic_form_postresults_ajax',
-        priority: -235
     )]
     public function submitAction(Request $request): JsonResponse
     {

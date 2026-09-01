@@ -42,7 +42,6 @@ final class PublicController extends AbstractFormController
         '/asset/{slug}',
         name: 'mautic_asset_download',
         defaults: ['slug' => ''],
-        priority: -217
     )]
     public function downloadAction(
         Request $request,

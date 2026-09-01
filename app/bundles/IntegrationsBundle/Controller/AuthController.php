@@ -17,7 +17,6 @@ final class AuthController extends CommonController
     #[Route(
         '/integration/{integration}/callback',
         name: 'mautic_integration_public_callback',
-        priority: -242
     )]
     public function callbackAction(AuthIntegrationsHelper $authIntegrationsHelper, string $integration, Request $request): Response
     {

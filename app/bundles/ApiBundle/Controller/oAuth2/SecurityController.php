@@ -14,8 +14,7 @@ final class SecurityController extends CommonController
     #[Route(
         '/oauth/v2/authorize_login',
         name: 'mautic_oauth2_server_auth_login',
-        methods: ['GET|POST'],
-        priority: -215
+        methods: ['GET', 'POST'],
     )]
     public function loginAction(Request $request): Response
     {
@@ -55,8 +54,7 @@ final class SecurityController extends CommonController
     #[Route(
         '/oauth/v2/authorize_login_check',
         name: 'mautic_oauth2_server_auth_login_check',
-        methods: ['GET|POST'],
-        priority: -216
+        methods: ['GET', 'POST'],
     )]
     public function loginCheckAction(): Response
     {

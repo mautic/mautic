@@ -35,8 +35,7 @@ final class InstallController extends CommonController
     #[Route(
         '/s/marketplace/install/{vendor}/{package}',
         name: 'mautic_marketplace_install',
-        methods: ['GET|POST'],
-        priority: -709
+        methods: ['GET', 'POST'],
     )]
     public function viewAction(string $vendor, string $package): Response
     {

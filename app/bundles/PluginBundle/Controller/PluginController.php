@@ -39,7 +39,6 @@ final class PluginController extends FormController
     #[Route(
         '/s/plugins',
         name: 'mautic_plugin_index',
-        priority: -724
     )]
     public function indexAction(Request $request, IntegrationHelper $integrationHelper): Response
     {
@@ -146,7 +145,6 @@ final class PluginController extends FormController
         name: 'mautic_plugin_config',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
-        priority: -725
     )]
     public function configAction(Request $request, EntityManagerInterface $em, IntegrationHelper $integrationHelper, LoggerInterface $mauticLogger, $name, $activeTab = 'details-container', $page = 1): JsonResponse|Response
     {
@@ -380,7 +378,6 @@ final class PluginController extends FormController
     #[Route(
         '/s/plugins/info/{name}',
         name: 'mautic_plugin_info',
-        priority: -726
     )]
     public function infoAction(IntegrationHelper $integrationHelper, $name): Response
     {
@@ -423,7 +420,6 @@ final class PluginController extends FormController
     #[Route(
         '/s/plugins/reload',
         name: 'mautic_plugin_reload',
-        priority: -727
     )]
     public function reloadAction(Request $request, ReloadFacade $reloadFacade): Response
     {

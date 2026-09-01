@@ -23,7 +23,6 @@ final class FieldPaginationController extends CommonController
         name: 'mautic_integration_config_field_pagination',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 1],
-        priority: -678
     )]
     public function paginateAction(
         Request $request,

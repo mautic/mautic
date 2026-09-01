@@ -87,7 +87,6 @@ final class EmailMapStatsController extends AbstractController
         name: 'mautic_email_map_stats',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
-        priority: -665
     )]
     public function viewAction(
         CorePermissions $security,

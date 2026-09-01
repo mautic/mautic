@@ -38,7 +38,6 @@ final class ReportController extends FormController
         name: 'mautic_report_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
-        priority: -745
     )]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
@@ -50,7 +49,6 @@ final class ReportController extends FormController
         name: 'mautic_report_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
-        priority: -739
     )]
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
     {
@@ -548,7 +546,6 @@ final class ReportController extends FormController
         name: 'mautic_report_view',
         requirements: ['reportPage' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['reportPage' => 1, 'objectId' => 0],
-        priority: -742
     )]
     public function viewAction(Request $request, $objectId, $reportPage = 1): Response
     {
@@ -786,7 +783,6 @@ final class ReportController extends FormController
         name: 'mautic_report_export',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['format' => 'csv', 'objectId' => 0],
-        priority: -740
     )]
     public function exportAction(Request $request, $objectId, $format = 'csv'): Response
     {
@@ -891,7 +887,6 @@ final class ReportController extends FormController
         '/s/reports/download/{reportId}/{format}',
         name: 'mautic_report_download',
         defaults: ['format' => 'csv'],
-        priority: -741
     )]
     public function downloadAction(FileHandler $fileHandler, $reportId, $format = 'csv'): Response|BinaryFileResponse
     {

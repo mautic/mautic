@@ -38,7 +38,6 @@ final class PublicController extends FormController
     #[Route(
         '/passwordreset',
         name: 'mautic_user_passwordreset',
-        priority: -260
     )]
     public function passwordResetAction(Request $request, LoggerInterface $logger): RedirectResponse|Response
     {
@@ -95,7 +94,6 @@ final class PublicController extends FormController
     #[Route(
         '/passwordresetconfirm',
         name: 'mautic_user_passwordresetconfirm',
-        priority: -261
     )]
     public function passwordResetConfirmAction(Request $request): RedirectResponse|Response
     {
@@ -165,7 +163,6 @@ final class PublicController extends FormController
     #[Route(
         '/invite/{token}',
         name: 'mautic_user_invite_register',
-        priority: -262
     )]
     public function inviteAction(Request $request, UserModel $model, LoggerInterface $logger): RedirectResponse|Response
     {

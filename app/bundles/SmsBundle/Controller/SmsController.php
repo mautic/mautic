@@ -41,7 +41,6 @@ final class SmsController extends FormController
         name: 'mautic_sms_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
-        priority: -747
     )]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
@@ -56,7 +55,6 @@ final class SmsController extends FormController
         name: 'mautic_sms_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
-        priority: -746
     )]
     public function indexAction(Request $request, TransportChain $transportChain, $page = 1): Response
     {
@@ -747,7 +745,6 @@ final class SmsController extends FormController
         name: 'mautic_sms_contacts',
         requirements: ['page' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['page' => 0, 'objectId' => 0],
-        priority: -748
     )]
     public function contactsAction(
         Request $request,

@@ -290,7 +290,6 @@ final readonly class CoreSubscriber implements EventSubscriberInterface
         }
 
         // Add the route
-        $priority = (int) ($details['priority'] ?? 0);
-        $collection->add($name, new Route($details['path'], $defaults, $requirements, [], '', [], $method), $priority);
+        $collection->add($name, new Route($details['path'], $defaults, $requirements, [], '', [], $method));
     }
 }

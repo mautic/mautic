@@ -45,7 +45,6 @@ final class RoleController extends FormController
         name: 'mautic_role_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
-        priority: -761
     )]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
@@ -74,7 +73,6 @@ final class RoleController extends FormController
         name: 'mautic_role_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
-        priority: -760
     )]
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
     {

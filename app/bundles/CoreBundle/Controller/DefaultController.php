@@ -31,7 +31,6 @@ final class DefaultController extends CommonController
     #[Route(
         '/',
         name: 'mautic_base_index',
-        priority: -209
     )]
     public function indexAction(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse|Response
     {

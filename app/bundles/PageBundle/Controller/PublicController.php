@@ -286,7 +286,6 @@ final class PublicController extends AbstractFormController
         '/page/preview/{id}/{objectType}',
         name: 'mautic_page_preview',
         defaults: ['objectType' => null],
-        priority: -255
     )]
     public function previewAction(Request $request, PageConfig $pageConfig, CorePermissions $security, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, ThemeHelper $themeHelper, PageModel $model, LeadModel $leadModel, int $id, ?string $objectType = null): Response
     {
@@ -368,7 +367,6 @@ final class PublicController extends AbstractFormController
     #[Route(
         '/mtracking.gif',
         name: 'mautic_page_tracker',
-        priority: -250
     )]
     public function trackingImageAction(Request $request, PageModel $model): Response
     {
@@ -380,7 +378,6 @@ final class PublicController extends AbstractFormController
     #[Route(
         '/mtc/event',
         name: 'mautic_page_tracker_cors',
-        priority: -251
     )]
     public function trackingAction(
         Request $request,
@@ -431,12 +428,10 @@ final class PublicController extends AbstractFormController
     #[Route(
         '/r/{redirectId}',
         name: 'mautic_url_redirect',
-        priority: -253
     )]
     #[Route(
         '/redirect/{redirectId}',
         name: 'mautic_page_redirect',
-        priority: -254
     )]
     public function redirectAction(
         Request $request,
@@ -561,7 +556,6 @@ final class PublicController extends AbstractFormController
     #[Route(
         '/mtc',
         name: 'mautic_page_tracker_getcontact',
-        priority: -252
     )]
     public function getContactIdAction(DeviceTrackingServiceInterface $trackedDeviceService, ContactTracker $contactTracker): JsonResponse
     {

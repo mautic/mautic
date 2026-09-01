@@ -32,7 +32,6 @@ final class AssetController extends FormController
         name: 'mautic_asset_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
-        priority: -630
     )]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
@@ -44,7 +43,6 @@ final class AssetController extends FormController
         name: 'mautic_asset_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
-        priority: -628
     )]
     public function indexAction(Request $request, CoreParametersHelper $parametersHelper, AssetModel $assetModel, int $page = 1): Response
     {
@@ -739,7 +737,6 @@ final class AssetController extends FormController
     #[Route(
         '/s/assets/remote',
         name: 'mautic_asset_remote',
-        priority: -629
     )]
     public function remoteAction(Request $request, IntegrationHelper $integrationHelper): Response
     {

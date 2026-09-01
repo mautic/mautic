@@ -22,7 +22,6 @@ final class SysinfoController extends FormController
     #[Route(
         '/s/sysinfo',
         name: 'mautic_sysinfo_index',
-        priority: -655
     )]
     public function indexAction(): Response
     {

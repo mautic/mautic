@@ -23,7 +23,6 @@ final class ThemeController extends FormController
         name: 'mautic_themes_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
-        priority: -624
     )]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
@@ -33,7 +32,6 @@ final class ThemeController extends FormController
     #[Route(
         '/s/themes',
         name: 'mautic_themes_index',
-        priority: -623
     )]
     public function indexAction(Request $request, ThemeHelperInterface $themeHelper, BuilderIntegrationsHelper $builderIntegrationsHelper, PathsHelper $pathsHelper): Response
     {
