@@ -27,7 +27,7 @@ final readonly class CategorySubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CategoryEvents::CATEGORY_ON_BUNDLE_LIST_BUILD => ['onCategoryBundleListBuild', 0],
+            CategoryTypesEvent::class                    => ['onCategoryBundleListBuild', 0],
             CategoryEvents::CATEGORY_POST_SAVE            => ['onCategoryPostSave', 0],
             CategoryEvents::CATEGORY_POST_DELETE          => ['onCategoryDelete', 0],
             CategoryEvents::CATEGORY_PRE_DELETE           => ['onCategoryPreDelete', 0],

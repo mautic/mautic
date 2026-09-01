@@ -2,7 +2,6 @@
 
 namespace Mautic\CategoryBundle\Form\Type;
 
-use Mautic\CategoryBundle\CategoryEvents;
 use Mautic\CategoryBundle\Event\CategoryTypesEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\AbstractType;
@@ -24,8 +23,8 @@ final class CategoryBundlesType extends AbstractType
     {
         $resolver->setDefaults([
             'choices' => function (Options $options): array {
-                if ($this->dispatcher->hasListeners(CategoryEvents::CATEGORY_ON_BUNDLE_LIST_BUILD)) {
-                    $event = $this->dispatcher->dispatch(new CategoryTypesEvent(), CategoryEvents::CATEGORY_ON_BUNDLE_LIST_BUILD);
+                if ($this->dispatcher->hasListeners(CategoryTypesEvent::class)) {
+                    $event = $this->dispatcher->dispatch(new CategoryTypesEvent());
                     $types = $event->getCategoryTypes();
                 } else {
                     $types = [];

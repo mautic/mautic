@@ -2,7 +2,6 @@
 
 namespace Mautic\CategoryBundle\Controller;
 
-use Mautic\CategoryBundle\CategoryEvents;
 use Mautic\CategoryBundle\Event\CategoryTypesEvent;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Controller\AbstractFormController;
@@ -150,9 +149,9 @@ final class CategoryController extends AbstractFormController
 
         $categoryTypes = ['category' => $this->translator->trans('mautic.core.select')];
 
-        if ($this->dispatcher->hasListeners(CategoryEvents::CATEGORY_ON_BUNDLE_LIST_BUILD)) {
+        if ($this->dispatcher->hasListeners(CategoryTypesEvent::class)) {
             $event = new CategoryTypesEvent();
-            $this->dispatcher->dispatch($event, CategoryEvents::CATEGORY_ON_BUNDLE_LIST_BUILD);
+            $this->dispatcher->dispatch($event);
             $categoryTypes = array_merge($categoryTypes, $event->getCategoryTypes());
         }
 
