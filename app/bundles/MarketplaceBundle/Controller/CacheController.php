@@ -9,6 +9,7 @@ use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
 use Mautic\MarketplaceBundle\Service\Allowlist;
 use Mautic\MarketplaceBundle\Service\Config;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
 final class CacheController extends CommonController
@@ -26,6 +27,11 @@ final class CacheController extends CommonController
         $this->allowlist = $allowlist;
     }
 
+    #[Route(
+        '/s/marketplace/clear/cache',
+        name: 'mautic_marketplace_clear_cache',
+        methods: ['GET'],
+    )]
     public function clearAction(): Response
     {
         if (!$this->config->marketplaceIsEnabled()) {

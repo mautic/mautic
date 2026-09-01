@@ -6,9 +6,14 @@ use Mautic\CoreBundle\Event\BuildJsEvent;
 use Mautic\CoreBundle\Event\BuildJsScope;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
 final class JsController extends CommonController
 {
+    #[Route(
+        '/mtc.js',
+        name: 'mautic_js',
+    )]
     public function indexAction(
         #[Autowire(param: 'kernel.debug')]
         bool $kernelDebug,
@@ -16,6 +21,10 @@ final class JsController extends CommonController
         return $this->buildJs($kernelDebug);
     }
 
+    #[Route(
+        '/mautic-essential.js',
+        name: 'mautic_essential_js',
+    )]
     public function essentialAction(
         #[Autowire(param: 'kernel.debug')]
         bool $kernelDebug,
@@ -23,6 +32,10 @@ final class JsController extends CommonController
         return $this->buildJs($kernelDebug, [BuildJsScope::RUNTIME, BuildJsScope::ESSENTIAL]);
     }
 
+    #[Route(
+        '/mautic-tracking.js',
+        name: 'mautic_tracking_js',
+    )]
     public function trackingAction(
         #[Autowire(param: 'kernel.debug')]
         bool $kernelDebug,

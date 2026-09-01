@@ -4,40 +4,6 @@ declare(strict_types=1);
 
 return [
     'routes' => [
-        'main' => [
-            'mautic_email_batch_categories_view' => [
-                'path'       => '/emails/batch/categories/view',
-                'controller' => 'Mautic\EmailBundle\Controller\BatchEmailController::indexAction',
-            ],
-            'mautic_email_batch_categories_set' => [
-                'path'       => '/emails/batch/categories/set',
-                'controller' => 'Mautic\EmailBundle\Controller\BatchEmailController::execAction',
-            ],
-            'mautic_email_index' => [
-                'path'       => '/emails/{page}',
-                'controller' => 'Mautic\EmailBundle\Controller\EmailController::indexAction',
-            ],
-            'mautic_email_graph_stats' => [
-                'path'       => '/emails-graph-stats/{objectId}/{isVariant}/{dateFrom}/{dateTo}',
-                'controller' => 'Mautic\EmailBundle\Controller\EmailGraphStatsController::viewAction',
-            ],
-            'mautic_email_map_stats' => [
-                'path'       => '/emails-map-stats/{objectId}/{isVariant}/{dateFrom}/{dateTo}',
-                'controller' => 'Mautic\EmailBundle\Controller\EmailMapStatsController::viewAction',
-            ],
-            'mautic_email_action' => [
-                'path'       => '/emails/{objectAction}/{objectId}',
-                'controller' => 'Mautic\EmailBundle\Controller\EmailController::executeAction',
-            ],
-            'mautic_email_contacts' => [
-                'path'       => '/emails/view/{objectId}/contact/{page}',
-                'controller' => 'Mautic\EmailBundle\Controller\EmailController::contactsAction',
-            ],
-            'mautic_abtest_generate' => [
-                'path'       => '/email/abtest/generate/{objectId}',
-                'controller' => 'Mautic\EmailBundle\Controller\ABTestController::generateABTestAction',
-            ],
-        ],
         'api' => [
             'mautic_api_emailstandard' => [
                 'standard_entity' => true,
@@ -59,48 +25,6 @@ return [
                 'path'       => '/emails/reply/{trackingHash}',
                 'controller' => 'Mautic\EmailBundle\Controller\Api\EmailApiController::replyAction',
                 'method'     => 'POST',
-            ],
-        ],
-        'public' => [
-            'mautic_plugin_tracker' => [
-                'path'         => '/plugin/{integration}/tracking.gif',
-                'controller'   => 'Mautic\EmailBundle\Controller\PublicController::pluginTrackingGifAction',
-                'requirements' => [
-                    'integration' => '.+',
-                ],
-            ],
-            'mautic_email_tracker' => [
-                'path'       => '/email/{idHash}.gif',
-                'controller' => 'Mautic\EmailBundle\Controller\PublicController::trackingImageAction',
-            ],
-            'mautic_email_webview' => [
-                'path'       => '/email/view/{idHash}',
-                'controller' => 'Mautic\EmailBundle\Controller\PublicController::indexAction',
-            ],
-            'mautic_email_unsubscribe' => [
-                'path'       => '/email/unsubscribe/{idHash}/{urlEmail}/{secretHash}',
-                'controller' => 'Mautic\EmailBundle\Controller\PublicController::unsubscribeAction',
-                'defaults'   => ['urlEmail' => null, 'secretHash' => null],
-            ],
-            'mautic_email_unsubscribe_all' => [
-                'path'       => '/email/dnc/{idHash}/{urlEmail}/{secretHash}',
-                'controller' => 'Mautic\EmailBundle\Controller\PublicController::unsubscribeAllAction',
-                'defaults'   => ['urlEmail' => null, 'secretHash' => null],
-            ],
-            'mautic_email_resubscribe' => [
-                'path'       => '/email/resubscribe/{idHash}',
-                'controller' => 'Mautic\EmailBundle\Controller\PublicController::resubscribeAction',
-            ],
-            'mautic_mailer_transport_callback' => [
-                'path'       => '/mailer/callback',
-                'controller' => 'Mautic\EmailBundle\Controller\PublicController::mailerCallbackAction',
-            ],
-            'mautic_email_preview' => [
-                'path'       => '/email/preview/{objectId}/{objectType}',
-                'controller' => 'Mautic\EmailBundle\Controller\PublicController::previewAction',
-                'defaults'   => [
-                    'objectType'    => null,
-                ],
             ],
         ],
     ],

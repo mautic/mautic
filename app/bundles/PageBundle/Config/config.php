@@ -4,54 +4,6 @@ declare(strict_types=1);
 
 return [
     'routes' => [
-        'main' => [
-            'mautic_page_index' => [
-                'path'       => '/pages/{page}',
-                'controller' => 'Mautic\PageBundle\Controller\PageController::indexAction',
-            ],
-            'mautic_page_action' => [
-                'path'       => '/pages/{objectAction}/{objectId}',
-                'controller' => 'Mautic\PageBundle\Controller\PageController::executeAction',
-            ],
-            'mautic_page_results' => [
-                'path'       => '/pages/results/{objectId}/{page}',
-                'controller' => 'Mautic\PageBundle\Controller\PageController::resultsAction',
-            ],
-            'mautic_page_export' => [
-                'path'       => '/pages/results/{objectId}/export/{format}',
-                'controller' => 'Mautic\PageBundle\Controller\PageController::exportAction',
-                'defaults'   => [
-                    'format' => 'csv',
-                ],
-            ],
-        ],
-        'public' => [
-            'mautic_page_tracker' => [
-                'path'       => '/mtracking.gif',
-                'controller' => 'Mautic\PageBundle\Controller\PublicController::trackingImageAction',
-            ],
-            'mautic_page_tracker_cors' => [
-                'path'       => '/mtc/event',
-                'controller' => 'Mautic\PageBundle\Controller\PublicController::trackingAction',
-            ],
-            'mautic_page_tracker_getcontact' => [
-                'path'       => '/mtc',
-                'controller' => 'Mautic\PageBundle\Controller\PublicController::getContactIdAction',
-            ],
-            'mautic_url_redirect' => [
-                'path'       => '/r/{redirectId}',
-                'controller' => 'Mautic\PageBundle\Controller\PublicController::redirectAction',
-            ],
-            'mautic_page_redirect' => [
-                'path'       => '/redirect/{redirectId}',
-                'controller' => 'Mautic\PageBundle\Controller\PublicController::redirectAction',
-            ],
-            'mautic_page_preview' => [
-                'path'       => '/page/preview/{id}/{objectType}',
-                'controller' => 'Mautic\PageBundle\Controller\PublicController::previewAction',
-                'defaults'   => ['objectType' => null],
-            ],
-        ],
         'api' => [
             'mautic_api_pagesstandard' => [
                 'standard_entity' => true,

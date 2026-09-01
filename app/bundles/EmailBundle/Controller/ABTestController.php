@@ -11,6 +11,7 @@ use Mautic\EmailBundle\Form\Type\GenerateABTestType;
 use Mautic\EmailBundle\Model\EmailModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
 final class ABTestController extends AbstractFormController
 {
@@ -18,6 +19,12 @@ final class ABTestController extends AbstractFormController
 
     public const int TOTAL_WEIGHT = 10;
 
+    #[Route(
+        '/s/email/abtest/generate/{objectId}',
+        name: 'mautic_abtest_generate',
+        requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
+        defaults: ['objectId' => 0],
+    )]
     public function generateABTestAction(Request $request, EmailModel $emailModel, int $objectId): Response
     {
         if (!$parent = $emailModel->getEntity($objectId)) {

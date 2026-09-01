@@ -7,9 +7,14 @@ use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
 final class PopupController extends CommonController
 {
+    #[Route(
+        '/notification',
+        name: 'mautic_notification_popup',
+    )]
     public function indexAction(AssetsHelper $assetsHelper): Response
     {
         $assetsHelper->addStylesheet('/app/bundles/NotificationBundle/Assets/css/popup/popup.css');

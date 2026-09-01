@@ -4,30 +4,6 @@ declare(strict_types=1);
 
 return [
     'routes' => [
-        'main' => [
-            'mautic_category_batch_contact_set' => [
-                'path'       => '/categories/batch/contact/set',
-                'controller' => 'Mautic\CategoryBundle\Controller\BatchContactController::execAction',
-            ],
-            'mautic_category_batch_contact_view' => [
-                'path'       => '/categories/batch/contact/view',
-                'controller' => 'Mautic\CategoryBundle\Controller\BatchContactController::indexAction',
-            ],
-            'mautic_category_index' => [
-                'path'       => '/categories/{bundle}/{page}',
-                'controller' => 'Mautic\CategoryBundle\Controller\CategoryController::indexAction',
-                'defaults'   => [
-                    'bundle' => 'category',
-                ],
-            ],
-            'mautic_category_action' => [
-                'path'       => '/categories/{bundle}/{objectAction}/{objectId}',
-                'controller' => 'Mautic\CategoryBundle\Controller\CategoryController::executeCategoryAction',
-                'defaults'   => [
-                    'bundle' => 'category',
-                ],
-            ],
-        ],
         'api' => [
             'mautic_api_categoriesstandard' => [
                 'standard_entity' => true,

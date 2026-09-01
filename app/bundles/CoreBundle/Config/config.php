@@ -4,52 +4,7 @@ declare(strict_types=1);
 
 return [
     'routes' => [
-        'main' => [
-            'mautic_core_ajax' => [
-                'path'       => '/ajax',
-                'controller' => 'Mautic\CoreBundle\Controller\AjaxController::delegateAjaxAction',
-            ],
-            'mautic_core_form_action' => [
-                'path'       => '/action/{objectAction}/{objectModel}/{objectId}',
-                'controller' => 'Mautic\CoreBundle\Controller\FormController::executeAction',
-                'defaults'   => [
-                    'objectModel' => '',
-                ],
-            ],
-            'mautic_core_file_action' => [
-                'path'       => '/file/{objectAction}/{objectId}',
-                'controller' => 'Mautic\CoreBundle\Controller\FileController::executeAction',
-            ],
-            'mautic_themes_index' => [
-                'path'       => '/themes',
-                'controller' => 'Mautic\CoreBundle\Controller\ThemeController::indexAction',
-            ],
-            'mautic_themes_action' => [
-                'path'       => '/themes/{objectAction}/{objectId}',
-                'controller' => 'Mautic\CoreBundle\Controller\ThemeController::executeAction',
-            ],
-            'mautic_core_keep_alive' => [
-                'path'       => '/keep-alive',
-                'controller' => 'Mautic\CoreBundle\Controller\KeepAliveController::keepAliveAction',
-            ],
-        ],
         'public' => [
-            'mautic_js' => [
-                'path'       => '/mtc.js',
-                'controller' => 'Mautic\CoreBundle\Controller\JsController::indexAction',
-            ],
-            'mautic_essential_js' => [
-                'path'       => '/mautic-essential.js',
-                'controller' => 'Mautic\CoreBundle\Controller\JsController::essentialAction',
-            ],
-            'mautic_tracking_js' => [
-                'path'       => '/mautic-tracking.js',
-                'controller' => 'Mautic\CoreBundle\Controller\JsController::trackingAction',
-            ],
-            'mautic_base_index' => [
-                'path'       => '/',
-                'controller' => 'Mautic\CoreBundle\Controller\DefaultController::indexAction',
-            ],
             'mautic_secure_root' => [
                 'path'       => '/s',
                 'controller' => 'Mautic\CoreBundle\Controller\DefaultController::redirectSecureRootAction',
@@ -61,10 +16,10 @@ return [
             'mautic_remove_trailing_slash' => [
                 'path'         => '/{url}',
                 'controller'   => 'Mautic\CoreBundle\Controller\CommonController::removeTrailingSlashAction',
-                'method'       => 'GET',
                 'requirements' => [
                     'url' => '.*/$',
                 ],
+                'method'       => 'GET',
             ],
         ],
         'api' => [
@@ -105,6 +60,19 @@ return [
                 'controller' => 'Mautic\CoreBundle\Controller\Api\StatsApiController::listAction',
                 'defaults'   => [
                     'table' => '',
+                ],
+            ],
+        ],
+        'main' => [
+            'mautic_core_ajax' => [
+                'path'       => '/ajax',
+                'controller' => 'Mautic\CoreBundle\Controller\AjaxController::delegateAjaxAction',
+            ],
+            'mautic_core_form_action' => [
+                'path'       => '/action/{objectAction}/{objectModel}/{objectId}',
+                'controller' => 'Mautic\CoreBundle\Controller\FormController::executeAction',
+                'defaults'   => [
+                    'objectModel' => '',
                 ],
             ],
         ],

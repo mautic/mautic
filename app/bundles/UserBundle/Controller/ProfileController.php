@@ -13,6 +13,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
@@ -30,6 +31,10 @@ final class ProfileController extends FormController
     /**
      * Generate's account profile.
      */
+    #[Route(
+        '/s/account',
+        name: 'mautic_user_account',
+    )]
     public function indexAction(Request $request, LanguageHelper $languageHelper,
         TokenStorageInterface $tokenStorage, SAMLHelper $samlHelper): Response|RedirectResponse
     {

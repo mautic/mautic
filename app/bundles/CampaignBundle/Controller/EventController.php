@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
 final class EventController extends CommonFormController
@@ -46,6 +47,17 @@ final class EventController extends CommonFormController
         $this->dateHelper = $dateHelper;
         $this->campaignModel = $campaignModel;
         $this->eventModel = $eventModel;
+    }
+
+    #[Route(
+        '/s/campaigns/events/{objectAction}/{objectId}',
+        name: 'mautic_campaignevent_action',
+        requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
+        defaults: ['objectId' => 0],
+    )]
+    public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
+    {
+        return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
     }
 
     /**

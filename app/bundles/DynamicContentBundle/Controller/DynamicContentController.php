@@ -11,6 +11,7 @@ use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
 final class DynamicContentController extends FormController
@@ -54,6 +55,23 @@ final class DynamicContentController extends FormController
         );
     }
 
+    #[Route(
+        '/s/dwc/{objectAction}/{objectId}',
+        name: 'mautic_dynamicContent_action',
+        requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
+        defaults: ['objectId' => 0],
+    )]
+    public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
+    {
+        return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
+    }
+
+    #[Route(
+        '/s/dwc/{page}',
+        name: 'mautic_dynamicContent_index',
+        requirements: ['page' => '\d+'],
+        defaults: ['page' => 0],
+    )]
     public function indexAction(Request $request, $page = 1): Response
     {
         $permissions = $this->getPermissions();

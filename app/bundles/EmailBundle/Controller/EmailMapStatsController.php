@@ -12,6 +12,7 @@ use Mautic\EmailBundle\Model\EmailModel;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Routing\Attribute\Route;
 
 final class EmailMapStatsController extends AbstractController
 {
@@ -81,6 +82,12 @@ final class EmailMapStatsController extends AbstractController
     /**
      * @throws \Exception
      */
+    #[Route(
+        '/s/emails-map-stats/{objectId}/{isVariant}/{dateFrom}/{dateTo}',
+        name: 'mautic_email_map_stats',
+        requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
+        defaults: ['objectId' => 0],
+    )]
     public function viewAction(
         CorePermissions $security,
         int $objectId,

@@ -4,20 +4,6 @@ declare(strict_types=1);
 
 return [
     'routes' => [
-        'main' => [
-            'mautic_dashboard_index' => [
-                'path'       => '/dashboard',
-                'controller' => 'Mautic\DashboardBundle\Controller\DashboardController::indexAction',
-            ],
-            'mautic_dashboard_widget' => [
-                'path'       => '/dashboard/widget/{widgetId}',
-                'controller' => 'Mautic\DashboardBundle\Controller\DashboardController::widgetAction',
-            ],
-            'mautic_dashboard_action' => [
-                'path'       => '/dashboard/{objectAction}/{objectId}',
-                'controller' => 'Mautic\DashboardBundle\Controller\DashboardController::executeAction',
-            ],
-        ],
         'api' => [
             'mautic_widget_types' => [
                 'path'       => '/data',

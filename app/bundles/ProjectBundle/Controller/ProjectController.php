@@ -18,6 +18,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
 final class ProjectController extends AbstractFormController
 {
@@ -31,6 +32,23 @@ final class ProjectController extends AbstractFormController
 
     private const string TEMPLATE_FORM  = '@MauticProject/Project/form.html.twig';
 
+    #[Route(
+        '/s/projects/{objectAction}/{objectId}',
+        name: 'mautic_project_action',
+        requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
+        defaults: ['objectId' => 0],
+    )]
+    public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
+    {
+        return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
+    }
+
+    #[Route(
+        '/s/projects/{page}',
+        name: 'mautic_project_index',
+        requirements: ['page' => '\d+'],
+        defaults: ['page' => 0],
+    )]
     public function indexAction(Request $request, ProjectModel $projectModel, CorePermissions $corePermissions, ProjectEntityLoaderService $entityLoader, int $page = 1): Response
     {
         $session = $request->getSession();

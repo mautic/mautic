@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
 final class FileController extends AjaxController
 {
@@ -19,6 +20,17 @@ final class FileController extends AjaxController
     private array $response = [];
 
     private int $statusCode = Response::HTTP_OK;
+
+    #[Route(
+        '/s/file/{objectAction}/{objectId}',
+        name: 'mautic_core_file_action',
+        requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
+        defaults: ['objectId' => 0],
+    )]
+    public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
+    {
+        return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
+    }
 
     /**
      * Uploads a file.

@@ -16,6 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
 final class CampaignMetricsController extends AbstractController
 {
@@ -25,6 +26,12 @@ final class CampaignMetricsController extends AbstractController
     ) {
     }
 
+    #[Route(
+        '/s/campaign/metrics/email-weekdays/{objectId}/{dateFrom}/{dateTo}',
+        name: 'mautic_campaign_metrics_email_weekdays',
+        requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
+        defaults: ['objectId' => 0],
+    )]
     public function emailWeekdaysAction(
         EmailPeriodMetrics $emailPeriodMetrics,
         CampaignModel $model,
@@ -65,6 +72,12 @@ final class CampaignMetricsController extends AbstractController
         );
     }
 
+    #[Route(
+        '/s/campaign/metrics/email-hours/{objectId}/{dateFrom}/{dateTo}',
+        name: 'mautic_campaign_metrics_email_hours',
+        requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
+        defaults: ['objectId' => 0],
+    )]
     public function emailHoursAction(
         EmailPeriodMetrics $emailPeriodMetrics,
         CampaignModel $model,
@@ -109,6 +122,12 @@ final class CampaignMetricsController extends AbstractController
         );
     }
 
+    #[Route(
+        '/s/campaign/metrics/event-details/{objectId}',
+        name: 'mautic_campaign_metrics_event_details',
+        requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
+        defaults: ['objectId' => 0],
+    )]
     public function eventDetailsAction(
         EventDispatcherInterface $eventDispatcher,
         EventModel $eventModel,

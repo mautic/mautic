@@ -7,6 +7,7 @@ use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\ReportBundle\Scheduler\Date\DateBuilder;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
 final class ScheduleController extends CommonAjaxController
@@ -20,6 +21,11 @@ final class ScheduleController extends CommonAjaxController
         $this->reportModel = $reportModel;
     }
 
+    #[Route(
+        '/s/reports/schedule/preview/{isScheduled}/{scheduleUnit}/{scheduleDay}/{scheduleMonthFrequency}',
+        name: 'mautic_report_schedule_preview',
+        defaults: ['isScheduled' => 0, 'scheduleUnit' => '', 'scheduleDay' => '', 'scheduleMonthFrequency' => ''],
+    )]
     public function indexAction(DateBuilder $dateBuilder, $isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency): JsonResponse
     {
         $dates = $dateBuilder->getPreviewDays($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency);
@@ -43,6 +49,10 @@ final class ScheduleController extends CommonAjaxController
      *
      * @param int $reportId
      */
+    #[Route(
+        '/s/reports/schedule/{reportId}/now',
+        name: 'mautic_report_schedule',
+    )]
     public function nowAction($reportId): JsonResponse
     {
         /** @var \Mautic\ReportBundle\Entity\Report $report */

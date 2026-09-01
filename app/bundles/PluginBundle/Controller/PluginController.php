@@ -18,6 +18,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
 final class PluginController extends FormController
@@ -35,6 +36,10 @@ final class PluginController extends FormController
         $this->pluginRepository = $pluginRepository;
     }
 
+    #[Route(
+        '/s/plugins',
+        name: 'mautic_plugin_index',
+    )]
     public function indexAction(Request $request, IntegrationHelper $integrationHelper): Response
     {
         if (!$this->security->isGranted('plugin:plugins:manage')) {
@@ -135,6 +140,12 @@ final class PluginController extends FormController
     /**
      * @param string $name
      */
+    #[Route(
+        '/s/plugins/config/{name}/{page}',
+        name: 'mautic_plugin_config',
+        requirements: ['page' => '\d+'],
+        defaults: ['page' => 0],
+    )]
     public function configAction(Request $request, EntityManagerInterface $em, IntegrationHelper $integrationHelper, LoggerInterface $mauticLogger, $name, $activeTab = 'details-container', $page = 1): JsonResponse|Response
     {
         if (!$this->security->isGranted('plugin:plugins:manage')) {
@@ -364,6 +375,10 @@ final class PluginController extends FormController
         );
     }
 
+    #[Route(
+        '/s/plugins/info/{name}',
+        name: 'mautic_plugin_info',
+    )]
     public function infoAction(IntegrationHelper $integrationHelper, $name): Response
     {
         if (!$this->security->isGranted('plugin:plugins:manage')) {
@@ -402,6 +417,10 @@ final class PluginController extends FormController
     /**
      * Scans the addon bundles directly and loads bundles which are not registered to the database.
      */
+    #[Route(
+        '/s/plugins/reload',
+        name: 'mautic_plugin_reload',
+    )]
     public function reloadAction(Request $request, ReloadFacade $reloadFacade): Response
     {
         if (!$this->security->isGranted('plugin:plugins:manage')) {
