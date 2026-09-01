@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\Notification\Helper;
 
 use Mautic\IntegrationsBundle\Event\InternalObjectOwnerEvent;
-use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
 use Mautic\IntegrationsBundle\Sync\Notification\Helper\OwnerProvider;
@@ -75,8 +74,7 @@ final class OwnerProviderTest extends TestCase
                     $event->setOwners([$event->getObjectIds()[0] => 456]);
 
                     return true;
-                }),
-                IntegrationEvents::INTEGRATION_FIND_OWNER_IDS
+                })
             );
 
         $this->assertSame([123 => 456], $this->ownerProvider->getOwnersForObjectIds(Contact::NAME, [123]));

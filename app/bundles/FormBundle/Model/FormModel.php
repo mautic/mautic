@@ -641,7 +641,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         if (empty($customComponents)) {
             // build them
             $event = new FormBuilderEvent($this->translator);
-            $this->dispatcher->dispatch($event, FormEvents::FORM_ON_BUILD);
+            $this->dispatcher->dispatch($event);
             $customComponents['fields']     = $event->getFormFields();
             $customComponents['actions']    = $event->getSubmitActions();
             $customComponents['choices']    = $event->getSubmitActionGroups();

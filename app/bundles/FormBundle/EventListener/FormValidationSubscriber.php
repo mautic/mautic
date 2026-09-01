@@ -24,8 +24,8 @@ final readonly class FormValidationSubscriber implements EventSubscriberInterfac
     public static function getSubscribedEvents(): array
     {
         return [
-            FormEvents::FORM_ON_BUILD    => ['onFormBuilder', 0],
-            FormEvents::ON_FORM_VALIDATE => ['onFormValidate', 0],
+            Events\FormBuilderEvent::class => ['onFormBuilder', 0],
+            FormEvents::ON_FORM_VALIDATE   => ['onFormValidate', 0],
         ];
     }
 

@@ -7,7 +7,6 @@ namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\Helper;
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use Mautic\IntegrationsBundle\Entity\ObjectMappingRepository;
 use Mautic\IntegrationsBundle\Event\InternalObjectFindEvent;
-use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
@@ -137,8 +136,7 @@ final class MappingHelperTest extends TestCase
 
                         return true;
                     }
-                ),
-                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS
+                )
             );
 
         $foundInternalObject = $this->mappingHelper->findMauticObject($mappingManual, $internalObjectName, $integrationObjectDAO);
@@ -196,8 +194,7 @@ final class MappingHelperTest extends TestCase
 
                         return true;
                     }
-                ),
-                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS
+                )
             );
 
         $foundInternalObject = $this->mappingHelper->findMauticObject($mappingManual, $internalObjectName, $integrationObjectDAO);
@@ -255,8 +252,7 @@ final class MappingHelperTest extends TestCase
 
                         return true;
                     }
-                ),
-                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS
+                )
             );
 
         $foundInternalObject = $this->mappingHelper->findMauticObject(

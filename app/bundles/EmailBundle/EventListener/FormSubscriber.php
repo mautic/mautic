@@ -24,7 +24,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            FormEvents::FORM_ON_BUILD            => ['onFormBuilder', 0],
+            FormBuilderEvent::class             => ['onFormBuilder', 0],
             FormEvents::ON_EXECUTE_SUBMIT_ACTION => [
                 ['onFormSubmitActionSendEmail', 0],
             ],

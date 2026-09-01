@@ -105,8 +105,7 @@ final class FullObjectReportBuilderTest extends TestCase
                     ]);
 
                     return true;
-                }),
-                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS
+                })
             );
 
         $report  = $this->reportBuilder->buildReport($requestDAO);
@@ -159,8 +158,7 @@ final class FullObjectReportBuilderTest extends TestCase
                     ]);
 
                     return true;
-                }),
-                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS
+                })
             );
 
         $report  = $this->reportBuilder->buildReport($requestDAO);
@@ -244,7 +242,6 @@ final class FullObjectReportBuilderTest extends TestCase
                         );
                     };
                     $callback($parameters[0]);
-                    $this->assertSame(IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS, $parameters[1]);
                 }
                 if (2 === $matcher->numberOfInvocations()) {
                     $callback = function (InternalObjectFindByIdEvent $event) use ($internalObject, $contactEntity): void {
@@ -349,7 +346,6 @@ final class FullObjectReportBuilderTest extends TestCase
                         );
                     };
                     $callback($parameters[0]);
-                    $this->assertSame(IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS, $parameters[1]);
                 }
                 if (2 === $matcher->numberOfInvocations()) {
                     $callback = function (InternalObjectFindByIdEvent $event) use ($internalObject, $companyEntity): void {

@@ -6,7 +6,6 @@ namespace Mautic\FormBundle\Collector;
 
 use Mautic\FormBundle\Collection\ObjectCollection;
 use Mautic\FormBundle\Event\ObjectCollectEvent;
-use Mautic\FormBundle\FormEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class ObjectCollector implements ObjectCollectorInterface
@@ -30,7 +29,7 @@ final class ObjectCollector implements ObjectCollectorInterface
     private function collect(): void
     {
         $event = new ObjectCollectEvent();
-        $this->dispatcher->dispatch($event, FormEvents::ON_OBJECT_COLLECT);
+        $this->dispatcher->dispatch($event);
         $this->objects = $event->getObjects();
     }
 }

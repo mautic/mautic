@@ -6,7 +6,6 @@ namespace Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder
 
 use Mautic\IntegrationsBundle\Entity\FieldChangeRepository;
 use Mautic\IntegrationsBundle\Event\InternalObjectFindEvent;
-use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO as ReportObjectDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
@@ -154,7 +153,7 @@ class PartialObjectReportBuilder
 
         $event = new InternalObjectFindEvent($this->objectProvider->getObjectByName($objectName));
         $event->setIds(array_keys($this->objectsWithMissingFields));
-        $this->dispatcher->dispatch($event, IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS);
+        $this->dispatcher->dispatch($event);
 
         return $event->getFoundObjects();
     }

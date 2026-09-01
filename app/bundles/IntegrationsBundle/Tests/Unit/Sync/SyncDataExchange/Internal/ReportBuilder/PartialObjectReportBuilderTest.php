@@ -6,7 +6,6 @@ namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange\Internal\Re
 
 use Mautic\IntegrationsBundle\Entity\FieldChangeRepository;
 use Mautic\IntegrationsBundle\Event\InternalObjectFindEvent;
-use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO;
@@ -158,8 +157,7 @@ final class PartialObjectReportBuilderTest extends TestCase
                     ]);
 
                     return true;
-                }),
-                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS
+                })
             );
 
         $report  = $this->reportBuilder->buildReport($requestDAO);
@@ -249,8 +247,7 @@ final class PartialObjectReportBuilderTest extends TestCase
                     ]);
 
                     return true;
-                }),
-                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS
+                })
             );
 
         $report  = $this->reportBuilder->buildReport($requestDAO);
@@ -387,8 +384,7 @@ final class PartialObjectReportBuilderTest extends TestCase
                     ]);
 
                     return true;
-                }),
-                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS
+                })
             );
 
         $report  = $this->reportBuilder->buildReport($requestDAO);

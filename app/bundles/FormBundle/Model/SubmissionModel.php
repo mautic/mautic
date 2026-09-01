@@ -34,7 +34,6 @@ use Mautic\FormBundle\Event\ValidationEvent;
 use Mautic\FormBundle\Exception\FileValidationException;
 use Mautic\FormBundle\Exception\NoFileGivenException;
 use Mautic\FormBundle\Exception\ValidationException;
-use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
@@ -391,12 +390,12 @@ final class SubmissionModel extends CommonFormModel
             }
         }
 
-        if ($this->dispatcher->hasListeners(FormEvents::FORM_ON_SUBMIT)) {
+        if ($this->dispatcher->hasListeners(SubmissionEvent::class)) {
             // Reset action config from executeFormActions()
             $submissionEvent->setAction();
 
             // Dispatch to on submit listeners
-            $this->dispatcher->dispatch($submissionEvent, FormEvents::FORM_ON_SUBMIT);
+            $this->dispatcher->dispatch($submissionEvent);
         }
 
         // get callback commands from the submit action

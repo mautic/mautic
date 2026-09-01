@@ -3,7 +3,6 @@
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
 use Mautic\FormBundle\Event\SubmissionEvent;
-use Mautic\FormBundle\FormEvents;
 use Mautic\PageBundle\Event\PageHitEvent;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
@@ -22,7 +21,7 @@ final readonly class StatSubscriber implements EventSubscriberInterface
     {
         return [
             PageHitEvent::class    => ['onPageHit', 0],
-            FormEvents::FORM_ON_SUBMIT => ['onFormSubmit', 0],
+            SubmissionEvent::class => ['onFormSubmit', 0],
         ];
     }
 

@@ -184,7 +184,7 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
             OwnerSubscriber::class,
             \Mautic\PageBundle\EventListener\BuilderSubscriber::class,
         ],
-        'mautic.form_on_build' => [
+        \Mautic\FormBundle\Event\FormBuilderEvent::class => [
             \MauticPlugin\MauticSocialBundle\EventListener\FormSubscriber::class,
             \Mautic\AssetBundle\EventListener\FormSubscriber::class,
             \Mautic\EmailBundle\EventListener\FormSubscriber::class,

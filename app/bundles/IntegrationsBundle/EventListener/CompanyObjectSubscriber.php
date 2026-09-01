@@ -11,7 +11,6 @@ use Mautic\IntegrationsBundle\Event\InternalObjectFindEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectOwnerEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectRouteEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectUpdateEvent;
-use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Company;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -28,17 +27,17 @@ final readonly class CompanyObjectSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            InternalObjectEvent::class                           => ['collectInternalObjects', 0],
-            InternalObjectUpdateEvent::class                     => ['updateCompanies', 0],
-            InternalObjectCreateEvent::class                     => ['createCompanies', 0],
-            IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS => [
+            InternalObjectEvent::class         => ['collectInternalObjects', 0],
+            InternalObjectUpdateEvent::class   => ['updateCompanies', 0],
+            InternalObjectCreateEvent::class   => ['createCompanies', 0],
+            InternalObjectFindEvent::class     => [
                 ['findCompaniesByIds', 0],
                 ['findCompaniesByDateRange', 0],
                 ['findCompaniesByFieldValues', 0],
             ],
-            IntegrationEvents::INTEGRATION_FIND_OWNER_IDS        => ['findOwnerIdsForCompanies', 0],
-            InternalObjectRouteEvent::class                      => ['buildCompanyRoute', 0],
-            InternalObjectFindByIdEvent::class                   => ['findCompanyById', 0],
+            InternalObjectOwnerEvent::class    => ['findOwnerIdsForCompanies', 0],
+            InternalObjectRouteEvent::class    => ['buildCompanyRoute', 0],
+            InternalObjectFindByIdEvent::class => ['findCompanyById', 0],
         ];
     }
 

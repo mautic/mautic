@@ -14,7 +14,6 @@ use Mautic\FormBundle\Collector\AlreadyMappedFieldCollectorInterface;
 use Mautic\FormBundle\Collector\MappedObjectCollectorInterface;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Event\FormBuilderEvent;
-use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
@@ -441,7 +440,7 @@ final class FieldController extends CommonFormController
         $form->get('formId')->setData($formId);
 
         $event      = new FormBuilderEvent($this->translator);
-        $this->dispatcher->dispatch($event, FormEvents::FORM_ON_BUILD);
+        $this->dispatcher->dispatch($event);
         $event->addValidatorsToBuilder($form);
 
         return $form;

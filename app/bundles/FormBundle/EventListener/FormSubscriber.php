@@ -43,7 +43,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         return [
             FormEvents::FORM_POST_SAVE           => ['onFormPostSave', 0],
             FormEvents::FORM_POST_DELETE         => ['onFormDelete', 0],
-            FormEvents::FORM_ON_BUILD            => ['onFormBuilder', 0],
+            Events\FormBuilderEvent::class       => ['onFormBuilder', 0],
             FormEvents::ON_EXECUTE_SUBMIT_ACTION => [
                 ['onFormSubmitActionSendEmail', 0],
                 ['onFormSubmitActionRepost', 0],
