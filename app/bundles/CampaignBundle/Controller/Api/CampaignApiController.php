@@ -29,6 +29,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
@@ -120,6 +121,13 @@ final class CampaignApiController extends CommonApiController
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
+    #[Route(
+        '/api/campaigns/{id}/contact/{leadId}/add',
+        name: 'mautic_api_campaignaddcontact',
+        requirements: ['id' => '\d+', 'leadId' => '\d+'],
+        defaults: ['_format' => 'json'],
+        methods: ['POST']
+    )]
     public function addLeadAction($id, $leadId): Response
     {
         $entity = $this->model->getEntity($id);
@@ -151,6 +159,13 @@ final class CampaignApiController extends CommonApiController
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
+    #[Route(
+        '/api/campaigns/{id}/contact/{leadId}/remove',
+        name: 'mautic_api_campaignremovecontact',
+        requirements: ['id' => '\d+', 'leadId' => '\d+'],
+        defaults: ['_format' => 'json'],
+        methods: ['POST']
+    )]
     public function removeLeadAction($id, $leadId): Response
     {
         $entity = $this->model->getEntity($id);
@@ -321,6 +336,13 @@ final class CampaignApiController extends CommonApiController
     /**
      * Obtains a list of campaign contacts.
      */
+    #[Route(
+        '/api/campaigns/{id}/contacts',
+        name: 'mautic_api_campaigngetcontacts',
+        requirements: ['id' => '\d+'],
+        defaults: ['_format' => 'json'],
+        methods: ['GET']
+    )]
     public function getContactsAction(Request $request, $id): Response
     {
         $entity = $this->model->getEntity($id);
@@ -363,6 +385,13 @@ final class CampaignApiController extends CommonApiController
         );
     }
 
+    #[Route(
+        '/api/campaigns/clone/{campaignId}',
+        name: 'mautic_api_contact_clone_campaign',
+        requirements: ['campaignId' => '\d+'],
+        defaults: ['_format' => 'json'],
+        methods: ['POST']
+    )]
     public function cloneCampaignAction($campaignId): Response
     {
         if (empty($campaignId) || false == intval($campaignId)) {
@@ -401,6 +430,13 @@ final class CampaignApiController extends CommonApiController
     /**
      * Get a list of events.
      */
+    #[Route(
+        '/api/campaigns/export/{campaignId}',
+        name: 'mautic_api_export_campaign',
+        requirements: ['campaignId' => '\d+'],
+        defaults: ['_format' => 'json'],
+        methods: ['GET']
+    )]
     public function exportCampaignAction(int $campaignId): Response
     {
         // Check if the campaign exists
@@ -426,6 +462,12 @@ final class CampaignApiController extends CommonApiController
         return $this->handleView($view);
     }
 
+    #[Route(
+        '/api/campaigns/import',
+        name: 'mautic_api_import_campaign',
+        defaults: ['_format' => 'json'],
+        methods: ['POST']
+    )]
     public function importCampaignAction(Request $request, UserHelper $userHelper, ImportHelper $importHelper): Response
     {
         // Check if user has permission to import campaigns

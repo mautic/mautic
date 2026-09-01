@@ -50,19 +50,6 @@ return [
                 'path'            => '/users',
                 'controller'      => Mautic\UserBundle\Controller\Api\UserApiController::class,
             ],
-            'mautic_api_getself' => [
-                'path'       => '/users/self',
-                'controller' => 'Mautic\UserBundle\Controller\Api\UserApiController::getSelfAction',
-            ],
-            'mautic_api_checkpermission' => [
-                'path'       => '/users/{id}/permissioncheck',
-                'controller' => 'Mautic\UserBundle\Controller\Api\UserApiController::isGrantedAction',
-                'method'     => 'POST',
-            ],
-            'mautic_api_getuserroles' => [
-                'path'       => '/users/list/roles',
-                'controller' => 'Mautic\UserBundle\Controller\Api\UserApiController::getRolesAction',
-            ],
             'mautic_api_rolesstandard' => [
                 'standard_entity' => true,
                 'name'            => 'roles',

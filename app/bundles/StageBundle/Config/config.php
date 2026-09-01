@@ -11,16 +11,6 @@ return [
                 'path'            => '/stages',
                 'controller'      => Mautic\StageBundle\Controller\Api\StageApiController::class,
             ],
-            'mautic_api_stageddcontact' => [
-                'path'       => '/stages/{id}/contact/{contactId}/add',
-                'controller' => 'Mautic\StageBundle\Controller\Api\StageApiController::addContactAction',
-                'method'     => 'POST',
-            ],
-            'mautic_api_stageremovecontact' => [
-                'path'       => '/stages/{id}/contact/{contactId}/remove',
-                'controller' => 'Mautic\StageBundle\Controller\Api\StageApiController::removeContactAction',
-                'method'     => 'POST',
-            ],
         ],
     ],
 

@@ -21,6 +21,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -62,6 +63,12 @@ final class PointApiController extends CommonApiController
     /**
      * Return array of available point action types.
      */
+    #[Route(
+        '/api/points/actions/types',
+        name: 'mautic_api_getpointactiontypes',
+        defaults: ['_format' => 'json'],
+        methods: ['GET']
+    )]
     public function getPointActionTypesAction(): Response
     {
         if (!$this->security->isGranted([$this->permissionBase.':view', $this->permissionBase.':viewown'])) {
@@ -81,6 +88,13 @@ final class PointApiController extends CommonApiController
      * @param string $operator
      * @param int    $delta
      */
+    #[Route(
+        '/api/contacts/{leadId}/points/{operator}/{delta}',
+        name: 'mautic_api_adjustcontactpoints',
+        requirements: ['leadId' => '\d+'],
+        defaults: ['_format' => 'json'],
+        methods: ['POST']
+    )]
     public function adjustPointsAction(Request $request, IpLookupHelper $ipLookupHelper, $leadId, $operator, $delta): Response
     {
         $lead = $this->checkLeadAccess($leadId, 'edit');

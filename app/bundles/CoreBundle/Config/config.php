@@ -22,47 +22,6 @@ return [
                 'method'       => 'GET',
             ],
         ],
-        'api' => [
-            'mautic_core_api_file_list' => [
-                'path'       => '/files/{dir}',
-                'controller' => 'Mautic\CoreBundle\Controller\Api\FileApiController::listAction',
-            ],
-            'mautic_core_api_file_create' => [
-                'path'       => '/files/{dir}/new',
-                'controller' => 'Mautic\CoreBundle\Controller\Api\FileApiController::createAction',
-                'method'     => 'POST',
-            ],
-            'mautic_core_api_file_delete' => [
-                'path'       => '/files/{dir}/{file}/delete',
-                'controller' => 'Mautic\CoreBundle\Controller\Api\FileApiController::deleteAction',
-                'method'     => 'DELETE',
-            ],
-            'mautic_core_api_theme_list' => [
-                'path'       => '/themes',
-                'controller' => 'Mautic\CoreBundle\Controller\Api\ThemeApiController::listAction',
-            ],
-            'mautic_core_api_theme_get' => [
-                'path'       => '/themes/{theme}',
-                'controller' => 'Mautic\CoreBundle\Controller\Api\ThemeApiController::getAction',
-            ],
-            'mautic_core_api_theme_create' => [
-                'path'       => '/themes/new',
-                'controller' => 'Mautic\CoreBundle\Controller\Api\ThemeApiController::newAction',
-                'method'     => 'POST',
-            ],
-            'mautic_core_api_theme_delete' => [
-                'path'       => '/themes/{theme}/delete',
-                'controller' => 'Mautic\CoreBundle\Controller\Api\ThemeApiController::deleteAction',
-                'method'     => 'DELETE',
-            ],
-            'mautic_core_api_stats' => [
-                'path'       => '/stats/{table}',
-                'controller' => 'Mautic\CoreBundle\Controller\Api\StatsApiController::listAction',
-                'defaults'   => [
-                    'table' => '',
-                ],
-            ],
-        ],
         'main' => [
             'mautic_core_ajax' => [
                 'path'       => '/ajax',

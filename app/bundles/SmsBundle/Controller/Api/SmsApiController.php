@@ -20,6 +20,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -63,6 +64,13 @@ final class SmsApiController extends CommonApiController
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }
 
+    #[Route(
+        '/api/smses/{id}/contact/{contactId}/send',
+        name: 'mautic_api_smses_send',
+        requirements: ['id' => '\d+', 'contactId' => '\d+'],
+        defaults: ['_format' => 'json'],
+        methods: ['GET']
+    )]
     public function sendAction(TransportChain $transportChain, LoggerInterface $mauticLogger, $id, $contactId): JsonResponse|Response
     {
         if (!$transportChain->getEnabledTransports()) {

@@ -11,21 +11,6 @@ return [
                 'path'            => '/emails',
                 'controller'      => Mautic\EmailBundle\Controller\Api\EmailApiController::class,
             ],
-            'mautic_api_sendemail' => [
-                'path'       => '/emails/{id}/send',
-                'controller' => 'Mautic\EmailBundle\Controller\Api\EmailApiController::sendAction',
-                'method'     => 'POST',
-            ],
-            'mautic_api_sendcontactemail' => [
-                'path'       => '/emails/{id}/contact/{leadId}/send',
-                'controller' => 'Mautic\EmailBundle\Controller\Api\EmailApiController::sendLeadAction',
-                'method'     => 'POST',
-            ],
-            'mautic_api_reply' => [
-                'path'       => '/emails/reply/{trackingHash}',
-                'controller' => 'Mautic\EmailBundle\Controller\Api\EmailApiController::replyAction',
-                'method'     => 'POST',
-            ],
         ],
     ],
     'menu' => [

@@ -18,6 +18,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -56,6 +57,12 @@ final class FileApiController extends CommonApiController
     /**
      * Uploads a file.
      */
+    #[Route(
+        '/api/files/{dir}/new',
+        name: 'mautic_core_api_file_create',
+        defaults: ['_format' => 'json'],
+        methods: ['POST']
+    )]
     public function createAction(Request $request, PathsHelper $pathsHelper, $dir): Response
     {
         try {
@@ -93,6 +100,12 @@ final class FileApiController extends CommonApiController
     /**
      * List the files in /media directory.
      */
+    #[Route(
+        '/api/files/{dir}',
+        name: 'mautic_core_api_file_list',
+        defaults: ['_format' => 'json'],
+        methods: ['GET']
+    )]
     public function listAction(Request $request, PathsHelper $pathsHelper, $dir): Response
     {
         try {
@@ -122,6 +135,12 @@ final class FileApiController extends CommonApiController
     /**
      * Delete a file from /media directory.
      */
+    #[Route(
+        '/api/files/{dir}/{file}/delete',
+        name: 'mautic_core_api_file_delete',
+        defaults: ['_format' => 'json'],
+        methods: ['DELETE']
+    )]
     public function deleteAction(Request $request, PathsHelper $pathsHelper, $dir, $file): Response
     {
         $response = ['success' => false];

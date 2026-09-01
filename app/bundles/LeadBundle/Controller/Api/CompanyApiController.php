@@ -21,6 +21,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -89,6 +90,13 @@ final class CompanyApiController extends CommonApiController
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
+    #[Route(
+        '/api/companies/{companyId}/contact/{contactId}/add',
+        name: 'mautic_api_companyaddcontact',
+        requirements: ['companyId' => '\d+', 'contactId' => '\d+'],
+        defaults: ['_format' => 'json'],
+        methods: ['POST']
+    )]
     public function addContactAction($companyId, $contactId): Response
     {
         $company = $this->model->getEntity($companyId);
@@ -116,6 +124,13 @@ final class CompanyApiController extends CommonApiController
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
+    #[Route(
+        '/api/companies/{companyId}/contact/{contactId}/remove',
+        name: 'mautic_api_companyremovecontact',
+        requirements: ['companyId' => '\d+', 'contactId' => '\d+'],
+        defaults: ['_format' => 'json'],
+        methods: ['POST']
+    )]
     public function removeContactAction($companyId, $contactId): Response
     {
         $company = $this->model->getEntity($companyId);

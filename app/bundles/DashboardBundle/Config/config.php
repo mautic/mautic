@@ -3,19 +3,6 @@
 declare(strict_types=1);
 
 return [
-    'routes' => [
-        'api' => [
-            'mautic_widget_types' => [
-                'path'       => '/data',
-                'controller' => 'Mautic\DashboardBundle\Controller\Api\WidgetApiController::getTypesAction',
-            ],
-            'mautic_widget_data' => [
-                'path'       => '/data/{type}',
-                'controller' => 'Mautic\DashboardBundle\Controller\Api\WidgetApiController::getDataAction',
-            ],
-        ],
-    ],
-
     'menu' => [
         'main' => [
             'priority' => 100,

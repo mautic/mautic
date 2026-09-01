@@ -11,105 +11,17 @@ return [
                 'path'            => '/contacts',
                 'controller'      => Mautic\LeadBundle\Controller\Api\LeadApiController::class,
             ],
-            'mautic_api_dncaddcontact' => [
-                'path'       => '/contacts/{id}/dnc/{channel}/add',
-                'controller' => 'Mautic\LeadBundle\Controller\Api\LeadApiController::addDncAction',
-                'method'     => 'POST',
-                'defaults'   => [
-                    'channel' => 'email',
-                ],
-            ],
-            'mautic_api_dncremovecontact' => [
-                'path'       => '/contacts/{id}/dnc/{channel}/remove',
-                'controller' => 'Mautic\LeadBundle\Controller\Api\LeadApiController::removeDncAction',
-                'method'     => 'POST',
-            ],
-            'mautic_api_getcontactevents' => [
-                'path'       => '/contacts/{id}/activity',
-                'controller' => 'Mautic\LeadBundle\Controller\Api\LeadApiController::getActivityAction',
-            ],
-            'mautic_api_getcontactsevents' => [
-                'path'       => '/contacts/activity',
-                'controller' => 'Mautic\LeadBundle\Controller\Api\LeadApiController::getAllActivityAction',
-            ],
-            'mautic_api_getcontactnotes' => [
-                'path'       => '/contacts/{id}/notes',
-                'controller' => 'Mautic\LeadBundle\Controller\Api\LeadApiController::getNotesAction',
-            ],
-            'mautic_api_getcontactdevices' => [
-                'path'       => '/contacts/{id}/devices',
-                'controller' => 'Mautic\LeadBundle\Controller\Api\LeadApiController::getDevicesAction',
-            ],
-            'mautic_api_getcontactcampaigns' => [
-                'path'       => '/contacts/{id}/campaigns',
-                'controller' => 'Mautic\LeadBundle\Controller\Api\LeadApiController::getCampaignsAction',
-            ],
-            'mautic_api_getcontactssegments' => [
-                'path'       => '/contacts/{id}/segments',
-                'controller' => 'Mautic\LeadBundle\Controller\Api\LeadApiController::getListsAction',
-            ],
-            'mautic_api_getcontactscompanies' => [
-                'path'       => '/contacts/{id}/companies',
-                'controller' => 'Mautic\LeadBundle\Controller\Api\LeadApiController::getCompaniesAction',
-            ],
-            'mautic_api_utmcreateevent' => [
-                'path'       => '/contacts/{id}/utm/add',
-                'controller' => 'Mautic\LeadBundle\Controller\Api\LeadApiController::addUtmTagsAction',
-                'method'     => 'POST',
-            ],
-            'mautic_api_utmremoveevent' => [
-                'path'       => '/contacts/{id}/utm/{utmid}/remove',
-                'controller' => 'Mautic\LeadBundle\Controller\Api\LeadApiController::removeUtmTagsAction',
-                'method'     => 'POST',
-            ],
-            'mautic_api_getcontactowners' => [
-                'path'       => '/contacts/list/owners',
-                'controller' => 'Mautic\LeadBundle\Controller\Api\LeadApiController::getOwnersAction',
-            ],
-            'mautic_api_getcontactfields' => [
-                'path'       => '/contacts/list/fields',
-                'controller' => 'Mautic\LeadBundle\Controller\Api\LeadApiController::getFieldsAction',
-            ],
-            'mautic_api_getcontactsegments' => [
-                'path'       => '/contacts/list/segments',
-                'controller' => 'Mautic\LeadBundle\Controller\Api\ListApiController::getListsAction',
-            ],
             'mautic_api_segmentsstandard' => [
                 'standard_entity' => true,
                 'name'            => 'lists',
                 'path'            => '/segments',
                 'controller'      => Mautic\LeadBundle\Controller\Api\ListApiController::class,
             ],
-            'mautic_api_segmentaddcontact' => [
-                'path'       => '/segments/{id}/contact/{leadId}/add',
-                'controller' => 'Mautic\LeadBundle\Controller\Api\ListApiController::addLeadAction',
-                'method'     => 'POST',
-            ],
-            'mautic_api_segmentaddcontacts' => [
-                'path'       => '/segments/{id}/contacts/add',
-                'controller' => 'Mautic\LeadBundle\Controller\Api\ListApiController::addLeadsAction',
-                'method'     => 'POST',
-            ],
-            'mautic_api_segmentremovecontact' => [
-                'path'       => '/segments/{id}/contact/{leadId}/remove',
-                'controller' => 'Mautic\LeadBundle\Controller\Api\ListApiController::removeLeadAction',
-                'method'     => 'POST',
-            ],
             'mautic_api_companiesstandard' => [
                 'standard_entity' => true,
                 'name'            => 'companies',
                 'path'            => '/companies',
                 'controller'      => Mautic\LeadBundle\Controller\Api\CompanyApiController::class,
-            ],
-            'mautic_api_companyaddcontact' => [
-                'path'       => '/companies/{companyId}/contact/{contactId}/add',
-                'controller' => 'Mautic\LeadBundle\Controller\Api\CompanyApiController::addContactAction',
-                'method'     => 'POST',
-            ],
-            'mautic_api_companyremovecontact' => [
-                'path'       => '/companies/{companyId}/contact/{contactId}/remove',
-                'controller' => 'Mautic\LeadBundle\Controller\Api\CompanyApiController::removeContactAction',
-                'method'     => 'POST',
             ],
             'mautic_api_fieldsstandard' => [
                 'standard_entity' => true,

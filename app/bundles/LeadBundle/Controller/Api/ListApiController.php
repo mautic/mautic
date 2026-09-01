@@ -21,6 +21,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -130,6 +131,12 @@ final class ListApiController extends CommonApiController
     /**
      * Obtains a list of smart lists for the user.
      */
+    #[Route(
+        '/api/contacts/list/segments',
+        name: 'mautic_api_getcontactsegments',
+        defaults: ['_format' => 'json'],
+        methods: ['GET']
+    )]
     public function getListsAction(): Response
     {
         $lists   = $this->listModel->getUserLists();
@@ -148,6 +155,13 @@ final class ListApiController extends CommonApiController
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
+    #[Route(
+        '/api/segments/{id}/contact/{leadId}/add',
+        name: 'mautic_api_segmentaddcontact',
+        requirements: ['id' => '\d+', 'leadId' => '\d+'],
+        defaults: ['_format' => 'json'],
+        methods: ['POST']
+    )]
     public function addLeadAction($id, $leadId): Response
     {
         $entity = $this->model->getEntity($id);
@@ -181,6 +195,13 @@ final class ListApiController extends CommonApiController
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
+    #[Route(
+        '/api/segments/{id}/contacts/add',
+        name: 'mautic_api_segmentaddcontacts',
+        requirements: ['id' => '\d+'],
+        defaults: ['_format' => 'json'],
+        methods: ['POST']
+    )]
     public function addLeadsAction(Request $request, $id): Response
     {
         $contactIds = $request->request->all()['ids'] ?? null;
@@ -224,6 +245,13 @@ final class ListApiController extends CommonApiController
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
+    #[Route(
+        '/api/segments/{id}/contact/{leadId}/remove',
+        name: 'mautic_api_segmentremovecontact',
+        requirements: ['id' => '\d+', 'leadId' => '\d+'],
+        defaults: ['_format' => 'json'],
+        methods: ['POST']
+    )]
     public function removeLeadAction($id, $leadId): Response
     {
         $entity = $this->model->getEntity($id);

@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * @extends CommonApiController<object>
@@ -21,6 +22,12 @@ final class StatsApiController extends CommonApiController
      * @param array  $order
      * @param array  $where
      */
+    #[Route(
+        '/api/stats/{table}',
+        name: 'mautic_core_api_stats',
+        defaults: ['table' => '', '_format' => 'json'],
+        methods: ['GET']
+    )]
     public function listAction(Request $request, UserHelper $userHelper, $table = null, string $itemsName = 'stats', $order = [], $where = [], int $start = 0, int $limit = 100): Response
     {
         $response = [];

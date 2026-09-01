@@ -20,6 +20,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -58,6 +59,12 @@ final class WidgetApiController extends CommonApiController
     /**
      * Obtains a list of available widget types.
      */
+    #[Route(
+        '/api/data',
+        name: 'mautic_widget_types',
+        defaults: ['_format' => 'json'],
+        methods: ['GET']
+    )]
     public function getTypesAction(): Response
     {
         $event = new WidgetTypeListEvent();
@@ -73,6 +80,12 @@ final class WidgetApiController extends CommonApiController
      *
      * @param string $type of the widget
      */
+    #[Route(
+        '/api/data/{type}',
+        name: 'mautic_widget_data',
+        defaults: ['_format' => 'json'],
+        methods: ['GET']
+    )]
     public function getDataAction(Request $request, string $type): Response
     {
         $start      = microtime(true);

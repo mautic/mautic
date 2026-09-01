@@ -31,55 +31,6 @@ return [
                 'path'                => '/campaigns/events',
                 'controller'          => Mautic\CampaignBundle\Controller\Api\EventApiController::class,
             ],
-            'mautic_api_campaigns_events_contact'     => [
-                'path'       => '/campaigns/events/contact/{contactId}',
-                'controller' => 'Mautic\CampaignBundle\Controller\Api\EventLogApiController::getContactEventsAction',
-                'method'     => 'GET',
-            ],
-            'mautic_api_campaigns_edit_contact_event' => [
-                'path'       => '/campaigns/events/{eventId}/contact/{contactId}/edit',
-                'controller' => 'Mautic\CampaignBundle\Controller\Api\EventLogApiController::editContactEventAction',
-                'method'     => 'PUT',
-            ],
-            'mautic_api_campaigns_batchedit_events'   => [
-                'path'       => '/campaigns/events/batch/edit',
-                'controller' => 'Mautic\CampaignBundle\Controller\Api\EventLogApiController::editEventsAction',
-                'method'     => 'PUT',
-            ],
-            'mautic_api_campaign_contact_events'      => [
-                'path'       => '/campaigns/{campaignId}/events/contact/{contactId}',
-                'controller' => 'Mautic\CampaignBundle\Controller\Api\EventLogApiController::getContactEventsAction',
-                'method'     => 'GET',
-            ],
-            'mautic_api_campaigngetcontacts'          => [
-                'path'       => '/campaigns/{id}/contacts',
-                'controller' => 'Mautic\CampaignBundle\Controller\Api\CampaignApiController::getContactsAction',
-            ],
-            'mautic_api_campaignaddcontact'           => [
-                'path'       => '/campaigns/{id}/contact/{leadId}/add',
-                'controller' => 'Mautic\CampaignBundle\Controller\Api\CampaignApiController::addLeadAction',
-                'method'     => 'POST',
-            ],
-            'mautic_api_campaignremovecontact'        => [
-                'path'       => '/campaigns/{id}/contact/{leadId}/remove',
-                'controller' => 'Mautic\CampaignBundle\Controller\Api\CampaignApiController::removeLeadAction',
-                'method'     => 'POST',
-            ],
-            'mautic_api_contact_clone_campaign' => [
-                'path'       => '/campaigns/clone/{campaignId}',
-                'controller' => 'Mautic\CampaignBundle\Controller\Api\CampaignApiController::cloneCampaignAction',
-                'method'     => 'POST',
-            ],
-            'mautic_api_export_campaign' => [
-                'path'       => '/campaigns/export/{campaignId}',
-                'controller' => 'Mautic\CampaignBundle\Controller\Api\CampaignApiController::exportCampaignAction',
-                'method'     => 'GET',
-            ],
-            'mautic_api_import_campaign' => [
-                'path'       => '/campaigns/import',
-                'controller' => 'Mautic\CampaignBundle\Controller\Api\CampaignApiController::importCampaignAction',
-                'method'     => 'POST',
-            ],
         ],
     ],
 
