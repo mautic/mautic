@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Event\EntityExportEvent;
+use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -157,5 +158,60 @@ final class EmailImportExportSubscriberFunctionalTest extends MauticMysqlTestCas
         $this->assertIsArray($exportedEmail);
         $this->assertIsArray($exportedEmail['variant_settings']);
         $this->assertSame([], $exportedEmail['variant_settings']);
+    }
+
+    /**
+     * The export writes snake_case keys while the entity exposes camelCase properties. When the
+     * import hydrated straight through the serializer those keys were silently discarded, so an
+     * imported email arrived with no body at all and fell back to the blank theme.
+     */
+    public function testImportKeepsTheFieldsTheExportWrote(): void
+    {
+        $email = new Email();
+        $email->setName('Round Trip Email');
+        $email->setSubject('Round Trip Subject');
+        $email->setCustomHtml('<html><body><p>Original body</p></body></html>');
+        $email->setPlainText('Original body');
+        $email->setPreheaderText('Original preheader');
+        $email->setEmailType('transactional');
+        $email->setLanguage('en');
+        $email->setIsPublished(true);
+        $email->setPublishUp(new \DateTime('2026-01-01 09:00:00'));
+        $email->setPublishDown(new \DateTime('2026-12-31 18:00:00'));
+
+        $this->em->persist($email);
+        $this->em->flush();
+
+        $exportEvent = new EntityExportEvent(Email::ENTITY_NAME, $email->getId());
+        $this->dispatcher->dispatch($exportEvent);
+
+        $exported = reset($exportEvent->getEntities()[Email::ENTITY_NAME]);
+        $this->assertIsArray($exported);
+
+        // A fresh uuid makes the import create a second email rather than update the source one.
+        $exported['uuid'] = 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee';
+
+        $importEvent = new EntityImportEvent(Email::ENTITY_NAME, [$exported], 1);
+        $this->dispatcher->dispatch($importEvent);
+
+        $this->em->clear();
+
+        $imported = $this->em->getRepository(Email::class)->findOneBy(['uuid' => $exported['uuid']]);
+        $this->assertInstanceOf(Email::class, $imported);
+
+        $this->assertSame($email->getCustomHtml(), $imported->getCustomHtml());
+        $this->assertSame($email->getPlainText(), $imported->getPlainText());
+        $this->assertSame($email->getPreheaderText(), $imported->getPreheaderText());
+        $this->assertSame($email->getEmailType(), $imported->getEmailType());
+        $this->assertSame($email->getLanguage(), $imported->getLanguage());
+
+        // The export serialises these as DATE_ATOM strings, so the import has to turn them back
+        // into dates rather than storing null and silently republishing the email.
+        $this->assertInstanceOf(\DateTimeInterface::class, $imported->getPublishUp());
+        $this->assertInstanceOf(\DateTimeInterface::class, $imported->getPublishDown());
+        $this->assertSame(
+            $email->getPublishUp()->format('Y-m-d H:i'),
+            $imported->getPublishUp()->format('Y-m-d H:i')
+        );
     }
 }
