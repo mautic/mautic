@@ -4,7 +4,6 @@ namespace Mautic\DashboardBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Event\WidgetFormEvent;
 use Mautic\DashboardBundle\Event\WidgetTypeListEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -42,7 +41,7 @@ final class WidgetType extends AbstractType
 
         $event = new WidgetTypeListEvent();
         $event->setSecurity($this->security);
-        $this->dispatcher->dispatch($event, DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE);
+        $this->dispatcher->dispatch($event);
 
         $types = array_map(array_flip(...), $event->getTypes());
 
@@ -120,7 +119,7 @@ final class WidgetType extends AbstractType
             }
 
             $event->setType($type);
-            $this->dispatcher->dispatch($event, DashboardEvents::DASHBOARD_ON_MODULE_FORM_GENERATE);
+            $this->dispatcher->dispatch($event);
             $widgetForm = $event->getForm();
             $form->setData($params);
 

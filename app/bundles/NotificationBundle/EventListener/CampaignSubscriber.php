@@ -232,8 +232,7 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         /** @var NotificationSendEvent $sendEvent */
         $sendEvent = $this->dispatcher->dispatch(
-            new NotificationSendEvent($tokenEvent->getContent(), $notification->getHeading(), $lead),
-            NotificationEvents::NOTIFICATION_ON_SEND
+            new NotificationSendEvent($tokenEvent->getContent(), $notification->getHeading(), $lead)
         );
 
         if ($url = $notification->getUrl()) {

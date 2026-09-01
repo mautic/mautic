@@ -34,8 +34,8 @@ class DashboardSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE   => ['onWidgetListGenerate', 0],
-            DashboardEvents::DASHBOARD_ON_MODULE_FORM_GENERATE   => ['onWidgetFormGenerate', 0],
+            WidgetTypeListEvent::class                           => ['onWidgetListGenerate', 0],
+            WidgetFormEvent::class                               => ['onWidgetFormGenerate', 0],
             DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_PRE_LOAD => ['onWidgetDetailPreLoad', 0],
             DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE => ['onWidgetDetailGenerate', 0],
         ];
