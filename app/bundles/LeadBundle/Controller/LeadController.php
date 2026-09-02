@@ -162,7 +162,6 @@ final class LeadController extends FormController
     )]
     public function indexAction(
         Request $request,
-        DoNotContactModel $leadDNCModel,
         ContactColumnsDictionary $contactColumnsDictionary,
         LeadSearchScopeProvider $leadSearchScopeProvider,
         $page = 1,
@@ -295,7 +294,7 @@ final class LeadController extends FormController
 
         // Get the max ID of the latest lead added
         $maxLeadId = $this->leadRepository->getMaxLeadId();
-        $dncRepository = $leadDNCModel->getDncRepo();
+        $dncRepository = $this->doNotContactRepository;
 
         return $this->delegateView(
             [

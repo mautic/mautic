@@ -6,6 +6,7 @@ use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Exception\ApiErrorException;
@@ -27,6 +28,8 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
 
     private DoNotContact $doNotContactModel;
 
+    private DoNotContactRepository $dncRepository;
+
     private UserModel $userModel;
 
     #[Required]
@@ -34,10 +37,12 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
         CompanyRepository $companyRepository,
         DoNotContact $doNotContactModel,
         UserModel $userModel,
+        DoNotContactRepository $dncRepository,
     ): void {
         $this->companyRepository = $companyRepository;
         $this->doNotContactModel = $doNotContactModel;
         $this->userModel = $userModel;
+        $this->dncRepository = $dncRepository;
     }
 
     /**
@@ -1234,7 +1239,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
         }
         $leadEntity = $this->leadModel->getEntity($lead['internal_entity_id']);
         /** @var \Mautic\LeadBundle\Entity\DoNotContact[] $dncEntries */
-        $dncEntries   = $this->doNotContactModel->getDncRepo()->getEntriesByLeadAndChannel($leadEntity, 'email');
+        $dncEntries   = $this->dncRepository->getEntriesByLeadAndChannel($leadEntity, 'email');
         $sugarDncKeys = array_combine(array_values($this->sugarDncKeys), $this->sugarDncKeys);
         foreach ($dncEntries as $dncEntry) {
             if ([] === $sugarDncKeys) {
