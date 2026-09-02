@@ -30,10 +30,16 @@ final class DynamicListType extends AbstractType
 
                 // Reorder list in case keys were dynamically removed.
                 if (is_array($data)) {
+                    $data = array_filter(
+                        $data,
+                        static fn (mixed $key): bool => is_int($key) || (is_string($key) && ctype_digit($key)),
+                        ARRAY_FILTER_USE_KEY
+                    );
                     $data = array_values($data);
                     $event->setData($data);
                 }
-            }
+            },
+            512
         );
     }
 
