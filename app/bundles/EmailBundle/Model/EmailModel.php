@@ -165,11 +165,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         return $this->emailStatModel->getRepository();
     }
 
-    public function getStatDeviceRepository(): StatDeviceRepository
-    {
-        return $this->statDeviceRepository;
-    }
-
     public function getPermissionBase(): string
     {
         return 'email:emails';
