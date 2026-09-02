@@ -175,12 +175,6 @@ parameters:
 			path: app/bundles/CampaignBundle/Controller/Api/CampaignApiController.php
 
 		-
-			message: '#^Method Mautic\\CampaignBundle\\Controller\\CampaignController\:\:getIndexItems\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CampaignBundle/Controller/CampaignController.php
-
-		-
 			message: '#^Parameter \#1 \$prefix of function uniqid expects string, int\<0, max\> given\.$#'
 			identifier: argument.type
 			count: 2
@@ -1492,12 +1486,6 @@ parameters:
 			path: app/bundles/CoreBundle/ErrorHandler/ErrorHandler.php
 
 		-
-			message: '#^Method Mautic\\CoreBundle\\ErrorHandler\\ErrorHandler\:\:log\(\) has parameter \$debugTrace with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/ErrorHandler/ErrorHandler.php
-
-		-
 			message: '#^Method Mautic\\CoreBundle\\ErrorHandler\\ErrorHandler\:\:prepareExceptionForOutput\(\) has parameter \$exception with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -1535,12 +1523,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\CoreBundle\\Event\\BuilderEvent\:\:__construct\(\) has parameter \$requested with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Event/BuilderEvent.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Event\\BuilderEvent\:\:__construct\(\) has parameter \$translator with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/CoreBundle/Event/BuilderEvent.php
@@ -1864,12 +1846,6 @@ parameters:
 			path: app/bundles/CoreBundle/Helper/AbstractFormFieldHelper.php
 
 		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\AssetGenerationHelper\:\:findOverrides\(\) has parameter \$env with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Helper/AssetGenerationHelper.php
-
-		-
 			message: '#^Method Mautic\\CoreBundle\\Helper\\BundleHelper\:\:getBundleConfig\(\) has parameter \$bundleName with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -2128,18 +2104,6 @@ parameters:
 			path: app/bundles/CoreBundle/Helper/PhoneNumberHelper.php
 
 		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\SearchStringHelper\:\:addFilterCommand\(\) has parameter \$filters with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Helper/SearchStringHelper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\SearchStringHelper\:\:addFilterCommand\(\) has parameter \$mergeFilter with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Helper/SearchStringHelper.php
-
-		-
 			message: '#^Method Mautic\\CoreBundle\\Helper\\SearchStringHelper\:\:mergeCommands\(\) has parameter \$filters with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -2186,12 +2150,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/CoreBundle/IpLookup/AbstractLocalDataLookup.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\IpLookup\\AbstractLookup\:\:__construct\(\) has parameter \$config with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/IpLookup/AbstractLookup.php
 
 		-
 			message: '#^Method Mautic\\CoreBundle\\IpLookup\\AbstractLookup\:\:lookup\(\) has no return type specified\.$#'
@@ -2454,18 +2412,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\CoreBundle\\Test\\Doctrine\\DBALMocker\:\:getMockResultStatement\(\) has no return type specified\.$#'
 			identifier: missingType.return
-			count: 1
-			path: app/bundles/CoreBundle/Test/Doctrine/DBALMocker.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Test\\Doctrine\\DBALMocker\:\:getQueryPart\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CoreBundle/Test/Doctrine/DBALMocker.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Test\\Doctrine\\DBALMocker\:\:getQueryPart\(\) has parameter \$part with no type specified\.$#'
-			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/CoreBundle/Test/Doctrine/DBALMocker.php
 
@@ -3161,18 +3107,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\EmailBundle\\Helper\\MailHelper\:\:getTrackableLink\(\) has parameter \$url with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Helper/MailHelper.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Helper\\MailHelper\:\:isMontoringEnabled\(\) has parameter \$bundleKey with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Helper/MailHelper.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Helper\\MailHelper\:\:isMontoringEnabled\(\) has parameter \$folderKey with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/EmailBundle/Helper/MailHelper.php

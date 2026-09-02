@@ -8,8 +8,14 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 final class CustomContentEvent extends Event
 {
+    /**
+     * @var string[]
+     */
     private array $content = [];
 
+    /**
+     * @var array<mixed, array<string, string|mixed[]>>
+     */
     private array $templates = [];
 
     /**
@@ -74,11 +80,17 @@ final class CustomContentEvent extends Event
         return $this->vars;
     }
 
+    /**
+     * @return string[]
+     */
     public function getContent(): array
     {
         return $this->content;
     }
 
+    /**
+     * @return array<mixed, array<string, string|mixed[]>>
+     */
     public function getTemplates(): array
     {
         return $this->templates;

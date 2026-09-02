@@ -17,6 +17,9 @@ final class StatHelper
      */
     private array $stats = [];
 
+    /**
+     * @var string[]|null[]
+     */
     private array $deleteUs = [];
 
     public function __construct(

@@ -102,6 +102,8 @@ class CommonController extends AbstractController implements MauticController
     /**
      * Override this method in your controller
      * for easy access to the permissions.
+     *
+     * @return mixed[]
      */
     protected function getPermissions(): array
     {
@@ -116,10 +118,10 @@ class CommonController extends AbstractController implements MauticController
     /**
      * Forwards the request to another controller and include the POST.
      *
-     * @param string $controller The controller name (a string like BlogBundle:Post:index)
-     * @param array  $request    An array of request parameters
-     * @param array  $path       An array of path parameters
-     * @param array  $query      An array of query parameters
+     * @param string               $controller The controller name (a string like BlogBundle:Post:index)
+     * @param array<string, mixed> $request    An array of request parameters
+     * @param array<string, mixed> $path       An array of path parameters
+     * @param array                $query      An array of query parameters
      *
      * @return Response A Response instance
      */
@@ -245,7 +247,7 @@ class CommonController extends AbstractController implements MauticController
     /**
      * Redirects controller if not ajax or retrieves html output for ajax request.
      *
-     * @param array $args [returnUrl, viewParameters, contentTemplate, passthroughVars, flashes, forwardController]
+     * @param array<string, mixed> $args [returnUrl, viewParameters, contentTemplate, passthroughVars, flashes, forwardController]
      */
     public function postActionRedirect(array $args = []): RedirectResponse|Response
     {
@@ -285,7 +287,7 @@ class CommonController extends AbstractController implements MauticController
     /**
      * Generates html for ajax request.
      *
-     * @param array $args [parameters, contentTemplate, passthroughVars, forwardController]
+     * @param array<string, mixed> $args [parameters, contentTemplate, passthroughVars, forwardController]
      */
     public function ajaxAction(Request $request, array $args = []): Response
     {
@@ -578,6 +580,8 @@ class CommonController extends AbstractController implements MauticController
 
     /**
      * Renders notification info for ajax.
+     *
+     * @return array<string, mixed>
      */
     protected function getNotificationContent(?Request $request = null): array
     {

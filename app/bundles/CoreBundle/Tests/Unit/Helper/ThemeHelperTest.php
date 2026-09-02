@@ -605,6 +605,9 @@ final class ThemeHelperTest extends TestCase
 
 final class ThemeHelperRuntimeBackedFilterExtension extends AbstractExtension
 {
+    /**
+     * @return TwigFilter[]
+     */
     public function getFilters(): array
     {
         return [

@@ -219,7 +219,8 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param mixed[] $deletedEvents
+     * @param mixed[]              $deletedEvents
+     * @param array<string, mixed> $sessionConnections
      */
     public function setEvents(Campaign $entity, $sessionEvents, array $sessionConnections, array $deletedEvents): array
     {
@@ -699,8 +700,9 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * Get line chart data of hits.
      *
-     * @param string|null $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param string      $dateFormat
+     * @param string|null          $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string               $dateFormat
+     * @param array<string, mixed> $filter
      */
     public function getCampaignMetricsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = []): array
     {
@@ -763,6 +765,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
      * @param Campaign $entity
      * @param string   $root
      * @param int      $order
+     * @param Event[]  $events
      */
     protected function buildOrder(array $hierarchy, array &$events, $entity, $root = 'null', $order = 1): void
     {

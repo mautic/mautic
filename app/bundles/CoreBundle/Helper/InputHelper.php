@@ -92,7 +92,7 @@ final class InputHelper
     /**
      * Wrapper to InputHelper.
      *
-     * @param mixed[] $arguments
+     * @param array<int, mixed> $arguments
      *
      * @return mixed
      */

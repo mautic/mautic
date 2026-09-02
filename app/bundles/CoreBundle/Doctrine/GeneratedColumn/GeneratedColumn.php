@@ -16,6 +16,9 @@ final class GeneratedColumn implements GeneratedColumnInterface
 
     private ?string $timeUnit = null;
 
+    /**
+     * @var string[]
+     */
     private array $indexColumns = [];
 
     private ?string $filterDateColumn = null;
@@ -95,6 +98,9 @@ final class GeneratedColumn implements GeneratedColumnInterface
         return "{$this->columnType} AS ({$this->as}){$stored} COMMENT '(DC2Type:generated)'";
     }
 
+    /**
+     * @return string[]
+     */
     public function getIndexColumns(): array
     {
         return $this->indexColumns;

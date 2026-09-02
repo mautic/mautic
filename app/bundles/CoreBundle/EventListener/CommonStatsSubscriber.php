@@ -106,6 +106,9 @@ abstract class CommonStatsSubscriber implements EventSubscriberInterface
         return $this->addRestrictedRepostories($repoNames, ['lead' => 'lead:leads']);
     }
 
+    /**
+     * @param array<string, string> $permissions
+     */
     protected function addRestrictedRepostories(array $repoNames, array $permissions)
     {
         foreach ($repoNames as $repoName) {
