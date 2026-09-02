@@ -135,7 +135,7 @@ final class SourceControllerUnitTest extends TestCase
             ], JSON_THROW_ON_ERROR),
         ]);
 
-        $response = $controller->deleteAction($request, 1);
+        $response = $controller->deleteAction($request);
 
         $payload = json_decode((string) $response->getContent(), true);
         $this->assertSame(1, $payload['success']);
@@ -156,7 +156,7 @@ final class SourceControllerUnitTest extends TestCase
             'modifiedSources' => json_encode(['lists' => [12 => true]], JSON_THROW_ON_ERROR),
         ]);
 
-        $response = $controller->deleteAction($request, 1);
+        $response = $controller->deleteAction($request);
 
         $payload = json_decode((string) $response->getContent(), true);
         $this->assertSame(['success' => 0], $payload);
