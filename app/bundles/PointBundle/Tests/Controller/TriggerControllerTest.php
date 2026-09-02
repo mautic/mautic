@@ -34,7 +34,7 @@ final class TriggerControllerTest extends MauticMysqlTestCase
         $triggerModel = self::getContainer()->get(TriggerModel::class);
 
         $triggerRepo      = $triggerModel->getRepository();
-        $triggerEventRepo = $triggerModel->getEventRepository();
+        $triggerEventRepo = self::getContainer()->get(\Mautic\PointBundle\Entity\TriggerEventRepository::class);
 
         $trigger = $this->createTrigger('Trigger', 5);
         $this->createAddTagEvent('tag1', $trigger);
