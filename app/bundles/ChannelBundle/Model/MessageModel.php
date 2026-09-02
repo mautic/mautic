@@ -2,7 +2,7 @@
 
 namespace Mautic\ChannelBundle\Model;
 
-use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Entity\Message;
 use Mautic\ChannelBundle\Entity\MessageRepository;
@@ -35,19 +35,19 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
 
     protected ChannelListHelper $channelListHelper;
 
-    protected CampaignModel $campaignModel;
+    private LeadEventLogRepository $leadEventLogRepository;
 
     private MessageRepository $messageRepository;
 
     #[Required]
     public function autowireMessageModel(
         ChannelListHelper $channelListHelper,
-        CampaignModel $campaignModel,
+        LeadEventLogRepository $leadEventLogRepository,
         MessageRepository $messageRepository,
     ): void {
-        $this->channelListHelper = $channelListHelper;
-        $this->campaignModel     = $campaignModel;
-        $this->messageRepository = $messageRepository;
+        $this->channelListHelper      = $channelListHelper;
+        $this->leadEventLogRepository = $leadEventLogRepository;
+        $this->messageRepository      = $messageRepository;
     }
 
     /**
@@ -179,7 +179,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
 
     public function getLeadStatsPost($messageId, $dateFrom = null, $dateTo = null, $channel = null): array
     {
-        $eventLog = $this->campaignModel->getCampaignLeadEventLogRepository();
+        $eventLog = $this->leadEventLogRepository;
 
         return $eventLog->getChartQuery(
             [
@@ -198,7 +198,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
      */
     public function getMarketingMessagesEventLogs($messageId, $dateFrom = null, $dateTo = null)
     {
-        $eventLog = $this->campaignModel->getCampaignLeadEventLogRepository();
+        $eventLog = $this->leadEventLogRepository;
 
         return $eventLog->getEventLogs(['type' => 'message.send', 'dateFrom' => $dateFrom, 'dateTo' => $dateTo, 'channel' => 'message', 'channelId' => $messageId]);
     }
