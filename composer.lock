@@ -6729,16 +6729,16 @@
         },
         {
             "name": "nette/utils",
-            "version": "v4.1.4",
+            "version": "v4.1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/utils.git",
-                "reference": "7da6c396d7ebe142bc857c20479d5e70a5e1aac7"
+                "reference": "b043439dbdf954e6c28b5ea7e34b0100f83165e0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/utils/zipball/7da6c396d7ebe142bc857c20479d5e70a5e1aac7",
-                "reference": "7da6c396d7ebe142bc857c20479d5e70a5e1aac7",
+                "url": "https://api.github.com/repos/nette/utils/zipball/b043439dbdf954e6c28b5ea7e34b0100f83165e0",
+                "reference": "b043439dbdf954e6c28b5ea7e34b0100f83165e0",
                 "shasum": ""
             },
             "require": {
@@ -6758,7 +6758,7 @@
             },
             "suggest": {
                 "ext-gd": "to use Image",
-                "ext-iconv": "to use Strings::webalize(), toAscii(), chr() and reverse()",
+                "ext-iconv": "to use Strings::chr(), ord() and reverse()",
                 "ext-intl": "to use Strings::webalize(), toAscii(), normalize() and compare()",
                 "ext-json": "to use Nette\\Utils\\Json",
                 "ext-mbstring": "to use Strings::lower() etc...",
@@ -6814,9 +6814,9 @@
             ],
             "support": {
                 "issues": "https://github.com/nette/utils/issues",
-                "source": "https://github.com/nette/utils/tree/v4.1.4"
+                "source": "https://github.com/nette/utils/tree/v4.1.5"
             },
-            "time": "2026-05-11T20:49:54+00:00"
+            "time": "2026-07-17T23:02:45+00:00"
         },
         {
             "name": "nikic/php-parser",
@@ -9919,16 +9919,16 @@
         },
         {
             "name": "symfony/finder",
-            "version": "v7.4.14",
+            "version": "v7.4.17",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/finder.git",
-                "reference": "13b38720174286f55d1761152b575a8d1436fc25"
+                "reference": "5ce28827081f6d1f0c32eaf3882750f19cb5bbe6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/finder/zipball/13b38720174286f55d1761152b575a8d1436fc25",
-                "reference": "13b38720174286f55d1761152b575a8d1436fc25",
+                "url": "https://api.github.com/repos/symfony/finder/zipball/5ce28827081f6d1f0c32eaf3882750f19cb5bbe6",
+                "reference": "5ce28827081f6d1f0c32eaf3882750f19cb5bbe6",
                 "shasum": ""
             },
             "require": {
@@ -9963,7 +9963,7 @@
             "description": "Finds files and directories via an intuitive fluent interface",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/finder/tree/v7.4.14"
+                "source": "https://github.com/symfony/finder/tree/v7.4.17"
             },
             "funding": [
                 {
@@ -9983,7 +9983,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-06-27T08:31:18+00:00"
+            "time": "2026-08-21T12:09:28+00:00"
         },
         {
             "name": "symfony/form",
@@ -14256,16 +14256,16 @@
         },
         {
             "name": "tomasvotruba/class-leak",
-            "version": "2.2.0",
+            "version": "2.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/TomasVotruba/class-leak.git",
-                "reference": "cdc1c116f3deaa68ebd338fa2f791a0b4a52ad87"
+                "reference": "dc1988337e630e145bcaeaa8d2b528a91e205645"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/TomasVotruba/class-leak/zipball/cdc1c116f3deaa68ebd338fa2f791a0b4a52ad87",
-                "reference": "cdc1c116f3deaa68ebd338fa2f791a0b4a52ad87",
+                "url": "https://api.github.com/repos/TomasVotruba/class-leak/zipball/dc1988337e630e145bcaeaa8d2b528a91e205645",
+                "reference": "dc1988337e630e145bcaeaa8d2b528a91e205645",
                 "shasum": ""
             },
             "require": {
@@ -14309,7 +14309,7 @@
             "description": "Detect leaking classes",
             "support": {
                 "issues": "https://github.com/TomasVotruba/class-leak/issues",
-                "source": "https://github.com/TomasVotruba/class-leak/tree/2.2.0"
+                "source": "https://github.com/TomasVotruba/class-leak/tree/2.2.1"
             },
             "funding": [
                 {
@@ -14321,7 +14321,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-08-29T20:55:33+00:00"
+            "time": "2026-09-02T22:41:08+00:00"
         },
         {
             "name": "twbs/bootstrap-sass",
