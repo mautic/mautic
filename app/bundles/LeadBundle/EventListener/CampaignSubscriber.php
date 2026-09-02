@@ -77,6 +77,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
         private readonly TagRepository $tagRepository,
         private readonly CampaignLeadRepository $campaignLeadRepository,
         private readonly GroupContactScoreRepository $groupContactScoreRepository,
+        private readonly LeadDeviceRepository $leadDeviceRepository,
     ) {
     }
 
@@ -528,7 +529,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
         }
 
         if ($event->checkContext('lead.device')) {
-            $result = $this->validateContactDevice($event, $lead, $this->leadModel->getDeviceRepository());
+            $result = $this->validateContactDevice($event, $lead, $this->leadDeviceRepository);
         } elseif ($event->checkContext('lead.tags')) {
             $result = $this->tagRepository->checkLeadByTags($lead, $event->getConfig()['tags']);
         } elseif ($event->checkContext('lead.segments')) {

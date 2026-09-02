@@ -175,7 +175,8 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->createStub(LeadFieldRepository::class),
             $this->createStub(TagRepository::class),
             $this->createStub(\Mautic\CampaignBundle\Entity\LeadRepository::class),
-            $this->createStub(\Mautic\PointBundle\Entity\GroupContactScoreRepository::class)
+            $this->createStub(\Mautic\PointBundle\Entity\GroupContactScoreRepository::class),
+            $this->createStub(\Mautic\LeadBundle\Entity\LeadDeviceRepository::class)
         );
     }
 

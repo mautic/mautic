@@ -217,14 +217,6 @@ class LeadModel extends FormModel
     }
 
     /**
-     * Get the tags repository.
-     */
-    public function getDeviceRepository(): LeadDeviceRepository
-    {
-        return $this->leadDeviceRepository;
-    }
-
-    /**
      * Get the lead event log repository.
      */
     public function getEventLogRepository(): LeadEventLogRepository

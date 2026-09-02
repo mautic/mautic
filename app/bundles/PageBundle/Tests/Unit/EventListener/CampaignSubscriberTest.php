@@ -12,7 +12,7 @@ use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\PageBundle\EventListener\CampaignSubscriber;
 use Mautic\PageBundle\Helper\TrackingHelper;
 use PHPUnit\Framework\TestCase;
@@ -55,7 +55,7 @@ final class CampaignSubscriberTest extends TestCase
     private function getSubscriber(TrackingHelper $trackingHelper): CampaignSubscriber
     {
         return new CampaignSubscriber(
-            $this->createStub(LeadModel::class),
+            $this->createStub(LeadDeviceRepository::class),
             $trackingHelper,
             $this->createStub(RealTimeExecutioner::class)
         );
