@@ -466,11 +466,6 @@ class WebhookModel extends FormModel
         $this->saveEntity($webhook);
     }
 
-    public function getEventRepository(): EventRepository
-    {
-        return $this->eventRepository;
-    }
-
     public function getLogRepository(): LogRepository
     {
         return $this->logRepository;
