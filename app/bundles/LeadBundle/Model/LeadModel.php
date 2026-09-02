@@ -240,14 +240,6 @@ class LeadModel extends FormModel
         return $this->leadEventLogRepository;
     }
 
-    public function getStagesChangeLogRepository(): StagesChangeLogRepository
-    {
-        return $this->stagesChangeLogRepository;
-    }
-
-    /**
-     * Get the lead categories repository.
-     */
     public function getLeadCategoryRepository(): LeadCategoryRepository
     {
         return $this->leadCategoryRepository;
