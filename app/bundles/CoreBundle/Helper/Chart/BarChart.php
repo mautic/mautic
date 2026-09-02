@@ -51,6 +51,8 @@ final class BarChart extends AbstractChart implements ChartInterface
      * Generate unique color for the dataset.
      *
      * @param int $datasetId
+     *
+     * @return array<string, string|bool>
      */
     public function generateColors($datasetId): array
     {

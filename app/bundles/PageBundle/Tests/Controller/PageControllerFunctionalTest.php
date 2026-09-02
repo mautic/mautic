@@ -51,7 +51,7 @@ final class PageControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param mixed[] $filters
+     * @param array<int, array<string, int[]|null[]|string|null>> $filters
      */
     private function createDynamicContentWithSegmentFilter(array $filters = []): DynamicContent
     {

@@ -39,7 +39,7 @@ abstract class AbstractCommonModel implements MauticModelInterface, SearchComman
     /**
      * Retrieve the supported search commands for a repository.
      *
-     * @return array
+     * @return array{}
      */
     public function getSupportedSearchCommands()
     {

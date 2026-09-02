@@ -75,7 +75,7 @@ final class FieldModelFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param mixed[] $payload
+     * @param array<array<string, mixed>, mixed> $payload
      */
     private function createForm(array $payload): Form
     {

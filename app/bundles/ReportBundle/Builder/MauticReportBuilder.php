@@ -136,7 +136,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
     /**
      * This method configures the ReportBuilder. It has to return a configured Doctrine DBAL QueryBuilder.
      *
-     * @param array $options Options array
+     * @param array<string, mixed> $options Options array
      *
      * @return QueryBuilder
      */
@@ -825,8 +825,8 @@ final class MauticReportBuilder implements ReportBuilderInterface
     }
 
     /**
-     * @param mixed[] $filter
-     * @param mixed[] $filterDefinitions
+     * @param array<string, mixed> $filter
+     * @param mixed[]              $filterDefinitions
      */
     private function doesColumnSupportEmptyValue(array $filter, array $filterDefinitions): bool
     {

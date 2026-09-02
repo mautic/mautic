@@ -14,6 +14,9 @@ class PointActionHelper
     ) {
     }
 
+    /**
+     * @param array<string, mixed> $action
+     */
     public static function validatePageHit($eventDetails, array $action): bool
     {
         $pageHit = $eventDetails->getPage();
@@ -35,6 +38,9 @@ class PointActionHelper
         return empty($limitToPages) || in_array($pageHitId, $limitToPages);
     }
 
+    /**
+     * @param array<string, mixed> $action
+     */
     public function validateUrlHit($eventDetails, array $action): bool
     {
         $changePoints = [];

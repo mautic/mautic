@@ -7,7 +7,9 @@ use Mautic\PluginBundle\Exception\ApiErrorException;
 final class ZohoApi extends CrmApi
 {
     /**
-     * @param string $operation
+     * @param string                        $operation
+     * @param array<string, string|mixed[]> $parameters
+     * @param array<string, mixed>          $settings
      *
      * @return array
      *
@@ -81,7 +83,8 @@ final class ZohoApi extends CrmApi
     }
 
     /**
-     * @param string $object
+     * @param string               $object
+     * @param array<string, mixed> $params
      *
      * @return array
      *
@@ -115,6 +118,8 @@ final class ZohoApi extends CrmApi
     }
 
     /**
+     * @param array<string, mixed> $params
+     *
      * @return array
      *
      * @throws ApiErrorException

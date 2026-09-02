@@ -105,6 +105,9 @@ final class EventAccessor
         return $this->decisions;
     }
 
+    /**
+     * @param array<string, mixed> $events
+     */
     private function buildEvents(array $events): void
     {
         if (isset($events[Event::TYPE_ACTION])) {

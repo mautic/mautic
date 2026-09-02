@@ -16,6 +16,8 @@ final class DataExporterHelper
      *
      * @template T of object
      *
+     * @param array<string, mixed> $args
+     *
      * @return mixed[]|null
      */
     public function getDataForExport(
@@ -57,6 +59,9 @@ final class DataExporterHelper
         return $toExport;
     }
 
+    /**
+     * @param string[] $row
+     */
     private function secureAgainstCsvInjection(array $row): array
     {
         foreach ($row as $colNum => $colVal) {

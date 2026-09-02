@@ -237,7 +237,7 @@ final readonly class AssetGenerationHelper
     /**
      * Finds directory assets.
      *
-     * @param mixed[] $assets
+     * @param array<string, mixed> $assets
      *
      * @return array<string, false|int>
      */
@@ -324,6 +324,8 @@ final readonly class AssetGenerationHelper
 
     /**
      * Find asset overrides in the template.
+     *
+     * @param array<string, mixed> $assets
      */
     private function findOverrides(string $env, array &$assets): array
     {

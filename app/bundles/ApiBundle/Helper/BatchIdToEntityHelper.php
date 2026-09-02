@@ -10,6 +10,9 @@ final class BatchIdToEntityHelper
 
     private array $originalKeys = [];
 
+    /**
+     * @var string[]
+     */
     private array $errors = [];
 
     private bool $isAssociative = false;
@@ -36,6 +39,9 @@ final class BatchIdToEntityHelper
         return [] !== $this->errors;
     }
 
+    /**
+     * @return string[]
+     */
     public function getErrors(): array
     {
         return $this->errors;
@@ -83,6 +89,9 @@ final class BatchIdToEntityHelper
         return $orderedEntities;
     }
 
+    /**
+     * @param array<string, mixed> $parameters
+     */
     private function extractIds(array $parameters): void
     {
         $this->ids = [];
@@ -124,6 +133,9 @@ final class BatchIdToEntityHelper
         $this->errors[] = 'mautic.api.call.id_missing';
     }
 
+    /**
+     * @param array<string, mixed> $parameters
+     */
     private function extractIdsFromParams(array $parameters): void
     {
         $this->isAssociative = $this->isAssociativeArray($parameters);

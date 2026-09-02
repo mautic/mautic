@@ -79,8 +79,9 @@ abstract class AbstractHelper implements StatHelperInterface
     }
 
     /**
-     * @param string $column
-     * @param string $prefix
+     * @param string            $column
+     * @param string            $prefix
+     * @param array<int, mixed> $ids
      */
     protected function limitQueryToEmailIds(QueryBuilder $q, array $ids, $column, $prefix): void
     {

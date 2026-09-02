@@ -440,7 +440,8 @@ class StatRepository extends CommonRepository
     /**
      * Get a lead's email stat.
      *
-     * @param int $leadId
+     * @param int                  $leadId
+     * @param array<string, mixed> $options
      *
      * @return array
      *

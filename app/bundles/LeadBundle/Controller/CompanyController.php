@@ -702,6 +702,8 @@ final class CompanyController extends FormController
      * @param int        $companyId
      * @param int        $page
      * @param array<int> $leadIds   filter to get only company's contacts
+     *
+     * @return array<string, mixed>
      */
     public function getCompanyContacts(Request $request, $companyId, $page = 0, $leadIds = []): array
     {

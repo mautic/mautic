@@ -74,7 +74,7 @@ final class ModifyCustomFieldCommandFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param mixed[] $rows
+     * @param array<array<mixed, array<string, mixed>>, mixed> $rows
      */
     private function createCustomFields(array $rows): void
     {
@@ -97,7 +97,7 @@ final class ModifyCustomFieldCommandFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param mixed[] $rows
+     * @param array<array<mixed, array<string, mixed>>, mixed> $rows
      */
     private function generateSmallCSV(array $rows): string
     {

@@ -52,6 +52,8 @@ final class FieldFilterHelper
     }
 
     /**
+     * @param MappedFieldInfoInterface[] $fields
+     *
      * @return MappedFieldInfoInterface[]
      */
     private function getPageOfFields(array $fields, int $page, int $limit): array
@@ -62,6 +64,8 @@ final class FieldFilterHelper
     }
 
     /**
+     * @param MappedFieldInfoInterface[] $fields
+     *
      * @return MappedFieldInfoInterface[]
      */
     private function getFieldsByKeyword(array $fields, string $keyword): array

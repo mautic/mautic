@@ -41,7 +41,8 @@ final class CustomFieldHelper
     }
 
     /**
-     * @param mixed $value This value can be at least array, string, null and maybe others
+     * @param mixed                $value This value can be at least array, string, null and maybe others
+     * @param array<string, mixed> $field
      *
      * @return mixed|string|null
      */

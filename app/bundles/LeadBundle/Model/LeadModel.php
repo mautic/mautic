@@ -1850,11 +1850,12 @@ class LeadModel extends FormModel
     /**
      * Get bar chart data of contacts.
      *
-     * @param string    $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param string    $dateFormat
-     * @param bool      $canViewOthers
+     * @param string               $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param \DateTime            $dateFrom
+     * @param \DateTime            $dateTo
+     * @param string               $dateFormat
+     * @param bool                 $canViewOthers
+     * @param array<string, mixed> $filter
      */
     public function getLeadsLineChartData($unit, $dateFrom, $dateTo, $dateFormat = null, array $filter = [], $canViewOthers = true): array
     {
@@ -2069,8 +2070,9 @@ class LeadModel extends FormModel
     /**
      * Get a list of leads in a date range.
      *
-     * @param int   $limit
-     * @param array $filters
+     * @param int                  $limit
+     * @param array                $filters
+     * @param array<string, mixed> $options
      */
     public function getLeadList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], array $options = []): array
     {
@@ -2387,7 +2389,7 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param mixed[] $args
+     * @param array<string, mixed> $args
      *
      * @return int[]
      */

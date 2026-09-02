@@ -144,7 +144,7 @@ abstract class AbstractPermissions
      * @param string $name
      * @param string $level
      *
-     * @return array
+     * @return array<int, string>
      */
     protected function getSynonym($name, $level)
     {
@@ -211,7 +211,8 @@ abstract class AbstractPermissions
     }
 
     /**
-     * @param bool $isSecondRound
+     * @param bool                 $isSecondRound
+     * @param array<string, mixed> $permissions
      *
      * @return bool Return true if a second round is required after all other bundles have analyzed it's permissions
      */
@@ -261,7 +262,7 @@ abstract class AbstractPermissions
     /**
      * Generates an array of granted and total permissions.
      *
-     * @return array
+     * @return array<int, int>
      */
     public function getPermissionRatio(array $data)
     {
@@ -362,6 +363,7 @@ abstract class AbstractPermissions
      * @param string               $level
      * @param FormBuilderInterface $builder
      * @param bool                 $includePublish
+     * @param array<string, mixed> $data
      */
     protected function addStandardFormFields($bundle, $level, &$builder, array $data, $includePublish = true)
     {
@@ -427,6 +429,7 @@ abstract class AbstractPermissions
      * @param string               $bundle
      * @param string               $level
      * @param FormBuilderInterface $builder
+     * @param array<string, mixed> $data
      */
     protected function addManageFormFields($bundle, $level, &$builder, array $data)
     {
@@ -486,6 +489,7 @@ abstract class AbstractPermissions
      * @param string               $level
      * @param FormBuilderInterface $builder
      * @param bool                 $includePublish
+     * @param array<string, mixed> $data
      */
     protected function addExtendedFormFields($bundle, $level, &$builder, array $data, $includePublish = true)
     {

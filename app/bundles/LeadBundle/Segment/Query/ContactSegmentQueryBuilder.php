@@ -243,6 +243,8 @@ final class ContactSegmentQueryBuilder
     /**
      * Returns array with plan for processing.
      *
+     * @param int[] $resolved
+     *
      * @throws SegmentQueryException
      */
     private function getResolutionPlan(int $segmentId, array $seen = [], array &$resolved = []): array

@@ -20,6 +20,8 @@ readonly class ContactSegmentService
     }
 
     /**
+     * @param array<string, mixed> $batchLimiters
+     *
      * @return array<int,mixed[]>
      *
      * @throws Exception\SegmentQueryException
@@ -112,6 +114,7 @@ readonly class ContactSegmentService
 
     /**
      * @param array<string, mixed> $batchLimiters
+<<<<<<< HEAD
      *
      * @throws Exception\SegmentQueryException
      * @throws \Doctrine\DBAL\Exception
@@ -140,6 +143,8 @@ readonly class ContactSegmentService
 
     /**
      * @param mixed[] $batchLimiters
+=======
+>>>>>>> 509f602fb6 ([cs] add iterable docblock types with more precise values)
      */
     public function getNewLeadListLeadsQueryBuilder(LeadList $segment, array $batchLimiters, bool $addNewContactsRestrictions = true): QueryBuilder
     {

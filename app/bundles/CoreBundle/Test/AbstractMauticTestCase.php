@@ -49,6 +49,9 @@ abstract class AbstractMauticTestCase extends WebTestCase
         'PHP_AUTH_PW'   => 'Maut1cR0cks!',
     ];
 
+    /**
+     * @var array<string, bool|string>
+     */
     protected array $configParams = [
         'api_enabled'                       => true,
         'api_enable_basic_auth'             => true,

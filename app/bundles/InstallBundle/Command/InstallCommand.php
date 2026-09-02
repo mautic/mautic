@@ -352,8 +352,8 @@ final class InstallCommand extends Command
     /**
      * Controller action for install steps.
      *
-     * @param array $params The install parameters
-     * @param float $index  The step number to process
+     * @param array<string, mixed> $params The install parameters
+     * @param float                $index  The step number to process
      *
      * @throws \Exception
      */

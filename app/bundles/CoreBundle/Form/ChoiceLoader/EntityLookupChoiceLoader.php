@@ -170,6 +170,8 @@ final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     }
 
     /**
+     * @param int[] $data
+     *
      * @return array|mixed
      */
     private function fetchChoices(string $modelName, array $data = [])

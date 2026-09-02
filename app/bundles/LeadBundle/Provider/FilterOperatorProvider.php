@@ -38,7 +38,7 @@ final class FilterOperatorProvider implements FilterOperatorProviderInterface
     }
 
     /**
-     * @param mixed[] $operators
+     * @param array<string, mixed[]> $operators
      *
      * @return mixed[]
      */

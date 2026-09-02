@@ -17,6 +17,9 @@ final class FileController extends AjaxController
 {
     public const string EDITOR_CKEDITOR = 'ckeditor';
 
+    /**
+     * @var array<mixed, array<string, string>>
+     */
     private array $response = [];
 
     private int $statusCode = Response::HTTP_OK;

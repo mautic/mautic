@@ -35,6 +35,9 @@ class RelationsHelper
         }
     }
 
+    /**
+     * @return ObjectDAO[]
+     */
     public function getObjectsToSynchronize(): array
     {
         return $this->objectsToSynchronize;

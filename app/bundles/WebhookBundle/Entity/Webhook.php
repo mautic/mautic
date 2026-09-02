@@ -98,6 +98,9 @@ class Webhook extends FormEntity implements SkipModifiedInterface
      */
     private $logs;
 
+    /**
+     * @var Event[]
+     */
     private array $removedEvents = [];
 
     /**
@@ -109,6 +112,8 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     /**
      * Holds a simplified array of events, just an array of event types.
      * It's used for API serializaiton.
+     *
+     * @var string[]|null[]
      */
     #[Groups(['webhook:read', 'webhook:write'])]
     private array $triggers = [];

@@ -104,6 +104,9 @@ class OneSignalApi extends AbstractNotificationApi
         return $this->send('/notifications', $data);
     }
 
+    /**
+     * @param array<string, mixed[]>|array<string, null>|array<string, string>|string[] $data
+     */
     protected function addMobileData(array &$data, array $mobileConfig): void
     {
         foreach ($mobileConfig as $key => $value) {

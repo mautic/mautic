@@ -9,7 +9,8 @@ use Mautic\LeadBundle\Entity\Lead;
 final class EventHelper
 {
     /**
-     * @param Lead $lead
+     * @param Lead                 $lead
+     * @param array<string, mixed> $action
      *
      * @return int
      */

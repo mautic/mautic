@@ -96,7 +96,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param mixed[] $payload
+     * @param array<string, string>|array<string, int>|null[] $payload
      */
     private function makeRequest(array $payload): void
     {

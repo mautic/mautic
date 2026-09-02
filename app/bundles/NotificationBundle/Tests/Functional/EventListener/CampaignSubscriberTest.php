@@ -498,7 +498,7 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param mixed[] $expectedData
+     * @param array<array<string, mixed>, mixed> $expectedData
      */
     private function responseDataAssertion(
         array $expectedData,

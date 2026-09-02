@@ -226,6 +226,8 @@ class EventRepository extends CommonRepository
     /**
      * Get array of events with stats.
      *
+     * @param array<string, mixed> $args
+     *
      * @return array
      */
     public function getEvents(array $args = [])

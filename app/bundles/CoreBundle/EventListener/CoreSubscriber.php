@@ -244,6 +244,9 @@ final readonly class CoreSubscriber implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @param array<string, mixed> $details
+     */
     private function addRouteToCollection(RouteCollection $collection, string $type, string $name, array $details): void
     {
         // Set defaults and controller

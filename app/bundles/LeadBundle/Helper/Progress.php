@@ -97,6 +97,8 @@ final class Progress
 
     /**
      * Bind Progress from simple array.
+     *
+     * @param array<int, mixed> $progress
      */
     public function bindArray(array $progress): static
     {
@@ -113,6 +115,8 @@ final class Progress
 
     /**
      * Convert this object to a simple array.
+     *
+     * @return array<int, int>
      */
     public function toArray(): array
     {

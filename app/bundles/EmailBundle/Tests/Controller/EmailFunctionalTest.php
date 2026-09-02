@@ -203,8 +203,8 @@ final class EmailFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param mixed[] $expectedAvailableOptions
-     * @param mixed[] $expectedValue
+     * @param int[]|null[] $expectedAvailableOptions
+     * @param int[]|null[] $expectedValue
      */
     private function assertChoiceOptions(ChoiceFormField $field, array $expectedAvailableOptions, array $expectedValue): void
     {
@@ -213,7 +213,7 @@ final class EmailFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param mixed[] $expectedListIds
+     * @param int[]|null[] $expectedListIds
      */
     private function assertEmailLists(array $expectedListIds, Collection $collection): void
     {

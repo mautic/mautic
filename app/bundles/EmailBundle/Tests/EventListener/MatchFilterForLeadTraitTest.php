@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 final class MatchFilterForLeadTraitTest extends TestCase
 {
     /**
-     * @var mixed[]
+     * @var array<string, int|string>
      */
     private array $lead = [
         'id'     => 1,
@@ -21,7 +21,7 @@ final class MatchFilterForLeadTraitTest extends TestCase
     ];
 
     /**
-     * @var mixed[]
+     * @var array<int, array<string, string|null>>
      */
     private array $filter = [
         0 => [

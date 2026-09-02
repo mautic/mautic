@@ -34,8 +34,9 @@ class AjaxController extends CommonController
     }
 
     /**
-     * @param int  $statusCode
-     * @param bool $addIgnoreWdt
+     * @param int                                                                        $statusCode
+     * @param bool                                                                       $addIgnoreWdt
+     * @param array<string, int>|array<string, string>|array<int, array<string, string>> $dataArray
      *
      * @throws \Exception
      */

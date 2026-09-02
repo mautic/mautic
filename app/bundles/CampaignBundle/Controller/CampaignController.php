@@ -1282,6 +1282,8 @@ class CampaignController extends AbstractStandardFormController
 
     /**
      * @param bool $isClone
+     *
+     * @return array{}
      */
     protected function prepareCampaignEventsForEdit($entity, $objectId, $isClone = false): array
     {

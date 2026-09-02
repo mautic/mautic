@@ -131,6 +131,9 @@ final class SysinfoModel
         return $this->tail($log, $lines);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getDbInfo(): array
     {
         return [

@@ -92,6 +92,9 @@ final class DoctrineStep implements StepInterface
         return DoctrineStepType::class;
     }
 
+    /**
+     * @return string[]
+     */
     public function checkRequirements(): array
     {
         $messages = [];

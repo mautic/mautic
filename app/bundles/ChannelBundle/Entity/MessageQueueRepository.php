@@ -99,7 +99,8 @@ class MessageQueueRepository extends CommonRepository
     /**
      * Get a lead's point log.
      *
-     * @param int|null $leadId
+     * @param int|null             $leadId
+     * @param array<string, mixed> $options
      *
      * @return array
      */

@@ -42,6 +42,9 @@ final class ExampleSyncDataExchange implements SyncDataExchangeInterface
         ],
     ];
 
+    /**
+     * @var array<string, never[]>
+     */
     private array $payload = ['create' => [], 'update' => []];
 
     private readonly ValueNormalizer $valueNormalizer;
@@ -211,6 +214,9 @@ final class ExampleSyncDataExchange implements SyncDataExchangeInterface
         return $syncReport;
     }
 
+    /**
+     * @return array<string, never[]>
+     */
     public function getOrderPayload(): array
     {
         return $this->payload;

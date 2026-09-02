@@ -23,6 +23,9 @@ final class DBALMocker
 
     private $queryResponse;
 
+    /**
+     * @var array<string, never[]>
+     */
     private array $queryParts = [
         'select'     => [],
         'from'       => [],
@@ -40,6 +43,9 @@ final class DBALMocker
         $this->queryResponse = $queryResponse;
     }
 
+    /**
+     * @return array<string, never[]>
+     */
     public function getQueryParts(): array
     {
         return $this->queryParts;

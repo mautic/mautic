@@ -27,7 +27,7 @@ abstract class AbstractRemoteDataLookup extends AbstractLookup
     abstract protected function parseResponse($response);
 
     /**
-     * @return array
+     * @return array{}
      */
     protected function getHeaders()
     {
@@ -35,7 +35,7 @@ abstract class AbstractRemoteDataLookup extends AbstractLookup
     }
 
     /**
-     * @return array
+     * @return array{}
      */
     protected function getParameters()
     {

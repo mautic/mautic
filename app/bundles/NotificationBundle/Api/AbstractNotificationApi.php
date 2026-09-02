@@ -31,7 +31,8 @@ abstract class AbstractNotificationApi
     /**
      * Convert a non-tracked url to a tracked url.
      *
-     * @param string $url
+     * @param string               $url
+     * @param array<string, mixed> $clickthrough
      *
      * @return string
      */

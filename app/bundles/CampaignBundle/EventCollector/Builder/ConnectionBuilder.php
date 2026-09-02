@@ -6,6 +6,9 @@ final class ConnectionBuilder
 {
     private static array $eventTypes = [];
 
+    /**
+     * @var array<string, never[]>
+     */
     private static array $connectionRestrictions = ['anchor' => []];
 
     /**
@@ -28,7 +31,8 @@ final class ConnectionBuilder
     }
 
     /**
-     * @param string $key
+     * @param string               $key
+     * @param array<string, mixed> $event
      */
     private static function addTypeConnection($key, array $event): void
     {

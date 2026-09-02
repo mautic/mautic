@@ -32,6 +32,8 @@ final class SchemaHelper
     private ?AbstractSchemaManager $schemaManager = null;
 
     /**
+     * @param array<string, mixed> $dbParams
+     *
      * @throws \Doctrine\DBAL\Exception
      */
     public function __construct(
@@ -196,6 +198,9 @@ final class SchemaHelper
     }
 
     /**
+     * @param string[]              $tables
+     * @param array<string, string> $mauticTables
+     *
      * @throws \Doctrine\DBAL\Exception
      */
     private function backupExistingSchema(array $tables, array $mauticTables, string $backupPrefix): array
@@ -292,6 +297,10 @@ final class SchemaHelper
         return $sql;
     }
 
+    /**
+     * @param string[]              $tables
+     * @param array<string, string> $mauticTables
+     */
     private function dropExistingSchema(array $tables, array $mauticTables): array
     {
         $sql = [];

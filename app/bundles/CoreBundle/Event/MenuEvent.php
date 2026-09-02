@@ -25,6 +25,8 @@ final class MenuEvent extends Event
 
     /**
      * Add items to the menu.
+     *
+     * @param array<string, mixed> $menuItems
      */
     public function addMenuItems(array $menuItems): void
     {

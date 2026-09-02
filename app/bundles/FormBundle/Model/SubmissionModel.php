@@ -120,7 +120,8 @@ final class SubmissionModel extends CommonFormModel
     }
 
     /**
-     * @param bool $returnEvent
+     * @param bool                 $returnEvent
+     * @param array<string, mixed> $server
      *
      * @throws ORMException
      */

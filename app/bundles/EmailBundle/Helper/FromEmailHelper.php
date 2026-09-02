@@ -122,7 +122,7 @@ class FromEmailHelper
     }
 
     /**
-     * @param mixed[] $owner
+     * @param array<string, mixed> $owner
      */
     private function replaceSignatureTokens(array $owner): string
     {

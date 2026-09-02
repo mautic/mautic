@@ -1107,6 +1107,9 @@ final class LoadSegmentsData extends Fixture implements OrderedFixtureInterface
         }
     }
 
+    /**
+     * @param array<string, mixed> $listConfig
+     */
     private function createSegment(array $listConfig, ObjectManager $manager): void
     {
         $adminUser = $this->getReference('admin-user');

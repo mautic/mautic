@@ -394,6 +394,9 @@ trait CustomFieldRepositoryTrait
         return $this->customFieldList;
     }
 
+    /**
+     * @param int[] $fields
+     */
     protected function prepareDbalFieldsForSave(array &$fields): void
     {
         // Ensure booleans are integers
