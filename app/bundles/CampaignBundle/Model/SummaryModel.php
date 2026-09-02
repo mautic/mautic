@@ -148,11 +148,6 @@ class SummaryModel extends AbstractCommonModel
         $this->outputProcessTime($startedAt, $output);
     }
 
-    public function getCampaignLeadEventLogRepository(): LeadEventLogRepository
-    {
-        return $this->leadEventLogRepository;
-    }
-
     /**
      * @throws \Doctrine\DBAL\Exception
      */
