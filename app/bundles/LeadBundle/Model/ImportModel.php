@@ -45,8 +45,6 @@ class ImportModel extends FormModel
         return 'lead.import';
     }
 
-    protected LeadEventLogRepository $leadEventLogRepo;
-
     public function __construct(
         protected PathsHelper $pathsHelper,
         protected LeadModel $leadModel,
@@ -64,8 +62,6 @@ class ImportModel extends FormModel
         private readonly ImportRepository $importRepository,
         private readonly LeadEventLogRepository $leadEventLogRepository,
     ) {
-        $this->leadEventLogRepo  = $leadModel->getEventLogRepository();
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $config);
     }
 
@@ -357,7 +353,7 @@ class ImportModel extends FormModel
                     $eventLog->addProperty('error', implode('\n', $event->getWarnings()))
                         ->setAction('failed');
                 }
-                $this->leadEventLogRepo->saveEntity($eventLog);
+                $this->leadEventLogRepository->saveEntity($eventLog);
             }
 
             // Release entities in Doctrine's memory to prevent memory leak
@@ -479,7 +475,7 @@ class ImportModel extends FormModel
         $eventLog->addProperty('error', $this->translator->trans($errorMessage))
             ->setAction('failed');
 
-        $this->leadEventLogRepo->saveEntity($eventLog);
+        $this->leadEventLogRepository->saveEntity($eventLog);
     }
 
     /**
