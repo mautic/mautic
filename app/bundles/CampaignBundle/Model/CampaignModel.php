@@ -87,11 +87,6 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         return $this->campaignRepository;
     }
 
-    public function getEventRepository(): EventRepository
-    {
-        return $this->eventRepository;
-    }
-
     public function getCampaignLeadRepository(): LeadRepository
     {
         return $this->leadRepository;

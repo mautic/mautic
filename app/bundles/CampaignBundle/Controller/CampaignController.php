@@ -8,6 +8,7 @@ use Mautic\AssetBundle\Event\AssetExportListEvent;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\SummaryRepository;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
@@ -127,6 +128,7 @@ class CampaignController extends AbstractStandardFormController
         private readonly CampaignRepository $campaignRepository,
         private readonly SummaryRepository $summaryRepository,
         private readonly LeadEventLogRepository $leadEventLogRepository,
+        private readonly EventRepository $eventRepository,
     ) {
         parent::__construct($formFactory, $fieldHelper, $managerRegistry, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -521,7 +523,7 @@ class CampaignController extends AbstractStandardFormController
         $response        = [];
         // CRITICAL: Always include deleted events in individual tabs by setting ignoreDeleted=false
         // This ensures deleted events appear in the action/decision/condition tabs
-        $events          = $this->campaignModel->getEventRepository()->getCampaignEvents($objectId, false);
+        $events          = $this->eventRepository->getCampaignEvents($objectId, false);
 
         $dateFrom        = null;
         $dateTo          = null;
