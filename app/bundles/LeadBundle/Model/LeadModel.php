@@ -240,14 +240,6 @@ class LeadModel extends FormModel
         return $this->leadEventLogRepository;
     }
 
-    /**
-     * Get the frequency rules repository.
-     */
-    public function getFrequencyRuleRepository(): FrequencyRuleRepository
-    {
-        return $this->frequencyRuleRepository;
-    }
-
     public function getStagesChangeLogRepository(): StagesChangeLogRepository
     {
         return $this->stagesChangeLogRepository;
