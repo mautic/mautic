@@ -1329,7 +1329,7 @@ class LeadModel extends FormModel
      * @param string[]|string|null         $tags
      * @param ?int                         $importId
      */
-    public function import(array $fields, array $data, $owner = null, $list = null, $tags = null, bool $persist = true, ?LeadEventLog $eventLog = null, $importId = null, bool $skipIfExists = false): bool
+    public function import(array $fields, array $data, $owner = null, $list = null, $tags = null, bool $persist = true, ?LeadEventLog $eventLog = null, $importId = null, bool $skipIfExists = false, bool $createNew = true): bool
     {
         $fields    = array_flip($fields);
 
@@ -1345,6 +1345,10 @@ class LeadModel extends FormModel
 
         $lead ??= $this->checkForDuplicateContact($fieldData);
         $merged = (bool) $lead->getId();
+
+        if (!$createNew && !$merged) {
+            throw new \Exception($this->translator->trans('mautic.lead.import.creating_contacts_disabled'));
+        }
 
         if ($merged) {
             $granted = $this->security->hasEntityAccess(
