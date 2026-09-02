@@ -60,7 +60,8 @@ final class FormSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->createStub(LeadFieldRepository::class),
             $this->createStub(PointGroupModel::class),
             $this->createStub(DoNotContact::class),
-            $this->createStub(FieldModel::class)
+            $this->createStub(FieldModel::class),
+            $this->createStub(\Mautic\LeadBundle\Entity\UtmTagRepository::class)
         );
     }
 

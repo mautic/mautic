@@ -13,6 +13,7 @@ use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Entity\UtmTag;
+use Mautic\LeadBundle\Entity\UtmTagRepository;
 use Mautic\LeadBundle\Form\Type\ActionAddUtmTagsType;
 use Mautic\LeadBundle\Form\Type\ActionRemoveDoNotContact;
 use Mautic\LeadBundle\Form\Type\CompanyChangeScoreActionType;
@@ -40,6 +41,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         private PointGroupModel $groupModel,
         private DoNotContact $doNotContact,
         private FieldModel $leadFieldModel,
+        private UtmTagRepository $utmTagRepository,
     ) {
     }
 
@@ -280,7 +282,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         $utmValues->setUtmTerm($queryArray['utm_term'] ?? $queryReferer['utm_term'] ?? null);
 
         if ($utmValues->hasUtmTags()) {
-            $this->leadModel->getUtmTagRepository()->saveEntity($utmValues);
+            $this->utmTagRepository->saveEntity($utmValues);
             $this->leadModel->setUtmTags($utmValues->getLead(), $utmValues);
         }
     }

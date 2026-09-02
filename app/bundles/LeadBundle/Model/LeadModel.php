@@ -219,14 +219,6 @@ class LeadModel extends FormModel
     /**
      * Get the tags repository.
      */
-    public function getUtmTagRepository(): UtmTagRepository
-    {
-        return $this->utmTagRepository;
-    }
-
-    /**
-     * Get the tags repository.
-     */
     public function getDeviceRepository(): LeadDeviceRepository
     {
         return $this->leadDeviceRepository;
