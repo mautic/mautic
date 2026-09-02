@@ -237,11 +237,6 @@ class LeadModel extends FormModel
         return $this->leadListRepository;
     }
 
-    public function getGroupContactScoreRepository(): GroupContactScoreRepository
-    {
-        return $this->groupContactScoreRepository;
-    }
-
     public function getPermissionBase(): string
     {
         return 'lead:leads';

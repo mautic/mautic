@@ -51,6 +51,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Provider\FilterOperatorProvider;
 use Mautic\LeadBundle\Segment\OperatorOptions;
+use Mautic\PointBundle\Entity\GroupContactScoreRepository;
 use Mautic\PointBundle\Model\PointGroupModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -75,6 +76,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
         private readonly LeadFieldRepository $leadFieldRepository,
         private readonly TagRepository $tagRepository,
         private readonly CampaignLeadRepository $campaignLeadRepository,
+        private readonly GroupContactScoreRepository $groupContactScoreRepository,
     ) {
     }
 
@@ -709,7 +711,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
             $operatorExpr = $operators[$event->getConfig()['operator']]['expr'];
 
             if ($group) {
-                $result = $this->leadModel->getGroupContactScoreRepository()->compareScore(
+                $result = $this->groupContactScoreRepository->compareScore(
                     $lead->getId(), $group, $score, $operatorExpr,
                 );
             } else {
