@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Model\FieldModel;
-use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Entity\PointsChangeLogRepository;
 use Mautic\LeadBundle\Report\DncReportService;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ColumnCollectEvent;
@@ -64,7 +64,7 @@ final class ReportSubscriber implements EventSubscriberInterface
     private ?array $channelActions = null;
 
     public function __construct(
-        private readonly LeadModel $leadModel,
+        private readonly PointsChangeLogRepository $pointsChangeLogRepository,
         private readonly FieldModel $fieldModel,
         private readonly StageModel $stageModel,
         private readonly EventCollector $eventCollector,
@@ -391,7 +391,7 @@ final class ReportSubscriber implements EventSubscriberInterface
 
         $graphs       = $event->getRequestedGraphs();
         $qb           = $event->getQueryBuilder();
-        $pointLogRepo = $this->leadModel->getPointLogRepository();
+        $pointLogRepo = $this->pointsChangeLogRepository;
 
         foreach ($graphs as $g) {
             $queryBuilder = clone $qb;

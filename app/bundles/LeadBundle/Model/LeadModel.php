@@ -211,11 +211,6 @@ class LeadModel extends FormModel
         return $this->leadRepository;
     }
 
-    public function getPointLogRepository(): PointsChangeLogRepository
-    {
-        return $this->pointsChangeLogRepository;
-    }
-
     /**
      * Get the lead event log repository.
      */

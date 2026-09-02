@@ -18,7 +18,6 @@ use Mautic\LeadBundle\Entity\PointsChangeLogRepository;
 use Mautic\LeadBundle\EventListener\ReportSubscriber;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Model\FieldModel;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Report\DncReportService;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ColumnCollectEvent;
@@ -36,11 +35,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 #[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MockObject&LeadModel
-     */
-    private MockObject $leadModelMock;
-
     /**
      * @var MockObject&FieldModel
      */
@@ -125,7 +119,6 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->leadModelMock                    = $this->createMock(LeadModel::class);
         $this->leadFieldModelMock               = $this->createMock(FieldModel::class);
         $stageModelMock                         = $this->createMock(StageModel::class);
         $eventCollectorMock                     = $this->createMock(EventCollector::class);
@@ -140,7 +133,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->queryBuilderMock                 = $this->createMock(QueryBuilder::class);
         $this->reportGraphEventMock             = $this->createMock(ReportGraphEvent::class);
         $this->reportSubscriber                 = new ReportSubscriber(
-            $this->leadModelMock,
+            $this->createStub(PointsChangeLogRepository::class),
             $this->leadFieldModelMock,
             $stageModelMock,
             $eventCollectorMock,
@@ -879,10 +872,6 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                 'mautic.lead.graph.line.points',
                 'mautic.lead.table.most.points',
             ]);
-
-        $this->leadModelMock->expects($this->once())
-            ->method('getPointLogRepository')
-            ->willReturn($this->createStub(PointsChangeLogRepository::class));
 
         $this->reportGraphEventMock->expects($this->once())
             ->method('getQueryBuilder')
