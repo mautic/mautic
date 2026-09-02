@@ -28,6 +28,9 @@ final readonly class FrequencyActionModel
         }
     }
 
+    /**
+     * @param array<string, mixed> $params
+     */
     private function updateFrequencyRules(Lead $contact, array $params, ?string $preferredChannel): void
     {
         $frequencyRules = $contact->getFrequencyRules()->toArray();

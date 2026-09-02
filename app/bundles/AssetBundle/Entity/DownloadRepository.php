@@ -45,7 +45,8 @@ class DownloadRepository extends CommonRepository
     /**
      * Get a lead's page downloads.
      *
-     * @param int|null $leadId
+     * @param int|null             $leadId
+     * @param array<string, mixed> $options
      *
      * @return array
      */

@@ -632,7 +632,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     /**
      * @param array<int, array<string|int>> $errors
      * @param TEntity|null                  $entity
-     * @param array<int, TEntity|null>      $entities
+     * @param array<TEntity|null>           $entities
      */
     protected function setBatchError(int $key, string $msg, int $code, array &$errors, array &$entities = [], ?object $entity = null): void
     {

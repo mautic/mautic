@@ -203,6 +203,8 @@ abstract class SocialIntegration extends AbstractIntegration
     /**
      * Get the access token from session or socialCache.
      *
+     * @param array<string, mixed> $socialCache
+     *
      * @return array|mixed|null
      */
     protected function getContactAccessToken(array &$socialCache)

@@ -62,6 +62,7 @@ final readonly class ReloadHelper
      * @param array<string, array<class-string, ClassMetadata>> $pluginMetadata
      * @param array<string, Plugin>                             $installedPlugins
      * @param array<string, Schema>                             $installedPluginsSchemas
+     * @param array<string, mixed>                              $allPlugins
      */
     public function updatePlugins(array $allPlugins, array $installedPlugins, array $pluginMetadata, array $installedPluginsSchemas): array
     {
@@ -124,6 +125,9 @@ final readonly class ReloadHelper
         return $installedPlugins;
     }
 
+    /**
+     * @param array<string, mixed> $config
+     */
     private function mapConfigToPluginEntity(Plugin $plugin, array $config): Plugin
     {
         $plugin->setBundle($config['bundle']);

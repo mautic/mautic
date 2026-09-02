@@ -68,6 +68,9 @@ final class CheckStep implements StepInterface
         return CheckStepType::class;
     }
 
+    /**
+     * @return string[]
+     */
     public function checkRequirements(): array
     {
         $messages = [];
@@ -149,6 +152,9 @@ final class CheckStep implements StepInterface
         return $messages;
     }
 
+    /**
+     * @return string[]
+     */
     public function checkOptionalSettings(): array
     {
         $messages = [];

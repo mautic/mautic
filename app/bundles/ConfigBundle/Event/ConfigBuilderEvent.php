@@ -34,6 +34,8 @@ class ConfigBuilderEvent extends Event
 
     /**
      * Set new form to the forms array.
+     *
+     * @param array<string, mixed> $form
      */
     public function addForm(array $form): static
     {
@@ -72,6 +74,8 @@ class ConfigBuilderEvent extends Event
 
     /**
      * Returns the formThemes array.
+     *
+     * @return string[]
      */
     public function getFormThemes(): array
     {
@@ -105,6 +109,9 @@ class ConfigBuilderEvent extends Event
         return $this;
     }
 
+    /**
+     * @return string[]
+     */
     public function getFileFields(): array
     {
         return $this->encodedFields;

@@ -90,6 +90,9 @@ class MessageQueue
      */
     private $dateSent;
 
+    /**
+     * @var mixed[][]
+     */
     private array $options = [];
 
     /**
@@ -199,6 +202,9 @@ class MessageQueue
         $this->attempts = $attempts;
     }
 
+    /**
+     * @return mixed[][]
+     */
     public function getOptions(): array
     {
         return $this->options;

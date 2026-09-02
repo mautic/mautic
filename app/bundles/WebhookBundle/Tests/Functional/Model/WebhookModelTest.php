@@ -92,7 +92,7 @@ final class WebhookModelTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param mixed[] $payload
+     * @param array<string, int> $payload
      */
     private function createWebhookQueue(Webhook $webhook, Event $event, array $payload): void
     {

@@ -32,6 +32,8 @@ trait PushToIntegrationTrait
 
     /**
      * Used because the the Point trigger actions have not be converted to Events yet and thus must leverage a callback.
+     *
+     * @param array<string, mixed> $config
      */
     protected function pushIt(array $config, $lead, &$errors): bool
     {

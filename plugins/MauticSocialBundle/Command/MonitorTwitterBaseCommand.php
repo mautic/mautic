@@ -242,6 +242,8 @@ abstract class MonitorTwitterBaseCommand extends Command
     /**
      * Prints the search query metadata from twitter.
      * Only shows stats if explicitly requested or if we're in verbose mode.
+     *
+     * @param array<string, mixed> $metadata
      */
     protected function printQueryMetadata(array $metadata): void
     {
@@ -266,7 +268,8 @@ abstract class MonitorTwitterBaseCommand extends Command
      * Prints a summary of the search query.
      * Only shows stats if explicitly requested or if we're in verbose mode.
      *
-     * @param Monitoring $monitor
+     * @param Monitoring           $monitor
+     * @param array<string, mixed> $results
      */
     protected function printInformation($monitor, array $results): void
     {

@@ -80,8 +80,9 @@ final class TweetModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Create/update Tweet Stat and update sent count for Tweet.
      *
-     * @param string $source
-     * @param int    $sourceId
+     * @param string               $source
+     * @param int                  $sourceId
+     * @param array<string, mixed> $sendResponse
      */
     public function registerSend(Tweet $tweet, Lead $lead, array $sendResponse, $source = null, $sourceId = null): static
     {

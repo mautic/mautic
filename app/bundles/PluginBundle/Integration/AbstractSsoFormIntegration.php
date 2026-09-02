@@ -10,9 +10,9 @@ namespace Mautic\PluginBundle\Integration;
 abstract class AbstractSsoFormIntegration extends AbstractSsoServiceIntegration
 {
     /**
-     * @return array
+     * @return string[]
      */
-    public function getSupportedFeatures()
+    public function getSupportedFeatures(): array
     {
         return [
             'sso_form',

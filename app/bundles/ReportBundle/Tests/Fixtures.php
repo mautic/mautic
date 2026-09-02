@@ -7,7 +7,7 @@ namespace Mautic\ReportBundle\Tests;
 final class Fixtures
 {
     /**
-     * @return mixed[]
+     * @return array<string, \DateTime|mixed[]|string|int>
      */
     public static function getValidReportResult(): array
     {
@@ -57,7 +57,7 @@ final class Fixtures
     }
 
     /**
-     * @return mixed[]
+     * @return array<int, array<string, string>>
      */
     public static function getValidReportData(): array
     {
@@ -192,7 +192,7 @@ final class Fixtures
     }
 
     /**
-     * @return mixed[]
+     * @return array<string, array<string, array<array<string, array<string, mixed>>, mixed>>>
      */
     public static function getReportBuilderEventData(): array
     {
@@ -251,7 +251,7 @@ final class Fixtures
     }
 
     /**
-     * @return mixed[]
+     * @return array<string, \DateTime|mixed[]|string|int>
      */
     public static function getValidReportResultWithAggregatedColumns(): array
     {
@@ -301,7 +301,7 @@ final class Fixtures
     }
 
     /**
-     * @return mixed[]
+     * @return array<int, array<string, string>>
      */
     public static function getValidReportDataAggregatedColumns(): array
     {

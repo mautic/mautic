@@ -181,6 +181,9 @@ final class LookupHelper
         return ($person) ? new FullContact_Person($keys['apikey']) : new FullContact_Company($keys['apikey']);
     }
 
+    /**
+     * @return array<int, string|non-empty-array<mixed>>
+     */
     private function getCache(Lead|Company $entity, $notify): array
     {
         $user      = $this->userHelper->getUser();

@@ -6,6 +6,9 @@ use Mautic\AssetBundle\Entity\Asset;
 
 final class PointActionHelper
 {
+    /**
+     * @param array<string, mixed> $action
+     */
     public static function validateAssetDownload(Asset $eventDetails, array $action): bool
     {
         $assetId       = $eventDetails->getId();

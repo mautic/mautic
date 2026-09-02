@@ -338,6 +338,8 @@ final class TwitterCommandHelper
 
     /**
      * Increment the post counter.
+     *
+     * @param array<string, mixed> $tweet
      */
     private function incrementPostCount(Monitoring $monitor, array $tweet): void
     {

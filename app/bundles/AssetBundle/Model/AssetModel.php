@@ -100,6 +100,8 @@ class AssetModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param array<string, mixed> $systemEntry
+     *
      * @throws \Doctrine\ORM\ORMException
      * @throws \Exception
      */
@@ -586,7 +588,8 @@ class AssetModel extends FormModel implements GlobalSearchInterface
     /**
      * Get a list of assets in a date range.
      *
-     * @param array $filters
+     * @param array                $filters
+     * @param array<string, mixed> $options
      */
     public function getAssetList(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], array $options = []): array
     {

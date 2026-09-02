@@ -18,11 +18,17 @@ final class TwitterIntegration extends SocialIntegration
         return 5000;
     }
 
-    public function getIdentifierFields(): string
+    /**
+     * @return string[]
+     */
+    public function getIdentifierFields(): array
     {
-        return 'twitter';
+        return ['twitter'];
     }
 
+    /**
+     * @return string[]
+     */
     public function getSupportedFeatures(): array
     {
         return [

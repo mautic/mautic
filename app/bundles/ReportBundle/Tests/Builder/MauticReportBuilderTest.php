@@ -597,7 +597,7 @@ final class MauticReportBuilderTest extends TestCase
     }
 
     /**
-     * @param mixed[] $filters
+     * @param array<int, array<string, string>> $filters
      */
     private function buildReportWithFilters(array $filters): Report
     {
@@ -609,7 +609,7 @@ final class MauticReportBuilderTest extends TestCase
     }
 
     /**
-     * @param mixed[] $filterDefinitions
+     * @param array<string, array<string, string>> $filterDefinitions
      */
     private function buildQueryWithFilters(Report $report, array $filterDefinitions): QueryBuilder
     {
