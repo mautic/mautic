@@ -307,6 +307,8 @@ final class ThemeController extends FormController
 
     /**
      * A helper method to keep the code DRY.
+     *
+     * @return array<string, string|array<string, string>>
      */
     public function getIndexPostActionVars(): array
     {

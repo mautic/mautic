@@ -58,7 +58,7 @@ final readonly class CampaignContactCountHelper
     }
 
     /**
-     * @param mixed[] $contactCountDetail
+     * @param array<string, int>|array<string, string> $contactCountDetail
      */
     private function setContactCountInCache(int $campaignId, array $contactCountDetail): void
     {

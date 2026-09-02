@@ -93,6 +93,8 @@ class TableSchemaHelper
      *                     'uniqueIndex' => array()
      *                     )
      *
+     * @param array<string, mixed> $table
+     *
      * @throws SchemaException
      */
     public function addTable(array $table, $checkExists = true, $dropExisting = false): static

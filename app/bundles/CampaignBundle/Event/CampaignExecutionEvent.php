@@ -61,6 +61,7 @@ class CampaignExecutionEvent extends Event
 
     /**
      * @param bool|mixed[]|string|null $result
+     * @param array<string, mixed>     $args
      */
     public function __construct(
         array $args,

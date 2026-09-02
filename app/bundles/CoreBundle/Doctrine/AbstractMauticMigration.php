@@ -167,7 +167,7 @@ abstract class AbstractMauticMigration extends AbstractMigration
     /**
      * Generate index and foreign constraint.
      *
-     * @return array [idx, fk]
+     * @return array<int, string> [idx, fk]
      */
     protected function generateKeys($table, array $columnNames)
     {

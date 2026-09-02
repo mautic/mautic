@@ -13,6 +13,9 @@ final class Fetcher
 {
     private ?array $mailboxes = null;
 
+    /**
+     * @var string[]
+     */
     private array $log = [];
 
     private int $processedMessageCounter = 0;
@@ -83,6 +86,9 @@ final class Fetcher
         }
     }
 
+    /**
+     * @return string[]
+     */
     public function getLog(): array
     {
         return $this->log;

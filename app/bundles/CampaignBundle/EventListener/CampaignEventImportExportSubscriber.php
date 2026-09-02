@@ -198,6 +198,8 @@ final readonly class CampaignEventImportExportSubscriber implements EventSubscri
 
     /**
      * @phpstan-ignore-next-line
+     *
+     * @param array<string, mixed> $data
      */
     private function mergeExportData(array &$data, EntityExportEvent $subEvent): void
     {

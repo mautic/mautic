@@ -58,6 +58,8 @@ final class ColorHelper
 
     /**
      * Returns array of [R, G, B] of current state.
+     *
+     * @return array<int, int|float>
      */
     public function getColorArray(): array
     {

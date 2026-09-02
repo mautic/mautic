@@ -88,6 +88,9 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @param array<string, mixed> $feedback
+     */
     private function getCurrentLead(array $feedback): ?array
     {
         // Deal with Lead email

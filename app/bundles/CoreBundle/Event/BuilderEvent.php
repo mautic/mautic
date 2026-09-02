@@ -87,6 +87,10 @@ class BuilderEvent extends Event
         $this->abTestWinnerCriteria[$key] = $criteria;
     }
 
+    /**
+     * @param string[]              $keys
+     * @param array<string, string> $criteria
+     */
     private function verifyCriteria(array $keys, array $criteria): void
     {
         foreach ($keys as $k) {
@@ -162,6 +166,8 @@ class BuilderEvent extends Event
 
     /**
      * Get text of the search filter.
+     *
+     * @return array<string, string|string[]>
      */
     public function getTokenFilter(): array
     {

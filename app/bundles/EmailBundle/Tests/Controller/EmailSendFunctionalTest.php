@@ -217,7 +217,7 @@ final class EmailSendFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param mixed[] $queryParams
+     * @param array<string|int, mixed[]|string> $queryParams
      */
     private function requestUrl(string $uri, array $queryParams): void
     {

@@ -124,6 +124,8 @@ class SendEmailToContact
     }
 
     /**
+     * @param array<string, mixed> $contact
+     *
      * @throws FailedToSendToContactException
      */
     public function setContact(array $contact, array $tokens = []): static
@@ -238,6 +240,9 @@ class SendEmailToContact
         throw new FailedToSendToContactException($errorMessages);
     }
 
+    /**
+     * @param array<string, mixed> $sendFailures
+     */
     protected function processSendFailures(array $sendFailures): void
     {
         $failedEmailAddresses = $sendFailures['failures'];
@@ -316,6 +321,9 @@ class SendEmailToContact
         --$this->emailSentCounts[$emailId];
     }
 
+    /**
+     * @return array<int, mixed>
+     */
     protected function queueTokenizedEmail(): array
     {
         [$queued, $queueErrors] = $this->mailer->queue(true, MailHelper::QUEUE_RETURN_ERRORS);

@@ -594,6 +594,9 @@ class ThemeHelper implements ThemeHelperInterface
         $this->sortThemesInfo($key);
     }
 
+    /**
+     * @param array<string, mixed> $config
+     */
     private function shouldLoadTheme(array $config, string $featureRequested): bool
     {
         if ('all' === $featureRequested) {

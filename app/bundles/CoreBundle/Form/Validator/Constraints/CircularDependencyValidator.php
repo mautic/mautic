@@ -52,6 +52,9 @@ final class CircularDependencyValidator extends ConstraintValidator
         return (int) $routeParams['objectId'];
     }
 
+    /**
+     * @param mixed[][] $filters
+     */
     private function reduceToSegmentIds(array $filters): array
     {
         $segmentFilters = array_filter($filters, fn (array $filter): bool => 'leadlist' === $filter['type']
@@ -66,6 +69,9 @@ final class CircularDependencyValidator extends ConstraintValidator
         return $this->flatten($segentIdsInFilter);
     }
 
+    /**
+     * @param mixed[][] $array
+     */
     private function flatten(array $array): array
     {
         return array_unique(array_reduce($array, array_merge(...), []));

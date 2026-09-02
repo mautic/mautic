@@ -39,7 +39,7 @@ final class ContentPreviewSettingsTypeTest extends TestCase
     private MockObject $userHelperMock;
 
     /**
-     * @var mixed[]
+     * @var string[]|array<string, array<string, string>>[]
      */
     private array $contactFieldDefinition = [
         'contact',

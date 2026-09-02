@@ -125,7 +125,8 @@ class ColumnSchemaHelper
      *                           ['type']    string (optional) Doctrine type for column; defaults to text
      *                           ['options'] array  (optional) Defining options for column
      *
-     * @param bool $checkExists Check if table exists; pass false if this has already been done
+     * @param bool                 $checkExists Check if table exists; pass false if this has already been done
+     * @param array<string, mixed> $column
      *
      * @throws SchemaException
      */

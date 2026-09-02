@@ -54,6 +54,9 @@ class EmailSendEvent extends CommonEvent
      */
     private array $errors = [];
 
+    /**
+     * @param array<string, mixed> $args
+     */
     public function __construct(
         private readonly ?MailHelper $helper = null,
         array $args = [],

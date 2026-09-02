@@ -49,6 +49,9 @@ abstract class AbstractMauticTestCase extends WebTestCase
         'PHP_AUTH_PW'   => 'Maut1cR0cks!',
     ];
 
+    /**
+     * @var array<string, mixed>
+     */
     protected array $configParams = [
         'api_enabled'                       => true,
         'api_enable_basic_auth'             => true,
@@ -108,6 +111,9 @@ abstract class AbstractMauticTestCase extends WebTestCase
         restore_exception_handler();
     }
 
+    /**
+     * @param array<string, mixed> $defaultConfigOptions
+     */
     protected function setUpSymfony(array $defaultConfigOptions = []): void
     {
         putenv('MAUTIC_CONFIG_PARAMETERS='.json_encode($defaultConfigOptions));

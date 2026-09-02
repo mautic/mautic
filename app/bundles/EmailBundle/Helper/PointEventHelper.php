@@ -12,6 +12,9 @@ final readonly class PointEventHelper
     ) {
     }
 
+    /**
+     * @param array<string, mixed> $action
+     */
     public static function validateEmail($eventDetails, array $action): bool
     {
         if (null === $eventDetails) {
@@ -28,6 +31,9 @@ final readonly class PointEventHelper
         return empty($limitToEmails) || in_array($emailId, $limitToEmails);
     }
 
+    /**
+     * @param array<string, mixed> $event
+     */
     public function sendEmail(array $event, Lead $lead): bool
     {
         $properties = $event['properties'];

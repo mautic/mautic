@@ -370,7 +370,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
         }
 
         /**
-         * @param mixed[] $context
+         * @param array<string, mixed> $context
          */
         private function log(string $logLevel, string $message, array $context = [], ?array $debugTrace = null): void
         {
@@ -395,7 +395,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
         }
 
         /**
-         * @param mixed[] $error
+         * @param array<string, mixed> $error
          */
         private function generateResponse(array $error, bool $inTemplate = false): string|false
         {

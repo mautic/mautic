@@ -132,6 +132,8 @@ class InactiveHelper
     }
 
     /**
+     * @param int[]|string[] $contactIds
+     *
      * @return array<string, \DateTimeInterface>|null
      */
     private function getLastActiveDates(?int $lastActiveEventId, array $contactIds): ?array

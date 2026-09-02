@@ -21,6 +21,8 @@ final class PlainTextHelper
      * used in conjunction with $replace.
      *
      * @see $replace
+     *
+     * @var string[]
      */
     private array $search = [
         "/\r/",                                           // Non-legal carriage return
@@ -51,6 +53,8 @@ final class PlainTextHelper
      * List of pattern replacements corresponding to patterns searched.
      *
      * @see $search
+     *
+     * @var string[]
      */
     private array $replace = [
         '',                              // Non-legal carriage return
@@ -82,6 +86,8 @@ final class PlainTextHelper
      * used in conjunction with $entReplace.
      *
      * @see $entReplace
+     *
+     * @var string[]
      */
     private array $entSearch = [
         '/&#153;/i',                                     // TM symbol in win-1252
@@ -94,6 +100,8 @@ final class PlainTextHelper
      * List of pattern replacements corresponding to patterns searched.
      *
      * @see $entSearch
+     *
+     * @var string[]
      */
     private array $entReplace = [
         '™',         // TM symbol
@@ -105,6 +113,8 @@ final class PlainTextHelper
     /**
      * List of preg* regular expression patterns to search for
      * and replace using callback function.
+     *
+     * @var string[]
      */
     private array $callbackSearch = [
         '/<(h)[123456]( [^>]*)?>(.*?)<\/h[123456]>/i',           // h1 - h6
@@ -119,6 +129,8 @@ final class PlainTextHelper
      * used in conjunction with $preReplace.
      *
      * @see $preReplace
+     *
+     * @var string[]
      */
     private array $preSearch = [
         "/\n/",
@@ -132,6 +144,8 @@ final class PlainTextHelper
      * List of pattern replacements corresponding to patterns searched for PRE body.
      *
      * @see $preSearch
+     *
+     * @var string[]
      */
     private array $preReplace = [
         '<br>',
@@ -157,6 +171,8 @@ final class PlainTextHelper
      * Contains URL addresses from links to be rendered in plain text.
      *
      * @see buildlinkList()
+     *
+     * @var string[]
      */
     private array $linkList = [];
 
@@ -411,7 +427,7 @@ final class PlainTextHelper
     /**
      * Callback function for preg_replace_callback use.
      *
-     * @param array $matches PREG matches
+     * @param array<int, mixed> $matches PREG matches
      *
      * @return string
      */

@@ -19,9 +19,8 @@ final class BatchTransport extends AbstractTransport implements TokenTransportIn
      * @var array<string, mixed>
      */
     private array $transports = []; // @phpstan-ignore-line
-
     /**
-     * @var mixed[]
+     * @var array<mixed, array<string, array<string, mixed[]>>>
      */
     private array $metadatas  = [];
 
@@ -86,6 +85,9 @@ final class BatchTransport extends AbstractTransport implements TokenTransportIn
         return $this->maxRecipients;
     }
 
+    /**
+     * @return array<mixed, array<string, array<string, mixed[]>>>
+     */
     public function getMetadatas(): array
     {
         return $this->metadatas;

@@ -21,6 +21,9 @@ final class CoreHelpersExtension extends AbstractExtension
     ) {
     }
 
+    /**
+     * @return TwigFunction[]
+     */
     public function getFunctions(): array
     {
         return [

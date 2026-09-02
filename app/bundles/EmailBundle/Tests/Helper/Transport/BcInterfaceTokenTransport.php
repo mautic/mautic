@@ -29,7 +29,7 @@ final class BcInterfaceTokenTransport implements TransportInterface
     private array $fromNames = [];
 
     /**
-     * @var mixed[]
+     * @var mixed[][]
      */
     private array $metadatas = [];
 
@@ -70,7 +70,7 @@ final class BcInterfaceTokenTransport implements TransportInterface
     }
 
     /**
-     * @return mixed[]
+     * @return mixed[][]
      */
     public function getMetadatas(): array
     {
