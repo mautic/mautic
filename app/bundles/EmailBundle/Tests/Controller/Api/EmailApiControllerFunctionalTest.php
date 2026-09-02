@@ -476,7 +476,10 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_POST, '/api/emails/new', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertArrayHasKey('email', $response, print_r($response, true));
         $this->assertArrayHasKey('sendToDnc', $response['email'], print_r($response, true));
+
         $this->assertFalse($response['email']['sendToDnc']); // it will not change as sales user does not have permission to change sendToDnc
     }
 
