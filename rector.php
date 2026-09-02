@@ -17,10 +17,10 @@ return RectorConfig::configure()
         deadCode: true,
         codeQuality: true,
         typeDeclarations: true,
-        phpunitCodeQuality: true,
+        typeDeclarationDocblocks: true,
         privatization: true,
         symfonyCodeQuality: true,
-        phpunitCodeQuality: true,
+        // phpunitCodeQuality: true,
         phpunitMockToStub: true,
         phpunitNarrowAsserts: true,
     )
@@ -34,7 +34,7 @@ return RectorConfig::configure()
 
         Rector\PHPUnit\CodeQuality\Rector\ClassMethod\AssertClassToThisAssertRector::class,
         Rector\TypeDeclarationDocblocks\Rector\Property\MergePhpstanDocTagIntoNativeRector::class,
-        Rector\TypeDeclarationDocblocks\Rector\ClassMethod\NarrowArrayCollectionUnionReturnDocblockRector::class,
+        // Rector\TypeDeclarationDocblocks\Rector\ClassMethod\NarrowArrayCollectionUnionReturnDocblockRector::class,
         // custom rules
         UnserializeToSerializerDecodeRector::class,
         Utils\Rector\AssertTrueResponseIsOkToAssertResponseIsSuccessfulRector::class,

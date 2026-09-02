@@ -22,7 +22,7 @@ final class GetStatDataEvent extends Event
     }
 
     /**
-     * @return mixed[]
+     * @return array<string, mixed[]>
      */
     public function getResults(): array
     {

@@ -34,7 +34,7 @@ class AjaxController extends CommonController
     }
 
     /**
-     * @param mixed[] $dataArray
+     * @param array<string, int>|array<string, string>|array<int, array<string, string>> $dataArray
      *
      * @throws \Exception
      */

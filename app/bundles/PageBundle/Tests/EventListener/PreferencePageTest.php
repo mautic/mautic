@@ -182,7 +182,7 @@ final class PreferencePageTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<string, bool>
      */
     private function createParams(): array
     {

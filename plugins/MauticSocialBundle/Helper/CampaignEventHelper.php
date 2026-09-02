@@ -78,7 +78,8 @@ final class CampaignEventHelper
     /**
      * PreParse the twitter message and replace placeholders with values.
      *
-     * @param string $text
+     * @param string                 $text
+     * @param non-empty-array<mixed> $lead
      *
      * @return string|string[]
      */
