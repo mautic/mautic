@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\SmsBundle\Collection\RecipientCollection;
@@ -72,6 +73,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         private readonly SmsRepository $smsRepository,
         private readonly StatRepository $statRepository,
         private readonly DoNotContactRepository $doNotContactRepository,
+        private readonly LeadListRepository $leadListRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -386,7 +388,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         $stat->setLead($lead);
         $stat->setSms($sms);
         if (null !== $listId) {
-            $stat->setList($this->leadModel->getLeadListRepository()->getEntity($listId));
+            $stat->setList($this->leadListRepository->getEntity($listId));
         }
         if (is_array($source)) {
             $stat->setSourceId($source[1]);

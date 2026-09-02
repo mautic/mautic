@@ -89,6 +89,7 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
             $this->smsRepository, // $smsRepository
             $this->createStub(StatRepository::class), // $statRepository
             $this->createStub(DoNotContactRepository::class), // $doNotContactRepository
+            $this->createStub(\Mautic\LeadBundle\Entity\LeadListRepository::class), // $leadListRepository
         );
     }
 

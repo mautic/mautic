@@ -224,11 +224,6 @@ class LeadModel extends FormModel
         return $this->leadEventLogRepository;
     }
 
-    public function getLeadListRepository(): LeadListRepository
-    {
-        return $this->leadListRepository;
-    }
-
     public function getPermissionBase(): string
     {
         return 'lead:leads';
