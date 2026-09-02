@@ -20,7 +20,7 @@ use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class DwcTokensSubscriber implements EventSubscriberInterface
+final readonly class DwcTokensSubscriber implements EventSubscriberInterface
 {
     public const DWCTOKENREGEX = '{dwc=(.*?)}Default content goes here{/dwc}';
 
@@ -47,7 +47,7 @@ final class DwcTokensSubscriber implements EventSubscriberInterface
 
     public function onEmailBuild(EmailBuilderEvent $event): void
     {
-        if ($event->tokensRequested([static::DWCTOKENREGEX])) {
+        if ($event->tokensRequested([self::DWCTOKENREGEX])) {
             $dwcTokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper(
                 'dynamicContent',
                 'dynamiccontent:dynamiccontents'
@@ -57,14 +57,14 @@ final class DwcTokensSubscriber implements EventSubscriberInterface
                 ->and('e.is_campaign_based <> 1 and e.slot_name is not null and e.type = "'.TypeList::TEXT.'"');
 
             $tokens = $dwcTokenHelper->getTokens(
-                static::DWCTOKENREGEX,
+                self::DWCTOKENREGEX,
                 '',
                 'slot_name',
                 'slot_name',
                 $expr
             );
             if (is_array($tokens)) {
-                array_walk($tokens, function (&$val) {
+                array_walk($tokens, function (string &$val): void {
                     $val = 'DWC:'.$val;
                 });
             }
@@ -111,7 +111,7 @@ final class DwcTokensSubscriber implements EventSubscriberInterface
             $usedTokenNames = $matches[0];
 
             $invalidTokenNames   = array_diff($usedTokenNames, $allowedToken);
-            if (!empty($usedTokenNames) && !empty($invalidTokenNames)) {
+            if ($usedTokenNames !== [] && $invalidTokenNames !== []) {
                 $event->getContext()->buildViolation('mautic.dynamicContent.error.token_disallowed', [
                     '%entity%'        => $event->getEntity() instanceof Email ? 'email' : 'page',
                     '%invalidTokens%' => implode(', ', $invalidTokenNames),

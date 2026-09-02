@@ -163,7 +163,7 @@ HTML;
             ->willReturn($content);
         $matcher = $this->exactly(2);
         $event->expects($matcher)
-            ->method('setContent')->willReturnCallback(function (...$parameters) use ($matcher, $content, $expected) {
+            ->method('setContent')->willReturnCallback(function (...$parameters) use ($matcher, $content, $expected): void {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($content, $parameters[0]);
                 }

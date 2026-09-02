@@ -9,7 +9,7 @@ use Mautic\DynamicContentBundle\Entity\DynamicContentRepository;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-class ReorderingDynamicContentTest extends MauticMysqlTestCase
+final class ReorderingDynamicContentTest extends MauticMysqlTestCase
 {
     use DynamicContentReOrderingTrait;
 
@@ -49,13 +49,13 @@ class ReorderingDynamicContentTest extends MauticMysqlTestCase
         $dwcRepo = self::getContainer()->get('mautic.dynamicContent.model.dynamicContent')->getRepository();
         $dwcList = $dwcRepo->getDynamicContentBySlotName('slot-Name-1');
 
-        Assert::assertEquals(3, count($dwcList));
+        $this->assertCount(3, $dwcList);
 
-        Assert::assertEquals('DC 2', $dwcList[0]['name']);
-        Assert::assertEquals(1, $dwcList[0]['display_order']);
+        $this->assertEquals('DC 2', $dwcList[0]['name']);
+        $this->assertEquals(1, $dwcList[0]['display_order']);
 
-        Assert::assertEquals('DC 3', $dwcList[1]['name']);
-        Assert::assertEquals(2, $dwcList[1]['display_order']);
+        $this->assertEquals('DC 3', $dwcList[1]['name']);
+        $this->assertEquals(2, $dwcList[1]['display_order']);
     }
 
     public function testReorderingDynamicContentWhenSlotNameChanges(): void
@@ -104,7 +104,7 @@ class ReorderingDynamicContentTest extends MauticMysqlTestCase
         /** @var DynamicContentRepository $dwcRepo */
         $dwcRepo = self::getContainer()->get('mautic.dynamicContent.model.dynamicContent')->getRepository();
         $dwc     = $dwcRepo->getEntity($dwc1->getId());
-        Assert::assertNull($dwc->getDisplayOrder(), 'Display Order should be null when isCampaignBased is set to true');
+        $this->assertNull($dwc->getDisplayOrder(), 'Display Order should be null when isCampaignBased is set to true');
 
         $this->assertDynamicContentOrder('slot-1', [
             'DC-2' => 1,

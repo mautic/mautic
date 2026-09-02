@@ -12,7 +12,7 @@ use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-class DynamicContentTokenReplacementTest extends MauticMysqlTestCase
+final class DynamicContentTokenReplacementTest extends MauticMysqlTestCase
 {
     use DynamicContentReOrderingTrait;
 
@@ -30,6 +30,7 @@ class DynamicContentTokenReplacementTest extends MauticMysqlTestCase
         $entity       = $this->$functionName($content);
 
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(\Mautic\UserBundle\Entity\User::class, $user);
         $this->loginUser($user);
         $this->assertContent('/'.$entityName.'/preview/'.$entity->getId().'?contactId='.$lead1->getId(), 'some content');
         $this->assertContent('/'.$entityName.'/preview/'.$entity->getId().'?contactId='.$lead2->getId(), 'Default content goes here');
@@ -42,7 +43,7 @@ class DynamicContentTokenReplacementTest extends MauticMysqlTestCase
             $url
         );
         $response = $this->client->getResponse();
-        Assert::assertStringContainsString($expectedContent, $response->getContent());
+        $this->assertStringContainsString($expectedContent, (string) $response->getContent());
     }
 
     private function createEmail(string $content): Email

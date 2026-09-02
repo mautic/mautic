@@ -142,7 +142,7 @@ final class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         return new TrackingSubscriber(
             $this->statRepository,
-            $this->createMock(LeadModel::class)
+            $this->createStub(LeadModel::class)
         );
     }
 }

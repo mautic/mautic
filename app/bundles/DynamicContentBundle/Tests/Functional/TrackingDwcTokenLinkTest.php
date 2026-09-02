@@ -16,7 +16,7 @@ use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Entity\TrackableRepository;
 use PHPUnit\Framework\Assert;
 
-class TrackingDwcTokenLinkTest extends MauticMysqlTestCase
+final class TrackingDwcTokenLinkTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {
@@ -34,12 +34,12 @@ class TrackingDwcTokenLinkTest extends MauticMysqlTestCase
         /** @var EmailModel $emailModel */
         $emailModel    = self::getContainer()->get('mautic.email.model.email');
         [$sentCount]   = $emailModel->sendEmailToLists($email);
-        Assert::assertEquals(2, $sentCount);
+        $this->assertEquals(2, $sentCount);
 
         /** @var TrackableRepository $trackableRepository */
         $trackableRepository = $this->em->getRepository(Trackable::class);
         $redirects           = $trackableRepository->findByChannel('email', $email->getId());
-        Assert::assertCount(1, $redirects);
+        $this->assertCount(1, $redirects);
     }
 
     private function createSegment(string $name): LeadList

@@ -144,7 +144,7 @@ final class DynamicContentTypeTest extends TestCase
         $matcher = $this->exactly(3);
         $formBuilderInterfaceMock->expects($matcher)
             ->method('addEventListener')
-            ->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->willReturnCallback(function (...$parameters) use ($matcher): void {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertFormEvent(FormEvents::PRE_SUBMIT, $parameters);
                 }
@@ -170,7 +170,7 @@ final class DynamicContentTypeTest extends TestCase
     private function assertFormEvent(string $event, array $parameters): void
     {
         $this->assertSame($event, $parameters[0]);
-        $callback = function ($listener) {
+        $callback = function ($listener): bool {
             $reflection = new \ReflectionFunction($listener);
             $parameters = $reflection->getParameters();
 

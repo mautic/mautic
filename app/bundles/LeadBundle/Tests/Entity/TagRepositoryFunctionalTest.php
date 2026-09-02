@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
 use PHPUnit\Framework\Assert;
 
-class TagRepositoryFunctionalTest extends MauticMysqlTestCase
+final class TagRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     private TagRepository $tagRepository;
 
@@ -35,10 +35,10 @@ class TagRepositoryFunctionalTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
-        Assert::assertEqualsCanonicalizing([$tagOne->getId(), $tagTwo->getId()], $this->tagRepository->getTagIdsByLeadId((string) $leadOne->getId()));
-        Assert::assertEqualsCanonicalizing([$tagThree->getId()], $this->tagRepository->getTagIdsByLeadId((string) $leadTwo->getId()));
-        Assert::assertEmpty($this->tagRepository->getTagIdsByLeadId((string) $leadThree->getId()));
-        Assert::assertEmpty($this->tagRepository->getTagIdsByLeadId('non-existing'));
+        $this->assertEqualsCanonicalizing([$tagOne->getId(), $tagTwo->getId()], $this->tagRepository->getTagIdsByLeadId((string) $leadOne->getId()));
+        $this->assertEqualsCanonicalizing([$tagThree->getId()], $this->tagRepository->getTagIdsByLeadId((string) $leadTwo->getId()));
+        $this->assertEmpty($this->tagRepository->getTagIdsByLeadId((string) $leadThree->getId()));
+        $this->assertEmpty($this->tagRepository->getTagIdsByLeadId('non-existing'));
     }
 
     private function createLead(): Lead

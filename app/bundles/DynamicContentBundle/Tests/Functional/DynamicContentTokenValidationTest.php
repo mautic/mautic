@@ -31,11 +31,11 @@ final class DynamicContentTokenValidationTest extends MauticMysqlTestCase
         $content = '<html><body><p>some text</p></body></html>';
         $form    = $this->prepareEmailForm($content, $subject);
         $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        $this->assertTrue($this->client->getResponse()->isOk());
         if (!$success) {
-            $this->assertStringContainsString(self::INVALID_TOKEN_WITH_MISSING_CONTENT, $this->client->getResponse()->getContent());
+            $this->assertStringContainsString(self::INVALID_TOKEN_WITH_MISSING_CONTENT, (string) $this->client->getResponse()->getContent());
         } else {
-            $this->assertStringNotContainsString(self::INVALID_TOKEN_WITH_MISSING_CONTENT, $this->client->getResponse()->getContent());
+            $this->assertStringNotContainsString(self::INVALID_TOKEN_WITH_MISSING_CONTENT, (string) $this->client->getResponse()->getContent());
         }
     }
 
@@ -73,10 +73,10 @@ final class DynamicContentTokenValidationTest extends MauticMysqlTestCase
 
         $form = $this->prepareEmailForm('<div data-slot="dwc" data-param-slot-name="'.$dwc->getSlotName().'">Default content</div>', 'Email A subject ');
         $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        $this->assertTrue($this->client->getResponse()->isOk());
 
         $errorMsg = 'The email contains disallowed token(s) &quot;'.$formToken.'&quot; in DWC ID '.$dwc->getId().'. Please remove or correct them before saving.';
-        Assert::assertStringContainsString($errorMsg, $this->client->getResponse()->getContent());
+        $this->assertStringContainsString($errorMsg, (string) $this->client->getResponse()->getContent());
     }
 
     /**
@@ -98,15 +98,15 @@ final class DynamicContentTokenValidationTest extends MauticMysqlTestCase
 
         $form = $this->preparePageForm('<div data-slot="dwc" data-param-slot-name="'.$dwc->getSlotName().'">Default content</div>');
         $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        $this->assertTrue($this->client->getResponse()->isOk());
 
         $errorMsg = 'The page contains disallowed token(s) &quot;'.$contactToken.'&quot; in DWC ID '.$dwc->getId().'. Please remove or correct them before saving.';
         $content  = $this->client->getResponse()->getContent();
 
         if ($useTokenEligibilityValidation) {
-            Assert::assertStringContainsString($errorMsg, $content);
+            $this->assertStringContainsString($errorMsg, (string) $content);
         } else {
-            Assert::assertStringNotContainsString($errorMsg, $content);
+            $this->assertStringNotContainsString($errorMsg, (string) $content);
         }
     }
 

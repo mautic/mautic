@@ -73,7 +73,7 @@ class DynamicContentHelper
      *
      * @return string
      */
-    public function getDynamicContentSlotForLead($slotName, $lead, ?PageDisplayEvent $event = null)
+    public function getDynamicContentSlotForLead(array|string $slotName, $lead, ?PageDisplayEvent $event = null)
     {
         $leadArray = [];
         if ($lead instanceof Lead) {
@@ -236,7 +236,7 @@ class DynamicContentHelper
         $result            = [];
         $dwcListBySlotName = $this->findDwcVariantsBySlotNames($slotNames);
 
-        if (empty($dwcListBySlotName)) {
+        if ($dwcListBySlotName === []) {
             return $result;
         }
 
@@ -270,7 +270,7 @@ class DynamicContentHelper
         if (!empty($matches[1])) {
             $tokens = $this->getDwcTokensWithContent($matches[1], $lead, $event);
             foreach ($matches[1] as $key => $slotName) {
-                $content = isset($tokens[$slotName]) ? $tokens[$slotName] : $matches[2][$key];
+                $content = $tokens[$slotName] ?? $matches[2][$key];
                 $content = $this->replaceTokenInsideDWCContent($content, $event, $lead);
 
                 $token          = '{dwc_subject_'.$slotName.'_'.$key.'}';
@@ -354,7 +354,7 @@ class DynamicContentHelper
     {
         return preg_replace_callback(
             self::DYNAMIC_WEB_CONTENT_REGEX,
-            function ($matches) {
+            function ($matches): string {
                 $slotName = htmlspecialchars($matches[1], ENT_QUOTES);
 
                 return '<div data-slot="dwc" data-param-slot-name="'.$slotName.'"></div>';

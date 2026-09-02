@@ -13,7 +13,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
-class CompanyFieldsInDwcTest extends MauticMysqlTestCase
+final class CompanyFieldsInDwcTest extends MauticMysqlTestCase
 {
     public function testCompanyFieldsAreAvailableInFilters(): void
     {
@@ -108,9 +108,9 @@ class CompanyFieldsInDwcTest extends MauticMysqlTestCase
         $email = $this->getMailerMessages()[0]->getHtmlBody();
 
         if ($shouldMatch) {
-            Assert::assertStringContainsString($dynamicContent->getContent(), $email);
+            $this->assertStringContainsString($dynamicContent->getContent(), (string) $email);
         } else {
-            Assert::assertStringNotContainsString($dynamicContent->getContent(), $email);
+            $this->assertStringNotContainsString($dynamicContent->getContent(), (string) $email);
         }
     }
 

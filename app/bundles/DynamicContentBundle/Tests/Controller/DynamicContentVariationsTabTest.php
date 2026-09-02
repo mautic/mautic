@@ -10,7 +10,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class DynamicContentVariationsTabTest extends MauticMysqlTestCase
+final class DynamicContentVariationsTabTest extends MauticMysqlTestCase
 {
     private string $slotName = 'test_slot';
 
@@ -37,11 +37,11 @@ class DynamicContentVariationsTabTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/s/dwc/view/'.$this->mainDwc->getId());
 
         // Ensure response is OK
-        Assert::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
 
         // Check if the variations tab exists
         $content = $this->client->getResponse()->getContent();
-        Assert::assertStringContainsString('href="#variations-container"', $content);
+        $this->assertStringContainsString('href="#variations-container"', (string) $content);
     }
 
     public function testVariationsTabLoadsCorrectly(): void
@@ -53,22 +53,22 @@ class DynamicContentVariationsTabTest extends MauticMysqlTestCase
         );
 
         // Ensure response is OK
-        Assert::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
 
         // Check if the variations table exists and has the correct number of rows
         $tableRows = $crawler->filter('#dwcVariationsTable tbody tr');
 
         // 4 variations including the main one
-        Assert::assertEquals(4, $tableRows->count());
+        $this->assertCount(4, $tableRows);
 
         // Check if the content shows the variation names
         $content = $this->client->getResponse()->getContent();
-        Assert::assertStringContainsString('Variation 1', $content);
-        Assert::assertStringContainsString('Variation 2', $content);
-        Assert::assertStringContainsString('Variation 3', $content);
+        $this->assertStringContainsString('Variation 1', (string) $content);
+        $this->assertStringContainsString('Variation 2', (string) $content);
+        $this->assertStringContainsString('Variation 3', (string) $content);
 
         // Check if the current entity is also present with the current label
-        Assert::assertStringContainsString('Main DWC', $content);
+        $this->assertStringContainsString('Main DWC', (string) $content);
     }
 
     public function testVariationsAreSortedByDisplayOrderByDefault(): void
@@ -80,16 +80,14 @@ class DynamicContentVariationsTabTest extends MauticMysqlTestCase
         );
 
         // Get all rows and extract display orders
-        $displayOrders = $crawler->filter('#dwcVariationsTable tbody tr td:nth-child(2)')->each(function ($node) {
-            return (int) $node->text();
-        });
+        $displayOrders = $crawler->filter('#dwcVariationsTable tbody tr td:nth-child(2)')->each(fn($node): int => (int) $node->text());
 
         // Check if the variations are sorted by display_order in DESC order
         $sortedOrders = $displayOrders;
         rsort($sortedOrders);
 
         // The order should be 30, 20, 15, 10 (DESC) with 10 being the main DWC
-        Assert::assertEquals($sortedOrders, $displayOrders);
+        $this->assertEquals($sortedOrders, $displayOrders);
     }
 
     public function testVariationsTabNotShownWithSingleEntity(): void
@@ -102,11 +100,11 @@ class DynamicContentVariationsTabTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/s/dwc/view/'.$uniqueSlotDwc->getId());
 
         // Ensure response is OK
-        Assert::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
 
         // Check that variations tab does NOT exist since there are no other variations
         $content = $this->client->getResponse()->getContent();
-        Assert::assertStringNotContainsString('href="#variations-container"', $content);
+        $this->assertStringNotContainsString('href="#variations-container"', (string) $content);
     }
 
     /**

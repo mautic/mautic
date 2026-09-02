@@ -16,6 +16,12 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class AjaxController extends CommonAjaxController
 {
+    private \Mautic\DynamicContentBundle\Entity\DynamicContentRepository $dynamicContentRepository;
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireAjaxController(\Mautic\DynamicContentBundle\Entity\DynamicContentRepository $dynamicContentRepository): void
+    {
+        $this->dynamicContentRepository = $dynamicContentRepository;
+    }
     use AjaxLookupControllerTrait;
 
     public function slotNameListAction(Request $request): JsonResponse
@@ -51,8 +57,7 @@ final class AjaxController extends CommonAjaxController
         }
 
         if (!empty($slotName)) {
-            /** @var DynamicContentRepository $dynamicContentRepository */
-            $dynamicContentRepository = $this->getModel('dynamicContent')->getRepository();
+            $dynamicContentRepository = $this->dynamicContentRepository;
             $dynamicContent           = $dynamicContentRepository->getEntity($dwcId);
             $dwcTokens                = $dynamicContentRepository->getDynamicContentBySlotName($slotName);
 
@@ -86,31 +91,5 @@ final class AjaxController extends CommonAjaxController
         }
 
         return $this->sendJsonResponse(['display_orders' => $displayOrderArray]);
-    }
-
-    /**
-     * Called by parent::getBuilderTokensAction().
-     *
-     * @param mixed $query
-     *
-     * @return mixed[]
-     */
-    protected function getBuilderTokens($query): array
-    {
-        $pageToken  = $this->getTokens('page');
-        $emailToken = $this->getTokens('email');
-
-        return ['tokens' => array_merge($pageToken['tokens'] ?? [], $emailToken['tokens'] ?? [])];
-    }
-
-    /**
-     * @return mixed[]
-     */
-    private function getTokens(string $modelName): array
-    {
-        /** @var PageModel|EmailModel $model */
-        $model = $this->getModel($modelName);
-
-        return $model->getBuilderComponents(null, ['tokens']);
     }
 }

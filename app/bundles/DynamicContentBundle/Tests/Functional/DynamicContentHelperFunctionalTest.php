@@ -9,7 +9,7 @@ use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Helper\DynamicContentHelper;
 use PHPUnit\Framework\Assert;
 
-class DynamicContentHelperFunctionalTest extends MauticMysqlTestCase
+final class DynamicContentHelperFunctionalTest extends MauticMysqlTestCase
 {
     public function testGetDwcsBySlotNameWithPublishedOnlyTrue(): void
     {
@@ -38,7 +38,7 @@ class DynamicContentHelperFunctionalTest extends MauticMysqlTestCase
 
         foreach ($tokens as $token) {
             foreach ($token as $varient) {
-                Assert::assertTrue($varient->getIsPublished());
+                $this->assertTrue($varient->getIsPublished());
             }
         }
     }

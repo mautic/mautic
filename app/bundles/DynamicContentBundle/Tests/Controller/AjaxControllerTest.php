@@ -12,7 +12,7 @@ use Mautic\FormBundle\Entity\Form;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-class AjaxControllerTest extends MauticMysqlTestCase
+final class AjaxControllerTest extends MauticMysqlTestCase
 {
     use DynamicContentReOrderingTrait;
 
@@ -49,15 +49,15 @@ class AjaxControllerTest extends MauticMysqlTestCase
     {
         $this->client->request('GET', '/s/ajax?action=dynamicContent:slotNameList&filter=test-');
         $clientResponse = $this->client->getResponse();
-        Assert::assertEquals(200, $clientResponse->getStatusCode());
-        Assert::assertJson($clientResponse->getContent());
-        Assert::assertJsonStringEqualsJsonString('[{"label":"test-dwc-1","value":"test-dwc-1"}]', $clientResponse->getContent());
+        $this->assertEquals(200, $clientResponse->getStatusCode());
+        $this->assertJson($clientResponse->getContent());
+        $this->assertJsonStringEqualsJsonString('[{"label":"test-dwc-1","value":"test-dwc-1"}]', $clientResponse->getContent());
     }
 
     public function testGetDwcTokensBySlotNameAction(): void
     {
         $this->createDynamicContent('DC-1', 'slot-1', 0);
-        $dwc = $this->createDynamicContent('DC-2', 'slot-1', 1);
+        $this->createDynamicContent('DC-2', 'slot-1', 1);
         $this->createDynamicContent('DC-3', 'slot-1', 2);
 
         $parameters = http_build_query([
@@ -69,8 +69,8 @@ class AjaxControllerTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
         $content = $this->client->getResponse()->getContent();
         $result  = json_decode($content, true);
-        Assert::assertJson($content);
-        Assert::assertCount(5, $result['display_orders']);
+        $this->assertJson($content);
+        $this->assertCount(5, $result['display_orders']);
     }
 
     public function testGetDwcTokensBySlotNameActionWithIdParam(): void
@@ -90,9 +90,9 @@ class AjaxControllerTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
         $content = $this->client->getResponse()->getContent();
         $result  = json_decode($content, true);
-        Assert::assertJson($content);
-        Assert::assertCount(4, $result['display_orders']);
-        Assert::assertTrue($result['display_orders']['(1) DC-1']['selected']);
+        $this->assertJson($content);
+        $this->assertCount(4, $result['display_orders']);
+        $this->assertTrue($result['display_orders']['(1) DC-1']['selected']);
     }
 
     public function testGetBuilderTokensAction(): void

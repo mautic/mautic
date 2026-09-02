@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use Mautic\DynamicContentBundle\Entity\DynamicContentRepository;
 use Mautic\DynamicContentBundle\Event as Events;
 use Mautic\DynamicContentBundle\Helper\DynamicContentHelper;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
@@ -27,7 +28,7 @@ use Mautic\PageBundle\PageEvents;
 use MauticPlugin\MauticFocusBundle\Helper\TokenHelper as FocusTokenHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class DynamicContentSubscriber implements EventSubscriberInterface
+final readonly class DynamicContentSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private TrackableModel $trackableModel,
@@ -41,6 +42,7 @@ final class DynamicContentSubscriber implements EventSubscriberInterface
         private CorePermissions $security,
         private ContactTracker $contactTracker,
         private CompanyLeadRepository $companyLeadRepository,
+        private DynamicContentRepository $dynamicContentRepository,
     ) {
     }
 
@@ -68,12 +70,12 @@ final class DynamicContentSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $dcRepository = $this->dynamicContentModel->getRepository();
+        $dcRepository = $this->dynamicContentRepository;
         $lastOrder    = $dcRepository->getLastDisplayOrder($dynamicContent->getSlotName()) + 1;
 
         // reorder dwc if non campaign based dwc converted to campaign based
         if ($dynamicContent->getIsCampaignBased() && $isCampaignBasedChanged) {
-            $dcRepository = $this->dynamicContentModel->getRepository();
+            $dcRepository = $this->dynamicContentRepository;
             $slotName     = $dynamicContent->getSlotName();
             $currentOrder = $changes['displayOrder'][0];
             if ($currentOrder < $lastOrder) {
@@ -139,7 +141,7 @@ final class DynamicContentSubscriber implements EventSubscriberInterface
         $entity = $event->getDynamicContent();
 
         // Reordering other dwc after deletion.
-        $dcRepository = $this->dynamicContentModel->getRepository();
+        $dcRepository = $this->dynamicContentRepository;
         $slotName     = $entity->getSlotName();
         $currentOrder = $entity->getDisplayOrder();
         if (!$entity->getIsCampaignBased()
@@ -294,7 +296,7 @@ final class DynamicContentSubscriber implements EventSubscriberInterface
         $index   = 1;
         $content = preg_replace_callback(
             '/<([a-z0-9]+)[^>]*data-slot="dwc"[^>]*data-param-slot-name="([^"]+)"[^>]*>.*?<\/\1>/is',
-            function ($matches) use ($dwcSlotContentForLead, &$index, $event, $lead) {
+            function (array $matches) use ($dwcSlotContentForLead, &$index, $event, $lead): string {
                 $slotName    = $matches[2];
                 $token       = '{dwc_'.$slotName.'_'.$index.'}';
                 $slotContent = $matches[0];

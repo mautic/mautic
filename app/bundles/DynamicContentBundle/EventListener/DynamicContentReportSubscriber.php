@@ -10,7 +10,7 @@ use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class DynamicContentReportSubscriber implements EventSubscriberInterface
+final readonly class DynamicContentReportSubscriber implements EventSubscriberInterface
 {
     public const CONTEXT_DWC          = 'dwc';
     public const DWC_PREFIX           = 'dwc';

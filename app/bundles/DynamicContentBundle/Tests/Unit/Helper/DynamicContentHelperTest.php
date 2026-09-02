@@ -35,7 +35,6 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
      * @var MockObject&LeadModel
      */
     private MockObject $leadModel;
-    private MockObject $segmentRepository;
 
     private DynamicContentHelper $helper;
 
@@ -44,15 +43,14 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
         $this->mockModel            = $this->createMock(DynamicContentModel::class);
         $this->mockDispatcher       = $this->createMock(EventDispatcher::class);
         $this->leadModel            = $this->createMock(LeadModel::class);
-        $this->segmentRepository    = $this->createMock(LeadListRepository::class);
         $this->helper               = new DynamicContentHelper(
             $this->mockModel,
             $this->createStub(RealTimeExecutioner::class),
             $this->mockDispatcher,
             $this->leadModel,
-            $this->segmentRepository,
-            $this->createMock(CompanyLeadRepository::class),
-            $this->createMock(TagRepository::class),
+            $this->createStub(LeadListRepository::class),
+            $this->createStub(CompanyLeadRepository::class),
+            $this->createStub(TagRepository::class),
         );
     }
 

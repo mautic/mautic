@@ -17,7 +17,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class DynamicContentReportSubscriberFunctionalTest extends MauticMysqlTestCase
+final class DynamicContentReportSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     private DynamicContent $dynamicContent;
     private Page $page;
@@ -66,18 +66,16 @@ class DynamicContentReportSubscriberFunctionalTest extends MauticMysqlTestCase
      */
     private function verifyReportContent(array $report, bool $isPage): void
     {
-        $matchingRows = array_filter($report['data'], function (array $row) use ($isPage) {
-            return (
-                $isPage ?
-                    isset($row['page_id']) && (int) $row['page_id'] === $this->page->getId() :
-                    isset($row['email_id']) && (int) $row['email_id'] === $this->email->getId()
-            )
-                && isset($row['dwc_id']) && (int) $row['dwc_id'] === $this->dynamicContent->getId()
-                && isset($row['dwc_slot_name']) && $row['dwc_slot_name'] === $this->dynamicContent->getSlotName()
-                && isset($row['target']) && $row['target'] === $this->dwcPlacement;
-        });
+        $matchingRows = array_filter($report['data'], fn(array $row): bool => (
+            $isPage ?
+                isset($row['page_id']) && (int) $row['page_id'] === $this->page->getId() :
+                isset($row['email_id']) && (int) $row['email_id'] === $this->email->getId()
+        )
+            && isset($row['dwc_id']) && (int) $row['dwc_id'] === $this->dynamicContent->getId()
+            && isset($row['dwc_slot_name']) && $row['dwc_slot_name'] === $this->dynamicContent->getSlotName()
+            && isset($row['target']) && $row['target'] === $this->dwcPlacement);
 
-        Assert::assertNotEmpty($matchingRows, 'Expected Dynamic Web Content in report data not found');
+        $this->assertNotEmpty($matchingRows, 'Expected Dynamic Web Content in report data not found');
     }
 
     /**
@@ -189,7 +187,7 @@ class DynamicContentReportSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $model = $this->getContainer()->get('mautic.dynamicContent.model.dynamicContent');
-        \assert($model instanceof DynamicContentModel);
+        $this->assertInstanceOf(DynamicContentModel::class, $model);
 
         // Create page stat
         $pageEvent = new PageDisplayEvent('text', $this->page);
