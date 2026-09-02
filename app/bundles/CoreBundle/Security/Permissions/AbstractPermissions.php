@@ -188,8 +188,9 @@ abstract class AbstractPermissions
     /**
      * Determines if the user has access to the specified permission.
      *
-     * @param string $name
-     * @param string $level
+     * @param string               $name
+     * @param string               $level
+     * @param array<string, mixed> $userPermissions
      */
     public function isGranted(array $userPermissions, $name, $level): bool
     {

@@ -196,7 +196,7 @@ final class PreferencePageTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param mixed[] $params
+     * @param array<string, mixed> $params
      */
     private function dispatchEvent(Page $page, array $params): string
     {

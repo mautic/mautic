@@ -299,6 +299,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * Returns the field the integration needs in order to find the user.
+     *
+     * @return string[]
      */
     public function getIdentifierFields(): array
     {

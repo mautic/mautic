@@ -31,10 +31,9 @@ final class ConnectionBuilder
     }
 
     /**
-     * @param string               $key
      * @param array<string, mixed> $event
      */
-    private static function addTypeConnection($key, array $event): void
+    private static function addTypeConnection(string $key, array $event): void
     {
         self::$connectionRestrictions[$key] ??= [
             'source' => self::$eventTypes,
@@ -49,10 +48,9 @@ final class ConnectionBuilder
     }
 
     /**
-     * @param string $key
      * @param string $restrictionType
      */
-    private static function addRestriction($key, $restrictionType, array $restrictions): void
+    private static function addRestriction(string $key, $restrictionType, array $restrictions): void
     {
         switch ($restrictionType) {
             case 'source':

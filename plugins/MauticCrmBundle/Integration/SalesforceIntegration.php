@@ -1587,6 +1587,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return mb_strtolower($this->cleanPushData($email));
     }
 
+    /**
+     * @param mixed[] $trackedContacts
+     */
     protected function getMauticContactsToUpdate(
         array &$checkEmailsInSF,
         $mauticLeadFieldString,
@@ -2249,6 +2252,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
     }
 
+    /**
+     * @param array<string, mixed> $checkEmailsInSF
+     * @param array<string, mixed> $processedLeads
+     */
     protected function prepareMauticContactsToCreate(
         &$mauticData,
         array &$checkEmailsInSF,

@@ -111,6 +111,9 @@ abstract class AbstractMauticTestCase extends WebTestCase
         restore_exception_handler();
     }
 
+    /**
+     * @param array<string, mixed> $defaultConfigOptions
+     */
     protected function setUpSymfony(array $defaultConfigOptions = []): void
     {
         putenv('MAUTIC_CONFIG_PARAMETERS='.json_encode($defaultConfigOptions));

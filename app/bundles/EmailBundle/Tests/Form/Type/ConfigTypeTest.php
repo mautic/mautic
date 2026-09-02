@@ -21,7 +21,6 @@ use Mautic\EmailBundle\Validator\EmailOrEmailTokenListValidator;
 use Mautic\LeadBundle\Validator\CustomFieldValidator;
 use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Form\Type\PreferenceCenterListType;
-use Mautic\PageBundle\Model\PageModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -49,9 +48,6 @@ final class ConfigTypeTest extends TypeTestCase
         $repoMock = $this->createMock(PageRepository::class);
         $repoMock->method('getPageList')->willReturn([]);
 
-        $pageModelMock = $this->createMock(PageModel::class);
-        $pageModelMock->method('getRepository')->willReturn($repoMock);
-
         $permsMock = $this->createMock(CorePermissions::class);
         $permsMock->method('isGranted')->willReturn(false);
 
@@ -71,7 +67,7 @@ final class ConfigTypeTest extends TypeTestCase
         );
 
         $configType                     = new ConfigType($translator);
-        $preferenceCenterList           = new PreferenceCenterListType($pageModelMock, $permsMock);
+        $preferenceCenterList           = new PreferenceCenterListType($permsMock, $repoMock);
         $configMonitoredEmail           = new ConfigMonitoredEmailType(new EventDispatcher());
         $configMonitoredMailboxes       = new ConfigMonitoredMailboxesType($this->createStub(Mailbox::class));
         $dsnValidator                   = new DsnValidator($this->createStub(TransportFactory::class));

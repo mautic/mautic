@@ -191,8 +191,8 @@ final class EmailFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param mixed[] $expected
-     * @param mixed[] $actual
+     * @param int[]|null[] $expected
+     * @param mixed[]      $actual
      */
     private function assertArrayValuesEquals(array $expected, array $actual): void
     {

@@ -919,7 +919,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param array $fields
+     * @param array                $fields
+     * @param array<string, mixed> $data
      */
     protected function getFieldData($fields, array $data): array
     {
@@ -1027,8 +1028,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param mixed[] $fields
-     * @param mixed[] $data
+     * @param string[]             $fields
+     * @param array<string, mixed> $data
      */
     private function existDataForUpdate(array $fields, array $data): bool
     {

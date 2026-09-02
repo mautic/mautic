@@ -198,6 +198,8 @@ final class SalesforceApi extends CrmApi
     }
 
     /**
+     * @param non-empty-array<string, mixed> $data
+     *
      * @return mixed|string
      *
      * @throws ApiErrorException

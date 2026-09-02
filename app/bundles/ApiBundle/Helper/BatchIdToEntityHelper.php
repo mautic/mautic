@@ -162,6 +162,9 @@ final class BatchIdToEntityHelper
         }
     }
 
+    /**
+     * @param array<string, mixed> $array
+     */
     private function isAssociativeArray(array $array): bool
     {
         if ([] === $array) {

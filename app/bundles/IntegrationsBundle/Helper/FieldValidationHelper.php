@@ -58,6 +58,9 @@ final class FieldValidationHelper
         }
     }
 
+    /**
+     * @param int[]|string[] $missingFields
+     */
     private function validateIntegrationRequiredFields(FormInterface $fieldMappingsForm, array $missingFields): void
     {
         $hasMissingFields  = false;

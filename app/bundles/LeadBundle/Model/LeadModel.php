@@ -1481,7 +1481,7 @@ class LeadModel extends FormModel
                 continue;
             }
 
-            if ('company' === $leadField['alias'] && !empty($companyData)) {
+            if ('company' === $leadField['alias'] && [] !== $companyData) {
                 $company = $this->companyModel->importCompany(array_flip($companyFields), $companyData);
             }
 
@@ -1624,6 +1624,8 @@ class LeadModel extends FormModel
 
     /**
      * Add leads UTM tags via API.
+     *
+     * @param array<string, mixed> $params
      */
     public function addUTMTags(Lead $lead, array $params): void
     {

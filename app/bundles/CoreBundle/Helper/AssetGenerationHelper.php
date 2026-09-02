@@ -197,7 +197,7 @@ final readonly class AssetGenerationHelper
                                     throw new \ErrorException('These files are missing: '.implode(', ', $missing).'. Have you forgot to install/update modules?');
                                 }
 
-                                if ('css' == $type) {
+                                if ('css' === $type) {
                                     $minifier = new Minify\CSS(...array_column($files, 'fullPath'));
                                     $minifier->minify($assetFile);
                                 } else {

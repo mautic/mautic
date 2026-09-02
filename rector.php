@@ -17,7 +17,7 @@ return RectorConfig::configure()
         typeDeclarationDocblocks: true,
         privatization: true,
         symfonyCodeQuality: true,
-        // phpunitCodeQuality: true,
+        phpunitCodeQuality: true,
         phpunitMockToStub: true,
         phpunitNarrowAsserts: true,
     )
@@ -26,28 +26,29 @@ return RectorConfig::configure()
     ->withRules([
         Rector\PHPUnit\CodeQuality\Rector\ClassMethod\AssertClassToThisAssertRector::class,
         Rector\TypeDeclarationDocblocks\Rector\Property\MergePhpstanDocTagIntoNativeRector::class,
-        // Rector\TypeDeclarationDocblocks\Rector\ClassMethod\NarrowArrayCollectionUnionReturnDocblockRector::class,
         // custom rules
         UnserializeToSerializerDecodeRector::class,
         Utils\Rector\AssertTrueResponseIsOkToAssertResponseIsSuccessfulRector::class,
         Utils\Rector\ModelGetRepositoryToRepositoryServiceRector::class,
     ])
-    ->reportUnusedSkips()
     ->withComposerBased(phpunit: true, symfony: true)
     ->withSkip([
         // handle later
         Rector\PHPUnit\PHPUnit120\Rector\Class_\AllowMockObjectsForDataProviderRector::class,
 
+        // called globally
+        Rector\TypeDeclarationDocblocks\Rector\Class_\ClassMethodArrayDocblockParamFromLocalCallsRector::class => [
+            __DIR__.'/plugins/MauticCrmBundle/Integration/SalesforceIntegration.php',
+            __DIR__.'/app/bundles/CoreBundle/Controller/AjaxController.php',
+        ],
+        Rector\TypeDeclarationDocblocks\Rector\ClassMethod\AddParamArrayDocblockFromDimFetchAccessRector::class => [
+            __DIR__.'/app/bundles/CoreBundle/Controller/AjaxController.php',
+        ],
+
         // prefer implicit compare on object|null
-        Rector\Php74\Rector\If_\IfToNullCoalescingAssignRector::class,
         Rector\TypeDeclaration\Rector\BooleanAnd\BinaryOpNullableToInstanceofRector::class,
         Rector\CodeQuality\Rector\If_\ObjectExplicitBoolCompareRector::class,
         Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector::class,
-
-        // Rector\Symfony\CodeQuality\Rector\Class_\LoadValidatorMetadataToAttributeRector::class,
-        Utils\Rector\ModelGetRepositoryToRepositoryServiceRector::class => [
-            __DIR__.'/app/bundles/PageBundle/Form/Type/PreferenceCenterListType.php',
-        ],
 
         Rector\CodeQuality\Rector\Isset_\IssetOnPropertyObjectToPropertyExistsRector::class => [
             // doctrine magic

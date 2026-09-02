@@ -1078,7 +1078,7 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * Unique handling for $filter->not since dbal does not support the not() function with it's QueryBuilder.
      *
-     * @return array<int, Query\Expr\Orx|CompositeExpression|Query\Expr\Andx|non-empty-array<string, mixed>>
+     * @return array<int, Query\Expr\Orx|CompositeExpression|Andx|non-empty-array<string, mixed>>
      */
     protected function addDbalCatchAllWhereClause(QueryBuilder|DbalQueryBuilder &$q, \stdClass $filter, array $columns): array
     {
@@ -1128,7 +1128,7 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return array<int, CompositeExpression|Query\Expr\Orx|Query\Expr\Andx|Query\Expr\Func|non-empty-array<string, mixed>>
+     * @return array<int, CompositeExpression|Query\Expr\Orx|Andx|Query\Expr\Func|non-empty-array<string, mixed>>
      */
     protected function addStandardCatchAllWhereClause(QueryBuilder|DbalQueryBuilder &$q, \stdClass $filter, array $columns): array
     {
