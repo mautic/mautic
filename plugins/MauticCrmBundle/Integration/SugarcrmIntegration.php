@@ -366,7 +366,8 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array|null $query
+     * @param array|null           $query
+     * @param array<string, mixed> $params
      *
      * @return int|null
      */
@@ -1086,8 +1087,9 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array  $keys
-     * @param string $object
+     * @param array                $keys
+     * @param string               $object
+     * @param array<string, mixed> $fields
      */
     public function cleanSugarData(array $fields, $keys, $object): array
     {
@@ -1105,6 +1107,8 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @param array<string, mixed> $params
+     *
      * @return mixed[]
      */
     public function pushLeads(array $params = []): array
@@ -1224,6 +1228,8 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
 
     /**
      * Update body to sync.
+     *
+     * @param array<string, mixed> $lead
      */
     private function pushDncToSugar(array $lead, array &$body): void
     {
@@ -1261,6 +1267,9 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
         }
     }
 
+    /**
+     * @param array<string, mixed> $data
+     */
     private function fetchDncToMautic(?Lead $lead = null, array $data = []): void
     {
         if (null === $lead) {
@@ -1298,9 +1307,9 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
     /**
      * @param string $object
      *
-     * @return array The first element is made up of records that exist in Mautic, but which no longer have a match in CRM.
-     *               We therefore assume that they've been deleted in CRM and will mark them as deleted in the pushLeads function (~line 1320).
-     *               The second element contains Ids of records that were explicitly marked as deleted in CRM. ATM, nothing is done with this data.
+     * @return array<int, mixed> The first element is made up of records that exist in Mautic, but which no longer have a match in CRM.
+     *                           We therefore assume that they've been deleted in CRM and will mark them as deleted in the pushLeads function (~line 1320).
+     *                           The second element contains Ids of records that were explicitly marked as deleted in CRM. ATM, nothing is done with this data.
      */
     public function getObjectDataToUpdate($checkEmailsInSugar, array &$mauticData, $availableFields, $contactSugarFields, $leadSugarFields, $object = 'Leads'): array
     {
@@ -1403,6 +1412,9 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
         return $result;
     }
 
+    /**
+     * @param array<string, mixed> $lead
+     */
     private function getOwnerEmail(array $lead)
     {
         if (isset($lead['owner_id']) && !empty($lead['owner_id'])) {
@@ -1415,6 +1427,10 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
         return null;
     }
 
+    /**
+     * @param array<string, mixed> $mauticData
+     * @param array<string, mixed> $availableFields
+     */
     private function buildCompositeBody(array &$mauticData, array $availableFields, array $fieldsToUpdateInSugarUpdate, string $object, array $lead, ?array $onwerAssignedUserIdByEmail = null, $objectId = null): void
     {
         $body = [];
@@ -1459,6 +1475,8 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
 
     /**
      * @param array $response
+     *
+     * @return array<int, int>
      */
     private function processCompositeResponse($response): array
     {

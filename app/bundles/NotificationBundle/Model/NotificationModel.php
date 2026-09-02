@@ -208,9 +208,10 @@ final class NotificationModel extends FormModel implements AjaxLookupModelInterf
     /**
      * Get line chart data of hits.
      *
-     * @param ?string $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param string  $dateFormat
-     * @param bool    $canViewOthers
+     * @param ?string              $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string               $dateFormat
+     * @param bool                 $canViewOthers
+     * @param array<string, mixed> $filter
      */
     public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], $canViewOthers = true): array
     {

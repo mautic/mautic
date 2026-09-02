@@ -1098,6 +1098,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @param array<string, mixed> $params
+     *
      * @return mixed[]
      */
     public function pushLeads(array $params = []): array
@@ -1446,6 +1448,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     /**
      * @param array<string, mixed> $fields
+     *
+     * @return string[]
      */
     public function getMixedLeadFields(array $fields, $object): array
     {
@@ -1583,6 +1587,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return mb_strtolower($this->cleanPushData($email));
     }
 
+    /**
+     * @param mixed[] $trackedContacts
+     */
     protected function getMauticContactsToUpdate(
         array &$checkEmailsInSF,
         $mauticLeadFieldString,
@@ -1633,6 +1640,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @param array<string, mixed> $fieldMapping
+     *
      * @return array
      *
      * @throws ApiErrorException
@@ -1710,6 +1719,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $sfEntityRecords;
     }
 
+    /**
+     * @param array<string, mixed> $mauticData
+     * @param array<string, mixed> $objectFields
+     */
     protected function buildCompositeBody(
         array &$mauticData,
         array $objectFields,
@@ -1810,6 +1823,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $updateEntity;
     }
 
+    /**
+     * @param array<string, mixed> $config
+     *
+     * @return array<int, string|mixed[]>
+     */
     protected function getRequiredFieldString(array $config, array $availableFields, $object): array
     {
         $requiredFields = $this->getRequiredFields($availableFields[$object]);
@@ -1911,6 +1929,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
      * @param int $totalUpdated
      * @param int $totalCreated
      * @param int $totalErrored
+     *
+     * @return array<int, int>
      */
     protected function processCompositeResponse($response, &$totalUpdated = 0, &$totalCreated = 0, &$totalErrored = 0): array
     {
@@ -2075,6 +2095,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $this->getApiHelper()->request('query', ['q' => $findQuery], 'GET', false, null, $queryUrl);
     }
 
+    /**
+     * @param array<string, mixed> $checkEmailsInSF
+     * @param array<string, mixed> $processedLeads
+     * @param array<string, mixed> $trackedContacts
+     * @param array<string, mixed> $sfEntityRecords
+     */
     protected function prepareMauticContactsToUpdate(
         &$mauticData,
         array &$checkEmailsInSF,
@@ -2226,6 +2252,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
     }
 
+    /**
+     * @param array<string, mixed> $checkEmailsInSF
+     * @param array<string, mixed> $processedLeads
+     */
     protected function prepareMauticContactsToCreate(
         &$mauticData,
         array &$checkEmailsInSF,
@@ -2288,6 +2318,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
     }
 
+    /**
+     * @param array<string, mixed> $checkEmailsInSF
+     * @param array<string, mixed> $lead
+     */
     protected function setContactToSync(array &$checkEmailsInSF, array $lead): false|string
     {
         $key = $this->getSyncKey($lead['email']);
@@ -2346,6 +2380,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $this->prepareFieldsForSync($fields, $fieldsToUpdate, $objects);
     }
 
+    /**
+     * @param array<string, mixed> $config
+     */
     protected function mapContactDataForPush(Lead $lead, array $config): array
     {
         $fields             = array_keys($config['leadFields'] ?? []);
@@ -2393,6 +2430,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $mappedData;
     }
 
+    /**
+     * @param array<string, mixed> $config
+     */
     protected function mapCompanyDataForPush(Company $company, array $config): array
     {
         $object     = 'company';
@@ -2513,8 +2553,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * Update the record in each system taking the last modified record.
      *
-     * @param string $channel
-     * @param string $sfObject
+     * @param string               $channel
+     * @param string               $sfObject
+     * @param array<string, mixed> $params
      *
      * @throws ApiErrorException
      */
@@ -2607,6 +2648,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @param array<string, mixed> $params
+     *
      * @return mixed[]
      */
     public function pushCompanies(array $params = []): array
@@ -2796,6 +2839,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return [$totalUpdated, $totalCreated, $totalErrors, $totalIgnored];
     }
 
+    /**
+     * @param array<string, array<string, mixed[]>> $objectFields
+     * @param array<string, mixed>                  $sfEntityRecords
+     */
     protected function prepareMauticCompaniesToUpdate(
         &$mauticData,
         array &$checkCompaniesInSF,
@@ -2888,6 +2935,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
     }
 
+    /**
+     * @param array<string, array<string, mixed[]>> $objectFields
+     */
     protected function prepareMauticCompaniesToCreate(
         &$mauticData,
         array &$checkCompaniesInSF,

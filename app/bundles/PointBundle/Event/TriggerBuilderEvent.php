@@ -18,18 +18,18 @@ final class TriggerBuilderEvent extends Event
     /**
      * Adds an action to the list of available .
      *
-     * @param string $key   - a unique identifier; it is recommended that it be namespaced i.e. lead.action
-     * @param array  $event - can contain the following keys:
-     *                      'label'           => (required) what to display in the list
-     *                      'description'     => (optional) short description of event
-     *                      'template'        => (optional) template to use for the action's HTML in the point builder
-     *                      i.e AcmeMyBundle:PointAction:theaction.html.twig
-     *                      'formType'        => (optional) name of the form type SERVICE for the action
-     *                      'formTypeOptions' => (optional) array of options to pass to formType
-     *                      'callback'        => (required) callback function that will be passed when the action is triggered
-     *                      The callback function can receive the following arguments by name (via ReflectionMethod::invokeArgs())
-     *                      Mautic\PointBundle\Entity\TriggerEvent  $event
-     *                      Mautic\LeadBundle\Entity\Lead           $lead
+     * @param string               $key   - a unique identifier; it is recommended that it be namespaced i.e. lead.action
+     * @param array<string, mixed> $event - can contain the following keys:
+     *                                    'label'           => (required) what to display in the list
+     *                                    'description'     => (optional) short description of event
+     *                                    'template'        => (optional) template to use for the action's HTML in the point builder
+     *                                    i.e AcmeMyBundle:PointAction:theaction.html.twig
+     *                                    'formType'        => (optional) name of the form type SERVICE for the action
+     *                                    'formTypeOptions' => (optional) array of options to pass to formType
+     *                                    'callback'        => (required) callback function that will be passed when the action is triggered
+     *                                    The callback function can receive the following arguments by name (via ReflectionMethod::invokeArgs())
+     *                                    Mautic\PointBundle\Entity\TriggerEvent  $event
+     *                                    Mautic\LeadBundle\Entity\Lead           $lead
      *
      * @throws InvalidArgumentException
      */
@@ -68,6 +68,10 @@ final class TriggerBuilderEvent extends Event
     }
 
     /**
+     * @param string[]             $keys
+     * @param string[]             $methods
+     * @param array<string, mixed> $component
+     *
      * @throws InvalidArgumentException
      */
     private function verifyComponent(array $keys, array $methods, array $component): void

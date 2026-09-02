@@ -36,6 +36,8 @@ final class ResultsPaginator
     }
 
     /**
+     * @param array<string, mixed> $results
+     *
      * @throws ApiErrorException
      */
     public function setResults(array $results): static

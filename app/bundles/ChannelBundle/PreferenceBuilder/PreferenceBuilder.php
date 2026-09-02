@@ -40,7 +40,8 @@ final class PreferenceBuilder
     }
 
     /**
-     * @param string $channel
+     * @param string               $channel
+     * @param array<string, mixed> $rule
      */
     private function addChannelRule($channel, array $rule, LeadEventLog $log, int $priority): void
     {

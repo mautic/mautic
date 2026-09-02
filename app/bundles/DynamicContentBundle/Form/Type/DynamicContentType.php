@@ -49,19 +49,19 @@ final class DynamicContentType extends AbstractType
     private array $fieldChoices;
 
     /**
-     * @var mixed[]
+     * @var array<string, string>
      */
     private readonly array $countryChoices;
 
     /**
-     * @var mixed[]
+     * @var array<string, array<string, string>>
      */
     private readonly array $regionChoices;
 
     private $timezoneChoices;
 
     /**
-     * @var mixed[]
+     * @var array<string, string>
      */
     private readonly array $localeChoices;
 
@@ -73,7 +73,7 @@ final class DynamicContentType extends AbstractType
     private $deviceBrandsChoices;
 
     /**
-     * @var mixed[]
+     * @var int[]|string[]
      */
     private readonly array $deviceOsChoices;
 

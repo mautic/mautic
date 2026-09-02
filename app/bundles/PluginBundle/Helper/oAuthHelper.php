@@ -20,8 +20,14 @@ final class oAuthHelper
 
     private $callback;
 
+    /**
+     * @var array<string, mixed>
+     */
     private readonly array $settings;
 
+    /**
+     * @param array<string, mixed> $settings
+     */
     public function __construct(
         UnifiedIntegrationInterface $integration,
         private readonly ?Request $request = null,
@@ -39,6 +45,9 @@ final class oAuthHelper
         $this->settings          = $settings;
     }
 
+    /**
+     * @return array<int, string>
+     */
     public function getAuthorizationHeader(string $url, $parameters, string $method): array
     {
         // Get standard OAuth headers

@@ -11,9 +11,9 @@ abstract class EmailAbstractIntegration extends AbstractIntegration
     protected $pushContactLink = false;
 
     /**
-     * @return array
+     * @return string[]
      */
-    public function getSupportedFeatures()
+    public function getSupportedFeatures(): array
     {
         return ['push_lead'];
     }

@@ -7693,12 +7693,6 @@ parameters:
 			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
 
 		-
-			message: '#^Method Mautic\\PluginBundle\\Integration\\AbstractIntegration\:\:getBearerToken\(\) has parameter \$inAuthorization with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
-
-		-
 			message: '#^Method Mautic\\PluginBundle\\Integration\\AbstractIntegration\:\:getContactTimelineLink\(\) has parameter \$contactId with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -7875,12 +7869,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\PluginBundle\\Integration\\AbstractSsoServiceIntegration\:\:extractAuthKeys\(\) has parameter \$tokenOverride with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PluginBundle/Integration/AbstractSsoServiceIntegration.php
-
-		-
-			message: '#^Return type \(array\) of method Mautic\\PluginBundle\\Integration\\AbstractSsoServiceIntegration\:\:extractAuthKeys\(\) should be compatible with return type \(bool\|string\) of method Mautic\\PluginBundle\\Integration\\AbstractIntegration\:\:extractAuthKeys\(\)$#'
-			identifier: method.childReturnType
 			count: 1
 			path: app/bundles/PluginBundle/Integration/AbstractSsoServiceIntegration.php
 
@@ -9526,12 +9514,6 @@ parameters:
 			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\DynamicsIntegration\:\:getBearerToken\(\) should return string but returns false\.$#'
-			identifier: return.type
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/DynamicsIntegration.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\DynamicsIntegration\:\:getFormNotes\(\) has parameter \$section with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -9738,12 +9720,6 @@ parameters:
 		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SalesforceIntegration\:\:convertLeadFieldKey\(\) has parameter \$field with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SalesforceIntegration\:\:getBearerToken\(\) should return string but returns false\.$#'
-			identifier: return.type
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
 
@@ -10321,12 +10297,6 @@ parameters:
 			message: '#^Parameter \#1 \$internalEntityId of method Mautic\\PluginBundle\\Entity\\IntegrationEntity\:\:setInternalEntityId\(\) expects int, string\|null given\.$#'
 			identifier: argument.type
 			count: 2
-			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
-
-		-
-			message: '#^Property MauticPlugin\\MauticCrmBundle\\Integration\\SugarcrmIntegration\:\:\$authorizationError has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
 			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
 
 		-
@@ -11058,12 +11028,6 @@ parameters:
 		-
 			message: '#^Method MauticPlugin\\MauticSocialBundle\\Integration\\InstagramIntegration\:\:getApiUrl\(\) has parameter \$endpoint with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticSocialBundle/Integration/InstagramIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticSocialBundle\\Integration\\InstagramIntegration\:\:getContactUserId\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: plugins/MauticSocialBundle/Integration/InstagramIntegration.php
 

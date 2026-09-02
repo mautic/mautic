@@ -345,6 +345,9 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return $this->currentPassword;
     }
 
+    /**
+     * @return string[]
+     */
     public function getRoles(): array
     {
         $roles = [];

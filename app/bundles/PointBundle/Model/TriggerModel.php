@@ -307,8 +307,8 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * Triggers a specific event.
      *
-     * @param array $event triggerEvent converted to array
-     * @param bool  $force
+     * @param array<string, mixed> $event triggerEvent converted to array
+     * @param bool                 $force
      *
      * @return bool Was event triggered
      */
@@ -354,6 +354,10 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
         return (bool) $triggerExecutedEvent->getResult();
     }
 
+    /**
+     * @param array<string, mixed> $event
+     * @param array<string, mixed> $settings
+     */
     private function invokeCallback(array $event, Lead $lead, array $settings): mixed
     {
         $args = [

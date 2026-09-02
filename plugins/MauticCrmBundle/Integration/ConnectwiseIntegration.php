@@ -295,7 +295,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return array of company fields for connectwise
+     * @return array<string, array<string, bool|string>> of company fields for connectwise
      */
     public function getCompanyFields(): array
     {
@@ -342,7 +342,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return array of contact fields for connectwise
+     * @return array<string, array<array<string, mixed>, mixed>> of contact fields for connectwise
      */
     public function getContactFields(): array
     {
@@ -623,6 +623,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
     /**
      * @param array<string, mixed> $config
+     * @param array<string, mixed> $cwContactData
      */
     public function getMappedFields(string $object, $lead, bool $personFound, array $config, array $cwContactData = []): array
     {
@@ -960,6 +961,8 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @param array<string, mixed> $config
+     *
      * @throws ApiErrorException
      */
     public function createActivity(array $config, $cwContactId, $leadId): ?IntegrationEntity
