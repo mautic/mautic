@@ -4,12 +4,6 @@ declare(strict_types=1);
 
 return [
     'routes' => [
-        'public' => [
-            'mautic_receive_notification' => [
-                'path'       => '/notification/receive',
-                'controller' => 'Mautic\NotificationBundle\Controller\Api\NotificationApiController::receiveAction',
-            ],
-        ],
         'api' => [
             'mautic_api_notificationsstandard' => [
                 'standard_entity' => true,

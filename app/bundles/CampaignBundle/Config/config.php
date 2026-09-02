@@ -4,16 +4,6 @@ declare(strict_types=1);
 
 return [
     'routes' => [
-        'main' => [
-            'mautic_campaign_preview'      => [
-                'path'       => '/campaign/preview/{objectId}',
-                'controller' => 'Mautic\EmailBundle\Controller\PublicController::previewAction',
-            ],
-            'mautic_campaign_import_index' => [
-                'path'       => '/campaign/import',
-                'controller' => 'Mautic\CampaignBundle\Controller\ImportController::indexAction',
-            ],
-        ],
         'api'  => [
             'mautic_api_campaignsstandard'            => [
                 'standard_entity' => true,

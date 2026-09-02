@@ -172,6 +172,7 @@
 ```
 
   Non-model services that happen to live under the same `mautic.<bundle>.model.*` namespace (e.g. `mautic.lead.model.dnc` was a model but `mautic.report.model.report_exporter` is a helper) are unaffected — only aliases pointing at `MauticModelInterface` models were removed.
+- Dead routes removed from bundle route config. `mautic_receive_notification` (`/notification/receive`), `mautic_campaign_import_index` (`/s/campaign/import`) and `mautic_integration_companies` (`/plugin/{integration}/company_data`, CRM plugin) pointed at controller actions that do not exist (`NotificationApiController::receiveAction`, `ImportController::indexAction`, `MauticCrmBundle\Controller\PublicController::companyDataAction`), so they returned an error on every request.
 
 ## Changed code
 
