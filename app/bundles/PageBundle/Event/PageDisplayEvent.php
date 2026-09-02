@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PageBundle\Event;
 
 use Mautic\LeadBundle\Entity\Lead;
@@ -17,17 +19,15 @@ class PageDisplayEvent extends Event
 
     public function __construct(
         private string $content,
-        private Page $page,
+        private readonly Page $page,
         private array $params = [],
     ) {
     }
 
     /**
      * Returns the Page entity.
-     *
-     * @return Page
      */
-    public function getPage()
+    public function getPage(): Page
     {
         return $this->page;
     }
@@ -42,30 +42,18 @@ class PageDisplayEvent extends Event
 
     /**
      * Set page content.
-     *
-     * @param string $content
      */
-    public function setContent($content): void
+    public function setContent(string $content): void
     {
         $this->content = $content;
     }
 
-    /**
-     * Get params.
-     *
-     * @return array
-     */
-    public function getParams()
+    public function getParams(): array
     {
         return $this->params;
     }
 
-    /**
-     * Set params.
-     *
-     * @param array $params
-     */
-    public function setParams($params): void
+    public function setParams(array $params): void
     {
         $this->params = $params;
     }

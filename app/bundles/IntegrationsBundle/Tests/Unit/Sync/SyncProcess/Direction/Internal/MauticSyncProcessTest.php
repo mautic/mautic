@@ -27,29 +27,26 @@ use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\ObjectChangeGe
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class MauticSyncProcessTest extends TestCase
+final class MauticSyncProcessTest extends TestCase
 {
     private const INTEGRATION_NAME = 'Test';
 
     /**
-     * @var SyncDateHelper|MockObject
+     * @var MockObject&SyncDateHelper
      */
     private MockObject $syncDateHelper;
 
     /**
-     * @var ObjectChangeGenerator|MockObject
+     * @var MockObject&ObjectChangeGenerator
      */
     private MockObject $objectChangeGenerator;
 
     /**
-     * @var MauticSyncDataExchange|MockObject
+     * @var MockObject&MauticSyncDataExchange
      */
     private MockObject $syncDataExchange;
 
-    /**
-     * @var InputOptionsDAO
-     */
-    private $inputOptionsDAO;
+    private InputOptionsDAO $inputOptionsDAO;
 
     protected function setUp(): void
     {
@@ -83,7 +80,7 @@ class MauticSyncProcessTest extends TestCase
         $this->syncDataExchange->expects($this->once())
             ->method('getSyncReport')
             ->willReturnCallback(
-                function (RequestDAO $requestDAO) {
+                function (RequestDAO $requestDAO): ReportDAO {
                     $requestObjects = $requestDAO->getObjects();
                     $this->assertCount(1, $requestObjects);
 
@@ -186,7 +183,7 @@ class MauticSyncProcessTest extends TestCase
             ->willThrowException(new ObjectDeletedException());
 
         $syncOrder = $this->createMauticSyncProcess($mappingManual)->getSyncOrder($syncReport);
-        self::assertEquals([], $syncOrder->getIdentifiedObjects());
+        $this->assertSame([], $syncOrder->getIdentifiedObjects());
     }
 
     public function testGetSyncOrderObjectSkipped(): void
@@ -226,7 +223,7 @@ class MauticSyncProcessTest extends TestCase
 
         $syncOrder = $this->createMauticSyncProcess($mappingManual)->getSyncOrder($syncReport);
 
-        self::assertEquals([], $syncOrder->getIdentifiedObjects());
+        $this->assertSame([], $syncOrder->getIdentifiedObjects());
     }
 
     public function testThatItDoesntSyncOtherEntityTypesWhenIDsForSomeEntityAreSpecified(): void

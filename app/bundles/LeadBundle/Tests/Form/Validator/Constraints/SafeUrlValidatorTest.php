@@ -6,17 +6,18 @@ namespace Mautic\LeadBundle\Tests\Form\Validator\Constraints;
 
 use Mautic\LeadBundle\Validator\Constraints\SafeUrl;
 use Mautic\LeadBundle\Validator\Constraints\SafeUrlValidator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class SafeUrlValidatorTest extends ConstraintValidatorTestCase
+final class SafeUrlValidatorTest extends ConstraintValidatorTestCase
 {
     protected function createValidator(): ConstraintValidatorInterface
     {
         return new SafeUrlValidator();
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('urlProvider')]
+    #[DataProvider('urlProvider')]
     public function testSafeUrlValidation(string $url, bool $isValid): void
     {
         $constraint = new SafeUrl();
@@ -31,14 +32,12 @@ class SafeUrlValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * @return list<array{string, bool}>
+     * @return \Iterator<int<0, max>, array{string, bool}>
      */
-    public static function urlProvider(): array
+    public static function urlProvider(): \Iterator
     {
-        return [
-            ['http://example.com', true],
-            ['https://example.com/path', true],
-            ['data:text/html;base64,abc', false],
-        ];
+        yield ['http://example.com', true];
+        yield ['https://example.com/path', true];
+        yield ['data:text/html;base64,abc', false];
     }
 }

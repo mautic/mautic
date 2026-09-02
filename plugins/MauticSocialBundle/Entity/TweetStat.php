@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticSocialBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
@@ -22,10 +24,7 @@ class TweetStat
      */
     private $twitterTweetId;
 
-    /**
-     * @var Tweet|null
-     */
-    private $tweet;
+    private ?Tweet $tweet = null;
 
     /**
      * @var TheLead|null
@@ -170,10 +169,8 @@ class TweetStat
 
     /**
      * @param string $twitterTweetId
-     *
-     * @return $this
      */
-    public function setTwitterTweetId($twitterTweetId)
+    public function setTwitterTweetId($twitterTweetId): static
     {
         $this->twitterTweetId = $twitterTweetId;
 
@@ -196,17 +193,11 @@ class TweetStat
         $this->dateSent = $dateSent;
     }
 
-    /**
-     * @return Tweet
-     */
-    public function getTweet()
+    public function getTweet(): ?Tweet
     {
         return $this->tweet;
     }
 
-    /**
-     * @param mixed $tweet
-     */
     public function setTweet(?Tweet $tweet = null): void
     {
         $this->tweet = $tweet;
@@ -220,97 +211,63 @@ class TweetStat
         return $this->lead;
     }
 
-    /**
-     * @param mixed $lead
-     */
     public function setLead(?TheLead $lead = null): void
     {
         $this->lead = $lead;
     }
 
-    /**
-     * @return ?int
-     */
-    public function getRetryCount()
+    public function getRetryCount(): ?int
     {
         return $this->retryCount;
     }
 
-    /**
-     * @param ?int $retryCount
-     */
-    public function setRetryCount($retryCount): void
+    public function setRetryCount(?int $retryCount): void
     {
         $this->retryCount = $retryCount;
     }
 
     public function retryCountUp(): void
     {
-        $this->setRetryCount($this->getRetryCount() + 1);
+        $this->setRetryCount($this->retryCount + 1);
     }
 
-    /**
-     * @return ?int
-     */
-    public function getFavoriteCount()
+    public function getFavoriteCount(): ?int
     {
         return $this->favoriteCount;
     }
 
-    /**
-     * @param ?int $favoriteCount
-     *
-     * @return $this
-     */
-    public function setFavoriteCount($favoriteCount)
+    public function setFavoriteCount(?int $favoriteCount): static
     {
         $this->favoriteCount = $favoriteCount;
 
         return $this;
     }
 
-    /**
-     * @return ?int
-     */
-    public function getRetweetCount()
+    public function getRetweetCount(): ?int
     {
         return $this->retweetCount;
     }
 
-    /**
-     * @param ?int $retweetCount
-     *
-     * @return $this
-     */
-    public function setRetweetCount($retweetCount)
+    public function setRetweetCount(?int $retweetCount): static
     {
         $this->retweetCount = $retweetCount;
 
         return $this;
     }
 
-    /**
-     * @return ?bool
-     */
-    public function getIsFailed()
+    public function getIsFailed(): ?bool
     {
         return $this->isFailed;
     }
 
-    /**
-     * @param ?bool $isFailed
-     */
-    public function setIsFailed($isFailed): void
+    public function setIsFailed(?bool $isFailed): void
     {
         $this->isFailed = $isFailed;
     }
 
-    /**
-     * @return ?bool
-     */
-    public function isFailed()
+    public function isFailed(): ?bool
     {
-        return $this->getIsFailed();
+        return $this->isFailed;
     }
 
     /**
@@ -364,17 +321,15 @@ class TweetStat
     /**
      * @return ?mixed[]
      */
-    public function getResponseDetails()
+    public function getResponseDetails(): ?array
     {
         return $this->responseDetails;
     }
 
     /**
      * @param ?mixed[] $responseDetails
-     *
-     * @return self
      */
-    public function setResponseDetails($responseDetails)
+    public function setResponseDetails(?array $responseDetails): static
     {
         $this->responseDetails = $responseDetails;
 

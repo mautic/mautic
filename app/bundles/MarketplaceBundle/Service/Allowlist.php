@@ -17,9 +17,9 @@ class Allowlist
     private const MARKETPLACE_ALLOWLIST_CACHE_KEY = 'marketplace_allowlist';
 
     public function __construct(
-        private Config $config,
-        private CacheProvider $cache,
-        private ClientInterface $httpClient,
+        private readonly Config $config,
+        private readonly CacheProvider $cache,
+        private readonly ClientInterface $httpClient,
     ) {
     }
 

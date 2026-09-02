@@ -4,7 +4,7 @@ namespace Mautic\DynamicContentBundle\Form\Type;
 
 use DeviceDetector\Parser\Device\AbstractDeviceParser as DeviceParser;
 use DeviceDetector\Parser\OperatingSystem;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\DynamicContentBundle\DynamicContent\TypeList;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\EmailBundle\Form\Type\EmailUtmTagsType;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
 use Mautic\LeadBundle\Form\Type\HtmlType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
@@ -41,7 +42,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<DynamicContent>
  */
-class DynamicContentType extends AbstractType
+final class DynamicContentType extends AbstractType
 {
     /**
      * @var mixed[]
@@ -51,31 +52,31 @@ class DynamicContentType extends AbstractType
     /**
      * @var mixed[]
      */
-    private array $countryChoices;
+    private readonly array $countryChoices;
 
     /**
      * @var mixed[]
      */
-    private array $regionChoices;
+    private readonly array $regionChoices;
 
     private $timezoneChoices;
 
     /**
      * @var mixed[]
      */
-    private array $localeChoices;
+    private readonly array $localeChoices;
 
     /**
      * @var mixed[]
      */
-    private array $deviceTypesChoices;
+    private readonly array $deviceTypesChoices;
 
     private $deviceBrandsChoices;
 
     /**
      * @var mixed[]
      */
-    private array $deviceOsChoices;
+    private readonly array $deviceOsChoices;
 
     /**
      * @var array<string, string>
@@ -86,12 +87,13 @@ class DynamicContentType extends AbstractType
      * @throws \InvalidArgumentException
      */
     public function __construct(
-        private EntityManager $em,
+        private readonly EntityManagerInterface $em,
         ListModel $listModel,
-        private TranslatorInterface $translator,
-        private LeadModel $leadModel,
+        private readonly TranslatorInterface $translator,
+        LeadModel $leadModel,
         private TypeList $typeList,
-        private RelativeDate $relativeDate,
+        private readonly RelativeDate $relativeDate,
+        private readonly LeadRepository $leadRepository,
     ) {
         $this->fieldChoices    = $listModel->getChoiceFields();
         $this->timezoneChoices = FormFieldHelper::getTimezonesChoices();
@@ -342,13 +344,13 @@ class DynamicContentType extends AbstractType
             }
         );
 
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event): void {
             /** @var DynamicContent|null $dynamicContent */
             $dynamicContent = $event->getData();
             $this->addContentField($event->getForm(), $dynamicContent?->getType());
         });
 
-        $builder->get('type')->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
+        $builder->get('type')->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event): void {
             $form = $event->getForm();
             $this->addContentField($form->getParent(), $form->getData());
         });
@@ -383,7 +385,7 @@ class DynamicContentType extends AbstractType
 
     private function filterFieldChoices(): void
     {
-        $customFields = $this->leadModel->getRepository()->getCustomFieldList('lead');
+        $customFields = $this->leadRepository->getCustomFieldList('lead');
 
         $this->fieldChoices['lead'] = array_filter(
             $this->fieldChoices['lead'],

@@ -12,15 +12,15 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\LoggerInterface;
 
-class Interval implements ScheduleModeInterface
+final class Interval implements ScheduleModeInterface
 {
     public const LOG_DATE_FORMAT = 'Y-m-d H:i:s T';
 
     private ?\DateTimeZone $defaultTimezone = null;
 
     public function __construct(
-        private LoggerInterface $logger,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly LoggerInterface $logger,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -41,7 +41,7 @@ class Interval implements ScheduleModeInterface
         } catch (\Exception $exception) {
             $this->logger->error('CAMPAIGN: Determining interval scheduled failed with "'.$exception->getMessage().'"');
 
-            throw new NotSchedulableException($exception->getMessage());
+            throw new NotSchedulableException($exception->getMessage(), $exception->getCode(), $exception);
         }
 
         if ($comparedToDateTime > $compareFromDateTime) {
@@ -141,11 +141,7 @@ class Interval implements ScheduleModeInterface
             return true;
         }
 
-        if (!$this->isTriggerModeInterval($event) || $this->isRestrictedToDailyScheduling($event) || $this->hasTimeRelatedRestrictions($event) || $this->isNegativePath($event)) {
-            return false;
-        }
-
-        return true;
+        return !(!$this->isTriggerModeInterval($event) || $this->isRestrictedToDailyScheduling($event) || $this->hasTimeRelatedRestrictions($event) || $this->isNegativePath($event));
     }
 
     private function isTriggerModeInterval(Event $event): bool
@@ -184,7 +180,7 @@ class Interval implements ScheduleModeInterface
      * @return \DateTimeInterface
      */
     private function getGroupExecutionDateTime(
-        $eventId,
+        int $eventId,
         Lead $contact,
         \DateTimeInterface $compareFromDateTime,
         ?\DateTimeInterface $hour = null,
@@ -248,7 +244,7 @@ class Interval implements ScheduleModeInterface
     /**
      * @return \DateTimeInterface
      */
-    private function getExecutionDateTimeFromHour(Lead $contact, \DateTimeInterface $hour, $eventId, \DateTimeInterface $compareFromDateTime)
+    private function getExecutionDateTimeFromHour(Lead $contact, \DateTimeInterface $hour, int $eventId, \DateTimeInterface $compareFromDateTime)
     {
         /** @var \DateTime $groupHour */
         $groupHour = clone $hour;
@@ -276,12 +272,12 @@ class Interval implements ScheduleModeInterface
         Lead $contact,
         \DateTimeInterface $startTime,
         \DateTimeInterface $endTime,
-        $eventId,
+        int $eventId,
         \DateTimeInterface $compareFromDateTime,
     ) {
-        /* @var \DateTime $startTime */
+        /** @var \DateTime $startTime */
         $startTime = clone $startTime;
-        /* @var \DateTime $endTime */
+        /** @var \DateTime $endTime */
         $endTime   = clone $endTime;
 
         if ($endTime < $startTime) {
@@ -315,10 +311,7 @@ class Interval implements ScheduleModeInterface
         return $groupExecutionDate;
     }
 
-    /**
-     * @return \DateTimeZone
-     */
-    private function getDefaultTimezone()
+    private function getDefaultTimezone(): \DateTimeZone
     {
         if ($this->defaultTimezone) {
             return $this->defaultTimezone;

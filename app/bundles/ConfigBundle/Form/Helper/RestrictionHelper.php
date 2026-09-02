@@ -6,7 +6,7 @@ use Mautic\ConfigBundle\Mapper\Helper\RestrictionHelper as FieldHelper;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class RestrictionHelper
+final readonly class RestrictionHelper
 {
     public const MODE_REMOVE = 'remove';
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Command;
 
 use Mautic\CoreBundle\IpLookup\AbstractLocalDataLookup;
@@ -15,27 +17,20 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 #[AsCommand(
     name: 'mautic:iplookup:download',
-    description: 'Fetch remote datastores for IP lookup services that leverage local lookups'
-)]
-class UpdateIpDataStoreCommand extends Command
-{
-    public function __construct(
-        private TranslatorInterface $translator,
-        private AbstractLookup $ipService,
-    ) {
-        parent::__construct();
-    }
-
-    protected function configure()
-    {
-        $this
-            ->setHelp(
-                <<<'EOT'
+    description: 'Fetch remote datastores for IP lookup services that leverage local lookups',
+    help: <<<'TXT'
                 The <info>%command.name%</info> command is used to update local IP lookup data if applicable.
 
 <info>php %command.full_name%</info>
-EOT
-            );
+TXT
+)]
+final class UpdateIpDataStoreCommand extends Command
+{
+    public function __construct(
+        private readonly TranslatorInterface $translator,
+        private readonly AbstractLookup $ipService,
+    ) {
+        parent::__construct();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -51,7 +46,7 @@ EOT
                     $output->writeln('<error>'.$this->translator->trans(
                         'mautic.core.ip_lookup.remote_fetch_error',
                         [
-                            '%remoteUrl%' => $remoteUrl,
+                            '%remoteUrl%' => AbstractLocalDataLookup::cleanUrl($remoteUrl),
                             '%localPath%' => $localPath,
                         ]
                     ).'</error>');

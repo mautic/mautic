@@ -38,12 +38,12 @@ class ContactObjectHelper implements ObjectHelperInterface
     private array $contactsCreated = [];
 
     public function __construct(
-        private LeadModel $model,
-        private LeadRepository $repository,
-        private Connection $connection,
-        private DoNotContactModel $dncModel,
-        private FieldList $fieldList,
-        private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
+        private readonly LeadModel $model,
+        private readonly LeadRepository $repository,
+        private readonly Connection $connection,
+        private readonly DoNotContactModel $dncModel,
+        private readonly FieldList $fieldList,
+        private readonly FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
     ) {
     }
 
@@ -222,8 +222,9 @@ class ContactObjectHelper implements ObjectHelperInterface
         $qb->select('*')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->where(
-                $qb->expr()->in('id', $ids)
-            );
+                $qb->expr()->in('id', ':ids')
+            )
+            ->setParameter('ids', $ids, ArrayParameterType::INTEGER);
 
         return $qb->executeQuery()->fetchAllAssociative();
     }
@@ -236,7 +237,7 @@ class ContactObjectHelper implements ObjectHelperInterface
 
         foreach ($fields as $col => $val) {
             // Use andWhere because Mautic treats conflicting unique identifiers as different objects
-            $q->{$this->repository->getUniqueIdentifiersWherePart()}("l.$col = :".$col)
+            $q->{$this->repository->getUniqueIdentifiersWherePart()}("l.{$col} = :".$col)
                 ->setParameter($col, $val);
         }
 
@@ -270,7 +271,7 @@ class ContactObjectHelper implements ObjectHelperInterface
 
     public function findOwnerIds(array $objectIds): array
     {
-        if (empty($objectIds)) {
+        if ([] === $objectIds) {
             return [];
         }
 
@@ -356,7 +357,7 @@ class ContactObjectHelper implements ObjectHelperInterface
         }
     }
 
-    private function getDoNotContactReason($value): int
+    private function getDoNotContactReason(mixed $value): int
     {
         $value = (int) $value;
 

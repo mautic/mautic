@@ -14,6 +14,7 @@ use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Entity\DynamicContentRepository;
 use Mautic\DynamicContentBundle\Entity\Stat;
+use Mautic\DynamicContentBundle\Entity\StatRepository;
 use Mautic\DynamicContentBundle\Event\DynamicContentEvent;
 use Mautic\DynamicContentBundle\Form\Type\DynamicContentType;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -23,6 +24,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends FormModel<DynamicContent>
@@ -34,6 +36,19 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
     use VariantModelTrait;
     use TranslationModelTrait;
 
+    private StatRepository $statRepository;
+
+    private DynamicContentRepository $dynamicContentRepository;
+
+    #[Required]
+    public function autowireDynamicContentModel(
+        DynamicContentRepository $dynamicContentRepository,
+        StatRepository $statRepository,
+    ): void {
+        $this->dynamicContentRepository = $dynamicContentRepository;
+        $this->statRepository = $statRepository;
+    }
+
     /**
      * Retrieve the permissions base.
      */
@@ -42,26 +57,16 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
         return 'dynamiccontent:dynamiccontents';
     }
 
-    /**
-     * @return DynamicContentRepository
-     */
-    public function getRepository()
+    public function getRepository(): DynamicContentRepository
     {
-        /** @var DynamicContentRepository $repo */
-        $repo = $this->em->getRepository(DynamicContent::class);
+        $this->dynamicContentRepository->setCurrentUser($this->userHelper->getUser());
 
-        $repo->setTranslator($this->translator);
-        $repo->setCurrentUser($this->userHelper->getUser());
-
-        return $repo;
+        return $this->dynamicContentRepository;
     }
 
-    /**
-     * @return \Mautic\DynamicContentBundle\Entity\StatRepository
-     */
-    public function getStatRepository()
+    public function getStatRepository(): StatRepository
     {
-        return $this->em->getRepository(Stat::class);
+        return $this->statRepository;
     }
 
     /**
@@ -97,7 +102,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
 
         if (!empty($type)) {
             if (!in_array($typeCondition, ['=', '<>', '!='], true)) {
-                throw new \InvalidArgumentException("Invalid operator '$typeCondition'");
+                throw new \InvalidArgumentException("Invalid operator '{$typeCondition}'");
             }
 
             $qb->andWhere("type {$typeCondition} :type");
@@ -147,12 +152,11 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
     }
 
     /**
-     * @param string     $slot
-     * @param Lead|array $lead
+     * @param Lead|mixed[]|null $lead
      *
      * @return array<string, mixed>|false
      */
-    public function getSlotContentForLead($slot, $lead)
+    public function getSlotContentForLead(string $slot, array|Lead|null $lead)
     {
         if (!$lead) {
             return [];
@@ -178,16 +182,16 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
 
     /**
      * @param Lead|array $lead
+     * @param PageDisplayEvent|EmailSendEvent|string $source
      */
-    public function createStatEntry(
-        DynamicContent $dynamicContent,
-        $lead,
-        PageDisplayEvent|EmailSendEvent|null $event = null,
-    ): ?Stat {
+    public function createStatEntry(DynamicContent $dynamicContent, $lead, $source = null): ?Stat
+    {
         if (empty($lead)
             || ($lead instanceof Lead && !$lead->getId())
             || (is_array($lead) && !isset($lead['id']))
         ) {
+
+        if ($lead instanceof Lead && !$lead->getId()) {
             return null;
         }
 
@@ -203,24 +207,24 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
             'slotName' => $dynamicContent->getSlotName(),
         ];
 
-        if ($event instanceof PageDisplayEvent || $event instanceof EmailSendEvent) {
+        if ($source instanceof PageDisplayEvent || $source instanceof EmailSendEvent) {
             $tokenPlacement = 'body';
-            if ($event instanceof EmailSendEvent) {
+            if ($source instanceof EmailSendEvent) {
                 $stat->setSource('email');
-                $stat->setSourceId($event->getEmail()?->getId());
-                if ($event->getIsSubject()) {
+                $stat->setSourceId($source->getEmail()?->getId());
+                if ($source->getIsSubject()) {
                     $tokenPlacement = 'subject';
                 }
             } else {
                 $stat->setSource('page');
-                $stat->setSourceId($event->getPage()->getId());
+                $stat->setSourceId($source->getPage()->getId());
             }
             $stat->setTokenPlacement($tokenPlacement);
         }
 
         $stat->setSentDetails($detail);
 
-        $this->getStatRepository()->saveEntity($stat);
+        $this->statRepository->saveEntity($stat);
 
         return $stat;
     }
@@ -252,7 +256,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new DynamicContentEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -280,10 +284,9 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
      *
      * @param ?string $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string  $dateFormat
-     * @param array   $filter
      * @param bool    $canViewOthers
      */
-    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
+    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], $canViewOthers = true): array
     {
         $flag = null;
 
@@ -322,14 +325,12 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
     }
 
     /**
-     * @param string $filter
-     * @param int    $limit
-     * @param int    $start
-     * @param array  $options
+     * @param string|array<int, string> $filter
+     * @param array<string, mixed>      $options
      *
      * @return mixed[]
      */
-    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0, $options = []): array
+    public function getLookupResults(string $type, string|array $filter = '', int $limit = 10, int $start = 0, array $options = []): array
     {
         $results = [];
         switch ($type) {

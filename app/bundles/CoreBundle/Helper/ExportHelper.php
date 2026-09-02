@@ -30,11 +30,11 @@ class ExportHelper
     public const EXPORT_TYPE_CSV   = 'csv';
 
     public function __construct(
-        private TranslatorInterface $translator,
-        private CoreParametersHelper $coreParametersHelper,
-        private FilePathResolver $filePathResolver,
-        private ProcessSignalService $processSignalService,
-        private EventDispatcherInterface $eventDispatcher,
+        private readonly TranslatorInterface $translator,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly FilePathResolver $filePathResolver,
+        private readonly ProcessSignalService $processSignalService,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -101,7 +101,7 @@ class ExportHelper
             return $zipFilePath;
         }
 
-        throw new FilePathException("Could not create zip archive at $zipFilePath.");
+        throw new FilePathException("Could not create zip archive at {$zipFilePath}.");
     }
 
     private function exportAsExcel(\Iterator $data, string $filename): StreamedResponse
@@ -205,8 +205,8 @@ class ExportHelper
         $contactExportDir = $this->coreParametersHelper->get('contact_export_dir');
         $this->filePathResolver->createDirectory($contactExportDir);
         $filePath     = $contactExportDir.'/'.$fileName;
-        $fileName     = (string) pathinfo($filePath, PATHINFO_FILENAME);
-        $extension    = (string) pathinfo($filePath, PATHINFO_EXTENSION);
+        $fileName     = pathinfo($filePath, PATHINFO_FILENAME);
+        $extension    = pathinfo($filePath, PATHINFO_EXTENSION);
         $originalName = $fileName;
         $i            = 1;
 

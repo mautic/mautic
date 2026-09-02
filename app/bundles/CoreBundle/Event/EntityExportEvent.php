@@ -12,13 +12,16 @@ final class EntityExportEvent extends Event
      * @var array<string, array<string, mixed>>
      */
     private array $entities     = [];
+
     /**
      * @var array<string, array<string, mixed>>
      */
     private array $dependencies = [];
 
-    public function __construct(private string $entityName, private int $entityId)
-    {
+    public function __construct(
+        private readonly string $entityName,
+        private readonly int $entityId,
+    ) {
     }
 
     public function getEntityName(): string

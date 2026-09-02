@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\DAO\Mapping;
 
-class FieldMappingDAO
+final class FieldMappingDAO
 {
-    private bool $isRequired;
+    private readonly bool $isRequired;
 
     /**
      * @param string $internalObject

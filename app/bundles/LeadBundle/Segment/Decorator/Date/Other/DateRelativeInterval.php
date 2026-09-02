@@ -7,16 +7,20 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionParameters;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
+use Mautic\LeadBundle\Segment\Decorator\ParseDateFilterValueTrait;
+use Mautic\LeadBundle\Segment\OperatorOptions;
 
-class DateRelativeInterval implements FilterDecoratorInterface
+final class DateRelativeInterval implements FilterDecoratorInterface
 {
+    use ParseDateFilterValueTrait;
+
     /**
      * @param string $originalValue
      */
     public function __construct(
-        private DateDecorator $dateDecorator,
+        private readonly DateDecorator $dateDecorator,
         private $originalValue,
-        private DateOptionParameters $dateOptionParameters,
+        private readonly DateOptionParameters $dateOptionParameters,
     ) {
     }
 
@@ -50,29 +54,41 @@ class DateRelativeInterval implements FilterDecoratorInterface
 
     /**
      * @param array|string $argument
-     *
-     * @return array|string
      */
-    public function getParameterHolder(ContactSegmentFilterCrate $contactSegmentFilterCrate, $argument)
+    public function getParameterHolder(ContactSegmentFilterCrate $contactSegmentFilterCrate, $argument): string|array
     {
         return $this->dateDecorator->getParameterHolder($contactSegmentFilterCrate, $argument);
     }
 
-    /**
-     * @return array|bool|float|string|null
-     */
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate): mixed
     {
         $date = $this->dateOptionParameters->getDefaultDate();
-        $date->modify($this->originalValue);
+        $date->modify($this->parseDateFilterValue(
+            $this->originalValue,
+            $contactSegmentFilterCrate->getOperator())
+        );
 
         $operator = $this->getOperator($contactSegmentFilterCrate);
         $format   = 'Y-m-d';
-        if ('like' === $operator || 'notLike' === $operator) {
+
+        $isLikeOperator = 'like' === $operator || 'notLike' === $operator;
+        if (!$isLikeOperator && $contactSegmentFilterCrate->hasTimeParts() && !in_array($operator, [OperatorOptions::IN_LAST, OperatorOptions::IN_NEXT])) {
+            $format .= ' H:i:s';
+        }
+        if ($isLikeOperator) {
             $format .= '%';
         }
+        if (!$contactSegmentFilterCrate->hasTimeParts() && 'gt' === $operator) {
+            $format .= ' 23:59:59';
+        }
 
-        return $date->toLocalString($format);
+        if (OperatorOptions::IN_NEXT === $operator) {
+            $format .= ' 23:59:59';
+        } elseif (OperatorOptions::IN_LAST === $operator) {
+            $format .= ' 00:00:00';
+        }
+
+        return $date->toUtcString($format);
     }
 
     public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate): string

@@ -27,7 +27,7 @@ use Mautic\PageBundle\PageEvents;
 use MauticPlugin\MauticFocusBundle\Helper\TokenHelper as FocusTokenHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class DynamicContentSubscriber implements EventSubscriberInterface
+final class DynamicContentSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private TrackableModel $trackableModel,
@@ -188,7 +188,8 @@ class DynamicContentSubscriber implements EventSubscriberInterface
 
             $dwc     =  $this->dynamicContentModel->getEntity($clickthrough['dynamic_content_id']);
             $utmTags = [];
-            if ($dwc && $dwc instanceof DynamicContent) {
+
+            if ($dwc instanceof DynamicContent) {
                 $utmTags = $dwc->getUtmTags();
             }
 

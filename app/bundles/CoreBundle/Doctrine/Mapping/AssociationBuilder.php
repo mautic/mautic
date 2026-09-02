@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Doctrine\Mapping;
 
 /**
@@ -8,7 +10,7 @@ namespace Mautic\CoreBundle\Doctrine\Mapping;
  *
  * Also gives support for allowing a many-to-one to be the primary key
  */
-class AssociationBuilder extends \Doctrine\ORM\Mapping\Builder\AssociationBuilder
+final class AssociationBuilder extends \Doctrine\ORM\Mapping\Builder\AssociationBuilder
 {
     /**
      * Set orphanRemoval.
@@ -26,12 +28,21 @@ class AssociationBuilder extends \Doctrine\ORM\Mapping\Builder\AssociationBuilde
 
     /**
      * Allow a many-to-one to be the ID.
-     *
-     * @return $this
      */
-    public function isPrimaryKey()
+    public function isPrimaryKey(): static
     {
         $this->mapping['id'] = true;
+
+        return $this;
+    }
+
+    /**
+     * Mark this association as the parent for ownership/permission checks.
+     * Used by entities that implement getPermissionUser() to delegate to a parent entity.
+     */
+    public function isOwnershipParent(): static
+    {
+        $this->mapping['isOwnershipParent'] = true;
 
         return $this;
     }

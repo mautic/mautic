@@ -9,10 +9,11 @@ use Mautic\AssetBundle\Event\AssetExportListEvent;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class AssetExportListEventSubscriber implements EventSubscriberInterface
+final readonly class AssetExportListEventSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private PathsHelper $pathsHelper)
-    {
+    public function __construct(
+        private PathsHelper $pathsHelper,
+    ) {
     }
 
     public static function getSubscribedEvents(): array
@@ -26,7 +27,7 @@ final class AssetExportListEventSubscriber implements EventSubscriberInterface
     {
         $data = $event->getEntityData();
 
-        if (empty($data)) {
+        if ([] === $data) {
             return;
         }
 

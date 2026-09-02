@@ -8,7 +8,7 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class TrackingSubscriber implements EventSubscriberInterface
+final readonly class TrackingSubscriber implements EventSubscriberInterface
 {
     /**
      * TrackingSubscriber constructor.

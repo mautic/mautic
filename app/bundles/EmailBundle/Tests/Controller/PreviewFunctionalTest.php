@@ -14,9 +14,10 @@ use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class PreviewFunctionalTest extends MauticMysqlTestCase
+final class PreviewFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
+
     private const PREHEADER_TEXT = 'Preheader text';
 
     protected $useCleanupRollback = false;
@@ -43,12 +44,22 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
         $this->assertPageContent($urlWithContact, $contentNoContactInfo, self::PREHEADER_TEXT);
     }
 
+    public function testPreviewPageWithTemplateAndNoSavedHtml(): void
+    {
+        $email = $this->createEmail();
+        $email->setCustomHtml('');
+        $email->setContent([]);
+        $this->em->flush();
+
+        $this->assertPageContent("/email/preview/{$email->getId()}", 'Hello World!');
+    }
+
     private function assertPageContent(string $url, string ...$expectedContents): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, $url);
         self::assertResponseIsSuccessful();
         foreach ($expectedContents as $expectedContent) {
-            self::assertStringContainsString($expectedContent, $crawler->text());
+            $this->assertStringContainsString($expectedContent, $crawler->text());
         }
     }
 
@@ -136,7 +147,7 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
             ]
         );
         self::assertResponseStatusCodeSame(201);
-        self::assertJson($this->client->getResponse()->getContent());
+        $this->assertJson($this->client->getResponse()->getContent());
 
         // Create some contacts
         $this->client->request(
@@ -234,7 +245,7 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/email/preview/5009');
         self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
-        self::assertStringContainsString('404 Not Found - Requested URL not found: /email/preview/5009', $crawler->text());
+        $this->assertStringContainsString('404 Not Found - Requested URL not found: /email/preview/5009', $crawler->text());
     }
 
     private function createSegment(string $name = 'Segment 1'): LeadList
@@ -282,6 +293,7 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
         $url                    = "/email/preview/{$email->getId()}";

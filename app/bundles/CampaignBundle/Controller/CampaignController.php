@@ -3,21 +3,21 @@
 namespace Mautic\CampaignBundle\Controller;
 
 use Doctrine\DBAL\Cache\CacheException;
-use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\AssetBundle\Event\AssetExportListEvent;
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Event;
-use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
-use Mautic\CampaignBundle\Entity\Summary;
 use Mautic\CampaignBundle\Entity\SummaryRepository;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber;
+use Mautic\CampaignBundle\Helper\CampaignSearchScopeProvider;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CampaignBundle\Service\PublishStateService;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
+use Mautic\CoreBundle\Controller\QuickFilterSearchTrait;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
@@ -47,6 +47,7 @@ use Symfony\Component\HttpFoundation\Response;
 class CampaignController extends AbstractStandardFormController
 {
     use EntityContactsTrait;
+    use QuickFilterSearchTrait;
 
     /**
      * @var array<string, mixed>
@@ -95,6 +96,11 @@ class CampaignController extends AbstractStandardFormController
 
     protected $sessionId;
 
+    /**
+     * @var list<array{command: string, label: string, suffix?: string, default?: bool, translate?: bool}>|null
+     */
+    private ?array $indexSearchScopes = null;
+
     public function __construct(
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
@@ -110,8 +116,12 @@ class CampaignController extends AbstractStandardFormController
         private LoggerInterface $logger,
         private RequestStack $requestStack,
         CorePermissions $security,
-        private EntityManager $em,
         private PublishStateService $publishStateService,
+        private CampaignModel $campaignModel,
+        private EventModel $eventModel,
+        private readonly CampaignRepository $campaignRepository,
+        private readonly SummaryRepository $summaryRepository,
+        private readonly LeadEventLogRepository $leadEventLogRepository,
     ) {
         parent::__construct($formFactory, $fieldHelper, $managerRegistry, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -176,12 +186,12 @@ class CampaignController extends AbstractStandardFormController
         if (!$this->security->isGranted('campaign:export:enable', 'MATCH_ONE')) {
             $this->logger->error('Access denied for campaign export', ['user' => $this->user->getId()]);
 
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $campaign = $campaignModel->getEntity($objectId);
 
-        if (empty($campaign)) {
+        if (!$campaign instanceof Campaign) {
             $this->logger->error('Campaign not found for export', ['objectId' => $objectId]);
 
             return $this->notFound();
@@ -220,9 +230,9 @@ class CampaignController extends AbstractStandardFormController
         );
 
         if (!$permissions['campaign:campaigns:viewown'] && !$permissions['campaign:campaigns:viewother']) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         } elseif (!$this->security->isGranted('campaign:export:enable', 'MATCH_ONE')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $session     = $request->getSession();
@@ -235,9 +245,6 @@ class CampaignController extends AbstractStandardFormController
         $objectIds      = json_decode($ids, true);
 
         if (empty($ids)) {
-            $repo = $this->em->getRepository(Campaign::class);
-            $repo->setTranslator($this->translator);
-
             $args = [
                 'filter'           => $filter,
                 'orderBy'          => 'c.id',
@@ -246,7 +253,7 @@ class CampaignController extends AbstractStandardFormController
             ];
 
             // Query campaigns
-            $campaigns = $repo->getEntities($args);
+            $campaigns = $this->campaignRepository->getEntities($args);
 
             // Get campaign IDs
             $objectIds = array_map(fn ($c) => $c->getId(), $campaigns);
@@ -285,8 +292,6 @@ class CampaignController extends AbstractStandardFormController
      * @param string|int $objectId
      * @param int        $page
      * @param int|null   $count
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
     public function contactsAction(
         Request $request,
@@ -296,7 +301,7 @@ class CampaignController extends AbstractStandardFormController
         $count = null,
         ?\DateTimeInterface $dateFrom = null,
         ?\DateTimeInterface $dateTo = null,
-    ) {
+    ): Response {
         $session = $request->getSession();
         $session->set('mautic.campaign.contact.page', $page);
 
@@ -334,7 +339,7 @@ class CampaignController extends AbstractStandardFormController
         $response        = [];
         // CRITICAL: Always include deleted events in individual tabs by setting ignoreDeleted=false
         // This ensures deleted events appear in the action/decision/condition tabs
-        $events          = $this->getCampaignModel()->getEventRepository()->getCampaignEvents($objectId, false);
+        $events          = $this->campaignModel->getEventRepository()->getCampaignEvents($objectId, false);
 
         $dateFrom        = null;
         $dateTo          = null;
@@ -344,7 +349,7 @@ class CampaignController extends AbstractStandardFormController
             $dateTo   = $dateTo->modify('+1 day');
         }
 
-        $hasCampaignLeads = $this->getCampaignModel()->getRepository()->hasCampaignLeads($objectId);
+        $hasCampaignLeads = $this->campaignRepository->hasCampaignLeads($objectId, (int) $this->coreParametersHelper->get('campaign_event_cache_ttl'));
         $logCounts        = $this->processCampaignLogCounts($objectId, $dateFrom, $dateTo);
 
         $campaignLogCounts          = $logCounts['campaignLogCounts'] ?? [];
@@ -354,11 +359,11 @@ class CampaignController extends AbstractStandardFormController
         $this->addSchedulingLabels($events);
         $sortedEvents           = $this->processCampaignEventsFromParentCondition($events);
 
-        $sourcesList     = $this->getCampaignModel()->getSourceLists(null, false, true);
-        $campaign        = $this->getCampaignModel()->getEntity($objectId);
+        $sourcesList     = $this->campaignModel->getSourceLists(null, false, true);
+        $campaign        = $this->campaignModel->getEntity($objectId);
         $this->prepareCampaignSourcesForEdit($objectId, $sourcesList, true);
         // Filter out deleted events for the preview (but keep them for action/decision/condition tabs)
-        $previewEvents = array_filter($events, fn ($event) => empty($event['deleted']));
+        $previewEvents = array_filter($events, fn (array $event): bool => empty($event['deleted']));
 
         $response['preview']    = trim(
             $this->renderView(
@@ -385,7 +390,7 @@ class CampaignController extends AbstractStandardFormController
         $dateRangeValues = ['date_from' => $dateFrom, 'date_to' => $dateTo];
         $action          = $this->generateUrl('mautic_campaign_action', ['objectAction' => 'view', 'objectId' => $objectId]);
         $dateRangeForm   = $this->formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
-        $stats           = $this->getCampaignModel()->getCampaignMetricsLineChartData(
+        $stats           = $this->campaignModel->getCampaignMetricsLineChartData(
             null,
             new \DateTime($dateRangeForm->get('date_from')->getData()),
             new \DateTime($dateRangeForm->get('date_to')->getData()),
@@ -422,34 +427,32 @@ class CampaignController extends AbstractStandardFormController
     /**
      * @param int $page
      */
-    public function indexAction(Request $request, $page = null): Response
+    public function indexAction(Request $request, CampaignSearchScopeProvider $campaignSearchScopeProvider, $page = null): Response
     {
+        $this->indexSearchScopes = $campaignSearchScopeProvider->getScopes();
+
         return $this->indexStandard($request, $page);
     }
 
-    protected function getDefaultOrderColumn()
+    protected function getDefaultOrderColumn(): string
     {
         return 'dateModified';
     }
 
-    protected function getDefaultOrderDirection()
+    protected function getDefaultOrderDirection(): string
     {
         return 'DESC';
     }
 
     /**
      * Generates new form and processes post data.
-     *
-     * @return RedirectResponse|Response
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request): Response
     {
-        /** @var CampaignModel $model */
-        $model    = $this->getModel('campaign');
-        $campaign = $model->getEntity();
+        $campaign = $this->campaignModel->getEntity();
 
         if (!$this->security->isGranted('campaign:campaigns:create')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         // set the page we came from
@@ -457,7 +460,7 @@ class CampaignController extends AbstractStandardFormController
 
         $options = $this->getEntityFormOptions();
         $action  = $this->generateUrl('mautic_campaign_action', ['objectAction' => 'new']);
-        $form    = $model->createForm($campaign, $this->formFactory, $action, $options);
+        $form    = $this->campaignModel->createForm($campaign, $this->formFactory, $action, $options);
 
         // /Check for a submitted form and process it
         $isPost = 'POST' === $request->getMethod();
@@ -469,18 +472,12 @@ class CampaignController extends AbstractStandardFormController
                 if ($valid = $this->isFormValid($form)) {
                     if ($valid = $this->beforeEntitySave($campaign, $form, 'new')) {
                         $campaign->setDateModified(new \DateTime());
-                        $model->saveEntity($campaign);
+                        $this->campaignModel->saveEntity($campaign);
                         $this->afterEntitySave($campaign, $form, 'new', $valid);
 
-                        if (method_exists($this, 'viewAction')) {
-                            $viewParameters = ['objectId' => $campaign->getId(), 'objectAction' => 'view'];
-                            $returnUrl      = $this->generateUrl('mautic_campaign_action', $viewParameters);
-                            $template       = 'Mautic\CampaignBundle\Controller\CampaignController::viewAction';
-                        } else {
-                            $viewParameters = ['page' => $page];
-                            $returnUrl      = $this->generateUrl('mautic_campaign_index', $viewParameters);
-                            $template       = 'Mautic\CampaignBundle\Controller\CampaignController::indexAction';
-                        }
+                        $viewParameters = ['objectId' => $campaign->getId(), 'objectAction' => 'view'];
+                        $returnUrl      = $this->generateUrl('mautic_campaign_action', $viewParameters);
+                        $template       = 'Mautic\CampaignBundle\Controller\CampaignController::viewAction';
                     }
                 }
 
@@ -520,14 +517,15 @@ class CampaignController extends AbstractStandardFormController
                         'new'
                     )
                 );
-            } elseif ($valid && $this->isFormApplied($form)) {
+            }
+            if ($valid && $this->isFormApplied($form)) {
                 return $this->editAction($request, $campaign->getId(), true);
             }
         }
 
         $delegateArgs = [
             'viewParameters' => [
-                'permissionBase'  => $model->getPermissionBase(),
+                'permissionBase'  => $this->campaignModel->getPermissionBase(),
                 'mauticContent'   => 'campaign',
                 'actionRoute'     => 'mautic_campaign_action',
                 'indexRoute'      => 'mautic_campaign_index',
@@ -568,7 +566,7 @@ class CampaignController extends AbstractStandardFormController
         // If the response contains events and is a form view, make sure deleted events are marked
         if ($result instanceof Response && $this->campaignEvents) {
             // Pre-filter the campaign events for the preview tab (in case something was missed)
-            $this->campaignEvents = array_filter($this->campaignEvents, fn ($event) => empty($event['deleted']));
+            $this->campaignEvents = array_filter($this->campaignEvents, fn (array $event): bool => empty($event['deleted']));
 
             $this->campaignElements['campaignEvents'] = $this->campaignEvents;
         }
@@ -601,7 +599,7 @@ class CampaignController extends AbstractStandardFormController
             $clone->setTempId($tempEventId);
 
             // Just wipe out the parent as it'll be generated when the cloned entity is saved
-            $clone->setParent(null);
+            $clone->setParent();
 
             if (CampaignActionJumpToEventSubscriber::EVENT_NAME === $clone->getType()) {
                 // Update properties to point to the new temp ID
@@ -643,8 +641,10 @@ class CampaignController extends AbstractStandardFormController
         $campaign->setCanvasSettings($canvasSettings);
         $tempId = $this->getCampaignSessionId($campaign, 'clone', $tempId);
 
-        $campaignSources = $this->getCampaignModel()->getLeadSources($objectId);
+        $campaignSources = $this->campaignModel->getLeadSources($objectId);
         $this->prepareCampaignSourcesForEdit($tempId, $campaignSources);
+
+        return [];
     }
 
     /**
@@ -652,21 +652,21 @@ class CampaignController extends AbstractStandardFormController
      * @param string    $action
      * @param bool|null $persistConnections
      */
-    protected function afterEntitySave($entity, FormInterface $form, $action, $persistConnections = null)
+    protected function afterEntitySave($entity, FormInterface $form, $action, $persistConnections = null): void
     {
         if ($persistConnections) {
             // Update canvas settings with new event IDs then save
-            $this->connections = $this->getCampaignModel()->setCanvasSettings($entity, $this->connections);
+            $this->connections = $this->campaignModel->setCanvasSettings($entity, $this->connections);
         } else {
             // Just update and add to entity
-            $this->connections = $this->getCampaignModel()->setCanvasSettings($entity, $this->connections, false, $this->modifiedEvents);
+            $this->connections = $this->campaignModel->setCanvasSettings($entity, $this->connections, false, $this->modifiedEvents);
         }
     }
 
     /**
      * @param bool $isClone
      */
-    protected function afterFormProcessed($isValid, $entity, FormInterface $form, $action, $isClone = false)
+    protected function afterFormProcessed($isValid, $entity, FormInterface $form, $action, $isClone = false): void
     {
         if (!$isValid) {
             // Add the canvas settings to the entity to be able to rebuild it
@@ -681,7 +681,7 @@ class CampaignController extends AbstractStandardFormController
      *
      * @param bool $isClone
      */
-    protected function beforeFormProcessed($entity, FormInterface $form, $action, $isPost, $objectId = null, $isClone = false)
+    protected function beforeFormProcessed($entity, FormInterface $form, $action, $isPost, $objectId = null, $isClone = false): void
     {
         $sessionId = $this->getCampaignSessionId($entity, $action, $objectId);
 
@@ -700,7 +700,7 @@ class CampaignController extends AbstractStandardFormController
             // set global elements (this may override some events with form data)
             $this->setCampaignElements($campaignElements, $isClone);
 
-            $this->getCampaignModel()->setCanvasSettings($entity, $this->connections, false, $this->modifiedEvents);
+            $this->campaignModel->setCanvasSettings($entity, $this->connections, false, $this->modifiedEvents);
             $this->prepareCampaignSourcesForEdit($sessionId, $this->campaignSources, true);
         } else {
             if (!$isClone) {
@@ -708,7 +708,7 @@ class CampaignController extends AbstractStandardFormController
                 $this->modifiedEvents = $this->campaignSources = [];
 
                 if ($entity->getId()) {
-                    $campaignSources = $this->getCampaignModel()->getLeadSources($entity->getId());
+                    $campaignSources = $this->campaignModel->getLeadSources($entity->getId());
                     $this->prepareCampaignSourcesForEdit($sessionId, $campaignSources);
                 } else {
                     $this->campaignElements['modifiedSources']  = [];
@@ -753,7 +753,7 @@ class CampaignController extends AbstractStandardFormController
      */
     protected function beforeEntitySave($entity, FormInterface $form, $action, $objectId = null, $isClone = false): bool
     {
-        if (empty($this->campaignEvents)) {
+        if ([] === $this->campaignEvents) {
             // set the error
             $form->addError(
                 new FormError(
@@ -777,54 +777,50 @@ class CampaignController extends AbstractStandardFormController
 
         if ($isClone) {
             $this->setCampaignSources($isClone);
-            $this->getCampaignModel()->setLeadSources($entity, $this->campaignElements['campaignSources'], []);
+            $this->campaignModel->setLeadSources($entity, $this->campaignElements['campaignSources'], []);
             // If this is a clone, we need to save the entity first to properly build the events, sources and canvas settings
-            $this->getCampaignModel()->getRepository()->saveEntity($entity);
+            $this->campaignRepository->saveEntity($entity);
             // Set as new so that timestamps are still hydrated
             $entity->setNew();
             $this->sessionId = $entity->getId();
         }
 
         // Set lead sources
-        $this->getCampaignModel()->setLeadSources($entity, $this->addedSources, $this->deletedSources);
+        $this->campaignModel->setLeadSources($entity, $this->addedSources, $this->deletedSources);
 
         // Build and set Event entities
-        $this->getCampaignModel()->setEvents($entity, $this->campaignEvents, $this->connections, $this->deletedEvents);
+        $this->campaignModel->setEvents($entity, $this->campaignEvents, $this->connections, $this->deletedEvents);
 
         if ('edit' === $action && null !== $this->connections) {
-            if (!empty($this->deletedEvents)) {
-                /** @var EventModel $eventModel */
-                $eventModel = $this->getModel('campaign.event');
-                $eventModel->deleteEvents($entity->getEvents()->toArray(), $this->deletedEvents);
+            if ([] !== $this->deletedEvents) {
+                $this->eventModel->deleteEvents($entity->getEvents()->toArray(), $this->deletedEvents);
             }
         }
 
         return true;
     }
 
-    /**
-     * @return CampaignModel
-     */
-    protected function getCampaignModel()
+    protected function campaignModel(): CampaignModel
     {
-        /** @var CampaignModel $model */
-        $model = $this->getModel($this->getModelName());
-
-        return $model;
+        return $this->campaignModel;
     }
 
     /**
+     * @param string          $action
+     * @param string|int|null $objectId
+     *
      * @return int|string|null
      */
     protected function getCampaignSessionId(Campaign $campaign, $action, $objectId = null)
     {
-        if (isset($this->sessionId)) {
+        if (null !== $this->sessionId) {
             return $this->sessionId;
         }
 
+        $sessionId = null;
         if ($objectId) {
             $sessionId = $objectId;
-        } elseif ('new' === $action && empty($sessionId)) {
+        } elseif ('new' === $action) {
             $sessionId = 'mautic_'.sha1(uniqid(mt_rand(), true));
             if ($this->requestStack->getCurrentRequest()->request->has('campaign')) {
                 $campaign  = $this->requestStack->getCurrentRequest()->request->all()['campaign'] ?? [];
@@ -850,7 +846,7 @@ class CampaignController extends AbstractStandardFormController
         $currentFilters = $session->get('mautic.campaign.list_filters', []);
         $updatedFilters = $this->requestStack->getCurrentRequest()->get('filters', false);
 
-        $sourceLists = $this->getCampaignModel()->getSourceLists();
+        $sourceLists = $this->campaignModel->getSourceLists();
         $listFilters = [
             'filters' => [
                 'placeholder' => $this->translator->trans('mautic.campaign.filter.placeholder'),
@@ -891,25 +887,30 @@ class CampaignController extends AbstractStandardFormController
 
         $joinLists = $joinForms = false;
         if (!empty($currentFilters)) {
-            $listIds = [];
+            $formIds = $listAliases = $searchFilterTerms = [];
             foreach ($currentFilters as $type => $typeFilters) {
                 $listFilters['filters']['groups']['mautic.campaign.leadsource.'.$type]['values'] = $typeFilters;
 
                 foreach ($typeFilters as $fltr) {
                     if ('list' == $type) {
-                        $listIds[] = (int) $fltr;
+                        $listAliases[]       = $fltr;
+                        $searchFilterTerms[] = 'list:'.$fltr;
                     } else {
-                        $formIds[] = (int) $fltr;
+                        $formIds[]           = (int) $fltr;
+                        $searchFilterTerms[] = 'form:'.$fltr;
                     }
                 }
             }
 
-            if (!empty($listIds)) {
+            $filter['string'] = $this->stripQuickFilterTokensFromSearch((string) ($filter['string'] ?? ''), $searchFilterTerms);
+            $session->set('mautic.campaign.filter', $filter['string']);
+
+            if ([] !== $listAliases) {
                 $joinLists         = true;
-                $filter['force'][] = ['column' => 'l.id', 'expr' => 'in', 'value' => $listIds];
+                $filter['force'][] = ['column' => 'l.alias', 'expr' => 'in', 'value' => array_values(array_unique($listAliases))];
             }
 
-            if (!empty($formIds)) {
+            if ([] !== $formIds) {
                 $joinForms         = true;
                 $filter['force'][] = ['column' => 'f.id', 'expr' => 'in', 'value' => $formIds];
             }
@@ -946,7 +947,7 @@ class CampaignController extends AbstractStandardFormController
 
         // Extract IDs from deleted events and use as keys for filtering
         $deletedEventIds = array_column($this->deletedEvents, 'id');
-        $deletedEventIds = $deletedEventIds ? array_fill_keys($deletedEventIds, true) : [];
+        $deletedEventIds = [] !== $deletedEventIds ? array_fill_keys($deletedEventIds, true) : [];
 
         $this->campaignEvents = array_diff_key($this->modifiedEvents, $deletedEventIds);
     }
@@ -1029,6 +1030,10 @@ class CampaignController extends AbstractStandardFormController
                         null,
                         true));
                 $args['viewParameters']['enableExportPermission'] = $this->security->isAdmin() || $this->security->isGranted('campaign:export:enable', 'MATCH_ONE');
+                if (null !== $this->indexSearchScopes) {
+                    $args['viewParameters']['searchScopes'] = $this->indexSearchScopes;
+                    $this->indexSearchScopes                = null;
+                }
                 break;
             case 'view':
                 /** @var Campaign $entity */
@@ -1041,15 +1046,19 @@ class CampaignController extends AbstractStandardFormController
                 $isEmailStatsEnabled = (bool) $this->coreParametersHelper->get('campaign_email_stats_enabled', true);
                 $showEmailStats      = $isEmailStatsEnabled && $entity->isEmailCampaign();
 
+                $contactCounts = $this->campaignModel->getCampaignLeadRepository()->getCampaignContactCounts([$entity->getId()]);
+                $contactCount  = (int) ($contactCounts[0]['contact_count'] ?? 0);
+
                 $args['viewParameters'] = array_merge(
                     $args['viewParameters'],
                     [
                         'campaign'         => $entity,
-                        'sources'          => $this->getCampaignModel()->getLeadSources($entity),
+                        'sources'          => $this->campaignModel->getLeadSources($entity),
                         'showEmailStats'   => $showEmailStats,
                         'dateRangeForm'    => $dateRangeForm->createView(),
                         'campaignElements' => $this->campaignElements,
                         'lastPublishDate'  => $this->publishStateService->getLastPublishDate($entity),
+                        'contactCount'     => $contactCount,
                     ]
                 );
                 break;
@@ -1115,18 +1124,17 @@ class CampaignController extends AbstractStandardFormController
         $this->modifiedEvents                     = $this->campaignEvents                     = $campaignEvents;
         $this->campaignElements['modifiedEvents'] = $campaignEvents;
         $this->campaignElements['campaignEvents'] = $campaignEvents;
+
+        return [];
     }
 
-    protected function prepareCampaignSourcesForEdit($objectId, $campaignSources, $isPost = false)
+    protected function prepareCampaignSourcesForEdit($objectId, $campaignSources, $isPost = false): void
     {
         $this->campaignSources = [];
         if (is_array($campaignSources)) {
             foreach ($campaignSources as $type => $sources) {
                 if (!empty($sources)) {
-                    $campaignModel = $this->getModel('campaign');
-                    \assert($campaignModel instanceof CampaignModel);
-
-                    $sourceList                   = $campaignModel->getSourceLists($type, false, true);
+                    $sourceList                   = $this->campaignModel->getSourceLists($type, false, true);
                     $this->campaignSources[$type] = [
                         'sourceType' => $type,
                         'campaignId' => $objectId,
@@ -1150,15 +1158,12 @@ class CampaignController extends AbstractStandardFormController
     private function processCampaignLogCounts(int $id, ?\DateTimeImmutable $dateFrom, ?\DateTimeImmutable $dateTo): array
     {
         if ($this->coreParametersHelper->get('campaign_use_summary')) {
-            /** @var SummaryRepository $summaryRepo */
-            $summaryRepo                = $this->doctrine->getManager()->getRepository(Summary::class);
-            $campaignLogCounts          = $summaryRepo->getCampaignLogCounts($id, $dateFrom, $dateTo);
+            $campaignLogCounts          = $this->summaryRepository->getCampaignLogCounts($id, $dateFrom, $dateTo);
             $campaignLogCountsProcessed = $this->getCampaignLogCountsProcessed($campaignLogCounts);
         } else {
-            /** @var LeadEventLogRepository $eventLogRepo */
-            $eventLogRepo               = $this->doctrine->getManager()->getRepository(LeadEventLog::class);
-            $campaignLogCounts          = $eventLogRepo->getCampaignLogCounts($id, false, false, false, $dateFrom, $dateTo);
-            $campaignLogCountsProcessed = $eventLogRepo->getCampaignLogCounts($id, true, false, false, $dateFrom, $dateTo);
+            $cacheTTL = (int) $this->coreParametersHelper->get('campaign_event_cache_ttl');
+            $campaignLogCounts          = $this->leadEventLogRepository->getCampaignLogCounts($id, false, false, false, $dateFrom, $dateTo, null, $cacheTTL);
+            $campaignLogCountsProcessed = $this->leadEventLogRepository->getCampaignLogCounts($id, true, false, false, $dateFrom, $dateTo, null, $cacheTTL);
         }
 
         return [

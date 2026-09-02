@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Field\Dispatcher;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Event\LeadFieldEvent;
 use Mautic\LeadBundle\Exception\NoListenerException;
@@ -16,9 +16,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class FieldDeleteDispatcher
 {
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
-        private EntityManager $entityManager,
-        private BackgroundSettings $backgroundSettings,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly BackgroundSettings $backgroundSettings,
     ) {
     }
 
@@ -50,7 +50,7 @@ class FieldDeleteDispatcher
      *
      * @throws NoListenerException
      */
-    private function dispatchEvent($action, LeadField $entity, ?LeadFieldEvent $event = null): LeadFieldEvent
+    private function dispatchEvent(string $action, LeadField $entity, ?LeadFieldEvent $event = null): LeadFieldEvent
     {
         if (!$this->dispatcher->hasListeners($action)) {
             throw new NoListenerException('There is no Listener for this event');

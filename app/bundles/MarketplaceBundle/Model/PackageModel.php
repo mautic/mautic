@@ -11,8 +11,8 @@ use Mautic\MarketplaceBundle\Service\Allowlist;
 class PackageModel
 {
     public function __construct(
-        private Connection $connection,
-        private Allowlist $allowlist,
+        private readonly Connection $connection,
+        private readonly Allowlist $allowlist,
     ) {
     }
 

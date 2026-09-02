@@ -11,6 +11,30 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class TagRepository extends CommonRepository
 {
     /**
+     * Delete an entity through the repository.
+     *
+     * @param Tag  $entity
+     * @param bool $flush  true by default; use false if persisting in batches
+     */
+    public function deleteEntity($entity, $flush = true): void
+    {
+        if ($entity instanceof Tag && null !== $entity->getId()) {
+            $this->deleteLeadAssociations((int) $entity->getId());
+        }
+
+        parent::deleteEntity($entity, $flush);
+    }
+
+    private function deleteLeadAssociations(int $tagId): void
+    {
+        $this->_em->getConnection()->createQueryBuilder()
+            ->delete(MAUTIC_TABLE_PREFIX.'lead_tags_xref')
+            ->where('tag_id = :tagId')
+            ->setParameter('tagId', $tagId)
+            ->executeStatement();
+    }
+
+    /**
      * Delete orphan tags that are not associated with any lead.
      */
     public function deleteOrphans(): void
@@ -25,14 +49,15 @@ class TagRepository extends CommonRepository
         $qb->select('t.id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_tags', 't')
             ->having(sprintf('(%s)', $havingQb->getSQL()).' = 0');
-        $delete = $qb->executeQuery()->fetchAssociative();
+        $delete = $qb->executeQuery()->fetchFirstColumn();
 
         if (count($delete)) {
             $qb->resetQueryParts();
             $qb->delete(MAUTIC_TABLE_PREFIX.'lead_tags')
                 ->where(
-                    $qb->expr()->in('id', $delete)
+                    $qb->expr()->in('id', ':deleteIds')
                 )
+                ->setParameter('deleteIds', $delete, ArrayParameterType::INTEGER)
                 ->executeStatement();
         }
     }
@@ -46,14 +71,14 @@ class TagRepository extends CommonRepository
      */
     public function getTagsByName(array $tags): array
     {
-        if (empty($tags)) {
+        if ([] === $tags) {
             return [];
         }
 
         $tags = $this->removeMinusFromTags($tags);
         $qb   = $this->createQueryBuilder('t', 't.tag');
 
-        if ($tags) {
+        if ([] !== $tags) {
             $qb->where(
                 $qb->expr()->in('t.tag', ':tags')
             )
@@ -118,8 +143,6 @@ class TagRepository extends CommonRepository
     }
 
     /**
-     * Add tags to leads.
-     *
      * @param array<int> $leadIds
      * @param array<int> $tagIds
      *
@@ -131,8 +154,6 @@ class TagRepository extends CommonRepository
     }
 
     /**
-     * Update tags in leads.
-     *
      * @param array<int> $leadIds
      * @param array<int> $tagIds
      *
@@ -142,13 +163,13 @@ class TagRepository extends CommonRepository
     {
         $result = [];
 
-        if (empty($leadIds) || empty($tagIds)) {
+        if ([] === $leadIds || [] === $tagIds) {
             return $result;
         }
 
         $tags = $this->getTagById($tagIds);
 
-        if (empty($tags)) {
+        if ([] === $tags) {
             return $result;
         }
 
@@ -170,8 +191,6 @@ class TagRepository extends CommonRepository
     }
 
     /**
-     * Remove tags from leads.
-     *
      * @param array<int> $leadIds
      * @param array<int> $tagIds
      *

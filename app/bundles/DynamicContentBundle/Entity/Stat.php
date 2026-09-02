@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\DynamicContentBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
@@ -142,12 +144,7 @@ class Stat
         ++$this->sentCount;
     }
 
-    /**
-     * Up the sent count.
-     *
-     * @return Stat
-     */
-    public function upSentCount()
+    public function upSentCount(): static
     {
         $count           = (int) $this->sentCount + 1;
         $this->sentCount = $count;
@@ -169,7 +166,7 @@ class Stat
     }
 
     /**
-     * @return DynamicContent
+     * @return DynamicContent|null
      */
     public function getDynamicContent()
     {
@@ -182,7 +179,7 @@ class Stat
     }
 
     /**
-     * @return Lead
+     * @return Lead|null
      */
     public function getLead()
     {
@@ -198,7 +195,7 @@ class Stat
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getDateSent()
     {
@@ -214,7 +211,7 @@ class Stat
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getSentCount()
     {
@@ -262,7 +259,7 @@ class Stat
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getSource()
     {
@@ -278,7 +275,7 @@ class Stat
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getSourceId()
     {

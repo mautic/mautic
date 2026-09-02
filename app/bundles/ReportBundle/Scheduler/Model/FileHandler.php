@@ -17,9 +17,9 @@ class FileHandler
     private const REPORTS_DIR = 'csv_reports';
 
     public function __construct(
-        private FilePathResolver $filePathResolver,
-        private FileProperties $fileProperties,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly FilePathResolver $filePathResolver,
+        private readonly FileProperties $fileProperties,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

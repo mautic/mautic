@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Event;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -8,7 +10,6 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 
 final class PendingEventTest extends \PHPUnit\Framework\TestCase
 {
@@ -31,13 +32,13 @@ final class PendingEventTest extends \PHPUnit\Framework\TestCase
         $failedLogs  = $pendingEvent->getFailures();
         $successLogs = $pendingEvent->getSuccessful();
 
-        Assert::assertCount(1, $failedLogs);
-        Assert::assertCount(1, $successLogs);
-        Assert::AssertSame($logA, $failedLogs->current());
-        Assert::AssertSame($logB, $successLogs->current());
-        Assert::AssertSame($interval, $logA->getRescheduleInterval());
-        Assert::AssertSame(['failed' => 1, 'reason' => 'reason A'], $logA->getMetadata());
-        Assert::AssertSame(['failed' => 1, 'reason' => 'Error B'], $logB->getMetadata());
-        Assert::AssertNull($logB->getRescheduleInterval());
+        $this->assertCount(1, $failedLogs);
+        $this->assertCount(1, $successLogs);
+        $this->AssertSame($logA, $failedLogs->current());
+        $this->AssertSame($logB, $successLogs->current());
+        $this->AssertSame($interval, $logA->getRescheduleInterval());
+        $this->AssertSame(['failed' => 1, 'reason' => 'reason A'], $logA->getMetadata());
+        $this->AssertSame(['failed' => 1, 'reason' => 'Error B'], $logB->getMetadata());
+        $this->assertNotInstanceOf(\DateInterval::class, $logB->getRescheduleInterval());
     }
 }

@@ -8,9 +8,10 @@ use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-class ControllerSubscriber implements EventSubscriberInterface
+final readonly class ControllerSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private IntegrationsHelper $integrationsHelper,
@@ -25,7 +26,7 @@ class ControllerSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onKernelController(\Symfony\Component\HttpKernel\Event\ControllerEvent $event): void
+    public function onKernelController(ControllerEvent $event): void
     {
         $request = $event->getRequest();
 

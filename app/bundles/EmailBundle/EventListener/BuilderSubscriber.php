@@ -14,13 +14,15 @@ use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Redirect;
+use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Entity\Trackable;
+use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class BuilderSubscriber implements EventSubscriberInterface
+final class BuilderSubscriber implements EventSubscriberInterface
 {
     /**
      * @var array<string, array{array{string, string}, Trackable[]|Redirect[]}>
@@ -28,13 +30,15 @@ class BuilderSubscriber implements EventSubscriberInterface
     private array $convertedContent = [];
 
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper,
-        private EmailModel $emailModel,
-        private TrackableModel $pageTrackableModel,
-        private RedirectModel $pageRedirectModel,
-        private TranslatorInterface $translator,
-        private MailHashHelper $mailHash,
-        private FromEmailHelper $fromEmailHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly EmailModel $emailModel,
+        private readonly TrackableModel $pageTrackableModel,
+        private readonly RedirectModel $pageRedirectModel,
+        private readonly TranslatorInterface $translator,
+        private readonly MailHashHelper $mailHash,
+        private readonly FromEmailHelper $fromEmailHelper,
+        private readonly TrackableRepository $trackableRepository,
+        private readonly RedirectRepository $redirectRepository,
     ) {
     }
 
@@ -123,7 +127,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         // Add the <title/> tag with email subject value into the <head/> tag if it's missing.
         $content = preg_replace_callback(
             "/<title>(.*?)<\/title>/is",
-            fn ($matches) => empty(trim($matches[1])) ? "<title>{$subject}</title>" : $matches[0],
+            fn ($matches): string => empty(trim($matches[1])) ? "<title>{$subject}</title>" : $matches[0],
             $content,
             -1,
             $fixed
@@ -147,6 +151,7 @@ class BuilderSubscriber implements EventSubscriberInterface
     {
         $idHash = $event->getIdHash();
         $lead   = $event->getLead();
+        /** @var Email|null $email */
         $email  = $event->getEmail();
 
         // Get email
@@ -174,10 +179,11 @@ class BuilderSubscriber implements EventSubscriberInterface
         }
 
         // We will replace tokens in unsubscribe text too
+        $unsubscribeLink = $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash]);
         $unsubscribeText = \Mautic\LeadBundle\Helper\TokenHelper::findLeadTokens($unsubscribeText, $lead, true);
-        $unsubscribeText = str_replace('|URL|', $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash]), $unsubscribeText);
+        $unsubscribeText = str_replace('|URL|', $unsubscribeLink, $unsubscribeText);
         $event->addToken('{unsubscribe_text}', EmojiHelper::toHtml($unsubscribeText));
-        $event->addToken('{unsubscribe_url}', $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash]));
+        $event->addToken('{unsubscribe_url}', $unsubscribeLink);
         $event->addToken('{dnc_url}', $this->emailModel->buildUrl('mautic_email_unsubscribe_all', ['idHash' => $idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash]));
         $event->addToken('{resubscribe_url}', $this->emailModel->buildUrl('mautic_email_resubscribe', ['idHash' => $idHash]));
 
@@ -185,14 +191,15 @@ class BuilderSubscriber implements EventSubscriberInterface
         if (!$webviewText) {
             $webviewText = $this->translator->trans('mautic.email.webview.text', ['%link%' => '|URL|']);
         }
-        $webviewText = str_replace('|URL|', $this->emailModel->buildUrl('mautic_email_webview', ['idHash' => $idHash]), $webviewText);
+        $webviewLink = $this->emailModel->buildUrl('mautic_email_webview', ['idHash' => $idHash]);
+        $webviewText = str_replace('|URL|', $webviewLink, $webviewText);
         $event->addToken('{webview_text}', EmojiHelper::toHtml($webviewText));
 
         // Show public email preview if the lead is not known to prevent 404
         if (empty($lead['id']) && $email) {
             $event->addToken('{webview_url}', $this->emailModel->buildUrl('mautic_email_preview', ['objectId' => $email->getId()]));
         } else {
-            $event->addToken('{webview_url}', $this->emailModel->buildUrl('mautic_email_webview', ['idHash' => $idHash]));
+            $event->addToken('{webview_url}', $webviewLink);
         }
 
         $signatureText = (string) $this->coreParametersHelper->get('default_signature_text');
@@ -206,7 +213,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 $signatureText = '';
             }
         } else {
-            $fromName      = $this->coreParametersHelper->get('mailer_from_name');
+            $fromName      = $this->coreParametersHelper->get('mailer_from_name') ?? '';
             $signatureText = str_replace('|FROM_NAME|', $fromName, nl2br($signatureText));
         }
 
@@ -283,16 +290,13 @@ class BuilderSubscriber implements EventSubscriberInterface
             $this->convertedContent[$cacheKey] = [$content, $trackables];
 
             foreach ($trackables as $trackable) {
-                $trackableRepository = $this->pageTrackableModel->getRepository();
-                $redirectRepository  = $this->pageRedirectModel->getRepository();
-
                 if ($trackable instanceof Trackable) {
-                    $trackableRepository->detachEntity($trackable);
-                    $redirectRepository->detachEntity($trackable->getRedirect());
-                    $trackableRepository->detachEntities($trackable->getRedirect()->getTrackableList()->toArray());
+                    $this->trackableRepository->detachEntity($trackable);
+                    $this->redirectRepository->detachEntity($trackable->getRedirect());
+                    $this->trackableRepository->detachEntities($trackable->getRedirect()->getTrackableList()->toArray());
                 } else {
-                    $redirectRepository->detachEntity($trackable);
-                    $trackableRepository->detachEntities($trackable->getTrackableList()->toArray());
+                    $this->redirectRepository->detachEntity($trackable);
+                    $this->trackableRepository->detachEntities($trackable->getTrackableList()->toArray());
                 }
             }
         }

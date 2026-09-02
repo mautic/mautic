@@ -4,22 +4,20 @@ declare(strict_types=1);
 
 namespace Mautic\MarketplaceBundle\Tests\Functional\Controller;
 
-use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\Test\Guzzle\ClientMockTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\MarketplaceBundle\Service\Allowlist;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 final class DetailControllerTest extends MauticMysqlTestCase
 {
     use ClientMockTrait;
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataProvider')]
+    #[DataProvider('dataProvider')]
     public function testMarketplaceDetailPage(string $requestedPackage, int $responseCode, string $foundPackageName, string $foundPackageDesc, string $latestVersion = ''): void
     {
-        /** @var MockHandler $handlerStack */
         $handlerStack = $this->getClientMockHandler();
         $handlerStack->append(
             new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__.'/../../ApiResponse/allowlist.json')), // Getting Allow list from Github API.
@@ -27,17 +25,17 @@ final class DetailControllerTest extends MauticMysqlTestCase
         );
 
         /** @var Allowlist $allowlist */
-        $allowlist = static::getContainer()->get('marketplace.service.allowlist');
+        $allowlist = self::getContainer()->get(Allowlist::class);
         $allowlist->clearCache();
 
         $this->client->request('GET', "s/marketplace/detail/{$requestedPackage}");
 
         $responseContent = $this->client->getResponse()->getContent();
 
-        Assert::assertSame($responseCode, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
-        Assert::assertStringContainsString($foundPackageDesc, $responseContent);
-        Assert::assertStringContainsString($foundPackageName, $responseContent);
-        Assert::assertStringContainsString($latestVersion, $responseContent);
+        self::assertResponseStatusCodeSame($responseCode);
+        $this->assertStringContainsString($foundPackageDesc, (string) $responseContent);
+        $this->assertStringContainsString($foundPackageName, (string) $responseContent);
+        $this->assertStringContainsString($latestVersion, (string) $responseContent);
     }
 
     /**

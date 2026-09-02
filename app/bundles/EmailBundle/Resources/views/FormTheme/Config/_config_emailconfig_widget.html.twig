@@ -28,6 +28,7 @@
                     {{ _self.row_if_exists(fields, 'mailer_return_path') }}
                     {{ _self.row_if_exists(fields, 'mailer_address_length_limit') }}
                     {{ _self.row_if_exists(fields, 'mailer_is_owner') }}
+                    {{ _self.row_if_exists(fields, 'disable_unsubscribe_link_header') }}
                     {{ _self.row_if_exists(fields, 'mailer_custom_headers') }}
                 </div>
             </div>
@@ -87,6 +88,10 @@
                 {{ _self.row_if_exists(fields, 'mailer_append_tracking_pixel') }}
                 {{ _self.row_if_exists(fields, 'mailer_convert_embed_images') }}
                 {{ _self.row_if_exists(fields, 'disable_trackable_urls') }}
+                {{ _self.row_if_exists(fields, 'email_default_utm_source') }}
+                {{ _self.row_if_exists(fields, 'email_default_utm_medium') }}
+                {{ _self.row_if_exists(fields, 'email_default_utm_campaign') }}
+                {{ _self.row_if_exists(fields, 'email_default_utm_content') }}
                 {{ _self.row_if_exists(fields, 'minify_email_html') }}
                 {{ _self.row_if_exists(fields, 'email_draft_enabled') }}
             </div>
@@ -103,6 +108,7 @@
                 {{ _self.row_if_exists(fields, 'unsubscribe_text') }}
                 {{ _self.row_if_exists(fields, 'unsubscribe_message') }}
                 {{ _self.row_if_exists(fields, 'resubscribe_message') }}
+                {{ _self.row_if_exists(fields, 'email_default_preference_center_id') }}
                 {{ _self.row_if_exists(fields, 'show_contact_preferences') }}
                 {{ _self.row_if_exists(fields, 'show_contact_segments') }}
                 {{ _self.row_if_exists(fields, 'show_contact_frequency') }}

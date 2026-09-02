@@ -3,9 +3,10 @@
 namespace Mautic\LeadBundle\Segment\Query;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Event\LeadListFilteringEvent;
 use Mautic\LeadBundle\Event\LeadListQueryBuilderGeneratedEvent;
 use Mautic\LeadBundle\LeadEvents;
@@ -19,7 +20,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 /**
  * Responsible for building queries for segments.
  */
-class ContactSegmentQueryBuilder
+final class ContactSegmentQueryBuilder
 {
     use LeadBatchLimiterTrait;
 
@@ -29,9 +30,10 @@ class ContactSegmentQueryBuilder
     private array $dependencyMap = [];
 
     public function __construct(
-        private EntityManager $entityManager,
+        private EntityManagerInterface $entityManager,
         private RandomParameterName $randomParameterName,
         private EventDispatcherInterface $dispatcher,
+        private LeadListRepository $leadListRepository,
     ) {
     }
 
@@ -50,7 +52,6 @@ class ContactSegmentQueryBuilder
             $connection->ensureConnectedToReplica();
         }
 
-        /** @var QueryBuilder $queryBuilder */
         $queryBuilder = new QueryBuilder($connection);
 
         $leadsTableAlias = $changeAlias ? $this->generateRandomParameterName() : Lead::DEFAULT_ALIAS;
@@ -173,7 +174,7 @@ class ContactSegmentQueryBuilder
             );
 
         $existingQueryWherePart = $existsQueryBuilder->getQueryPart('where');
-        $existsQueryBuilder->where("$leadsTableAlias.id = $tableAlias.lead_id");
+        $existsQueryBuilder->where("{$leadsTableAlias}.id = {$tableAlias}.lead_id");
         $existsQueryBuilder->andWhere($existingQueryWherePart);
 
         $queryBuilder->orWhere(
@@ -280,7 +281,7 @@ class ContactSegmentQueryBuilder
      */
     private function getSegmentEdges($segmentId): array
     {
-        $segment = $this->entityManager->getRepository(LeadList::class)->find($segmentId);
+        $segment = $this->leadListRepository->find($segmentId);
         if (null === $segment) {
             return [];
         }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\SmsBundle\Tests\Helper;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -12,17 +14,17 @@ use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class ReplyHelperTest extends \PHPUnit\Framework\TestCase
+final class ReplyHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&EventDispatcherInterface
      */
     private \PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
 
     private NullLogger $logger;
 
     /**
-     * @var ContactTracker|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&ContactTracker
      */
     private \PHPUnit\Framework\MockObject\MockObject $contactTracker;
 
@@ -57,7 +59,7 @@ class ReplyHelperTest extends \PHPUnit\Framework\TestCase
         $handler->expects($this->once())
             ->method('getContacts')
             ->willReturnCallback(
-                function (): void {
+                function (): never {
                     throw new NumberNotFoundException('');
                 }
             );
@@ -71,10 +73,7 @@ class ReplyHelperTest extends \PHPUnit\Framework\TestCase
         $this->getHelper()->handleRequest($handler, new Request());
     }
 
-    /**
-     * @return ReplyHelper
-     */
-    private function getHelper()
+    private function getHelper(): ReplyHelper
     {
         return new ReplyHelper($this->eventDispatcher, $this->logger, $this->contactTracker);
     }

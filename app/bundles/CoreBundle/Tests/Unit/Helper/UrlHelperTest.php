@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\UrlHelper;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-class UrlHelperTest extends \PHPUnit\Framework\TestCase
+final class UrlHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testAppendQueryToUrl(): void
     {
@@ -21,7 +23,7 @@ class UrlHelperTest extends \PHPUnit\Framework\TestCase
             'https://mautic.org#anchor'        => 'https://mautic.org?'.$appendQueryString.'#anchor',
         ];
         foreach ($urls as $url=>$expectedUrl) {
-            $this->assertEquals(UrlHelper::appendQueryToUrl($url, $appendQueryString), $expectedUrl);
+            $this->assertSame(UrlHelper::appendQueryToUrl($url, $appendQueryString), $expectedUrl);
         }
     }
 
@@ -109,7 +111,7 @@ class UrlHelperTest extends \PHPUnit\Framework\TestCase
     #[DataProvider('provideUrlsForSanitizeQueryParameters')]
     public function testSanitizeQueryParameters(string $url, string $expected): void
     {
-        self::assertSame($expected, UrlHelper::sanitizeAbsoluteUrl($url));
+        $this->assertSame($expected, UrlHelper::sanitizeAbsoluteUrl($url));
     }
 
     public static function provideUrlsForSanitizeQueryParameters(): \Generator
@@ -132,7 +134,7 @@ class UrlHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetUrlsFromPlaintextWithHttp(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             ['http://mautic.org'],
             UrlHelper::getUrlsFromPlaintext('Hello there, http://mautic.org!')
         );
@@ -140,7 +142,7 @@ class UrlHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetUrlsFromPlaintextSkipDefaultTokenValues(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             // 1 is skipped because it's set as the token default
             [0 => 'https://find.this', 2 => '{contactfield=website|http://skip.this}'],
             UrlHelper::getUrlsFromPlaintext(
@@ -151,7 +153,7 @@ class UrlHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetUrlsFromPlaintextWith2Urls(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             ['http://mautic.org', 'http://mucktick.org'],
             UrlHelper::getUrlsFromPlaintext(
                 'Hello there, http://mautic.org is the correct URL. Not http://mucktick.org.'
@@ -161,7 +163,7 @@ class UrlHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetUrlsFromPlaintextWithSymbols(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'https://example.org/with/square/brackets',
                 'https://example.org/square/brackets/with/slash/and/comma/',

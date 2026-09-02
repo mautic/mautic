@@ -8,36 +8,36 @@ use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class AssetExtension extends AbstractExtension
+final class AssetExtension extends AbstractExtension
 {
     public function __construct(
-        protected AssetsHelper $assetsHelper,
+        private readonly AssetsHelper $assetsHelper,
     ) {
     }
 
     /**
      * @see Twig_Extension::getFunctions()
      */
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
-            new TwigFunction('outputScripts', [$this, 'outputScripts'], ['is_safe' => ['all']]),
-            new TwigFunction('includeScript', [$this, 'includeScript'], ['is_safe' => ['all']]),
-            new TwigFunction('includeStylesheet', [$this, 'includeStylesheet'], ['is_safe' => ['all']]),
-            new TwigFunction('outputHeadDeclarations', [$this, 'outputHeadDeclarations'], ['is_safe' => ['all']]),
-            new TwigFunction('getAssetUrl', [$this, 'getAssetUrl'], ['is_safe' => ['html']]),
-            new TwigFunction('getOverridableUrl', [$this, 'getOverridableUrl'], ['is_safe' => ['html']]),
-            new TwigFunction('addAssetScript', [$this, 'addScript'], ['is_safe' => ['html']]),
-            new TwigFunction('outputStyles', [$this, 'outputStyles'], ['is_safe' => ['html']]),
-            new TwigFunction('outputSystemScripts', [$this, 'outputSystemScripts'], ['is_safe' => ['html']]),
-            new TwigFunction('outputSystemStylesheets', [$this, 'outputSystemStylesheets'], ['is_safe' => ['html']]),
-            new TwigFunction('assetsGetImagesPath', [$this, 'getImagesPath']),
-            new TwigFunction('assetsGetPrefix', [$this, 'getAssetPrefix']),
-            new TwigFunction('assetAddScriptDeclaration', [$this, 'addScriptDeclaration']),
-            new TwigFunction('assetAddCustomDeclaration', [$this, 'addCustomDeclaration']),
-            new TwigFunction('assetGetCountryFlag', [$this, 'getCountryFlag']),
-            new TwigFunction('assetGetBaseUrl', [$this, 'getBaseUrl'], ['is_safe' => ['html']]),
-            new TwigFunction('assetMakeLinks', [$this, 'makeLinks'], ['is_safe' => ['html']]),
+            new TwigFunction('outputScripts', $this->outputScripts(...), ['is_safe' => ['all']]),
+            new TwigFunction('includeScript', $this->includeScript(...), ['is_safe' => ['all']]),
+            new TwigFunction('includeStylesheet', $this->includeStylesheet(...), ['is_safe' => ['all']]),
+            new TwigFunction('outputHeadDeclarations', $this->outputHeadDeclarations(...), ['is_safe' => ['all']]),
+            new TwigFunction('getAssetUrl', $this->getAssetUrl(...), ['is_safe' => ['html']]),
+            new TwigFunction('getOverridableUrl', $this->getOverridableUrl(...), ['is_safe' => ['html']]),
+            new TwigFunction('addAssetScript', $this->addScript(...), ['is_safe' => ['html']]),
+            new TwigFunction('outputStyles', $this->outputStyles(...), ['is_safe' => ['html']]),
+            new TwigFunction('outputSystemScripts', $this->outputSystemScripts(...), ['is_safe' => ['html']]),
+            new TwigFunction('outputSystemStylesheets', $this->outputSystemStylesheets(...), ['is_safe' => ['html']]),
+            new TwigFunction('assetsGetImagesPath', $this->getImagesPath(...)),
+            new TwigFunction('assetsGetPrefix', $this->getAssetPrefix(...)),
+            new TwigFunction('assetAddScriptDeclaration', $this->addScriptDeclaration(...)),
+            new TwigFunction('assetAddCustomDeclaration', $this->addCustomDeclaration(...)),
+            new TwigFunction('assetGetCountryFlag', $this->getCountryFlag(...)),
+            new TwigFunction('assetGetBaseUrl', $this->getBaseUrl(...), ['is_safe' => ['html']]),
+            new TwigFunction('assetMakeLinks', $this->makeLinks(...), ['is_safe' => ['html']]),
         ];
     }
 
@@ -113,12 +113,10 @@ class AssetExtension extends AbstractExtension
     }
 
     /**
-     * @param string|null $packageName
-     * @param string|null $version
-     * @param bool        $absolute
-     * @param bool        $ignorePrefix
+     * @param bool $absolute
+     * @param bool $ignorePrefix
      */
-    public function getAssetUrl(string $path, $packageName = null, $version = null, $absolute = false, $ignorePrefix = false): string
+    public function getAssetUrl(string $path, ?string $packageName = null, ?string $version = null, $absolute = false, $ignorePrefix = false): string
     {
         return $this->assetsHelper->getUrl($path, $packageName, $version, $absolute, $ignorePrefix);
     }

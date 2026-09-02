@@ -8,7 +8,7 @@ use Mautic\IntegrationsBundle\Sync\DAO\DateRange;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\ObjectInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class InternalObjectFindEvent extends Event
+final class InternalObjectFindEvent extends Event
 {
     /**
      * @var int[]
@@ -26,7 +26,7 @@ class InternalObjectFindEvent extends Event
     private array $fieldValues = [];
 
     public function __construct(
-        private ObjectInterface $object,
+        private readonly ObjectInterface $object,
     ) {
     }
 

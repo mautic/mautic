@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Helper\Chart;
 
-class BarChart extends AbstractChart implements ChartInterface
+final class BarChart extends AbstractChart implements ChartInterface
 {
     /**
      * Defines the basic chart values, generates the time axe labels from it.
@@ -30,10 +30,8 @@ class BarChart extends AbstractChart implements ChartInterface
      *
      * @param string $label
      * @param int    $order
-     *
-     * @return $this
      */
-    public function setDataset($label, array $data, $order = null)
+    public function setDataset($label, array $data, $order = null): static
     {
         $datasetId = count($this->datasets);
 

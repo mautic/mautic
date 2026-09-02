@@ -19,7 +19,7 @@ class DateTimeHelper
 
     private string $format;
 
-    private ?string $timezone = null;
+    private ?string $timezone;
 
     private \DateTimeZone $utc;
 
@@ -35,7 +35,7 @@ class DateTimeHelper
      * @param string|null               $fromFormat Format the string is in
      * @param string|null               $timezone   Timezone the string is in
      */
-    public function __construct($string = '', $fromFormat = self::FORMAT_DB, $timezone = 'UTC')
+    public function __construct($string = '', ?string $fromFormat = self::FORMAT_DB, ?string $timezone = 'UTC')
     {
         $this->setDefaultTimezone();
         $this->setDateTime($string, $fromFormat, $timezone);
@@ -46,7 +46,7 @@ class DateTimeHelper
      */
     public function setDateTime($datetime = '', ?string $fromFormat = self::FORMAT_DB, string $timezone = 'local'): void
     {
-        if ('local' == $timezone) {
+        if ('local' === $timezone) {
             $timezone = self::$defaultLocalTimezone;
         } elseif (empty($timezone)) {
             $timezone = 'UTC';
@@ -235,6 +235,8 @@ class DateTimeHelper
             return $dt;
         }
         $this->datetime->add($interval);
+
+        return $this->datetime;
     }
 
     /**
@@ -255,6 +257,8 @@ class DateTimeHelper
             return $dt;
         }
         $this->datetime->sub($interval);
+
+        return $this->datetime;
     }
 
     /**
@@ -307,14 +311,14 @@ class DateTimeHelper
             return $dt;
         }
         $this->datetime->modify($string);
+
+        return $this->datetime;
     }
 
     /**
      * Returns today, yesterday, tomorrow or false if before yesterday or after tomorrow.
-     *
-     * @return bool|string
      */
-    public function getTextDate($interval = null)
+    public function getTextDate($interval = null): string|false
     {
         if (null == $interval) {
             $interval = $this->getDiff('now', null, true);
@@ -334,14 +338,9 @@ class DateTimeHelper
      * Tries to guess timezone from timezone offset.
      *
      * @param int $offset in seconds
-     *
-     * @return string
      */
-    public function guessTimezoneFromOffset($offset = 0)
+    public function guessTimezoneFromOffset(int $offset = 0): string|false|null
     {
-        // Sanitize input
-        $offset = (int) $offset;
-
         $timezone = timezone_name_from_abbr('', $offset, 0);
 
         // In case http://bugs.php.net/44780 bug happens
@@ -369,7 +368,7 @@ class DateTimeHelper
 
         if (!in_array($unit, $possibleUnits, true)) {
             $possibleUnitsString = implode(', ', $possibleUnits);
-            throw new \InvalidArgumentException("Unit '$unit' is not supported. Use one of these: $possibleUnitsString");
+            throw new \InvalidArgumentException("Unit '{$unit}' is not supported. Use one of these: {$possibleUnitsString}");
         }
     }
 

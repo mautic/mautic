@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Exception\InvalidObjectTypeException;
 use Mautic\LeadBundle\Field\DTO\CustomFieldObject;
 
-class CustomFieldObjectTest extends \PHPUnit\Framework\TestCase
+final class CustomFieldObjectTest extends \PHPUnit\Framework\TestCase
 {
     public function testLeadObject(): void
     {

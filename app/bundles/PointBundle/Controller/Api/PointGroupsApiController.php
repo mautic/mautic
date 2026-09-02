@@ -27,15 +27,28 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Group>
  */
-class PointGroupsApiController extends CommonApiController
+final class PointGroupsApiController extends CommonApiController
 {
     /**
      * @var PointGroupModel
      */
     protected $model;
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, PointGroupModel $pointGroupModel, private LeadModel $leadModel)
-    {
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        PointGroupModel $pointGroupModel,
+        private readonly LeadModel $leadModel,
+    ) {
         $this->model            = $pointGroupModel;
         $this->entityClass      = Group::class;
         $this->entityNameOne    = 'pointGroup';

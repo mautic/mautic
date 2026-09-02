@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\DependencyInjection\Builder\Metadata;
 
 use Mautic\AssetBundle\Security\Permissions\AssetPermissions;
@@ -8,7 +10,7 @@ use Mautic\CoreBundle\DependencyInjection\Builder\Metadata\PermissionClassMetada
 use Mautic\CoreBundle\Security\Permissions\SystemPermissions;
 use PHPUnit\Framework\TestCase;
 
-class PermissionClassMetadataTest extends TestCase
+final class PermissionClassMetadataTest extends TestCase
 {
     public function testPermissionsFound(): void
     {
@@ -27,7 +29,7 @@ class PermissionClassMetadataTest extends TestCase
         $permissionClassMetadata = new PermissionClassMetadata($metadata);
         $permissionClassMetadata->build();
 
-        $this->assertTrue(isset($metadata->toArray()['permissionClasses'][SystemPermissions::class]));
+        $this->assertArrayHasKey(SystemPermissions::class, $metadata->toArray()['permissionClasses']);
         $this->assertCount(1, $metadata->toArray()['permissionClasses']);
     }
 
@@ -48,6 +50,6 @@ class PermissionClassMetadataTest extends TestCase
         $permissionClassMetadata = new PermissionClassMetadata($metadata);
         $permissionClassMetadata->build();
 
-        $this->assertTrue(isset($metadata->toArray()['permissionClasses'][AssetPermissions::class]));
+        $this->assertArrayHasKey(AssetPermissions::class, $metadata->toArray()['permissionClasses']);
     }
 }

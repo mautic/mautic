@@ -11,9 +11,12 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 
-class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends MauticMysqlTestCase
+final class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends MauticMysqlTestCase
 {
+    private const HOUR_DATE_FORMAT = 'Y-m-d H:00:00';
+
     private static string $timezone;
 
     protected function setUp(): void
@@ -30,7 +33,7 @@ class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends Mau
         parent::setUp();
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataForCampaignWithJumpToEventWithIntervalTriggerMode')]
+    #[DataProvider('dataForCampaignWithJumpToEventWithIntervalTriggerMode')]
     public function testCampaignWithJumpToEventWithIntervalTriggerMode(Event $adjustPointEvent, callable $assertEventLog): void
     {
         // Create Campaign
@@ -162,9 +165,10 @@ class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends Mau
 
         yield 'Points at a relative time: Scheduled at - before one hour. Should trigger now.' => [
             $adjustPointEvent,
-            function (LeadEventLog $eventLog) use ($testNow): void {
+            function (LeadEventLog $eventLog): void {
+                $now = new \DateTime('now', new \DateTimeZone(self::$timezone));
                 Assert::assertFalse($eventLog->getIsScheduled());
-                self::assertPlusMinusOneMinuteOf($testNow->format('Y-m-d H:00:00'), $eventLog->getTriggerDate()->format('Y-m-d H:00:00'));
+                self::assertPlusMinusOneMinuteOf($now->format(self::HOUR_DATE_FORMAT), $eventLog->getTriggerDate()->format(self::HOUR_DATE_FORMAT));
             },
         ];
 
@@ -271,7 +275,7 @@ class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends Mau
             $adjustPointEvent,
             function (LeadEventLog $eventLog) use ($triggerHourDate): void {
                 Assert::assertTrue($eventLog->getIsScheduled());
-                self::assertPlusMinusOneMinuteOf($triggerHourDate->format('Y-m-d H:00:00'), $eventLog->getTriggerDate()->format('Y-m-d H:00:00'));
+                self::assertPlusMinusOneMinuteOf($triggerHourDate->format(self::HOUR_DATE_FORMAT), $eventLog->getTriggerDate()->format(self::HOUR_DATE_FORMAT));
             },
         ];
 
@@ -301,9 +305,10 @@ class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends Mau
 
         yield 'Execute the event when Send From is in the past on the selected day when the day is today' => [
             $adjustPointEvent,
-            function (LeadEventLog $eventLog) use ($testNow): void {
+            function (LeadEventLog $eventLog): void {
+                $now = new \DateTime('now', new \DateTimeZone(self::$timezone));
                 Assert::assertFalse($eventLog->getIsScheduled());
-                self::assertPlusMinusOneMinuteOf($testNow->format('Y-m-d H:00:00'), $eventLog->getTriggerDate()->format('Y-m-d H:00:00'));
+                self::assertPlusMinusOneMinuteOf($now->format(self::HOUR_DATE_FORMAT), $eventLog->getTriggerDate()->format(self::HOUR_DATE_FORMAT));
             },
         ];
 
@@ -312,13 +317,29 @@ class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends Mau
     }
 
     /**
-     * Avoid flaky test when executing the test right whe the minute is increasing.
+     * Avoid flaky test when the test crosses an hour boundary between data provider and execution.
+     * Both values are truncated to hours via 'Y-m-d H:00:00', so compare at hour precision.
      */
     private static function assertPlusMinusOneMinuteOf(string $expectedDateString, string $actualDateString): void
     {
         $expectedDate = new \DateTime($expectedDateString);
         $actualDate   = new \DateTime($actualDateString);
-        Assert::assertLessThanOrEqual($expectedDate->modify('+1 minute'), $actualDate);
-        Assert::assertGreaterThanOrEqual($expectedDate->modify('-2 minute'), $actualDate);
+
+        // Don't use modify() since it mutates in place and can compound errors.
+        $from = (clone $expectedDate)->modify('-1 hour');
+        $to   = (clone $expectedDate)->modify('+1 hour');
+
+        Assert::assertThat(
+            $actualDate,
+            Assert::logicalAnd(
+                Assert::greaterThanOrEqual($from),
+                Assert::lessThanOrEqual($to),
+            ),
+            sprintf(
+                'Failed asserting that trigger date %s is within one hour of %s.',
+                $actualDate->format('Y-m-d H:i:s'),
+                $expectedDate->format('Y-m-d H:i:s'),
+            ),
+        );
     }
 }

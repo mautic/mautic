@@ -16,16 +16,16 @@ use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ExcelExporterTest extends TestCase
+final class ExcelExporterTest extends TestCase
 {
     private ExcelExporter $excelExporter;
 
     private string|false $tmpFile;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $translator       = $this->createMock(TranslatorInterface::class);
-        $translator->expects($this->any())
+        $translator
             ->method('trans')
             ->with('mautic.report.report.groupby.totals')
             ->willReturn('Totals');
@@ -36,7 +36,7 @@ class ExcelExporterTest extends TestCase
             'F j, Y',
             'g:i a',
             $translator,
-            $this->createMock(CoreParametersHelper::class)
+            $this->createStub(CoreParametersHelper::class)
         );
 
         $formatterHelper  = new FormatterHelper($dateHelperMock, $translator);
@@ -47,7 +47,7 @@ class ExcelExporterTest extends TestCase
         parent::setUp();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         if (file_exists($this->tmpFile)) {
             unlink($this->tmpFile);

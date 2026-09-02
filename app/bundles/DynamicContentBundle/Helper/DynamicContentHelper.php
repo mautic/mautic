@@ -40,12 +40,9 @@ class DynamicContentHelper
     }
 
     /**
-     * @param string     $slot
-     * @param Lead|array $lead
-     *
      * @return string
      */
-    public function getDynamicContentForLead($slot, $lead, ?PageDisplayEvent $event = null)
+    public function getDynamicContentForLead(string $slot, Lead|array|null $lead, ?PageDisplayEvent $event = null)
     {
         // Attempt campaign slots first
         $this->realTimeExecutioner->execute(
@@ -92,7 +89,7 @@ class DynamicContentHelper
             // enrich lead array with company data if this DWC has company filters
             $leadWithCompanies = $this->loadLeadPrimaryCompanyIfNeeded($leadArray, [$dwc->getSlotName() => [$dwc]]);
             if ($lead && $this->filtersMatchContact($dwc->getFilters(), $leadWithCompanies)) {
-                return $lead ? $this->getRealDynamicContent($lead, $dwc, $event) : '';
+                return $this->getRealDynamicContent($lead, $dwc, $event);
             }
         }
 
@@ -123,11 +120,8 @@ class DynamicContentHelper
      *
      * @return string
      */
-    public function getRealDynamicContent(
-        $lead,
-        DynamicContent $dwc,
-        PageDisplayEvent|EmailSendEvent|null $event = null,
-    ) {
+    public function getRealDynamicContent($slot, Lead|array|null $lead, DynamicContent $dwc)
+    {
         $content = $dwc->getContent() ?? '';
         // Determine a translation based on contact's preferred locale
         /** @var DynamicContent $translation */

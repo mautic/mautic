@@ -15,13 +15,13 @@ use Symfony\Component\Console\Output\OutputInterface;
     name: InstallCommand::NAME,
     description: 'Installs a plugin that is available at Packagist.org'
 )]
-class InstallCommand extends Command
+final class InstallCommand extends Command
 {
     public const NAME = 'mautic:marketplace:install';
 
     public function __construct(
-        private ComposerHelper $composer,
-        private PackageModel $packageModel,
+        private readonly ComposerHelper $composer,
+        private readonly PackageModel $packageModel,
     ) {
         parent::__construct();
     }
@@ -37,15 +37,15 @@ class InstallCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $packageName = $input->getArgument('package');
-        $dryRun      = true === $input->getOption('dry-run') ? true : false;
+        $dryRun      = true === $input->getOption('dry-run');
 
         try {
             $package = $this->packageModel->getPackageDetail($packageName);
         } catch (ApiException $e) {
             if (404 === $e->getCode()) {
-                throw new \InvalidArgumentException('Given package '.$packageName.' does not exist in Packagist. Please check the name for typos.');
+                throw new \InvalidArgumentException('Given package '.$packageName.' does not exist in Packagist. Please check the name for typos.', $e->getCode(), $e);
             }
-            throw new \Exception('Error while trying to get package details: '.$e->getMessage());
+            throw new \Exception('Error while trying to get package details: '.$e->getMessage(), $e->getCode(), $e);
         }
 
         if (empty($package->packageBase->type) || 'mautic-plugin' !== $package->packageBase->type) {

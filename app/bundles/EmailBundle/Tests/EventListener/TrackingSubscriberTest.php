@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Mautic\EmailBundle\Entity\Email;
@@ -10,10 +12,10 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\ContactIdentificationEvent;
 use Mautic\LeadBundle\Model\LeadModel;
 
-class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
+final class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|StatRepository
+     * @var \PHPUnit\Framework\MockObject\MockObject&StatRepository
      */
     private \PHPUnit\Framework\MockObject\MockObject $statRepository;
 
@@ -70,7 +72,7 @@ class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->getSubscriber()->onIdentifyContact($event);
 
-        $this->assertNull($event->getIdentifiedContact());
+        $this->assertNotInstanceOf(Lead::class, $event->getIdentifiedContact());
     }
 
     public function testChannelIdMismatchDoesNotIdentify(): void
@@ -104,7 +106,7 @@ class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->getSubscriber()->onIdentifyContact($event);
 
-        $this->assertNull($event->getIdentifiedContact());
+        $this->assertNotInstanceOf(Lead::class, $event->getIdentifiedContact());
     }
 
     public function testStatEmptyLeadDoesNotIdentify(): void
@@ -133,13 +135,10 @@ class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->getSubscriber()->onIdentifyContact($event);
 
-        $this->assertNull($event->getIdentifiedContact());
+        $this->assertNotInstanceOf(Lead::class, $event->getIdentifiedContact());
     }
 
-    /**
-     * @return TrackingSubscriber
-     */
-    private function getSubscriber()
+    private function getSubscriber(): TrackingSubscriber
     {
         return new TrackingSubscriber(
             $this->statRepository,

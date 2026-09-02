@@ -15,7 +15,6 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Email;
-use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Reply;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
@@ -31,7 +30,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Email>
  */
-class EmailApiController extends CommonApiController
+final class EmailApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
@@ -45,11 +44,20 @@ class EmailApiController extends CommonApiController
      */
     protected $extraGetEntitiesArguments = ['ignoreListJoin' => true];
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper)
-    {
-        $emailModel = $modelFactory->getModel('email');
-        \assert($emailModel instanceof EmailModel);
-
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        EmailModel $emailModel,
+    ) {
         $this->model            = $emailModel;
         $this->entityClass      = Email::class;
         $this->entityNameOne    = 'email';
@@ -77,10 +85,8 @@ class EmailApiController extends CommonApiController
 
     /**
      * Obtains a list of emails.
-     *
-     * @return Response
      */
-    public function getEntitiesAction(Request $request, UserHelper $userHelper)
+    public function getEntitiesAction(Request $request, UserHelper $userHelper): Response
     {
         // get parent level only
         $this->listFilters[] = [
@@ -96,11 +102,9 @@ class EmailApiController extends CommonApiController
      *
      * @param int $id Email ID
      *
-     * @return Response
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function sendAction(Request $request, $id)
+    public function sendAction(Request $request, $id): Response
     {
         $entity = $this->model->getEntity($id);
 
@@ -113,8 +117,8 @@ class EmailApiController extends CommonApiController
         }
 
         $lists = $request->request->all()['lists'] ?? [];
-        $limit = $request->request->get('limit', null);
-        $batch = $request->request->get('batch', null);
+        $limit = $request->request->get('limit');
+        $batch = $request->request->get('batch');
 
         [$count, $failed] = $this->model->sendEmailToLists($entity, $lists, $limit, $batch);
 
@@ -136,11 +140,9 @@ class EmailApiController extends CommonApiController
      * @param int $id     Email ID
      * @param int $leadId Lead ID
      *
-     * @return Response
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function sendLeadAction(Request $request, $id, $leadId)
+    public function sendLeadAction(Request $request, $id, $leadId): Response
     {
         $entity = $this->model->getEntity($id);
 
@@ -188,8 +190,7 @@ class EmailApiController extends CommonApiController
                 'tokens'            => $cleanTokens,
                 'assetAttachments'  => $assetsIds,
                 'return_errors'     => true,
-                'ignoreDNC'         => true,
-                'email_type'        => MailHelper::EMAIL_TYPE_TRANSACTIONAL,
+                'ignoreDNC'         => $entity->getSendToDnc(),
             ]
         );
 
@@ -206,10 +207,8 @@ class EmailApiController extends CommonApiController
 
     /**
      * @param string $trackingHash
-     *
-     * @return Response
      */
-    public function replyAction(Reply $replyService, RandomHelperInterface $randomHelper, $trackingHash)
+    public function replyAction(Reply $replyService, RandomHelperInterface $randomHelper, $trackingHash): Response
     {
         try {
             $replyService->createReplyByHash($trackingHash, "api-{$randomHelper->generate()}");
@@ -229,5 +228,30 @@ class EmailApiController extends CommonApiController
             unset($params['publicPreview']);
         }
         parent::prepareParametersFromRequest($form, $params, $entity, $masks, $fields);
+    }
+
+    /**
+     * Processes API Form.
+     *
+     * @param Email        $entity
+     * @param mixed[]|null $parameters
+     * @param string       $method
+     *
+     * @return mixed
+     */
+    protected function processForm(Request $request, $entity, $parameters = null, $method = 'PUT')
+    {
+        if (array_key_exists('sendToDnc', $parameters)
+            && !$this->security->isGranted('email:emails:sendtodnc')) {
+            // do not save user defined value for sendToDnc if user do not have permission
+            unset($parameters['sendToDnc']);
+        }
+
+        if (Request::METHOD_PUT === $method && !array_key_exists('sendToDnc', $parameters)) {
+            // use default value, in case of PUT method it does not use default value if entity is already exist and tried to call setter method with null value.
+            $parameters['sendToDnc'] = false;
+        }
+
+        return parent::processForm($request, $entity, $parameters, $method);
     }
 }
