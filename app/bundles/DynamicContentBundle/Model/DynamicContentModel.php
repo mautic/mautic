@@ -190,8 +190,6 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
             || ($lead instanceof Lead && !$lead->getId())
             || (is_array($lead) && !isset($lead['id']))
         ) {
-
-        if ($lead instanceof Lead && !$lead->getId()) {
             return null;
         }
 
