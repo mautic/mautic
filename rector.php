@@ -14,6 +14,7 @@ return RectorConfig::configure()
         deadCode: true,
         codeQuality: true,
         typeDeclarations: true,
+        phpunitCodeQuality: true,
         privatization: true,
         symfonyCodeQuality: true,
         phpunitCodeQuality: true,
