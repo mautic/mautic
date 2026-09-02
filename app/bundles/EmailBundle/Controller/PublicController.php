@@ -145,7 +145,7 @@ final class PublicController extends CommonFormController
         name: 'mautic_email_unsubscribe',
         defaults: ['urlEmail' => null, 'secretHash' => null],
     )]
-    public function unsubscribeAction(Request $request, ContactTracker $contactTracker, EmailModel $model, LeadModel $leadModel, FormModel $formModel, PageModel $pageModel, MailHashHelper $mailHash, ThemeHelper $themeHelper, EmailDefaultsHelper $emailDefaultsHelper, $idHash, ?string $urlEmail = null, ?string $secretHash = null): Response
+    public function unsubscribeAction(Request $request, ContactTracker $contactTracker, EmailModel $model, FormModel $formModel, PageModel $pageModel, MailHashHelper $mailHash, ThemeHelper $themeHelper, EmailDefaultsHelper $emailDefaultsHelper, $idHash, ?string $urlEmail = null, ?string $secretHash = null): Response
     {
         $stat                   = $model->getEmailStatus($idHash);
         $message                = '';
@@ -489,7 +489,6 @@ final class PublicController extends CommonFormController
         EmailConfig $emailConfig,
         EmailModel $model,
         Request $request,
-        LeadModel $leadModel,
         FakeContactHelper $fakeLeadHelper,
         string $objectId,
         ?string $objectType = null,

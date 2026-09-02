@@ -27,7 +27,6 @@ use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Helper\FakeContactHelper;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\PageBundle\Exception\InvalidRenderedHtmlException;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -1723,7 +1722,7 @@ final class EmailController extends FormController
      * Generating the modal box content for
      * the send multiple example email option.
      */
-    public function sendExampleAction(Request $request, $objectId, CorePermissions $security, EmailModel $model, LeadModel $leadModel, FakeContactHelper $fakeLeadHelper): Response
+    public function sendExampleAction(Request $request, $objectId, CorePermissions $security, EmailModel $model, FakeContactHelper $fakeLeadHelper): Response
     {
         $entity = $model->getEntity($objectId);
 

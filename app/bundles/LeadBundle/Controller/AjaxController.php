@@ -109,7 +109,7 @@ final class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($results);
     }
 
-    public function getLeadIdsByFieldValueAction(Request $request, LeadModel $leadModel): JsonResponse
+    public function getLeadIdsByFieldValueAction(Request $request): JsonResponse
     {
         $field     = InputHelper::clean($request->query->get('field'));
         $value     = InputHelper::clean($request->query->all()['value'] ?? '');
@@ -403,7 +403,7 @@ final class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function removeBounceStatusAction(Request $request, DoNotContactModel $doNotContact, EmailModel $emailModel): JsonResponse
+    public function removeBounceStatusAction(Request $request, DoNotContactModel $doNotContact): JsonResponse
     {
         $dataArray   = ['success' => 0];
         $dncId       = $request->request->get('id');

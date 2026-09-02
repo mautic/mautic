@@ -337,7 +337,7 @@ final class NoteController extends FormController
     /**
      * Deletes the entity.
      */
-    public function deleteAction(Request $request, $leadId, $objectId): Response|JsonResponse
+    public function deleteAction($leadId, $objectId): Response|JsonResponse
     {
         $lead = $this->checkLeadAccess($leadId, 'view');
         if ($lead instanceof Response) {

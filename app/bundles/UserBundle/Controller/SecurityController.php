@@ -108,7 +108,7 @@ final class SecurityController extends CommonController implements EventSubscrib
         '/s/sso_login/{integration}',
         name: 'mautic_sso_login',
     )]
-    public function ssoLoginAction($integration): RedirectResponse
+    public function ssoLoginAction(): RedirectResponse
     {
         return new RedirectResponse($this->generateUrl('login'));
     }
@@ -120,7 +120,7 @@ final class SecurityController extends CommonController implements EventSubscrib
         '/s/sso_login_check/{integration}',
         name: 'mautic_sso_login_check',
     )]
-    public function ssoLoginCheckAction($integration): RedirectResponse
+    public function ssoLoginCheckAction(): RedirectResponse
     {
         // The plugin should be handling this in it's listener
 

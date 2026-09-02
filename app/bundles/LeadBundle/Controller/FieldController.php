@@ -385,7 +385,7 @@ final class FieldController extends FormController
     /**
      * Clone an entity.
      */
-    public function cloneAction(Request $request, FieldAliasHelper $fieldAliasHelper, FieldModel $fieldModel, $objectId): RedirectResponse|Response
+    public function cloneAction(FieldAliasHelper $fieldAliasHelper, FieldModel $fieldModel, $objectId): RedirectResponse|Response
     {
         $entity = $fieldModel->getEntity($objectId);
 
