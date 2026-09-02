@@ -1805,6 +1805,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "darkdi",
+      "name": "Dmitry",
+      "avatar_url": "https://avatars.githubusercontent.com/u/45711841?v=4",
+      "profile": "https://rant.ae",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
