@@ -10,6 +10,7 @@ use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
+use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Entity\SummaryRepository;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber;
@@ -129,6 +130,7 @@ class CampaignController extends AbstractStandardFormController
         private readonly SummaryRepository $summaryRepository,
         private readonly LeadEventLogRepository $leadEventLogRepository,
         private readonly EventRepository $eventRepository,
+        private readonly LeadRepository $campaignLeadRepository,
     ) {
         parent::__construct($formFactory, $fieldHelper, $managerRegistry, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -1242,7 +1244,7 @@ class CampaignController extends AbstractStandardFormController
                 $isEmailStatsEnabled = (bool) $this->coreParametersHelper->get('campaign_email_stats_enabled', true);
                 $showEmailStats      = $isEmailStatsEnabled && $entity->isEmailCampaign();
 
-                $contactCounts = $this->campaignModel->getCampaignLeadRepository()->getCampaignContactCounts([$entity->getId()]);
+                $contactCounts = $this->campaignLeadRepository->getCampaignContactCounts([$entity->getId()]);
                 $contactCount  = (int) ($contactCounts[0]['contact_count'] ?? 0);
 
                 $args['viewParameters'] = array_merge(

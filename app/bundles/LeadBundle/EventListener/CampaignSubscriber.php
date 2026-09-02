@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Entity\LeadRepository as CampaignLeadRepository;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Event\ConditionEvent;
@@ -73,6 +74,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
         private readonly LeadRepository $leadRepository,
         private readonly LeadFieldRepository $leadFieldRepository,
         private readonly TagRepository $tagRepository,
+        private readonly CampaignLeadRepository $campaignLeadRepository,
     ) {
     }
 
@@ -536,7 +538,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
         } elseif ($event->checkContext('lead.attached')) {
             $result = $this->onCampaignTriggerConditionContactAdded($event);
         } elseif ($event->checkContext('lead.campaigns')) {
-            $result = $this->campaignModel->getCampaignLeadRepository()->checkLeadInCampaigns($lead, $event->getConfig());
+            $result = $this->campaignLeadRepository->checkLeadInCampaigns($lead, $event->getConfig());
         } elseif ($event->checkContext('lead.field_value')) {
             if ('date' === $event->getConfig()['operator']) {
                 // Set the date in system timezone since this is triggered by cron
