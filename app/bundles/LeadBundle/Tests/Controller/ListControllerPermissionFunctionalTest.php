@@ -769,7 +769,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param array<int, array<string, int[]|null[][]|null[]|string>> $filters
+     * @param array<int, mixed> $filters
      */
     private function createSegment(string $name, User $user, array $filters = []): LeadList
     {
