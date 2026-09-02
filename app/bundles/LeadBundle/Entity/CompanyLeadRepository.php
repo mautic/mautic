@@ -77,31 +77,6 @@ class CompanyLeadRepository extends CommonRepository
     }
 
     /**
-     * @param int[] $ids
-     *
-     * @return list<array<string, mixed>>
-     */
-    public function getPrimaryCompaniesByLeadIds(array $ids): array
-    {
-        $ids = array_filter($ids);
-
-        if ([] === $ids) {
-            return [];
-        }
-
-        $q = $this->_em->getConnection()->createQueryBuilder();
-
-        $q->select('comp.*')
-            ->from(MAUTIC_TABLE_PREFIX.'companies', 'comp')
-            ->join('comp', MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', 'cl.company_id = comp.id')
-            ->andWhere('cl.is_primary = 1')
-            ->andWhere('cl.lead_id IN (:ids)')
-            ->setParameter('ids', $ids, ArrayParameterType::INTEGER);
-
-        return $q->executeQuery()->fetchAllAssociative();
-    }
-
-    /**
      * @return mixed[]
      *
      * @throws PrimaryCompanyNotFoundException
