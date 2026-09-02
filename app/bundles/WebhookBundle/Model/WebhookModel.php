@@ -466,11 +466,6 @@ class WebhookModel extends FormModel
         $this->saveEntity($webhook);
     }
 
-    public function getLogRepository(): LogRepository
-    {
-        return $this->logRepository;
-    }
-
     /**
      * Get the payload from the webhook.
      *
