@@ -7,7 +7,7 @@ final class ConnectionBuilder
     private static array $eventTypes = [];
 
     /**
-     * @var array<string, never[]>
+     * @var array<string, mixed>
      */
     private static array $connectionRestrictions = ['anchor' => []];
 

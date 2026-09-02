@@ -1763,7 +1763,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Used mostly when batching to generate preferred channels without hydrating associations one at a time.
      *
-     * @param mixed[][] $frequencyRules
+     * @param FrequencyRule[] $frequencyRules
      *
      * @return array<mixed, array<'dnc'|'frequency', mixed>>
      */

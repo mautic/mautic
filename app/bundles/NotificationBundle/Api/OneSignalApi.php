@@ -105,7 +105,7 @@ class OneSignalApi extends AbstractNotificationApi
     }
 
     /**
-     * @param array<string, mixed[]>|array<string, null>|array<string, string>|string[] $data
+     * @param array<string, mixed> $data
      */
     protected function addMobileData(array &$data, array $mobileConfig): void
     {

@@ -41,9 +41,9 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @return array
+     * @return string[]
      */
-    public function getSupportedFeatures()
+    public function getSupportedFeatures(): array
     {
         return ['push_lead', 'get_leads'];
     }

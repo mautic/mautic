@@ -738,7 +738,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * Return array of options for the form when it's being created.
      *
-     * @return array{}
+     * @return array<string, mixed>
      */
     protected function getEntityFormOptions()
     {

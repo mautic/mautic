@@ -1702,7 +1702,7 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return array{}
+     * @return array<string[]>
      */
     protected function getDefaultOrder(): array
     {

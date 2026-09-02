@@ -27,7 +27,7 @@ abstract class AbstractRemoteDataLookup extends AbstractLookup
     abstract protected function parseResponse($response);
 
     /**
-     * @return array{}
+     * @return array<string, mixed>
      */
     protected function getHeaders()
     {

@@ -34,13 +34,11 @@ class AjaxController extends CommonController
     }
 
     /**
-     * @param int                                                                        $statusCode
-     * @param bool                                                                       $addIgnoreWdt
-     * @param array<string, int>|array<string, string>|array<int, array<string, string>> $dataArray
+     * @param mixed[] $dataArray
      *
      * @throws \Exception
      */
-    protected function sendJsonResponse(array $dataArray, $statusCode = null, $addIgnoreWdt = true): JsonResponse
+    protected function sendJsonResponse(array $dataArray, ?int $statusCode = null, bool $addIgnoreWdt = true): JsonResponse
     {
         $response = new JsonResponse();
 

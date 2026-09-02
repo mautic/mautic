@@ -50,7 +50,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
     ];
 
     /**
-     * @var array<string, bool|string>
+     * @var array<string, mixed>
      */
     protected array $configParams = [
         'api_enabled'                       => true,

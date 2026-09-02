@@ -213,6 +213,9 @@ final class FocusController extends AbstractStandardFormController
         return $args;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function getEntityFormOptions(): array
     {
         $focus        = $this->getCurrentRequest()->request->all()['focus'] ?? [];

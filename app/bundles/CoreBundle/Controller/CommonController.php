@@ -103,7 +103,7 @@ class CommonController extends AbstractController implements MauticController
      * Override this method in your controller
      * for easy access to the permissions.
      *
-     * @return array{}
+     * @return mixed[]
      */
     protected function getPermissions(): array
     {
@@ -118,10 +118,10 @@ class CommonController extends AbstractController implements MauticController
     /**
      * Forwards the request to another controller and include the POST.
      *
-     * @param string                    $controller The controller name (a string like BlogBundle:Post:index)
-     * @param array<string, mixed>      $request    An array of request parameters
-     * @param array<string, \Exception> $path       An array of path parameters
-     * @param array                     $query      An array of query parameters
+     * @param string               $controller The controller name (a string like BlogBundle:Post:index)
+     * @param array<string, mixed> $request    An array of request parameters
+     * @param array<string, mixed> $path       An array of path parameters
+     * @param array                $query      An array of query parameters
      *
      * @return Response A Response instance
      */

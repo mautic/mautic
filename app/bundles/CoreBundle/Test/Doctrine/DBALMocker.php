@@ -24,7 +24,7 @@ final class DBALMocker
     private $queryResponse;
 
     /**
-     * @var array<string, never[]>
+     * @var array<string, mixed[]>
      */
     private array $queryParts = [
         'select'     => [],
@@ -44,14 +44,14 @@ final class DBALMocker
     }
 
     /**
-     * @return array<string, never[]>
+     * @return array<string, mixed[]>
      */
     public function getQueryParts(): array
     {
         return $this->queryParts;
     }
 
-    public function getQueryPart($part)
+    public function getQueryPart(string $part): array
     {
         if (array_key_exists($part, $this->queryParts)) {
             return $this->queryParts[$part];

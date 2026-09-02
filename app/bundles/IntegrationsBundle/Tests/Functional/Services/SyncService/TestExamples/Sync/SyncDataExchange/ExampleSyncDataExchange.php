@@ -43,7 +43,7 @@ final class ExampleSyncDataExchange implements SyncDataExchangeInterface
     ];
 
     /**
-     * @var array<string, never[]>
+     * @var array<string, mixed[]>
      */
     private array $payload = ['create' => [], 'update' => []];
 
@@ -215,7 +215,7 @@ final class ExampleSyncDataExchange implements SyncDataExchangeInterface
     }
 
     /**
-     * @return array<string, never[]>
+     * @return array<string, mixed>
      */
     public function getOrderPayload(): array
     {

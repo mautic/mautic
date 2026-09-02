@@ -17,9 +17,9 @@ final class InstagramIntegration extends SocialIntegration
         ];
     }
 
-    public function getIdentifierFields(): string
+    public function getIdentifierFields(): array
     {
-        return 'instagram';
+        return ['instagram'];
     }
 
     public function getAuthenticationUrl(): string

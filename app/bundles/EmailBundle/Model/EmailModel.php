@@ -1325,14 +1325,14 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * Send an email to lead(s).
      *
-     * @param array<string, mixed> $options = array()
-     *                                      array source array('model', 'id')
-     *                                      array emailSettings
-     *                                      int   listId
-     *                                      bool  allowResends     If false, exact emails (by id) already sent to the lead will not be resent
-     *                                      bool  ignoreDNC        If true, emails listed in the do not contact table will still get the email
-     *                                      array assetAttachments Array of optional Asset IDs to attach
-     * @param array<string, mixed> $leads
+     * @param array<string, mixed>     $options = array()
+     *                                          array source array('model', 'id')
+     *                                          array emailSettings
+     *                                          int   listId
+     *                                          bool  allowResends     If false, exact emails (by id) already sent to the lead will not be resent
+     *                                          bool  ignoreDNC        If true, emails listed in the do not contact table will still get the email
+     *                                          array assetAttachments Array of optional Asset IDs to attach
+     * @param array<string|int, mixed> $leads
      *
      * @return string[]|bool|string|null
      */

@@ -275,9 +275,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *  sso_service - SSO using 3rd party service via sso_login and sso_login_check routes
      *  sso_form - SSO using submitted credentials through the login form
      *
-     * @return array{}
+     * @return string[]
      */
-    public function getSupportedFeatures()
+    public function getSupportedFeatures(): array
     {
         return [];
     }
@@ -292,17 +292,15 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return array<string, string>
      */
-    public function getSupportedFeatureTooltips()
+    public function getSupportedFeatureTooltips(): array
     {
         return [];
     }
 
     /**
      * Returns the field the integration needs in order to find the user.
-     *
-     * @return array{}
      */
-    public function getIdentifierFields()
+    public function getIdentifierFields(): array
     {
         return [];
     }
@@ -534,7 +532,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Get the keys for the refresh token and expiry.
      *
-     * @return array{}
+     * @return string[]
      */
     public function getRefreshTokenKeys()
     {

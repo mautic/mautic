@@ -18,7 +18,7 @@ final class FileController extends AjaxController
     public const string EDITOR_CKEDITOR = 'ckeditor';
 
     /**
-     * @var array<mixed, array<string, string>>
+     * @var array<string, mixed>
      */
     private array $response = [];
 
@@ -75,11 +75,11 @@ final class FileController extends AjaxController
                 if (!is_dir($name)) {
                     try {
                         $fileUploader->validateImage($imageFile);
-                        $this->response[] = [
+                        $this->response = array_merge($this->response, [
                             'url'   => $imageUrl,
                             'thumb' => $imageUrl,
                             'name'  => $name,
-                        ];
+                        ]);
                     } catch (FileUploadException) {
                     }
                 }

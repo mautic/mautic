@@ -395,7 +395,7 @@ trait CustomFieldRepositoryTrait
     }
 
     /**
-     * @param int[] $fields
+     * @param array<string, mixed> $fields
      */
     protected function prepareDbalFieldsForSave(array &$fields): void
     {
