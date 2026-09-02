@@ -260,6 +260,7 @@ rules:
     - Utils\PHPStan\Rule\PreferInterfaceInConstructorRule
     - Utils\PHPStan\Rule\NoPropertyToPropertyAssignRule
     - Utils\PHPStan\Rule\ControllerMethodMustReturnResponseRule
+    - Utils\PHPStan\Rule\NoUnusedControllerActionParameterRule
 
     - Utils\PHPStan\Rule\NoServicesInBundleConfigRule
     - Utils\PHPStan\Rule\NoServiceInMethodParameterRule
