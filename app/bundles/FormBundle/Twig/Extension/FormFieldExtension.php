@@ -11,6 +11,9 @@ use Twig\TwigFunction;
 
 final class FormFieldExtension extends AbstractExtension
 {
+    /**
+     * @return TwigFilter[]
+     */
     public function getFilters(): array
     {
         return [
@@ -18,6 +21,9 @@ final class FormFieldExtension extends AbstractExtension
         ];
     }
 
+    /**
+     * @return TwigFunction[]
+     */
     public function getFunctions(): array
     {
         return [

@@ -113,6 +113,10 @@ trait LeadDetailsTrait
         return $filters;
     }
 
+    /**
+     * @param array<string, mixed> $a
+     * @param array<string, mixed> $b
+     */
     private function cmp(array $a, array $b): int
     {
         return $b['timestamp'] <=> $a['timestamp'];
@@ -176,7 +180,7 @@ trait LeadDetailsTrait
     }
 
     /**
-     * @return mixed[]
+     * @return array<string, mixed>
      */
     protected function getAuditlogs(Lead $lead, ?array $filters = null, ?array $orderBy = null, int $page = 1, int $limit = 25): array
     {
@@ -276,6 +280,8 @@ trait LeadDetailsTrait
 
     /**
      * Get an array with engagements and points of a contact.
+     *
+     * @return array<string, mixed[]>
      */
     protected function getStatsCount(Lead $lead, ?\DateTime $fromDate = null, ?\DateTime $toDate = null): array
     {
@@ -304,6 +310,8 @@ trait LeadDetailsTrait
      * Get an array to create company's engagements graph.
      *
      * @param array $contacts
+     *
+     * @return array<string, list<(float|int)>>
      */
     protected function getCompanyEngagementData($contacts): array
     {

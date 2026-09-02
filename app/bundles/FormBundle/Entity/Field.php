@@ -858,7 +858,7 @@ class Field implements UuidInterface
     /**
      * Was field displayed.
      *
-     * @param mixed[] $data
+     * @param array<string, mixed> $data
      */
     public function showForConditionalField(array $data): bool
     {

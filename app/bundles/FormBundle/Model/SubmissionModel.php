@@ -118,7 +118,8 @@ final class SubmissionModel extends CommonFormModel
     }
 
     /**
-     * @param bool $returnEvent
+     * @param bool                 $returnEvent
+     * @param array<string, mixed> $server
      *
      * @throws ORMException
      */
@@ -1176,9 +1177,9 @@ final class SubmissionModel extends CommonFormModel
     }
 
     /**
-     * @return bool|string True if valid; otherwise string with invalid reason
+     * @return true|string|string[] True if valid; otherwise string with invalid reason
      */
-    private function validateFieldValue(Field $field, $value)
+    private function validateFieldValue(Field $field, $value): true|string|array
     {
         $standardValidation = $this->fieldHelper->validateFieldValue($field->getType(), $value, $field);
         if ([] !== $standardValidation) {

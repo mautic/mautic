@@ -4267,12 +4267,6 @@ parameters:
 			path: app/bundles/FormBundle/Model/SubmissionModel.php
 
 		-
-			message: '#^Method Mautic\\FormBundle\\Model\\SubmissionModel\:\:validateFieldValue\(\) should return bool\|string but returns array\.$#'
-			identifier: return.type
-			count: 1
-			path: app/bundles/FormBundle/Model/SubmissionModel.php
-
-		-
 			message: '#^Parameter \#1 \$object of method Mautic\\LeadBundle\\Model\\FieldModel\:\:getFieldListWithProperties\(\) expects string, false given\.$#'
 			identifier: argument.type
 			count: 1
@@ -5056,12 +5050,6 @@ parameters:
 			path: app/bundles/LeadBundle/Entity/Lead.php
 
 		-
-			message: '#^Method Mautic\\LeadBundle\\Entity\\Lead\:\:getPrimaryIdentifier\(\) should return string but returns true\.$#'
-			identifier: return.type
-			count: 1
-			path: app/bundles/LeadBundle/Entity/Lead.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Entity\\Lead\:\:setActualPoints\(\) has parameter \$points with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -5465,12 +5453,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\LeadBundle\\Entity\\LeadRepository\:\:getLeadsByIp\(\) has parameter \$ip with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Entity/LeadRepository.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Entity\\LeadRepository\:\:getLeadsByUniqueFields\(\) has parameter \$uniqueFieldsWithData with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/LeadBundle/Entity/LeadRepository.php

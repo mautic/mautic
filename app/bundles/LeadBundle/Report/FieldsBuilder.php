@@ -103,6 +103,9 @@ class FieldsBuilder
         return array_merge($baseColumns, $fieldColumns);
     }
 
+    /**
+     * @return array<string, array<string, string>>
+     */
     private function getBaseLeadColumns(): array
     {
         return [
@@ -148,6 +151,9 @@ class FieldsBuilder
         ];
     }
 
+    /**
+     * @return array<string, array<string, string>>
+     */
     private function getBaseCompanyColumns(): array
     {
         return [

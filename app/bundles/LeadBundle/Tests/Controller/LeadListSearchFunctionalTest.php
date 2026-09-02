@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
 {
     /**
-     * @var mixed[]
+     * @var array<string, true>
      */
     protected array $clientOptions = ['debug' => true];
 

@@ -622,7 +622,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param mixed[] $properties
+     * @param array<array<string, mixed>, mixed> $properties
      */
     private function createEvent(Campaign $campaign, string $name, string $type, string $eventType, array $properties): Event
     {

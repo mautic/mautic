@@ -58,6 +58,9 @@ final class FieldValidationHelper
         }
     }
 
+    /**
+     * @param int[]|string[] $missingFields
+     */
     private function validateIntegrationRequiredFields(FormInterface $fieldMappingsForm, array $missingFields): void
     {
         $hasMissingFields  = false;
@@ -93,6 +96,9 @@ final class FieldValidationHelper
         }
     }
 
+    /**
+     * @return int[]|string[]
+     */
     private function findMissingIntegrationRequiredFieldMappings(string $object, array $mappedFields): array
     {
         $requiredFields = $this->integrationObject->getRequiredFieldsForMapping($object);

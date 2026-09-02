@@ -74,6 +74,9 @@ class FieldHelper
         }
     }
 
+    /**
+     * @param array<string, mixed> $fieldChange
+     */
     public function getFieldChangeObject(array $fieldChange): FieldDAO
     {
         $changeTimestamp = new \DateTimeImmutable($fieldChange['modified_at'], new \DateTimeZone('UTC'));

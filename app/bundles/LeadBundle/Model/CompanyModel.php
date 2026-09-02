@@ -742,6 +742,9 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         return $this->companyFields;
     }
 
+    /**
+     * @return array<int, mixed[]>
+     */
     public function extractCompanyDataFromImport(array &$mappedFields, array &$data): array
     {
         $companyData    = [];
@@ -790,6 +793,9 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
+     * @param string[]             $fields
+     * @param array<string, mixed> $data
+     *
      * @throws \Exception
      */
     public function importCompany(array $fields, array $data, $owner = null, $persist = true, $skipIfExists = false, bool $createNew = true): ?Company
@@ -918,7 +924,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param array $fields
+     * @param array                $fields
+     * @param array<string, mixed> $data
      */
     protected function getFieldData($fields, array $data): array
     {
@@ -1026,8 +1033,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param mixed[] $fields
-     * @param mixed[] $data
+     * @param string[]             $fields
+     * @param array<string, mixed> $data
      */
     private function existDataForUpdate(array $fields, array $data): bool
     {

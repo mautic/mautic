@@ -107,7 +107,7 @@ trait FormSubmissionTrait
     /**
      * @param mixed[] $payload
      *
-     * @return mixed[]
+     * @return array<int, mixed>
      */
     private function createForm(array $payload): array
     {

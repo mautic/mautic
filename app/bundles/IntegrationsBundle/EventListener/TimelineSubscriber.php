@@ -53,9 +53,9 @@ final readonly class TimelineSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param mixed[] $log
+     * @param array<string, mixed> $log
      *
-     * @return mixed[]
+     * @return array<string, mixed>
      */
     private function getEventEntry(array $log, string $eventType, string $eventTypeName): array
     {

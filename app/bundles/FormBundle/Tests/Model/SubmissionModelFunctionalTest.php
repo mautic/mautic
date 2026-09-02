@@ -151,7 +151,7 @@ final class SubmissionModelFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param mixed[] $payload
+     * @param array<array<string, mixed>, mixed> $payload
      *
      * @return array{int,string}
      */

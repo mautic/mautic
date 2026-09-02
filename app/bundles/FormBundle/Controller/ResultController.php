@@ -467,6 +467,8 @@ final class ResultController extends CommonFormController
     }
 
     /**
+     * @param array<string, mixed> $parameters
+     *
      * @return mixed
      */
     protected function getFormIdFromRequest(array $parameters = [])

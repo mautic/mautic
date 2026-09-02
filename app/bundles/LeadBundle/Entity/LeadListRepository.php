@@ -363,6 +363,8 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
+     * @param array<string, mixed> $parameters
+     *
      * @return QueryBuilder
      */
     protected function createFilterExpressionSubQuery($table, $alias, $column, $value, array &$parameters, $leadId = null, array $subQueryFilters = [])
@@ -503,6 +505,9 @@ class LeadListRepository extends CommonRepository
         return $strings;
     }
 
+    /**
+     * @return array<int, string>
+     */
     public static function getRelativeDateTranslationKeys(): array
     {
         return [

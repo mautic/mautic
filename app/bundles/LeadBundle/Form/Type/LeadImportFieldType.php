@@ -178,11 +178,11 @@ final class LeadImportFieldType extends AbstractType
     }
 
     /**
-     * @param string $fieldName
+     * @param array<string, mixed> $importFields
      *
      * @return string
      */
-    public function getDefaultValue($fieldName, array $importFields)
+    public function getDefaultValue(string $fieldName, array $importFields)
     {
         return $importFields[$fieldName] ?? null;
     }

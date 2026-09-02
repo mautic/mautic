@@ -16,6 +16,9 @@ final class FormBuilderEvent extends Event
 
     private array $actions = [];
 
+    /**
+     * @var array<string, mixed>
+     */
     private array $fields = [];
 
     private array $validators = [];
@@ -28,18 +31,18 @@ final class FormBuilderEvent extends Event
     /**
      * Adds a submit action to the list of available actions.
      *
-     * @param string $key    a unique identifier; it is recommended that it be namespaced i.e. lead.action
-     * @param array  $action can contain the following keys:
-     *                       $action = [
-     *                       'group'              => (required) Label of the group to add this action to
-     *                       'label'              => (required) what to display in the list
-     *                       'eventName'          => (required) Event dispatched to execute action; it will receive a SubmissionEvent object
-     *                       'formType'           => (required) name of the form type SERVICE for the action
-     *                       'description'        => (optional) short description of event
-     *                       'template'           => (optional) template to use for the action's HTML in the form builder; eg AcmeMyBundle:FormAction:theaction.html.twig
-     *                       'formTypeOptions'    => (optional) array of options to pass to formType
-     *                       'formTheme'          => (optional)  theme for custom form views
-     *                       ]
+     * @param string               $key    a unique identifier; it is recommended that it be namespaced i.e. lead.action
+     * @param array<string, mixed> $action can contain the following keys:
+     *                                     $action = [
+     *                                     'group'              => (required) Label of the group to add this action to
+     *                                     'label'              => (required) what to display in the list
+     *                                     'eventName'          => (required) Event dispatched to execute action; it will receive a SubmissionEvent object
+     *                                     'formType'           => (required) name of the form type SERVICE for the action
+     *                                     'description'        => (optional) short description of event
+     *                                     'template'           => (optional) template to use for the action's HTML in the form builder; eg AcmeMyBundle:FormAction:theaction.html.twig
+     *                                     'formTypeOptions'    => (optional) array of options to pass to formType
+     *                                     'formTheme'          => (optional)  theme for custom form views
+     *                                     ]
      *
      * @throws BadConfigurationException
      */
@@ -91,26 +94,26 @@ final class FormBuilderEvent extends Event
     /**
      * Adds a form field to the list of available fields in the form builder.
      *
-     * @param string $key   unique identifier; it is recommended that it be namespaced i.e. leadbundle.myfield
-     * @param array  $field can contain the following key/values
-     *                      $field = [
-     *                      'label'            => (required) what to display in the list
-     *                      'formType'         => (required) name of the form type SERVICE for the field's property column
-     *                      'template'         => (required) template to use for the field's HTML eg AcmeMyBundle:FormField:thefield.html.twig
-     *                      'formTypeOptions'  => (optional) array of options to pass to formType
-     *                      'formTheme'        => (optional) theme for custom form view
-     *                      'valueFilter'      => (optional) the filter to use to clean the input as supported by InputHelper or a callback;
-     *                      should accept arguments FormField $field and $filteredValue
-     *                      'builderOptions'   => (optional) array of options
-     *                      [
-     *                      'addHelpMessage'     => (bool) show help message inputs
-     *                      'addShowLabel'       => (bool) show label input
-     *                      'addDefaultValue'    => (bool) show default value input
-     *                      'addLabelAttributes' => (bool) show label attribute input
-     *                      'addInputAttributes' => (bool) show input attribute input
-     *                      'addIsRequired'      => (bool) show is required toggle
-     *                      ]
-     *                      ]
+     * @param string               $key   unique identifier; it is recommended that it be namespaced i.e. leadbundle.myfield
+     * @param array<string, mixed> $field can contain the following key/values
+     *                                    $field = [
+     *                                    'label'            => (required) what to display in the list
+     *                                    'formType'         => (required) name of the form type SERVICE for the field's property column
+     *                                    'template'         => (required) template to use for the field's HTML eg AcmeMyBundle:FormField:thefield.html.twig
+     *                                    'formTypeOptions'  => (optional) array of options to pass to formType
+     *                                    'formTheme'        => (optional) theme for custom form view
+     *                                    'valueFilter'      => (optional) the filter to use to clean the input as supported by InputHelper or a callback;
+     *                                    should accept arguments FormField $field and $filteredValue
+     *                                    'builderOptions'   => (optional) array of options
+     *                                    [
+     *                                    'addHelpMessage'     => (bool) show help message inputs
+     *                                    'addShowLabel'       => (bool) show label input
+     *                                    'addDefaultValue'    => (bool) show default value input
+     *                                    'addLabelAttributes' => (bool) show label attribute input
+     *                                    'addInputAttributes' => (bool) show input attribute input
+     *                                    'addIsRequired'      => (bool) show is required toggle
+     *                                    ]
+     *                                    ]
      *
      * @throws \InvalidArgumentException
      * @throws BadConfigurationException
