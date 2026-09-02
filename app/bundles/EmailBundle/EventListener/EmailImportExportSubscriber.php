@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
+use Mautic\EmailBundle\Helper\EmailMediaImageHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\FormRepository;
@@ -38,6 +39,7 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
         private AuditLogModel $auditLogModel,
         private IpLookupHelper $ipLookupHelper,
         private DenormalizerInterface $serializer,
+        private EmailMediaImageHelper $mediaImageHelper,
     ) {
     }
 
@@ -156,6 +158,15 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
 
             $email->setUnsubscribeForm($unsubscribeForm);
             $email->setPreferenceCenter($preferenceCenter);
+
+            // Relocate builder images packed with the export into the served media images directory and
+            // rewrite their references to host-relative URLs so the content renders on this instance.
+            if (!empty($element['custom_html']) && is_string($element['custom_html'])) {
+                $element['custom_html'] = $this->mediaImageHelper->restoreInHtml($element['custom_html']);
+            }
+            if (!empty($element['content']) && is_array($element['content'])) {
+                $element['content'] = $this->mediaImageHelper->restoreInContent($element['content']);
+            }
 
             $this->serializer->denormalize(
                 $element,
