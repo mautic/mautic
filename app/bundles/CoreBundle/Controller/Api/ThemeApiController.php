@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
 /**
@@ -29,6 +30,12 @@ final class ThemeApiController extends CommonApiController
     /**
      * Accepts the zip file and installs the theme from it.
      */
+    #[Route(
+        '/api/themes/new',
+        name: 'mautic_core_api_theme_create',
+        defaults: ['_format' => 'json'],
+        methods: ['POST']
+    )]
     public function newAction(Request $request, PathsHelper $pathsHelper): Response
     {
         if (!$this->security->isGranted('core:themes:create')) {
@@ -73,6 +80,12 @@ final class ThemeApiController extends CommonApiController
      *
      * @param string $theme dir name
      */
+    #[Route(
+        '/api/themes/{theme}',
+        name: 'mautic_core_api_theme_get',
+        defaults: ['_format' => 'json'],
+        methods: ['GET']
+    )]
     public function getAction($theme): Response
     {
         if (!$this->security->isGranted('core:themes:view')) {
@@ -103,6 +116,12 @@ final class ThemeApiController extends CommonApiController
     /**
      * List the folders (themes) in the /themes directory.
      */
+    #[Route(
+        '/api/themes',
+        name: 'mautic_core_api_theme_list',
+        defaults: ['_format' => 'json'],
+        methods: ['GET']
+    )]
     public function listAction(): Response
     {
         if (!$this->security->isGranted('core:themes:view')) {
@@ -125,6 +144,12 @@ final class ThemeApiController extends CommonApiController
      *
      * @param string $theme
      */
+    #[Route(
+        '/api/themes/{theme}/delete',
+        name: 'mautic_core_api_theme_delete',
+        defaults: ['_format' => 'json'],
+        methods: ['DELETE']
+    )]
     public function deleteAction($theme): Response
     {
         if (!$this->security->isGranted('core:themes:delete')) {

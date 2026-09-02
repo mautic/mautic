@@ -181,7 +181,8 @@
         ],
         "defaults": {
             "_controller": "Mautic\\CampaignBundle\\Controller\\Api\\EventLogApiController::getContactEventsAction",
-            "_format": "json"
+            "_format": "json",
+            "campaignId": null
         },
         "requirements": {
             "campaignId": "\\d+",
@@ -199,7 +200,7 @@
         },
         "requirements": {
             "id": "\\d+",
-            "id}/contact/{leadId": "\\d+"
+            "leadId": "\\d+"
         }
     },
     "mautic_api_campaigngetcontacts": {
@@ -226,7 +227,7 @@
         },
         "requirements": {
             "id": "\\d+",
-            "id}/contact/{leadId": "\\d+"
+            "leadId": "\\d+"
         }
     },
     "mautic_api_campaigns_batchedit_events": {
@@ -1392,7 +1393,9 @@
         ],
         "defaults": {
             "_controller": "Mautic\\FormBundle\\Controller\\Api\\SubmissionApiController::getEntityAction",
-            "_format": "json"
+            "_format": "json",
+            "formId": null,
+            "submissionId": null
         },
         "requirements": {
             "formId": "\\d+",
@@ -1406,7 +1409,8 @@
         ],
         "defaults": {
             "_controller": "Mautic\\FormBundle\\Controller\\Api\\SubmissionApiController::getEntitiesAction",
-            "_format": "json"
+            "_format": "json",
+            "formId": null
         },
         "requirements": {
             "formId": "\\d+"
@@ -3067,7 +3071,7 @@
         },
         "requirements": {
             "id": "\\d+",
-            "id}/contact/{leadId": "\\d+"
+            "leadId": "\\d+"
         }
     },
     "mautic_api_segmentaddcontacts": {
@@ -3094,7 +3098,7 @@
         },
         "requirements": {
             "id": "\\d+",
-            "id}/contact/{leadId": "\\d+"
+            "leadId": "\\d+"
         }
     },
     "mautic_api_sendcontactemail": {
@@ -3108,7 +3112,7 @@
         },
         "requirements": {
             "id": "\\d+",
-            "id}/contact/{leadId": "\\d+"
+            "leadId": "\\d+"
         }
     },
     "mautic_api_sendemail": {
@@ -3252,8 +3256,8 @@
             "_format": "json"
         },
         "requirements": {
-            "id": "\\d+",
-            "id}/contact/{contactId": "\\d+"
+            "contactId": "\\d+",
+            "id": "\\d+"
         }
     },
     "mautic_api_stageddcontact": {
@@ -3266,8 +3270,8 @@
             "_format": "json"
         },
         "requirements": {
-            "id": "\\d+",
-            "id}/contact/{contactId": "\\d+"
+            "contactId": "\\d+",
+            "id": "\\d+"
         }
     },
     "mautic_api_stageremovecontact": {
@@ -3280,8 +3284,8 @@
             "_format": "json"
         },
         "requirements": {
-            "id": "\\d+",
-            "id}/contact/{contactId": "\\d+"
+            "contactId": "\\d+",
+            "id": "\\d+"
         }
     },
     "mautic_api_stages_delete": {

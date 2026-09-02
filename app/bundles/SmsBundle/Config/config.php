@@ -11,10 +11,6 @@ return [
                 'path'            => '/smses',
                 'controller'      => Mautic\SmsBundle\Controller\Api\SmsApiController::class,
             ],
-            'mautic_api_smses_send' => [
-                'path'       => '/smses/{id}/contact/{contactId}/send',
-                'controller' => 'Mautic\SmsBundle\Controller\Api\SmsApiController::sendAction',
-            ],
         ],
     ],
     'menu' => [

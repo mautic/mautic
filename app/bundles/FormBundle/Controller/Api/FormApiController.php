@@ -24,6 +24,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -70,6 +71,13 @@ final class FormApiController extends CommonApiController
     /**
      * Delete fields from a form.
      */
+    #[Route(
+        '/api/forms/{formId}/fields/delete',
+        name: 'mautic_api_formdeletefields',
+        requirements: ['formId' => '\d+'],
+        defaults: ['_format' => 'json'],
+        methods: ['DELETE']
+    )]
     public function deleteFieldsAction(Request $request, $formId): Response
     {
         if (!$this->security->isGranted(['form:forms:editown', 'form:forms:editother'], 'MATCH_ONE')) {
@@ -98,6 +106,13 @@ final class FormApiController extends CommonApiController
     /**
      * Delete fields from a form.
      */
+    #[Route(
+        '/api/forms/{formId}/actions/delete',
+        name: 'mautic_api_formdeleteactions',
+        requirements: ['formId' => '\d+'],
+        defaults: ['_format' => 'json'],
+        methods: ['DELETE']
+    )]
     public function deleteActionsAction(Request $request, $formId): Response
     {
         if (!$this->security->isGranted(['form:forms:editown', 'form:forms:editother'], 'MATCH_ONE')) {

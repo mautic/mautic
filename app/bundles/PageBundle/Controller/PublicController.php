@@ -45,6 +45,11 @@ final class PublicController extends AbstractFormController
      * @throws \Exception
      * @throws FileNotFoundException
      */
+    #[Route(
+        '/{slug}',
+        name: 'mautic_page_public',
+        requirements: ['slug' => '^(?!(_(profiler|wdt)|css|images|js|favicon.ico|apps/bundles/|plugins/)).+'],
+    )]
     public function indexAction(
         Request $request,
         ContactRequestHelper $contactRequestHelper,

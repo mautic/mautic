@@ -36,6 +36,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -92,6 +93,12 @@ final class LeadApiController extends CommonApiController
     /**
      * Obtains a list of users for lead owner edits.
      */
+    #[Route(
+        '/api/contacts/list/owners',
+        name: 'mautic_api_getcontactowners',
+        defaults: ['_format' => 'json'],
+        methods: ['GET']
+    )]
     public function getOwnersAction(Request $request): Response
     {
         if (!$this->security->isGranted(
@@ -121,6 +128,12 @@ final class LeadApiController extends CommonApiController
     /**
      * Obtains a list of custom fields.
      */
+    #[Route(
+        '/api/contacts/list/fields',
+        name: 'mautic_api_getcontactfields',
+        defaults: ['_format' => 'json'],
+        methods: ['GET']
+    )]
     public function getFieldsAction(): Response
     {
         if (!$this->security->isGranted(['lead:leads:editown', 'lead:leads:editother'], 'MATCH_ONE')) {
@@ -152,6 +165,13 @@ final class LeadApiController extends CommonApiController
     /**
      * Obtains a list of notes on a specific lead.
      */
+    #[Route(
+        '/api/contacts/{id}/notes',
+        name: 'mautic_api_getcontactnotes',
+        requirements: ['id' => '\d+'],
+        defaults: ['_format' => 'json'],
+        methods: ['GET']
+    )]
     public function getNotesAction(Request $request, $id): Response
     {
         $entity = $this->model->getEntity($id);
@@ -204,6 +224,13 @@ final class LeadApiController extends CommonApiController
     /**
      * Obtains a list of devices on a specific lead.
      */
+    #[Route(
+        '/api/contacts/{id}/devices',
+        name: 'mautic_api_getcontactdevices',
+        requirements: ['id' => '\d+'],
+        defaults: ['_format' => 'json'],
+        methods: ['GET']
+    )]
     public function getDevicesAction(Request $request, $id): Response
     {
         $entity = $this->model->getEntity($id);
@@ -256,6 +283,13 @@ final class LeadApiController extends CommonApiController
     /**
      * Obtains a list of contact segments the contact is in.
      */
+    #[Route(
+        '/api/contacts/{id}/segments',
+        name: 'mautic_api_getcontactssegments',
+        requirements: ['id' => '\d+'],
+        defaults: ['_format' => 'json'],
+        methods: ['GET']
+    )]
     public function getListsAction($id): Response
     {
         $entity = $this->model->getEntity($id);
@@ -292,6 +326,13 @@ final class LeadApiController extends CommonApiController
     /**
      * Obtains a list of contact companies the contact is in.
      */
+    #[Route(
+        '/api/contacts/{id}/companies',
+        name: 'mautic_api_getcontactscompanies',
+        requirements: ['id' => '\d+'],
+        defaults: ['_format' => 'json'],
+        methods: ['GET']
+    )]
     public function getCompaniesAction($id): Response
     {
         $entity = $this->model->getEntity($id);
@@ -320,6 +361,13 @@ final class LeadApiController extends CommonApiController
     /**
      * Obtains a list of campaigns the lead is part of.
      */
+    #[Route(
+        '/api/contacts/{id}/campaigns',
+        name: 'mautic_api_getcontactcampaigns',
+        requirements: ['id' => '\d+'],
+        defaults: ['_format' => 'json'],
+        methods: ['GET']
+    )]
     public function getCampaignsAction($id): Response
     {
         $entity = $this->model->getEntity($id);
@@ -361,6 +409,13 @@ final class LeadApiController extends CommonApiController
     /**
      * Obtains a list of contact events.
      */
+    #[Route(
+        '/api/contacts/{id}/activity',
+        name: 'mautic_api_getcontactevents',
+        requirements: ['id' => '\d+'],
+        defaults: ['_format' => 'json'],
+        methods: ['GET']
+    )]
     public function getActivityAction(Request $request, $id): Response
     {
         $entity = $this->model->getEntity($id);
@@ -379,6 +434,12 @@ final class LeadApiController extends CommonApiController
     /**
      * Obtains a list of contact events.
      */
+    #[Route(
+        '/api/contacts/activity',
+        name: 'mautic_api_getcontactsevents',
+        defaults: ['_format' => 'json'],
+        methods: ['GET']
+    )]
     public function getAllActivityAction(Request $request, $lead = null): Response
     {
         $canViewOwn    = $this->security->isGranted('lead:leads:viewown');
@@ -405,6 +466,13 @@ final class LeadApiController extends CommonApiController
     /**
      * Adds a DNC to the contact.
      */
+    #[Route(
+        '/api/contacts/{id}/dnc/{channel}/add',
+        name: 'mautic_api_dncaddcontact',
+        requirements: ['id' => '\d+'],
+        defaults: ['channel' => 'email', '_format' => 'json'],
+        methods: ['POST']
+    )]
     public function addDncAction(Request $request, $id, $channel): Response
     {
         $entity = $this->model->getEntity((int) $id);
@@ -445,6 +513,13 @@ final class LeadApiController extends CommonApiController
     /**
      * Removes a DNC from the contact.
      */
+    #[Route(
+        '/api/contacts/{id}/dnc/{channel}/remove',
+        name: 'mautic_api_dncremovecontact',
+        requirements: ['id' => '\d+'],
+        defaults: ['_format' => 'json'],
+        methods: ['POST']
+    )]
     public function removeDncAction($id, $channel): Response
     {
         $entity = $this->model->getEntity((int) $id);
@@ -513,6 +588,13 @@ final class LeadApiController extends CommonApiController
      *
      * @param int $id
      */
+    #[Route(
+        '/api/contacts/{id}/utm/add',
+        name: 'mautic_api_utmcreateevent',
+        requirements: ['id' => '\d+'],
+        defaults: ['_format' => 'json'],
+        methods: ['POST']
+    )]
     public function addUtmTagsAction(Request $request, $id): Response
     {
         return $this->applyUtmTagsAction($id, 'addUTMTags', $request->request->all());
@@ -524,6 +606,13 @@ final class LeadApiController extends CommonApiController
      * @param int $id
      * @param int $utmid
      */
+    #[Route(
+        '/api/contacts/{id}/utm/{utmid}/remove',
+        name: 'mautic_api_utmremoveevent',
+        requirements: ['id' => '\d+'],
+        defaults: ['_format' => 'json'],
+        methods: ['POST']
+    )]
     public function removeUtmTagsAction($id, $utmid): Response
     {
         return $this->applyUtmTagsAction($id, 'removeUtmTags', (int) $utmid);

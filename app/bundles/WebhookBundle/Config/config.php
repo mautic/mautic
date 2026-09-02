@@ -11,10 +11,6 @@ return [
                 'path'            => '/hooks',
                 'controller'      => Mautic\WebhookBundle\Controller\Api\WebhookApiController::class,
             ],
-            'mautic_api_webhookevents' => [
-                'path'       => '/hooks/triggers',
-                'controller' => 'Mautic\WebhookBundle\Controller\Api\WebhookApiController::getTriggersAction',
-            ],
         ],
     ],
 

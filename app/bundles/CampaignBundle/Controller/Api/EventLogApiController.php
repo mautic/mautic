@@ -26,6 +26,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * @extends FetchCommonApiController<LeadEventLog>
@@ -89,6 +90,20 @@ final class EventLogApiController extends FetchCommonApiController
     /**
      * Get a list of events.
      */
+    #[Route(
+        '/api/campaigns/events/contact/{contactId}',
+        name: 'mautic_api_campaigns_events_contact',
+        requirements: ['contactId' => '\d+'],
+        defaults: ['_format' => 'json'],
+        methods: ['GET']
+    )]
+    #[Route(
+        '/api/campaigns/{campaignId}/events/contact/{contactId}',
+        name: 'mautic_api_campaign_contact_events',
+        requirements: ['campaignId' => '\d+', 'contactId' => '\d+'],
+        defaults: ['_format' => 'json'],
+        methods: ['GET']
+    )]
     public function getContactEventsAction(Request $request, UserHelper $userHelper, $contactId, $campaignId = null): Response
     {
         // Ensure contact exists and user has access
@@ -136,6 +151,13 @@ final class EventLogApiController extends FetchCommonApiController
         return $this->getEntitiesAction($request, $userHelper);
     }
 
+    #[Route(
+        '/api/campaigns/events/{eventId}/contact/{contactId}/edit',
+        name: 'mautic_api_campaigns_edit_contact_event',
+        requirements: ['eventId' => '\d+', 'contactId' => '\d+'],
+        defaults: ['_format' => 'json'],
+        methods: ['PUT']
+    )]
     public function editContactEventAction(Request $request, $eventId, $contactId): Response
     {
         $parameters = $request->request->all();
@@ -178,6 +200,12 @@ final class EventLogApiController extends FetchCommonApiController
         return $this->handleView($view);
     }
 
+    #[Route(
+        '/api/campaigns/events/batch/edit',
+        name: 'mautic_api_campaigns_batchedit_events',
+        defaults: ['_format' => 'json'],
+        methods: ['PUT']
+    )]
     public function editEventsAction(Request $request): Response
     {
         $parameters = $request->request->all();

@@ -25,6 +25,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -104,6 +105,13 @@ final class EmailApiController extends CommonApiController
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
+    #[Route(
+        '/api/emails/{id}/send',
+        name: 'mautic_api_sendemail',
+        requirements: ['id' => '\d+'],
+        defaults: ['_format' => 'json'],
+        methods: ['POST']
+    )]
     public function sendAction(Request $request, $id): Response
     {
         $entity = $this->model->getEntity($id);
@@ -142,6 +150,13 @@ final class EmailApiController extends CommonApiController
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
+    #[Route(
+        '/api/emails/{id}/contact/{leadId}/send',
+        name: 'mautic_api_sendcontactemail',
+        requirements: ['id' => '\d+', 'leadId' => '\d+'],
+        defaults: ['_format' => 'json'],
+        methods: ['POST']
+    )]
     public function sendLeadAction(Request $request, $id, $leadId): Response
     {
         $entity = $this->model->getEntity($id);
@@ -208,6 +223,12 @@ final class EmailApiController extends CommonApiController
     /**
      * @param string $trackingHash
      */
+    #[Route(
+        '/api/emails/reply/{trackingHash}',
+        name: 'mautic_api_reply',
+        defaults: ['_format' => 'json'],
+        methods: ['POST']
+    )]
     public function replyAction(Reply $replyService, RandomHelperInterface $randomHelper, $trackingHash): Response
     {
         try {

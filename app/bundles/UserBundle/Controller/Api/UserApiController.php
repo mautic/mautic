@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
@@ -61,6 +62,12 @@ final class UserApiController extends CommonApiController
      *
      * @throws NotFoundHttpException
      */
+    #[Route(
+        '/api/users/self',
+        name: 'mautic_api_getself',
+        defaults: ['_format' => 'json'],
+        methods: ['GET']
+    )]
     public function getSelfAction(TokenStorageInterface $tokenStorage): Response
     {
         $currentUser = $tokenStorage->getToken()->getUser();
@@ -170,6 +177,13 @@ final class UserApiController extends CommonApiController
      * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
      * @throws NotFoundHttpException
      */
+    #[Route(
+        '/api/users/{id}/permissioncheck',
+        name: 'mautic_api_checkpermission',
+        requirements: ['id' => '\\d+'],
+        defaults: ['_format' => 'json'],
+        methods: ['POST']
+    )]
     public function isGrantedAction(Request $request, $id): Response
     {
         $entity = $this->model->getEntity($id);
@@ -195,6 +209,12 @@ final class UserApiController extends CommonApiController
     /**
      * Obtains a list of roles for user edits.
      */
+    #[Route(
+        '/api/users/list/roles',
+        name: 'mautic_api_getuserroles',
+        defaults: ['_format' => 'json'],
+        methods: ['GET']
+    )]
     public function getRolesAction(Request $request): Response
     {
         if (!$this->security->isGranted(

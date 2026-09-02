@@ -20,6 +20,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -141,6 +142,12 @@ final class TriggerApiController extends CommonApiController
     /**
      * Return array of available point trigger event types.
      */
+    #[Route(
+        '/api/points/triggers/events/types',
+        name: 'mautic_api_getpointtriggereventtypes',
+        defaults: ['_format' => 'json'],
+        methods: ['GET']
+    )]
     public function getPointTriggerEventTypesAction(): Response
     {
         if (!$this->security->isGranted([$this->permissionBase.':view', $this->permissionBase.':viewown'])) {
@@ -164,6 +171,13 @@ final class TriggerApiController extends CommonApiController
      *
      * @param int $triggerId
      */
+    #[Route(
+        '/api/points/triggers/{triggerId}/events/delete',
+        name: 'mautic_api_pointtriggerdeleteevents',
+        requirements: ['triggerId' => '\d+'],
+        defaults: ['_format' => 'json'],
+        methods: ['DELETE']
+    )]
     public function deletePointTriggerEventsAction($triggerId): Response
     {
         if (!$this->security->isGranted([$this->permissionBase.':editown', $this->permissionBase.':editother'], 'MATCH_ONE')) {

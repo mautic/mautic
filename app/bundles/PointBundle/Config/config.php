@@ -11,48 +11,17 @@ return [
                 'path'            => '/points',
                 'controller'      => Mautic\PointBundle\Controller\Api\PointApiController::class,
             ],
-            'mautic_api_getpointactiontypes' => [
-                'path'       => '/points/actions/types',
-                'controller' => 'Mautic\PointBundle\Controller\Api\PointApiController::getPointActionTypesAction',
-            ],
             'mautic_api_pointtriggersstandard' => [
                 'standard_entity' => true,
                 'name'            => 'triggers',
                 'path'            => '/points/triggers',
                 'controller'      => Mautic\PointBundle\Controller\Api\TriggerApiController::class,
             ],
-            'mautic_api_getpointtriggereventtypes' => [
-                'path'       => '/points/triggers/events/types',
-                'controller' => 'Mautic\PointBundle\Controller\Api\TriggerApiController::getPointTriggerEventTypesAction',
-            ],
-            'mautic_api_pointtriggerdeleteevents' => [
-                'path'       => '/points/triggers/{triggerId}/events/delete',
-                'controller' => 'Mautic\PointBundle\Controller\Api\TriggerApiController::deletePointTriggerEventsAction',
-                'method'     => 'DELETE',
-            ],
-            'mautic_api_adjustcontactpoints' => [
-                'path'       => '/contacts/{leadId}/points/{operator}/{delta}',
-                'controller' => 'Mautic\PointBundle\Controller\Api\PointApiController::adjustPointsAction',
-                'method'     => 'POST',
-            ],
             'mautic_api_pointgroupsstandard' => [
                 'standard_entity' => true,
                 'name'            => 'pointGroups',
                 'path'            => '/points/groups',
                 'controller'      => Mautic\PointBundle\Controller\Api\PointGroupsApiController::class,
-            ],
-            'mautic_api_getcontactpointgroups' => [
-                'path'       => '/contacts/{contactId}/points/groups',
-                'controller' => 'Mautic\PointBundle\Controller\Api\PointGroupsApiController::getContactPointGroupsAction',
-            ],
-            'mautic_api_getcontactpointgroup' => [
-                'path'       => '/contacts/{contactId}/points/groups/{groupId}',
-                'controller' => 'Mautic\PointBundle\Controller\Api\PointGroupsApiController::getContactPointGroupAction',
-            ],
-            'mautic_api_adjustcontactgrouppoints' => [
-                'path'       => '/contacts/{contactId}/points/groups/{groupId}/{operator}/{value}',
-                'controller' => 'Mautic\PointBundle\Controller\Api\PointGroupsApiController::adjustGroupPointsAction',
-                'method'     => 'POST',
             ],
             'mautic_api_pointinsightsstandard' => [
                 'standard_entity' => true,

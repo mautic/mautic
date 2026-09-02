@@ -20,6 +20,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -57,6 +58,13 @@ final class SubmissionApiController extends CommonApiController
      *
      * @param int $formId
      */
+    #[Route(
+        '/api/forms/{formId}/submissions',
+        name: 'mautic_api_formresults',
+        requirements: ['formId' => '\d+'],
+        defaults: ['_format' => 'json'],
+        methods: ['GET']
+    )]
     public function getEntitiesAction(Request $request, UserHelper $userHelper, $formId = null): Response
     {
         $form = $this->getFormOrResponseWithError($formId);
@@ -83,6 +91,13 @@ final class SubmissionApiController extends CommonApiController
      * @param int $formId
      * @param int $contactId
      */
+    #[Route(
+        '/api/forms/{formId}/submissions/contact/{contactId}',
+        name: 'mautic_api_contactformresults',
+        requirements: ['formId' => '\d+', 'contactId' => '\d+'],
+        defaults: ['_format' => 'json'],
+        methods: ['GET']
+    )]
     public function getEntitiesForContactAction(Request $request, UserHelper $userHelper, $formId, $contactId): Response
     {
         $filter = [
@@ -105,6 +120,13 @@ final class SubmissionApiController extends CommonApiController
     /**
      * Obtains a specific entity as defined by the API URL.
      */
+    #[Route(
+        '/api/forms/{formId}/submissions/{submissionId}',
+        name: 'mautic_api_formresult',
+        requirements: ['formId' => '\d+', 'submissionId' => '\d+'],
+        defaults: ['_format' => 'json'],
+        methods: ['GET']
+    )]
     public function getEntityAction(Request $request, $formId = null, $submissionId = null): Response
     {
         $form = $this->getFormOrResponseWithError($formId);

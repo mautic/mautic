@@ -12,15 +12,6 @@ return [
                 'controller'      => Mautic\PageBundle\Controller\Api\PageApiController::class,
             ],
         ],
-        'catchall' => [
-            'mautic_page_public' => [
-                'path'         => '/{slug}',
-                'controller'   => 'Mautic\PageBundle\Controller\PublicController::indexAction',
-                'requirements' => [
-                    'slug' => '^(?!(_(profiler|wdt)|css|images|js|favicon.ico|apps/bundles/|plugins/)).+',
-                ],
-            ],
-        ],
     ],
 
     'menu' => [
