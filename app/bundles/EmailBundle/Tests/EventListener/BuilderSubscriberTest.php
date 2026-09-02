@@ -228,7 +228,7 @@ final class BuilderSubscriberTest extends TestCase
         $event = new EmailSendEvent(null, $args);
 
         $unsubscribeTokenizedText = '{contactfield=companyname} {contactfield=lastname}';
-        $matcher                  = $this->exactly(5);
+        $matcher                  = $this->exactly(6);
 
         $this->coreParametersHelper->expects($matcher)
             ->method('get')->willReturnCallback(function (...$parameters) use ($matcher, $unsubscribeTokenizedText) {
@@ -238,21 +238,26 @@ final class BuilderSubscriberTest extends TestCase
                     return $unsubscribeTokenizedText;
                 }
                 if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame('validate_unsubscribe_emails', $parameters[0]);
+
+                    return false;
+                }
+                if (3 === $matcher->numberOfInvocations()) {
                     $this->assertSame('webview_text', $parameters[0]);
 
                     return 'Just a text';
                 }
-                if (3 === $matcher->numberOfInvocations()) {
+                if (4 === $matcher->numberOfInvocations()) {
                     $this->assertSame('default_signature_text', $parameters[0]);
 
                     return 'Signature';
                 }
-                if (4 === $matcher->numberOfInvocations()) {
+                if (5 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mailer_from_name', $parameters[0]);
 
                     return 'jan.kozak@acquia.com';
                 }
-                if (5 === $matcher->numberOfInvocations()) {
+                if (6 === $matcher->numberOfInvocations()) {
                     $this->assertSame('brand_name', $parameters[0]);
 
                     return 'ACME';
@@ -295,17 +300,18 @@ final class BuilderSubscriberTest extends TestCase
         $unsubscribeTokenizedText = '<a href="|URL|">Unsubscribe</a> {contactfield=companyname} {contactfield=lastname}';
 
         $callCount         = 0;
-        $expectedKeys      = ['secret_key', 'unsubscribe_text', 'webview_text', 'default_signature_text', 'mailer_from_name', 'brand_name'];
+        $expectedKeys      = ['secret_key', 'unsubscribe_text', 'validate_unsubscribe_emails', 'webview_text', 'default_signature_text', 'mailer_from_name', 'brand_name'];
         $expectedResponses = [
             'secret',
             $unsubscribeTokenizedText,
+            true,
             'Just a text',
             'Signature',
             'jan.kozak@acquia.com',
             'ACME',
         ];
         $this->coreParametersHelper->method('get')
-            ->willReturnCallback(function ($key) use (&$callCount, $expectedKeys, $expectedResponses): ?string {
+            ->willReturnCallback(function ($key) use (&$callCount, $expectedKeys, $expectedResponses): string|bool|null {
                 if ($callCount < count($expectedKeys)) {
                     $this->assertSame($expectedKeys[$callCount], $key);
                 }
@@ -351,13 +357,20 @@ final class BuilderSubscriberTest extends TestCase
         ];
         $event = new EmailSendEvent(null, $args);
 
-        $this->coreParametersHelperMock
+        $this->coreParametersHelper
             ->method('get')
-            ->withConsecutive(['secret_key'], ['unsubscribe_text'], ['validate_unsubscribe_emails'], ['webview_text'], ['default_signature_text'], ['mailer_from_name'])
-            ->willReturnOnConsecutiveCalls('secret', null, false, null, null, null);
+            ->willReturnCallback(fn (string $key): mixed => match ($key) {
+                'secret_key'                  => 'secret',
+                'unsubscribe_text'            => null,
+                'validate_unsubscribe_emails' => false,
+                'webview_text'                => null,
+                'default_signature_text'      => null,
+                'mailer_from_name'            => null,
+                default                       => null,
+            });
 
         $emailHash = hash_hmac('sha256', 'test@example.com', 'secret');
-        $this->emailModelMock
+        $this->emailModel
             ->method('buildUrl')
             ->willReturnCallback(static function (string $route, array $parameters): string {
                 if ('mautic_email_unsubscribe' === $route) {
@@ -375,7 +388,7 @@ final class BuilderSubscriberTest extends TestCase
                 return '/';
             });
 
-        $this->translatorMock
+        $this->translator
             ->method('trans')
             ->willReturnCallback(static function (string $id, array $parameters = []): string {
                 if ('mautic.email.unsubscribe.text' === $id) {

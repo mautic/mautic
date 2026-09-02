@@ -65,7 +65,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
             $this->configParams['show_contact_segments'] = 1;
         }
 
-        switch ($this->getName()) {
+        switch ($this->name()) {
             case 'testResubscribeSuccessMessageContainsDirectUnsubscribeLinkWhenValidationDisabled':
             case 'testUnsubscribeSuccessMessageContainsDirectResubscribeLinkWhenValidationDisabled':
                 $this->configParams['validate_unsubscribe_emails'] = false;
@@ -1021,16 +1021,16 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
             '/email/resubscribe/'.$idHash.'/'.$email.'/'.$secretHash
         );
 
-        Assert::assertTrue($this->client->getResponse()->isOk());
-        Assert::assertStringContainsString(
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertStringContainsString(
             'has been re-subscribed',
             strip_tags((string) $this->client->getResponse()->getContent())
         );
-        Assert::assertStringContainsString(
+        $this->assertStringContainsString(
             '/email/unsubscribe/'.$idHash.'/'.$email.'/'.$secretHash,
             (string) $this->client->getResponse()->getContent()
         );
-        Assert::assertStringNotContainsString(
+        $this->assertStringNotContainsString(
             '/email/validate/',
             (string) $this->client->getResponse()->getContent()
         );
@@ -1049,16 +1049,16 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
             '/email/unsubscribe/'.$idHash.'/'.$email.'/'.$secretHash
         );
 
-        Assert::assertTrue($this->client->getResponse()->isOk());
-        Assert::assertStringContainsString(
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertStringContainsString(
             'will no longer receive emails from us',
             strip_tags((string) $this->client->getResponse()->getContent())
         );
-        Assert::assertStringContainsString(
+        $this->assertStringContainsString(
             '/email/resubscribe/'.$idHash.'/'.$email.'/'.$secretHash,
             (string) $this->client->getResponse()->getContent()
         );
-        Assert::assertStringNotContainsString(
+        $this->assertStringNotContainsString(
             '/email/validate/',
             (string) $this->client->getResponse()->getContent()
         );

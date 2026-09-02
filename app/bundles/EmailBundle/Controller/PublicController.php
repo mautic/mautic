@@ -824,7 +824,7 @@ final class PublicController extends CommonFormController
             );
         }
 
-        $secretHash = $mailHash->getEmailHash($email);
+        $secretHash = $this->mailHashHelper->getEmailHash($email);
         if ($this->coreParametersHelper->get('validate_unsubscribe_emails')) {
             $resubscribeUrl = $this->generateUrl('mautic_email_validate_email_form', ['action' => 'resubscribe', 'secretHash' => $secretHash, 'idHash' => $idHash]);
         } else {
