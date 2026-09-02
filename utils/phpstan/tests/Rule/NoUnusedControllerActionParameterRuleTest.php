@@ -46,4 +46,9 @@ final class NoUnusedControllerActionParameterRuleTest extends RuleTestCase
     {
         $this->analyse([__DIR__.'/Fixture/SomeAutowireService.php'], []);
     }
+
+    public function testSkipControllerDispatchingActionsPositionally(): void
+    {
+        $this->analyse([__DIR__.'/Fixture/DynamicDispatchController.php'], []);
+    }
 }
