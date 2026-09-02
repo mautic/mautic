@@ -46,11 +46,6 @@ class EventModel extends FormModel
         return $this->eventRepository;
     }
 
-    public function getCampaignRepository(): CampaignRepository
-    {
-        return $this->campaignRepository;
-    }
-
     public function getLeadEventLogRepository(): LeadEventLogRepository
     {
         return $this->leadEventLogRepository;
