@@ -46,11 +46,6 @@ class EventModel extends FormModel
         return $this->eventRepository;
     }
 
-    public function getLeadEventLogRepository(): LeadEventLogRepository
-    {
-        return $this->leadEventLogRepository;
-    }
-
     public function getPermissionBase(): string
     {
         return 'campaign:campaigns';
