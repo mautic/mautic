@@ -555,11 +555,6 @@ class ImportModel extends FormModel
         return $this->importRepository;
     }
 
-    public function getEventLogRepository(): LeadEventLogRepository
-    {
-        return $this->leadEventLogRepository;
-    }
-
     public function getPermissionBase(): string
     {
         return 'lead:imports';
