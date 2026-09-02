@@ -245,11 +245,6 @@ class LeadModel extends FormModel
         return $this->leadCategoryRepository;
     }
 
-    public function getMergeRecordRepository(): MergeRecordRepository
-    {
-        return $this->mergeRecordRepository;
-    }
-
     public function getLeadListRepository(): LeadListRepository
     {
         return $this->leadListRepository;
