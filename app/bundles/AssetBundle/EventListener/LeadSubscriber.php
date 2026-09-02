@@ -87,7 +87,7 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
 
     public function onLeadChange(LeadChangeEvent $event): void
     {
-        $this->assetModel->getDownloadRepository()->updateLeadByTrackingId(
+        $this->downloadRepository->updateLeadByTrackingId(
             $event->getNewLead()->getId(),
             $event->getNewTrackingId(),
             $event->getOldTrackingId()
@@ -96,6 +96,6 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
 
     public function onLeadMerge(LeadMergeEvent $event): void
     {
-        $this->assetModel->getDownloadRepository()->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
+        $this->downloadRepository->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
     }
 }
