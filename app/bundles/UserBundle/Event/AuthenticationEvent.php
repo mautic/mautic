@@ -126,11 +126,6 @@ class AuthenticationEvent extends Event
         return $this->token->getUserIdentifier();
     }
 
-    public function getUserProvider(): UserProvider
-    {
-        return $this->userProvider;
-    }
-
     /**
      * Set if this user is successfully authenticated.
      *

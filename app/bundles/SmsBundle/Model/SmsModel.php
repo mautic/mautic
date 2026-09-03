@@ -81,11 +81,6 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         return $this->smsRepository;
     }
 
-    public function getStatRepository(): StatRepository
-    {
-        return $this->statRepository;
-    }
-
     public function getPermissionBase(): string
     {
         return 'sms:smses';
