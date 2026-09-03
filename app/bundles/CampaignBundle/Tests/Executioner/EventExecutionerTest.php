@@ -68,7 +68,7 @@ final class EventExecutionerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var OptimisticLockServiceInterface&MockObject
      */
-    private $optimisticLockService;
+    private MockObject $optimisticLockService;
 
     protected function setUp(): void
     {
