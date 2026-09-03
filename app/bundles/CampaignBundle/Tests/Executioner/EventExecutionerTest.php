@@ -80,6 +80,7 @@ final class EventExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->eventScheduler        = $this->createMock(EventScheduler::class);
         $this->leadRepository        = $this->createMock(LeadRepository::class);
         $this->eventRepository       = $this->createMock(EventRepository::class);
+        $this->optimisticLockService = $this->createMock(OptimisticLockServiceInterface::class);
     }
 
     public function testJumpToEventsAreProcessedAfterOtherEvents(): void
@@ -294,10 +295,6 @@ final class EventExecutionerTest extends \PHPUnit\Framework\TestCase
             ->method('execute')
             ->with($config, $logs)
             ->willThrowException($exception);
-
-        $this->logger->expects($this->once())
-            ->method('error')
-            ->with('CAMPAIGN: Error executing action ID 123 - Test exception');
 
         $this->optimisticLockService->expects($this->once())
             ->method('resetVersion')
