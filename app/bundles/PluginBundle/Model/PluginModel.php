@@ -53,7 +53,6 @@ class PluginModel extends FormModel
         return $this->pluginRepository;
     }
 
-
     public function getPermissionBase(): string
     {
         return 'plugin:plugins';

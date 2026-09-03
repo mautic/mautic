@@ -105,7 +105,6 @@ class FocusModel extends FormModel implements GlobalSearchInterface
         return $this->focusRepository;
     }
 
-
     /**
      * @param int|null $id
      */
