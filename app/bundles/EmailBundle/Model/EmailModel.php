@@ -149,6 +149,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
     public function getRepository(): EmailRepository
     {
+        $this->emailRepository->setDispatcher($this->dispatcher);
+
         return $this->emailRepository;
     }
 
