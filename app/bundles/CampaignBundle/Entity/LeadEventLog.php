@@ -141,6 +141,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
 
         $builder->createField('dateTriggered', 'datetime')
             ->columnName('date_triggered')
+            ->precision(3)
             ->nullable()
             ->build();
 

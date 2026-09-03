@@ -150,10 +150,12 @@ class Hit
 
         $builder->createField('dateHit', 'datetime')
             ->columnName('date_hit')
+            ->precision(3)
             ->build();
 
         $builder->createField('dateLeft', 'datetime')
             ->columnName('date_left')
+            ->precision(3)
             ->nullable()
             ->build();
 
