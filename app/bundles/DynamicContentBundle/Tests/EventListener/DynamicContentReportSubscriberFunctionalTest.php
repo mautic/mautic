@@ -33,6 +33,8 @@ final class DynamicContentReportSubscriberFunctionalTest extends MauticMysqlTest
             $this->markTestSkipped('Test skipped because ONLY_FULL_GROUP_BY is enabled in sql_mode.');
         }
         $this->setupTestEntities();
+
+        $this->dynamicContent = new DynamicContent();
     }
 
     /**
@@ -185,8 +187,8 @@ final class DynamicContentReportSubscriberFunctionalTest extends MauticMysqlTest
         $this->em->persist($this->contact);
         $this->em->flush();
 
-        $model = $this->getContainer()->get('mautic.dynamicContent.model.dynamicContent');
-        $this->assertInstanceOf(DynamicContentModel::class, $model);
+        $model = $this->getContainer()->get(DynamicContentModel::class);
+        \assert($model instanceof DynamicContentModel);
 
         // Create page stat
         $pageEvent = new PageDisplayEvent('text', $this->page);

@@ -32,7 +32,7 @@ final class DynamicContentHelperFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         /** @var DynamicContentHelper $dynamicContentHelper */
-        $dynamicContentHelper = self::getContainer()->get('mautic.helper.dynamicContent');
+        $dynamicContentHelper = self::getContainer()->get(DynamicContentHelper::class);
         $tokens               = $dynamicContentHelper->findDwcVariantsBySlotNames(['test_slot']);
 
         foreach ($tokens as $token) {

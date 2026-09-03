@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\DynamicContentBundle\Tests\Functional;
 
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use PHPUnit\Framework\Assert;
 
 trait DynamicContentReOrderingTrait
@@ -50,7 +51,8 @@ trait DynamicContentReOrderingTrait
             ->setSlotName($slotName)
             ->setDisplayOrder($order);
 
-        $model = self::getContainer()->get('mautic.dynamicContent.model.dynamicContent');
+        $model = $this->getContainer()->get(DynamicContentModel::class);
+        \assert($model instanceof DynamicContentModel);
         $model->saveEntity($dwc);
 
         return $dwc;
@@ -61,7 +63,7 @@ trait DynamicContentReOrderingTrait
      */
     private function assertDynamicContentOrder(string $slotName, array $expectedOrder): void
     {
-        $dwcRepo     = self::getContainer()->get('mautic.dynamicContent.model.dynamicContent')->getRepository();
+        $dwcRepo     = $this->getContainer()->get(DynamicContentModel::class)->getRepository();
         $dwcList     = $dwcRepo->getDynamicContentBySlotName($slotName);
         $actualOrder = array_column($dwcList, 'display_order', 'name');
         Assert::assertEquals($expectedOrder, $actualOrder, print_r($actualOrder, true));

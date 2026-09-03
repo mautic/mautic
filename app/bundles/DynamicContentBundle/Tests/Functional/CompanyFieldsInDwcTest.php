@@ -6,6 +6,7 @@ namespace Mautic\DynamicContentBundle\Tests\Functional;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
@@ -104,12 +105,13 @@ final class CompanyFieldsInDwcTest extends MauticMysqlTestCase
         $this->client->submit($form);
         $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
 
-        $email = $this->getMailerMessages()[0]->getHtmlBody();
+        $email = self::getMailerMessage(0);
+        $this->assertInstanceOf(MauticMessage::class, $email);
 
         if ($shouldMatch) {
-            $this->assertStringContainsString($dynamicContent->getContent(), (string) $email);
+            $this->assertStringContainsString($dynamicContent->getContent(), (string) $email->getHtmlBody());
         } else {
-            $this->assertStringNotContainsString($dynamicContent->getContent(), (string) $email);
+            $this->assertStringNotContainsString($dynamicContent->getContent(), (string) $email->getHtmlBody());
         }
     }
 

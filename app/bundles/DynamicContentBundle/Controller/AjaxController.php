@@ -7,9 +7,10 @@ namespace Mautic\DynamicContentBundle\Controller;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Entity\DynamicContentRepository;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
+use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -18,21 +19,21 @@ final class AjaxController extends CommonAjaxController
 {
     use AjaxLookupControllerTrait;
     private DynamicContentRepository $dynamicContentRepository;
+    private DynamicContentModel $dynamicContentModel;
 
     #[Required]
     public function autowireDynamicContentAjaxController(
         DynamicContentRepository $dynamicContentRepository,
+        DynamicContentModel $dynamicContentModel,
     ): void {
         $this->dynamicContentRepository = $dynamicContentRepository;
+        $this->dynamicContentModel      = $dynamicContentModel;
     }
 
     public function slotNameListAction(Request $request): JsonResponse
     {
-        $filter    = InputHelper::clean($request->query->get('filter'));
-
-        /** @var DynamicContentModel $model */
-        $model     = $this->getModel(DynamicContent::class);
-        $results   = $model->getLookupResults('slot_name', $filter, 10);
+        $filter  = InputHelper::clean($request->query->get('filter'));
+        $results = $this->dynamicContentModel->getLookupResults('slot_name', $filter, 10);
 
         return $this->sendJsonResponse($results);
     }
@@ -92,5 +93,29 @@ final class AjaxController extends CommonAjaxController
         }
 
         return $this->sendJsonResponse(['display_orders' => $displayOrderArray]);
+    }
+
+    /**
+     * Called by parent::getBuilderTokensAction().
+     *
+     * @return mixed[]
+     */
+    protected function getBuilderTokens(mixed $query): array
+    {
+        $pageToken  = $this->getTokens('page');
+        $emailToken = $this->getTokens('email');
+
+        return ['tokens' => array_merge($pageToken['tokens'] ?? [], $emailToken['tokens'] ?? [])];
+    }
+
+    /**
+     * @return mixed[]
+     */
+    private function getTokens(string $modelName): array
+    {
+        /** @var PageModel|EmailModel $model */
+        $model = $this->getModel($modelName);
+
+        return $model->getBuilderComponents(null, ['tokens']);
     }
 }

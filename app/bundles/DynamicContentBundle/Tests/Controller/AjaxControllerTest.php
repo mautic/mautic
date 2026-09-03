@@ -40,8 +40,8 @@ final class AjaxControllerTest extends MauticMysqlTestCase
             ->setDisplayOrder(1)
             ->setFilters($filters);
 
-        $model = self::getContainer()->get('mautic.dynamicContent.model.dynamicContent');
-        $model->saveEntity($dwc);
+        $this->em->persist($dwc);
+        $this->em->flush();
     }
 
     public function testSlotNameListAction(): void
