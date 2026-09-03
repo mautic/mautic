@@ -120,7 +120,7 @@ class DynamicContentHelper
      *
      * @return string
      */
-    public function getRealDynamicContent($slot, Lead|array|null $lead, DynamicContent $dwc)
+    public function getRealDynamicContent(Lead|array|null $lead, DynamicContent $dwc, PageDisplayEvent|EmailSendEvent|null $event = null)
     {
         $content = $dwc->getContent() ?? '';
         // Determine a translation based on contact's preferred locale

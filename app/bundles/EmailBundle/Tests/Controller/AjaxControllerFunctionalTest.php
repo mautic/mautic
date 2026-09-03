@@ -436,7 +436,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         }
     }
 
-    public function testGetBuilderTokensAction(): void
+    public function testGetBuilderTokensAjaxAction(): void
     {
         $this->createDwcTokens();
 

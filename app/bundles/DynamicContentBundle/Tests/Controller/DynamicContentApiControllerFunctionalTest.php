@@ -12,6 +12,7 @@ use Mautic\DynamicContentBundle\Entity\DynamicContentLeadData;
 use Mautic\DynamicContentBundle\Tests\Functional\DynamicContentReOrderingTrait;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,7 +22,6 @@ use Symfony\Component\HttpFoundation\Response;
 #[RunTestsInSeparateProcesses]
 final class DynamicContentApiControllerFunctionalTest extends MauticMysqlTestCase
 {
-    use IsolatedTestTrait;
     use DynamicContentReOrderingTrait;
 
     public function testDwcGetEndpointForNoSlotNorContact(): void
@@ -63,7 +63,7 @@ final class DynamicContentApiControllerFunctionalTest extends MauticMysqlTestCas
 
         $this->client->request(Request::METHOD_GET, "/dwc/slot-a?ct={$ct}");
 
-        self::assertResponseIsSuccessful($this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
 
         $responseArray = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertSame('<some>content</some>', $responseArray['content']);
