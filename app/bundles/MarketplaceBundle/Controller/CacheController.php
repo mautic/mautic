@@ -6,7 +6,6 @@ namespace Mautic\MarketplaceBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
-use Mautic\MarketplaceBundle\Service\Allowlist;
 use Mautic\MarketplaceBundle\Service\Config;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -16,15 +15,10 @@ final class CacheController extends CommonController
 {
     private Config $config;
 
-    private Allowlist $allowlist;
-
     #[Required]
-    public function autowireCacheController(
-        Config $config,
-        Allowlist $allowlist,
-    ): void {
-        $this->config    = $config;
-        $this->allowlist = $allowlist;
+    public function autowireCacheController(Config $config): void
+    {
+        $this->config = $config;
     }
 
     #[Route(
@@ -41,8 +35,6 @@ final class CacheController extends CommonController
         if (!$this->security->isGranted(MarketplacePermissions::CAN_VIEW_PACKAGES)) {
             $this->throwAccessDenied();
         }
-
-        $this->allowlist->clearCache();
 
         return $this->forward(
             'Mautic\MarketplaceBundle\Controller\Package\ListController::listAction'

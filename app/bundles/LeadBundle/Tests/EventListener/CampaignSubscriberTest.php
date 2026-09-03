@@ -391,6 +391,82 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($event->wasConditionSatisfied());
     }
 
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function pageUrlFilterProvider(): iterable
+    {
+        yield 'plain text substring' => ['example.com'];
+        yield 'legacy wildcard'      => ['*example.com*'];
+    }
+
+    #[DataProvider('pageUrlFilterProvider')]
+    public function testOnCampaignTriggerConditionLeadPageUrlHitMatchesUrlFilter(string $pageUrlFilter): void
+    {
+        $lead = new Lead();
+        $lead->setId(99);
+
+        $this->mockLeadModel->expects($this->once())
+            ->method('getEngagements')
+            ->willReturn($this->createPageHitTimeline('https://example.com/hello'));
+
+        $event = new CampaignExecutionEvent($this->createPageHitEventArgs($lead, $pageUrlFilter), true);
+        $this->subscriber->onCampaignTriggerCondition($event);
+        $this->assertTrue($event->getResult());
+    }
+
+    /**
+     * @return array<int, array<string, array<int, array<string, mixed>>>>
+     */
+    private function createPageHitTimeline(string $url): array
+    {
+        return [
+            0 => [
+                'events' => [
+                    0 => [
+                        'event'     => 'page.hit',
+                        'eventId'   => '5',
+                        'eventType' => 'Page hit',
+                        'timestamp' => new \DateTime('2022-06-08 12:45:22.0'),
+                        'contactId' => '1',
+                        'details'   => [
+                            'hit' => [
+                                'hitId'    => '5',
+                                'page_id'  => '',
+                                'dateHit'  => new \DateTime('2022-06-08 12:45:22.0'),
+                                'dateLeft' => new \DateTime('2022-06-08 12:50:42.0'),
+                                'url'      => $url,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function createPageHitEventArgs(Lead $lead, string $pageUrlFilter): array
+    {
+        return [
+            'lead'  => $lead,
+            'event' => [
+                'type'       => 'lead.pageHit',
+                'properties' => [
+                    'startDate'         => '',
+                    'endDate'           => '',
+                    'page'              => '',
+                    'page_url'          => $pageUrlFilter,
+                    'accumulative_time' => '',
+                ],
+            ],
+            'eventDetails'    => [],
+            'systemTriggered' => true,
+            'eventSettings'   => [],
+        ];
+    }
+
     public function testOnCampaignTriggerActionUpdateLead(): void
     {
         $eventAccessor = $this->createStub(ActionAccessor::class);

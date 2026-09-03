@@ -7,6 +7,7 @@ namespace Mautic\LeadBundle\Tests\Model;
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Test\ReflectionHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Deduplicate\CompanyDeduper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -76,6 +77,22 @@ final class CompanyModelTest extends \PHPUnit\Framework\TestCase
         ReflectionHelper::setValue($companyModel, 'companyDeduper', $companyDeduper);
         $duplicatedCompany->expects($this->once())->method('addUpdatedField');
         $companyModel->importCompany([], [], null, false, false);
+    }
+
+    public function testImportCompanyThrowsExceptionWhenCreateNewIsFalseAndCompanyNotFound(): void
+    {
+        $companyModel = $this->getCompanyModelForImport();
+
+        $companyDeduper = $this->createMock(CompanyDeduper::class);
+        $companyDeduper->method('checkForDuplicateCompanies')->willReturn([]);
+        ReflectionHelper::setValue($companyModel, 'companyDeduper', $companyDeduper);
+
+        $translator = $this->createMock(Translator::class);
+        $translator->method('trans')->willReturn('mautic.lead.import.creating_companies_disabled');
+        ReflectionHelper::setValue($companyModel, 'translator', $translator);
+
+        $this->expectException(\Exception::class);
+        $companyModel->importCompany([], [], null, false, false, false);
     }
 
     public function testImportHtmlFieldsForCompany(): void

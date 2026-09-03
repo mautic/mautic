@@ -24,6 +24,7 @@ use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\Exception\ValidationException;
 use Mautic\FormBundle\Helper\FormFieldHelper;
+use Mautic\FormBundle\Helper\FormSearchScopeProvider;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -76,7 +77,7 @@ class FormController extends CommonFormController
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, FormSearchScopeProvider $formSearchScopeProvider, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -151,8 +152,9 @@ class FormController extends CommonFormController
         return $this->delegateView(
             [
                 'viewParameters'  => [
-                    'searchValue' => $search,
-                    'items'       => $forms,
+                    'searchValue'     => $search,
+                    'searchScopes'    => $formSearchScopeProvider->getScopes(),
+                    'items'           => $forms,
                     'totalItems'  => $count,
                     'page'        => $page,
                     'limit'       => $limit,

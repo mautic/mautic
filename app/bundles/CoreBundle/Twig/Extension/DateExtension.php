@@ -52,11 +52,9 @@ final readonly class DateExtension
      * Returns date and time concat eg 2014-08-02 5:00am.
      *
      * @param \DateTime|string $datetime
-     *
-     * @return string
      */
     #[AsTwigFunction(name: 'dateToFullConcat', isSafe: ['all'])]
-    public function toFullConcat($datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s')
+    public function toFullConcat($datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s'): string
     {
         return $this->dateHelper->toFullConcat($datetime, $timezone, $fromFormat);
     }
@@ -65,11 +63,9 @@ final readonly class DateExtension
      * Returns date only e.g. 2014-08-09.
      *
      * @param \DateTime|string $datetime
-     *
-     * @return string
      */
     #[AsTwigFunction(name: 'dateToDate', isSafe: ['all'])]
-    public function toDate($datetime, string $timezone = 'local', string $fromFormat = 'Y-m-d H:i:s')
+    public function toDate($datetime, string $timezone = 'local', string $fromFormat = 'Y-m-d H:i:s'): string
     {
         return $this->dateHelper->toDate($datetime, $timezone, $fromFormat);
     }

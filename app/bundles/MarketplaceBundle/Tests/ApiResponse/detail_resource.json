@@ -1,0 +1,59 @@
+{
+    "package": {
+        "name": "vukovicpredrag\/mautic-test-campaign-template",
+        "description": "Simple welcome drip campaign for testing the Mautic Marketplace",
+        "time": "2026-03-10T15:33:00+00:00",
+        "maintainers": [
+            {
+                "name": "predragv",
+                "avatar_url": "https:\/\/www.gravatar.com\/avatar\/placeholder?d=identicon"
+            }
+        ],
+        "versions": {
+            "v1.0.0": {
+                "name": "vukovicpredrag\/mautic-test-campaign-template",
+                "description": "Simple welcome drip campaign for testing the Mautic Marketplace",
+                "keywords": [],
+                "homepage": "",
+                "version": "v1.0.0",
+                "version_normalized": "1.0.0.0",
+                "license": [
+                    "GPL-3.0-only"
+                ],
+                "source": {
+                    "type": "git",
+                    "url": "https:\/\/github.com\/vukovicpredrag\/mautic-test-campaign-template.git",
+                    "reference": "abc123"
+                },
+                "dist": {
+                    "type": "zip",
+                    "url": "https:\/\/api.github.com\/repos\/vukovicpredrag\/mautic-test-campaign-template\/zipball\/abc123",
+                    "reference": "abc123",
+                    "shasum": ""
+                },
+                "type": "mautic-resource",
+                "support": {
+                    "source": "https:\/\/github.com\/vukovicpredrag\/mautic-test-campaign-template\/tree\/v1.0.0",
+                    "issues": "https:\/\/github.com\/vukovicpredrag\/mautic-test-campaign-template\/issues"
+                },
+                "time": "2026-03-10T15:33:00+00:00"
+            }
+        },
+        "type": "mautic-resource",
+        "repository": "https:\/\/github.com\/vukovicpredrag\/mautic-test-campaign-template",
+        "github_stars": 0,
+        "github_watchers": 0,
+        "github_forks": 0,
+        "github_open_issues": 0,
+        "language": "JSON",
+        "dependents": 0,
+        "suggesters": 0,
+        "downloads": {
+            "total": 0,
+            "monthly": 0,
+            "daily": 0
+        },
+        "favers": 0,
+        "reviews": {}
+    }
+}

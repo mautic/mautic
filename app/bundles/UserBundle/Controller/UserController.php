@@ -19,6 +19,7 @@ use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Form\Type\ContactType;
 use Mautic\UserBundle\Form\Type\UserInviteType;
+use Mautic\UserBundle\Helper\UserSearchScopeProvider;
 use Mautic\UserBundle\Model\RoleModel;
 use Mautic\UserBundle\Model\UserModel;
 use Mautic\UserBundle\Security\SAML\Helper as SAMLHelper;
@@ -73,7 +74,7 @@ final class UserController extends FormController
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): JsonResponse|Response
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, UserSearchScopeProvider $userSearchScopeProvider, int $page = 1): JsonResponse|Response
     {
         if (!$this->security->isGranted('user:users:view')) {
             $this->throwAccessDenied();
@@ -135,9 +136,10 @@ final class UserController extends FormController
 
         return $this->delegateView([
             'viewParameters'  => [
-                'items'         => $users,
-                'searchValue'   => $search,
-                'page'          => $page,
+                'items'           => $users,
+                'searchValue'     => $search,
+                'searchScopes'    => $userSearchScopeProvider->getScopes(),
+                'page'            => $page,
                 'limit'         => $limit,
                 'tmpl'          => $tmpl,
                 'currentUserId' => $currentUserId,

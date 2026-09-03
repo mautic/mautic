@@ -818,11 +818,7 @@ class Event implements ChannelInterface, UuidInterface
 
     public function setTriggerDate(mixed $triggerDate = 'now'): void
     {
-        if (is_array($triggerDate) && array_key_exists('date', $triggerDate)) {
-            $triggerDate = new \DateTime($triggerDate['date']);
-        } elseif (is_string($triggerDate)) {
-            $triggerDate = new \DateTime($triggerDate);
-        }
+        $triggerDate = $this->convertToDateTime($triggerDate);
 
         $this->isChanged('triggerDate', $triggerDate);
         $this->triggerDate = $triggerDate;
@@ -1139,11 +1135,25 @@ class Event implements ChannelInterface, UuidInterface
     private function convertToDateTime(mixed $triggerDate): mixed
     {
         if (empty($triggerDate)) {
-            $triggerDate = null;
-        } elseif (is_array($triggerDate) && array_key_exists('date', $triggerDate)) {
-            $triggerDate = new \DateTime($triggerDate['date']);
-        } elseif (is_string($triggerDate)) {
-            $triggerDate = new \DateTime($triggerDate);
+            return null;
+        }
+
+        if ($triggerDate instanceof \DateTimeInterface) {
+            return $triggerDate instanceof \DateTimeImmutable
+                ? \DateTime::createFromInterface($triggerDate)
+                : clone $triggerDate;
+        }
+
+        if (is_array($triggerDate) && array_key_exists('date', $triggerDate)) {
+            $timezone = !empty($triggerDate['timezone'])
+                ? new \DateTimeZone($triggerDate['timezone'])
+                : null;
+
+            return new \DateTime($triggerDate['date'], $timezone);
+        }
+
+        if (is_string($triggerDate)) {
+            return new \DateTime($triggerDate);
         }
 
         return $triggerDate;

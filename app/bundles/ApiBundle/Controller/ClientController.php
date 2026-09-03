@@ -2,6 +2,7 @@
 
 namespace Mautic\ApiBundle\Controller;
 
+use Mautic\ApiBundle\Helper\ClientSearchScopeProvider;
 use Mautic\ApiBundle\Model\ClientModel;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
@@ -44,7 +45,7 @@ final class ClientController extends AbstractStandardFormController
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, ClientSearchScopeProvider $clientSearchScopeProvider, int $page = 1): Response
     {
         if (!$this->security->isGranted('api:clients:view')) {
             $this->throwAccessDenied();
@@ -107,17 +108,18 @@ final class ClientController extends AbstractStandardFormController
         return $this->delegateView(
             [
                 'viewParameters'  => [
-                    'items'       => $clients,
-                    'page'        => $page,
-                    'limit'       => $limit,
-                    'permissions' => [
+                    'items'           => $clients,
+                    'page'            => $page,
+                    'limit'           => $limit,
+                    'permissions'     => [
                         'create' => $this->security->isGranted('api:clients:create'),
                         'edit'   => $this->security->isGranted('api:clients:editother'),
                         'delete' => $this->security->isGranted('api:clients:deleteother'),
                     ],
-                    'tmpl'        => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
-                    'searchValue' => $filter,
-                    'filters'     => $filters,
+                    'tmpl'            => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                    'searchValue'     => $filter,
+                    'searchScopes'    => $clientSearchScopeProvider->getScopes(),
+                    'filters'         => $filters,
                 ],
                 'contentTemplate' => '@MauticApi/Client/list.html.twig',
                 'passthroughVars' => [

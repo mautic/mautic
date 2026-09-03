@@ -10,6 +10,7 @@ use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\EmailBundle\Helper\UrlMatcher;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
@@ -664,7 +665,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
 
                     if (!empty($url)) {
                         $pageUrl = html_entity_decode($pageHitUrl);
-                        if (fnmatch($url, $pageUrl)) {
+                        if (UrlMatcher::hasMatch([$url], $pageUrl)) {
                             if ($hit['dateLeft'] && $totalSpentTime) {
                                 $realTotalSpentTime = new \DateTime($hit['dateLeft']->format('Y-m-d H:i'))->getTimestamp() -
                                     new \DateTime($hit['dateHit']->format('Y-m-d H:i'))->getTimestamp();

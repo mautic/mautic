@@ -56,8 +56,9 @@ final class EventLoggerTest extends TestCase
             $logCollection->add($log);
         }
 
-        $this->leadEventLogRepository->expects($this->exactly(3))
-            ->method('saveEntities');
+        // upsert is called once per log (60 times total)
+        $this->leadEventLogRepository->expects($this->exactly(60))
+            ->method('upsert');
 
         $logger = $this->getLogger();
         foreach ($logCollection as $log) {

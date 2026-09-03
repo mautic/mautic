@@ -3,6 +3,7 @@
 namespace Mautic\ChannelBundle\Controller;
 
 use Mautic\ChannelBundle\Entity\Channel;
+use Mautic\ChannelBundle\Helper\MessageSearchScopeProvider;
 use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
@@ -19,6 +20,11 @@ use Symfony\Contracts\Service\Attribute\Required;
 final class MessageController extends AbstractStandardFormController
 {
     use EntityContactsTrait;
+
+    /**
+     * @var list<array{command: string, label: string, suffix?: string, default?: bool, translate?: bool}>|null
+     */
+    private ?array $indexSearchScopes = null;
 
     private RequestStack $requestStack;
 
@@ -71,8 +77,10 @@ final class MessageController extends AbstractStandardFormController
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function indexAction(Request $request, $page = 1): Response
+    public function indexAction(Request $request, MessageSearchScopeProvider $messageSearchScopeProvider, $page = 1): Response
     {
+        $this->indexSearchScopes = $messageSearchScopeProvider->getScopes();
+
         return $this->indexStandard($request, $page);
     }
 
@@ -105,6 +113,11 @@ final class MessageController extends AbstractStandardFormController
                     'listItemTemplate'  => '@MauticChannel/Message/list_item.html.twig',
                     'enableCloneButton' => true,
                 ];
+
+                if (null !== $this->indexSearchScopes) {
+                    $viewParameters['searchScopes'] = $this->indexSearchScopes;
+                    $this->indexSearchScopes        = null;
+                }
 
                 break;
             case 'view':

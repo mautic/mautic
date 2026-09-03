@@ -379,6 +379,19 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
         }
     }
 
+    public function testImportThrowsExceptionWhenCreateNewIsFalseAndContactNotFound(): void
+    {
+        $mockLeadModel = $this->createMockLeadModelStub();
+        $this->setupMockLeadModelForImport($mockLeadModel);
+        ReflectionHelper::setValue($mockLeadModel, 'translator', $this->translator);
+
+        $mockLeadModel->expects($this->never())->method('saveEntity');
+        $mockLeadModel->expects($this->once())->method('checkForDuplicateContact')->willReturn(new Lead());
+
+        $this->expectException(\Exception::class);
+        $mockLeadModel->import([], [], null, null, null, true, null, null, false, false);
+    }
+
     /**
      * Test that the Lead will be set to the LeadEventLog if the Lead save succeed.
      */
