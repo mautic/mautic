@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Utils\PHPStan\Rule;
 
-use Mautic\CoreBundle\CoreEvents;
 use PhpParser\Node;
 use PhpParser\Node\Expr\ClassConstFetch;
 use PhpParser\Node\Expr\MethodCall;
@@ -68,10 +67,6 @@ final class SingleArgumentDispatchRule implements Rule
         }
 
         if (!$secondArg->class instanceof Name) {
-            return [];
-        }
-
-        if (CoreEvents::class !== $secondArg->class->toString()) {
             return [];
         }
 
