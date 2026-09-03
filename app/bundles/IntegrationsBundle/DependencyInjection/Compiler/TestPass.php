@@ -14,7 +14,7 @@ final class TestPass implements CompilerPassInterface
     public function process(ContainerBuilder $container): void
     {
         $definition = $container->getDefinition('mautic.integrations.auth_provider.oauth2threelegged');
-        $definition->setFactory('\Mautic\IntegrationsBundle\Tests\Functional\Auth\Provider\Oauth2ThreeLegged\HttpFactory::factory');
+        $definition->setFactory([\Mautic\IntegrationsBundle\Tests\Functional\Auth\Provider\Oauth2ThreeLegged\HttpFactory::class, 'factory']);
         $definition->addArgument(new Reference(MockHandler::class));
     }
 }
