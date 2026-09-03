@@ -177,6 +177,7 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
                 $smsRepo,
                 $this->createStub(StatRepository::class),
                 $this->createStub(DoNotContactRepository::class),
+                $this->createStub(\Mautic\LeadBundle\Entity\LeadListRepository::class),
             ])
             ->onlyMethods(['getRepository', 'getStatRepository'])
             ->getMock();
