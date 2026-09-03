@@ -7069,6 +7069,18 @@ parameters:
 			path: app/bundles/LeadBundle/Segment/TableSchemaColumnsCache.php
 
 		-
+			message: '#^Method Mautic\\LeadBundle\\Tests\\Form\\Type\\FilterTraitStubFormType\:\:buildFiltersForm\(\) has parameter \$currentListId with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/bundles/LeadBundle/Tests/Form/Type/FilterTraitTest.php
+
+		-
+			message: '#^Method Mautic\\LeadBundle\\Tests\\Form\\Type\\FilterTraitStubFormType\:\:prepareRegex\(\) has parameter \$regex with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/bundles/LeadBundle/Tests/Form/Type/FilterTraitTest.php
+
+		-
 			message: '#^Property Mautic\\LeadBundle\\Tests\\StandardImportTestHelper\:\:\$csvPath has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
