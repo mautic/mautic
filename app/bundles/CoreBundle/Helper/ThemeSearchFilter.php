@@ -11,13 +11,18 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 final class ThemeSearchFilter
 {
+    public function __construct(
+        private readonly TranslatorInterface $translator,
+    ) {
+    }
+
     /**
      * @param array<string, array<string, mixed>> $themes
      * @param list<string>                        $scopeCommands
      *
      * @return array<string, array<string, mixed>>
      */
-    public function filter(array $themes, string $search, array $scopeCommands, TranslatorInterface $translator): array
+    public function filter(array $themes, string $search, array $scopeCommands): array
     {
         $search = trim($search);
         if ('' === $search) {
@@ -32,8 +37,8 @@ final class ThemeSearchFilter
             return $this->filterStandard($themes, $value);
         }
 
-        $featureCommand = $translator->trans('mautic.core.theme.searchcommand.feature');
-        $builderCommand = $translator->trans('mautic.core.theme.searchcommand.builder');
+        $featureCommand = $this->translator->trans('mautic.core.theme.searchcommand.feature');
+        $builderCommand = $this->translator->trans('mautic.core.theme.searchcommand.builder');
 
         if ($command === $featureCommand) {
             return $this->filterByFeature($themes, $value);

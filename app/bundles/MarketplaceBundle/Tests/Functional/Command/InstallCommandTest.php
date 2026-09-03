@@ -188,11 +188,9 @@ final class InstallCommandTest extends AbstractMauticTestCase
         $packageName = 'vukovicpredrag/mautic-test-campaign-template';
 
         $this->packageModel->method('getPackageDetail')
-            ->with($packageName)
             ->willReturn($this->getResourcePackageDetail());
 
         $this->resourceInstaller->method('install')
-            ->with($packageName, $this->anything())
             ->willReturn(['success' => true, 'summary' => [], 'errors' => []]);
 
         $command = new InstallCommand($this->composerHelper, $this->packageModel, $this->resourceInstaller, $this->userModel, $this->userRepository);
@@ -212,7 +210,6 @@ final class InstallCommandTest extends AbstractMauticTestCase
         $packageName = 'vukovicpredrag/mautic-test-campaign-template';
 
         $this->packageModel->method('getPackageDetail')
-            ->with($packageName)
             ->willReturn($this->getResourcePackageDetail());
 
         $command = new InstallCommand($this->composerHelper, $this->packageModel, $this->resourceInstaller, $this->userModel, $this->userRepository);
@@ -232,11 +229,9 @@ final class InstallCommandTest extends AbstractMauticTestCase
         $packageName = 'vukovicpredrag/mautic-test-campaign-template';
 
         $this->packageModel->method('getPackageDetail')
-            ->with($packageName)
             ->willReturn($this->getResourcePackageDetail());
 
         $this->resourceInstaller->method('install')
-            ->with($packageName, $this->anything())
             ->willReturn(['success' => false, 'summary' => [], 'errors' => ['Import failed']]);
 
         $command = new InstallCommand($this->composerHelper, $this->packageModel, $this->resourceInstaller, $this->userModel, $this->userRepository);

@@ -38,8 +38,6 @@ final class ClientRepository extends CommonRepository
     }
 
     /**
-     * @param object $filter
-     *
      * @return array{0: mixed, 1: array<string, mixed>}
      */
     protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q, \stdClass $filter): array

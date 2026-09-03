@@ -49,7 +49,7 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
         $this->dispatcher             = $this->createMock(EventDispatcherInterface::class);
 
         $pathsHelper->method('getImportCampaignsPath')->willReturn($importDir);
-        $pathsHelper->method('getSystemPath')->with('root')->willReturn($this->tmpRoot);
+        $pathsHelper->method('getSystemPath')->willReturn($this->tmpRoot);
         $pathsHelper->method('getTemporaryPath')->willReturn($this->tmpRoot.'/tmp');
         $pathsHelper->method('getMediaPath')->willReturn($this->tmpRoot.'/media');
 

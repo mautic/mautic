@@ -28,7 +28,6 @@ final class ThemeSearchFilterTest extends TestCase
     protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->filter     = new ThemeSearchFilter();
 
         $this->translator->method('trans')
             ->willReturnCallback(static fn (string $key): string => match ($key) {
@@ -36,6 +35,8 @@ final class ThemeSearchFilterTest extends TestCase
                 'mautic.core.theme.searchcommand.builder' => 'builder',
                 default => $key,
             });
+
+        $this->filter = new ThemeSearchFilter($this->translator);
 
         $this->scopeCommands = ['', 'feature', 'builder'];
 
@@ -63,7 +64,7 @@ final class ThemeSearchFilterTest extends TestCase
 
     public function testFilterStandardMatchesName(): void
     {
-        $result = $this->filter->filter($this->themes, 'aurora', $this->scopeCommands, $this->translator);
+        $result = $this->filter->filter($this->themes, 'aurora', $this->scopeCommands);
 
         $this->assertArrayHasKey('aurora', $result);
         $this->assertArrayNotHasKey('blank', $result);
@@ -71,7 +72,7 @@ final class ThemeSearchFilterTest extends TestCase
 
     public function testFilterByFeature(): void
     {
-        $result = $this->filter->filter($this->themes, 'feature:page', $this->scopeCommands, $this->translator);
+        $result = $this->filter->filter($this->themes, 'feature:page', $this->scopeCommands);
 
         $this->assertArrayHasKey('blank', $result);
         $this->assertArrayNotHasKey('aurora', $result);
@@ -79,7 +80,7 @@ final class ThemeSearchFilterTest extends TestCase
 
     public function testFilterByBuilder(): void
     {
-        $result = $this->filter->filter($this->themes, 'builder:grapesjsbuilder', $this->scopeCommands, $this->translator);
+        $result = $this->filter->filter($this->themes, 'builder:grapesjsbuilder', $this->scopeCommands);
 
         $this->assertArrayHasKey('blank', $result);
         $this->assertArrayNotHasKey('aurora', $result);

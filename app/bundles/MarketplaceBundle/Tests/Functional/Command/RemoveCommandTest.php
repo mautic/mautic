@@ -45,7 +45,6 @@ final class RemoveCommandTest extends AbstractMauticTestCase
             ->willReturn(['koco/mautic-recaptcha-bundle']);
 
         $this->packageModel->method('getPackageDetail')
-            ->with($this->packageName)
             ->willReturn($this->getPluginPackageDetail());
 
         $command = new RemoveCommand($composer, $this->logger, $this->packageModel, $this->resourceInstaller);
@@ -68,7 +67,6 @@ final class RemoveCommandTest extends AbstractMauticTestCase
             ->willReturn([]);
 
         $this->packageModel->method('getPackageDetail')
-            ->with($this->packageName)
             ->willReturn($this->getPluginPackageDetail());
 
         $command = new RemoveCommand($composer, $this->logger, $this->packageModel, $this->resourceInstaller);
@@ -91,7 +89,6 @@ final class RemoveCommandTest extends AbstractMauticTestCase
             ->willReturn(['koco/mautic-recaptcha-bundle']);
 
         $this->packageModel->method('getPackageDetail')
-            ->with($this->packageName)
             ->willReturn($this->getPluginPackageDetail());
 
         $command = new RemoveCommand($composer, $this->logger, $this->packageModel, $this->resourceInstaller);
@@ -111,11 +108,9 @@ final class RemoveCommandTest extends AbstractMauticTestCase
         $composer            = $this->createStub(ComposerHelper::class);
 
         $this->packageModel->method('getPackageDetail')
-            ->with($resourcePackageName)
             ->willReturn($this->getResourcePackageDetail());
 
         $this->resourceInstaller->method('isInstalled')
-            ->with($resourcePackageName)
             ->willReturn(true);
 
         $command = new RemoveCommand($composer, $this->logger, $this->packageModel, $this->resourceInstaller);
@@ -136,11 +131,9 @@ final class RemoveCommandTest extends AbstractMauticTestCase
         $composer            = $this->createStub(ComposerHelper::class);
 
         $this->packageModel->method('getPackageDetail')
-            ->with($resourcePackageName)
             ->willReturn($this->getResourcePackageDetail());
 
         $this->resourceInstaller->method('isInstalled')
-            ->with($resourcePackageName)
             ->willReturn(false);
 
         $command = new RemoveCommand($composer, $this->logger, $this->packageModel, $this->resourceInstaller);
@@ -161,15 +154,12 @@ final class RemoveCommandTest extends AbstractMauticTestCase
         $composer            = $this->createStub(ComposerHelper::class);
 
         $this->packageModel->method('getPackageDetail')
-            ->with($resourcePackageName)
             ->willReturn($this->getResourcePackageDetail());
 
         $this->resourceInstaller->method('isInstalled')
-            ->with($resourcePackageName)
             ->willReturn(true);
 
         $this->resourceInstaller->method('uninstall')
-            ->with($resourcePackageName)
             ->willThrowException(new \RuntimeException('Failed to delete entities'));
 
         $command = new RemoveCommand($composer, $this->logger, $this->packageModel, $this->resourceInstaller);
@@ -190,7 +180,6 @@ final class RemoveCommandTest extends AbstractMauticTestCase
         $composer    = $this->createStub(ComposerHelper::class);
 
         $this->packageModel->method('getPackageDetail')
-            ->with($packageName)
             ->willThrowException(new ApiException('Package not found', 404));
 
         $command = new RemoveCommand($composer, $this->logger, $this->packageModel, $this->resourceInstaller);

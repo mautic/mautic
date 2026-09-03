@@ -106,7 +106,7 @@ final class ThemeController extends FormController
         $searchScopes    = $themeSearchScopeProvider->getScopes();
         $scopeCommands   = array_column($searchScopes, 'command');
         $items           = $themeHelper->getInstalledThemes('all', true, true);
-        $items           = $themeSearchFilter->filter($items, $search, $scopeCommands, $this->translator);
+        $items           = $themeSearchFilter->filter($items, $search, $scopeCommands);
 
         $contentTemplate = ('list' === $tmpl)
             ? '@MauticCore/Theme/list_results.html.twig'

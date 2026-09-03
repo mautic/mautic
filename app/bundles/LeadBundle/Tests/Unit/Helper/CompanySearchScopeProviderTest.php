@@ -27,7 +27,6 @@ final class CompanySearchScopeProviderTest extends SearchScopeProviderTestCase
             });
 
         $fieldList->method('getFieldList')
-            ->with(false, true, ['isPublished' => true, 'object' => 'company'])
             ->willReturn([
                 'companyindustry' => 'Industry',
             ]);

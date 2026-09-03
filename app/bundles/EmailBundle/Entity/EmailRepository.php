@@ -635,12 +635,12 @@ class EmailRepository extends CommonRepository
                 );
             case $this->translator->trans('mautic.core.searchcommand.name'):
             case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
-                $expr            = $q->expr()->like('e.name', ":$unique");
+                $expr            = $queryBuilder->expr()->like('e.name', ":$unique");
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.email.email.searchcommand.subject'):
             case $this->translator->trans('mautic.email.email.searchcommand.subject', [], null, 'en_US'):
-                $expr            = $q->expr()->like('e.subject', ":$unique");
+                $expr            = $queryBuilder->expr()->like('e.subject', ":$unique");
                 $returnParameter = true;
                 break;
         }

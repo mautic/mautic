@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\PageBundle\Tests\EventListener;
 
-use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Event\DecisionEvent;
+use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Hit;
@@ -28,50 +31,50 @@ final class CampaignSubscriberTest extends TestCase
 
     public function testOnCampaignTriggerDecisionMatchesPlainTextUrlFilter(): void
     {
-        $event = $this->createCampaignExecutionEvent(
+        $event = $this->createDecisionEvent(
             $this->createHitMock('https://example.com/product/1234', null),
             ['url' => 'product/123']
         );
 
         $this->subscriber->onCampaignTriggerDecision($event);
 
-        $this->assertTrue($event->getResult());
+        $this->assertTrue($event->wasDecisionApplicable());
     }
 
     public function testOnCampaignTriggerDecisionMatchesLegacyWildcardRefererFilter(): void
     {
-        $event = $this->createCampaignExecutionEvent(
+        $event = $this->createDecisionEvent(
             $this->createHitMock('https://example.com/page', 'https://ref.example.com/source/123'),
             ['referer' => '*source/123*']
         );
 
         $this->subscriber->onCampaignTriggerDecision($event);
 
-        $this->assertTrue($event->getResult());
+        $this->assertTrue($event->wasDecisionApplicable());
     }
 
     public function testOnCampaignTriggerDecisionReturnsFalseWhenUrlDoesNotMatch(): void
     {
-        $event = $this->createCampaignExecutionEvent(
+        $event = $this->createDecisionEvent(
             $this->createHitMock('https://example.com/product/1234', null),
             ['url' => 'does-not-match']
         );
 
         $this->subscriber->onCampaignTriggerDecision($event);
 
-        $this->assertFalse($event->getResult());
+        $this->assertFalse($event->wasDecisionApplicable());
     }
 
     public function testOnCampaignTriggerDecisionMatchesCommaSeparatedUrlFilters(): void
     {
-        $event = $this->createCampaignExecutionEvent(
+        $event = $this->createDecisionEvent(
             $this->createHitMock('https://example.com/product/1234', null),
             ['url' => 'alpha,product/123,omega']
         );
 
         $this->subscriber->onCampaignTriggerDecision($event);
 
-        $this->assertTrue($event->getResult());
+        $this->assertTrue($event->wasDecisionApplicable());
     }
 
     private function createHitMock(string $url, ?string $referer): Hit&MockObject
@@ -87,15 +90,19 @@ final class CampaignSubscriberTest extends TestCase
     /**
      * @param array<string, string> $properties
      */
-    private function createCampaignExecutionEvent(Hit&MockObject $hit, array $properties): CampaignExecutionEvent
+    private function createDecisionEvent(Hit&MockObject $hit, array $properties): DecisionEvent
     {
-        // @phpstan-ignore-next-line (CampaignExecutionEvent is deprecated but needed for this test)
-        return new CampaignExecutionEvent([
-            'lead'            => null,
-            'event'           => ['type' => 'page.pagehit', 'parent' => [], 'properties' => $properties],
-            'eventDetails'    => $hit,
-            'systemTriggered' => true,
-            'eventSettings'   => [],
-        ], true);
+        $campaignEvent = new Event();
+        $campaignEvent->setType('page.pagehit');
+        $campaignEvent->setProperties($properties);
+
+        $log = $this->createStub(LeadEventLog::class);
+        $log->method('getEvent')->willReturn($campaignEvent);
+        $log->method('getLead')->willReturn(null);
+
+        $config = $this->createStub(DecisionAccessor::class);
+        $config->method('getConfig')->willReturn([]);
+
+        return new DecisionEvent($config, $log, $hit);
     }
 }

@@ -410,9 +410,22 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getEngagements')
             ->willReturn($this->createPageHitTimeline('https://example.com/hello'));
 
-        $event = new CampaignExecutionEvent($this->createPageHitEventArgs($lead, $pageUrlFilter), true);
+        $log = $this->createStub(LeadEventLog::class);
+        $log->method('getLead')->willReturn($lead);
+        $log->method('getEvent')->willReturn([
+            'type'       => 'lead.pageHit',
+            'properties' => [
+                'startDate'         => '',
+                'endDate'           => '',
+                'page'              => '',
+                'page_url'          => $pageUrlFilter,
+                'accumulative_time' => '',
+            ],
+        ]);
+
+        $event = new ConditionEvent($this->createStub(AbstractEventAccessor::class), $log);
         $this->subscriber->onCampaignTriggerCondition($event);
-        $this->assertTrue($event->getResult());
+        $this->assertTrue($event->wasConditionSatisfied());
     }
 
     /**
@@ -441,29 +454,6 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
                     ],
                 ],
             ],
-        ];
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function createPageHitEventArgs(Lead $lead, string $pageUrlFilter): array
-    {
-        return [
-            'lead'  => $lead,
-            'event' => [
-                'type'       => 'lead.pageHit',
-                'properties' => [
-                    'startDate'         => '',
-                    'endDate'           => '',
-                    'page'              => '',
-                    'page_url'          => $pageUrlFilter,
-                    'accumulative_time' => '',
-                ],
-            ],
-            'eventDetails'    => [],
-            'systemTriggered' => true,
-            'eventSettings'   => [],
         ];
     }
 
