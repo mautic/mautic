@@ -106,7 +106,7 @@ if (!isset($args['repackage'])) {
             continue;
         }
         $files = array_diff(scandir($path), ['..', '.']);
-        array_walk($files, function (&$item) use ($dir) { $item = 'media/'.$dir.'/'.$item; });
+        array_walk($files, function (string &$item) use ($dir): void { $item = 'media/'.$dir.'/'.$item; });
         $releaseFiles = array_merge($releaseFiles, $files);
     }
 
@@ -116,7 +116,7 @@ if (!isset($args['repackage'])) {
     $grapesJsDistDir = 'plugins/GrapesJsBuilderBundle/Assets/library/js/dist';
     if (is_dir(__DIR__.'/packaging/'.$grapesJsDistDir)) {
         $files = array_diff(scandir(__DIR__.'/packaging/'.$grapesJsDistDir), ['..', '.']);
-        array_walk($files, function (&$item) use ($grapesJsDistDir) { $item = $grapesJsDistDir.'/'.$item; });
+        array_walk($files, function (string &$item) use ($grapesJsDistDir): void { $item = $grapesJsDistDir.'/'.$item; });
         $releaseFiles = array_merge($releaseFiles, $files);
         foreach ($files as $file) {
             $modifiedFiles[$file] = true;
@@ -239,9 +239,7 @@ if (!isset($args['repackage'])) {
     if (0 === $result) {
         $deletedFiles = array_unique(array_merge(
             $deletedFiles,
-            array_filter($vendorDeletedFiles, function ($path) {
-                return str_starts_with($path, 'vendor/');
-            })
+            array_filter($vendorDeletedFiles, fn (string $path): bool => str_starts_with($path, 'vendor/'))
         ));
         sort($deletedFiles);
     }

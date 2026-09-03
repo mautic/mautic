@@ -1,0 +1,48 @@
+{#
+    This field relies on the `group.html.twig` implementation.
+#}
+{% set yesLabel = field.properties.yes is defined ? field.properties.yes : ('mautic.core.form.yes'|trans) %}
+{% set noLabel = field.properties.no is defined ? field.properties.no : ('mautic.core.form.no'|trans) %}
+
+{% set onlyYesLabel = yesLabel is not empty and noLabel is empty %}
+{% set onlyNoLabel = noLabel is not empty and yesLabel is empty %}
+
+{% set list = {} %}
+{% if onlyYesLabel %}
+    {% set list = [{'value': '1', 'label': yesLabel}] %}
+    {% set inputType = 'checkbox' %}
+    {% set isCheckboxMode = true %}
+{% elseif onlyNoLabel %}
+    {% set list = [{'value': '0', 'label': noLabel}] %}
+    {% set inputType = 'checkbox' %}
+    {% set isCheckboxMode = true %}
+{% else %}
+    {% if noLabel is not empty %}
+        {% set list = [{'value': '0', 'label': noLabel}] %}
+    {% endif %}
+    {% if yesLabel is not empty %}
+        {% if noLabel is not empty %}
+            {% set list = list|merge([{'value': '1', 'label': yesLabel}]) %}
+        {% else %}
+            {% set list = [{'value': '1', 'label': yesLabel}] %}
+        {% endif %}
+    {% endif %}
+    {% set inputType = 'radio' %}
+    {% set isCheckboxMode = false %}
+{% endif %}
+
+{% set isBooleanList = true %}
+
+{{- include([theme|default('') ~ 'group.html.twig', '@MauticForm/Field/group.html.twig'], {
+        'field': field,
+        'fields': fields|default([]),
+        'inForm': inForm|default(false),
+        'id': id,
+        'formId': formId|default(0),
+        'formName': formName|default(''),
+        'type': inputType,
+        'list': list,
+        'isBooleanList': isBooleanList,
+        'isCheckboxMode': isCheckboxMode|default(false),
+        'mappedFields': mappedFields|default([]),
+    }) -}}
