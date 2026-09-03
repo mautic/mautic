@@ -186,6 +186,8 @@ return function (ContainerConfigurator $configurator): void {
             service('mautic.helper.core_parameters'),
             service('mautic.cipher.openssl'),
         ]);
+    $services->alias('mautic.helper.encryption', Mautic\CoreBundle\Helper\EncryptionHelper::class)
+        ->deprecate('mautic/mautic', '7.2', 'The "%alias_id%" service alias is deprecated. Use the "'.Mautic\CoreBundle\Helper\EncryptionHelper::class.'" service instead.');
 
     $services->set('mautic.form.list.validator.circular', Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator::class)->tag('validator.constraint_validator');
     $services->alias(Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator::class, 'mautic.form.list.validator.circular');
@@ -336,4 +338,18 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.core.model.auditlog', Mautic\CoreBundle\Model\AuditLogModel::class);
     $services->alias('mautic.core.model.notification', Mautic\CoreBundle\Model\NotificationModel::class);
     $services->alias('mautic.core.model.form', Mautic\CoreBundle\Model\FormModel::class);
+
+    // Deprecated legacy string aliases kept for plugin BC. Use the FQCN services instead.
+    $services->alias('mautic.core.service.flashbag', Mautic\CoreBundle\Service\FlashBag::class)
+        ->deprecate('mautic/mautic', '7.2', 'The "%alias_id%" service alias is deprecated. Use the "'.Mautic\CoreBundle\Service\FlashBag::class.'" service instead.');
+    $services->alias('mautic.database.version.provider', Mautic\CoreBundle\Doctrine\Provider\VersionProvider::class)
+        ->deprecate('mautic/mautic', '7.2', 'The "%alias_id%" service alias is deprecated. Use the "'.Mautic\CoreBundle\Doctrine\Provider\VersionProvider::class.'" service instead.');
+    $services->alias('mautic.doctrine.loader.mautic_fixtures_loader', Mautic\CoreBundle\Doctrine\Loader\MauticFixturesLoader::class)
+        ->deprecate('mautic/mautic', '7.2', 'The "%alias_id%" service alias is deprecated. Use the "'.Mautic\CoreBundle\Doctrine\Loader\MauticFixturesLoader::class.'" service instead.');
+    $services->alias('mautic.generated.columns.provider', Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProvider::class)
+        ->deprecate('mautic/mautic', '7.2', 'The "%alias_id%" service alias is deprecated. Use the "'.Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProvider::class.'" service instead.');
+    $services->alias('mautic.helper.twig.menu', Mautic\CoreBundle\Twig\Helper\MenuHelper::class)
+        ->deprecate('mautic/mautic', '7.2', 'The "%alias_id%" service alias is deprecated. Use the "'.Mautic\CoreBundle\Twig\Helper\MenuHelper::class.'" service instead.');
+    $services->alias('mautic.route_loader', Mautic\CoreBundle\Loader\RouteLoader::class)
+        ->deprecate('mautic/mautic', '7.2', 'The "%alias_id%" service alias is deprecated. Use the "'.Mautic\CoreBundle\Loader\RouteLoader::class.'" service instead.');
 };

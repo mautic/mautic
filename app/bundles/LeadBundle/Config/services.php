@@ -236,5 +236,9 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.lead.field.settings.background_service', Mautic\LeadBundle\Field\BackgroundService::class);
     $services->alias('mautic.lead.report.dnc_report_service', Mautic\LeadBundle\Report\DncReportService::class);
     $services->alias('mautic.helper.segment.count.cache', Mautic\LeadBundle\Helper\SegmentCountCacheHelper::class);
+    $services->alias('mautic.lead.export_scheduled_notification_subscriber', Mautic\LeadBundle\EventListener\ContactExportSchedulerNotificationSubscriber::class)
+        ->deprecate('mautic/mautic', '7.2', 'The "%alias_id%" service alias is deprecated. Use the "'.Mautic\LeadBundle\EventListener\ContactExportSchedulerNotificationSubscriber::class.'" service instead.');
+    $services->alias('mautic.lead.segment.stat.chart.query.factory', Mautic\LeadBundle\Segment\Stat\SegmentChartQueryFactory::class)
+        ->deprecate('mautic/mautic', '7.2', 'The "%alias_id%" service alias is deprecated. Use the "'.Mautic\LeadBundle\Segment\Stat\SegmentChartQueryFactory::class.'" service instead.');
     $services->get(Mautic\LeadBundle\Validator\Constraints\SegmentDateValidator::class)->tag('validator.constraint_validator');
 };
