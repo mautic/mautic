@@ -32,9 +32,8 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
 
     public function onLeadDelete(LeadEvent $event): bool
     {
-        $lead                  = $event->getLead();
-        $integrationEntityRepo = $this->integrationEntityRepository;
-        $integrationEntityRepo->findLeadsToDelete('lead%', $lead->getId());
+        $lead = $event->getLead();
+        $this->integrationEntityRepository->findLeadsToDelete('lead%', $lead->getId());
 
         return false;
     }
@@ -42,9 +41,8 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
     public function onCompanyDelete(CompanyEvent $event): bool
     {
         /** @var \Mautic\LeadBundle\Entity\Company $company */
-        $company               = $event->getCompany();
-        $integrationEntityRepo = $this->integrationEntityRepository;
-        $integrationEntityRepo->findLeadsToDelete('company%', $company->getId());
+        $company = $event->getCompany();
+        $this->integrationEntityRepository->findLeadsToDelete('company%', $company->getId());
 
         return false;
     }
@@ -54,10 +52,9 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
     */
     public function onLeadSave(LeadEvent $event): void
     {
-        $lead                  = $event->getLead();
-        $integrationEntityRepo = $this->integrationEntityRepository;
+        $lead = $event->getLead();
         if ($this->isAnyIntegrationEnabled()) {
-            $integrationEntityRepo->updateErrorLeads('lead-error', $lead->getId());
+            $this->integrationEntityRepository->updateErrorLeads('lead-error', $lead->getId());
         }
     }
 

@@ -530,7 +530,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
         }
 
         if ($event->checkContext('lead.device')) {
-            $result = $this->validateContactDevice($event, $lead, $this->leadDeviceRepository);
+            $result = $this->validateContactDevice($event, $lead);
         } elseif ($event->checkContext('lead.tags')) {
             $result = $this->tagRepository->checkLeadByTags($lead, $event->getConfig()['tags']);
         } elseif ($event->checkContext('lead.segments')) {
@@ -836,13 +836,13 @@ final class CampaignSubscriber implements EventSubscriberInterface
      * device specified in the
      * CampaignExecutionEvent's settings.
      */
-    private function validateContactDevice(CampaignExecutionEvent $campaignExecutionEvent, Lead $contact, LeadDeviceRepository $leadDeviceRepository): bool // @phpstan-ignore parameter.deprecatedClass
+    private function validateContactDevice(CampaignExecutionEvent $campaignExecutionEvent, Lead $contact): bool
     {
         $campaignExecutionEventConfig = $campaignExecutionEvent->getConfig();
         $deviceType                   = empty($campaignExecutionEventConfig['device_type']) ? null : $campaignExecutionEventConfig['device_type'];
         $deviceBrands                 = empty($campaignExecutionEventConfig['device_brand']) ? null : $campaignExecutionEventConfig['device_brand'];
         $deviceOs                     = empty($campaignExecutionEventConfig['device_os']) ? null : $campaignExecutionEventConfig['device_os'];
 
-        return !empty($leadDeviceRepository->getDevice($contact, $deviceType, $deviceBrands, null, $deviceOs));
+        return !empty($this->leadDeviceRepository->getDevice($contact, $deviceType, $deviceBrands, null, $deviceOs));
     }
 }

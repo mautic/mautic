@@ -147,10 +147,6 @@ class PageModel extends FormModel implements GlobalSearchInterface
         return $this->pageRepository;
     }
 
-    public function getHitRepository(): HitRepository
-    {
-        return $this->hitRepository;
-    }
 
     public function getPermissionBase(): string
     {

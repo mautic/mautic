@@ -9,8 +9,9 @@ use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ChannelTimelineInterface;
+use Mautic\PageBundle\Entity\HitRepository;
+use Mautic\PageBundle\Entity\VideoHitRepository;
 use Mautic\PageBundle\Model\PageModel;
-use Mautic\PageBundle\Model\VideoModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -24,7 +25,8 @@ final class LeadSubscriber implements EventSubscriberInterface
      */
     public function __construct(
         private readonly PageModel $pageModel,
-        private readonly VideoModel $pageVideoModel,
+        private readonly HitRepository $hitRepository,
+        private readonly VideoHitRepository $videoHitRepository,
         private readonly TranslatorInterface $translator,
         private readonly RouterInterface $router,
         ModelFactory $modelFactory,
@@ -59,7 +61,7 @@ final class LeadSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $hits = $this->pageModel->getHitRepository()->getLeadHits(
+        $hits = $this->hitRepository->getLeadHits(
             $event->getLeadId(),
             $event->getQueryOptions()
         );
@@ -149,7 +151,7 @@ final class LeadSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $hits = $this->pageVideoModel->getHitRepository()->getTimelineStats(
+        $hits = $this->videoHitRepository->getTimelineStats(
             $event->getLeadId(),
             $event->getQueryOptions()
         );
@@ -181,7 +183,7 @@ final class LeadSubscriber implements EventSubscriberInterface
 
     public function onLeadChange(LeadChangeEvent $event): void
     {
-        $this->pageModel->getHitRepository()->updateLeadByTrackingId(
+        $this->hitRepository->updateLeadByTrackingId(
             $event->getNewLead()->getId(),
             $event->getNewTrackingId(),
             $event->getOldTrackingId()
@@ -190,12 +192,12 @@ final class LeadSubscriber implements EventSubscriberInterface
 
     public function onLeadMerge(LeadMergeEvent $event): void
     {
-        $this->pageModel->getHitRepository()->updateLead(
+        $this->hitRepository->updateLead(
             $event->getLoser()->getId(),
             $event->getVictor()->getId()
         );
 
-        $this->pageVideoModel->getHitRepository()->updateLead(
+        $this->videoHitRepository->updateLead(
             $event->getLoser()->getId(),
             $event->getVictor()->getId()
         );
