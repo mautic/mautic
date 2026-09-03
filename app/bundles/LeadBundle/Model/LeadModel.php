@@ -40,9 +40,7 @@ use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadCategory;
 use Mautic\LeadBundle\Entity\LeadCategoryRepository;
-use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Entity\LeadEventLog;
-use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
@@ -50,13 +48,11 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\MergeRecordRepository;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
-use Mautic\LeadBundle\Entity\PointsChangeLogRepository;
 use Mautic\LeadBundle\Entity\StagesChangeLog;
 use Mautic\LeadBundle\Entity\StagesChangeLogRepository;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
 use Mautic\LeadBundle\Entity\UtmTag;
-use Mautic\LeadBundle\Entity\UtmTagRepository;
 use Mautic\LeadBundle\Event\CategoryChangeEvent;
 use Mautic\LeadBundle\Event\DoNotContactAddEvent;
 use Mautic\LeadBundle\Event\DoNotContactRemoveEvent;
@@ -73,7 +69,6 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
-use Mautic\PointBundle\Entity\GroupContactScoreRepository;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Entity\StageRepository;
 use Mautic\UserBundle\Entity\User;
@@ -158,16 +153,11 @@ class LeadModel extends FormModel
         LoggerInterface $mauticLogger,
         private readonly LeadRepository $leadRepository,
         private readonly TagRepository $tagRepository,
-        private readonly PointsChangeLogRepository $pointsChangeLogRepository,
-        private readonly UtmTagRepository $utmTagRepository,
-        private readonly LeadDeviceRepository $leadDeviceRepository,
-        private readonly LeadEventLogRepository $leadEventLogRepository,
         private readonly FrequencyRuleRepository $frequencyRuleRepository,
         private readonly StagesChangeLogRepository $stagesChangeLogRepository,
         private readonly LeadCategoryRepository $leadCategoryRepository,
         private readonly MergeRecordRepository $mergeRecordRepository,
         private readonly LeadListRepository $leadListRepository,
-        private readonly GroupContactScoreRepository $groupContactScoreRepository,
         private readonly StageRepository $stageRepository,
         private readonly UserRepository $userRepository,
         private readonly CompanyLeadRepository $companyLeadRepository,

@@ -7,7 +7,6 @@ namespace Mautic\CampaignBundle\Tests;
 use Doctrine\ORM\EntityManager;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\EventRepository;
-use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Membership\MembershipBuilder;
@@ -90,7 +89,6 @@ abstract class CampaignTestAbstract extends TestCase
             $this->createStub(CampaignRepository::class), // $campaignRepository
             $this->createStub(EventRepository::class), // $eventRepository
             $this->createStub(LeadRepository::class), // $leadRepository
-            $this->createStub(LeadEventLogRepository::class), // $leadEventLogRepository
             $this->createStub(StatRepository::class), // $statRepository
             $formRepository, // $formRepository
         );
