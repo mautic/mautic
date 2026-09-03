@@ -134,7 +134,7 @@ final class CampaignSendWebhookFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request('POST', '/api/campaigns/new', $payload);
         $response = $this->client->getResponse();
-        $this->assertSame(201, $response->getStatusCode(), $response->getContent());
+        $this->assertSame(\Symfony\Component\HttpFoundation\Response::HTTP_CREATED, $response->getStatusCode(), (string) $response->getContent());
 
         $responseData = json_decode($response->getContent(), true);
         $campaignId   = $responseData['campaign']['id'];
@@ -229,7 +229,7 @@ final class CampaignSendWebhookFunctionalTest extends MauticMysqlTestCase
         $this->assertTrue($response->isOk(), $response->getContent());
 
         $responseData = json_decode($response->getContent(), true);
-        $this->assertSame(1, $responseData['success'], $response->getContent());
+        $this->assertSame(1, $responseData['success'], (string) $response->getContent());
 
         return $responseData;
     }

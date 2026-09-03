@@ -22,7 +22,7 @@ use Symfony\Component\Filesystem\Filesystem;
 
 final class ResourceInstallerTest extends AbstractMauticTestCase
 {
-    private const PACKAGE = 'vendor/pkg';
+    private const string PACKAGE = 'vendor/pkg';
 
     private MockObject&Connection $marketplaceConnection;
 
@@ -41,7 +41,7 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
         $this->tmpRoot   = sys_get_temp_dir().'/mautic_resource_installer_'.bin2hex(random_bytes(4));
         $importDir = $this->tmpRoot.'/import';
 
-        (new Filesystem())->mkdir([$this->tmpRoot, $this->tmpRoot.'/var']);
+        new Filesystem()->mkdir([$this->tmpRoot, $this->tmpRoot.'/var']);
 
         $this->marketplaceConnection  = $this->createMock(Connection::class);
         $this->httpClient             = $this->createMock(ClientInterface::class);
@@ -65,7 +65,7 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
 
     public function tearDown(): void
     {
-        (new Filesystem())->remove($this->tmpRoot);
+        new Filesystem()->remove($this->tmpRoot);
         parent::tearDown();
     }
 

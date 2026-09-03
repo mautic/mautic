@@ -66,13 +66,7 @@ final class ThemeSearchFilter
                     mb_strtolower((string) ($theme['config']['author'] ?? '')),
                 ];
 
-                foreach ($haystacks as $haystack) {
-                    if (str_contains($haystack, $value)) {
-                        return true;
-                    }
-                }
-
-                return false;
+                return array_any($haystacks, fn (string $haystack): bool => str_contains($haystack, $value));
             },
             ARRAY_FILTER_USE_BOTH
         );
@@ -98,13 +92,7 @@ final class ThemeSearchFilter
                     return false;
                 }
 
-                foreach ($features as $feature) {
-                    if ($value === mb_strtolower((string) $feature)) {
-                        return true;
-                    }
-                }
-
-                return false;
+                return array_any($features, fn ($feature): bool => $value === mb_strtolower((string) $feature));
             }
         );
     }
@@ -129,13 +117,7 @@ final class ThemeSearchFilter
                     return false;
                 }
 
-                foreach ($builders as $builder) {
-                    if ($value === mb_strtolower((string) $builder)) {
-                        return true;
-                    }
-                }
-
-                return false;
+                return array_any($builders, fn ($builder): bool => $value === mb_strtolower((string) $builder));
             }
         );
     }

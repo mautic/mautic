@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 final class SearchScopeHelperTest extends TestCase
 {
-    private const CONTACT_SCOPES = ['', 'firstname', 'lastname', 'email', 'country', 'ids'];
+    private const array CONTACT_SCOPES = ['', 'firstname', 'lastname', 'email', 'country', 'ids'];
 
     public function testParseReturnsStandardForUnscopedSearch(): void
     {

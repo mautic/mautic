@@ -572,7 +572,7 @@ class CommonRepository extends ServiceEntityRepository
         $alias ??= $this->getTableAlias();
 
         if ($setNowParameter) {
-            $now = (new DateTimeHelper(new \DateTime(), 'Y-m-d H:i:s', 'local'))->toUtcString();
+            $now = new DateTimeHelper(new \DateTime(), 'Y-m-d H:i:s', 'local')->toUtcString();
             $q->setParameter('now', $now);
         }
 
@@ -602,8 +602,6 @@ class CommonRepository extends ServiceEntityRepository
 
     /**
      * @deprecated use getPublishedByDateOrmExpression() or getPublishedByDateDbalExpression()
-     *
-     * @return Andx|CompositeExpression
      */
     public function getPublishedByDateExpression(
         QueryBuilder|DbalQueryBuilder $q,
@@ -611,7 +609,7 @@ class CommonRepository extends ServiceEntityRepository
         bool $setNowParameter = true,
         bool $setTrueParameter = true,
         bool $allowNullForPublishedUp = true,
-    ) {
+    ): Andx|CompositeExpression {
         if ($q instanceof QueryBuilder) {
             return $this->getPublishedByDateOrmExpression($q, $alias, $setNowParameter, $setTrueParameter, $allowNullForPublishedUp);
         }

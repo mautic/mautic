@@ -284,7 +284,7 @@ class CampaignController extends AbstractStandardFormController
             ? mb_substr($campaignName, 0, 57).'...'
             : $campaignName;
 
-        $description = (new PlainTextHelper(['width' => 0]))
+        $description = new PlainTextHelper(['width' => 0])
             ->setHtml($campaign->getDescription() ?: '')
             ->getText();
 
@@ -374,7 +374,7 @@ class CampaignController extends AbstractStandardFormController
             ]);
         }
 
-        $date           = (new \DateTimeImmutable())->format(DateTimeHelper::FORMAT_DB);
+        $date           = new \DateTimeImmutable()->format(DateTimeHelper::FORMAT_DB);
         $exportFileName = $this->translator->trans('mautic.campaign.campaign_export_file.name', ['%date%' => $date]);
         // Same archive as the publish flow, so the Download button also carries the
         // banner and gallery images attached in the form.

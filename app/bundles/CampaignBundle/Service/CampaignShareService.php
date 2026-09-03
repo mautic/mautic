@@ -17,13 +17,13 @@ final readonly class CampaignShareService
     // The marketplace copies the ZIP into its own storage on submit, so the file only
     // needs to be reachable for the short window between user clicking Publish on Mautic
     // and Submit on the marketplace publish page.
-    public const SHARE_TTL_SECONDS = 3600;
+    public const int SHARE_TTL_SECONDS = 3600;
 
-    public const SHARE_DIR = 'campaign_share';
+    public const string SHARE_DIR = 'campaign_share';
 
     // Uploaded banner/gallery images are parked here when the share form fails
     // validation, so a corrected re-submit doesn't force the user to pick them again.
-    public const PENDING_DIR = 'campaign_share/pending';
+    public const string PENDING_DIR = 'campaign_share/pending';
 
     public function __construct(
         private ExportHelper $exportHelper,

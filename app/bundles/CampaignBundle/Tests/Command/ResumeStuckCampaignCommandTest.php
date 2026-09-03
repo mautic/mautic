@@ -182,7 +182,7 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
 
         // Contact 8 - Not Stuck as event is added after first event is executed
         $l1 = $this->createEventLog($contact8, $rootEmail, $campaign, 1);
-        $l1->setDateTriggered((new \DateTime())->modify('-5 minutes'));
+        $l1->setDateTriggered(new \DateTime()->modify('-5 minutes'));
         $this->markEventLogAsCompleted($l1);
 
         $log = $this->createEventLog($contact8, $conditionEvent, $campaign, 1);
@@ -879,7 +879,7 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
         // Child event scheduled for future
         $scheduledLog = $this->createEventLog($contact, $childEvent, $campaign, 1);
         $scheduledLog->setIsScheduled(true);
-        $scheduledLog->setTriggerDate((new \DateTime())->modify('+1 day'));
+        $scheduledLog->setTriggerDate(new \DateTime()->modify('+1 day'));
 
         $this->em->flush();
 
@@ -921,7 +921,7 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
         $this->createEventLog($contact, $rootEvent, $campaign, 1);
         $scheduledLog = $this->createEventLog($contact, $childEvent, $campaign, 1);
         $scheduledLog->setIsScheduled(true);
-        $scheduledLog->setTriggerDate((new \DateTime())->modify('-1 day'));
+        $scheduledLog->setTriggerDate(new \DateTime()->modify('-1 day'));
 
         $this->em->flush();
 

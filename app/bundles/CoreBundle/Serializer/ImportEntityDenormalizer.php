@@ -25,7 +25,7 @@ final readonly class ImportEntityDenormalizer
      *
      * @var array<string, string>
      */
-    private const ALIASES = [
+    private const array ALIASES = [
         'lang'           => 'language',
         'form_attr'      => 'formAttributes',
         'container_attr' => 'containerAttributes',
@@ -42,7 +42,7 @@ final readonly class ImportEntityDenormalizer
      *
      * @var array<int, string>
      */
-    private const NOT_IMPORTABLE = [
+    private const array NOT_IMPORTABLE = [
         'unique_hits',
         'variant_hits',
         'column_is_not_created',

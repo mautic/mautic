@@ -172,7 +172,7 @@ final class SearchScopeHelper
     /**
      * Number of non-breaking spaces used to visually indent custom-field options.
      */
-    private const INDENT = "\u{00A0}\u{00A0}\u{00A0}\u{00A0}";
+    private const string INDENT = "\u{00A0}\u{00A0}\u{00A0}\u{00A0}";
 
     /**
      * Format a scope label for display in the dropdown (e.g. "is:published" -> "Is:Published").

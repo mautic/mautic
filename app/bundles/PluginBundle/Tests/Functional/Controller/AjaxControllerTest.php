@@ -55,7 +55,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         );
 
         $response = $this->client->getResponse();
-        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame(\Symfony\Component\HttpFoundation\Response::HTTP_OK, $response->getStatusCode(), (string) $response->getContent());
 
         $data = json_decode($response->getContent(), true);
         $this->assertSame(1, $data['success']);

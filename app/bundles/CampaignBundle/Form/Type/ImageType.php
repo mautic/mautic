@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Constraints\File;
  */
 final class ImageType extends AbstractType
 {
-    private const MIME_TYPES = ['image/png', 'image/jpeg', 'image/webp'];
+    private const array MIME_TYPES = ['image/png', 'image/jpeg', 'image/webp'];
 
     public function configureOptions(OptionsResolver $resolver): void
     {

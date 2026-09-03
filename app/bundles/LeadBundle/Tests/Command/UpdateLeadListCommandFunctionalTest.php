@@ -482,7 +482,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
 
         $lastBuiltDate = \DateTime::createFromFormat(
             'Y-m-d H:i:s',
-            (new \DateTime('-1 day'))->format('Y-m-d H:i:s')
+            new \DateTime('-1 day')->format('Y-m-d H:i:s')
         );
         $segment->setLastBuiltDate($lastBuiltDate);
         $segment->setDateModified(new \DateTime('-1 week'));
@@ -575,7 +575,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
 
         $lastBuiltDate = \DateTime::createFromFormat(
             'Y-m-d H:i:s',
-            (new \DateTime('-1 day'))->format('Y-m-d H:i:s')
+            new \DateTime('-1 day')->format('Y-m-d H:i:s')
         );
         $dateModified  = new \DateTime('-1 week');
 

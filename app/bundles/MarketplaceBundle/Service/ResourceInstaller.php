@@ -23,13 +23,13 @@ use Symfony\Component\Filesystem\Filesystem;
 
 final readonly class ResourceInstaller implements ResourceInstallerInterface
 {
-    private const INSTALLED_FILE = 'marketplace_installed_resources.json';
+    private const string INSTALLED_FILE = 'marketplace_installed_resources.json';
 
-    private const MAX_REDIRECTS = 5;
+    private const int MAX_REDIRECTS = 5;
 
     // A resource is a campaign export (JSON + a handful of images), so a legitimate ZIP is
     // small; this caps how much a malicious/misconfigured dist URL can make us write to disk.
-    private const MAX_DOWNLOAD_BYTES = 52428800; // 50 MB
+    private const int MAX_DOWNLOAD_BYTES = 52428800; // 50 MB
 
     public function __construct(
         private Connection $connection,
@@ -157,7 +157,7 @@ final readonly class ResourceInstaller implements ResourceInstallerInterface
         $this->assertSafeDownloadUrl($url);
 
         $importDir = $this->pathsHelper->getImportCampaignsPath();
-        (new Filesystem())->mkdir($importDir, 0755);
+        new Filesystem()->mkdir($importDir, 0755);
 
         // Use a fully random file name so the path never derives from user-controlled
         // input (the package name), preventing path-injection.
@@ -451,7 +451,7 @@ final readonly class ResourceInstaller implements ResourceInstallerInterface
         $dir  = dirname($path);
 
         if (!is_dir($dir)) {
-            (new Filesystem())->mkdir($dir, 0755);
+            new Filesystem()->mkdir($dir, 0755);
         }
 
         file_put_contents($path, json_encode($installed));

@@ -20,11 +20,11 @@ final class CampaignShareControllerTest extends MauticMysqlTestCase
     use CreateTestEntitiesTrait;
     use UserEntityTrait;
 
-    private const SHARE_ROUTE       = '/s/campaigns/share/';
+    private const string SHARE_ROUTE       = '/s/campaigns/share/';
 
-    private const CAMPAIGN_NAME     = 'Share Test Campaign';
+    private const string CAMPAIGN_NAME     = 'Share Test Campaign';
 
-    private const TEST_DESCRIPTION  = 'This is a test description for the campaign share form. This is a test description for the campaign share form. This is a test description for the campaign share form. ';
+    private const string TEST_DESCRIPTION  = 'This is a test description for the campaign share form. This is a test description for the campaign share form. This is a test description for the campaign share form. ';
 
     private Campaign $campaign;
 

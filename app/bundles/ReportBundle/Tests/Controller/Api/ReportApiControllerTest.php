@@ -77,7 +77,7 @@ final class ReportApiControllerTest extends MauticMysqlTestCase
         ]);
 
         $response = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
+        $this->assertSame(Response::HTTP_OK, $response->getStatusCode(), (string) $response->getContent());
 
         $payload = json_decode($response->getContent(), true);
         $this->assertSame(1, $payload['total']);

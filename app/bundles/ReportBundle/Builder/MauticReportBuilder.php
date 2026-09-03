@@ -82,7 +82,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
      * references; used by extractBaseColumns(). Function names are already
      * excluded by the not-followed-by-parenthesis check.
      */
-    private const SQL_KEYWORD_TOKENS = [
+    private const array SQL_KEYWORD_TOKENS = [
         'SELECT', 'FROM', 'WHERE', 'CASE', 'WHEN', 'THEN', 'ELSE', 'END', 'AND',
         'OR', 'NOT', 'NULL', 'IS', 'IN', 'LIKE', 'BETWEEN', 'EXISTS', 'DISTINCT',
         'AS', 'ASC', 'DESC', 'INTERVAL', 'DAY', 'DAYOFWEEK', 'DAYOFMONTH',
@@ -93,7 +93,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
     /**
      * Aggregate functions whose arguments never need to appear in GROUP BY.
      */
-    private const AGGREGATE_FUNCTIONS = [
+    private const array AGGREGATE_FUNCTIONS = [
         'COUNT', 'SUM', 'AVG', 'MIN', 'MAX', 'GROUP_CONCAT', 'BIT_AND',
         'BIT_OR', 'BIT_XOR', 'JSON_ARRAYAGG', 'JSON_OBJECTAGG', 'STD',
         'STDDEV', 'VARIANCE',

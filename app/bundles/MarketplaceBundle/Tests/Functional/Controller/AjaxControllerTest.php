@@ -119,7 +119,7 @@ final class AjaxControllerTest extends AbstractMauticTestCase
         $response = $controller->installPackageAction($request);
 
         $this->assertSame('[]', $response->getContent());
-        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
     }
 
     public function testInstallResourcePackageAlreadyInstalled(): void
@@ -142,7 +142,7 @@ final class AjaxControllerTest extends AbstractMauticTestCase
 
         $response = $controller->installPackageAction($request);
 
-        $this->assertSame(400, $response->getStatusCode());
+        $this->assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode(), (string) $response->getContent());
     }
 
     public function testRemoveResourcePackageAction(): void
@@ -166,7 +166,7 @@ final class AjaxControllerTest extends AbstractMauticTestCase
         $response = $controller->removePackageAction($request);
 
         $this->assertSame('[]', $response->getContent());
-        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
     }
 
     public function testRemoveResourcePackageNotInstalled(): void
@@ -189,7 +189,7 @@ final class AjaxControllerTest extends AbstractMauticTestCase
 
         $response = $controller->removePackageAction($request);
 
-        $this->assertSame(400, $response->getStatusCode());
+        $this->assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode(), (string) $response->getContent());
     }
 
     private function generateController(bool $isPackageInstalled): AjaxController

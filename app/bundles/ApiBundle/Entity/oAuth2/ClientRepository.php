@@ -28,7 +28,7 @@ final class ClientRepository extends CommonRepository
 
     /**
      * @return array{0: mixed, 1: array<string, mixed>}
-     */    
+     */
     protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return $this->addStandardCatchAllWhereClause($queryBuilder, $filter, [
@@ -38,12 +38,11 @@ final class ClientRepository extends CommonRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param object                                                       $filter
+     * @param object $filter
      *
      * @return array{0: mixed, 1: array<string, mixed>}
      */
-    protected function addSearchCommandWhereClause($q, $filter): array
+    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q, \stdClass $filter): array
     {
         [$expr, $parameters] = parent::addSearchCommandWhereClause($q, $filter);
 

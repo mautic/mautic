@@ -23,21 +23,21 @@ final class DateHelperTest extends TestCase
 
     private CoreParametersHelper&MockObject $coreParametersHelper;
 
-    private const TEN_MINUTES_AGO    = '-10 minutes';
+    private const string TEN_MINUTES_AGO    = '-10 minutes';
 
-    private const TEN_MINUTES_IN     = '+10 minutes';
+    private const string TEN_MINUTES_IN     = '+10 minutes';
 
-    private const MINUTES_AGO        = 'minute(s) ago';
+    private const string MINUTES_AGO        = 'minute(s) ago';
 
-    private const MINUTES            = 'minute(s)';
+    private const string MINUTES            = 'minute(s)';
 
-    private const REGEX_MINUTES_AGO  = '/\d+ minute\(s\) ago/';
+    private const string REGEX_MINUTES_AGO  = '/\d+ minute\(s\) ago/';
 
-    private const REGEX_MINUTES_IN   = '/in \d+ minute\(s\)/';
+    private const string REGEX_MINUTES_IN   = '/in \d+ minute\(s\)/';
 
-    private const TIMEZONE_NEW_YORK  = 'America/New_York';
+    private const string TIMEZONE_NEW_YORK  = 'America/New_York';
 
-    private const DATE_FORMAT_CUSTOM = 'Y/m/d H:i';
+    private const string DATE_FORMAT_CUSTOM = 'Y/m/d H:i';
 
     public static function setUpBeforeClass(): void
     {

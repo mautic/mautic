@@ -23,9 +23,9 @@ final readonly class EmailMediaImageHelper
 {
     // The builder emits URLs under "media/images" regardless of a remote instance's configured image_path,
     // so this segment is what we detect in incoming content to stay compatible across installations.
-    private const SOURCE_IMAGE_SEGMENT = 'media/images';
+    private const string SOURCE_IMAGE_SEGMENT = 'media/images';
 
-    private const IMAGE_EXTENSIONS = 'png|jpe?g|gif|webp|svg';
+    private const string IMAGE_EXTENSIONS = 'png|jpe?g|gif|webp|svg';
 
     public function __construct(
         private PathsHelper $pathsHelper,

@@ -18,7 +18,7 @@ final class RouterSubscriberTest extends TestCase
         $router  = $this->createStub(RouterInterface::class);
         $router->method('getContext')->willReturn($context);
 
-        $subscriber = new RouterSubscriber($router, 'https', 'mautic.example.com', '8443', '8080', '/mautic');
+        $subscriber = new RouterSubscriber($router, 'https', 'mautic.example.com', 8443, 8080, '/mautic');
         $subscriber->setRouterRequestContext();
 
         $this->assertSame('/mautic', $context->getBaseUrl());
