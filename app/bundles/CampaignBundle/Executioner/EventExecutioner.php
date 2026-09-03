@@ -13,12 +13,12 @@ use Mautic\CampaignBundle\Executioner\Event\ActionExecutioner;
 use Mautic\CampaignBundle\Executioner\Event\ConditionExecutioner;
 use Mautic\CampaignBundle\Executioner\Event\DecisionExecutioner;
 use Mautic\CampaignBundle\Executioner\Logger\EventLogger;
-use Mautic\CampaignBundle\Model\SummaryModel;
 use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
 use Mautic\CampaignBundle\Executioner\Result\Responses;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CampaignBundle\Helper\RemovedContactTracker;
+use Mautic\CampaignBundle\Model\SummaryModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\LoggerInterface;
 
