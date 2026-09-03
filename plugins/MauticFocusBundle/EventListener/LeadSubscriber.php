@@ -4,7 +4,6 @@ namespace MauticPlugin\MauticFocusBundle\EventListener;
 
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
-use Mautic\LeadBundle\LeadEvents;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use MauticPlugin\MauticFocusBundle\FocusEventTypes;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
@@ -23,7 +22,7 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            LeadEvents::TIMELINE_ON_GENERATE      => ['onTimelineGenerate', 0],
+            LeadTimelineEvent::class      => ['onTimelineGenerate', 0],
         ];
     }
 

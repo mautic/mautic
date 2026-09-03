@@ -11,7 +11,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
@@ -32,7 +31,7 @@ final class TimelineEventLogCampaignSubscriber implements EventSubscriberInterfa
         return [
             CampaignEvents::CAMPAIGN_ON_LEADCHANGE     => 'onChange',
             CampaignEvents::LEAD_CAMPAIGN_BATCH_CHANGE => 'onBatchChange',
-            LeadEvents::TIMELINE_ON_GENERATE           => 'onTimelineGenerate',
+            LeadTimelineEvent::class           => 'onTimelineGenerate',
         ];
     }
 

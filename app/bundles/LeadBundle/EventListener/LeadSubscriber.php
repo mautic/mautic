@@ -83,7 +83,7 @@ final class LeadSubscriber implements EventSubscriberInterface
             LeadEvents::FIELD_POST_DELETE    => ['onFieldDelete', 0],
             LeadEvents::NOTE_POST_SAVE       => ['onNotePostSave', 0],
             LeadEvents::NOTE_POST_DELETE     => ['onNoteDelete', 0],
-            LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
+            Events\LeadTimelineEvent::class => ['onTimelineGenerate', 0],
             LeadEvents::LEAD_COMPANY_CHANGE  => ['onLeadCompanyChange', 0],
         ];
     }

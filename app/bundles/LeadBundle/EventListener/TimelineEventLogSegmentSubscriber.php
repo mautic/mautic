@@ -33,7 +33,7 @@ final class TimelineEventLogSegmentSubscriber implements EventSubscriberInterfac
         return [
             LeadEvents::LEAD_LIST_CHANGE       => 'onChange',
             LeadEvents::LEAD_LIST_BATCH_CHANGE => 'onBatchChange',
-            LeadEvents::TIMELINE_ON_GENERATE   => 'onTimelineGenerate',
+            LeadTimelineEvent::class   => 'onTimelineGenerate',
         ];
     }
 
