@@ -13,6 +13,7 @@ use PhpParser\Node\NullableType;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Return_;
 use PHPStan\Analyser\Scope;
+use PHPStan\Reflection\ClassReflection;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 
@@ -25,7 +26,8 @@ use PHPStan\Rules\RuleErrorBuilder;
  * where it is used instead.
  *
  * Matched: a public, non-static get*() method whose only statement is "return $this->property;" and whose return type
- * is a service class (by suffix - Repository, Model, Manager, Factory, Provider, Service, Helper, Handler).
+ * is a service class (by suffix - Repository, Model, Factory, Provider, Service, Handler). Methods that override a
+ * parent-class or interface method are skipped - a contract getter cannot be replaced with direct injection.
  *
  * @implements Rule<ClassMethod>
  */
@@ -44,11 +46,9 @@ final class NoServiceGetterRule implements Rule
     private const SERVICE_SUFFIXES = [
         'Repository',
         'Model',
-        'Manager',
         'Factory',
         'Provider',
         'Service',
-        'Helper',
         'Handler',
     ];
 
@@ -72,6 +72,11 @@ final class NoServiceGetterRule implements Rule
             return [];
         }
 
+        $classReflection = $scope->getClassReflection();
+        if (null !== $classReflection && $this->overridesParentMethod($classReflection, $node->name->toString())) {
+            return [];
+        }
+
         $returnClassName = $this->matchServiceReturnType($node->returnType, $scope);
         if (null === $returnClassName) {
             return [];
@@ -90,6 +95,27 @@ final class NoServiceGetterRule implements Rule
             ->build();
 
         return [$ruleError];
+    }
+
+    /**
+     * True when a parent class or interface declares the same method - a contract method
+     * (e.g. AbstractCommonModel::getRepository) cannot be injected around, so it is left alone.
+     */
+    private function overridesParentMethod(ClassReflection $classReflection, string $methodName): bool
+    {
+        foreach ($classReflection->getParents() as $parent) {
+            if ($parent->hasNativeMethod($methodName)) {
+                return true;
+            }
+        }
+
+        foreach ($classReflection->getInterfaces() as $interface) {
+            if ($interface->hasNativeMethod($methodName)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

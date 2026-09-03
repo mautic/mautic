@@ -23,11 +23,11 @@ final class NoServiceGetterRuleTest extends RuleTestCase
         $this->analyse([__DIR__.'/Fixture/ServiceGetter.php'], [
             [
                 'Public getter "getRepository()" returns service "Utils\PHPStan\Tests\Rule\Fixture\SomeRepository". Inject the service where it is used instead of exposing it.',
-                35,
+                41,
             ],
             [
                 'Public getter "getModel()" returns service "Utils\PHPStan\Tests\Rule\Fixture\SomeModel". Inject the service where it is used instead of exposing it.',
-                40,
+                46,
             ],
         ]);
     }

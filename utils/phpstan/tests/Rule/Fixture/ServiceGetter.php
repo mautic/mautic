@@ -16,6 +16,10 @@ final class SomeManager
 {
 }
 
+final class SomeHelper
+{
+}
+
 final class SomeEntity
 {
 }
@@ -27,6 +31,8 @@ final class ServiceGetter
     private SomeModel $model;
 
     private SomeManager $manager;
+
+    private SomeHelper $helper;
 
     private SomeEntity $entity;
 
@@ -42,6 +48,16 @@ final class ServiceGetter
         return $this->model;
     }
 
+    public function getManager(): SomeManager
+    {
+        return $this->manager;
+    }
+
+    public function getHelper(): SomeHelper
+    {
+        return $this->helper;
+    }
+
     public function getName(): string
     {
         return $this->name;
@@ -52,20 +68,35 @@ final class ServiceGetter
         return $this->entity;
     }
 
-    private function getPrivateManager(): SomeManager
+    private function getPrivateRepository(): SomeRepository
     {
-        return $this->manager;
+        return $this->repository;
     }
 
-    public static function getStaticManager(SomeManager $manager): SomeManager
+    public static function getStaticRepository(SomeRepository $repository): SomeRepository
     {
-        return $manager;
+        return $repository;
     }
 
-    public function getComputedManager(): SomeManager
+    public function getComputedRepository(): SomeRepository
     {
-        $manager = $this->manager;
+        $repository = $this->repository;
 
-        return $manager;
+        return $repository;
+    }
+}
+
+interface RepositoryAwareInterface
+{
+    public function getRepository(): SomeRepository;
+}
+
+final class ContractServiceGetter implements RepositoryAwareInterface
+{
+    private SomeRepository $repository;
+
+    public function getRepository(): SomeRepository
+    {
+        return $this->repository;
     }
 }
