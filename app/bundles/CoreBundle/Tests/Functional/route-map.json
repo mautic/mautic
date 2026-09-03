@@ -3906,14 +3906,6 @@
         },
         "requirements": []
     },
-    "mautic_campaign_import_index": {
-        "path": "/s/campaign/import",
-        "methods": [],
-        "defaults": {
-            "_controller": "Mautic\\CampaignBundle\\Controller\\ImportController::indexAction"
-        },
-        "requirements": []
-    },
     "mautic_campaign_index": {
         "path": "/s/campaigns/{page}",
         "methods": [],
@@ -5439,14 +5431,6 @@
         "requirements": {
             "page": "\\d+"
         }
-    },
-    "mautic_receive_notification": {
-        "path": "/notification/receive",
-        "methods": [],
-        "defaults": {
-            "_controller": "Mautic\\NotificationBundle\\Controller\\Api\\NotificationApiController::receiveAction"
-        },
-        "requirements": []
     },
     "mautic_remove_trailing_slash": {
         "path": "/{url}",

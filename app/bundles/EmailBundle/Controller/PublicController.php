@@ -476,6 +476,12 @@ final class PublicController extends CommonFormController
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectType' => null, 'objectId' => 0],
     )]
+    #[Route(
+        '/s/campaign/preview/{objectId}',
+        name: 'mautic_campaign_preview',
+        requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
+        defaults: ['objectId' => 0],
+    )]
     public function previewAction(
         AnalyticsHelper $analyticsHelper,
         ThemeHelper $themeHelper,

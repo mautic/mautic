@@ -16,13 +16,6 @@ return [
                     'integration' => '.+',
                 ],
             ],
-            'mautic_integration_companies' => [
-                'path'         => '/plugin/{integration}/company_data',
-                'controller'   => 'MauticPlugin\MauticCrmBundle\Controller\PublicController::companyDataAction',
-                'requirements' => [
-                    'integration' => '.+',
-                ],
-            ],
         ],
     ],
 ];
