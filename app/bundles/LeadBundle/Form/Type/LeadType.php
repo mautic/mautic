@@ -8,8 +8,8 @@ use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Form\Type\StageListType;
 use Mautic\UserBundle\Entity\User;
@@ -31,9 +31,9 @@ final class LeadType extends AbstractType
 
     public function __construct(
         private readonly TranslatorInterface $translator,
-        private readonly CompanyModel $companyModel,
         private readonly EntityManagerInterface $entityManager,
         private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly CompanyLeadRepository $companyLeadRepository,
     ) {
     }
 
@@ -115,7 +115,7 @@ final class LeadType extends AbstractType
         );
 
         $allowMultipleCompanies = $this->coreParametersHelper->get('contact_allow_multiple_companies');
-        $companyIds             = $this->companyModel->getCompanyLeadRepository()->getCompanyIdsByLeadId((string) $options['data']->getId());
+        $companyIds             = $this->companyLeadRepository->getCompanyIdsByLeadId((string) $options['data']->getId());
 
         $builder->add(
             'companies',

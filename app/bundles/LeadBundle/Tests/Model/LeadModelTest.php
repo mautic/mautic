@@ -201,8 +201,6 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->setSecurity($this->leadModel);
-
-        $this->companyModelMock->method('getCompanyLeadRepository')->willReturn($this->companyLeadRepositoryMock);
     }
 
     public function testIpLookupDoesNotAddCompanyIfConfiguredSo(): void
@@ -601,10 +599,6 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
             // Taking only company_id into consideration as only this is required in this case
             $leadCompanies[] = ['company_id' => $i];
         }
-
-        $this->companyModelMock->expects($this->once())
-            ->method('getCompanyLeadRepository')
-            ->willReturn($this->companyLeadRepositoryMock);
 
         $this->companyLeadRepositoryMock->expects($this->once())
             ->method('getCompaniesByLeadId')

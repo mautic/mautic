@@ -32,8 +32,7 @@ final class IdentifyCompanyHelper
             $companyData   = $companyEntity->getProfileFields();
 
             if ($lead) {
-                $companyLeadRepo = $companyModel->getCompanyLeadRepository();
-                $companyLead     = $companyLeadRepo->getCompaniesByLeadId($lead->getId(), $companyEntity->getId());
+                $companyLead = $companyModel->getCompaniesByLeadId($lead->getId(), $companyEntity->getId());
                 if ([] !== $companyLead) {
                     $addContactToCompany = false;
                 }

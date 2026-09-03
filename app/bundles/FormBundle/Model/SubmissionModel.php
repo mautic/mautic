@@ -42,6 +42,7 @@ use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
@@ -108,6 +109,7 @@ final class SubmissionModel extends CommonFormModel
         private readonly LeadRepository $leadRepository,
         private readonly StageRepository $stageRepository,
         private readonly UserRepository $userRepository,
+        private readonly CompanyLeadRepository $companyLeadRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -1168,7 +1170,7 @@ final class SubmissionModel extends CommonFormModel
                 $this->leadModel->setPrimaryCompany($companyEntity->getId(), $lead->getId());
             }
             if (null !== $companyChangeLog) {
-                $this->companyModel->getCompanyLeadRepository()->detachEntity($companyChangeLog);
+                $this->companyLeadRepository->detachEntity($companyChangeLog);
             }
         }
 

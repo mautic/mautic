@@ -40,6 +40,8 @@ final class CompanyController extends FormController
 
     private LeadModel $leadModel;
 
+    private CompanyLeadRepository $companyLeadRepository;
+
     #[Required]
     public function autowireCompanyController(
         LeadModel $leadModel,
@@ -47,12 +49,14 @@ final class CompanyController extends FormController
         FieldModel $fieldModel,
         CompanyRepository $companyRepository,
         \Mautic\UserBundle\Entity\UserRepository $userRepository,
+        CompanyLeadRepository $companyLeadRepository,
     ): void {
         $this->leadModel = $leadModel;
         $this->companyModel = $companyModel;
         $this->fieldModel = $fieldModel;
         $this->companyRepository = $companyRepository;
         $this->userRepository = $userRepository;
+        $this->companyLeadRepository = $companyLeadRepository;
     }
 
     public function batchOwnersAction(Request $request): JsonResponse|Response
@@ -238,8 +242,7 @@ final class CompanyController extends FormController
             'RETURN_ARRAY'
         );
 
-        $companiesRepo  = $this->companyModel->getCompanyLeadRepository();
-        $contacts       = $companiesRepo->getCompanyLeads($objectId);
+        $contacts       = $this->companyLeadRepository->getCompanyLeads($objectId);
 
         $leadIds = array_column($contacts, 'lead_id');
 

@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\EmailBundle\Helper\UrlMatcher;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
@@ -79,6 +80,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
         private readonly GroupContactScoreRepository $groupContactScoreRepository,
         private readonly LeadDeviceRepository $leadDeviceRepository,
         private readonly TagRepository $tagRepository,
+        private readonly CompanyLeadRepository $companyLeadRepository,
     ) {
     }
 
@@ -507,7 +509,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
                 }
 
                 if (null !== $companyChangeLog) {
-                    $this->companyModel->getCompanyLeadRepository()->detachEntity($companyChangeLog);
+                    $this->companyLeadRepository->detachEntity($companyChangeLog);
                 }
             } else {
                 $this->companyModel->setFieldValues($primaryCompany, $config, false);

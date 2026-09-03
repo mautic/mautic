@@ -450,7 +450,7 @@ class LeadModel extends FormModel
             $this->companyModel->addLeadToCompany($companyEntity, $entity);
             $this->setPrimaryCompany($companyEntity->getId(), $entity->getId());
         } elseif (array_key_exists('company', $updatedFields) && empty($updatedFields['company'])) {
-            $this->companyModel->getCompanyLeadRepository()->removeContactPrimaryCompany($entity->getId());
+            $this->companyLeadRepository->removeContactPrimaryCompany($entity->getId());
         }
 
         if (null !== $changeLogEntity) {
@@ -1812,7 +1812,7 @@ class LeadModel extends FormModel
     public function modifyCompanies(Lead $lead, array $companies): void
     {
         // See which companies belong to the lead already
-        $leadCompanies = $this->companyModel->getCompanyLeadRepository()->getCompaniesByLeadId($lead->getId());
+        $leadCompanies = $this->companyLeadRepository->getCompaniesByLeadId($lead->getId());
 
         $requestedCompanies = new Collection($companies);
         $currentCompanies   = new Collection($leadCompanies)->keyBy('company_id');
@@ -2170,7 +2170,7 @@ class LeadModel extends FormModel
             return false;
         }
 
-        $companyLead = $this->companyModel->getCompanyLeadRepository()->getCompaniesByLeadId($lead->getId(), $company->getId());
+        $companyLead = $this->companyLeadRepository->getCompaniesByLeadId($lead->getId(), $company->getId());
 
         if ([] === $companyLead) {
             $this->companyModel->addLeadToCompany($company, $lead);
@@ -2240,7 +2240,7 @@ class LeadModel extends FormModel
 
         $lead = $this->getEntity($leadId);
 
-        $companyLeads = $this->companyModel->getCompanyLeadRepository()->getEntitiesByLead($lead);
+        $companyLeads = $this->companyLeadRepository->getEntitiesByLead($lead);
 
         /** @var CompanyLead $companyLead */
         foreach ($companyLeads as $companyLead) {
@@ -2262,7 +2262,7 @@ class LeadModel extends FormModel
         }
 
         if (!$newPrimaryCompany) {
-            $latestCompany = $this->companyModel->getCompanyLeadRepository()->getLatestCompanyForLead($leadId);
+            $latestCompany = $this->companyLeadRepository->getLatestCompanyForLead($leadId);
             if (!empty($latestCompany)) {
                 $lead->addUpdatedField('company', $latestCompany['companyname'])
                     ->setDateModified(new \DateTime());
@@ -2271,11 +2271,11 @@ class LeadModel extends FormModel
 
         if ([] !== $companyArray) {
             $this->leadRepository->saveEntity($lead);
-            $this->companyModel->getCompanyLeadRepository()->saveEntities($companyArray, false);
+            $this->companyLeadRepository->saveEntities($companyArray, false);
         }
 
         // Clear CompanyLead entities from Doctrine memory
-        $this->companyModel->getCompanyLeadRepository()->detachEntities($companyLeads);
+        $this->companyLeadRepository->detachEntities($companyLeads);
 
         return ['oldPrimary' => $oldPrimaryCompany, 'newPrimary' => $companyId];
     }
@@ -2284,7 +2284,7 @@ class LeadModel extends FormModel
     {
         $success          = false;
         $entities         = [];
-        $contactCompanies = $this->companyModel->getCompanyLeadRepository()->getCompaniesByLeadId($lead->getId());
+        $contactCompanies = $this->companyLeadRepository->getCompaniesByLeadId($lead->getId());
 
         foreach ($contactCompanies as $contactCompany) {
             $company  = $this->companyModel->getEntity($contactCompany['company_id']);

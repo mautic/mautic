@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Model\CompanyModel;
 
 final class CompanyLeadRepositoryFunctionalTest extends MauticMysqlTestCase
 {
@@ -32,9 +31,7 @@ final class CompanyLeadRepositoryFunctionalTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
-        /** @var CompanyModel $companyModel */
-        $companyModel    = self::getContainer()->get(CompanyModel::class);
-        $repoCompanyLead = $companyModel->getCompanyLeadRepository();
+        $repoCompanyLead = $this->em->getRepository(CompanyLead::class);
 
         $this->assertCount(0, $repoCompanyLead->getPrimaryCompaniesByLeadIds([]), 'No IDs');
         $this->assertCount(0, $repoCompanyLead->getPrimaryCompaniesByLeadIds([0]), 'Empty IDs');

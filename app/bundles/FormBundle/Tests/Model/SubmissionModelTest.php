@@ -30,6 +30,7 @@ use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\FormBundle\Validator\UploadFieldValidator;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
@@ -229,6 +230,7 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(LeadRepository::class), // $leadRepository
             $this->createStub(StageRepository::class), // $stageRepository
             $this->createStub(UserRepository::class), // $userRepository
+            $this->createStub(CompanyLeadRepository::class), // $companyLeadRepository
         );
 
         $this->submissionModelReflection = new \ReflectionClass($this->submissionModel);

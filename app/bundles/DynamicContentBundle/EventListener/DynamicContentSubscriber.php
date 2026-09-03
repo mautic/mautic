@@ -13,10 +13,10 @@ use Mautic\DynamicContentBundle\Helper\DynamicContentHelper;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
 use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Exception\PrimaryCompanyNotFoundException;
 use Mautic\LeadBundle\Helper\TokenHelper;
-use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Event\PageDisplayEvent;
@@ -40,7 +40,7 @@ final readonly class DynamicContentSubscriber implements EventSubscriberInterfac
         private DynamicContentModel $dynamicContentModel,
         private CorePermissions $security,
         private ContactTracker $contactTracker,
-        private CompanyModel $companyModel,
+        private CompanyLeadRepository $companyLeadRepository,
     ) {
     }
 
@@ -98,7 +98,7 @@ final readonly class DynamicContentSubscriber implements EventSubscriberInterfac
         if ($lead instanceof Lead && $content) {
             $leadArray = $lead->getProfileFields();
             try {
-                $primaryCompany         = $this->companyModel->getCompanyLeadRepository()->getPrimaryCompanyByLeadId($lead->getId());
+                $primaryCompany         = $this->companyLeadRepository->getPrimaryCompanyByLeadId($lead->getId());
                 $leadArray['companies'] = [$primaryCompany];
             } catch (PrimaryCompanyNotFoundException) {
             }

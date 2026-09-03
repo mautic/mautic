@@ -17,7 +17,7 @@ final class StatHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testStatsAreCreatedAndDeleted(): void
     {
-        $emailStatmodel     = $this->createMock(EmailStatModel::class);
+        $emailStatmodel     = $this->createStub(EmailStatModel::class);
         $mockStatRepository = $this->createMock(StatRepository::class);
 
         $mockStatRepository->expects($this->once())

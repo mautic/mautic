@@ -131,9 +131,15 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         return $this->companyRepository;
     }
 
-    public function getCompanyLeadRepository(): CompanyLeadRepository
+    /**
+     * @param int|string|null $leadId
+     * @param int|string|null $companyId
+     *
+     * @return mixed[]
+     */
+    public function getCompaniesByLeadId($leadId, $companyId = null, ?bool $onlyPrimary = null): array
     {
-        return $this->companyLeadRepository;
+        return $this->companyLeadRepository->getCompaniesByLeadId($leadId, $companyId, $onlyPrimary);
     }
 
     public function getPermissionBase(): string

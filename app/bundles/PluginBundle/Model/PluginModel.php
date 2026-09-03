@@ -4,22 +4,14 @@ namespace Mautic\PluginBundle\Model;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Helper\BundleHelper;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Field\FieldList;
-use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Entity\PluginRepository;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends FormModel<Plugin>
@@ -31,21 +23,21 @@ class PluginModel extends FormModel
         return 'plugin.plugin';
     }
 
-    public function __construct(
-        protected FieldModel $leadFieldModel,
-        private readonly FieldList $fieldList,
-        CoreParametersHelper $coreParametersHelper,
-        private readonly BundleHelper $bundleHelper,
-        EntityManagerInterface $em,
-        CorePermissions $security,
-        EventDispatcherInterface $dispatcher,
-        UrlGeneratorInterface $router,
-        Translator $translator,
-        UserHelper $userHelper,
-        LoggerInterface $mauticLogger,
-        private readonly PluginRepository $pluginRepository,
-    ) {
-        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
+    private FieldList $fieldList;
+
+    private BundleHelper $bundleHelper;
+
+    private PluginRepository $pluginRepository;
+
+    #[Required]
+    public function autowirePluginModel(
+        FieldList $fieldList,
+        BundleHelper $bundleHelper,
+        PluginRepository $pluginRepository,
+    ): void {
+        $this->fieldList        = $fieldList;
+        $this->bundleHelper     = $bundleHelper;
+        $this->pluginRepository = $pluginRepository;
     }
 
     public function getRepository(): PluginRepository
