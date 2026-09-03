@@ -49,9 +49,6 @@ final class DynamicContentApiController extends CommonApiController
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }
 
-    /**
-     * @return Response
-     */
     public function newEntityAction(Request $request): Response
     {
         $parameters = $request->request->all();
@@ -74,9 +71,6 @@ final class DynamicContentApiController extends CommonApiController
         return $this->processForm($request, $entity, $parameters, 'POST');
     }
 
-    /**
-     * @return Response
-     */
     public function editEntityAction(Request $request, $id): Response
     {
         /** @var DynamicContent|null $entity */
