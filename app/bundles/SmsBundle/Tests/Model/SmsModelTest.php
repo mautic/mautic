@@ -177,11 +177,8 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
                 $this->createStub(StatRepository::class),
                 $this->createStub(DoNotContactRepository::class),
             ])
-            ->onlyMethods(['getRepository', 'getStatRepository'])
+            ->onlyMethods(['getRepository'])
             ->getMock();
-
-        $smsModel->method('getStatRepository')
-            ->willReturn($this->createStub(StatRepository::class));
 
         $smsRepo->expects($this->once())
             ->method('upCount')
@@ -189,9 +186,6 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
 
         $smsModel->method('getRepository')
             ->willReturn($this->createStub(SmsRepository::class));
-
-        $smsModel->method('getStatRepository')
-            ->willReturn($this->createStub(StatRepository::class));
 
         if ($isMMS) {
             $this->transport->expects($this->once())

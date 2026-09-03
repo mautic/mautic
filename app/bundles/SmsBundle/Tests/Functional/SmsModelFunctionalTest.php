@@ -166,7 +166,7 @@ final class SmsModelFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(3, $results, 'Total results count should be 3.');
 
         // 7. Validate SMS stats per contact
-        $statRepo = $smsModel->getStatRepository();
+        $statRepo = $this->getContainer()->get(\Mautic\SmsBundle\Entity\StatRepository::class);
         $this->assertInstanceOf(Lead::class, $contact1);
 
         $stat1 = $statRepo->getLeadStats($contact1->getId());
