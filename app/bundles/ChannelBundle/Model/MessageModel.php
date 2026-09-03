@@ -179,9 +179,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
 
     public function getLeadStatsPost($messageId, $dateFrom = null, $dateTo = null, $channel = null): array
     {
-        $eventLog = $this->leadEventLogRepository;
-
-        return $eventLog->getChartQuery(
+        return $this->leadEventLogRepository->getChartQuery(
             [
                 'type'       => 'message.send',
                 'dateFrom'   => $dateFrom,
@@ -198,9 +196,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
      */
     public function getMarketingMessagesEventLogs($messageId, $dateFrom = null, $dateTo = null)
     {
-        $eventLog = $this->leadEventLogRepository;
-
-        return $eventLog->getEventLogs(['type' => 'message.send', 'dateFrom' => $dateFrom, 'dateTo' => $dateTo, 'channel' => 'message', 'channelId' => $messageId]);
+        return $this->leadEventLogRepository->getEventLogs(['type' => 'message.send', 'dateFrom' => $dateFrom, 'dateTo' => $dateTo, 'channel' => 'message', 'channelId' => $messageId]);
     }
 
     /**
