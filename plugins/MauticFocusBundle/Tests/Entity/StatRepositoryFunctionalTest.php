@@ -9,6 +9,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
+use MauticPlugin\MauticFocusBundle\Entity\StatRepository;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 
 final class StatRepositoryFunctionalTest extends MauticMysqlTestCase
@@ -25,12 +26,12 @@ final class StatRepositoryFunctionalTest extends MauticMysqlTestCase
 
     public function testGetStatsViewByLead(): void
     {
-        $this->assertCount(5, $this->focusModel->getStatRepository()->getStatsViewByLead());
+        $this->assertCount(5, self::$kernel->getContainer()->get(StatRepository::class)->getStatsViewByLead());
     }
 
     public function testGetStatsClickByLead(): void
     {
-        $this->assertCount(2, $this->focusModel->getStatRepository()->getStatsClickByLead());
+        $this->assertCount(2, self::$kernel->getContainer()->get(StatRepository::class)->getStatsClickByLead());
     }
 
     private function createLead(): Lead

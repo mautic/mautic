@@ -9,6 +9,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
+use MauticPlugin\MauticFocusBundle\Entity\StatRepository;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 
 final class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
@@ -29,24 +30,25 @@ final class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
 
     public function testSearchPhraseInNameFocusStat(): void
     {
-        $this->assertCount(3, $this->searchPhrase('bar', $this->lead, $this->focusModel));
-        $this->assertCount(4, $this->searchPhrase('popup', $this->lead, $this->focusModel));
-        $this->assertCount(2, $this->searchPhrase('popup focus B', $this->lead, $this->focusModel));
+        $this->assertCount(3, $this->searchPhrase('bar', $this->lead));
+        $this->assertCount(4, $this->searchPhrase('popup', $this->lead));
+        $this->assertCount(2, $this->searchPhrase('popup focus B', $this->lead));
     }
 
     public function testSearchPhraseInTypeFocusStat(): void
     {
-        $this->assertCount(2, $this->searchPhrase('click', $this->lead, $this->focusModel));
-        $this->assertCount(5, $this->searchPhrase('view', $this->lead, $this->focusModel));
+        $this->assertCount(2, $this->searchPhrase('click', $this->lead));
+        $this->assertCount(5, $this->searchPhrase('view', $this->lead));
     }
 
     /**
      * @return array<string, mixed>
      */
-    private function searchPhrase(string $phrase, Lead $lead, FocusModel $focusModel): array
+    private function searchPhrase(string $phrase, Lead $lead): array
     {
-        $searchViewStats  = $focusModel->getStatRepository()->getStatsViewByLead($lead->getId(), ['search'=>$phrase]);
-        $searchClickStats = $focusModel->getStatRepository()->getStatsClickByLead($lead->getId(), ['search'=>$phrase]);
+        $statRepository   = self::getContainer()->get(StatRepository::class);
+        $searchViewStats  = $statRepository->getStatsViewByLead($lead->getId(), ['search'=>$phrase]);
+        $searchClickStats = $statRepository->getStatsClickByLead($lead->getId(), ['search'=>$phrase]);
 
         return array_merge($searchViewStats, $searchClickStats);
     }
