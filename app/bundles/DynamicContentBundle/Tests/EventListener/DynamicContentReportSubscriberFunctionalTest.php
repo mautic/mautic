@@ -32,9 +32,8 @@ final class DynamicContentReportSubscriberFunctionalTest extends MauticMysqlTest
         if (str_contains($sqlMode, 'ONLY_FULL_GROUP_BY')) {
             $this->markTestSkipped('Test skipped because ONLY_FULL_GROUP_BY is enabled in sql_mode.');
         }
-        $this->setupTestEntities();
 
-        $this->dynamicContent = new DynamicContent();
+        $this->setupTestEntities();
     }
 
     /**

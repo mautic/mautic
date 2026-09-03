@@ -111,7 +111,8 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
     {
         $slotName = 'test';
         $contact  = new Lead();
-        $contact->setFields(['email' => 'ma@ka.t', 'id' => 123]);
+        $contact->setId(123);
+        $contact->setFields(['email' => 'ma@ka.t']);
 
         $slot = new DynamicContent();
         $slot->setName($slotName);
@@ -164,7 +165,8 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
     {
         $slotName = 'test';
         $contact  = new Lead();
-        $contact->setFields(['email' => 'ma@ka.t', 'id' => 123]);
+        $contact->setId(123);
+        $contact->setFields(['email' => 'ma@ka.t']);
 
         $slot = new DynamicContent();
         $slot->setName($slotName);
@@ -215,7 +217,8 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
     {
         $slotName = 'test';
         $contact  = new Lead();
-        $contact->setFields(['email' => 'ma@ka.t', 'id' => 123]);
+        $contact->setId(123);
+        $contact->setFields(['email' => 'ma@ka.t']);
 
         $slot = new DynamicContent();
         $slot->setName($slotName);
@@ -259,7 +262,8 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
     {
         $slotName = 'test';
         $contact  = new Lead();
-        $contact->setFields(['email' => 'ma@ka.t', 'id' => 123]);
+        $contact->setId(123);
+        $contact->setFields(['email' => 'ma@ka.t']);
 
         $slot = new DynamicContent();
         $slot->setName($slotName);

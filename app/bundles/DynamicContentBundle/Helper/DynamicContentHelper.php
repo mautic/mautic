@@ -87,7 +87,7 @@ class DynamicContentHelper
                 continue;
             }
             // enrich lead array with company data if this DWC has company filters
-            $leadWithCompanies = $this->loadLeadPrimaryCompanyIfNeeded($leadArray, [$dwc->getSlotName() => [$dwc]]);
+            $leadWithCompanies = $this->loadLeadPrimaryCompanyIfNeeded($leadArray, [$dwc->getSlotName() ?? '' => [$dwc]]);
             if ($lead && $this->filtersMatchContact($dwc->getFilters(), $leadWithCompanies)) {
                 return $this->getRealDynamicContent($lead, $dwc, $event);
             }

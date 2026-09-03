@@ -20,7 +20,9 @@ final readonly class DynamicContentReportSubscriber implements EventSubscriberIn
     public const SEGMENT_PREFIX       = 'ls';
     public const SEGMENT_XREF_PREFIX  = 'elx';
 
-    public function __construct(private TranslatorInterface $translator)
+    public function __construct(
+        private TranslatorInterface $translator
+    )
     {
     }
 
