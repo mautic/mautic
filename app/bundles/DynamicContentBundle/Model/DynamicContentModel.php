@@ -66,11 +66,6 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
         return $this->dynamicContentRepository;
     }
 
-    public function getStatRepository(): StatRepository
-    {
-        return $this->statRepository;
-    }
-
     /**
      * @param object $entity
      * @param bool   $unlock
