@@ -7,8 +7,8 @@ use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\PluginBundle\Entity\Integration;
+use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Entity\IntegrationRepository;
-use Mautic\PluginBundle\Model\PluginModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class LeadSubscriber implements EventSubscriberInterface
@@ -16,7 +16,7 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
     private const string FEATURE_PUSH_LEAD = 'push_lead';
 
     public function __construct(
-        private PluginModel $pluginModel,
+        private IntegrationEntityRepository $integrationEntityRepository,
         private IntegrationRepository $integrationRepository,
     ) {
     }
@@ -33,7 +33,7 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
     public function onLeadDelete(LeadEvent $event): bool
     {
         $lead                  = $event->getLead();
-        $integrationEntityRepo = $this->pluginModel->getIntegrationEntityRepository();
+        $integrationEntityRepo = $this->integrationEntityRepository;
         $integrationEntityRepo->findLeadsToDelete('lead%', $lead->getId());
 
         return false;
@@ -43,7 +43,7 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
     {
         /** @var \Mautic\LeadBundle\Entity\Company $company */
         $company               = $event->getCompany();
-        $integrationEntityRepo = $this->pluginModel->getIntegrationEntityRepository();
+        $integrationEntityRepo = $this->integrationEntityRepository;
         $integrationEntityRepo->findLeadsToDelete('company%', $company->getId());
 
         return false;
@@ -55,7 +55,7 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
     public function onLeadSave(LeadEvent $event): void
     {
         $lead                  = $event->getLead();
-        $integrationEntityRepo = $this->pluginModel->getIntegrationEntityRepository();
+        $integrationEntityRepo = $this->integrationEntityRepository;
         if ($this->isAnyIntegrationEnabled()) {
             $integrationEntityRepo->updateErrorLeads('lead-error', $lead->getId());
         }

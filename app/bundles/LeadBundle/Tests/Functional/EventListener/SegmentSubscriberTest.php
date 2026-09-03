@@ -7,6 +7,7 @@ namespace Mautic\LeadBundle\Tests\Functional\EventListener;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\ListModel;
@@ -108,7 +109,7 @@ final class SegmentSubscriberTest extends MauticMysqlTestCase
         $listModel = $this->getContainer()->get(ListModel::class);
         $this->assertInstanceOf(ListModel::class, $listModel);
 
-        $leadCount = $listModel->getListLeadRepository()->getContactsCountBySegment($segmentId);
+        $leadCount = $this->em->getRepository(ListLead::class)->getContactsCountBySegment($segmentId);
         $this->assertSame(5, $leadCount);
 
         $listModel->deleteEntity($segment);
@@ -119,7 +120,7 @@ final class SegmentSubscriberTest extends MauticMysqlTestCase
         $deletedEntity = $listModel->getSoftDeletedEntity($segmentId);
         $this->assertNotInstanceOf(LeadList::class, $deletedEntity);
 
-        $leadCount = $listModel->getListLeadRepository()->getContactsCountBySegment($segmentId);
+        $leadCount = $this->em->getRepository(ListLead::class)->getContactsCountBySegment($segmentId);
         $this->assertSame(0, $leadCount);
     }
 

@@ -15,7 +15,6 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\PluginBundle\Entity\Integration;
-use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Entity\PluginRepository;
 use Psr\Log\LoggerInterface;
@@ -45,7 +44,6 @@ class PluginModel extends FormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         private readonly PluginRepository $pluginRepository,
-        private readonly IntegrationEntityRepository $integrationEntityRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -55,10 +53,6 @@ class PluginModel extends FormModel
         return $this->pluginRepository;
     }
 
-    public function getIntegrationEntityRepository(): IntegrationEntityRepository
-    {
-        return $this->integrationEntityRepository;
-    }
 
     public function getPermissionBase(): string
     {
