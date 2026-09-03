@@ -9,7 +9,6 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\UserBundle\Entity\User;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
 final class DynamicContentTokenReplacementTest extends MauticMysqlTestCase
@@ -27,10 +26,10 @@ final class DynamicContentTokenReplacementTest extends MauticMysqlTestCase
         $content = '<html><body><p>'.$token.'</p></body></html>';
 
         $functionName = 'create'.ucfirst($entityName);
-        $entity       = $this->$functionName($content);
+        $entity       = $this->{$functionName}($content);
 
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
-        $this->assertInstanceOf(\Mautic\UserBundle\Entity\User::class, $user);
+        $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
         $this->assertContent('/'.$entityName.'/preview/'.$entity->getId().'?contactId='.$lead1->getId(), 'some content');
         $this->assertContent('/'.$entityName.'/preview/'.$entity->getId().'?contactId='.$lead2->getId(), 'Default content goes here');

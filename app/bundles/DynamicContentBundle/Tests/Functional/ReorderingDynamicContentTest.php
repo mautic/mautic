@@ -6,7 +6,6 @@ namespace Mautic\DynamicContentBundle\Tests\Functional;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\DynamicContentBundle\Entity\DynamicContentRepository;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
 final class ReorderingDynamicContentTest extends MauticMysqlTestCase

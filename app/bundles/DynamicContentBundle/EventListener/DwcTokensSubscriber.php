@@ -111,7 +111,7 @@ final readonly class DwcTokensSubscriber implements EventSubscriberInterface
             $usedTokenNames = $matches[0];
 
             $invalidTokenNames   = array_diff($usedTokenNames, $allowedToken);
-            if ($usedTokenNames !== [] && $invalidTokenNames !== []) {
+            if ([] !== $usedTokenNames && [] !== $invalidTokenNames) {
                 $event->getContext()->buildViolation('mautic.dynamicContent.error.token_disallowed', [
                     '%entity%'        => $event->getEntity() instanceof Email ? 'email' : 'page',
                     '%invalidTokens%' => implode(', ', $invalidTokenNames),

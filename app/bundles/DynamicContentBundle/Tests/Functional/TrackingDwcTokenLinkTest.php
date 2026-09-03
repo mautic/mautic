@@ -14,7 +14,6 @@ use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Entity\TrackableRepository;
-use PHPUnit\Framework\Assert;
 
 final class TrackingDwcTokenLinkTest extends MauticMysqlTestCase
 {

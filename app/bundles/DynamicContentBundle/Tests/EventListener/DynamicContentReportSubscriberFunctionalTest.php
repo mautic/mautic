@@ -13,7 +13,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\ReportBundle\Entity\Report;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -66,7 +65,7 @@ final class DynamicContentReportSubscriberFunctionalTest extends MauticMysqlTest
      */
     private function verifyReportContent(array $report, bool $isPage): void
     {
-        $matchingRows = array_filter($report['data'], fn(array $row): bool => (
+        $matchingRows = array_filter($report['data'], fn (array $row): bool => (
             $isPage ?
                 isset($row['page_id']) && (int) $row['page_id'] === $this->page->getId() :
                 isset($row['email_id']) && (int) $row['email_id'] === $this->email->getId()

@@ -131,7 +131,7 @@ class DynamicContentHelper
             $dwc     = $translation;
             $content = $dwc->getContent();
         }
-        if (is_null($event) || !$event->getIsPreview()) {
+        if (null === $event || !$event->getIsPreview()) {
             $this->dynamicContentModel->createStatEntry($dwc, $lead, $event);
         }
 
@@ -236,7 +236,7 @@ class DynamicContentHelper
         $result            = [];
         $dwcListBySlotName = $this->findDwcVariantsBySlotNames($slotNames);
 
-        if ($dwcListBySlotName === []) {
+        if ([] === $dwcListBySlotName) {
             return $result;
         }
 

@@ -9,7 +9,6 @@ use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Tests\Functional\DynamicContentReOrderingTrait;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
 final class AjaxControllerTest extends MauticMysqlTestCase

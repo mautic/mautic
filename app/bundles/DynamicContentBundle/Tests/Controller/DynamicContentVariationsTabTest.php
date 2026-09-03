@@ -6,7 +6,6 @@ namespace Mautic\DynamicContentBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -80,7 +79,7 @@ final class DynamicContentVariationsTabTest extends MauticMysqlTestCase
         );
 
         // Get all rows and extract display orders
-        $displayOrders = $crawler->filter('#dwcVariationsTable tbody tr td:nth-child(2)')->each(fn($node): int => (int) $node->text());
+        $displayOrders = $crawler->filter('#dwcVariationsTable tbody tr td:nth-child(2)')->each(fn ($node): int => (int) $node->text());
 
         // Check if the variations are sorted by display_order in DESC order
         $sortedOrders = $displayOrders;

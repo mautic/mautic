@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
-use PHPUnit\Framework\Assert;
 
 final class TagRepositoryFunctionalTest extends MauticMysqlTestCase
 {

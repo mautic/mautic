@@ -7,7 +7,6 @@ namespace Mautic\DynamicContentBundle\Tests\Functional;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Helper\DynamicContentHelper;
-use PHPUnit\Framework\Assert;
 
 final class DynamicContentHelperFunctionalTest extends MauticMysqlTestCase
 {

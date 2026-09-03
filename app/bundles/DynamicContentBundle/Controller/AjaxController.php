@@ -9,20 +9,21 @@ use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\DynamicContentBundle\Entity\DynamicContentRepository;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
-use Mautic\EmailBundle\Model\EmailModel;
-use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 final class AjaxController extends CommonAjaxController
 {
-    private \Mautic\DynamicContentBundle\Entity\DynamicContentRepository $dynamicContentRepository;
+    use AjaxLookupControllerTrait;
+    private DynamicContentRepository $dynamicContentRepository;
+
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireAjaxController(\Mautic\DynamicContentBundle\Entity\DynamicContentRepository $dynamicContentRepository): void
+    public function autowireAjaxController(
+        DynamicContentRepository $dynamicContentRepository
+    ): void
     {
         $this->dynamicContentRepository = $dynamicContentRepository;
     }
-    use AjaxLookupControllerTrait;
 
     public function slotNameListAction(Request $request): JsonResponse
     {
