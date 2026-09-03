@@ -205,11 +205,6 @@ final class TweetModel extends FormModel implements AjaxLookupModelInterface
         return $this->tweetRepository;
     }
 
-    public function getStatRepository(): TweetStatRepository
-    {
-        return $this->tweetStatRepository;
-    }
-
     public function getPermissionBase(): string
     {
         return 'mauticSocial:tweets';
