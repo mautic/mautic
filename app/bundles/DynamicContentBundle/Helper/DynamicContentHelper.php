@@ -354,7 +354,7 @@ class DynamicContentHelper
     {
         return preg_replace_callback(
             self::DYNAMIC_WEB_CONTENT_REGEX,
-            function ($matches): string {
+            function (array $matches): string {
                 $slotName = htmlspecialchars($matches[1], ENT_QUOTES);
 
                 return '<div data-slot="dwc" data-param-slot-name="'.$slotName.'"></div>';

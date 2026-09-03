@@ -81,7 +81,7 @@ final readonly class DynamicContentSubscriber implements EventSubscriberInterfac
             if ($currentOrder < $lastOrder) {
                 $dcRepository->reorderDwc($currentOrder, $lastOrder, $slotName);
             }
-            $dynamicContent->setDisplayOrder(null);
+            $dynamicContent->setDisplayOrder();
 
             return;
         }
