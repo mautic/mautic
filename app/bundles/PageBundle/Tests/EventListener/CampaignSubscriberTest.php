@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\PageBundle\Tests\EventListener;
 
+use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\DecisionEvent;
@@ -92,9 +93,13 @@ final class CampaignSubscriberTest extends TestCase
      */
     private function createDecisionEvent(Hit&MockObject $hit, array $properties): DecisionEvent
     {
+        $campaign = new Campaign();
+        $campaign->setName('Test Campaign');
+
         $campaignEvent = new Event();
         $campaignEvent->setType('page.pagehit');
         $campaignEvent->setProperties($properties);
+        $campaignEvent->setCampaign($campaign);
 
         $log = $this->createStub(LeadEventLog::class);
         $log->method('getEvent')->willReturn($campaignEvent);

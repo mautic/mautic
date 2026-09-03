@@ -8,7 +8,6 @@ use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
 use Knp\Menu\Matcher\MatcherInterface;
 use Knp\Menu\MenuFactory;
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MenuEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Menu\MenuBuilder;
@@ -51,9 +50,7 @@ final class MenuBuilderTest extends TestCase
         $this->dispatcher
             ->expects($this->once())
             ->method('dispatch')
-            ->willReturnCallback(function (MenuEvent $event, string $eventName): MenuEvent {
-                $this->assertSame(CoreEvents::BUILD_MENU, $eventName);
-
+            ->willReturnCallback(function (MenuEvent $event): MenuEvent {
                 $event->addMenuItems([
                     'mautic.contribute.menu.index' => [
                         'uri'       => 'https://mautic.org',

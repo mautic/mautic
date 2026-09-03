@@ -9,10 +9,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * Filters installed themes for the themes list search.
  */
-final class ThemeSearchFilter
+final readonly class ThemeSearchFilter
 {
     public function __construct(
-        private readonly TranslatorInterface $translator,
+        private TranslatorInterface $translator,
     ) {
     }
 

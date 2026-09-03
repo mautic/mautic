@@ -5,14 +5,11 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\ThemeSearchFilter;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ThemeSearchFilterTest extends TestCase
 {
-    private TranslatorInterface&MockObject $translator;
-
     private ThemeSearchFilter $filter;
 
     /**
@@ -27,16 +24,16 @@ final class ThemeSearchFilterTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->translator = $this->createMock(TranslatorInterface::class);
+        $translator = $this->createMock(TranslatorInterface::class);
 
-        $this->translator->method('trans')
+        $translator->method('trans')
             ->willReturnCallback(static fn (string $key): string => match ($key) {
                 'mautic.core.theme.searchcommand.feature' => 'feature',
                 'mautic.core.theme.searchcommand.builder' => 'builder',
                 default => $key,
             });
 
-        $this->filter = new ThemeSearchFilter($this->translator);
+        $this->filter = new ThemeSearchFilter($translator);
 
         $this->scopeCommands = ['', 'feature', 'builder'];
 
