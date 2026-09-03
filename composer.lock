@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e9f36cba4c8fee1ffe42be6e6ae64dcb",
+    "content-hash": "7bfe969318141289b998070f58fc7ded",
     "packages": [
         {
             "name": "api-platform/core",
@@ -14256,16 +14256,16 @@
         },
         {
             "name": "tomasvotruba/class-leak",
-            "version": "2.2.1",
+            "version": "dev-main",
             "source": {
                 "type": "git",
                 "url": "https://github.com/TomasVotruba/class-leak.git",
-                "reference": "dc1988337e630e145bcaeaa8d2b528a91e205645"
+                "reference": "c7ad7ad04d0ffab5b957fca74c0db2de8e3b721f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/TomasVotruba/class-leak/zipball/dc1988337e630e145bcaeaa8d2b528a91e205645",
-                "reference": "dc1988337e630e145bcaeaa8d2b528a91e205645",
+                "url": "https://api.github.com/repos/TomasVotruba/class-leak/zipball/c7ad7ad04d0ffab5b957fca74c0db2de8e3b721f",
+                "reference": "c7ad7ad04d0ffab5b957fca74c0db2de8e3b721f",
                 "shasum": ""
             },
             "require": {
@@ -14291,6 +14291,7 @@
                 "symplify/phpstan-extensions": "^12",
                 "tracy/tracy": "^2.12"
             },
+            "default-branch": true,
             "bin": [
                 "bin/class-leak",
                 "bin/class-leak.php"
@@ -14309,7 +14310,7 @@
             "description": "Detect leaking classes",
             "support": {
                 "issues": "https://github.com/TomasVotruba/class-leak/issues",
-                "source": "https://github.com/TomasVotruba/class-leak/tree/2.2.1"
+                "source": "https://github.com/TomasVotruba/class-leak/tree/main"
             },
             "funding": [
                 {
@@ -14321,7 +14322,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-02T22:41:08+00:00"
+            "time": "2026-09-03T06:03:40+00:00"
         },
         {
             "name": "twbs/bootstrap-sass",
@@ -19642,7 +19643,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {},
+    "stability-flags": {
+        "tomasvotruba/class-leak": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {},
