@@ -18,6 +18,7 @@ use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Entity\TagRepository;
 use Mautic\LeadBundle\Event\ListTypeaheadEvent;
 use Mautic\LeadBundle\Form\Type\FieldType;
 use Mautic\LeadBundle\Form\Type\FilterPropertiesType;
@@ -545,7 +546,7 @@ final class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($data);
     }
 
-    public function updateLeadTagsAction(Request $request, LeadModel $leadModel): JsonResponse
+    public function updateLeadTagsAction(Request $request, LeadModel $leadModel, TagRepository $tagRepository): JsonResponse
     {
         $post        = $request->request->all()['lead_tags'] ?? [];
         $lead        = $leadModel->getEntity((int) $post['id']);
@@ -560,7 +561,7 @@ final class AjaxController extends CommonAjaxController
             $leadTagKeys = $leadTags->getKeys();
 
             // Get an updated list of tags
-            $tags       = $leadModel->getTagRepository()->getSimpleList(null, [], 'tag');
+            $tags       = $tagRepository->getSimpleList(null, [], 'tag');
             $tagOptions = '';
 
             foreach ($tags as $tag) {
@@ -575,7 +576,7 @@ final class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($data);
     }
 
-    public function addLeadTagsAction(Request $request, LeadModel $leadModel): JsonResponse
+    public function addLeadTagsAction(Request $request, TagRepository $tagRepository): JsonResponse
     {
         $tags = $request->request->get('tags');
         $tags = json_decode($tags, true);
@@ -585,16 +586,16 @@ final class AjaxController extends CommonAjaxController
 
             foreach ($tags as $tag) {
                 if (!is_numeric($tag)) {
-                    $newTags[] = $leadModel->getTagRepository()->getTagByNameOrCreateNewOne($tag);
+                    $newTags[] = $tagRepository->getTagByNameOrCreateNewOne($tag);
                 }
             }
 
             if ([] !== $newTags) {
-                $leadModel->getTagRepository()->saveEntities($newTags);
+                $tagRepository->saveEntities($newTags);
             }
 
             // Get an updated list of tags
-            $allTags    = $leadModel->getTagRepository()->getSimpleList(null, [], 'tag');
+            $allTags    = $tagRepository->getSimpleList(null, [], 'tag');
             $tagOptions = '';
 
             foreach ($allTags as $tag) {

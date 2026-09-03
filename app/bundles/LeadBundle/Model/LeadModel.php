@@ -211,14 +211,6 @@ class LeadModel extends FormModel
         return $this->leadRepository;
     }
 
-    /**
-     * Get the tags repository.
-     */
-    public function getTagRepository(): TagRepository
-    {
-        return $this->tagRepository;
-    }
-
     public function getPointLogRepository(): PointsChangeLogRepository
     {
         return $this->pointsChangeLogRepository;
