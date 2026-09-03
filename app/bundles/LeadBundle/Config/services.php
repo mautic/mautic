@@ -3,7 +3,11 @@
 declare(strict_types=1);
 
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
+use Mautic\LeadBundle\Segment\Query\Filter\AnyCompanyRelationValueFilterQueryBuilder;
+use Mautic\LeadBundle\Segment\Query\Filter\PrimaryCompanyRelationValueFilterQueryBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 return function (ContainerConfigurator $configurator): void {
     $services = $configurator->services()
@@ -203,6 +207,11 @@ return function (ContainerConfigurator $configurator): void {
     $services->get(Mautic\LeadBundle\Entity\LeadRepository::class)
         ->call('setUniqueIdentifiersOperator', ['%mautic.contact_unique_identifiers_operator%'])
         ->call('setListLeadRepository', [\Symfony\Component\DependencyInjection\Loader\Configurator\service('mautic.lead.repository.list_lead')]);
+
+    $services->set(PrimaryCompanyRelationValueFilterQueryBuilder::class)
+        ->args([service('mautic.lead.model.random_parameter_name'), service('event_dispatcher')]);
+    $services->set(AnyCompanyRelationValueFilterQueryBuilder::class)
+        ->args([service('mautic.lead.model.random_parameter_name'), service('event_dispatcher')]);
 
     $services->alias('mautic.lead.model.field', Mautic\LeadBundle\Model\FieldModel::class);
     $services->alias('mautic.lead.model.list', Mautic\LeadBundle\Model\ListModel::class);
