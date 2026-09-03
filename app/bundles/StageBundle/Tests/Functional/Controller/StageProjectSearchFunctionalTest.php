@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\StageBundle\Tests\Controller;
+namespace Mautic\StageBundle\Tests\Functional\Controller;
 
 use Mautic\ProjectBundle\Tests\Functional\AbstractProjectSearchTestCase;
 use Mautic\StageBundle\Entity\Stage;

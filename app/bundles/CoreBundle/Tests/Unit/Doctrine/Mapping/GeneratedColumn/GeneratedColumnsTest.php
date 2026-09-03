@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\CoreBundle\Tests\Unit\Doctrine\GeneratedColumn;
+namespace Mautic\CoreBundle\Tests\Unit\Doctrine\Mapping\GeneratedColumn;
 
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns;

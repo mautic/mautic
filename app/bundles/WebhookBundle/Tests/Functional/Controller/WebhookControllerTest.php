@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\WebhookBundle\Tests\Controller;
+namespace Mautic\WebhookBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\WebhookBundle\Entity\Event;
