@@ -11,7 +11,7 @@ use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 /**
  * @extends CommonRepository<DynamicContent>
  */
-final class DynamicContentRepository extends CommonRepository
+class DynamicContentRepository extends CommonRepository
 {
     use ProjectRepositoryTrait;
 

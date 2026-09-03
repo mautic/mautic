@@ -52,7 +52,7 @@ final class DynamicContentApiController extends CommonApiController
     /**
      * @return Response
      */
-    public function newEntityAction(Request $request)
+    public function newEntityAction(Request $request): Response
     {
         $parameters = $request->request->all();
 
@@ -77,7 +77,7 @@ final class DynamicContentApiController extends CommonApiController
     /**
      * @return Response
      */
-    public function editEntityAction(Request $request, $id)
+    public function editEntityAction(Request $request, $id): Response
     {
         /** @var DynamicContent|null $entity */
         $entity     = $this->model->getEntity($id);

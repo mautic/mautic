@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use Mautic\DynamicContentBundle\Entity\DynamicContentRepository;
 use Mautic\DynamicContentBundle\EventListener\DynamicContentSubscriber;
 use Mautic\DynamicContentBundle\Helper\DynamicContentHelper;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
@@ -91,6 +92,7 @@ final class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->security                   = $this->createMock(CorePermissions::class);
         $this->contactTracker             = $this->createMock(ContactTracker::class);
         $this->companyLeadRepositoryMock  = $this->createMock(CompanyLeadRepository::class);
+        $dynamicContentRepository    = $this->createMock(DynamicContentRepository::class);
         $this->subscriber                 = new DynamicContentSubscriber(
             $this->trackableModel,
             $this->pageTokenHelper,
@@ -103,6 +105,7 @@ final class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->security,
             $this->contactTracker,
             $this->companyLeadRepositoryMock,
+            $dynamicContentRepository,
         );
     }
 

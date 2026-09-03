@@ -6,6 +6,7 @@ namespace Mautic\DynamicContentBundle\Tests\Functional;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\DynamicContentBundle\Entity\DynamicContentRepository;
+use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Symfony\Component\HttpFoundation\Request;
 
 final class ReorderingDynamicContentTest extends MauticMysqlTestCase
@@ -45,7 +46,7 @@ final class ReorderingDynamicContentTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_POST, '/s/dwc/delete/'.$dwc->getId());
         $this->assertResponseIsSuccessful();
 
-        $dwcRepo = self::getContainer()->get('mautic.dynamicContent.model.dynamicContent')->getRepository();
+        $dwcRepo = self::getContainer()->get(DynamicContentModel::class)->getRepository();
         $dwcList = $dwcRepo->getDynamicContentBySlotName('slot-Name-1');
 
         $this->assertCount(3, $dwcList);
@@ -101,7 +102,7 @@ final class ReorderingDynamicContentTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         /** @var DynamicContentRepository $dwcRepo */
-        $dwcRepo = self::getContainer()->get('mautic.dynamicContent.model.dynamicContent')->getRepository();
+        $dwcRepo = self::getContainer()->get(DynamicContentModel::class)->getRepository();
         $dwc     = $dwcRepo->getEntity($dwc1->getId());
         $this->assertNull($dwc->getDisplayOrder(), 'Display Order should be null when isCampaignBased is set to true');
 

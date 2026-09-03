@@ -9,6 +9,7 @@ use DeviceDetector\Parser\OperatingSystem;
 use Doctrine\ORM\EntityManager;
 use Mautic\DynamicContentBundle\DynamicContent\TypeList;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use Mautic\DynamicContentBundle\Entity\DynamicContentRepository;
 use Mautic\DynamicContentBundle\Form\Type\DwcEntryFiltersType;
 use Mautic\DynamicContentBundle\Form\Type\DynamicContentListType;
 use Mautic\DynamicContentBundle\Form\Type\DynamicContentType;
@@ -26,6 +27,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class DynamicContentTypeTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        if (!isset($_ENV['MAUTIC_UPLOAD_DIR'])) {
+            $_ENV['MAUTIC_UPLOAD_DIR'] = '/tmp';
+        }
+    }
+
     public function testFormBuild(): void
     {
         $entityManagerMock       = $this->createStub(EntityManager::class);
@@ -45,6 +55,8 @@ final class DynamicContentTypeTest extends TestCase
             ->with('lead')
             ->willReturn($this->getMockCustomFieldList());
 
+        $dynamicContentRepositoryMock = $this->createMock(DynamicContentRepository::class);
+
         $tags = $this->getMockTagList();
         $leadModelMock->expects($this->once())
             ->method('getTagList')
@@ -58,6 +70,7 @@ final class DynamicContentTypeTest extends TestCase
             new TypeList(),
             $relativeDateMock,
             $leadRepositoryMock,
+            $dynamicContentRepositoryMock,
         );
 
         $formBuilderInterfaceMock = $this->createMock(FormBuilderInterface::class);
