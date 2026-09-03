@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\DynamicContentBundle\DynamicContent\TypeList;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use Mautic\DynamicContentBundle\Entity\DynamicContentRepository;
 use Mautic\EmailBundle\Form\Type\EmailUtmTagsType;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
@@ -91,16 +92,16 @@ final class DynamicContentType extends AbstractType
         ListModel $listModel,
         private readonly TranslatorInterface $translator,
         LeadModel $leadModel,
-        private TypeList $typeList,
+        private readonly TypeList $typeList,
         private readonly RelativeDate $relativeDate,
         private readonly LeadRepository $leadRepository,
+        private readonly DynamicContentRepository $dynamicContentRepository,
     ) {
         $this->fieldChoices    = $listModel->getChoiceFields();
         $this->timezoneChoices = FormFieldHelper::getTimezonesChoices();
         $this->countryChoices  = FormFieldHelper::getCountryChoices();
         $this->regionChoices   = FormFieldHelper::getRegionChoices();
         $this->localeChoices   = FormFieldHelper::getLocaleChoices();
-        $this->typeList        = $typeList;
 
         $this->filterFieldChoices();
 
@@ -158,7 +159,7 @@ final class DynamicContentType extends AbstractType
         $isSlotNameChanged = isset($changes['slotName'][0]) && $changes['slotName'][0] !== $slotName;
 
         if (!empty($slotName)) {
-            $dynamicContents = $this->em->getRepository(DynamicContent::class)
+            $dynamicContents = $this->dynamicContentRepository
                 ->getDynamicContentBySlotName($slotName);
             foreach ($dynamicContents as $dynamicContent) {
                 if ($currentOrder != (int) $dynamicContent['display_order'] || $isSlotNameChanged) {

@@ -7,21 +7,22 @@ namespace Mautic\DynamicContentBundle\Controller;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Entity\DynamicContentRepository;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Service\Attribute\Required;
 
 final class AjaxController extends CommonAjaxController
 {
     use AjaxLookupControllerTrait;
     private DynamicContentRepository $dynamicContentRepository;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireAjaxController(
-        DynamicContentRepository $dynamicContentRepository
-    ): void
-    {
+    #[Required]
+    public function autowireDynamicContentAjaxController(
+        DynamicContentRepository $dynamicContentRepository,
+    ): void {
         $this->dynamicContentRepository = $dynamicContentRepository;
     }
 
@@ -30,7 +31,7 @@ final class AjaxController extends CommonAjaxController
         $filter    = InputHelper::clean($request->query->get('filter'));
 
         /** @var DynamicContentModel $model */
-        $model     = $this->getModel('dynamicContent');
+        $model     = $this->getModel(DynamicContent::class);
         $results   = $model->getLookupResults('slot_name', $filter, 10);
 
         return $this->sendJsonResponse($results);
@@ -42,7 +43,7 @@ final class AjaxController extends CommonAjaxController
     public function getDwcTokensBySlotNameAction(Request $request): JsonResponse
     {
         $displayOrderArray    = [];
-        $dwcId                = InputHelper::clean($request->query->get('id'));
+        $dwcId                = (int) InputHelper::clean($request->query->get('id'));
         $slotName             = InputHelper::clean($request->query->get('slotName'));
         $includeDefaultOption = InputHelper::clean($request->query->get('includeDefaultOption'));
 
@@ -58,9 +59,8 @@ final class AjaxController extends CommonAjaxController
         }
 
         if (!empty($slotName)) {
-            $dynamicContentRepository = $this->dynamicContentRepository;
-            $dynamicContent           = $dynamicContentRepository->getEntity($dwcId);
-            $dwcTokens                = $dynamicContentRepository->getDynamicContentBySlotName($slotName);
+            $dynamicContent = $this->dynamicContentRepository->getEntity($dwcId);
+            $dwcTokens      = $this->dynamicContentRepository->getDynamicContentBySlotName($slotName);
 
             if (empty($dynamicContent)) {
                 foreach ($dwcTokens as $dwcToken) {

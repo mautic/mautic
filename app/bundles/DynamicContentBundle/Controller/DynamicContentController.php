@@ -352,6 +352,7 @@ final class DynamicContentController extends FormController
      */
     public function viewAction(Request $request, $objectId): Response
     {
+        $model = $this->getModel(DynamicContent::class);
         $security = $this->security;
         $entity   = $this->dynamicContentModel->getEntity($objectId);
 

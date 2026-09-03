@@ -18,6 +18,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -48,6 +49,9 @@ final class DynamicContentApiController extends CommonApiController
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }
 
+    /**
+     * @return Response
+     */
     public function newEntityAction(Request $request)
     {
         $parameters = $request->request->all();
@@ -70,6 +74,9 @@ final class DynamicContentApiController extends CommonApiController
         return $this->processForm($request, $entity, $parameters, 'POST');
     }
 
+    /**
+     * @return Response
+     */
     public function editEntityAction(Request $request, $id)
     {
         /** @var DynamicContent|null $entity */
