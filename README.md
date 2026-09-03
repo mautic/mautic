@@ -378,6 +378,8 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://vedantmadane.github.io"><img src="https://avatars.githubusercontent.com/u/6527493?v=4?s=100" width="100px;" alt="Vedant Madane"/><br /><sub><b>Vedant Madane</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=VedantMadane" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/TechEnthusGH"><img src="https://avatars.githubusercontent.com/u/289884007?v=4?s=100" width="100px;" alt="TechEnthusGH"/><br /><sub><b>TechEnthusGH</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=TechEnthusGH" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://vaibhavsrivastava.me"><img src="https://avatars.githubusercontent.com/u/173471846?v=4?s=100" width="100px;" alt="Vaibhav Srivastava"/><br /><sub><b>Vaibhav Srivastava</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=vaibhav8a" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://rant.ae"><img src="https://avatars.githubusercontent.com/u/45711841?v=4?s=100" width="100px;" alt="Dmitry"/><br /><sub><b>Dmitry</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=darkdi" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

@@ -13,6 +13,7 @@ use Mautic\CoreBundle\EventListener\ImportExportTrait;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UuidHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Serializer\ImportEntityDenormalizer;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\FieldRepository;
 use Mautic\FormBundle\Entity\Form;
@@ -22,7 +23,6 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 final class FieldImportExportSubscriber implements EventSubscriberInterface
 {
@@ -37,7 +37,7 @@ final class FieldImportExportSubscriber implements EventSubscriberInterface
         private FieldModel $fieldModel,
         private LeadFieldModel $leadFieldModel,
         private EventDispatcherInterface $dispatcher,
-        private DenormalizerInterface $serializer,
+        private ImportEntityDenormalizer $serializer,
     ) {
     }
 
@@ -135,7 +135,10 @@ final class FieldImportExportSubscriber implements EventSubscriberInterface
             $isNew = !$field;
             $field ??= new Field();
 
-            foreach (['properties', 'validation', 'custom_parameters', 'conditions', 'label_attr', 'input_attr', 'container_attr'] as $jsonField) {
+            // Only the array and json columns are stored encoded. The *_attr columns are plain
+            // strings ("class=\"btn btn-default\""), and running them through json_decode turned
+            // every one of them into an empty array.
+            foreach (['properties', 'validation', 'custom_parameters', 'conditions'] as $jsonField) {
                 if (isset($fieldData[$jsonField]) && is_string($fieldData[$jsonField])) {
                     $decoded               = json_decode($fieldData[$jsonField], true);
                     $fieldData[$jsonField] = is_array($decoded) ? $decoded : [];
