@@ -15,7 +15,6 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -72,7 +71,6 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         CoreParametersHelper $coreParametersHelper,
         private readonly SmsRepository $smsRepository,
         private readonly StatRepository $statRepository,
-        private readonly DoNotContactRepository $doNotContactRepository,
         private readonly LeadListRepository $leadListRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);

@@ -10,7 +10,6 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Test\ReflectionHelper;
-use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\TrackableModel;
@@ -88,7 +87,6 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
             $this->coreParametersHelper,
             $this->smsRepository, // $smsRepository
             $this->createStub(StatRepository::class), // $statRepository
-            $this->createStub(DoNotContactRepository::class), // $doNotContactRepository
             $this->createStub(\Mautic\LeadBundle\Entity\LeadListRepository::class), // $leadListRepository
         );
     }
@@ -176,7 +174,6 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
                 $this->coreParametersHelper,
                 $smsRepo,
                 $this->createStub(StatRepository::class),
-                $this->createStub(DoNotContactRepository::class),
                 $this->createStub(\Mautic\LeadBundle\Entity\LeadListRepository::class),
             ])
             ->onlyMethods(['getRepository', 'getStatRepository'])
