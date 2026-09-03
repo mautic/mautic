@@ -128,8 +128,8 @@ body:has(.s-dashboard) {
     flex-grow: 1;
 }
 .dashboard-widgets .card-body > .chart-wrapper > div,
-.dashboard-widgets .card-body > .chart-wrapper > div > div {
-    height: 100% !important;
+.dashboard-widgets .chart-fit-container {
+    height: 100%;
 }
 
 .chart-wrapper {
