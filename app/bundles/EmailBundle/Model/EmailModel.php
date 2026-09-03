@@ -148,6 +148,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         private readonly LeadRepository $leadRepository,
         private readonly LeadEventLogRepository $leadEventLogRepository,
         private readonly CompanyRepository $companyRepository,
+        private readonly StatRepository $statRepository,
     ) {
         $this->connection = $em->getConnection(); // Necessary for FilterTrait
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
@@ -156,11 +157,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     public function getRepository(): EmailRepository
     {
         return $this->emailRepository;
-    }
-
-    public function getStatRepository(): StatRepository
-    {
-        return $this->emailStatModel->getRepository();
     }
 
     public function getPermissionBase(): string
@@ -572,7 +568,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             $createdByUserId = $this->userHelper->getUser()->getId();
         }
 
-        $stats = $this->getStatRepository()->getSentEmailToContactData($limit, $dateFrom, $dateTo, $createdByUserId, $companyId, $campaignId, $segmentId);
+        $stats = $this->statRepository->getSentEmailToContactData($limit, $dateFrom, $dateTo, $createdByUserId, $companyId, $campaignId, $segmentId);
         $data  = [];
 
         foreach ($stats as $stat) {
@@ -608,7 +604,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             ];
 
             if ($item['click'] && $item['email_id'] && $item['contact_id']) {
-                $item['links_clicked'] = $this->getStatRepository()->getUniqueClickedLinksPerContactAndEmail($item['contact_id'], $item['email_id']);
+                $item['links_clicked'] = $this->statRepository->getUniqueClickedLinksPerContactAndEmail($item['contact_id'], $item['email_id']);
             }
 
             $data[$statId] = $item;
@@ -652,7 +648,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      */
     public function getEmailStatus($idHash)
     {
-        return $this->getStatRepository()->getEmailStatus($idHash);
+        return $this->statRepository->getEmailStatus($idHash);
     }
 
     /**
@@ -662,7 +658,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      */
     public function getEmailStati($emailId, $leadId)
     {
-        return $this->getStatRepository()->findBy(
+        return $this->statRepository->findBy(
             [
                 'email' => (int) $emailId,
                 'lead'  => (int) $leadId,
@@ -680,7 +676,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     {
         $emailIds = ($includeVariants && ($entity->isVariant() || $entity->isTranslation())) ? $entity->getRelatedEntityIds() : [$entity->getId()];
 
-        $emailStats            = $this->getStatRepository()->getStatsSummaryByCountry($dateFrom, $dateTo, $emailIds);
+        $emailStats            = $this->statRepository->getStatsSummaryByCountry($dateFrom, $dateTo, $emailIds);
         $results['read_count'] = $results['clicked_through_count'] = [];
 
         foreach ($emailStats as $e) {
@@ -719,15 +715,13 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             ]
         );
 
-        $statRepo = $this->getStatRepository();
-
         $query         = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $key           = ($listCount > 1) ? 1 : 0;
 
         if ($listCount > 1) {
-            $sentCounts         = $statRepo->getSentCount($emailIds, $lists->getKeys(), $query);
-            $readCounts         = $statRepo->getReadCount($emailIds, $lists->getKeys(), $query);
-            $failedCounts       = $statRepo->getFailedCount($emailIds, $lists->getKeys(), $query);
+            $sentCounts         = $this->statRepository->getSentCount($emailIds, $lists->getKeys(), $query);
+            $readCounts         = $this->statRepository->getReadCount($emailIds, $lists->getKeys(), $query);
+            $failedCounts       = $this->statRepository->getFailedCount($emailIds, $lists->getKeys(), $query);
             $clickCounts        = $this->trackableRepository->getCount('email', $emailIds, $lists->getKeys(), $query, false, 'DISTINCT ph.lead_id');
             $unsubscribedCounts = $this->doNotContactRepository->getCount('email', $emailIds, DoNotContact::UNSUBSCRIBED, $lists->getKeys(), $query);
             $bouncedCounts      = $this->doNotContactRepository->getCount('email', $emailIds, DoNotContact::BOUNCED, $lists->getKeys(), $query);
@@ -759,9 +753,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
         if ($listCount) {
             $combined = [
-                $statRepo->getSentCount($emailIds, null, $query),
-                $statRepo->getReadCount($emailIds, null, $query),
-                $statRepo->getFailedCount($emailIds, null, $query),
+                $this->statRepository->getSentCount($emailIds, null, $query),
+                $this->statRepository->getReadCount($emailIds, null, $query),
+                $this->statRepository->getFailedCount($emailIds, null, $query),
                 $this->trackableRepository->getCount('email', $emailIds, null, $query, true, 'DISTINCT ph.lead_id'),
                 $this->doNotContactRepository->getCount('email', $emailIds, DoNotContact::UNSUBSCRIBED, null, $query),
                 $this->doNotContactRepository->getCount('email', $emailIds, DoNotContact::BOUNCED, null, $query),
@@ -1045,9 +1039,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     {
         $emailIds = ($includeVariants && ($email->isVariant() || $email->isTranslation())) ? $email->getRelatedEntityIds() : [$email->getId()];
 
-        $statRepo = $this->getStatRepository();
-
-        $failedCount    = (int) $statRepo->getFailedCount($emailIds);
+        $failedCount    = (int) $this->statRepository->getFailedCount($emailIds);
         $bouncedCount   = (int) $this->doNotContactRepository->getCount('email', $emailIds, DoNotContact::BOUNCED);
         $sentCount      = (int) $email->getSentCount($includeVariants);
         $deliveredCount = $sentCount - $failedCount - $bouncedCount;
@@ -1490,7 +1482,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
                 foreach ($contacts as $contact) {
                     try {
                         if ('list' === $email->getEmailType()
-                            && $this->getStatRepository()->checkContactSentEmail(
+                            && $this->statRepository->checkContactSentEmail(
                                 $contact['id'],
                                 $email->getId(),
                             )) {
@@ -2435,7 +2427,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             return null;
         }
 
-        $lastSentDate = $this->getStatRepository()->getEmailSentLastDate($emailId);
+        $lastSentDate = $this->statRepository->getEmailSentLastDate($emailId);
 
         if (!$lastSentDate) {
             // No emails sent yet — fall back to variant_start_date
@@ -2494,7 +2486,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
     public function isReadyToSendWinner(int $emailId, int $delayHours): bool
     {
-        $lastSentDate = $this->getStatRepository()->getEmailSentLastDate($emailId);
+        $lastSentDate = $this->statRepository->getEmailSentLastDate($emailId);
 
         if (!$lastSentDate) {
             return false;

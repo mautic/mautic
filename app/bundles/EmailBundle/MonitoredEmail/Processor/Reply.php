@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityNotFoundException;
 use Mautic\CoreBundle\Helper\EmailAddressHelper;
 use Mautic\EmailBundle\Entity\EmailReply;
 use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Event\EmailReplyEvent;
 use Mautic\EmailBundle\Model\EmailStatModel;
 use Mautic\EmailBundle\MonitoredEmail\Exception\ReplyNotFound;
@@ -21,6 +22,7 @@ final readonly class Reply implements ProcessorInterface
 {
     public function __construct(
         private EmailStatModel $emailStatModel,
+        private StatRepository $statRepository,
         private ContactFinder $contactFinder,
         private EventDispatcherInterface $dispatcher,
         private LoggerInterface $logger,
@@ -70,7 +72,7 @@ final readonly class Reply implements ProcessorInterface
         if (null !== $stat->getLead()) {
             $this->leadRepository->detachEntity($stat->getLead());
         }
-        $this->emailStatModel->getRepository()->detachEntity($stat);
+        $this->statRepository->detachEntity($stat);
     }
 
     /**
@@ -80,7 +82,7 @@ final readonly class Reply implements ProcessorInterface
     public function createReplyByHash($trackingHash, $messageId): void
     {
         /** @var Stat|null $stat */
-        $stat = $this->emailStatModel->getRepository()->findOneBy(['trackingHash' => $trackingHash]);
+        $stat = $this->statRepository->findOneBy(['trackingHash' => $trackingHash]);
 
         if (null === $stat) {
             throw new EntityNotFoundException("Email Stat with tracking hash {$trackingHash} was not found");

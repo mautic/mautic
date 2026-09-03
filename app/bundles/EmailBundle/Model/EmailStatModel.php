@@ -34,9 +34,4 @@ class EmailStatModel
 
         $this->dispatcher->dispatch(new EmailStatPostSaveEvent($stats));
     }
-
-    public function getRepository(): StatRepository
-    {
-        return $this->statRepository;
-    }
 }
