@@ -21,7 +21,6 @@ use Mautic\CoreBundle\Model\AbTest\AbTestSettingsService;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Test\Doctrine\DBALMocker;
 use Mautic\CoreBundle\Translation\Translator;
-use Mautic\EmailBundle\Entity\CopyRepository;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Entity\Stat;
@@ -288,7 +287,6 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->abTestSettingsServiceMock,
             $this->createStub(EmailVariantConverterService::class),
             $this->emailRepository, // $emailRepository
-            $this->createStub(CopyRepository::class), // $copyRepository
             $this->createStub(StatDeviceRepository::class), // $statDeviceRepository
             $this->leadDeviceRepository, // $leadDeviceRepository
             $this->createStub(CampaignRepository::class), // $campaignRepository
@@ -633,7 +631,6 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->abTestSettingsServiceMock,
             $this->createStub(EmailVariantConverterService::class),
             $this->emailRepository, // $emailRepository
-            $this->createStub(CopyRepository::class), // $copyRepository
             $this->createStub(StatDeviceRepository::class), // $statDeviceRepository
             $this->leadDeviceRepository, // $leadDeviceRepository
             $this->createStub(CampaignRepository::class), // $campaignRepository
@@ -778,7 +775,6 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->abTestSettingsServiceMock,
             $this->createStub(EmailVariantConverterService::class),
             $this->emailRepository, // $emailRepository
-            $this->createStub(CopyRepository::class), // $copyRepository
             $this->createStub(StatDeviceRepository::class), // $statDeviceRepository
             $this->leadDeviceRepository, // $leadDeviceRepository
             $this->createStub(CampaignRepository::class), // $campaignRepository

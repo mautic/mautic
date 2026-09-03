@@ -32,7 +32,6 @@ use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
-use Mautic\EmailBundle\Entity\CopyRepository;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Entity\Stat;
@@ -141,7 +140,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         private readonly AbTestSettingsService $abTestSettingsService,
         private readonly EmailVariantConverterService $variantConverterService,
         private readonly EmailRepository $emailRepository,
-        private readonly CopyRepository $copyRepository,
         private readonly StatDeviceRepository $statDeviceRepository,
         private readonly LeadDeviceRepository $leadDeviceRepository,
         private readonly CampaignRepository $campaignRepository,
