@@ -186,7 +186,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        commands: ['PHPSTAN', 'CS Fixer', 'Rector', 'Twig Lint', 'scaffolded files mismatch', 'composer install', 'composer lock check']
+        commands: ['PHPSTAN', 'CS Fixer', 'Rector', 'Twig Lint', 'Class Leak', 'scaffolded files mismatch', 'composer install', 'composer lock check']
         php-versions: ['8.4']
 
     name: ${{ matrix.commands }} - ${{ matrix.php-versions }}
@@ -301,6 +301,26 @@ jobs:
             }
             echo \"OK: Webroot correctly auto-detected as {\$webrootDir}\n\";
           "
+        elif [[ "${{ matrix.commands }}" == "Class Leak" ]]; then
+          # skip-type entries are false positives: Symfony autodiscovered services and test helpers class-leak cannot see referenced
+          vendor/bin/class-leak check app \
+            --skip-type "Mautic\CacheBundle\Cache\CacheProviderTagAware" \
+            --skip-type "Mautic\CoreBundle\Console\Output\ConsoleDatetimeOutput" \
+            --skip-type "Mautic\CoreBundle\Doctrine\QueryFormatter\MysqlFormatter" \
+            --skip-type "Mautic\CoreBundle\Entity\Transformer\NotificationArrayTransformer" \
+            --skip-type "Mautic\CoreBundle\Factory\PageHelperFactory" \
+            --skip-type "Mautic\CoreBundle\Service\OptimisticLockService" \
+            --skip-type "Mautic\CoreBundle\Service\SearchCommandList" \
+            --skip-type "Mautic\IntegrationsBundle\Sync\SyncJudge\SyncJudge" \
+            --skip-type "Mautic\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelper" \
+            --skip-type "Mautic\IntegrationsBundle\Tests\Functional\Auth\Provider\Oauth2ThreeLegged\HttpFactory" \
+            --skip-type "Mautic\MessengerBundle\DependencyInjection\EnvProcessor\MessengerNullableEnvVarProcessor" \
+            --skip-type "Mautic\MessengerBundle\Transport\NullTransportFactory" \
+            --skip-type "Mautic\PluginBundle\Integration\AbstractSsoFormIntegration" \
+            --skip-type "Mautic\ReportBundle\Tests\Form\Type\DynamicFiltersTypeIntegrationTest" \
+            --skip-type "Mautic\CoreBundle\Controller\KeepAliveController" \
+            --skip-type "Mautic\CoreBundle\Tests\Twig\TwigIntegrationTestTrait" \
+            --skip-type "Mautic\IntegrationsBundle\Integration\DefaultConfigFormTrait"
         elif [[ "${{ matrix.commands }}" == "composer lock check" ]]; then
           composer validate --ansi
         else
