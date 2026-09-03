@@ -21,4 +21,6 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->alias('mautic.integration.clearbit', MauticPlugin\MauticClearbitBundle\Integration\ClearbitIntegration::class);
     $services->alias('mautic.integration.clearbit.config', MauticPlugin\MauticClearbitBundle\Integration\Support\ConfigSupport::class);
+    $services->alias('mautic.plugin.clearbit.lookup_helper', MauticPlugin\MauticClearbitBundle\Helper\LookupHelper::class)
+        ->deprecate('mautic/mautic', '7.2', 'The "%alias_id%" service alias is deprecated. Use the "'.MauticPlugin\MauticClearbitBundle\Helper\LookupHelper::class.'" service instead.');
 };

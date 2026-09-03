@@ -30,4 +30,6 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->set(Mautic\ChannelBundle\Helper\ChannelListHelper::class)
         ->tag('twig.helper', ['alias' => 'channel']);
+    $services->alias('mautic.channel.helper.channel_list', Mautic\ChannelBundle\Helper\ChannelListHelper::class)
+        ->deprecate('mautic/mautic', '7.2', 'The "%alias_id%" service alias is deprecated. Use the "'.Mautic\ChannelBundle\Helper\ChannelListHelper::class.'" service instead.');
 };
