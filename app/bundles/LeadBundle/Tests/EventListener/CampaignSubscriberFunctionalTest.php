@@ -36,6 +36,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     use LeadFieldTestTrait;
