@@ -24,14 +24,16 @@ use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CampaignBundle\Form\Type\CampaignEventJumpToEventType;
 use Mautic\CampaignBundle\Helper\RemovedContactTracker;
+use Mautic\CampaignBundle\Model\SummaryModel;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Form\Type\EmailSendType;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class EventExecutionerTest extends \PHPUnit\Framework\TestCase
 {
     /**
@@ -185,7 +187,7 @@ final class EventExecutionerTest extends \PHPUnit\Framework\TestCase
             $this->createStub(LoggerInterface::class),
             $this->eventScheduler,
             $this->createStub(RemovedContactTracker::class),
-            $this->createStub(\Mautic\CampaignBundle\Model\SummaryModel::class),
+            $this->createStub(SummaryModel::class),
         );
     }
 

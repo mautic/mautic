@@ -13,9 +13,10 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\EventListener\CampaignSubscriber;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class CampaignSubscriberTest extends TestCase
 {
     public function testActionPassesLogWhenNoIntegrationRejects(): void

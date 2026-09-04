@@ -15,10 +15,11 @@ use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\EventListener\CampaignSendSubscriber;
 use Mautic\SmsBundle\Model\SmsModel;
 use Mautic\SmsBundle\Sms\TransportChain;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class CampaignSendSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private MockObject&SmsModel $smsModel;

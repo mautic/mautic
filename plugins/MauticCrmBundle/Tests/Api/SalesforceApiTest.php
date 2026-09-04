@@ -9,13 +9,14 @@ use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCrmBundle\Api\SalesforceApi;
 use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
 use Psr\SimpleCache\CacheInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[CoversClass(SalesforceApi::class)]
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 {
     #[TestDox('Test that a locked record request is retried up to 3 times')]

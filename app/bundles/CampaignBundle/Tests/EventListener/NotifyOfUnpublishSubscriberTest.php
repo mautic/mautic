@@ -8,10 +8,11 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Event\NotifyOfUnpublishEvent;
 use Mautic\CampaignBundle\EventListener\NotifyOfUnpublishSubscriber;
 use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class NotifyOfUnpublishSubscriberTest extends TestCase
 {
     private MockObject&NotificationHelper $notificationHelper;

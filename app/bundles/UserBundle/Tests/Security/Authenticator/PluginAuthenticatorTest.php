@@ -15,6 +15,7 @@ use Mautic\UserBundle\Security\Authenticator\Passport\Badge\PluginBadge;
 use Mautic\UserBundle\Security\Authenticator\PluginAuthenticator;
 use Mautic\UserBundle\UserEvents;
 use OAuth2\OAuth2;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -30,7 +31,7 @@ use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class PluginAuthenticatorTest extends TestCase
 {
     public function testAuthenticateByPreAuthenticationReplacesToken(): void

@@ -7,10 +7,11 @@ namespace Mautic\SmsBundle\Tests\DependencyInjection\Compiler;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\SmsBundle\DependencyInjection\Compiler\SmsTransportPass;
 use Mautic\SmsBundle\Sms\TransportChain;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class SmsTransportPassTest extends TestCase
 {
     public function testProcess(): void

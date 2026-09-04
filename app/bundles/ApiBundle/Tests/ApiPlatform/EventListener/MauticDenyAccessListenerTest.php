@@ -12,6 +12,7 @@ use Mautic\ApiBundle\ApiPlatform\EventListener\MauticDenyAccessListener;
 use Mautic\ApiBundle\Event\ApiPlatformPermissionContextEvent;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -21,7 +22,7 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class MauticDenyAccessListenerTest extends TestCase
 {
     private MockObject&CorePermissions $corePermissionsMock;

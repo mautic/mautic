@@ -7,10 +7,11 @@ namespace Mautic\CoreBundle\Tests\Unit\Shortener;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Shortener\Shortener;
 use Mautic\CoreBundle\Shortener\ShortenerServiceInterface;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class ShortenerTest extends TestCase
 {
     /**

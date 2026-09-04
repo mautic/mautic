@@ -8,10 +8,11 @@ use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\EventListener\DetermineWinnerSubscriber;
 use Mautic\PageBundle\Entity\Page;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**

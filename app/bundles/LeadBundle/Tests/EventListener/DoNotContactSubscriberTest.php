@@ -9,8 +9,9 @@ use Mautic\LeadBundle\Event\DoNotContactAddEvent;
 use Mautic\LeadBundle\Event\DoNotContactRemoveEvent;
 use Mautic\LeadBundle\EventListener\DoNotContactSubscriber;
 use Mautic\LeadBundle\Model\DoNotContact;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class DoNotContactSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private DoNotContactSubscriber $doNotContactSubscriber;

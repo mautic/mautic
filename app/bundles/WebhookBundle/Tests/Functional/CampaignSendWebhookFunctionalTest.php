@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\HttpFoundation\Response;
 
 final class CampaignSendWebhookFunctionalTest extends MauticMysqlTestCase
 {
@@ -134,7 +135,7 @@ final class CampaignSendWebhookFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request('POST', '/api/campaigns/new', $payload);
         $response = $this->client->getResponse();
-        $this->assertSame(\Symfony\Component\HttpFoundation\Response::HTTP_CREATED, $response->getStatusCode(), (string) $response->getContent());
+        $this->assertSame(Response::HTTP_CREATED, $response->getStatusCode(), (string) $response->getContent());
 
         $responseData = json_decode($response->getContent(), true);
         $campaignId   = $responseData['campaign']['id'];

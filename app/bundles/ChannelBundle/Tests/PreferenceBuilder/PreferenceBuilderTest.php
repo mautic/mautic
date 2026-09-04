@@ -11,9 +11,10 @@ use Mautic\ChannelBundle\PreferenceBuilder\ChannelPreferences;
 use Mautic\ChannelBundle\PreferenceBuilder\PreferenceBuilder;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Psr\Log\NullLogger;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class PreferenceBuilderTest extends \PHPUnit\Framework\TestCase
 {
     public function testChannelsArePrioritized(): void

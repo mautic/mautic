@@ -6,11 +6,12 @@ namespace Mautic\CoreBundle\Tests\Unit\Factory;
 
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\PointBundle\Model\TriggerModel;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class ModelFactoryTest extends TestCase
 {
     /**

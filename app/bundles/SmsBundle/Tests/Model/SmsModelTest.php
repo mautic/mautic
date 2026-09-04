@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\SmsBundle\Collection\RecipientCollection;
@@ -21,13 +22,14 @@ use Mautic\SmsBundle\Form\Type\SmsType;
 use Mautic\SmsBundle\Helper\DTO\SmsRecipientDTO;
 use Mautic\SmsBundle\Model\SmsModel;
 use Mautic\SmsBundle\Sms\TransportChain;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class SmsModelTest extends \PHPUnit\Framework\TestCase
 {
     private \PHPUnit\Framework\MockObject\Stub&EntityManagerInterface $entityManger;
@@ -87,7 +89,7 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
             $this->coreParametersHelper,
             $this->smsRepository, // $smsRepository
             $this->createStub(StatRepository::class), // $statRepository
-            $this->createStub(\Mautic\LeadBundle\Entity\LeadListRepository::class), // $leadListRepository
+            $this->createStub(LeadListRepository::class), // $leadListRepository
         );
     }
 
@@ -174,7 +176,7 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
                 $this->coreParametersHelper,
                 $smsRepo,
                 $this->createStub(StatRepository::class),
-                $this->createStub(\Mautic\LeadBundle\Entity\LeadListRepository::class),
+                $this->createStub(LeadListRepository::class),
             ])
             ->onlyMethods(['getRepository'])
             ->getMock();

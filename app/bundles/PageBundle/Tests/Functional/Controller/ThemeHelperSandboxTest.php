@@ -6,6 +6,7 @@ namespace Mautic\PageBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\Page;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -18,7 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
  * - configGetParameter() for credential/secret leakage
  * - source() for arbitrary file read
  */
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class ThemeHelperSandboxTest extends MauticMysqlTestCase
 {
     private string $themesDir;

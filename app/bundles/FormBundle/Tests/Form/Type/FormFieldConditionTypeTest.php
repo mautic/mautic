@@ -8,12 +8,13 @@ use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\FormBundle\Form\Type\FormFieldConditionType;
 use Mautic\FormBundle\Helper\PropertiesAccessor;
 use Mautic\FormBundle\Model\FieldModel;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Rule\AnyInvokedCount;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**

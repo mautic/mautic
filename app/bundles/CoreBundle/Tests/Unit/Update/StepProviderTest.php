@@ -6,10 +6,11 @@ namespace Mautic\CoreBundle\Tests\Unit\Update;
 
 use Mautic\CoreBundle\Update\Step\StepInterface;
 use Mautic\CoreBundle\Update\StepProvider;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class StepProviderTest extends TestCase
 {
     private StepProvider $provider;

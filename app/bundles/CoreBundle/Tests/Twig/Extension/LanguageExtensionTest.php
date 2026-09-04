@@ -6,10 +6,11 @@ namespace Mautic\CoreBundle\Tests\Twig\Extension;
 
 use Mautic\CoreBundle\Twig\Extension\LanguageExtension;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Security;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class LanguageExtensionTest extends TestCase
 {
     public function testGetLanguageNameReturnsEnglishForEn(): void

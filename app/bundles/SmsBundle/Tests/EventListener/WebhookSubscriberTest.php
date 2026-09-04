@@ -10,9 +10,10 @@ use Mautic\SmsBundle\EventListener\WebhookSubscriber;
 use Mautic\SmsBundle\SmsEvents;
 use Mautic\WebhookBundle\Event\WebhookBuilderEvent;
 use Mautic\WebhookBundle\Model\WebhookModel;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
