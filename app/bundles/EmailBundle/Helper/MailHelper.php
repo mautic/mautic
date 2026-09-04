@@ -1375,7 +1375,7 @@ class MailHelper
             if ($toEmail) {
                 $unsubscribeHash = $this->mailHashHelper->getEmailHash($toEmail);
                 $url             = $this->router->generate('mautic_email_unsubscribe',
-                    ['idHash' => $this->idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash],
+                    ['idHash' => $this->idHash, 'urlEmail' => rawurlencode($toEmail), 'secretHash' => $unsubscribeHash],
                     UrlGeneratorInterface::ABSOLUTE_URL
                 );
             } else {
