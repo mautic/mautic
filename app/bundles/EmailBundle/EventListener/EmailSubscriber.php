@@ -9,8 +9,14 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Event as Events;
+use Mautic\EmailBundle\Event\EmailDisplayEvent;
 use Mautic\EmailBundle\Event\EmailEditSubmitEvent;
 use Mautic\EmailBundle\Event\EmailEvent;
+use Mautic\EmailBundle\Event\EmailPostDeleteEvent;
+use Mautic\EmailBundle\Event\EmailPostSaveEvent;
+use Mautic\EmailBundle\Event\EmailPreDeleteEvent;
+use Mautic\EmailBundle\Event\EmailPreSaveEvent;
+use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Model\EmailDraftModel;
 use Mautic\EmailBundle\Model\EmailModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -43,15 +49,15 @@ final readonly class EmailSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            EmailEvents::EMAIL_PRE_SAVE       => ['cloneParentEmailDataForVariant', 0],
-            EmailEvents::EMAIL_POST_SAVE      => ['onEmailPostSave', 0],
-            EmailEvents::EMAIL_ON_SEND        => ['onEmailSendAddPreheaderText', 200],
-            EmailEvents::EMAIL_ON_DISPLAY     => ['onEmailSendAddPreheaderText', 200],
-            EmailEvents::EMAIL_POST_DELETE    => ['onEmailDelete', 0],
-            EmailEvents::EMAIL_FAILED         => ['onEmailFailed', 0],
-            EmailEvents::EMAIL_RESEND         => ['onEmailResend', 0],
-            EmailEvents::ON_EMAIL_EDIT_SUBMIT => ['manageEmailDraft'],
-            EmailEvents::EMAIL_PRE_DELETE     => ['deleteEmailDraft'],
+            EmailPreSaveEvent::class    => ['cloneParentEmailDataForVariant', 0],
+            EmailPostSaveEvent::class   => ['onEmailPostSave', 0],
+            EmailSendEvent::class       => ['onEmailSendAddPreheaderText', 200],
+            EmailDisplayEvent::class    => ['onEmailSendAddPreheaderText', 200],
+            EmailPostDeleteEvent::class => ['onEmailDelete', 0],
+            EmailEvents::EMAIL_FAILED   => ['onEmailFailed', 0],
+            EmailEvents::EMAIL_RESEND   => ['onEmailResend', 0],
+            EmailEditSubmitEvent::class => ['manageEmailDraft'],
+            EmailPreDeleteEvent::class  => ['deleteEmailDraft'],
         ];
     }
 
@@ -85,7 +91,7 @@ final readonly class EmailSubscriber implements EventSubscriberInterface
     /**
      * Add preheader text to email body.
      */
-    public function onEmailSendAddPreheaderText(Events\EmailSendEvent $event): void
+    public function onEmailSendAddPreheaderText(EmailSendEvent $event): void
     {
         $email = $event->getEmail();
         $html  = $event->getContent();

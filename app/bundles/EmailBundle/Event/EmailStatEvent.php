@@ -7,7 +7,7 @@ namespace Mautic\EmailBundle\Event;
 use Mautic\EmailBundle\Entity\Stat;
 use Symfony\Contracts\EventDispatcher\Event;
 
-final class EmailStatEvent extends Event
+class EmailStatEvent extends Event
 {
     /**
      * @param Stat[] $stats

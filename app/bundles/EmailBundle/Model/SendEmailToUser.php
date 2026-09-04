@@ -3,11 +3,10 @@
 namespace Mautic\EmailBundle\Model;
 
 use Doctrine\ORM\ORMException;
-use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Exception\InvalidValueException;
 use Mautic\CoreBundle\Exception\RecordException;
 use Mautic\CoreBundle\Helper\ArrayHelper;
-use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Event\OnEmailAddressTokenReplacementEvent;
 use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Helper\EmailValidator;
@@ -100,8 +99,8 @@ class SendEmailToUser
 
     private function replaceToken(string $token, Lead $lead): string
     {
-        $tokenEvent = new TokenReplacementEvent($token, $lead);
-        $this->dispatcher->dispatch($tokenEvent, EmailEvents::ON_EMAIL_ADDRESS_TOKEN_REPLACEMENT);
+        $tokenEvent = new OnEmailAddressTokenReplacementEvent($token, $lead);
+        $this->dispatcher->dispatch($tokenEvent);
 
         return $tokenEvent->getContent();
     }

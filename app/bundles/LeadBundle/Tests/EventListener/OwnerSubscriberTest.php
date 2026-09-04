@@ -12,7 +12,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\CopyRepository;
-use Mautic\EmailBundle\Event\EmailBuilderEvent;
+use Mautic\EmailBundle\Event\EmailOnBuildEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Helper\FromEmailHelper;
 use Mautic\EmailBundle\Helper\MailHashHelper;
@@ -91,7 +91,7 @@ final class OwnerSubscriberTest extends TestCase
     public function testOnEmailBuild(): void
     {
         $subscriber = new OwnerSubscriber($this->getMockTranslator(), $this->getMockLeadRepository());
-        $event      = new EmailBuilderEvent($this->getMockTranslator());
+        $event      = new EmailOnBuildEvent($this->getMockTranslator());
         $subscriber->onEmailBuild($event);
 
         $tokens = $event->getTokens();

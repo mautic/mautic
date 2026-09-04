@@ -11,11 +11,11 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
-use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Copy;
 use Mautic\EmailBundle\Entity\CopyRepository;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Event\EmailPreSendEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Form\Type\ConfigType;
 use Mautic\EmailBundle\Helper\DTO\AddressDTO;
@@ -1481,7 +1481,7 @@ class MailHelper
         $this->eventTokens = [];
 
         $event = new EmailSendEvent($this);
-        $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_SEND);
+        $this->dispatcher->dispatch($event);
         $this->eventTokens = $event->getTokens(false);
     }
 
@@ -2052,8 +2052,8 @@ class MailHelper
 
     public function dispatchPreSendEvent(): void
     {
-        $event = new EmailSendEvent($this);
-        $this->dispatcher->dispatch($event, EmailEvents::EMAIL_PRE_SEND);
+        $event = new EmailPreSendEvent($this);
+        $this->dispatcher->dispatch($event);
 
         $this->skip               = $event->isSkip();
         $this->fatal              = $event->isFatal();

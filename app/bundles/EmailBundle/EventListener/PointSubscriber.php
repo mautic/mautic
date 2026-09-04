@@ -33,7 +33,7 @@ final readonly class PointSubscriber implements EventSubscriberInterface
             PointEvents::POINT_ON_BUILD   => ['onPointBuild', 0],
             PointEvents::TRIGGER_ON_BUILD => ['onTriggerBuild', 0],
             EmailOpenEvent::class         => ['onEmailOpen', 0],
-            EmailEvents::EMAIL_ON_SEND    => ['onEmailSend', 0],
+            EmailSendEvent::class         => ['onEmailSend', 0],
         ];
     }
 

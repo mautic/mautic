@@ -10,7 +10,6 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
-use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\CopyRepository;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -1367,8 +1366,8 @@ final class MailHelperTest extends TestCase
         $trackedHtml = $initialHtml.'{unsubscribe_url}<img height="1" width="1" src="{tracking_pixel}" alt="" />';
 
         $this->dispatcher->method('dispatch')
-            ->willReturnCallback(function (EmailSendEvent $event, string $eventName): EmailSendEvent {
-                if (EmailEvents::EMAIL_ON_SEND === $eventName) {
+            ->willReturnCallback(function (EmailSendEvent $event): EmailSendEvent {
+                if (EmailSendEvent::class === $event::class) {
                     $event->addToken('{ token }', 'https://mautic.com/app/assets/images/flags/Venezuela.png');
                     $event->addToken('{ country }', 'Venezuela');
                 }
@@ -1445,8 +1444,8 @@ final class MailHelperTest extends TestCase
         $onSendDispatchCount = 0;
         $eventDispatcher->expects($this->atLeastOnce())
             ->method('dispatch')
-            ->willReturnCallback(function (object $event, ?string $eventName = null) use (&$onSendDispatchCount): object {
-                if ($event instanceof EmailSendEvent && EmailEvents::EMAIL_ON_SEND === $eventName) {
+            ->willReturnCallback(function (object $event) use (&$onSendDispatchCount): object {
+                if (EmailSendEvent::class === $event::class) {
                     ++$onSendDispatchCount;
                     $event->addToken('{signature}', 'Demo Signature');
                 }

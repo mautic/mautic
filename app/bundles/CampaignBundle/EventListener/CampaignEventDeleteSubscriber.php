@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\EventListener;
 
-use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Event\DeleteCampaign;
 use Mautic\CampaignBundle\Event\DeleteEvent;
@@ -26,8 +25,8 @@ final readonly class CampaignEventDeleteSubscriber implements EventSubscriberInt
     public static function getSubscribedEvents(): array
     {
         return [
-            DeleteCampaign::class              => ['onCampaignDelete', 0],
-            CampaignEvents::ON_EVENT_DELETE    => ['onEventDelete', 0],
+            DeleteCampaign::class => ['onCampaignDelete', 0],
+            DeleteEvent::class    => ['onEventDelete', 0],
         ];
     }
 

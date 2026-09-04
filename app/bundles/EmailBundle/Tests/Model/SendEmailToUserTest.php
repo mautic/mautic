@@ -6,7 +6,6 @@ namespace Mautic\EmailBundle\Tests\Model;
 
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Exception\RecordNotPublishedException;
-use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
@@ -179,7 +178,6 @@ final class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
                         return true;
                     }
                 ),
-                EmailEvents::ON_EMAIL_ADDRESS_TOKEN_REPLACEMENT,
             );
         $matcher = $this->exactly(4);
 

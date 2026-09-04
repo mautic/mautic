@@ -3,8 +3,8 @@
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
-use Mautic\EmailBundle\EmailEvents;
-use Mautic\EmailBundle\Event\EmailBuilderEvent;
+use Mautic\EmailBundle\Event\EmailDisplayEvent;
+use Mautic\EmailBundle\Event\EmailOnBuildEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\PageBundle\Event\UrlTokenReplaceEvent;
@@ -33,16 +33,16 @@ final class OwnerSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            EmailEvents::EMAIL_ON_BUILD    => ['onEmailBuild', 0],
-            EmailEvents::EMAIL_ON_SEND     => ['onEmailGenerate', 0],
-            EmailEvents::EMAIL_ON_DISPLAY  => ['onEmailDisplay', 0],
-            TokensBuildEvent::class        => ['onSmsTokensBuild', 0],
-            SmsEvents::TOKEN_REPLACEMENT   => ['onSmsTokenReplacement', 0],
-            UrlTokenReplaceEvent::class    => ['onUrlTokenReplace', 0],
+            EmailOnBuildEvent::class     => ['onEmailBuild', 0],
+            EmailSendEvent::class        => ['onEmailGenerate', 0],
+            EmailDisplayEvent::class     => ['onEmailDisplay', 0],
+            TokensBuildEvent::class      => ['onSmsTokensBuild', 0],
+            SmsEvents::TOKEN_REPLACEMENT => ['onSmsTokenReplacement', 0],
+            UrlTokenReplaceEvent::class  => ['onUrlTokenReplace', 0],
         ];
     }
 
-    public function onEmailBuild(EmailBuilderEvent $event): void
+    public function onEmailBuild(EmailOnBuildEvent $event): void
     {
         $event->addTokens($this->getTokens());
     }

@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\AssetBundle\AssetEvents;
-use Mautic\EmailBundle\EmailEvents;
-use Mautic\EmailBundle\Event\EmailBuilderEvent;
+use Mautic\EmailBundle\Event\EmailOnBuildEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class EmailSubscriber implements EventSubscriberInterface
@@ -14,11 +13,11 @@ final class EmailSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            EmailEvents::EMAIL_ON_BUILD => ['onEmailBuild', 0],
+            EmailOnBuildEvent::class => ['onEmailBuild', 0],
         ];
     }
 
-    public function onEmailBuild(EmailBuilderEvent $event): void
+    public function onEmailBuild(EmailOnBuildEvent $event): void
     {
         if ($event->abTestWinnerCriteriaRequested()) {
             // add AB Test Winner Criteria

@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace MauticPlugin\GrapesJsBuilderBundle\EventSubscriber;
 
-use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Event as Events;
+use Mautic\EmailBundle\Event\EmailEditSubmitEvent;
+use Mautic\EmailBundle\Event\EmailPostDeleteEvent;
+use Mautic\EmailBundle\Event\EmailPostSaveEvent;
+use Mautic\EmailBundle\Event\EmailPreSaveEvent;
 use Mautic\EmailBundle\Helper\EmailConfigInterface;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
@@ -31,10 +34,10 @@ final class EmailSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            EmailEvents::EMAIL_PRE_SAVE       => ['onEmailPreSave', 0],
-            EmailEvents::EMAIL_POST_SAVE      => ['onEmailPostSave', 0],
-            EmailEvents::EMAIL_POST_DELETE    => ['onEmailDelete', 0],
-            EmailEvents::ON_EMAIL_EDIT_SUBMIT => ['manageEmailDraft'],
+            EmailPreSaveEvent::class    => ['onEmailPreSave', 0],
+            EmailPostSaveEvent::class   => ['onEmailPostSave', 0],
+            EmailPostDeleteEvent::class => ['onEmailDelete', 0],
+            EmailEditSubmitEvent::class => ['manageEmailDraft'],
         ];
     }
 
@@ -85,7 +88,7 @@ final class EmailSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function manageEmailDraft(Events\EmailEditSubmitEvent $event): void
+    public function manageEmailDraft(EmailEditSubmitEvent $event): void
     {
         if (!$this->config->isPublished()) {
             return;

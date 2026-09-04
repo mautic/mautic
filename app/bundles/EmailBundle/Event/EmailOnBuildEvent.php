@@ -7,12 +7,9 @@ namespace Mautic\EmailBundle\Event;
 use Mautic\CoreBundle\Event\BuilderEvent;
 use Mautic\EmailBundle\Entity\Email;
 
-final class EmailBuilderEvent extends BuilderEvent
+final class EmailOnBuildEvent extends BuilderEvent
 {
-    /**
-     * @return Email|null
-     */
-    public function getEmail()
+    public function getEmail(): ?Email
     {
         return $this->entity;
     }

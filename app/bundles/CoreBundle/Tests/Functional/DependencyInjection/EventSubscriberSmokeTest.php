@@ -170,7 +170,7 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
             \Mautic\PageBundle\EventListener\ConfigSubscriber::class,
             \Mautic\UserBundle\EventListener\ConfigSubscriber::class,
         ],
-        'mautic.email_on_send' => [
+        \Mautic\EmailBundle\Event\EmailSendEvent::class => [
             \Mautic\AssetBundle\EventListener\BuilderSubscriber::class,
             \Mautic\EmailBundle\EventListener\BuilderSubscriber::class,
             DateTimeTokenSubscriber::class,

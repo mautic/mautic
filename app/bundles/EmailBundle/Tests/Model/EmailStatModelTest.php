@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
+use Mautic\EmailBundle\Event\EmailStatEvent;
+use Mautic\EmailBundle\Event\EmailStatPostSaveEvent;
 use Mautic\EmailBundle\Model\EmailStatModel;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -46,13 +47,13 @@ final class EmailStatModelTest extends TestCase
             {
                 switch ($this->dispatchMethodCounter) {
                     case 0:
-                        Assert::assertSame(EmailEvents::ON_EMAIL_STAT_PRE_SAVE, $eventName);
+                        Assert::assertSame(EmailStatEvent::class, $event::class);
                         Assert::assertCount(1, $event->getStats());
                         Assert::assertNull($event->getStats()[0]->getId());
                         break;
 
                     case 1:
-                        Assert::assertSame(EmailEvents::ON_EMAIL_STAT_POST_SAVE, $eventName);
+                        Assert::assertInstanceOf(EmailStatPostSaveEvent::class, $event);
                         Assert::assertCount(1, $event->getStats());
                         Assert::assertSame('123', $event->getStats()[0]->getId());
                         break;

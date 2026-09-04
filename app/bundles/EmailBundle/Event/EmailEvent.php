@@ -7,7 +7,7 @@ namespace Mautic\EmailBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\EmailBundle\Entity\Email;
 
-final class EmailEvent extends CommonEvent
+class EmailEvent extends CommonEvent
 {
     public function __construct(Email &$email, bool $isNew = false)
     {
