@@ -20,7 +20,6 @@ use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Helper\FakeContactHelper;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -253,7 +252,7 @@ final class EmailControllerTest extends TestCase
 
         $request = new Request();
         $this->requestStack->push($request);
-        $this->controller->sendExampleAction($request, 1, $this->corePermissionsMock, $this->modelMock, $this->createStub(LeadModel::class), $this->createStub(FakeContactHelper::class));
+        $this->controller->sendExampleAction($request, 1, $this->corePermissionsMock, $this->modelMock, $this->createStub(FakeContactHelper::class));
     }
 
     public function testWinnerActionForDispatchManualWinnerEvent(): void

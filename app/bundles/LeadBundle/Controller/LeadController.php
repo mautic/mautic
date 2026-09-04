@@ -1432,7 +1432,7 @@ final class LeadController extends FormController
     /**
      * @param int $objectId
      */
-    public function emailAction(Request $request, UserHelper $userHelper, MailHelper $mailHelper, LeadModel $leadModel, EmailModel $emailModel, $objectId = 0): JsonResponse|Response
+    public function emailAction(Request $request, UserHelper $userHelper, MailHelper $mailHelper, EmailModel $emailModel, $objectId = 0): JsonResponse|Response
     {
         $valid = $cancelled = false;
 
@@ -1619,10 +1619,8 @@ final class LeadController extends FormController
 
     /**
      * Bulk edit lead campaigns.
-     *
-     * @param int $objectId
      */
-    public function batchCampaignsAction(Request $request, MembershipManager $membershipManager, $objectId = 0): JsonResponse|Response
+    public function batchCampaignsAction(Request $request, MembershipManager $membershipManager): JsonResponse|Response
     {
         if ('POST' === $request->getMethod()) {
             $data  = $request->request->all()['lead_batch'] ?? [];
@@ -1810,10 +1808,8 @@ final class LeadController extends FormController
 
     /**
      * Bulk edit lead stages.
-     *
-     * @param int $objectId
      */
-    public function batchStagesAction(Request $request, $objectId = 0): JsonResponse|Response
+    public function batchStagesAction(Request $request): JsonResponse|Response
     {
         if ('POST' === $request->getMethod()) {
             $data  = $request->request->all()['lead_batch_stage'] ?? [];
@@ -1907,10 +1903,8 @@ final class LeadController extends FormController
 
     /**
      * Bulk edit lead owner.
-     *
-     * @param int $objectId
      */
-    public function batchOwnersAction(Request $request, $objectId = 0): JsonResponse|Response
+    public function batchOwnersAction(Request $request): JsonResponse|Response
     {
         if (!$this->security->isGranted('user:users:view')) {
             $this->throwAccessDenied();

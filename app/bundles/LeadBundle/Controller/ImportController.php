@@ -190,10 +190,9 @@ final class ImportController extends FormController
     }
 
     /**
-     * @param int  $objectId
      * @param bool $ignorePost
      */
-    public function newAction(Request $request, $objectId = 0, $ignorePost = false): Response
+    public function newAction(Request $request, $ignorePost = false): Response
     {
         try {
             $initEvent = $this->dispatchImportOnInit();
@@ -262,7 +261,7 @@ final class ImportController extends FormController
                     $this->removeImportFile($fullPath);
                     $this->logger->log(LogLevel::INFO, "Import for file {$fullPath} failed with: {$e->getMessage()}.");
 
-                    return $this->newAction($request, 0, true);
+                    return $this->newAction($request, true);
                 }
 
                 break;
@@ -317,7 +316,7 @@ final class ImportController extends FormController
                 $reason = isset($form) ? 'the form is empty' : 'the form was canceled';
                 $this->logger->log(LogLevel::WARNING, "Import for file {$fullPath} was aborted because {$reason}.");
 
-                return $this->newAction($request, 0, true);
+                return $this->newAction($request, true);
             }
 
             $valid = $this->isFormValid($form);
@@ -370,7 +369,7 @@ final class ImportController extends FormController
                                     $this->requestStack->getSession()->set('mautic.'.$object.'.import.progress', [0, $linecount]);
                                     $this->requestStack->getSession()->set('mautic.'.$object.'.import.original.file', $fileData->getClientOriginalName());
 
-                                    return $this->newAction($request, 0, true);
+                                    return $this->newAction($request, true);
                                 }
                             } catch (FileException $e) {
                                 if (str_contains($e->getMessage(), 'upload_max_filesize')) {
@@ -411,7 +410,7 @@ final class ImportController extends FormController
                         $this->removeImportFile($fullPath);
                         $this->logger->log(LogLevel::WARNING, "Import for file {$fullPath} was aborted as there were no matched files found.");
 
-                        return $this->newAction($request, 0, true);
+                        return $this->newAction($request, true);
                     }
 
                     /** @var Import $import */
@@ -451,7 +450,7 @@ final class ImportController extends FormController
                         return $this->indexAction($request);
                     }
 
-                    return $this->newAction($request, 0, true);
+                    return $this->newAction($request, true);
                 default:
                     // Done or something wrong
 

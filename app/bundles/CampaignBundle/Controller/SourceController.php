@@ -251,7 +251,7 @@ class SourceController extends CommonFormController
     /**
      * Deletes the entity.
      */
-    public function deleteAction(Request $request, $objectId): JsonResponse
+    public function deleteAction(Request $request): JsonResponse
     {
         $this->setCampaignElements($request->request);
         $modifiedSources = $this->modifiedSources;

@@ -12,12 +12,10 @@ use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\FormBundle\Entity\FieldRepository;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Event\SubmissionEvent;
-use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Helper\TokenHelper;
-use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\UserBundle\Entity\UserRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -686,7 +684,7 @@ final class PublicController extends CommonFormController
         name: 'mautic_form_company_lookup',
         methods: ['POST'],
     )]
-    public function lookupCompanyAction(Request $request, FieldModel $fieldModel, CompanyModel $companyModel): JsonResponse
+    public function lookupCompanyAction(Request $request): JsonResponse
     {
         $parameters = json_decode($request->getContent(), true);
         $search     = InputHelper::clean($parameters['search'] ?? '');
