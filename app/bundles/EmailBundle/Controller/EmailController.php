@@ -1620,6 +1620,76 @@ final class EmailController extends FormController
         );
     }
 
+    public function batchSendExampleAction(Request $request, FakeContactHelper $fakeLeadHelper): Response
+    {
+        $page      = $request->getSession()->get('mautic.email.page', 1);
+        $returnUrl = $this->generateUrl('mautic_email_index', ['page' => $page]);
+        $flashes   = [];
+        $sent      = 0;
+
+        if ($request->isMethod(Request::METHOD_POST)) {
+            $ids    = json_decode($request->query->getString('ids'), true);
+            $fields = $fakeLeadHelper->prepareFakeContactWithPrimaryCompany();
+            $users  = [[
+                'id'        => $this->user->getId(),
+                'firstname' => $this->user->getFirstName(),
+                'lastname'  => $this->user->getLastName(),
+                'email'     => $this->user->getEmail(),
+            ]];
+
+            foreach (is_array($ids) ? $ids : [] as $objectId) {
+                $entity = $this->emailModel->getEntity($objectId);
+
+                if (!$entity instanceof Email) {
+                    $flashes[] = [
+                        'type'    => 'error',
+                        'msg'     => 'mautic.email.error.notfound',
+                        'msgVars' => ['%id%' => $objectId],
+                    ];
+                } elseif (!$this->security->hasEntityAccess(
+                    'email:emails:viewown',
+                    'email:emails:viewother',
+                    $entity->getCreatedBy()
+                )) {
+                    $flashes[] = $this->getAccessDeniedFlash();
+                } else {
+                    $entity->setSubject(sprintf('%s %s', self::EXAMPLE_EMAIL_SUBJECT_PREFIX, $entity->getSubject()));
+                    $errors = $this->emailModel->sendSampleEmailToUser($entity, $users, $fields, [], [], false);
+
+                    if ([] === $errors) {
+                        ++$sent;
+                    } else {
+                        $flashes[] = [
+                            'type'    => 'error',
+                            'msg'     => 'mautic.email.error.batch_test_failed',
+                            'msgVars' => ['%name%' => $entity->getName()],
+                        ];
+                    }
+                }
+            }
+        }
+
+        $flashes[] = [
+            'type'    => 'notice',
+            'msg'     => 'mautic.email.notice.batch_test_sent',
+            'msgVars' => [
+                '%count%' => $sent,
+                '%email%' => $this->user->getEmail(),
+            ],
+        ];
+
+        return $this->postActionRedirect([
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => ['page' => $page],
+            'contentTemplate' => self::class.'::indexAction',
+            'passthroughVars' => [
+                'activeLink'    => '#mautic_email_index',
+                'mauticContent' => 'email',
+            ],
+            'flashes' => $flashes,
+        ]);
+    }
+
     public function scheduleSendAction(CorePermissions $security, EmailModel $model, Request $request, int $objectId): JsonResponse|Response
     {
         $entity = $model->getEntity($objectId);

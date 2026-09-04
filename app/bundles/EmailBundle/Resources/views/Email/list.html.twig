@@ -36,6 +36,17 @@
                             'btnText': 'mautic.email.batch.categories'|trans,
                             'iconClass': 'ri-folder-line',
                         },
+                        {
+                            'confirm': {
+                                'message': 'mautic.email.form.confirmbatchsendexample'|trans({'%email%': app.user.email}),
+                                'confirmText': 'mautic.email.batch.send_example'|trans,
+                                'confirmAction': path('mautic_email_action', {'objectAction': 'batchSendExample'}),
+                                'iconClass': 'ri-mail-send-line',
+                                'btnText': 'mautic.email.batch.send_example'|trans,
+                                'precheck': 'batchActionPrecheck',
+                                'confirmCallback': 'executeBatchAction',
+                            },
+                        },
                     ]
                 },
                 'quickFilters': [
