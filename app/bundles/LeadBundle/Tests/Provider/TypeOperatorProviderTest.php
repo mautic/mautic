@@ -9,10 +9,11 @@ use Mautic\LeadBundle\Event\TypeOperatorsEvent;
 use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use Mautic\LeadBundle\Provider\TypeOperatorProvider;
 use Mautic\LeadBundle\Segment\OperatorOptions;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**

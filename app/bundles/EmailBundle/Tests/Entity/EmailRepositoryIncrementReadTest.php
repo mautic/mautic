@@ -9,8 +9,9 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class EmailRepositoryIncrementReadTest extends \PHPUnit\Framework\TestCase
 {
     use RepositoryConfiguratorTrait;

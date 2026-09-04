@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\HttpFoundation\Response;
 
 final class CampaignSendWebhookFunctionalTest extends MauticMysqlTestCase
 {
@@ -30,7 +31,7 @@ final class CampaignSendWebhookFunctionalTest extends MauticMysqlTestCase
         $responseData = $this->submitWebhookEventForm($campaign, $inputData);
         $properties   = $responseData['event']['properties'];
 
-        $this->assertCount(count($expectedData), $properties['additional_data']['list'], "Failed for scenario: $scenario");
+        $this->assertCount(count($expectedData), $properties['additional_data']['list'], "Failed for scenario: {$scenario}");
 
         foreach ($expectedData as $index => $expected) {
             $this->assertEquals($expected['label'], $properties['additional_data']['list'][$index]['label']);
@@ -134,7 +135,7 @@ final class CampaignSendWebhookFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request('POST', '/api/campaigns/new', $payload);
         $response = $this->client->getResponse();
-        $this->assertSame(\Symfony\Component\HttpFoundation\Response::HTTP_CREATED, $response->getStatusCode(), (string) $response->getContent());
+        $this->assertSame(Response::HTTP_CREATED, $response->getStatusCode(), (string) $response->getContent());
 
         $responseData = json_decode($response->getContent(), true);
         $campaignId   = $responseData['campaign']['id'];
@@ -148,7 +149,7 @@ final class CampaignSendWebhookFunctionalTest extends MauticMysqlTestCase
         $event      = $events->first();
         $properties = $event->getProperties();
 
-        $this->assertCount(count($expectedData), $properties['additional_data']['list'], "Failed for scenario: $scenario");
+        $this->assertCount(count($expectedData), $properties['additional_data']['list'], "Failed for scenario: {$scenario}");
 
         foreach ($expectedData as $index => $expected) {
             $this->assertEquals($expected['label'], $properties['additional_data']['list'][$index]['label']);

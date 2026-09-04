@@ -36,6 +36,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 
@@ -692,7 +693,7 @@ final class PublicController extends CommonFormController
     #[Route(
         '/plugin/{integration}/tracking.gif',
         name: 'mautic_plugin_tracker',
-        requirements: ['integration' => \Symfony\Component\Routing\Requirement\Requirement::CATCH_ALL],
+        requirements: ['integration' => Requirement::CATCH_ALL],
     )]
     public function pluginTrackingGifAction(Request $request, IntegrationHelper $integrationHelper, MailHelper $mailer, string $integration): Response
     {

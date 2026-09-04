@@ -6,8 +6,9 @@ namespace MauticPlugin\MauticCrmBundle\Tests;
 
 use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticCrmBundle\Integration\DynamicsIntegration;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class DynamicsIntegrationTest extends AbstractIntegrationTestCase
 {
     private DynamicsIntegration $integration;

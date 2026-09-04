@@ -8,10 +8,11 @@ use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class CampaignRepositoryTest extends TestCase
 {
     use RepositoryConfiguratorTrait;

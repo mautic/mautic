@@ -12,10 +12,11 @@ use Mautic\IntegrationsBundle\Auth\Support\Oauth2\Token\TokenPersistence;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotSetException;
 use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 use Mautic\PluginBundle\Entity\Integration;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class TokenPersistenceTest extends TestCase
 {
     /**

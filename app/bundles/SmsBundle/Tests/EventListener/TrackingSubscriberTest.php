@@ -10,8 +10,9 @@ use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\EventListener\TrackingSubscriber;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\ContactIdentificationEvent;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**

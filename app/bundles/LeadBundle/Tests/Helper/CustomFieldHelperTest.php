@@ -6,9 +6,10 @@ namespace Mautic\LeadBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Helper\CustomFieldHelper;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class CustomFieldHelperTest extends TestCase
 {
     public function testFixValueTypeForBooleans(): void

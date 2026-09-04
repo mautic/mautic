@@ -8,10 +8,11 @@ use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\DynamicContentBundle\Validator\Constraints\SlotNameType;
 use Mautic\DynamicContentBundle\Validator\Constraints\SlotNameTypeValidator;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class SlotNameTypeValidatorTest extends ConstraintValidatorTestCase
 {
     /**

@@ -9,10 +9,11 @@ use Mautic\CampaignBundle\Event\NotifyOfFailureEvent;
 use Mautic\CampaignBundle\EventListener\NotifyOfFailureSubscriber;
 use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class NotifyOfFailureSubscriberTest extends TestCase
 {
     private MockObject&NotificationHelper $notificationHelper;

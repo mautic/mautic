@@ -9,11 +9,12 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\CacheItem;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class SegmentCountCacheHelperTest extends TestCase
 {
     private MockObject&CacheProviderInterface $cacheProviderMock;
@@ -196,7 +197,7 @@ final class SegmentCountCacheHelperTest extends TestCase
 
         $this->cacheProviderMock
             ->method('getItem')
-            ->willReturnCallback(function ($key) use ($segmentId, $cacheItem): ?\Symfony\Component\Cache\CacheItem {
+            ->willReturnCallback(function ($key) use ($segmentId, $cacheItem): ?CacheItem {
                 if ($key === 'segment.'.$segmentId.'.lead') {
                     return $cacheItem;
                 }
@@ -226,7 +227,7 @@ final class SegmentCountCacheHelperTest extends TestCase
             ->willReturnCallback(fn (string $key): bool => $key === 'segment.'.$segmentId.'.lead');
         $this->cacheProviderMock
             ->method('getItem')
-            ->willReturnCallback(function ($key) use ($segmentId, $cacheItem): ?\Symfony\Component\Cache\CacheItem {
+            ->willReturnCallback(function ($key) use ($segmentId, $cacheItem): ?CacheItem {
                 if (in_array($key, ['segment.'.$segmentId.'.lead', 'segment.'.$segmentId.'.lead.recount'])) {
                     return $cacheItem;
                 }

@@ -7,9 +7,10 @@ namespace Mautic\CoreBundle\Tests\Unit\Doctrine\Mapping;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class ClassMetadataBuilderTest extends \PHPUnit\Framework\TestCase
 {
     /**

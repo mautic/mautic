@@ -7,6 +7,7 @@ namespace Mautic\FormBundle\Tests\Validator\Constraint;
 use Mautic\FormBundle\Finder\Tokens\RedirectUrlTokensFinder;
 use Mautic\FormBundle\Validator\Constraint\IsPostActionRedirectUrl;
 use Mautic\FormBundle\Validator\Constraint\IsPostActionRedirectUrlValidator;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -20,7 +21,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[CoversClass(IsPostActionRedirectUrlValidator::class)]
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class IsPostActionRedirectUrlValidatorTest extends ConstraintValidatorTestCase
 {
     private ?MockObject $urlValidator = null;

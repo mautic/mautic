@@ -19,10 +19,12 @@ use Mautic\CoreBundle\EventListener\ExceptionListener;
 use Mautic\CoreBundle\EventListener\RequestSubscriber;
 use Mautic\CoreBundle\EventListener\RouterSubscriber;
 use Mautic\CoreBundle\Helper\CookieHelper;
+use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\EventListener\DateTimeTokenSubscriber;
 use Mautic\EmailBundle\EventListener\PointSubscriber;
 use Mautic\EmailBundle\EventListener\ProcessUnsubscribeSubscriber;
 use Mautic\EmailBundle\EventListener\TokenSubscriber;
+use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\EventListener\FormValidationSubscriber;
 use Mautic\IntegrationsBundle\EventListener\ControllerSubscriber;
 use Mautic\LeadBundle\EventListener\CampaignActionDeleteContactSubscriber;
@@ -170,7 +172,7 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
             \Mautic\PageBundle\EventListener\ConfigSubscriber::class,
             \Mautic\UserBundle\EventListener\ConfigSubscriber::class,
         ],
-        \Mautic\EmailBundle\Event\EmailSendEvent::class => [
+        EmailSendEvent::class => [
             \Mautic\AssetBundle\EventListener\BuilderSubscriber::class,
             \Mautic\EmailBundle\EventListener\BuilderSubscriber::class,
             DateTimeTokenSubscriber::class,
@@ -184,7 +186,7 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
             OwnerSubscriber::class,
             \Mautic\PageBundle\EventListener\BuilderSubscriber::class,
         ],
-        \Mautic\FormBundle\Event\FormBuilderEvent::class => [
+        FormBuilderEvent::class => [
             \MauticPlugin\MauticSocialBundle\EventListener\FormSubscriber::class,
             \Mautic\AssetBundle\EventListener\FormSubscriber::class,
             \Mautic\EmailBundle\EventListener\FormSubscriber::class,

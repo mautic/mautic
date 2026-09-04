@@ -9,10 +9,11 @@ use Mautic\CoreBundle\Helper\Update\PreUpdateChecks\PreUpdateCheckError;
 use Mautic\CoreBundle\Helper\Update\PreUpdateChecks\PreUpdateCheckResult;
 use Mautic\CoreBundle\Helper\UpdateHelper;
 use Mautic\CoreBundle\Update\Step\PreUpdateChecksStep;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class PreUpdateChecksStepTest extends AbstractStepTestCase
 {
     /**

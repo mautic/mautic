@@ -7,11 +7,12 @@ namespace Mautic\CoreBundle\Tests\Unit\Twig\Extension;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Twig\Extension\DateExtension;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Attribute\AsTwigFunction;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class DateExtensionTest extends TestCase
 {
     private DateExtension $dateExtension;

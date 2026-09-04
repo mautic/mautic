@@ -9,12 +9,13 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\MessengerBundle\Message\EmailHitNotification;
 use Mautic\MessengerBundle\MessageHandler\EmailHitNotificationHandler;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Messenger\Exception\RecoverableMessageHandlingException;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class EmailHitNotificationHandlerTest extends TestCase
 {
     public function testInvoke(): void

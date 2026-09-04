@@ -10,9 +10,10 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\Expr;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class EventRepositoryTest extends TestCase
 {
     use RepositoryConfiguratorTrait;

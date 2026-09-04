@@ -9,13 +9,14 @@ use Mautic\ApiBundle\ApiPlatform\EventListener\MauticWriteSubscriber;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class MauticWriteSubscriberTest extends TestCase
 {
     private MauticWriteSubscriber $mauticWriteSubscriber;

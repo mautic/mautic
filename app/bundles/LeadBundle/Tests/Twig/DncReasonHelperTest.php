@@ -7,9 +7,10 @@ namespace Mautic\LeadBundle\Tests\Twig;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Exception\UnknownDncReasonException;
 use Mautic\LeadBundle\Twig\Helper\DncReasonHelper;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class DncReasonHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**

@@ -14,6 +14,7 @@ use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Mautic\IntegrationsBundle\Integration\Interfaces\BuilderInterface;
 use Mautic\PluginBundle\Entity\Integration;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\Finder;
@@ -27,7 +28,7 @@ use Twig\Loader\FilesystemLoader;
 use Twig\RuntimeLoader\FactoryRuntimeLoader;
 use Twig\TwigFilter;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class ThemeHelperTest extends TestCase
 {
     /**
