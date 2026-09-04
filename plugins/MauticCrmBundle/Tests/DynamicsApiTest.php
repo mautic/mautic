@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticCrmBundle\Tests;
 
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticCrmBundle\Api\DynamicsApi;
@@ -35,7 +36,7 @@ final class DynamicsApiTest extends AbstractIntegrationTestCase
             $this->integrationEntityModel,
             $this->doNotContact,
             $this->fieldsWithUniqueIdentifier,
-            new IdentifyCompanyHelper($this->companyModel)
+            new IdentifyCompanyHelper($this->companyModel, $this->createMock(CompanyLeadRepository::class))
         );
 
         /** @phpstan-ignore new.resultUnused */

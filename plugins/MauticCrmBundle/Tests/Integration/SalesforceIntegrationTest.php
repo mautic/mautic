@@ -7,6 +7,7 @@ namespace MauticPlugin\MauticCrmBundle\Tests\Integration;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Entity\NotificationRepository;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\PluginBundle\Entity\Integration;
@@ -967,7 +968,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                 $integrationEntityModelMock,
                 $this->doNotContact,
                 $this->fieldsWithUniqueIdentifier,
-                new IdentifyCompanyHelper($this->companyModel),
+                new IdentifyCompanyHelper($this->companyModel, $this->createMock(CompanyLeadRepository::class)),
             ])
             ->onlyMethods($this->sfMockMethods)
             ->getMock();

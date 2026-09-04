@@ -30,7 +30,7 @@ final class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
             ->method('fetchCompanyFields')
             ->willReturn([['alias' => 'companyname']]);
 
-        $helper                     = new IdentifyCompanyHelper($model, $this->createMock(CompanyLeadRepository::class));
+        $helper                     = new IdentifyCompanyHelper($model, $this->createStub(CompanyLeadRepository::class));
         [$resultCompany, $entities] = $helper->findCompany($company);
 
         $this->assertEquals($expected, $resultCompany);
@@ -58,7 +58,7 @@ final class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
             ->method('fetchCompanyFields')
             ->willReturn([['alias' => 'companyname']]);
 
-        $helper                     = new IdentifyCompanyHelper($model, $this->createMock(CompanyLeadRepository::class));
+        $helper                     = new IdentifyCompanyHelper($model, $this->createStub(CompanyLeadRepository::class));
         [$resultCompany, $entities] = $helper->findCompany($company);
 
         $this->assertEquals($expected, $resultCompany);
@@ -88,7 +88,7 @@ final class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
             ->method('fetchCompanyFields')
             ->willReturn([['alias' => 'companyname']]);
 
-        $helper                     = new IdentifyCompanyHelper($model, $this->createMock(CompanyLeadRepository::class));
+        $helper                     = new IdentifyCompanyHelper($model, $this->createStub(CompanyLeadRepository::class));
         [$resultCompany, $entities] = $helper->findCompany($company);
 
         $this->assertEquals($expected, $resultCompany);
