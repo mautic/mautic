@@ -29,6 +29,8 @@ final class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $dateOptionFactory;
 
+    private CompanyDecorator&\PHPUnit\Framework\MockObject\Stub $companyDecorator;
+
     private DecoratorFactory $decoratorFactory;
 
     protected function setUp(): void
@@ -37,13 +39,14 @@ final class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
 
         $this->eventDispatcherMock            = $this->createMock(EventDispatcherInterface::class);
         $contactSegmentFilterDictionary       = new ContactSegmentFilterDictionary($this->eventDispatcherMock);
+        $this->companyDecorator               = $this->createStub(CompanyDecorator::class);
         $this->dateOptionFactory              = $this->createMock(DateOptionFactory::class);
         $this->decoratorFactory               = new DecoratorFactory(
             $contactSegmentFilterDictionary,
             $this->createStub(BaseDecorator::class),
             $this->createStub(CustomMappedDecorator::class),
             $this->dateOptionFactory,
-            $this->createStub(CompanyDecorator::class),
+            $this->companyDecorator,
             $this->eventDispatcherMock);
     }
 
@@ -69,6 +72,34 @@ final class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
 
         $this->assertInstanceOf(
             CustomMappedDecorator::class,
+            $this->decoratorFactory->getDecoratorForFilter($contactSegmentFilterCrate)
+        );
+    }
+
+    public function testPrimaryCompanyDecorator(): void
+    {
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate([
+            'object' => ContactSegmentFilterCrate::COMPANY_OBJECT,
+            'field'  => 'companycity',
+            'type'   => 'text',
+        ]);
+
+        $this->assertSame(
+            $this->companyDecorator,
+            $this->decoratorFactory->getDecoratorForFilter($contactSegmentFilterCrate)
+        );
+    }
+
+    public function testCompanyAllDecorator(): void
+    {
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate([
+            'object' => ContactSegmentFilterCrate::COMPANY_ALL_OBJECT,
+            'field'  => 'companycity',
+            'type'   => 'text',
+        ]);
+
+        $this->assertSame(
+            $this->companyDecorator,
             $this->decoratorFactory->getDecoratorForFilter($contactSegmentFilterCrate)
         );
     }

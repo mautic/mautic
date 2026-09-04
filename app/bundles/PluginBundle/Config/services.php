@@ -26,7 +26,7 @@ return function (ContainerConfigurator $configurator): void {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('Mautic\\PluginBundle\\Entity\\', '../Entity/*Repository.php');
-    $services->set('mautic.helper.integration', Mautic\PluginBundle\Helper\IntegrationHelper::class);
+    $services->set('mautic.helper.integration', Mautic\PluginBundle\Helper\IntegrationHelper::class)->lazy();
     $services->alias(Mautic\PluginBundle\Helper\IntegrationHelper::class, 'mautic.helper.integration');
     $services->set('mautic.plugin.helper.reload', Mautic\PluginBundle\Helper\ReloadHelper::class);
     $services->alias(Mautic\PluginBundle\Helper\ReloadHelper::class, 'mautic.plugin.helper.reload');

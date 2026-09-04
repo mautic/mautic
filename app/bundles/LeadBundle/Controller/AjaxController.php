@@ -168,13 +168,17 @@ final class AjaxController extends CommonAjaxController
         $form = $formFactory->createNamed('RENAME', FilterPropertiesType::class);
 
         if ($fieldAlias && $operator) {
-            $formAdjustmentsProvider->adjustForm(
-                $form,
-                $fieldAlias,
-                $fieldObject,
-                $operator,
-                $listModel->getChoiceFields($search)[$fieldObject][$fieldAlias]
-            );
+            $fieldConfig = $listModel->getChoiceFields($search)[$fieldObject][$fieldAlias] ?? null;
+
+            if (null !== $fieldConfig) {
+                $formAdjustmentsProvider->adjustForm(
+                    $form,
+                    $fieldAlias,
+                    $fieldObject,
+                    $operator,
+                    $fieldConfig
+                );
+            }
         }
 
         $formHtml = $this->renderView(
@@ -850,6 +854,39 @@ final class AjaxController extends CommonAjaxController
         }
 
         return $this->sendJsonResponse([]);
+    }
+
+    public function removeTagFromCompanyAction(Request $request, CompanyModel $companyModel): JsonResponse
+    {
+        $dataArray = ['success' => 0];
+        $companyId = (int) $request->request->get('companyId');
+        $tagId     = (int) $request->request->get('tagId');
+
+        if (empty($companyId) || empty($tagId)) {
+            $this->addFlashMessage('mautic.company.tags.error', [], FlashBag::LEVEL_ERROR);
+            $dataArray['flashes'] = $this->getFlashContent();
+
+            return $this->sendJsonResponse($dataArray);
+        }
+
+        $company = $companyModel->getEntity($companyId);
+        if (null === $company || !$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $company->getPermissionUser())) {
+            $this->addFlashMessage('mautic.company.tags.error', [], FlashBag::LEVEL_ERROR);
+            $dataArray['flashes'] = $this->getFlashContent();
+
+            return $this->sendJsonResponse($dataArray);
+        }
+
+        if ($companyModel->removeTag($company, $tagId)) {
+            $dataArray['success'] = 1;
+            $this->addFlashMessage('mautic.company.tags.remove.success', [], FlashBag::LEVEL_SUCCESS);
+        } else {
+            $this->addFlashMessage('mautic.company.tags.error', [], FlashBag::LEVEL_ERROR);
+        }
+
+        $dataArray['flashes'] = $this->getFlashContent();
+
+        return $this->sendJsonResponse($dataArray);
     }
 
     public function updateLeadFieldOrderChoiceListAction(Request $request): Response

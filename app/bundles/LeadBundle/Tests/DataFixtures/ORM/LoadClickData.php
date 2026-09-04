@@ -6,8 +6,10 @@ namespace Mautic\LeadBundle\Tests\DataFixtures\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\SmsBundle\Entity\Sms;
@@ -111,7 +113,7 @@ final class LoadClickData extends AbstractFixture implements OrderedFixtureInter
         $hit->setUrl('https://mautic.org');
         $hit->setReferer('https://google.com');
         $hit->setUrlTitle('Test Title');
-        $hit->setLead($this->getReference('lead-'.$hitConfig['lead_id']));
+        $hit->setLead($this->getManagedLead($this->getReference('lead-'.$hitConfig['lead_id']), $manager));
         $hit->setDateHit($hitConfig['date_hit']);
         $hit->setCode(200);
         $hit->setTrackingId('abc');
@@ -124,6 +126,15 @@ final class LoadClickData extends AbstractFixture implements OrderedFixtureInter
         $this->setReference($hitConfig['alias'], $hit);
         $manager->persist($hit);
         $manager->flush();
+    }
+
+    private function getManagedLead(Lead $lead, ObjectManager $manager): Lead
+    {
+        \assert($manager instanceof EntityManagerInterface);
+        $managedLead = $manager->getReference(Lead::class, $lead->getId());
+        \assert($managedLead instanceof Lead);
+
+        return $managedLead;
     }
 
     public function getOrder(): int

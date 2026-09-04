@@ -105,11 +105,13 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         );
 
         $emails = $this->emailModel->getLookupResults('email', '', 0, 0, ['name_is_key' => true]);
+        $tags   = $this->getTagChoices();
 
         $event->setChoicesForFieldAlias('lead_asset_download', $this->getAssetChoices($event->getSearchTerm()));
         $event->setChoicesForFieldAlias('campaign', $this->getCampaignChoices());
         $event->setChoicesForFieldAlias('leadlist', $this->getSegmentChoices());
-        $event->setChoicesForFieldAlias('tags', $this->getTagChoices());
+        $event->setChoicesForFieldAlias('tags', $tags);
+        $event->setChoicesForFieldAlias('company_tags', $tags);
         $event->setChoicesForFieldAlias('stage', $this->getStageChoices());
         $event->setChoicesForFieldAlias('globalcategory', $this->getCategoryChoices());
         $event->setChoicesForFieldAlias('lead_email_received', $emails);
@@ -125,7 +127,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
 
     public function onSegmentFilterFormHandleTags(FormAdjustmentEvent $event): void
     {
-        if ('tags' !== $event->getFieldAlias()) {
+        if (!in_array($event->getFieldAlias(), ['tags', 'company_tags'], true)) {
             return;
         }
 

@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Tests\TestEntityCreationTrait;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -136,6 +137,69 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         $response       = json_decode($clientResponse->getContent(), true);
 
         $this->assertNotEquals($companyId, $response['company']['id']);
+    }
+
+    public function testCreateCompanyWithTagsViaStandardApiPayload(): void
+    {
+        $companyId = $this->createCompanyViaApi('API tagged company', ['Enterprise', 'VIP']);
+
+        /** @var Company|null $company */
+        $company = $this->em->getRepository(Company::class)->find($companyId);
+        $this->assertInstanceOf(Company::class, $company);
+        $companyTagNames = array_map(
+            static fn (Tag $tag): string => $tag->getTag(),
+            $company->getTags()->toArray()
+        );
+        sort($companyTagNames);
+        $this->assertSame(['Enterprise', 'VIP'], $companyTagNames);
+    }
+
+    public function testEditCompanyTagsViaStandardApiPayload(): void
+    {
+        $companyId = $this->createCompanyViaApi('API edited tags company', ['Enterprise', 'VIP']);
+
+        $this->client->request('PUT', sprintf('/api/companies/%d/edit', $companyId), [
+            'companyname' => 'API edited tags company',
+            'tags'        => ['-Enterprise', 'Strategic'],
+        ]);
+        $editResponse = $this->client->getResponse();
+        $this->assertResponseIsSuccessful($editResponse->getContent());
+
+        $this->em->clear();
+
+        /** @var Company|null $updatedCompany */
+        $updatedCompany = $this->em->getRepository(Company::class)->find($companyId);
+        $this->assertInstanceOf(Company::class, $updatedCompany);
+        $updatedTagNames = array_map(
+            static fn (Tag $tag): string => $tag->getTag(),
+            $updatedCompany->getTags()->toArray()
+        );
+        sort($updatedTagNames);
+
+        $this->assertNotContains('Enterprise', $updatedTagNames);
+        $this->assertContains('Strategic', $updatedTagNames);
+        $this->assertContains('VIP', $updatedTagNames);
+    }
+
+    public function testCreateCompanyViaStandardApiPayloadWithEmptyTags(): void
+    {
+        $this->client->request('POST', '/api/companies/new', [
+            'companyname' => 'Invalid tags type company',
+            'tags'        => [],
+        ]);
+        $response = $this->client->getResponse();
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, $response->getContent());
+
+        $payload = json_decode($response->getContent(), true);
+        $this->assertIsArray($payload);
+        $this->assertArrayHasKey('company', $payload);
+        $this->assertArrayHasKey('id', $payload['company']);
+
+        /** @var Company|null $createdCompany */
+        $createdCompany = $this->em->getRepository(Company::class)->find((int) $payload['company']['id']);
+        $this->assertInstanceOf(Company::class, $createdCompany);
+        $this->assertCount(0, $createdCompany->getTags());
     }
 
     /**
@@ -426,6 +490,28 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         $companyEmailField->setIsUniqueIdentifer(true);
         $this->em->persist($companyEmailField);
         $this->em->flush();
+    }
+
+    /**
+     * @param array<int, string> $tags
+     */
+    private function createCompanyViaApi(string $name, array $tags = []): int
+    {
+        $payload = ['companyname' => $name];
+        if ([] !== $tags) {
+            $payload['tags'] = $tags;
+        }
+
+        $this->client->request('POST', '/api/companies/new', $payload);
+        $response = $this->client->getResponse();
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, $response->getContent());
+
+        $payload = json_decode($response->getContent(), true);
+        $this->assertIsArray($payload);
+        $this->assertArrayHasKey('company', $payload);
+        $this->assertArrayHasKey('id', $payload['company']);
+
+        return (int) $payload['company']['id'];
     }
 
     private function getCompanyRepository(): CompanyRepository

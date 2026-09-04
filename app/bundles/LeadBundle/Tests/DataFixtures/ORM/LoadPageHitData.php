@@ -4,7 +4,9 @@ namespace Mautic\LeadBundle\Tests\DataFixtures\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectManager;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 
 final class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
@@ -93,7 +95,7 @@ final class LoadPageHitData extends AbstractFixture implements OrderedFixtureInt
         $hit->setUrl($hitConfig['url']);
         $hit->setReferer($hitConfig['referer']);
         $hit->setUrlTitle($hitConfig['urlTitle']);
-        $hit->setLead($hitConfig['contact']);
+        $hit->setLead($this->getManagedLead($hitConfig['contact'], $manager));
         $hit->setDateHit($hitConfig['dateHit']);
         $hit->setCode($hitConfig['code']);
         $hit->setTrackingId($hitConfig['trackingId']);
@@ -102,6 +104,15 @@ final class LoadPageHitData extends AbstractFixture implements OrderedFixtureInt
 
         $manager->persist($hit);
         $manager->flush();
+    }
+
+    private function getManagedLead(Lead $lead, ObjectManager $manager): Lead
+    {
+        \assert($manager instanceof EntityManagerInterface);
+        $managedLead = $manager->getReference(Lead::class, $lead->getId());
+        \assert($managedLead instanceof Lead);
+
+        return $managedLead;
     }
 
     public function getOrder(): int

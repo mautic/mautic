@@ -12,13 +12,13 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\Company;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
@@ -56,6 +56,7 @@ final class CompanyApiController extends CommonApiController
         $this->entityNameOne      = 'company';
         $this->entityNameMulti    = 'companies';
         $this->serializerGroups[] = 'companyDetails';
+        $this->serializerGroups[] = 'tagList';
 
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }
@@ -71,13 +72,33 @@ final class CompanyApiController extends CommonApiController
     }
 
     /**
-     * @param Company              $entity
+     * @return array<string, mixed>
+     */
+    protected function prepareParametersForBinding(Request $request, $parameters, $entity, $action): array
+    {
+        if (isset($parameters['tags'])) {
+            unset($parameters['tags']);
+        }
+
+        foreach ($entity->getTags() as $tag) {
+            $parameters['tags'][] = $tag->getId();
+        }
+
+        return $parameters;
+    }
+
+    /**
+     * @param Company              &$entity
      * @param FormInterface<mixed> $form
      * @param array<mixed>         $parameters
      * @param string               $action
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit'): void
     {
+        if (isset($this->entityRequestParameters['tags'])) {
+            $this->model->modifyTags($entity, $this->entityRequestParameters['tags'], null, false);
+        }
+
         $this->setCustomFieldValues($entity, $form, $parameters);
     }
 

@@ -75,6 +75,7 @@
 {% endblock %}
 
 {% block content %}
+{% set canEditCompany = securityHasEntityAccess(permissions['lead:leads:editown'], permissions['lead:leads:editother'], company.permissionUser) %}
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- left section -->
@@ -222,6 +223,106 @@
                 {% if company.phone is not empty %}
                   <h6 class="fw-sb">{{ 'mautic.company.phone'|trans }}</h6>
                   <p class="text-secondary">{{ company.phone }}</p>
+                {% endif %}
+
+                {% if company.tags|length <= 8 %}
+                    {% set tagContent %}
+                    <div class="d-flex jc-space-between">
+                        <span class="fw-b ellipsis mb-md">{{ 'mautic.lead.tags'|trans }}</span>
+                        <i class="ri-hashtag" aria-hidden="true"></i>
+                    </div>
+                    <div class="d-flex fw-wrap gap-xs mt-xs">
+                        {% if company.tags|length > 0 %}
+                            {% for tag in company.tags %}
+                                <div id="companyTagLabel{{ tag.id }}">
+                                    {% set companyTag = {
+                                        'label': tag.tag|purify,
+                                        'attributes': {
+                                            'href': path('mautic_tagmanager_action', {'objectAction': 'view', 'objectId': tag.id}),
+                                            'data-toggle': 'ajax',
+                                        },
+                                        'color': 'blue',
+                                    } %}
+                                    {% if canEditCompany %}
+                                        {% set companyTag = companyTag|merge({
+                                            'type': 'dismissible',
+                                            'dismissible_onclick': 'Mautic.removeTagFromCompany(this, ' ~ company.id ~ ', ' ~ tag.id ~ ', event);'
+                                        }) %}
+                                    {% endif %}
+                                    {% include '@MauticCore/Helper/_tag.html.twig' with {'tags': [companyTag]} %}
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-helper">{{ 'mautic.lead.tags.no_results'|trans }}</p>
+                        {% endif %}
+                    </div>
+                    {% endset %}
+
+                    {% include '@MauticCore/Components/tile.html.twig' with {
+                        'type': 'base',
+                        'content': tagContent
+                    } %}
+                {% else %}
+                    {% set firstEightTags = company.tags|slice(0, 8) %}
+                    {% set remainingTags = company.tags|slice(8) %}
+
+                    {% set aboveContent %}
+                    <div class="d-flex jc-space-between">
+                        <span class="fw-b ellipsis mb-md">{{ 'mautic.lead.tags'|trans }}</span>
+                        <i class="ri-hashtag" aria-hidden="true"></i>
+                    </div>
+                    <div class="d-flex fw-wrap gap-xs">
+                        {% for tag in firstEightTags %}
+                            <div id="companyTagLabel{{ tag.id }}">
+                                {% set companyTag = {
+                                    'label': tag.tag|purify,
+                                    'attributes': {
+                                        'href': path('mautic_tagmanager_action', {'objectAction': 'view', 'objectId': tag.id}),
+                                        'data-toggle': 'ajax',
+                                    },
+                                    'color': 'blue',
+                                } %}
+                                {% if canEditCompany %}
+                                    {% set companyTag = companyTag|merge({
+                                        'type': 'dismissible',
+                                        'dismissible_onclick': 'Mautic.removeTagFromCompany(this, ' ~ company.id ~ ', ' ~ tag.id ~ ', event);'
+                                    }) %}
+                                {% endif %}
+                                {% include '@MauticCore/Helper/_tag.html.twig' with {'tags': [companyTag]} %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% endset %}
+
+                    {% set belowContent %}
+                    <div class="d-flex fw-wrap gap-xs mt-xs">
+                        {% for tag in remainingTags %}
+                            <div id="companyTagLabel{{ tag.id }}">
+                                {% set companyTag = {
+                                    'label': tag.tag|purify,
+                                    'attributes': {
+                                        'href': path('mautic_tagmanager_action', {'objectAction': 'view', 'objectId': tag.id}),
+                                        'data-toggle': 'ajax',
+                                    },
+                                    'color': 'blue',
+                                } %}
+                                {% if canEditCompany %}
+                                    {% set companyTag = companyTag|merge({
+                                        'type': 'dismissible',
+                                        'dismissible_onclick': 'Mautic.removeTagFromCompany(this, ' ~ company.id ~ ', ' ~ tag.id ~ ', event);'
+                                    }) %}
+                                {% endif %}
+                                {% include '@MauticCore/Helper/_tag.html.twig' with {'tags': [companyTag]} %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% endset %}
+
+                    {% include '@MauticCore/Components/tile.html.twig' with {
+                        'type': 'expandable-interactive',
+                        'aboveFoldContent': aboveContent,
+                        'belowFoldContent': belowContent
+                    } %}
                 {% endif %}
             </div>
         </div>
