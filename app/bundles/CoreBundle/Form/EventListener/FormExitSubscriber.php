@@ -11,7 +11,7 @@ final class FormExitSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly string $model,
-        private array $options = [],
+        private readonly array $options = [],
     ) {
     }
 

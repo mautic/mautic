@@ -43,7 +43,7 @@ final class ScheduledEvent extends Event
     public function __construct(
         private readonly AbstractEventAccessor $eventConfig,
         private readonly LeadEventLog $eventLog,
-        private bool $isReschedule = false,
+        private readonly bool $isReschedule = false,
     ) {
         $this->eventSettings   = $eventConfig->getConfig();
         $this->event           = $eventLog->getEvent();
