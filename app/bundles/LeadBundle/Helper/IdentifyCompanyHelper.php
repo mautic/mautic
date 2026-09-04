@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Helper;
 
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Exception\UniqueFieldNotFoundException;
 use Mautic\LeadBundle\Model\CompanyModel;
 
@@ -11,7 +12,7 @@ final class IdentifyCompanyHelper
     /**
      * @param mixed $lead
      */
-    public static function identifyLeadsCompany(array $data, $lead, CompanyModel $companyModel): array
+    public static function identifyLeadsCompany(array $data, $lead, CompanyModel $companyModel, ?CompanyLeadRepository $companyLeadRepository = null): array
     {
         $addContactToCompany = true;
 
@@ -31,9 +32,8 @@ final class IdentifyCompanyHelper
             $companyEntity = end($companies);
             $companyData   = $companyEntity->getProfileFields();
 
-            if ($lead) {
-                $companyLeadRepo = $companyModel->getCompanyLeadRepository();
-                $companyLead     = $companyLeadRepo->getCompaniesByLeadId($lead->getId(), $companyEntity->getId());
+            if ($lead && null !== $companyLeadRepository) {
+                $companyLead     = $companyLeadRepository->getCompaniesByLeadId($lead->getId(), $companyEntity->getId());
                 if ([] !== $companyLead) {
                     $addContactToCompany = false;
                 }
