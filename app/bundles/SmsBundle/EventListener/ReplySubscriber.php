@@ -10,7 +10,6 @@ use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\EventListener\TimelineEventLogTrait;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\SmsBundle\Event\ReplyEvent;
 use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -29,7 +28,7 @@ final class ReplySubscriber implements EventSubscriberInterface
     {
         return [
             SmsEvents::ON_REPLY              => ['onReply', 0],
-            LeadEvents::TIMELINE_ON_GENERATE => 'onTimelineGenerate',
+            LeadTimelineEvent::class => 'onTimelineGenerate',
         ];
     }
 

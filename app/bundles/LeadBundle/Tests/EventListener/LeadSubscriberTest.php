@@ -26,7 +26,6 @@ use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\EventListener\LeadSubscriber;
 use Mautic\LeadBundle\Helper\LeadChangeEventDispatcher;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Twig\Helper\DncReasonHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -244,7 +243,7 @@ final class LeadSubscriberTest extends CommonMocks
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber($subscriber);
 
-        $dispatcher->dispatch($leadEvent, LeadEvents::TIMELINE_ON_GENERATE);
+        $dispatcher->dispatch($leadEvent);
 
         $this->assertSame([$timelineEvent], $leadEvent->getEvents());
     }

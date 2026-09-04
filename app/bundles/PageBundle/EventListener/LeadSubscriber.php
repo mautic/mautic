@@ -35,7 +35,7 @@ final class LeadSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            LeadEvents::TIMELINE_ON_GENERATE => [
+            LeadTimelineEvent::class => [
                 ['onTimelineGenerate', 0],
                 ['onTimelineGenerateVideo', 0],
             ],

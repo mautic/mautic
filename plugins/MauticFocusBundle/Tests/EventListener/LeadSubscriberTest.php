@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Tests\CommonMocks;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
-use Mautic\LeadBundle\LeadEvents;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use MauticPlugin\MauticFocusBundle\Entity\StatRepository;
 use MauticPlugin\MauticFocusBundle\EventListener\LeadSubscriber;
@@ -93,7 +92,7 @@ final class LeadSubscriberTest extends CommonMocks
 
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber($subscriber);
-        $dispatcher->dispatch($leadEvent, LeadEvents::TIMELINE_ON_GENERATE);
+        $dispatcher->dispatch($leadEvent);
 
         $this->assertSame([$timelineEvent], $leadEvent->getEvents());
     }
@@ -117,7 +116,7 @@ final class LeadSubscriberTest extends CommonMocks
 
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber($subscriber);
-        $dispatcher->dispatch($leadEvent, LeadEvents::TIMELINE_ON_GENERATE);
+        $dispatcher->dispatch($leadEvent);
 
         $this->assertSame([$timelineEvent], $leadEvent->getEvents());
     }
@@ -146,7 +145,7 @@ final class LeadSubscriberTest extends CommonMocks
 
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber($subscriber);
-        $dispatcher->dispatch($leadEvent, LeadEvents::TIMELINE_ON_GENERATE);
+        $dispatcher->dispatch($leadEvent);
 
         $this->assertSame([$timelineEvent], $leadEvent->getEvents());
     }
@@ -170,7 +169,7 @@ final class LeadSubscriberTest extends CommonMocks
 
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber($subscriber);
-        $dispatcher->dispatch($leadEvent, LeadEvents::TIMELINE_ON_GENERATE);
+        $dispatcher->dispatch($leadEvent);
 
         $this->assertSame([$timelineEvent], $leadEvent->getEvents());
     }

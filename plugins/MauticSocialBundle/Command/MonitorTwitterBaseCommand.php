@@ -9,7 +9,6 @@ use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 use MauticPlugin\MauticSocialBundle\Event\SocialMonitorEvent;
 use MauticPlugin\MauticSocialBundle\Helper\TwitterCommandHelper;
 use MauticPlugin\MauticSocialBundle\Integration\TwitterIntegration;
-use MauticPlugin\MauticSocialBundle\SocialEvents;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -161,8 +160,7 @@ abstract class MonitorTwitterBaseCommand extends Command
         $this->processMonitor($monitor);
 
         $this->dispatcher->dispatch(
-            new SocialMonitorEvent($this->getNetworkName(), $monitor, $this->twitterCommandHelper->getManipulatedLeads(), $this->twitterCommandHelper->getNewLeadsCount(), $this->twitterCommandHelper->getUpdatedLeadsCount()),
-            SocialEvents::MONITOR_POST_PROCESS
+            new SocialMonitorEvent($this->getNetworkName(), $monitor, $this->twitterCommandHelper->getManipulatedLeads(), $this->twitterCommandHelper->getNewLeadsCount(), $this->twitterCommandHelper->getUpdatedLeadsCount())
         );
 
         return Command::SUCCESS;

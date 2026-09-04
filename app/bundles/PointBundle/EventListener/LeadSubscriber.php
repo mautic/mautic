@@ -29,7 +29,7 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
     {
         return [
             LeadEvents::LEAD_POINTS_CHANGE   => ['onLeadPointsChange', 0],
-            LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
+            LeadTimelineEvent::class => ['onTimelineGenerate', 0],
             LeadEvents::LEAD_POST_MERGE      => ['onLeadMerge', 0],
             LeadEvents::LEAD_POST_SAVE       => ['onLeadSave', -1],
         ];

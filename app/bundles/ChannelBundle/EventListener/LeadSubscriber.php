@@ -4,7 +4,6 @@ namespace Mautic\ChannelBundle\EventListener;
 
 use Mautic\ChannelBundle\Entity\MessageQueueRepository;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -21,7 +20,7 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
+            LeadTimelineEvent::class => ['onTimelineGenerate', 0],
         ];
     }
 

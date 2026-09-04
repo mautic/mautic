@@ -25,7 +25,7 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
+            LeadTimelineEvent::class => ['onTimelineGenerate', 0],
             LeadEvents::CURRENT_LEAD_CHANGED => ['onLeadChange', 0],
             LeadEvents::LEAD_POST_MERGE      => ['onLeadMerge', 0],
         ];

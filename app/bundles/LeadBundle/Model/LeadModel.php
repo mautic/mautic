@@ -2190,8 +2190,7 @@ class LeadModel extends FormModel
     public function getEngagements(?Lead $lead = null, ?array $filters = null, ?array $orderBy = null, int $page = 1, int $limit = 25, bool $forTimeline = true): array
     {
         $event = $this->dispatcher->dispatch(
-            new LeadTimelineEvent($lead, $filters, $orderBy, $page, $limit, $forTimeline, $this->coreParametersHelper->get('site_url')),
-            LeadEvents::TIMELINE_ON_GENERATE
+            new LeadTimelineEvent($lead, $filters, $orderBy, $page, $limit, $forTimeline, $this->coreParametersHelper->get('site_url'))
         );
 
         $payload = [
@@ -2213,7 +2212,7 @@ class LeadModel extends FormModel
         $event = new LeadTimelineEvent();
         $event->fetchTypesOnly();
 
-        $this->dispatcher->dispatch($event, LeadEvents::TIMELINE_ON_GENERATE);
+        $this->dispatcher->dispatch($event);
 
         return $event->getEventTypes();
     }
@@ -2228,7 +2227,7 @@ class LeadModel extends FormModel
         $event = new LeadTimelineEvent($lead);
         $event->setCountOnly($dateFrom, $dateTo, $unit, $chartQuery);
 
-        $this->dispatcher->dispatch($event, LeadEvents::TIMELINE_ON_GENERATE);
+        $this->dispatcher->dispatch($event);
 
         return $event->getEventCounter();
     }
