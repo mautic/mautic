@@ -71,10 +71,6 @@ final class SingleArgumentDispatchRule implements Rule
             return [];
         }
 
-        if (CoreEvents::class !== $secondArg->class->toString()) {
-            return [];
-        }
-
         $constantName = $secondArg->name instanceof Identifier ? $secondArg->name->toString() : '';
 
         $ruleError = RuleErrorBuilder::message(sprintf(self::ERROR_MESSAGE, $constantName))

@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace Mautic\CampaignBundle\Tests\Functional\EventListener;
+
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
@@ -30,14 +32,14 @@ final class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
         $campaignLead = new CampaignLead();
         $campaignLead->setCampaign($campaign);
         $campaignLead->setLead($victor);
-        $campaignLead->setDateAdded(new DateTime());
+        $campaignLead->setDateAdded(new \DateTime());
 
         $this->em->persist($campaignLead);
 
         $campaignLead = new CampaignLead();
         $campaignLead->setCampaign($campaign);
         $campaignLead->setLead($loser);
-        $campaignLead->setDateAdded(new DateTime());
+        $campaignLead->setDateAdded(new \DateTime());
 
         $this->em->persist($campaignLead);
 
