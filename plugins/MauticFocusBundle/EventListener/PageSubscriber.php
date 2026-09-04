@@ -4,24 +4,23 @@ namespace MauticPlugin\MauticFocusBundle\EventListener;
 
 use Mautic\CoreBundle\DTO\TokenFormatOptions;
 use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
+use MauticPlugin\MauticFocusBundle\Helper\TokenHelper;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class PageSubscriber implements EventSubscriberInterface
 {
     private string $regex = '{focus=(.*?)}';
 
     public function __construct(
-        private readonly CorePermissions $security,
         private readonly FocusModel $model,
-        private readonly RouterInterface $router,
+        private readonly TokenHelper $tokenHelper,
         private readonly BuilderTokenHelperFactory $builderTokenHelperFactory,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -41,11 +40,22 @@ final class PageSubscriber implements EventSubscriberInterface
         if ($event->tokensRequested($this->regex)) {
             $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('focus', $this->model->getPermissionBase(), 'MauticFocusBundle', 'mautic.focus');
             $tokenFilter = $event->getTokenFilter();
-            $tokens      = $tokenHelper->getFormattedTokens(
+            $focusTokens = $tokenHelper->getFormattedTokens(
                 $this->regex,
                 TokenFormatOptions::simplePrefix('mautic.focus.focus_item'),
                 'label' === $tokenFilter['target'] ? $tokenFilter['filter'] : '',
             );
+            $tokens = [];
+            foreach ($focusTokens as $token => $label) {
+                $parsedToken = $this->tokenHelper->parseToken($token);
+                if (null === $parsedToken) {
+                    continue;
+                }
+
+                $tokens[$this->tokenHelper->formatToken($parsedToken['id'], TokenHelper::MODE_DISPLAY)] = $label.' '.$this->translator->trans('mautic.focus.token.display');
+                $tokens[$this->tokenHelper->formatToken($parsedToken['id'], TokenHelper::MODE_TRACKING)] = $label.' '.$this->translator->trans('mautic.focus.token.tracking');
+            }
+
             if ([] !== $tokens) {
                 $event->addTokens($tokens);
             }
@@ -54,32 +64,6 @@ final class PageSubscriber implements EventSubscriberInterface
 
     public function onPageDisplay(PageDisplayEvent $event): void
     {
-        $content = $event->getContent();
-        $regex   = '/'.$this->regex.'/i';
-
-        preg_match_all($regex, $content, $matches);
-
-        if (count($matches[0])) {
-            foreach ($matches[1] as $id) {
-                $focus = $this->model->getEntity((int) $id);
-                if (null !== $focus
-                    && (
-                        $focus->isPublished()
-                        || $this->security->hasEntityAccess(
-                            'focus:items:viewown',
-                            'focus:items:viewother',
-                            $focus->getCreatedBy()
-                        )
-                    )
-                ) {
-                    $script = '<script src="'.$this->router->generate('mautic_focus_generate', ['id' => $id], UrlGeneratorInterface::ABSOLUTE_URL)
-                        .'" type="text/javascript" charset="utf-8" async="async"></script>';
-                    $content = preg_replace('#{focus='.$id.'}#', $script, $content);
-                } else {
-                    $content = preg_replace('#{focus='.$id.'}#', '', $content);
-                }
-            }
-        }
-        $event->setContent($content);
+        $event->setContent(strtr($event->getContent(), $this->tokenHelper->findFocusTokens($event->getContent())));
     }
 }

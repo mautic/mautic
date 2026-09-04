@@ -6,6 +6,7 @@ use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
+use MauticPlugin\MauticFocusBundle\Enum\FocusJsScope;
 use MauticPlugin\MauticFocusBundle\Event\FocusViewEvent;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
@@ -26,21 +27,17 @@ final class PublicController extends CommonController
 
     public function generateAction($id): Response
     {
-        // Don't store a visitor with this request
-        defined('MAUTIC_NON_TRACKABLE_REQUEST') || define('MAUTIC_NON_TRACKABLE_REQUEST', 1);
-        $focus = $this->focusModel->getEntity($id);
+        return $this->buildJavascript($id);
+    }
 
-        if ($focus) {
-            if (!$focus->isPublished()) {
-                return new Response('', Response::HTTP_NOT_FOUND);
-            }
+    public function displayAction($id): Response
+    {
+        return $this->buildJavascript($id, [FocusJsScope::RUNTIME, FocusJsScope::DISPLAY]);
+    }
 
-            $content = $this->focusModel->generateJavascript($focus);
-
-            return new Response($content, 200, ['Content-Type' => 'application/javascript']);
-        }
-
-        return new Response('', Response::HTTP_NOT_FOUND);
+    public function trackingAction($id): Response
+    {
+        return $this->buildJavascript($id, [FocusJsScope::TRACKING]);
     }
 
     public function viewPixelAction(Request $request, ContactTracker $contactTracker): Response
@@ -62,5 +59,30 @@ final class PublicController extends CommonController
         }
 
         return TrackingPixelHelper::getResponse($request);
+    }
+
+    /**
+     * @param FocusJsScope[] $acceptedScopes
+     */
+    private function buildJavascript($id, array $acceptedScopes = [
+        FocusJsScope::RUNTIME,
+        FocusJsScope::DISPLAY,
+        FocusJsScope::TRACKING,
+    ]): Response
+    {
+        // Don't store a visitor with this request
+        defined('MAUTIC_NON_TRACKABLE_REQUEST') || define('MAUTIC_NON_TRACKABLE_REQUEST', 1);
+        $focus = $this->focusModel->getEntity($id);
+
+        if (!$focus || !$focus->isPublished()) {
+            return new Response('', Response::HTTP_NOT_FOUND);
+        }
+
+        $content = $this->focusModel->generateJavascript($focus, false, $acceptedScopes);
+
+        return new Response($content, Response::HTTP_OK, [
+            'Content-Type'  => 'application/javascript',
+            'Cache-Control' => 'private, no-store',
+        ]);
     }
 }

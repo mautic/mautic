@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\TokenHelper as LeadTokenHelper;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Model\TrackableModel;
@@ -25,6 +26,7 @@ use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Entity\FocusRepository;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use MauticPlugin\MauticFocusBundle\Entity\StatRepository;
+use MauticPlugin\MauticFocusBundle\Enum\FocusJsScope;
 use MauticPlugin\MauticFocusBundle\Event\FocusEvent;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
 use MauticPlugin\MauticFocusBundle\Form\Type\FocusType;
@@ -44,6 +46,8 @@ use Twig\Runtime\EscaperRuntime;
  */
 class FocusModel extends FormModel implements GlobalSearchInterface
 {
+    private const ANONYMOUS_CONTACT_TOKEN_MODIFIERS = ['true', 'datetime', 'date', 'time', 'label'];
+
     public function __construct(
         protected \Mautic\FormBundle\Model\FormModel $formModel,
         protected TrackableModel $trackableModel,
@@ -129,15 +133,25 @@ class FocusModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param bool $isPreview
+     * @param bool           $isPreview
+     * @param FocusJsScope[] $acceptedScopes
      */
-    public function generateJavascript(Focus $focus, $isPreview = false): string
+    public function generateJavascript(Focus $focus, $isPreview = false, array $acceptedScopes = [
+        FocusJsScope::RUNTIME,
+        FocusJsScope::DISPLAY,
+        FocusJsScope::TRACKING,
+    ]): string
     {
-        $lead           = $this->contactTracker->getContact();
-        $focusArray     = $focus->toArray();
-        $url            = '';
+        $runtimeEnabled  = in_array(FocusJsScope::RUNTIME, $acceptedScopes, true);
+        $displayEnabled  = in_array(FocusJsScope::DISPLAY, $acceptedScopes, true);
+        $trackingEnabled = in_array(FocusJsScope::TRACKING, $acceptedScopes, true);
+        $trackingOnly    = $trackingEnabled && !$runtimeEnabled && !$displayEnabled;
+        $lead            = $trackingEnabled ? $this->contactTracker->getContact() : null;
+        $focusArray      = $focus->toArray();
+        $url             = $trackingEnabled ? '' : $this->getAnonymousClickUrl($focusArray['properties']['content']['link_url'] ?? '');
+        $trackableUrl    = null;
 
-        if ($trackableUrl = $this->generateTrackableUrl($focus, $lead)) {
+        if ($trackingEnabled && $trackableUrl = $this->generateTrackableUrl($focus, $lead)) {
             $url = '{focusClickUrl}';
         }
 
@@ -147,23 +161,50 @@ class FocusModel extends FormModel implements GlobalSearchInterface
                 'focus'    => $focus,
                 'preview'  => $isPreview,
                 'clickUrl' => $url,
+                'acceptedScopes' => $acceptedScopes,
+                'runtimeEnabled'  => $runtimeEnabled,
+                'displayEnabled'  => $displayEnabled,
+                'trackingEnabled' => $trackingEnabled,
+                'trackingOnly'    => $trackingOnly,
+                'trackingClickUrl' => $trackableUrl,
+                'trackingPixelUrl' => $this->router->generate(
+                    'mautic_focus_pixel',
+                    ['id' => $focus->getId()],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                ),
+                'trackingUrl'     => $this->router->generate(
+                    'mautic_focus_generate_tracking',
+                    ['id' => $focus->getId()],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                ),
             ]
         );
 
-        $content = $this->getContent($focusArray, $isPreview, $url);
+        if ($trackingOnly) {
+            return (new Minify\JS($javascript))->minify();
+        }
+
+        $content = $this->getContent($focusArray, $isPreview, $url, $trackingEnabled);
         $data    = [
             'js'    => (new Minify\JS($javascript))->minify(),
             'focus' => InputHelper::minifyHTML($content['focus']),
             'form'  => InputHelper::minifyHTML($content['form']),
         ];
 
-        // Replace tokens to ensure clickthroughs, lead tokens etc. are appropriate
-        $tokenEvent = new TokenReplacementEvent($data['focus'], $lead, ['focus_id' => $focus->getId()]);
-        if ($trackableUrl) {
-            $tokenEvent->addToken($url, $trackableUrl);
+        $focusContent = $data['focus'];
+        if ($trackingEnabled) {
+            // Replace tokens to ensure clickthroughs, lead tokens etc. are appropriate
+            $tokenEvent = new TokenReplacementEvent($focusContent, $lead, ['focus_id' => $focus->getId()]);
+            if ($trackableUrl) {
+                $tokenEvent->addToken($url, $trackableUrl);
+            }
+            $this->dispatcher->dispatch($tokenEvent, FocusEvents::TOKEN_REPLACEMENT);
+            $focusContent = $tokenEvent->getContent();
+        } else {
+            $focusContent = $this->replaceContactTokensWithDefaults($focusContent);
+            $data['form'] = $this->replaceContactTokensWithDefaults($data['form']);
         }
-        $this->dispatcher->dispatch($tokenEvent, FocusEvents::TOKEN_REPLACEMENT);
-        $focusContent = $tokenEvent->getContent();
+
         $focusContent = str_replace('{focus_form}', $data['form'], $focusContent, $formReplaced);
         if (!$formReplaced && !empty($data['form'])) {
             // Form token missing so just append the form
@@ -181,7 +222,7 @@ class FocusModel extends FormModel implements GlobalSearchInterface
      *
      * @return array
      */
-    public function getContent(array $focus, $isPreview = false, $url = '#')
+    public function getContent(array $focus, $isPreview = false, $url = '#', bool $trackingEnabled = true)
     {
         $form = (!empty($focus['form']) && 'form' === $focus['type']) ? $this->formModel->getEntity($focus['form']) : null;
 
@@ -204,6 +245,7 @@ class FocusModel extends FormModel implements GlobalSearchInterface
                 'preview'  => $isPreview,
                 'htmlMode' => $htmlMode,
                 'clickUrl' => $url,
+                'trackingEnabled' => $trackingEnabled,
             ]
         );
 
@@ -229,10 +271,11 @@ class FocusModel extends FormModel implements GlobalSearchInterface
                 'companyFields'  => $this->leadFieldModel->getFieldListWithProperties('company'),
                 'viewOnlyFields' => $viewOnlyFields,
                 'displayManager' => $displayManager,
+                'trackingEnabled' => $trackingEnabled,
             ]
         ) : '';
 
-        if ($form) {
+        if ($form && $trackingEnabled) {
             $formName = $form->generateFormName("{$form->getName()}_focus", ['_']);
             $this->formModel->populateValuesWithLead($form, $formContent, $formName);
         }
@@ -433,5 +476,35 @@ class FocusModel extends FormModel implements GlobalSearchInterface
             false,
             $focus->getUtmTags()
         );
+    }
+
+    private function getAnonymousClickUrl(string $url): string
+    {
+        if (preg_match_all(LeadTokenHelper::REGEX, $url, $matches)) {
+            foreach ($matches[2] as $token) {
+                $default = self::getAnonymousContactTokenValue($token);
+                if ('' === $default) {
+                    return '#';
+                }
+            }
+        }
+
+        return $this->replaceContactTokensWithDefaults($url);
+    }
+
+    private function replaceContactTokensWithDefaults(string $content): string
+    {
+        return preg_replace_callback(
+            LeadTokenHelper::REGEX,
+            static fn (array $matches): string => self::getAnonymousContactTokenValue($matches[2]),
+            $content
+        );
+    }
+
+    private static function getAnonymousContactTokenValue(string $token): string
+    {
+        $default = explode('|', $token)[1] ?? '';
+
+        return in_array($default, self::ANONYMOUS_CONTACT_TOKEN_MODIFIERS, true) ? '' : $default;
     }
 }

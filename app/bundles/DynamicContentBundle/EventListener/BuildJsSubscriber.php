@@ -34,8 +34,9 @@ final readonly class BuildJsSubscriber implements EventSubscriberInterface
      */
     public function onBuildJs(BuildJsEvent $event): void
     {
-        $dwcUrl = $this->router->generate('mautic_api_dynamicContent_action', ['objectAlias' => 'slotNamePlaceholder'], UrlGeneratorInterface::ABSOLUTE_URL);
-
+        $request       = $this->requestStack->getCurrentRequest();
+        $dwcUrl        = $this->router->generate('mautic_api_dynamicContent_action', ['objectAlias' => 'slotNamePlaceholder'], UrlGeneratorInterface::ABSOLUTE_URL);
+        $mauticBaseUrl = json_encode($request->getSchemeAndHttpHost().$request->getBaseUrl(), JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
         $js = <<<JS
         
            // call variable if doesnt exist
@@ -83,14 +84,26 @@ MauticJS.enhanceDynamicContent = function(dwcContent) {
     // form load library
     MauticJS.initializeForms(dwcContent);
 
-    var m;
-    var regEx = /<script[^>]+src="?([^"\s]+)"?\s/g;
+    var container = document.createElement('div');
+    var mauticBaseUrl = new URL({$mauticBaseUrl});
+    var focusBasePath = mauticBaseUrl.pathname.replace(/\/$/, '') + '/focus/';
+    container.innerHTML = dwcContent;
+    var focusScripts = container.querySelectorAll('script[src]');
 
-    while (m = regEx.exec(dwcContent)) {
-        if ((m[1]).search("/focus/") > 0) {
-            MauticJS.insertScript(m[1]);
+    MauticJS.iterateCollection(focusScripts)(function(script) {
+        try {
+            var focusUrl = new URL(script.getAttribute('src'), mauticBaseUrl.href.replace(/\/$/, '') + '/');
+            var focusPath = focusUrl.pathname.substring(focusBasePath.length);
+            var isDisplayEndpoint = focusUrl.pathname.indexOf(focusBasePath) === 0 && /^[1-9]\d*\/display\.js$/.test(focusPath);
+            var isLegacyEndpoint = focusUrl.pathname.indexOf(focusBasePath) === 0 && /^[1-9]\d*\.js$/.test(focusPath);
+
+            if (focusUrl.origin === mauticBaseUrl.origin && (isDisplayEndpoint || (MauticJS.trackingEnabled && isLegacyEndpoint))) {
+                MauticJS.insertScript(focusUrl.href);
+            }
+        } catch (error) {
+            // Ignore invalid script URLs.
         }
-    }
+    });
 };
 
 MauticJS.initializeForms = function(content) {

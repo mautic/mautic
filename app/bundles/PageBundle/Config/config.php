@@ -95,6 +95,7 @@ return [
         'google_analytics'                      => null,
         'track_contact_by_ip'                   => false,
         'track_by_fingerprint'                  => false,
+        'focus_uses_mautic_tracking_consent'    => false,
         'google_analytics_id'                   => null,
         'google_analytics_trackingpage_enabled' => false,
         'google_analytics_landingpage_enabled'  => false,

@@ -719,6 +719,35 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         }
     }
 
+    public function testFormDetailsShowsCopyableSnippetsWithoutRenderingThem(): void
+    {
+        $form = $this->createForm('Test Form Snippets', 'test_form_snippets');
+        $this->em->persist($form);
+        $this->em->flush();
+
+        $crawler = $this->client->request('GET', sprintf('/s/forms/view/%d', $form->getId()));
+
+        $this->assertResponseIsSuccessful();
+
+        $snippets = $crawler->filter('#modal-manual-copy .code-snippet--multi');
+        $this->assertCount(2, $snippets);
+        $this->assertCount(0, $snippets->filter('script, form'));
+
+        $script      = $snippets->eq(0);
+        $content     = $snippets->eq(1);
+        $scriptText  = (string) $script->filter('pre')->getNode(0)?->textContent;
+        $contentText = (string) $content->filter('pre')->getNode(0)?->textContent;
+        $scriptCopy  = (string) $script->filter('[data-copy]')->attr('data-copy');
+        $contentCopy = (string) $content->filter('[data-copy]')->attr('data-copy');
+
+        $this->assertSame(ltrim($scriptText, "\r\n"), ltrim($scriptCopy, "\r\n"));
+        $this->assertSame(ltrim($contentText, "\r\n"), ltrim($contentCopy, "\r\n"));
+        $this->assertStringContainsString('<script', $scriptText);
+        $this->assertStringContainsString('<form', $contentText);
+        $this->assertStringNotContainsString('&lt;', $scriptCopy);
+        $this->assertStringNotContainsString('&lt;', $contentCopy);
+    }
+
     public function testSliderFieldRendersWithInputAttributes(): void
     {
         // Create a form with a slider field
