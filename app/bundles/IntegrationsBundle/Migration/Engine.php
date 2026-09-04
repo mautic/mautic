@@ -54,7 +54,13 @@ final readonly class Engine
                 $this->entityManager->commit();
             }
         } catch (\Doctrine\DBAL\Exception $e) {
-            $this->entityManager->rollback();
+            // Same guard as above: PHP 8+ and pdo_mysql will have already implicitly committed/closed
+            // a transaction that contained DDL, so rolling back unconditionally throws its own
+            // "There is no active transaction" error, masking the original $e below.
+            $connection = $this->entityManager->getConnection()->getNativeConnection();
+            if (!$connection instanceof \PDO || $connection->inTransaction()) {
+                $this->entityManager->rollback();
+            }
 
             throw $e;
         }
