@@ -22,7 +22,7 @@ final class ContactCompanyHtmlEntityDisplayFunctionalTest extends MauticMysqlTes
 
     public function testCompanyNameWithAmpersandIsDecodedOnContactListAndDetail(): void
     {
-        $companyName = 'Peculiar & Co';
+        $companyName = 'R&D';
 
         /** @var CompanyModel $companyModel */
         $companyModel = self::getContainer()->get(CompanyModel::class);
@@ -33,20 +33,22 @@ final class ContactCompanyHtmlEntityDisplayFunctionalTest extends MauticMysqlTes
         $leadModel = self::getContainer()->get(LeadModel::class);
 
         $namedContact = (new Lead())
-            ->setFirstname('Jane')
-            ->setLastname('Umeh')
-            ->setEmail('jane.amp-16321@example.test');
+            ->setFirstname('John')
+            ->setLastname('Doe')
+            ->setEmail('john.doe@example.com');
         $leadModel->saveEntity($namedContact);
         $companyModel->addLeadToCompany($company, $namedContact);
         $leadModel->saveEntity($namedContact);
 
         $namelessContact = (new Lead())
-            ->setEmail('nameless.amp-16321@example.test');
+            ->setEmail('test@example.com');
         $leadModel->saveEntity($namelessContact);
         $companyModel->addLeadToCompany($company, $namelessContact);
         $leadModel->saveEntity($namelessContact);
 
-        $namedContactId = $namedContact->getId();
+        $namedContactId    = $namedContact->getId();
+        $namelessContactId = $namelessContact->getId();
+        $companyId         = $company->getId();
         $this->em->clear();
 
         $listCrawler = $this->client->request(Request::METHOD_GET, '/s/contacts');
@@ -59,22 +61,41 @@ final class ContactCompanyHtmlEntityDisplayFunctionalTest extends MauticMysqlTes
 
         $detailCrawler = $this->client->request(Request::METHOD_GET, '/s/contacts/view/'.$namedContactId);
         $this->assertResponseIsSuccessful();
-        $companiesText = $detailCrawler->filter('.panel-companies')->text();
-        $this->assertStringContainsString($companyName, $companiesText);
-        $this->assertStringNotContainsString('Peculiar &amp; Co', $companiesText);
-        $this->assertStringNotContainsString('Peculiar &amp;amp; Co', $detailCrawler->html());
-        $this->assertStringContainsString('Peculiar &amp; Co', $detailCrawler->html());
+        $this->assertCompanyNameIsDisplayedOnce(
+            $detailCrawler->html(),
+            $detailCrawler->filter('.page-header-title, .panel-companies')->text(),
+            $companyName
+        );
+
+        $namelessDetailCrawler = $this->client->request(Request::METHOD_GET, '/s/contacts/view/'.$namelessContactId);
+        $this->assertResponseIsSuccessful();
+        $this->assertCompanyNameIsDisplayedOnce(
+            $namelessDetailCrawler->html(),
+            $namelessDetailCrawler->filter('.page-header-title')->text(),
+            $companyName
+        );
 
         $companyListCrawler = $this->client->request(Request::METHOD_GET, '/s/companies');
         $this->assertResponseIsSuccessful();
         $this->assertCompanyNameIsDisplayedOnce($companyListCrawler->html(), $companyListCrawler->filter('#companyTable')->text(), $companyName);
+
+        $companyContactsCrawler = $this->client->request(Request::METHOD_GET, '/s/company/'.$companyId.'/contacts/');
+        $this->assertResponseIsSuccessful();
+        $this->assertCompanyNameIsDisplayedOnce(
+            $companyContactsCrawler->html(),
+            $companyContactsCrawler->filter('#leadTable')->text(),
+            $companyName
+        );
     }
 
     private function assertCompanyNameIsDisplayedOnce(string $html, string $visibleText, string $companyName): void
     {
+        $encodedOnce  = htmlspecialchars($companyName, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $encodedTwice = htmlspecialchars($encodedOnce, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
         $this->assertStringContainsString($companyName, $visibleText);
-        $this->assertStringNotContainsString('Peculiar &amp; Co', $visibleText);
-        $this->assertStringNotContainsString('Peculiar &amp;amp; Co', $html);
-        $this->assertStringContainsString('Peculiar &amp; Co', $html);
+        $this->assertStringNotContainsString($encodedOnce, $visibleText);
+        $this->assertStringNotContainsString($encodedTwice, $html);
+        $this->assertStringContainsString($encodedOnce, $html);
     }
 }
