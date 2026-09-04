@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Entity;
 
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
@@ -89,54 +90,107 @@ final class SummaryRepository extends CommonRepository
         ?int $campaignId = null,
         ?int $eventId = null,
     ): void {
-        $dateFromTsActual = $dateFrom->getTimestamp();
-        $dateToTsActual   = $dateTo->getTimestamp();
-        $intervalInSeconds= 3600;
+        $dateFromTsActual  = $dateFrom->getTimestamp();
+        $dateToTsActual    = $dateTo->getTimestamp();
+        $intervalInSeconds = 3600;
 
         $dateFromStartWithZeroMinutes = $dateFromTsActual - ($dateFromTsActual % $intervalInSeconds);
         $numberOfIntervals            = ceil(($dateToTsActual - $dateFromStartWithZeroMinutes) / $intervalInSeconds);
+
+        $connection = $this->getEntityManager()->getConnection();
+        $platform   = $connection->getDatabasePlatform();
+
+        // Get ID handling for PostgreSQL (nextval) vs MySQL (auto_increment)
+        $idHandling = DatabasePlatform::getInsertIdHandling(
+            $platform,
+            MAUTIC_TABLE_PREFIX.'campaign_summary',
+            $this->getEntityManager()->getClassMetadata(Summary::class)
+        );
 
         for ($interval = 0; $interval < $numberOfIntervals; ++$interval) {
             $dateFromTs = date('Y-m-d H:i:s', $dateFromStartWithZeroMinutes + ($interval * $intervalInSeconds));
             $dateToTs   = date('Y-m-d H:i:s', strtotime($dateFromTs) + ($intervalInSeconds - 1));
 
-            $sql = 'INSERT INTO '.MAUTIC_TABLE_PREFIX.'campaign_summary '.
-            ' (campaign_id, event_id, date_triggered, scheduled_count, non_action_path_taken_count, failed_count, triggered_count, log_counts_processed) '.
-            ' SELECT * FROM (SELECT '.
-            '       mclel.campaign_id AS campaign_id, '.
-            '       mclel.event_id AS event_id, '.
-            '       "'.$dateFromTs.'" AS date_triggered_i, '.
-            '       SUM(IF(mclel.is_scheduled = 1 AND mclel.trigger_date > NOW(), 1, 0)) AS scheduled_count_i, '.
-            '       SUM(IF(mclel.is_scheduled = 1 AND mclel.trigger_date > NOW(), 0, mclel.non_action_path_taken)) AS non_action_path_taken_count_i, '.
-            '       SUM(IF((mclel.is_scheduled = 1 AND mclel.trigger_date > NOW()) OR mclel.non_action_path_taken, 0, mclefl.log_id IS NOT NULL)) AS failed_count_i, '.
-            '       SUM(IF((mclel.is_scheduled = 1 AND mclel.trigger_date > NOW()) OR mclel.non_action_path_taken OR mclefl.log_id IS NOT NULL, 0, 1)) AS triggered_count_i, '.
-            '       COUNT((SELECT mcl.campaign_id FROM '.MAUTIC_TABLE_PREFIX.'campaign_leads mcl 
-                WHERE mcl.campaign_id = mclel.campaign_id 
-                AND mclel.lead_id = mcl.lead_id 
-                AND mclel.is_scheduled = 0 
-                AND mclel.date_triggered IS NOT NULL 
-                AND NOT EXISTS(SELECT NULL FROM '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log mclefl2 
-                    WHERE mclefl2.log_id = mclel.id AND mclefl2.date_added BETWEEN "'.$dateFromTs.'" AND "'.$dateToTs.'")
-            )) AS log_counts_processed_i '.
-            ' FROM '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_log mclel LEFT JOIN '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log mclefl ON mclefl.log_id = mclel.id '.
-            ' WHERE (mclel.date_triggered BETWEEN "'.$dateFromTs.'" AND "'.$dateToTs.'") ';
-            if ($campaignId) {
-                $sql .= ' AND mclel.campaign_id = '.$campaignId;
+            // Quote the date strings once
+            $quotedFrom = $connection->quote($dateFromTs);
+            $quotedTo   = $connection->quote($dateToTs);
+
+            // Platform-specific expressions to ensure correct type (timestamp/datetime)
+            $dateTriggeredExpr = DatabasePlatform::applyTypeIfStrict($platform, $quotedFrom, 'timestamp');
+            $dateFromExpr      = $dateTriggeredExpr;
+            $dateToExpr        = DatabasePlatform::applyTypeIfStrict($platform, $quotedTo, 'timestamp');
+
+            // Build inner aggregation query with consistent integer types in CASE branches
+            $innerSql = '
+                SELECT
+                    '.$idHandling['idSelect'].'
+                    mclel.campaign_id AS campaign_id,
+                    mclel.event_id AS event_id,
+                    '.$dateTriggeredExpr.' AS date_triggered,
+                    SUM(CASE WHEN mclel.is_scheduled = 1 AND mclel.trigger_date > NOW() THEN 1 ELSE 0 END) AS scheduled_count,
+                    SUM(CASE WHEN mclel.is_scheduled = 1 AND mclel.trigger_date > NOW() THEN 0
+                             ELSE CASE WHEN mclel.non_action_path_taken = TRUE THEN 1 ELSE 0 END END) AS non_action_path_taken_count,
+                    SUM(CASE WHEN (mclel.is_scheduled = 1 AND mclel.trigger_date > NOW()) OR mclel.non_action_path_taken = TRUE THEN 0
+                             ELSE CASE WHEN mclefl.log_id IS NOT NULL THEN 1 ELSE 0 END END) AS failed_count,
+                    SUM(CASE WHEN (mclel.is_scheduled = 1 AND mclel.trigger_date > NOW()) OR mclel.non_action_path_taken = TRUE OR mclefl.log_id IS NOT NULL THEN 0
+                             ELSE 1 END) AS triggered_count,
+                    SUM(CASE WHEN EXISTS (
+                        SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'campaign_leads mcl
+                        WHERE mcl.campaign_id = mclel.campaign_id AND mcl.lead_id = mclel.lead_id
+                    ) AND mclel.is_scheduled = 0
+                    AND mclel.date_triggered IS NOT NULL
+                    AND mclefl.log_id IS NULL THEN 1 ELSE 0 END) AS log_counts_processed
+                FROM '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_log mclel
+                LEFT JOIN '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log mclefl
+                    ON mclefl.log_id = mclel.id
+                   AND mclefl.date_added BETWEEN '.$dateFromExpr.' AND '.$dateToExpr.'
+                WHERE mclel.date_triggered BETWEEN '.$dateFromExpr.' AND '.$dateToExpr.'
+            ';
+
+            if (null !== $campaignId) {
+                $innerSql .= ' AND mclel.campaign_id = '.$campaignId;
             }
 
-            if ($eventId) {
-                $sql .= ' AND mclel.event_id = '.$eventId;
+            if (null !== $eventId) {
+                $innerSql .= ' AND mclel.event_id = '.$eventId;
             }
 
-            $sql .= ' GROUP BY mclel.campaign_id, mclel.event_id) AS `s` '.
-            ' ON DUPLICATE KEY UPDATE '.
-            ' scheduled_count = s.scheduled_count_i, '.
-            ' non_action_path_taken_count = s.non_action_path_taken_count_i, '.
-            ' failed_count = s.failed_count_i, '.
-            ' triggered_count = s.triggered_count_i, '.
-            ' log_counts_processed = s.log_counts_processed_i;';
+            $innerSql .= ' GROUP BY mclel.campaign_id, mclel.event_id';
 
-            $this->getEntityManager()->getConnection()->executeStatement($sql);
+            // Columns for INSERT
+            $columns = [
+                'campaign_id',
+                'event_id',
+                'date_triggered',
+                'scheduled_count',
+                'non_action_path_taken_count',
+                'failed_count',
+                'triggered_count',
+                'log_counts_processed',
+            ];
+
+            // Add id column if exists
+            if (!empty($idHandling['idColumn'])) {
+                array_unshift($columns, $idHandling['idColumn']);
+            }
+
+            // Build upsert using centralized helper
+            $sql = DatabasePlatform::getSummarizeUpsertStatement(
+                $platform,
+                MAUTIC_TABLE_PREFIX.'campaign_summary',
+                implode(', ', $columns),
+                $innerSql,
+                'campaign_id, event_id, date_triggered',
+                [
+                    'scheduled_count'             => 'scheduled_count',
+                    'non_action_path_taken_count' => 'non_action_path_taken_count',
+                    'failed_count'                => 'failed_count',
+                    'triggered_count'             => 'triggered_count',
+                    'log_counts_processed'        => 'log_counts_processed',
+                ]
+            );
+
+            $connection->executeStatement($sql);
         }
     }
 }

@@ -17,10 +17,19 @@ use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
 {
+    private const ADMIN_USER = 'admin';
+
+    private const ADMIN_ROLE = 'Administrator';
+
+    private const SALES_ROLE = 'Sales Team';
+
     public function testRoleUpdateByApiGivesErrorResponseIfUserDoesNotExist(): void
     {
+        $role = $this->getRole(self::ADMIN_ROLE);
+        $this->assertInstanceOf(Role::class, $role);
+
         // Assuming user with id 99999 does not exist
-        $this->client->request(Request::METHOD_PATCH, '/api/users/99999/edit', ['role' => 1]);
+        $this->client->request(Request::METHOD_PATCH, '/api/users/99999/edit', ['role' => $role->getId()]);
         $clientResponse = $this->client->getResponse();
         self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
         $this->assertStringContainsString('"message":"Item was not found."', (string) $clientResponse->getContent());
@@ -28,8 +37,11 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testRoleUpdateByApiGivesErrorResponseIfRoleDoesNotExist(): void
     {
+        $user = $this->getUser(self::ADMIN_USER);
+        $this->assertInstanceOf(User::class, $user);
+
         // Assuming role with id 99999 does not exist
-        $this->client->request(Request::METHOD_PATCH, '/api/users/1/edit', ['role' => 99999]);
+        $this->client->request(Request::METHOD_PATCH, '/api/users/'.$user->getId().'/edit', ['role' => 99999]);
         $clientResponse = $this->client->getResponse();
         self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
         $this->assertStringContainsString('"message":"role: The selected choice is invalid."', (string) $clientResponse->getContent());
@@ -37,8 +49,14 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testRoleUpdateByApiGivesErrorResponseWithInvalidRequestFormat(): void
     {
+        $user = $this->getUser(self::ADMIN_USER);
+        $role = $this->getRole(self::SALES_ROLE);
+
+        $this->assertInstanceOf(User::class, $user);
+        $this->assertInstanceOf(Role::class, $role);
+
         // Correct request format is ['role' => 2]
-        $this->client->request(Request::METHOD_PATCH, '/api/users/1/edit', ['role' => ['id' => 2]]);
+        $this->client->request(Request::METHOD_PATCH, '/api/users/'.$user->getId().'/edit', ['role' => ['id' => $role->getId()]]);
         $clientResponse = $this->client->getResponse();
         self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
         $this->assertStringContainsString('"message":"role: The selected choice is invalid."', (string) $clientResponse->getContent());
@@ -129,13 +147,16 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
     #[DataProvider('passwordProvider')]
     public function testUserPasswordPolicy(int $responseCode, string $password): void
     {
+        $role = $this->getRole(self::ADMIN_ROLE);
+        $this->assertInstanceOf(Role::class, $role);
+
         $userPayload = [
             'username'      => 'lorem_ipsum',
             'firstName'     => 'lorem',
             'lastName'      => 'ipsum',
             'email'         => 'loremipsum@example.com',
             'plainPassword' => ['password' => $password, 'confirm' => $password],
-            'role'          => 1,
+            'role'          => $role->getId(),
         ];
 
         $this->client->request(Request::METHOD_POST, '/api/users/new', $userPayload);
@@ -273,5 +294,12 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
             ],
             'expectedStatusCode' => Response::HTTP_CREATED,
         ];
+    }
+
+    private function getRole(string $name): ?Role
+    {
+        $repository = $this->em->getRepository(Role::class);
+
+        return $repository->findOneBy(['name' => $name]);
     }
 }

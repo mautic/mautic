@@ -25,6 +25,16 @@ final class GeneratedColumnsProvider implements GeneratedColumnsProviderInterfac
      */
     public const MARIADB_MINIMUM_VERSION = '10.2.6';
 
+    /**
+     * @var string
+     *
+     * Minimum Version (Stored): PostgreSQL 12.
+     * Minimum Version (Virtual): PostgreSQL 18.
+     *
+     * @see https://www.postgresql.org/docs/current/ddl-generated-columns.html
+     */
+    public const POSTGRESQL_MINIMUM_VERSION = '18.0.0';
+
     private GeneratedColumns $generatedColumns;
 
     public function __construct(
@@ -49,11 +59,27 @@ final class GeneratedColumnsProvider implements GeneratedColumnsProviderInterfac
 
     public function generatedColumnsAreSupported(): bool
     {
-        return 1 !== version_compare($this->getMinimalSupportedVersion(), $this->versionProvider->getVersion());
+        if ($this->versionProvider->isPostgreSql()) {
+            /*
+             * We disable it on postgresql by default as the expressions we try to use are not immutable
+             * ERROR:  generation expression is not immutable
+             *
+             * As workaround for postgresql in future we should probably use
+             * standard column + trigger on update/edit which will fill the data.
+             */
+            return false;
+        }
+        $version = VersionProvider::getNumericVersion($this->versionProvider->getVersion());
+
+        return 1 !== version_compare($this->getMinimalSupportedVersion(), $version);
     }
 
     public function getMinimalSupportedVersion(): string
     {
+        if ($this->versionProvider->isPostgreSql()) {
+            return self::POSTGRESQL_MINIMUM_VERSION;
+        }
+
         if ($this->versionProvider->isMariaDb()) {
             return self::MARIADB_MINIMUM_VERSION;
         }

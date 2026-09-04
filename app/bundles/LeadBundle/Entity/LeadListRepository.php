@@ -5,6 +5,7 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Query\ResultSetMapping;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
@@ -329,10 +330,12 @@ class LeadListRepository extends CommonRepository
 
     private function forceUseIndex(QueryBuilder $qb, string $indexName): QueryBuilder
     {
-        $fromPart             = $qb->getQueryPart('from');
-        $fromPart[0]['alias'] = sprintf('%s USE INDEX (%s)', $fromPart[0]['alias'], $indexName);
-        $qb->resetQueryPart('from');
-        $qb->from($fromPart[0]['table'], $fromPart[0]['alias']);
+        if (DatabasePlatform::allowsIndexHint($this->getEntityManager()->getConnection()->getDatabasePlatform())) {
+            $fromPart             = $qb->getQueryPart('from');
+            $fromPart[0]['alias'] = sprintf('%s USE INDEX (%s)', $fromPart[0]['alias'], $indexName);
+            $qb->resetQueryPart('from');
+            $qb->from($fromPart[0]['table'], $fromPart[0]['alias']);
+        }
 
         return $qb;
     }

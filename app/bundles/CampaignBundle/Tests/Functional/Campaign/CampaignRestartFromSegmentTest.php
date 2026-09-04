@@ -78,7 +78,7 @@ final class CampaignRestartFromSegmentTest extends MauticMysqlTestCase
         // Use DBAL directly to avoid ORM caching complications with composite-PK entities.
         $connection = $this->em->getConnection();
         $affected   = $connection->executeStatement(
-            'UPDATE '.MAUTIC_TABLE_PREFIX.'lead_lists_leads SET manually_removed = 1 WHERE lead_id = ? AND leadlist_id = ?',
+            'UPDATE '.MAUTIC_TABLE_PREFIX.'lead_lists_leads SET manually_removed = TRUE WHERE lead_id = ? AND leadlist_id = ?',
             [$contact->getId(), $segment->getId()]
         );
         $this->assertSame(1, $affected, 'Expected exactly one ListLead row to be updated.');
@@ -100,7 +100,7 @@ final class CampaignRestartFromSegmentTest extends MauticMysqlTestCase
 
         // Simulate contact returning to the segment (e.g. tag is re-applied)
         $connection->executeStatement(
-            'UPDATE '.MAUTIC_TABLE_PREFIX.'lead_lists_leads SET manually_removed = 0 WHERE lead_id = ? AND leadlist_id = ?',
+            'UPDATE '.MAUTIC_TABLE_PREFIX.'lead_lists_leads SET manually_removed = FALSE WHERE lead_id = ? AND leadlist_id = ?',
             [$contact->getId(), $segment->getId()]
         );
         $this->em->clear();

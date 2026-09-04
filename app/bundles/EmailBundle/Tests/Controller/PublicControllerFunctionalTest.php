@@ -424,6 +424,20 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testPreviewDisabledByDefault(): void
     {
+        /*
+         * The test was flawed regardless of database:
+         *  It never flushes before the first request, so it doesn't truly test "preview disabled" behavior.
+         *  The 404 on MySQL is accidental (invalid ID), not due to access denial.
+         *  When publicPreview is false:
+         *      Anonymous users → access denied (403).
+         *      Authenticated users with permission → allowed (200).
+         *  The test assumes disabled → 404, but the code uses access denial for public users only.
+         *      To properly test public preview disabled:Flush after creating the email.
+         *      Use an anonymous client for the request (e.g., a separate unauthenticated client or logout).
+         *      Expect 403 (or whatever accessDenied() returns) when disabled, 200 when enabled.
+         * The test originally "passes" on MySQL purely by coincidence due to the delayed ID allocation.
+         */
+        $this->logoutUser(); // Public preview is always allowed for authenticated user
         $emailName    = 'Test preview email';
 
         $email = new Email();
@@ -432,13 +446,13 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $email->setEmailType('template');
         $email->setCustomHtml('some content');
         $this->em->persist($email);
+        $this->em->flush();
 
         $this->client->request('GET', '/email/preview/'.$email->getId());
-        $this->assertTrue($this->client->getResponse()->isNotFound(), $this->client->getResponse()->getContent());
+        $this->assertTrue($this->client->getResponse()->isForbidden(), $this->client->getResponse()->getContent());
 
         $email->setPublicPreview(true);
         $this->em->persist($email);
-
         $this->em->flush();
 
         $this->client->request('GET', '/email/preview/'.$email->getId());

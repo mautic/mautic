@@ -6,7 +6,9 @@ namespace Mautic\LeadBundle\Tests\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\Expr;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -39,6 +41,16 @@ final class LeadListRepositoryTest extends TestCase
         $this->queryBuilderMock = $this->createMock(QueryBuilder::class);
         $this->expressionMock   = $this->createMock(Expr::class);
         $this->repository       = $this->configureRepository(LeadList::class);
+        $this->entityManager    = $this->createMock(EntityManagerInterface::class);
+
+        // Default to MySQL platform for backward compatibility with existing tests
+        $platform = new MySQLPlatform();
+
+        $this->connection->method('getDatabasePlatform')
+            ->willReturn($platform);
+
+        $this->entityManager->method('getConnection')
+            ->willReturn($this->connection);
     }
 
     public function testIsContactInAnySegmentFalse(): void

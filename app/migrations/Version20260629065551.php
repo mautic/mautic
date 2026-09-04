@@ -10,33 +10,25 @@ use Mautic\LeadBundle\Field\Helper\IndexHelper;
 
 final class Version20260629065551 extends PreUpAssertionMigration
 {
+    protected const TABLE_NAME  = 'leads';
+    protected const INDEX_NAME  = 'last_active';
+
     protected function preUpAssertions(): void
     {
         $this->skipAssertion(function (Schema $schema) {
-            $table = $schema->getTable($this->getTableName());
+            $table = $schema->getTable($this->getPrefixedTableName());
+            $indexHelper    = $this->container->get(IndexHelper::class);
 
-            return count($table->getIndexes()) >= IndexHelper::MAX_COUNT_ALLOWED || $table->hasIndex($this->getIndexName());
-        }, sprintf('Index %s cannot be created because the %s table has hit the index limit or the index already exists', $this->getIndexName(), $this->getTableName()));
+            return count($table->getIndexes()) >= $indexHelper->getMaxCount() || $table->hasIndex($this->getPrefixedIndexName());
+        }, sprintf('Index %s cannot be created because the %s table has hit the index limit or the index already exists', $this->getPrefixedIndexName(), $this->getPrefixedTableName()));
     }
 
     public function up(Schema $schema): void
     {
-        $query = sprintf(
-            'ALTER TABLE %s ADD INDEX %s (last_active)',
-            $this->getTableName(),
-            $this->getIndexName()
+        $this->createIndex(
+            $this->getPrefixedTableName(),
+            $this->getPrefixedIndexName(),
+            ['last_active']
         );
-
-        $this->addSql($query);
-    }
-
-    private function getTableName(): string
-    {
-        return "{$this->prefix}leads";
-    }
-
-    private function getIndexName(): string
-    {
-        return "{$this->prefix}last_active";
     }
 }

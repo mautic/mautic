@@ -5,6 +5,7 @@ namespace Mautic\LeadBundle\Model;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Form\RequestTrait;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -580,8 +581,12 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                     }
                 }
 
-                $expr      = new ExpressionBuilder($this->em->getConnection());
-                $composite = $expr->and($expr->like("comp.{$column}", ':filterVar'));
+                $param        = 'filterVar';
+                $expr         = new ExpressionBuilder($this->em->getConnection());
+                $platform     = $this->em->getConnection()->getDatabasePlatform();
+                $composite    = $expr->and(
+                    DatabasePlatform::getCaseInsensitiveLike($platform, "comp.{$column}", ':'.$param)
+                );
 
                 // Validate owner permissions
                 if (!$this->security->isGranted('lead:leads:viewother')) {
@@ -598,7 +603,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
                 $results = $this->getRepository()->getAjaxSimpleList(
                     $composite,
-                    ['filterVar' => $filterVal.'%'],
+                    [$param => $filterVal.'%'],
                     $column,
                     'id',
                     $limit,

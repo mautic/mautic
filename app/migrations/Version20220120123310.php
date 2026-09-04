@@ -9,27 +9,39 @@ use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20220120123310 extends PreUpAssertionMigration
 {
-    private const TABLE = 'lead_lists';
+    protected const TABLE = 'lead_lists';
 
-    protected function preUpAssertions(): void
+    private function getTableName(): string
     {
-        $this->skipAssertion(
-            function (Schema $schema) {
-                $table = $schema->getTable($this->getPrefixedTableName(self::TABLE));
-
-                return $table->hasIndex($this->getIndexName());
-            },
-            "Index {$this->getIndexName()} cannot be created because the index already exists"
-        );
-    }
-
-    public function up(Schema $schema): void
-    {
-        $this->addSql("CREATE INDEX {$this->getIndexName()} ON {$this->getPrefixedTableName(self::TABLE)} (deleted)");
+        return $this->prefix.self::TABLE;
     }
 
     private function getIndexName(): string
     {
         return $this->prefix.'segment_deleted';
+    }
+
+    protected function preUpAssertions(): void
+    {
+        $tableName = $this->getTableName();
+        $indexName = $this->getIndexName();
+
+        $this->skipAssertion(
+            fn (Schema $schema) => $this->indexExists($tableName, $indexName),
+            "Index {$indexName} cannot be created because the index already exists"
+        );
+    }
+
+    public function up(Schema $schema): void
+    {
+        $tableName = $this->getTableName();
+        $indexName = $this->getIndexName();
+
+        if (!$schema->hasTable($tableName) || $this->indexExists($tableName, $indexName)) {
+            return;
+        }
+
+        $table = $schema->getTable($tableName);
+        $table->addIndex(['deleted'], $indexName);
     }
 }

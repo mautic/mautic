@@ -9,6 +9,7 @@ use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Doctrine\Loader\FixturesLoaderInterface;
 use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
@@ -294,9 +295,10 @@ class InstallService
             $messages['error'] = $this->translator->trans(
                 'mautic.installer.error.database.version',
                 [
-                    '%currentversion%'    => $e->getCurrentVersion(),
-                    '%mysqlminversion%'   => $metadata->getMinSupportedMySqlVersion(),
-                    '%mariadbminversion%' => $metadata->getMinSupportedMariaDbVersion(),
+                    '%currentversion%'       => $e->getCurrentVersion(),
+                    '%mysqlminversion%'      => $metadata->getMinSupportedMySqlVersion(),
+                    '%mariadbminversion%'    => $metadata->getMinSupportedMariaDbVersion(),
+                    '%postgresqlminversion%' => $metadata->getMinSupportedPostgreSqlVersion(),
                 ],
                 'flashes'
             );
@@ -501,6 +503,22 @@ class InstallService
      */
     public function finalMigrationStep(): void
     {
+        $connection = $this->entityManager->getConnection();
+
+        if (DatabasePlatform::isPostgreSQL($connection->getDatabasePlatform())) {
+            // Doctrine Migrations' TableMetadataStorage::ensureInitialized() is not idempotent on PostgreSQL
+            // — it always tries to add the PK via alterTable(), without first verifying if the constraint is already present.
+            // This is a long-standing limitation in Doctrine Migrations (especially versions 2.x/3.x),
+            // and it's well-known when using PostgreSQL (MySQL forgives duplicate attempts).
+            //
+            // schema:create / install may already create "migrations" with a PK;
+            // sync-metadata-storage then tries to ADD PRIMARY KEY again → 42P16
+            $schemaManager = $connection->createSchemaManager();
+            if (in_array('migrations', $schemaManager->listTableNames(), true)) {
+                $connection->executeStatement('DROP TABLE IF EXISTS migrations CASCADE');
+            }
+        }
+
         $application = new Application($this->kernel);
         $application->setAutoExit(false);
 

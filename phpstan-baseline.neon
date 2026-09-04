@@ -543,7 +543,7 @@ parameters:
 		-
 			message: '#^Parameter \#2 \$value of method Doctrine\\DBAL\\Query\\QueryBuilder\:\:set\(\) expects string, int given\.$#'
 			identifier: argument.type
-			count: 2
+			count: 1
 			path: app/bundles/CampaignBundle/Entity/LeadEventLogRepository.php
 
 		-
@@ -1853,12 +1853,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\CoreBundle\\Event\\BuilderEvent\:\:getTokens\(\) has parameter \$withBC with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Event/BuilderEvent.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Event\\BuilderEvent\:\:getTokensFromHelper\(\) has parameter \$labelColumn with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/CoreBundle/Event/BuilderEvent.php
@@ -4228,12 +4222,6 @@ parameters:
 			path: app/bundles/EmailBundle/MonitoredEmail/Processor/Bounce/BouncedEmail.php
 
 		-
-			message: '#^Method Mautic\\EmailBundle\\MonitoredEmail\\Processor\\Bounce\\Mapper\\Category\:\:__construct\(\) with return type void returns \$this\(Mautic\\EmailBundle\\MonitoredEmail\\Processor\\Bounce\\Mapper\\Category\) but should not return anything\.$#'
-			identifier: return.void
-			count: 1
-			path: app/bundles/EmailBundle/MonitoredEmail/Processor/Bounce/Mapper/Category.php
-
-		-
 			message: '#^Method Mautic\\EmailBundle\\MonitoredEmail\\Processor\\Bounce\\Mapper\\CategoryMapper\:\:map\(\) has parameter \$category with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -4713,12 +4701,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\FormBundle\\Model\\SubmissionModel\:\:validateFieldValue\(\) should return bool\|string but returns array\.$#'
 			identifier: return.type
-			count: 1
-			path: app/bundles/FormBundle/Model/SubmissionModel.php
-
-		-
-			message: '#^Parameter \#1 \$object of method Mautic\\LeadBundle\\Model\\FieldModel\:\:getFieldListWithProperties\(\) expects string, false given\.$#'
-			identifier: argument.type
 			count: 1
 			path: app/bundles/FormBundle/Model/SubmissionModel.php
 
@@ -5301,12 +5283,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\LeadBundle\\Entity\\CompanyLeadRepository\:\:saveEntities\(\) has parameter \$new with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Entity/CompanyLeadRepository.php
-
-		-
-			message: '#^Parameter \#2 \$value of method Doctrine\\DBAL\\Query\\QueryBuilder\:\:set\(\) expects string, int given\.$#'
-			identifier: argument.type
 			count: 1
 			path: app/bundles/LeadBundle/Entity/CompanyLeadRepository.php
 
@@ -12314,3 +12290,9 @@ parameters:
 			identifier: argument.type
 			count: 2
 			path: plugins/MauticSocialBundle/Security/Permissions/MauticSocialPermissions.php
+
+		-
+			message: '#^Method Mautic\\CoreBundle\\Test\\MauticMysqlTestCase\:\:__construct\(\) overrides @final method Mautic\\CoreBundle\\Test\\AbstractMauticTestCase\:\:__construct\(\)\.$#'
+			identifier: method.parentMethodFinalByPhpDoc
+			count: 1
+			path: app/bundles/CoreBundle/Test/MauticMysqlTestCase.php

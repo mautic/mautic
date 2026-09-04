@@ -65,8 +65,8 @@ final class LeadDetailFunctionalTest extends MauticMysqlTestCase
         $expectedLabels = $this->connection->createQueryBuilder()
             ->select('label')
             ->from(MAUTIC_TABLE_PREFIX.'lead_fields')
-            ->where('object = "lead"')
-            ->andWhere('field_group = "core"')
+            ->where("object = 'lead'")
+            ->andWhere("field_group = 'core'")
             ->andWhere('label IN (:leadFields)')
             ->orderBy('field_order')
             ->setParameter(

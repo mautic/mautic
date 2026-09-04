@@ -17,10 +17,22 @@ final class Version20230311195347 extends AbstractMauticMigration
         $columnName = 'integration';
         $value      = 'Pipedrive';
 
-        $rowCount = self::BATCH_SIZE;
+        // delete in consistent order (oldest first)
+        $sql = "DELETE FROM {$tableName}
+            WHERE {$columnName} = :value
+            AND id IN (
+                SELECT id FROM (
+                    SELECT id
+                    FROM {$tableName}
+                    WHERE {$columnName} = :value
+                    ORDER BY id ASC
+                    LIMIT ".self::BATCH_SIZE.'
+                ) AS subquery
+            )';
 
-        while ($rowCount) {
-            $sql      = "DELETE FROM {$tableName} WHERE {$columnName} = :value LIMIT ".self::BATCH_SIZE;
+        $rowCount = self::BATCH_SIZE;  // initial non-zero value to enter the loop
+
+        while ($rowCount > 0) {
             $rowCount = $this->connection->executeStatement($sql, ['value' => $value]);
         }
     }

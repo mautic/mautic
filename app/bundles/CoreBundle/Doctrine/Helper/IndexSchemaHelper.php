@@ -6,6 +6,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\TextType;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Exception\SchemaException;
 use Mautic\LeadBundle\Entity\LeadField;
 
@@ -89,15 +90,23 @@ class IndexSchemaHelper
             return $this;
         }
 
-        $index = new Index($this->prefix.$name, $textColumns, false, false, $options);
+        $indexName = $this->prefix.$name;
+        $index     = new Index($indexName, $textColumns, false, false, $options);
 
-        if ($this->table->hasIndex($this->prefix.$name)) {
-            $this->changedIndexes[] = $index;
-
+        // Check if index already exists with the same columns
+        if ($this->tableHasIndex($this->table->getName(), $indexName, $textColumns)) {
+            // Exact match → nothing to do
             return $this;
         }
 
-        $this->addedIndexes[] = $index;
+        // Index either doesn't exist, or exists but has different columns
+        if ($this->tableHasIndex($this->table->getName(), $indexName)) {
+            // Index exists but has different columns
+            $this->changedIndexes[] = $index;
+        } else {
+            // Index doesn't exist
+            $this->addedIndexes[] = $index;
+        }
 
         return $this;
     }
@@ -113,8 +122,14 @@ class IndexSchemaHelper
     {
         $textColumns = $this->getTextColumns($columns);
 
-        $index = new Index($this->prefix.$name, $textColumns, false, false, $options);
-        if ($this->table->hasIndex($this->prefix.$name)) {
+        if ([] === $textColumns) {
+            return $this;
+        }
+
+        $indexName = $this->prefix.$name;
+        $index     = new Index($indexName, $textColumns, false, false, $options);
+
+        if ($this->tableHasIndex($this->table->getName(), $indexName)) {
             $this->dropIndexes[] = $index;
         }
 
@@ -154,10 +169,10 @@ class IndexSchemaHelper
      */
     public function hasIndex(LeadField $leadField): bool
     {
-        $alias = $leadField->getAlias();
-        $this->setName($leadField->getCustomFieldObject());
-
-        return $this->table->hasIndex($this->prefix."{$alias}_search");
+        return $this->tableHasIndex(
+            $this->prefix.$leadField->getCustomFieldObject(),
+            $this->prefix.$leadField->getAlias().'_search'
+        );
     }
 
     /**
@@ -165,16 +180,11 @@ class IndexSchemaHelper
      */
     public function hasMatchingUniqueIdentifierIndex(LeadField $leadField, array $uniqueIdentifierColumns): bool
     {
-        $this->setName($leadField->getCustomFieldObject());
-
-        $index = $this->table->getIndex($this->prefix.'unique_identifier_search');
-
-        $columns = $index->getColumns();
-
-        asort($columns);
-        asort($uniqueIdentifierColumns);
-
-        return $columns === $uniqueIdentifierColumns;
+        return $this->tableHasIndex(
+            $this->prefix.$leadField->getCustomFieldObject(),
+            $this->prefix.$leadField->getObject().'_unique_identifier_search',
+            $uniqueIdentifierColumns
+        );
     }
 
     /**
@@ -182,9 +192,40 @@ class IndexSchemaHelper
      */
     public function hasUniqueIdentifierIndex(LeadField $leadField): bool
     {
-        $this->setName($leadField->getCustomFieldObject());
+        return $this->tableHasIndex(
+            $this->prefix.$leadField->getCustomFieldObject(),
+            $this->prefix.$leadField->getObject().'_unique_identifier_search'
+        );
+    }
 
-        return $this->table->hasIndex($this->prefix.'unique_identifier_search');
+    /**
+     * @return Index[]
+     */
+    public function getTableIndexes(string $fullTableName): array
+    {
+        // return $this->sm->listTableIndexes($fullTableName);
+        return DatabasePlatform::listTableIndexes($this->db, $fullTableName);
+    }
+
+    /**
+     * @param array<mixed> $indexColumns
+     */
+    private function tableHasIndex(string $tableName, string $indexName, array $indexColumns = []): bool
+    {
+        foreach ($this->getTableIndexes($tableName) as $idx) {
+            if (strtolower($idx->getName()) === strtolower($indexName)) {
+                if ([] === $indexColumns) {
+                    return true;
+                }
+                $columns = $idx->getColumns();
+                asort($columns);
+                asort($indexColumns);
+
+                return $columns === $indexColumns;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -194,23 +235,20 @@ class IndexSchemaHelper
      */
     private function getTextColumns($columns): array
     {
-        if (!is_array($columns)) {
-            $columns = [$columns];
-        }
-        foreach ($columns as $column) {
-            if (!in_array($column, $this->allowedColumns)) {
-                $columnSchema = $this->table->getColumn($column);
+        $platform  = $this->db->getDatabasePlatform();
+        $allowText = DatabasePlatform::allowsTextInIndex($platform);
 
-                $type = $columnSchema->getType();
-                if (!$type instanceof TextType) {
+        foreach ($columns as $column) {
+            if (!in_array($column, $this->allowedColumns, true)) {
+                $columnSchema = $this->table->getColumn($column);
+                $type         = $columnSchema->getType();
+
+                if (!$type instanceof TextType || $allowText) {
                     $this->allowedColumns[] = $columnSchema->getName();
                 }
             }
         }
 
-        // Indexes are only allowed on columns that are string
-        $columns = array_intersect($columns, $this->allowedColumns);
-
-        return $columns;
+        return array_values(array_intersect($columns, $this->allowedColumns));
     }
 }

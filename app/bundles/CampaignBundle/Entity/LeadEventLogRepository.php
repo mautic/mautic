@@ -8,6 +8,7 @@ use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Types\Types;
 use Mautic\CampaignBundle\DTO\EventLogStatsDto;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\LeadBundle\Entity\TimelineTrait;
@@ -65,13 +66,14 @@ class LeadEventLogRepository extends CommonRepository
      */
     public function getLeadLogs($leadId = null, array $options = [])
     {
-        $query = $this->getEntityManager()
-                      ->getConnection()
-                      ->createQueryBuilder()
-                      ->select('ll.id as log_id,
+        $connection = $this->getEntityManager()->getConnection();
+
+        $query = $connection
+            ->createQueryBuilder()
+            ->select('ll.id as log_id,
                     ll.event_id,
                     ll.campaign_id,
-                    ll.date_triggered as dateTriggered,
+                    ll.date_triggered as '.$connection->quoteIdentifier('dateTriggered').',
                     e.name AS event_name,
                     e.description AS event_description,
                     e.parent_id AS parent_id,
@@ -80,26 +82,33 @@ class LeadEventLogRepository extends CommonRepository
                     c.description AS campaign_description,
                     ll.metadata,
                     e.type,
-                    ll.is_scheduled as isScheduled,
-                    ll.trigger_date as triggerDate,
+                    ll.is_scheduled as '.$connection->quoteIdentifier('isScheduled').',
+                    ll.trigger_date as '.$connection->quoteIdentifier('triggerDate').',
                     ll.channel,
                     ll.channel_id as channel_id,
                     ll.lead_id,
-                    ll.non_action_path_taken as nonActionPathTaken,
+                    ll.non_action_path_taken as '.$connection->quoteIdentifier('nonActionPathTaken').',
                     fl.reason as fail_reason,
                     e.deleted AS event_deleted_timestamp,
                     e.redirect_event_id,
-                    ll.metadata')
-                        ->add('from', [
-                            'table' => MAUTIC_TABLE_PREFIX.'campaign_lead_event_log',
-                            'alias' => 'll',
-                            'hint'  => 'USE INDEX ('.MAUTIC_TABLE_PREFIX.'campaign_date_triggered)',
-                        ], true)
-                        ->join('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'll.event_id = e.id')
-                        ->join('ll', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'll.campaign_id = c.id')
-                        ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log', 'fl', 'fl.log_id = ll.id')
-                        ->andWhere('e.event_type != :eventType')
-                        ->setParameter('eventType', 'decision');
+                    ll.metadata');
+
+        if (DatabasePlatform::allowsIndexHint($connection->getDatabasePlatform())) {
+            $query->add('from', [
+                'table' => MAUTIC_TABLE_PREFIX.'campaign_lead_event_log',
+                'alias' => 'll',
+                'hint'  => 'USE INDEX ('.MAUTIC_TABLE_PREFIX.'campaign_date_triggered)',
+            ], true);
+        } else {
+            $query->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'll');
+        }
+
+        $query
+            ->join('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'll.event_id = e.id')
+            ->join('ll', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'll.campaign_id = c.id')
+            ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log', 'fl', 'fl.log_id = ll.id')
+            ->andWhere('e.event_type != :eventType')
+            ->setParameter('eventType', 'decision');
 
         if ($leadId) {
             $query->where('ll.lead_id = :leadId')
@@ -147,7 +156,8 @@ class LeadEventLogRepository extends CommonRepository
     {
         $leadIps = [];
 
-        $query = new QueryBuilder($this->_em->getConnection());
+        $connection = $this->_em->getConnection();
+        $query      = new QueryBuilder($connection);
 
         $joinCondition = 'e.id = ll.event_id';
         if (isset($options['type'])) {
@@ -164,13 +174,19 @@ class LeadEventLogRepository extends CommonRepository
                     c.name AS campaign_name,
                     c.description AS campaign_description,
                     ll.metadata,
-                    CONCAT(CONCAT(l.firstname, \' \'), l.lastname) AS lead_name')
-            ->add('from', [
+                    CONCAT(CONCAT(l.firstname, \' \'), l.lastname) AS lead_name');
+
+        if (DatabasePlatform::allowsIndexHint($connection->getDatabasePlatform())) {
+            $query->add('from', [
                 'table' => MAUTIC_TABLE_PREFIX.'campaign_lead_event_log',
                 'alias' => 'll',
                 'hint'  => 'USE INDEX ('.MAUTIC_TABLE_PREFIX.'idx_scheduled_events)',
-            ], true)
-            ->join('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', $joinCondition)
+            ], true);
+        } else {
+            $query->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'll');
+        }
+
+        $query->join('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', $joinCondition)
             ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'c.id = e.campaign_id')
             ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = ll.lead_id')
             ->where($query->expr()->eq('ll.is_scheduled', 1))
@@ -385,8 +401,8 @@ class LeadEventLogRepository extends CommonRepository
             $query->andWhere('e.channel = '.$query->expr()->literal($options['channel']));
         }
 
-        if (isset($options['channelId'])) {
-            $query->andWhere('e.channel_id = '.(int) $options['channelId']);
+        if (isset($options['channelId'])) { // match as text to make PostgreSQL happy
+            $query->andWhere('e.channel_id = '.$query->expr()->literal($options['channelId']));
         }
 
         if (isset($options['type'])) {
@@ -590,19 +606,31 @@ class LeadEventLogRepository extends CommonRepository
      */
     public function unscheduleEvents(Lead $campaignMember, $message): void
     {
+        $connection = $this->getEntityManager()->getConnection();
+        $platform   = $connection->getDatabasePlatform();
+
         $contactId  = $campaignMember->getLead()->getId();
         $campaignId = $campaignMember->getCampaign()->getId();
         $rotation   = $campaignMember->getRotation();
         $dateAdded  = (new \DateTime('now', new \DateTimeZone('UTC')))->format('Y-m-d H:i:s');
         // Insert entries into the failed log so it's known why they were never executed
         $prefix = MAUTIC_TABLE_PREFIX;
-        $sql    = <<<SQL
-REPLACE INTO {$prefix}campaign_lead_event_failed_log( `log_id`, `date_added`, `reason`)
-SELECT id, :dateAdded as date_added, :message as reason from {$prefix}campaign_lead_event_log
-WHERE is_scheduled = 1 AND lead_id = :contactId AND campaign_id = :campaignId AND rotation = :rotation
-SQL;
 
-        $connection = $this->getEntityManager()->getConnection();
+        // Universal upsert into failed log
+        $sql = DatabasePlatform::getUpsertSql(
+            $platform,
+            $prefix.'campaign_lead_event_failed_log',
+            ['log_id', 'date_added', 'reason'],              // columns to insert
+            "SELECT id, :dateAdded as date_added, :message as reason
+         FROM {$prefix}campaign_lead_event_log
+         WHERE is_scheduled = TRUE
+           AND lead_id = :contactId
+           AND campaign_id = :campaignId
+           AND rotation = :rotation",                         // select source
+            'log_id',                                // conflict target
+            ['date_added', 'reason']                          // columns to update on conflict
+        );
+
         $stmt       = $connection->prepare($sql);
         $stmt->bindValue('dateAdded', $dateAdded, \PDO::PARAM_STR);
         $stmt->bindValue('message', $message, \PDO::PARAM_STR);
@@ -614,10 +642,10 @@ SQL;
         // Now unschedule them
         $qb = $connection->createQueryBuilder();
         $qb->update(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log')
-            ->set('is_scheduled', 0)
+            ->set('is_scheduled', 'false')
             ->where(
                 $qb->expr()->and(
-                    $qb->expr()->eq('is_scheduled', 1),
+                    $qb->expr()->eq('is_scheduled', 'true'),
                     $qb->expr()->eq('lead_id', ':contactId'),
                     $qb->expr()->eq('campaign_id', ':campaignId'),
                     $qb->expr()->eq('rotation', ':rotation')
@@ -636,7 +664,16 @@ SQL;
     public function removeEventLogsByCampaignId(int $campaignId): void
     {
         $table_name    = $this->getTableName();
-        $sql           = "DELETE FROM {$table_name} WHERE campaign_id = (?) LIMIT ".self::LOG_DELETE_BATCH_SIZE;
+        // DELETE ... LIMIT n not work on PostgreSQL
+        $sql = "DELETE FROM {$table_name}
+            WHERE id IN (
+                SELECT id FROM (
+                    SELECT id
+                    FROM {$table_name}
+                    WHERE campaign_id = ?
+                    LIMIT ".self::LOG_DELETE_BATCH_SIZE.'
+                ) AS subquery
+            )';
         $conn          = $this->getEntityManager()->getConnection();
         $deleteEntries = true;
         while ($deleteEntries) {
@@ -663,9 +700,32 @@ SQL;
         $tableName      = $this->getTableName();
         $leadsTableName = MAUTIC_TABLE_PREFIX.'leads';
         $tempTableName  = 'to_delete';
-        $conn->executeQuery(sprintf('DROP TEMPORARY TABLE IF EXISTS %s', $tempTableName));
-        $conn->executeQuery(sprintf('CREATE TEMPORARY TABLE %s select id AS lead_id from %s where date_identified is null;', $tempTableName, $leadsTableName));
-        $deleteQuery       = sprintf('DELETE lll FROM %s lll JOIN (SELECT lead_id FROM %s LIMIT %d) d USING (lead_id); ', $tableName, $tempTableName, self::LOG_DELETE_BATCH_SIZE);
+        $platform       = $conn->getDatabasePlatform();
+
+        // Drop temporary table (platform-safe)
+        $conn->executeStatement(
+            DatabasePlatform::getDropTemporaryTableSql($platform, $tempTableName, true)
+        );
+
+        $selectSql = sprintf(
+            'SELECT id AS lead_id FROM %s WHERE date_identified IS NULL',
+            $leadsTableName
+        );
+
+        // Create temporary table with the select (platform-safe)
+        $conn->executeStatement(
+            DatabasePlatform::getCreateTemporaryTableSql($platform, $tempTableName, $selectSql)
+        );
+
+        // Build the delete query (platform-safe)
+        $deleteQuery = DatabasePlatform::getDeleteAnonymousContactsUsingTempTableSql(
+            $platform,
+            $tableName,
+            $tempTableName,
+            ['lead_id'],
+            self::LOG_DELETE_BATCH_SIZE
+        );
+
         $deletedRecordCount= 0;
         while ($deletedRows = $conn->executeQuery($deleteQuery)->rowCount()) {
             $deletedRecordCount += $deletedRows;
@@ -699,7 +759,7 @@ SQL;
         $qb->select(
             'COUNT(log.id) as total_logs',
             'COUNT(DISTINCT log.lead_id) as unique_executions',
-            'SUM(log.is_scheduled) as pending_executions',
+            'SUM(CASE WHEN log.is_scheduled THEN 1 ELSE 0 END) as pending_executions',
             'SUM(CASE WHEN log.non_action_path_taken = 1 AND log.is_scheduled = 0 THEN 1 ELSE 0 END) as negative_path_count',
             'SUM(CASE WHEN log.non_action_path_taken = 0 AND log.is_scheduled = 0 THEN 1 ELSE 0 END) as positive_path_count',
             'MIN(log.date_triggered) as first_execution_date',

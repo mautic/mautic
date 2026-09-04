@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Report;
 
+use Doctrine\DBAL\Connection;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Helper\DncFormatterHelper;
 use Mautic\LeadBundle\Model\DoNotContact;
@@ -19,6 +21,7 @@ class DncReportService
     public function __construct(
         private readonly DoNotContact $doNotContactModel,
         private readonly DncFormatterHelper $dncFormatterHelper,
+        private readonly Connection $connection,
     ) {
     }
 
@@ -29,12 +32,19 @@ class DncReportService
      */
     public function getDncColumns(): array
     {
+        $groupConcat = DatabasePlatform::getGroupConcat(
+            $this->connection->getDatabasePlatform(),
+            "CONCAT(dnc.reason, ':', dnc.channel)",
+            ',',
+            'dnc.date_added DESC, dnc.id DESC'
+        );
+
         return [
             'dnc_preferences' => [
                 'alias'   => 'dnc_preferences',
                 'label'   => 'mautic.lead.report.dnc_preferences',
                 'type'    => 'string',
-                'formula' => '(SELECT GROUP_CONCAT(CONCAT(dnc.reason, \':\', dnc.channel) ORDER BY dnc.date_added DESC SEPARATOR \',\') FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc WHERE dnc.lead_id = l.id)',
+                'formula' => "(SELECT $groupConcat FROM ".MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc WHERE dnc.lead_id = l.id)',
             ],
         ];
     }

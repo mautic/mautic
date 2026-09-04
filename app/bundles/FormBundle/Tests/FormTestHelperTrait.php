@@ -82,16 +82,14 @@ trait FormTestHelperTrait
     protected function deleteAllFormResultsTable(): void
     {
         $conn = $this->em->getConnection();
+        $sm   = $conn->createSchemaManager();
 
-        $sql  = "SELECT Table_name  from information_schema.tables where Table_name like '%form_results%' and table_schema in (SELECT DATABASE())";
-        $stmt = $conn->prepare($sql);
+        $tableNames = $sm->listTableNames();
 
-        $tables = $stmt->executeQuery()->fetchAllAssociative();
-
-        $sm = $conn->createSchemaManager();
-
-        foreach ($tables as $table) {
-            $sm->dropTable($table['Table_name']);
+        foreach ($tableNames as $tableName) {
+            if (str_contains($tableName, 'form_results')) {
+                $sm->dropTable($tableName);
+            }
         }
     }
 }

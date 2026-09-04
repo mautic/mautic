@@ -4,7 +4,8 @@ namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ArrayParameterType;
-use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\Query\ResultSetMappingBuilder;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\EmailBundle\Entity\Email;
@@ -153,28 +154,57 @@ class EventRepository extends CommonRepository
      */
     public function getCampaignEmailEvents(int $campaignId): array
     {
-        $qb = $this->getEntityManager()->createQueryBuilder();
+        /*
+         * Switching to DBAL's QueryBuilder to bypass DQL parser limitations
+         * and handle platform-specific join conditions.
+         *
+         * SQLSTATE[42883]: Undefined function: 7
+         * ERROR:  could not identify an equality operator for type json
+         *
+         * Email entity has Types::ARRAY for the content field,
+         * which in Doctrine versions maps to json type in PostgreSQL.
+         * This cause issue with DISTINCT em.* when PostgreSQL tries to
+         * compare JSON values for uniqueness.
+         *
+         * But we actually don't need DISTINCT if we use EXISTS with subqueries.
+         * It's much more efficient.
+         */
+        $entityManager = $this->getEntityManager();
+        $connection    = $entityManager->getConnection();
+        $platform      = $connection->getDatabasePlatform();
 
-        return $qb
-            ->select('DISTINCT em')
-            ->from(Event::class, 'e')
-            ->innerJoin(
-                Email::class,
-                'em',
-                Expr\Join::WITH,
-                $qb->expr()->eq('em.id', 'e.channelId')
-            )
-            ->where(
-                $qb->expr()->andX(
-                    $qb->expr()->eq('e.campaign', ':campaignId'),
-                    $qb->expr()->eq('e.channel', ':channel'),
-                    $qb->expr()->isNull('e.deleted')
-                )
-            )
+        // Build subquery using DBAL QueryBuilder
+        $subQb = $connection->createQueryBuilder();
+
+        $channelIdWhere = 'e.channel_id = '.DatabasePlatform::castIfStrict($platform, 'em.id');
+
+        $subQb->select('1')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_events', 'e')
+            ->where('e.campaign_id = :campaignId')
+            ->andWhere('e.channel = :channel')
+            ->andWhere('e.deleted IS NULL')
+            ->andWhere($channelIdWhere);
+
+        // Build main query using DBAL QueryBuilder
+        $mainQb = $connection->createQueryBuilder();
+        $mainQb->select('em.*')
+            ->from(MAUTIC_TABLE_PREFIX.'emails', 'em')
+            ->where('EXISTS ('.$subQb->getSQL().')')
             ->setParameter('campaignId', $campaignId)
-            ->setParameter('channel', Event::CHANNEL_EMAIL)
-            ->getQuery()
-            ->getResult();
+            ->setParameter('channel', Event::CHANNEL_EMAIL);
+
+        // Map to entities in a single step
+        $rsm = new ResultSetMappingBuilder($entityManager);
+        $rsm->addRootEntityFromClassMetadata(Email::class, 'em');
+
+        $query = $entityManager->createNativeQuery($mainQb->getSQL(), $rsm);
+
+        // Transfer parameters
+        foreach ($mainQb->getParameters() as $key => $value) {
+            $query->setParameter($key, $value);
+        }
+
+        return $query->getResult();
     }
 
     /**

@@ -10,6 +10,7 @@ use GuzzleHttp\Psr7\Response as GuzzleResponse;
 use Mautic\CoreBundle\Entity\NotificationRepository;
 use Mautic\CoreBundle\Test\Guzzle\ClientMockTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\UserBundle\Entity\User;
 use Mautic\WebhookBundle\Command\ProcessWebhookQueuesCommand;
 use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\Webhook;
@@ -25,6 +26,8 @@ use Symfony\Component\HttpFoundation\Response;
 final class WebhookFunctionalTest extends MauticMysqlTestCase
 {
     use ClientMockTrait;
+
+    private const ADMIN_USER = 'admin';
 
     protected $useCleanupRollback = false;
 
@@ -88,13 +91,15 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
     public function testWebhookWorkflowWithCommandProcessInQueueRange(): void
     {
         $this->mockSuccessfulWebhookResponse(2);
-        $webhook  = $this->createWebhook();
-        $contacts = $this->createContacts();
+        $webhook = $this->createWebhook();
+        $this->createContacts();
+        $range = $this->getWebhookQueueRange($webhook->getId());
 
+        // BUG: queue ID should be used, not contact ID
         $this->testSymfonyCommand(ProcessWebhookQueuesCommand::COMMAND_NAME, [
             '--webhook-id' => $webhook->getId(),
-            '--min-id'     => $contacts[0],
-            '--max-id'     => $contacts[2],
+            '--min-id'     => $range[0],
+            '--max-id'     => $range[1],
         ]);
 
         // The queue should be processed now.
@@ -118,13 +123,17 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
      */
     public static function dataNotificationToUser(): iterable
     {
-        yield 'Support User' => [null, 1];
-        yield 'Actual user' => [1, 1];
+        yield 'Support User' => [null, self::ADMIN_USER];
+        yield 'Actual user' => [self::ADMIN_USER, self::ADMIN_USER];
     }
 
     #[DataProvider('dataNotificationToUser')]
-    public function testWebhookFailureNotificationSent(?int $createdByUserId, ?int $expectedUserId): void
+    public function testWebhookFailureNotificationSent(?string $createdByUserName, ?string $expectedUserName): void
     {
+        // use real user ID
+        $createdByUser = is_null($createdByUserName) ? null : $this->getUser($createdByUserName);
+        $expectedUser  = $this->getUser($expectedUserName);
+
         $this->mockFailedWebhookResponse(2);
         $webhook = $this->createWebhook();
         $webhook->setCreatedBy();
@@ -145,6 +154,8 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
             $this->em->flush();
         }
 
+        $createdByUserId = is_null($createdByUser) ? $createdByUser : $createdByUser->getId();
+
         $webhook->setCreatedBy($createdByUserId);
         $webhook->setModifiedBy($createdByUserId);
         $webhook->setUnHealthySince((new \DateTimeImmutable())->modify('-3601 seconds'));
@@ -152,7 +163,7 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
 
         $this->testSymfonyCommand(ProcessWebhookQueuesCommand::COMMAND_NAME, ['--webhook-id' => $webhook->getId()]);
 
-        $this->assertCount(1, $this->notificationRepository->getNotifications($expectedUserId));
+        $this->assertCount(1, $this->notificationRepository->getNotifications($expectedUser->getId()));
         $this->assertSame(3, $this->getQueueCountByWebhookId($webhook->getId()));
 
         $this->testSymfonyCommand(ProcessWebhookQueuesCommand::COMMAND_NAME);
@@ -201,6 +212,7 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
 
     private function createWebhook(): Webhook
     {
+        $user    = $this->getUser(self::ADMIN_USER);
         $webhook = new Webhook();
         $event   = new Event();
 
@@ -212,7 +224,7 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
         $webhook->setWebhookUrl('https://httpbin.org/post');
         $webhook->setSecret('any_secret_will_do');
         $webhook->isPublished(true);
-        $webhook->setCreatedBy(1);
+        $webhook->setCreatedBy($user->getId());
 
         $this->em->persist($event);
         $this->em->persist($webhook);
@@ -305,6 +317,35 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
                 }
             );
         }
+    }
+
+    /**
+     * Returns the minimum and maximum queue ID for a given webhook.
+     *
+     * @return array{0: int, 1: int} // [minId, maxId]
+     */
+    private function getWebhookQueueRange(int $webhookId): array
+    {
+        $webhookQueues = $this->getWebhookQueue($webhookId);
+
+        if (0 === count($webhookQueues)) {
+            return [0, 0];
+        }
+
+        $minId = PHP_INT_MAX;
+        $maxId = PHP_INT_MIN;
+
+        foreach ($webhookQueues as $queue) {
+            $id = $queue->getId();
+            if ($id < $minId) {
+                $minId = $id;
+            }
+            if ($id > $maxId) {
+                $maxId = $id;
+            }
+        }
+
+        return [$minId, $maxId];
     }
 
     private function getWebhookQueue(int $webhookId): Paginator

@@ -646,9 +646,9 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
 
-        $this->client->submit($form);
+        $this->client->submit($form); // This seems odd – submitting again?
 
-        $rows = $this->listRepo->findAll();
+        $rows = $this->listRepo->findBy([], ['id' => 'ASC']);  // Sort to make test deterministic
         $this->assertCount(2, $rows);
 
         $this->assertSame('clonesegment', $rows[0]->getAlias());

@@ -1,0 +1,13 @@
+diff --git a/vendor/predis/predis/src/Connection/StreamConnection.php b/vendor/predis/predis/src/Connection/StreamConnection.php
+index bfcdbdc675..14cf520ea4 100644
+--- a/vendor/predis/predis/src/Connection/StreamConnection.php
++++ b/vendor/predis/predis/src/Connection/StreamConnection.php
+@@ -59,7 +59,7 @@ class StreamConnection extends AbstractConnection
+     public function __construct(ParametersInterface $parameters, ?StreamFactoryInterface $factory = null)
+     {
+         parent::__construct($parameters);
+-        $this->parameters->conn_uid = spl_object_hash($this);
++        $this->parameters->conn_uid = spl_object_id($this);
+
+         $this->streamFactory = $factory ?? new StreamFactory();
+     }

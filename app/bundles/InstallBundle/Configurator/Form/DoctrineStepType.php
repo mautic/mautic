@@ -7,6 +7,7 @@ use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -37,7 +38,8 @@ final class DoctrineStepType extends AbstractType
                 'placeholder'       => false,
                 'required'          => true,
                 'attr'              => [
-                    'class' => 'form-control',
+                    'class'     => 'form-control',
+                    'onchange'  => 'MauticInstaller.autoCompletePortAndCharset();',
                 ],
                 'constraints'       => [
                     new Choice(
@@ -112,6 +114,14 @@ final class DoctrineStepType extends AbstractType
                     'class'    => 'form-control',
                     'preaddon' => 'ri-lock-fill',
                 ],
+                'required' => false,
+            ]
+        );
+
+        $builder->add(
+            'charset',
+            HiddenType::class,
+            [
                 'required' => false,
             ]
         );

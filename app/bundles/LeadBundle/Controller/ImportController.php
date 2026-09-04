@@ -339,13 +339,39 @@ final class ImportController extends FormController
                                 $this->requestStack->getSession()->set('mautic.'.$object.'.import.config', $config);
 
                                 // Get the headers for matching
-                                $headers = $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']);
+                                // $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']) is deprecated
+                                // Below workaround for this deprecation in PHP8.6+
+                                $file->setFlags(\SplFileObject::DROP_NEW_LINE);
+                                $line = $file->fgets();
+                                $headers = str_getcsv(
+                                    $line,
+                                    $config['delimiter'],
+                                    $config['enclosure'],
+                                    $config['escape']
+                                );
+                                // End of workaround
 
                                 // Get the number of lines so we can track progress
                                 $file->seek(PHP_INT_MAX);
                                 $linecount = $file->key();
 
-                                if (!empty($headers) && is_array($headers)) {
+                                // Workaround for PHP8.6+ backward incompatibility
+                                // PHP 8.6+ counts a trailing newline as an extra empty line
+                                // Below workaround for PHPStan phpVersion.max:
+                                // Error: Comparison operation ">=" between int<50207, 80599> and 80600 is always false.
+                                // Error: Result of && is always false.
+                                // Remove below line once PHP8.6 is released
+                                // @phpstan-ignore-next-line
+                                if (\PHP_VERSION_ID >= 80600 && $linecount > 0) {
+                                    $file->seek($linecount);
+                                    $last = $file->current();
+                                    if (false === $last || null === $last || '' === $last || "\0" === $last) {
+                                        --$linecount;
+                                    }
+                                }
+
+                                // Treat a single null field (blank line) as no headers
+                                if ([null] !== $headers) {
                                     $headers = CsvHelper::sanitizeHeaders($headers);
 
                                     $this->requestStack->getSession()->set('mautic.'.$object.'.import.headers', $headers);

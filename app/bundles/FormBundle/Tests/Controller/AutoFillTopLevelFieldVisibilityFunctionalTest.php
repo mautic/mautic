@@ -64,6 +64,9 @@ final class AutoFillTopLevelFieldVisibilityFunctionalTest extends MauticMysqlTes
             $contactTracker->setUseSystemContact(false);
             $requestStack->pop();
             $this->client->enableReboot();
+            // Kernel boots can stack multiple handlers; PHPUnit 11.5 fails if any remain.
+            // @see https://github.com/sebastianbergmann/phpunit/issues/5721
+            restore_exception_handler();
         }
     }
 

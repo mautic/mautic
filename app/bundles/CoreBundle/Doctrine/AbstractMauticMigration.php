@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Doctrine;
 
+use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\Migrations\AbstractMigration;
@@ -13,6 +15,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 abstract class AbstractMauticMigration extends AbstractMigration
 {
     protected const TABLE_NAME = null;
+
+    protected const INDEX_NAME = null;
 
     /**
      * @var string
@@ -31,7 +35,7 @@ abstract class AbstractMauticMigration extends AbstractMigration
      *
      * @var string[]
      */
-    protected array $supported = ['mysql'];
+    protected array $supported = ['mysql', 'postgresql'];
 
     /**
      * Database prefix.
@@ -39,7 +43,7 @@ abstract class AbstractMauticMigration extends AbstractMigration
     protected string $prefix;
 
     /**
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      * @throws AbortMigration
      *
      * @todo remove this method to make it absctract for Mautic 6
@@ -71,6 +75,81 @@ abstract class AbstractMauticMigration extends AbstractMigration
     public function setPrefix(string $prefix): void
     {
         $this->prefix = $prefix;
+    }
+
+    protected function indexExists(string $tableName, string $indexName, array $columns = []): bool
+    {
+        $indexes = $this->getIndexes($tableName);
+
+        $lowerIndexName = strtolower($indexName);
+        $expectedColumns = array_map(strtolower(...), $columns);
+        foreach ($indexes as $index) {
+            if (strtolower($index->getName()) !== $lowerIndexName) {
+                continue;
+            }
+
+            // Name matches – if no columns were requested, we're done
+            if ([] === $expectedColumns) {
+                return true;
+            }
+
+            // Compare columns (order matters)
+            $actualColumns = array_map(strtolower(...), $index->getColumns());
+
+            if ($actualColumns === $expectedColumns) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Lists the indexes for a given table returning an array of Index instances.
+     *
+     * Keys of the portable indexes list are all lower-cased.
+     *
+     * @param string $tableName the name of the table
+     *
+     * @return Index[]
+     *
+     * @throws Exception
+     */
+    protected function getIndexes(string $tableName): array
+    {
+        // return $this->sm->listTableIndexes($tableName);
+        return DatabasePlatform::listTableIndexes($this->connection, $tableName);
+    }
+
+    protected function dropIndex(string $tableName, string $indexName, bool $ifExists = true): void
+    {
+        $this->addSql(
+            DatabasePlatform::getDropIndexSql(
+                $this->platform,
+                $tableName,
+                $indexName,
+                false,
+                $ifExists
+            )
+        );
+    }
+
+    /**
+     * @param array<string> $columns
+     */
+    protected function createIndex(string $tableName, string $indexName, array $columns, bool $unique = false, bool $ifNotExists = true): void
+    {
+        $this->addSql(
+            DatabasePlatform::getCreateIndexSql(
+                $this->platform,
+                $tableName,
+                $indexName,
+                $columns,
+                $unique,
+                false,
+                $ifNotExists
+            )
+        );
     }
 
     /**
@@ -122,7 +201,7 @@ abstract class AbstractMauticMigration extends AbstractMigration
 
                     $indexes = $schemaManager->listTableIndexes($table);
 
-                    /** @var \Doctrine\DBAL\Schema\Index $i */
+                    /** @var Index $i */
                     foreach ($indexes as $i) {
                         $name   = strtolower($i->getName());
                         $isIdx  = stripos($name, 'idx');
@@ -198,6 +277,19 @@ abstract class AbstractMauticMigration extends AbstractMigration
         }
 
         return $this->prefix.$tableName;
+    }
+
+    /**
+     * This method will remove the burden of getting prefixed table name index in individual migration file.
+     * Individual migration files just need to keep a protected constant INDEX_NAME.
+     */
+    protected function getPrefixedIndexName(?string $indexName = null): string
+    {
+        if (null === $indexName) {
+            $indexName = static::INDEX_NAME;
+        }
+
+        return $this->prefix.$indexName;
     }
 
     protected function getColumnTypeSignedOrUnsigned(Schema $schema, string $tableName, string $columnName): string

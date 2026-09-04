@@ -4,14 +4,16 @@ namespace Mautic\InstallBundle\Helper;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Doctrine\DBAL\Schema\Index;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Tools\SchemaTool;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
+use Mautic\CoreBundle\Doctrine\Provider\VersionProvider;
 use Mautic\CoreBundle\Release\ThisRelease;
 use Mautic\InstallBundle\Exception\DatabaseVersionTooOldException;
 
@@ -34,7 +36,7 @@ final class SchemaHelper
     private ?AbstractSchemaManager $schemaManager = null;
 
     /**
-     * @throws \Doctrine\DBAL\Exception
+     * @throws DBALException
      */
     public function __construct(array $dbParams)
     {
@@ -48,7 +50,6 @@ final class SchemaHelper
             }
         }
 
-        $dbParams['charset'] = 'utf8mb4';
         if (isset($dbParams['name'])) {
             $dbParams['dbname'] = $dbParams['name'];
             unset($dbParams['name']);
@@ -113,7 +114,7 @@ final class SchemaHelper
     /**
      * Generates SQL for installation.
      *
-     * @throws \Doctrine\DBAL\Exception
+     * @throws DBALException
      * @throws ORMException
      */
     public function installSchema(): bool
@@ -148,8 +149,21 @@ final class SchemaHelper
             $mauticTables[$tableName] = $this->generateBackupName($this->dbParams['table_prefix'], $backupPrefix, $tableName);
         }
 
-        $isSqlite = $this->em->getConnection()->getDatabasePlatform() instanceof SqlitePlatform;
-        $sql      = $isSqlite ? [] : ['SET foreign_key_checks = 0;'];
+        // Add Doctrine-managed OAuth tables which are missing from metadata
+        $doctrineDirectTables = [
+            'oauth2_accesstokens',
+            'oauth2_authcodes',
+            'oauth2_clients',
+            'oauth2_refreshtokens',
+        ];
+        foreach ($doctrineDirectTables as $table) {
+            if (!isset($mauticTables[$table])) {
+                $mauticTables[$table] = $this->generateBackupName($this->dbParams['table_prefix'], $backupPrefix, $table);
+            }
+        }
+
+        $noForeignKeyChecks = DatabasePlatform::isPostgreSQL($this->em->getConnection()->getDatabasePlatform());
+        $sql                = $noForeignKeyChecks ? [] : ['SET foreign_key_checks = 0;'];
         if ($this->dbParams['backup_tables']) {
             $sql = array_merge($sql, $this->backupExistingSchema($tables, $mauticTables, $backupPrefix));
         } else {
@@ -158,7 +172,6 @@ final class SchemaHelper
 
         $sql = array_merge($sql, $installSchema->toSql($this->platform));
 
-        // Execute drop queries
         foreach ($sql as $q) {
             try {
                 $this->db->executeStatement($q);
@@ -176,8 +189,12 @@ final class SchemaHelper
 
     public function validateDatabaseVersion(): void
     {
-        // Version strings are in the format 10.3.30-MariaDB-1:10.3.30+maria~focal-log
-        $version  = $this->db->executeQuery('SELECT VERSION()')->fetchOne();
+        $versionProvider = new VersionProvider($this->db);
+
+        // Version strings are in the format:
+        // 10.3.30-MariaDB-1:10.3.30+maria~focal-log
+        // PostgreSQL 16.11 (Ubuntu 16.11-0ubuntu0.24.04.1) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0, 64-bit
+        $version = VersionProvider::getNumericVersion($versionProvider->getVersion());
 
         // Platform class names are in the format Doctrine\DBAL\Platforms\MariaDb1027Platform
         $platform = strtolower($this->db->getDatabasePlatform()::class);
@@ -187,12 +204,14 @@ final class SchemaHelper
          * The second case is for MariaDB < 10.2, where Doctrine reports it as MySQLPlatform. Here we can use a little
          * help from the version string, which contains "MariaDB" in that case: 10.1.48-MariaDB-1~bionic.
          */
-        if (str_contains($platform, 'mariadb') || str_contains(strtolower($version), 'mariadb')) {
+        if (str_contains($platform, 'mariadb')) {
             $minSupported = $metadata->getMinSupportedMariaDbVersion();
         } elseif (str_contains($platform, 'mysql')) {
             $minSupported = $metadata->getMinSupportedMySqlVersion();
+        } elseif (str_contains($platform, 'postgresql')) {
+            $minSupported = $metadata->getMinSupportedPostgreSqlVersion();
         } else {
-            throw new \Exception('Invalid database platform '.$platform.'. Mautic only supports MySQL and MariaDB!');
+            throw new DBALException('Invalid database platform '.$platform.'. Mautic only supports MySQL, MariaDB and PostgreSQL.');
         }
 
         if (version_compare($version, $minSupported, '<')) {
@@ -201,7 +220,7 @@ final class SchemaHelper
     }
 
     /**
-     * @throws \Doctrine\DBAL\Exception
+     * @throws DBALException
      */
     private function backupExistingSchema($tables, array $mauticTables, $backupPrefix): array
     {
@@ -219,15 +238,37 @@ final class SchemaHelper
             }
 
             $restraints = $sm->listTableForeignKeys($t);
+            $sequences  = [];
+
+            if (DatabasePlatform::isPostgreSQL($this->platform)) {
+                foreach ($sm->listTableColumns($t) as $c) {
+                    /*
+                      * Can't use $c->getAutoincrement() check as doctrine dont set
+                      * sequence ownership to column/table for postgresql
+                      * need to check all
+                      */
+                    try {
+                        $sequence = DatabasePlatform::getSerialSequence($this->db, $t, $c->getName());
+
+                        if ($sequence) {
+                            $sql[] = $this->platform->getDropSequenceSQL($sequence);
+                        }
+                    } catch (DBALException) {
+                        // suppress
+                    }
+                }
+            }
 
             if (isset($mauticTables[$t])) {
                 // to be backed up
                 $backupRestraints[$mauticTables[$t]] = $restraints;
                 $backupTables[$t]                    = $mauticTables[$t];
                 $backupIndexes[$t]                   = $sm->listTableIndexes($t);
+                $backupSequences[$t]                 = $sequences;
             } else {
                 // existing backup to be dropped
-                $dropTables[] = $t;
+                $dropTables[]    = $t;
+                $dropSequences[] = $sequence;
             }
 
             foreach ($restraints as $restraint) {
@@ -236,8 +277,18 @@ final class SchemaHelper
         }
 
         // now drop all the backup tables
+        foreach ($dropSequences as $s) {
+            $sql[] = $this->platform->getDropSequenceSQL($s);
+        }
+
         foreach ($dropTables as $t) {
-            $sql[] = $this->platform->getDropTableSQL($t);
+            $dropSql = $this->platform->getDropTableSQL($t);
+            if (DatabasePlatform::isPostgreSQL($this->platform)) {
+                // this prevent constraint on tables
+                $dropSql .= ' CASCADE';
+            }
+
+            $sql[] = $dropSql;
         }
 
         // now backup tables
@@ -268,6 +319,14 @@ final class SchemaHelper
             // rename table
             $queries = $this->platform->getRenameTableSQL($t, $backup);
             $sql     = array_merge($sql, $queries);
+
+            // rename sequences
+            if (!empty($backupSequences[$t])) {
+                foreach ($backupSequences[$t] as $oldSequence) {
+                    $newSequence = str_replace($t, $backup, $oldSequence);
+                    $sql[]       = 'ALTER SEQUENCE '.$this->db->quoteIdentifier($oldSequence).' RENAME TO '.$this->db->quoteIdentifier($newSequence);
+                }
+            }
 
             // create new index
             if (!empty($newIndexes)) {
@@ -300,11 +359,36 @@ final class SchemaHelper
     private function dropExistingSchema($tables, array $mauticTables): array
     {
         $sql = [];
+        $sm  = $this->getSchemaManager();
 
         // drop tables
         foreach ($tables as $t) {
             if (isset($mauticTables[$t])) {
-                $sql[] = $this->platform->getDropTableSQL($t);
+                if (DatabasePlatform::isPostgreSQL($this->platform)) {
+                    foreach ($sm->listTableColumns($t) as $c) {
+                        /*
+                         * Can't use $c->getAutoincrement() check as doctrine dont set
+                         * sequence ownership to column/table for postgresql
+                         * need to check all
+                         */
+                        try {
+                            $sequence = DatabasePlatform::getSerialSequence($this->db, $t, $c->getName());
+
+                            if ($sequence) {
+                                $sql[] = $this->platform->getDropSequenceSQL($sequence);
+                            }
+                        } catch (DBALException) {
+                            // suppress
+                        }
+                    }
+                }
+
+                $dropSql = $this->platform->getDropTableSQL($t);
+                if (DatabasePlatform::isPostgreSQL($this->platform)) {
+                    // this prevent constraint on table test_assets depends on table test_categories errors
+                    $dropSql .= ' CASCADE';
+                }
+                $sql[] = $dropSql;
             }
         }
 

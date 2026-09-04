@@ -9,28 +9,6 @@ use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20231206152313 extends PreUpAssertionMigration
 {
-    protected function preUpAssertions(): void
-    {
-        $this->skipAssertion(function (Schema $schema) {
-            return $schema->getTable($this->getTableName())->hasIndex($this->getSentIndexName());
-        }, sprintf('Index %s already exists', $this->getSentIndexName()));
-
-        $this->skipAssertion(function (Schema $schema) {
-            return $schema->getTable($this->getTableName())->hasIndex($this->getIsReadIndexName());
-        }, sprintf('Index %s already exists', $this->getIsReadIndexName()));
-    }
-
-    public function up(Schema $schema): void
-    {
-        $this->addSql(sprintf('ALTER TABLE %s ADD INDEX %s (lead_id, date_sent), ADD INDEX %s (email_id, is_read)', $this->getTableName(), $this->getSentIndexName(), $this->getIsReadIndexName()));
-    }
-
-    public function postUp(Schema $schema): void
-    {
-        $this->dropIndex(['lead_id']);
-        $this->dropIndex(['email_id']);
-    }
-
     private function getTableName(): string
     {
         return "{$this->prefix}email_stats";
@@ -46,14 +24,58 @@ final class Version20231206152313 extends PreUpAssertionMigration
         return "{$this->prefix}stat_email_email_id_is_read";
     }
 
-    /**
-     * @param string[] $columnNames
-     */
-    private function dropIndex(array $columnNames): void
+    private function getOldLeadIndexName(): string
     {
-        try {
-            $this->connection->executeStatement(sprintf('DROP INDEX %s ON %s', $this->generatePropertyName('email_stats', 'idx', $columnNames), $this->getTableName()));
-        } catch (\Throwable) {
+        return $this->generatePropertyName('email_stats', 'idx', ['lead_id']);
+    }
+
+    private function getOldEmailIndexName(): string
+    {
+        return $this->generatePropertyName('email_stats', 'idx', ['email_id']);
+    }
+
+    protected function preUpAssertions(): void
+    {
+        $tableName = $this->getTableName();
+
+        $this->skipAssertion(
+            fn (Schema $schema) => $this->indexExists($tableName, $this->getSentIndexName()),
+            sprintf('Index %s already exists', $this->getSentIndexName())
+        );
+
+        $this->skipAssertion(
+            fn (Schema $schema) => $this->indexExists($tableName, $this->getIsReadIndexName()),
+            sprintf('Index %s already exists', $this->getIsReadIndexName())
+        );
+    }
+
+    public function up(Schema $schema): void
+    {
+        $tableName = $this->getTableName();
+        $table     = $schema->getTable($tableName);
+
+        if (!$this->indexExists($tableName, $this->getSentIndexName())) {
+            $table->addIndex(['lead_id', 'date_sent'], $this->getSentIndexName());
+        }
+
+        if (!$this->indexExists($tableName, $this->getIsReadIndexName())) {
+            $table->addIndex(['email_id', 'is_read'], $this->getIsReadIndexName());
+        }
+    }
+
+    public function postUp(Schema $schema): void
+    {
+        $tableName  = $this->getTableName();
+
+        $oldIndexes = [
+            $this->getOldLeadIndexName(),
+            $this->getOldEmailIndexName(),
+        ];
+
+        foreach ($oldIndexes as $oldIndexName) {
+            if ($this->indexExists($tableName, $oldIndexName)) {
+                $this->dropIndex($tableName, $oldIndexName);
+            }
         }
     }
 }

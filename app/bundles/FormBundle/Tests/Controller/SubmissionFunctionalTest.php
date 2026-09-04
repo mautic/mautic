@@ -1036,6 +1036,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
             'label' => 'Animal',
             'alias' => 'animal',
             'type'  => 'text',
+            'order' => $this->getOrder(),
         ]);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
@@ -1563,5 +1564,13 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         if ($this->connection->createSchemaManager()->tablesExist("{$tablePrefix}form_results_1_submission")) {
             $this->connection->executeQuery("DROP TABLE {$tablePrefix}form_results_1_submission");
         }
+    }
+
+    private function getOrder(string $group = 'core', string $object = 'lead'): ?int
+    {
+        $orderField = $this->em->getRepository(\Mautic\LeadBundle\Entity\LeadField::class)
+            ->findOneBy(['group' => $group, 'object' => $object, 'isFixed' => false], ['order' => 'DESC']);
+
+        return $orderField ? $orderField->getId() : null;
     }
 }

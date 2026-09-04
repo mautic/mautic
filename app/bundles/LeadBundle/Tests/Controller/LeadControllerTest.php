@@ -31,6 +31,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\StageBundle\Entity\Stage;
+use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\TestDox;
 use Symfony\Component\DomCrawler\Crawler;
@@ -42,6 +43,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class LeadControllerTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
+
+    private const ADMIN_USER = 'admin';
 
     private const CONTACT_A_EMAIL               = 'contact@a.email';
 
@@ -379,6 +382,9 @@ final class LeadControllerTest extends MauticMysqlTestCase
 
     public function testCompanyChangesAreTrackedWhenContactAddedViaUI(): void
     {
+        $adminUser = $this->getUser(self::ADMIN_USER);
+        $this->assertInstanceOf(User::class, $adminUser);
+
         $company = new Company();
         $company->setName('Doe Corp');
 
@@ -405,7 +411,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $contact = $this->em->getRepository(Lead::class)->findOneBy(['email' => 'john_23657@doe.com']);
 
         /** @var AuditLog $auditLog */
-        $auditLog = $this->em->getRepository(AuditLog::class)->findOneBy(['object' => 'lead', 'objectId' => $contact, 'userId' => 1]);
+        $auditLog = $this->em->getRepository(AuditLog::class)->findOneBy(['object' => 'lead', 'objectId' => $contact, 'userId' => $adminUser->getId()]);
 
         $this->assertArrayHasKey('fields', $auditLog->getDetails(), json_encode($auditLog, JSON_PRETTY_PRINT));
 
@@ -520,6 +526,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
             ->select('cl.lead_id, cl.manually_added, cl.manually_removed, cl.date_last_exited')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where("cl.campaign_id = {$campaignId}")
+            ->orderBy('cl.lead_id', 'ASC')
             ->executeQuery()
             ->fetchAllAssociative();
     }
@@ -562,7 +569,8 @@ final class LeadControllerTest extends MauticMysqlTestCase
     {
         /** @var FieldModel $fieldModel */
         $fieldModel     = self::getContainer()->get(FieldModel::class);
-        $firstnameField = $fieldModel->getEntity(2);
+        // Fetch firstname field by alias
+        $firstnameField = $fieldModel->getRepository()->findOneBy(['alias' => 'firstname']);
         $this->assertInstanceOf(LeadField::class, $firstnameField);
         $firstnameField->setIsRequired(true);
         $fieldModel->getRepository()->saveEntity($firstnameField);
@@ -1293,6 +1301,9 @@ EMAIL;
     {
         $this->loadFixtures([LoadLeadData::class]);
 
+        $adminUser = $this->getUser(self::ADMIN_USER);
+        $this->assertInstanceOf(User::class, $adminUser);
+
         $this->client->request(Request::METHOD_GET, '/s/contacts/batchExport?filetype=xlsx');
         $content = $this->client->getInternalResponse()->getContent();
 
@@ -1304,7 +1315,7 @@ EMAIL;
         $auditLog = $this->em->getRepository(AuditLog::class)->findOneBy([
             'object' => 'ContactExports',
             'bundle' => 'lead',
-            'userId' => 1,
+            'userId' => $adminUser->getId(),
             'action' => 'create',
         ]);
         $this->assertNotNull($auditLog);

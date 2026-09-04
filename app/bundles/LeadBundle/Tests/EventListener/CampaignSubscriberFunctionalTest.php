@@ -250,7 +250,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
                 'type'       => 'lead.stages',
                 'properties' => [
                     'type'   => 'lead.stages',
-                    'stages' => [0 => '1'],
+                    'stages' => [0 => $stageIds[0]],
                 ],
             ],
             'eventDetails'    => [],
@@ -1076,7 +1076,11 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
     #[DataProvider('regexOperatorProvider')]
     public function testRegexOperatorOnDateFieldCondition(string $operator, string $regex, string $fieldValue, bool $expectedResult): void
     {
-        $this->useCleanupRollback = false;
+        if (!$this->isPostgresqlPlatform()) {
+            // If useCleanupRollback is not disabled then this test trigger error on MySQL
+            // Doctrine\DBAL\Driver\PDO\PDOException: There is no active transaction
+            $this->useCleanupRollback = false;
+        }
 
         // Create the custom date field
         $this->createField([

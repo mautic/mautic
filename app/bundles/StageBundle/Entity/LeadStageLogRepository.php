@@ -134,22 +134,42 @@ final class LeadStageLogRepository extends CommonRepository
      */
     private function deleteDuplicateStageLogs(Connection $connection, string $table, int $fromStageId, int $toStageId, array $leadIds): void
     {
-        // Lead and stage are a composite key, so delete source rows that would duplicate an existing target row.
+        if ([] === $leadIds) {
+            return;
+        }
+
+        // Step 1: Find leads that already have the target stage
+        $conflictingLeads = $connection->fetchFirstColumn(
+            sprintf('SELECT lead_id FROM %s WHERE stage_id = :toStageId AND lead_id IN (:leadIds)', $table),
+            [
+                'toStageId' => $toStageId,
+                'leadIds'   => $leadIds,
+            ],
+            [
+                'toStageId' => ParameterType::INTEGER,
+                'leadIds'   => ArrayParameterType::STRING,
+            ]
+        );
+
+        if ([] === $conflictingLeads) {
+            return;
+        }
+
+        // Step 2: Delete only the conflicting source rows
         $connection->executeStatement(
             sprintf(
-                'DELETE source_log FROM %s source_log INNER JOIN %s target_log ON target_log.lead_id = source_log.lead_id AND target_log.stage_id = :toStageId WHERE source_log.stage_id = :fromStageId AND source_log.lead_id IN (:leadIds)',
-                $table,
+                'DELETE FROM %s
+             WHERE stage_id = :fromStageId
+               AND lead_id IN (:conflictingLeads)',
                 $table
             ),
             [
-                'fromStageId' => $fromStageId,
-                'leadIds'     => $leadIds,
-                'toStageId'   => $toStageId,
+                'fromStageId'      => $fromStageId,
+                'conflictingLeads' => $conflictingLeads,
             ],
             [
-                'fromStageId' => ParameterType::INTEGER,
-                'leadIds'     => ArrayParameterType::STRING,
-                'toStageId'   => ParameterType::INTEGER,
+                'fromStageId'      => ParameterType::INTEGER,
+                'conflictingLeads' => ArrayParameterType::STRING,
             ]
         );
     }

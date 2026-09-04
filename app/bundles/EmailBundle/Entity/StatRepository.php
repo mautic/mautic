@@ -449,7 +449,9 @@ class StatRepository extends CommonRepository
      */
     public function getLeadStats($leadId, array $options = [])
     {
-        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $connection = $this->getEntityManager()->getConnection();
+
+        $query = $connection->createQueryBuilder();
         $query->from(MAUTIC_TABLE_PREFIX.'email_stats', 's')
             ->leftJoin('s', MAUTIC_TABLE_PREFIX.'emails', 'e', 's.email_id = e.id')
             ->leftJoin('s', MAUTIC_TABLE_PREFIX.'email_copies', 'ec', 's.copy_id = ec.id');
@@ -459,13 +461,16 @@ class StatRepository extends CommonRepository
                 ->setParameter('leadId', $leadId);
         }
 
+        // Added double quotes around all aliases in the select (e.g., as "dateRead")
+        // to preserve case on PostgreSQL (unquoted identifiers are lowercased).
+        // Match the Twig template's camelCase access (e.g., item.isFailed now finds "isFailed" key).
         if (!empty($options['basic_select'])) {
             $query->select(
-                's.email_id, s.id, s.date_read as dateRead, s.date_sent as dateSent, e.subject, e.name as email_name, s.is_read as isRead, s.is_failed as isFailed, ec.subject as storedSubject'
+                's.email_id, s.id, s.date_read as '.$connection->quoteIdentifier('dateRead').', s.date_sent as '.$connection->quoteIdentifier('dateSent').', e.subject, e.name as email_name, s.is_read as '.$connection->quoteIdentifier('isRead').', s.is_failed as '.$connection->quoteIdentifier('isFailed').', ec.subject as storedSubject'
             );
         } else {
             $query->select(
-                's.email_id, s.id, s.date_read as dateRead, s.date_sent as dateSent,e.subject, e.name as email_name, s.is_read as isRead, s.is_failed as isFailed, s.viewed_in_browser as viewedInBrowser, s.retry_count as retryCount, s.list_id, l.name as list_name, s.tracking_hash as idHash, s.open_details as openDetails, ec.subject as storedSubject, s.lead_id'
+                's.email_id, s.id, s.date_read as '.$connection->quoteIdentifier('dateRead').', s.date_sent as '.$connection->quoteIdentifier('dateSent').',e.subject, e.name as email_name, s.is_read as '.$connection->quoteIdentifier('isRead').', s.is_failed as '.$connection->quoteIdentifier('isFailed').', s.viewed_in_browser as '.$connection->quoteIdentifier('viewedInBrowser').', s.retry_count as '.$connection->quoteIdentifier('retryCount').', s.list_id, l.name as list_name, s.tracking_hash as '.$connection->quoteIdentifier('idHash').', s.open_details as '.$connection->quoteIdentifier('openDetails').', ec.subject as '.$connection->quoteIdentifier('storedSubject').', s.lead_id'
             )
                 ->leftJoin('s', MAUTIC_TABLE_PREFIX.'lead_lists', 'l', 's.list_id = l.id');
         }
@@ -709,8 +714,9 @@ class StatRepository extends CommonRepository
      */
     public function getStatsSummaryForContacts(array $contacts): array
     {
-        $queryBuilder               = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $subQueryBuilder            = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $connection         = $this->getEntityManager()->getConnection();
+        $queryBuilder       = $connection->createQueryBuilder();
+        $subQueryBuilder    = $connection->createQueryBuilder();
 
         $leadAlias     = 'l'; // leads
         $statsAlias    = 'es'; // email_stats
@@ -737,12 +743,17 @@ class StatRepository extends CommonRepository
             ->setParameter('contacts', $contacts, ArrayParameterType::INTEGER)
             ->groupBy("{$cutAlias}.channel_id, {$pageHitsAlias}.lead_id");
 
+        $leadIdCol              = $connection->quoteIdentifier('lead_id');
+        $sentCountCol           = $connection->quoteIdentifier('sent_count');
+        $readCountCol           = $connection->quoteIdentifier('read_count');
+        $clickedThroughCountCol = $connection->quoteIdentifier('clicked_through_count');
+
         // main query
         $queryBuilder->select(
-            "{$leadAlias}.id AS `lead_id`",
-            "COUNT({$statsAlias}.id) AS `sent_count`",
-            "SUM(IF({$statsAlias}.is_read IS NULL, 0, {$statsAlias}.is_read)) AS `read_count`",
-            "SUM(IF({$subQueryAlias}.hits is NULL, 0, 1)) AS `clicked_through_count`",
+            "{$leadAlias}.id AS $leadIdCol",
+            "COUNT({$statsAlias}.id) AS $sentCountCol",
+            "SUM(CASE WHEN {$statsAlias}.is_read = TRUE THEN 1 ELSE 0 END) AS $readCountCol",
+            "SUM(COALESCE({$subQueryAlias}.hits, 0)) AS $clickedThroughCountCol",
         )->from(MAUTIC_TABLE_PREFIX.'email_stats', $statsAlias)
             ->rightJoin(
                 $statsAlias,
@@ -793,8 +804,9 @@ class StatRepository extends CommonRepository
      */
     public function getStatsSummaryForCampaignEvents(array $eventIds): array
     {
-        $queryBuilder    = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $subQueryBuilder = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $connection      = $this->getEntityManager()->getConnection();
+        $queryBuilder    = $connection->createQueryBuilder();
+        $subQueryBuilder = $connection->createQueryBuilder();
 
         $eventAlias     = 'e';  // campaign events
         $statsAlias     = 'es'; // email_stats
@@ -818,12 +830,17 @@ class StatRepository extends CommonRepository
             ->setParameter('events', $eventIds, ArrayParameterType::INTEGER)
             ->groupBy("{$statsAlias}.id");
 
+        $eventIdCol             = $connection->quoteIdentifier('event_id');
+        $sentCountCol           = $connection->quoteIdentifier('sent_count');
+        $readCountCol           = $connection->quoteIdentifier('read_count');
+        $clickedThroughCountCol = $connection->quoteIdentifier('clicked_through_count');
+
         // main query
         $queryBuilder->select(
-            "{$eventAlias}.id AS `event_id`",
-            "COUNT({$statsAlias}.id) AS `sent_count`",
-            "SUM(IF({$statsAlias}.is_read IS NULL, 0, {$statsAlias}.is_read)) AS `read_count`",
-            "COUNT(DISTINCT CASE WHEN {$subQueryAlias}.hits > 0 THEN {$statsAlias}.id END) AS `clicked_through_count`"
+            "{$eventAlias}.id AS $eventIdCol",
+            "COUNT({$statsAlias}.id) AS $sentCountCol",
+            "SUM(CASE WHEN {$statsAlias}.is_read = TRUE THEN 1 ELSE 0 END) AS $readCountCol",
+            "COUNT(DISTINCT CASE WHEN {$subQueryAlias}.hits > 0 THEN {$statsAlias}.id END) AS $clickedThroughCountCol"
         )->from(MAUTIC_TABLE_PREFIX.'email_stats', $statsAlias)
             ->rightJoin(
                 $statsAlias,
@@ -894,47 +911,52 @@ class StatRepository extends CommonRepository
                 "{$cutAlias}.redirect_id = {$pageHitsAlias}.redirect_id AND {$cutAlias}.channel_id = {$pageHitsAlias}.source_id"
             )
             ->where("{$cutAlias}.channel = 'email' AND {$pageHitsAlias}.source = 'email'")
-            ->andWhere("{$cutAlias}.channel_id in (:emails)")
+            ->andWhere("{$cutAlias}.channel_id IN (:emails)")
             ->groupBy("{$cutAlias}.channel_id, {$pageHitsAlias}.lead_id");
 
         // main query
         $queryBuilder->addSelect(
-            "COUNT({$statsAlias}.id) AS `sent_count`",
-            "SUM(IF({$statsAlias}.is_read IS NULL, 0, {$statsAlias}.is_read)) AS `read_count`",
-            "SUM(IF({$subQueryAlias}.hits is NULL, 0, 1)) AS `clicked_through_count`",
-        )->from(MAUTIC_TABLE_PREFIX.'email_stats', $statsAlias)
+            "COUNT({$statsAlias}.id) AS sent_count",
+            "SUM(CASE WHEN {$statsAlias}.is_read = true THEN 1 ELSE 0 END) AS read_count",
+            "SUM(CASE WHEN {$subQueryAlias}.hits IS NOT NULL THEN 1 ELSE 0 END) AS clicked_through_count",
+            "{$leadAlias}.country AS country"
+        )
+            ->from(MAUTIC_TABLE_PREFIX.'email_stats', $statsAlias)
             ->rightJoin(
                 $statsAlias,
                 MAUTIC_TABLE_PREFIX.'leads',
                 $leadAlias,
-                "{$statsAlias}.lead_id=l.id"
-            )->leftJoin(
+                "{$statsAlias}.lead_id = {$leadAlias}.id"
+            )
+            ->leftJoin(
                 $statsAlias,
-                "({$subQueryBuilder->getSQL()})",
+                '('.$subQueryBuilder->getSQL().')',
                 $subQueryAlias,
                 "{$statsAlias}.email_id = {$subQueryAlias}.channel_id AND {$statsAlias}.lead_id = {$subQueryAlias}.lead_id"
             );
 
         switch ($sourceType) {
             case 'campaign':
-                $queryBuilder->addSelect("{$leadAlias}.country AS `country`")
-                    ->andWhere("{$statsAlias}.source_id in (:events)")
+                $queryBuilder
+                    ->andWhere("{$statsAlias}.source_id IN (:events)")
                     ->andWhere("{$statsAlias}.source = :source")
-                    ->setParameter('emails', $emailsIds, ArrayParameterType::INTEGER)
                     ->setParameter('events', $eventsIds, ArrayParameterType::INTEGER)
                     ->setParameter('source', 'campaign.event');
                 break;
             case 'email':
-                $queryBuilder->addSelect("{$leadAlias}.country AS `country`")
-                    ->andWhere("{$statsAlias}.email_id in (:emails)")
-                    ->setParameter('emails', $emailsIds, ArrayParameterType::INTEGER);
+                $queryBuilder->andWhere("{$statsAlias}.email_id IN (:emails)");
+                break;
         }
 
-        $queryBuilder->groupBy("{$leadAlias}.country")
-                    ->orderBy("{$leadAlias}.country", 'ASC');
-        $queryBuilder->andWhere("{$statsAlias}.date_sent BETWEEN :dateFrom AND :dateTo");
-        $queryBuilder->setParameter('dateFrom', $dateFrom->format(DateTimeHelper::FORMAT_DB));
-        $queryBuilder->setParameter('dateTo', $dateTo->setTime(23, 59, 59)->format('Y-m-d H:i:s'));
+        // Always set :emails (used in the inlined subquery)
+        $queryBuilder->setParameter('emails', $emailsIds, ArrayParameterType::INTEGER);
+
+        $queryBuilder
+            ->groupBy("{$leadAlias}.country")
+            ->orderBy("{$leadAlias}.country", 'ASC')
+            ->andWhere("{$statsAlias}.date_sent BETWEEN :dateFrom AND :dateTo")
+            ->setParameter('dateFrom', $dateFrom->format(DateTimeHelper::FORMAT_DB))
+            ->setParameter('dateTo', $dateTo->setTime(23, 59, 59)->format('Y-m-d H:i:s'));
 
         return $queryBuilder->executeQuery()->fetchAllAssociative();
     }

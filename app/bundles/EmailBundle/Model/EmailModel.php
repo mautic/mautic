@@ -12,6 +12,7 @@ use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
@@ -1870,21 +1871,26 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $campaignId = ArrayHelper::pickValue('campaignId', $filter);
         $segmentId  = ArrayHelper::pickValue('segmentId', $filter);
 
-        $format = '%H:00';
-        if (12 == $timeFormat) {
-            $format = '%h %p';
-        }
+        $connection = $this->em->getConnection();
+        $platform   = $connection->getDatabasePlatform();
 
-        $query      = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
-
+        $query                 = new ChartQuery($connection, $dateFrom, $dateTo);
         $q                     = $query->prepareTimeDataQuery('email_stats', $column, $filter);
         $columnWithTimezone    = 't.'.$column;
         $defaultTimezoneOffset = (new DateTimeHelper())->getLocalTimezoneOffset();
-        $columnName            = "CONVERT_TZ({$columnWithTimezone}, '+00:00', '{$defaultTimezoneOffset}')";
-        $q->select('CONCAT(TIME_FORMAT('.$columnName.', \''.$format.'\'),\'-\',TIME_FORMAT('.$columnName.' + INTERVAL 1 HOUR, \''.$format.'\'),\'\') as hour, COUNT(t.id) AS count')
-        ->groupBy('hour')
-        ->orderBy('count', 'DESC')
-        ->setMaxResults(24);
+
+        // Use centralized best-hour expression (handles timezone + 12/24h format)
+        $bestHoursSelect = DatabasePlatform::getBestHoursSelectExpression(
+            $platform,
+            $columnWithTimezone,
+            (int) $timeFormat,
+            $defaultTimezoneOffset
+        );
+
+        $q->select($bestHoursSelect)
+            ->groupBy('hour')
+            ->orderBy('count', 'DESC')
+            ->setMaxResults(24);
 
         if (!$canViewOthers) {
             $this->limitQueryToCreator($q);

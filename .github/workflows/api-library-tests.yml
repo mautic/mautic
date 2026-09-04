@@ -88,6 +88,13 @@ jobs:
         mv "$GITHUB_WORKSPACE"/* /var/www/html/
         cp "$HOME/api-library/.github/ci-files/.env" /var/www/html/
         sed -i 's/DB_PORT=3306/DB_PORT=${{ job.services.mysql.ports[3306] }}/g' /var/www/html/.env
+        # Add DB_DRIVER only if not already present
+        if ! grep -q '^DB_DRIVER=' /var/www/html/.env; then
+          echo "DB_DRIVER=pdo_mysql" >> /var/www/html/.env
+        fi
+        if ! grep -q '^DB_CHARSET=' /var/www/html/.env; then
+          echo "DB_CHARSET=utf8mb4" >> /var/www/html/.env
+        fi
         rm -f /var/www/html/.env.test
 
     - name: Install Mautic

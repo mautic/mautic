@@ -234,6 +234,40 @@
     "patches": {
       "twig/twig": {
         "Make IntegrationTestCase data providers static for PHPUnit 11": "patches/twig-integration-testcase-static-data-providers.patch"
+      },
+      "doctrine/dbal": {
+        "Fix PostgreSQL platform indexes query for modern PG": "patches/doctrine-dbal-pgsql-platform-indexes.patch",
+        "PHP 8.5+ PDO PgSQL driver compatibility": "patches/doctrine-dbal-pgsql-php85-driver.patch"
+      },
+      "doctrine/doctrine-bundle": {
+        "PHP 8.6+ replace deprecated spl_object_hash() with spl_object_id()": "patches/doctrine-bundle-spl-object-id.patch"
+      },
+      "doctrine/persistence": {
+        "PHP 8.6+ replace deprecated spl_object_hash() with spl_object_id()": "patches/doctrine-persistence-spl-object-id.patch"
+      },
+      "javer/lightsaml": {
+        "PHP 8.6+ replace deprecated spl_object_hash() with spl_object_id()": "patches/javer-lightsaml-spl-object-id.patch"
+      },
+      "jms/serializer-bundle": {
+        "PHP 8.6+ replace deprecated spl_object_hash() with spl_object_id()": "patches/jms-serializer-bundle-spl-object-id.patch"
+      },
+      "klapaudius/oauth-server-bundle": {
+        "PHP 8.6+ precision lost in conversion fix": "patches/klapaudius-oauth-server-bundle-lost-precision.patch"
+      },
+      "predis/predis": {
+        "PHP 8.6+ replace deprecated spl_object_hash() with spl_object_id()": "patches/predis-spl-object-id.patch"
+      },
+      "symfony/doctrine-bridge": {
+        "PHP 8.6+ replace deprecated spl_object_hash() with spl_object_id()": "patches/symfony-doctrine-bridge-spl-object-id.patch"
+      },
+      "symfony/form": {
+        "PHP 8.6+ replace deprecated spl_object_hash() with spl_object_id()": "patches/symfony-form-spl-object-id.patch"
+      },
+      "symfony/http-foundation": {
+        "PHP 8.6+ add missing create_sid() in abstract session handler": "patches/symfony-http-foundation-create-sid.patch"
+      },
+      "symfony/validator": {
+        "PHP 8.6+ replace deprecated spl_object_hash() with spl_object_id()": "patches/symfony-validator-spl-object-id.patch"
       }
     }
   }

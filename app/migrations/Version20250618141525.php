@@ -35,7 +35,11 @@ final class Version20250618141525 extends PreUpAssertionMigration
     public function postUp(Schema $schema): void
     {
         $index = $this->generatePropertyName('point_trigger_projects_xref', 'idx', ['point_trigger_id']);
-        $this->connection->executeStatement(sprintf('DROP INDEX %s ON %s', $index, $this->prefix.'point_trigger_projects_xref'));
+
+        $this->dropIndex(
+            $this->prefix.'point_trigger_projects_xref',
+            $index
+        );
     }
 
     public function down(Schema $schema): void
