@@ -11,7 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\TimeType;
 /**
  * @implements DataTransformerInterface<array<mixed>, array<mixed>>
  */
-final class ReportFilterDataTransformer implements DataTransformerInterface
+final readonly class ReportFilterDataTransformer implements DataTransformerInterface
 {
     public function __construct(
         private array $columns,
