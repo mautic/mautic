@@ -436,7 +436,8 @@ class LeadEventLogRepository extends CommonRepository
             )
             ->setParameter('eventId', (int) $eventId)
             ->setParameter('now', $now)
-            ->setParameter('true', true, Types::BOOLEAN);
+            ->setParameter('true', true, Types::BOOLEAN)
+            ->orderBy('o.lead', 'ASC');
 
         $this->updateOrmQueryFromContactLimiter('o', $q, $limiter);
 

@@ -261,6 +261,13 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
 
             $this->processSignalService->throwExceptionIfSignalIsCaught();
 
+            // Check whether this is batch case
+            if (!$this->limiter->getContactId()) {
+                // Update the contact ID cursor to prevent duplicate processing when reader instances still show these records as scheduled due to replication lag.
+                $maxId = max([0, ...array_map(fn ($log) => $log->getLead()->getId(), $logs->toArray())]);
+                $this->limiter->setBatchMinContactId($maxId + 1);
+            }
+
             // Get next batch
             $this->scheduledContactFinder->clear($fetchedContacts);
             $logs = $this->repo->getScheduled($eventId, $this->now, $this->limiter);

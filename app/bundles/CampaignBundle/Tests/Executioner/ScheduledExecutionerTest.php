@@ -233,6 +233,93 @@ final class ScheduledExecutionerTest extends TestCase
         $this->assertEquals(0, $counter->getTotalExecuted());
     }
 
+    public function testBatchCursorAdvancesToHighestContactIdPlusOne(): void
+    {
+        $campaign = $this->createMock(Campaign::class);
+        $campaign->method('isPublished')
+            ->willReturn(true);
+        $campaign->method('getId')
+            ->willReturn(1);
+
+        $event = $this->createMock(Event::class);
+        $event->method('getId')
+            ->willReturn(1);
+        $event->method('getCampaign')
+            ->willReturn($campaign);
+
+        $lead5 = $this->createMock(Lead::class);
+        $lead5->method('getId')
+            ->willReturn(5);
+
+        $lead10 = $this->createMock(Lead::class);
+        $lead10->method('getId')
+            ->willReturn(10);
+
+        $log1 = $this->createMock(LeadEventLog::class);
+        $log1->method('getId')
+            ->willReturn(1);
+        $log1->method('getEvent')
+            ->willReturn($event);
+        $log1->method('getCampaign')
+            ->willReturn($campaign);
+        $log1->method('getLead')
+            ->willReturn($lead5);
+        $log1->method('getDateTriggered')
+            ->willReturn(new \DateTime());
+        $log1->method('getRotation')
+            ->willReturn(1);
+
+        $log2 = $this->createMock(LeadEventLog::class);
+        $log2->method('getId')
+            ->willReturn(2);
+        $log2->method('getEvent')
+            ->willReturn($event);
+        $log2->method('getCampaign')
+            ->willReturn($campaign);
+        $log2->method('getLead')
+            ->willReturn($lead10);
+        $log2->method('getDateTriggered')
+            ->willReturn(new \DateTime());
+        $log2->method('getRotation')
+            ->willReturn(1);
+
+        $logs = new ArrayCollection([1 => $log1, 2 => $log2]);
+
+        $this->repository->expects($this->once())
+            ->method('getScheduledCounts')
+            ->willReturn([1 => 2]);
+
+        $callCount            = 0;
+        $capturedMinContactId = null;
+        $this->repository->expects($this->exactly(2))
+            ->method('getScheduled')
+            ->willReturnCallback(function ($_eventId, $_now, ContactLimiter $limiter) use ($logs, &$callCount, &$capturedMinContactId) {
+                ++$callCount;
+                if (1 === $callCount) {
+                    return $logs;
+                }
+                $capturedMinContactId = $limiter->getMinContactId();
+
+                return new ArrayCollection();
+            });
+
+        $this->scheduler->method('validateExecutionDateTime')
+            ->willReturn(new \DateTime('-1 hour'));
+
+        $this->scheduler->method('shouldSchedule')
+            ->willReturn(false);
+
+        $this->contactFinder->method('hydrateContacts')
+            ->willReturn(new ArrayCollection());
+
+        $limiter = new ContactLimiter(100);
+
+        $this->getExecutioner()->execute($campaign, $limiter, new BufferedOutput());
+
+        // The second getScheduled call must start after the highest contact ID in the batch (10 + 1 = 11).
+        $this->assertSame(11, $capturedMinContactId);
+    }
+
     private function getExecutioner(): ScheduledExecutioner
     {
         return new ScheduledExecutioner(
