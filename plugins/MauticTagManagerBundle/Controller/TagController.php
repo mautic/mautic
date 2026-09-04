@@ -292,7 +292,6 @@ final class TagController extends FormController
     }
 
     /**
-     * @param \MauticPlugin\MauticTagManagerBundle\Entity\Tag $tag
      * @param array<string, mixed>                            $postActionVars
      */
     private function createTagModifyResponse(Request $request, Tag $tag, TagDependencies $tagDependencies, array $postActionVars, string $action, bool $ignorePost): Response
@@ -324,7 +323,6 @@ final class TagController extends FormController
     }
 
     /**
-     * @param \MauticPlugin\MauticTagManagerBundle\Entity\Tag $tag
      * @param array<string, mixed>                            $postActionVars
      */
     private function handleEditFormPost(Request $request, Tag $tag, TagDependencies $tagDependencies, FormInterface $form, array $postActionVars): ?Response
