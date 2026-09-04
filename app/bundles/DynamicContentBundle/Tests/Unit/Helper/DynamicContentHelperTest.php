@@ -11,7 +11,10 @@ use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent;
 use Mautic\DynamicContentBundle\Helper\DynamicContentHelper;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadListRepository;
+use Mautic\LeadBundle\Entity\TagRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -37,14 +40,17 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->mockModel           = $this->createMock(DynamicContentModel::class);
-        $this->mockDispatcher      = $this->createMock(EventDispatcher::class);
-        $this->leadModel           = $this->createMock(LeadModel::class);
-        $this->helper              = new DynamicContentHelper(
+        $this->mockModel            = $this->createMock(DynamicContentModel::class);
+        $this->mockDispatcher       = $this->createMock(EventDispatcher::class);
+        $this->leadModel            = $this->createMock(LeadModel::class);
+        $this->helper               = new DynamicContentHelper(
             $this->mockModel,
             $this->createStub(RealTimeExecutioner::class),
             $this->mockDispatcher,
             $this->leadModel,
+            $this->createStub(LeadListRepository::class),
+            $this->createStub(CompanyLeadRepository::class),
+            $this->createStub(TagRepository::class),
         );
     }
 
@@ -70,6 +76,7 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
                             ],
                         ],
                         'ignore_paginator' => true,
+                        'orderBy'          => 'e.displayOrder',
                     ], $parameters[0]);
 
                     return ['some entity'];
@@ -86,6 +93,7 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
                             ],
                         ],
                         'ignore_paginator' => true,
+                        'orderBy'          => 'e.displayOrder',
                     ], $parameters[0]);
 
                     return [];
@@ -103,7 +111,8 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
     {
         $slotName = 'test';
         $contact  = new Lead();
-        $contact->setFields(['email' => 'ma@ka.t', 'id' => 123]);
+        $contact->setId(123);
+        $contact->setFields(['email' => 'ma@ka.t']);
 
         $slot = new DynamicContent();
         $slot->setName($slotName);
@@ -156,7 +165,8 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
     {
         $slotName = 'test';
         $contact  = new Lead();
-        $contact->setFields(['email' => 'ma@ka.t', 'id' => 123]);
+        $contact->setId(123);
+        $contact->setFields(['email' => 'ma@ka.t']);
 
         $slot = new DynamicContent();
         $slot->setName($slotName);
@@ -207,7 +217,8 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
     {
         $slotName = 'test';
         $contact  = new Lead();
-        $contact->setFields(['email' => 'ma@ka.t', 'id' => 123]);
+        $contact->setId(123);
+        $contact->setFields(['email' => 'ma@ka.t']);
 
         $slot = new DynamicContent();
         $slot->setName($slotName);
@@ -251,7 +262,8 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
     {
         $slotName = 'test';
         $contact  = new Lead();
-        $contact->setFields(['email' => 'ma@ka.t', 'id' => 123]);
+        $contact->setId(123);
+        $contact->setFields(['email' => 'ma@ka.t']);
 
         $slot = new DynamicContent();
         $slot->setName($slotName);

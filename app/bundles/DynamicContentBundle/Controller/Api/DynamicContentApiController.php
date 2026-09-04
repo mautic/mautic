@@ -16,7 +16,9 @@ use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -45,5 +47,61 @@ final class DynamicContentApiController extends CommonApiController
         $this->serializerGroups = ['dwcDetails', 'categoryList'];
 
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
+    }
+
+    public function newEntityAction(Request $request): Response
+    {
+        $parameters = $request->request->all();
+
+        /** @var DynamicContent $entity */
+        $entity     = $this->getNewEntity($parameters);
+
+        if (!$this->checkEntityAccess($entity, 'create')) {
+            return $this->accessDenied();
+        }
+
+        $entity->setSlotName($parameters['slotName'] ?? null);
+
+        if (isset($parameters['type'])) {
+            $entity->setType($parameters['type']);
+        }
+
+        $entity->setIsCampaignBased($parameters['isCampaignBased'] ?? false);
+
+        return $this->processForm($request, $entity, $parameters, 'POST');
+    }
+
+    public function editEntityAction(Request $request, $id): Response
+    {
+        /** @var DynamicContent|null $entity */
+        $entity     = $this->model->getEntity($id);
+        $parameters = $request->request->all();
+        $method     = $request->getMethod();
+
+        if (null === $entity || !$entity->getId()) {
+            if ('PATCH' === $method) {
+                // PATCH requires that an entity exists
+                return $this->notFound();
+            }
+
+            // PUT can create a new entity if it doesn't exist
+            /** @var DynamicContent $entity */
+            $entity = $this->model->getEntity();
+            $entity->setSlotName($parameters['slotName'] ?? null);
+            $entity->setIsCampaignBased($parameters['isCampaignBased'] ?? false);
+
+            if (!$this->checkEntityAccess($entity, 'create')) {
+                return $this->accessDenied();
+            }
+        }
+
+        if (!$this->checkEntityAccess($entity, 'edit')) {
+            return $this->accessDenied();
+        }
+
+        $entity->setSlotName($parameters['slotName'] ?? null);
+        $entity->setIsCampaignBased($parameters['isCampaignBased'] ?? false);
+
+        return $this->processForm($request, $entity, $parameters, $method);
     }
 }

@@ -9,6 +9,7 @@ use DeviceDetector\Parser\OperatingSystem;
 use Doctrine\ORM\EntityManager;
 use Mautic\DynamicContentBundle\DynamicContent\TypeList;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use Mautic\DynamicContentBundle\Entity\DynamicContentRepository;
 use Mautic\DynamicContentBundle\Form\Type\DwcEntryFiltersType;
 use Mautic\DynamicContentBundle\Form\Type\DynamicContentListType;
 use Mautic\DynamicContentBundle\Form\Type\DynamicContentType;
@@ -26,6 +27,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class DynamicContentTypeTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        if (!isset($_ENV['MAUTIC_UPLOAD_DIR'])) {
+            $_ENV['MAUTIC_UPLOAD_DIR'] = '/tmp';
+        }
+    }
+
     public function testFormBuild(): void
     {
         $entityManagerMock       = $this->createStub(EntityManager::class);
@@ -45,6 +55,8 @@ final class DynamicContentTypeTest extends TestCase
             ->with('lead')
             ->willReturn($this->getMockCustomFieldList());
 
+        $dynamicContentRepositoryMock = $this->createMock(DynamicContentRepository::class);
+
         $tags = $this->getMockTagList();
         $leadModelMock->expects($this->once())
             ->method('getTagList')
@@ -58,6 +70,7 @@ final class DynamicContentTypeTest extends TestCase
             new TypeList(),
             $relativeDateMock,
             $leadRepositoryMock,
+            $dynamicContentRepositoryMock,
         );
 
         $formBuilderInterfaceMock = $this->createMock(FormBuilderInterface::class);
@@ -125,34 +138,13 @@ final class DynamicContentTypeTest extends TestCase
         $formBuilderInterfaceMock->expects($matcher)
             ->method('addEventListener')->willReturnCallback(function (...$parameters) use ($matcher, $formBuilderInterfaceMock): \PHPUnit\Framework\MockObject\MockObject {
                 if (1 === $matcher->numberOfInvocations()) {
-                    $this->assertSame(FormEvents::PRE_SUBMIT, $parameters[0]);
-                    $callback = function ($listener): bool {
-                        $reflection = new \ReflectionFunction($listener);
-                        $parameters = $reflection->getParameters();
-
-                        return FormEvent::class === (string) $parameters[0]->getType();
-                    };
-                    $this->assertTrue($callback($parameters[1]));
+                    $this->assertFormEvent(FormEvents::PRE_SUBMIT, $parameters);
                 }
                 if (2 === $matcher->numberOfInvocations()) {
-                    $this->assertSame(FormEvents::PRE_SET_DATA, $parameters[0]);
-                    $callback = function ($listener): bool {
-                        $reflection = new \ReflectionFunction($listener);
-                        $parameters = $reflection->getParameters();
-
-                        return FormEvent::class === (string) $parameters[0]->getType();
-                    };
-                    $this->assertTrue($callback($parameters[1]));
+                    $this->assertFormEvent(FormEvents::PRE_SET_DATA, $parameters);
                 }
                 if (3 === $matcher->numberOfInvocations()) {
-                    $this->assertSame(FormEvents::POST_SUBMIT, $parameters[0]);
-                    $callback = function ($listener): bool {
-                        $reflection = new \ReflectionFunction($listener);
-                        $parameters = $reflection->getParameters();
-
-                        return FormEvent::class === (string) $parameters[0]->getType();
-                    };
-                    $this->assertTrue($callback($parameters[1]));
+                    $this->assertFormEvent(FormEvents::POST_SUBMIT, $parameters);
                 }
 
                 return $formBuilderInterfaceMock;
@@ -162,8 +154,42 @@ final class DynamicContentTypeTest extends TestCase
             ->method('get')
             ->with('type')
             ->willReturn($formBuilderInterfaceMock);
+        $matcher = $this->exactly(3);
+        $formBuilderInterfaceMock->expects($matcher)
+            ->method('addEventListener')
+            ->willReturnCallback(function (...$parameters) use ($matcher): void {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertFormEvent(FormEvents::PRE_SUBMIT, $parameters);
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertFormEvent(FormEvents::PRE_SET_DATA, $parameters);
+                }
+                if (3 === $matcher->numberOfInvocations()) {
+                    $this->assertFormEvent(FormEvents::POST_SUBMIT, $parameters);
+                }
+            });
+
+        $formBuilderInterfaceMock->expects($this->once())
+            ->method('get')
+            ->with('type')
+            ->willReturn($formBuilderInterfaceMock);
 
         $dynamicContentType->buildForm($formBuilderInterfaceMock, $options);
+    }
+
+    /**
+     * @param mixed[] $parameters
+     */
+    private function assertFormEvent(string $event, array $parameters): void
+    {
+        $this->assertSame($event, $parameters[0]);
+        $callback = function ($listener): bool {
+            $reflection = new \ReflectionFunction($listener);
+            $parameters = $reflection->getParameters();
+
+            return FormEvent::class === (string) $parameters[0]->getType();
+        };
+        $this->assertTrue($callback($parameters[1]));
     }
 
     /**

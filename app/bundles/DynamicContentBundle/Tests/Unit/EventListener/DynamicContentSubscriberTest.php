@@ -9,13 +9,13 @@ use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use Mautic\DynamicContentBundle\Entity\DynamicContentRepository;
 use Mautic\DynamicContentBundle\EventListener\DynamicContentSubscriber;
 use Mautic\DynamicContentBundle\Helper\DynamicContentHelper;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
@@ -77,28 +77,23 @@ final class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private DynamicContentSubscriber $subscriber;
 
-    /**
-     * @var MockObject&CompanyModel
-     */
-    private MockObject $companyModel;
-
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->trackableModel            = $this->createMock(TrackableModel::class);
-        $this->pageTokenHelper           = $this->createMock(PageTokenHelper::class);
-        $this->assetTokenHelper          = $this->createMock(AssetTokenHelper::class);
-        $this->formTokenHelper           = $this->createMock(FormTokenHelper::class);
-        $this->focusTokenHelper          = $this->createMock(FocusTokenHelper::class);
-        $this->contactTracker            = $this->createMock(ContactTracker::class);
-        $this->dynamicContentHelper      = $this->createMock(DynamicContentHelper::class);
-        $this->dynamicContentModel       = $this->createMock(DynamicContentModel::class);
-        $this->security                  = $this->createMock(CorePermissions::class);
-        $this->contactTracker            = $this->createMock(ContactTracker::class);
-        $this->companyModel              = $this->createMock(CompanyModel::class);
-        $this->companyLeadRepositoryMock = $this->createMock(CompanyLeadRepository::class);
-        $this->subscriber                = new DynamicContentSubscriber(
+        $this->trackableModel             = $this->createMock(TrackableModel::class);
+        $this->pageTokenHelper            = $this->createMock(PageTokenHelper::class);
+        $this->assetTokenHelper           = $this->createMock(AssetTokenHelper::class);
+        $this->formTokenHelper            = $this->createMock(FormTokenHelper::class);
+        $this->focusTokenHelper           = $this->createMock(FocusTokenHelper::class);
+        $this->contactTracker             = $this->createMock(ContactTracker::class);
+        $this->dynamicContentHelper       = $this->createMock(DynamicContentHelper::class);
+        $this->dynamicContentModel        = $this->createMock(DynamicContentModel::class);
+        $this->security                   = $this->createMock(CorePermissions::class);
+        $this->contactTracker             = $this->createMock(ContactTracker::class);
+        $this->companyLeadRepositoryMock  = $this->createMock(CompanyLeadRepository::class);
+        $dynamicContentRepository    = $this->createMock(DynamicContentRepository::class);
+        $this->subscriber                 = new DynamicContentSubscriber(
             $this->trackableModel,
             $this->pageTokenHelper,
             $this->assetTokenHelper,
@@ -109,7 +104,8 @@ final class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->dynamicContentModel,
             $this->security,
             $this->contactTracker,
-            $this->companyModel
+            $this->companyLeadRepositoryMock,
+            $dynamicContentRepository,
         );
     }
 
@@ -161,101 +157,23 @@ HTML;
             ->method('getContact')
             ->willReturn($contact);
 
-        $this->dynamicContentHelper->expects($this->never())
-            ->method('convertLeadToArray');
-
-        $this->dynamicContentHelper->expects($this->once())
-            ->method('findDwcTokens')
-            ->with($content, $contact)
-            ->willReturn([]);
-
         $this->dynamicContentHelper->expects($this->once())
             ->method('getDynamicContentForLead')
-            ->with('test-token', $contact)
             ->willReturn($dwcContent);
 
-        $event->expects($this->once())
-            ->method('setContent')
-            ->with($expected);
-
-        $this->subscriber->decodeTokens($event);
-    }
-
-    /**
-     * This test is ensuring this error won't happen again:.
-     *
-     * DOMDocumentFragment::appendXML(): Entity: line 1: parser error : xmlParseEntityRef: no name
-     *
-     * It happens when there is an ampersand in the DWC content.
-     */
-    public function testDecodeTokensWithAmpersandInlineDwc(): void
-    {
-        $content = <<< HTML
-<!DOCTYPE html>
-<html>
-    <head></head>
-    <body>
-        <h2>Hello there!</h2>
-        {dwc=test-token}
-    </body>
-</html>
-
-HTML;
-
-        $expected = <<< HTML
-<!DOCTYPE html>
-<html>
-    <head></head>
-    <body>
-        <h2>Hello there!</h2>
-        <a href="https://john.doe&son">Link</a>
-    </body>
-</html>
-
-HTML;
-        $dwcContent = '<a href="https://john.doe&son">Link</a>';
-        $event      = $this->createMock(PageDisplayEvent::class);
-        $contact    = new Lead();
-
-        $event->expects($this->once())
-            ->method('getContent')
-            ->willReturn($content);
-
-        $this->security->expects($this->once())
-            ->method('isAnonymous')
-            ->willReturn(true);
-
-        $this->contactTracker->expects($this->once())
-            ->method('getContact')
-            ->willReturn($contact);
-
-        $this->dynamicContentHelper->expects($this->never())
-            ->method('convertLeadToArray');
-
         $this->dynamicContentHelper->expects($this->once())
-            ->method('findDwcTokens')
-            ->with($content, $contact)
-            ->willReturn([
-                '{dwc=test-token}'  => [
-                    'content' => $dwcContent,
-                    'filters' => [
-                        [
-                            'field'    => 'email',
-                            'operator' => '!empty',
-                            'filter'   => '',
-                            'type'     => 'email',
-                        ],
-                    ],
-                ],
-            ]);
-
-        $this->dynamicContentHelper->expects($this->never())
-            ->method('getDynamicContentForLead');
-
-        $event->expects($this->once())
-            ->method('setContent')
-            ->with($expected);
-
+            ->method('replaceDWCTokenToHtmlTag')
+            ->willReturn($content);
+        $matcher = $this->exactly(2);
+        $event->expects($matcher)
+            ->method('setContent')->willReturnCallback(function (...$parameters) use ($matcher, $content, $expected): void {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame($content, $parameters[0]);
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                    $this->assertSame($expected, $parameters[0]);
+                }
+            });
         $this->subscriber->decodeTokens($event);
     }
 
@@ -317,11 +235,6 @@ HTML;
                 'company'   => 'Doe Corp',
                 'email'     => 'john@doe.com',
             ]);
-
-        $this->companyModel
-            ->expects($this->once())
-            ->method('getCompanyLeadRepository')
-            ->willReturn($this->companyLeadRepositoryMock);
 
         $this->companyLeadRepositoryMock->expects($this->once())
             ->method('getPrimaryCompanyByLeadId')

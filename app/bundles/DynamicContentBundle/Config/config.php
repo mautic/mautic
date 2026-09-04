@@ -50,4 +50,7 @@ return [
             ],
         ],
     ],
+    'parameters' => [
+        'dynamic_content_use_token_eligibility_validation' => true,
+    ],
 ];

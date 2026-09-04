@@ -140,28 +140,31 @@ Mautic.updatePreviewContactLookupListFilter = function(field, item) {
     }
 };
 
+
+Mautic.activatePreviewContactLookupField = function (fieldOptions, filterId) {
+    Mautic.activateLookupField (fieldOptions, filterId, 'content_preview_settings_contact', '#content_preview_settings_contact_id', 'lead.lead');
+};
+
 /**
  * Used in data-lookup-callback attr of form field in ContentPreviewSettingsType
  * Take a look at https://github.com/twitter/typeahead.js/
  */
-Mautic.activatePreviewContactLookupField = function(fieldOptions, filterId) {
-
-    const lookupElementId = 'content_preview_settings_contact';
+Mautic.activateLookupField = function (fieldOptions, filterId, lookupElementId, elemId, searchKey) {
     const action          = mQuery('#' + lookupElementId).attr('data-chosen-lookup');
 
     const options = {
         limit: 20,
-        'searchKey': 'lead.lead',
+        'searchKey': searchKey,
     };
 
     Mautic.activateFieldTypeahead(lookupElementId, filterId, options, action);
     Mautic.contentPreviewUrlGenerator.init();
 
-    mQuery('#content_preview_settings_contact').on('change',function(event) {
+    mQuery('#' + lookupElementId).on('change', function (event) {
         if (event.target.value === '') {
             // Delete selected contact ID from URL and hidden input
-            Mautic.contentPreviewUrlGenerator.regenerateUrl('', mQuery('#content_preview_settings_contact_id'));
-            mQuery('#content_preview_settings_contact_id').val('');
+            Mautic.contentPreviewUrlGenerator.regenerateUrl('', mQuery(elemId));
+            mQuery(elemId).val('');
         }
     });
 

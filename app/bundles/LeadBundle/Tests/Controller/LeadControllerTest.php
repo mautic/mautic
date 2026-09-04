@@ -813,7 +813,7 @@ EMAIL;
 
         $this->client->submit($form);
         $clientResponse = $this->client->getResponse();
-        $this->assertStringContainsString('title: This value is too long. It should have 191 characters or less', (string) $clientResponse->getContent());
+        $this->assertStringContainsString('title: This value is too long. It should have 64 characters or less', (string) $clientResponse->getContent());
     }
 
     public function testQuickAddRendersErrorOnEmailDuplicate(): void
