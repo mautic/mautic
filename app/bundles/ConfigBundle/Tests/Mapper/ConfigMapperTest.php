@@ -173,7 +173,7 @@ final class ConfigMapperTest extends \PHPUnit\Framework\TestCase
 
         $processedForms = $mapper->bindFormConfigsWithRealValues($this->forms);
 
-        $this->assertEquals($this->forms, $processedForms);
+        $this->assertSame($this->forms, $processedForms);
     }
 
     #[TestDox('Defaults should be merged with local config values')]
@@ -233,7 +233,7 @@ final class ConfigMapperTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $this->assertEquals($forms, $processedForms);
+        $this->assertSame($forms, $processedForms);
     }
 
     #[TestDox('Defaults should be merged with local config values but restricted fields should be removed')]
@@ -254,6 +254,6 @@ final class ConfigMapperTest extends \PHPUnit\Framework\TestCase
         // Expected should have had monitored_email unset due to it being restricted
         unset($forms['emailconfig']['parameters']['monitored_email']);
 
-        $this->assertEquals($forms, $processedForms);
+        $this->assertSame($forms, $processedForms);
     }
 }
