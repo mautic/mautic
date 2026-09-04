@@ -698,31 +698,7 @@ class Stat
     {
         $this->openDetails = [];
 
-        $keepPayloads = [];
-        $toAdd        = [];
-
-        foreach ($openDetails as $key => $detail) {
-            if (StatOpenDetail::BOUNCES_KEY === $key) {
-                foreach ($detail as $bounce) {
-                    $id = $bounce[StatOpenDetail::ROW_ID_KEY] ?? null;
-                    unset($bounce[StatOpenDetail::ROW_ID_KEY]);
-                    if (null !== $id) {
-                        $keepPayloads[$id] = [StatOpenDetail::BOUNCES_KEY => [$bounce]];
-                    } else {
-                        $toAdd[] = ['bounce', $bounce];
-                    }
-                }
-                continue;
-            }
-
-            $id = $detail[StatOpenDetail::ROW_ID_KEY] ?? null;
-            unset($detail[StatOpenDetail::ROW_ID_KEY]);
-            if (null !== $id) {
-                $keepPayloads[$id] = $detail;
-            } else {
-                $toAdd[] = ['open', $detail];
-            }
-        }
+        [$keepPayloads, $toAdd] = $this->partitionOpenDetailsForSet($openDetails);
 
         // A row whose id is referenced in $openDetails is updated to match the (possibly edited)
         // content supplied for it; every other row is removed, whether or not it has been flushed
@@ -745,6 +721,52 @@ class Stat
         }
 
         return $this;
+    }
+
+    /**
+     * Splits the incoming array into rows to keep (id => reconstructed stored payload) and rows
+     * to insert as new (no id yet).
+     *
+     * @param array<int|string,mixed> $openDetails
+     *
+     * @return array{0: array<int,mixed>, 1: array<int,array{0: string, 1: array<string,mixed>}>}
+     */
+    private function partitionOpenDetailsForSet(array $openDetails): array
+    {
+        $keepPayloads = [];
+        $toAdd        = [];
+
+        foreach ($openDetails as $key => $detail) {
+            if (StatOpenDetail::BOUNCES_KEY !== $key) {
+                $this->collectOpenDetailEntry('open', $detail, $keepPayloads, $toAdd);
+                continue;
+            }
+
+            foreach ($detail as $bounce) {
+                $this->collectOpenDetailEntry('bounce', $bounce, $keepPayloads, $toAdd);
+            }
+        }
+
+        return [$keepPayloads, $toAdd];
+    }
+
+    /**
+     * @param array<string,mixed> $detail
+     * @param array<mixed>        $keepPayloads
+     * @param array<mixed>        $toAdd
+     */
+    private function collectOpenDetailEntry(string $type, array $detail, array &$keepPayloads, array &$toAdd): void
+    {
+        $id = $detail[StatOpenDetail::ROW_ID_KEY] ?? null;
+        unset($detail[StatOpenDetail::ROW_ID_KEY]);
+
+        if (null === $id) {
+            $toAdd[] = [$type, $detail];
+
+            return;
+        }
+
+        $keepPayloads[$id] = 'bounce' === $type ? [StatOpenDetail::BOUNCES_KEY => [$detail]] : $detail;
     }
 
     /**

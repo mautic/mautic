@@ -13,17 +13,19 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class PublicControllerTokensTest extends MauticMysqlTestCase
 {
+    private const SUBJECT = 'Test email';
+
     public function testViewInBrowserRendersTokensStoredOnStatData(): void
     {
         $email = new Email();
-        $email->setName('Test email');
-        $email->setSubject('Test email');
+        $email->setName(self::SUBJECT);
+        $email->setSubject(self::SUBJECT);
         $email->setCustomHtml('<html><head></head><body>Hi {contactfield=firstname}</body></html>');
 
         $copy = new Copy();
-        $copy->setId(md5('test-copy-body'));
+        $copy->setId('test-copy-body-fixture-000000000');
         $copy->setDateCreated(new \DateTime());
-        $copy->setSubject('Test email');
+        $copy->setSubject(self::SUBJECT);
         $copy->setBody('<html><head></head><body>Hi {contactfield=firstname}</body></html>');
 
         $stat = new Stat();

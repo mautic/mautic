@@ -11,14 +11,20 @@ use PHPUnit\Framework\Assert;
 
 final class StatOpenDetailsReconciliationTest extends MauticMysqlTestCase
 {
+    private const DATE_ONE = '2026-01-01 00:00:00';
+
+    private const DATE_TWO = '2026-01-02 00:00:00';
+
+    private const EDITED_REASON = 'Edited reason';
+
     public function testSetOpenDetailsReconcilesByRowIdAfterAFlush(): void
     {
         $stat = new Stat();
         $stat->setEmailAddress('john@doe.cz');
         $stat->setDateSent(new \DateTime());
 
-        $stat->addOpenDetails(['datetime' => '2026-01-01 00:00:00', 'useragent' => 'UA-one']);
-        $stat->addOpenDetails(['datetime' => '2026-01-02 00:00:00', 'useragent' => 'UA-two']);
+        $stat->addOpenDetails(['datetime' => self::DATE_ONE, 'useragent' => 'UA-one']);
+        $stat->addOpenDetails(['datetime' => self::DATE_TWO, 'useragent' => 'UA-two']);
         $stat->addBounceDetails(['datetime' => '2026-01-03 00:00:00', 'reason' => 'Mailbox full']);
 
         $this->em->persist($stat);
@@ -63,7 +69,7 @@ final class StatOpenDetailsReconciliationTest extends MauticMysqlTestCase
         $stat = new Stat();
         $stat->setEmailAddress('jane@doe.cz');
         $stat->setDateSent(new \DateTime());
-        $stat->addOpenDetails(['datetime' => '2026-01-01 00:00:00', 'useragent' => 'UA-persisted']);
+        $stat->addOpenDetails(['datetime' => self::DATE_ONE, 'useragent' => 'UA-persisted']);
 
         $this->em->persist($stat);
         $this->em->flush();
@@ -73,7 +79,7 @@ final class StatOpenDetailsReconciliationTest extends MauticMysqlTestCase
 
         // Add a second row without flushing, then call setOpenDetails() with content that
         // references neither the already-persisted row nor the one just added.
-        $stat->addOpenDetails(['datetime' => '2026-01-02 00:00:00', 'useragent' => 'UA-unflushed']);
+        $stat->addOpenDetails(['datetime' => self::DATE_TWO, 'useragent' => 'UA-unflushed']);
         $stat->setOpenDetails([
             ['datetime' => '2026-01-03 00:00:00', 'useragent' => 'UA-replacement'],
         ]);
@@ -95,8 +101,8 @@ final class StatOpenDetailsReconciliationTest extends MauticMysqlTestCase
         $stat = new Stat();
         $stat->setEmailAddress('edited@doe.cz');
         $stat->setDateSent(new \DateTime());
-        $stat->addOpenDetails(['datetime' => '2026-01-01 00:00:00', 'useragent' => 'UA-original']);
-        $stat->addBounceDetails(['datetime' => '2026-01-02 00:00:00', 'reason' => 'Original reason']);
+        $stat->addOpenDetails(['datetime' => self::DATE_ONE, 'useragent' => 'UA-original']);
+        $stat->addBounceDetails(['datetime' => self::DATE_TWO, 'reason' => 'Original reason']);
 
         $this->em->persist($stat);
         $this->em->flush();
@@ -109,7 +115,7 @@ final class StatOpenDetailsReconciliationTest extends MauticMysqlTestCase
         $numericKeys                                           = array_values(array_filter(array_keys($openDetails), 'is_int'));
         $openKey                                               = $numericKeys[0];
         $openDetails[$openKey]['useragent']                    = 'UA-edited';
-        $openDetails[StatOpenDetail::BOUNCES_KEY][0]['reason'] = 'Edited reason';
+        $openDetails[StatOpenDetail::BOUNCES_KEY][0]['reason'] = self::EDITED_REASON;
 
         $stat->setOpenDetails($openDetails);
         $this->em->persist($stat);
@@ -117,7 +123,7 @@ final class StatOpenDetailsReconciliationTest extends MauticMysqlTestCase
 
         $updated = $stat->getOpenDetails();
         Assert::assertSame('UA-edited', $updated[$openKey]['useragent']);
-        Assert::assertSame('Edited reason', $updated[StatOpenDetail::BOUNCES_KEY][0]['reason']);
+        Assert::assertSame(self::EDITED_REASON, $updated[StatOpenDetail::BOUNCES_KEY][0]['reason']);
 
         // Re-query to confirm the stored rows themselves changed, not just the in-memory entities.
         $rows = $this->connection->fetchAllAssociative(
@@ -126,7 +132,7 @@ final class StatOpenDetailsReconciliationTest extends MauticMysqlTestCase
         );
         $storedContent = implode(' ', array_column($rows, 'open_detail'));
         Assert::assertStringContainsString('UA-edited', $storedContent);
-        Assert::assertStringContainsString('Edited reason', $storedContent);
+        Assert::assertStringContainsString(self::EDITED_REASON, $storedContent);
         Assert::assertStringNotContainsString('UA-original', $storedContent);
         Assert::assertStringNotContainsString('Original reason', $storedContent);
     }
