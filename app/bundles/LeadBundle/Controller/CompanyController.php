@@ -238,6 +238,100 @@ final class CompanyController extends FormController
     }
 
     /**
+     * Removes selected contacts from a company.
+     */
+    public function batchRemoveContactsAction(Request $request, $objectId): Response
+    {
+        $returnUrl = $this->generateUrl('mautic_company_action', [
+            'objectAction' => 'view',
+            'objectId'     => $objectId,
+        ]);
+        $flashes = [];
+
+        $postActionVars = [
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => [
+                'objectAction' => 'view',
+                'objectId'     => $objectId,
+            ],
+            'contentTemplate' => 'Mautic\LeadBundle\Controller\CompanyController::viewAction',
+            'passthroughVars' => [
+                'activeLink'    => '#mautic_company_index',
+                'mauticContent' => 'company',
+            ],
+        ];
+
+        $company = $this->companyModel->getEntity($objectId);
+        if (null === $company) {
+            $flashes[] = [
+                'type'    => 'error',
+                'msg'     => 'mautic.company.error.notfound',
+                'msgVars' => ['%id%' => $objectId],
+            ];
+        } elseif (!$this->security->hasEntityAccess(
+            'lead:leads:viewown',
+            'lead:leads:viewother',
+            $company->getPermissionUser()
+        )) {
+            $this->throwAccessDenied();
+        } elseif (Request::METHOD_POST === $request->getMethod()) {
+            $ids = json_decode($request->query->get('ids', '[]'), true);
+
+            if (is_array($ids)) {
+                $companyContactIds = array_map(
+                    intval(...),
+                    array_column(
+                        $this->companyModel->getCompanyLeadRepository()->getCompanyLeads($objectId),
+                        'lead_id'
+                    )
+                );
+                $removed = 0;
+
+                foreach ($ids as $contactId) {
+                    $contactId = (int) $contactId;
+                    if (!in_array($contactId, $companyContactIds, true)) {
+                        continue;
+                    }
+
+                    $contact = $this->leadModel->getEntity($contactId);
+                    if (null === $contact) {
+                        continue;
+                    }
+
+                    if (!$this->security->hasEntityAccess(
+                        'lead:leads:editown',
+                        'lead:leads:editother',
+                        $contact->getPermissionUser()
+                    )) {
+                        $flashes[] = $this->getAccessDeniedFlash();
+
+                        continue;
+                    }
+
+                    if ($this->leadModel->isLocked($contact)) {
+                        $flashes[] = $this->isLocked($postActionVars, $contact, 'lead', true);
+
+                        continue;
+                    }
+
+                    $this->companyModel->removeLeadFromCompany($company, $contact);
+                    ++$removed;
+                }
+
+                $flashes[] = [
+                    'type'    => 'notice',
+                    'msg'     => 'mautic.company.contacts.notice.batch_removed',
+                    'msgVars' => ['%count%' => $removed],
+                ];
+            }
+        }
+
+        return $this->postActionRedirect(
+            array_merge($postActionVars, ['flashes' => $flashes])
+        );
+    }
+
+    /**
      * Generates new form and processes post data.
      *
      * @param Company $entity
