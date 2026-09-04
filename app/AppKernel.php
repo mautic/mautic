@@ -226,7 +226,7 @@ class AppKernel extends Kernel
         $this->initializeContainer();
 
         // boot bundles
-        foreach ($this->getBundles() as $name => $bundle) {
+        foreach ($this->getBundles() as $bundle) {
             $bundle->setContainer($this->container);
             $bundle->boot();
         }
