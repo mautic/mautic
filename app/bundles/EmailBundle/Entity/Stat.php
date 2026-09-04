@@ -3,6 +3,7 @@
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -113,9 +114,9 @@ class Stat
     private $replies;
 
     /**
-     * @var ?StatData
+     * @var ArrayCollection|StatData[]
      */
-    private $data;
+    private $dataCollection;
 
     /**
      * @var ArrayCollection|StatOpenDetail[]
@@ -130,9 +131,12 @@ class Stat
     public function __construct()
     {
         $this->replies         = new ArrayCollection();
-        $this->data            = new StatData();
+        $this->dataCollection  = new ArrayCollection();
         $this->dataOpenDetails = new ArrayCollection();
-        $this->data->setStat($this);
+
+        $data = new StatData();
+        $data->setStat($this);
+        $this->dataCollection->add($data);
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -231,25 +235,19 @@ class Stat
             ->cascadeAll()
             ->build();
 
-        // NOTE: All open details and tokens data for new entries are now stored in
-        // separate tables to allow for better performance and easier compaction,
-        // as that table can be truncated over time freeing up space in the table
-        // by clearing entire rows, rather than just shrinking rows in place in an
-        // existing table that leaves fragmentation.
-        // Existing data is maintained for backward compatibility, and to prevent
-        // upgrades from needing a massive long migration process on extremely
-        // large tables. Users are free to shrink the existing table manually if
-        // they wish to do so. But going forward, there is now a separate table
-        // that is fully maintained and recycled over time for open details and
-        // tokens that was the largest bulk of the data stored in this table.
-        $builder->createOneToOne('data', StatData::class)
+        // Mapped as OneToMany rather than OneToOne so it can lazy-load: an inverse-side to-one
+        // can never be lazy, which would force it onto every Stat hydration in Mautic. The
+        // shared-primary-key column on StatData still enforces at most one row per stat.
+        $builder->createOneToMany('dataCollection', StatData::class)
             ->mappedBy('stat')
             ->cascadeAll()
             ->build();
 
         $builder->createOneToMany('dataOpenDetails', StatOpenDetail::class)
+            ->orphanRemoval()
             ->mappedBy('stat')
             ->cascadeAll()
+            ->fetchExtraLazy()
             ->build();
     }
 
@@ -304,7 +302,9 @@ class Stat
         $dateSent = $this->toDateTime($dateSent);
         $this->addChange('dateSent', $this->dateSent, $dateSent);
         $this->dateSent = $dateSent;
-        $this->data->setDateSent($dateSent);
+        $this->getData()->setDateSent($dateSent);
+        // Denormalised onto each child row so MaintenanceSubscriber can compact
+        // email_stats_open_details by date_sent without joining email_stats.
         foreach ($this->dataOpenDetails as $detail) {
             $detail->setDateSent($dateSent);
         }
@@ -601,24 +601,36 @@ class Stat
         $this->replies[] = $reply;
     }
 
+    /**
+     * @return Collection<int,StatOpenDetail>
+     */
+    public function getDataOpenDetails(): Collection
+    {
+        return $this->dataOpenDetails;
+    }
+
     public function getData(): StatData
     {
-        if (null === $this->data) {
-            $this->data = new StatData();
-            $this->data->setStat($this);
-            $this->data->setDateSent($this->dateSent);
+        if ($this->dataCollection->isEmpty()) {
+            $data = new StatData();
+            $data->setStat($this);
+            $data->setDateSent($this->dateSent);
+            $this->dataCollection->add($data);
         }
 
-        return $this->data;
+        return $this->dataCollection->first();
     }
 
     /**
-     * @return array|null
+     * @return array
      */
     public function getTokens()
     {
         // Maintain existing data from email_stats
-        return array_merge($this->tokens, $this->data ? $this->data->getTokens() : []);
+        $tokens     = is_array($this->tokens) ? $this->tokens : [];
+        $dataTokens = $this->dataCollection->isEmpty() ? null : $this->dataCollection->first()->getTokens();
+
+        return array_merge($tokens, is_array($dataTokens) ? $dataTokens : []);
     }
 
     public function setTokens(array $tokens): void
@@ -629,17 +641,38 @@ class Stat
     }
 
     /**
-     * @param array $details
+     * @param array<string,mixed> $details
      */
-    public function addOpenDetails($details): void
+    public function addOpenDetails(array $details, bool $increaseOpenCount = true): void
     {
+        $storedCount = $increaseOpenCount ? $this->getOpenCount() : $this->dataOpenDetails->count();
+        if (self::MAX_OPEN_DETAILS > $storedCount) {
+            $entity = new StatOpenDetail();
+            $entity->setStat($this);
+            $entity->setDateSent($this->dateSent ?? new \DateTime());
+            $entity->setOpenDetail($details);
+            $this->dataOpenDetails->add($entity);
+        }
+
+        if ($increaseOpenCount) {
+            ++$this->openCount;
+        }
+    }
+
+    /**
+     * @param array<string,mixed> $details
+     */
+    public function addBounceDetails(array $details): void
+    {
+        if (self::MAX_OPEN_DETAILS <= $this->dataOpenDetails->count()) {
+            return;
+        }
+
         $entity = new StatOpenDetail();
         $entity->setStat($this);
-        $entity->setDateSent($this->dateSent);
-        $entity->setOpenDetail($details);
+        $entity->setDateSent($this->dateSent ?? new \DateTime());
+        $entity->setOpenDetail([StatOpenDetail::BOUNCES_KEY => [$details]]);
         $this->dataOpenDetails->add($entity);
-
-        ++$this->openCount;
     }
 
     /**
@@ -648,29 +681,67 @@ class Stat
     public function getOpenDetails()
     {
         // Maintain existing data from email_stats
-        $openDetails = $this->openDetails;
+        $openDetails = is_array($this->openDetails) ? $this->openDetails : [];
         foreach ($this->dataOpenDetails as $entity) {
-            $openDetails[] = $entity->getOpenDetail();
+            $openDetails = StatOpenDetail::mergeOpenDetail($openDetails, $entity->getOpenDetail(), $entity->getId());
         }
 
         return $openDetails;
     }
 
     /**
+     * @param array<int|string,mixed> $openDetails
+     *
      * @return Stat
      */
     public function setOpenDetails(array $openDetails)
     {
-        // Migrate data to the new data table
-        // Since we are setting, we clear existing data
         $this->openDetails = [];
-        $this->dataOpenDetails->clear();
-        foreach ($openDetails as $detail) {
-            $entity = new StatOpenDetail();
-            $entity->setStat($this);
-            $entity->setDateSent($this->dateSent);
-            $entity->setOpenDetail($detail);
-            $this->dataOpenDetails->add($entity);
+
+        $keepPayloads = [];
+        $toAdd        = [];
+
+        foreach ($openDetails as $key => $detail) {
+            if (StatOpenDetail::BOUNCES_KEY === $key) {
+                foreach ($detail as $bounce) {
+                    $id = $bounce[StatOpenDetail::ROW_ID_KEY] ?? null;
+                    unset($bounce[StatOpenDetail::ROW_ID_KEY]);
+                    if (null !== $id) {
+                        $keepPayloads[$id] = [StatOpenDetail::BOUNCES_KEY => [$bounce]];
+                    } else {
+                        $toAdd[] = ['bounce', $bounce];
+                    }
+                }
+                continue;
+            }
+
+            $id = $detail[StatOpenDetail::ROW_ID_KEY] ?? null;
+            unset($detail[StatOpenDetail::ROW_ID_KEY]);
+            if (null !== $id) {
+                $keepPayloads[$id] = $detail;
+            } else {
+                $toAdd[] = ['open', $detail];
+            }
+        }
+
+        // A row whose id is referenced in $openDetails is updated to match the (possibly edited)
+        // content supplied for it; every other row is removed, whether or not it has been flushed
+        // yet, so the result always matches $openDetails exactly.
+        foreach ($this->dataOpenDetails as $entity) {
+            $id = $entity->getId();
+            if (isset($keepPayloads[$id])) {
+                $entity->setOpenDetail($keepPayloads[$id]);
+            } else {
+                $this->dataOpenDetails->removeElement($entity);
+            }
+        }
+
+        foreach ($toAdd as [$type, $detail]) {
+            if ('bounce' === $type) {
+                $this->addBounceDetails($detail);
+            } else {
+                $this->addOpenDetails($detail, false);
+            }
         }
 
         return $this;

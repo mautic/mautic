@@ -36,7 +36,7 @@ final class StatHelperTest extends \PHPUnit\Framework\TestCase
             $stat = $this->createMock(Stat::class);
 
             $stat->method('getId')
-                ->willReturn((string) $counter);
+                ->willReturn($counter);
 
             $stat->method('getEmail')
                 ->willReturn($mockEmail);

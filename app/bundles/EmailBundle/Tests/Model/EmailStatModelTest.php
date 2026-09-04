@@ -34,7 +34,7 @@ final class EmailStatModelTest extends TestCase
                     $this->assertInstanceOf(StatTest::class, $entities[0]);
 
                     // Emulate database adding the entity some autoincrement ID.
-                    $entities[0]->setId('123');
+                    $entities[0]->setId(123);
                 }
             );
 
@@ -53,7 +53,7 @@ final class EmailStatModelTest extends TestCase
                     case 1:
                         Assert::assertSame(EmailEvents::ON_EMAIL_STAT_POST_SAVE, $eventName);
                         Assert::assertCount(1, $event->getStats());
-                        Assert::assertSame('123', $event->getStats()[0]->getId());
+                        Assert::assertSame(123, $event->getStats()[0]->getId());
                         break;
                 }
                 ++$this->dispatchMethodCounter;
@@ -74,9 +74,9 @@ final class EmailStatModelTest extends TestCase
 
 final class StatTest extends Stat
 {
-    private ?string $id = null;
+    private ?int $id = null;
 
-    public function setId(string $id): void
+    public function setId(int $id): void
     {
         $this->id = $id;
     }

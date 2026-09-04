@@ -10,12 +10,12 @@ class StatData
 {
     public const TABLE_NAME = 'email_stats_data';
 
-    private ?Stat $stat;
+    private ?Stat $stat = null;
 
     private ?\DateTimeInterface $dateSent = null;
 
     /**
-     * @var array
+     * @var array|null
      */
     private $tokens = [];
 
@@ -79,11 +79,11 @@ class StatData
     }
 
     /**
-     * @return array|null
+     * @return array
      */
     public function getTokens()
     {
-        return $this->tokens;
+        return $this->tokens ?? [];
     }
 
     public function setTokens(array $tokens): void

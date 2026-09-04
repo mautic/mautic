@@ -32,8 +32,9 @@ class MaintenanceSubscriber implements EventSubscriberInterface
 
         $compactionThresholdDays = (int) $this->coreParametersHelper->get('email_stats_compaction_threshold_days', 0);
         if ($compactionThresholdDays > 0) {
-            $thresholdDate = new \DateTime();
-            $thresholdDate->modify('-'.$compactionThresholdDays.' days');
+            // date_sent is always stored in UTC, so the threshold must be computed in UTC too,
+            // independent of the request/session timezone.
+            $thresholdDate = new \DateTime('-'.$compactionThresholdDays.' days', new \DateTimeZone('UTC'));
             $this->onDataCleanupForTable($event, $thresholdDate, 'email_stats_data', 'stat_id', $this->translator->trans('mautic.maintenance.email_stats_data'));
             $this->onDataCleanupForTable($event, $thresholdDate, 'email_stats_open_details', 'stat_id', $this->translator->trans('mautic.maintenance.email_stats_open_details'));
         }

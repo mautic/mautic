@@ -70,16 +70,11 @@ final readonly class TransportCallback
             $stat->setIsFailed(true);
         }
 
-        $openDetails = $stat->getOpenDetails();
-        if (!isset($openDetails['bounces'])) {
-            $openDetails['bounces'] = [];
-        }
-        $dtHelper                 = new DateTimeHelper();
-        $openDetails['bounces'][] = [
+        $dtHelper = new DateTimeHelper();
+        $stat->addBounceDetails([
             'datetime' => $dtHelper->toUtcString(),
             'reason'   => $comments,
-        ];
-        $stat->setOpenDetails($openDetails);
+        ]);
         $this->emailStatModel->saveEntity($stat);
     }
 }

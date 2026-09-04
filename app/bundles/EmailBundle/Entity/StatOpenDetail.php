@@ -10,13 +10,17 @@ class StatOpenDetail
 {
     public const TABLE_NAME = 'email_stats_open_details';
 
+    public const BOUNCES_KEY = 'bounces';
+
+    public const ROW_ID_KEY = '_id';
+
     private ?int $id = null;
 
-    private ?Stat $stat;
+    private ?Stat $stat = null;
 
     private ?\DateTimeInterface $dateSent = null;
 
-    private array $openDetail = [];
+    private ?array $openDetail = [];
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
@@ -36,7 +40,39 @@ class StatOpenDetail
             ->columnName('date_sent')
             ->build();
 
-        $builder->addNullableField('openDetail', 'array', 'open_detail');
+        $builder->createField('openDetail', 'array')
+            ->columnName('open_detail')
+            ->length(65535)
+            ->nullable()
+            ->build();
+    }
+
+    /**
+     * Folds one child row's stored entry into a running `Stat::getOpenDetails()`-shaped map.
+     *
+     * Each row holds exactly one entry, so this is a flat, one-shot check rather than a loop:
+     * a row either carries the reserved 'bounces' key (one bounce entry, wrapped once) or it
+     * is a bare open entry.
+     *
+     * @param array<int|string,mixed> $openDetails
+     * @param array<string,mixed>     $openDetail
+     *
+     * @return array<int|string,mixed>
+     */
+    public static function mergeOpenDetail(array $openDetails, array $openDetail, ?int $id): array
+    {
+        if (isset($openDetail[self::BOUNCES_KEY])) {
+            $entry                             = $openDetail[self::BOUNCES_KEY][0];
+            $entry[self::ROW_ID_KEY]           = $id;
+            $openDetails[self::BOUNCES_KEY][]  = $entry;
+
+            return $openDetails;
+        }
+
+        $openDetail[self::ROW_ID_KEY] = $id;
+        $openDetails[]                = $openDetail;
+
+        return $openDetails;
     }
 
     /**
@@ -86,7 +122,7 @@ class StatOpenDetail
      */
     public function getOpenDetail()
     {
-        return $this->openDetail;
+        return $this->openDetail ?? [];
     }
 
     /**

@@ -518,7 +518,7 @@ class StatRepository extends CommonRepository
             $options,
             'storedSubject, e.subject',
             $timestampColumn,
-            [],
+            ['openDetails'],
             ['dateRead', 'dateSent'],
             $timeToReadParser,
             's.id',
@@ -527,7 +527,8 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * Load and deserialize open details for a set of stats.
+     * Load and deserialize open details for a set of stats, merging the legacy `open_details`
+     * column (already decoded by `getTimelineResults()`) with the compacted child rows.
      *
      * @param array<int,array<string,mixed>> $results
      *
@@ -548,11 +549,19 @@ class StatRepository extends CommonRepository
         $openDetails = $query->executeQuery()->fetchAllAssociative();
         $resultById  = [];
         foreach ($results as &$stat) {
-            $stat['openDetails']     = [];
+            $stat['openDetails']     = is_array($stat['openDetails'] ?? null) ? $stat['openDetails'] : [];
             $resultById[$stat['id']] = &$stat;
         }
+        unset($stat);
         foreach ($openDetails as $detail) {
-            $resultById[$detail['stat_id']]['openDetails'][] = Serializer::decode($detail['open_detail']);
+            if (null === $detail['open_detail']) {
+                continue;
+            }
+            $resultById[$detail['stat_id']]['openDetails'] = StatOpenDetail::mergeOpenDetail(
+                $resultById[$detail['stat_id']]['openDetails'],
+                Serializer::decode($detail['open_detail']),
+                null,
+            );
         }
 
         return $results;
