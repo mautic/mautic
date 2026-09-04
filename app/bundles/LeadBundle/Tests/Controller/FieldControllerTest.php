@@ -16,6 +16,20 @@ final class FieldControllerTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
+    public function testFieldListOffersIndexedAndUniqueQuickFilters(): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/fields');
+
+        $this->assertResponseIsSuccessful();
+        $filterButton = $crawler->filter('button[data-toggle="popover"]');
+        $filterContent = $filterButton->attr('data-content');
+
+        $this->assertCount(1, $filterButton);
+        $this->assertNotNull($filterContent);
+        $this->assertStringContainsString('Indexed', $filterContent);
+        $this->assertStringContainsString('Unique', $filterContent);
+    }
+
     public function testLengthValidationOnLabelFieldWhenAddingCustomFieldFailure(): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/fields/new');
