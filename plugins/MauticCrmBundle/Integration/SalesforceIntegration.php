@@ -329,10 +329,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return parent::getFormNotes($section);
     }
 
-    /**
-     * @return mixed
-     */
-    public function getFetchQuery($params)
+    public function getFetchQuery(array $params): array
     {
         return $params;
     }
@@ -835,15 +832,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array  $params
-     * @param array  $result
-     * @param string $object
-     *
-     * @return array|null
-     *
      * @phpstan-impure
      */
-    public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'Lead'): array
+    public function getLeads(array $params = [], $query = null, &$executed = null, array $result = [], string $object = 'Lead'): array
     {
         if (!$query) {
             $query = $this->getFetchQuery($params);
@@ -958,22 +949,15 @@ class SalesforceIntegration extends CrmAbstractIntegration
         );
     }
 
-    /**
-     * @param array $params
-     *
-     * @return array|null
-     */
-    public function getCompanies($params = [], $query = null, $executed = null)
+    public function getCompanies(array $params = [], $query = null, $executed = null): array
     {
         return $this->getLeads($params, $query, $executed, [], 'Account');
     }
 
     /**
-     * @param array $params
-     *
      * @throws \Exception
      */
-    public function pushLeadActivity($params = []): ?int
+    public function pushLeadActivity(array $params = []): ?int
     {
         $executed = null;
 

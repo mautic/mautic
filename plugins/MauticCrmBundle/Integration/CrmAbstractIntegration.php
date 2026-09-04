@@ -82,10 +82,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         return false;
     }
 
-    /**
-     * @param array $params
-     */
-    public function getLeads($params, $query, &$executed, $result = [], $object = 'Lead')
+    public function getLeads(array $params, $query, ?array &$executed, array $result = [], string $object = 'Lead')
     {
         $executed = null;
 
@@ -114,7 +111,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     /**
      * get query to fetch lead data.
      */
-    public function getFetchQuery($config)
+    public function getFetchQuery(array $config)
     {
         return null;
     }
@@ -161,10 +158,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         return $this->helper;
     }
 
-    /**
-     * @param array $params
-     */
-    public function pushLeadActivity($params = [])
+    public function pushLeadActivity(array $params = []): ?int
     {
         return null;
     }
