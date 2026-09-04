@@ -76,6 +76,6 @@ final class HtmlExtension extends AbstractExtension
 
     public function htmlEntityDecode(string $content): string
     {
-        return html_entity_decode($content);
+        return html_entity_decode($content, ENT_QUOTES | ENT_HTML5, 'UTF-8');
     }
 }
