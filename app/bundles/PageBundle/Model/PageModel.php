@@ -378,6 +378,10 @@ class PageModel extends FormModel
             return;
         }
 
+        if ($request->isMethod('HEAD')) {
+            return;
+        }
+
         // Process the query
         if (empty($query) || !is_array($query)) {
             $query = $this->getHitQuery($request, $page);

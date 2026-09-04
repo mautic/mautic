@@ -15,6 +15,17 @@ use Symfony\Component\HttpFoundation\Request;
 
 class PageModelTest extends PageTestAbstract
 {
+    public function testHeadRequestDoesNotCreatePageHit(): void
+    {
+        $pageModel = $this->getPageModel();
+        $lead      = (new Lead())->setId(1);
+
+        $this->security->method('isAnonymous')->willReturn(true);
+        $this->ipLookupHelper->expects($this->never())->method('getIpAddress');
+
+        $pageModel->hitPage(null, Request::create('/', 'HEAD'), '200', $lead);
+    }
+
     public function testUtf8CharsInTitleWithTransletirationEnabled(): void
     {
         $providedTitle = '你好，世界';

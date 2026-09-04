@@ -44,6 +44,16 @@ class PageTestAbstract extends TestCase
      */
     protected $router;
 
+    /**
+     * @var IpLookupHelper|MockObject
+     */
+    protected $ipLookupHelper;
+
+    /**
+     * @var CorePermissions|MockObject
+     */
+    protected $security;
+
     protected function setUp(): void
     {
         $this->mockTrackingId = hash('sha1', uniqid(mt_rand(), true));
@@ -61,10 +71,12 @@ class PageTestAbstract extends TestCase
 
         $this->router = $this->createMock(Router::class);
 
-        $ipLookupHelper = $this
+        $this->ipLookupHelper = $this
             ->getMockBuilder(IpLookupHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
+
+        $this->security = $this->createMock(CorePermissions::class);
 
         $leadModel = $this
             ->getMockBuilder(LeadModel::class)
@@ -154,7 +166,7 @@ class PageTestAbstract extends TestCase
 
         $pageModel = new PageModel(
             $cookieHelper,
-            $ipLookupHelper,
+            $this->ipLookupHelper,
             $leadModel,
             $leadFieldModel,
             $redirectModel,
@@ -166,7 +178,7 @@ class PageTestAbstract extends TestCase
             $coreParametersHelper,
             $contactRequestHelper,
             $entityManager,
-            $this->createMock(CorePermissions::class),
+            $this->security,
             $dispatcher,
             $this->router,
             $translator,
