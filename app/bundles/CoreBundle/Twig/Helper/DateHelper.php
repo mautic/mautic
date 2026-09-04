@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Twig\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -9,7 +11,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final readonly class DateHelper
 {
     /**
-     * @var string[]
+     * @var array<string, string>
      */
     private array $formats;
 
@@ -34,12 +36,7 @@ final readonly class DateHelper
         $this->helper = $helper ?? new DateTimeHelper('', 'Y-m-d H:i:s', 'local');
     }
 
-    /**
-     * @param \DateTime|string $datetime
-     *
-     * @return string
-     */
-    private function format(string $type, $datetime, string $timezone, ?string $fromFormat)
+    private function format(string $type, mixed $datetime, string $timezone, ?string $fromFormat): string
     {
         if (empty($datetime)) {
             return '';
@@ -54,11 +51,9 @@ final readonly class DateHelper
     /**
      * Returns full date. eg. October 8, 2014 21:19.
      *
-     * @param \DateTime|string $datetime
-     *
-     * @return string
+     * @param \DateTimeInterface|string $datetime
      */
-    public function toFull($datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s')
+    public function toFull(mixed $datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s'): string
     {
         return $this->format('datetime', $datetime, $timezone, $fromFormat);
     }
@@ -66,11 +61,9 @@ final readonly class DateHelper
     /**
      * Returns date and time concat eg 2014-08-02 5:00am.
      *
-     * @param \DateTime|string $datetime
-     *
-     * @return string
+     * @param \DateTimeInterface|string $datetime
      */
-    public function toFullConcat($datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s')
+    public function toFullConcat(mixed $datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s'): string
     {
         $this->helper->setDateTime($datetime, $fromFormat, $timezone);
 
@@ -82,11 +75,9 @@ final readonly class DateHelper
     /**
      * Returns short date format eg Sun, Oct 8.
      *
-     * @param \DateTime|string $datetime
-     *
-     * @return string
+     * @param \DateTimeInterface|string $datetime
      */
-    public function toShort($datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s')
+    public function toShort(mixed $datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s'): string
     {
         return $this->format('short', $datetime, $timezone, $fromFormat);
     }
@@ -94,11 +85,9 @@ final readonly class DateHelper
     /**
      * Returns date only e.g. 2014-08-09.
      *
-     * @param \DateTime|string $datetime
-     *
-     * @return string
+     * @param \DateTimeInterface|string $datetime
      */
-    public function toDate($datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s')
+    public function toDate(mixed $datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s'): string
     {
         return $this->format('date', $datetime, $timezone, $fromFormat);
     }
@@ -106,11 +95,9 @@ final readonly class DateHelper
     /**
      * Returns time only e.g. 21:19.
      *
-     * @param \DateTime|string $datetime
-     *
-     * @return string
+     * @param \DateTimeInterface|string $datetime
      */
-    public function toTime($datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s')
+    public function toTime(mixed $datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s'): string
     {
         return $this->format('time', $datetime, $timezone, $fromFormat);
     }
@@ -118,10 +105,10 @@ final readonly class DateHelper
     /**
      * Returns date/time like Today, 10:00 AM.
      *
-     * @param string|int<min, -1>|int<1, max>|\DateTime $datetime
-     * @param bool                                      $forceDateForNonText If true, return as full date/time rather than "29 days ago"
+     * @param string|int<min, -1>|int<1, max>|\DateTimeInterface $datetime
+     * @param bool                                               $forceDateForNonText If true, return as full date/time rather than "29 days ago"
      */
-    public function toText($datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s', $forceDateForNonText = false): string
+    public function toText(mixed $datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s', bool $forceDateForNonText = false): string
     {
         if (empty($datetime)) {
             return '';
@@ -198,11 +185,11 @@ final readonly class DateHelper
     }
 
     /**
-     * Returns a humanized date string like "X hours ago".
+     * Returns a humanized date string like "X hours ago" or "in X hours".
      *
-     * @param \DateTime|string $datetime
+     * @param \DateTimeInterface|string $datetime
      */
-    public function toHumanized($datetime, string $timezone = 'local', string $fromFormat = 'Y-m-d H:i:s'): string
+    public function toHumanized(mixed $datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s'): string
     {
         if (empty($datetime)) {
             return '';
@@ -211,26 +198,41 @@ final readonly class DateHelper
         $this->helper->setDateTime($datetime, $fromFormat, $timezone);
         $date = $this->helper->getDateTime();
 
-        // Use default timezone if 'local' is provided
         $nowTimezone = ('local' === $timezone) ? date_default_timezone_get() : $timezone;
         $now         = new \DateTime('now', new \DateTimeZone($nowTimezone));
 
-        $diff = $now->diff($date);
+        $diff     = $now->diff($date);
+        $isFuture = $date > $now;
 
+        return $this->getHumanizedTimeString($diff, $isFuture);
+    }
+
+    private function getHumanizedTimeString(\DateInterval $diff, bool $isFuture): string
+    {
         if ($diff->y > 0) {
-            return $this->translator->trans('mautic.core.date.years.ago', ['%count%' => $diff->y]);
+            return $isFuture
+                ? $this->translator->trans('mautic.core.date.years.in', ['%count%' => $diff->y])
+                : $this->translator->trans('mautic.core.date.years.ago', ['%count%' => $diff->y]);
         }
         if ($diff->m > 0) {
-            return $this->translator->trans('mautic.core.date.months.ago', ['%count%' => $diff->m]);
+            return $isFuture
+                ? $this->translator->trans('mautic.core.date.months.in', ['%count%' => $diff->m])
+                : $this->translator->trans('mautic.core.date.months.ago', ['%count%' => $diff->m]);
         }
         if ($diff->d > 0) {
-            return $this->translator->trans('mautic.core.date.days.ago', ['%count%' => $diff->d]);
+            return $isFuture
+                ? $this->translator->trans('mautic.core.date.days.in', ['%count%' => $diff->d])
+                : $this->translator->trans('mautic.core.date.days.ago', ['%count%' => $diff->d]);
         }
         if ($diff->h > 0) {
-            return $this->translator->trans('mautic.core.date.hours.ago', ['%count%' => $diff->h]);
+            return $isFuture
+                ? $this->translator->trans('mautic.core.date.hours.in', ['%count%' => $diff->h])
+                : $this->translator->trans('mautic.core.date.hours.ago', ['%count%' => $diff->h]);
         }
         if ($diff->i > 0) {
-            return $this->translator->trans('mautic.core.date.minutes.ago', ['%count%' => $diff->i]);
+            return $isFuture
+                ? $this->translator->trans('mautic.core.date.minutes.in', ['%count%' => $diff->i])
+                : $this->translator->trans('mautic.core.date.minutes.ago', ['%count%' => $diff->i]);
         }
 
         return $this->translator->trans('mautic.core.date.just.now');
@@ -239,9 +241,9 @@ final readonly class DateHelper
     /**
      * Returns short text date like "Today", "Yesterday", or formatted date.
      *
-     * @param \DateTime|string $datetime
+     * @param \DateTimeInterface|string $datetime
      */
-    public function toTextShort($datetime, string $timezone = 'local', string $fromFormat = 'Y-m-d H:i:s'): string
+    public function toTextShort(mixed $datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s'): string
     {
         if (empty($datetime)) {
             return '';

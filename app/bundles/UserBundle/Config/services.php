@@ -109,6 +109,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->set(Mautic\UserBundle\Security\UserTokenSetter::class);
 
     $services->set('mautic.user.model.user_token_service', Mautic\UserBundle\Model\UserToken\UserTokenService::class);
+
     // Decorate the form_login class to ensure no user enumeration can
     // happen via timing attacks.
     $services->set('mautic.security.authenticator.form_login.decorator', Mautic\UserBundle\Security\TimingSafeFormLoginAuthenticator::class)

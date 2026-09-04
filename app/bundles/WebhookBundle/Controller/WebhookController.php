@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Helper\FormFieldHelper;
+use Mautic\WebhookBundle\Helper\WebhookSearchScopeProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,6 +21,11 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class WebhookController extends FormController
 {
+    /**
+     * @var list<array{command: string, label: string, suffix?: string, default?: bool, translate?: bool}>|null
+     */
+    private ?array $indexSearchScopes = null;
+
     public function __construct(
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
@@ -67,9 +73,28 @@ final class WebhookController extends FormController
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function indexAction(Request $request, $page = 1): Response
+    public function indexAction(Request $request, WebhookSearchScopeProvider $webhookSearchScopeProvider, $page = 1): Response
     {
+        $this->indexSearchScopes = $webhookSearchScopeProvider->getScopes();
+
         return parent::indexStandard($request, $page);
+    }
+
+    /**
+     * @param array<string, mixed> $args
+     * @param string               $action
+     *
+     * @return array<string, mixed>
+     */
+    public function getViewArguments(array $args, $action): array
+    {
+        if ('index' === $action && null !== $this->indexSearchScopes) {
+            $args['viewParameters']['searchScopes'] = $this->indexSearchScopes;
+            $this->indexSearchScopes                = null;
+        }
+
+        // @phpstan-ignore-next-line FormController extends deprecated AbstractStandardFormController; fix requires class hierarchy refactoring
+        return parent::getViewArguments($args, $action);
     }
 
     /**

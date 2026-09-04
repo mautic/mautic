@@ -2,6 +2,7 @@
 
 namespace Mautic\AssetBundle\Controller;
 
+use Mautic\AssetBundle\Helper\AssetSearchScopeProvider;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
@@ -44,7 +45,7 @@ final class AssetController extends FormController
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function indexAction(Request $request, CoreParametersHelper $parametersHelper, AssetModel $assetModel, int $page = 1): Response
+    public function indexAction(Request $request, CoreParametersHelper $parametersHelper, AssetModel $assetModel, AssetSearchScopeProvider $assetSearchScopeProvider, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted([
@@ -131,8 +132,9 @@ final class AssetController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'searchValue' => $search,
-                'items'       => $assets,
+                'searchValue'     => $search,
+                'searchScopes'    => $assetSearchScopeProvider->getScopes(),
+                'items'           => $assets,
                 'categories'  => $categories,
                 'limit'       => $limit,
                 'permissions' => $permissions,

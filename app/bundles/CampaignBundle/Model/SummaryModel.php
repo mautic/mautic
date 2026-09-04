@@ -67,8 +67,8 @@ class SummaryModel extends AbstractCommonModel
             $this->logData[$key] = [
                 'campaignId' => $campaign->getId(),
                 'eventId'    => $event->getId(),
-                'dateFrom'   => $dateFrom,
-                'dateTo'     => $dateTo,
+                'dateFrom'   => clone $dateFrom,
+                'dateTo'     => clone $dateTo,
             ];
         }
 
@@ -158,6 +158,10 @@ class SummaryModel extends AbstractCommonModel
      */
     public function persistSummaries(): void
     {
+        if (!$this->logData) {
+            return;
+        }
+
         foreach ($this->logData as $log) {
             $dateFrom   = $log['dateFrom'];
             $dateTo     = $log['dateTo'];
@@ -165,6 +169,8 @@ class SummaryModel extends AbstractCommonModel
             $eventId    = $log['eventId'];
             $this->summaryRepository->summarize($dateFrom, $dateTo, $campaignId, $eventId);
         }
+
+        $this->logData = [];
     }
 
     private function outputProcessTime(\DateTime $startedAt, OutputInterface $output): void

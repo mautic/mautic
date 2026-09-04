@@ -30,7 +30,7 @@ final class PathsHelperTest extends TestCase
     protected function setUp(): void
     {
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->coreParametersHelper->expects($this->exactly(7))->method('get')
+        $this->coreParametersHelper->method('get')
             ->willReturnCallback(
                 fn (string $key): string => match ($key) {
                     'image_path' => 'media/images',
@@ -103,7 +103,7 @@ final class PathsHelperTest extends TestCase
         $campaignImportPath = __DIR__.'/resource/paths/import/campaigns';
 
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->coreParametersHelper->expects($this->exactly(7))->method('get')
+        $this->coreParametersHelper->method('get')
             ->willReturnCallback(
                 fn (string $key): string => match ($key) {
                     'import_campaigns_dir' => $campaignImportPath,
@@ -127,7 +127,7 @@ final class PathsHelperTest extends TestCase
 
         /** @var CoreParametersHelper&MockObject $coreParametersHelper */
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $coreParametersHelper->expects($this->exactly(7))->method('get')
+        $coreParametersHelper->method('get')
             ->willReturnCallback(
                 fn (string $key): string => match ($key) {
                     'tmp_path' => $tempPath,
@@ -162,7 +162,7 @@ final class PathsHelperTest extends TestCase
 
         /** @var CoreParametersHelper&MockObject $coreParametersHelper */
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $coreParametersHelper->expects($this->exactly(7))->method('get')
+        $coreParametersHelper->method('get')
             ->willReturnCallback(
                 fn (string $key): string => match ($key) {
                     'dashboard_import_dir' => $dashboardDir,

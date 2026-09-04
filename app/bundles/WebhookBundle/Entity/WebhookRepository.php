@@ -11,6 +11,9 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class WebhookRepository extends CommonRepository
 {
+    /**
+     * @return array{0: mixed, 1: array<string, mixed>}
+     */
     protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return $this->addStandardCatchAllWhereClause($queryBuilder, $filter, ['e.name']);
@@ -18,7 +21,20 @@ class WebhookRepository extends CommonRepository
 
     protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
-        return $this->addStandardSearchCommandWhereClause($queryBuilder, $filter);
+        [$expr, $parameters] = parent::addSearchCommandWhereClause($queryBuilder, $filter);
+
+        if (false !== $expr) {
+            return [$expr, $parameters];
+        }
+
+        $command = $filter->command;
+
+        return match ($command) {
+            $this->translator->trans('mautic.core.searchcommand.name'), $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US') => $this->addStandardCatchAllWhereClause($queryBuilder, $filter, [
+                $this->getTableAlias().'.name',
+            ]),
+            default => $this->addStandardSearchCommandWhereClause($queryBuilder, $filter),
+        };
     }
 
     /**
@@ -26,7 +42,10 @@ class WebhookRepository extends CommonRepository
      */
     public function getSearchCommands(): array
     {
-        return $this->getStandardSearchCommands();
+        return array_merge(
+            ['mautic.core.searchcommand.name'],
+            $this->getStandardSearchCommands()
+        );
     }
 
     /**

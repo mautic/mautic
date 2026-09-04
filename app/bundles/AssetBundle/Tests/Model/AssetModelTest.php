@@ -22,6 +22,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactory;
@@ -233,9 +234,11 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
             ->method('getContact')
             ->willReturn($lead);
 
+        $trackedDevice = $this->createMock(LeadDevice::class);
+        $trackedDevice->method('getTrackingId')->willReturn('test-tracking-id');
         $this->deviceTrackingService->expects($this->once())
             ->method('getTrackedDevice')
-            ->willReturn(null);
+            ->willReturn($trackedDevice);
 
         $this->assetRepository->expects($this->once())
             ->method('upDownloadCount')

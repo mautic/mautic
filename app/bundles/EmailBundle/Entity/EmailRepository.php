@@ -571,6 +571,9 @@ class EmailRepository extends CommonRepository
         return false;
     }
 
+    /**
+     * @return array{0: mixed, 1: array<string, mixed>}
+     */
     protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return $this->addStandardCatchAllWhereClause($queryBuilder, $filter, [
@@ -579,6 +582,9 @@ class EmailRepository extends CommonRepository
         ]);
     }
 
+    /**
+     * @return array{0: mixed, 1: array<string, mixed>}
+     */
     protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($queryBuilder, $filter);
@@ -627,6 +633,16 @@ class EmailRepository extends CommonRepository
                     $filter->string,
                     $filter->not
                 );
+            case $this->translator->trans('mautic.core.searchcommand.name'):
+            case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
+                $expr            = $queryBuilder->expr()->like('e.name', ":$unique");
+                $returnParameter = true;
+                break;
+            case $this->translator->trans('mautic.email.email.searchcommand.subject'):
+            case $this->translator->trans('mautic.email.email.searchcommand.subject', [], null, 'en_US'):
+                $expr            = $queryBuilder->expr()->like('e.subject', ":$unique");
+                $returnParameter = true;
+                break;
         }
 
         if ($expr && $filter->not) {
@@ -653,6 +669,8 @@ class EmailRepository extends CommonRepository
             'mautic.core.searchcommand.isunpublished',
             'mautic.core.searchcommand.isuncategorized',
             'mautic.core.searchcommand.ismine',
+            'mautic.core.searchcommand.name',
+            'mautic.email.email.searchcommand.subject',
             'mautic.email.email.searchcommand.isexpired',
             'mautic.email.email.searchcommand.ispending',
             'mautic.core.searchcommand.category',
@@ -821,7 +839,7 @@ class EmailRepository extends CommonRepository
     private function getPublishedBroadcastsQuery(?int $id = null): Query
     {
         $qb   = $this->createQueryBuilder($this->getTableAlias());
-        $expr = $this->getPublishedByDateExpression($qb, null, true, true, false);
+        $expr = $this->getPublishedByDateOrmExpression($qb, null, true, true, false);
 
         $expr->add(
             $qb->expr()->eq($this->getTableAlias().'.emailType', $qb->expr()->literal('list'))
@@ -935,7 +953,7 @@ class EmailRepository extends CommonRepository
     public function getPublishedEmailsWithVariant(): array
     {
         $qb   = $this->getEntityManager()->createQueryBuilder();
-        $expr = $this->getPublishedByDateExpression($qb, $this->getTableAlias());
+        $expr = $this->getPublishedByDateOrmExpression($qb, $this->getTableAlias());
 
         $qb->select($this->getTableAlias())
             ->from(Email::class, $this->getTableAlias())

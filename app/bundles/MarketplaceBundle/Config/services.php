@@ -27,7 +27,4 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias(Mautic\MarketplaceBundle\Service\RouteProvider::class, 'marketplace.service.route_provider');
     $services->set('marketplace.service.config', Mautic\MarketplaceBundle\Service\Config::class);
     $services->alias(Mautic\MarketplaceBundle\Service\Config::class, 'marketplace.service.config');
-
-    $services->set(Mautic\MarketplaceBundle\Service\Allowlist::class)
-        ->arg('$httpClient', \Symfony\Component\DependencyInjection\Loader\Configurator\service('mautic.http.client'));
 };

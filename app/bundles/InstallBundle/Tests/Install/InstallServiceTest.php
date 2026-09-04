@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Doctrine\Loader\FixturesLoaderInterface;
 use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\InstallBundle\Install\InstallService;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
@@ -177,6 +178,28 @@ final class InstallServiceTest extends \PHPUnit\Framework\TestCase
             ->willReturn('test');
 
         $this->assertSame($messages, $this->installer->checkOptionalSettings($step));
+    }
+
+    public function testCheckOptionalSettingsPassesMemoryLimitParameter(): void
+    {
+        $step = $this->createMock(StepInterface::class);
+        $step->expects($this->once())
+            ->method('checkOptionalSettings')
+            ->willReturn(['mautic.install.memory.limit']);
+
+        $translated = 'The memory_limit setting is lower than the suggested minimum limit of 512M.';
+
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with(
+                'mautic.install.memory.limit',
+                ['%min_memory_limit%' => CheckStep::RECOMMENDED_MEMORY_LIMIT],
+                null,
+                null
+            )
+            ->willReturn($translated);
+
+        $this->assertSame([$translated], $this->installer->checkOptionalSettings($step));
     }
 
     public function testSaveConfigurationWhenNoCacheClear(): void

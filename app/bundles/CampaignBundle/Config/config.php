@@ -56,7 +56,8 @@ return [
         'import_campaigns_dir'                                                                  => '%kernel.project_dir%/var/import',
         'campaigns_resume_stuck_records_after'                                                  => '2025-10-01 00:00:00',
         'campaign_republish_behavior'                                                           => Mautic\CampaignBundle\Enum\RepublishBehavior::COUNT_ALL_TIME->value,
-        'campaign_contact_count_cache_ttl'                                                      => 43200, // 12 hours in seconds
         'campaign_event_cache_ttl'                                                              => 600, // seconds
+        'campaign_contact_count_cache_ttl'                                                      => 43200, // 12 hours in seconds
+        'marketplace_website_url'                                                               => '%env(default::MARKETPLACE_WEBSITE_URL)%',
     ],
 ];

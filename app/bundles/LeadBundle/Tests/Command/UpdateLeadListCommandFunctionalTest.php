@@ -13,6 +13,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\Tag;
+use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -113,20 +114,530 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
             },
         ];
 
-        // But the last built date will not update if we limit how many contacts to process.
+        // When --max-contacts caps a run but all matching contacts are still processed,
+        // the rebuild completes and last built date is updated.
         // Also testing the timing option = 1.
         yield [
             fn (): array => ['--max-contacts' => 1, '--timing' => 1],
             function (LeadList $segment, string $output): void {
-                Assert::assertEquals(
+                // Only one contact matches; the cap is reached but the rebuild is still complete.
+                Assert::assertGreaterThan(
                     new \DateTime('2000-01-01 00:00:00'),
                     $segment->getLastBuiltDate()
                 );
-                Assert::assertNull($segment->getLastBuiltTime());
+                Assert::assertNotNull($segment->getLastBuiltTime());
                 Assert::assertStringContainsString('Total time:', $output);
                 Assert::assertStringContainsString('seconds', $output);
             },
         ];
+    }
+
+    public function testMaxContactsPartialRebuildKeepsBuildingAndUpdatesCountCache(): void
+    {
+        $contacts = [];
+        foreach (['one@example.com', 'two@example.com', 'three@example.com'] as $email) {
+            $contact = new Lead();
+            $contact->setEmail($email);
+            $this->em->persist($contact);
+            $contacts[] = $contact;
+        }
+
+        $segment = new LeadList();
+        $segment->setName('Partial rebuild segment');
+        $segment->setPublicName('Partial rebuild segment');
+        $segment->setAlias('partial-rebuild-segment');
+        $segment->setFilters([
+            [
+                'glue'     => 'and',
+                'field'    => 'email',
+                'object'   => 'lead',
+                'type'     => 'email',
+                'filter'   => 'example.com',
+                'display'  => null,
+                'operator' => 'like',
+            ],
+        ]);
+
+        $longTimeAgo = new \DateTime('2000-01-01 00:00:00');
+        $segment->setDateModified(new \DateTime());
+        $segment->setLastBuiltDate($longTimeAgo);
+
+        $this->em->persist($segment);
+        $this->em->flush();
+        $segmentId = $segment->getId();
+        $this->em->clear();
+
+        $this->assertTrue(
+            $this->em->find(LeadList::class, $segmentId)->needsRebuild(),
+            'Segment should show as building before the partial rebuild'
+        );
+
+        $output = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, [
+            '--list-id'      => $segmentId,
+            '--max-contacts' => 1,
+        ]);
+        $this->assertSame(Command::SUCCESS, $output->getStatusCode());
+
+        /** @var LeadList $segment */
+        $segment = $this->em->find(LeadList::class, $segmentId);
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $segment->getLastBuiltDate());
+        $this->assertTrue($segment->needsRebuild());
+
+        /** @var LeadListRepository $leadListRepository */
+        $leadListRepository = $this->em->getRepository(LeadList::class);
+        $this->assertSame(1, $leadListRepository->getLeadCount([$segmentId]));
+
+        /** @var SegmentCountCacheHelper $segmentCountCacheHelper */
+        $segmentCountCacheHelper = self::getContainer()->get(SegmentCountCacheHelper::class);
+        $this->assertSame(1, $segmentCountCacheHelper->getSegmentContactCount($segmentId));
+
+        // Drain the remaining contacts; the final capped run should mark the rebuild finished.
+        $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, [
+            '--list-id'      => $segmentId,
+            '--max-contacts' => 1,
+        ]);
+        $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, [
+            '--list-id'      => $segmentId,
+            '--max-contacts' => 1,
+        ]);
+
+        $this->em->clear();
+        /** @var LeadList $segment */
+        $segment = $this->em->find(LeadList::class, $segmentId);
+        $this->assertGreaterThan($longTimeAgo, $segment->getLastBuiltDate());
+        $this->assertNotNull($segment->getLastBuiltTime());
+        $this->assertSame(3, $leadListRepository->getLeadCount([$segmentId]));
+        $this->assertSame(3, $segmentCountCacheHelper->getSegmentContactCount($segmentId));
+    }
+
+    public function testMaxContactsPartialOrphanRemovalKeepsBuildingAndUpdatesCountCache(): void
+    {
+        $contacts = [];
+        foreach (['one@example.com', 'two@example.com', 'three@example.com'] as $email) {
+            $contact = new Lead();
+            $contact->setEmail($email);
+            $this->em->persist($contact);
+            $contacts[] = $contact;
+        }
+
+        $segment = new LeadList();
+        $segment->setName('Orphan removal segment');
+        $segment->setPublicName('Orphan removal segment');
+        $segment->setAlias('orphan-removal-segment');
+        $segment->setFilters([
+            [
+                'glue'     => 'and',
+                'field'    => 'email',
+                'object'   => 'lead',
+                'type'     => 'email',
+                'filter'   => 'one@example.com',
+                'display'  => null,
+                'operator' => 'eq',
+            ],
+        ]);
+
+        $longTimeAgo = new \DateTime('2000-01-01 00:00:00');
+        $segment->setDateModified(new \DateTime());
+        $segment->setLastBuiltDate($longTimeAgo);
+
+        $this->em->persist($segment);
+        $this->em->flush();
+
+        foreach ($contacts as $contact) {
+            $this->createListLead($segment, $contact);
+        }
+
+        $this->em->flush();
+        $segmentId = $segment->getId();
+        $this->em->clear();
+
+        /** @var LeadListRepository $leadListRepository */
+        $leadListRepository = $this->em->getRepository(LeadList::class);
+        /** @var SegmentCountCacheHelper $segmentCountCacheHelper */
+        $segmentCountCacheHelper = self::getContainer()->get(SegmentCountCacheHelper::class);
+
+        $this->assertSame(3, $leadListRepository->getLeadCount([$segmentId]));
+
+        $output = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, [
+            '--list-id'      => $segmentId,
+            '--max-contacts' => 1,
+        ]);
+        $this->assertSame(Command::SUCCESS, $output->getStatusCode());
+
+        $this->em->clear();
+        /** @var LeadList $segment */
+        $segment = $this->em->find(LeadList::class, $segmentId);
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $segment->getLastBuiltDate());
+        $this->assertTrue($segment->needsRebuild());
+        $this->assertSame(2, $leadListRepository->getLeadCount([$segmentId]));
+        $this->assertSame(2, $segmentCountCacheHelper->getSegmentContactCount($segmentId));
+
+        $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, [
+            '--list-id'      => $segmentId,
+            '--max-contacts' => 1,
+        ]);
+
+        $this->em->clear();
+        /** @var LeadList $segment */
+        $segment = $this->em->find(LeadList::class, $segmentId);
+        $this->assertGreaterThan($longTimeAgo, $segment->getLastBuiltDate());
+        $this->assertNotNull($segment->getLastBuiltTime());
+        $this->assertSame(1, $leadListRepository->getLeadCount([$segmentId]));
+        $this->assertSame(1, $segmentCountCacheHelper->getSegmentContactCount($segmentId));
+    }
+
+    public function testMaxContactsPartialDependentSegmentDoesNotMarkCompleteEarly(): void
+    {
+        foreach (['one@example.com', 'two@example.com', 'three@example.com'] as $email) {
+            $contact = new Lead();
+            $contact->setEmail($email);
+            $this->em->persist($contact);
+        }
+
+        $baseSegment = new LeadList();
+        $baseSegment->setName('Base segment');
+        $baseSegment->setPublicName('Base segment');
+        $baseSegment->setAlias('base-segment');
+        $baseSegment->setFilters([
+            [
+                'glue'     => 'and',
+                'field'    => 'email',
+                'object'   => 'lead',
+                'type'     => 'email',
+                'filter'   => 'example.com',
+                'display'  => null,
+                'operator' => 'like',
+            ],
+        ]);
+
+        $this->em->persist($baseSegment);
+        $this->em->flush();
+        $baseSegmentId = $baseSegment->getId();
+
+        $dependentSegment = new LeadList();
+        $dependentSegment->setName('Dependent segment');
+        $dependentSegment->setPublicName('Dependent segment');
+        $dependentSegment->setAlias('dependent-segment');
+        $dependentSegment->setFilters([
+            [
+                'glue'     => 'and',
+                'field'    => 'leadlist',
+                'object'   => 'lead',
+                'type'     => 'leadlist',
+                'filter'   => [$baseSegmentId],
+                'display'  => null,
+                'operator' => 'in',
+            ],
+        ]);
+
+        $longTimeAgo = new \DateTime('2000-01-01 00:00:00');
+        $dependentSegment->setDateModified(new \DateTime());
+        $dependentSegment->setLastBuiltDate($longTimeAgo);
+        $baseSegment->setDateModified(new \DateTime());
+        $baseSegment->setLastBuiltDate($longTimeAgo);
+
+        $this->em->persist($dependentSegment);
+        $this->em->persist($baseSegment);
+        $this->em->flush();
+        $dependentSegmentId = $dependentSegment->getId();
+        $this->em->clear();
+
+        $output = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, [
+            '--list-id'      => $dependentSegmentId,
+            '--max-contacts' => 1,
+        ]);
+        $this->assertSame(Command::SUCCESS, $output->getStatusCode());
+
+        $this->em->clear();
+        /** @var LeadList $baseSegment */
+        $baseSegment = $this->em->find(LeadList::class, $baseSegmentId);
+        /** @var LeadList $dependentSegment */
+        $dependentSegment = $this->em->find(LeadList::class, $dependentSegmentId);
+
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $baseSegment->getLastBuiltDate());
+        $this->assertTrue($baseSegment->needsRebuild());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $dependentSegment->getLastBuiltDate());
+        $this->assertTrue($dependentSegment->needsRebuild());
+    }
+
+    public function testMaxContactsDependentSegmentNotMarkedCompleteWhenSingleRunLeavesBasePartial(): void
+    {
+        foreach (['one@example.com', 'two@example.com', 'three@example.com'] as $email) {
+            $contact = new Lead();
+            $contact->setEmail($email);
+            $this->em->persist($contact);
+        }
+
+        $baseSegment = new LeadList();
+        $baseSegment->setName('Base segment with pending contacts');
+        $baseSegment->setPublicName('Base segment with pending contacts');
+        $baseSegment->setAlias('base-segment-pending-'.uniqid());
+        $baseSegment->setFilters([
+            [
+                'glue'     => 'and',
+                'field'    => 'email',
+                'object'   => 'lead',
+                'type'     => 'email',
+                'filter'   => 'example.com',
+                'display'  => null,
+                'operator' => 'like',
+            ],
+        ]);
+
+        $this->em->persist($baseSegment);
+        $this->em->flush();
+        $baseSegmentId = $baseSegment->getId();
+
+        $dependentSegment = new LeadList();
+        $dependentSegment->setName('Dependent segment with pending base');
+        $dependentSegment->setPublicName('Dependent segment with pending base');
+        $dependentSegment->setAlias('dependent-segment-pending-'.uniqid());
+        $dependentSegment->setFilters([
+            [
+                'glue'     => 'and',
+                'field'    => 'leadlist',
+                'object'   => 'lead',
+                'type'     => 'leadlist',
+                'filter'   => [$baseSegmentId],
+                'display'  => null,
+                'operator' => 'in',
+            ],
+        ]);
+
+        $this->em->persist($dependentSegment);
+        $this->em->flush();
+        $dependentSegmentId = $dependentSegment->getId();
+        $this->em->clear();
+
+        // Full build first: both segments become complete.
+        $output = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, [
+            '--list-id' => $dependentSegmentId,
+        ]);
+        $this->assertSame(Command::SUCCESS, $output->getStatusCode());
+
+        $this->em->clear();
+        /** @var LeadList $baseSegment */
+        $baseSegment = $this->em->find(LeadList::class, $baseSegmentId);
+        /** @var LeadList $dependentSegment */
+        $dependentSegment = $this->em->find(LeadList::class, $dependentSegmentId);
+        $this->assertFalse($baseSegment->needsRebuild(), 'Base segment should be complete after a full build');
+        $this->assertFalse($dependentSegment->needsRebuild(), 'Dependent segment should be complete after a full build');
+
+        // New matching contacts leave the previously complete base with pending work.
+        foreach (['four@example.com', 'five@example.com'] as $email) {
+            $contact = new Lead();
+            $contact->setEmail($email);
+            $this->em->persist($contact);
+        }
+        $this->em->flush();
+        $this->em->clear();
+
+        // One capped run on the dependent segment: the base is rebuilt first but
+        // stays incomplete, so the dependent must not be marked complete either.
+        $output = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, [
+            '--list-id'      => $dependentSegmentId,
+            '--max-contacts' => 1,
+        ]);
+        $this->assertSame(Command::SUCCESS, $output->getStatusCode());
+
+        $this->em->clear();
+        /** @var LeadList $baseSegment */
+        $baseSegment = $this->em->find(LeadList::class, $baseSegmentId);
+        /** @var LeadList $dependentSegment */
+        $dependentSegment = $this->em->find(LeadList::class, $dependentSegmentId);
+
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $baseSegment->getLastBuiltDate());
+        $this->assertTrue($baseSegment->needsRebuild());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $dependentSegment->getLastBuiltDate());
+        $this->assertTrue($dependentSegment->needsRebuild());
+    }
+
+    public function testMaxContactsPartialRebuildKeepsPreviouslyCompleteSegmentBuilding(): void
+    {
+        foreach (['one@example.com', 'two@example.com', 'three@example.com'] as $email) {
+            $contact = new Lead();
+            $contact->setEmail($email);
+            $this->em->persist($contact);
+        }
+
+        $segment = new LeadList();
+        $segment->setName('Previously complete segment');
+        $segment->setPublicName('Previously complete segment');
+        $segment->setAlias('previously-complete-segment-'.uniqid());
+        $segment->setFilters([
+            [
+                'glue'     => 'and',
+                'field'    => 'email',
+                'object'   => 'lead',
+                'type'     => 'email',
+                'filter'   => 'example.com',
+                'display'  => null,
+                'operator' => 'like',
+            ],
+        ]);
+
+        $this->em->persist($segment);
+        $this->em->flush();
+        $segmentId = $segment->getId();
+
+        $lastBuiltDate = \DateTime::createFromFormat(
+            'Y-m-d H:i:s',
+            new \DateTime('-1 day')->format('Y-m-d H:i:s')
+        );
+        $segment->setLastBuiltDate($lastBuiltDate);
+        $segment->setDateModified(new \DateTime('-1 week'));
+        $segment->setLastBuiltTime(1.0);
+
+        foreach (['one@example.com', 'two@example.com', 'three@example.com'] as $email) {
+            $contact = $this->em->getRepository(Lead::class)->findOneBy(['email' => $email]);
+            $this->createListLead($segment, $contact);
+        }
+
+        $this->em->persist($segment);
+        $this->em->flush();
+        $this->em->clear();
+
+        /** @var LeadList $segment */
+        $segment = $this->em->find(LeadList::class, $segmentId);
+        $this->assertFalse($segment->needsRebuild(), 'Segment should appear complete before new contacts arrive');
+
+        foreach (['four@example.com', 'five@example.com'] as $email) {
+            $contact = new Lead();
+            $contact->setEmail($email);
+            $this->em->persist($contact);
+        }
+        $this->em->flush();
+        $this->em->clear();
+
+        $output = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, [
+            '--list-id'      => $segmentId,
+            '--max-contacts' => 1,
+        ]);
+        $this->assertSame(Command::SUCCESS, $output->getStatusCode());
+
+        $this->em->clear();
+        /** @var LeadList $segment */
+        $segment = $this->em->find(LeadList::class, $segmentId);
+        /** @var LeadListRepository $leadListRepository */
+        $leadListRepository = $this->em->getRepository(LeadList::class);
+
+        $this->assertSame(4, $leadListRepository->getLeadCount([$segmentId]));
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $segment->getLastBuiltDate());
+        $this->assertTrue(
+            $segment->needsRebuild(),
+            'Segment should keep showing as building while capped runs still have contacts to process'
+        );
+    }
+
+    public function testMaxContactsPartialDependentSegmentStaysBuildingWhenPreviouslyCompleteBaseHasPendingWork(): void
+    {
+        foreach (['one@example.com', 'two@example.com', 'three@example.com'] as $email) {
+            $contact = new Lead();
+            $contact->setEmail($email);
+            $this->em->persist($contact);
+        }
+
+        $baseSegment = new LeadList();
+        $baseSegment->setName('Previously complete base segment');
+        $baseSegment->setPublicName('Previously complete base segment');
+        $baseSegment->setAlias('previously-complete-base-'.uniqid());
+        $baseSegment->setFilters([
+            [
+                'glue'     => 'and',
+                'field'    => 'email',
+                'object'   => 'lead',
+                'type'     => 'email',
+                'filter'   => 'example.com',
+                'display'  => null,
+                'operator' => 'like',
+            ],
+        ]);
+
+        $this->em->persist($baseSegment);
+        $this->em->flush();
+        $baseSegmentId = $baseSegment->getId();
+
+        $dependentSegment = new LeadList();
+        $dependentSegment->setName('Previously complete dependent segment');
+        $dependentSegment->setPublicName('Previously complete dependent segment');
+        $dependentSegment->setAlias('previously-complete-dependent-'.uniqid());
+        $dependentSegment->setFilters([
+            [
+                'glue'     => 'and',
+                'field'    => 'leadlist',
+                'object'   => 'lead',
+                'type'     => 'leadlist',
+                'filter'   => [$baseSegmentId],
+                'display'  => null,
+                'operator' => 'in',
+            ],
+        ]);
+
+        $lastBuiltDate = \DateTime::createFromFormat(
+            'Y-m-d H:i:s',
+            new \DateTime('-1 day')->format('Y-m-d H:i:s')
+        );
+        $dateModified  = new \DateTime('-1 week');
+
+        foreach ([$baseSegment, $dependentSegment] as $listSegment) {
+            $listSegment->setLastBuiltDate($lastBuiltDate);
+            $listSegment->setDateModified($dateModified);
+            $listSegment->setLastBuiltTime(1.0);
+        }
+
+        foreach (['one@example.com', 'two@example.com', 'three@example.com'] as $email) {
+            $contact = $this->em->getRepository(Lead::class)->findOneBy(['email' => $email]);
+            $this->createListLead($baseSegment, $contact);
+            $this->createListLead($dependentSegment, $contact);
+        }
+
+        $this->em->persist($dependentSegment);
+        $this->em->persist($baseSegment);
+        $this->em->flush();
+        $dependentSegmentId = $dependentSegment->getId();
+        $this->em->clear();
+
+        foreach (['four@example.com', 'five@example.com'] as $email) {
+            $contact = new Lead();
+            $contact->setEmail($email);
+            $this->em->persist($contact);
+        }
+        $this->em->flush();
+        $this->em->clear();
+
+        $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, [
+            '--list-id'      => $baseSegmentId,
+            '--max-contacts' => 1,
+        ]);
+
+        $this->em->clear();
+        /** @var LeadList $baseSegment */
+        $baseSegment = $this->em->find(LeadList::class, $baseSegmentId);
+        /** @var LeadListRepository $leadListRepository */
+        $leadListRepository = $this->em->getRepository(LeadList::class);
+
+        $this->assertSame(4, $leadListRepository->getLeadCount([$baseSegmentId]));
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $baseSegment->getLastBuiltDate());
+        $this->assertTrue(
+            $baseSegment->needsRebuild(),
+            'Base segment should appear incomplete to dependent segment guards after a partial capped rebuild'
+        );
+
+        $output = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, [
+            '--list-id'      => $dependentSegmentId,
+            '--max-contacts' => 1,
+        ]);
+        $this->assertSame(Command::SUCCESS, $output->getStatusCode());
+
+        $this->em->clear();
+        /** @var LeadList $dependentSegment */
+        $dependentSegment = $this->em->find(LeadList::class, $dependentSegmentId);
+
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $dependentSegment->getLastBuiltDate());
+        $this->assertTrue(
+            $dependentSegment->needsRebuild(),
+            'Dependent segment should keep showing as building while capped rebuild work remains'
+        );
     }
 
     /**
