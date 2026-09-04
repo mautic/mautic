@@ -45,4 +45,23 @@ final class HtmlExtensionTest extends TestCase
 
         yield ['', []];
     }
+
+    #[DataProvider('htmlEntityDecodeProvider')]
+    public function testHtmlEntityDecode(string $input, string $expected): void
+    {
+        $extension = new HtmlExtension();
+
+        $this->assertSame($expected, $extension->htmlEntityDecode($input));
+    }
+
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function htmlEntityDecodeProvider(): iterable
+    {
+        yield 'ampersand entity' => ['Peculiar &amp; Co', 'Peculiar & Co'];
+        yield 'numeric ampersand' => ['Peculiar &#38; Co', 'Peculiar & Co'];
+        yield 'raw ampersand' => ['Peculiar & Co', 'Peculiar & Co'];
+        yield 'empty' => ['', ''];
+    }
 }
