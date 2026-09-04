@@ -35,8 +35,8 @@ use Rector\Rector\AbstractRector;
  * understand, the whole class is left untouched. A partial rewrite would silently drift
  * the schema, so it is all-or-nothing per class.
  *
- * Not yet handled (these make a class bail): createManyToMany, createOneToOne,
- * isOwnershipParent, and custom static helpers such as addProjectsField/addTranslationMetadata.
+ * Not yet handled (these make a class bail): isOwnershipParent and custom static
+ * helpers such as addProjectsField/addTranslationMetadata.
  */
 final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
 {
@@ -302,6 +302,8 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
             'addPublishDates'  => $this->handleAddPublishDates($calls),
             'createManyToOne'  => $this->handleAssociation($calls, 'ManyToOne'),
             'createOneToMany'  => $this->handleAssociation($calls, 'OneToMany'),
+            'createOneToOne'   => $this->handleAssociation($calls, 'OneToOne'),
+            'createManyToMany' => $this->handleManyToMany($calls),
             'addLead'          => $this->handleContactHelper($calls, 'lead', 'lead_id', 'Mautic\\LeadBundle\\Entity\\Lead'),
             'addContact'       => $this->handleContactHelper($calls, 'contact', 'contact_id', 'Mautic\\LeadBundle\\Entity\\Lead'),
             'addCategory'      => $this->handleAddCategory($calls),
@@ -769,6 +771,207 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
     }
 
     /**
+     * createManyToMany('field', Target::class)->setJoinTable('xref')
+     *     ->addJoinColumn(...)->addInverseJoinColumn(...)->build().
+     *
+     * @param list<MethodCall> $calls
+     *
+     * @return array<string, list<AttributeGroup>>|null
+     */
+    private function handleManyToMany(array $calls): ?array
+    {
+        $create    = $calls[0];
+        $fieldName = $this->stringArg($create, 0);
+        if (null === $fieldName || !isset($create->args[1]) || !$create->args[1] instanceof Arg) {
+            return null;
+        }
+
+        $target = $create->args[1]->value;
+
+        $mappedBy            = null;
+        $inversedBy          = null;
+        $cascade             = [];
+        $fetch               = null;
+        $orphanRemoval       = false;
+        $indexBy             = null;
+        $orderBy             = null;
+        $joinTable           = null;
+        $joinColumns         = [];
+        $inverseJoinColumns  = [];
+        $sawBuild            = false;
+
+        foreach (array_slice($calls, 1) as $call) {
+            $name = $this->methodName($call);
+
+            $cascadeType = $this->cascadeType($name);
+            if (null !== $cascadeType) {
+                $cascade[] = $cascadeType;
+                continue;
+            }
+
+            $fetchMode = $this->fetchMode($name);
+            if (null !== $fetchMode) {
+                $fetch = $fetchMode;
+                continue;
+            }
+
+            switch ($name) {
+                case 'mappedBy':
+                    $mappedBy = $this->stringArg($call, 0);
+                    if (null === $mappedBy) {
+                        return null;
+                    }
+                    break;
+
+                case 'inversedBy':
+                    $inversedBy = $this->stringArg($call, 0);
+                    if (null === $inversedBy) {
+                        return null;
+                    }
+                    break;
+
+                case 'setIndexBy':
+                    $indexBy = $this->stringArg($call, 0);
+                    if (null === $indexBy) {
+                        return null;
+                    }
+                    break;
+
+                case 'setOrderBy':
+                    if (!isset($call->args[0]) || !$call->args[0] instanceof Arg || !$call->args[0]->value instanceof Array_) {
+                        return null;
+                    }
+                    $orderBy = $call->args[0]->value;
+                    break;
+
+                case 'orphanRemoval':
+                    $orphanRemoval = $this->boolArg($call, 0, true);
+                    break;
+
+                case 'setJoinTable':
+                    $joinTable = $this->stringArg($call, 0);
+                    if (null === $joinTable) {
+                        return null;
+                    }
+                    break;
+
+                case 'addJoinColumn':
+                    $joinColumn = $this->parseJoinColumn($call);
+                    if (null === $joinColumn) {
+                        return null;
+                    }
+                    $joinColumns[] = $joinColumn;
+                    break;
+
+                case 'addInverseJoinColumn':
+                    $inverseJoinColumn = $this->parseJoinColumn($call);
+                    if (null === $inverseJoinColumn) {
+                        return null;
+                    }
+                    $inverseJoinColumns[] = $inverseJoinColumn;
+                    break;
+
+                case 'build':
+                    $sawBuild = true;
+                    break;
+
+                default:
+                    return null;
+            }
+        }
+
+        if (!$sawBuild) {
+            return null;
+        }
+
+        return [$fieldName => $this->manyToManyAttributes(
+            $target,
+            $mappedBy,
+            $inversedBy,
+            $cascade,
+            $fetch,
+            $orphanRemoval,
+            $indexBy,
+            $orderBy,
+            $joinTable,
+            $joinColumns,
+            $inverseJoinColumns,
+        )];
+    }
+
+    /**
+     * @param list<string>                                                                            $cascade
+     * @param list<array{name: string, ref: string, nullable: bool, unique: bool, onDelete: ?string}> $joinColumns
+     * @param list<array{name: string, ref: string, nullable: bool, unique: bool, onDelete: ?string}> $inverseJoinColumns
+     *
+     * @return list<AttributeGroup>
+     */
+    private function manyToManyAttributes(
+        Expr $target,
+        ?string $mappedBy,
+        ?string $inversedBy,
+        array $cascade,
+        ?string $fetch,
+        bool $orphanRemoval,
+        ?string $indexBy,
+        ?Array_ $orderBy,
+        ?string $joinTable,
+        array $joinColumns,
+        array $inverseJoinColumns,
+    ): array {
+        $args = [];
+
+        if (null !== $mappedBy) {
+            $args[] = $this->namedArg('mappedBy', new String_($mappedBy));
+        }
+
+        $args[] = $this->namedArg('targetEntity', $target);
+
+        if (null !== $inversedBy) {
+            $args[] = $this->namedArg('inversedBy', new String_($inversedBy));
+        }
+
+        if ([] !== $cascade) {
+            $args[] = $this->namedArg('cascade', new Array_(array_map(
+                static fn (string $c): ArrayItem => new ArrayItem(new String_($c)),
+                $cascade,
+            )));
+        }
+
+        if (null !== $fetch) {
+            $args[] = $this->namedArg('fetch', new String_($fetch));
+        }
+
+        if ($orphanRemoval) {
+            $args[] = $this->namedArg('orphanRemoval', new ConstFetch(new Name('true')));
+        }
+
+        if (null !== $indexBy) {
+            $args[] = $this->namedArg('indexBy', new String_($indexBy));
+        }
+
+        $attributes = [$this->attribute('ManyToMany', $args)];
+
+        if (null !== $joinTable) {
+            $attributes[] = $this->attribute('JoinTable', [$this->namedArg('name', new String_($joinTable))]);
+        }
+
+        foreach ($joinColumns as $joinColumn) {
+            $attributes[] = $this->joinColumnAttribute($joinColumn);
+        }
+
+        foreach ($inverseJoinColumns as $inverseJoinColumn) {
+            $attributes[] = $this->joinColumnAttribute($inverseJoinColumn, 'InverseJoinColumn');
+        }
+
+        if (null !== $orderBy) {
+            $attributes[] = $this->attribute('OrderBy', [new Arg($orderBy)]);
+        }
+
+        return $attributes;
+    }
+
+    /**
      * addLead($nullable, $onDelete, $isPrimaryKey, $inversedBy) and addContact(...).
      *
      * @param list<MethodCall> $calls
@@ -969,7 +1172,7 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
     /**
      * @param array{name: string, ref: string, nullable: bool, unique: bool, onDelete: ?string} $joinColumn
      */
-    private function joinColumnAttribute(array $joinColumn): AttributeGroup
+    private function joinColumnAttribute(array $joinColumn, string $shortName = 'JoinColumn'): AttributeGroup
     {
         $args = [$this->namedArg('name', new String_($joinColumn['name']))];
 
@@ -990,7 +1193,7 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
             $args[] = $this->namedArg('onDelete', new String_($joinColumn['onDelete']));
         }
 
-        return $this->attribute('JoinColumn', $args);
+        return $this->attribute($shortName, $args);
     }
 
     private function cascadeType(string $method): ?string
