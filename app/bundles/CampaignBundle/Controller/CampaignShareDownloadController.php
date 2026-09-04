@@ -13,12 +13,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class CampaignShareDownloadController extends CommonController
 {
-    #[Route(
-        '/campaign-share/{token}',
-        name: 'mautic_campaign_share_download',
-        methods: ['GET'],
-        requirements: ['token' => '[a-f0-9]{32}'],
-    )]
+    #[Route('/campaign-share/{token}', name: 'mautic_campaign_share_download', requirements: ['token' => '[a-f0-9]{32}'], methods: ['GET'])]
     public function downloadAction(string $token, CampaignShareService $shareService): Response
     {
         // The routing requirement constrains $token to 32 hex chars, so this is belt-and-braces
