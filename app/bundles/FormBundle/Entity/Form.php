@@ -17,6 +17,8 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\TranslationEntityInterface;
+use Mautic\CoreBundle\Entity\TranslationEntityTrait;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -38,17 +40,17 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     normalizationContext: [
         'groups'                  => ['form:read'],
         'swagger_definition_name' => 'Read',
-        'api_included'            => ['category', 'fields', 'actions'],
+        'api_included'            => ['category', 'fields', 'actions', 'translationChildren'],
     ],
     denormalizationContext: [
         'groups'                  => ['form:write'],
         'swagger_definition_name' => 'Write',
     ]
 )]
-class Form extends FormEntity implements UuidInterface
+class Form extends FormEntity implements UuidInterface, TranslationEntityInterface
 {
     use UuidTrait;
-
+    use TranslationEntityTrait;
     use ProjectTrait;
 
     public const ENTITY_NAME = 'forms';
@@ -60,9 +62,6 @@ class Form extends FormEntity implements UuidInterface
      */
     #[Groups(['form:read', 'download:read', 'campaign:read', 'email:read'])]
     private $id;
-
-    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
-    private ?string $language = null;
 
     /**
      * @var string
@@ -208,9 +207,10 @@ class Form extends FormEntity implements UuidInterface
 
     public function __construct()
     {
-        $this->fields      = new ArrayCollection();
-        $this->actions     = new ArrayCollection();
-        $this->submissions = new ArrayCollection();
+        $this->fields              = new ArrayCollection();
+        $this->actions             = new ArrayCollection();
+        $this->submissions         = new ArrayCollection();
+        $this->translationChildren = new ArrayCollection();
         $this->initializeProjects();
     }
 
@@ -225,10 +225,7 @@ class Form extends FormEntity implements UuidInterface
 
         $builder->addField('alias', 'string');
 
-        $builder->createField('language', 'string')
-            ->columnName('lang')
-            ->nullable()
-            ->build();
+        self::addTranslationMetadata($builder, self::class, nullableLanguage: true);
 
         $builder->addNullableField('formAttributes', 'string', 'form_attr');
 
@@ -376,8 +373,12 @@ class Form extends FormEntity implements UuidInterface
                     'noIndex',
                     'formAttributes',
                     'language',
+                    'translationParent',
+                    'translationChildren',
                 ],
             )
+            ->setMaxDepth(1, 'translationParent')
+            ->setMaxDepth(1, 'translationChildren')
             ->build();
 
         self::addProjectsInLoadApiMetadata($metadata, 'form');
@@ -388,6 +389,13 @@ class Form extends FormEntity implements UuidInterface
         if ('actions' == $prop || 'fields' == $prop) {
             // changes are already computed so just add them
             $this->changes[$prop][$val[0] ?? ''] = $val[1];
+        } elseif ('translationParent' == $prop || 'category' == $prop) {
+            $current   = $this->{'get'.ucfirst($prop)}();
+            $currentId = ($current) ? $current->getId() : '';
+            $newId     = ($val) ? $val->getId() : null;
+            if ($currentId != $newId) {
+                $this->changes[$prop] = [$currentId, $newId];
+            }
         } else {
             parent::isChanged($prop, $val);
         }
@@ -619,6 +627,36 @@ class Form extends FormEntity implements UuidInterface
         );
     }
 
+    public function setLanguage(?string $language): self
+    {
+        if (null === $language || '' === $language) {
+            $language = $this->getDefaultLanguage();
+        }
+        $this->isChanged('language', $language);
+        $this->language = $language;
+
+        return $this;
+    }
+
+    public function getLanguage(): ?string
+    {
+        return $this->language ?: $this->getDefaultLanguage();
+    }
+
+    private function getDefaultLanguage(): string
+    {
+        $language = 'en';
+
+        if (function_exists('locale_get_default')) {
+            $defaultLocale = \locale_get_default();
+            if ($defaultLocale) {
+                $language = $defaultLocale;
+            }
+        }
+
+        return $language;
+    }
+
     /**
      * Loops trough the form fields and returns a simple array of mapped object keys if any.
      *
@@ -834,19 +872,6 @@ class Form extends FormEntity implements UuidInterface
     public function getFormAttributes()
     {
         return $this->formAttributes;
-    }
-
-    public function setLanguage(?string $language): self
-    {
-        $this->isChanged('language', $language);
-        $this->language = $language;
-
-        return $this;
-    }
-
-    public function getLanguage(): ?string
-    {
-        return $this->language;
     }
 
     /**

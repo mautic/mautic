@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
+use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Collector\MappedObjectCollectorInterface;
@@ -49,6 +50,8 @@ use Twig\Environment;
  */
 class FormModel extends CommonFormModel implements GlobalSearchInterface
 {
+    use TranslationModelTrait;
+
     public function __construct(
         protected RequestStack $requestStack,
         protected Environment $twig,
@@ -329,6 +332,8 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
 
         // save the form so that the ID is available for the form html
         parent::saveEntity($entity, $unlock);
+
+        $this->postTranslationEntitySave($entity);
 
         // now build the form table
         if ($entity->getId()) {

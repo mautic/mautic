@@ -44,6 +44,27 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
     }
 
+    public function testIndexActionWithLegacyFormWithoutLanguage(): void
+    {
+        $form = $this->createForm('Legacy form', 'legacy-form');
+        $this->em->flush();
+        $tablePrefix = self::getContainer()->getParameter('mautic.db_table_prefix');
+        $this->em->getConnection()->update(
+            $tablePrefix.Form::TABLE_NAME,
+            ['lang' => null],
+            ['id' => $form->getId()],
+        );
+        $this->em->clear();
+
+        $legacyForm = $this->em->find(Form::class, $form->getId());
+        $this->assertInstanceOf(Form::class, $legacyForm);
+        $this->assertNotEmpty($legacyForm->getLanguage());
+
+        $this->client->request('GET', '/s/forms');
+
+        $this->assertResponseIsSuccessful();
+    }
+
     /**
      * Filtering should return status code 200.
      */

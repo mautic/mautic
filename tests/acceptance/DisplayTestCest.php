@@ -140,7 +140,7 @@ final class DisplayTestCest
         $I->click('#emailform_unsubscribeForm_chosen'); // Open dropdown
 
         // Grab all dropdown options
-        $forms = $I->grabMultiple('#emailform_unsubscribeForm_chosen .chosen-results li');
+        $forms = $I->grabMultiple('#emailform_unsubscribeForm_chosen .chosen-results li:not(.group-result)');
 
         // Assert that each point group follows the format "name (id)"
         foreach ($forms as $form) {
