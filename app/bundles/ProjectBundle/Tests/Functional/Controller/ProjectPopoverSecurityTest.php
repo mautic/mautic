@@ -29,6 +29,7 @@ final class ProjectPopoverSecurityTest extends MauticMysqlTestCase
         $email->setSubject('Project Popover Security Email');
         $email->setEmailType('template');
         $email->setTemplate('blank');
+        $email->setCustomHtml('<!DOCTYPE html><html><body>Test</body></html>');
         $email->addProject($project);
 
         /** @var EmailModel $emailModel */
