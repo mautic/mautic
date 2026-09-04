@@ -4,9 +4,12 @@ namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\ChannelTrait;
 use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
+use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
+use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ChannelTimelineInterface;
 use Mautic\PageBundle\Model\PageModel;
@@ -28,6 +31,7 @@ final class LeadSubscriber implements EventSubscriberInterface
         private TranslatorInterface $translator,
         private RouterInterface $router,
         ModelFactory $modelFactory,
+        private PrimaryCompanyHelper $primaryCompanyHelper,
     ) {
         $this->setModelFactory($modelFactory);
     }
@@ -68,6 +72,8 @@ final class LeadSubscriber implements EventSubscriberInterface
         $event->addToCounter($eventTypeKey, $hits);
 
         if (!$event->isEngagementCount()) {
+            $profileFields = null;
+
             // Add the hits to the event array
             foreach ($hits['results'] as $hit) {
                 $template = '@MauticPage/SubscribedEvents/Timeline/index.html.twig';
@@ -105,9 +111,18 @@ final class LeadSubscriber implements EventSubscriberInterface
                         'href'  => $this->router->generate('mautic_page_action', ['objectAction' => 'view', 'objectId' => $hit['page_id']]),
                     ];
                 } else {
+                    $url = (string) ($hit['url'] ?? '');
+
+                    // Tracked links are stored once as the un-rendered template, so resolve the
+                    // contact's tokens to show the URL that contact was actually sent to.
+                    if (TokenHelper::validToken($url)) {
+                        $profileFields ??= $this->getProfileFields($event->getLead());
+                        $url = TokenHelper::findLeadTokens($url, $profileFields, true);
+                    }
+
                     $eventLabel = [
-                        'label'      => $hit['urlTitle'] ?? $hit['url'],
-                        'href'       => $hit['url'],
+                        'label'      => $hit['urlTitle'] ?? $url,
+                        'href'       => $url,
                         'isExternal' => true,
                     ];
                 }
@@ -132,6 +147,14 @@ final class LeadSubscriber implements EventSubscriberInterface
                 );
             }
         }
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function getProfileFields(?Lead $lead): array
+    {
+        return $lead ? $this->primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead) : [];
     }
 
     /**
