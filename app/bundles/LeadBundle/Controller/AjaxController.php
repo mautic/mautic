@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\CampaignBundle\Security\Permissions\CampaignPermissions;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -334,11 +335,6 @@ final class AjaxController extends CommonAjaxController
 
     public function toggleLeadCampaignAction(Request $request, MembershipManager $membershipManager, LeadModel $leadModel, CampaignModel $campaignModel): JsonResponse
     {
-        if (!$this->security->isGranted('campaign:campaigns:editown')
-            && !$this->security->isGranted('campaign:campaigns:editother')) {
-            $this->throwAccessDenied();
-        }
-
         $dataArray  = ['success' => 0];
         $leadId     = (int) $request->request->get('leadId');
         $campaignId = (int) $request->request->get('campaignId');
@@ -352,6 +348,18 @@ final class AjaxController extends CommonAjaxController
 
         if (null === $lead || null === $campaign) {
             return $this->sendJsonResponse($dataArray);
+        }
+
+        if (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
+            $this->throwAccessDenied();
+        }
+
+        if (!$this->security->hasEntityAccess(
+            CampaignPermissions::LEADS_ADD_OWN,
+            CampaignPermissions::LEADS_ADD_OTHER,
+            $campaign->getCreatedBy()
+        )) {
+            $this->throwAccessDenied();
         }
 
         if ('add' === $action) {

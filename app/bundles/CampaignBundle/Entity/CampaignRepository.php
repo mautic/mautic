@@ -62,12 +62,12 @@ class CampaignRepository extends CommonRepository
     /**
      * Returns a list of all published (and active) campaigns (optionally for a specific lead).
      *
-     * @param bool $forList   If true, returns ID and name only
-     * @param bool $viewOther If true, returns all the campaigns
+     * @param bool $forList                  If true, returns ID and name only
+     * @param bool $canAccessOthersCampaigns If true, returns all the campaigns
      *
-     * @return array
+     * @return array<int|string, int|string|object|array<int|string, mixed[]>|null>
      */
-    public function getPublishedCampaigns($specificId = null, ?int $leadId = null, $forList = false, $viewOther = false)
+    public function getPublishedCampaigns($specificId = null, ?int $leadId = null, bool $forList = false, bool $canAccessOthersCampaigns = false): array
     {
         $q = $this->getEntityManager()->createQueryBuilder()
             ->from(Campaign::class, 'c', 'c.id');
@@ -89,7 +89,7 @@ class CampaignRepository extends CommonRepository
         $q->leftJoin('c.lists', 'll')
             ->where($this->getPublishedByDateOrmExpression($q));
 
-        if (!$viewOther) {
+        if (!$canAccessOthersCampaigns) {
             $q->andWhere($q->expr()->eq('c.createdBy', ':id'))
                 ->setParameter('id', $this->currentUser->getId());
         }

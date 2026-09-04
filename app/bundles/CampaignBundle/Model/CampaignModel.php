@@ -21,6 +21,7 @@ use Mautic\CampaignBundle\Helper\ChannelExtractor;
 use Mautic\CampaignBundle\Membership\MembershipBuilder;
 use Mautic\CampaignBundle\Model\Exceptions\CampaignAlreadyUnpublishedException;
 use Mautic\CampaignBundle\Model\Exceptions\CampaignVersionMismatchedException;
+use Mautic\CampaignBundle\Security\Permissions\CampaignPermissions;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -575,11 +576,9 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * Gets the campaigns a specific lead is part of.
      *
-     * @param bool $forList
-     *
      * @return mixed
      */
-    public function getLeadCampaigns(?Lead $lead = null, $forList = false)
+    public function getLeadCampaigns(?Lead $lead = null, bool $forList = false)
     {
         static $campaigns = [];
 
@@ -605,22 +604,46 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * Gets a list of published campaigns.
      *
-     * @return array
+     * @return array<int|string, int|string|object|array<int|string, mixed[]>|null>
      */
-    public function getPublishedCampaigns(bool $forList = false)
+    public function getPublishedCampaigns(bool $forList = false, string $permissionSuffix = 'viewother', ?string $ownPermissionSuffix = null, ?string $permissionBase = null): array
     {
         static $campaigns = [];
 
-        if (empty($campaigns)) {
-            $campaigns = $this->getRepository()->getPublishedCampaigns(
+        $permissionBase ??= $this->getPermissionBase();
+        $cacheKey = (int) $forList.'|'.$permissionBase.'|'.$permissionSuffix.'|'.$ownPermissionSuffix;
+
+        if (!array_key_exists($cacheKey, $campaigns)) {
+            $canAccessOthers = $this->security->isGranted($permissionBase.':'.$permissionSuffix);
+
+            if (null !== $ownPermissionSuffix
+                && !$canAccessOthers
+                && !$this->security->isGranted($permissionBase.':'.$ownPermissionSuffix)
+            ) {
+                $campaigns[$cacheKey] = [];
+
+                return $campaigns[$cacheKey];
+            }
+
+            $campaigns[$cacheKey] = $this->getRepository()->getPublishedCampaigns(
                 null,
                 null,
                 $forList,
-                $this->security->isGranted($this->getPermissionBase().':viewother')
+                $canAccessOthers
             );
         }
 
-        return $campaigns;
+        return $campaigns[$cacheKey];
+    }
+
+    /**
+     * Gets a list of published campaigns the current user can add/remove contacts from.
+     *
+     * @return array<int|string, int|string|object|array<int|string, mixed[]>|null>
+     */
+    public function getPublishedCampaignsForContactMembership(bool $forList = false): array
+    {
+        return $this->getPublishedCampaigns($forList, 'addother', 'addown', CampaignPermissions::LEADS);
     }
 
     /**
