@@ -10,7 +10,7 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\DecisionEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
-use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\EventListener\CampaignSubscriber;
 use Mautic\PageBundle\Helper\TrackingHelper;
@@ -24,7 +24,7 @@ final class CampaignSubscriberTest extends TestCase
     protected function setUp(): void
     {
         $this->subscriber = new CampaignSubscriber(
-            $this->createStub(LeadModel::class),
+            $this->createStub(LeadDeviceRepository::class),
             $this->createStub(TrackingHelper::class),
             $this->createStub(RealTimeExecutioner::class),
         );
