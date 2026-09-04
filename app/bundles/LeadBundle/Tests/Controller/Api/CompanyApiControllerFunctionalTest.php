@@ -5,19 +5,39 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyChangeLog;
+use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tests\TestEntityCreationTrait;
-use PHPUnit\Framework\Assert;
+use Mautic\UserBundle\Entity\Permission;
+use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Model\RoleModel;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
 {
-    use TestEntityCreationTrait;
+    use CreateTestEntitiesTrait {
+        CreateTestEntitiesTrait::createCompany as createNamedCompany;
+        CreateTestEntitiesTrait::createLead as createNamedLead;
+    }
+    use TestEntityCreationTrait {
+        TestEntityCreationTrait::createCompany insteadof CreateTestEntitiesTrait;
+    }
+
+    private const SALES_USER = 'sales';
+
+    private CompanyModel $companyModel;
+
+    private LeadModel $leadModel;
 
     protected function setUp(): void
     {
@@ -27,6 +47,9 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->configParams['update_company_mapping_data_in_background'] = !str_ends_with($this->name(), 'InHttpRequest');
 
         parent::setUp();
+
+        $this->companyModel = self::getContainer()->get(CompanyModel::class);
+        $this->leadModel    = self::getContainer()->get(LeadModel::class);
     }
 
     public function testBatchNewEndpoint(): void
@@ -412,6 +435,289 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $contactRepo = $this->getContactRepository();
         $this->assertSame($company1UpdatedName, $contactRepo->getEntity($contact1Id)->getCompany());
+    }
+
+    public function testBatchAddContactsSuccess(): void
+    {
+        $company = $this->createNamedCompany('Batch Co A', 'batch-co-a@example.com');
+        $contact = $this->createNamedLead('Batch', 'Success', 'batch-success@example.com');
+        $this->em->flush();
+
+        $this->requestBatchAddContacts([
+            'assignments' => [
+                ['contactId' => $contact->getId(), 'companyId' => $company->getId()],
+            ],
+        ]);
+
+        $response = $this->decodeResponse();
+        self::assertResponseIsSuccessful();
+        $this->assertSame(1, $response['summary']['total']);
+        $this->assertSame(1, $response['summary']['succeeded']);
+        $this->assertSame(0, $response['summary']['failed']);
+        $this->assertSame(Response::HTTP_OK, $response['results'][0]['status']);
+        $this->assertSame('Contact added to company', $response['results'][0]['message']);
+        $this->assertTrue($this->hasContactCompany($contact->getId(), $company->getId()));
+
+        $logs = $this->getCompanyChangeLogsForContact($contact->getId());
+        $this->assertCount(1, $logs);
+        $this->assertSame('api', $logs[0]->getType());
+        $this->assertSame('API batch assignment', $logs[0]->getEventName());
+        $this->assertSame('Lead added to the company, Batch Co A', $logs[0]->getActionName());
+        $this->assertSame($company->getId(), $logs[0]->getCompany());
+    }
+
+    public function testBatchAddContactsPartialFailure(): void
+    {
+        $company = $this->createNamedCompany('Batch Co B', 'batch-co-b@example.com');
+        $contact = $this->createNamedLead('Batch', 'Partial', 'batch-partial@example.com');
+        $this->em->flush();
+
+        $this->requestBatchAddContacts([
+            'assignments' => [
+                ['contactId' => $contact->getId(), 'companyId' => $company->getId()],
+                ['contactId' => $contact->getId(), 'companyId' => 999999],
+                ['contactId' => 999998, 'companyId' => $company->getId()],
+            ],
+        ]);
+
+        $response = $this->decodeResponse();
+        self::assertResponseIsSuccessful();
+        $this->assertSame(3, $response['summary']['total']);
+        $this->assertSame(1, $response['summary']['succeeded']);
+        $this->assertSame(2, $response['summary']['failed']);
+        $this->assertSame(Response::HTTP_OK, $response['results'][0]['status']);
+        $this->assertSame(Response::HTTP_NOT_FOUND, $response['results'][1]['status']);
+        $this->assertSame('Company not found', $response['results'][1]['message']);
+        $this->assertSame(Response::HTTP_NOT_FOUND, $response['results'][2]['status']);
+        $this->assertSame('Contact not found', $response['results'][2]['message']);
+        $this->assertCount(1, $this->getCompanyChangeLogsForContact($contact->getId()));
+    }
+
+    public function testBatchAddContactsEmptyBody(): void
+    {
+        $this->requestBatchAddContacts([]);
+
+        self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
+    }
+
+    public function testBatchAddContactsDuplicatePairs(): void
+    {
+        $company = $this->createNamedCompany('Batch Co C', 'batch-co-c@example.com');
+        $contact = $this->createNamedLead('Batch', 'Dup', 'batch-dup@example.com');
+        $this->em->flush();
+
+        $this->requestBatchAddContacts([
+            'assignments' => [
+                ['contactId' => $contact->getId(), 'companyId' => $company->getId()],
+                ['contactId' => $contact->getId(), 'companyId' => $company->getId()],
+            ],
+        ]);
+
+        $response = $this->decodeResponse();
+        self::assertResponseIsSuccessful();
+        $this->assertSame(2, $response['summary']['total']);
+        $this->assertSame(2, $response['summary']['succeeded']);
+        $this->assertSame(0, $response['summary']['failed']);
+        $this->assertCount(2, $response['results']);
+        $this->assertSame(Response::HTTP_OK, $response['results'][0]['status']);
+        $this->assertSame(Response::HTTP_OK, $response['results'][1]['status']);
+        $this->assertTrue($this->hasContactCompany($contact->getId(), $company->getId()));
+    }
+
+    public function testBatchAddContactsAlreadyAssigned(): void
+    {
+        $company = $this->createNamedCompany('Batch Co D', 'batch-co-d@example.com');
+        $contact = $this->createNamedLead('Batch', 'Existing', 'batch-existing@example.com');
+        $this->em->flush();
+        $this->companyModel->addLeadToCompany($company, $contact);
+
+        $this->requestBatchAddContacts([
+            'assignments' => [
+                ['contactId' => $contact->getId(), 'companyId' => $company->getId()],
+            ],
+        ]);
+
+        $response = $this->decodeResponse();
+        self::assertResponseIsSuccessful();
+        $this->assertSame(Response::HTTP_OK, $response['results'][0]['status']);
+        $this->assertSame(1, $response['summary']['succeeded']);
+        $this->assertTrue($this->hasContactCompany($contact->getId(), $company->getId()));
+        $this->assertCount(0, $this->getCompanyChangeLogsForContact($contact->getId()));
+    }
+
+    public function testSingleAddContactDoesNotCreateBatchChangeLog(): void
+    {
+        $company = $this->createNamedCompany('Single Co', 'single-co@example.com');
+        $contact = $this->createNamedLead('Single', 'Add', 'single-add@example.com');
+        $this->em->flush();
+
+        $this->client->request(
+            Request::METHOD_POST,
+            sprintf('/api/companies/%d/contact/%d/add', $company->getId(), $contact->getId())
+        );
+
+        self::assertResponseIsSuccessful();
+        $this->assertTrue($this->hasContactCompany($contact->getId(), $company->getId()));
+
+        $logs = $this->getCompanyChangeLogsForContact($contact->getId());
+        $this->assertCount(1, $logs);
+        $this->assertSame('api', $logs[0]->getType());
+        $this->assertSame('API assignment', $logs[0]->getEventName());
+        $this->assertNotSame('API batch assignment', $logs[0]->getEventName());
+        $this->assertSame('Lead added to the company, Single Co', $logs[0]->getActionName());
+        $this->assertSame($company->getId(), $logs[0]->getCompany());
+    }
+
+    public function testSingleAddContactAlreadyAssigned(): void
+    {
+        $company = $this->createNamedCompany('Single Co Existing', 'single-co-existing@example.com');
+        $contact = $this->createNamedLead('Single', 'Existing', 'single-existing@example.com');
+        $this->em->flush();
+        $this->companyModel->addLeadToCompany($company, $contact);
+
+        $this->client->request(
+            Request::METHOD_POST,
+            sprintf('/api/companies/%d/contact/%d/add', $company->getId(), $contact->getId())
+        );
+
+        self::assertResponseIsSuccessful();
+        $this->assertTrue($this->hasContactCompany($contact->getId(), $company->getId()));
+        $this->assertCount(0, $this->getCompanyChangeLogsForContact($contact->getId()));
+    }
+
+    public function testBatchAddContactsNoPermissionPerItem(): void
+    {
+        $adminContact = $this->createNamedLead('Batch', 'Admin', 'batch-admin-contact@example.com');
+        $company      = $this->createNamedCompany('Batch Co E', 'batch-co-e@example.com');
+        $this->em->flush();
+
+        $salesUser = $this->em->getRepository(User::class)->findOneBy(['username' => self::SALES_USER]);
+        $this->assertInstanceOf(User::class, $salesUser);
+        $this->setLeadPermissions($salesUser, ['editown']);
+
+        $this->client->setServerParameter('PHP_AUTH_USER', self::SALES_USER);
+        $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
+
+        $this->requestBatchAddContacts([
+            'assignments' => [
+                ['contactId' => $adminContact->getId(), 'companyId' => $company->getId()],
+            ],
+        ]);
+
+        $response = $this->decodeResponse();
+        self::assertResponseIsSuccessful();
+        $this->assertSame(Response::HTTP_FORBIDDEN, $response['results'][0]['status']);
+        $this->assertSame('Access denied', $response['results'][0]['message']);
+        $this->assertFalse($this->hasContactCompany($adminContact->getId(), $company->getId()));
+    }
+
+    public function testBatchAddContactsGlobalForbiddenWithoutEditPermission(): void
+    {
+        $salesUser = $this->em->getRepository(User::class)->findOneBy(['username' => self::SALES_USER]);
+        $this->assertInstanceOf(User::class, $salesUser);
+        $this->setLeadPermissions($salesUser, ['viewown', 'viewother']);
+
+        $this->client->setServerParameter('PHP_AUTH_USER', self::SALES_USER);
+        $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
+
+        $this->requestBatchAddContacts([
+            'assignments' => [
+                ['contactId' => 1, 'companyId' => 1],
+            ],
+        ]);
+
+        self::assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+    }
+
+    public function testBatchAddContactsExceedsBatchLimit(): void
+    {
+        $assignments = [];
+        for ($i = 0; $i < 201; ++$i) {
+            $assignments[] = ['contactId' => 1, 'companyId' => 1];
+        }
+
+        $this->requestBatchAddContacts([
+            'assignments' => $assignments,
+        ]);
+
+        self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     */
+    private function requestBatchAddContacts(array $payload): void
+    {
+        $this->client->request(
+            Request::METHOD_POST,
+            '/api/companies/batch/addcontacts',
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/json'],
+            json_encode($payload, JSON_THROW_ON_ERROR)
+        );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function decodeResponse(): array
+    {
+        $content = $this->client->getResponse()->getContent();
+        $this->assertNotFalse($content);
+
+        return json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+    }
+
+    /**
+     * @return list<CompanyChangeLog>
+     */
+    private function getCompanyChangeLogsForContact(int $contactId): array
+    {
+        $this->em->clear();
+        $contact = $this->leadModel->getEntity($contactId);
+        $this->assertInstanceOf(Lead::class, $contact);
+
+        return $this->em->getRepository(CompanyChangeLog::class)->findBy(
+            ['lead' => $contact],
+            ['dateAdded' => 'ASC']
+        );
+    }
+
+    private function hasContactCompany(int $contactId, int $companyId): bool
+    {
+        $contact = $this->leadModel->getEntity($contactId);
+        $company = $this->companyModel->getEntity($companyId);
+        $this->assertInstanceOf(Lead::class, $contact);
+        $this->assertInstanceOf(Company::class, $company);
+
+        return null !== $this->em->getRepository(CompanyLead::class)->findOneBy([
+            'lead'    => $contact,
+            'company' => $company,
+        ]);
+    }
+
+    /**
+     * @param list<string> $permissions
+     */
+    private function setLeadPermissions(User $user, array $permissions): void
+    {
+        $role = $user->getRole();
+        $this->assertInstanceOf(\Mautic\UserBundle\Entity\Role::class, $role);
+
+        $this->em->createQueryBuilder()
+            ->delete(Permission::class, 'p')
+            ->where('p.bundle = :bundle')
+            ->andWhere('p.role = :role_id')
+            ->setParameters(['bundle' => 'lead', 'role_id' => $role->getId()])
+            ->getQuery()
+            ->execute();
+
+        $role->setIsAdmin(false);
+        $roleModel = self::getContainer()->get(RoleModel::class);
+        $roleModel->setRolePermissions($role, ['lead:leads' => $permissions]);
+        $this->em->persist($role);
+        $this->em->flush();
     }
 
     /**
