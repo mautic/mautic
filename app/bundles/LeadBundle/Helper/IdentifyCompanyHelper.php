@@ -38,18 +38,8 @@ final readonly class IdentifyCompanyHelper
             $companyEntity = end($companies);
             $companyData   = $companyEntity->getProfileFields();
 
-<<<<<<< HEAD
-            if ($lead && null !== $companyLeadRepository) {
-                $companyLead     = $companyLeadRepository->getCompaniesByLeadId($lead->getId(), $companyEntity->getId());
-=======
             if ($lead) {
-<<<<<<< HEAD
-                $companyLeadRepo = $this->companyModel->getCompanyLeadRepository();
-                $companyLead     = $companyLeadRepo->getCompaniesByLeadId($lead->getId(), $companyEntity->getId());
->>>>>>> 633a44e98f ([lead] convert IdentifyCompanyHelper to a service)
-=======
                 $companyLead     = $this->companyLeadRepository->getCompaniesByLeadId($lead->getId(), $companyEntity->getId());
->>>>>>> 50ef4c0137 (fixup! [docs] add UPGRADE-8.0 entry for IdentifyCompanyHelper service change)
                 if ([] !== $companyLead) {
                     $addContactToCompany = false;
                 }
