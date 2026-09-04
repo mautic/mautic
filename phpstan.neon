@@ -41,6 +41,10 @@ parameters:
     bootstrapFiles:
         - phpstan-bootstrap.php
     ignoreErrors:
+        # CompanyLeadRepository is only needed by the static IdentifyCompanyHelper, exposed via getter to avoid threading it through 9 call sites
+        -
+            identifier: mautic.noServiceGetter
+            path: app/bundles/LeadBundle/Model/CompanyModel.php
         # ReportGenerator keeps a nullable form factory for its lazy build flow
         -
             identifier: mautic.noNullableServiceInConstructor
