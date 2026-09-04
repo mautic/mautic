@@ -30,13 +30,14 @@ final class StatLazyLoadingTest extends MauticMysqlTestCase
 
         // Middleware (DebugStack's replacement) wraps the driver at connection-construction
         // time, too late for an already-open connection, so DebugStack is used deliberately.
-        // @phpstan-ignore new.deprecated
+        // @phpstan-ignore new.deprecatedClass, method.deprecatedClass
         $logger = new DebugStack();
         // @phpstan-ignore method.deprecated
         $this->connection->getConfiguration()->setSQLLogger($logger);
 
         $freshStat = $this->em->getRepository(Stat::class)->find($statId);
 
+        // @phpstan-ignore property.deprecatedClass
         foreach ($logger->queries as $query) {
             Assert::assertStringNotContainsStringIgnoringCase(
                 'email_stats_data',
@@ -52,6 +53,7 @@ final class StatLazyLoadingTest extends MauticMysqlTestCase
 
         Assert::assertSame(['{token}' => 'value'], $tokens);
         Assert::assertTrue(
+            // @phpstan-ignore property.deprecatedClass
             (bool) array_filter($logger->queries, static fn ($q) => str_contains(strtolower($q['sql']), 'email_stats_data')),
             'getTokens() should have triggered a query against email_stats_data.'
         );

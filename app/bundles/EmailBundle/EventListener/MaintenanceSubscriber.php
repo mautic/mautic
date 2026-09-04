@@ -40,7 +40,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function onDataCleanupForTable(MaintenanceEvent $event, \DateTime $thresholdDate, string $tableName, string $idColumn, string $message): void
+    private function onDataCleanupForTable(MaintenanceEvent $event, \DateTimeInterface $thresholdDate, string $tableName, string $idColumn, string $message): void
     {
         $qb = null;
         if ($event->isDryRun()) {
@@ -48,12 +48,14 @@ class MaintenanceSubscriber implements EventSubscriberInterface
         } else {
             $rows = $this->executeCompaction($tableName, $idColumn, $thresholdDate, $qb);
         }
-        assert(null !== $qb);
 
         $event->setStat($message, $rows, $qb->getSQL(), $qb->getParameters());
     }
 
-    private function getCompactionCount(string $tableName, string $idColumn, \DateTime $thresholdDate, ?QueryBuilder &$qb): int
+    /**
+     * @param-out QueryBuilder $qb
+     */
+    private function getCompactionCount(string $tableName, string $idColumn, \DateTimeInterface $thresholdDate, ?QueryBuilder &$qb): int
     {
         $qb = $this->db->createQueryBuilder();
 
@@ -65,7 +67,10 @@ class MaintenanceSubscriber implements EventSubscriberInterface
             ->fetchOne();
     }
 
-    private function executeCompaction(string $tableName, string $idColumn, \DateTime $thresholdDate, ?QueryBuilder &$qb): int
+    /**
+     * @param-out QueryBuilder $qb
+     */
+    private function executeCompaction(string $tableName, string $idColumn, \DateTimeInterface $thresholdDate, ?QueryBuilder &$qb): int
     {
         $qb = $this->db->createQueryBuilder();
 

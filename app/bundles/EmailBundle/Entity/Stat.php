@@ -20,7 +20,7 @@ class Stat
 
     public const TABLE_NAME = 'email_stats';
 
-    private ?int $id = null;
+    private ?string $id = null;
 
     /**
      * @var Email|null
@@ -121,7 +121,7 @@ class Stat
     /**
      * @var ArrayCollection|StatOpenDetail[]
      */
-    private $dataOpenDetails = [];
+    private $dataOpenDetails;
 
     /**
      * @var array<string,mixed[]>
@@ -323,7 +323,7 @@ class Stat
         $this->email = $email;
     }
 
-    public function getId(): ?int
+    public function getId(): ?string
     {
         return $this->id;
     }

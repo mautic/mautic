@@ -14,7 +14,7 @@ class StatOpenDetail
 
     public const ROW_ID_KEY = '_id';
 
-    private ?int $id = null;
+    private ?string $id = null;
 
     private ?Stat $stat = null;
 
@@ -59,7 +59,7 @@ class StatOpenDetail
      *
      * @return array<int|string,mixed>
      */
-    public static function mergeOpenDetail(array $openDetails, array $openDetail, ?int $id): array
+    public static function mergeOpenDetail(array $openDetails, array $openDetail, ?string $id): array
     {
         if (isset($openDetail[self::BOUNCES_KEY])) {
             $entry                             = $openDetail[self::BOUNCES_KEY][0];
@@ -91,7 +91,7 @@ class StatOpenDetail
             ->build();
     }
 
-    public function getId(): ?int
+    public function getId(): ?string
     {
         return $this->id;
     }
@@ -125,10 +125,7 @@ class StatOpenDetail
         return $this->openDetail ?? [];
     }
 
-    /**
-     * @return Stat
-     */
-    public function setOpenDetail(array $openDetail)
+    public function setOpenDetail(array $openDetail): self
     {
         $this->openDetail = $openDetail;
 

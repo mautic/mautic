@@ -53,7 +53,7 @@ final class EmailStatModelTest extends TestCase
                     case 1:
                         Assert::assertSame(EmailEvents::ON_EMAIL_STAT_POST_SAVE, $eventName);
                         Assert::assertCount(1, $event->getStats());
-                        Assert::assertSame(123, $event->getStats()[0]->getId());
+                        Assert::assertSame('123', $event->getStats()[0]->getId());
                         break;
                 }
                 ++$this->dispatchMethodCounter;
@@ -74,14 +74,14 @@ final class EmailStatModelTest extends TestCase
 
 final class StatTest extends Stat
 {
-    private ?int $id = null;
+    private ?string $id = null;
 
     public function setId(int $id): void
     {
-        $this->id = $id;
+        $this->id = (string) $id;
     }
 
-    public function getId(): ?int
+    public function getId(): ?string
     {
         return $this->id;
     }
