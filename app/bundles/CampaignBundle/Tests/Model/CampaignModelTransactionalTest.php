@@ -9,7 +9,6 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\EventRepository;
-use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Membership\MembershipBuilder;
@@ -68,7 +67,6 @@ final class CampaignModelTransactionalTest extends TestCase
                 $this->campaignRepositoryMock,
                 $this->createStub(EventRepository::class),
                 $this->createStub(LeadRepository::class),
-                $this->createStub(LeadEventLogRepository::class),
                 $this->createStub(StatRepository::class),
                 $this->createStub(FormRepository::class),
             ])
