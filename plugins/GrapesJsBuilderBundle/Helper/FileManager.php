@@ -29,7 +29,7 @@ final readonly class FileManager
      *
      * @throws FileUploadException
      */
-    public function uploadFiles($request)
+    public function uploadFiles($request): array
     {
         if (isset($request->files->all()['files'])) {
             $files         = $request->files->all()['files'];

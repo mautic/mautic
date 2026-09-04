@@ -81,7 +81,7 @@ final readonly class AssetGenerationHelper
      *
      * @return array
      */
-    public function getAssets($forceRegeneration = false)
+    public function getAssets($forceRegeneration = false): array
     {
         static $assets = [];
 

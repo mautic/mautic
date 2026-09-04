@@ -143,7 +143,7 @@ class TrackableModel extends AbstractCommonModel
      *
      * @return array<Trackable>
      */
-    public function getTrackablesByUrls($urls, $channel, $channelId)
+    public function getTrackablesByUrls($urls, $channel, $channelId): array
     {
         $uniqueUrls = array_unique(
             array_values($urls)
