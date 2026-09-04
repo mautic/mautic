@@ -5,8 +5,8 @@ namespace MauticPlugin\MauticFocusBundle\EventListener;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
+use MauticPlugin\MauticFocusBundle\Entity\StatRepository;
 use MauticPlugin\MauticFocusBundle\FocusEventTypes;
-use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -15,7 +15,7 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
     public function __construct(
         private Translator $translator,
         private RouterInterface $router,
-        private FocusModel $focusModel,
+        private StatRepository $statRepository,
     ) {
     }
 
@@ -43,8 +43,8 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
 
         $leadId = $event->getLeadId();
 
-        $statsViewsByLead = $this->focusModel->getStatRepository()->getStatsViewByLead($leadId, $event->getQueryOptions());
-        $statsClickByLead = $this->focusModel->getStatRepository()->getStatsClickByLead($leadId, $event->getQueryOptions());
+        $statsViewsByLead = $this->statRepository->getStatsViewByLead($leadId, $event->getQueryOptions());
+        $statsClickByLead = $this->statRepository->getStatsClickByLead($leadId, $event->getQueryOptions());
 
         if (!$event->isEngagementCount()) {
             $icon     = 'ri-search-line';

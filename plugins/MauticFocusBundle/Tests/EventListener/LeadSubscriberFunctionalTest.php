@@ -29,24 +29,24 @@ final class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
 
     public function testSearchPhraseInNameFocusStat(): void
     {
-        $this->assertCount(3, $this->searchPhrase('bar', $this->lead, $this->focusModel));
-        $this->assertCount(4, $this->searchPhrase('popup', $this->lead, $this->focusModel));
-        $this->assertCount(2, $this->searchPhrase('popup focus B', $this->lead, $this->focusModel));
+        $this->assertCount(3, $this->searchPhrase('bar', $this->lead));
+        $this->assertCount(4, $this->searchPhrase('popup', $this->lead));
+        $this->assertCount(2, $this->searchPhrase('popup focus B', $this->lead));
     }
 
     public function testSearchPhraseInTypeFocusStat(): void
     {
-        $this->assertCount(2, $this->searchPhrase('click', $this->lead, $this->focusModel));
-        $this->assertCount(5, $this->searchPhrase('view', $this->lead, $this->focusModel));
+        $this->assertCount(2, $this->searchPhrase('click', $this->lead));
+        $this->assertCount(5, $this->searchPhrase('view', $this->lead));
     }
 
     /**
      * @return array<string, mixed>
      */
-    private function searchPhrase(string $phrase, Lead $lead, FocusModel $focusModel): array
+    private function searchPhrase(string $phrase, Lead $lead): array
     {
-        $searchViewStats  = $focusModel->getStatRepository()->getStatsViewByLead($lead->getId(), ['search'=>$phrase]);
-        $searchClickStats = $focusModel->getStatRepository()->getStatsClickByLead($lead->getId(), ['search'=>$phrase]);
+        $searchViewStats  = $this->em->getRepository(Stat::class)->getStatsViewByLead($lead->getId(), ['search'=>$phrase]);
+        $searchClickStats = $this->em->getRepository(Stat::class)->getStatsClickByLead($lead->getId(), ['search'=>$phrase]);
 
         return array_merge($searchViewStats, $searchClickStats);
     }

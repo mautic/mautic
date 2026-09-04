@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Model\ListModel;
 
 final class DeleteLeadListsCommandFunctionalTest extends MauticMysqlTestCase
@@ -32,7 +33,7 @@ final class DeleteLeadListsCommandFunctionalTest extends MauticMysqlTestCase
 
         /** @var ListModel $listModel */
         $listModel = $this->getContainer()->get(ListModel::class);
-        $leadCount = $listModel->getListLeadRepository()->getContactsCountBySegment($segmentId);
+        $leadCount = $this->em->getRepository(ListLead::class)->getContactsCountBySegment($segmentId);
         $this->assertSame(5, $leadCount);
 
         $listModel->deleteEntity($segment);
@@ -47,7 +48,7 @@ final class DeleteLeadListsCommandFunctionalTest extends MauticMysqlTestCase
 
         $this->testSymfonyCommand(DeleteLeadListsCommand::COMMAND_NAME, ['list-id' => $segmentId]);
 
-        $leadCount = $listModel->getListLeadRepository()->getContactsCountBySegment($segmentId);
+        $leadCount = $this->em->getRepository(ListLead::class)->getContactsCountBySegment($segmentId);
         $this->assertSame(0, $leadCount);
 
         $deletedEntity = $listModel->getSoftDeletedEntity($segmentId);
@@ -67,7 +68,7 @@ final class DeleteLeadListsCommandFunctionalTest extends MauticMysqlTestCase
 
         /** @var ListModel $listModel */
         $listModel = $this->getContainer()->get(ListModel::class);
-        $leadCount = $listModel->getListLeadRepository()->getContactsCountBySegment($segmentBId);
+        $leadCount = $this->em->getRepository(ListLead::class)->getContactsCountBySegment($segmentBId);
         $this->assertSame(5, $leadCount);
 
         // Test segments delete command without ids
@@ -84,7 +85,7 @@ final class DeleteLeadListsCommandFunctionalTest extends MauticMysqlTestCase
         // command without  args --list-id
         $this->testSymfonyCommand(DeleteLeadListsCommand::COMMAND_NAME);
 
-        $leadCount = $listModel->getListLeadRepository()->getContactsCountBySegment($segmentBId);
+        $leadCount = $this->em->getRepository(ListLead::class)->getContactsCountBySegment($segmentBId);
         $this->assertSame(0, $leadCount);
 
         $deletedEntity = $listModel->getSoftDeletedEntity($segmentBId);

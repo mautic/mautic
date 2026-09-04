@@ -27,11 +27,6 @@ class IntegrationEntityModel extends FormModel
         $this->integrationEntityRepository = $integrationEntityRepository;
     }
 
-    public function getIntegrationEntityRepository(): IntegrationEntityRepository
-    {
-        return $this->integrationEntityRepository;
-    }
-
     public function logDataSync(IntegrationObject $integrationObject): void
     {
     }

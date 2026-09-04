@@ -73,6 +73,7 @@ final class ReplyTest extends \PHPUnit\Framework\TestCase
         $this->leadRepository     = $this->createMock(LeadRepository::class);
         $this->processor          = new Reply(
             $this->emailStatModel,
+            $this->statRepo,
             $this->contactFinder,
             $this->dispatcher,
             $this->createStub(Logger::class),
@@ -80,8 +81,6 @@ final class ReplyTest extends \PHPUnit\Framework\TestCase
             $emailAddressHelper,
             $this->leadRepository
         );
-
-        $this->emailStatModel->method('getRepository')->willReturn($this->statRepo);
     }
 
     #[TestDox('Test that the message is processed appropriately')]

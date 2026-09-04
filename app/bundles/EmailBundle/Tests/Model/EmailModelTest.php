@@ -21,7 +21,6 @@ use Mautic\CoreBundle\Model\AbTest\AbTestSettingsService;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Test\Doctrine\DBALMocker;
 use Mautic\CoreBundle\Translation\Translator;
-use Mautic\EmailBundle\Entity\CopyRepository;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Entity\Stat;
@@ -222,7 +221,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->companyRepository         = $this->createMock(CompanyRepository::class);
         $dncModel                        = $this->createMock(DoNotContact::class);
         $this->emailStatModel            = $this->createMock(EmailStatModel::class);
-        $statHelper                      = new StatHelper($this->emailStatModel);
+        $statHelper                      = new StatHelper($this->emailStatModel, $this->statRepository);
         $this->sendToContactModel        = new SendEmailToContact($this->mailHelper, $statHelper, $dncModel, $this->translator);
         $this->deviceTrackerMock         = $this->createMock(DeviceTracker::class);
         $this->redirectRepositoryMock    = $this->createStub(RedirectRepository::class);
@@ -246,7 +245,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->companyRepository         = $this->createMock(CompanyRepository::class);
         $dncModel                        = $this->createMock(DoNotContact::class);
         $this->emailStatModel            = $this->createMock(EmailStatModel::class);
-        $statHelper                      = new StatHelper($this->emailStatModel);
+        $statHelper                      = new StatHelper($this->emailStatModel, $this->statRepository);
         $this->sendToContactModel        = new SendEmailToContact($this->mailHelper, $statHelper, $dncModel, $this->translator);
         $this->deviceTrackerMock         = $this->createMock(DeviceTracker::class);
         $this->redirectRepositoryMock    = $this->createStub(RedirectRepository::class);
@@ -288,7 +287,6 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->abTestSettingsServiceMock,
             $this->createStub(EmailVariantConverterService::class),
             $this->emailRepository, // $emailRepository
-            $this->createStub(CopyRepository::class), // $copyRepository
             $this->createStub(StatDeviceRepository::class), // $statDeviceRepository
             $this->leadDeviceRepository, // $leadDeviceRepository
             $this->createStub(CampaignRepository::class), // $campaignRepository
@@ -297,9 +295,8 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(LeadRepository::class), // $leadRepository
             $this->createStub(LeadEventLogRepository::class), // $leadEventLogRepository
             $this->companyRepository, // $companyRepository
+            $this->statRepository, // $statRepository
         );
-
-        $this->emailStatModel->method('getRepository')->willReturn($this->statRepository);
     }
 
     /**
@@ -633,7 +630,6 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->abTestSettingsServiceMock,
             $this->createStub(EmailVariantConverterService::class),
             $this->emailRepository, // $emailRepository
-            $this->createStub(CopyRepository::class), // $copyRepository
             $this->createStub(StatDeviceRepository::class), // $statDeviceRepository
             $this->leadDeviceRepository, // $leadDeviceRepository
             $this->createStub(CampaignRepository::class), // $campaignRepository
@@ -642,6 +638,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(LeadRepository::class), // $leadRepository
             $this->createStub(LeadEventLogRepository::class), // $leadEventLogRepository
             $this->companyRepository, // $companyRepository
+            $this->statRepository, // $statRepository
         );
 
         $contacts = [
@@ -778,7 +775,6 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->abTestSettingsServiceMock,
             $this->createStub(EmailVariantConverterService::class),
             $this->emailRepository, // $emailRepository
-            $this->createStub(CopyRepository::class), // $copyRepository
             $this->createStub(StatDeviceRepository::class), // $statDeviceRepository
             $this->leadDeviceRepository, // $leadDeviceRepository
             $this->createStub(CampaignRepository::class), // $campaignRepository
@@ -787,6 +783,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(LeadRepository::class), // $leadRepository
             $this->createStub(LeadEventLogRepository::class), // $leadEventLogRepository
             $this->companyRepository, // $companyRepository
+            $this->statRepository, // $statRepository
         );
 
         $this->emailEntity->method('getId')

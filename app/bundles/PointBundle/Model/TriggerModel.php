@@ -74,14 +74,6 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
         return $this->triggerRepository;
     }
 
-    /**
-     * Retrieves an instance of the TriggerEventRepository.
-     */
-    public function getEventRepository(): TriggerEventRepository
-    {
-        return $this->triggerEventRepository;
-    }
-
     public function getPermissionBase(): string
     {
         return 'point:triggers';

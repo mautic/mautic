@@ -39,11 +39,6 @@ final class VideoModel extends FormModel
         $this->videoHitRepository = $videoHitRepository;
     }
 
-    public function getHitRepository(): VideoHitRepository
-    {
-        return $this->videoHitRepository;
-    }
-
     public function getPermissionBase(): string
     {
         return 'page:pages';

@@ -436,10 +436,6 @@ final class ImportModelTest extends StandardImportTestHelper
             ->setConstructorArgs([16 => $this->entityManager])
             ->getMock();
 
-        $leadModel
-            ->method('getEventLogRepository')
-            ->willReturn($logRepository);
-
         /** @var MockObject&CompanyModel $companyModel */
         $companyModel = $this->getMockBuilder(CompanyModel::class)
             ->disableOriginalConstructor()

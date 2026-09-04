@@ -303,11 +303,6 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         return $this->assetRepository;
     }
 
-    public function getDownloadRepository(): DownloadRepository
-    {
-        return $this->downloadRepository;
-    }
-
     public function getPermissionBase(): string
     {
         return 'asset:assets';

@@ -215,9 +215,4 @@ class EventLogger
 
         $this->persistQueue->clear();
     }
-
-    public function getSummaryModel(): SummaryModel
-    {
-        return $this->summaryModel;
-    }
 }

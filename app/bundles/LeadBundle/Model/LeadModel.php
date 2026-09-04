@@ -40,9 +40,7 @@ use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadCategory;
 use Mautic\LeadBundle\Entity\LeadCategoryRepository;
-use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Entity\LeadEventLog;
-use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
@@ -50,13 +48,11 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\MergeRecordRepository;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
-use Mautic\LeadBundle\Entity\PointsChangeLogRepository;
 use Mautic\LeadBundle\Entity\StagesChangeLog;
 use Mautic\LeadBundle\Entity\StagesChangeLogRepository;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
 use Mautic\LeadBundle\Entity\UtmTag;
-use Mautic\LeadBundle\Entity\UtmTagRepository;
 use Mautic\LeadBundle\Event\CategoryChangeEvent;
 use Mautic\LeadBundle\Event\DoNotContactAddEvent;
 use Mautic\LeadBundle\Event\DoNotContactRemoveEvent;
@@ -73,7 +69,6 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
-use Mautic\PointBundle\Entity\GroupContactScoreRepository;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Entity\StageRepository;
 use Mautic\UserBundle\Entity\User;
@@ -158,16 +153,11 @@ class LeadModel extends FormModel
         LoggerInterface $mauticLogger,
         private readonly LeadRepository $leadRepository,
         private readonly TagRepository $tagRepository,
-        private readonly PointsChangeLogRepository $pointsChangeLogRepository,
-        private readonly UtmTagRepository $utmTagRepository,
-        private readonly LeadDeviceRepository $leadDeviceRepository,
-        private readonly LeadEventLogRepository $leadEventLogRepository,
         private readonly FrequencyRuleRepository $frequencyRuleRepository,
         private readonly StagesChangeLogRepository $stagesChangeLogRepository,
         private readonly LeadCategoryRepository $leadCategoryRepository,
         private readonly MergeRecordRepository $mergeRecordRepository,
         private readonly LeadListRepository $leadListRepository,
-        private readonly GroupContactScoreRepository $groupContactScoreRepository,
         private readonly StageRepository $stageRepository,
         private readonly UserRepository $userRepository,
         private readonly CompanyLeadRepository $companyLeadRepository,
@@ -209,71 +199,6 @@ class LeadModel extends FormModel
         }
 
         return $this->leadRepository;
-    }
-
-    public function getPointLogRepository(): PointsChangeLogRepository
-    {
-        return $this->pointsChangeLogRepository;
-    }
-
-    /**
-     * Get the tags repository.
-     */
-    public function getUtmTagRepository(): UtmTagRepository
-    {
-        return $this->utmTagRepository;
-    }
-
-    /**
-     * Get the tags repository.
-     */
-    public function getDeviceRepository(): LeadDeviceRepository
-    {
-        return $this->leadDeviceRepository;
-    }
-
-    /**
-     * Get the lead event log repository.
-     */
-    public function getEventLogRepository(): LeadEventLogRepository
-    {
-        return $this->leadEventLogRepository;
-    }
-
-    /**
-     * Get the frequency rules repository.
-     */
-    public function getFrequencyRuleRepository(): FrequencyRuleRepository
-    {
-        return $this->frequencyRuleRepository;
-    }
-
-    public function getStagesChangeLogRepository(): StagesChangeLogRepository
-    {
-        return $this->stagesChangeLogRepository;
-    }
-
-    /**
-     * Get the lead categories repository.
-     */
-    public function getLeadCategoryRepository(): LeadCategoryRepository
-    {
-        return $this->leadCategoryRepository;
-    }
-
-    public function getMergeRecordRepository(): MergeRecordRepository
-    {
-        return $this->mergeRecordRepository;
-    }
-
-    public function getLeadListRepository(): LeadListRepository
-    {
-        return $this->leadListRepository;
-    }
-
-    public function getGroupContactScoreRepository(): GroupContactScoreRepository
-    {
-        return $this->groupContactScoreRepository;
     }
 
     public function getPermissionBase(): string
@@ -525,7 +450,7 @@ class LeadModel extends FormModel
             $this->companyModel->addLeadToCompany($companyEntity, $entity);
             $this->setPrimaryCompany($companyEntity->getId(), $entity->getId());
         } elseif (array_key_exists('company', $updatedFields) && empty($updatedFields['company'])) {
-            $this->companyModel->getCompanyLeadRepository()->removeContactPrimaryCompany($entity->getId());
+            $this->companyLeadRepository->removeContactPrimaryCompany($entity->getId());
         }
 
         if (null !== $changeLogEntity) {
@@ -1887,7 +1812,7 @@ class LeadModel extends FormModel
     public function modifyCompanies(Lead $lead, array $companies): void
     {
         // See which companies belong to the lead already
-        $leadCompanies = $this->companyModel->getCompanyLeadRepository()->getCompaniesByLeadId($lead->getId());
+        $leadCompanies = $this->companyLeadRepository->getCompaniesByLeadId($lead->getId());
 
         $requestedCompanies = new Collection($companies);
         $currentCompanies   = new Collection($leadCompanies)->keyBy('company_id');
@@ -2244,7 +2169,7 @@ class LeadModel extends FormModel
             return false;
         }
 
-        $companyLead = $this->companyModel->getCompanyLeadRepository()->getCompaniesByLeadId($lead->getId(), $company->getId());
+        $companyLead = $this->companyLeadRepository->getCompaniesByLeadId($lead->getId(), $company->getId());
 
         if ([] === $companyLead) {
             $this->companyModel->addLeadToCompany($company, $lead);
@@ -2314,7 +2239,7 @@ class LeadModel extends FormModel
 
         $lead = $this->getEntity($leadId);
 
-        $companyLeads = $this->companyModel->getCompanyLeadRepository()->getEntitiesByLead($lead);
+        $companyLeads = $this->companyLeadRepository->getEntitiesByLead($lead);
 
         /** @var CompanyLead $companyLead */
         foreach ($companyLeads as $companyLead) {
@@ -2336,7 +2261,7 @@ class LeadModel extends FormModel
         }
 
         if (!$newPrimaryCompany) {
-            $latestCompany = $this->companyModel->getCompanyLeadRepository()->getLatestCompanyForLead($leadId);
+            $latestCompany = $this->companyLeadRepository->getLatestCompanyForLead($leadId);
             if (!empty($latestCompany)) {
                 $lead->addUpdatedField('company', $latestCompany['companyname'])
                     ->setDateModified(new \DateTime());
@@ -2345,11 +2270,11 @@ class LeadModel extends FormModel
 
         if ([] !== $companyArray) {
             $this->leadRepository->saveEntity($lead);
-            $this->companyModel->getCompanyLeadRepository()->saveEntities($companyArray, false);
+            $this->companyLeadRepository->saveEntities($companyArray, false);
         }
 
         // Clear CompanyLead entities from Doctrine memory
-        $this->companyModel->getCompanyLeadRepository()->detachEntities($companyLeads);
+        $this->companyLeadRepository->detachEntities($companyLeads);
 
         return ['oldPrimary' => $oldPrimaryCompany, 'newPrimary' => $companyId];
     }
@@ -2358,7 +2283,7 @@ class LeadModel extends FormModel
     {
         $success          = false;
         $entities         = [];
-        $contactCompanies = $this->companyModel->getCompanyLeadRepository()->getCompaniesByLeadId($lead->getId());
+        $contactCompanies = $this->companyLeadRepository->getCompaniesByLeadId($lead->getId());
 
         foreach ($contactCompanies as $contactCompany) {
             $company  = $this->companyModel->getEntity($contactCompany['company_id']);

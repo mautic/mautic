@@ -9,9 +9,9 @@ use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\CompanyRepository;
+use Mautic\LeadBundle\Entity\PointsChangeLogRepository;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Model\FieldModel;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Report\DncReportService;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ColumnCollectEvent;
@@ -64,7 +64,7 @@ final class ReportSubscriber implements EventSubscriberInterface
     private ?array $channelActions = null;
 
     public function __construct(
-        private readonly LeadModel $leadModel,
+        private readonly PointsChangeLogRepository $pointsChangeLogRepository,
         private readonly FieldModel $fieldModel,
         private readonly StageModel $stageModel,
         private readonly EventCollector $eventCollector,
@@ -391,7 +391,6 @@ final class ReportSubscriber implements EventSubscriberInterface
 
         $graphs       = $event->getRequestedGraphs();
         $qb           = $event->getQueryBuilder();
-        $pointLogRepo = $this->leadModel->getPointLogRepository();
 
         foreach ($graphs as $g) {
             $queryBuilder = clone $qb;
@@ -509,7 +508,7 @@ final class ReportSubscriber implements EventSubscriberInterface
                         ->orderBy('points', 'DESC');
                     $limit                  = 10;
                     $offset                 = 0;
-                    $items                  = $pointLogRepo->getMostPoints($queryBuilder, $limit, $offset);
+                    $items                  = $this->pointsChangeLogRepository->getMostPoints($queryBuilder, $limit, $offset);
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
@@ -525,7 +524,7 @@ final class ReportSubscriber implements EventSubscriberInterface
                     $limit  = 10;
                     $offset = 0;
 
-                    $items                  = $pointLogRepo->getMostLeads($queryBuilder, $limit, $offset);
+                    $items                  = $this->pointsChangeLogRepository->getMostLeads($queryBuilder, $limit, $offset);
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
@@ -540,7 +539,7 @@ final class ReportSubscriber implements EventSubscriberInterface
                     $limit  = 10;
                     $offset = 0;
 
-                    $items                  = $pointLogRepo->getMostLeads($queryBuilder, $limit, $offset);
+                    $items                  = $this->pointsChangeLogRepository->getMostLeads($queryBuilder, $limit, $offset);
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
@@ -554,7 +553,7 @@ final class ReportSubscriber implements EventSubscriberInterface
                         ->orderBy('events', 'DESC');
                     $limit                  = 10;
                     $offset                 = 0;
-                    $items                  = $pointLogRepo->getMostPoints($queryBuilder, $limit, $offset);
+                    $items                  = $this->pointsChangeLogRepository->getMostPoints($queryBuilder, $limit, $offset);
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
@@ -568,7 +567,7 @@ final class ReportSubscriber implements EventSubscriberInterface
                         ->orderBy('actions', 'DESC');
                     $limit                  = 10;
                     $offset                 = 0;
-                    $items                  = $pointLogRepo->getMostPoints($queryBuilder, $limit, $offset);
+                    $items                  = $this->pointsChangeLogRepository->getMostPoints($queryBuilder, $limit, $offset);
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;

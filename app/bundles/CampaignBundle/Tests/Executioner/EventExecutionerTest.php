@@ -185,6 +185,7 @@ final class EventExecutionerTest extends \PHPUnit\Framework\TestCase
             $this->createStub(LoggerInterface::class),
             $this->eventScheduler,
             $this->createStub(RemovedContactTracker::class),
+            $this->createStub(\Mautic\CampaignBundle\Model\SummaryModel::class),
         );
     }
 

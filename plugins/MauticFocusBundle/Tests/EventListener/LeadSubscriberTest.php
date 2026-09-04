@@ -12,7 +12,6 @@ use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use MauticPlugin\MauticFocusBundle\Entity\StatRepository;
 use MauticPlugin\MauticFocusBundle\EventListener\LeadSubscriber;
 use MauticPlugin\MauticFocusBundle\FocusEventTypes;
-use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Rule\AnyInvokedCount;
@@ -28,11 +27,6 @@ final class LeadSubscriberTest extends CommonMocks
     private MockObject $translator;
 
     /**
-     * @var MockObject&FocusModel
-     */
-    private MockObject $focusModel;
-
-    /**
      * @var MockObject&StatRepository
      */
     private MockObject $statRepository;
@@ -46,7 +40,6 @@ final class LeadSubscriberTest extends CommonMocks
     protected function setUp(): void
     {
         $this->translator     = $this->createMock(Translator::class);
-        $this->focusModel     = $this->createMock(FocusModel::class);
         $this->statRepository = $this->createMock(StatRepository::class);
 
         $matcher              =  new AnyInvokedCount();
@@ -87,7 +80,7 @@ final class LeadSubscriberTest extends CommonMocks
         $subscriber = new LeadSubscriber(
             $this->translator,
             $this->createStub(RouterInterface::class),
-            $this->focusModel
+            $this->statRepository
         );
 
         $dispatcher = new EventDispatcher();
@@ -111,7 +104,7 @@ final class LeadSubscriberTest extends CommonMocks
         $subscriber = new LeadSubscriber(
             $this->translator,
             $this->createStub(RouterInterface::class),
-            $this->focusModel
+            $this->statRepository
         );
 
         $dispatcher = new EventDispatcher();
@@ -140,7 +133,7 @@ final class LeadSubscriberTest extends CommonMocks
         $subscriber = new LeadSubscriber(
             $this->translator,
             $this->createStub(RouterInterface::class),
-            $this->focusModel
+            $this->statRepository
         );
 
         $dispatcher = new EventDispatcher();
@@ -164,7 +157,7 @@ final class LeadSubscriberTest extends CommonMocks
         $subscriber = new LeadSubscriber(
             $this->translator,
             $this->createStub(RouterInterface::class),
-            $this->focusModel
+            $this->statRepository
         );
 
         $dispatcher = new EventDispatcher();
@@ -190,7 +183,6 @@ final class LeadSubscriberTest extends CommonMocks
         ];
 
         $this->statRepository->method($method)->willReturn($stats);
-        $this->focusModel->method('getStatRepository')->willReturn($this->statRepository);
     }
 
     private function getLead(): Lead

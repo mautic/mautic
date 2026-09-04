@@ -10,7 +10,6 @@ use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Entity\IntegrationRepository;
 use Mautic\PluginBundle\EventListener\LeadSubscriber;
-use Mautic\PluginBundle\Model\PluginModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -30,17 +29,12 @@ final class LeadSubscriberTest extends TestCase
 
     protected function setUp(): void
     {
-        $pluginModel                       = $this->createMock(PluginModel::class);
         $this->integrationRepository       = $this->createMock(IntegrationRepository::class);
         $this->integrationEntityRepository = $this->createMock(IntegrationEntityRepository::class);
         $this->subscriber                  = new LeadSubscriber(
-            $pluginModel,
+            $this->integrationEntityRepository,
             $this->integrationRepository
         );
-
-        $pluginModel->expects($this->once())
-            ->method('getIntegrationEntityRepository')
-            ->willReturn($this->integrationEntityRepository);
     }
 
     public function testOnLeadSaveWithoutActiveIntegration(): void

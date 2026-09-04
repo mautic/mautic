@@ -331,15 +331,14 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         }
 
         if (MailHelper::EMAIL_TYPE_MARKETING == $type) {
-            $statRepository = $this->emailModel->getStatRepository();
             // Determine if this lead has received the email before and if so, don't send it again
-            $stats = $statRepository->getSentCountForContacts($contactIds, $emailId);
+            $stats = $this->statRepository->getSentCountForContacts($contactIds, $emailId);
 
             // Merge stats from variant children
             foreach ($email->getVariantChildren() as $child) {
                 $stats = array_merge(
                     $stats,
-                    $statRepository->getSentCountForContacts($contactIds, $child->getId())
+                    $this->statRepository->getSentCountForContacts($contactIds, $child->getId())
                 );
             }
 

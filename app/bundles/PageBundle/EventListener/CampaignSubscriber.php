@@ -7,8 +7,8 @@ use Mautic\CampaignBundle\Event\DecisionEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\EmailBundle\Helper\UrlMatcher;
+use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadDeviceType;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageHitEvent;
@@ -21,7 +21,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 final readonly class CampaignSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private LeadModel $leadModel,
+        private LeadDeviceRepository $leadDeviceRepository,
         private TrackingHelper $trackingHelper,
         private RealTimeExecutioner $realTimeExecutioner,
     ) {
@@ -121,8 +121,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $deviceRepo = $this->leadModel->getDeviceRepository();
-        $result     = false;
+        $result = false;
 
         $deviceId     = $eventDetails->getDeviceStat() ? $eventDetails->getDeviceStat()->getId() : null;
         $deviceType   = $config['device_type'];
@@ -131,21 +130,21 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
 
         if (!empty($deviceType)) {
             $result = false;
-            if (!empty($deviceRepo->getDevice($lead, $deviceType, null, null, null, $deviceId))) {
+            if (!empty($this->leadDeviceRepository->getDevice($lead, $deviceType, null, null, null, $deviceId))) {
                 $result = true;
             }
         }
 
         if (!empty($deviceBrands)) {
             $result = false;
-            if (!empty($deviceRepo->getDevice($lead, null, $deviceBrands, null, null, $deviceId))) {
+            if (!empty($this->leadDeviceRepository->getDevice($lead, null, $deviceBrands, null, null, $deviceId))) {
                 $result = true;
             }
         }
 
         if (!empty($deviceOs)) {
             $result = false;
-            if (!empty($deviceRepo->getDevice($lead, null, null, null, $deviceOs, $deviceId))) {
+            if (!empty($this->leadDeviceRepository->getDevice($lead, null, null, null, $deviceOs, $deviceId))) {
                 $result = true;
             }
         }

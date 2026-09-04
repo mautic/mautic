@@ -173,7 +173,11 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->createStub(LeadListRepository::class),
             $this->createStub(LeadRepository::class),
             $this->createStub(LeadFieldRepository::class),
-            $this->createStub(TagRepository::class)
+            $this->createStub(TagRepository::class),
+            $this->createStub(\Mautic\CampaignBundle\Entity\LeadRepository::class),
+            $this->createStub(\Mautic\PointBundle\Entity\GroupContactScoreRepository::class),
+            $this->createStub(\Mautic\LeadBundle\Entity\LeadDeviceRepository::class),
+            $this->createStub(CompanyLeadRepository::class)
         );
     }
 
@@ -195,7 +199,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->mockCompanyModel->expects($this->once())->method('getEntity')->willReturn($companyEntityFrom);
 
-        $mockCompanyLeadRepo  = $this->createMock(CompanyLeadRepository::class);
+        $mockCompanyLeadRepo = $this->createMock(CompanyLeadRepository::class);
         $mockCompanyLeadRepo->expects($this->once())->method('getCompaniesByLeadId')->willReturn([]);
 
         $this->mockCompanyModel->expects($this->atLeastOnce())

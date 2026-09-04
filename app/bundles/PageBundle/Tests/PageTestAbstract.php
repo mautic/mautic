@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Helper\BotRatioHelper;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\UtmTagRepository;
@@ -159,7 +160,8 @@ abstract class PageTestAbstract extends TestCase
             $this->createStub(UtmTagRepository::class), // $utmTagRepository
             $this->createStub(RedirectRepository::class),
             $this->createStub(TrackableRepository::class),
-            $this->createStub(LeadRepository::class)
+            $this->createStub(LeadRepository::class),
+            $this->createStub(CompanyLeadRepository::class)
         );
     }
 

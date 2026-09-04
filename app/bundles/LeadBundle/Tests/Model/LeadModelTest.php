@@ -24,17 +24,13 @@ use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadCategoryRepository;
-use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Entity\LeadEventLog;
-use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\MergeRecordRepository;
-use Mautic\LeadBundle\Entity\PointsChangeLogRepository;
 use Mautic\LeadBundle\Entity\StagesChangeLogRepository;
 use Mautic\LeadBundle\Entity\TagRepository;
-use Mautic\LeadBundle\Entity\UtmTagRepository;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\SaveBatchLeadsEvent;
 use Mautic\LeadBundle\Exception\ImportFailedException;
@@ -50,7 +46,6 @@ use Mautic\LeadBundle\Tests\Fixtures\Model\LeadModelStub;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
-use Mautic\PointBundle\Entity\GroupContactScoreRepository;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Entity\StageRepository;
 use Mautic\UserBundle\Entity\User;
@@ -192,16 +187,11 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(LoggerInterface::class),
             $this->leadRepositoryMock,
             $this->createStub(TagRepository::class),
-            $this->createStub(PointsChangeLogRepository::class),
-            $this->createStub(UtmTagRepository::class),
-            $this->createStub(LeadDeviceRepository::class),
-            $this->createStub(LeadEventLogRepository::class),
             $this->createStub(FrequencyRuleRepository::class),
             $this->stagesChangeLogRepositoryMock,
             $this->createStub(LeadCategoryRepository::class),
             $this->createStub(MergeRecordRepository::class),
             $this->createStub(LeadListRepository::class),
-            $this->createStub(GroupContactScoreRepository::class),
             $this->stageRepositoryMock,
             $this->createStub(UserRepository::class),
             $this->companyLeadRepositoryMock,
@@ -211,8 +201,6 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->setSecurity($this->leadModel);
-
-        $this->companyModelMock->method('getCompanyLeadRepository')->willReturn($this->companyLeadRepositoryMock);
     }
 
     public function testIpLookupDoesNotAddCompanyIfConfiguredSo(): void
@@ -612,10 +600,6 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
             $leadCompanies[] = ['company_id' => $i];
         }
 
-        $this->companyModelMock->expects($this->once())
-            ->method('getCompanyLeadRepository')
-            ->willReturn($this->companyLeadRepositoryMock);
-
         $this->companyLeadRepositoryMock->expects($this->once())
             ->method('getCompaniesByLeadId')
             ->with($lead->getId())
@@ -678,7 +662,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
         $action = 'post_batch_save';
 
         // Lead Model that provides access to dispatchBatchEvent
-        $leadModel = new class($this->requestStack, $this->createStub(IpLookupHelper::class), $this->createStub(PathsHelper::class), $this->createStub(IntegrationHelper::class), $this->fieldModelMock, $this->fieldsWithUniqueIdentifier, $this->createStub(ListModel::class), $this->createStub(FormFactory::class), $this->companyModelMock, $this->createStub(CategoryModel::class), $this->channelListHelperMock, $this->coreParametersHelperMock, $this->emailValidatorMock, $this->createStub(UserProvider::class), $this->createStub(ContactTracker::class), $this->createStub(DeviceTracker::class), $this->createStub(IpAddressModel::class), $this->entityManagerMock, $this->createStub(CorePermissions::class), $this->dispatcherMock, $this->createStub(UrlGeneratorInterface::class), $this->translator, $this->userHelperMock, $this->createStub(LoggerInterface::class), $this->leadRepositoryMock, $this->createStub(TagRepository::class), $this->createStub(PointsChangeLogRepository::class), $this->createStub(UtmTagRepository::class), $this->createStub(LeadDeviceRepository::class), $this->createStub(LeadEventLogRepository::class), $this->createStub(FrequencyRuleRepository::class), $this->stagesChangeLogRepositoryMock, $this->createStub(LeadCategoryRepository::class), $this->createStub(MergeRecordRepository::class), $this->createStub(LeadListRepository::class), $this->createStub(GroupContactScoreRepository::class), $this->stageRepositoryMock, $this->createStub(UserRepository::class), $this->companyLeadRepositoryMock, $this->createStub(StatRepository::class), $this->createStub(CompanyRepository::class), $this->fieldListMock) extends LeadModel {
+        $leadModel = new class($this->requestStack, $this->createStub(IpLookupHelper::class), $this->createStub(PathsHelper::class), $this->createStub(IntegrationHelper::class), $this->fieldModelMock, $this->fieldsWithUniqueIdentifier, $this->createStub(ListModel::class), $this->createStub(FormFactory::class), $this->companyModelMock, $this->createStub(CategoryModel::class), $this->channelListHelperMock, $this->coreParametersHelperMock, $this->emailValidatorMock, $this->createStub(UserProvider::class), $this->createStub(ContactTracker::class), $this->createStub(DeviceTracker::class), $this->createStub(IpAddressModel::class), $this->entityManagerMock, $this->createStub(CorePermissions::class), $this->dispatcherMock, $this->createStub(UrlGeneratorInterface::class), $this->translator, $this->userHelperMock, $this->createStub(LoggerInterface::class), $this->leadRepositoryMock, $this->createStub(TagRepository::class), $this->createStub(FrequencyRuleRepository::class), $this->stagesChangeLogRepositoryMock, $this->createStub(LeadCategoryRepository::class), $this->createStub(MergeRecordRepository::class), $this->createStub(LeadListRepository::class), $this->stageRepositoryMock, $this->createStub(UserRepository::class), $this->companyLeadRepositoryMock, $this->createStub(StatRepository::class), $this->createStub(CompanyRepository::class), $this->fieldListMock) extends LeadModel {
             /**
              * @param array<mixed> $leads
              */

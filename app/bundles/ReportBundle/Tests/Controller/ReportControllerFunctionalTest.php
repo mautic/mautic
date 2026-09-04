@@ -12,7 +12,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
-use Mautic\PageBundle\Model\PageModel;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Entity\SchedulerRepository;
 use Mautic\ReportBundle\Model\ReportFileWriter;
@@ -39,9 +38,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $query->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph');
         $query->leftJoin('ph', MAUTIC_TABLE_PREFIX.'pages', 'p', 'ph.page_id = p.id');
 
-        /** @var PageModel $pageModel */
-        $pageModel = self::getContainer()->get(PageModel::class);
-        $res       = $pageModel->getHitRepository()->getMostVisited($query);   // $this->em->getRepository(Hit::class);
+        $res = $this->em->getRepository(Hit::class)->getMostVisited($query);
 
         foreach ($res as $hit) {
             $this->assertNotNull($hit['id']);

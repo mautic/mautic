@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\EmailBundle\Entity\CopyRepository;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Exception\FailedToSendToContactException;
 use Mautic\EmailBundle\Helper\DTO\AddressDTO;
@@ -118,7 +119,7 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $this->dncModel             = $this->createMock(DoNotContact::class);
         $this->mailHelper           = $this->createMock(MailHelper::class);
         $this->emailStatModel       = $this->createMock(EmailStatModel::class);
-        $this->statHelper           = new StatHelper($this->emailStatModel);
+        $this->statHelper           = new StatHelper($this->emailStatModel, $this->createStub(StatRepository::class));
         $this->fromEmaiHelper       = $this->createMock(FromEmailHelper::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->mailbox              = $this->createStub(Mailbox::class);

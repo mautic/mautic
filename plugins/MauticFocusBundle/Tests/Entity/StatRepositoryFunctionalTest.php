@@ -25,12 +25,12 @@ final class StatRepositoryFunctionalTest extends MauticMysqlTestCase
 
     public function testGetStatsViewByLead(): void
     {
-        $this->assertCount(5, $this->focusModel->getStatRepository()->getStatsViewByLead());
+        $this->assertCount(5, $this->em->getRepository(Stat::class)->getStatsViewByLead());
     }
 
     public function testGetStatsClickByLead(): void
     {
-        $this->assertCount(2, $this->focusModel->getStatRepository()->getStatsClickByLead());
+        $this->assertCount(2, $this->em->getRepository(Stat::class)->getStatsClickByLead());
     }
 
     private function createLead(): Lead

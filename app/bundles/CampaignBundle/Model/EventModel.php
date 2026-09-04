@@ -24,10 +24,6 @@ class EventModel extends FormModel
         return 'campaign.event';
     }
 
-    private LeadEventLogRepository $leadEventLogRepository;
-
-    private CampaignRepository $campaignRepository;
-
     private EventRepository $eventRepository;
 
     #[Required]
@@ -37,23 +33,11 @@ class EventModel extends FormModel
         LeadEventLogRepository $leadEventLogRepository,
     ): void {
         $this->eventRepository = $eventRepository;
-        $this->campaignRepository = $campaignRepository;
-        $this->leadEventLogRepository = $leadEventLogRepository;
     }
 
     public function getRepository(): EventRepository
     {
         return $this->eventRepository;
-    }
-
-    public function getCampaignRepository(): CampaignRepository
-    {
-        return $this->campaignRepository;
-    }
-
-    public function getLeadEventLogRepository(): LeadEventLogRepository
-    {
-        return $this->leadEventLogRepository;
     }
 
     public function getPermissionBase(): string

@@ -17,16 +17,14 @@ final class StatHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testStatsAreCreatedAndDeleted(): void
     {
-        $emailStatmodel     = $this->createMock(EmailStatModel::class);
+        $emailStatmodel     = $this->createStub(EmailStatModel::class);
         $mockStatRepository = $this->createMock(StatRepository::class);
-
-        $emailStatmodel->method('getRepository')->willReturn($mockStatRepository);
 
         $mockStatRepository->expects($this->once())
             ->method('deleteStats')
             ->with([1, 2, 3, 4, 5]);
 
-        $statHelper = new StatHelper($emailStatmodel);
+        $statHelper = new StatHelper($emailStatmodel, $mockStatRepository);
 
         $mockEmail = $this->createMock(Email::class);
         $mockEmail->method('getId')
@@ -72,7 +70,7 @@ final class StatHelperTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(StatNotFoundException::class);
 
-        $statHelper = new StatHelper($this->createStub(EmailStatModel::class));
+        $statHelper = new StatHelper($this->createStub(EmailStatModel::class), $this->createStub(StatRepository::class));
 
         $statHelper->getStat('nada@nada.com');
     }

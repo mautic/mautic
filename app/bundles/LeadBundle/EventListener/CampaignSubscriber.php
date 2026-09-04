@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Entity\LeadRepository as CampaignLeadRepository;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Event\ConditionEvent;
@@ -13,6 +14,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\EmailBundle\Helper\UrlMatcher;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
@@ -50,6 +52,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Provider\FilterOperatorProvider;
 use Mautic\LeadBundle\Segment\OperatorOptions;
+use Mautic\PointBundle\Entity\GroupContactScoreRepository;
 use Mautic\PointBundle\Model\PointGroupModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -73,6 +76,10 @@ final class CampaignSubscriber implements EventSubscriberInterface
         private readonly LeadRepository $leadRepository,
         private readonly LeadFieldRepository $leadFieldRepository,
         private readonly TagRepository $tagRepository,
+        private readonly CampaignLeadRepository $campaignLeadRepository,
+        private readonly GroupContactScoreRepository $groupContactScoreRepository,
+        private readonly LeadDeviceRepository $leadDeviceRepository,
+        private readonly CompanyLeadRepository $companyLeadRepository,
     ) {
     }
 
@@ -501,7 +508,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
                 }
 
                 if (null !== $companyChangeLog) {
-                    $this->companyModel->getCompanyLeadRepository()->detachEntity($companyChangeLog);
+                    $this->companyLeadRepository->detachEntity($companyChangeLog);
                 }
             } else {
                 $this->companyModel->setFieldValues($primaryCompany, $config, false);
@@ -524,7 +531,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
         }
 
         if ($event->checkContext('lead.device')) {
-            $result = $this->validateContactDevice($event, $lead, $this->leadModel->getDeviceRepository());
+            $result = $this->validateContactDevice($event, $lead);
         } elseif ($event->checkContext('lead.tags')) {
             $result = $this->tagRepository->checkLeadByTags($lead, $event->getConfig()['tags']);
         } elseif ($event->checkContext('lead.segments')) {
@@ -536,7 +543,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
         } elseif ($event->checkContext('lead.attached')) {
             $result = $this->onCampaignTriggerConditionContactAdded($event);
         } elseif ($event->checkContext('lead.campaigns')) {
-            $result = $this->campaignModel->getCampaignLeadRepository()->checkLeadInCampaigns($lead, $event->getConfig());
+            $result = $this->campaignLeadRepository->checkLeadInCampaigns($lead, $event->getConfig());
         } elseif ($event->checkContext('lead.field_value')) {
             if ('date' === $event->getConfig()['operator']) {
                 // Set the date in system timezone since this is triggered by cron
@@ -707,7 +714,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
             $operatorExpr = $operators[$event->getConfig()['operator']]['expr'];
 
             if ($group) {
-                $result = $this->leadModel->getGroupContactScoreRepository()->compareScore(
+                $result = $this->groupContactScoreRepository->compareScore(
                     $lead->getId(), $group, $score, $operatorExpr,
                 );
             } else {
@@ -830,13 +837,13 @@ final class CampaignSubscriber implements EventSubscriberInterface
      * device specified in the
      * CampaignExecutionEvent's settings.
      */
-    private function validateContactDevice(CampaignExecutionEvent $campaignExecutionEvent, Lead $contact, LeadDeviceRepository $leadDeviceRepository): bool // @phpstan-ignore parameter.deprecatedClass
+    private function validateContactDevice(CampaignExecutionEvent $campaignExecutionEvent, Lead $contact): bool
     {
         $campaignExecutionEventConfig = $campaignExecutionEvent->getConfig();
         $deviceType                   = empty($campaignExecutionEventConfig['device_type']) ? null : $campaignExecutionEventConfig['device_type'];
         $deviceBrands                 = empty($campaignExecutionEventConfig['device_brand']) ? null : $campaignExecutionEventConfig['device_brand'];
         $deviceOs                     = empty($campaignExecutionEventConfig['device_os']) ? null : $campaignExecutionEventConfig['device_os'];
 
-        return !empty($leadDeviceRepository->getDevice($contact, $deviceType, $deviceBrands, null, $deviceOs));
+        return !empty($this->leadDeviceRepository->getDevice($contact, $deviceType, $deviceBrands, null, $deviceOs));
     }
 }

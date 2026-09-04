@@ -29,6 +29,7 @@ use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Helper\BotRatioHelper;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\UtmTag;
@@ -129,6 +130,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         private readonly RedirectRepository $redirectRepository,
         private readonly TrackableRepository $trackableRepository,
         private readonly LeadRepository $leadRepository,
+        private readonly CompanyLeadRepository $companyLeadRepository,
     ) {
         $this->dateTimeHelper = new DateTimeHelper();
 
@@ -145,11 +147,6 @@ class PageModel extends FormModel implements GlobalSearchInterface
         $this->pageRepository->setCurrentUser($this->userHelper->getUser());
 
         return $this->pageRepository;
-    }
-
-    public function getHitRepository(): HitRepository
-    {
-        return $this->hitRepository;
     }
 
     public function getPermissionBase(): string
@@ -457,7 +454,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
             }
 
             if (null !== $companyChangeLog) {
-                $this->companyModel->getCompanyLeadRepository()->detachEntity($companyChangeLog);
+                $this->companyLeadRepository->detachEntity($companyChangeLog);
             }
         }
 

@@ -18,6 +18,7 @@ use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
 use Mautic\CampaignBundle\Executioner\Result\Responses;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CampaignBundle\Helper\RemovedContactTracker;
+use Mautic\CampaignBundle\Model\SummaryModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\LoggerInterface;
 
@@ -36,6 +37,7 @@ class EventExecutioner
         private readonly LoggerInterface $logger,
         private readonly EventScheduler $scheduler,
         private readonly RemovedContactTracker $removedContactTracker,
+        private readonly SummaryModel $summaryModel,
     ) {
         // Be sure that all events are compared using the exact same \DateTime
         $this->executionDate = new \DateTime();
@@ -412,6 +414,6 @@ class EventExecutioner
      */
     public function persistSummaries(): void
     {
-        $this->eventLogger->getSummaryModel()->persistSummaries();
+        $this->summaryModel->persistSummaries();
     }
 }

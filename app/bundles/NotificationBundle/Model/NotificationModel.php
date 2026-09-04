@@ -60,11 +60,6 @@ final class NotificationModel extends FormModel implements AjaxLookupModelInterf
         return $this->notificationRepository;
     }
 
-    public function getStatRepository(): StatRepository
-    {
-        return $this->statRepository;
-    }
-
     public function getPermissionBase(): string
     {
         return 'notification:notifications';

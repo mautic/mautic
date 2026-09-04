@@ -11,7 +11,6 @@ use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
-use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Event as Events;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
@@ -73,7 +72,6 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         private readonly CampaignRepository $campaignRepository,
         private readonly EventRepository $eventRepository,
         private readonly LeadRepository $leadRepository,
-        private readonly LeadEventLogRepository $leadEventLogRepository,
         private readonly StatRepository $statRepository,
         private readonly FormRepository $formRepository,
     ) {
@@ -85,21 +83,6 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         $this->campaignRepository->setCurrentUser($this->userHelper->getUser());
 
         return $this->campaignRepository;
-    }
-
-    public function getEventRepository(): EventRepository
-    {
-        return $this->eventRepository;
-    }
-
-    public function getCampaignLeadRepository(): LeadRepository
-    {
-        return $this->leadRepository;
-    }
-
-    public function getCampaignLeadEventLogRepository(): LeadEventLogRepository
-    {
-        return $this->leadEventLogRepository;
     }
 
     public function getPermissionBase(): string
