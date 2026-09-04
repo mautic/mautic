@@ -140,6 +140,11 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $mockCompanyModel;
 
+    /**
+     * @var MockObject&CompanyLeadRepository
+     */
+    private MockObject $mockCompanyLeadRepository;
+
     private CampaignSubscriber $subscriber;
 
     /**
@@ -151,6 +156,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $this->mockLeadModel          = $this->createMock(LeadModel::class);
         $this->mockCompanyModel       = $this->createMock(CompanyModel::class);
+        $this->mockCompanyLeadRepository = $this->createMock(CompanyLeadRepository::class);
         $this->doNotContact           = $this->createMock(DoNotContact::class);
         $filterOperatorProvider       = new FilterOperatorProvider(
             $this->createStub(EventDispatcherInterface::class),
@@ -177,7 +183,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->createStub(\Mautic\CampaignBundle\Entity\LeadRepository::class),
             $this->createStub(\Mautic\PointBundle\Entity\GroupContactScoreRepository::class),
             $this->createStub(\Mautic\LeadBundle\Entity\LeadDeviceRepository::class),
-            $this->createStub(CompanyLeadRepository::class)
+            $this->mockCompanyLeadRepository
         );
     }
 
@@ -199,12 +205,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->mockCompanyModel->expects($this->once())->method('getEntity')->willReturn($companyEntityFrom);
 
-        $mockCompanyLeadRepo = $this->createMock(CompanyLeadRepository::class);
-        $mockCompanyLeadRepo->expects($this->once())->method('getCompaniesByLeadId')->willReturn([]);
-
-        $this->mockCompanyModel->expects($this->atLeastOnce())
-            ->method('getCompanyLeadRepository')
-            ->willReturn($mockCompanyLeadRepo);
+        $this->mockCompanyLeadRepository->expects($this->once())->method('getCompaniesByLeadId')->willReturn([]);
 
         $this->mockCompanyModel->expects($this->once())
             ->method('checkForDuplicateCompanies')

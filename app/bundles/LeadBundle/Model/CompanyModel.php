@@ -131,11 +131,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         return $this->companyRepository;
     }
 
-    public function getCompanyLeadRepository(): CompanyLeadRepository
-    {
-        return $this->companyLeadRepository;
-    }
-
     public function getPermissionBase(): string
     {
         // We are using lead:leads in the CompanyController so this should match to prevent a BC break
