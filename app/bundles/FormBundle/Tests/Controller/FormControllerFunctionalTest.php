@@ -663,6 +663,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $clonedForm   = $forms[1];
         $this->assertSame($form->getId(), $originalForm->getId());
         $this->assertNotSame($form->getId(), $clonedForm->getId());
+        $this->assertNotSame($originalForm->getAlias(), $clonedForm->getAlias());
 
         $fields = $clonedForm->getFields()->getValues();
         $this->assertCount(3, $fields);
