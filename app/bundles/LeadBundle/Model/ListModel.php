@@ -858,16 +858,22 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 continue;
             }
 
-            if (($manuallyRemoved && $listLead->wasManuallyAdded()) || (!$manuallyRemoved && !$listLead->wasManuallyAdded())) {
-                // lead was manually added and now manually removed or was not manually added and now being removed
+            if (!$manuallyRemoved && !$listLead->wasManuallyAdded()) {
+                // Filter-based removal of a filter-added lead. There is nothing to protect against
+                // re-addition here, so it is safe to delete the membership record outright.
                 $deleteLists[]    = $listLead;
                 $dispatchEvents[] = $listId;
-            } elseif ($manuallyRemoved && !$listLead->wasManuallyAdded()) {
+            } elseif ($manuallyRemoved) {
+                // Manual removal must be persisted (regardless of whether the lead was originally
+                // added manually or by filter) so that a future segment rebuild does not silently
+                // re-add this lead if/when they start matching the segment's filters again.
                 $listLead->setManuallyRemoved(true);
 
                 $persistLists[]   = $listLead;
                 $dispatchEvents[] = $listId;
             }
+            // The remaining case (a filter-based removal attempt on a manually-added lead) is a
+            // no-op: automated segment rebuilds must never override a manual add.
 
             if ($this->coreParametersHelper->get('update_segment_contact_count_in_background', false)) {
                 $this->segmentCountCacheHelper->invalidateSegmentContactCount($listId);
