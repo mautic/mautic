@@ -59,9 +59,9 @@ final class HtmlExtensionTest extends TestCase
      */
     public static function htmlEntityDecodeProvider(): iterable
     {
-        yield 'ampersand entity' => ['Peculiar &amp; Co', 'Peculiar & Co'];
-        yield 'numeric ampersand' => ['Peculiar &#38; Co', 'Peculiar & Co'];
-        yield 'raw ampersand' => ['Peculiar & Co', 'Peculiar & Co'];
+        yield 'ampersand entity' => ['R&amp;D', 'R&D'];
+        yield 'numeric ampersand' => ['R&#38;D', 'R&D'];
+        yield 'raw ampersand' => ['R&D', 'R&D'];
         yield 'empty' => ['', ''];
     }
 }
