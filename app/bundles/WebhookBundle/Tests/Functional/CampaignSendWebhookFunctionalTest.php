@@ -30,7 +30,7 @@ final class CampaignSendWebhookFunctionalTest extends MauticMysqlTestCase
         $responseData = $this->submitWebhookEventForm($campaign, $inputData);
         $properties   = $responseData['event']['properties'];
 
-        $this->assertCount(count($expectedData), $properties['additional_data']['list'], "Failed for scenario: $scenario");
+        $this->assertCount(count($expectedData), $properties['additional_data']['list'], "Failed for scenario: {$scenario}");
 
         foreach ($expectedData as $index => $expected) {
             $this->assertEquals($expected['label'], $properties['additional_data']['list'][$index]['label']);
@@ -148,7 +148,7 @@ final class CampaignSendWebhookFunctionalTest extends MauticMysqlTestCase
         $event      = $events->first();
         $properties = $event->getProperties();
 
-        $this->assertCount(count($expectedData), $properties['additional_data']['list'], "Failed for scenario: $scenario");
+        $this->assertCount(count($expectedData), $properties['additional_data']['list'], "Failed for scenario: {$scenario}");
 
         foreach ($expectedData as $index => $expected) {
             $this->assertEquals($expected['label'], $properties['additional_data']['list'][$index]['label']);

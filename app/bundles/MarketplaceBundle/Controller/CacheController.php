@@ -16,8 +16,9 @@ final class CacheController extends CommonController
     private Config $config;
 
     #[Required]
-    public function autowireCacheController(Config $config): void
-    {
+    public function autowireCacheController(
+        Config $config,
+    ): void {
         $this->config = $config;
     }
 

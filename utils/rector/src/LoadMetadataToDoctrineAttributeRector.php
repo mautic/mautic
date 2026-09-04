@@ -119,7 +119,7 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
             $expr = $stmt->expr;
 
             // $builder = new ClassMetadataBuilder($metadata);
-            if ($expr instanceof Node\Expr\Assign) {
+            if ($expr instanceof Expr\Assign) {
                 if (!$expr->var instanceof Variable || !$this->isName($expr->var, 'builder') || !$expr->expr instanceof New_) {
                     return null;
                 }
@@ -651,7 +651,7 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
 
     /**
      * createManyToOne('field', Target::class)->...->build()
-     * createOneToMany('field', Target::class)->mappedBy('x')->...->build()
+     * createOneToMany('field', Target::class)->mappedBy('x')->...->build().
      *
      * @param list<MethodCall> $calls
      *
@@ -898,8 +898,8 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
     }
 
     /**
-     * @param list<string>                                                                              $cascade
-     * @param list<array{name: string, ref: string, nullable: bool, unique: bool, onDelete: ?string}>   $joinColumns
+     * @param list<string>                                                                            $cascade
+     * @param list<array{name: string, ref: string, nullable: bool, unique: bool, onDelete: ?string}> $joinColumns
      *
      * @return list<AttributeGroup>
      */
