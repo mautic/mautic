@@ -19,6 +19,7 @@ use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
+use Mautic\LeadBundle\Entity\TagRepository;
 use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Form\Type\AddToCompanyActionType;
 use Mautic\LeadBundle\Form\Type\CampaignConditionLeadPageHitType;
@@ -71,6 +72,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
         private readonly LeadListRepository $leadListRepository,
         private readonly LeadRepository $leadRepository,
         private readonly LeadFieldRepository $leadFieldRepository,
+        private readonly TagRepository $tagRepository,
     ) {
     }
 
@@ -524,8 +526,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
         if ($event->checkContext('lead.device')) {
             $result = $this->validateContactDevice($event, $lead, $this->leadModel->getDeviceRepository());
         } elseif ($event->checkContext('lead.tags')) {
-            $tagRepo = $this->leadModel->getTagRepository();
-            $result  = $tagRepo->checkLeadByTags($lead, $event->getConfig()['tags']);
+            $result = $this->tagRepository->checkLeadByTags($lead, $event->getConfig()['tags']);
         } elseif ($event->checkContext('lead.segments')) {
             $result = $this->leadListRepository->checkLeadSegmentsByIds($lead, $event->getConfig()['segments']);
         } elseif ($event->checkContext('lead.stages')) {

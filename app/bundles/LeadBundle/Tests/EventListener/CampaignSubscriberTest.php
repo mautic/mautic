@@ -20,6 +20,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Entity\TagRepository;
 use Mautic\LeadBundle\EventListener\CampaignSubscriber;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact;
@@ -171,7 +172,8 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $filterOperatorProvider,
             $this->createStub(LeadListRepository::class),
             $this->createStub(LeadRepository::class),
-            $this->createStub(LeadFieldRepository::class)
+            $this->createStub(LeadFieldRepository::class),
+            $this->createStub(TagRepository::class)
         );
     }
 
