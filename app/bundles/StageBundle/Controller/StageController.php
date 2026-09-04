@@ -7,11 +7,11 @@ use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Entity\StageRepository;
 use Mautic\StageBundle\Form\Type\StageMergeType;
+use Mautic\StageBundle\Helper\StageSearchScopeProvider;
 use Mautic\StageBundle\Model\StageModel;
 use Mautic\StageBundle\Security\Permissions\StagePermissions;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -31,7 +31,7 @@ final class StageController extends AbstractFormController
         $this->stageRepository = $stageRepository;
     }
 
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, StageSearchScopeProvider $stageSearchScopeProvider, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -98,8 +98,9 @@ final class StageController extends AbstractFormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'searchValue' => $search,
-                    'items'       => $stages,
+                    'searchValue'     => $search,
+                    'searchScopes'    => $stageSearchScopeProvider->getScopes(),
+                    'items'           => $stages,
                     'actions'     => $actions['actions'],
                     'page'        => $page,
                     'limit'       => $limit,
@@ -239,10 +240,8 @@ final class StageController extends AbstractFormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function editAction(Request $request, FormFactoryInterface $formFactory, $objectId, $ignorePost = false)
+    public function editAction(Request $request, FormFactoryInterface $formFactory, $objectId, $ignorePost = false): Response
     {
         $entity = $this->stageModel->getEntity($objectId);
 
@@ -486,10 +485,8 @@ final class StageController extends AbstractFormController
      * Deletes the entity.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         $page      = $request->getSession()->get('mautic.stage.page', 1);
         $returnUrl = $this->generateUrl('mautic_stage_index', ['page' => $page]);

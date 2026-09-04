@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Helper\FormFieldHelper;
+use Mautic\WebhookBundle\Helper\WebhookSearchScopeProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,6 +20,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class WebhookController extends FormController
 {
+    /**
+     * @var list<array{command: string, label: string, suffix?: string, default?: bool, translate?: bool}>|null
+     */
+    private ?array $indexSearchScopes = null;
+
     public function __construct(
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
@@ -48,20 +54,35 @@ final class WebhookController extends FormController
 
     /**
      * @param int $page
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function indexAction(Request $request, $page = 1): Response
+    public function indexAction(Request $request, WebhookSearchScopeProvider $webhookSearchScopeProvider, $page = 1): Response
     {
+        $this->indexSearchScopes = $webhookSearchScopeProvider->getScopes();
+
         return parent::indexStandard($request, $page);
     }
 
     /**
-     * Generates new form and processes post data.
+     * @param array<string, mixed> $args
+     * @param string               $action
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return array<string, mixed>
      */
-    public function newAction(Request $request)
+    public function getViewArguments(array $args, $action): array
+    {
+        if ('index' === $action && null !== $this->indexSearchScopes) {
+            $args['viewParameters']['searchScopes'] = $this->indexSearchScopes;
+            $this->indexSearchScopes                = null;
+        }
+
+        // @phpstan-ignore-next-line FormController extends deprecated AbstractStandardFormController; fix requires class hierarchy refactoring
+        return parent::getViewArguments($args, $action);
+    }
+
+    /**
+     * Generates new form and processes post data.
+     */
+    public function newAction(Request $request): Response
     {
         return parent::newStandard($request);
     }
@@ -71,8 +92,6 @@ final class WebhookController extends FormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function editAction(Request $request, $objectId, $ignorePost = false): Response
     {
@@ -81,10 +100,8 @@ final class WebhookController extends FormController
 
     /**
      * Displays details on a Focus.
-     *
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(Request $request, $objectId): Response
     {
         return $this->viewStandard($request, $objectId, 'webhook', 'webhook', null, 'item');
     }
@@ -93,10 +110,8 @@ final class WebhookController extends FormController
      * Clone an entity.
      *
      * @param int $objectId
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function cloneAction(Request $request, $objectId)
+    public function cloneAction(Request $request, $objectId): Response
     {
         return parent::cloneStandard($request, $objectId);
     }
@@ -105,20 +120,16 @@ final class WebhookController extends FormController
      * Deletes the entity.
      *
      * @param int $objectId
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         return parent::deleteStandard($request, $objectId);
     }
 
     /**
      * Deletes a group of entities.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): Response
     {
         return parent::batchDeleteStandard($request);
     }

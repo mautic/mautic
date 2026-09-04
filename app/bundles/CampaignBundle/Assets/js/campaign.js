@@ -220,6 +220,62 @@ Mautic.campaignOnLoad = function (container, response) {
     }
 
     Mautic.campaignAuditlogOnLoad(container, response);
+    Mautic.campaignShareOnLoad(container, response);
+};
+
+Mautic.campaignShareOnLoad = function (container, response) {
+    const headlineInput = document.querySelector('[data-share-headline]');
+    const counter = document.getElementById('headline-counter');
+    if (headlineInput && counter) {
+        const updateCounter = function () {
+            counter.textContent = headlineInput.value.length + '/60';
+        };
+        headlineInput.addEventListener('input', updateCounter);
+        updateCounter();
+    }
+
+    const addBtn = document.getElementById('add-gallery-slot');
+    const maxSlots = 8;
+    if (addBtn) {
+        addBtn.addEventListener('click', function () {
+            const slots = document.querySelectorAll('[data-gallery-slot]');
+            let shown = 0;
+            let nextHidden = null;
+            for (let i = 0; i < slots.length; i++) {
+                if (slots[i].style.display !== 'none') {
+                    shown++;
+                } else if (!nextHidden) {
+                    nextHidden = slots[i];
+                }
+            }
+            if (nextHidden) {
+                nextHidden.style.display = '';
+                nextHidden.style.marginTop = '10px';
+                shown++;
+            }
+            if (shown >= maxSlots) {
+                addBtn.style.display = 'none';
+            }
+        });
+    }
+
+    const $shareForm = mQuery('form[name="campaign_share"]');
+    const $downloadBtn = $shareForm.find('#campaign_share_download');
+    if ($shareForm.length && $downloadBtn.length) {
+        $downloadBtn.off('click.shareDownload').on('click.shareDownload', function (e) {
+            e.preventDefault();
+
+            $shareForm.find('input.button-clicked').remove();
+            mQuery('<input type="hidden" class="button-clicked">')
+                .attr({
+                    name: $downloadBtn.attr('name'),
+                    value: $downloadBtn.attr('value') || ''
+                })
+                .appendTo($shareForm);
+
+            $shareForm.get(0).submit();
+        });
+    }
 };
 
 Mautic.lazyLoadContactListOnCampaignDetail = function() {

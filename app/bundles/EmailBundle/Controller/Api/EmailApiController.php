@@ -140,11 +140,9 @@ final class EmailApiController extends CommonApiController
      * @param int $id     Email ID
      * @param int $leadId Lead ID
      *
-     * @return Response
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function sendLeadAction(Request $request, $id, $leadId)
+    public function sendLeadAction(Request $request, $id, $leadId): Response
     {
         $entity = $this->model->getEntity($id);
 

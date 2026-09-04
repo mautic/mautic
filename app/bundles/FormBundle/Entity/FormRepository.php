@@ -149,7 +149,7 @@ class FormRepository extends CommonRepository
                         $q->expr()->eq('s.form', 'f')
                     )
                     ->getDql();
-                $expr = $q->expr()->gt(sprintf('(%s)', $subquery), 1);
+                $expr = $q->expr()->gt(sprintf('(%s)', $subquery), 0);
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
             case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):

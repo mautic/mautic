@@ -19,6 +19,7 @@ use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Form\Type\ContactType;
 use Mautic\UserBundle\Form\Type\UserInviteType;
+use Mautic\UserBundle\Helper\UserSearchScopeProvider;
 use Mautic\UserBundle\Model\RoleModel;
 use Mautic\UserBundle\Model\UserModel;
 use Mautic\UserBundle\Security\SAML\Helper as SAMLHelper;
@@ -55,7 +56,7 @@ final class UserController extends FormController
     /**
      * Generate's default user list.
      */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): JsonResponse|Response
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, UserSearchScopeProvider $userSearchScopeProvider, int $page = 1): JsonResponse|Response
     {
         if (!$this->security->isGranted('user:users:view')) {
             $this->throwAccessDenied();
@@ -117,9 +118,10 @@ final class UserController extends FormController
 
         return $this->delegateView([
             'viewParameters'  => [
-                'items'         => $users,
-                'searchValue'   => $search,
-                'page'          => $page,
+                'items'           => $users,
+                'searchValue'     => $search,
+                'searchScopes'    => $userSearchScopeProvider->getScopes(),
+                'page'            => $page,
                 'limit'         => $limit,
                 'tmpl'          => $tmpl,
                 'currentUserId' => $currentUserId,
@@ -311,10 +313,8 @@ final class UserController extends FormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return JsonResponse|Response
      */
-    public function editAction(Request $request, LanguageHelper $languageHelper, SAMLHelper $samlHelper, $objectId, $ignorePost = false)
+    public function editAction(Request $request, LanguageHelper $languageHelper, SAMLHelper $samlHelper, $objectId, $ignorePost = false): Response
     {
         if (!$this->security->isGranted('user:users:edit')) {
             $this->throwAccessDenied();
@@ -460,10 +460,8 @@ final class UserController extends FormController
      * Deletes a user object.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         if (!$this->security->isGranted('user:users:delete')) {
             $this->throwAccessDenied();

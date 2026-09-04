@@ -5,10 +5,10 @@ namespace Mautic\PointBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\PointBundle\Entity\Trigger;
+use Mautic\PointBundle\Helper\TriggerSearchScopeProvider;
 use Mautic\PointBundle\Model\TriggerEventModel;
 use Mautic\PointBundle\Model\TriggerModel;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -28,7 +28,7 @@ final class TriggerController extends FormController
         $this->triggerModel      = $triggerModel;
     }
 
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, TriggerSearchScopeProvider $triggerSearchScopeProvider, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted([
@@ -86,8 +86,9 @@ final class TriggerController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'searchValue' => $search,
-                'items'       => $triggers,
+                'searchValue'     => $search,
+                'searchScopes'    => $triggerSearchScopeProvider->getScopes(),
+                'items'           => $triggers,
                 'page'        => $page,
                 'limit'       => $limit,
                 'permissions' => $permissions,
@@ -293,10 +294,8 @@ final class TriggerController extends FormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return JsonResponse|Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false): Response
     {
         $entity     = $this->triggerModel->getEntity($objectId);
         $session    = $request->getSession();
@@ -493,10 +492,8 @@ final class TriggerController extends FormController
 
     /**
      * Deletes the entity.
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         $page      = $request->getSession()->get('mautic.point.trigger.page', 1);
         $returnUrl = $this->generateUrl('mautic_pointtrigger_index', ['page' => $page]);

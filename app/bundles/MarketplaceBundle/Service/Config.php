@@ -8,11 +8,11 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
 class Config
 {
-    public const MARKETPLACE_ENABLED                     = 'marketplace_enabled';
+    public const MARKETPLACE_ENABLED           = 'marketplace_enabled';
 
-    public const MARKETPLACE_ALLOWLIST_URL               = 'marketplace_allowlist_url';
+    public const MARKETPLACE_WEBSITE_URL       = 'marketplace_website_url';
 
-    public const MARKETPLACE_ALLOWLIST_CACHE_TTL_SECONDS = 'marketplace_allowlist_cache_ttl_seconds';
+    public const MARKETPLACE_REGISTRY_URL      = 'marketplace_registry_url';
 
     public function __construct(
         private readonly CoreParametersHelper $coreParametersHelper,
@@ -24,14 +24,21 @@ class Config
         return (bool) $this->coreParametersHelper->get(self::MARKETPLACE_ENABLED);
     }
 
-    public function getAllowlistUrl(): string
+    public function getMarketplaceWebsiteUrl(): string
     {
-        return $this->coreParametersHelper->get(self::MARKETPLACE_ALLOWLIST_URL);
+        return $this->coreParametersHelper->get(self::MARKETPLACE_WEBSITE_URL);
     }
 
-    public function getAllowlistCacheTtlSeconds(): int
+    /**
+     * Base URL of the marketplace application, which fronts the package registry.
+     *
+     * Deliberately a different parameter from the old marketplace_api_base: that one pointed
+     * straight at the storage backend, so a stale value carried over from an older install
+     * would silently 404 against these routes.
+     */
+    public function getRegistryUrl(): string
     {
-        return (int) $this->coreParametersHelper->get(self::MARKETPLACE_ALLOWLIST_CACHE_TTL_SECONDS, 3600);
+        return rtrim((string) $this->coreParametersHelper->get(self::MARKETPLACE_REGISTRY_URL), '/');
     }
 
     public function isComposerEnabled(): bool

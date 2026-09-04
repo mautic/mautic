@@ -279,7 +279,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
         $url    = sprintf('s/campaigns/event/stats/%d/%s/%s', $campaign->getId(), $before->format('Y-m-d'), $after->format('Y-m-d'));
         $this->client->request('GET', $url);
         $response = $this->client->getResponse();
-        $body     = json_decode($response->getContent(), true);
+        $body     = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $this->client->restart();
 
         return new Crawler($body['actions']);

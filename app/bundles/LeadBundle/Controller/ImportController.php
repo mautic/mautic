@@ -26,7 +26,6 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -68,8 +67,6 @@ final class ImportController extends FormController
 
     /**
      * @param int $page
-     *
-     * @return JsonResponse|RedirectResponse
      */
     public function indexAction(Request $request, $page = 1): Response
     {
@@ -119,18 +116,14 @@ final class ImportController extends FormController
 
     /**
      * @param int $objectId
-     *
-     * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(Request $request, $objectId): Response
     {
         return $this->viewStandard($request, $objectId, 'import', 'lead');
     }
 
     /**
      * Cancel and unpublish the import during manual import.
-     *
-     * @return JsonResponse|RedirectResponse
      */
     public function cancelAction(Request $request, NotificationModel $notificationModel, UserRepository $userRepository): Response
     {
@@ -418,6 +411,7 @@ final class ImportController extends FormController
                         ->setDefault('list', $validateEvent->getList())
                         ->setDefault('tags', $validateEvent->getTags())
                         ->setDefault('skip_if_exists', $validateEvent->getSkipIfExists())
+                        ->setDefault('create_new', $validateEvent->getCreateNew())
                         ->setHeaders($this->requestStack->getSession()->get('mautic.'.$object.'.import.headers'))
                         ->setParserConfig($this->requestStack->getSession()->get('mautic.'.$object.'.import.config'));
 

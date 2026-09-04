@@ -3,6 +3,7 @@
 namespace Mautic\ChannelBundle\Controller;
 
 use Mautic\ChannelBundle\Entity\Channel;
+use Mautic\ChannelBundle\Helper\MessageSearchScopeProvider;
 use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
@@ -10,8 +11,6 @@ use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,6 +19,11 @@ use Symfony\Contracts\Service\Attribute\Required;
 final class MessageController extends AbstractStandardFormController
 {
     use EntityContactsTrait;
+
+    /**
+     * @var list<array{command: string, label: string, suffix?: string, default?: bool, translate?: bool}>|null
+     */
+    private ?array $indexSearchScopes = null;
 
     private RequestStack $requestStack;
 
@@ -34,18 +38,12 @@ final class MessageController extends AbstractStandardFormController
         $this->messageModel = $messageModel;
     }
 
-    /**
-     * @return JsonResponse|RedirectResponse
-     */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): Response
     {
         return $this->batchDeleteStandard($request);
     }
 
-    /**
-     * @return Response|JsonResponse|RedirectResponse
-     */
-    public function cloneAction(Request $request, $objectId)
+    public function cloneAction(Request $request, $objectId): Response
     {
         return $this->cloneStandard($request, $objectId);
     }
@@ -61,8 +59,10 @@ final class MessageController extends AbstractStandardFormController
     /**
      * @param int $page
      */
-    public function indexAction(Request $request, $page = 1): Response
+    public function indexAction(Request $request, MessageSearchScopeProvider $messageSearchScopeProvider, $page = 1): Response
     {
+        $this->indexSearchScopes = $messageSearchScopeProvider->getScopes();
+
         return $this->indexStandard($request, $page);
     }
 
@@ -71,10 +71,7 @@ final class MessageController extends AbstractStandardFormController
         return $this->newStandard($request);
     }
 
-    /**
-     * @return array|JsonResponse|RedirectResponse|Response
-     */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(Request $request, $objectId): Response
     {
         return $this->viewStandard($request, $objectId, 'message', 'channel');
     }
@@ -98,6 +95,11 @@ final class MessageController extends AbstractStandardFormController
                     'listItemTemplate'  => '@MauticChannel/Message/list_item.html.twig',
                     'enableCloneButton' => true,
                 ];
+
+                if (null !== $this->indexSearchScopes) {
+                    $viewParameters['searchScopes'] = $this->indexSearchScopes;
+                    $this->indexSearchScopes        = null;
+                }
 
                 break;
             case 'view':
@@ -179,10 +181,7 @@ final class MessageController extends AbstractStandardFormController
         return $args;
     }
 
-    /**
-     * @return JsonResponse|RedirectResponse
-     */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         return $this->deleteStandard($request, $objectId);
     }
@@ -224,8 +223,6 @@ final class MessageController extends AbstractStandardFormController
 
     /**
      * @param int $page
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
     public function contactsAction(
         Request $request,
@@ -233,7 +230,7 @@ final class MessageController extends AbstractStandardFormController
         $objectId,
         $channel,
         $page = 1,
-    ) {
+    ): Response {
         $filter = [];
         if ('all' !== $channel) {
             $returnUrl = $this->generateUrl(

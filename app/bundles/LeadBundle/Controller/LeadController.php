@@ -42,6 +42,7 @@ use Mautic\LeadBundle\Form\Type\EmailType;
 use Mautic\LeadBundle\Form\Type\MergeType;
 use Mautic\LeadBundle\Form\Type\OwnerType;
 use Mautic\LeadBundle\Form\Type\StageType;
+use Mautic\LeadBundle\Helper\LeadSearchScopeProvider;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\ContactExportSchedulerModel;
@@ -145,6 +146,7 @@ final class LeadController extends FormController
         Request $request,
         DoNotContactModel $leadDNCModel,
         ContactColumnsDictionary $contactColumnsDictionary,
+        LeadSearchScopeProvider $leadSearchScopeProvider,
         $page = 1,
     ): Response {
         // set some permissions
@@ -296,6 +298,8 @@ final class LeadController extends FormController
                     'noContactList'    => $dncRepository->getChannelList(null, array_keys($leads)),
                     'maxLeadId'        => $maxLeadId,
                     'anonymousShowing' => $anonymousShowing,
+                    'searchScopes'     => $leadSearchScopeProvider->getScopes(),
+                    'searchScopeHint'  => 'mautic.core.search.scope.hint',
                 ],
                 'contentTemplate' => "@MauticLead/Lead/{$indexMode}.html.twig",
                 'passthroughVars' => [
@@ -1174,10 +1178,8 @@ final class LeadController extends FormController
 
     /**
      * Deletes the entity.
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         $page      = $request->getSession()->get('mautic.lead.page', 1);
         $returnUrl = $this->generateUrl('mautic_contact_index', ['page' => $page]);
@@ -1829,12 +1831,20 @@ final class LeadController extends FormController
 
                     if (!empty($data['addstage'])) {
                         $stage = $this->stageModel->getEntity((int) $data['addstage']);
-                        $this->leadModel->addToStages($lead, $stage);
+                        $this->leadModel->addToStage(
+                            $lead,
+                            $stage,
+                            $this->translator->trans('mautic.stage.event.added.batch')
+                        );
                     }
 
                     if (!empty($data['removestage'])) {
                         $stage = $this->stageModel->getEntity($data['removestage']);
-                        $this->leadModel->removeFromStages($lead, $stage);
+                        $this->leadModel->removeFromStage(
+                            $lead,
+                            $stage,
+                            $this->translator->trans('mautic.stage.event.removed.batch')
+                        );
                     }
                 }
             }
