@@ -25,16 +25,15 @@ final readonly class FileManager
     }
 
     /**
-     * @return array
-     *
      * @throws FileUploadException
      */
     public function uploadFiles($request): array
     {
+        $uploadedFiles = [];
+
         if (isset($request->files->all()['files'])) {
             $files         = $request->files->all()['files'];
             $uploadDir     = $this->getUploadDir();
-            $uploadedFiles = [];
 
             foreach ($files as $file) {
                 $this->fileUploader->validateImage($file);
