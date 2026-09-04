@@ -9,8 +9,11 @@ use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
+use Mautic\ReportBundle\Helper\RelativeDateHelper;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 
 final class MauticReportBuilder implements ReportBuilderInterface
 {
@@ -618,6 +621,41 @@ final class MauticReportBuilder implements ReportBuilderInterface
                     continue;
                 }
 
+                $filterDefinition = $filterDefinitions[$filter['column']] ?? [];
+                $type             = $filterDefinition['type'] ?? null;
+                $isRelativeDate   = in_array($type, ['date', 'datetime', DateType::class, DateTimeType::class], true)
+                    && !in_array($exprFunction, ['like', 'notLike', 'startsWith', 'endsWith', 'contains'], true)
+                    && RelativeDateHelper::isRelative($filter['value']);
+                if ($isRelativeDate) {
+                    if (isset($filterDefinition['formula'])) {
+                        $filter['column'] = $filterDefinition['formula'];
+                    }
+                    if (RelativeDateHelper::isAnniversary($filter['value'])) {
+                        if (!in_array($exprFunction, ['empty', 'notEmpty'], true)) {
+                            $filter['column'] = sprintf("DATE_FORMAT(%s, '%%m-%%d')", $filter['column']);
+                            $filter['value']  = RelativeDateHelper::resolveAnniversary($filter['value']);
+                        }
+                    } else {
+                        $range = RelativeDateHelper::resolveRange($filter['value'], in_array($type, ['date', DateType::class], true));
+                        if (in_array($exprFunction, ['eq', 'neq'], true)) {
+                            $startParam = $paramName.'Start';
+                            $endParam   = $paramName.'End';
+                            $queryBuilder->setParameter($startParam, $range['start']);
+                            $queryBuilder->setParameter($endParam, $range['end']);
+                            $rangeExpression = 'eq' === $exprFunction
+                                ? CompositeExpression::and($expr->gte($filter['column'], ':'.$startParam), $expr->lte($filter['column'], ':'.$endParam))
+                                : CompositeExpression::or($expr->isNull($filter['column']), $expr->lt($filter['column'], ':'.$startParam), $expr->gt($filter['column'], ':'.$endParam));
+                            $andGroup[] = $rangeExpression;
+
+                            continue;
+                        }
+
+                        $filter['value'] = RelativeDateHelper::isCalendarPeriod($filter['value']) || in_array($type, ['date', DateType::class], true)
+                            ? (in_array($exprFunction, ['gt', 'lte'], true) ? $range['end'] : $range['start'])
+                            : RelativeDateHelper::resolveInstant($filter['value'], false);
+                    }
+                }
+
                 switch ($exprFunction) {
                     case 'notEmpty':
                         $andGroup[] = $expr->isNotNull($filter['column']);
@@ -648,11 +686,9 @@ final class MauticReportBuilder implements ReportBuilderInterface
                         break;
                     default:
                         $columnValue = ":{$paramName}";
-                        $type        = $filterDefinitions[$filter['column']]['type'];
-                        if (isset($filterDefinitions[$filter['column']]['formula'])) {
-                            $filter['column'] = $filterDefinitions[$filter['column']]['formula'];
+                        if (!$isRelativeDate && isset($filterDefinition['formula'])) {
+                            $filter['column'] = $filterDefinition['formula'];
                         }
-
                         switch ($type) {
                             case 'bool':
                             case 'boolean':
