@@ -15,6 +15,7 @@ use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\LeadListRepository;
@@ -176,8 +177,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->createStub(\Mautic\CampaignBundle\Entity\LeadRepository::class),
             $this->createStub(\Mautic\PointBundle\Entity\GroupContactScoreRepository::class),
             $this->createStub(\Mautic\LeadBundle\Entity\LeadDeviceRepository::class),
-            $this->createStub(\Mautic\LeadBundle\Entity\TagRepository::class),
-            $this->createStub(\Mautic\LeadBundle\Entity\CompanyLeadRepository::class)
+            $this->createStub(CompanyLeadRepository::class)
         );
     }
 
@@ -199,9 +199,12 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->mockCompanyModel->expects($this->once())->method('getEntity')->willReturn($companyEntityFrom);
 
-        $this->mockCompanyModel->expects($this->once())
-            ->method('getCompaniesByLeadId')
-            ->willReturn([]);
+        $mockCompanyLeadRepo = $this->createMock(CompanyLeadRepository::class);
+        $mockCompanyLeadRepo->expects($this->once())->method('getCompaniesByLeadId')->willReturn([]);
+
+        $this->mockCompanyModel->expects($this->atLeastOnce())
+            ->method('getCompanyLeadRepository')
+            ->willReturn($mockCompanyLeadRepo);
 
         $this->mockCompanyModel->expects($this->once())
             ->method('checkForDuplicateCompanies')

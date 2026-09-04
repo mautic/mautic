@@ -79,7 +79,6 @@ final class CampaignSubscriber implements EventSubscriberInterface
         private readonly CampaignLeadRepository $campaignLeadRepository,
         private readonly GroupContactScoreRepository $groupContactScoreRepository,
         private readonly LeadDeviceRepository $leadDeviceRepository,
-        private readonly TagRepository $tagRepository,
         private readonly CompanyLeadRepository $companyLeadRepository,
     ) {
     }
