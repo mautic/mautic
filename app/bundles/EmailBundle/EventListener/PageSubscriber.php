@@ -56,8 +56,13 @@ final readonly class PageSubscriber implements EventSubscriberInterface
             if (!empty($stat)) {
                 // Check to see if it has been marked as opened
                 if (!$stat->isRead()) {
-                    // Mark it as read
-                    $this->emailModel->hitEmail($stat, $this->requestStack->getCurrentRequest() ?: $event->getRequest());
+                    // Mark it as read. A click is an explicit user action, so allow it through
+                    // privacy signals (GPC/DNT) while still honoring bot/IP checks.
+                    $this->emailModel->hitEmail(
+                        $stat,
+                        $this->requestStack->getCurrentRequest() ?: $event->getRequest(),
+                        isExplicitAction: true
+                    );
                 }
             }
         }

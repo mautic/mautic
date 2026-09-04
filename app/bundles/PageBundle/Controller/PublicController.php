@@ -494,7 +494,7 @@ final class PublicController extends AbstractFormController
                 // Search replace lead fields in the URL
                 try {
                     $lead           = $contactRequestHelper->getContactFromQuery(['ct' => $ct]);
-                    $isHitTrackable = $pageModel->hitPage($redirect, $request, 200, $lead);
+                    $isHitTrackable = $pageModel->hitPage($redirect, $request, 200, $lead, [], null, true);
                 } catch (InvalidDecodedStringException $e) {
                     // Invalid ct value so we must unset it
                     // and process the request without it
@@ -504,7 +504,7 @@ final class PublicController extends AbstractFormController
                     $request->request->remove('ct');
                     $request->query->remove('ct');
                     $lead           = $contactRequestHelper->getContactFromQuery();
-                    $isHitTrackable = $pageModel->hitPage($redirect, $request, 200, $lead);
+                    $isHitTrackable = $pageModel->hitPage($redirect, $request, 200, $lead, [], null, true);
                 }
 
                 if ($lead) {
