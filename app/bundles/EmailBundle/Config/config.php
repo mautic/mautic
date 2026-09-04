@@ -55,6 +55,11 @@ return [
                 'controller' => 'Mautic\EmailBundle\Controller\Api\EmailApiController::sendLeadAction',
                 'method'     => 'POST',
             ],
+            'mautic_api_sendexampleemail' => [
+                'path'       => '/emails/{id}/example/send',
+                'controller' => 'Mautic\EmailBundle\Controller\Api\EmailApiController::sendExampleAction',
+                'method'     => 'POST',
+            ],
             'mautic_api_reply' => [
                 'path'       => '/emails/reply/{trackingHash}',
                 'controller' => 'Mautic\EmailBundle\Controller\Api\EmailApiController::replyAction',
