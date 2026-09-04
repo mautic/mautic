@@ -3802,8 +3802,8 @@ parameters:
 			path: app/bundles/EmailBundle/Model/EmailModel.php
 
 		-
-			message: '#^Parameter \#1 \$details of method Mautic\\EmailBundle\\Entity\\Stat\:\:addOpenDetails\(\) expects string, array\<string, mixed\> given\.$#'
-			identifier: argument.type
+			message: '#^Method Mautic\\EmailBundle\\Model\\EmailModel\:\:setEmailDoNotContact\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/EmailBundle/Model/EmailModel.php
 
