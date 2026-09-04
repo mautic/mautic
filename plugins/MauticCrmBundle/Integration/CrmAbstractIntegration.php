@@ -174,7 +174,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      *
      * @return mixed[]
      */
-    public function getLeadData(?\DateTime $startDate = null, ?\DateTime $endDate = null, $leadId = [])
+    public function getLeadData(?\DateTime $startDate = null, ?\DateTime $endDate = null, $leadId = []): array
     {
         $leadIds      = (!is_array($leadId)) ? [$leadId] : $leadId;
         $leadActivity = [];

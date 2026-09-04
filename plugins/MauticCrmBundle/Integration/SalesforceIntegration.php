@@ -843,7 +843,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      *
      * @phpstan-impure
      */
-    public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'Lead')
+    public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'Lead'): array
     {
         if (!$query) {
             $query = $this->getFetchQuery($params);

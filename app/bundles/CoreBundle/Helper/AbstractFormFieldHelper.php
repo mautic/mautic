@@ -67,7 +67,7 @@ abstract class AbstractFormFieldHelper
      *
      * @return array
      */
-    public function getChoiceList($customFields = [])
+    public function getChoiceList($customFields = []): array
     {
         $choices = [];
 
