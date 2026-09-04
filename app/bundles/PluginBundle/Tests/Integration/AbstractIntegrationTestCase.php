@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
+use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -119,6 +120,8 @@ abstract class AbstractIntegrationTestCase extends TestCase
      */
     protected MockObject $fieldsWithUniqueIdentifier;
 
+    protected IdentifyCompanyHelper $identifyCompanyHelper;
+
     /**
      * @var MockObject&IntegrationEntityRepository
      */
@@ -161,6 +164,7 @@ abstract class AbstractIntegrationTestCase extends TestCase
         $this->integrationEntityModel     = $this->createMock(IntegrationEntityModel::class);
         $this->doNotContact               = $this->createMock(DoNotContact::class);
         $this->fieldsWithUniqueIdentifier = $this->createMock(FieldsWithUniqueIdentifier::class);
+        $this->identifyCompanyHelper      = new IdentifyCompanyHelper($this->companyModel);
         $this->integrationEntityRepository = $this->createMock(IntegrationEntityRepository::class);
         $this->leadRepository              = $this->createMock(LeadRepository::class);
         $this->userRepository              = $this->createMock(UserRepository::class);

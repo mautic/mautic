@@ -7,6 +7,7 @@ namespace MauticPlugin\MauticCrmBundle\Tests;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\Deduplicate\CompanyDeduper;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticCrmBundle\Integration\VtigerIntegration;
 use MauticPlugin\MauticCrmBundle\Tests\Fixtures\Model\CompanyModelStub;
@@ -112,6 +113,7 @@ final class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
                 $this->integrationEntityModel,
                 $this->doNotContact,
                 $this->fieldsWithUniqueIdentifier,
+                new IdentifyCompanyHelper($companyModel),
             ])
             ->onlyMethods(['populateMauticLeadData', 'mergeConfigToFeatureSettings'])
             ->getMock();

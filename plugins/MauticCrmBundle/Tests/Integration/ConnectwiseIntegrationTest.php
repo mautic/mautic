@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticCrmBundle\Tests\Integration;
 
+use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\PluginBundle\Model\IntegrationEntityModel;
 use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi;
@@ -79,6 +80,7 @@ final class ConnectwiseIntegrationTest extends AbstractIntegrationTestCase
                 $integrationEntityModel,
                 $this->doNotContact,
                 $this->fieldsWithUniqueIdentifier,
+                new IdentifyCompanyHelper($this->companyModel),
             ])
             ->onlyMethods(['isAuthorized', 'getApiHelper', 'getRecords', 'saveCampaignMembers'])
             ->getMock();

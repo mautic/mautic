@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MauticPlugin\MauticSocialBundle\Tests\Integration;
 
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticSocialBundle\Integration\FoursquareIntegration;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -36,6 +37,7 @@ final class FoursquareIntegrationTest extends AbstractIntegrationTestCase
             $this->integrationEntityModel,
             $this->doNotContact,
             $this->fieldsWithUniqueIdentifier,
+            new IdentifyCompanyHelper($this->companyModel),
         );
     }
 

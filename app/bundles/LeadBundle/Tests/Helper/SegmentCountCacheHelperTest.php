@@ -196,7 +196,7 @@ final class SegmentCountCacheHelperTest extends TestCase
 
         $this->cacheProviderMock
             ->method('getItem')
-            ->willReturnCallback(function ($key) use ($segmentId, $cacheItem): ?\Symfony\Component\Cache\CacheItem {
+            ->willReturnCallback(function ($key) use ($segmentId, $cacheItem): ?CacheItem {
                 if ($key === 'segment.'.$segmentId.'.lead') {
                     return $cacheItem;
                 }
@@ -226,7 +226,7 @@ final class SegmentCountCacheHelperTest extends TestCase
             ->willReturnCallback(fn (string $key): bool => $key === 'segment.'.$segmentId.'.lead');
         $this->cacheProviderMock
             ->method('getItem')
-            ->willReturnCallback(function ($key) use ($segmentId, $cacheItem): ?\Symfony\Component\Cache\CacheItem {
+            ->willReturnCallback(function ($key) use ($segmentId, $cacheItem): ?CacheItem {
                 if (in_array($key, ['segment.'.$segmentId.'.lead', 'segment.'.$segmentId.'.lead.recount'])) {
                     return $cacheItem;
                 }

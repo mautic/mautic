@@ -29,10 +29,8 @@ final class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
             ->method('fetchCompanyFields')
             ->willReturn([['alias' => 'companyname']]);
 
-        $helper                     = new IdentifyCompanyHelper();
-        $reflection                 = new \ReflectionClass(IdentifyCompanyHelper::class);
-        $method                     = $reflection->getMethod('findCompany');
-        [$resultCompany, $entities] = $method->invokeArgs($helper, [$company, $model]);
+        $helper                     = new IdentifyCompanyHelper($model);
+        [$resultCompany, $entities] = $helper->findCompany($company);
 
         $this->assertEquals($expected, $resultCompany);
     }
@@ -59,10 +57,8 @@ final class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
             ->method('fetchCompanyFields')
             ->willReturn([['alias' => 'companyname']]);
 
-        $helper                     = new IdentifyCompanyHelper();
-        $reflection                 = new \ReflectionClass(IdentifyCompanyHelper::class);
-        $method                     = $reflection->getMethod('findCompany');
-        [$resultCompany, $entities] = $method->invokeArgs($helper, [$company, $model]);
+        $helper                     = new IdentifyCompanyHelper($model);
+        [$resultCompany, $entities] = $helper->findCompany($company);
 
         $this->assertEquals($expected, $resultCompany);
     }
@@ -91,10 +87,8 @@ final class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
             ->method('fetchCompanyFields')
             ->willReturn([['alias' => 'companyname']]);
 
-        $helper                     = new IdentifyCompanyHelper();
-        $reflection                 = new \ReflectionClass(IdentifyCompanyHelper::class);
-        $method                     = $reflection->getMethod('findCompany');
-        [$resultCompany, $entities] = $method->invokeArgs($helper, [$company, $model]);
+        $helper                     = new IdentifyCompanyHelper($model);
+        [$resultCompany, $entities] = $helper->findCompany($company);
 
         $this->assertEquals($expected, $resultCompany);
     }

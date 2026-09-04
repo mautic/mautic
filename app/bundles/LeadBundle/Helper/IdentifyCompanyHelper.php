@@ -7,23 +7,29 @@ use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Exception\UniqueFieldNotFoundException;
 use Mautic\LeadBundle\Model\CompanyModel;
 
-final class IdentifyCompanyHelper
+final readonly class IdentifyCompanyHelper
 {
+    public function __construct(
+        private CompanyModel $companyModel,
+        private CompanyLeadRepository $companyLeadRepository,
+    ) {
+    }
+
     /**
      * @param mixed $lead
      */
-    public static function identifyLeadsCompany(array $data, $lead, CompanyModel $companyModel, ?CompanyLeadRepository $companyLeadRepository = null): array
+    public function identifyLeadsCompany(array $data, $lead): array
     {
         $addContactToCompany = true;
 
-        $parameters = self::normalizeParameters($data);
+        $parameters = $this->normalizeParameters($data);
 
-        if (!self::hasCompanyParameters($parameters, $companyModel)) {
+        if (!$this->hasCompanyParameters($parameters)) {
             return [null, false, null];
         }
 
         try {
-            $companies = $companyModel->checkForDuplicateCompanies($parameters);
+            $companies = $this->companyModel->checkForDuplicateCompanies($parameters);
         } catch (UniqueFieldNotFoundException) {
             return [null, false, null];
         }
@@ -32,8 +38,18 @@ final class IdentifyCompanyHelper
             $companyEntity = end($companies);
             $companyData   = $companyEntity->getProfileFields();
 
+<<<<<<< HEAD
             if ($lead && null !== $companyLeadRepository) {
                 $companyLead     = $companyLeadRepository->getCompaniesByLeadId($lead->getId(), $companyEntity->getId());
+=======
+            if ($lead) {
+<<<<<<< HEAD
+                $companyLeadRepo = $this->companyModel->getCompanyLeadRepository();
+                $companyLead     = $companyLeadRepo->getCompaniesByLeadId($lead->getId(), $companyEntity->getId());
+>>>>>>> 633a44e98f ([lead] convert IdentifyCompanyHelper to a service)
+=======
+                $companyLead     = $this->companyLeadRepository->getCompaniesByLeadId($lead->getId(), $companyEntity->getId());
+>>>>>>> 50ef4c0137 (fixup! [docs] add UPGRADE-8.0 entry for IdentifyCompanyHelper service change)
                 if ([] !== $companyLead) {
                     $addContactToCompany = false;
                 }
@@ -43,24 +59,24 @@ final class IdentifyCompanyHelper
 
             // create new company
             $companyEntity = new Company();
-            $companyModel->setFieldValues($companyEntity, $companyData, true);
-            $companyModel->saveEntity($companyEntity);
+            $this->companyModel->setFieldValues($companyEntity, $companyData, true);
+            $this->companyModel->saveEntity($companyEntity);
             $companyData['id'] = $companyEntity->getId();
         }
 
         return [$companyData, $addContactToCompany, $companyEntity];
     }
 
-    public static function findCompany(array $data, CompanyModel $companyModel): array
+    public function findCompany(array $data): array
     {
-        $parameters = self::normalizeParameters($data);
+        $parameters = $this->normalizeParameters($data);
 
-        if (!self::hasCompanyParameters($parameters, $companyModel)) {
+        if (!$this->hasCompanyParameters($parameters)) {
             return [[], []];
         }
 
         try {
-            $companyEntities = $companyModel->checkForDuplicateCompanies($parameters);
+            $companyEntities = $this->companyModel->checkForDuplicateCompanies($parameters);
         } catch (UniqueFieldNotFoundException) {
             return [[], []];
         }
@@ -74,9 +90,9 @@ final class IdentifyCompanyHelper
         return [$companyData, $companyEntities];
     }
 
-    private static function hasCompanyParameters(array $parameters, CompanyModel $companyModel): bool
+    private function hasCompanyParameters(array $parameters): bool
     {
-        $companyFields = $companyModel->fetchCompanyFields();
+        $companyFields = $this->companyModel->fetchCompanyFields();
         foreach ($parameters as $alias => $value) {
             foreach ($companyFields as $companyField) {
                 if ($companyField['alias'] === $alias) {
@@ -93,7 +109,7 @@ final class IdentifyCompanyHelper
      *
      * @return mixed[]
      */
-    private static function normalizeParameters(array $parameters): array
+    private function normalizeParameters(array $parameters): array
     {
         if (isset($parameters['company'])) {
             $parameters['companyname'] = filter_var($parameters['company']);

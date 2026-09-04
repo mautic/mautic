@@ -67,6 +67,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
         private readonly LeadModel $leadModel,
         private readonly FieldModel $leadFieldModel,
         private readonly CompanyModel $companyModel,
+        private readonly IdentifyCompanyHelper $identifyCompanyHelper,
         private readonly CampaignModel $campaignModel,
         private readonly CoreParametersHelper $coreParametersHelper,
         private readonly DoNotContact $doNotContact,
@@ -492,7 +493,11 @@ final class CampaignSubscriber implements EventSubscriberInterface
             $primaryCompany = $this->companyModel->getEntity($company['id']);
 
             if (isset($config['companyname']) && $primaryCompany->getName() != $config['companyname']) {
+<<<<<<< HEAD
                 [$company, $leadAdded, $companyEntity] = IdentifyCompanyHelper::identifyLeadsCompany($config, $lead, $this->companyModel, $this->companyLeadRepository);
+=======
+                [$company, $leadAdded, $companyEntity] = $this->identifyCompanyHelper->identifyLeadsCompany($config, $lead);
+>>>>>>> 633a44e98f ([lead] convert IdentifyCompanyHelper to a service)
                 $companyChangeLog                      = null;
                 if ($leadAdded) {
                     $companyChangeLog = $lead->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);

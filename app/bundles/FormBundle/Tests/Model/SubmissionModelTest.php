@@ -34,6 +34,7 @@ use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
+use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -209,6 +210,7 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(MembershipManager::class),
             $this->leadFieldModel,
             $this->companyModel,
+            new IdentifyCompanyHelper($this->companyModel),
             $fieldHelper,
             $this->uploadFieldValidatorMock,
             $this->createStub(FormUploader::class),

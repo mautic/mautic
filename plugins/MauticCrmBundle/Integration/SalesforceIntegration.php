@@ -13,7 +13,6 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use Mautic\UserBundle\Entity\RoleRepository;
@@ -2203,10 +2202,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         'mautic.integration.form.lead.unknown'
                     )
                 ) {
-                    $company = IdentifyCompanyHelper::identifyLeadsCompany(
+                    $company = $this->identifyCompanyHelper->identifyLeadsCompany(
                         ['company' => $sfEntityRecord['Company']],
-                        null,
-                        $this->companyModel
+                        null
                     );
 
                     if (!empty($company[2])) {

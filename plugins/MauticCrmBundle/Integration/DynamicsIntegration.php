@@ -4,7 +4,6 @@ namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCrmBundle\Api\DynamicsApi;
@@ -611,10 +610,9 @@ final class DynamicsIntegration extends CrmAbstractIntegration
                             'mautic.integration.form.lead.unknown'
                         )
                     ) {
-                        $company = IdentifyCompanyHelper::identifyLeadsCompany(
+                        $company = $this->identifyCompanyHelper->identifyLeadsCompany(
                             ['company' => $entityData['parentcustomerid']],
-                            null,
-                            $this->companyModel
+                            null
                         );
 
                         if (!empty($company[2])) {
