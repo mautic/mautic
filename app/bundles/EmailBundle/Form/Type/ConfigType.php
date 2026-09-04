@@ -8,6 +8,7 @@ use Mautic\ConfigBundle\Form\Type\DsnType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\SortableListType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\EmailBundle\Enum\EmailListColumn;
 use Mautic\EmailBundle\Validator\Dsn;
 use Mautic\EmailBundle\Validator\EmailOrEmailTokenList;
 use Mautic\PageBundle\Form\Type\PreferenceCenterListType;
@@ -17,6 +18,9 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -411,6 +415,58 @@ final class ConfigType extends AbstractType
             ]
         );
 
+        $buildEmailColumnsField = static function (FormInterface $form, array $currentColumns, array $extraOptions = []): void {
+            $order        = [];
+            $orderColumns = [];
+            if ([] !== $currentColumns) {
+                $orderColumns = array_values($currentColumns);
+                $order        = htmlspecialchars(json_encode($orderColumns), ENT_QUOTES, 'UTF-8');
+            }
+
+            $options = [
+                'label'       => 'mautic.config.tab.columns',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => [
+                    'class'         => 'form-control multiselect',
+                    'data-sortable' => 'true',
+                    'data-order'    => $order,
+                ],
+                'multiple'    => true,
+                'required'    => true,
+                'expanded'    => false,
+                'constraints' => [
+                    new NotBlank(
+                        message: 'mautic.core.value.required'
+                    ),
+                ],
+                'data'        => $orderColumns,
+            ] + $extraOptions;
+
+            $form->add(
+                'email_columns',
+                EmailColumnsType::class,
+                $options
+            );
+        };
+
+        $builder->addEventListener(
+            FormEvents::PRE_SET_DATA,
+            function (FormEvent $event) use ($buildEmailColumnsField): void {
+                $data    = $event->getData();
+                $columns = empty($data['email_columns']) ? $this->getDefaultEmailColumns() : $data['email_columns'];
+                $buildEmailColumnsField($event->getForm(), $columns);
+            }
+        );
+
+        $builder->addEventListener(
+            FormEvents::PRE_SUBMIT,
+            static function (FormEvent $event) use ($buildEmailColumnsField): void {
+                $data    = $event->getData();
+                $columns = $data['email_columns'] ?? [];
+                $buildEmailColumnsField($event->getForm(), $columns);
+            }
+        );
+
         $builder->add(
             'mailer_custom_headers',
             SortableListType::class,
@@ -602,5 +658,13 @@ final class ConfigType extends AbstractType
     public function getBlockPrefix(): string
     {
         return 'emailconfig';
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function getDefaultEmailColumns(): array
+    {
+        return EmailListColumn::defaultValues();
     }
 }

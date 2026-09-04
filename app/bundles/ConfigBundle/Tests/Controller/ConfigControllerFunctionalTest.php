@@ -14,7 +14,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 {
-    private const SUBDOMAIN_URL = 'subdomain_url.com';
+    private const SUBDOMAIN_URL           = 'subdomain_url.com';
+
+    private const DEFAULT_CONTACT_COLUMNS = ['name', 'email', 'id'];
+
+    private const DEFAULT_EMAIL_COLUMNS   = ['name', 'category', 'template', 'stats', 'dateAdded', 'dateModified', 'createdByUser', 'id'];
 
     private string $prefix;
 
@@ -62,7 +66,8 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
                 'config[coreconfig][site_url]'           => 'https://mautic-community.local', // required
                 'config[coreconfig][do_not_track_ips]'   => $trackIps,
                 'config[pageconfig][google_analytics]'   => $googleAnalytics,
-                'config[leadconfig][contact_columns]'    => ['name', 'email', 'id'],
+                'config[leadconfig][contact_columns]'    => self::DEFAULT_CONTACT_COLUMNS,
+                'config[emailconfig][email_columns]'     => self::DEFAULT_EMAIL_COLUMNS,
                 'config[companyconfig][company_columns]' => ['companyname', 'companyemail', 'companywebsite', 'score', 'leadcount', 'id'],
             ]
         );
@@ -192,7 +197,8 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $form->setValues(
             [
                 'config[coreconfig][site_url]'           => 'https://mautic-community.local', // required
-                'config[leadconfig][contact_columns]'    => ['name', 'email', 'id'],
+                'config[leadconfig][contact_columns]'    => self::DEFAULT_CONTACT_COLUMNS,
+                'config[emailconfig][email_columns]'     => self::DEFAULT_EMAIL_COLUMNS,
                 'config[companyconfig][company_columns]' => ['companyname', 'companyemail', 'companywebsite', 'score', 'leadcount', 'id'],
                 'config[coreconfig][404_page]'           => $page3,
             ]
@@ -229,13 +235,14 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
         $form->setValues(
             [
-                'config[coreconfig][site_url]'                                         => 'https://mautic-community.local', // required
-                'config[leadconfig][contact_columns]'                                  => ['name', 'email', 'id'],
-                'config[companyconfig][company_columns]'                               => ['companyname', 'companyemail', 'companywebsite', 'score', 'leadcount', 'id'],
-                'config[notification_config][campaign_send_notification_to_author]'    => $send_notification_to_author,
-                'config[notification_config][campaign_notification_email_addresses]'   => $campaign_notification_email_addresses,
-                'config[notification_config][webhook_send_notification_to_author]'     => $send_notification_to_author,
-                'config[notification_config][webhook_notification_email_addresses]'    => $webhook_notification_email_addresses,
+                'config[coreconfig][site_url]'                                       => 'https://mautic-community.local', // required
+                'config[leadconfig][contact_columns]'                                => self::DEFAULT_CONTACT_COLUMNS,
+                'config[emailconfig][email_columns]'                                 => self::DEFAULT_EMAIL_COLUMNS,
+                'config[companyconfig][company_columns]'                             => ['companyname', 'companyemail', 'companywebsite', 'score', 'leadcount', 'id'],
+                'config[notification_config][campaign_send_notification_to_author]'  => $send_notification_to_author,
+                'config[notification_config][campaign_notification_email_addresses]' => $campaign_notification_email_addresses,
+                'config[notification_config][webhook_send_notification_to_author]'   => $send_notification_to_author,
+                'config[notification_config][webhook_notification_email_addresses]'  => $webhook_notification_email_addresses,
             ]
         );
 
@@ -322,8 +329,10 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $configForm       = $configSaveButton->form();
         $configForm->setValues(
             [
-                'config[coreconfig][locale]'   => 'en_US',
-                'config[coreconfig][site_url]' => 'https://mautic-cloud.local', // required
+                'config[coreconfig][locale]'          => 'en_US',
+                'config[coreconfig][site_url]'        => 'https://mautic-cloud.local', // required
+                'config[leadconfig][contact_columns]' => self::DEFAULT_CONTACT_COLUMNS,
+                'config[emailconfig][email_columns]'  => self::DEFAULT_EMAIL_COLUMNS,
             ]
         );
         $this->client->submit($configForm);
@@ -372,6 +381,8 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
             [
                 'config[userconfig][saml_idp_entity_id]'   => $availableOptions[1],
                 'config[coreconfig][site_url]'             => 'https://mautic-cloud.local', // required
+                'config[leadconfig][contact_columns]'      => self::DEFAULT_CONTACT_COLUMNS,
+                'config[emailconfig][email_columns]'       => self::DEFAULT_EMAIL_COLUMNS,
             ]
         );
         $this->client->submit($configForm);

@@ -1,0 +1,68 @@
+{% set edit = securityHasEntityAccess(
+    permissions['email:emails:editown'],
+    permissions['email:emails:editother'],
+    item.getCreatedBy()
+) %}
+
+{% set sendButton = {
+    'attr': {
+        'data-toggle': 'ajax',
+        'href': path('mautic_email_action', {'objectAction': 'send', 'objectId': item.getId()}),
+    },
+    'iconClass': 'ri-send-plane-line',
+    'btnText': 'mautic.email.send'
+} %}
+
+{% if item.isBackgroundSending() %}
+    {% set sendButton = sendButton|merge({
+        'attr': {
+            'href': 'javascript:void(0);',
+            'disabled': true
+        },
+        'tooltip': 'mautic.email.send.disabled',
+        'btnClass': 'disabled'
+    }) %}
+{% endif %}
+
+{% set previewButton = {
+    'attr': {
+        'class': 'btn btn-ghost btn-sm btn-nospin',
+        'href': url('mautic_email_preview', {'objectId': item.getId()}),
+        'target': '_blank',
+        'data-toggle': '',
+    },
+    'iconClass': 'ri-external-link-line',
+    'btnText': 'mautic.core.open_link'|trans,
+    'priority': 100
+} %}
+
+{% set sendExampleButton = {
+    'attr': {
+        'class': 'btn btn-ghost btn-sm btn-nospin',
+        'data-toggle': 'ajaxmodal',
+        'data-target': '#MauticSharedModal',
+        'href': path('mautic_email_action', {'objectAction': 'sendExample', 'objectId': item.getId()}),
+        'data-header': 'mautic.email.send.example'|trans,
+    },
+    'iconClass': 'ri-mail-send-line',
+    'btnText': 'mautic.email.send.example',
+    'priority': 150
+} %}
+
+{% set customButtons = ('list' == type) ? [sendButton, sendExampleButton, previewButton] : [sendExampleButton, previewButton] %}
+
+{{- include('@MauticCore/Helper/list_actions.html.twig', {
+    'item': item,
+    'templateButtons': {
+        'edit': edit,
+        'clone': permissions['email:emails:create'],
+        'delete': securityHasEntityAccess(
+            permissions['email:emails:deleteown'],
+            permissions['email:emails:deleteother'],
+            item.getCreatedBy()
+        ),
+        'abtest': ((not hasVariants) and edit and permissions['email:emails:create']),
+    },
+    'routeBase': 'email',
+    'customButtons': customButtons,
+}) -}}
