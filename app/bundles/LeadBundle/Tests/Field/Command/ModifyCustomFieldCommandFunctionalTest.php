@@ -7,8 +7,10 @@ namespace Mautic\LeadBundle\Tests\Field\Command;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Console\Command\Command;
 
+#[Group('non-parallel')]
 final class ModifyCustomFieldCommandFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;

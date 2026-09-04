@@ -10,10 +10,12 @@ use Mautic\CampaignBundle\Service\CampaignAuditService;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 #[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[Group('non-parallel')]
 final class CampaignAuditServiceTest extends MauticMysqlTestCase
 {
     private const string CAMPAIGN_NAME = 'Test Campaign';

@@ -88,8 +88,8 @@ jobs:
       with:
         php-version: ${{ matrix.php-versions }}
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
-        coverage: pcov
-        ini-values: pcov.enabled=0, pcov.directory=., pcov.exclude="~tests|themes|vendor~", zend.assertions=1
+        coverage: ${{ env.COVERAGE == 'true' && 'pcov' || 'none' }}
+        ini-values: ${{ env.COVERAGE == 'true' && 'pcov.enabled=0, pcov.directory=., pcov.exclude="~tests|themes|vendor~", zend.assertions=1' || 'zend.assertions=1' }}
 
     - name: add MySQL config file
       run: |
@@ -117,7 +117,10 @@ jobs:
         if [[ "$COVERAGE" == "true" ]]; then
           php -d zend.assertions=1 -d pcov.enabled=1 vendor/bin/phpunit -d memory_limit=3G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --coverage-clover=coverage.xml --log-junit=junit.xml
         else
-          php -d zend.assertions=1 vendor/bin/phpunit -d memory_limit=2G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist
+          # Parallel lane: the transaction-rollback tests, spread across all cores.
+          php -d zend.assertions=1 vendor/bin/paratest -p"$(nproc)" --runner=WrapperRunner --bootstrap app/paratest_bootstrap.php --configuration app/phpunit.xml.dist --exclude-group non-parallel --passthru-php="'-d' 'zend.assertions=1' '-d' 'memory_limit=2G'"
+          # Serial lane: tests that commit data (useCleanupRollback = false) and are not isolation-safe under parallel execution.
+          php -d zend.assertions=1 vendor/bin/phpunit -d memory_limit=2G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --group non-parallel
         fi
 
     - name: Upload coverage report

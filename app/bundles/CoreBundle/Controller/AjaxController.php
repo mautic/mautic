@@ -406,7 +406,12 @@ class AjaxController extends CommonController
                         $themes   = $ipService->getConfigFormThemes();
                         $themes[] = '@MauticCore/FormTheme/Config/config_layout.html.twig';
 
-                        $form = $this->createFormBuilder()
+                        // This form fragment is embedded in the parent configuration form,
+                        // which carries its own CSRF token, so the fragment must not emit one.
+                        // Emitting it made the token's presence depend on global CSRF state,
+                        // which leaked between tests (testGetIpLookupForm passed only in a
+                        // specific suite order and failed when run in isolation).
+                        $form = $this->createFormBuilder(null, ['csrf_protection' => false])
                             ->add(
                                 'ip_lookup_config',
                                 $formType,
