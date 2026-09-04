@@ -7,8 +7,9 @@ use Utils\Rector\UnserializeToSerializerDecodeRector;
 
 return RectorConfig::configure()
     ->withPaths([
-        __DIR__.'/app/bundles',
+        __DIR__.'/app',
         __DIR__.'/plugins',
+        __DIR__.'/utils',
     ])
     ->withPreparedSets(
         deadCode: true,
