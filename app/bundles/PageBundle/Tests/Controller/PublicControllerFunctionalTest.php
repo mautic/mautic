@@ -6,6 +6,7 @@ namespace Mautic\PageBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Tag;
+use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
@@ -143,5 +144,24 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
         $content = $this->client->getResponse()->getContent();
         $this->assertStringNotContainsString('<img src onerror=alert(\'Company\')>', (string) $content);
+    }
+
+    public function testPageHitWithGpcHeaderDoesNotTrack(): void
+    {
+        $page = new Page();
+        $page->setIsPublished(true);
+        $page->setTitle('Privacy landing page');
+        $page->setAlias('privacy-landing-page');
+        $page->setCustomHtml('<html><body>Privacy test</body></html>');
+        $this->em->persist($page);
+        $this->em->flush();
+
+        $this->logoutUser();
+
+        $this->client->request(Request::METHOD_GET, '/privacy-landing-page', [], [], ['HTTP_SEC_GPC' => '1']);
+        $this->assertResponseIsSuccessful();
+
+        $hit = $this->em->getRepository(Hit::class)->findOneBy(['page' => $page]);
+        $this->assertNull($hit, 'Ordinary page visits with an active GPC signal must not be tracked.');
     }
 }
