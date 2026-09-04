@@ -140,7 +140,7 @@ abstract class PageTestAbstract extends TestCase
             $this->createStub(TrackableModel::class),
             $this->createStub(MessageBus::class),
             $this->companyModel,
-            new IdentifyCompanyHelper($this->companyModel),
+            new IdentifyCompanyHelper($this->companyModel, $this->createMock(CompanyLeadRepository::class)),
             $this->createStub(DeviceTracker::class),
             $contactTracker,
             $coreParametersHelper,

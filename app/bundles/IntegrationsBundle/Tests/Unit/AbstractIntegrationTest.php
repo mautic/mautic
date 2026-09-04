@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -48,7 +49,7 @@ JSON;
     {
         // creating a double since we can't instantiate
         // we also need to expose some things for better unit test coverage
-        return new class($this->createStub(EventDispatcherInterface::class), $this->createStub(CacheProviderInterface::class), $this->createStub(EntityManager::class), $this->createStub(RequestStack::class), $this->createStub(Router::class), $this->createStub(TranslatorInterface::class), $this->createStub(Logger::class), $this->createStub(EncryptionHelper::class), $this->createStub(LeadModel::class), $this->createStub(CompanyModel::class), $this->createStub(PathsHelper::class), $this->createStub(NotificationModel::class), $this->createStub(FieldModel::class), $this->createStub(IntegrationEntityModel::class), $this->createStub(DoNotContactModel::class), $this->createStub(FieldsWithUniqueIdentifier::class), new IdentifyCompanyHelper($this->createStub(CompanyModel::class))) extends AbstractIntegration {
+        return new class($this->createStub(EventDispatcherInterface::class), $this->createStub(CacheProviderInterface::class), $this->createStub(EntityManager::class), $this->createStub(RequestStack::class), $this->createStub(Router::class), $this->createStub(TranslatorInterface::class), $this->createStub(Logger::class), $this->createStub(EncryptionHelper::class), $this->createStub(LeadModel::class), $this->createStub(CompanyModel::class), $this->createStub(PathsHelper::class), $this->createStub(NotificationModel::class), $this->createStub(FieldModel::class), $this->createStub(IntegrationEntityModel::class), $this->createStub(DoNotContactModel::class), $this->createStub(FieldsWithUniqueIdentifier::class), new IdentifyCompanyHelper($this->createStub(CompanyModel::class), $this->createStub(CompanyLeadRepository::class))) extends AbstractIntegration {
             public function getName(): string
             {
                 return 'double';

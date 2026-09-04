@@ -210,7 +210,7 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(MembershipManager::class),
             $this->leadFieldModel,
             $this->companyModel,
-            new IdentifyCompanyHelper($this->companyModel),
+            new IdentifyCompanyHelper($this->companyModel, $this->createMock(CompanyLeadRepository::class)),
             $fieldHelper,
             $this->uploadFieldValidatorMock,
             $this->createStub(FormUploader::class),

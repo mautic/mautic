@@ -172,7 +172,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->mockLeadModel,
             $this->createStub(FieldModel::class),
             $this->mockCompanyModel,
-            new IdentifyCompanyHelper($this->mockCompanyModel),
+            new IdentifyCompanyHelper($this->mockCompanyModel, $this->mockCompanyLeadRepository),
             $this->createStub(CampaignModel::class),
             $mockCoreParametersHelper,
             $this->doNotContact,

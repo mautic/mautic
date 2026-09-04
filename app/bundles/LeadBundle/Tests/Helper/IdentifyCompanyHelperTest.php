@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Helper;
 
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 
@@ -29,7 +30,7 @@ final class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
             ->method('fetchCompanyFields')
             ->willReturn([['alias' => 'companyname']]);
 
-        $helper                     = new IdentifyCompanyHelper($model);
+        $helper                     = new IdentifyCompanyHelper($model, $this->createMock(CompanyLeadRepository::class));
         [$resultCompany, $entities] = $helper->findCompany($company);
 
         $this->assertEquals($expected, $resultCompany);
@@ -57,7 +58,7 @@ final class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
             ->method('fetchCompanyFields')
             ->willReturn([['alias' => 'companyname']]);
 
-        $helper                     = new IdentifyCompanyHelper($model);
+        $helper                     = new IdentifyCompanyHelper($model, $this->createMock(CompanyLeadRepository::class));
         [$resultCompany, $entities] = $helper->findCompany($company);
 
         $this->assertEquals($expected, $resultCompany);
@@ -87,7 +88,7 @@ final class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
             ->method('fetchCompanyFields')
             ->willReturn([['alias' => 'companyname']]);
 
-        $helper                     = new IdentifyCompanyHelper($model);
+        $helper                     = new IdentifyCompanyHelper($model, $this->createMock(CompanyLeadRepository::class));
         [$resultCompany, $entities] = $helper->findCompany($company);
 
         $this->assertEquals($expected, $resultCompany);
