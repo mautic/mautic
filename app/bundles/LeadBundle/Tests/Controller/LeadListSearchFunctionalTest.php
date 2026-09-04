@@ -10,6 +10,7 @@ use Doctrine\ORM\ORMException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\ListLead;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -34,8 +35,8 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
         $leadSix   = $this->createLead('six');
 
         // add some leads in lists
-        $listOne  = $this->createLeadList('first-list', $leadOne, $leadTwo, $leadThree);
-        $listTwo  = $this->createLeadList('second-list', $leadOne, $leadFour, $leadFive, $leadSix);
+        $listOne  = $this->createLeadList('first-list', [$leadTwo], $leadOne, $leadTwo, $leadThree);
+        $listTwo  = $this->createLeadList('second-list', [], $leadOne, $leadFour, $leadFive, $leadSix);
 
         $this->em->flush();
         $this->em->clear();
@@ -55,48 +56,50 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
         $this->assertSearchResult('segment%3A'.$listOne->getAlias(), [$leadOne, $leadTwo, $leadThree], [$leadFour, $leadFive, $leadSix]);
         $this->assertQueries([
             "SELECT list.id FROM {$prefix}lead_lists list WHERE list.alias = '{$listOne->getAlias()}'",
-            "SELECT COUNT(l.id) as count FROM {$prefix}leads l USE INDEX FOR JOIN ({$prefix}lead_date_added) WHERE (EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ('{$listOne->getId()}')))) AND (l.date_identified IS NOT NULL)",
-            "SELECT l.* FROM {$prefix}leads l USE INDEX FOR JOIN ({$prefix}lead_date_added) WHERE (EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ('{$listOne->getId()}')))) AND (l.date_identified IS NOT NULL) ORDER BY l.last_active DESC, l.id DESC LIMIT 30",
+            "SELECT COUNT(l.id) as count FROM {$prefix}leads l USE INDEX FOR JOIN ({$prefix}lead_date_added) WHERE (EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ({$listOne->getId()})))) AND (l.date_identified IS NOT NULL)",
+            "SELECT l.* FROM {$prefix}leads l USE INDEX FOR JOIN ({$prefix}lead_date_added) WHERE (EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ({$listOne->getId()})))) AND (l.date_identified IS NOT NULL) ORDER BY l.last_active DESC, l.id DESC LIMIT 30",
         ], $previousQueries);
+
         $this->assertSearchResult('!segment%3A'.$listOne->getAlias(), [$leadFour, $leadFive, $leadSix], [$leadOne, $leadTwo, $leadThree]);
         $this->assertQueries([
             "SELECT list.id FROM {$prefix}lead_lists list WHERE list.alias = '{$listOne->getAlias()}'",
-            "SELECT COUNT(l.id) as count FROM {$prefix}leads l USE INDEX FOR JOIN ({$prefix}lead_date_added) WHERE (NOT EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ('{$listOne->getId()}')))) AND (l.date_identified IS NOT NULL)",
-            "SELECT l.* FROM {$prefix}leads l USE INDEX FOR JOIN ({$prefix}lead_date_added) WHERE (NOT EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ('{$listOne->getId()}')))) AND (l.date_identified IS NOT NULL) ORDER BY l.last_active DESC, l.id DESC LIMIT 30",
+            "SELECT COUNT(l.id) as count FROM {$prefix}leads l USE INDEX FOR JOIN ({$prefix}lead_date_added) WHERE (NOT EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ({$listOne->getId()})))) AND (l.date_identified IS NOT NULL)",
+            "SELECT l.* FROM {$prefix}leads l USE INDEX FOR JOIN ({$prefix}lead_date_added) WHERE (NOT EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ({$listOne->getId()})))) AND (l.date_identified IS NOT NULL) ORDER BY l.last_active DESC, l.id DESC LIMIT 30",
         ], $previousQueries);
 
         // second-list segment search
         $this->assertSearchResult('segment%3A'.$listTwo->getAlias(), [$leadOne, $leadFour, $leadFive, $leadSix], [$leadTwo, $leadThree]);
         $this->assertQueries([
             "SELECT list.id FROM {$prefix}lead_lists list WHERE list.alias = '{$listTwo->getAlias()}'",
-            "SELECT COUNT(l.id) as count FROM {$prefix}leads l USE INDEX FOR JOIN ({$prefix}lead_date_added) WHERE (EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ('{$listTwo->getId()}')))) AND (l.date_identified IS NOT NULL)",
-            "SELECT l.* FROM {$prefix}leads l USE INDEX FOR JOIN ({$prefix}lead_date_added) WHERE (EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ('{$listTwo->getId()}')))) AND (l.date_identified IS NOT NULL) ORDER BY l.last_active DESC, l.id DESC LIMIT 30",
+            "SELECT COUNT(l.id) as count FROM {$prefix}leads l USE INDEX FOR JOIN ({$prefix}lead_date_added) WHERE (EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ({$listTwo->getId()})))) AND (l.date_identified IS NOT NULL)",
+            "SELECT l.* FROM {$prefix}leads l USE INDEX FOR JOIN ({$prefix}lead_date_added) WHERE (EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ({$listTwo->getId()})))) AND (l.date_identified IS NOT NULL) ORDER BY l.last_active DESC, l.id DESC LIMIT 30",
         ], $previousQueries);
         $this->assertSearchResult('!segment%3A'.$listTwo->getAlias(), [$leadTwo, $leadThree], [$leadOne, $leadFour, $leadFive, $leadSix]);
         $this->assertQueries([
             "SELECT list.id FROM {$prefix}lead_lists list WHERE list.alias = '{$listTwo->getAlias()}'",
-            "SELECT COUNT(l.id) as count FROM {$prefix}leads l USE INDEX FOR JOIN ({$prefix}lead_date_added) WHERE (NOT EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ('{$listTwo->getId()}')))) AND (l.date_identified IS NOT NULL)",
-            "SELECT l.* FROM {$prefix}leads l USE INDEX FOR JOIN ({$prefix}lead_date_added) WHERE (NOT EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ('{$listTwo->getId()}')))) AND (l.date_identified IS NOT NULL) ORDER BY l.last_active DESC, l.id DESC LIMIT 30",
+            "SELECT COUNT(l.id) as count FROM {$prefix}leads l USE INDEX FOR JOIN ({$prefix}lead_date_added) WHERE (NOT EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ({$listTwo->getId()})))) AND (l.date_identified IS NOT NULL)",
+            "SELECT l.* FROM {$prefix}leads l USE INDEX FOR JOIN ({$prefix}lead_date_added) WHERE (NOT EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ({$listTwo->getId()})))) AND (l.date_identified IS NOT NULL) ORDER BY l.last_active DESC, l.id DESC LIMIT 30",
         ], $previousQueries);
     }
 
-    /**
-     * @param Lead[] $expectedLeads
-     * @param Lead[] $notExpectedLeads
-     */
-    private function assertSearchResult(string $search, array $expectedLeads, array $notExpectedLeads): void
+    public function testSegmentSourceSearch(): void
     {
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts?search='.$search);
-        self::assertResponseIsSuccessful();
-        $responseText = $crawler->text();
+        $leadOne   = $this->createLead('one');
+        $leadTwo   = $this->createLead('two');
+        $leadThree = $this->createLead('three');
 
-        foreach ($expectedLeads as $expectedLead) {
-            $this->assertStringContainsString($expectedLead->getEmail(), $responseText, sprintf('Lead with the email "%s" should be in the result.', $expectedLead->getEmail()));
-        }
+        $list = $this->createLeadList('first-list', [$leadTwo], $leadOne, $leadTwo, $leadThree);
 
-        foreach ($notExpectedLeads as $notExpectedLead) {
-            $this->assertStringNotContainsString($notExpectedLead->getEmail(), $responseText, sprintf('Lead with the email "%s" should not be in the result.', $notExpectedLead->getEmail()));
-        }
+        $this->em->flush();
+        $this->em->clear();
+
+        $leadRepository = $this->em->getRepository(Lead::class);
+        $this->assertInstanceOf(LeadRepository::class, $leadRepository);
+        $this->assertContains('mautic.lead.lead.searchcommand.source', $leadRepository->getSearchCommands());
+
+        $this->assertSearchResult('segment%3A'.$list->getAlias().'%20source%3Amanually_added', [$leadTwo], [$leadOne, $leadThree]);
+        $this->assertSearchResult('segment%3A'.$list->getAlias().'%20source%3Afilter_added', [$leadOne, $leadThree], [$leadTwo]);
+        $this->assertSearchResult('source%3Amanually_added', [], [$leadOne, $leadTwo, $leadThree]);
     }
 
     /**
@@ -121,6 +124,25 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
+     * @param Lead[] $expectedLeads
+     * @param Lead[] $notExpectedLeads
+     */
+    private function assertSearchResult(string $search, array $expectedLeads, array $notExpectedLeads): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts?search='.$search);
+        self::assertResponseIsSuccessful();
+        $responseText = $crawler->text();
+
+        foreach ($expectedLeads as $expectedLead) {
+            $this->assertStringContainsString($expectedLead->getEmail(), $responseText, sprintf('Lead with the email "%s" should be in the result.', $expectedLead->getEmail()));
+        }
+
+        foreach ($notExpectedLeads as $notExpectedLead) {
+            $this->assertStringNotContainsString($notExpectedLead->getEmail(), $responseText, sprintf('Lead with the email "%s" should not be in the result.', $notExpectedLead->getEmail()));
+        }
+    }
+
+    /**
      * @throws ORMException
      */
     private function createLead(string $lastName): Lead
@@ -134,9 +156,11 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
+     * @param Lead[] $manuallyAddedLeads
+     *
      * @throws ORMException
      */
-    private function createLeadList(string $name, Lead ...$leads): LeadList
+    private function createLeadList(string $name, array $manuallyAddedLeads, Lead ...$leads): LeadList
     {
         $leadList = new LeadList();
         $leadList->setName($name);
@@ -145,18 +169,19 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($leadList);
 
         foreach ($leads as $lead) {
-            $this->addLeadToList($lead, $leadList);
+            $this->addLeadToList($lead, $leadList, in_array($lead, $manuallyAddedLeads, true));
         }
 
         return $leadList;
     }
 
-    private function addLeadToList(Lead $leadOne, LeadList $sourceList): void
+    private function addLeadToList(Lead $lead, LeadList $sourceList, bool $manuallyAdded): void
     {
         $listLead = new ListLead();
-        $listLead->setLead($leadOne);
+        $listLead->setLead($lead);
         $listLead->setList($sourceList);
         $listLead->setDateAdded(new \DateTime());
+        $listLead->setManuallyAdded($manuallyAdded);
         $this->em->persist($listLead);
     }
 }
