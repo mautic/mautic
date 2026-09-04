@@ -162,6 +162,6 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $hit = $this->em->getRepository(Hit::class)->findOneBy(['page' => $page]);
-        $this->assertNull($hit, 'Ordinary page visits with an active GPC signal must not be tracked.');
+        $this->assertNotInstanceOf(Hit::class, $hit, 'Ordinary page visits with an active GPC signal must not be tracked.');
     }
 }

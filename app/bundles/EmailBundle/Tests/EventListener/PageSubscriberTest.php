@@ -35,8 +35,7 @@ final class PageSubscriberTest extends TestCase
 
         $this->request = new Request();
 
-        $requestStack = new RequestStack();
-        $requestStack->push($this->request);
+        $requestStack = new RequestStack([$this->request]);
 
         $this->pageSubscriber = new PageSubscriber(
             $this->emailModel,
@@ -48,10 +47,10 @@ final class PageSubscriberTest extends TestCase
     public function testOnPageHitDispatchesEmailClickForEmailRedirect(): void
     {
         $emailId = 123;
-        $email   = $this->createMock(Email::class);
+        $email   = $this->createStub(Email::class);
         $email->method('getId')->willReturn($emailId);
 
-        $redirect = $this->createMock(Redirect::class);
+        $redirect = $this->createStub(Redirect::class);
 
         $lead = $this->createMock(Lead::class);
         $lead->method('getId')->willReturn(789);
@@ -90,7 +89,7 @@ final class PageSubscriberTest extends TestCase
 
     public function testOnPageHitDoesNotDispatchEmailClickWithoutRedirect(): void
     {
-        $email = $this->createMock(Email::class);
+        $email = $this->createStub(Email::class);
 
         $hit = new Hit();
         $hit->setEmail($email);
@@ -105,12 +104,12 @@ final class PageSubscriberTest extends TestCase
     public function testOnPageHitMarksEmailAsReadWhenStatExists(): void
     {
         $emailId = 123;
-        $email   = $this->createMock(Email::class);
+        $email   = $this->createStub(Email::class);
         $email->method('getId')->willReturn($emailId);
 
-        $redirect = $this->createMock(Redirect::class);
+        $redirect = $this->createStub(Redirect::class);
 
-        $stat = $this->createMock(Stat::class);
+        $stat = $this->createStub(Stat::class);
 
         $hit = new Hit();
         $hit->setRedirect($redirect);
