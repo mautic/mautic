@@ -362,10 +362,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
         return $sugarFields;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getFetchQuery(array $params)
+    public function getFetchQuery(array $params): array
     {
         return $params;
     }
@@ -516,6 +513,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
 
         $params['offset'] ??= 0;
         $query = $params;
+        $executed = (int) $executed;
 
         try {
             if ($this->isAuthorized()) {
