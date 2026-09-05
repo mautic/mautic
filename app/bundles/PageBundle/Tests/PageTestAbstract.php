@@ -22,6 +22,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\UtmTagRepository;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
+use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -139,6 +140,7 @@ abstract class PageTestAbstract extends TestCase
             $this->createStub(TrackableModel::class),
             $this->createStub(MessageBus::class),
             $this->companyModel,
+            new IdentifyCompanyHelper($this->companyModel, $this->createStub(CompanyLeadRepository::class)),
             $this->createStub(DeviceTracker::class),
             $contactTracker,
             $coreParametersHelper,

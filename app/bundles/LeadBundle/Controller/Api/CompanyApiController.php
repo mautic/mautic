@@ -51,6 +51,7 @@ final class CompanyApiController extends CommonApiController
         CoreParametersHelper $coreParametersHelper,
         private readonly CompanyModel $companyModel,
         private readonly LeadModel $leadModel,
+        private readonly IdentifyCompanyHelper $identifyCompanyHelper,
     ) {
         $this->model              = $companyModel;
         $this->entityClass        = Company::class;
@@ -63,7 +64,7 @@ final class CompanyApiController extends CommonApiController
 
     public function getNewEntity(array $params)
     {
-        [$company, $companyEntities] = IdentifyCompanyHelper::findCompany($params, $this->companyModel);
+        [$company, $companyEntities] = $this->identifyCompanyHelper->findCompany($params);
         if (count($companyEntities)) {
             return $this->model->getEntity($company['id']);
         }

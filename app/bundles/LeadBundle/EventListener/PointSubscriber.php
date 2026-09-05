@@ -112,7 +112,7 @@ final readonly class PointSubscriber implements EventSubscriberInterface
         try {
             $stage = $this->stageModel->getEntity($stageId);
             if (null === $stage || false === $stage->isPublished()) {
-                throw new \InvalidArgumentException("Stage for ID $stageId not found");
+                throw new \InvalidArgumentException("Stage for ID {$stageId} not found");
             }
 
             $this->leadModel->changeStage(

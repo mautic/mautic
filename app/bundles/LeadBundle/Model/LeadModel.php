@@ -136,6 +136,7 @@ class LeadModel extends FormModel
         protected ListModel $leadListModel,
         protected FormFactoryInterface $formFactory,
         protected CompanyModel $companyModel,
+        private readonly IdentifyCompanyHelper $identifyCompanyHelper,
         protected CategoryModel $categoryModel,
         protected ChannelListHelper $channelListHelper,
         CoreParametersHelper $coreParametersHelper,
@@ -429,7 +430,7 @@ class LeadModel extends FormModel
         $changeLogEntity = null;
         if (isset($updatedFields['company'])) {
             $companyFieldMatches['company']            = $updatedFields['company'];
-            [$company, $leadAdded, $companyEntity]     = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $entity, $this->companyModel, $this->companyLeadRepository);
+            [$company, $leadAdded, $companyEntity]     = $this->identifyCompanyHelper->identifyLeadsCompany($companyFieldMatches, $entity);
             if ($leadAdded) {
                 $changeLogEntity = $entity->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
             }

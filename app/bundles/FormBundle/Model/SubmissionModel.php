@@ -88,6 +88,7 @@ final class SubmissionModel extends CommonFormModel
         private readonly MembershipManager $membershipManager,
         private readonly LeadFieldModel $leadFieldModel,
         private readonly CompanyModel $companyModel,
+        private readonly IdentifyCompanyHelper $identifyCompanyHelper,
         private readonly FormFieldHelper $fieldHelper,
         private readonly UploadFieldValidator $uploadFieldValidator,
         private readonly FormUploader $formUploader,
@@ -1153,7 +1154,7 @@ final class SubmissionModel extends CommonFormModel
 
         $companyFieldMatches = $getCompanyData($leadFieldMatches);
         if ([] !== $companyFieldMatches) {
-            [$company, $leadAdded, $companyEntity] = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $lead, $this->companyModel, $this->companyLeadRepository);
+            [$company, $leadAdded, $companyEntity] = $this->identifyCompanyHelper->identifyLeadsCompany($companyFieldMatches, $lead);
             $companyChangeLog                      = null;
             if ($leadAdded) {
                 $companyChangeLog = $lead->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);

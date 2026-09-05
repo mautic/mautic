@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticOutlookBundle\Tests\Integration;
 
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
+use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticOutlookBundle\Integration\OutlookIntegration;
 
@@ -33,6 +35,7 @@ final class OutlookIntegrationTest extends AbstractIntegrationTestCase
             $this->integrationEntityModel,
             $this->doNotContact,
             $this->fieldsWithUniqueIdentifier,
+            new IdentifyCompanyHelper($this->companyModel, $this->createStub(CompanyLeadRepository::class)),
         );
     }
 

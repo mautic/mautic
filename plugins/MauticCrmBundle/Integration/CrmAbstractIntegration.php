@@ -5,7 +5,6 @@ namespace MauticPlugin\MauticCrmBundle\Integration;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
@@ -301,7 +300,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
         // Default to new company
         $company         = new Company();
-        $existingCompany = IdentifyCompanyHelper::identifyLeadsCompany($matchedFields, null, $this->companyModel);
+        $existingCompany = $this->identifyCompanyHelper->identifyLeadsCompany($matchedFields, null);
         if (!empty($existingCompany[2])) {
             $company = $existingCompany[2];
         }

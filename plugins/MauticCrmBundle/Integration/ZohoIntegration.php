@@ -5,7 +5,6 @@ namespace MauticPlugin\MauticCrmBundle\Integration;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper;
@@ -263,10 +262,9 @@ final class ZohoIntegration extends CrmAbstractIntegration
                             'mautic.integration.form.lead.unknown'
                         )
                     ) {
-                        $company = IdentifyCompanyHelper::identifyLeadsCompany(
+                        $company = $this->identifyCompanyHelper->identifyLeadsCompany(
                             ['company' => $entityData['Company']],
-                            null,
-                            $this->companyModel
+                            null
                         );
 
                         if (!empty($company[2])) {
@@ -338,10 +336,9 @@ final class ZohoIntegration extends CrmAbstractIntegration
                                 'mautic.integration.form.lead.unknown'
                             )
                         ) {
-                            $company = IdentifyCompanyHelper::identifyLeadsCompany(
+                            $company = $this->identifyCompanyHelper->identifyLeadsCompany(
                                 ['company' => $entityData['AccountName']],
-                                null,
-                                $this->companyModel
+                                null
                             );
 
                             if (!empty($company[2])) {

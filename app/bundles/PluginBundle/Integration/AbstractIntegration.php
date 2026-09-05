@@ -18,6 +18,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
+use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -138,6 +139,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         protected IntegrationEntityModel $integrationEntityModel,
         protected DoNotContactModel $doNotContact,
         protected FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
+        protected IdentifyCompanyHelper $identifyCompanyHelper,
     ) {
         // the integration name namespaces the cache keys so that integrations cannot overwrite each other
         $this->cache                  = new Psr16Cache(new ProxyAdapter($cacheProvider, (string) $this->getName()));

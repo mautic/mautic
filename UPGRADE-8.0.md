@@ -622,3 +622,16 @@
         ->args([service('knp_menu.matcher'), service('twig'), ['template' => '@MyBundle/Menu/mybundle.html.twig']])
         ->tag('knp_menu.renderer', ['alias' => 'mybundle']);
     ```
+
+- `Mautic\LeadBundle\Helper\IdentifyCompanyHelper` is now an autowired service instead of a static utility. `CompanyModel` is injected via the constructor, and `identifyLeadsCompany()` and `findCompany()` are now instance methods with the `CompanyModel` parameter dropped. Inject the helper and call it on the instance instead of calling it statically:
+
+    ```diff
+    -use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
+    +public function __construct(
+    +    private IdentifyCompanyHelper $identifyCompanyHelper,
+    +) {
+    +}
+
+    -[$company, $companyEntities] = IdentifyCompanyHelper::identifyLeadsCompany($data, $lead, $companyModel);
+    +[$company, $companyEntities] = $this->identifyCompanyHelper->identifyLeadsCompany($data, $lead);
+    ```

@@ -108,6 +108,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         protected TrackableModel $pageTrackableModel,
         private readonly MessageBusInterface $messageBus,
         private readonly CompanyModel $companyModel,
+        private readonly IdentifyCompanyHelper $identifyCompanyHelper,
         private readonly DeviceTracker $deviceTracker,
         private readonly ContactTracker $contactTracker,
         CoreParametersHelper $coreParametersHelper,
@@ -438,7 +439,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
             $lead = $this->contactRequestHelper->getContactFromQuery($query);
 
             // company
-            [$company, $leadAdded, $companyEntity] = IdentifyCompanyHelper::identifyLeadsCompany($query, $lead, $this->companyModel, $this->companyLeadRepository);
+            [$company, $leadAdded, $companyEntity] = $this->identifyCompanyHelper->identifyLeadsCompany($query, $lead);
             $companyChangeLog                      = null;
             if ($leadAdded) {
                 $companyChangeLog = $lead->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace MauticPlugin\MauticSocialBundle\Tests\Integration;
 
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
+use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticSocialBundle\Integration\InstagramIntegration;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -36,6 +38,7 @@ final class InstagramIntegrationTest extends AbstractIntegrationTestCase
             $this->integrationEntityModel,
             $this->doNotContact,
             $this->fieldsWithUniqueIdentifier,
+            new IdentifyCompanyHelper($this->companyModel, $this->createStub(CompanyLeadRepository::class)),
         );
     }
 

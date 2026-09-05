@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticCrmBundle\Tests\Integration;
 
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
+use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Event\PluginIntegrationKeyEvent;
 use Mautic\PluginBundle\PluginEvents;
@@ -38,6 +40,7 @@ final class HubspotIntegrationTest extends AbstractIntegrationTestCase
             $this->integrationEntityModel,
             $this->doNotContact,
             $this->fieldsWithUniqueIdentifier,
+            new IdentifyCompanyHelper($this->companyModel, $this->createStub(CompanyLeadRepository::class)),
         );
     }
 
