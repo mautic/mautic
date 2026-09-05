@@ -362,10 +362,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
         return $sugarFields;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getFetchQuery(array $params)
+    public function getFetchQuery(array $params): array
     {
         return $params;
     }

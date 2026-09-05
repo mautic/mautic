@@ -400,11 +400,10 @@ final class ZohoIntegration extends CrmAbstractIntegration
     /**
      * @param string $query
      *
-     * @return int
      *
      * @param-out int $executed
      */
-    public function getLeads(array $params, $query, &$executed, array $result = [], string $object = 'Lead')
+    public function getLeads(array $params, $query, &$executed, array $result = [], string $object = 'Lead'): int
     {
         if ('Lead' === $object || 'Contact' === $object) {
             $object .= 's'; // pluralize object name for Zoho
