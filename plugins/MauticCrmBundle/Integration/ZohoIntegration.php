@@ -400,6 +400,8 @@ final class ZohoIntegration extends CrmAbstractIntegration
     /**
      * @param string $query
      *
+     * @return int
+     *
      * @param-out int $executed
      */
     public function getLeads(array $params, $query, &$executed, array $result = [], string $object = 'Lead')
