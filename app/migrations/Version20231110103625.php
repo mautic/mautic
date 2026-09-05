@@ -38,7 +38,7 @@ final class Version20231110103625 extends AbstractMauticMigration
             $stmt->bindValue('id', $row['id'], \PDO::PARAM_INT);
             $updatedRecords += $stmt->executeStatement();
 
-            foreach ($addPermissions as $roleId => $permissionsToAdd) {
+            foreach ($addPermissions as $permissionsToAdd) {
                 foreach ($permissionsToAdd as $permissionToAdd => $bitwise) {
                     $sql             = sprintf('INSERT IGNORE  INTO %s (role_id, bundle, name, bitwise) VALUES (:role_id, :bundle, :name, :bitwise)', $this->prefix.'permissions');
                     $stmt            = $this->connection->prepare($sql);

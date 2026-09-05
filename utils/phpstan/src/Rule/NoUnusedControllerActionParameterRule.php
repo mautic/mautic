@@ -35,7 +35,7 @@ use PHPStan\Rules\RuleErrorBuilder;
  *
  * @implements Rule<InClassNode>
  */
-final class NoUnusedControllerActionParameterRule implements Rule
+final readonly class NoUnusedControllerActionParameterRule implements Rule
 {
     /**
      * @var string

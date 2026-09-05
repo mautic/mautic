@@ -143,7 +143,7 @@ class TrackableModel extends AbstractCommonModel
      *
      * @return array<Trackable>
      */
-    public function getTrackablesByUrls($urls, $channel, $channelId)
+    public function getTrackablesByUrls($urls, $channel, $channelId): array
     {
         $uniqueUrls = array_unique(
             array_values($urls)
@@ -607,7 +607,7 @@ class TrackableModel extends AbstractCommonModel
     /**
      * @return array<string, Trackable|Redirect>
      */
-    protected function getEntitiesFromUrls($trackableUrls, $channel, $channelId)
+    protected function getEntitiesFromUrls($trackableUrls, $channel, $channelId): array
     {
         if (!empty($channel) && !empty($channelId)) {
             // Track as channel aware

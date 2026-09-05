@@ -58,7 +58,7 @@ final class DynamicContentType extends AbstractType
      */
     private readonly array $regionChoices;
 
-    private $timezoneChoices;
+    private readonly array $timezoneChoices;
 
     /**
      * @var mixed[]
