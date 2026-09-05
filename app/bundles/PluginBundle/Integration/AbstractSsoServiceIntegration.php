@@ -99,9 +99,9 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
     }
 
     /**
-     * @return array
+     * @return string[]
      */
-    public function getSupportedFeatures()
+    public function getSupportedFeatures(): array
     {
         return [
             'sso_service',

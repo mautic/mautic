@@ -13,6 +13,8 @@ final class PostCountRepository extends CommonRepository
     /**
      * Fetch Lead stats for some period of time.
      *
+     * @param array<string, mixed> $options
+     *
      * @return PostCount[]
      *
      * @throws \Doctrine\ORM\NoResultException

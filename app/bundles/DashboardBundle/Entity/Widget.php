@@ -323,6 +323,9 @@ class Widget extends FormEntity
         return $this->loadTime;
     }
 
+    /**
+     * @return array<string, int|string|mixed[]|null>
+     */
     public function toArray(): array
     {
         return [

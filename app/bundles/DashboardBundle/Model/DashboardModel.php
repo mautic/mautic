@@ -106,6 +106,8 @@ class DashboardModel extends FormModel
      * Useful for dashboard exports.
      *
      * @param string $name
+     *
+     * @return array<string, string|mixed[]>
      */
     public function toArray($name): array
     {
@@ -307,6 +309,8 @@ class DashboardModel extends FormModel
 
     /**
      * Generate default date range filter and time unit.
+     *
+     * @return array<string, \DateTime>
      */
     public function getDefaultFilter(): array
     {

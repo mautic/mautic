@@ -446,7 +446,9 @@ class ReportModel extends FormModel implements GlobalSearchInterface
     /**
      * Get report data for view rendering.
      *
-     * @return mixed[]
+     * @param array<string, mixed> $options
+     *
+     * @return array<string, mixed>
      */
     public function getReportData(Report $entity, ?FormFactoryInterface $formFactory = null, array $options = []): array
     {
@@ -763,6 +765,8 @@ class ReportModel extends FormModel implements GlobalSearchInterface
     /**
      * Determine what operators should be used for the filter type.
      *
+     * @param array<string, mixed> $data
+     *
      * @return mixed|string
      */
     private function getOperatorOptions(array $data)
@@ -787,6 +791,9 @@ class ReportModel extends FormModel implements GlobalSearchInterface
         return $options;
     }
 
+    /**
+     * @param array<string, mixed> $debugData
+     */
     private function getTotalCount(QueryBuilder $qb, array &$debugData): int
     {
         $countQb = clone $qb;

@@ -13,6 +13,9 @@ final class ReportDataResult
      */
     private $data;
 
+    /**
+     * @var string[]|mixed[]
+     */
     private array $headers = [];
 
     private array $types = [];
@@ -165,6 +168,9 @@ final class ReportDataResult
         return $this->columnKeys;
     }
 
+    /**
+     * @param array<string, mixed> $data
+     */
     private function buildHeader(array $data): void
     {
         foreach ($this->columnKeys as $k) {
@@ -180,6 +186,9 @@ final class ReportDataResult
         }
     }
 
+    /**
+     * @param array<string, mixed> $data
+     */
     private function buildTypes(array $data): void
     {
         foreach ($this->columnKeys as $k) {

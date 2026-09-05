@@ -28,6 +28,8 @@ final class CampaignHelper
 
     /**
      * Prepares the neccessary data transformations and then makes the HTTP request.
+     *
+     * @param array<string, mixed> $config
      */
     public function fireWebhook(array $config, Lead $contact): void
     {
@@ -49,6 +51,8 @@ final class CampaignHelper
 
     /**
      * Gets the payload fields from the config and if there are tokens it translates them to contact values.
+     *
+     * @param array<string, mixed> $config
      */
     private function getPayload(array $config, Lead $contact): array
     {
@@ -60,6 +64,8 @@ final class CampaignHelper
 
     /**
      * Gets the payload fields from the config and if there are tokens it translates them to contact values.
+     *
+     * @param array<string, mixed> $config
      */
     private function getHeaders(array $config, Lead $contact): array
     {
@@ -70,7 +76,8 @@ final class CampaignHelper
     }
 
     /**
-     * @param int $timeout
+     * @param int                  $timeout
+     * @param array<string, mixed> $headers
      *
      * @throws \InvalidArgumentException
      * @throws \OutOfRangeException
@@ -117,6 +124,8 @@ final class CampaignHelper
 
     /**
      * Translates tokens to values.
+     *
+     * @param int[]|string[] $rawTokens
      */
     private function getTokenValues(array $rawTokens, Lead $contact): array
     {

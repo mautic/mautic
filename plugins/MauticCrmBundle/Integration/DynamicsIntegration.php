@@ -416,6 +416,9 @@ final class DynamicsIntegration extends CrmAbstractIntegration
         return $executed;
     }
 
+    /**
+     * @param array<string, mixed> $params
+     */
     public function getCompanies(array $params = []): int
     {
         $executed    = 0;
@@ -668,6 +671,8 @@ final class DynamicsIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @param array<string, mixed> $params
+     *
      * @return mixed[]
      */
     public function pushLeads(array $params = []): array

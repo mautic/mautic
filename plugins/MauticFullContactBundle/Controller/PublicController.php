@@ -256,8 +256,8 @@ final class PublicController extends FormController
     /**
      * This is only called internally.
      *
-     * @param mixed[] $result
-     * @param mixed[] $validatedRequest
+     * @param array<string, mixed> $result
+     * @param array<string, mixed> $validatedRequest
      *
      * @throws \InvalidArgumentException
      */
