@@ -413,7 +413,7 @@ class Form extends FormEntity implements UuidInterface
     /**
      * @return string|null
      */
-    public function getDescription($truncate = false, $length = 45)
+    public function getDescription(bool $truncate = false, $length = 45)
     {
         if ($truncate) {
             if (strlen($this->description) > $length) {

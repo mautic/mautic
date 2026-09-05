@@ -97,9 +97,8 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
 
     /**
      * @param Trigger $entity
-     * @param bool    $unlock
      */
-    public function saveEntity($entity, $unlock = true): void
+    public function saveEntity($entity, bool $unlock = true): void
     {
         $isNew = !(bool) $entity->getId();
 
@@ -194,7 +193,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Trigger) {
             throw new MethodNotAllowedHttpException(['Trigger']);
@@ -300,11 +299,10 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
      * Triggers a specific event.
      *
      * @param array $event triggerEvent converted to array
-     * @param bool  $force
      *
      * @return bool Was event triggered
      */
-    public function triggerEvent(array $event, ?Lead $lead = null, $force = false): bool
+    public function triggerEvent(array $event, ?Lead $lead = null, bool $force = false): bool
     {
         // only trigger events for anonymous users
         if (!$force && !$this->security->isAnonymous()) {

@@ -54,11 +54,9 @@ final class AssetsHelper
     }
 
     /**
-     * @param bool $includeEndingSlash
-     *
      * @return string
      */
-    public function getAssetPrefix($includeEndingSlash = false)
+    public function getAssetPrefix(bool $includeEndingSlash = false)
     {
         $prefix = $this->pathsHelper->getSystemPath('asset_prefix');
         if (!empty($prefix)) {
@@ -84,10 +82,9 @@ final class AssetsHelper
      * This could be logo's, country flags, ...
      * So to be able to override an asset, it has to exist in the assets folder.
      *
-     * @param string     $path
-     * @param bool|false $absolute
+     * @param string $path
      */
-    public function getOverridableUrl($path, $absolute = false): false|string
+    public function getOverridableUrl($path, bool $absolute = false): false|string
     {
         $mediaPath  = $this->pathsHelper->getSystemPath('media', false);
         $assetsPath = $this->pathsHelper->getSystemPath('assets', false);
@@ -108,11 +105,9 @@ final class AssetsHelper
     /**
      * Set asset url path.
      *
-     * @param string     $path
-     * @param bool|false $absolute
-     * @param bool|false $ignorePrefix
+     * @param string $path
      */
-    public function getUrl($path, ?string $packageName = null, ?string $version = null, $absolute = false, $ignorePrefix = false): string
+    public function getUrl($path, ?string $packageName = null, ?string $version = null, bool $absolute = false, bool $ignorePrefix = false): string
     {
         // if we have http in the url it is absolute and we can just return it
         if (str_starts_with($path, 'http')) {
@@ -158,10 +153,9 @@ final class AssetsHelper
      *
      * @param string|array<string, string> $script
      * @param string                       $location
-     * @param bool                         $async
      * @param string                       $name
      */
-    public function addScript($script, $location = 'head', $async = false, $name = null): self
+    public function addScript($script, $location = 'head', bool $async = false, $name = null): self
     {
         $assets     = &$this->assets[$this->context];
         $addScripts = function ($s) use ($location, &$assets, $async, $name): void {
@@ -398,10 +392,7 @@ final class AssetsHelper
         }
     }
 
-    /**
-     * @param bool|false $includeEditor
-     */
-    public function outputSystemScripts($includeEditor = false): void
+    public function outputSystemScripts(bool $includeEditor = false): void
     {
         $assets = $this->assetHelper->getAssets();
 
@@ -435,12 +426,11 @@ final class AssetsHelper
     /**
      * Fetch system scripts.
      *
-     * @param bool $render        If true, a string will be returned of rendered script for header
-     * @param bool $includeEditor
+     * @param bool $render If true, a string will be returned of rendered script for header
      *
      * @return array<string, string>|string
      */
-    public function getSystemScripts($render = false, $includeEditor = false)
+    public function getSystemScripts(bool $render = false, bool $includeEditor = false)
     {
         $assets = $this->assetHelper->getAssets();
 
@@ -574,11 +564,10 @@ final class AssetsHelper
     }
 
     /**
-     * @param string    $country
-     * @param bool|true $urlOnly
-     * @param string    $class
+     * @param string $country
+     * @param string $class
      */
-    public function getCountryFlag($country, $urlOnly = true, $class = ''): string
+    public function getCountryFlag($country, bool $urlOnly = true, $class = ''): string
     {
         $country  = ucwords(iconv('UTF-8', 'ASCII//TRANSLIT', str_replace(' ', '-', $country)));
         $flagImg  = (string) $this->getOverridableUrl('images/flags/'.$country.'.png');

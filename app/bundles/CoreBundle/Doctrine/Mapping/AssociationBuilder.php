@@ -15,11 +15,9 @@ final class AssociationBuilder extends \Doctrine\ORM\Mapping\Builder\Association
     /**
      * Set orphanRemoval.
      *
-     * @param bool $orphanRemoval
-     *
      * @return AssociationBuilder
      */
-    public function orphanRemoval($orphanRemoval = true)
+    public function orphanRemoval(bool $orphanRemoval = true)
     {
         $this->mapping['orphanRemoval'] = $orphanRemoval;
 

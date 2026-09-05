@@ -13,11 +13,10 @@ final class TweetRepository extends CommonRepository
      * @param string $search
      * @param int    $limit
      * @param int    $start
-     * @param bool   $viewOther
      *
      * @return array
      */
-    public function getTweetList($search = '', $limit = 10, $start = 0, $viewOther = false, array $ignoreIds = [])
+    public function getTweetList($search = '', $limit = 10, $start = 0, bool $viewOther = false, array $ignoreIds = [])
     {
         $qb = $this->createQueryBuilder('t');
         $qb->select('partial t.{id, text, name, language}');

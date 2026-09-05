@@ -79,14 +79,13 @@ class EventExecutioner
 
     /**
      * @param ArrayCollection<int,Lead> $contacts
-     * @param bool                      $isInactiveEvent
      *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function executeForContacts(Event $event, ArrayCollection $contacts, ?Counter $counter = null, $isInactiveEvent = false): void
+    public function executeForContacts(Event $event, ArrayCollection $contacts, ?Counter $counter = null, bool $isInactiveEvent = false): void
     {
         if (!$contacts->count()) {
             $this->logger->debug('CAMPAIGN: No contacts to process for event ID '.$event->getId());
@@ -147,14 +146,12 @@ class EventExecutioner
     }
 
     /**
-     * @param bool $isInactive
-     *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function executeEventsForContacts(ArrayCollection $events, ArrayCollection $contacts, ?Counter $childrenCounter = null, $isInactive = false): void
+    public function executeEventsForContacts(ArrayCollection $events, ArrayCollection $contacts, ?Counter $childrenCounter = null, bool $isInactive = false): void
     {
         if (!$contacts->count()) {
             return;
@@ -190,10 +187,7 @@ class EventExecutioner
         }
     }
 
-    /**
-     * @param bool $isInactiveEvent
-     */
-    public function recordLogsAsExecutedForEvent(Event $event, ArrayCollection $contacts, $isInactiveEvent = false): void
+    public function recordLogsAsExecutedForEvent(Event $event, ArrayCollection $contacts, bool $isInactiveEvent = false): void
     {
         $config = $this->collector->getEventConfig($event);
         $logs   = $this->eventLogger->generateLogsFromContacts($event, $config, $contacts, $isInactiveEvent);
@@ -205,10 +199,7 @@ class EventExecutioner
         }
     }
 
-    /**
-     * @param bool $isInactiveEvent
-     */
-    public function recordLogsAsFailedForEvent(Event $event, ArrayCollection $contacts, $reason, $isInactiveEvent = false): void
+    public function recordLogsAsFailedForEvent(Event $event, ArrayCollection $contacts, $reason, bool $isInactiveEvent = false): void
     {
         $config = $this->collector->getEventConfig($event);
         $logs   = $this->eventLogger->generateLogsFromContacts($event, $config, $contacts, $isInactiveEvent);

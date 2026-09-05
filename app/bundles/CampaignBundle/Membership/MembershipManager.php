@@ -31,10 +31,7 @@ class MembershipManager
     ) {
     }
 
-    /**
-     * @param bool $isManualAction
-     */
-    public function addContact(Lead $contact, Campaign $campaign, $isManualAction = true): void
+    public function addContact(Lead $contact, Campaign $campaign, bool $isManualAction = true): void
     {
         // Validate that contact is not already in the Campaign
         /** @var CampaignMember $campaignMember */
@@ -86,9 +83,8 @@ class MembershipManager
 
     /**
      * @param ArrayCollection<int, Lead> $contacts
-     * @param bool                       $isManualAction
      */
-    public function addContacts(ArrayCollection $contacts, Campaign $campaign, $isManualAction = true): void
+    public function addContacts(ArrayCollection $contacts, Campaign $campaign, bool $isManualAction = true): void
     {
         // Get a list of existing campaign members
         $campaignMembers = $this->leadRepository->getCampaignMembers($contacts->getKeys(), $campaign);
@@ -135,10 +131,7 @@ class MembershipManager
         $this->leadRepository->detachEntities($campaignMembers);
     }
 
-    /**
-     * @param bool $isExit
-     */
-    public function removeContact(Lead $contact, Campaign $campaign, $isExit = false): void
+    public function removeContact(Lead $contact, Campaign $campaign, bool $isExit = false): void
     {
         // Validate that contact is not already in the Campaign
         /** @var CampaignMember $campaignMember */
@@ -177,7 +170,7 @@ class MembershipManager
      * @param bool                       $isExit   If true, the contact can be added by a segment/source. If false, the contact can only be added back
      *                                             by a manual process.
      */
-    public function removeContacts(ArrayCollection $contacts, Campaign $campaign, $isExit = false): void
+    public function removeContacts(ArrayCollection $contacts, Campaign $campaign, bool $isExit = false): void
     {
         // Get a list of existing campaign members
         $campaignMembers = $this->leadRepository->getCampaignMembers($contacts->getKeys(), $campaign);

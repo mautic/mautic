@@ -171,13 +171,12 @@ class PathsHelper
      * which will be absolute regardless of $fullPath setting.
      *
      * @param string $name
-     * @param bool   $fullPath
      *
      * @return string
      *
      * @throws \InvalidArgumentException
      */
-    public function getSystemPath($name, $fullPath = false)
+    public function getSystemPath($name, bool $fullPath = false)
     {
         switch ($name) {
             case 'currentTheme':

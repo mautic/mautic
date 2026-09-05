@@ -112,10 +112,9 @@ class FormModel extends AbstractCommonModel
     /**
      * Create/edit entity.
      *
-     * @param T    $entity
-     * @param bool $unlock
+     * @param T $entity
      */
-    public function saveEntity($entity, $unlock = true): void
+    public function saveEntity($entity, bool $unlock = true): void
     {
         $isNew = $this->isNewEntity($entity);
 
@@ -129,10 +128,8 @@ class FormModel extends AbstractCommonModel
 
     /**
      * Create/edit entity then detach to preserve RAM.
-     *
-     * @param bool $unlock
      */
-    public function saveAndDetachEntity($entity, $unlock = true): void
+    public function saveAndDetachEntity($entity, bool $unlock = true): void
     {
         $this->saveEntity($entity, $unlock);
 
@@ -143,9 +140,8 @@ class FormModel extends AbstractCommonModel
      * Save an array of entities.
      *
      * @param iterable<T> $entities
-     * @param bool        $unlock
      */
-    public function saveEntities($entities, $unlock = true): void
+    public function saveEntities($entities, bool $unlock = true): void
     {
         // iterate over the results so the events are dispatched on each delete
         $batchSize             = 20;
@@ -253,9 +249,8 @@ class FormModel extends AbstractCommonModel
      *
      * @param object $entity
      * @param bool   $isNew
-     * @param bool   $unlock
      */
-    public function setTimestamps(&$entity, $isNew, $unlock = true): void
+    public function setTimestamps(&$entity, $isNew, bool $unlock = true): void
     {
         // unlock the row if applicable
         if ($unlock && method_exists($entity, 'setCheckedOut')) {
@@ -392,9 +387,8 @@ class FormModel extends AbstractCommonModel
      *
      * @param string $action
      * @param object $entity
-     * @param bool   $isNew
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         // ...
 

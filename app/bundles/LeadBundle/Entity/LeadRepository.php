@@ -117,11 +117,10 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * @param string          $field
      * @param string[]|string $value
      * @param ?int            $ignoreId
-     * @param bool            $indexByColumn
      *
      * @return array
      */
-    public function getLeadsByFieldValue($field, $value, $ignoreId = null, $indexByColumn = false)
+    public function getLeadsByFieldValue($field, $value, $ignoreId = null, bool $indexByColumn = false)
     {
         $results = $this->getEntities([
             'qb'               => $this->buildQueryForGetLeadsByFieldValue($field, $value, $ignoreId),
@@ -318,7 +317,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      *
      * @return array|null
      */
-    public function getLeadByEmail($email, $all = false)
+    public function getLeadByEmail($email, bool $all = false)
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('l.id')
@@ -338,11 +337,9 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Get leads by IP address.
      *
-     * @param bool $byId
-     *
      * @return array
      */
-    public function getLeadsByIp($ip, $byId = false)
+    public function getLeadsByIp($ip, bool $byId = false)
     {
         $q = $this->createQueryBuilder('l')
             ->leftJoin('l.ipAddresses', 'i');

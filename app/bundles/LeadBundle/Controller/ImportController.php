@@ -189,10 +189,7 @@ final class ImportController extends FormController
         return $this->indexAction($request);
     }
 
-    /**
-     * @param bool $ignorePost
-     */
-    public function newAction(Request $request, $ignorePost = false): Response
+    public function newAction(Request $request, bool $ignorePost = false): Response
     {
         try {
             $initEvent = $this->dispatchImportOnInit();

@@ -95,14 +95,14 @@ class TableSchemaHelper
      *
      * @throws SchemaException
      */
-    public function addTable(array $table, $checkExists = true, $dropExisting = false): static
+    public function addTable(array $table, bool $checkExists = true, bool $dropExisting = false): static
     {
         if (empty($table['name'])) {
             throw new SchemaException('Table is missing required name key.');
         }
 
         if ($checkExists || $dropExisting) {
-            $throwException = !(bool) $dropExisting;
+            $throwException = !$dropExisting;
             if ($this->checkTableExists($table['name'], $throwException) && $dropExisting) {
                 $this->deleteTable($table['name']);
             }
@@ -178,11 +178,10 @@ class TableSchemaHelper
      * Determine if a table exists.
      *
      * @param string $table
-     * @param bool   $throwException
      *
      * @throws SchemaException
      */
-    public function checkTableExists($table, $throwException = false): bool
+    public function checkTableExists($table, bool $throwException = false): bool
     {
         if ($this->sm->tablesExist([$this->prefix.$table])) {
             if ($throwException) {

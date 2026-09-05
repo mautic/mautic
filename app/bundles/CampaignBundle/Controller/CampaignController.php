@@ -608,10 +608,7 @@ class CampaignController extends AbstractStandardFormController
         return $this->deleteStandard($request, $objectId);
     }
 
-    /**
-     * @param bool $ignorePost
-     */
-    public function editAction(Request $request, $objectId, $ignorePost = false): JsonResponse|RedirectResponse|Response
+    public function editAction(Request $request, $objectId, bool $ignorePost = false): JsonResponse|RedirectResponse|Response
     {
         return $this->editStandard($request, $objectId, $ignorePost);
     }
@@ -861,10 +858,7 @@ class CampaignController extends AbstractStandardFormController
         }
     }
 
-    /**
-     * @param bool $isClone
-     */
-    protected function afterFormProcessed($isValid, $entity, FormInterface $form, $action, $isClone = false): void
+    protected function afterFormProcessed($isValid, $entity, FormInterface $form, $action, bool $isClone = false): void
     {
         if (!$isValid) {
             // Add the canvas settings to the entity to be able to rebuild it
@@ -876,10 +870,8 @@ class CampaignController extends AbstractStandardFormController
 
     /**
      * This method is called before and after form is submitted.
-     *
-     * @param bool $isClone
      */
-    protected function beforeFormProcessed($entity, FormInterface $form, $action, $isPost, $objectId = null, $isClone = false): void
+    protected function beforeFormProcessed($entity, FormInterface $form, $action, $isPost, $objectId = null, bool $isClone = false): void
     {
         $sessionId = $this->getCampaignSessionId($entity, $action, $objectId);
 
@@ -947,9 +939,8 @@ class CampaignController extends AbstractStandardFormController
 
     /**
      * @param Campaign $entity
-     * @param bool     $isClone
      */
-    protected function beforeEntitySave($entity, FormInterface $form, $action, $objectId = null, $isClone = false): bool
+    protected function beforeEntitySave($entity, FormInterface $form, $action, $objectId = null, bool $isClone = false): bool
     {
         if ([] === $this->campaignEvents) {
             // set the error
@@ -1280,10 +1271,7 @@ class CampaignController extends AbstractStandardFormController
         return $args;
     }
 
-    /**
-     * @param bool $isClone
-     */
-    protected function prepareCampaignEventsForEdit($entity, $objectId, $isClone = false): array
+    protected function prepareCampaignEventsForEdit($entity, $objectId, bool $isClone = false): array
     {
         // load existing events into session
         $campaignEvents = [];
@@ -1324,7 +1312,7 @@ class CampaignController extends AbstractStandardFormController
         return [];
     }
 
-    protected function prepareCampaignSourcesForEdit($objectId, $campaignSources, $isPost = false): void
+    protected function prepareCampaignSourcesForEdit($objectId, $campaignSources, bool $isPost = false): void
     {
         $this->campaignSources = [];
         if (is_array($campaignSources)) {

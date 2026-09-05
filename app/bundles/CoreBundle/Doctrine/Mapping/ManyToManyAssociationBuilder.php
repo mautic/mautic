@@ -15,11 +15,9 @@ final class ManyToManyAssociationBuilder extends \Doctrine\ORM\Mapping\Builder\M
     /**
      * Set orphanRemoval.
      *
-     * @param bool $orphanRemoval
-     *
      * @return ManyToManyAssociationBuilder
      */
-    public function orphanRemoval($orphanRemoval = true)
+    public function orphanRemoval(bool $orphanRemoval = true)
     {
         $this->mapping['orphanRemoval'] = $orphanRemoval;
 
