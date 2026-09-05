@@ -27,15 +27,9 @@ use PHPStan\Rules\RuleErrorBuilder;
  */
 final class SingleArgumentDispatchRule implements Rule
 {
-    /**
-     * @var string
-     */
-    private const DISPATCH_METHOD = 'dispatch';
+    private const string DISPATCH_METHOD = 'dispatch';
 
-    /**
-     * @var string
-     */
-    private const ERROR_MESSAGE = 'Dispatch the event object alone: ->dispatch($event). The event class is the event name (Symfony 4.3+), so drop the CoreEvents::%s second argument.';
+    private const string ERROR_MESSAGE = 'Dispatch the event object alone: ->dispatch($event). The event class is the event name (Symfony 4.3+), so drop the CoreEvents::%s second argument.';
 
     public function getNodeType(): string
     {

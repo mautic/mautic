@@ -25,10 +25,7 @@ use PHPStan\Collectors\Collector;
  */
 final class ClassTargetServiceAliasCollector implements Collector
 {
-    /**
-     * @var string
-     */
-    private const SERVICES_FILE_NAME = 'services.php';
+    private const string SERVICES_FILE_NAME = 'services.php';
 
     public function getNodeType(): string
     {

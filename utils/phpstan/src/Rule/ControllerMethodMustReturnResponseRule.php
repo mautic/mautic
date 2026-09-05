@@ -31,35 +31,23 @@ use PHPStan\Rules\RuleErrorBuilder;
  *
  * @implements Rule<ClassMethod>
  */
-final class ControllerMethodMustReturnResponseRule implements Rule
+final readonly class ControllerMethodMustReturnResponseRule implements Rule
 {
-    /**
-     * @var string
-     */
-    private const RESPONSE_CLASS = 'Symfony\\Component\\HttpFoundation\\Response';
+    private const string RESPONSE_CLASS = \Symfony\Component\HttpFoundation\Response::class;
 
-    /**
-     * @var string
-     */
-    private const CONTROLLER_SUFFIX = 'Controller';
+    private const string CONTROLLER_SUFFIX = 'Controller';
 
-    /**
-     * @var string
-     */
-    private const ACTION_SUFFIX = 'action';
+    private const string ACTION_SUFFIX = 'action';
 
-    /**
-     * @var string
-     */
-    private const INVOKE_METHOD = '__invoke';
+    private const string INVOKE_METHOD = '__invoke';
 
     /**
      * @var string[]
      */
-    private const SKIPPED_CLASS_NAME_PARTS = ['Abstract', 'Common'];
+    private const array SKIPPED_CLASS_NAME_PARTS = ['Abstract', 'Common'];
 
     public function __construct(
-        private readonly ReflectionProvider $reflectionProvider,
+        private ReflectionProvider $reflectionProvider,
     ) {
     }
 
@@ -126,13 +114,7 @@ final class ControllerMethodMustReturnResponseRule implements Rule
         $lastSeparatorPosition = strrpos($className, '\\');
         $shortClassName        = false === $lastSeparatorPosition ? $className : substr($className, $lastSeparatorPosition + 1);
 
-        foreach (self::SKIPPED_CLASS_NAME_PARTS as $skippedClassNamePart) {
-            if (str_contains($shortClassName, $skippedClassNamePart)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any(self::SKIPPED_CLASS_NAME_PARTS, fn (string $skippedClassNamePart): bool => str_contains($shortClassName, $skippedClassNamePart));
     }
 
     private function isAction(ClassMethod $classMethod): bool

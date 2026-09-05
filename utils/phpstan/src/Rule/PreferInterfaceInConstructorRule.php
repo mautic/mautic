@@ -22,7 +22,7 @@ use PHPStan\Rules\RuleErrorBuilder;
  *
  * @implements Rule<ClassMethod>
  */
-final class PreferInterfaceInConstructorRule implements Rule
+final readonly class PreferInterfaceInConstructorRule implements Rule
 {
     /**
      * @var string[]
@@ -32,22 +32,22 @@ final class PreferInterfaceInConstructorRule implements Rule
      *
      * @var string[]
      */
-    private const HANDLED_NAMESPACE_PREFIXES = ['Symfony\\', 'Doctrine\\'];
+    private const array HANDLED_NAMESPACE_PREFIXES = ['Symfony\\', 'Doctrine\\'];
 
     /**
      * @var string[]
      */
-    private const SKIPPED_INTERFACES = [
+    private const array SKIPPED_INTERFACES = [
         // the concrete Session is the only way to reach getFlashBag()
-        'Symfony\\Component\\HttpFoundation\\Session\\SessionInterface',
+        \Symfony\Component\HttpFoundation\Session\SessionInterface::class,
         // route loading relies on the concrete Loader
-        'Symfony\\Component\\Config\\Loader\\LoaderInterface',
+        \Symfony\Component\Config\Loader\LoaderInterface::class,
         // only the concrete TransportFactory is aliased as a service, see MessengerBundle/Config/services.php
-        'Symfony\\Component\\Messenger\\Transport\\TransportFactoryInterface',
+        \Symfony\Component\Messenger\Transport\TransportFactoryInterface::class,
     ];
 
     public function __construct(
-        private readonly ReflectionProvider $reflectionProvider,
+        private ReflectionProvider $reflectionProvider,
     ) {
     }
 
@@ -138,12 +138,6 @@ final class PreferInterfaceInConstructorRule implements Rule
 
     private function isHandledNamespace(string $className): bool
     {
-        foreach (self::HANDLED_NAMESPACE_PREFIXES as $handledNamespacePrefix) {
-            if (str_starts_with($className, $handledNamespacePrefix)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any(self::HANDLED_NAMESPACE_PREFIXES, fn (string $handledNamespacePrefix): bool => str_starts_with($className, $handledNamespacePrefix));
     }
 }

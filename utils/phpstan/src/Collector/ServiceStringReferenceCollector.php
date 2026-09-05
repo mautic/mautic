@@ -21,15 +21,9 @@ use PHPStan\Collectors\Collector;
  */
 final class ServiceStringReferenceCollector implements Collector
 {
-    /**
-     * @var string
-     */
-    private const SERVICES_FILE_NAME = 'services.php';
+    private const string SERVICES_FILE_NAME = 'services.php';
 
-    /**
-     * @var string
-     */
-    private const SERVICE_FUNCTION = 'Symfony\Component\DependencyInjection\Loader\Configurator\service';
+    private const string SERVICE_FUNCTION = 'Symfony\Component\DependencyInjection\Loader\Configurator\service';
 
     public function getNodeType(): string
     {

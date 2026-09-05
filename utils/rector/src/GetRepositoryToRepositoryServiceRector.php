@@ -57,9 +57,9 @@ final class GetRepositoryToRepositoryServiceRector extends AbstractRector
     /**
      * Any class extending this is treated as a test and gets the container lookup.
      */
-    private const KERNEL_TEST_CASE = 'Symfony\Bundle\FrameworkBundle\Test\KernelTestCase';
+    private const string KERNEL_TEST_CASE = \Symfony\Bundle\FrameworkBundle\Test\KernelTestCase::class;
 
-    private const ENTITY_MANAGER = 'Doctrine\ORM\EntityManagerInterface';
+    private const string ENTITY_MANAGER = \Doctrine\ORM\EntityManagerInterface::class;
 
     public function __construct(
         private readonly AstResolver $astResolver,
@@ -308,7 +308,7 @@ final class GetRepositoryToRepositoryServiceRector extends AbstractRector
 
         // Symfony calls every #[Required] method on service instantiation.
         $classMethod->attrGroups = [
-            new AttributeGroup([new Attribute(new FullyQualified('Symfony\Contracts\Service\Attribute\Required'))]),
+            new AttributeGroup([new Attribute(new FullyQualified(\Symfony\Contracts\Service\Attribute\Required::class))]),
         ];
 
         return $classMethod;

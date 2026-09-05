@@ -21,20 +21,11 @@ use PHPStan\Rules\RuleErrorBuilder;
  */
 final class NoServicesInBundleConfigRule implements Rule
 {
-    /**
-     * @var string
-     */
-    private const CONFIG_FILE_NAME = 'config.php';
+    private const string CONFIG_FILE_NAME = 'config.php';
 
-    /**
-     * @var string
-     */
-    private const SERVICES_KEY_NAME = 'services';
+    private const string SERVICES_KEY_NAME = 'services';
 
-    /**
-     * @var string
-     */
-    private const TESTS_DIRECTORY_NAME = '/Tests/';
+    private const string TESTS_DIRECTORY_NAME = '/Tests/';
 
     public function getNodeType(): string
     {

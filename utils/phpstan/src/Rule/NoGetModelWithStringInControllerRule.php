@@ -23,15 +23,9 @@ use PHPStan\Rules\RuleErrorBuilder;
  */
 final class NoGetModelWithStringInControllerRule implements Rule
 {
-    /**
-     * @var string
-     */
-    private const GET_MODEL_METHOD = 'getModel';
+    private const string GET_MODEL_METHOD = 'getModel';
 
-    /**
-     * @var string
-     */
-    private const CONTROLLER_SUFFIX = 'Controller.php';
+    private const string CONTROLLER_SUFFIX = 'Controller.php';
 
     public function getNodeType(): string
     {

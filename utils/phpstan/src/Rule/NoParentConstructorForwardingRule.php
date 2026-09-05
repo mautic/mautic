@@ -48,24 +48,19 @@ use PHPStan\Rules\RuleErrorBuilder;
  */
 final class NoParentConstructorForwardingRule implements Rule
 {
-    /**
-     * @var string
-     */
-    private const CONSTRUCTOR_NAME = '__construct';
+    private const string CONSTRUCTOR_NAME = '__construct';
 
     /**
      * A parameter or two handed over is no bother, a long list repeated in every child is.
-     *
-     * @var int
      */
-    private const MINIMAL_PASSED_THROUGH_PARAM_COUNT = 6;
+    private const int MINIMAL_PASSED_THROUGH_PARAM_COUNT = 6;
 
     /**
      * Classes 3rd-party code extends, so their constructor contract must stay as it is.
      *
      * @var string[]
      */
-    private const SKIPPED_CLASSES = [
+    private const array SKIPPED_CLASSES = [
         CommonApiController::class,
     ];
 

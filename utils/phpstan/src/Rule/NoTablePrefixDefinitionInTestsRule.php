@@ -18,10 +18,7 @@ use PHPStan\Rules\RuleErrorBuilder;
  */
 final class NoTablePrefixDefinitionInTestsRule implements Rule
 {
-    /**
-     * @var string
-     */
-    private const TABLE_PREFIX_CONSTANT = 'MAUTIC_TABLE_PREFIX';
+    private const string TABLE_PREFIX_CONSTANT = 'MAUTIC_TABLE_PREFIX';
 
     public function getNodeType(): string
     {

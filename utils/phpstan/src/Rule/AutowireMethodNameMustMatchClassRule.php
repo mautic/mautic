@@ -27,30 +27,15 @@ use PHPStan\Rules\RuleErrorBuilder;
  */
 final class AutowireMethodNameMustMatchClassRule implements Rule
 {
-    /**
-     * @var string
-     */
-    private const REQUIRED_ATTRIBUTE = 'Symfony\Contracts\Service\Attribute\Required';
+    private const string REQUIRED_ATTRIBUTE = \Symfony\Contracts\Service\Attribute\Required::class;
 
-    /**
-     * @var string
-     */
-    private const AUTOWIRE_PREFIX = 'autowire';
+    private const string AUTOWIRE_PREFIX = 'autowire';
 
-    /**
-     * @var string
-     */
-    private const CONTROLLER_SUFFIX = 'Controller.php';
+    private const string CONTROLLER_SUFFIX = 'Controller.php';
 
-    /**
-     * @var string
-     */
-    private const AJAX_CONTROLLER_SHORT_CLASS_NAME = 'AjaxController';
+    private const string AJAX_CONTROLLER_SHORT_CLASS_NAME = 'AjaxController';
 
-    /**
-     * @var string
-     */
-    private const BUNDLE_SUFFIX = 'Bundle';
+    private const string BUNDLE_SUFFIX = 'Bundle';
 
     public function getNodeType(): string
     {

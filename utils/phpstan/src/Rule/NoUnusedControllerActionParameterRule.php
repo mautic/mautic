@@ -35,32 +35,20 @@ use PHPStan\Rules\RuleErrorBuilder;
  *
  * @implements Rule<InClassNode>
  */
-final class NoUnusedControllerActionParameterRule implements Rule
+final readonly class NoUnusedControllerActionParameterRule implements Rule
 {
-    /**
-     * @var string
-     */
-    private const CONTROLLER_SUFFIX = 'Controller';
+    private const string CONTROLLER_SUFFIX = 'Controller';
 
-    /**
-     * @var string
-     */
-    private const ACTION_SUFFIX = 'action';
+    private const string ACTION_SUFFIX = 'action';
 
-    /**
-     * @var string
-     */
-    private const INVOKE_METHOD = '__invoke';
+    private const string INVOKE_METHOD = '__invoke';
 
-    /**
-     * @var string
-     */
-    private const THIS = 'this';
+    private const string THIS = 'this';
 
     /**
      * @var string[]
      */
-    private const SKIPPED_CLASS_NAME_PARTS = ['Abstract', 'Common'];
+    private const array SKIPPED_CLASS_NAME_PARTS = ['Abstract', 'Common'];
 
     /**
      * These read or write the local scope by variable name, so a parameter can be used without ever appearing as a
@@ -68,7 +56,7 @@ final class NoUnusedControllerActionParameterRule implements Rule
      *
      * @var string[]
      */
-    private const SCOPE_READING_FUNCTIONS = ['compact', 'extract', 'func_get_args', 'get_defined_vars'];
+    private const array SCOPE_READING_FUNCTIONS = ['compact', 'extract', 'func_get_args', 'get_defined_vars'];
 
     private NodeFinder $nodeFinder;
 
@@ -188,13 +176,7 @@ final class NoUnusedControllerActionParameterRule implements Rule
         $lastSeparatorPosition = strrpos($className, '\\');
         $shortClassName        = false === $lastSeparatorPosition ? $className : substr($className, $lastSeparatorPosition + 1);
 
-        foreach (self::SKIPPED_CLASS_NAME_PARTS as $skippedClassNamePart) {
-            if (str_contains($shortClassName, $skippedClassNamePart)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any(self::SKIPPED_CLASS_NAME_PARTS, fn (string $skippedClassNamePart): bool => str_contains($shortClassName, $skippedClassNamePart));
     }
 
     /**

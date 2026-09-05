@@ -31,41 +31,29 @@ use PHPStan\Type\TypeCombinator;
  */
 final class NoContainerGetRule implements Rule
 {
-    /**
-     * @var string
-     */
-    private const GET_METHOD = 'get';
+    private const string GET_METHOD = 'get';
 
-    /**
-     * @var string
-     */
-    private const ERROR_MESSAGE = 'Do not fetch a service from the container via ->get(...). Inject the service as a typed constructor property instead.';
+    private const string ERROR_MESSAGE = 'Do not fetch a service from the container via ->get(...). Inject the service as a typed constructor property instead.';
 
-    /**
-     * @var string
-     */
-    private const TEST_ERROR_MESSAGE = 'Do not fetch a service from the container by a string name. Use a class constant, e.g. ->get(SomeService::class), to get a typed service.';
+    private const string TEST_ERROR_MESSAGE = 'Do not fetch a service from the container by a string name. Use a class constant, e.g. ->get(SomeService::class), to get a typed service.';
 
-    /**
-     * @var string
-     */
-    private const SERVICE_LOCATOR_TYPE = 'Symfony\Component\DependencyInjection\ServiceLocator';
+    private const string SERVICE_LOCATOR_TYPE = \Symfony\Component\DependencyInjection\ServiceLocator::class;
 
     /**
      * Services that cannot be injected as a typed property and must be fetched by name.
      *
      * @var string[]
      */
-    private const ALLOWED_SERVICE_NAMES = [
+    private const array ALLOWED_SERVICE_NAMES = [
         'monolog.logger.mautic',
     ];
 
     /**
      * @var string[]
      */
-    private const CONTAINER_TYPES = [
-        'Psr\Container\ContainerInterface',
-        'Symfony\Component\DependencyInjection\ContainerInterface',
+    private const array CONTAINER_TYPES = [
+        \Psr\Container\ContainerInterface::class,
+        \Symfony\Component\DependencyInjection\ContainerInterface::class,
     ];
 
     public function getNodeType(): string
@@ -154,17 +142,11 @@ final class NoContainerGetRule implements Rule
         $callerType = TypeCombinator::removeNull($callerType);
 
         // a scoped ServiceLocator is an allowed, explicit set of services
-        if ((new ObjectType(self::SERVICE_LOCATOR_TYPE))->isSuperTypeOf($callerType)->yes()) {
+        if (new ObjectType(self::SERVICE_LOCATOR_TYPE)->isSuperTypeOf($callerType)->yes()) {
             return false;
         }
 
-        foreach (self::CONTAINER_TYPES as $containerType) {
-            if ((new ObjectType($containerType))->isSuperTypeOf($callerType)->yes()) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any(self::CONTAINER_TYPES, fn (string $containerType): bool => new ObjectType($containerType)->isSuperTypeOf($callerType)->yes());
     }
 
     private function isTestFile(string $file): bool

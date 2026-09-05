@@ -35,10 +35,8 @@ final readonly class NoUnusedServiceNameRule implements Rule
      * The "mautic.%s.model.%s" format ModelFactory builds a model container id by.
      *
      * @see \Mautic\CoreBundle\Factory\ModelFactory::getModel()
-     *
-     * @var string
      */
-    private const MODEL_ID_PATTERN = '#^mautic\.[a-zA-Z0-9_]+\.model\.[a-zA-Z0-9_]+$#';
+    private const string MODEL_ID_PATTERN = '#^mautic\.[a-zA-Z0-9_]+\.model\.[a-zA-Z0-9_]+$#';
 
     public function __construct(
         private ServiceNameUsageResolver $serviceNameUsageResolver,
