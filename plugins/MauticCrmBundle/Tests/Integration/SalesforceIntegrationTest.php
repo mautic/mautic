@@ -968,7 +968,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                 $integrationEntityModelMock,
                 $this->doNotContact,
                 $this->fieldsWithUniqueIdentifier,
-                new IdentifyCompanyHelper($this->companyModel, $this->createMock(CompanyLeadRepository::class)),
+                new IdentifyCompanyHelper($this->companyModel, $this->createStub(CompanyLeadRepository::class)),
             ])
             ->onlyMethods($this->sfMockMethods)
             ->getMock();

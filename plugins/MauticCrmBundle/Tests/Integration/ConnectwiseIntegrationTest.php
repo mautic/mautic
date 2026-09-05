@@ -81,7 +81,7 @@ final class ConnectwiseIntegrationTest extends AbstractIntegrationTestCase
                 $integrationEntityModel,
                 $this->doNotContact,
                 $this->fieldsWithUniqueIdentifier,
-                new IdentifyCompanyHelper($this->companyModel, $this->createMock(CompanyLeadRepository::class)),
+                new IdentifyCompanyHelper($this->companyModel, $this->createStub(CompanyLeadRepository::class)),
             ])
             ->onlyMethods(['isAuthorized', 'getApiHelper', 'getRecords', 'saveCampaignMembers'])
             ->getMock();

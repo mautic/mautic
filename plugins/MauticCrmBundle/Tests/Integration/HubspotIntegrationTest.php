@@ -40,7 +40,7 @@ final class HubspotIntegrationTest extends AbstractIntegrationTestCase
             $this->integrationEntityModel,
             $this->doNotContact,
             $this->fieldsWithUniqueIdentifier,
-            new IdentifyCompanyHelper($this->companyModel, $this->createMock(CompanyLeadRepository::class)),
+            new IdentifyCompanyHelper($this->companyModel, $this->createStub(CompanyLeadRepository::class)),
         );
     }
 

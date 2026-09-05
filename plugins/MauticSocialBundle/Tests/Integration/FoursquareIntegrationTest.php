@@ -38,7 +38,7 @@ final class FoursquareIntegrationTest extends AbstractIntegrationTestCase
             $this->integrationEntityModel,
             $this->doNotContact,
             $this->fieldsWithUniqueIdentifier,
-            new IdentifyCompanyHelper($this->companyModel, $this->createMock(CompanyLeadRepository::class)),
+            new IdentifyCompanyHelper($this->companyModel, $this->createStub(CompanyLeadRepository::class)),
         );
     }
 
