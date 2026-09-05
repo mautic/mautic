@@ -9,6 +9,7 @@ return RectorConfig::configure()
     ->withPaths([
         __DIR__.'/app/bundles',
         __DIR__.'/plugins',
+        __DIR__.'/utils',
     ])
     ->withPreparedSets(
         deadCode: true,
@@ -34,6 +35,7 @@ return RectorConfig::configure()
     ->reportUnusedSkips()
     ->withComposerBased(phpunit: true, symfony: true)
     ->withSkip([
+        '*/Fixture/*',
         // handle later
         Rector\PHPUnit\PHPUnit120\Rector\Class_\AllowMockObjectsForDataProviderRector::class,
 
