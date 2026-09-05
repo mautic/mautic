@@ -1212,8 +1212,16 @@ export default class BuilderService {
   mjmlToHtml(mjml) {
     const converted = MjmlService.mjmlToHtml(mjml);
 
-    if (0 === converted.errors.length) {
+    if (converted.html) {
+      if (converted.errors.length) {
+        console.warn('MJML conversion completed with warnings', converted.errors);
+      }
+
       return converted.html;
+    }
+
+    if (converted.errors.length) {
+      console.warn('MJML conversion failed', converted.errors);
     }
 
     return '';

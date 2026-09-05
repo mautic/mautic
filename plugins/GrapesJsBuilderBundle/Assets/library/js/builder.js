@@ -61,56 +61,227 @@ function useBuilderForCodeMode() {
   return true;
 }
 
+let themeHtmlLoadCount = 0;
+let themeHtmlLoadPromise = Promise.resolve();
+let themeHtmlRequestId = 0;
+let pendingThemeHtmlReject = null;
+
+const THEME_HTML_REQUEST_SUPERSEDED = 'ThemeHtmlRequestSuperseded';
+
+function isThemeHtmlLoading() {
+  return themeHtmlLoadCount > 0;
+}
+
+function waitForThemeHtml() {
+  return themeHtmlLoadPromise;
+}
+
+function isThemeHtmlMissing(theme) {
+  if (!theme || theme === 'mautic_code_mode') {
+    return false;
+  }
+
+  const textareaHtml = mQuery('textarea.builder-html');
+
+  return !textareaHtml.length || !textareaHtml.val()?.trim().length;
+}
+
+function ensureThemeHtmlFromMjml() {
+  const textareaHtml = mQuery('textarea.builder-html');
+  const textareaMjml = mQuery('textarea.builder-mjml');
+
+  if (textareaHtml.val()?.trim().length) {
+    return true;
+  }
+
+  const mjml = textareaMjml.val()?.trim();
+
+  if (!mjml?.length) {
+    return false;
+  }
+
+  const assetService = new AssetService();
+  const builder = new BuilderService(assetService);
+  const html = builder.mjmlToHtml(mjml);
+
+  if (html?.trim().length) {
+    textareaHtml.val(html);
+
+    return true;
+  }
+
+  return false;
+}
+
+function hasStoredThemeMjml() {
+  return Boolean(mQuery('textarea.builder-mjml').val()?.trim().length);
+}
+
+function resolveThemeHtmlBeforeSubmit(theme) {
+  if (isThemeHtmlLoading()) {
+    return waitForThemeHtml();
+  }
+
+  if (hasStoredThemeMjml()) {
+    ensureThemeHtmlFromMjml();
+
+    return Promise.resolve();
+  }
+
+  return setThemeHtml(theme);
+}
+
+function showThemeHtmlSaveError(translationKey) {
+  Mautic.setFlashes(Mautic.addErrorFlashMessage(Mautic.translate(translationKey)));
+}
+
+function shouldWaitForThemeHtml(theme) {
+  if (!theme || theme === 'mautic_code_mode') {
+    return false;
+  }
+
+  return isThemeHtmlLoading() || isThemeHtmlMissing(theme);
+}
+
+function attachThemeHtmlSubmitGuard(themeField) {
+  const form = themeField.closest('form')[0];
+
+  if (!form || form.dataset.themeHtmlGuardAttached === 'true') {
+    return;
+  }
+
+  form.dataset.themeHtmlGuardAttached = 'true';
+
+  form.addEventListener(
+    'submit',
+    (event) => {
+      const theme = themeField.val();
+
+      if (!shouldWaitForThemeHtml(theme)) {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+
+      const submitAfterThemeHtml = () => {
+        ensureThemeHtmlFromMjml();
+
+        if (shouldWaitForThemeHtml(theme)) {
+          showThemeHtmlSaveError('grapesjsbuilder.builder.error.theme_html_empty');
+
+          return;
+        }
+
+        if (typeof form.requestSubmit === 'function') {
+          form.requestSubmit();
+          return;
+        }
+
+        mQuery(form).trigger('submit');
+      };
+
+      const themeHtmlPromise = resolveThemeHtmlBeforeSubmit(theme);
+
+      themeHtmlPromise
+        .catch((error) => {
+          if (error?.message === THEME_HTML_REQUEST_SUPERSEDED) {
+            return waitForThemeHtml();
+          }
+
+          throw error;
+        })
+        .then(() => submitAfterThemeHtml())
+        .catch(() => {
+          showThemeHtmlSaveError('grapesjsbuilder.builder.error.theme_html_load');
+        });
+    },
+    true
+  );
+}
+
 /**
  * Set theme's HTML
  *
  * @param theme
+ * @returns {Promise<void>}
  */
 function setThemeHtml(theme) {
+  if (!theme || theme === 'mautic_code_mode') {
+    return Promise.resolve();
+  }
+
+  if (pendingThemeHtmlReject) {
+    pendingThemeHtmlReject(new Error(THEME_HTML_REQUEST_SUPERSEDED));
+    pendingThemeHtmlReject = null;
+  }
+
+  themeHtmlLoadCount += 1;
+  const requestId = ++themeHtmlRequestId;
   BuilderService.setupButtonLoadingIndicator(true);
-  // Load template and fill field
-  mQuery.ajax({
-    url: mQuery('#builder_url').val(),
-    data: {
-      template: theme,
-      resetEditorState: 1,
-    },
-    dataType: 'json',
-    success(response) {
-      const textareaHtml = mQuery('textarea.builder-html');
-      const textareaMjml = mQuery('textarea.builder-mjml');
-      const textareaJson = mQuery('textarea.builder-json');
-      const form = textareaHtml.closest('form');
 
-      textareaHtml.val(response.templateHtml);
+  themeHtmlLoadPromise = new Promise((resolve, reject) => {
+    pendingThemeHtmlReject = reject;
 
-      if (typeof textareaMjml !== 'undefined') {
-        textareaMjml.val(response.templateMjml);
-      }
+    mQuery.ajax({
+      url: mQuery('#builder_url').val(),
+      data: {
+        template: theme,
+        resetEditorState: 1,
+      },
+      dataType: 'json',
+      success(response) {
+        if (requestId !== themeHtmlRequestId) {
+          return;
+        }
 
-      if (textareaJson.length) {
-        textareaJson.val('');
-      }
+        pendingThemeHtmlReject = null;
 
-      if (form.length) {
-        form.attr('data-grapesjsbuilder-reset', 'true');
-      }
+        const textareaHtml = mQuery('textarea.builder-html');
+        const textareaMjml = mQuery('textarea.builder-mjml');
+        const textareaJson = mQuery('textarea.builder-json');
+        const form = textareaHtml.closest('form');
 
-      // If MJML template, generate HTML before save
-      if (!textareaHtml.val().length && textareaMjml.val().length) {
-        const assetService = new AssetService();
-        const builder = new BuilderService(assetService);
+        textareaHtml.val(response.templateHtml);
 
-        textareaHtml.val(builder.mjmlToHtml(response.templateMjml));
-      }
-    },
-    error(request, textStatus) {
-      console.log(`setThemeHtml - Request failed: ${textStatus}`);
-    },
-    complete() {
-      BuilderService.setupButtonLoadingIndicator(false);
-    },
+        if (textareaMjml.length) {
+          textareaMjml.val(response.templateMjml);
+        }
+
+        if (textareaJson.length) {
+          textareaJson.val('');
+        }
+
+        if (form.length) {
+          form.attr('data-grapesjsbuilder-reset', 'true');
+        }
+
+        // If MJML template, generate HTML before save
+        ensureThemeHtmlFromMjml();
+
+        resolve();
+      },
+      error(request, textStatus) {
+        if (requestId !== themeHtmlRequestId) {
+          return;
+        }
+
+        pendingThemeHtmlReject = null;
+        console.log(`setThemeHtml - Request failed: ${textStatus}`);
+        reject(new Error(textStatus || 'setThemeHtml failed'));
+      },
+      complete() {
+        themeHtmlLoadCount = Math.max(0, themeHtmlLoadCount - 1);
+
+        if (!isThemeHtmlLoading()) {
+          BuilderService.setupButtonLoadingIndicator(false);
+        }
+      },
+    });
   });
+
+  return themeHtmlLoadPromise;
 }
 
 /**
@@ -185,6 +356,7 @@ function initSelectThemeGrapesjs(parentInitSelectTheme) {
 
     // Launch original Mautic.initSelectTheme function
     parentInitSelectTheme(themeField);
+    attachThemeHtmlSubmitGuard(themeField);
 
     mQuery('[data-theme]').click((event) => {
       const target = mQuery(event.target);
@@ -200,3 +372,5 @@ function initSelectThemeGrapesjs(parentInitSelectTheme) {
 Mautic.launchBuilder = launchBuilderGrapesjs;
 Mautic.initSelectTheme = initSelectThemeGrapesjs(Mautic.initSelectTheme);
 Mautic.setThemeHtml = setThemeHtml;
+Mautic.waitForThemeHtml = waitForThemeHtml;
+Mautic.isThemeHtmlLoading = isThemeHtmlLoading;

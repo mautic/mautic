@@ -14,6 +14,7 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Event\TransportWebhookEvent;
 use Mautic\EmailBundle\Helper\EmailConfig;
 use Mautic\EmailBundle\Helper\EmailDefaultsHelper;
+use Mautic\EmailBundle\Helper\EmailPreviewContentHelper;
 use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -446,9 +447,9 @@ final class PublicController extends CommonFormController
      */
     public function previewAction(
         AnalyticsHelper $analyticsHelper,
-        ThemeHelper $themeHelper,
         AssetsHelper $assetsHelper,
         EmailConfig $emailConfig,
+        EmailPreviewContentHelper $emailPreviewContentHelper,
         EmailModel $model,
         Request $request,
         LeadModel $leadModel,
@@ -494,29 +495,22 @@ final class PublicController extends CommonFormController
         // bogus ID
         $idHash = 'xxxxxxxxxxxxxx';
 
-        $content = $emailEntity->getCustomHtml();
-
+        $previewContentOverride    = null;
+        $usePreviewContentOverride = false;
         if ('draft' === $objectType && $draftEnabled && $emailEntity->hasDraft()) {
-            $content = $emailEntity->getDraftContent();
+            $usePreviewContentOverride = true;
+            $previewContentOverride    = $emailEntity->getDraftContent();
         }
 
-        if (empty($content) && $emailEntity->getTemplate()) {
-            $template = $emailEntity->getTemplate();
+        $previewResult = $emailPreviewContentHelper->resolve(
+            $emailEntity,
+            $previewContentOverride,
+            $usePreviewContentOverride
+        );
+        $content       = $previewResult->getContent();
 
+        if ($previewResult->isRenderedFromTheme()) {
             $assetsHelper->addCustomDeclaration('<meta name="robots" content="noindex">');
-
-            $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
-
-            $content = $themeHelper->renderThemeTemplate(
-                $logicalName,
-                [
-                    'inBrowser' => true,
-                    'content'   => $emailEntity->getContent(),
-                    'email'     => $emailEntity,
-                    'lead'      => null,
-                    'template'  => $template,
-                ]
-            );
         }
 
         // Override tracking_pixel
@@ -543,6 +537,7 @@ final class PublicController extends CommonFormController
                 'tokens'       => $tokens,
                 'internalSend' => true,
                 'lead'         => $contact,
+                'source'       => ['publicPreview' => true],
             ]
         );
         $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_DISPLAY);
