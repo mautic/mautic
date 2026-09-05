@@ -732,22 +732,10 @@ Mautic.onPageLoad = function (container, response, inModal) {
 Mautic.setDynamicContentEditors = function(container) {
     // The editor for dynamic content should only be initialized when the modal is opened due to conflicts and not being able to edit content otherwise
     if (mQuery(container + ' textarea.editor-dynamic-content').length) {
-        console.log('[Builder] Using CKEditor for the Dynamic Content editor');
         mQuery(container + ' textarea.editor-dynamic-content').each(function () {
             const textarea = mQuery(this);
-            const maxButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'heading', 'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor', 'alignment', 'numberedList', 'bulletedList', 'blockQuote', 'removeFormat', 'link', 'ckfinder', 'mediaEmbed', 'insertTable', 'TokenPlugin', 'sourceEditing'];
-            let minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline'];
-
-            if (textarea.hasClass('editor-dynamic-content') || textarea.hasClass('editor-basic')) {
-                minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'heading', 'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor', 'alignment', 'numberedList', 'bulletedList', 'blockQuote', 'removeFormat', 'link', 'ckfinder', 'mediaEmbed', 'insertTable', 'sourceEditing'];
-            }
-
-            let ckEditorToolbar = minButtons;
-            if (textarea.hasClass('editor-advanced') || textarea.hasClass('editor-basic-fullpage')) {
-                ckEditorToolbar = maxButtons;
-            }
-
-            Mautic.ConvertFieldToCkeditor(textarea, ckEditorToolbar);
+            Mautic.ensureDynamicContentEditorAttributes(textarea);
+            Mautic.ConvertFieldToCkeditor(textarea, Mautic.getDynamicContentCkEditorToolbar());
         });
     }
 }
