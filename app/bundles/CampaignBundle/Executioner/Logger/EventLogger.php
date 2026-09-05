@@ -192,6 +192,9 @@ class EventLogger
         return $this->persistQueuedLogs();
     }
 
+    /**
+     * @param int[]|string[] $contactIds
+     */
     public function hydrateContactRotationsForNewLogs(array $contactIds, int $campaignId): void
     {
         $this->contactRotations[$campaignId]     = $this->leadRepository->getContactRotations($contactIds, $campaignId);

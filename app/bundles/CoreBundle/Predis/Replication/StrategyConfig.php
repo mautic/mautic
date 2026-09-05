@@ -12,7 +12,7 @@ final readonly class StrategyConfig
     }
 
     /**
-     * @param mixed[] $options
+     * @param array<string, mixed> $options
      */
     public static function fromArray(array $options): self
     {

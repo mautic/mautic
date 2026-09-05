@@ -94,7 +94,8 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * Examines the arguments passed to getEntities and converts ORM properties to dBAL column names.
      *
-     * @param string $entityClass
+     * @param string               $entityClass
+     * @param array<string, mixed> $args
      */
     public function convertOrmProperties($entityClass, array $args): array
     {
@@ -434,6 +435,8 @@ class CommonRepository extends ServiceEntityRepository
 
     /**
      * @param array<mixed> $filter
+     *
+     * @return array<int, mixed>
      */
     public function getFilterExpr(QueryBuilder|DbalQueryBuilder $q, array $filter, ?string $unique = null): array
     {
@@ -622,6 +625,8 @@ class CommonRepository extends ServiceEntityRepository
      *
      * @param int $start
      * @param int $limit
+     *
+     * @return array<string, mixed>
      */
     public function getRows($start = 0, $limit = 100, array $order = [], array $where = [], ?array $select = null, array $allowedJoins = []): array
     {
@@ -961,7 +966,7 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * Validate array for one order by condition.
      *
-     * @param array $clause ['col' => 'column_a', 'dir' => 'ASC']
+     * @param array<string, mixed> $clause ['col' => 'column_a', 'dir' => 'ASC']
      *
      * @throws \InvalidArgumentException
      */
@@ -985,7 +990,7 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * Validate the array for one where condition.
      *
-     * @param array $clause ['expr' => 'expression', 'col' => 'DB column', 'val' => 'value to search for']
+     * @param array<string, mixed> $clause ['expr' => 'expression', 'col' => 'DB column', 'val' => 'value to search for']
      *
      * @throws \InvalidArgumentException
      */
@@ -1019,7 +1024,7 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * @param \stdClass|mixed[] $filters
      *
-     * @return mixed[]
+     * @return array<int, mixed>
      */
     protected function addAdvancedSearchWhereClause(QueryBuilder|DbalQueryBuilder $qb, $filters): array
     {
@@ -1072,6 +1077,8 @@ class CommonRepository extends ServiceEntityRepository
 
     /**
      * Unique handling for $filter->not since dbal does not support the not() function with it's QueryBuilder.
+     *
+     * @return array<int, Query\Expr\Orx|CompositeExpression|Query\Expr\Andx|non-empty-array<string, mixed>>
      */
     protected function addDbalCatchAllWhereClause(QueryBuilder|DbalQueryBuilder &$q, \stdClass $filter, array $columns): array
     {
@@ -1099,6 +1106,9 @@ class CommonRepository extends ServiceEntityRepository
         ];
     }
 
+    /**
+     * @return array<int, Query\Expr\Func|string|mixed[]|bool>
+     */
     protected function addSearchCommandWhereClause(QueryBuilder|DbalQueryBuilder $queryBuilder, \stdClass $filter): array
     {
         $command = $filter->command;
@@ -1117,6 +1127,9 @@ class CommonRepository extends ServiceEntityRepository
         ];
     }
 
+    /**
+     * @return array<int, CompositeExpression|Query\Expr\Orx|Query\Expr\Andx|Query\Expr\Func|non-empty-array<string, mixed>>
+     */
     protected function addStandardCatchAllWhereClause(QueryBuilder|DbalQueryBuilder &$q, \stdClass $filter, array $columns): array
     {
         $unique = $this->generateRandomParameterName(); // ensure that the string has a unique parameter identifier
@@ -1162,6 +1175,9 @@ class CommonRepository extends ServiceEntityRepository
         ];
     }
 
+    /**
+     * @return array<int, Query\Expr\Func|Query\Expr\Comparison|Query\Expr\Orx|CompositeExpression|string|array<string, mixed>|bool>
+     */
     protected function addStandardSearchCommandWhereClause(QueryBuilder|DbalQueryBuilder &$queryBuilder, \stdClass $filter): array
     {
         $command         = $filter->command;
@@ -1309,6 +1325,9 @@ class CommonRepository extends ServiceEntityRepository
         return $joinAdded;
     }
 
+    /**
+     * @param array<string, mixed> $args
+     */
     protected function buildIndexByClause(QueryBuilder|DbalQueryBuilder $q, array $args)
     {
         if (!empty($args['index_by'])) {
@@ -1325,6 +1344,9 @@ class CommonRepository extends ServiceEntityRepository
         }
     }
 
+    /**
+     * @param array<string, mixed> $args
+     */
     protected function buildLimiterClauses(QueryBuilder|DbalQueryBuilder $q, array $args): void
     {
         $start = array_key_exists('start', $args) ? $args['start'] : 0;
@@ -1336,6 +1358,9 @@ class CommonRepository extends ServiceEntityRepository
         }
     }
 
+    /**
+     * @param array<string, mixed> $args
+     */
     protected function buildOrderByClause(QueryBuilder|DbalQueryBuilder $q, array $args): void
     {
         $orderBy = array_key_exists('orderBy', $args) ? $args['orderBy'] : '';
@@ -1376,6 +1401,9 @@ class CommonRepository extends ServiceEntityRepository
         }
     }
 
+    /**
+     * @param array<string, mixed> $args
+     */
     protected function buildSelectClause(QueryBuilder|DbalQueryBuilder $q, array $args)
     {
         $isOrm = $q instanceof QueryBuilder;
@@ -1444,6 +1472,9 @@ class CommonRepository extends ServiceEntityRepository
         }
     }
 
+    /**
+     * @param array<string, mixed> $args
+     */
     protected function buildWhereClause(QueryBuilder|DbalQueryBuilder $q, array $args)
     {
         $filter                    = array_key_exists('filter', $args) ? $args['filter'] : '';
@@ -1670,6 +1701,9 @@ class CommonRepository extends ServiceEntityRepository
         return 'par'.$value;
     }
 
+    /**
+     * @return array<string[]>
+     */
     protected function getDefaultOrder(): array
     {
         return [];

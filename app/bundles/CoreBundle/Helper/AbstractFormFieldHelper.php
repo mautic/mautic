@@ -223,7 +223,7 @@ abstract class AbstractFormFieldHelper
     }
 
     /**
-     * @param mixed[] $choices
+     * @param array<string, mixed> $choices
      *
      * @return mixed[]
      */

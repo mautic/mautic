@@ -104,6 +104,9 @@ final class BundleMetadataBuilder
         return $metadata->toArray();
     }
 
+    /**
+     * @return array<string, bool|string|null>
+     */
     private function getMetadata(bool $isPlugin, string $namespace, string $symfonyBundle, string $bundleName, string $relativePath): array
     {
         return [

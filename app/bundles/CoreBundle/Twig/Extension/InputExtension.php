@@ -10,6 +10,9 @@ use Twig\TwigFunction;
 
 final class InputExtension extends AbstractExtension
 {
+    /**
+     * @return TwigFunction[]
+     */
     public function getFunctions(): array
     {
         return [

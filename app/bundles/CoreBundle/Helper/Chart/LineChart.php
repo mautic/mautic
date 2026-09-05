@@ -10,6 +10,8 @@ final class LineChart extends AbstractChart implements ChartInterface
     /**
      * Match date/time unit to a humanly readable label
      * {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}.
+     *
+     * @var array<string, string>
      */
     private array $labelFormats = [
         's' => 'H:i:s',
@@ -106,6 +108,8 @@ final class LineChart extends AbstractChart implements ChartInterface
      * Generate unique color for the dataset.
      *
      * @param int $datasetId
+     *
+     * @return array<string, string>
      */
     public function generateColors($datasetId): array
     {

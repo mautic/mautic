@@ -10,6 +10,9 @@ use Twig\TwigFunction;
 
 final class DeviceExtension extends AbstractExtension
 {
+    /**
+     * @return TwigFunction[]
+     */
     public function getFunctions(): array
     {
         return [

@@ -101,6 +101,8 @@ final class UrlHelper
      * With exception of URLs used as a token default values.
      *
      * @param string $text
+     *
+     * @return string[]
      */
     public static function getUrlsFromPlaintext($text, array $contactUrlFields = []): array
     {

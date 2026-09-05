@@ -42,6 +42,8 @@ class ExportHelper
 
     /**
      * Returns supported export types as an array.
+     *
+     * @return array<int, string>
      */
     public function getSupportedExportTypes(): array
     {

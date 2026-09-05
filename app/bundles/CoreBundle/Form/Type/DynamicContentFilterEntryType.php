@@ -25,22 +25,22 @@ final class DynamicContentFilterEntryType extends AbstractType
     private array $fieldChoices = [];
 
     /**
-     * @var mixed[]
+     * @var array<string, string>
      */
     private readonly array $countryChoices;
 
     /**
-     * @var mixed[]
+     * @var array<string, array<string, string>>
      */
     private readonly array $regionChoices;
 
     /**
-     * @var mixed[]
+     * @var array<string, mixed>
      */
     private readonly array $timezoneChoices;
 
     /**
-     * @var mixed[]
+     * @var array<string, string>
      */
     private readonly array $localeChoices;
 

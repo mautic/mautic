@@ -412,7 +412,7 @@ class FormModel extends AbstractCommonModel
     /**
      * Dispatches batch events for child classes.
      *
-     * @param mixed[] $entitiesBatchParams
+     * @param array<int, array<string, object|bool|null>>|array<int, array<string, mixed>> $entitiesBatchParams
      */
     protected function dispatchBatchEvent(string $action, array &$entitiesBatchParams, ?Event $event = null): ?Event
     {

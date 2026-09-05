@@ -9,6 +9,9 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Mapper\Category as Catego
 
 final class CategoryMapper
 {
+    /**
+     * @var array<string, array<string, bool|string>>
+     */
     private static array $mappings = [
         Category::ANTISPAM       => ['permanent' => false, 'bounce_type' => Type::BLOCKED],
         Category::AUTOREPLY      => ['permanent' => false, 'bounce_type' => Type::AUTOREPLY],

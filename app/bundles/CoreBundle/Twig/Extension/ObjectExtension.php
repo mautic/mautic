@@ -10,6 +10,9 @@ use Twig\TwigTest;
 
 final class ObjectExtension extends AbstractExtension
 {
+    /**
+     * @return TwigFunction[]
+     */
     public function getFunctions(): array
     {
         return [
@@ -17,6 +20,9 @@ final class ObjectExtension extends AbstractExtension
         ];
     }
 
+    /**
+     * @return TwigTest[]
+     */
     public function getTests(): array
     {
         return [

@@ -75,7 +75,7 @@ abstract class AbstractLookup
     /**
      * Return details of the IP address lookup.
      *
-     * @return array
+     * @return array<string, mixed>
      */
     public function getDetails()
     {
