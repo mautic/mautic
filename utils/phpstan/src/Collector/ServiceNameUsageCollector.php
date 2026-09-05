@@ -27,10 +27,8 @@ final class ServiceNameUsageCollector implements Collector
      * Service ids are dot separated and mostly lowercase, yet a bundle named in camel case brings a camel case
      * segment along, e.g. "mautic.dynamicContent.model.dynamicContent". A "%s" placeholder stands for the part
      * filled in at runtime.
-     *
-     * @var string
      */
-    private const SERVICE_ID_PATTERN = '#^[a-zA-Z][a-zA-Z0-9_%]*(\.[a-zA-Z0-9_%]+)+$#';
+    private const string SERVICE_ID_PATTERN = '#^[a-zA-Z][a-zA-Z0-9_%]*(\.[a-zA-Z0-9_%]+)+$#';
 
     public function getNodeType(): string
     {

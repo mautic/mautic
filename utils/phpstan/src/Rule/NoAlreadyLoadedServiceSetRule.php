@@ -39,22 +39,17 @@ use PHPStan\Rules\RuleErrorBuilder;
  *
  * @implements Rule<FileNode>
  */
-final class NoAlreadyLoadedServiceSetRule implements Rule
+final readonly class NoAlreadyLoadedServiceSetRule implements Rule
 {
-    /**
-     * @var string
-     */
-    private const SERVICES_FILE_NAME = 'services.php';
+    private const string SERVICES_FILE_NAME = 'services.php';
 
     /**
      * The variable the services of a Config/services.php file are registered on.
-     *
-     * @var string
      */
-    private const SERVICES_VARIABLE_NAME = 'services';
+    private const string SERVICES_VARIABLE_NAME = 'services';
 
     public function __construct(
-        private readonly ReflectionProvider $reflectionProvider,
+        private ReflectionProvider $reflectionProvider,
     ) {
     }
 

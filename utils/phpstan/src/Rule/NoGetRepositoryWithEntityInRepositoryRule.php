@@ -23,15 +23,9 @@ use PHPStan\Rules\RuleErrorBuilder;
  */
 final class NoGetRepositoryWithEntityInRepositoryRule implements Rule
 {
-    /**
-     * @var string
-     */
-    private const GET_REPOSITORY_METHOD = 'getRepository';
+    private const string GET_REPOSITORY_METHOD = 'getRepository';
 
-    /**
-     * @var string
-     */
-    private const REPOSITORY_SUFFIX = 'Repository.php';
+    private const string REPOSITORY_SUFFIX = 'Repository.php';
 
     public function getNodeType(): string
     {

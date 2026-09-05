@@ -46,20 +46,14 @@ use PHPStan\Rules\RuleErrorBuilder;
  *
  * @implements Rule<MethodCall>
  */
-final class NoRedundantAutowiredServiceArgumentRule implements Rule
+final readonly class NoRedundantAutowiredServiceArgumentRule implements Rule
 {
-    /**
-     * @var string
-     */
-    private const SERVICES_FILE_NAME = 'services.php';
+    private const string SERVICES_FILE_NAME = 'services.php';
 
-    /**
-     * @var string
-     */
-    private const SERVICE_FUNCTION = 'Symfony\Component\DependencyInjection\Loader\Configurator\service';
+    private const string SERVICE_FUNCTION = 'Symfony\Component\DependencyInjection\Loader\Configurator\service';
 
     public function __construct(
-        private readonly ReflectionProvider $reflectionProvider,
+        private ReflectionProvider $reflectionProvider,
     ) {
     }
 

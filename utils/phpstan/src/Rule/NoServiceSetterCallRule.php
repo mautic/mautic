@@ -39,22 +39,14 @@ use PHPStan\Rules\RuleErrorBuilder;
  */
 final class NoServiceSetterCallRule implements Rule
 {
-    /**
-     * @var string
-     */
-    private const SERVICES_FILE_NAME = 'services.php';
+    private const string SERVICES_FILE_NAME = 'services.php';
 
     /**
      * A setter is a setXxx() method, e.g. setListLeadRepository(). A "setup" or "settle" method is no setter.
-     *
-     * @var string
      */
-    private const SETTER_METHOD_PATTERN = '#^set\p{Lu}#u';
+    private const string SETTER_METHOD_PATTERN = '#^set\p{Lu}#u';
 
-    /**
-     * @var string
-     */
-    private const SERVICE_FUNCTION = 'Symfony\Component\DependencyInjection\Loader\Configurator\service';
+    private const string SERVICE_FUNCTION = 'Symfony\Component\DependencyInjection\Loader\Configurator\service';
 
     public function getNodeType(): string
     {
@@ -114,13 +106,7 @@ final class NoServiceSetterCallRule implements Rule
             return false;
         }
 
-        foreach ($secondArg->value->items as $item) {
-            if ($item->value instanceof FuncCall && $this->isServiceFunction($item->value)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($secondArg->value->items, fn (Node\ArrayItem $item): bool => $item->value instanceof FuncCall && $this->isServiceFunction($item->value));
     }
 
     private function isServiceFunction(FuncCall $funcCall): bool

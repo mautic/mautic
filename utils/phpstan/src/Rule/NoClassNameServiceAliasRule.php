@@ -41,10 +41,7 @@ use Utils\PHPStan\Collector\ServiceDefinitionNameCollector;
  */
 final class NoClassNameServiceAliasRule implements Rule
 {
-    /**
-     * @var string
-     */
-    private const MAUTIC_SERVICE_ID_PREFIX = 'mautic.';
+    private const string MAUTIC_SERVICE_ID_PREFIX = 'mautic.';
 
     public function getNodeType(): string
     {

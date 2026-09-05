@@ -18,10 +18,10 @@ use Symfony\Component\Validator\Constraint;
  *
  * @implements Rule<Class_>
  */
-final class ConstraintMustHaveAttributeRule implements Rule
+final readonly class ConstraintMustHaveAttributeRule implements Rule
 {
     public function __construct(
-        private readonly ReflectionProvider $reflectionProvider,
+        private ReflectionProvider $reflectionProvider,
     ) {
     }
 

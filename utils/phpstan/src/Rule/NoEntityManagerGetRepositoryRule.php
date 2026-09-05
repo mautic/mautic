@@ -27,10 +27,7 @@ use PHPStan\Type\ObjectType;
  */
 final class NoEntityManagerGetRepositoryRule implements Rule
 {
-    /**
-     * @var string
-     */
-    private const GET_REPOSITORY_METHOD = 'getRepository';
+    private const string GET_REPOSITORY_METHOD = 'getRepository';
 
     public function getNodeType(): string
     {
@@ -82,7 +79,7 @@ final class NoEntityManagerGetRepositoryRule implements Rule
 
         // the caller must be an entity manager, a property, a variable or any other expression alike
         $callerType = $scope->getType($node->var);
-        if (!(new ObjectType(ObjectManager::class))->isSuperTypeOf($callerType)->yes()) {
+        if (!new ObjectType(ObjectManager::class)->isSuperTypeOf($callerType)->yes()) {
             return [];
         }
 

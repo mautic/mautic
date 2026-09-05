@@ -56,16 +56,16 @@ final class ModelGetRepositoryToRepositoryServiceRector extends AbstractRector
     /**
      * Any class extending this is a test and is left alone.
      */
-    private const TEST_CASE = 'PHPUnit\Framework\TestCase';
+    private const string TEST_CASE = \PHPUnit\Framework\TestCase::class;
 
-    private const ABSTRACT_COMMON_MODEL = AbstractCommonModel::class;
+    private const string ABSTRACT_COMMON_MODEL = AbstractCommonModel::class;
 
     /**
      * Generic repository bases - a model that does not override getRepository() resolves to one of these,
      * and there is no dedicated service to depend on.
      */
-    private const GENERIC_REPOSITORIES = [
-        'Doctrine\ORM\EntityRepository',
+    private const array GENERIC_REPOSITORIES = [
+        \Doctrine\ORM\EntityRepository::class,
         CommonRepository::class,
     ];
 
@@ -283,7 +283,7 @@ final class ModelGetRepositoryToRepositoryServiceRector extends AbstractRector
 
         // Symfony calls every #[Required] method on service instantiation.
         $classMethod->attrGroups = [
-            new AttributeGroup([new Attribute(new FullyQualified('Symfony\Contracts\Service\Attribute\Required'))]),
+            new AttributeGroup([new Attribute(new FullyQualified(\Symfony\Contracts\Service\Attribute\Required::class))]),
         ];
 
         return $classMethod;

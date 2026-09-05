@@ -24,20 +24,14 @@ use PHPStan\Rules\RuleErrorBuilder;
  */
 final class NoRequiredMethodWithConstructorInControllerRule implements Rule
 {
-    /**
-     * @var string
-     */
-    private const REQUIRED_ATTRIBUTE = 'Symfony\Contracts\Service\Attribute\Required';
+    private const string REQUIRED_ATTRIBUTE = \Symfony\Contracts\Service\Attribute\Required::class;
 
-    /**
-     * @var string
-     */
-    private const CONTROLLER_SUFFIX = 'Controller.php';
+    private const string CONTROLLER_SUFFIX = 'Controller.php';
 
     /**
      * @var string[]
      */
-    private const PARENT_CONTROLLER_NAME_PARTS = ['Base', 'Common'];
+    private const array PARENT_CONTROLLER_NAME_PARTS = ['Base', 'Common'];
 
     public function getNodeType(): string
     {
@@ -92,13 +86,7 @@ final class NoRequiredMethodWithConstructorInControllerRule implements Rule
 
     private function isParentController(string $shortClassName): bool
     {
-        foreach (self::PARENT_CONTROLLER_NAME_PARTS as $parentControllerNamePart) {
-            if (str_contains($shortClassName, $parentControllerNamePart)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any(self::PARENT_CONTROLLER_NAME_PARTS, fn (string $parentControllerNamePart): bool => str_contains($shortClassName, $parentControllerNamePart));
     }
 
     private function hasRequiredAttribute(ClassMethod $classMethod): bool

@@ -27,7 +27,7 @@ use PHPStan\Rules\RuleErrorBuilder;
  *
  * @implements Rule<ClassMethod>
  */
-final class NoServiceInMethodParameterRule implements Rule
+final readonly class NoServiceInMethodParameterRule implements Rule
 {
     /**
      * Services that are always container-provided singletons. Subtypes are matched too, so RouterInterface covers
@@ -36,29 +36,29 @@ final class NoServiceInMethodParameterRule implements Rule
      *
      * @var string[]
      */
-    private const SERVICE_TYPES = [
-        'Doctrine\\ORM\\EntityManagerInterface',
-        'Doctrine\\Persistence\\ManagerRegistry',
-        'Psr\\Cache\\CacheItemPoolInterface',
-        'Psr\\Log\\LoggerInterface',
-        'Symfony\\Component\\Filesystem\\Filesystem',
-        'Symfony\\Component\\Form\\FormFactoryInterface',
-        'Symfony\\Component\\HttpFoundation\\RequestStack',
-        'Symfony\\Component\\HttpKernel\\KernelInterface',
-        'Symfony\\Component\\Mailer\\MailerInterface',
-        'Symfony\\Component\\Messenger\\MessageBusInterface',
-        'Symfony\\Component\\PasswordHasher\\Hasher\\UserPasswordHasherInterface',
-        'Symfony\\Component\\Routing\\Generator\\UrlGeneratorInterface',
-        'Symfony\\Component\\Security\\Core\\Authentication\\Token\\Storage\\TokenStorageInterface',
-        'Symfony\\Component\\Security\\Core\\Authorization\\AuthorizationCheckerInterface',
-        'Symfony\\Component\\Security\\Csrf\\CsrfTokenManagerInterface',
-        'Symfony\\Component\\Serializer\\SerializerInterface',
-        'Symfony\\Component\\Validator\\Validator\\ValidatorInterface',
-        'Symfony\\Contracts\\Cache\\CacheInterface',
-        'Symfony\\Contracts\\EventDispatcher\\EventDispatcherInterface',
-        'Symfony\\Contracts\\HttpClient\\HttpClientInterface',
-        'Symfony\\Contracts\\Translation\\TranslatorInterface',
-        'Twig\\Environment',
+    private const array SERVICE_TYPES = [
+        \Doctrine\ORM\EntityManagerInterface::class,
+        \Doctrine\Persistence\ManagerRegistry::class,
+        \Psr\Cache\CacheItemPoolInterface::class,
+        \Psr\Log\LoggerInterface::class,
+        \Symfony\Component\Filesystem\Filesystem::class,
+        \Symfony\Component\Form\FormFactoryInterface::class,
+        \Symfony\Component\HttpFoundation\RequestStack::class,
+        \Symfony\Component\HttpKernel\KernelInterface::class,
+        \Symfony\Component\Mailer\MailerInterface::class,
+        \Symfony\Component\Messenger\MessageBusInterface::class,
+        \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface::class,
+        \Symfony\Component\Routing\Generator\UrlGeneratorInterface::class,
+        \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface::class,
+        \Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface::class,
+        \Symfony\Component\Security\Csrf\CsrfTokenManagerInterface::class,
+        \Symfony\Component\Serializer\SerializerInterface::class,
+        \Symfony\Component\Validator\Validator\ValidatorInterface::class,
+        \Symfony\Contracts\Cache\CacheInterface::class,
+        \Symfony\Contracts\EventDispatcher\EventDispatcherInterface::class,
+        \Symfony\Contracts\HttpClient\HttpClientInterface::class,
+        \Symfony\Contracts\Translation\TranslatorInterface::class,
+        \Twig\Environment::class,
     ];
 
     /**
@@ -68,8 +68,8 @@ final class NoServiceInMethodParameterRule implements Rule
      *
      * @var string[]
      */
-    private const SKIPPED_TYPES = [
-        'Symfony\\Component\\DependencyInjection\\ContainerBuilder',
+    private const array SKIPPED_TYPES = [
+        \Symfony\Component\DependencyInjection\ContainerBuilder::class,
         Translator::class,
     ];
 
@@ -79,15 +79,13 @@ final class NoServiceInMethodParameterRule implements Rule
      *
      * @var array<string, string>
      */
-    private const SKIPPED_PARENT_CLASS_METHODS = [FormModel::class => 'createform'];
+    private const array SKIPPED_PARENT_CLASS_METHODS = [FormModel::class => 'createform'];
 
     /**
      * A test case has no container to inject from - it fetches services itself and hands them to its own data
      * builders and helper methods.
-     *
-     * @var string
      */
-    private const TEST_CASE_CLASS = 'PHPUnit\\Framework\\TestCase';
+    private const string TEST_CASE_CLASS = \PHPUnit\Framework\TestCase::class;
 
     /**
      * An event or an entity is created by the code that uses it, never by the container, so a service it needs can
@@ -97,47 +95,34 @@ final class NoServiceInMethodParameterRule implements Rule
      *
      * @var string[]
      */
-    private const SKIPPED_CLASS_TYPES = [
-        'Symfony\\Contracts\\EventDispatcher\\Event',
+    private const array SKIPPED_CLASS_TYPES = [
+        \Symfony\Contracts\EventDispatcher\Event::class,
         'Symfony\\Component\\EventDispatcher\\Event',
         CommonEntity::class,
-        'Twig\\Extension\\AbstractExtension',
-        'FOS\\OAuthServerBundle\\Controller\\AuthorizeController',
+        \Twig\Extension\AbstractExtension::class,
+        \FOS\OAuthServerBundle\Controller\AuthorizeController::class,
     ];
 
     /**
      * A controller action gets its services from the Symfony argument resolver, which is a container injection of
      * its own - there is no call site that would have to carry the service.
-     *
-     * @var string
      */
-    private const CONTROLLER_SUFFIX = 'Controller';
+    private const string CONTROLLER_SUFFIX = 'Controller';
 
-    /**
-     * @var string
-     */
-    private const ACTION_SUFFIX = 'action';
+    private const string ACTION_SUFFIX = 'action';
 
     /**
      * A create*() method is a factory: it builds the object for its caller, so the service it builds with belongs to
      * the caller, not to the factory.
-     *
-     * @var string
      */
-    private const CREATE_PREFIX = 'create';
+    private const string CREATE_PREFIX = 'create';
 
-    /**
-     * @var string
-     */
-    private const AUTOWIRE_PREFIX = 'autowire';
+    private const string AUTOWIRE_PREFIX = 'autowire';
 
-    /**
-     * @var string
-     */
-    private const REQUIRED_ATTRIBUTE = 'Symfony\\Contracts\\Service\\Attribute\\Required';
+    private const string REQUIRED_ATTRIBUTE = \Symfony\Contracts\Service\Attribute\Required::class;
 
     public function __construct(
-        private readonly ReflectionProvider $reflectionProvider,
+        private ReflectionProvider $reflectionProvider,
     ) {
     }
 
@@ -254,13 +239,7 @@ final class NoServiceInMethodParameterRule implements Rule
 
         $methodName = $classMethod->name->toLowerString();
 
-        foreach (self::SKIPPED_PARENT_CLASS_METHODS as $parentClass => $skippedMethodName) {
-            if ($methodName === $skippedMethodName && $classReflection->is($parentClass)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any(self::SKIPPED_PARENT_CLASS_METHODS, fn (string $skippedMethodName, $parentClass): bool => $methodName === $skippedMethodName && $classReflection->is($parentClass));
     }
 
     private function isControllerAction(ClassMethod $classMethod, Scope $scope): bool
@@ -284,13 +263,7 @@ final class NoServiceInMethodParameterRule implements Rule
             return false;
         }
 
-        foreach (self::SKIPPED_CLASS_TYPES as $skippedClassType) {
-            if ($classReflection->is($skippedClassType)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any(self::SKIPPED_CLASS_TYPES, fn (string $skippedClassType): bool => $classReflection->is($skippedClassType));
     }
 
     private function isInTestCase(Scope $scope): bool
@@ -317,12 +290,6 @@ final class NoServiceInMethodParameterRule implements Rule
             }
         }
 
-        foreach (self::SERVICE_TYPES as $serviceType) {
-            if ($classReflection->is($serviceType)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any(self::SERVICE_TYPES, fn (string $serviceType): bool => $classReflection->is($serviceType));
     }
 }

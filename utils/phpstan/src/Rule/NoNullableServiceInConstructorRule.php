@@ -26,28 +26,28 @@ use PHPStan\Rules\RuleErrorBuilder;
  *
  * @implements Rule<ClassMethod>
  */
-final class NoNullableServiceInConstructorRule implements Rule
+final readonly class NoNullableServiceInConstructorRule implements Rule
 {
     /**
      * @var string[]
      */
-    private const SKIPPED_NAMESPACE_PARTS = ['\\Entity\\', '\\Event\\', '\\DTO\\', '\\Message\\', '\\DAO\\', '\\Token\\', '\\Exception\\', '\\Helper\\', '\\ValueObject\\'];
+    private const array SKIPPED_NAMESPACE_PARTS = ['\\Entity\\', '\\Event\\', '\\DTO\\', '\\Message\\', '\\DAO\\', '\\Token\\', '\\Exception\\', '\\Helper\\', '\\ValueObject\\'];
 
     /**
      * @var string[]
      */
-    private const SKIPPED_CLASS_TYPES = [
-        'Symfony\\Component\\Security\\Http\\Authenticator\\Passport\\Badge\\BadgeInterface',
-        'Symfony\\Component\\Form\\FormTypeInterface',
+    private const array SKIPPED_CLASS_TYPES = [
+        \Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface::class,
+        \Symfony\Component\Form\FormTypeInterface::class,
     ];
 
     /**
      * @var string[]
      */
-    private const SKIPPED_EXACT_CLASSES = [AbstractLookup::class];
+    private const array SKIPPED_EXACT_CLASSES = [AbstractLookup::class];
 
     public function __construct(
-        private readonly ReflectionProvider $reflectionProvider,
+        private ReflectionProvider $reflectionProvider,
     ) {
     }
 
@@ -190,13 +190,7 @@ final class NoNullableServiceInConstructorRule implements Rule
 
     private function isSkippedNamespace(string $className): bool
     {
-        foreach (self::SKIPPED_NAMESPACE_PARTS as $skippedNamespacePart) {
-            if (str_contains($className, $skippedNamespacePart)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any(self::SKIPPED_NAMESPACE_PARTS, fn (string $skippedNamespacePart): bool => str_contains($className, $skippedNamespacePart));
     }
 
     /**

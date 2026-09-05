@@ -50,20 +50,11 @@ use PHPStan\Rules\RuleErrorBuilder;
  */
 final class NoServiceJugglingRule implements Rule
 {
-    /**
-     * @var string
-     */
-    private const CONSTRUCTOR_NAME = '__construct';
+    private const string CONSTRUCTOR_NAME = '__construct';
 
-    /**
-     * @var string
-     */
-    private const AUTOWIRE_PREFIX = 'autowire';
+    private const string AUTOWIRE_PREFIX = 'autowire';
 
-    /**
-     * @var string
-     */
-    private const REQUIRED_ATTRIBUTE = 'Symfony\Contracts\Service\Attribute\Required';
+    private const string REQUIRED_ATTRIBUTE = \Symfony\Contracts\Service\Attribute\Required::class;
 
     public function getNodeType(): string
     {
@@ -350,13 +341,7 @@ final class NoServiceJugglingRule implements Rule
             return false;
         }
 
-        foreach ($classReflection->getTraits(true) as $traitReflection) {
-            if ($traitReflection->hasNativeMethod($methodName)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($classReflection->getTraits(true), fn (ClassReflection $traitReflection): bool => $traitReflection->hasNativeMethod($methodName));
     }
 
     /**

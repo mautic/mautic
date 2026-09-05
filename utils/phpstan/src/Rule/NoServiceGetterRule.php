@@ -33,17 +33,14 @@ use PHPStan\Rules\RuleErrorBuilder;
  */
 final class NoServiceGetterRule implements Rule
 {
-    /**
-     * @var string
-     */
-    private const GET_PREFIX = 'get';
+    private const string GET_PREFIX = 'get';
 
     /**
      * Class-name suffixes that mark a service. A getter returning one of these hands out an injectable dependency.
      *
      * @var string[]
      */
-    private const SERVICE_SUFFIXES = [
+    private const array SERVICE_SUFFIXES = [
         'Repository',
         'Model',
         'Factory',
@@ -109,13 +106,7 @@ final class NoServiceGetterRule implements Rule
             }
         }
 
-        foreach ($classReflection->getInterfaces() as $interface) {
-            if ($interface->hasNativeMethod($methodName)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($classReflection->getInterfaces(), fn (ClassReflection $interface): bool => $interface->hasNativeMethod($methodName));
     }
 
     /**

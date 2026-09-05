@@ -18,10 +18,10 @@ use Symfony\Component\Console\Command\Command;
  *
  * @implements Rule<Class_>
  */
-final class CommandMustHaveAsCommandAttributeRule implements Rule
+final readonly class CommandMustHaveAsCommandAttributeRule implements Rule
 {
     public function __construct(
-        private readonly ReflectionProvider $reflectionProvider,
+        private ReflectionProvider $reflectionProvider,
     ) {
     }
 

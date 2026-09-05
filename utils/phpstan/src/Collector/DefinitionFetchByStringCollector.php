@@ -25,7 +25,7 @@ final class DefinitionFetchByStringCollector implements Collector
     /**
      * @var list<string>
      */
-    private const DEFINITION_METHOD_NAMES = ['getDefinition', 'hasDefinition', 'findDefinition', 'removeDefinition'];
+    private const array DEFINITION_METHOD_NAMES = ['getDefinition', 'hasDefinition', 'findDefinition', 'removeDefinition'];
 
     public function getNodeType(): string
     {

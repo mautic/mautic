@@ -43,17 +43,11 @@ use Twig\Extension\ExtensionInterface;
  *
  * @implements Rule<FileNode>
  */
-final class NoAutoconfiguredServiceTagRule implements Rule
+final readonly class NoAutoconfiguredServiceTagRule implements Rule
 {
-    /**
-     * @var string
-     */
-    private const SERVICES_FILE_NAME = 'services.php';
+    private const string SERVICES_FILE_NAME = 'services.php';
 
-    /**
-     * @var string
-     */
-    private const SERVICES_VARIABLE_NAME = 'services';
+    private const string SERVICES_VARIABLE_NAME = 'services';
 
     /**
      * The tags Symfony adds on its own to a service of the given type.
@@ -63,7 +57,7 @@ final class NoAutoconfiguredServiceTagRule implements Rule
      *
      * @var array<string, string>
      */
-    private const AUTOCONFIGURED_TAGS = [
+    private const array AUTOCONFIGURED_TAGS = [
         'console.command'                => Command::class,
         'form.type'                      => FormTypeInterface::class,
         'kernel.event_subscriber'        => EventSubscriberInterface::class,
@@ -73,7 +67,7 @@ final class NoAutoconfiguredServiceTagRule implements Rule
     ];
 
     public function __construct(
-        private readonly ReflectionProvider $reflectionProvider,
+        private ReflectionProvider $reflectionProvider,
     ) {
     }
 
@@ -144,13 +138,7 @@ final class NoAutoconfiguredServiceTagRule implements Rule
      */
     private function hasAutoconfigureCall(array $methodCalls): bool
     {
-        foreach ($methodCalls as $methodCall) {
-            if ($methodCall->name instanceof Identifier && 'autoconfigure' === $methodCall->name->toString()) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($methodCalls, fn (MethodCall $methodCall): bool => $methodCall->name instanceof Identifier && 'autoconfigure' === $methodCall->name->toString());
     }
 
     /**
