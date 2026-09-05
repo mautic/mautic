@@ -82,7 +82,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         return false;
     }
 
-    public function getLeads(array $params, $query, ?array &$executed, array $result = [], string $object = 'Lead')
+    public function getLeads(array $params, $query, &$executed, array $result = [], string $object = 'Lead')
     {
         $executed = null;
 

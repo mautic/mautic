@@ -50,6 +50,11 @@ final class ListModelTest extends TestCase
      */
     private MockObject $contactSegmentServiceMock;
 
+    /**
+     * @var MockObject&DoNotContactRepository
+     */
+    private MockObject $doNotContactRepositoryMock;
+
     protected function setUp(): void
     {
         $eventDispatcherInterfaceMock = $this->createMock(EventDispatcherInterface::class);
@@ -62,6 +67,8 @@ final class ListModelTest extends TestCase
         $this->contactSegmentServiceMock       = $this->createMock(ContactSegmentService::class);
         $this->segmentCountCacheHelper         = $this->createMock(SegmentCountCacheHelper::class);
 
+        $this->doNotContactRepositoryMock = $this->createMock(DoNotContactRepository::class);
+
         $this->model = new ListModel(
             $this->createStub(CategoryModel::class),
             $this->createStub(CoreParametersHelper::class),
@@ -69,7 +76,7 @@ final class ListModelTest extends TestCase
             $this->createStub(SegmentChartQueryFactory::class),
             $this->createStub(RequestStack::class),
             $this->segmentCountCacheHelper,
-            $this->createStub(DoNotContactRepository::class),
+            $this->doNotContactRepositoryMock,
             $entityManagerMock,
             $this->createStub(CorePermissions::class),
             $eventDispatcherInterfaceMock,
@@ -78,7 +85,7 @@ final class ListModelTest extends TestCase
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->leadListRepositoryMock,
-            $this->createStub(ListLeadRepository::class), // $listLeadRepository
+            $this->createStub(ListLeadRepository::class),
         );
     }
 
@@ -362,16 +369,10 @@ final class ListModelTest extends TestCase
             ->with($segmentId)
             ->willReturn($total);
 
-        $doNotContactRepository = $this->createMock(DoNotContactRepository::class);
-        $doNotContactRepository
-            ->expects($this->once())
+        $this->doNotContactRepositoryMock->expects($this->once())
             ->method('getCount')
             ->with(null, null, null, $segmentId)
             ->willReturn($dnc);
-
-        $reflection = new \ReflectionClass($this->model);
-        $property   = $reflection->getProperty('doNotContactRepository');
-        $property->setValue($this->model, $doNotContactRepository);
 
         $active = $this->model->getActiveSegmentContactCount($segmentId);
         $this->assertSame($total - $dnc, $active);
