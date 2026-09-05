@@ -13,6 +13,9 @@ class UserHelper
     ) {
     }
 
+    /**
+     * @return int[]
+     */
     public function getAdminUsers(): array
     {
         $qb      = $this->connection->createQueryBuilder();

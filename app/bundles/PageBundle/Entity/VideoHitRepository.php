@@ -16,7 +16,8 @@ final class VideoHitRepository extends CommonRepository
     /**
      * Get video hit info for lead timeline.
      *
-     * @param int|null $leadId
+     * @param int|null             $leadId
+     * @param array<string, mixed> $options
      *
      * @return array
      */
@@ -55,7 +56,8 @@ final class VideoHitRepository extends CommonRepository
     /**
      * Get a lead's page hits.
      *
-     * @param int $leadId
+     * @param int                  $leadId
+     * @param array<string, mixed> $options
      *
      * @return array
      *
@@ -80,6 +82,8 @@ final class VideoHitRepository extends CommonRepository
      * Count stats from hit times.
      *
      * @param array $times
+     *
+     * @return array<string, mixed>
      */
     public function countStats($times): array
     {

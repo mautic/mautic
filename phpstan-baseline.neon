@@ -4093,12 +4093,6 @@ parameters:
 			path: app/bundles/FormBundle/Model/SubmissionModel.php
 
 		-
-			message: '#^Method Mautic\\FormBundle\\Model\\SubmissionModel\:\:validateFieldValue\(\) should return bool\|string but returns array\.$#'
-			identifier: return.type
-			count: 1
-			path: app/bundles/FormBundle/Model/SubmissionModel.php
-
-		-
 			message: '#^Parameter \#1 \$object of method Mautic\\LeadBundle\\Model\\FieldModel\:\:getFieldListWithProperties\(\) expects string, false given\.$#'
 			identifier: argument.type
 			count: 1

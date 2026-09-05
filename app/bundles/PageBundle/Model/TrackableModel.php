@@ -86,8 +86,9 @@ class TrackableModel extends AbstractCommonModel
     }
 
     /**
-     * @param bool|false $shortenUrl If true, use the configured shortener service to shorten the URLs
-     * @param array      $utmTags
+     * @param bool|false           $shortenUrl   If true, use the configured shortener service to shorten the URLs
+     * @param array                $utmTags
+     * @param array<string, mixed> $clickthrough
      *
      * @return string
      */
@@ -634,6 +635,8 @@ class TrackableModel extends AbstractCommonModel
 
     /**
      * Build query string while accounting for tokens that include an equal sign.
+     *
+     * @param array<string, mixed> $queryParts
      */
     protected function httpBuildQuery(array $queryParts): ?string
     {

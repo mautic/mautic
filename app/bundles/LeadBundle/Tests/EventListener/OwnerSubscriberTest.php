@@ -213,7 +213,7 @@ final class OwnerSubscriberTest extends TestCase
     }
 
     /**
-     * @param mixed[] $parameterMap
+     * @param array<int, array<array<string, string>|string>> $parameterMap
      */
     private function getMockParametersHelper(bool $mailIsOwner = true, array $parameterMap = []): MockObject&CoreParametersHelper
     {

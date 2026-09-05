@@ -266,7 +266,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param mixed[] $templateParams
+     * @param array<string, mixed>|array<string, array<int, mixed[]>> $templateParams
      */
     private function renderTemplate(string $templateName, array $templateParams, string $wrapperTemplate = '', string ...$wrapperTemplateValues): string
     {
@@ -298,6 +298,9 @@ final class BuilderSubscriber implements EventSubscriberInterface
         );
     }
 
+    /**
+     * @param array<string, mixed> $params
+     */
     private function renderSegmentList(array $params): string
     {
         return $this->renderTemplate(
@@ -308,6 +311,9 @@ final class BuilderSubscriber implements EventSubscriberInterface
         );
     }
 
+    /**
+     * @param array<string, mixed> $params
+     */
     private function renderCategoryList(array $params): string
     {
         return $this->renderTemplate(
@@ -318,6 +324,9 @@ final class BuilderSubscriber implements EventSubscriberInterface
         );
     }
 
+    /**
+     * @param array<string, mixed> $params
+     */
     private function renderPreferredChannel(array $params): string
     {
         return $this->renderTemplate(
@@ -327,6 +336,9 @@ final class BuilderSubscriber implements EventSubscriberInterface
         );
     }
 
+    /**
+     * @param array<string, mixed> $params
+     */
     private function renderChannelFrequency(array $params): string
     {
         return $this->renderTemplate(
@@ -337,6 +349,9 @@ final class BuilderSubscriber implements EventSubscriberInterface
         );
     }
 
+    /**
+     * @param array<string, mixed> $params
+     */
     private function renderSavePrefs(array $params): string
     {
         return $this->renderTemplate(
@@ -433,7 +448,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param mixed[] $params
+     * @param array<string, mixed> $params
      */
     private function wrapPreferenceCenterInFormTag(string $content, array $params): string
     {

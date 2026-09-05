@@ -185,7 +185,7 @@ final class LeadCategoryRepositoryFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param mixed[] $categories
+     * @param array<string, mixed> $categories
      */
     private function setLeadCategories(Lead $lead, array $categories): void
     {

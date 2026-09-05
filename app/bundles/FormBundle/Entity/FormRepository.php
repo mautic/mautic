@@ -177,6 +177,8 @@ class FormRepository extends CommonRepository
     /**
      * Fetch the form results.
      *
+     * @param array<string, mixed> $options
+     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */

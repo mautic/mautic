@@ -182,7 +182,7 @@ final class PreferencePageTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return mixed[]
+     * @return array<string, mixed>
      */
     private function createParams(): array
     {
@@ -196,7 +196,7 @@ final class PreferencePageTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param mixed[] $params
+     * @param array<string, mixed> $params
      */
     private function dispatchEvent(Page $page, array $params): string
     {
@@ -225,7 +225,7 @@ final class PreferencePageTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param mixed[] $params
+     * @param array<string, mixed> $params
      */
     private function assertCustomLabels(array $params, string $content): void
     {

@@ -42,6 +42,9 @@ class ContactRequestHelper
     ) {
     }
 
+    /**
+     * @param array<string, mixed> $queryFields
+     */
     public function getContactFromQuery(array $queryFields = []): ?Lead
     {
         $request = $this->getCurrentRequest();

@@ -493,6 +493,10 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
         $this->buildJoinQuery($event, $tables, $config);
     }
 
+    /**
+     * @param array<int, array<string, string>>  $tables
+     * @param array<array<string, mixed>, mixed> $config
+     */
     private function buildJoinQuery(LeadBuildSearchEvent $event, array $tables, array $config): void
     {
         if (!isset($config['column']) || 0 === count($tables)) {

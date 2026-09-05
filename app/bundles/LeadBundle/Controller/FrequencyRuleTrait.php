@@ -148,7 +148,8 @@ trait FrequencyRuleTrait
     }
 
     /**
-     * @param int $currentChannelId
+     * @param int                  $currentChannelId
+     * @param array<string, mixed> $formData
      */
     protected function persistFrequencyRuleFormData(Lead $lead, array $formData, array $allChannels, array $leadChannels, $currentChannelId = null): void
     {

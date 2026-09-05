@@ -9,6 +9,9 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 final class InternalObjectEvent extends Event
 {
+    /**
+     * @var ObjectInterface[]
+     */
     private array $objects = [];
 
     public function addObject(ObjectInterface $object): void
