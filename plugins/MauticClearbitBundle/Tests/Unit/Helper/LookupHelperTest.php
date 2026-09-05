@@ -18,11 +18,12 @@ use MauticPlugin\MauticClearbitBundle\Helper\LookupHelper;
 use MauticPlugin\MauticClearbitBundle\Integration\ClearbitIntegration;
 use MauticPlugin\MauticClearbitBundle\Services\Clearbit_Company;
 use MauticPlugin\MauticClearbitBundle\Services\Clearbit_Person;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class LookupHelperTest extends TestCase
 {
     private MockObject&IntegrationsHelper $integrationsHelper;

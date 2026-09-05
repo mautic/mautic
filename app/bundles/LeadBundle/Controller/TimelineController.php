@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Requirement\Requirement;
 
 final class TimelineController extends CommonController
 {
@@ -73,7 +74,7 @@ final class TimelineController extends CommonController
     #[Route(
         '/s/plugin/{integration}/timeline/{page}',
         name: 'mautic_plugin_timeline_index',
-        requirements: ['integration' => \Symfony\Component\Routing\Requirement\Requirement::CATCH_ALL, 'page' => '\d+'],
+        requirements: ['integration' => Requirement::CATCH_ALL, 'page' => '\d+'],
         defaults: ['page' => 0],
     )]
     public function pluginIndexAction(Request $request, $integration, int $page = 1): Response
@@ -141,7 +142,7 @@ final class TimelineController extends CommonController
     #[Route(
         '/s/plugin/{integration}/timeline/view/{leadId}/{page}',
         name: 'mautic_plugin_timeline_view',
-        requirements: ['integration' => \Symfony\Component\Routing\Requirement\Requirement::CATCH_ALL, 'leadId' => '\d+', 'page' => '\d+'],
+        requirements: ['integration' => Requirement::CATCH_ALL, 'leadId' => '\d+', 'page' => '\d+'],
         defaults: ['page' => 0],
     )]
     public function pluginViewAction(Request $request, $integration, $leadId, int $page = 1): Response

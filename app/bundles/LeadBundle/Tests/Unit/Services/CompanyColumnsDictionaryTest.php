@@ -7,11 +7,12 @@ namespace Mautic\LeadBundle\Tests\Unit\Services;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Services\CompanyColumnsDictionary;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class CompanyColumnsDictionaryTest extends TestCase
 {
     private CoreParametersHelper&MockObject $coreParametersHelper;

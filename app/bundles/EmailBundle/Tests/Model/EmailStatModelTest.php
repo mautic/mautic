@@ -11,11 +11,12 @@ use Mautic\EmailBundle\Event\EmailStatEvent;
 use Mautic\EmailBundle\Event\EmailStatPostSaveEvent;
 use Mautic\EmailBundle\Model\EmailStatModel;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class EmailStatModelTest extends TestCase
 {
     public function testSave(): void

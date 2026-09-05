@@ -7,10 +7,11 @@ namespace Mautic\LeadBundle\Tests\Entity;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
 use Mautic\LeadBundle\Entity\UtmTagRepository;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class TimelineTraitTest extends TestCase
 {
     private UtmTagRepository&MockObject $repository;

@@ -12,11 +12,12 @@ use Mautic\CampaignBundle\Event\DecisionResultsEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
 use Mautic\CampaignBundle\Executioner\Dispatcher\DecisionDispatcher;
 use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class DecisionDispatcherTest extends TestCase
 {
     private MockObject&EventDispatcherInterface $dispatcher;

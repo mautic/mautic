@@ -7,9 +7,10 @@ namespace Mautic\ApiBundle\Tests;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class EntityResultHelperTest extends TestCase
 {
     public const string NEW_TITLE = 'Callback Title';

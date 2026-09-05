@@ -6,9 +6,10 @@ namespace Mautic\FormBundle\Tests\Helper;
 
 use Mautic\FormBundle\Helper\PropertiesAccessor;
 use Mautic\FormBundle\Model\FormModel;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class PropertiesAccessorTest extends \PHPUnit\Framework\TestCase
 {
     /**

@@ -10,13 +10,14 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\IpLookup\MaxmindCountryLookup;
 use Mautic\CoreBundle\IpLookup\MaxmindOmniLookup;
 use Mautic\CoreBundle\IpLookup\MaxmindPrecisionLookup;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Maxmind requires API key and thus cannot test actual lookup so just make API endpoint works and
  * classes are initiated.
  */
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class MaxmindLookupTest extends \PHPUnit\Framework\TestCase
 {
     private string $cacheDir = __DIR__.'/../../../../../../var/cache/test';

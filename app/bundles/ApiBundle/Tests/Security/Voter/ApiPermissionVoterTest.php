@@ -7,6 +7,7 @@ namespace Mautic\ApiBundle\Tests\Security\Voter;
 use Mautic\ApiBundle\Event\ApiPlatformPermissionContextEvent;
 use Mautic\ApiBundle\Security\Voter\ApiPermissionVoter;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -15,7 +16,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class ApiPermissionVoterTest extends TestCase
 {
     private CorePermissions&MockObject $corePermissionsMock;

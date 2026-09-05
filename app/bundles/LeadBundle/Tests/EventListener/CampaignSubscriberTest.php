@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
@@ -28,13 +29,15 @@ use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Provider\FilterOperatorProvider;
+use Mautic\PointBundle\Entity\GroupContactScoreRepository;
 use Mautic\PointBundle\Model\PointGroupModel;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
@@ -183,8 +186,8 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->createStub(LeadFieldRepository::class),
             $this->createStub(TagRepository::class),
             $this->createStub(\Mautic\CampaignBundle\Entity\LeadRepository::class),
-            $this->createStub(\Mautic\PointBundle\Entity\GroupContactScoreRepository::class),
-            $this->createStub(\Mautic\LeadBundle\Entity\LeadDeviceRepository::class),
+            $this->createStub(GroupContactScoreRepository::class),
+            $this->createStub(LeadDeviceRepository::class),
             $this->mockCompanyLeadRepository
         );
     }

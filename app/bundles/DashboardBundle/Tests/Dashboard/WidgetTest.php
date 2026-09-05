@@ -9,13 +9,14 @@ use Mautic\DashboardBundle\Dashboard\Widget;
 use Mautic\DashboardBundle\Entity\Widget as WidgetEntity;
 use Mautic\DashboardBundle\Model\DashboardModel;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class WidgetTest extends TestCase
 {
     private const int USER_ID = 1;
