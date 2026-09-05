@@ -516,6 +516,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
 
         $params['offset'] ??= 0;
         $query = $params;
+        $executed = (int) $executed;
 
         try {
             if ($this->isAuthorized()) {
