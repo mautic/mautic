@@ -855,6 +855,12 @@ class EmailRepository extends CommonRepository
             $qb->expr()->eq($this->getTableAlias().'.emailType', $qb->expr()->literal('list'))
         );
 
+        // Translation children must not be broadcast independently. They are sent
+        // by the parent's broadcast to the contacts with a matching preferred locale.
+        $expr->add(
+            $qb->expr()->isNull($this->getTableAlias().'.translationParent')
+        );
+
         if (null !== $id && 0 !== $id) {
             $expr->add(
                 $qb->expr()->eq($this->getTableAlias().'.id', (int) $id)
