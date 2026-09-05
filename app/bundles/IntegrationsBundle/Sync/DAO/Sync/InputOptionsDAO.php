@@ -47,6 +47,8 @@ class InputOptionsDAO
      *      'end-datetime' => '2019-09-12T12:01:20' or a DateTimeInterface object, Expecting UTC timezone
      * ].
      *
+     * @param array<string, mixed> $input
+     *
      * @throws InvalidValueException
      */
     public function __construct(array $input)
@@ -118,6 +120,8 @@ class InputOptionsDAO
     }
 
     /**
+     * @param array<string, mixed> $input
+     *
      * @throws InvalidValueException
      */
     private function validateDateTime(array $input, string $optionName): ?\DateTimeInterface
@@ -137,6 +141,8 @@ class InputOptionsDAO
     }
 
     /**
+     * @param array<string, mixed> $input
+     *
      * @throws InvalidValueException
      */
     private function validateObjectIds(array $input, string $optionName): ?ObjectIdsDAO
@@ -157,6 +163,8 @@ class InputOptionsDAO
     /**
      * This method exists only because Mautic leads were renamed to contacts. Users will be able
      * to use the "contact" keywoard and developers "lead" as the integration bundle use "lead" everywhere.
+     *
+     * @param array<string, mixed> $input
      */
     private function fixNaming(array $input): array
     {
@@ -179,6 +187,9 @@ class InputOptionsDAO
         return $input;
     }
 
+    /**
+     * @param array<string, mixed> $input
+     */
     private function validateOptions(array $input): array
     {
         if (is_array($input['options'] ?? null)) {

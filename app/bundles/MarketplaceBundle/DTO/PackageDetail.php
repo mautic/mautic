@@ -22,6 +22,9 @@ final class PackageDetail
     ) {
     }
 
+    /**
+     * @param array<string, mixed> $array
+     */
     public static function fromArray(array $array): self
     {
         $reviews = ReviewCollection::fromArray($array['reviews'] ?? []);

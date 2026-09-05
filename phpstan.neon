@@ -231,6 +231,10 @@ parameters:
         -
             identifier: parameterByRef.type
             path: app/bundles/EmailBundle/Helper/PlainTextHelper.php
+        # useless generics
+        -
+            identifier: argument.templateType
+            path: plugins/MauticSocialBundle/Helper/CampaignEventHelper.php
 
     scanDirectories:
         # the kernel boot reflects these classes, so PHPStan can no longer locate them by autoloading

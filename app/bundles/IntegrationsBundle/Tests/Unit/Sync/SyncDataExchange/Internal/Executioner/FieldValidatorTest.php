@@ -127,7 +127,7 @@ final class FieldValidatorTest extends TestCase
     }
 
     /**
-     * @param mixed[] $parameters
+     * @param array<int|string, mixed> $parameters
      */
     private function getNotificationAssertion(array $parameters, string $message, ObjectChangeDAO $changedObject, string $fieldName, string $type): void
     {

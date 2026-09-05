@@ -14,7 +14,7 @@ class PropertiesAccessor
     }
 
     /**
-     * @param mixed[] $field
+     * @param array<string, mixed> $field
      *
      * @return mixed[]
      */

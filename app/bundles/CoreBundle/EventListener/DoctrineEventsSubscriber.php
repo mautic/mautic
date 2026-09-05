@@ -16,6 +16,9 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 #[AsDoctrineListener(ToolEvents::postGenerateSchema)]
 final class DoctrineEventsSubscriber
 {
+    /**
+     * @var string[]
+     */
     private array $deprecatedEntityTables = [];
 
     public function __construct(

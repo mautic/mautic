@@ -12,6 +12,9 @@ use MauticPlugin\MauticCrmBundle\Integration\HubspotIntegration;
  */
 final class HubspotApi extends CrmApi
 {
+    /**
+     * @var array<string, string>
+     */
     private array $requestSettings = [
         'encode_parameters' => 'json',
     ];
@@ -23,6 +26,9 @@ final class HubspotApi extends CrmApi
         parent::__construct($integration);
     }
 
+    /**
+     * @param array<string, mixed> $parameters
+     */
     private function request(string $operation, array $parameters = [], string $method = 'GET', string $object = 'contacts')
     {
         if ('oauth2' === $this->integration->getAuthenticationType()) {
@@ -74,6 +80,8 @@ final class HubspotApi extends CrmApi
 
     /**
      * Creates Hubspot lead.
+     *
+     * @param array<string, mixed> $data
      *
      * @return mixed
      */

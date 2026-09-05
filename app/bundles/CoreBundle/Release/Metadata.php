@@ -38,6 +38,9 @@ final readonly class Metadata implements \JsonSerializable
 
     private string $minSupportedMariaDbVersion;
 
+    /**
+     * @param array<string, mixed> $metadata
+     */
     public function __construct(array $metadata)
     {
         $this->version                      = $metadata['version'];

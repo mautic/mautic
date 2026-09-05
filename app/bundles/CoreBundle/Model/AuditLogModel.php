@@ -34,7 +34,7 @@ class AuditLogModel extends AbstractCommonModel
     /**
      * Writes an entry to the audit log.
      *
-     * @param array $args [bundle, object, objectId, action, details, ipAddress]
+     * @param array<string, mixed> $args [bundle, object, objectId, action, details, ipAddress]
      */
     public function writeToLog(array $args): void
     {

@@ -28,6 +28,9 @@ use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
 
 class ObjectChangeGenerator
 {
+    /**
+     * @var string[]
+     */
     private array $judgementModes = [
         SyncJudgeInterface::HARD_EVIDENCE_MODE,
         SyncJudgeInterface::BEST_EVIDENCE_MODE,

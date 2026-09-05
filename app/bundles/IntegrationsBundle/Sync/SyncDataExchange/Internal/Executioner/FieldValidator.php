@@ -84,7 +84,7 @@ final class FieldValidator implements FieldValidatorInterface
     }
 
     /**
-     * @param mixed[] $schemaDefinition
+     * @param array<string, mixed> $schemaDefinition
      */
     private function isFieldTypeValid(array $schemaDefinition, NormalizedValueDAO $field): bool
     {

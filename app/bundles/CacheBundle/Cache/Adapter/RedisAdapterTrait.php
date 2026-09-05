@@ -11,7 +11,7 @@ use Predis\Client;
 trait RedisAdapterTrait
 {
     /**
-     * @param mixed[] $servers
+     * @param array<string, mixed> $servers
      */
     private function createClient(array $servers, bool $primaryOnly): Client
     {

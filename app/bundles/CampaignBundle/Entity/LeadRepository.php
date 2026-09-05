@@ -130,6 +130,7 @@ class LeadRepository extends CommonRepository
      * Check Lead in campaign.
      *
      * @param \Mautic\LeadBundle\Entity\Lead $lead
+     * @param array<string, mixed>           $options
      */
     public function checkLeadInCampaigns($lead, array $options = []): bool
     {

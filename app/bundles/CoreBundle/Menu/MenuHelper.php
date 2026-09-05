@@ -257,6 +257,8 @@ final class MenuHelper
     /**
      * Handle access check and other checks for menu items.
      *
+     * @param array<string, mixed> $menuItem
+     *
      * @return bool Returns false if the item fails the access check or any other checks
      */
     private function handleChecks(array $menuItem): bool

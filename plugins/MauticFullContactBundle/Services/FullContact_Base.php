@@ -53,7 +53,7 @@ class FullContact_Base
     }
 
     /**
-     * @param mixed[] $hdr
+     * @param array<string, mixed> $hdr
      */
     private function _update_rate_limit(array $hdr): void
     {
@@ -102,7 +102,8 @@ class FullContact_Base
      * @author  Keith Casey <contrib@caseysoftware.com>
      * @author  David Boskovic <me@david.gs> @dboskovic
      *
-     * @param array $postData
+     * @param array                $postData
+     * @param array<string, mixed> $params
      *
      * @return object
      *

@@ -53,7 +53,7 @@ final class PRedisConnectionHelper
     /**
      * Transform the redis mautic config to an options array consumable by PRedis.
      *
-     * @param array $redisConfiguration mautic's redis configuration
+     * @param array<string, mixed> $redisConfiguration mautic's redis configuration
      */
     public static function makeRedisOptions(array $redisConfiguration, string $prefix = ''): array
     {
@@ -82,8 +82,8 @@ final class PRedisConnectionHelper
     }
 
     /**
-     * @param mixed[] $endpoints
-     * @param mixed[] $inputOptions
+     * @param mixed[]              $endpoints
+     * @param array<string, mixed> $inputOptions
      */
     public static function createClient(array $endpoints, array $inputOptions): Client
     {

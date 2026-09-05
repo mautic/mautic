@@ -132,6 +132,9 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     #[Groups(['campaign:read', 'campaign:write'])]
     private Collection $forms;
 
+    /**
+     * @var array<string, mixed>
+     */
     #[Groups(['campaign:read', 'campaign:write'])]
     private array $canvasSettings = [];
 

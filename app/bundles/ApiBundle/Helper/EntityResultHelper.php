@@ -49,7 +49,7 @@ class EntityResultHelper
     }
 
     /**
-     * @param mixed[] $array
+     * @param non-empty-array<mixed, mixed> $array
      */
     private function getDataForArray(array $array): mixed
     {

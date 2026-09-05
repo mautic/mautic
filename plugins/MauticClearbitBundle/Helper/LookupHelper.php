@@ -166,6 +166,9 @@ final class LookupHelper
         return ($person) ? new Clearbit_Person($keys['apikey']) : new Clearbit_Company($keys['apikey']);
     }
 
+    /**
+     * @return array<int, string|non-empty-array<mixed>>
+     */
     private function getCache(Lead|Company $entity, $notify): array
     {
         $user      = $this->userHelper->getUser();

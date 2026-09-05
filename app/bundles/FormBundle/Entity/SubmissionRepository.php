@@ -276,6 +276,8 @@ class SubmissionRepository extends CommonRepository
     /**
      * Fetch the base submission data from the database.
      *
+     * @param array<string, mixed> $options
+     *
      * @return array
      *
      * @throws \Doctrine\ORM\NoResultException

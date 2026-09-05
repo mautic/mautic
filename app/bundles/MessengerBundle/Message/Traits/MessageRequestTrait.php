@@ -45,7 +45,7 @@ trait MessageRequestTrait
     }
 
     /**
-     * @param mixed[] $data
+     * @param array<string, mixed> $data
      */
     public function __unserialize(array $data): void
     {

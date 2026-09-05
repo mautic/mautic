@@ -78,7 +78,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * Modify the cloned entity prior to sending through editAction.
      *
-     * @return array of arguments for editAction
+     * @return array<int, mixed> of arguments for editAction
      */
     protected function afterEntityClone($newEntity, $entity)
     {
@@ -562,6 +562,8 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
     /**
      * Get items for index list.
+     *
+     * @return array<int, iterable<object>|\Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator<mixed>|int>
      */
     protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = [])
     {
@@ -613,6 +615,8 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
     /**
      * Amend the parameters sent through postActionRedirect.
+     *
+     * @param array<array<string, mixed>, mixed> $args
      */
     protected function getPostActionRedirectArguments(array $args, $action): array
     {
@@ -723,6 +727,8 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
     /**
      * Amend the parameters sent through delegateView.
+     *
+     * @param array<array<string, mixed>, mixed> $args
      */
     protected function getViewArguments(array $args, $action): array
     {
@@ -732,7 +738,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * Return array of options for the form when it's being created.
      *
-     * @return array
+     * @return array<string, mixed>
      */
     protected function getEntityFormOptions()
     {
@@ -767,7 +773,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * @param string $timezone
      *
-     * @return array
+     * @return \DateTime[]
      */
     protected function getViewDateRange(Request $request, $objectId, $returnUrl, $timezone = 'local', &$dateRangeForm = null)
     {

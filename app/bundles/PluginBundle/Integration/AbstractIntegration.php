@@ -99,6 +99,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     protected array $deleteIntegrationEntities  = [];
 
+    /**
+     * @var IntegrationEntity[]|null[]
+     */
     protected array $persistIntegrationEntities = [];
 
     protected array $commandParameters = [];
@@ -274,9 +277,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *  sso_service - SSO using 3rd party service via sso_login and sso_login_check routes
      *  sso_form - SSO using submitted credentials through the login form
      *
-     * @return array
+     * @return string[]
      */
-    public function getSupportedFeatures()
+    public function getSupportedFeatures(): array
     {
         return [];
     }
@@ -291,7 +294,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return array<string, string>
      */
-    public function getSupportedFeatureTooltips()
+    public function getSupportedFeatureTooltips(): array
     {
         return [];
     }
@@ -299,9 +302,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Returns the field the integration needs in order to find the user.
      *
-     * @return mixed
+     * @return string[]
      */
-    public function getIdentifierFields()
+    public function getIdentifierFields(): array
     {
         return [];
     }
@@ -509,7 +512,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Array of keys to mask in the config form.
      *
-     * @return array
+     * @return array<int, string>
      */
     public function getSecretKeys()
     {
@@ -533,7 +536,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Get the keys for the refresh token and expiry.
      *
-     * @return array
+     * @return string[]
      */
     public function getRefreshTokenKeys()
     {
@@ -645,10 +648,10 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Make a basic call using cURL to get the data.
      *
-     * @param string $url
-     * @param array  $parameters
-     * @param string $method
-     * @param array  $settings   Set $settings['return_raw'] to receive a ResponseInterface
+     * @param string               $url
+     * @param array                $parameters
+     * @param string               $method
+     * @param array<string, mixed> $settings   Set $settings['return_raw'] to receive a ResponseInterface
      *
      * @return mixed|string|ResponseInterface
      */
@@ -869,7 +872,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Method to prepare the request parameters. Builds array of headers and parameters.
      *
-     * @return array
+     * @param array<string, mixed> $settings
+     *
+     * @return array<int, mixed>
      */
     public function prepareRequest(string $url, $parameters, string $method, array $settings, $authType)
     {
@@ -1062,8 +1067,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Retrieves and stores tokens returned from oAuthLogin.
      *
-     * @param mixed[] $settings
-     * @param mixed[] $parameters
+     * @param array<string, mixed> $settings
+     * @param mixed[]              $parameters
      *
      * @throws ApiErrorException if OAuth2 state does not match
      */
@@ -1352,7 +1357,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Get a list of available fields from the connecting API.
      *
-     * @param mixed[] $settings
+     * @param array<string, mixed> $settings
      *
      * @return mixed[]
      */
@@ -1369,6 +1374,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
+     * @param array<string, mixed> $mauticLeadFields
+     *
      * @return array
      */
     public function cleanUpFields(Integration $entity, array $mauticLeadFields, array $mauticCompanyFields)
@@ -1762,6 +1769,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Merges a config from integration_list with feature settings.
      *
+     * @param array<string, mixed> $config
+     *
      * @return array|mixed
      */
     public function mergeConfigToFeatureSettings(array $config = [])
@@ -2084,7 +2093,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Get available fields for choices in the config UI.
      *
-     * @param mixed[] $settings
+     * @param array<string, mixed> $settings
      *
      * @return mixed[]
      */
@@ -2099,6 +2108,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * Get available company fields for choices in the config UI.
+     *
+     * @param array<string, mixed> $settings
      *
      * @return array
      */
@@ -2280,8 +2291,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * @param CommonEntity|null $entity
-     * @param bool              $ignoreEntityChanges
+     * @param CommonEntity|null    $entity
+     * @param bool                 $ignoreEntityChanges
+     * @param array<string, mixed> $params
      *
      * @return bool|\DateTime|null
      */
@@ -2327,6 +2339,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      * Function used to format unformated fields coming from FieldsTypeTrait
      * (usually used in campaign actions).
      *
+     * @param array<string, mixed> $fields
+     *
      * @return array
      */
     public function formatMatchedFields(array $fields)
@@ -2371,6 +2385,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * Get pseudo fields from mautic, these are lead properties we want to map to integration fields.
+     *
+     * @param array<string, mixed> $lead
      *
      * @return mixed
      */

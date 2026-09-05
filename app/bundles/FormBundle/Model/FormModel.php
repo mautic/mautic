@@ -482,6 +482,11 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         return $html;
     }
 
+    /**
+     * @param Field[] $fields
+     *
+     * @return array<int, int|string|array<string, array<string|int, int>>|bool>
+     */
     public function getPages(array $fields): array
     {
         $pages = ['open' => [], 'close' => []];
@@ -863,8 +868,9 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * Get a list of assets in a date range.
      *
-     * @param int   $limit
-     * @param array $filters
+     * @param int                  $limit
+     * @param array                $filters
+     * @param array<string, mixed> $options
      */
     public function getFormList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], array $options = []): array
     {

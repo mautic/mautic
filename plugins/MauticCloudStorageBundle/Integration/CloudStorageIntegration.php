@@ -61,7 +61,7 @@ abstract class CloudStorageIntegration extends AbstractIntegration
      */
     abstract public function getPublicUrl($key);
 
-    public function getSupportedFeatures()
+    public function getSupportedFeatures(): array
     {
         return ['cloud_storage'];
     }

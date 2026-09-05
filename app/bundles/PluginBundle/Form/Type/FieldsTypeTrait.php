@@ -254,6 +254,9 @@ trait FieldsTypeTrait
         );
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     protected function buildFieldView(FormView $view, array $options): void
     {
         $view->vars['specialInstructions'] = $options['special_instructions'];

@@ -8,6 +8,9 @@ final class ConstantContactApi extends EmailMarketingApi
 {
     private string $version = 'v2';
 
+    /**
+     * @param array<string, mixed> $query
+     */
     private function request(string $endpoint, array $parameters = [], string $method = 'GET', array $query = [])
     {
         $url = sprintf('https://api.constantcontact.com/%s/%s?api_key=%s', $this->version, $endpoint, $this->keys['client_id']);
@@ -41,7 +44,8 @@ final class ConstantContactApi extends EmailMarketingApi
     }
 
     /**
-     * @param array $fields
+     * @param array                $fields
+     * @param array<string, mixed> $config
      *
      * @return mixed|string
      *

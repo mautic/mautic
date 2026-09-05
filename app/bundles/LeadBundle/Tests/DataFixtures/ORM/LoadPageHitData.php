@@ -85,6 +85,9 @@ final class LoadPageHitData extends Fixture implements OrderedFixtureInterface
         }
     }
 
+    /**
+     * @param array<string, object>|array<string, string>|array<string, int> $hitConfig
+     */
     private function createHit(array $hitConfig, ObjectManager $manager): void
     {
         $hit = new Hit();

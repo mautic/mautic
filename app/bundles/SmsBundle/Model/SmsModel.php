@@ -180,6 +180,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
     /**
      * @param Lead|int|array<Lead>|array<int> $sendTo
      * @param array<int, Lead>                $contacts
+     * @param array<string, mixed>            $options
      */
     public function sendSms(Sms $sms, $sendTo, array $options = [], array &$contacts = []): array
     {
@@ -450,9 +451,10 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
     /**
      * Get line chart data of hits.
      *
-     * @param ?string $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param string  $dateFormat
-     * @param bool    $canViewOthers
+     * @param ?string              $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string               $dateFormat
+     * @param bool                 $canViewOthers
+     * @param array<string, mixed> $filter
      */
     public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], $canViewOthers = true): array
     {

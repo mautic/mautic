@@ -258,6 +258,11 @@ class Mailbox
         $this->imapFullPath = $paths['full'];
     }
 
+    /**
+     * @param array<string, mixed> $settings
+     *
+     * @return array<string, string>
+     */
     public function getImapPath(array $settings): array
     {
         $settings['encryption'] ??= (!empty($settings['ssl'])) ? '/ssl' : '';

@@ -46,8 +46,8 @@ final class BulkNotificationTest extends TestCase
     }
 
     /**
-     * @param mixed[] $data
-     * @param mixed[] $notification
+     * @param \DateTime[]|User[]|string[] $data
+     * @param array<int, mixed>           $notification
      */
     private function assertNotification(array $data, array $notification, ?\DateTime $deduplicateDateTimeFrom): void
     {

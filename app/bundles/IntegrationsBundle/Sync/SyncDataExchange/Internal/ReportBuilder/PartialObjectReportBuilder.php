@@ -82,6 +82,8 @@ class PartialObjectReportBuilder
     }
 
     /**
+     * @param array<string, mixed> $fieldChange
+     *
      * @throws ObjectNotFoundException
      */
     private function processFieldChange(array $fieldChange, RequestObjectDAO $objectDAO): void

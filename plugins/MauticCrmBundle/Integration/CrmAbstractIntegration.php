@@ -40,9 +40,9 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @return array
+     * @return string[]
      */
-    public function getSupportedFeatures()
+    public function getSupportedFeatures(): array
     {
         return ['push_lead', 'get_leads'];
     }
@@ -454,6 +454,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
+     * @param array<string, mixed> $settings
+     *
      * @return array|mixed
      */
     protected function getFormFieldsByObject($object, array $settings = [])
@@ -492,7 +494,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @param string $priorityObject
+     * @param string               $priorityObject
+     * @param array<string, mixed> $config
      *
      * @return array
      */
@@ -503,6 +506,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
     /**
      * @param string[]|string|null $objects
+     * @param array<string, mixed> $fieldsToUpdate
      *
      * @return array
      */
@@ -520,7 +524,9 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @return array
+     * @param array<string, mixed> $params
+     *
+     * @return array<int, string|null>
      */
     protected function getSyncTimeframeDates(array $params)
     {
@@ -532,6 +538,9 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         return [$fromDate, $toDate];
     }
 
+    /**
+     * @param array<string, mixed> $integrationData
+     */
     public function getBlankFieldsToUpdateInMautic(array $matchedFields, array $leadFieldValues, $objectFields, array $integrationData, $object = 'Lead')
     {
         foreach ($objectFields as $integrationField => $mauticField) {
@@ -543,6 +552,10 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         return $matchedFields;
     }
 
+    /**
+     * @param array<string, mixed> $objectFields
+     * @param array<string, mixed> $config
+     */
     public function getBlankFieldsToUpdate(array $fields, $sfRecord, array $objectFields, array $config)
     {
         // check if update blank fields is selected
@@ -589,6 +602,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
+     * @param array<string, mixed> $matchedFields
+     *
      * @return array
      */
     private function hydrateCompanyName(array $matchedFields)

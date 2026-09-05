@@ -16,7 +16,9 @@ final class DynamicsApi extends CrmApi
     }
 
     /**
-     * @param string $moduleobject
+     * @param string                                               $moduleobject
+     * @param array<string, mixed>                                 $parameters
+     * @param array<string, string|array<string|int, string|bool>> $settings
      *
      * @return array|ResponseInterface
      *
@@ -76,8 +78,10 @@ final class DynamicsApi extends CrmApi
 
         $operation  = sprintf('EntityDefinitions(LogicalName=\'%s\')/Attributes', $logicalName);
         $parameters = [
-            '$filter' => 'Microsoft.Dynamics.CRM.NotIn(PropertyName=\'AttributeTypeName\',PropertyValues=["Virtual", "Uniqueidentifier", "Picklist", "Lookup", "Owner", "Customer"]) and IsValidForUpdate eq true and AttributeOf eq null and LogicalName ne \'parentcustomerid\'', // ignore system fields
-            '$select' => 'RequiredLevel,LogicalName,DisplayName,AttributeTypeName', // select only miningful columns
+            // ignore system fields
+            '$filter' => 'Microsoft.Dynamics.CRM.NotIn(PropertyName=\'AttributeTypeName\',PropertyValues=["Virtual", "Uniqueidentifier", "Picklist", "Lookup", "Owner", "Customer"]) and IsValidForUpdate eq true and AttributeOf eq null and LogicalName ne \'parentcustomerid\'',
+            // select only miningful columns
+            '$select' => 'RequiredLevel,LogicalName,DisplayName,AttributeTypeName',
         ];
 
         return $this->request($operation, $parameters, 'GET', $object);

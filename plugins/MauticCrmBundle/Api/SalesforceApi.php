@@ -96,6 +96,8 @@ final class SalesforceApi extends CrmApi
     }
 
     /**
+     * @param array<string, mixed> $data
+     *
      * @throws ApiErrorException
      */
     public function getPerson(array $data): array
@@ -138,6 +140,8 @@ final class SalesforceApi extends CrmApi
     }
 
     /**
+     * @param array<string, mixed> $data
+     *
      * @throws ApiErrorException
      */
     public function getCompany(array $data): array
@@ -178,6 +182,8 @@ final class SalesforceApi extends CrmApi
     }
 
     /**
+     * @param array<string, mixed> $data
+     *
      * @return array|mixed|string
      *
      * @throws ApiErrorException
@@ -192,6 +198,8 @@ final class SalesforceApi extends CrmApi
     }
 
     /**
+     * @param non-empty-array<string, mixed> $data
+     *
      * @return mixed|string
      *
      * @throws ApiErrorException
@@ -226,6 +234,8 @@ final class SalesforceApi extends CrmApi
     }
 
     /**
+     * @param array<array<string, mixed>, mixed> $data
+     *
      * @return mixed|string
      *
      * @throws ApiErrorException
@@ -544,6 +554,8 @@ final class SalesforceApi extends CrmApi
     }
 
     /**
+     * @param non-empty-array<mixed, mixed> $error
+     *
      * @throws ApiErrorException
      * @throws RetryRequestException
      */

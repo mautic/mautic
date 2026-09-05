@@ -99,6 +99,9 @@ final class MaxMindDoNotSellPurgeCommand extends Command
         }
     }
 
+    /**
+     * @param string[] $ips
+     */
     private function findContactsFromIPs(array $ips): array
     {
         $in  = "'".implode("','", $ips)."'";
