@@ -9,7 +9,7 @@ return RectorConfig::configure()
     ->withPaths([
         __DIR__.'/app',
         __DIR__.'/plugins',
-        __DIR__.'/utils',
+        // __DIR__.'/utils',
     ])
     ->withPreparedSets(
         deadCode: true,
