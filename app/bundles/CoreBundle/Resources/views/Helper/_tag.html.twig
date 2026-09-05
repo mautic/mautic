@@ -41,7 +41,6 @@
         {% set label_tooltip = translated_label|striptags %}
     {% endif %}
 
-    {# Wrapper element switching logic #}
     {% set wrapper_tag = attributes.href is defined ? 'a' : 'div' %}
     <{{ wrapper_tag }} id="{{ id }}" class="{{ classes|join(' ') }}" aria-label="{{ translated_label|striptags }}" size="{{ size }}"
         {% if wrapper_tag == 'a' %} href="{{ attributes.href }}" {% endif %}
