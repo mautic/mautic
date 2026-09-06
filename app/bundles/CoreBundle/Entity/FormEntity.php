@@ -426,10 +426,7 @@ class FormEntity extends CommonEntity
         return $status;
     }
 
-    /**
-     * @return bool
-     */
-    public function isNew()
+    public function isNew(): bool
     {
         if ($this->new) {
             return true;

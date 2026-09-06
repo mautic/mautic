@@ -14,14 +14,12 @@ final class TriggerEvent extends CommonEvent
      */
     protected $entity;
 
-    /**
-     * @param bool $isNew
-     */
     public function __construct(
         Trigger &$trigger,
-        protected $isNew = false,
+        bool $isNew = false,
     ) {
         $this->entity = &$trigger;
+        $this->isNew = $isNew;
     }
 
     /**

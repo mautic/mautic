@@ -14,12 +14,9 @@ class WebhookEvent extends CommonEvent
      */
     protected $entity;
 
-    /**
-     * @param bool $isNew
-     */
     public function __construct(
         Webhook $webhook,
-        protected $isNew = false,
+        protected bool $isNew = false,
         private string $reason = '',
     ) {
         $this->entity = $webhook;

@@ -9,10 +9,7 @@ use MauticPlugin\MauticFocusBundle\Entity\Focus;
 
 final class FocusEvent extends CommonEvent
 {
-    /**
-     * @param bool|false $isNew
-     */
-    public function __construct(Focus $focus, $isNew = false)
+    public function __construct(Focus $focus, bool $isNew = false)
     {
         $this->entity = $focus;
         $this->isNew  = $isNew;

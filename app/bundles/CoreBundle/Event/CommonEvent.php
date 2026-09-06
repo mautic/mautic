@@ -18,10 +18,7 @@ class CommonEvent extends Event
      */
     protected $entity;
 
-    /**
-     * @var bool
-     */
-    protected $isNew = true;
+    protected bool $isNew = true;
 
     /**
      * @var bool|array
@@ -45,10 +42,8 @@ class CommonEvent extends Event
 
     /**
      * Returns if a saved lead is new or not.
-     *
-     * @return bool
      */
-    public function isNew()
+    public function isNew(): bool
     {
         return $this->isNew;
     }
