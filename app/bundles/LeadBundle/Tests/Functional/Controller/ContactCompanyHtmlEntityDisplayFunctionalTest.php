@@ -67,7 +67,7 @@ final class ContactCompanyHtmlEntityDisplayFunctionalTest extends MauticMysqlTes
             $detailCrawler->filter('.page-header-title, .panel-companies')->text(),
             $companyName
         );
-        $this->assertSame(0, $companiesPanel->filter('.contained-list')->count());
+        $this->assertCount(0, $companiesPanel->filter('.contained-list'));
         $this->assertGreaterThan(0, $companiesPanel->filter('.label')->count());
         $this->assertStringContainsString('ri-building-line', $companiesPanel->html());
 
