@@ -28,11 +28,26 @@ return ECSConfig::configure()
         PhpCsFixer\Fixer\Whitespace\MethodChainingIndentationFixer::class,
         Symplify\CodingStandard\Fixer\Spacing\MethodChainingNewlineFixer::class,
         PhpCsFixer\Fixer\ControlStructure\YodaStyleFixer::class,
+
+        // templates rely on alternative syntax (endforeach, endif), keep it as-is
+        PhpCsFixer\Fixer\ControlStructure\NoAlternativeSyntaxFixer::class,
+        PhpCsFixer\Fixer\Phpdoc\PhpdocToCommentFixer::class,
+
+        // conflicts with Utils/no_blank_line_between_imports, which keeps imports in one block
+        PhpCsFixer\Fixer\Whitespace\BlankLineBetweenImportGroupsFixer::class,
     ])
-//    ->withRules([
-//        Symplify\CodingStandard\Fixer\Spacing\StandaloneLinePromotedPropertyFixer::class,
-//        Symplify\CodingStandard\Fixer\Spacing\StandaloneLineSymfonyAttributeParamFixer::class,
-//    ])
+    ->withConfiguredRule(PhpCsFixer\Fixer\Phpdoc\NoSuperfluousPhpdocTagsFixer::class, [
+        'allow_mixed' => true,
+    ])
+    ->withConfiguredRule(PhpCsFixer\Fixer\Operator\NewWithParenthesesFixer::class, [
+        'anonymous_class' => true,
+    ])
+    ->withRules([
+        PhpCsFixer\Fixer\Semicolon\MultilineWhitespaceBeforeSemicolonsFixer::class,
+        PhpCsFixer\Fixer\FunctionNotation\NullableTypeDeclarationForDefaultNullValueFixer::class,
+        Utils\ECS\Fixer\NoBlankLineBetweenImportsFixer::class,
+    ])
+    ->withPhpCsFixerSets(symfony: true)
     ->withPreparedSets(
         comments: true,
         docblocks: true,

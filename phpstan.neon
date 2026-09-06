@@ -32,6 +32,8 @@ parameters:
         - plugins/*/vendor/*
         - */Fixture/*
         - */Source/*
+        # custom ECS fixer relies on php-cs-fixer classes bundled inside easy-coding-standard, not resolvable as a root dependency
+        - utils/ecs/*
         # @todo handle once the other PRs are merged
         - app/bundles/CoreBundle/Controller/AbstractStandardFormController.php
     dynamicConstantNames:

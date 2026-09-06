@@ -3,12 +3,10 @@
 declare(strict_types=1);
 
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-
-use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
-
 use Utils\PHPStan\Tests\Rule\Fixture\ServiceNameBundle\ModelNameService;
 use Utils\PHPStan\Tests\Rule\Fixture\ServiceNameBundle\UnusedNameService;
 use Utils\PHPStan\Tests\Rule\Fixture\ServiceNameBundle\UsedNameService;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 return function (ContainerConfigurator $configurator): void {
     $parameters = $configurator->parameters();

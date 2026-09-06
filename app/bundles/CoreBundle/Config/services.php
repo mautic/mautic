@@ -4,11 +4,9 @@ declare(strict_types=1);
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Mautic\CoreBundle\Menu\MenuRenderer;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-
+use Twig\Extra\String\StringExtension;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\param;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
-
-use Twig\Extra\String\StringExtension;
 
 return function (ContainerConfigurator $configurator): void {
     $parameters = $configurator->parameters();

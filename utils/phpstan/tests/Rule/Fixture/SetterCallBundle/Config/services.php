@@ -3,11 +3,9 @@
 declare(strict_types=1);
 
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-
-use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
-
 use Utils\PHPStan\Tests\Rule\Fixture\SetterCallBundle\Repository;
 use Utils\PHPStan\Tests\Rule\Fixture\SetterCallBundle\SomeService;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 return function (ContainerConfigurator $configurator): void {
     $services = $configurator->services();
