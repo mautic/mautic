@@ -74,6 +74,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
      * @var string|null
      */
     #[Groups(['campaign:read', 'campaign:write'])]
+    #[Assert\NotBlank(message: 'mautic.core.name.required')]
     private $name;
 
     /**
@@ -218,13 +219,6 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $metadata->addPropertyConstraint(
-            'name',
-            new Assert\NotBlank(
-                message: 'mautic.core.name.required'
-            )
-        );
-
         $metadata->addConstraint(new NoOrphanEvents());
     }
 
@@ -645,7 +639,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
             fn ($id): bool => !in_array($id, ['lists', 'forms'])
         );
 
-        if (empty($eventIds)) {
+        if ([] === $eventIds) {
             return false;
         }
 

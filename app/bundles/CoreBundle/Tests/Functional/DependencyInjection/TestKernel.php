@@ -28,12 +28,12 @@ final class TestKernel extends \AppTestKernel
 
     public function boot(): void
     {
-        $exceptionHandlerBeforeBoot = self::currentExceptionHandler();
+        $exceptionHandlerBeforeBoot = $this->currentExceptionHandler();
 
         parent::boot();
 
         // the Symfony ErrorHandler registers itself on boot and never restores the previous handler, what PHPUnit reports as a risky test
-        if (self::currentExceptionHandler() !== $exceptionHandlerBeforeBoot) {
+        if ($this->currentExceptionHandler() !== $exceptionHandlerBeforeBoot) {
             restore_exception_handler();
         }
 
@@ -44,7 +44,7 @@ final class TestKernel extends \AppTestKernel
         }
     }
 
-    private static function currentExceptionHandler(): ?callable
+    private function currentExceptionHandler(): ?callable
     {
         $exceptionHandler = set_exception_handler(null);
         restore_exception_handler();

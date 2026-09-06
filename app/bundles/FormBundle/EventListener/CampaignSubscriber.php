@@ -24,8 +24,8 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         private FormModel $formModel,
         private RealTimeExecutioner $realTimeExecutioner,
         private FormFieldHelper $formFieldHelper,
-        private readonly FormRepository $formRepository,
-        private readonly SubmissionRepository $submissionRepository,
+        private FormRepository $formRepository,
+        private SubmissionRepository $submissionRepository,
     ) {
     }
 

@@ -7,15 +7,19 @@ use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
+use MauticPlugin\MauticFocusBundle\Helper\FocusSearchScopeProvider;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
 final class FocusController extends AbstractStandardFormController
 {
+    /**
+     * @var list<array{command: string, label: string, suffix?: string, default?: bool, translate?: bool}>|null
+     */
+    private ?array $indexSearchScopes = null;
+
     private CacheProviderTagAwareInterface $cacheProvider;
 
     private FocusModel $focusModel;
@@ -46,17 +50,17 @@ final class FocusController extends AbstractStandardFormController
     /**
      * @param int $page
      */
-    public function indexAction(Request $request, $page = 1): Response
+    public function indexAction(Request $request, FocusSearchScopeProvider $focusSearchScopeProvider, $page = 1): Response
     {
+        $this->indexSearchScopes = $focusSearchScopeProvider->getScopes();
+
         return parent::indexStandard($request, $page);
     }
 
     /**
      * Generates new form and processes post data.
-     *
-     * @return JsonResponse|Response
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request): Response
     {
         return parent::newStandard($request);
     }
@@ -74,10 +78,8 @@ final class FocusController extends AbstractStandardFormController
 
     /**
      * Displays details on a Focus.
-     *
-     * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(Request $request, $objectId): Response
     {
         return parent::viewStandard($request, $objectId, 'focus', 'focus');
     }
@@ -86,10 +88,8 @@ final class FocusController extends AbstractStandardFormController
      * Clone an entity.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
-    public function cloneAction(Request $request, $objectId)
+    public function cloneAction(Request $request, $objectId): Response
     {
         return parent::cloneStandard($request, $objectId);
     }
@@ -98,20 +98,16 @@ final class FocusController extends AbstractStandardFormController
      * Deletes the entity.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse|RedirectResponse
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         return parent::deleteStandard($request, $objectId);
     }
 
     /**
      * Deletes a group of entities.
-     *
-     * @return JsonResponse|RedirectResponse
      */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): Response
     {
         return parent::batchDeleteStandard($request);
     }
@@ -122,6 +118,11 @@ final class FocusController extends AbstractStandardFormController
     public function getViewArguments(array $args, $action): array
     {
         $cacheTimeout = (int) $this->coreParametersHelper->get('cached_data_timeout');
+
+        if ('index' === $action && null !== $this->indexSearchScopes) {
+            $args['viewParameters']['searchScopes'] = $this->indexSearchScopes;
+            $this->indexSearchScopes                = null;
+        }
 
         if ('view' == $action) {
             /** @var Focus $item */

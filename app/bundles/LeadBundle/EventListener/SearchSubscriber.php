@@ -88,7 +88,6 @@ final class SearchSubscriber implements EventSubscriberInterface
                 ]);
 
             $this->addGlobalSearchResults(
-                $this->twig,
                 $event,
                 $results,
                 'mautic.lead.leads',
@@ -105,7 +104,7 @@ final class SearchSubscriber implements EventSubscriberInterface
             '@MauticLead/SubscribedEvents/Search/global_segment.html.twig'
         );
 
-        if (!empty($results)) {
+        if ([] !== $results) {
             $event->addResults('mautic.segment.segment', $results);
         }
     }
@@ -133,7 +132,6 @@ final class SearchSubscriber implements EventSubscriberInterface
                 ]);
 
             $this->addGlobalSearchResults(
-                $this->twig,
                 $event,
                 $results,
                 'mautic.company.company',
@@ -527,7 +525,6 @@ final class SearchSubscriber implements EventSubscriberInterface
      * @param array<string, mixed> $templateParameters
      */
     private function addGlobalSearchResults(
-        Environment $twig,
         GlobalSearchEvent $event,
         array $results,
         string $resultKey,
@@ -541,12 +538,12 @@ final class SearchSubscriber implements EventSubscriberInterface
         }
 
         $renderedResults = array_map(
-            fn ($item): string => $twig->render($template, array_merge(['item' => $item], $templateParameters)),
+            fn ($item): string => $this->twig->render($template, array_merge(['item' => $item], $templateParameters)),
             $results['results']
         );
 
         if ($count > GlobalSearchEvent::RESULTS_LIMIT) {
-            $renderedResults[] = $twig->render($template, [
+            $renderedResults[] = $this->twig->render($template, [
                 'showMore'     => true,
                 'searchString' => $event->getSearchString(),
                 'remaining'    => $count - GlobalSearchEvent::RESULTS_LIMIT,

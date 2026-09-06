@@ -63,7 +63,7 @@ final class FieldValidationHelper
         $hasMissingFields  = false;
         $errorsOnGivenPage = false;
 
-        if (!empty($missingFields)) {
+        if ([] !== $missingFields) {
             $hasMissingFields = true;
         }
 
@@ -113,7 +113,7 @@ final class FieldValidationHelper
     private function validateMauticRequiredFields(FormInterface $fieldMappingsForm, string $object, array $objectFieldMappings): void
     {
         $missingFields = $this->findMissingInternalRequiredFieldMappings($object, $objectFieldMappings);
-        if (empty($missingFields)) {
+        if ([] === $missingFields) {
             return;
         }
 

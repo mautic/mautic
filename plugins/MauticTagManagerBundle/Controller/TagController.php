@@ -12,6 +12,7 @@ use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\TagModel;
 use MauticPlugin\MauticTagManagerBundle\Entity\TagRepository;
 use MauticPlugin\MauticTagManagerBundle\Form\Type\TagMergeType;
+use MauticPlugin\MauticTagManagerBundle\Helper\TagSearchScopeProvider;
 use MauticPlugin\MauticTagManagerBundle\Model\TagModel as TagManagerModel;
 use MauticPlugin\MauticTagManagerBundle\Stats\TagDependencies;
 use Symfony\Component\Form\FormInterface;
@@ -53,7 +54,7 @@ final class TagController extends FormController
      *
      * @param int $page
      */
-    public function indexAction(Request $request, $page = 1): Response
+    public function indexAction(Request $request, TagSearchScopeProvider $tagSearchScopeProvider, $page = 1): Response
     {
         // Use overwritten tag model so overwritten repository can be fetched,
         // we need it to define table alias so we can define sort order.
@@ -132,18 +133,19 @@ final class TagController extends FormController
         $session->set('mautic.tagmanager.page', $page);
 
         $tagIds    = array_map(fn (Tag $tag) => $tag->getId(), iterator_to_array($items->getIterator()));
-        $tagsCount = (!empty($tagIds)) ? $this->tagRepository->countByLeads($tagIds) : [];
+        $tagsCount = ([] !== $tagIds) ? $this->tagRepository->countByLeads($tagIds) : [];
 
         $parameters = [
-            'items'       => $items,
-            'tagsCount'   => $tagsCount,
-            'page'        => $page,
-            'limit'       => $limit,
-            'permissions' => $permissions,
-            'security'    => $this->security,
-            'tmpl'        => $tmpl,
-            'currentUser' => $this->user,
-            'searchValue' => $search,
+            'items'           => $items,
+            'tagsCount'       => $tagsCount,
+            'page'            => $page,
+            'limit'           => $limit,
+            'permissions'     => $permissions,
+            'security'        => $this->security,
+            'tmpl'            => $tmpl,
+            'currentUser'     => $this->user,
+            'searchValue'     => $search,
+            'searchScopes'    => $tagSearchScopeProvider->getScopes(),
         ];
 
         return $this->delegateView([
@@ -177,7 +179,7 @@ final class TagController extends FormController
         // get the user form factory
         $form = $this->tagManagerModel->createForm($tag, $this->formFactory, $action);
 
-        $response = $this->handleNewActionPost($request, $tagDependencies, $tag, $this->tagManagerModel, $form, $returnUrl, $page);
+        $response = $this->handleNewActionPost($request, $tagDependencies, $tag, $form, $returnUrl, $page);
         if (null === $response) {
             $response = $this->delegateView([
                 'viewParameters' => [
@@ -196,7 +198,7 @@ final class TagController extends FormController
         return $response;
     }
 
-    private function handleNewActionPost(Request $request, TagDependencies $tagDependencies, \MauticPlugin\MauticTagManagerBundle\Entity\Tag $tag, TagManagerModel $model, FormInterface $form, string $returnUrl, int $page): ?Response
+    private function handleNewActionPost(Request $request, TagDependencies $tagDependencies, \MauticPlugin\MauticTagManagerBundle\Entity\Tag $tag, FormInterface $form, string $returnUrl, int $page): ?Response
     {
         if (Request::METHOD_POST !== $request->getMethod()) {
             return null;
@@ -218,7 +220,7 @@ final class TagController extends FormController
                         ]),
                     ]);
                 } else {
-                    $model->saveEntity($tag);
+                    $this->tagManagerModel->saveEntity($tag);
 
                     $this->addFlashMessage('mautic.core.notice.created', [
                         '%name%'      => $tag->getTag(),
@@ -796,7 +798,7 @@ final class TagController extends FormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 try {
                     $entities = $this->leadTagModel->deleteEntities($deleteIds);
                 } catch (ForeignKeyConstraintViolationException) {

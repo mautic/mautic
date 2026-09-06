@@ -26,7 +26,7 @@ final class BatchIdToEntityHelper
 
     public function hasIds(): bool
     {
-        return !empty($this->ids);
+        return [] !== $this->ids;
     }
 
     public function getIds(): array
@@ -36,7 +36,7 @@ final class BatchIdToEntityHelper
 
     public function hasErrors(): bool
     {
-        return !empty($this->errors);
+        return [] !== $this->errors;
     }
 
     public function getErrors(): array
@@ -155,7 +155,7 @@ final class BatchIdToEntityHelper
 
     private function isAssociativeArray(array $array): bool
     {
-        if (empty($array)) {
+        if ([] === $array) {
             return false;
         }
         $firstKey = array_key_first($array);

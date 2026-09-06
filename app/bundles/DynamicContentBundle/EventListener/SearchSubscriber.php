@@ -35,7 +35,7 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
             '@MauticDynamicContent/SubscribedEvents/Search/global.html.twig'
         );
 
-        if (!empty($results)) {
+        if ([] !== $results) {
             $event->addResults('mautic.dynamicContent.dynamicContent', $results);
         }
     }

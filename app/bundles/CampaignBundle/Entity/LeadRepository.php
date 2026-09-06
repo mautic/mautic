@@ -109,7 +109,7 @@ class LeadRepository extends CommonRepository
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = '.(int) $fromLeadId);
 
-        if (!empty($campaigns)) {
+        if ([] !== $campaigns) {
             $q->andWhere(
                 $q->expr()->notIn('campaign_id', ':ids')
             )

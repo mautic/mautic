@@ -306,6 +306,9 @@ return function (ContainerConfigurator $configurator): void {
         ->autowire()
         ->tag('twig.extension', ['priority' => 100]);
 
+    $services->get(Mautic\CoreBundle\Twig\Extension\FormExtension::class)
+        ->arg('$formRenderer', \Symfony\Component\DependencyInjection\Loader\Configurator\service('twig.form.renderer'));
+
     $services->set('mautic.http.client', GuzzleHttp\Client::class)->autowire();
     $services->set(Mautic\CoreBundle\Doctrine\MigrationFactoryDecorator::class)->autowire();
 

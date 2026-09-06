@@ -139,7 +139,7 @@ final class DoctrineStep implements StepInterface
      */
     public static function getDriverKeys(): array
     {
-        return array_keys(static::getDrivers());
+        return array_keys(self::getDrivers());
     }
 
     /**

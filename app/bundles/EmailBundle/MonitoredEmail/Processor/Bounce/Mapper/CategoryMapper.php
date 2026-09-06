@@ -37,11 +37,11 @@ final class CategoryMapper
      */
     public static function map($category): CategoryObject
     {
-        if (!isset(static::$mappings[$category])) {
+        if (!isset(self::$mappings[$category])) {
             throw new CategoryNotFound();
         }
 
-        $mapping = static::$mappings[$category];
+        $mapping = self::$mappings[$category];
 
         return new CategoryObject($category, $mapping['bounce_type'], $mapping['permanent']);
     }

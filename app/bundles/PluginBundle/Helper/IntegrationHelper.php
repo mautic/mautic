@@ -207,7 +207,7 @@ class IntegrationHelper
             }
 
             // Save newly found integrations
-            if (!empty($newIntegrations)) {
+            if ([] !== $newIntegrations) {
                 $this->integrationRepository->saveEntities($newIntegrations);
                 unset($newIntegrations);
             }

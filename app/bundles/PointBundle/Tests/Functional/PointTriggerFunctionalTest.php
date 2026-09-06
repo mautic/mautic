@@ -67,7 +67,6 @@ final class PointTriggerFunctionalTest extends MauticMysqlTestCase
         $lead = $model->getEntity($lead->getId());
         $this->assertInstanceOf(Lead::class, $lead);
         $pointGroupModel->adjustPoints($lead, $groupA, 5);
-        $this->assertInstanceOf(Lead::class, $lead);
         $lead = $model->getEntity($lead->getId());
         $this->assertInstanceOf(Lead::class, $lead);
 
@@ -147,7 +146,6 @@ final class PointTriggerFunctionalTest extends MauticMysqlTestCase
         $this->assertInstanceOf(Lead::class, $lead);
 
         $this->assertFalse($this->leadHasTag($lead, 'tagC'));
-        $this->assertInstanceOf(Lead::class, $lead);
         $this->assertFalse($this->leadHasTag($lead, 'tagB'));
         $this->assertTrue($this->leadHasTag($lead, 'tagA'));
     }

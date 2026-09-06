@@ -8,7 +8,6 @@ use Mautic\CampaignBundle\Form\Type\EventType;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -66,11 +65,10 @@ final class EventController extends CommonFormController
         $valid   = $cancelled   = false;
         $this->setCampaignElements($request->request);
         if ('1' === $request->request->get('submit')) {
-            $event                = $request->request->all()['campaignevent'] ?? [];
-            $type                 = $event['type'];
-            $eventType            = $event['eventType'];
-            $campaignId           = $event['campaignId'];
-            $event['triggerDate'] = (!empty($event['triggerDate'])) ? (new DateTimeHelper($event['triggerDate']))->getDateTime() : null;
+            $event      = $request->request->all()['campaignevent'] ?? [];
+            $type       = $event['type'];
+            $eventType  = $event['eventType'];
+            $campaignId = $event['campaignId'];
         } else {
             $type       = $request->query->get('type');
             $eventType  = $request->query->get('eventType');
@@ -362,7 +360,7 @@ final class EventController extends CommonFormController
             $this->throwAccessDenied();
         }
 
-        $event = (array_key_exists($objectId, $modifiedEvents)) ? $modifiedEvents[$objectId] : null;
+        $event = $modifiedEvents[$objectId] ?? null;
 
         if ('POST' === $request->getMethod() && null !== $event) {
             $events = $this->eventCollector->getEventsArray();
@@ -424,7 +422,7 @@ final class EventController extends CommonFormController
             $this->throwAccessDenied();
         }
 
-        $event = (array_key_exists($objectId, $modifiedEvents)) ? $modifiedEvents[$objectId] : null;
+        $event = $modifiedEvents[$objectId] ?? null;
 
         if ('POST' === $request->getMethod() && null !== $event) {
             $events = $this->eventCollector->getEventsArray();
@@ -491,7 +489,7 @@ final class EventController extends CommonFormController
             $this->throwAccessDenied();
         }
 
-        $event = (array_key_exists($objectId, $modifiedEvents)) ? $modifiedEvents[$objectId] : null;
+        $event = $modifiedEvents[$objectId] ?? null;
 
         if ('POST' === $request->getMethod() && null !== $event) {
             $keyId          = 'new'.hash('sha1', uniqid((string) mt_rand()));

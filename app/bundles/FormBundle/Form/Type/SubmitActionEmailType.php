@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\ToBcBccFieldsTrait;
@@ -123,7 +125,7 @@ final class SubmitActionEmailType extends AbstractType
             ]
         );
 
-        $this->addToBcBccFields($builder);
+        $this->addToBcBccFields($builder, true);
     }
 
     public function getBlockPrefix(): string

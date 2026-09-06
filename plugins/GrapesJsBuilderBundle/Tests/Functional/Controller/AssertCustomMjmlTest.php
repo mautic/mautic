@@ -66,7 +66,7 @@ final class AssertCustomMjmlTest extends MauticMysqlTestCase
         /** @var GrapesJsBuilderRepository $repository */
         $repository = $this->em->getRepository(GrapesJsBuilder::class);
 
-        $repository->setTranslator($this->getTranslatorMock());
+        $repository->autowireCommonRepository($this->getTranslatorMock());
 
         return $repository;
     }

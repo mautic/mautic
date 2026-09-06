@@ -12,6 +12,7 @@ use Mautic\AssetBundle\Entity\DownloadRepository;
 use Mautic\AssetBundle\Event\AssetEvent;
 use Mautic\AssetBundle\Event\AssetLoadEvent;
 use Mautic\AssetBundle\Form\Type\AssetType;
+use Mautic\CategoryBundle\Entity\CategoryRepository;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -72,6 +73,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         private readonly EmailRepository $emailRepository,
         private readonly AssetRepository $assetRepository,
         private readonly DownloadRepository $downloadRepository,
+        private readonly CategoryRepository $categoryRepository,
     ) {
         $this->maxAssetSize           = $coreParametersHelper->get('max_size');
 
@@ -240,6 +242,14 @@ class AssetModel extends FormModel implements GlobalSearchInterface
 
         $download->setTrackingId($trackingId);
 
+        // Skip persisting download record when there is no tracking context
+        // (e.g. programmatic/API requests without a browser session).
+        if (null === $trackingId && empty($systemEntry)) {
+            $this->getRepository()->upDownloadCount($asset->getId(), 1, true);
+
+            return;
+        }
+
         if (empty($systemEntry)) {
             $download->setAsset($asset);
 
@@ -395,7 +405,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
                 $results = $this->assetRepository->getAssetList($filter, $limit, 0, $viewOther);
                 break;
             case 'category':
-                $results = $this->categoryModel->getRepository()->getCategoryList($filter, $limit, 0);
+                $results = $this->categoryRepository->getCategoryList($filter, $limit, 0);
                 break;
         }
 
@@ -417,7 +427,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         $referenceType = ($absolute) ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH;
         $url           = $this->router->generate('mautic_asset_download', $routeParams, $referenceType);
 
-        if (empty($clickthrough)) {
+        if ([] === $clickthrough) {
             return $url;
         }
 
@@ -468,7 +478,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
             $assets = [$assets];
         }
 
-        if (empty($assets)) {
+        if ([] === $assets) {
             return 0;
         }
 
@@ -632,7 +642,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
 
         [$id] = array_pad(explode(':', $slug, 2), 1, null);
 
-        if (empty($id) || !ctype_digit((string) $id)) {
+        if (empty($id) || !ctype_digit($id)) {
             return false;
         }
 

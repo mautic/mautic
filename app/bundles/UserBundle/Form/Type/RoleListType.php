@@ -2,7 +2,7 @@
 
 namespace Mautic\UserBundle\Form\Type;
 
-use Mautic\UserBundle\Model\RoleModel;
+use Mautic\UserBundle\Entity\RoleRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -13,7 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 final class RoleListType extends AbstractType
 {
     public function __construct(
-        private readonly RoleModel $roleModel,
+        private readonly RoleRepository $roleRepository,
     ) {
     }
 
@@ -38,7 +38,7 @@ final class RoleListType extends AbstractType
     private function getRoleChoices(): array
     {
         $choices = [];
-        $roles   = $this->roleModel->getRepository()->getEntities(
+        $roles   = $this->roleRepository->getEntities(
             [
                 'filter' => [
                     'force' => [

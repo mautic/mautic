@@ -14,6 +14,13 @@ final class AutoFillReadOnlyFormSubmissionTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
+    protected function setUp(): void
+    {
+        $this->configParams['form_field_autofill'] = true;
+
+        parent::setUp();
+    }
+
     /**
      * @param array<string, bool|null> $data
      * @param array<string, string>    $expected

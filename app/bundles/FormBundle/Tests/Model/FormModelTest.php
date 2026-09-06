@@ -75,6 +75,11 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
         $this->primaryCompanyHelper  = $this->createMock(PrimaryCompanyHelper::class);
         $this->leadFieldModel        = $this->createMock(LeadFieldModel::class);
         $this->formRepository        = $this->createMock(FormRepository::class);
+        $coreParametersHelper  = $this->createMock(CoreParametersHelper::class);
+        $coreParametersHelper->method('get')
+            ->willReturnMap([
+                ['form_field_autofill', false, true],
+            ]);
 
         $this->formModel = new FormModel(
             $this->createStub(RequestStack::class),
@@ -97,7 +102,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(Translator::class),
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
-            $this->createStub(CoreParametersHelper::class),
+            $coreParametersHelper,
             $this->formRepository,
         );
     }
@@ -509,6 +514,53 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
             ->method('getContact');
 
         $this->formModel->populateValuesWithLead($form, $formHtml);
+    }
+
+    public function testPopulateValuesWithLeadWhenAutofillFeatureDisabled(): void
+    {
+        $formHtml   = '<html>';
+        $form       = new Form();
+        $emailField = new Field();
+        $emailField->setMappedField('email');
+        $emailField->setMappedObject('contact');
+        $emailField->setIsAutoFill(true);
+        $form->addField(123, $emailField);
+
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $coreParametersHelper->expects($this->once())
+            ->method('get')
+            ->with('form_field_autofill', false)
+            ->willReturn(false);
+
+        $formModel = new FormModel(
+            $this->createStub(RequestStack::class),
+            $this->createStub(Environment::class),
+            $this->createStub(ThemeHelper::class),
+            $this->createStub(ActionModel::class),
+            $this->createStub(FieldModel::class),
+            $this->fieldHelper,
+            $this->primaryCompanyHelper,
+            $this->leadFieldModel,
+            $this->createStub(FormUploader::class),
+            $this->contactTracker,
+            $this->createStub(ColumnSchemaHelper::class),
+            $this->createStub(TableSchemaHelper::class),
+            $this->createStub(MappedObjectCollectorInterface::class),
+            $this->createStub(EntityManager::class),
+            $this->createStub(CorePermissions::class),
+            $this->createStub(EventDispatcher::class),
+            $this->createStub(UrlGeneratorInterface::class),
+            $this->createStub(Translator::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $coreParametersHelper,
+            $this->formRepository,
+        );
+
+        $this->contactTracker->expects($this->never())
+            ->method('getContact');
+
+        $formModel->populateValuesWithLead($form, $formHtml);
     }
 
     public function testPopulateValuesWithLeadWithoutLeadObject(): void

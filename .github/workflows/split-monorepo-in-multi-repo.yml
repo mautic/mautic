@@ -101,7 +101,7 @@ jobs:
                     fetch-depth: 0
 
             # Add a personal access token to the repository secrets. This will allow the splitter action to push the new commits
-            -   uses: frankdejonge/use-github-token@15e6289d07c12b3b1603268a628bb74f2e9765f4 # 1.1.0
+            -   uses: frankdejonge/use-github-token@ae451b947d7d5975ca9aaadf04655bbd75dfbd85 # 1.1.1
                 with:
                     authentication: 'username:${{ secrets.ACCESS_TOKEN }}'
                     user_name: 'Mautic CI'

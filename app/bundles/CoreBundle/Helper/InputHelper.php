@@ -205,7 +205,7 @@ final class InputHelper
 
         $delimiter = '~';
 
-        if (!empty($allowedCharacters)) {
+        if ([] !== $allowedCharacters) {
             $regex = $delimiter.'[^0-9a-z'.preg_quote(implode('', $allowedCharacters), $delimiter).']+'.$delimiter.'i';
         } else {
             $regex = $delimiter.'[^0-9a-z]+'.$delimiter.'i';

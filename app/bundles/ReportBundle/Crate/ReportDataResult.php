@@ -131,7 +131,7 @@ final class ReportDataResult
      */
     public function getTotalsToExport(FormatterHelper $formatterHelper): array
     {
-        if (empty($this->totals)) {
+        if ([] === $this->totals) {
             return [];
         }
 

@@ -51,7 +51,7 @@ final class ExecuteEventCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
+        defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') || define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
 
         $now     = empty($input->getOption('execution-time')) ? null : new \DateTime($input->getOption('execution-time'));
         $ids     = $this->formatterHelper->simpleCsvToArray($input->getOption('scheduled-log-ids'), 'int');

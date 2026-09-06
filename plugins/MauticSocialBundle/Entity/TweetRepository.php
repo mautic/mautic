@@ -38,7 +38,7 @@ final class TweetRepository extends CommonRepository
                 ->setParameter('id', $this->currentUser->getId());
         }
 
-        if (!empty($ignoreIds)) {
+        if ([] !== $ignoreIds) {
             $qb->andWhere($qb->expr()->notIn('t.id', ':ignoreIds'))
                 ->setParameter('ignoreIds', $ignoreIds);
         }

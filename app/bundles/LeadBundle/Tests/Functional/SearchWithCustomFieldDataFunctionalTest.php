@@ -123,7 +123,7 @@ final class SearchWithCustomFieldDataFunctionalTest extends AbstractSearchTestCa
         $this->assertStringContainsString('ABC', $crawler->html());
         $this->assertStringNotContainsString('XYZ', $crawler->html());
 
-        $translator = static::getContainer()->get(TranslatorInterface::class);
+        $translator = self::getContainer()->get(TranslatorInterface::class);
 
         $this->assertStringContainsString(
             $translator->trans('mautic.core.pagination.items', ['%count%' => 1]),

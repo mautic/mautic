@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Form\Type;
 
 use Mautic\CampaignBundle\Form\Validator\Constraints\InfiniteLoop;

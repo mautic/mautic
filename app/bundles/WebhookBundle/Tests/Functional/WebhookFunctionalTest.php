@@ -192,7 +192,6 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
         $webhook = $this->webhhokRepository->find($webhook->getId());
         $this->assertInstanceOf(Webhook::class, $webhook);
         $this->assertNotInstanceOf(\DateTimeImmutable::class, $webhook->getMarkedUnhealthyAt());
-        $this->assertInstanceOf(Webhook::class, $webhook);
         $this->assertNotInstanceOf(\DateTimeImmutable::class, $webhook->getUnHealthySince());
         $this->assertNotInstanceOf(\DateTimeImmutable::class, $webhook->getLastNotificationSentAt());
 

@@ -212,12 +212,10 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
             $log2->getEvent()->getId(),
             'Log2 should now point to redirect target event'
         );
-        $this->assertInstanceOf(LeadEventLog::class, $log1);
 
         // Verify rotation values are correctly calculated
         // (should be 3 and 4 since we had an existing log with rotation 2)
         $this->assertContains($log1->getRotation(), [3, 4], 'Log1 should have rotation 3 or 4');
-        $this->assertInstanceOf(LeadEventLog::class, $log2);
         $this->assertContains($log2->getRotation(), [3, 4], 'Log2 should have rotation 3 or 4');
         $this->assertNotEquals(
             $log1->getRotation(),

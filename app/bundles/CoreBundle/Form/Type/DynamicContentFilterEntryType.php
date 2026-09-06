@@ -6,9 +6,8 @@ use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\ListModel;
-use Mautic\StageBundle\Model\StageModel;
+use Mautic\StageBundle\Entity\StageRepository;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
@@ -47,8 +46,8 @@ final class DynamicContentFilterEntryType extends AbstractType
 
     public function __construct(
         ListModel $listModel,
-        private readonly StageModel $stageModel,
         private readonly BuilderIntegrationsHelper $builderIntegrationsHelper,
+        private readonly StageRepository $stageRepository,
     ) {
         $this->fieldChoices = $listModel->getChoiceFields();
 
@@ -86,7 +85,7 @@ final class DynamicContentFilterEntryType extends AbstractType
         $builder->add(
             $builder->create(
                 'filters',
-                CollectionType::class,
+                DynamicListType::class,
                 [
                     'entry_type'    => DynamicContentFilterEntryFiltersType::class,
                     'entry_options' => [
@@ -101,11 +100,12 @@ final class DynamicContentFilterEntryType extends AbstractType
                         'locales'   => $this->localeChoices,
                         'fields'    => $this->fieldChoices,
                     ],
-                    'error_bubbling' => false,
-                    'mapped'         => true,
-                    'allow_add'      => true,
-                    'allow_delete'   => true,
-                    'label'          => false,
+                    'error_bubbling'  => false,
+                    'mapped'          => true,
+                    'option_required' => false,
+                    'allow_add'       => true,
+                    'allow_delete'    => true,
+                    'label'           => false,
                 ]
             )
         );
@@ -153,7 +153,7 @@ final class DynamicContentFilterEntryType extends AbstractType
 
     private function getStageList(): array
     {
-        $stages = $this->stageModel->getRepository()->getSimpleList();
+        $stages = $this->stageRepository->getSimpleList();
 
         foreach ($stages as $stage) {
             $stages[$stage['value']] = $stage['label'];

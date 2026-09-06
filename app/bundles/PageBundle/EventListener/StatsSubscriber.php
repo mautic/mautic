@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PageBundle\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;

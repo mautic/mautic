@@ -131,7 +131,7 @@ final class FieldMergerHelper
             $supportedDirections[] = ObjectMappingDAO::SYNC_TO_MAUTIC;
         }
 
-        if (empty($supportedDirections)) {
+        if ([] === $supportedDirections) {
             throw new InvalidFormOptionException('field "'.$field->getName().'" must allow at least 1 direction for sync');
         }
 

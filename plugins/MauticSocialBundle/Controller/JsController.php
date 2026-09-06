@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticSocialBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;

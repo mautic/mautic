@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'name'        => 'Mautic tag manager bundle',
     'description' => 'Provides an interface for tags management.',

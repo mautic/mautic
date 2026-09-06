@@ -2,7 +2,7 @@
 
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
-class InstagramIntegration extends SocialIntegration
+final class InstagramIntegration extends SocialIntegration
 {
     public function getName(): string
     {

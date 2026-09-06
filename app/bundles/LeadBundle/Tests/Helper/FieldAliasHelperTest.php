@@ -19,7 +19,7 @@ final class FieldAliasHelperTest extends \PHPUnit\Framework\TestCase
 
         $fieldRepository = $this->createMock(LeadFieldRepository::class);
         $fieldModel      = $this->getMockBuilder(FieldModel::class)
-            ->onlyMethods(['cleanAlias', 'getRepository'])
+            ->onlyMethods(['cleanAlias'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -31,9 +31,7 @@ final class FieldAliasHelperTest extends \PHPUnit\Framework\TestCase
 
         $fieldModel->method('cleanAlias')->willReturnCallback(fn (): mixed => func_get_args()[0]);
 
-        $fieldModel->method('getRepository')->willReturn($fieldRepository);
-
-        $this->helper = new FieldAliasHelper($fieldModel);
+        $this->helper = new FieldAliasHelper($fieldModel, $fieldRepository);
     }
 
     public function testDuplicatedAliasWithAliasSet(): void

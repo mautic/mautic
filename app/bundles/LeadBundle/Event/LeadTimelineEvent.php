@@ -76,7 +76,7 @@ final class LeadTimelineEvent extends Event
         private $forTimeline = true,
         private $siteDomain = null,
     ) {
-        $this->filters = !empty($filters)
+        $this->filters = [] !== $filters
             ? $filters
             :
             [
@@ -175,7 +175,7 @@ final class LeadTimelineEvent extends Event
      */
     public function getEvents()
     {
-        if (empty($this->events)) {
+        if ([] === $this->events) {
             return [];
         }
 

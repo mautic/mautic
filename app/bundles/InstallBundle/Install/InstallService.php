@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Loader\ParameterLoader;
 use Mautic\CoreBundle\Release\ThisRelease;
+use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 use Mautic\InstallBundle\Exception\AlreadyInstalledException;
 use Mautic\InstallBundle\Exception\DatabaseVersionTooOldException;
@@ -24,6 +25,7 @@ use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -76,7 +78,7 @@ class InstallService
         $params = $this->configurator->getParameters();
 
         // Check to ensure the installer is in the right place
-        if ((empty($params)
+        if (([] === $params
                 || !isset($params['db_driver'])
                 || empty($params['db_driver'])) && $index > 1) {
             return $this->configurator->getStep(self::DOCTRINE_STEP)[0];
@@ -135,18 +137,35 @@ class InstallService
 
     /**
      * Translation messages array.
+     *
+     * @param array<int|string, string> $messages
+     *
+     * @return array<int|string, string>
      */
     private function translateMessages(array $messages): array
     {
-        if (empty($messages)) {
+        if ([] === $messages) {
             return $messages;
         }
 
         foreach ($messages as $key => $value) {
-            $messages[$key] = $this->translator->trans($value);
+            $messages[$key] = $this->translator->trans($value, $this->getTranslationParameters($value));
         }
 
         return $messages;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function getTranslationParameters(string $messageKey): array
+    {
+        return match ($messageKey) {
+            'mautic.install.memory.limit' => [
+                '%min_memory_limit%' => CheckStep::RECOMMENDED_MEMORY_LIMIT,
+            ],
+            default => [],
+        };
     }
 
     /**
@@ -246,7 +265,7 @@ class InstallService
     {
         $messages = $this->validateDatabaseParams($dbParams);
 
-        if (!empty($messages)) {
+        if ([] !== $messages) {
             return $messages;
         }
 
@@ -259,7 +278,7 @@ class InstallService
 
             if ($schemaHelper->createDatabase()) {
                 $messages = $this->saveConfiguration($dbParams, $step, true);
-                if (empty($messages)) {
+                if ([] === $messages) {
                     return $messages;
                 }
             }
@@ -402,7 +421,7 @@ class InstallService
             }
         }
 
-        if (!empty($messages)) {
+        if ([] !== $messages) {
             return $messages;
         }
 
@@ -424,7 +443,7 @@ class InstallService
             }
         }
 
-        if (!empty($messages)) {
+        if ([] !== $messages) {
             return $messages;
         }
 
@@ -482,13 +501,22 @@ class InstallService
      */
     public function finalMigrationStep(): void
     {
-        // Add database migrations up to this point since this is a fresh install (must be done at this point
-        // after the cache has been rebuilt
-        $input  = new ArgvInput(['console', 'doctrine:migrations:version', '--add', '--all', '--no-interaction']);
-        $output = new BufferedOutput();
-
         $application = new Application($this->kernel);
         $application->setAutoExit(false);
-        $application->run($input, $output);
+
+        $commands = [
+            // Create the metadata storage before marking migrations as applied.
+            ['console', 'doctrine:migrations:sync-metadata-storage', '--no-interaction'],
+            ['console', 'doctrine:migrations:version', '--add', '--all', '--no-interaction'],
+        ];
+
+        foreach ($commands as $arguments) {
+            $output   = new BufferedOutput();
+            $exitCode = $application->run(new ArgvInput($arguments), $output);
+
+            if (Command::SUCCESS !== $exitCode) {
+                throw new \RuntimeException(sprintf('Command "%s" failed with exit code %d: %s', $arguments[1], $exitCode, trim($output->fetch())));
+            }
+        }
     }
 }

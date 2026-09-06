@@ -112,7 +112,8 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['description'], $response['form']['description']);
         $this->assertIsArray($response['form']['fields']);
         $this->assertCount(count($payload['fields']), $response['form']['fields']);
-        for ($i = 0; $i < count($payload['fields']); ++$i) {
+        $counter = count($payload['fields']);
+        for ($i = 0; $i < $counter; ++$i) {
             $this->assertEquals($payload['fields'][$i]['label'], $response['form']['fields'][$i]['label']);
             $this->assertEquals($payload['fields'][$i]['alias'], $response['form']['fields'][$i]['alias']);
             $this->assertEquals($payload['fields'][$i]['type'], $response['form']['fields'][$i]['type']);
@@ -133,7 +134,8 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['description'], $responsePatch['form']['description']);
         $this->assertIsArray($responsePatch['form']['fields']);
         $this->assertCount(count($payload['fields']), $responsePatch['form']['fields']);
-        for ($i = 0; $i < count($payload['fields']); ++$i) {
+        $counter = count($payload['fields']);
+        for ($i = 0; $i < $counter; ++$i) {
             $this->assertEquals($payload['fields'][$i]['label'], $responsePatch['form']['fields'][$i]['label']);
             $this->assertEquals($payload['fields'][$i]['alias'], $responsePatch['form']['fields'][$i]['alias']);
             $this->assertEquals($payload['fields'][$i]['type'], $responsePatch['form']['fields'][$i]['type']);
@@ -522,7 +524,8 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['description'], $response['form']['description']);
         $this->assertIsArray($response['form']['fields']);
         $this->assertCount(count($payload['fields']), $response['form']['fields']);
-        for ($i = 0; $i < count($payload['fields']); ++$i) {
+        $counter = count($payload['fields']);
+        for ($i = 0; $i < $counter; ++$i) {
             $this->assertEquals($payload['fields'][$i]['label'], $response['form']['fields'][$i]['label']);
             $this->assertEquals($payload['fields'][$i]['alias'], $response['form']['fields'][$i]['alias']);
             $this->assertEquals($payload['fields'][$i]['type'], $response['form']['fields'][$i]['type']);

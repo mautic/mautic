@@ -41,7 +41,7 @@ final class UserSummaryNotificationHelper
         $this->mauticObject       = $mauticObject;
         $this->listTranslationKey = $listTranslationKey;
 
-        if (empty($this->userNotifications)) {
+        if ([] === $this->userNotifications) {
             return;
         }
 

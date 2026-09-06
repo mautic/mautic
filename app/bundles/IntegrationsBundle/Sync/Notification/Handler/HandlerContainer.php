@@ -7,7 +7,7 @@ namespace Mautic\IntegrationsBundle\Sync\Notification\Handler;
 use Mautic\IntegrationsBundle\Sync\Exception\HandlerNotSupportedException;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-class HandlerContainer
+final class HandlerContainer
 {
     private array $handlers = [];
 

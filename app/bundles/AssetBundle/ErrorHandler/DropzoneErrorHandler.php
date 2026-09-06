@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\AssetBundle\ErrorHandler;
 
 use Oneup\UploaderBundle\Uploader\ErrorHandler\ErrorHandlerInterface;

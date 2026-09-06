@@ -4,7 +4,7 @@ namespace MauticPlugin\MauticEmailMarketingBundle\Integration;
 
 use MauticPlugin\MauticEmailMarketingBundle\Form\Type\IcontactType;
 
-class IcontactIntegration extends EmailAbstractIntegration
+final class IcontactIntegration extends EmailAbstractIntegration
 {
     public function getName(): string
     {
@@ -203,7 +203,7 @@ class IcontactIntegration extends EmailAbstractIntegration
 
                 $listId = $config['list_settings']['list'];
 
-                if (!empty($customfields)) {
+                if ([] !== $customfields) {
                     $mappedData += $customfields;
                 }
 

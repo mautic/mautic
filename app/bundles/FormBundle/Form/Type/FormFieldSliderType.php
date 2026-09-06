@@ -32,9 +32,7 @@ final class FormFieldSliderType extends AbstractType
             'attr'        => ['class' => 'form-control'],
             'data'        => $options['data']['max'] ?? 100,
             'constraints' => [
-                new SliderMaxGreaterThanMin([
-                    'message' => 'mautic.form.field.form.slider_max_gt_min_error',
-                ]),
+                new SliderMaxGreaterThanMin(message: 'mautic.form.field.form.slider_max_gt_min_error'),
             ],
         ]);
 
@@ -45,10 +43,8 @@ final class FormFieldSliderType extends AbstractType
             'attr'        => ['class' => 'form-control'],
             'data'        => $options['data']['step'] ?? 1,
             'constraints' => [
-                new Range(min: 1, minMessage: 'mautic.form.field.form.slider_step_min_error'),
-                new SliderStepLessThanMax([
-                    'message' => 'mautic.form.field.form.slider_step_lt_max_error',
-                ]),
+                new Range(minMessage: 'mautic.form.field.form.slider_step_min_error', min: 1),
+                new SliderStepLessThanMax(message: 'mautic.form.field.form.slider_step_lt_max_error'),
             ],
         ]);
     }

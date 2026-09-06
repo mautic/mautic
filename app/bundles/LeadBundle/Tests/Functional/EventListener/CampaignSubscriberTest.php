@@ -148,7 +148,6 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
         $campaignExecutionEvent = new CampaignExecutionEvent($eventProperties, false);
 
         $this->campaignSubscriber->onCampaignTriggerCondition($campaignExecutionEvent);
-        $this->assertInstanceOf(CampaignExecutionEvent::class, $campaignExecutionEvent); // @phpstan-ignore classConstant.deprecatedClass
         $this->assertSame($expected, $campaignExecutionEvent->getResult());
     }
 

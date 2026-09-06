@@ -45,7 +45,7 @@ final class TrackableModelFunctionalTest extends MauticMysqlTestCase
             $this->assertStringContainsString($untrackedHtml, (string) $newContent);
         }
 
-        if (empty($expectedTrackedUrls)) {
+        if ([] === $expectedTrackedUrls) {
             $this->assertStringNotContainsString('{trackable=', (string) $newContent);
         } else {
             $this->assertStringContainsString('{trackable=', (string) $newContent);

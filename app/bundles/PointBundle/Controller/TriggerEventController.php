@@ -153,7 +153,7 @@ final class TriggerEventController extends CommonFormController
         $events       = $session->get('mautic.point.'.$triggerId.'.triggerevents.modified', []);
         $success      = 0;
         $valid        = $cancelled = false;
-        $triggerEvent = array_key_exists($objectId, $events) ? $events[$objectId] : null;
+        $triggerEvent = $events[$objectId] ?? null;
 
         if (null !== $triggerEvent) {
             $eventType         = $triggerEvent['type'];
@@ -280,7 +280,7 @@ final class TriggerEventController extends CommonFormController
             $this->throwAccessDenied();
         }
 
-        $triggerEvent = (array_key_exists($objectId, $events)) ? $events[$objectId] : null;
+        $triggerEvent = $events[$objectId] ?? null;
 
         if ('POST' === $request->getMethod() && null !== $triggerEvent) {
             // add the field to the delete list
@@ -339,7 +339,7 @@ final class TriggerEventController extends CommonFormController
             $this->throwAccessDenied();
         }
 
-        $triggerEvent = (array_key_exists($objectId, $events)) ? $events[$objectId] : null;
+        $triggerEvent = $events[$objectId] ?? null;
 
         if ('POST' === $request->getMethod() && null !== $triggerEvent) {
             // add the field to the delete list

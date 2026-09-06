@@ -37,6 +37,8 @@ class PathsHelper
 
     private readonly string $importCampaignDir;
 
+    private readonly string $localRoot;
+
     public function __construct(
         UserHelper $userHelper,
         CoreParametersHelper $coreParametersHelper,
@@ -62,6 +64,12 @@ class PathsHelper
         include $root.'/config/paths_helper.php';
 
         $this->paths = $paths;
+
+        // Get local_root (webroot) from parameters - this is auto-detected from composer.json
+        // for recommended-project installations, or can be explicitly set in paths_local.php
+        $localRootParam = $this->removeTrailingSlash((string) $coreParametersHelper->get('local_root'));
+        // @phpstan-ignore nullCoalesce.offset (paths['root'] is always set by paths_helper.php include)
+        $this->localRoot = '' !== $localRootParam ? $localRootParam : ($this->paths['root'] ?? $rootDir);
     }
 
     public function getLocalConfigurationFile(): string
@@ -122,6 +130,19 @@ class PathsHelper
     public function getPluginsPath(): string
     {
         return $this->getSystemPath('plugins', true);
+    }
+
+    /**
+     * Returns the webroot directory path.
+     *
+     * For standard installations, this is the same as the project root.
+     * For recommended-project installations (with docroot/ or public/),
+     * this returns the actual webroot directory where media/, themes/,
+     * plugins/, etc. are located.
+     */
+    public function getLocalRoot(): string
+    {
+        return $this->localRoot;
     }
 
     public function getImportLeadsPath(): string
@@ -220,7 +241,16 @@ class PathsHelper
             return $path;
         }
 
-        $rootPath = (!empty($this->paths[$name.'_root'])) ? $this->paths[$name.'_root'] : $this->paths['root'];
+        // Webroot-relative paths should resolve from local_root (the actual webroot directory)
+        // for recommended-project installations where webroot is a subdirectory.
+        // Other paths resolve from the project root as before.
+        $webrootRelativePaths = ['themes', 'media', 'plugins', 'assets', 'images', 'translations'];
+        if (in_array($name, $webrootRelativePaths, true)) {
+            $rootPath = $this->localRoot;
+        } else {
+            $rootPath = (!empty($this->paths[$name.'_root'])) ? $this->paths[$name.'_root'] : $this->paths['root'];
+        }
+
         if (!str_contains($path, $rootPath)) {
             return $rootPath.'/'.$path;
         }

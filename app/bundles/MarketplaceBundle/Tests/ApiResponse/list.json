@@ -6,7 +6,9 @@
             "url": "https:\/\/packagist.org\/packages\/mautic\/mautic-saelos-bundle",
             "repository": "https:\/\/github.com\/mautic\/mautic-saelos-bundle",
             "downloads": 10586,
-            "favers": 11
+            "favers": 11,
+            "average_rating": 0,
+            "total_review": 0
         },
         {
             "name": "koco\/mautic-recaptcha-bundle",
@@ -14,7 +16,9 @@
             "url": "https:\/\/packagist.org\/packages\/koco\/mautic-recaptcha-bundle",
             "repository": "https:\/\/github.com\/KonstantinCodes\/mautic-recaptcha",
             "downloads": 2012,
-            "favers": 20
+            "favers": 20,
+            "average_rating": 0,
+            "total_review": 0
         },
         {
             "name": "monogramm\/mautic-ldap-auth-bundle",
@@ -22,7 +26,9 @@
             "url": "https:\/\/packagist.org\/packages\/monogramm\/mautic-ldap-auth-bundle",
             "repository": "https:\/\/github.com\/Monogramm\/MauticLdapAuthBundle",
             "downloads": 307,
-            "favers": 8
+            "favers": 8,
+            "average_rating": 0,
+            "total_review": 0
         },
         {
             "name": "maatoo\/mautic-referrals-bundle",
@@ -30,7 +36,9 @@
             "url": "https:\/\/packagist.org\/packages\/maatoo\/mautic-referrals-bundle",
             "repository": "https:\/\/github.com\/maatoo-io\/MauticReferralsBundle",
             "downloads": 527,
-            "favers": 5
+            "favers": 5,
+            "average_rating": 0,
+            "total_review": 0
         },
         {
             "name": "thedmsgroup\/mautic-do-not-contact-extras-bundle",
@@ -38,7 +46,9 @@
             "url": "https:\/\/packagist.org\/packages\/thedmsgroup\/mautic-do-not-contact-extras-bundle",
             "repository": "https:\/\/github.com\/TheDMSGroup\/mautic-dnc-extras",
             "downloads": 532,
-            "favers": 9
+            "favers": 9,
+            "average_rating": 0,
+            "total_review": 0
         }
     ],
     "total": 58,

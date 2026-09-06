@@ -93,8 +93,8 @@ final class TwitterCommandHelper
         $handleFieldGroup = $leadField->getGroup();
 
         // Just a means to let any LeadEvents listeners know that many leads are likely coming in case that matters to their logic
-        defined('MASS_LEADS_MANIPULATION') or define('MASS_LEADS_MANIPULATION', 1);
-        defined('SOCIAL_MONITOR_IMPORT') or define('SOCIAL_MONITOR_IMPORT', 1);
+        defined('MASS_LEADS_MANIPULATION') || define('MASS_LEADS_MANIPULATION', 1);
+        defined('SOCIAL_MONITOR_IMPORT') || define('SOCIAL_MONITOR_IMPORT', 1);
 
         // Get a list of existing leads to tone down on queries
         $usersByHandles    = [];
@@ -129,7 +129,7 @@ final class TwitterCommandHelper
         }
         unset($expr);
 
-        if (!empty($usersByHandles)) {
+        if ([] !== $usersByHandles) {
             $leads = $this->leadRepository->getEntities(
                 [
                     'filter' => [

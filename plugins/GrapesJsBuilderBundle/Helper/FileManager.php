@@ -13,14 +13,14 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
-class FileManager
+final readonly class FileManager
 {
     public const GRAPESJS_IMAGES_DIRECTORY = '';
 
     public function __construct(
-        private readonly FileUploader $fileUploader,
-        private readonly CoreParametersHelper $coreParametersHelper,
-        private readonly PathsHelper $pathsHelper,
+        private FileUploader $fileUploader,
+        private CoreParametersHelper $coreParametersHelper,
+        private PathsHelper $pathsHelper,
     ) {
     }
 

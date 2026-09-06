@@ -354,7 +354,7 @@ class LeadEventLogRepository extends CommonRepository
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = '.(int) $fromLeadId);
 
-        if (!empty($exists)) {
+        if ([] !== $exists) {
             $q->andWhere(
                 $q->expr()->notIn('event_id', ':ids')
             )

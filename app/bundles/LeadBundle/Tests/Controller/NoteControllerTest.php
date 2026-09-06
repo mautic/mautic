@@ -240,7 +240,7 @@ final class NoteControllerTest extends MauticMysqlTestCase
         $this->em->persist($role);
         $this->em->flush();
 
-        $roleModel = static::getContainer()->get(RoleModel::class);
+        $roleModel = self::getContainer()->get(RoleModel::class);
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);
 
@@ -251,7 +251,7 @@ final class NoteControllerTest extends MauticMysqlTestCase
         $user->setEmail('note.controller.'.uniqid().'@example.com');
         $user->setRole($role);
 
-        $hasher = static::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash('Maut1cR0cks!'));
         $this->em->persist($user);
@@ -292,7 +292,7 @@ final class NoteControllerTest extends MauticMysqlTestCase
         $this->em->persist($role);
         $this->em->flush();
 
-        $roleModel = static::getContainer()->get(RoleModel::class);
+        $roleModel = self::getContainer()->get(RoleModel::class);
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);
 
@@ -303,7 +303,7 @@ final class NoteControllerTest extends MauticMysqlTestCase
         $user->setEmail('note.user.'.uniqid().'@example.com');
         $user->setRole($role);
 
-        $hasher = static::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash('Maut1cR0cks!'));
         $this->em->persist($user);

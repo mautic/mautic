@@ -99,10 +99,8 @@ final class DBALMocker
             $mock->expects(new AnyInvokedCount())
                 ->method('getReference')
                 ->willReturnCallback(function (): Lead {
-                    switch (func_get_arg(0)) {
-                        case Lead::class:
-                            $entity = new Lead();
-                            break;
+                    if (Lead::class === func_get_arg(0)) {
+                        $entity = new Lead();
                     }
 
                     $entity->setId(func_get_arg(1));

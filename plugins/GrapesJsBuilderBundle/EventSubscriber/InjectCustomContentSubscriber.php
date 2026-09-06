@@ -25,7 +25,7 @@ final readonly class InjectCustomContentSubscriber implements EventSubscriberInt
         private Environment $twig,
         private RequestStack $requestStack,
         private RouterInterface $router,
-        private readonly GrapesJsBuilderRepository $grapesJsBuilderRepository,
+        private GrapesJsBuilderRepository $grapesJsBuilderRepository,
     ) {
     }
 

@@ -101,7 +101,7 @@ class SubmissionRepository extends CommonRepository
         // Quote reserved keywords in field aliases
         $fieldAliases = array_map($databasePlatform->quoteIdentifier(...), $fieldAliases);
 
-        $fieldAliasSql = (!empty($fieldAliases)) ? ', r.'.implode(',r.', $fieldAliases) : '';
+        $fieldAliasSql = ([] !== $fieldAliases) ? ', r.'.implode(',r.', $fieldAliases) : '';
         $dq->select('r.submission_id, s.date_submitted as dateSubmitted, s.lead_id as leadId, s.referer, i.ip_address as ipAddress'.$fieldAliasSql);
         $results = $dq->executeQuery()->fetchAllAssociative();
 
@@ -562,7 +562,7 @@ class SubmissionRepository extends CommonRepository
      */
     public function batchDeleteFormResultsTableRecord(array $submissionIds): void
     {
-        if (!empty($submissionIds)) {
+        if ([] !== $submissionIds) {
             $entity = $this->getEntity((int) $submissionIds[0]);
             $form   = $entity->getForm();
 

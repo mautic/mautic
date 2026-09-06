@@ -40,11 +40,11 @@ final class CommonApiControllerTest extends MauticMysqlTestCase
 
         $this->assertEquals(Response::HTTP_CONFLICT, $error['code']);
 
-        $translator = static::getContainer()->get(TranslatorInterface::class);
+        $translator = self::getContainer()->get(TranslatorInterface::class);
         $this->assertInstanceOf(TranslatorInterface::class, $translator);
 
         /** @var CoreParametersHelper $coreParametersHelper */
-        $coreParametersHelper = static::getContainer()->get(CoreParametersHelper::class);
+        $coreParametersHelper = self::getContainer()->get(CoreParametersHelper::class);
         $this->assertInstanceOf(CoreParametersHelper::class, $coreParametersHelper);
         $dateFormat = $coreParametersHelper->get('date_format_dateonly');
         $timeFormat = $coreParametersHelper->get('date_format_timeonly');
@@ -113,11 +113,11 @@ final class CommonApiControllerTest extends MauticMysqlTestCase
 
         $this->assertEquals(Response::HTTP_CONFLICT, $error['code']);
 
-        $translator = static::getContainer()->get(TranslatorInterface::class);
+        $translator = self::getContainer()->get(TranslatorInterface::class);
         $this->assertInstanceOf(TranslatorInterface::class, $translator);
 
         /** @var CoreParametersHelper $coreParametersHelper */
-        $coreParametersHelper = static::getContainer()->get(CoreParametersHelper::class);
+        $coreParametersHelper = self::getContainer()->get(CoreParametersHelper::class);
         $this->assertInstanceOf(CoreParametersHelper::class, $coreParametersHelper);
         $dateFormat = $coreParametersHelper->get('date_format_dateonly');
         $timeFormat = $coreParametersHelper->get('date_format_timeonly');
@@ -157,6 +157,6 @@ final class CommonApiControllerTest extends MauticMysqlTestCase
         $this->em->persist($user);
         $this->em->flush();
 
-        static::getContainer()->get(UserTokenSetter::class)->setUser($user->getId());
+        self::getContainer()->get(UserTokenSetter::class)->setUser($user->getId());
     }
 }

@@ -57,7 +57,7 @@ final class IntegrationSyncSettingsObjectFieldType extends AbstractType
             $choices['mautic.integration.sync_direction_mautic'] = ObjectMappingDAO::SYNC_TO_MAUTIC;
         }
 
-        if (empty($choices)) {
+        if ([] === $choices) {
             throw new InvalidFormOptionException('field "'.$field->getName().'" must allow at least 1 direction for sync');
         }
 

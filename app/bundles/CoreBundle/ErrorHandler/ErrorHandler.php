@@ -473,7 +473,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 }
             }
 
-            defined('MAUTIC_OFFLINE') or define('MAUTIC_OFFLINE', 1);
+            defined('MAUTIC_OFFLINE') || define('MAUTIC_OFFLINE', 1);
 
             try {
                 // Get the URLs base path
@@ -548,7 +548,7 @@ namespace {
                 if (1 === count($context) && true === $context[0]) {
                     ErrorHandler::logDebugEntry($log, $context, true);
                 } else {
-                    ErrorHandler::logDebugEntry($log, (empty($context)) ? [] : $context);
+                    ErrorHandler::logDebugEntry($log, $context);
                 }
             }
         }

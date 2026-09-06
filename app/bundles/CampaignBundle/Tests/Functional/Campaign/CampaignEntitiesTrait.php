@@ -67,7 +67,7 @@ trait CampaignEntitiesTrait
         array $additionalValue,
         int $index,
     ): Lead {
-        $fieldValue      = !empty($fieldDetails) ?
+        $fieldValue      = [] !== $fieldDetails ?
             array_merge($fieldDetails, ['value' => array_merge(['v'.$index], $additionalValue)]) : [];
         $leadFieldValue  = 'lead' === $object ? $fieldValue : [];
         $lead            = $this->createLead('l'.$index, $leadFieldValue);
@@ -89,7 +89,7 @@ trait CampaignEntitiesTrait
         \assert($contactRepo instanceof LeadRepository);
         $lead        = new Lead();
         $lead->setFirstname($leadName);
-        if (!empty($customField)) {
+        if ([] !== $customField) {
             $lead->setFields([
                 $customField['group'] => [
                     $customField['alias'] => [
@@ -117,7 +117,7 @@ trait CampaignEntitiesTrait
         \assert($companyRepo instanceof CompanyRepository);
         $company = new Company();
         $company->setName($name);
-        if (!empty($customField)) {
+        if ([] !== $customField) {
             $company->setFields([
                 $customField['group'] => [
                     $customField['alias'] => [

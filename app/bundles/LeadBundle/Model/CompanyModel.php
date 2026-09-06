@@ -305,7 +305,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             }
         }
 
-        if (!empty($searchForCompanies)) {
+        if ([] !== $searchForCompanies) {
             $companyEntities = $this->getEntities([
                 'filter' => [
                     'force' => [
@@ -362,7 +362,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             }
         }
 
-        if (!empty($persistCompany)) {
+        if ([] !== $persistCompany) {
             $this->companyLeadRepository->saveEntities($persistCompany);
         }
 
@@ -378,7 +378,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             }
         }
 
-        if (!empty($dispatchEvents) && $this->dispatcher->hasListeners(LeadEvents::LEAD_COMPANY_CHANGE)) {
+        if ([] !== $dispatchEvents && $this->dispatcher->hasListeners(LeadEvents::LEAD_COMPANY_CHANGE)) {
             foreach ($dispatchEvents as $companyId) {
                 $event = new LeadChangeCompanyEvent($lead, $companyLeadAdd[$companyId]);
                 $this->dispatcher->dispatch($event, LeadEvents::LEAD_COMPANY_CHANGE);
@@ -411,7 +411,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                 $l                    = (int) $l;
                 $searchForCompanies[] = $l;
             }
-            if (!empty($searchForCompanies)) {
+            if ([] !== $searchForCompanies) {
                 $companyEntities = $this->getEntities(
                     [
                         'filter' => [
@@ -477,7 +477,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             unset($companyLead);
         }
 
-        if (!empty($deleteCompanyLead)) {
+        if ([] !== $deleteCompanyLead) {
             $this->companyLeadRepository->deleteEntities($deleteCompanyLead);
         }
 
@@ -490,7 +490,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         // Clear CompanyLead entities from Doctrine memory
         $this->companyLeadRepository->detachEntities($deleteCompanyLead);
 
-        if (!empty($dispatchEvents) && $this->dispatcher->hasListeners(LeadEvents::LEAD_COMPANY_CHANGE)) {
+        if ([] !== $dispatchEvents && $this->dispatcher->hasListeners(LeadEvents::LEAD_COMPANY_CHANGE)) {
             foreach ($dispatchEvents as $companyId) {
                 $event = new LeadChangeCompanyEvent($lead, $companyLeadRemove[$companyId], false);
                 $this->dispatcher->dispatch($event, LeadEvents::LEAD_COMPANY_CHANGE);
@@ -774,9 +774,9 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      * @param array<mixed>    $data
      * @param int|string|null $owner
      */
-    public function import(array $fields, array $data, $owner = null, bool $skipIfExists = false): bool
+    public function import(array $fields, array $data, $owner = null, bool $skipIfExists = false, bool $createNew = true): bool
     {
-        $company = $this->importCompany($fields, $data, $owner, false, $skipIfExists);
+        $company = $this->importCompany($fields, $data, $owner, false, $skipIfExists, $createNew);
 
         if (null === $company) {
             throw new \Exception($this->translator->trans('mautic.lead.import.unique_field_not_exist', [], 'flashes'));
@@ -792,7 +792,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     /**
      * @throws \Exception
      */
-    public function importCompany(array $fields, array $data, $owner = null, $persist = true, $skipIfExists = false): ?Company
+    public function importCompany(array $fields, array $data, $owner = null, $persist = true, $skipIfExists = false, bool $createNew = true): ?Company
     {
         try {
             $duplicateCompanies = $this->companyDeduper->checkForDuplicateCompanies($this->getFieldData($fields, $data));
@@ -800,7 +800,11 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             return null;
         }
 
-        $company = !empty($duplicateCompanies) ? $duplicateCompanies[0] : new Company();
+        $company = $duplicateCompanies[0] ?? new Company();
+
+        if (!$createNew && $company->isNew()) {
+            throw new \Exception($this->translator->trans('mautic.lead.import.creating_companies_disabled'));
+        }
 
         if (!$company->isNew() && !$this->existDataForUpdate($fields, $data)) {
             return $company;

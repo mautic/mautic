@@ -22,7 +22,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @template T of object
  */
-abstract class AbstractCommonModel implements MauticModelInterface
+abstract class AbstractCommonModel implements MauticModelInterface, SearchCommandListInterface
 {
     public function __construct(
         protected EntityManagerInterface $em,
@@ -94,12 +94,11 @@ abstract class AbstractCommonModel implements MauticModelInterface
     public function getEntities(array $args = [])
     {
         // set the translator
-        $repo = $this->getRepository();
+        $repository = $this->getRepository();
 
-        $repo->setTranslator($this->translator);
-        $repo->setCurrentUser($this->userHelper->getUser());
+        $repository->setCurrentUser($this->userHelper->getUser());
 
-        return $repo->getEntities($args);
+        return $repository->getEntities($args);
     }
 
     /**

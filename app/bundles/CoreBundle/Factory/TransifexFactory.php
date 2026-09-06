@@ -30,7 +30,7 @@ final class TransifexFactory
     public function getTransifex(): TransifexInterface
     {
         if (!$this->transifex) {
-            $this->transifex = $this->create($this->client, $this->coreParametersHelper->get('transifex_api_token') ?? '');
+            $this->transifex = $this->create($this->coreParametersHelper->get('transifex_api_token') ?? '');
         }
 
         return $this->transifex;
@@ -39,13 +39,13 @@ final class TransifexFactory
     /**
      * @throws InvalidConfigurationException
      */
-    private function create(ClientInterface $client, string $apiToken): TransifexInterface
+    private function create(string $apiToken): TransifexInterface
     {
         $config = new Config();
         $config->setApiToken($apiToken);
         $config->setOrganization('mautic');
         $config->setProject('mautic');
 
-        return new Transifex($client, new RequestFactory(), new StreamFactory(), new UriFactory(), $config);
+        return new Transifex($this->client, new RequestFactory(), new StreamFactory(), new UriFactory(), $config);
     }
 }

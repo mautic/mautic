@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PluginBundle\EventListener;
 
 use Mautic\PluginBundle\Form\Type\IntegrationsListType;

@@ -94,7 +94,13 @@
                   <td>{{ item.id|e }}</td>
                   <td>
                       {% if item.leadId is defined and item.leadId is not empty %}
-                        <a href="{{ path('mautic_contact_action', {'objectAction': 'view', 'objectId': item.leadId}) }}" data-toggle="ajax">
+                        <a href="{{ path('mautic_contact_action', {
+                            'objectAction': 'view',
+                            'objectId': item.leadId,
+                            'returnTo': 'form_results',
+                            'formId': formId,
+                            'formPage': page,
+                        }) }}" data-toggle="ajax">
                             {{ item.leadId|e }}
                         </a>
                       {% endif %}

@@ -73,7 +73,7 @@ class PublishStateService
         $eventLogCreatedDateRanges        = $this->generatePublishStateDateRanges($campaign);
         $publishOnlyStates                = $this->filterRangesForState($eventLogCreatedDateRanges, true);
 
-        if (empty($publishOnlyStates)) {
+        if ([] === $publishOnlyStates) {
             return null; // The campaign has never been published
         }
 

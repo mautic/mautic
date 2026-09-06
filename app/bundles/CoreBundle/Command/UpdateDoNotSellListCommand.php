@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Command;
 
 use Mautic\CoreBundle\Helper\MaxMindDoNotSellDownloadHelper;

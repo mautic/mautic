@@ -130,7 +130,7 @@ final class PrivateAddressChecker
             }
 
             // If no allowed private addresses are set, all private URLs are forbidden
-            if (empty($this->allowedPrivateAddresses)) {
+            if ([] === $this->allowedPrivateAddresses) {
                 return false;
             }
 

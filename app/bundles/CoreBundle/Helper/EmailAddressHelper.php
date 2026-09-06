@@ -22,7 +22,7 @@ final class EmailAddressHelper
         $emails = [$email, $this->cleanEmail($email)];
         // email without suffix
         preg_match('#^(.*?)\+(.*?)@(.*?)$#', $email, $parts);
-        if (!empty($parts)) {
+        if ([] !== $parts) {
             $emails[] = $parts[1].'@'.$parts[3];
         }
 

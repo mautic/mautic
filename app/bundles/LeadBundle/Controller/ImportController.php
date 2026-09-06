@@ -26,7 +26,6 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -68,8 +67,6 @@ final class ImportController extends FormController
 
     /**
      * @param int $page
-     *
-     * @return JsonResponse|RedirectResponse
      */
     public function indexAction(Request $request, $page = 1): Response
     {
@@ -119,18 +116,14 @@ final class ImportController extends FormController
 
     /**
      * @param int $objectId
-     *
-     * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(Request $request, $objectId): Response
     {
         return $this->viewStandard($request, $objectId, 'import', 'lead');
     }
 
     /**
      * Cancel and unpublish the import during manual import.
-     *
-     * @return JsonResponse|RedirectResponse
      */
     public function cancelAction(Request $request, NotificationModel $notificationModel, UserRepository $userRepository): Response
     {
@@ -397,7 +390,7 @@ final class ImportController extends FormController
 
                     $matchedFields = $validateEvent->getMatchedFields();
 
-                    if (empty($matchedFields)) {
+                    if ([] === $matchedFields) {
                         $this->resetImport($object);
                         $this->removeImportFile($fullPath);
                         $this->logger->log(LogLevel::WARNING, "Import for file {$fullPath} was aborted as there were no matched files found.");
@@ -418,6 +411,7 @@ final class ImportController extends FormController
                         ->setDefault('list', $validateEvent->getList())
                         ->setDefault('tags', $validateEvent->getTags())
                         ->setDefault('skip_if_exists', $validateEvent->getSkipIfExists())
+                        ->setDefault('create_new', $validateEvent->getCreateNew())
                         ->setHeaders($this->requestStack->getSession()->get('mautic.'.$object.'.import.headers'))
                         ->setParserConfig($this->requestStack->getSession()->get('mautic.'.$object.'.import.config'));
 
@@ -654,28 +648,24 @@ final class ImportController extends FormController
      */
     public function getViewArguments(array $args, $action): array
     {
-        switch ($action) {
-            case 'view':
-                /** @var Import $entity */
-                $entity = $args['entity'];
-
-                $args['viewParameters'] = array_merge(
-                    $args['viewParameters'],
-                    [
-                        'failedRows'        => $this->importModel->getFailedRows($entity->getId(), $entity->getObject()),
-                        'importedRowsChart' => $entity->getDateStarted() ? $this->importModel->getImportedRowsLineChartData(
-                            'i',
-                            $entity->getDateStarted(),
-                            $entity->getDateEnded() ?: $entity->getDateModified(),
-                            null,
-                            [
-                                'object_id' => $entity->getId(),
-                            ]
-                        ) : [],
-                    ]
-                );
-
-                break;
+        if ('view' === $action) {
+            /** @var Import $entity */
+            $entity = $args['entity'];
+            $args['viewParameters'] = array_merge(
+                $args['viewParameters'],
+                [
+                    'failedRows'        => $this->importModel->getFailedRows($entity->getId(), $entity->getObject()),
+                    'importedRowsChart' => $entity->getDateStarted() ? $this->importModel->getImportedRowsLineChartData(
+                        'i',
+                        $entity->getDateStarted(),
+                        $entity->getDateEnded() ?: $entity->getDateModified(),
+                        null,
+                        [
+                            'object_id' => $entity->getId(),
+                        ]
+                    ) : [],
+                ]
+            );
         }
 
         return $args;

@@ -70,7 +70,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         );
 
         $validator->initialize($context);
-        $validator->validate('john@doe.com, jane@doe.com', new EmailOrEmailTokenList(['allowMultiple' => false]));
+        $validator->validate('john@doe.com, jane@doe.com', new EmailOrEmailTokenList(allowMultiple: false));
 
         $this->assertSame(1, $context->violationCount);
     }

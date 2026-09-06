@@ -46,7 +46,7 @@ final class FieldChangeRepositoryTest extends MauticMysqlTestCase
         $this->deleteLead($lead2);
 
         $changes = $this->repository->findChangesBefore(
-            static::INTEGRATION,
+            self::INTEGRATION,
             Lead::class,
             $this->getNow()->modify('+30 seconds'),
             null,
@@ -71,9 +71,9 @@ final class FieldChangeRepositoryTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $this->repository->deleteEntitiesForObject(
-            static::OBJECT_ID,
+            self::OBJECT_ID,
             Lead::class,
-            static::INTEGRATION,
+            self::INTEGRATION,
             $now->modify('+30 seconds')
         );
 
@@ -91,11 +91,11 @@ final class FieldChangeRepositoryTest extends MauticMysqlTestCase
         $now          = $this->getNow();
         for ($i = 1; $i <= $quantity; ++$i) {
             $fieldChange = new FieldChange();
-            $fieldChange->setIntegration(static::INTEGRATION);
-            $fieldChange->setObjectId(static::OBJECT_ID);
+            $fieldChange->setIntegration(self::INTEGRATION);
+            $fieldChange->setObjectId(self::OBJECT_ID);
             $fieldChange->setObjectType(Lead::class);
             $fieldChange->setModifiedAt($now);
-            $fieldChange->setColumnName(static::COLUMN_NAME);
+            $fieldChange->setColumnName(self::COLUMN_NAME);
             $fieldChange->setColumnType('string');
             $fieldChange->setColumnValue((string) $i);
 

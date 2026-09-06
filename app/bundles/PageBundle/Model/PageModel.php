@@ -30,6 +30,7 @@ use Mautic\EmailBundle\Helper\BotRatioHelper;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Entity\UtmTagRepository;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
@@ -45,6 +46,8 @@ use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Entity\Redirect;
+use Mautic\PageBundle\Entity\RedirectRepository;
+use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageEvent;
 use Mautic\PageBundle\Event\PageHitEvent;
@@ -119,6 +122,9 @@ class PageModel extends FormModel implements GlobalSearchInterface
         private readonly HitRepository $hitRepository,
         private readonly EmailRepository $emailRepository,
         private readonly UtmTagRepository $utmTagRepository,
+        private readonly RedirectRepository $redirectRepository,
+        private readonly TrackableRepository $trackableRepository,
+        private readonly LeadRepository $leadRepository,
     ) {
         $this->dateTimeHelper = new DateTimeHelper();
 
@@ -304,13 +310,11 @@ class PageModel extends FormModel implements GlobalSearchInterface
     public function getLookupResults($type, $filter = '', $limit = 10)
     {
         $results = [];
-        switch ($type) {
-            case 'page':
-                $viewOther = $this->security->isGranted('page:pages:viewother');
-                $repo      = $this->getRepository();
-                $repo->setCurrentUser($this->userHelper->getUser());
-                $results = $repo->getPageList($filter, $limit, 0, $viewOther);
-                break;
+        if ('page' === $type) {
+            $viewOther = $this->security->isGranted('page:pages:viewother');
+            $repo      = $this->getRepository();
+            $repo->setCurrentUser($this->userHelper->getUser());
+            $results = $repo->getPageList($filter, $limit, 0, $viewOther);
         }
 
         return $results;
@@ -442,7 +446,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
                 $this->companyModel->saveEntity($companyEntity);
             }
 
-            if (!empty($company) and $companyEntity instanceof Company) {
+            if (!empty($company) && $companyEntity instanceof Company) {
                 // Save after the lead in for new leads created through the API and maybe other places
                 $this->companyModel->addLeadToCompany($companyEntity, $lead);
                 $this->leadModel->setPrimaryCompany($companyEntity->getId(), $lead->getId());
@@ -551,11 +555,15 @@ class PageModel extends FormModel implements GlobalSearchInterface
 
         $query = $hit->getQuery() ?: [];
 
-        if (isset($query['timezone_offset']) && !$lead->getTimezone()) {
-            // timezone_offset holds timezone offset in minutes. Multiply by 60 to get seconds.
-            // Multiply by -1 because Firgerprint2 seems to have it the other way around.
-            $timezone = (-1 * $query['timezone_offset'] * 60);
-            $lead->setTimezone($this->dateTimeHelper->guessTimezoneFromOffset($timezone));
+        if (!$lead->getTimezone()) {
+            if (isset($query['timezone'])) {
+                $lead->setTimezone($query['timezone']);
+            } elseif (isset($query['timezone_offset'])) {
+                // timezone_offset holds timezone offset in minutes. Multiply by 60 to get seconds.
+                // Multiply by -1 because Firgerprint2 seems to have it the other way around.
+                $timezone = (-1 * $query['timezone_offset'] * 60);
+                $lead->setTimezone($this->dateTimeHelper->guessTimezoneFromOffset($timezone));
+            }
         }
 
         $query = $this->cleanQuery($query);
@@ -629,11 +637,11 @@ class PageModel extends FormModel implements GlobalSearchInterface
             }
         } elseif ($page instanceof Redirect) {
             try {
-                $this->pageRedirectModel->getRepository()->upHitCount($page->getId(), 1, $isUnique);
+                $this->redirectRepository->upHitCount($page->getId(), 1, $isUnique);
 
                 // If this is a trackable, up the trackable counts as well
                 if ($hit->getSource() && $hit->getSourceId()) {
-                    $this->pageTrackableModel->getRepository()->upHitCount(
+                    $this->trackableRepository->upHitCount(
                         $page->getId(),
                         $hit->getSource(),
                         $hit->getSourceId(),
@@ -706,7 +714,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         if (null !== $hitDate) {
             if (null === $lead->getLastActive() || $lead->getLastActive() < $hitDate) {
                 try {
-                    $this->leadModel->getRepository()->updateLastActive($lead->getId(), $hitDate);
+                    $this->leadRepository->updateLastActive($lead->getId(), $hitDate);
                 } catch (\Exception $e) {
                     $data = [
                         'unique'             => ($isUnique ? 'true' : 'false'),
@@ -1151,7 +1159,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
                     $decoded = true;
                 }
 
-                if (is_array($query) && !empty($query)) {
+                if (is_array($query) && [] !== $query) {
                     if (isset($query['page_url'])) {
                         $pageURL = $query['page_url'];
                         if (!$decoded) {

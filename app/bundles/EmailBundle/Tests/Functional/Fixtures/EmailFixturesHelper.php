@@ -40,7 +40,7 @@ final readonly class EmailFixturesHelper
             ->setTemplate($template)
             ->setCustomHtml($customHtml);
 
-        if (!empty($segments)) {
+        if ([] !== $segments) {
             $email->setLists($segments);
         }
 

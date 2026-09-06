@@ -11,9 +11,9 @@ use Mautic\LeadBundle\Segment\Query\QueryBuilder;
  */
 final class LeadListFilteringEvent extends CommonEvent
 {
-    private bool $isFilteringDone;
+    private bool $isFilteringDone = false;
 
-    private string $subQuery;
+    private string $subQuery = '';
 
     private readonly string $leadsTableAlias;
 
@@ -33,8 +33,6 @@ final class LeadListFilteringEvent extends CommonEvent
         EntityManagerInterface $entityManager,
     ) {
         $this->em              = $entityManager;
-        $this->isFilteringDone = false;
-        $this->subQuery        = '';
         $this->leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
     }
 

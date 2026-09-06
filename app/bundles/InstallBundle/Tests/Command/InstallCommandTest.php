@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\InstallBundle\Tests\Command;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
+use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Doctrine\Connection\ConnectionWrapper;
 use Mautic\InstallBundle\Command\InstallCommand;
 use Mautic\InstallBundle\Install\InstallService;
@@ -82,5 +83,38 @@ final class InstallCommandTest extends TestCase
         $this->command->run($input, $output);
 
         $this->assertStringContainsString('Install complete'.PHP_EOL, $output->fetch());
+    }
+
+    public function testCommandStripsHtmlFromOptionalInstallerMessages(): void
+    {
+        $this->installer->method('checkIfInstalled')->willReturn(false);
+        $this->installer->method('getStep')->willReturn($this->createStub(StepInterface::class));
+        $this->installer->method('checkRequirements')->willReturn([]);
+        $this->installer->method('checkOptionalSettings')->willReturn([
+            'The <strong>memory_limit</strong> setting in your PHP configuration is lower than the suggested minimum limit of 512M. Mautic can have performance issues with large datasets without sufficient memory.',
+        ]);
+        $this->doctrineRegistry->method('getConnection')->willReturn($this->createStub(ConnectionWrapper::class));
+
+        $input = new ArrayInput(
+            [
+                'site_url'          => 'localhost',
+                '--force'           => true,
+                '--admin_firstname' => 'Admin',
+                '--admin_lastname'  => 'Mautic',
+                '--admin_username'  => 'admin',
+                '--admin_email'     => 'admin@example.com',
+                '--admin_password'  => 'password',
+            ]
+        );
+        $output = new BufferedOutput();
+        $this->command->run($input, $output);
+        $display = $output->fetch();
+
+        $this->assertStringContainsString('Missing optional settings:', $display);
+        $this->assertStringContainsString('memory_limit', $display);
+        $this->assertStringContainsString('512M', $display);
+        $this->assertStringNotContainsString('<strong>', $display);
+        $this->assertStringNotContainsString('</strong>', $display);
+        $this->assertStringNotContainsString('%min_memory_limit%', $display);
     }
 }
