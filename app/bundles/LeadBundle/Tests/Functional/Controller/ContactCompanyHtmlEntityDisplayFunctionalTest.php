@@ -61,11 +61,15 @@ final class ContactCompanyHtmlEntityDisplayFunctionalTest extends MauticMysqlTes
 
         $detailCrawler = $this->client->request(Request::METHOD_GET, '/s/contacts/view/'.$namedContactId);
         $this->assertResponseIsSuccessful();
+        $companiesPanel = $detailCrawler->filter('.panel-companies');
         $this->assertCompanyNameIsDisplayedOnce(
             $detailCrawler->html(),
             $detailCrawler->filter('.page-header-title, .panel-companies')->text(),
             $companyName
         );
+        $this->assertSame(0, $companiesPanel->filter('.contained-list')->count());
+        $this->assertGreaterThan(0, $companiesPanel->filter('.label')->count());
+        $this->assertStringContainsString('ri-building-line', $companiesPanel->html());
 
         $namelessDetailCrawler = $this->client->request(Request::METHOD_GET, '/s/contacts/view/'.$namelessContactId);
         $this->assertResponseIsSuccessful();
