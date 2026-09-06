@@ -762,7 +762,7 @@
 {% macro render_company(company, leadId, color) %}
     {% set companyName = htmlEntityDecode(company.companyname) %}
     <div data-company-id="{{ company.id }}" class="d-flex ai-center gap-xs">
-        <a id="company-{{ company.id }}" class="label label-{{ color }}" href="{{ path('mautic_company_action', {'objectAction': 'view', 'objectId': company.id}) }}" data-toggle="ajax" aria-label="{{ companyName|e('html_attr') }}">
+        <a id="company-{{ company.id }}" class="label label-{{ color }}" href="{{ path('mautic_company_action', {'objectAction': 'view', 'objectId': company.id}) }}" data-toggle="ajax">
             {% if company.is_primary == 1 %}
                 <i class="ri-user-star-fill company-primary-icon primary" aria-hidden="true" focusable="false"></i>
             {% endif %}
