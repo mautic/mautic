@@ -24,7 +24,7 @@ final class Version20211209022550Test extends TestCase
         ]);
 
         $roleModel = new class($role) {
-            public function __construct(private Role $role)
+            public function __construct(private readonly Role $role)
             {
             }
 
@@ -38,7 +38,7 @@ final class Version20211209022550Test extends TestCase
         $entityManager->expects($this->once())->method('flush');
 
         $container = $this->createMock(ContainerInterface::class);
-        $container->method('get')->willReturnMap([
+        $container->expects($this->atLeast(2))->method('get')->willReturnMap([
             [\Mautic\UserBundle\Model\RoleModel::class, $roleModel],
             ['doctrine.orm.entity_manager', $entityManager],
         ]);
