@@ -186,7 +186,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        commands: ['PHPSTAN', 'ECS', 'Rector', 'Twig Lint', 'Class Leak', 'scaffolded files mismatch', 'composer install', 'composer lock check']
+        commands: ['PHPSTAN', 'Easy Coding Standard', 'Rector', 'Twig Lint', 'Class Leak', 'scaffolded files mismatch', 'composer install', 'composer lock check']
         php-versions: ['8.4']
 
     name: ${{ matrix.commands }} - ${{ matrix.php-versions }}
@@ -253,7 +253,7 @@ jobs:
           vendor/bin/rector --dry-run --ansi
         elif [[ "${{ matrix.commands }}" == "Twig Lint" ]]; then
           bin/console lint:twig app plugins
-        elif [[ "${{ matrix.commands }}" == "ECS" ]]; then
+        elif [[ "${{ matrix.commands }}" == "Easy Coding Standard" ]]; then
           for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
             if [[ $file == *.php ]]; then
               cs_fix_files="${cs_fix_files} $file"
