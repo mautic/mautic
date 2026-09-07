@@ -10,9 +10,8 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\LeadList;
-use PHPUnit\Framework\Assert;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 final class CustomSearchCommandTest extends MauticMysqlTestCase
 {
@@ -21,7 +20,7 @@ final class CustomSearchCommandTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->dispatcher = static::getContainer()->get('event_dispatcher');
+        $this->dispatcher = self::getContainer()->get(EventDispatcherInterface::class);
     }
 
     public function testCustomSearchCommandIsAddedToEmailSearchCommands(): void
@@ -38,11 +37,11 @@ final class CustomSearchCommandTest extends MauticMysqlTestCase
         $this->dispatcher->addListener(SearchCommandEvent::class, $listener);
 
         try {
-            $emailModel = static::getContainer()->get(EmailModel::class);
+            $emailModel = self::getContainer()->get(EmailModel::class);
             $commands   = $emailModel->getCommandList();
 
-            Assert::assertTrue($customCommandAdded, 'SearchCommandEvent listener was not called');
-            Assert::assertContains('mautic.test.custom.searchcommand', $commands, 'Custom command was not added to the list');
+            $this->assertTrue($customCommandAdded, 'SearchCommandEvent listener was not called');
+            $this->assertContains('mautic.test.custom.searchcommand', $commands, 'Custom command was not added to the list');
         } finally {
             $this->dispatcher->removeListener(SearchCommandEvent::class, $listener);
         }
@@ -59,10 +58,10 @@ final class CustomSearchCommandTest extends MauticMysqlTestCase
         $this->dispatcher->addListener(SearchCommandEvent::class, $listener);
 
         try {
-            $emailModel = static::getContainer()->get(EmailModel::class);
+            $emailModel = self::getContainer()->get(EmailModel::class);
             $emailModel->getCommandList();
 
-            Assert::assertSame('email', $capturedContext, 'SearchCommandEvent context should be "email"');
+            $this->assertSame('email', $capturedContext, 'SearchCommandEvent context should be "email"');
         } finally {
             $this->dispatcher->removeListener(SearchCommandEvent::class, $listener);
         }
@@ -110,8 +109,8 @@ final class CustomSearchCommandTest extends MauticMysqlTestCase
             $this->assertResponseIsSuccessful();
 
             $content = $this->client->getResponse()->getContent();
-            Assert::assertStringContainsString('Email One', $content, 'Email with special marker should be found');
-            Assert::assertStringNotContainsString('Email Two', $content, 'Email without special marker should not be found');
+            $this->assertStringContainsString('Email One', (string) $content, 'Email with special marker should be found');
+            $this->assertStringNotContainsString('Email Two', (string) $content, 'Email without special marker should not be found');
         } finally {
             $this->dispatcher->removeListener(SearchCommandEvent::class, $listener);
             $this->dispatcher->removeListener(SearchQueryEvent::class, $queryListener);
