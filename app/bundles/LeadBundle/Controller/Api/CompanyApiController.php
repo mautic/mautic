@@ -106,17 +106,12 @@ final class CompanyApiController extends CommonApiController
             return $contact;
         }
 
-        $addedCompanyIds = $this->model->addLeadToCompany($company, $contact);
-
-        try {
-            $this->batchCompanyContactAssignmentModel->logContactCompanyAssignments(
-                $contact,
-                $addedCompanyIds,
-                [$company->getId() => $company],
-            );
-        } catch (\Throwable) {
-            // Assignment succeeded; logging failure must not change the API outcome.
-        }
+        $addedCompanyIds = $this->model->addLeadToCompanyReturningAddedIds($company, $contact);
+        $this->batchCompanyContactAssignmentModel->logContactCompanyAssignmentsSafely(
+            $contact,
+            $addedCompanyIds,
+            [$company->getId() => $company],
+        );
 
         return $this->handleView($view);
     }
@@ -141,6 +136,11 @@ final class CompanyApiController extends CommonApiController
             if (!is_array($entry)) {
                 return $this->returnError('Assignments entries must be a non-empty array', Response::HTTP_BAD_REQUEST);
             }
+        }
+
+        $invalidIds = $this->validateAssignmentIds($assignments);
+        if ($invalidIds instanceof Response) {
+            return $invalidIds;
         }
 
         $valid = $this->validateBatchPayload($assignments);
@@ -170,6 +170,38 @@ final class CompanyApiController extends CommonApiController
         }
 
         return $request->request->all();
+    }
+
+    /**
+     * @param non-empty-array<int, array<string, mixed>> $assignments
+     */
+    private function validateAssignmentIds(array $assignments): Response|true
+    {
+        foreach ($assignments as $entry) {
+            foreach (['contactId', 'companyId'] as $field) {
+                if (!array_key_exists($field, $entry) || !$this->isValidPositiveIntegerId($entry[$field])) {
+                    return $this->returnError(
+                        'Assignment entries must include valid positive integer "contactId" and "companyId" values',
+                        Response::HTTP_BAD_REQUEST
+                    );
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private function isValidPositiveIntegerId(mixed $value): bool
+    {
+        if (is_int($value)) {
+            return $value > 0;
+        }
+
+        if (!is_string($value) || !ctype_digit($value)) {
+            return false;
+        }
+
+        return (int) $value > 0;
     }
 
     /**

@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 class BatchCompanyContactAssignmentModel
@@ -35,6 +36,7 @@ class BatchCompanyContactAssignmentModel
         private readonly LeadModel $leadModel,
         private readonly CorePermissions $security,
         private readonly LeadRepository $leadRepository,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -112,23 +114,22 @@ class BatchCompanyContactAssignmentModel
 
         foreach ($companyIdsByContact as $contactId => $companyIdsForContact) {
             $contact = $contactsById[$contactId];
-            sort($companyIdsForContact);
 
             try {
-                $addedCompanyIds = $this->companyModel->addLeadToCompany($companyIdsForContact, $contact);
+                $addedCompanyIds = $this->companyModel->addLeadToCompanyReturningAddedIds($companyIdsForContact, $contact);
                 $status          = Response::HTTP_OK;
                 $message         = self::MESSAGE_ADDED;
-            } catch (\Throwable) {
+            } catch (\Throwable $e) {
+                $this->logger->error(
+                    'Batch company contact assignment failed for contact {contactId}: {message}',
+                    ['contactId' => $contactId, 'message' => $e->getMessage(), 'exception' => $e]
+                );
                 $status  = Response::HTTP_INTERNAL_SERVER_ERROR;
                 $message = self::MESSAGE_UNEXPECTED;
             }
 
             if (Response::HTTP_OK === $status) {
-                try {
-                    $this->logContactCompanyAssignments($contact, $addedCompanyIds, $companiesById, self::LOG_EVENT_NAME_BATCH);
-                } catch (\Throwable) {
-                    // Assignment succeeded; logging failure must not change the API outcome.
-                }
+                $this->logContactCompanyAssignmentsSafely($contact, $addedCompanyIds, $companiesById, self::LOG_EVENT_NAME_BATCH);
             }
 
             foreach ($companyIdsForContact as $companyId) {
@@ -290,6 +291,22 @@ class BatchCompanyContactAssignmentModel
         }
 
         $this->leadRepository->saveEntity($contact);
+    }
+
+    /**
+     * @param list<int>           $addedCompanyIds
+     * @param array<int, Company> $companiesById
+     */
+    public function logContactCompanyAssignmentsSafely(Lead $contact, array $addedCompanyIds, array $companiesById, string $eventName = self::LOG_EVENT_NAME_SINGLE): void
+    {
+        try {
+            $this->logContactCompanyAssignments($contact, $addedCompanyIds, $companiesById, $eventName);
+        } catch (\Throwable $e) {
+            $this->logger->error(
+                'Failed to log company assignment for contact {contactId}: {message}',
+                ['contactId' => $contact->getId(), 'message' => $e->getMessage(), 'exception' => $e]
+            );
+        }
     }
 
     /**

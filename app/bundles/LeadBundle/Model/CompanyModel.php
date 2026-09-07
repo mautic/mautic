@@ -273,11 +273,22 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      * @param array|Company $companies
      * @param array|Lead    $lead
      *
+     * @throws \Doctrine\ORM\ORMException
+     */
+    public function addLeadToCompany($companies, $lead): bool
+    {
+        return [] !== $this->addLeadToCompanyReturningAddedIds($companies, $lead);
+    }
+
+    /**
+     * @param array|Company $companies
+     * @param array|Lead    $lead
+     *
      * @return list<int> IDs of companies the lead was newly added to
      *
      * @throws \Doctrine\ORM\ORMException
      */
-    public function addLeadToCompany($companies, $lead): array
+    public function addLeadToCompanyReturningAddedIds($companies, $lead): array
     {
         // Primary company name to be persisted to the lead's contact company field
         $companyName        = '';

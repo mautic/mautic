@@ -629,6 +629,47 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
     }
 
+    /**
+     * @param array<string, mixed> $payload
+     */
+    #[DataProvider('invalidAssignmentIdProvider')]
+    public function testBatchAddContactsRejectsMalformedAssignmentIds(array $payload): void
+    {
+        $this->requestBatchAddContacts($payload);
+
+        self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
+    }
+
+    /**
+     * @return \Generator<string, array{array<string, mixed>}>
+     */
+    public static function invalidAssignmentIdProvider(): \Generator
+    {
+        yield 'non-numeric contactId' => [[
+            'assignments' => [
+                ['contactId' => '1junk', 'companyId' => 1],
+            ],
+        ]];
+
+        yield 'float companyId' => [[
+            'assignments' => [
+                ['contactId' => 1, 'companyId' => 1.9],
+            ],
+        ]];
+
+        yield 'array contactId' => [[
+            'assignments' => [
+                ['contactId' => [999], 'companyId' => 1],
+            ],
+        ]];
+
+        yield 'missing companyId' => [[
+            'assignments' => [
+                ['contactId' => 1],
+            ],
+        ]];
+    }
+
     public function testBatchAddContactsExceedsBatchLimit(): void
     {
         $assignments = [];
