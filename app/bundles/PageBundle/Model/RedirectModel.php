@@ -111,7 +111,7 @@ class RedirectModel extends FormModel
      *
      * @return array<Redirect>
      */
-    public function getRedirectsByUrls(array $urls)
+    public function getRedirectsByUrls(array $urls): array
     {
         /** @var array<Redirect> $redirects */
         $redirects   = $this->redirectRepository->findByUrls(array_values($urls));

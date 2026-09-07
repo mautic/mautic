@@ -166,7 +166,7 @@ final class FormFieldHelper extends AbstractFormFieldHelper
      *
      * @return array<string, mixed>
      */
-    public static function getTimezonesChoices()
+    public static function getTimezonesChoices(): array
     {
         static $timezones;
 

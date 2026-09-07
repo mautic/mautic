@@ -7,10 +7,10 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
-final class FormExitSubscriber implements EventSubscriberInterface
+final readonly class FormExitSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly string $model,
+        private string $model,
         private array $options = [],
     ) {
     }

@@ -76,7 +76,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         private readonly SegmentChartQueryFactory $segmentChartQueryFactory,
         private readonly RequestStack $requestStack,
         private readonly SegmentCountCacheHelper $segmentCountCacheHelper,
-        private DoNotContactRepository $doNotContactRepository,
+        private readonly DoNotContactRepository $doNotContactRepository,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,

@@ -334,14 +334,7 @@ class HubspotIntegration extends CrmAbstractIntegration
         return $fieldsValues;
     }
 
-    /**
-     * @param array  $params
-     * @param array  $result
-     * @param string $object
-     *
-     * @return array|null
-     */
-    public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'Lead')
+    public function getLeads(array $params = [], $query = null, &$executed = null, array $result = [], string $object = 'Lead'): array
     {
         if (!is_array($executed)) {
             $executed = [

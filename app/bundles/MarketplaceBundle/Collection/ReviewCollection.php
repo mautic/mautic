@@ -11,7 +11,7 @@ final class ReviewCollection implements \Iterator, \Countable
     /**
      * @var Review[]
      */
-    private array $records;
+    private readonly array $records;
 
     private int $position = 0;
 

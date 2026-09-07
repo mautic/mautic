@@ -362,10 +362,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
         return $sugarFields;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getFetchQuery($params)
+    public function getFetchQuery(array $params): array
     {
         return $params;
     }
@@ -407,12 +404,10 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $params
-     *
      * @throws \Exception
      *                    To be modified
      */
-    public function pushLeadActivity($params = []): ?int
+    public function pushLeadActivity(array $params = []): ?int
     {
         $executed = null;
 
@@ -508,17 +503,17 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array      $params
      * @param array|null $query
      *
-     * @return int|null
+     * @param-out int $executed
      */
-    public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'Leads')
+    public function getLeads(array $params = [], $query = null, &$executed = null, ?array $result = [], string $object = 'Leads'): int
     {
         $params['max_results'] = 100;
 
         $params['offset'] ??= 0;
         $query = $params;
+        $executed = (int) $executed;
 
         try {
             if ($this->isAuthorized()) {
@@ -530,7 +525,8 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
                         (isset($result['total_count']) && $result['total_count'] > $params['offset'])   // Sugar 6
                         || (!isset($result['total_count']) && $params['offset'] > -1)) {            // Sugar 7
                         $params['object'] = $object;
-                        $executed += $this->getLeads($params, null, $executed, [], $object);
+                        $recursed = null;
+                        $executed += $this->getLeads($params, null, $recursed, [], $object);
                     }
                 }
 
