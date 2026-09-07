@@ -12,7 +12,6 @@ use Mautic\DynamicContentBundle\Entity\DynamicContentLeadData;
 use Mautic\DynamicContentBundle\Tests\Functional\DynamicContentReOrderingTrait;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
