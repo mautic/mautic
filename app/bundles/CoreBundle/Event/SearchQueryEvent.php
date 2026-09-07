@@ -13,12 +13,12 @@ class SearchQueryEvent extends Event
 {
     use SearchEventTrait;
 
-    private Base|Comparison $expr;
+    private Base|Comparison|null $expr = null;
 
     /**
      * @var mixed[]
      */
-    private array $parameters;
+    private array $parameters = [];
 
     public function __construct(
         private object $filter,
@@ -43,7 +43,7 @@ class SearchQueryEvent extends Event
         return $this->alias;
     }
 
-    public function getExpr(): Base|Comparison
+    public function getExpr(): Base|Comparison|null
     {
         return $this->expr;
     }
