@@ -94,7 +94,7 @@ class StatData
     /**
      * @param \DateTime|\DateTimeImmutable|null $dateTime
      */
-    private function toDateTime($dateTime): ?\DateTime
+    private function toDateTime(?\DateTimeInterface $dateTime): ?\DateTime
     {
         return $dateTime instanceof \DateTimeImmutable ? \DateTime::createFromImmutable($dateTime) : $dateTime;
     }

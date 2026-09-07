@@ -522,7 +522,7 @@ class StatRepository extends CommonRepository
             ['dateRead', 'dateSent'],
             $timeToReadParser,
             's.id',
-            postCallback: [$this, 'loadAndDeserializeOpenDetails'],
+            postCallback: $this->loadAndDeserializeOpenDetails(...),
         );
     }
 

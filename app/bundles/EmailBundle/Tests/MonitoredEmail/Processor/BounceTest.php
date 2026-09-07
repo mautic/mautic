@@ -17,7 +17,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Monolog\Logger;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\TestDox;
 use Symfony\Component\Mailer\Transport\NullTransport;
 
@@ -55,17 +54,15 @@ final class BounceTest extends \PHPUnit\Framework\TestCase
         $emailStatModel = $this->createMock(EmailStatModel::class);
         $emailStatModel->expects($this->once())
             ->method('saveEntity')
-            ->with($this->callback(function (Stat $stat) {
+            ->willReturnCallback(function (Stat $stat): void {
                 $openDetails = $stat->getOpenDetails();
-                Assert::assertArrayHasKey('bounces', $openDetails);
-                Assert::assertArrayHasKey(0, $openDetails['bounces']);
-                Assert::assertArrayHasKey('datetime', $openDetails['bounces'][0]);
-                Assert::assertArrayHasKey('reason', $openDetails['bounces'][0]);
-                Assert::assertArrayHasKey('code', $openDetails['bounces'][0]);
-                Assert::assertArrayHasKey('type', $openDetails['bounces'][0]);
-
-                return true;
-            }));
+                $this->assertArrayHasKey('bounces', $openDetails);
+                $this->assertArrayHasKey(0, $openDetails['bounces']);
+                $this->assertArrayHasKey('datetime', $openDetails['bounces'][0]);
+                $this->assertArrayHasKey('reason', $openDetails['bounces'][0]);
+                $this->assertArrayHasKey('code', $openDetails['bounces'][0]);
+                $this->assertArrayHasKey('type', $openDetails['bounces'][0]);
+            });
 
         $leadModel = $this->createStub(LeadModel::class);
 

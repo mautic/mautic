@@ -621,10 +621,7 @@ class Stat
         return $this->dataCollection->first();
     }
 
-    /**
-     * @return array
-     */
-    public function getTokens()
+    public function getTokens(): array
     {
         // Maintain existing data from email_stats
         $tokens     = is_array($this->tokens) ? $this->tokens : [];
@@ -675,10 +672,7 @@ class Stat
         $this->dataOpenDetails->add($entity);
     }
 
-    /**
-     * @return array
-     */
-    public function getOpenDetails()
+    public function getOpenDetails(): array
     {
         // Maintain existing data from email_stats
         $openDetails = is_array($this->openDetails) ? $this->openDetails : [];
@@ -691,10 +685,8 @@ class Stat
 
     /**
      * @param array<int|string,mixed> $openDetails
-     *
-     * @return Stat
      */
-    public function setOpenDetails(array $openDetails)
+    public function setOpenDetails(array $openDetails): static
     {
         $this->openDetails = [];
 

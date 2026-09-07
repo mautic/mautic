@@ -7,7 +7,6 @@ namespace Mautic\EmailBundle\Tests\Functional\Entity;
 use Doctrine\DBAL\Logging\DebugStack;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Stat;
-use PHPUnit\Framework\Assert;
 
 final class StatLazyLoadingTest extends MauticMysqlTestCase
 {
@@ -22,7 +21,7 @@ final class StatLazyLoadingTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $statId = $stat->getId();
-        Assert::assertNotNull($statId);
+        $this->assertNotNull($statId);
 
         // Detach everything so the next find() is a genuine fresh hydration from the DB,
         // not a return of the already-in-memory managed instance.
@@ -39,22 +38,18 @@ final class StatLazyLoadingTest extends MauticMysqlTestCase
 
         // @phpstan-ignore property.deprecatedClass
         foreach ($logger->queries as $query) {
-            Assert::assertStringNotContainsStringIgnoringCase(
-                'email_stats_data',
-                $query['sql'],
-                'Loading a Stat must not eagerly join or select email_stats_data.'
-            );
+            $this->assertStringNotContainsStringIgnoringCase('email_stats_data', $query['sql'], 'Loading a Stat must not eagerly join or select email_stats_data.');
         }
 
         // Only once getTokens() is actually called should a query touch email_stats_data.
         $tokens = $freshStat->getTokens();
         // @phpstan-ignore method.deprecated
-        $this->connection->getConfiguration()->setSQLLogger(null);
+        $this->connection->getConfiguration()->setSQLLogger();
 
-        Assert::assertSame(['{token}' => 'value'], $tokens);
-        Assert::assertTrue(
+        $this->assertSame(['{token}' => 'value'], $tokens);
+        $this->assertTrue(
             // @phpstan-ignore property.deprecatedClass
-            (bool) array_filter($logger->queries, static fn ($q) => str_contains(strtolower($q['sql']), 'email_stats_data')),
+            (bool) array_filter($logger->queries, static fn (array $q): bool => str_contains(strtolower($q['sql']), 'email_stats_data')),
             'getTokens() should have triggered a query against email_stats_data.'
         );
     }

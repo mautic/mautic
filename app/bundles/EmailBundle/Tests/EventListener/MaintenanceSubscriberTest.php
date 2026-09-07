@@ -11,7 +11,7 @@ use Mautic\EmailBundle\EventListener\MaintenanceSubscriber;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class MaintenanceSubscriberTest extends TestCase
+final class MaintenanceSubscriberTest extends TestCase
 {
     private string $previousTimezone;
 

@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Copy;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
 final class PublicControllerTokensTest extends MauticMysqlTestCase
@@ -47,7 +46,7 @@ final class PublicControllerTokensTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/email/view/abc123trackinghash');
         $response = $this->client->getResponse();
 
-        Assert::assertTrue($response->isSuccessful(), (string) $response->getContent());
-        Assert::assertStringContainsString('Hi John', (string) $response->getContent());
+        $this->assertTrue($response->isSuccessful(), (string) $response->getContent());
+        $this->assertStringContainsString('Hi John', (string) $response->getContent());
     }
 }

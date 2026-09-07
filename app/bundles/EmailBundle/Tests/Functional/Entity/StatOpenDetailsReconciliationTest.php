@@ -7,7 +7,6 @@ namespace Mautic\EmailBundle\Tests\Functional\Entity;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatOpenDetail;
-use PHPUnit\Framework\Assert;
 
 final class StatOpenDetailsReconciliationTest extends MauticMysqlTestCase
 {
@@ -31,17 +30,17 @@ final class StatOpenDetailsReconciliationTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $statId = $stat->getId();
-        Assert::assertNotNull($statId);
+        $this->assertNotNull($statId);
 
         $rowsBefore = $this->connection->fetchAllAssociative(
             'SELECT id FROM '.MAUTIC_TABLE_PREFIX.'email_stats_open_details WHERE stat_id = :statId ORDER BY id ASC',
             ['statId' => $statId]
         );
-        Assert::assertCount(3, $rowsBefore);
+        $this->assertCount(3, $rowsBefore);
 
         // Drop the first open entry (the lowest numeric key) from the array before writing it back.
         $openDetails = $stat->getOpenDetails();
-        $numericKeys = array_values(array_filter(array_keys($openDetails), 'is_int'));
+        $numericKeys = array_values(array_filter(array_keys($openDetails), is_int(...)));
         sort($numericKeys);
         unset($openDetails[$numericKeys[0]]);
 
@@ -53,15 +52,15 @@ final class StatOpenDetailsReconciliationTest extends MauticMysqlTestCase
             'SELECT id FROM '.MAUTIC_TABLE_PREFIX.'email_stats_open_details WHERE stat_id = :statId ORDER BY id ASC',
             ['statId' => $statId]
         );
-        Assert::assertCount(2, $rowsAfter);
+        $this->assertCount(2, $rowsAfter);
 
         $idsBefore = array_column($rowsBefore, 'id');
         $idsAfter  = array_column($rowsAfter, 'id');
 
         // The surviving rows kept their original ids -- proving they were left untouched rather
         // than deleted and reinserted -- and exactly one row (the dropped open entry) is gone.
-        Assert::assertCount(1, array_diff($idsBefore, $idsAfter));
-        Assert::assertEmpty(array_diff($idsAfter, $idsBefore));
+        $this->assertCount(1, array_diff($idsBefore, $idsAfter));
+        $this->assertEmpty(array_diff($idsAfter, $idsBefore));
     }
 
     public function testSetOpenDetailsReplacesRowsAddedSincePersisting(): void
@@ -75,7 +74,7 @@ final class StatOpenDetailsReconciliationTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $statId = $stat->getId();
-        Assert::assertNotNull($statId);
+        $this->assertNotNull($statId);
 
         // Add a second row without flushing, then call setOpenDetails() with content that
         // references neither the already-persisted row nor the one just added.
@@ -92,8 +91,8 @@ final class StatOpenDetailsReconciliationTest extends MauticMysqlTestCase
         );
 
         // Neither the persisted row nor the unflushed one survives -- only what was passed in.
-        Assert::assertCount(1, $rows);
-        Assert::assertStringContainsString('UA-replacement', $rows[0]['open_detail']);
+        $this->assertCount(1, $rows);
+        $this->assertStringContainsString('UA-replacement', (string) $rows[0]['open_detail']);
     }
 
     public function testSetOpenDetailsUpdatesContentOfAKeptRow(): void
@@ -108,11 +107,11 @@ final class StatOpenDetailsReconciliationTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $statId = $stat->getId();
-        Assert::assertNotNull($statId);
+        $this->assertNotNull($statId);
 
         // Edit both entries' content in place while keeping their _id, then write back.
         $openDetails                                           = $stat->getOpenDetails();
-        $numericKeys                                           = array_values(array_filter(array_keys($openDetails), 'is_int'));
+        $numericKeys                                           = array_values(array_filter(array_keys($openDetails), is_int(...)));
         $openKey                                               = $numericKeys[0];
         $openDetails[$openKey]['useragent']                    = 'UA-edited';
         $openDetails[StatOpenDetail::BOUNCES_KEY][0]['reason'] = self::EDITED_REASON;
@@ -122,8 +121,8 @@ final class StatOpenDetailsReconciliationTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $updated = $stat->getOpenDetails();
-        Assert::assertSame('UA-edited', $updated[$openKey]['useragent']);
-        Assert::assertSame(self::EDITED_REASON, $updated[StatOpenDetail::BOUNCES_KEY][0]['reason']);
+        $this->assertSame('UA-edited', $updated[$openKey]['useragent']);
+        $this->assertSame(self::EDITED_REASON, $updated[StatOpenDetail::BOUNCES_KEY][0]['reason']);
 
         // Re-query to confirm the stored rows themselves changed, not just the in-memory entities.
         $rows = $this->connection->fetchAllAssociative(
@@ -131,9 +130,9 @@ final class StatOpenDetailsReconciliationTest extends MauticMysqlTestCase
             ['statId' => $statId]
         );
         $storedContent = implode(' ', array_column($rows, 'open_detail'));
-        Assert::assertStringContainsString('UA-edited', $storedContent);
-        Assert::assertStringContainsString(self::EDITED_REASON, $storedContent);
-        Assert::assertStringNotContainsString('UA-original', $storedContent);
-        Assert::assertStringNotContainsString('Original reason', $storedContent);
+        $this->assertStringContainsString('UA-edited', $storedContent);
+        $this->assertStringContainsString(self::EDITED_REASON, $storedContent);
+        $this->assertStringNotContainsString('UA-original', $storedContent);
+        $this->assertStringNotContainsString('Original reason', $storedContent);
     }
 }
