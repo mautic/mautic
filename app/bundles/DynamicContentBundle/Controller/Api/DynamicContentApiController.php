@@ -103,13 +103,13 @@ final class DynamicContentApiController extends CommonApiController
         if (array_key_exists('slotName', $parameters)) {
             $entity->setSlotName($parameters['slotName']);
         } elseif ('PUT' === $method) {
-            $entity->setSlotName($parameters['slotName'] ?? null);
+            $entity->setSlotName('');
         }
 
         if (array_key_exists('isCampaignBased', $parameters)) {
             $entity->setIsCampaignBased($parameters['isCampaignBased']);
         } elseif ('PUT' === $method) {
-            $entity->setIsCampaignBased($parameters['isCampaignBased'] ?? false);
+            $entity->setIsCampaignBased(false);
         }
 
         return $this->processForm($request, $entity, $parameters, $method);
