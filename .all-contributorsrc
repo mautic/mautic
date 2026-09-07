@@ -1814,6 +1814,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "kah-ja",
+      "name": "Jan Kahmen",
+      "avatar_url": "https://avatars.githubusercontent.com/u/36455663?v=4",
+      "profile": "https://turingpoint.de/en/",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
