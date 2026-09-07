@@ -10,7 +10,6 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Executioner\Scheduler\Mode\Interval;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 
 /**
  * Reproduces a bug where a contact whose preferred timezone is ahead of UTC
@@ -61,7 +60,7 @@ final class IntervalWeekdayHourTimezoneTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $intervalScheduler = $this->getContainer()->get(Interval::class);
-        \assert($intervalScheduler instanceof Interval);
+        $this->assertInstanceOf(Interval::class, $intervalScheduler);
 
         $contacts = new ArrayCollection([$contact]);
 
@@ -72,7 +71,7 @@ final class IntervalWeekdayHourTimezoneTest extends MauticMysqlTestCase
 
         $groups = $intervalScheduler->groupContactsByDate($event, $contacts, $scheduledSaturdayUtc);
 
-        Assert::assertCount(1, $groups, 'Expected exactly one execution-date group.');
+        $this->assertCount(1, $groups, 'Expected exactly one execution-date group.');
 
         /** @var \DateTime $executionDate */
         $executionDate = array_values($groups)[0]->getExecutionDate();
@@ -80,17 +79,9 @@ final class IntervalWeekdayHourTimezoneTest extends MauticMysqlTestCase
         $executionDateJst = clone $executionDate;
         $executionDateJst->setTimezone(new \DateTimeZone('Asia/Tokyo'));
 
-        Assert::assertSame(
-            'Monday',
-            $executionDateJst->format('l'),
-            'Event must be rescheduled to Monday (the next allowed weekday after Saturday).'
-        );
-        Assert::assertSame(
-            '09:00',
-            $executionDateJst->format('H:i'),
-            'Event must fire at 09:00 AM JST. '
-            .'The bug causes it to fire at 18:13 JST because the DOW loop advances the day '
-            .'without resetting the time to the configured send-hour.'
-        );
+        $this->assertSame('Monday', $executionDateJst->format('l'), 'Event must be rescheduled to Monday (the next allowed weekday after Saturday).');
+        $this->assertSame('09:00', $executionDateJst->format('H:i'), 'Event must fire at 09:00 AM JST. '
+        .'The bug causes it to fire at 18:13 JST because the DOW loop advances the day '
+        .'without resetting the time to the configured send-hour.');
     }
 }
