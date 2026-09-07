@@ -59,8 +59,13 @@ class DateTimeHelper
         $this->local = new \DateTimeZone(self::$defaultLocalTimezone);
 
         if ($datetime instanceof \DateTimeInterface) {
-            $this->datetime = $datetime;
-            $this->timezone = $datetime->getTimezone()->getName();
+            // Always clone so timezone conversions below never mutate the caller's object.
+            // Campaign event forms previously shifted triggerDate on each save because
+            // DateHelper::toFull() → toLocalString() changed the DateTime in modifiedEvents.
+            $this->datetime = $datetime instanceof \DateTimeImmutable
+                ? \DateTime::createFromInterface($datetime)
+                : clone $datetime;
+            $this->timezone = $this->datetime->getTimezone()->getName();
             $this->string   = $this->datetime->format($this->format);
         } elseif (empty($datetime)) {
             $this->datetime = new \DateTime('now', new \DateTimeZone($this->timezone));
@@ -116,7 +121,8 @@ class DateTimeHelper
     public function toLocalString($format = null)
     {
         if ($this->datetime) {
-            $local = $this->datetime->setTimezone($this->local);
+            $dateTime = clone $this->datetime;
+            $local    = $dateTime->setTimezone($this->local);
             if (empty($format)) {
                 $format = $this->format;
             }

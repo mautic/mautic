@@ -74,6 +74,36 @@ final class UrlMatcherTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(UrlMatcher::hasMatch($urls, 'https://yahoo.com'));
     }
 
+    public function testEmptyUrlFilterIsIgnored(): void
+    {
+        $urls = [
+            'http://google.com',
+            'product/123',
+            '//google.com/hello',
+            '',
+        ];
+
+        $this->assertFalse(UrlMatcher::hasMatch($urls, 'https://yahoo.com'));
+    }
+
+    public function testPlainTextMatchesWithinUrl(): void
+    {
+        $urls = [
+            'product/123',
+        ];
+
+        $this->assertTrue(UrlMatcher::hasMatch($urls, 'https://example.com/product/1234'));
+    }
+
+    public function testLegacyWildcardPatternStillMatches(): void
+    {
+        $urls = [
+            '*product/123*',
+        ];
+
+        $this->assertTrue(UrlMatcher::hasMatch($urls, 'https://example.com/product/1234'));
+    }
+
     public function testFTPSchemeMisMatch(): void
     {
         $urls = [

@@ -1567,4 +1567,84 @@ final class MailHelperTest extends TestCase
         $this->assertSame(1, $onSendDispatchCount);
         $this->assertStringContainsString('Demo Signature', (string) $mailer->message->getHtmlBody());
     }
+
+    public function testBounceMailboxReturnPathIsNotShadowedBySenderHeader(): void
+    {
+        $this->stubCoreParameters(['mailer_from_email' => 'from@example.com', 'mailer_from_name' => 'From']);
+
+        $this->mailbox->method('isConfigured')->willReturn(true);
+        $this->mailbox->method('getMailboxSettings')->willReturn(['address' => 'bounces@example.com']);
+
+        $transport = new SmtpTransport();
+        $mailer    = $this->createMailHelperWithTransport($transport);
+        $mailer->setIdHash('abc123');
+        $mailer->setTo('recipient@example.com');
+        $mailer->setSubject('Subject');
+        $mailer->setBody('<p>Body</p>');
+
+        $this->assertTrue($mailer->send());
+
+        $returnPath = $transport->sentMessage->getReturnPath();
+        $this->assertInstanceOf(\Symfony\Component\Mime\Address::class, $returnPath, 'Return-Path should be set to the VERP bounce address.');
+        $this->assertSame('bounces+bounce_abc123@example.com', $returnPath->getAddress());
+
+        $this->assertNotInstanceOf(
+            \Symfony\Component\Mime\Address::class,
+            $transport->sentMessage->getSender(),
+            'Sender header must be removed when a VERP Return-Path is configured; otherwise Symfony Mailer routes the SMTP envelope to From instead of Return-Path.'
+        );
+    }
+
+    public function testCustomReturnPathIsNotShadowedBySenderHeader(): void
+    {
+        $this->stubCoreParameters([
+            'mailer_from_email'  => 'from@example.com',
+            'mailer_from_name'   => 'From',
+            'mailer_return_path' => 'bounce@example.org',
+        ]);
+
+        $this->mailbox->method('isConfigured')->willReturn(false);
+
+        $transport = new SmtpTransport();
+        $mailer    = $this->createMailHelperWithTransport($transport);
+        $mailer->setTo('recipient@example.com');
+        $mailer->setSubject('Subject');
+        $mailer->setBody('<p>Body</p>');
+
+        $this->assertTrue($mailer->send());
+
+        $returnPath = $transport->sentMessage->getReturnPath();
+        $this->assertInstanceOf(\Symfony\Component\Mime\Address::class, $returnPath);
+        $this->assertSame('bounce@example.org', $returnPath->getAddress());
+        $this->assertNotInstanceOf(\Symfony\Component\Mime\Address::class, $transport->sentMessage->getSender());
+    }
+
+    public function testSenderHeaderAlignsWithFromWhenNoReturnPathIsConfigured(): void
+    {
+        $this->stubCoreParameters(['mailer_from_email' => 'from@example.com', 'mailer_from_name' => 'From']);
+
+        $this->mailbox->method('isConfigured')->willReturn(false);
+
+        $transport = new SmtpTransport();
+        $mailer    = $this->createMailHelperWithTransport($transport);
+        $mailer->setTo('recipient@example.com');
+        $mailer->setSubject('Subject');
+        $mailer->setBody('<p>Body</p>');
+
+        $this->assertTrue($mailer->send());
+
+        $this->assertNotInstanceOf(\Symfony\Component\Mime\Address::class, $transport->sentMessage->getReturnPath());
+        $sender = $transport->sentMessage->getSender();
+        $this->assertInstanceOf(\Symfony\Component\Mime\Address::class, $sender, 'Sender must align with From when no Return-Path is set so strict SMTP servers do not reject the envelope (see #14047).');
+        $this->assertSame('from@example.com', $sender->getAddress());
+    }
+
+    /**
+     * @param array<string, mixed> $values
+     */
+    private function stubCoreParameters(array $values): void
+    {
+        $this->coreParametersHelper->method('get')
+            ->willReturnCallback(fn (string $name, $default = null) => $values[$name] ?? $default);
+    }
 }

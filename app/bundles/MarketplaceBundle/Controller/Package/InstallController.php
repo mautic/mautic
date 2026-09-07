@@ -37,8 +37,14 @@ final class InstallController extends CommonController
             return $this->notFound();
         }
 
-        if (!$this->security->isGranted(MarketplacePermissions::CAN_INSTALL_PACKAGES)
-            || !$this->config->isComposerEnabled()) {
+        if (!$this->security->isGranted(MarketplacePermissions::CAN_INSTALL_PACKAGES)) {
+            $this->throwAccessDenied();
+        }
+
+        $packageDetail = $this->packageModel->getPackageDetail("{$vendor}/{$package}");
+        $isResource    = 'mautic-resource' === ($packageDetail->packageBase->type ?? '');
+
+        if (!$isResource && !$this->config->isComposerEnabled()) {
             $this->throwAccessDenied();
         }
 
@@ -46,7 +52,7 @@ final class InstallController extends CommonController
             [
                 'returnUrl'      => $this->routeProvider->buildListRoute(),
                 'viewParameters' => [
-                    'packageDetail'  => $this->packageModel->getPackageDetail("{$vendor}/{$package}"),
+                    'packageDetail'  => $packageDetail,
                 ],
                 'contentTemplate' => '@Marketplace/Package/install.html.twig',
                 'passthroughVars' => [

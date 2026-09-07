@@ -30,6 +30,7 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PointBundle\Entity\Group;
+use Mautic\StageBundle\Entity\Stage;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\TestDox;
 use Symfony\Component\DomCrawler\Crawler;
@@ -80,6 +81,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
             'campaigns',
             'categories',
             'lead_lists',
+            'stages',
         ]);
     }
 
@@ -720,6 +722,63 @@ EMAIL;
         $this->testEmailSendToContactSync();
     }
 
+    public function testContactStagesAreChangedInBatch(): void
+    {
+        $contactA = $this->createContact('contact-stage-a@example.com');
+        $contactB = $this->createContact('contact-stage-b@example.com');
+        $contactC = $this->createContact('contact-stage-c@example.com');
+        $stage    = $this->createStage('added stage');
+
+        $payload = [
+            'lead_batch_stage' => [
+                'addstage' => $stage->getId(),
+                'ids'      => json_encode([$contactA->getId(), $contactB->getId(), $contactC->getId()]),
+            ],
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/s/contacts/batchStages', $payload);
+
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertArrayHasKey('closeModal', $response, self::CLOSE_MODAL_ASSERTION_MESSAGE);
+        $this->assertTrue($response['closeModal']);
+        $this->assertStringContainsString('3 contacts affected', (string) $response['flashes']);
+    }
+
+    public function testContactStagesAreRemovedInBatch(): void
+    {
+        $contactA = $this->createContact('contact-stage-remove-a@example.com');
+        $contactB = $this->createContact('contact-stage-remove-b@example.com');
+        $contactC = $this->createContact('contact-stage-remove-c@example.com');
+        $stage    = $this->createStage('removed stage');
+
+        $contactA->setStage($stage);
+        $contactC->setStage($stage);
+
+        $this->em->persist($contactA);
+        $this->em->persist($contactC);
+        $this->em->flush();
+
+        $payload = [
+            'lead_batch_stage' => [
+                'removestage' => $stage->getId(),
+                'ids'         => json_encode([$contactA->getId(), $contactB->getId(), $contactC->getId()]),
+            ],
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/s/contacts/batchStages', $payload);
+
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertArrayHasKey('closeModal', $response, self::CLOSE_MODAL_ASSERTION_MESSAGE);
+        $this->assertTrue($response['closeModal']);
+        $this->assertStringContainsString('3 contacts affected', (string) $response['flashes']);
+    }
+
     private function createContact(string $email): Lead
     {
         $lead = new Lead();
@@ -729,6 +788,17 @@ EMAIL;
         $this->em->flush();
 
         return $lead;
+    }
+
+    private function createStage(string $name): Stage
+    {
+        $stage = new Stage();
+        $stage->setName($name);
+
+        $this->em->persist($stage);
+        $this->em->flush();
+
+        return $stage;
     }
 
     public function testLookupTypeFieldOnError(): void

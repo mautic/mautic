@@ -132,4 +132,43 @@ final class ImportHelperTest extends TestCase
 
         $this->assertSame($jsonData, $this->importHelper->readZipFile($zipFilePath));
     }
+
+    /**
+     * A real campaign/email export is a single highly-compressible JSON blob that compresses far
+     * better than 1:10. It must not be rejected as a zip bomb just because of its compression ratio.
+     */
+    public function testReadFromZipAllowsHighlyCompressibleJson(): void
+    {
+        $jsonData   = ['custom_html' => str_repeat('<p>Highly compressible content.</p>', 5000)];
+        $jsonOutput = json_encode($jsonData, JSON_THROW_ON_ERROR);
+
+        $zipFilePath   = $this->exportHelper->writeToZipFile($jsonOutput, [], '');
+        $this->paths[] = $zipFilePath;
+
+        $this->assertSame($jsonData, $this->importHelper->readZipFile($zipFilePath));
+    }
+
+    /**
+     * An entry whose uncompressed size exceeds the threshold and still compresses beyond the
+     * allowed ratio is treated as a zip bomb and rejected.
+     */
+    public function testReadFromZipRejectsLargeZipBomb(): void
+    {
+        $tempDir = sys_get_temp_dir();
+
+        // 2MB of a single repeated byte: well above the 1MB ratio-check threshold and compresses
+        // far beyond 1:10.
+        $bombPath = tempnam($tempDir, 'zip_bomb');
+        file_put_contents($bombPath, str_repeat('A', 2 * 1024 * 1024));
+        $this->paths[] = $bombPath;
+
+        $jsonOutput    = json_encode(['key' => 'value'], JSON_THROW_ON_ERROR);
+        $zipFilePath   = $this->exportHelper->writeToZipFile($jsonOutput, [$bombPath], '');
+        $this->paths[] = $zipFilePath;
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Suspicious compression ratio');
+
+        $this->importHelper->readZipFile($zipFilePath);
+    }
 }

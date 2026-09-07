@@ -7,6 +7,7 @@ use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
+use MauticPlugin\MauticFocusBundle\Helper\FocusSearchScopeProvider;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,6 +15,11 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 final class FocusController extends AbstractStandardFormController
 {
+    /**
+     * @var list<array{command: string, label: string, suffix?: string, default?: bool, translate?: bool}>|null
+     */
+    private ?array $indexSearchScopes = null;
+
     private CacheProviderTagAwareInterface $cacheProvider;
 
     private FocusModel $focusModel;
@@ -44,8 +50,10 @@ final class FocusController extends AbstractStandardFormController
     /**
      * @param int $page
      */
-    public function indexAction(Request $request, $page = 1): Response
+    public function indexAction(Request $request, FocusSearchScopeProvider $focusSearchScopeProvider, $page = 1): Response
     {
+        $this->indexSearchScopes = $focusSearchScopeProvider->getScopes();
+
         return parent::indexStandard($request, $page);
     }
 
@@ -110,6 +118,11 @@ final class FocusController extends AbstractStandardFormController
     public function getViewArguments(array $args, $action): array
     {
         $cacheTimeout = (int) $this->coreParametersHelper->get('cached_data_timeout');
+
+        if ('index' === $action && null !== $this->indexSearchScopes) {
+            $args['viewParameters']['searchScopes'] = $this->indexSearchScopes;
+            $this->indexSearchScopes                = null;
+        }
 
         if ('view' == $action) {
             /** @var Focus $item */
