@@ -28,7 +28,7 @@ class EmailRepository extends CommonRepository
     use ProjectRepositoryTrait;
     use QueryBuilderManipulatorTrait;
 
-    protected EventDispatcherInterface $dispatcher;
+    protected ?EventDispatcherInterface $dispatcher = null;
 
     public function setDispatcher(EventDispatcherInterface $dispatcher): void
     {
@@ -704,10 +704,13 @@ class EmailRepository extends CommonRepository
             'mautic.project.searchcommand.name',
         ];
 
-        $searchCommandEvent = new SearchCommandEvent($commands, 'email');
-        $this->dispatcher->dispatch($searchCommandEvent);
+        if (null !== $this->dispatcher) {
+            $searchCommandEvent = new SearchCommandEvent($commands, 'email');
+            $this->dispatcher->dispatch($searchCommandEvent);
+            $commands = $searchCommandEvent->getCommands();
+        }
 
-        return array_merge($searchCommandEvent->getCommands(), parent::getSearchCommands());
+        return array_merge($commands, parent::getSearchCommands());
     }
 
     /**
@@ -1002,6 +1005,10 @@ class EmailRepository extends CommonRepository
      */
     private function dispatchAddSearchCommandWhereClause($query, object $filter): array
     {
+        if (null === $this->dispatcher) {
+            return [null, []];
+        }
+
         $searchQueryEvent = new SearchQueryEvent($filter, $query, $this->getTableAlias(), 'email');
         $this->dispatcher->dispatch($searchQueryEvent);
 

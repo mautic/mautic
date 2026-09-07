@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Event;
 
+use Doctrine\DBAL\Query\QueryBuilder as DBALQueryBuilder;
 use Doctrine\ORM\Query\Expr\Base;
 use Doctrine\ORM\Query\Expr\Comparison;
-use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\QueryBuilder as ORMQueryBuilder;
 use Symfony\Contracts\EventDispatcher\Event;
 
 class SearchQueryEvent extends Event
@@ -22,7 +23,7 @@ class SearchQueryEvent extends Event
 
     public function __construct(
         private object $filter,
-        private QueryBuilder $query,
+        private ORMQueryBuilder|DBALQueryBuilder $query,
         private string $alias,
         private string $context,
     ) {
@@ -33,7 +34,7 @@ class SearchQueryEvent extends Event
         return $this->filter;
     }
 
-    public function getQuery(): QueryBuilder
+    public function getQuery(): ORMQueryBuilder|DBALQueryBuilder
     {
         return $this->query;
     }
