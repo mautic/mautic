@@ -5,14 +5,12 @@
 !.htaccess
 !.gitkeep
 !.ddev
-!.php-cs-fixer.php
 !.github/ci-files/.my.cnf
 .ddev/mautic-preference
 /.ddev/docker-compose.host-docker-internal.yaml
 !/.ddev/.env.*.dist
 /.ddev/docker-compose.phpmyadmin_norouter.yaml
 !.ddev/commands/web/dd
-.php_cs.cache
 /.env.local
 /.env.local.php
 /.env.*.local

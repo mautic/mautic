@@ -3,13 +3,15 @@
 declare(strict_types=1);
 
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
+
 use Utils\PHPStan\Tests\Rule\Fixture\AutowiredArgumentBundle\Bar;
 use Utils\PHPStan\Tests\Rule\Fixture\AutowiredArgumentBundle\Baz;
 use Utils\PHPStan\Tests\Rule\Fixture\AutowiredArgumentBundle\Foo;
 use Utils\PHPStan\Tests\Rule\Fixture\AutowiredArgumentBundle\NamedArgumentService;
 use Utils\PHPStan\Tests\Rule\Fixture\AutowiredArgumentBundle\NeedsInterface;
 use Utils\PHPStan\Tests\Rule\Fixture\AutowiredArgumentBundle\TwoArg;
-use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 return function (ContainerConfigurator $configurator): void {
     $services = $configurator->services();

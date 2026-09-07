@@ -15,6 +15,8 @@ return ECSConfig::configure()
     ->withRootFiles()
     ->withSkip([
         '*/node_modules/*',
+        // test fixtures are data, reformatting them shifts line numbers asserted in rule tests
+        '*/Fixture/*',
         PhpCsFixer\Fixer\Phpdoc\PhpdocNoEmptyReturnFixer::class => [
             // in docbclock on purpose, to avoid BC return on child classes
             __DIR__.'/app/bundles/CoreBundle/Entity/CommonEntity.php',
@@ -31,23 +33,16 @@ return ECSConfig::configure()
 
         // templates rely on alternative syntax (endforeach, endif), keep it as-is
         PhpCsFixer\Fixer\ControlStructure\NoAlternativeSyntaxFixer::class,
-        PhpCsFixer\Fixer\Phpdoc\PhpdocToCommentFixer::class,
-
-        // conflicts with Utils/no_blank_line_between_imports, which keeps imports in one block
-        PhpCsFixer\Fixer\Whitespace\BlankLineBetweenImportGroupsFixer::class,
     ])
-    ->withConfiguredRule(PhpCsFixer\Fixer\Phpdoc\NoSuperfluousPhpdocTagsFixer::class, [
-        'allow_mixed' => true,
-    ])
-    ->withConfiguredRule(PhpCsFixer\Fixer\Operator\NewWithParenthesesFixer::class, [
-        'anonymous_class' => true,
+    // keep @Symfony import grouping (class, then function, then const), so no reordering happens
+    ->withConfiguredRule(PhpCsFixer\Fixer\Import\OrderedImportsFixer::class, [
+        'imports_order' => ['class', 'function', 'const'],
+        'sort_algorithm' => 'alpha',
     ])
     ->withRules([
         PhpCsFixer\Fixer\Semicolon\MultilineWhitespaceBeforeSemicolonsFixer::class,
-        PhpCsFixer\Fixer\FunctionNotation\NullableTypeDeclarationForDefaultNullValueFixer::class,
         Utils\ECS\Fixer\NoBlankLineBetweenImportsFixer::class,
     ])
-    ->withPhpCsFixerSets(symfony: true)
     ->withPreparedSets(
         comments: true,
         docblocks: true,
