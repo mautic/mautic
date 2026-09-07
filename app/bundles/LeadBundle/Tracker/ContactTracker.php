@@ -261,7 +261,7 @@ class ContactTracker
             $lead->addIpAddress($ip);
         }
 
-        if ($persist && !defined('MAUTIC_NON_TRACKABLE_REQUEST')) {
+        if ($persist && !defined('MAUTIC_NON_TRACKABLE_REQUEST') && !$this->requestStack->getCurrentRequest()?->isMethod('HEAD')) {
             // Dispatch events for new lead to write create log, ip address change, etc
             $event = new LeadEvent($lead, true);
             $this->dispatcher->dispatch($event, LeadEvents::LEAD_PRE_SAVE);

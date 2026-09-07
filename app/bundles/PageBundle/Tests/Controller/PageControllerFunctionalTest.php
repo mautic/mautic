@@ -6,12 +6,42 @@ namespace Mautic\PageBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\HttpFoundation\Request;
 
 class PageControllerFunctionalTest extends MauticMysqlTestCase
 {
+    /**
+     * @dataProvider providePageRequestMethods
+     */
+    public function testPageRequestTracking(string $method, int $expectedCount): void
+    {
+        $page   = $this->createPage();
+        $pageId = $page->getId();
+        $url    = '/'.$page->getAlias();
+
+        $this->client->request(Request::METHOD_GET, '/s/logout');
+        $contactCount = $this->em->getRepository(Lead::class)->count([]);
+
+        $this->client->request($method, $url, [], [], ['HTTP_USER_AGENT' => 'Mozilla/5.0']);
+
+        $this->assertSame(200, $this->client->getResponse()->getStatusCode());
+        $this->assertSame($contactCount + $expectedCount, $this->em->getRepository(Lead::class)->count([]));
+        $this->assertSame($expectedCount, $this->em->getRepository(Hit::class)->count(['page' => $pageId]));
+    }
+
+    /**
+     * @return iterable<string, array{string, int}>
+     */
+    public static function providePageRequestMethods(): iterable
+    {
+        yield 'HEAD does not track' => [Request::METHOD_HEAD, 0];
+        yield 'GET still tracks' => [Request::METHOD_GET, 1];
+    }
+
     public function testPagePreview(): void
     {
         $segment = $this->createSegment();
