@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ff6844ccbe13e1b9e75eb65b4428e7a7",
+    "content-hash": "64c96493d78f4805beafff56df037c96",
     "packages": [
         {
             "name": "api-platform/core",
@@ -18628,16 +18628,16 @@
         },
         {
             "name": "symplify/easy-coding-standard",
-            "version": "13.2.19",
+            "version": "13.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ecsphp/ecs.git",
-                "reference": "a2af21c295837302b095180659971029a8294200"
+                "reference": "f672131b66a8482d8b68d9331c9a76fad2e9b424"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ecsphp/ecs/zipball/a2af21c295837302b095180659971029a8294200",
-                "reference": "a2af21c295837302b095180659971029a8294200",
+                "url": "https://api.github.com/repos/ecsphp/ecs/zipball/f672131b66a8482d8b68d9331c9a76fad2e9b424",
+                "reference": "f672131b66a8482d8b68d9331c9a76fad2e9b424",
                 "shasum": ""
             },
             "require": {
@@ -18647,9 +18647,6 @@
                 "friendsofphp/php-cs-fixer": "<3.95.20",
                 "phpcsstandards/php_codesniffer": "<4.0.4",
                 "symplify/coding-standard": "<13.0"
-            },
-            "suggest": {
-                "ext-dom": "Needed to support checkstyle output format in class CheckstyleOutputFormatter"
             },
             "bin": [
                 "bin/ecs"
@@ -18672,9 +18669,9 @@
                 "static analysis"
             ],
             "support": {
-                "source": "https://github.com/ecsphp/ecs/tree/13.2.19"
+                "source": "https://github.com/ecsphp/ecs/tree/13.3.0"
             },
-            "time": "2026-08-24T17:02:37+00:00"
+            "time": "2026-09-07T06:47:35+00:00"
         },
         {
             "name": "symplify/phpstan-rules",

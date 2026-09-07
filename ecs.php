@@ -34,14 +34,8 @@ return ECSConfig::configure()
         // templates rely on alternative syntax (endforeach, endif), keep it as-is
         PhpCsFixer\Fixer\ControlStructure\NoAlternativeSyntaxFixer::class,
     ])
-    // keep @Symfony import grouping (class, then function, then const), so no reordering happens
-    ->withConfiguredRule(PhpCsFixer\Fixer\Import\OrderedImportsFixer::class, [
-        'imports_order' => ['class', 'function', 'const'],
-        'sort_algorithm' => 'alpha',
-    ])
     ->withRules([
         PhpCsFixer\Fixer\Semicolon\MultilineWhitespaceBeforeSemicolonsFixer::class,
-        Utils\ECS\Fixer\NoBlankLineBetweenImportsFixer::class,
     ])
     ->withPreparedSets(
         comments: true,
@@ -50,4 +44,6 @@ return ECSConfig::configure()
         cleanup: true,
         controlStructures: true,
         standaloneLine: true,
+        // @todo enable next
+        // spaces: true,
     );

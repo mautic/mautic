@@ -36,8 +36,6 @@ return RectorConfig::configure()
     ->withComposerBased(phpunit: true, symfony: true)
     ->withSkip([
         '*/Fixture/*',
-        // custom ECS fixer relies on php-cs-fixer classes bundled inside easy-coding-standard, not resolvable here
-        __DIR__.'/utils/ecs',
         // handle later
         Rector\PHPUnit\PHPUnit120\Rector\Class_\AllowMockObjectsForDataProviderRector::class,
 
