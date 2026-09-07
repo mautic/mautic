@@ -99,8 +99,18 @@ final class DynamicContentApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $entity->setSlotName($parameters['slotName'] ?? null);
-        $entity->setIsCampaignBased($parameters['isCampaignBased'] ?? false);
+        // For PATCH, only update fields that are provided in the request
+        if (array_key_exists('slotName', $parameters)) {
+            $entity->setSlotName($parameters['slotName']);
+        } elseif ('PUT' === $method) {
+            $entity->setSlotName($parameters['slotName'] ?? null);
+        }
+
+        if (array_key_exists('isCampaignBased', $parameters)) {
+            $entity->setIsCampaignBased($parameters['isCampaignBased']);
+        } elseif ('PUT' === $method) {
+            $entity->setIsCampaignBased($parameters['isCampaignBased'] ?? false);
+        }
 
         return $this->processForm($request, $entity, $parameters, $method);
     }
