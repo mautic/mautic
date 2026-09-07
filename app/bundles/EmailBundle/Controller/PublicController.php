@@ -263,11 +263,17 @@ final class PublicController extends CommonFormController
 
         $config = $theme->getConfig();
 
+        $messageType = 'unsubscribed';
+        if ($showContactPreferences && !$isUnsubscribeAll && $lead) {
+            $messageType = 'preference_center';
+        }
+
         $viewParams = [
-            'email'    => $email,
-            'lead'     => $lead,
-            'template' => $template,
-            'message'  => $message,
+            'email'        => $email,
+            'lead'         => $lead,
+            'template'     => $template,
+            'message'      => $message,
+            'message_type' => $messageType,
         ];
 
         if (!empty($formContent)) {
@@ -421,11 +427,12 @@ final class PublicController extends CommonFormController
         return new Response($themeHelper->renderThemeTemplate(
             $logicalName,
             [
-                'message'  => $message,
-                'type'     => 'notice',
-                'email'    => $email,
-                'lead'     => $lead,
-                'template' => $template,
+                'message'      => $message,
+                'type'         => 'notice',
+                'message_type' => 'resubscribed',
+                'email'        => $email,
+                'lead'         => $lead,
+                'template'     => $template,
             ]
         ));
     }
