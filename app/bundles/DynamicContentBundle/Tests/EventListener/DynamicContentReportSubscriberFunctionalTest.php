@@ -187,7 +187,7 @@ final class DynamicContentReportSubscriberFunctionalTest extends MauticMysqlTest
         $this->em->flush();
 
         $model = $this->getContainer()->get(DynamicContentModel::class);
-        \assert($model instanceof DynamicContentModel);
+        $this->assertInstanceOf(DynamicContentModel::class, $model);
 
         // Create page stat
         $pageEvent = new PageDisplayEvent('text', $this->page);

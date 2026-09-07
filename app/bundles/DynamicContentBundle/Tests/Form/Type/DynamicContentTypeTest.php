@@ -55,7 +55,7 @@ final class DynamicContentTypeTest extends TestCase
             ->with('lead')
             ->willReturn($this->getMockCustomFieldList());
 
-        $dynamicContentRepositoryMock = $this->createMock(DynamicContentRepository::class);
+        $dynamicContentRepositoryMock = $this->createStub(DynamicContentRepository::class);
 
         $tags = $this->getMockTagList();
         $leadModelMock->expects($this->once())

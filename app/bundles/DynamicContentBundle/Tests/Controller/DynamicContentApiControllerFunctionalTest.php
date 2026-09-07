@@ -105,7 +105,7 @@ final class DynamicContentApiControllerFunctionalTest extends MauticMysqlTestCas
         $this->client->request('POST', '/api/dynamiccontents/new', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
-        Assert::assertNotEmpty($response['errors']);
+        $this->assertNotEmpty($response['errors']);
     }
 
     /**
@@ -143,8 +143,8 @@ final class DynamicContentApiControllerFunctionalTest extends MauticMysqlTestCas
         $this->assertResponseIsSuccessful();
 
         $response = json_decode($this->client->getResponse()->getContent(), true);
-        Assert::assertNotEmpty($response['dynamicContent']);
-        Assert::assertSame('DC-4', $response['dynamicContent']['name']);
+        $this->assertNotEmpty($response['dynamicContent']);
+        $this->assertSame('DC-4', $response['dynamicContent']['name']);
 
         $this->assertDynamicContentOrder('slot-Name', $expectedOrder);
     }
@@ -173,8 +173,8 @@ final class DynamicContentApiControllerFunctionalTest extends MauticMysqlTestCas
         $this->assertResponseIsSuccessful();
 
         $response = json_decode($this->client->getResponse()->getContent(), true);
-        Assert::assertNotEmpty($response['dynamicContent']);
-        Assert::assertSame($dwcName, $response['dynamicContent']['name']);
+        $this->assertNotEmpty($response['dynamicContent']);
+        $this->assertSame($dwcName, $response['dynamicContent']['name']);
     }
 
     public function testHtmlContentIsNotStrippedForHtmlType(): void
