@@ -241,6 +241,16 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertTrue($repo->exists((string) $lead->getId()));
     }
 
+    public function testGetFieldValuesReturnEmptyArrayIfLeadDoesNotExist(): void
+    {
+        $leadRepository = $this->em->getRepository(Lead::class);
+        $this->assertInstanceOf(LeadRepository::class, $leadRepository);
+
+
+        $this->assertSame([], $leadRepository->getFieldValues(999));
+    }
+
+
     private function createLead(string $email = ''): Lead
     {
         $lead = new Lead();

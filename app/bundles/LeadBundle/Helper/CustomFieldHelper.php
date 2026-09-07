@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Helper;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\LeadBundle\Segment\OperatorOptions;
 
 /**
  * Helper class custom field operations.
@@ -41,49 +42,54 @@ final class CustomFieldHelper
     }
 
     /**
+     * @deprecated use the correctly spelled `fieldValueTransformer` instead
+     *
      * @param mixed $value This value can be at least array, string, null and maybe others
      *
      * @return mixed|string|null
      */
-    public static function fieldValueTransfomer(array $field, $value, ?DateTimeHelper $dateTimeHelper = null)
+    public static function fieldValueTransfomer(array $field, $value, ?DateTimeHelper $dateTimeHelper = null): mixed
     {
-        if (null === $value) {
-            // do not transform null values
+        return self::fieldValueTransformer($field, $value, null, $dateTimeHelper);
+    }
+
+    /**
+     * @param array<string, mixed> $field
+     * @param mixed                $value This value can be at least array, string, null and maybe others
+     *
+     * @return mixed|string|null
+     */
+    public static function fieldValueTransformer(array $field, mixed $value, ?string $operator = null, ?DateTimeHelper $dateTimeHelper = null): mixed
+    {
+        $type = $field['type'];
+
+        if (null === $value || is_array($value) || !in_array($type, ['datetime', 'date', 'time'])) {
+            // Do not transform null, array, and non-date type values
+            return $value;
+        }
+
+        // Not sure if this happens anywhere but just in case do not transform empty strings
+        if ('' === $value) {
             return null;
         }
 
-        $type = $field['type'];
-        switch ($type) {
-            case 'datetime':
-            case 'date':
-            case 'time':
-                // Not sure if this happens anywhere but just in case do not transform empty strings
-                if ('' === $value) {
-                    return null;
-                }
-
-                if (!($value instanceof \DateTimeInterface) && !is_string($value)) {
-                    throw new \InvalidArgumentException('Wrong type given. String or DateTimeInterface expected.');
-                }
-
-                $dtHelper = $dateTimeHelper ?: new DateTimeHelper($value, null, 'local');
-                $dtHelper->setDateTime($value);
-
-                switch ($type) {
-                    case 'datetime':
-                        $value = $dtHelper->toUtcString('Y-m-d H:i:s');
-                        break;
-                    case 'date':
-                        $value = $dtHelper->toUtcString('Y-m-d');
-                        break;
-                    case 'time':
-                        $value = $dtHelper->toUtcString('H:i:s');
-                        break;
-                }
-                break;
+        if (OperatorOptions::IN_NEXT === $operator) {
+            $type = OperatorOptions::IN_NEXT;
+        } elseif (OperatorOptions::IN_LAST === $operator) {
+            $type = OperatorOptions::IN_LAST;
         }
 
-        return $value;
+        $dtHelper = $dateTimeHelper ?: new DateTimeHelper($value, null, 'local');
+        $dtHelper->setDateTime($value);
+
+        return match ($type) {
+            'datetime'               => $dtHelper->toUtcString('Y-m-d H:i:s'),
+            'date'                   => $dtHelper->toUtcString('Y-m-d'),
+            'time'                   => $dtHelper->toUtcString('H:i:s'),
+            OperatorOptions::IN_NEXT => $dtHelper->toUtcString('Y-m-d').' 23:59:59',
+            OperatorOptions::IN_LAST => $dtHelper->toUtcString('Y-m-d').' 00:00:00',
+            default                  => $value,
+        };
     }
 
     /**
