@@ -138,9 +138,7 @@ final readonly class ResourceInstaller implements ResourceInstallerInterface
                 $version = $v;
                 break;
             }
-            if (null === $version) {
-                $version = $v;
-            }
+            $version ??= $v;
         }
 
         if (null === $version || empty($version['dist']['url'])) {

@@ -290,9 +290,7 @@ final class ParameterLoader
         $webRoot = $composerJson['extra']['mautic-scaffold']['locations']['web-root'] ?? null;
 
         // Fallback to Symfony's public-dir
-        if (null === $webRoot) {
-            $webRoot = $composerJson['extra']['public-dir'] ?? '.';
-        }
+        $webRoot ??= $composerJson['extra']['public-dir'] ?? '.';
 
         $webRoot = rtrim($webRoot, '/');
         if ('.' === $webRoot || '' === $webRoot) {
