@@ -53,7 +53,16 @@ final class BounceTest extends \PHPUnit\Framework\TestCase
 
         $emailStatModel = $this->createMock(EmailStatModel::class);
         $emailStatModel->expects($this->once())
-            ->method('saveEntity');
+            ->method('saveEntity')
+            ->willReturnCallback(function (Stat $stat): void {
+                $openDetails = $stat->getOpenDetails();
+                $this->assertArrayHasKey('bounces', $openDetails);
+                $this->assertArrayHasKey(0, $openDetails['bounces']);
+                $this->assertArrayHasKey('datetime', $openDetails['bounces'][0]);
+                $this->assertArrayHasKey('reason', $openDetails['bounces'][0]);
+                $this->assertArrayHasKey('code', $openDetails['bounces'][0]);
+                $this->assertArrayHasKey('type', $openDetails['bounces'][0]);
+            });
 
         $leadModel = $this->createStub(LeadModel::class);
 
