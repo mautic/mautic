@@ -279,6 +279,7 @@ rules:
     - Utils\PHPStan\Rule\NoRedundantAutowiredServiceArgumentRule
     - Utils\PHPStan\Rule\NoServiceSetterCallRule
     - Utils\PHPStan\Rule\NoServiceGetterRule
+    - Utils\PHPStan\Rule\NoReadonlyEntityClassRule
 
 services:
     - Utils\PHPStan\ServiceNameUsageResolver
