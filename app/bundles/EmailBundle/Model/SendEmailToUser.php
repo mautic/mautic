@@ -18,13 +18,13 @@ use Mautic\LeadBundle\Validator\CustomFieldValidator;
 use Mautic\UserBundle\Hash\UserHash;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class SendEmailToUser
+readonly class SendEmailToUser
 {
     public function __construct(
-        private readonly EmailModel $emailModel,
-        private readonly EventDispatcherInterface $dispatcher,
-        private readonly CustomFieldValidator $customFieldValidator,
-        private readonly EmailValidator $emailValidator,
+        private EmailModel $emailModel,
+        private EventDispatcherInterface $dispatcher,
+        private CustomFieldValidator $customFieldValidator,
+        private EmailValidator $emailValidator,
     ) {
     }
 

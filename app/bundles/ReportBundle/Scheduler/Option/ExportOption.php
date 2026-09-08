@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Scheduler\Option;
 
-class ExportOption
+readonly class ExportOption
 {
-    private readonly int $reportId;
+    private int $reportId;
 
     /**
      * @param int|null $reportId

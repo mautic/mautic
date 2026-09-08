@@ -6,12 +6,12 @@ namespace Mautic\LeadBundle\Field\Settings;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
-class BackgroundSettings
+readonly class BackgroundSettings
 {
     public const CREATE_CUSTOM_FIELD_IN_BACKGROUND = 'create_custom_field_in_background';
 
     public function __construct(
-        private readonly CoreParametersHelper $coreParametersHelper,
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

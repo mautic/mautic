@@ -6,10 +6,10 @@ namespace Mautic\IntegrationsBundle\Sync\Notification\Helper;
 
 use Doctrine\DBAL\Connection;
 
-class UserHelper
+readonly class UserHelper
 {
     public function __construct(
-        private readonly Connection $connection,
+        private Connection $connection,
     ) {
     }
 

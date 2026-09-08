@@ -2,11 +2,11 @@
 
 namespace Mautic\LeadBundle\Segment\IntegrationCampaign;
 
-final class IntegrationCampaignParts
+final readonly class IntegrationCampaignParts
 {
-    private readonly string $integrationName;
+    private string $integrationName;
 
-    private readonly string $campaignId;
+    private string $campaignId;
 
     /**
      * @param string $field

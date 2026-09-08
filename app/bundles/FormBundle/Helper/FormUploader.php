@@ -10,11 +10,11 @@ use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
 
-class FormUploader
+readonly class FormUploader
 {
     public function __construct(
-        private readonly FileUploader $fileUploader,
-        private readonly CoreParametersHelper $coreParametersHelper,
+        private FileUploader $fileUploader,
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

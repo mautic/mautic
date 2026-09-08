@@ -23,7 +23,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\OrderEx
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FullObjectReportBuilder;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\PartialObjectReportBuilder;
 
-class MauticSyncDataExchange implements SyncDataExchangeInterface
+readonly class MauticSyncDataExchange implements SyncDataExchangeInterface
 {
     public const NAME           = 'mautic';
 
@@ -32,13 +32,13 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
     public const OBJECT_COMPANY = 'company';
 
     public function __construct(
-        private readonly FieldChangeRepository $fieldChangeRepository,
-        private readonly FieldHelper $fieldHelper,
-        private readonly MappingHelper $mappingHelper,
-        private readonly FullObjectReportBuilder $fullObjectReportBuilder,
-        private readonly PartialObjectReportBuilder $partialObjectReportBuilder,
-        private readonly OrderExecutioner $orderExecutioner,
-        private readonly SyncDateHelper $syncDateHelper,
+        private FieldChangeRepository $fieldChangeRepository,
+        private FieldHelper $fieldHelper,
+        private MappingHelper $mappingHelper,
+        private FullObjectReportBuilder $fullObjectReportBuilder,
+        private PartialObjectReportBuilder $partialObjectReportBuilder,
+        private OrderExecutioner $orderExecutioner,
+        private SyncDateHelper $syncDateHelper,
     ) {
     }
 

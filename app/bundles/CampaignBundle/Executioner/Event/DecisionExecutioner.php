@@ -15,14 +15,14 @@ use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
 use Mautic\CoreBundle\Service\OptimisticLockServiceInterface;
 use Mautic\LeadBundle\Entity\Lead;
 
-class DecisionExecutioner implements EventInterface
+readonly class DecisionExecutioner implements EventInterface
 {
     public const TYPE = 'decision';
 
     public function __construct(
-        private readonly EventLogger $eventLogger,
-        private readonly DecisionDispatcher $dispatcher,
-        private readonly OptimisticLockServiceInterface $optimisticLockService,
+        private EventLogger $eventLogger,
+        private DecisionDispatcher $dispatcher,
+        private OptimisticLockServiceInterface $optimisticLockService,
     ) {
     }
 

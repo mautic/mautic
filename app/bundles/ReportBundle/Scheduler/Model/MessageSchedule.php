@@ -8,11 +8,11 @@ use Mautic\ReportBundle\Entity\Report;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class MessageSchedule
+readonly class MessageSchedule
 {
     public function __construct(
-        private readonly TranslatorInterface $translator,
-        private readonly UrlGeneratorInterface $router,
+        private TranslatorInterface $translator,
+        private UrlGeneratorInterface $router,
     ) {
     }
 

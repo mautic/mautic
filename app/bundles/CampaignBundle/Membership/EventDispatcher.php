@@ -8,10 +8,10 @@ use Mautic\CampaignBundle\Event\CampaignLeadChangeEvent;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class EventDispatcher
+readonly class EventDispatcher
 {
     public function __construct(
-        private readonly EventDispatcherInterface $dispatcher,
+        private EventDispatcherInterface $dispatcher,
     ) {
     }
 

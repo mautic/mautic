@@ -6,11 +6,11 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Model\FieldModel;
 
-class FieldAliasHelper
+readonly class FieldAliasHelper
 {
     public function __construct(
-        private readonly FieldModel $fieldModel,
-        private readonly LeadFieldRepository $leadFieldRepository,
+        private FieldModel $fieldModel,
+        private LeadFieldRepository $leadFieldRepository,
     ) {
     }
 

@@ -10,7 +10,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * Provides translated flash messages.
  */
-class FlashBag
+readonly class FlashBag
 {
     public const LEVEL_ERROR     = 'error';
 
@@ -21,9 +21,9 @@ class FlashBag
     public const LEVEL_SUCCESS   = 'success';
 
     public function __construct(
-        private readonly TranslatorInterface $translator,
-        private readonly RequestStack $requestStack,
-        private readonly NotificationModel $notificationModel,
+        private TranslatorInterface $translator,
+        private RequestStack $requestStack,
+        private NotificationModel $notificationModel,
     ) {
     }
 

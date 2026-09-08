@@ -9,11 +9,11 @@ use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Exception\NoListenerException;
 use Mautic\LeadBundle\Field\Dispatcher\FieldSaveDispatcher;
 
-class LeadFieldSaver
+readonly class LeadFieldSaver
 {
     public function __construct(
-        private readonly LeadFieldRepository $leadFieldRepository,
-        private readonly FieldSaveDispatcher $fieldSaveDispatcher,
+        private LeadFieldRepository $leadFieldRepository,
+        private FieldSaveDispatcher $fieldSaveDispatcher,
     ) {
     }
 

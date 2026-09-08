@@ -9,10 +9,10 @@ use Mautic\CoreBundle\Helper\Update\Exception\MetadataNotFoundException;
 use Mautic\CoreBundle\Helper\Update\Exception\UpdatePackageNotFoundException;
 use Mautic\CoreBundle\Release\Metadata;
 
-class ReleaseParser
+readonly class ReleaseParser
 {
     public function __construct(
-        private readonly Client $client,
+        private Client $client,
     ) {
     }
 

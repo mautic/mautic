@@ -9,11 +9,11 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\PageBundle\Entity\Page;
 
-class EmailDefaultsHelper
+readonly class EmailDefaultsHelper
 {
     public function __construct(
-        private readonly CoreParametersHelper $coreParametersHelper,
-        private readonly EntityManagerInterface $entityManager,
+        private CoreParametersHelper $coreParametersHelper,
+        private EntityManagerInterface $entityManager,
     ) {
     }
 

@@ -7,10 +7,10 @@ namespace Mautic\LeadBundle\Segment\Decorator\Date;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
-class TimezoneResolver
+readonly class TimezoneResolver
 {
     public function __construct(
-        private readonly CoreParametersHelper $coreParametersHelper,
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

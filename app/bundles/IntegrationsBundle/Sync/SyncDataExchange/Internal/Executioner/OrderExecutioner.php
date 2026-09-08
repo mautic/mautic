@@ -16,14 +16,14 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class OrderExecutioner
+readonly class OrderExecutioner
 {
     public function __construct(
-        private readonly MappingHelper $mappingHelper,
-        private readonly EventDispatcherInterface $dispatcher,
-        private readonly ObjectProvider $objectProvider,
-        private readonly ReferenceResolverInterface $referenceResolver,
-        private readonly FieldValidatorInterface $fieldValidator,
+        private MappingHelper $mappingHelper,
+        private EventDispatcherInterface $dispatcher,
+        private ObjectProvider $objectProvider,
+        private ReferenceResolverInterface $referenceResolver,
+        private FieldValidatorInterface $fieldValidator,
     ) {
     }
 

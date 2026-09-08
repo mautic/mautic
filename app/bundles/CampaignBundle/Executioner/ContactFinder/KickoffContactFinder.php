@@ -11,12 +11,12 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Psr\Log\LoggerInterface;
 
-class KickoffContactFinder
+readonly class KickoffContactFinder
 {
     public function __construct(
-        private readonly LeadRepository $leadRepository,
-        private readonly CampaignRepository $campaignRepository,
-        private readonly LoggerInterface $logger,
+        private LeadRepository $leadRepository,
+        private CampaignRepository $campaignRepository,
+        private LoggerInterface $logger,
     ) {
     }
 

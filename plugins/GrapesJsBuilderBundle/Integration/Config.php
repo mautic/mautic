@@ -8,10 +8,10 @@ use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 use Mautic\PluginBundle\Entity\Integration;
 
-class Config
+readonly class Config
 {
     public function __construct(
-        private readonly IntegrationsHelper $integrationsHelper,
+        private IntegrationsHelper $integrationsHelper,
     ) {
     }
 

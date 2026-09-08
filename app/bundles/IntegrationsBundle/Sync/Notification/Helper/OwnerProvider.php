@@ -11,11 +11,11 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class OwnerProvider
+readonly class OwnerProvider
 {
     public function __construct(
-        private readonly EventDispatcherInterface $dispatcher,
-        private readonly ObjectProvider $objectProvider,
+        private EventDispatcherInterface $dispatcher,
+        private ObjectProvider $objectProvider,
     ) {
     }
 

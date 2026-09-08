@@ -10,14 +10,14 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 /**
  * @template M of object
  */
-class ModelFactory
+readonly class ModelFactory
 {
     public function __construct(
         #[AutowireLocator(
             MauticModelInterface::class,
             defaultIndexMethod: 'getName'
         )]
-        private readonly ServiceLocator $container,
+        private ServiceLocator $container,
     ) {
     }
 

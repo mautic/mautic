@@ -15,15 +15,15 @@ use Mautic\CoreBundle\Service\OptimisticLockServiceInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-class ConditionExecutioner implements EventInterface
+readonly class ConditionExecutioner implements EventInterface
 {
     public const TYPE = 'condition';
 
     public function __construct(
-        private readonly ConditionDispatcher $dispatcher,
-        private readonly OptimisticLockServiceInterface $optimisticLockService,
+        private ConditionDispatcher $dispatcher,
+        private OptimisticLockServiceInterface $optimisticLockService,
         #[Autowire(service: 'monolog.logger.mautic')]
-        private readonly LoggerInterface $logger,
+        private LoggerInterface $logger,
     ) {
     }
 

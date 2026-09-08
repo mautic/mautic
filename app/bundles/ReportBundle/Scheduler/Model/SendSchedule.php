@@ -9,15 +9,15 @@ use Mautic\ReportBundle\Event\PermanentReportFileCreatedEvent;
 use Mautic\ReportBundle\Exception\FileTooBigException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class SendSchedule
+readonly class SendSchedule
 {
-    private readonly MailHelper $mailer;
+    private MailHelper $mailer;
 
     public function __construct(
         MailHelper $mailer,
-        private readonly MessageSchedule $messageSchedule,
-        private readonly FileHandler $fileHandler,
-        private readonly EventDispatcherInterface $eventDispatcher,
+        private MessageSchedule $messageSchedule,
+        private FileHandler $fileHandler,
+        private EventDispatcherInterface $eventDispatcher,
     ) {
         $this->mailer = $mailer->getMailer();
     }

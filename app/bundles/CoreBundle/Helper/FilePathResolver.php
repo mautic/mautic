@@ -7,11 +7,11 @@ use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class FilePathResolver
+readonly class FilePathResolver
 {
     public function __construct(
-        private readonly Filesystem $filesystem,
-        private readonly InputHelper $inputHelper,
+        private Filesystem $filesystem,
+        private InputHelper $inputHelper,
     ) {
     }
 

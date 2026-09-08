@@ -12,14 +12,14 @@ use Mautic\CoreBundle\Helper\FileProperties;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Exception\FileTooBigException;
 
-class FileHandler
+readonly class FileHandler
 {
     private const string REPORTS_DIR = 'csv_reports';
 
     public function __construct(
-        private readonly FilePathResolver $filePathResolver,
-        private readonly FileProperties $fileProperties,
-        private readonly CoreParametersHelper $coreParametersHelper,
+        private FilePathResolver $filePathResolver,
+        private FileProperties $fileProperties,
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

@@ -12,14 +12,14 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class NotificationHelper
+readonly class NotificationHelper
 {
     public function __construct(
-        private readonly UserModel $userModel,
-        private readonly NotificationModel $notificationModel,
-        private readonly TranslatorInterface $translator,
-        private readonly RouterInterface $router,
-        private readonly CoreParametersHelper $coreParametersHelper,
+        private UserModel $userModel,
+        private NotificationModel $notificationModel,
+        private TranslatorInterface $translator,
+        private RouterInterface $router,
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
