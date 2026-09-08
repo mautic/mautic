@@ -6,94 +6,64 @@ namespace Mautic\IntegrationsBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
+#[ORM\Entity(repositoryClass: FieldChangeRepository::class)]
+#[ORM\Table(name: 'sync_object_field_change_report')]
+#[ORM\Index(columns: ['object_type', 'object_id', 'column_name'], name: 'object_composite_key')]
+#[ORM\Index(columns: ['integration', 'object_type', 'object_id', 'column_name'], name: 'integration_object_composite_key')]
+#[ORM\Index(columns: ['integration', 'object_type', 'modified_at'], name: 'integration_object_type_modification_composite_key')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class FieldChange
 {
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: Types::STRING, length: 191)]
     private $integration;
 
     /**
      * @var int|string
      */
+    #[ORM\Column(name: 'object_id', type: 'bigint', options: ['unsigned' => true])]
     private $objectId;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'object_type', type: Types::STRING, length: 191)]
     private $objectType;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'modified_at', type: Types::DATETIME_MUTABLE)]
     private $modifiedAt;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'column_name', type: Types::STRING, length: 191)]
     private $columnName;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'column_type', type: Types::STRING, length: 191)]
     private $columnType;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'column_value', type: Types::TEXT)]
     private $columnValue;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->setTable('sync_object_field_change_report')
-            ->setCustomRepositoryClass(FieldChangeRepository::class)
-            ->addIndex(['object_type', 'object_id', 'column_name'], 'object_composite_key')
-            ->addIndex(['integration', 'object_type', 'object_id', 'column_name'], 'integration_object_composite_key')
-            ->addIndex(['integration', 'object_type', 'modified_at'], 'integration_object_type_modification_composite_key');
-
-        $builder->addId();
-
-        $builder
-            ->createField('integration', Types::STRING)
-            ->build();
-
-        $builder->addBigIntIdField('objectId', 'object_id', false);
-
-        $builder
-            ->createField('objectType', Types::STRING)
-            ->columnName('object_type')
-            ->build();
-
-        $builder
-            ->createField('modifiedAt', Types::DATETIME_MUTABLE)
-            ->columnName('modified_at')
-            ->build();
-
-        $builder
-            ->createField('columnName', Types::STRING)
-            ->columnName('column_name')
-            ->build();
-
-        $builder
-            ->createField('columnType', Types::STRING)
-            ->columnName('column_type')
-            ->build();
-
-        $builder
-            ->createField('columnValue', Types::TEXT)
-            ->columnName('column_value')
-            ->build();
-    }
 
     /**
      * @return int|null

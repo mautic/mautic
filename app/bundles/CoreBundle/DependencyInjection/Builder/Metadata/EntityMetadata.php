@@ -65,6 +65,17 @@ final class EntityMetadata
                     'is_bundle' => true,
                 ];
             }
+
+            // The bundle maps entities with native Doctrine attributes
+            if ([] === $this->ormConfig && $reflectionClass->getAttributes(\Doctrine\ORM\Mapping\Entity::class)) {
+                $this->ormConfig = [
+                    'dir'       => 'Entity',
+                    'type'      => 'attribute',
+                    'prefix'    => $bundleNamespace.'\\Entity',
+                    'mapping'   => true,
+                    'is_bundle' => true,
+                ];
+            }
         }
     }
 
