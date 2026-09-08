@@ -79,7 +79,7 @@ class SchemaDefinition
     }
 
     /**
-     * @param mixed[] $schemaDefinition
+     * @param array<string, mixed> $schemaDefinition
      */
     public static function getFieldCharLengthLimit(array $schemaDefinition): ?int
     {

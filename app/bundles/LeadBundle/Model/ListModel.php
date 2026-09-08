@@ -1027,7 +1027,8 @@ class ListModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param bool $canViewOthers
+     * @param bool                 $canViewOthers
+     * @param array<string, mixed> $filter
      */
     public function getLifeCycleSegmentChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat, array $filter, $canViewOthers, $listName): array
     {
@@ -1060,7 +1061,10 @@ class ListModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param bool $canViewOthers
+     * @param bool                 $canViewOthers
+     * @param array<string, mixed> $filter
+     *
+     * @return array<string, array<int|string, mixed>>
      */
     public function getStagesBarChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], $canViewOthers = true): array
     {
@@ -1120,7 +1124,10 @@ class ListModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param bool $canViewOthers
+     * @param bool                 $canViewOthers
+     * @param array<string, mixed> $filter
+     *
+     * @return array<string, array<int|string, mixed>>
      */
     public function getDeviceGranularityData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], $canViewOthers = true): array
     {

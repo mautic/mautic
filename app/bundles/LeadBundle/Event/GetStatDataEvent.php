@@ -9,7 +9,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 final class GetStatDataEvent extends Event
 {
     /**
-     * @var array<string,mixed[]>
+     * @var mixed[]
      */
     private array $results = [];
 

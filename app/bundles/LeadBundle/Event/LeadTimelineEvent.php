@@ -61,8 +61,9 @@ final class LeadTimelineEvent extends Event
     ];
 
     /**
-     * @param Lead|null $lead  Lead entity for the lead the timeline is being generated for
-     * @param int       $limit Limit per type
+     * @param Lead|null            $lead    Lead entity for the lead the timeline is being generated for
+     * @param int                  $limit   Limit per type
+     * @param array<string, mixed> $filters
      */
     public function __construct(
         private readonly ?Lead $lead = null,
@@ -99,7 +100,7 @@ final class LeadTimelineEvent extends Event
      * 'timestamp' => \DateTime The timestamp of the event
      * 'extra'     => array     An optional array of extra data for the event
      *
-     * @param array $data Data array for the table
+     * @param array<string, mixed> $data Data array for the table
      */
     public function addEvent(array $data): void
     {
@@ -280,6 +281,8 @@ final class LeadTimelineEvent extends Event
 
     /**
      * Fetch start/limit for queries.
+     *
+     * @return array<string, int|null>
      */
     public function getEventLimit(): array
     {
@@ -520,6 +523,8 @@ final class LeadTimelineEvent extends Event
 
     /**
      * Generate something consistent for this event to identify this log entry.
+     *
+     * @param array<string, mixed> $data
      */
     private function generateEventId(array $data): string
     {

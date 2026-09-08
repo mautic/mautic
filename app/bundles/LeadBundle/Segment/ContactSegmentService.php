@@ -20,6 +20,8 @@ readonly class ContactSegmentService
     }
 
     /**
+     * @param array<string, mixed> $batchLimiters
+     *
      * @return array<int,mixed[]>
      *
      * @throws Exception\SegmentQueryException
@@ -139,7 +141,7 @@ readonly class ContactSegmentService
     }
 
     /**
-     * @param mixed[] $batchLimiters
+     * @param array<string, mixed> $batchLimiters
      */
     public function getNewLeadListLeadsQueryBuilder(LeadList $segment, array $batchLimiters, bool $addNewContactsRestrictions = true): QueryBuilder
     {

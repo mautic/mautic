@@ -14,6 +14,8 @@ class QueryBuilder extends BaseQueryBuilder
 
     /**
      * Unprocessed logic for segment processing.
+     *
+     * @var string[]|CompositeExpression[]
      */
     private array $logicStack = [];
 
@@ -345,6 +347,9 @@ class QueryBuilder extends BaseQueryBuilder
         return count($this->logicStack) > 0;
     }
 
+    /**
+     * @return string[]|CompositeExpression[]
+     */
     public function getLogicStack(): array
     {
         return $this->logicStack;

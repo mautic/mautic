@@ -815,6 +815,8 @@ class FieldModel extends FormModel
     }
 
     /**
+     * @param array<string, mixed> $properties
+     *
      * @return string|true
      */
     public function setFieldProperties(LeadField $entity, array $properties)

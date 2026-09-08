@@ -37,6 +37,8 @@ final class CustomFieldValueHelper
     }
 
     /**
+     * @param array<string, mixed> $field
+     *
      * @return mixed
      */
     public static function normalizeValue(array $field)
@@ -49,7 +51,8 @@ final class CustomFieldValueHelper
     }
 
     /**
-     * @param string $value
+     * @param string               $value
+     * @param array<string, mixed> $properties
      *
      * @return string
      */

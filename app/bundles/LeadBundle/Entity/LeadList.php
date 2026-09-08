@@ -432,6 +432,8 @@ class LeadList extends FormEntity implements UuidInterface
      *
      * This is needed go keep BC after we moved 'filter' and 'display' params
      * to the 'properties' array.
+     *
+     * @param mixed[][] $filters
      */
     private function addLegacyParams(array $filters): array
     {

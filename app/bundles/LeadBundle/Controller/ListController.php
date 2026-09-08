@@ -397,6 +397,8 @@ final class ListController extends FormController
     /**
      * Create modifying response for segments - edit.
      *
+     * @param array<string, mixed> $postActionVars
+     *
      * @return Response
      */
     private function createSegmentModifyResponse(Request $request, LeadList $segment, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $segmentModel, AuditLogModel $auditLogModel, array $postActionVars, string $action, bool $ignorePost)
@@ -476,6 +478,8 @@ final class ListController extends FormController
      * Get variables for POST action.
      *
      * @param int|null $objectId
+     *
+     * @return array<string, string|array<string, mixed>|array<string, string|int>|array<string, string>>
      */
     private function getPostActionVars(Request $request, $objectId = null): array
     {

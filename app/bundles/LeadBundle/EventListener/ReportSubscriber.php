@@ -778,6 +778,9 @@ final class ReportSubscriber implements EventSubscriberInterface
         $event->addTable(self::CONTEXT_CONTACT_FREQUENCYRULES, $data, self::GROUP_CONTACTS);
     }
 
+    /**
+     * @param array<string, mixed> $filters
+     */
     private function injectAttributionReportData(ReportBuilderEvent $event, array $columns, array $filters, string $type): void
     {
         $attributionColumns = [

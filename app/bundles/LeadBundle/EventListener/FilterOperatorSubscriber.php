@@ -22,6 +22,9 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
 {
     use SegmentFilterIconTrait;
 
+    /**
+     * @var array<string, string[]>
+     */
     private array $behaviorOperators = [
         'datetime' => [
             OperatorOptions::EQUAL_TO,

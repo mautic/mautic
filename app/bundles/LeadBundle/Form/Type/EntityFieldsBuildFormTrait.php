@@ -32,6 +32,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 trait EntityFieldsBuildFormTrait
 {
     /**
+     * @param array<string, mixed> $options
+     *
      * @return array<string, 'html'|'raw'>
      */
     private function getFormFields(FormBuilderInterface $builder, array $options, string $object = 'lead'): array

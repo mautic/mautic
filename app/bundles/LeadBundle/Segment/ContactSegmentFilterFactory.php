@@ -151,7 +151,7 @@ final class ContactSegmentFilterFactory
     }
 
     /**
-     * @param mixed[] $stack
+     * @param array<int, mixed> $stack
      *
      * @return mixed[]
      */

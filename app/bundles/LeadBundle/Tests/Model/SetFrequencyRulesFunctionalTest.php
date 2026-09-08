@@ -60,7 +60,7 @@ final class SetFrequencyRulesFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param mixed[] $cats
+     * @param array<string, bool> $cats
      *
      * @return Category[]
      */
