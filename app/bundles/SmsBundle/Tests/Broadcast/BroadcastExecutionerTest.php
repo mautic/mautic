@@ -15,9 +15,11 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\SmsBundle\Broadcast\BroadcastExecutioner;
 use Mautic\SmsBundle\Broadcast\BroadcastQuery;
+use Mautic\SmsBundle\Collection\RecipientCollection;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Entity\SmsRepository;
 use Mautic\SmsBundle\Model\SmsModel;
+use Mautic\SmsBundle\Sms\TransportChain;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -164,6 +166,91 @@ final class BroadcastExecutionerTest extends MauticMysqlTestCase
             'failed'                 => 1,
             'failedRecipientsByList' => [],
         ], array_values($event->getResults())[0]);
+    }
+
+    public function testMixedTranslationFailureKeepsCompletedOutcomesAndLeavesFailedCollectionRetryable(): void
+    {
+        [$sms, $contacts] = $this->createBroadcast(2, 'partial-translations');
+        $sms->setLanguage('en');
+
+        $translatedSms = new Sms();
+        $translatedSms->setName('partial-translations-fr');
+        $translatedSms->setMessage('Bonjour');
+        $translatedSms->setLanguage('fr_FR');
+        $translatedSms->setIsPublished(true);
+        $translatedSms->setTranslationParent($sms);
+        $contacts[1]->addUpdatedField('preferred_locale', 'fr_FR');
+        $this->em->persist($translatedSms);
+        $this->em->flush();
+
+        $smsId           = $sms->getId();
+        $translatedSmsId = $translatedSms->getId();
+        $firstContactId  = $contacts[0]->getId();
+        $secondContactId = $contacts[1]->getId();
+        $this->em->clear();
+
+        $sms = $this->em->find(Sms::class, $smsId);
+        $localizedContact = $this->em->find(Lead::class, $secondContactId);
+        $this->assertInstanceOf(Sms::class, $sms);
+        $this->assertInstanceOf(Lead::class, $localizedContact);
+        $localizedContact->addUpdatedField('preferred_locale', 'fr_FR');
+
+        $transport = $this->createMock(TransportChain::class);
+        $transport->expects($this->exactly(2))
+            ->method('sendBatchSms')
+            ->willReturnCallback(static function (RecipientCollection $collection, string $message): RecipientCollection {
+                if ('Bonjour' === $message) {
+                    throw new \RuntimeException('Provider rejected +41790000001: private message body');
+                }
+
+                foreach ($collection as $recipient) {
+                    $recipient->setResult(true);
+                }
+
+                return $collection;
+            });
+        self::getContainer()->set('mautic.sms.transport_chain', $transport);
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
+            ->method('error')
+            ->with('SMS broadcast execution failed.', [
+                'smsId'          => $smsId,
+                'exceptionClass' => \RuntimeException::class,
+            ]);
+        $smsModel = self::getContainer()->get(SmsModel::class);
+        ReflectionHelper::setValue($smsModel, 'transport', $transport);
+        $executioner = $this->createExecutioner($smsModel, $logger);
+
+        $result = $executioner->sendNextBatch($sms, 2, new ContactLimiter(2));
+
+        $this->assertSame(1, $result->getProcessedCount());
+        $this->assertSame(1, $result->getSubmittedCount());
+        $this->assertSame(1, $result->getExecutionFailureCount());
+        $this->assertSame(1, $result->getFailedCount());
+        $this->assertSame([], $result->getFailedContacts());
+        $this->assertSame(1, $result->getRemainingCount());
+
+        $firstStats = $smsModel->getStatRepository()->findBy(['lead' => $firstContactId]);
+        $this->assertCount(1, $firstStats);
+        $this->assertFalse($firstStats[0]->isFailed());
+        $this->assertSame($smsId, $firstStats[0]->getSms()->getId());
+        $this->assertSame([], $smsModel->getStatRepository()->findBy(['lead' => $secondContactId]));
+
+        $this->em->clear();
+        $sms           = $this->em->find(Sms::class, $smsId);
+        $translatedSms = $this->em->find(Sms::class, $translatedSmsId);
+        $this->assertInstanceOf(Sms::class, $sms);
+        $this->assertInstanceOf(Sms::class, $translatedSms);
+        $this->assertSame(1, $sms->getSentCount());
+        $this->assertSame(0, $translatedSms->getSentCount());
+
+        $pendingContacts = self::getContainer()->get(BroadcastQuery::class)
+            ->getPendingContacts($sms, new ContactLimiter(10));
+        $this->assertSame([$secondContactId], array_map(
+            static fn (array $contact): int => (int) $contact['id'],
+            $pendingContacts,
+        ));
     }
 
     public function testExecuteRetainsSentBatchOutcomeWhenRemainingCountFails(): void

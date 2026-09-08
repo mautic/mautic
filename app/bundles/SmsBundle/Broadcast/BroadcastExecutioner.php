@@ -8,6 +8,7 @@ use Mautic\ChannelBundle\Event\ChannelBroadcastEvent;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Entity\SmsRepository;
+use Mautic\SmsBundle\Exception\PartialBatchException;
 use Mautic\SmsBundle\Model\SmsModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -98,12 +99,19 @@ final readonly class BroadcastExecutioner
 
         $loadedContacts = [];
         $sendFailure    = null;
+        $partialFailure = null;
         try {
             $sendResults = $this->smsModel->sendSms($sms, $contactIds, [
                 'channel' => ['sms', $sms->getId()],
                 'listId'  => $listIds,
             ], $loadedContacts);
             $result->process($sendResults, count($contactIds));
+        } catch (PartialBatchException $exception) {
+            // Only completed/pre-filtered outcomes are included. The collection that
+            // raised the transport exception remains unprocessed and retryable.
+            $result->process($exception->getResults());
+            $result->executionFailed();
+            $partialFailure = $exception;
         } catch (\Throwable $exception) {
             $sendFailure = $exception;
         }
@@ -112,7 +120,7 @@ final readonly class BroadcastExecutioner
         try {
             $this->leadRepository->detachEntities($loadedContacts);
         } catch (\Throwable $exception) {
-            if (null === $sendFailure) {
+            if (null === $sendFailure && null === $partialFailure) {
                 // Submission has already completed. Preserve those known outcomes while
                 // reporting that cleanup could not be completed.
                 $result->executionFailed();
@@ -123,6 +131,21 @@ final readonly class BroadcastExecutioner
 
         if (null !== $sendFailure) {
             throw $sendFailure;
+        }
+
+        if (null !== $partialFailure) {
+            $this->reportExecutionFailureClass($sms, $partialFailure->getOriginalExceptionClass());
+
+            try {
+                // Do not advance the cursor past an unknown transport outcome. Completed
+                // contacts have stats and are excluded; the failed collection can retry.
+                $result->setRemainingCount($this->broadcastQuery->getPendingCount($sms, $partition));
+            } catch (\Throwable) {
+                // The transport failure is already represented and logged. Avoid
+                // replacing or double-reporting it with secondary bookkeeping failures.
+            }
+
+            return $result;
         }
 
         $nextContactId = $contactIds[array_key_last($contactIds)] + 1;

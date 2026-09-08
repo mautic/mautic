@@ -286,6 +286,33 @@ final class BroadcastQueryFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(0, $this->getBroadcastQuery()->getPendingCount($sms));
     }
 
+    public function testUnusableNumberFailureIsNotReselected(): void
+    {
+        $segment = $this->createSegment('sms-unusable-number');
+        $sms     = $this->createBroadcastSms([$segment]);
+        $contact = $this->createContact("\t", null);
+        $this->addContactToSegment($contact, $segment);
+        $this->em->flush();
+
+        $contactId = $contact->getId();
+        $this->assertSame([$contactId], $this->getIds($this->getBroadcastQuery()->getPendingContacts($sms, new ContactLimiter(100))));
+
+        $transport = $this->createMock(TransportChain::class);
+        $transport->expects($this->never())->method('sendBatchSms');
+        self::getContainer()->set('mautic.sms.transport_chain', $transport);
+
+        /** @var SmsModel $smsModel */
+        $smsModel = self::getContainer()->get(SmsModel::class);
+        $results  = $smsModel->sendSms($sms, $contact);
+
+        $this->assertSame('mautic.sms.campaign.failed.missing_number', $results[$contactId]['status']);
+        $stats = $smsModel->getStatRepository()->findBy(['sms' => $sms->getId(), 'lead' => $contactId]);
+        $this->assertCount(1, $stats);
+        $this->assertTrue($stats[0]->isFailed());
+        $this->assertSame([], $this->getBroadcastQuery()->getPendingContacts($sms, new ContactLimiter(100)));
+        $this->assertSame(0, $this->getBroadcastQuery()->getPendingCount($sms));
+    }
+
     private function getBroadcastQuery(): BroadcastQuery
     {
         return self::getContainer()->get(BroadcastQuery::class);

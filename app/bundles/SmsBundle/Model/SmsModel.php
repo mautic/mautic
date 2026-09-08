@@ -29,6 +29,7 @@ use Mautic\SmsBundle\Event\FilterEvent;
 use Mautic\SmsBundle\Event\QueueEvent;
 use Mautic\SmsBundle\Event\SmsEvent;
 use Mautic\SmsBundle\Event\SmsSendEvent;
+use Mautic\SmsBundle\Exception\PartialBatchException;
 use Mautic\SmsBundle\Exception\PrimaryTransportNotEnabledException;
 use Mautic\SmsBundle\Form\Type\SmsType;
 use Mautic\SmsBundle\Helper\DTO\SmsRecipientDTO;
@@ -267,12 +268,31 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         $filterEvent = new FilterEvent($sendContacts);
         $this->dispatcher->dispatch($filterEvent, SmsEvents::FILTER_CONTACTS_ON_SEND);
 
+        $missingNumberStats      = [];
+        $missingNumberContactIds = array_flip($filterEvent->getRemovedContacts(FilterEvent::REMOVAL_REASON_MISSING_NUMBER));
         foreach ($filterEvent->getRemovedContacts() as $contactId) {
+            $status = 'mautic.sms.campaign.failed.missing_number';
             $results[$contactId] = [
                 'sent'   => false,
-                'status' => 'mautic.sms.campaign.failed.missing_number',
+                'status' => $status,
             ];
+
+            if (!isset($missingNumberContactIds[$contactId])) {
+                continue;
+            }
+
+            $contact = $sendContacts[$contactId];
+            $stat    = $this->createStatEntry(
+                $sms,
+                $contact,
+                $channel,
+                false,
+                $this->getContactListId($listIds, $contactId),
+            );
+            $this->markStatFailed($stat, $status);
+            $missingNumberStats[$contactId] = $stat;
         }
+        $this->persistStats($missingNumberStats, $results);
 
         $sendContacts = $filterEvent->getContacts();
 
@@ -328,7 +348,6 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
             unset($smsEvent, $tokenEvent);
         }
 
-        $sentCount = [];
         foreach ($recipientCollections as $recipientCollection) {
             $translatedSms = $recipientCollection->getSms();
             $media         = $translatedSms->getMedia();
@@ -341,10 +360,25 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
                 } else {
                     $this->transport->sendBatchSms($recipientCollection, $message);
                 }
-            } catch (PrimaryTransportNotEnabledException $exception) {
-                $this->logger->warning($exception->getMessage());
+            } catch (PrimaryTransportNotEnabledException) {
+                $this->logger->warning('Primary SMS transport is not enabled.');
 
-                return $results;
+                foreach ($recipientCollection as $recipient) {
+                    $contactId = $recipient->getKey();
+                    unset($stats[$contactId]);
+                    $results[$contactId] = [
+                        'sent'   => false,
+                        'status' => 'mautic.sms.config.no_transport',
+                    ];
+                }
+
+                continue;
+            } catch (\Throwable $exception) {
+                if ([] === $results) {
+                    throw $exception;
+                }
+
+                throw new PartialBatchException($results, $exception);
             }
 
             $defaultSendResult = [
@@ -355,36 +389,39 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
                 'name'    => $recipientCollection->getSms()->getName(),
             ];
 
+            $collectionStats = [];
+            $sentCount       = 0;
             foreach ($recipientCollection as $recipient) {
                 $contactId = $recipient->getKey();
                 $defaultSendResult['content'] = $recipient->getFinalMessage();
                 if (true !== $recipient->getResult()) {
+                    $status                      = 'mautic.sms.timeline.status.failed';
                     $defaultSendResult['sent']   = false;
-                    $defaultSendResult['status'] = $recipient->getResult();
-                    unset($stats[$contactId]);
+                    $defaultSendResult['status'] = $status;
+                    $this->markStatFailed($stats[$contactId], $status);
                 } else {
-                    $defaultSendResult['sent']          = true;
-                    $defaultSendResult['status']        = 'mautic.sms.timeline.status.delivered';
-                    $sentCount[$translatedSms->getId()] = ($sentCount[$translatedSms->getId()] ?? 0) + 1;
+                    $defaultSendResult['sent']   = true;
+                    $defaultSendResult['status'] = 'mautic.sms.timeline.status.delivered';
+                    ++$sentCount;
                 }
 
-                $results[$contactId] = $defaultSendResult;
+                $results[$contactId]         = $defaultSendResult;
+                $collectionStats[$contactId] = $stats[$contactId];
             }
-        }
 
-        foreach ($sentCount as $id => $count) {
-            $this->smsRepository->upCount($id, 'sent', $count);
-        }
+            // Commit each translated collection before attempting the next one. A later
+            // transport exception must not make already submitted contacts eligible again.
+            $this->persistStats($collectionStats, $results);
+            foreach (array_keys($collectionStats) as $contactId) {
+                unset($stats[$contactId]);
+            }
 
-        if (count($stats)) {
-            $this->statRepository->saveEntities($stats);
-
-            foreach ($stats as $stat) {
-                if (!$stat->isFailed()) {
-                    $results[$stat->getLead()->getId()]['statId'] = $stat->getId();
+            if ($sentCount > 0) {
+                try {
+                    $this->smsRepository->upCount($translatedSms->getId(), 'sent', $sentCount);
+                } catch (\Throwable $exception) {
+                    throw new PartialBatchException($results, $exception);
                 }
-
-                $this->smsRepository->detachEntity($stat);
             }
         }
 
@@ -394,6 +431,33 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
     private function getContactListId(mixed $listIds, int $contactId): mixed
     {
         return is_array($listIds) ? ($listIds[$contactId] ?? null) : $listIds;
+    }
+
+    private function markStatFailed(Stat $stat, string $status): void
+    {
+        $stat->setIsFailed(true);
+        $stat->addDetail('failed', $this->translator->trans($status));
+    }
+
+    /**
+     * @param array<int, Stat>                 $stats
+     * @param array<int, array<string, mixed>> $results
+     */
+    private function persistStats(array $stats, array &$results): void
+    {
+        if ([] === $stats) {
+            return;
+        }
+
+        $this->statRepository->saveEntities($stats);
+
+        foreach ($stats as $stat) {
+            if (!$stat->isFailed()) {
+                $results[$stat->getLead()->getId()]['statId'] = $stat->getId();
+            }
+
+            $this->smsRepository->detachEntity($stat);
+        }
     }
 
     /**
