@@ -1,0 +1,34 @@
+{% set hasTranslations = item.isTranslation(true) %}
+{% set hasChildrenTranslations = item.hasTranslations() %}
+{% set hasVariants = item.isVariant(true) %}
+{% set hasChildrenVariants = item.hasVariants() %}
+{% set type = item.getEmailType() %}
+{% set hasDraft = item.hasDraft() %}
+{% set mauticTemplateVars = _context|merge({'item': item}) %}
+
+<tr id="row_email_{{ item.id }}">
+    <td>
+        {{ include('@MauticEmail/Email/_list_row_actions.html.twig', {
+            'item': item,
+            'type': type,
+            'hasVariants': hasVariants,
+            'permissions': permissions
+        }) }}
+    </td>
+
+    {% for column, label in columns %}
+        {{ include('@MauticEmail/Email/_list_column.html.twig', {
+            'column': column,
+            'label': label,
+            'item': item,
+            'type': type,
+            'hasVariants': hasVariants,
+            'hasChildrenVariants': hasChildrenVariants,
+            'hasTranslations': hasTranslations,
+            'hasChildrenTranslations': hasChildrenTranslations,
+            'hasDraft': hasDraft,
+            'isDraftEnabled': isDraftEnabled,
+            'mauticTemplateVars': mauticTemplateVars
+        }) }}
+    {% endfor %}
+</tr>

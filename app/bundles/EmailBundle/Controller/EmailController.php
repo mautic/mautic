@@ -25,6 +25,8 @@ use Mautic\EmailBundle\Form\Type\ScheduleSendType;
 use Mautic\EmailBundle\Helper\EmailConfig;
 use Mautic\EmailBundle\Helper\EmailSearchScopeProvider;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\EmailBundle\Services\EmailColumnsDictionary;
+use Mautic\EmailBundle\Services\EmailListingHelper;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Helper\FakeContactHelper;
@@ -68,27 +70,18 @@ final class EmailController extends FormController
 
     private bool $invalidHtmlError = false;
 
-    /**
-     * @param int $page
-     */
-    public function indexAction(Request $request, EmailModel $model, EmailConfig $emailConfig, ThemeHelper $themeHelper, EmailSearchScopeProvider $emailSearchScopeProvider, $page = 1): Response
-    {
+    public function indexAction(
+        Request $request,
+        EmailModel $model,
+        EmailConfig $emailConfig,
+        ThemeHelper $themeHelper,
+        EmailColumnsDictionary $emailColumnsDictionary,
+        EmailListingHelper $emailListingHelper,
+        EmailSearchScopeProvider $emailSearchScopeProvider,
+        int $page = 1,
+    ): JsonResponse|Response {
         $isDraftEnabled = $emailConfig->isDraftEnabled();
-        // set some permissions
-        $permissions = $this->security->isGranted(
-            [
-                'email:emails:viewown',
-                'email:emails:viewother',
-                'email:emails:create',
-                'email:emails:editown',
-                'email:emails:editother',
-                'email:emails:deleteown',
-                'email:emails:deleteother',
-                'email:emails:publishown',
-                'email:emails:publishother',
-            ],
-            'RETURN_ARRAY'
-        );
+        $permissions    = $emailListingHelper->getEmailPermissions();
 
         if (!$permissions['email:emails:viewown'] && !$permissions['email:emails:viewother']) {
             $this->throwAccessDenied();
@@ -96,24 +89,12 @@ final class EmailController extends FormController
 
         $this->setListFilters();
 
-        $session = $request->getSession();
-
-        $listFilters = [
-            'filters' => [
-                'placeholder' => $this->translator->trans('mautic.email.filter.placeholder'),
-                'multiple'    => true,
-            ],
-        ];
-
-        // Reset available groups
-        $listFilters['filters']['groups'] = [];
+        $session     = $request->getSession();
+        $listFilters = $emailListingHelper->getListFilters($themeHelper);
 
         // set limits
         $limit = $session->get('mautic.email.limit', $this->coreParametersHelper->get('default_pagelimit'));
-        $start = (1 === $page) ? 0 : (($page - 1) * $limit);
-        if ($start < 0) {
-            $start = 0;
-        }
+        $start = $emailListingHelper->getStart($page, $limit);
 
         $search = $request->get('search', $session->get('mautic.email.filter', ''));
         $session->set('mautic.email.filter', $search);
@@ -133,7 +114,6 @@ final class EmailController extends FormController
             'options' => array_column($availableLists, 'name', 'alias'),
             'prefix'  => 'list',
         ];
-        $listAliasLookup = array_column($availableLists, 'alias', 'id');
 
         // retrieve a list of themes
         $listFilters['filters']['groups']['mautic.core.filter.themes'] = [
@@ -143,83 +123,14 @@ final class EmailController extends FormController
 
         $currentFilters = $session->get('mautic.email.list_filters', []);
         $updatedFilters = $request->get('filters', false);
-        $ignoreListJoin = true;
 
         if ($updatedFilters) {
-            // Filters have been updated
-
-            // Parse the selected values
-            $newFilters     = [];
-            $updatedFilters = json_decode($updatedFilters, true);
-
-            if ($updatedFilters) {
-                foreach ($updatedFilters as $updatedFilter) {
-                    [$column, $filterValue] = explode(':', $updatedFilter);
-
-                    $newFilters[$column][] = $filterValue;
-                }
-
-                $currentFilters = $newFilters;
-            } else {
-                $currentFilters = [];
-            }
+            $currentFilters = $emailListingHelper->getUpdatedFilters($updatedFilters);
         }
+
         $session->set('mautic.email.list_filters', $currentFilters);
 
-        if (!empty($currentFilters)) {
-            $listAliases = $catIds = $templates = $searchFilterTerms = [];
-            foreach ($currentFilters as $type => $typeFilters) {
-                switch ($type) {
-                    case 'list':
-                        $key = 'lists';
-                        break;
-                    case 'category':
-                        $key = 'categories';
-                        break;
-                    case 'theme':
-                        $key = 'themes';
-                        break;
-                }
-
-                $listFilters['filters']['groups']['mautic.core.filter.'.$key]['values'] = $typeFilters;
-
-                foreach ($typeFilters as $fltr) {
-                    switch ($type) {
-                        case 'list':
-                            $resolvedAlias       = $listAliasLookup[(int) $fltr] ?? $fltr;
-                            $listAliases[]       = $resolvedAlias;
-                            $searchFilterTerms[] = 'list:'.$fltr;
-                            $searchFilterTerms[] = 'list:'.$resolvedAlias;
-                            break;
-                        case 'category':
-                            $catIds[]            = (int) $fltr;
-                            $searchFilterTerms[] = 'category:'.$fltr;
-                            break;
-                        case 'theme':
-                            $templates[]         = $fltr;
-                            $searchFilterTerms[] = 'theme:'.$fltr;
-                            break;
-                    }
-                }
-            }
-
-            $search = $this->stripQuickFilterTokensFromSearch($search, $searchFilterTerms);
-            $session->set('mautic.email.filter', $search);
-            $filter['string'] = $search;
-
-            if ([] !== $listAliases) {
-                $filter['force'][] = ['column' => 'l.alias', 'expr' => 'in', 'value' => array_values(array_unique($listAliases))];
-                $ignoreListJoin    = false;
-            }
-
-            if ([] !== $catIds) {
-                $filter['force'][] = ['column' => 'c.id', 'expr' => 'in', 'value' => $catIds];
-            }
-
-            if ([] !== $templates) {
-                $filter['force'][] = ['column' => 'e.template', 'expr' => 'in', 'value' => $templates];
-            }
-        }
+        $ignoreListJoin = $emailListingHelper->applyCurrentFilters($currentFilters, $listFilters, $filter);
 
         $orderBy    = $session->get('mautic.email.orderby', 'e.dateModified');
         $orderByDir = $session->get('mautic.email.orderbydir', $this->getDefaultOrderDirection());
@@ -235,15 +146,9 @@ final class EmailController extends FormController
             ]
         );
 
-        $count = count($emails);
-        if ($count && $count < ($start + 1)) {
-            // the number of entities are now less then the current page so redirect to the last page
-            if (1 === $count) {
-                $lastPage = 1;
-            } else {
-                $lastPage = (floor($count / $limit)) ?: 1;
-            }
-
+        $count    = count($emails);
+        $lastPage = $emailListingHelper->getLastPageIfCurrentPageIsOutOfBounds($count, $start, $limit);
+        if (null !== $lastPage) {
             $session->set('mautic.email.page', $lastPage);
             $returnUrl = $this->generateUrl('mautic_email_index', ['page' => $lastPage]);
 
@@ -264,17 +169,19 @@ final class EmailController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'searchValue'    => $search,
-                    'filters'        => $listFilters,
-                    'items'          => $emails,
-                    'totalItems'     => $count,
-                    'page'           => $page,
-                    'limit'          => $limit,
-                    'tmpl'           => $request->get('tmpl', 'index'),
-                    'permissions'    => $permissions,
-                    'model'          => $model,
-                    'isDraftEnabled' => $isDraftEnabled,
-                    'searchScopes'   => $emailSearchScopeProvider->getScopes(),
+                    'searchValue'      => $search,
+                    'filters'          => $listFilters,
+                    'columns'          => $emailColumnsDictionary->getColumns(),
+                    'columnHeaderMeta' => $emailColumnsDictionary->getHeaderMeta(),
+                    'items'            => $emails,
+                    'totalItems'       => $count,
+                    'page'             => $page,
+                    'limit'            => $limit,
+                    'tmpl'             => $request->get('tmpl', 'index'),
+                    'permissions'      => $permissions,
+                    'model'            => $model,
+                    'isDraftEnabled'   => $isDraftEnabled,
+                    'searchScopes'     => $emailSearchScopeProvider->getScopes(),
                 ],
                 'contentTemplate' => '@MauticEmail/Email/list.html.twig',
                 'passthroughVars' => [
