@@ -23,6 +23,13 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('Mautic\\SmsBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
 
+    $services->set(Mautic\SmsBundle\ApiPlatform\SmsProcessor::class)
+        ->args([
+            service('api_platform.doctrine.orm.state.persist_processor'),
+            service(Mautic\CoreBundle\Security\Permissions\CorePermissions::class),
+        ])
+        ->tag('api_platform.state_processor');
+
     $services->set('mautic.sms.twilio.transport', Mautic\SmsBundle\Integration\Twilio\TwilioTransport::class)
         ->arg('$logger', service('monolog.logger.mautic'))
         ->tag('mautic.sms_transport', ['integrationAlias' => 'Twilio']);

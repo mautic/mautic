@@ -95,6 +95,10 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
 
     public function saveEntity($entity, $unlock = true): void
     {
+        if ($entity instanceof Sms) {
+            $this->normalizeSchedule($entity);
+        }
+
         parent::saveEntity($entity, $unlock);
 
         $this->postTranslationEntitySave($entity);
@@ -111,6 +115,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         $batchSize = 20;
         $i         = 0;
         foreach ($entities as $entity) {
+            $this->normalizeSchedule($entity);
             $isNew = !(bool) $entity->getId();
 
             // set some defaults
@@ -131,6 +136,13 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
             }
         }
         $this->em->flush();
+    }
+
+    private function normalizeSchedule(Sms $sms): void
+    {
+        if ('list' === $sms->getSmsType() && !$sms->isContinueSending()) {
+            $sms->setPublishDown(null);
+        }
     }
 
     /**

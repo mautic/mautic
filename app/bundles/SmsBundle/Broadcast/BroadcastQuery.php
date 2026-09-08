@@ -4,6 +4,7 @@ namespace Mautic\SmsBundle\Broadcast;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Entity\ContactLimiterTrait;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
@@ -88,6 +89,11 @@ final class BroadcastQuery
         $this->excludeStatsRecords($this->getTranslationIds($sms));
         $this->excludeDnc();
         $this->excludeQueue();
+
+        if (!$sms->isContinueSending() && null !== $sms->getPublishUp()) {
+            $this->query->andWhere($this->query->expr()->lte('lll.date_added', ':max_date'))
+                ->setParameter('max_date', $sms->getPublishUp(), Types::DATETIME_MUTABLE);
+        }
 
         return $this->query;
     }

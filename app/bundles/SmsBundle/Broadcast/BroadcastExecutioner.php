@@ -46,7 +46,7 @@ final readonly class BroadcastExecutioner
             try {
                 while ($remainingLimit > 0) {
                     $batchSize  = min($event->getBatch(), $remainingLimit);
-                    $batchResult = $this->sendNextBatch($sms, $batchSize, $partition);
+                    $batchResult = $this->sendNextBatch($sms, $batchSize, $partition, requireActiveSchedule: true);
                     $result->merge($batchResult);
 
                     $processedCount  = $batchResult->getProcessedCount();
@@ -56,6 +56,8 @@ final readonly class BroadcastExecutioner
                         break;
                     }
                 }
+
+                $this->unpublishCompletedOneTimeSchedule($sms, $event, $result);
             } catch (\Throwable $exception) {
                 $result->executionFailed();
                 $this->reportExecutionFailure($sms, $exception);
@@ -69,15 +71,22 @@ final readonly class BroadcastExecutioner
         }
     }
 
-    public function sendNextBatch(Sms $sms, int $batchSize, ?ContactLimiter $partition = null): BroadcastResult
-    {
+    public function sendNextBatch(
+        Sms $sms,
+        int $batchSize,
+        ?ContactLimiter $partition = null,
+        bool $requireActiveSchedule = false,
+    ): BroadcastResult {
         $result = new BroadcastResult();
         if ($batchSize <= 0 || null === $sms->getId()) {
             return $result;
         }
 
         $this->entityManager->refresh($sms);
-        if ('list' !== $sms->getSmsType() || !$sms->isPublished()) {
+        if ('list' !== $sms->getSmsType()
+            || !$sms->isPublished()
+            || ($requireActiveSchedule && !$sms->isBackgroundSending())
+        ) {
             return $result;
         }
 
@@ -168,6 +177,30 @@ final readonly class BroadcastExecutioner
         }
 
         return $result;
+    }
+
+    private function unpublishCompletedOneTimeSchedule(Sms $sms, ChannelBroadcastEvent $event, BroadcastResult $result): void
+    {
+        $isFirstOrOnlyThread = !$event->getThreadId() || 1 === $event->getThreadId();
+        if (!$isFirstOrOnlyThread || $result->getSuccessfulCount() > 0) {
+            return;
+        }
+
+        $this->entityManager->refresh($sms);
+        if (!$sms->isBackgroundSending() || $sms->isContinueSending()) {
+            return;
+        }
+
+        if ($this->broadcastQuery->getPendingCount($sms) > 0) {
+            return;
+        }
+
+        $sms->setIsPublished(false);
+        $this->smsModel->saveEntity($sms);
+        $event->getOutput()->writeln($this->translator->trans(
+            'mautic.sms.notice.broadcast.unpublished',
+            ['%name%' => $sms->getName()]
+        ));
     }
 
     private function reportExecutionFailure(Sms $sms, \Throwable $exception): void
