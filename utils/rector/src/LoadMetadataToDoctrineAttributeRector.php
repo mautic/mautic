@@ -110,6 +110,7 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
         $classAttributes    = [];
         $propertyAttributes = [];
         $entityArgs         = [];
+        $isMappedSuperclass = false;
 
         foreach ($stmts as $stmt) {
             if (!$stmt instanceof Expression) {
@@ -152,6 +153,17 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
 
             $first = $this->methodName($calls[0]);
 
+            // $builder->setMappedSuperClass(): emit #[ORM\MappedSuperclass] instead of #[ORM\Entity].
+            if ('setMappedSuperClass' === $first) {
+                if (1 !== count($calls) || [] !== $calls[0]->args) {
+                    return null;
+                }
+
+                $isMappedSuperclass = true;
+
+                continue;
+            }
+
             if (in_array($first, ['setTable', 'setCustomRepositoryClass', 'addIndex', 'addFulltextIndex'], true)) {
                 $handled = $this->handleClassChain($calls);
                 if (null === $handled) {
@@ -174,8 +186,11 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
             }
         }
 
-        // #[ORM\Entity] is mandatory; place it first.
-        array_unshift($classAttributes, $this->attribute('Entity', $entityArgs));
+        // The mapping root attribute is mandatory; place it first.
+        $rootAttribute = $isMappedSuperclass
+            ? $this->attribute('MappedSuperclass', $entityArgs)
+            : $this->attribute('Entity', $entityArgs);
+        array_unshift($classAttributes, $rootAttribute);
 
         return [$classAttributes, $propertyAttributes];
     }
