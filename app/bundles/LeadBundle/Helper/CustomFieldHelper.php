@@ -73,6 +73,10 @@ final class CustomFieldHelper
             return null;
         }
 
+        if (!$value instanceof \DateTimeInterface && !is_string($value)) {
+            throw new \InvalidArgumentException('Wrong type given. String or DateTimeInterface expected.');
+        }
+
         if (OperatorOptions::IN_NEXT === $operator) {
             $type = OperatorOptions::IN_NEXT;
         } elseif (OperatorOptions::IN_LAST === $operator) {
