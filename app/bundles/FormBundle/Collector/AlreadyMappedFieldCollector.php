@@ -18,6 +18,9 @@ final readonly class AlreadyMappedFieldCollector implements AlreadyMappedFieldCo
     ) {
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getFields(string $formId, string $object): array
     {
         $cacheItem = $this->cacheProvider->getItem($this->buildCacheKey($formId, $object));
