@@ -190,6 +190,15 @@ trait VariantEntityTrait
         return $this->getVariantChildren()->count();
     }
 
+    /**
+     * Total weight represents a percentage of how many email should be sent as an A/B test.
+     * The rest of the contacts should receive the winner variant. Returning 100% if not defined.
+     */
+    public function getTotalWeight(): int
+    {
+        return (int) $this->getVariantSettings()['totalWeight'] ?? AbTestSettingsService::DEFAULT_TOTAL_WEIGHT;
+    }
+
     public function clearVariants(): void
     {
         $this->variantChildren = new ArrayCollection();

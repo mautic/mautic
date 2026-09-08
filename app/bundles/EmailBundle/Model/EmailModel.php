@@ -1206,107 +1206,105 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      */
     public function &getEmailSettings(Email $email, $includeVariants = true)
     {
-        if (empty($this->emailSettings[$email->getId()])) {
-            // store the settings of all the variants in order to properly disperse the emails
-            // set the parent's settings
-            $emailSettings = [
-                $email->getId() => [
-                    'template'     => $email->getTemplate(),
-                    'sentCount'    => $email->getSentCount(),
-                    'variantCount' => $email->getVariantSentCount(),
-                    'isVariant'    => null !== $email->getVariantStartDate(),
-                    'entity'       => $email,
-                    'translations' => $email->getTranslations(true),
-                    'languages'    => ['default' => $email->getId()],
-                ],
-            ];
+        // store the settings of all the variants in order to properly disperse the emails
+        // set the parent's settings
+        $emailSettings = [
+            $email->getId() => [
+                'template'     => $email->getTemplate(),
+                'sentCount'    => $email->getSentCount(),
+                'variantCount' => $email->getVariantSentCount(),
+                'isVariant'    => null !== $email->getVariantStartDate(),
+                'entity'       => $email,
+                'translations' => $email->getTranslations(true),
+                'languages'    => ['default' => $email->getId()],
+            ],
+        ];
 
-            if ($emailSettings[$email->getId()]['translations']) {
-                // Add in the sent counts for translations of this email
-                /** @var Email $translation */
-                foreach ($emailSettings[$email->getId()]['translations'] as $translation) {
-                    if ($translation->isPublished()) {
-                        $emailSettings[$email->getId()]['sentCount'] += $translation->getSentCount();
-                        $emailSettings[$email->getId()]['variantCount'] += $translation->getVariantSentCount();
+        if ($emailSettings[$email->getId()]['translations']) {
+            // Add in the sent counts for translations of this email
+            /** @var Email $translation */
+            foreach ($emailSettings[$email->getId()]['translations'] as $translation) {
+                if ($translation->isPublished()) {
+                    $emailSettings[$email->getId()]['sentCount'] += $translation->getSentCount();
+                    $emailSettings[$email->getId()]['variantCount'] += $translation->getVariantSentCount();
 
-                        // Prevent empty key due to misconfiguration - pretty much ignored
-                        if (!$language = $translation->getLanguage()) {
-                            $language = 'unknown';
-                        }
-                        $core = $this->getTranslationLocaleCore($language);
-                        if (!isset($emailSettings[$email->getId()]['languages'][$core])) {
-                            $emailSettings[$email->getId()]['languages'][$core] = [];
-                        }
-                        $emailSettings[$email->getId()]['languages'][$core][$language] = $translation->getId();
+                    // Prevent empty key due to misconfiguration - pretty much ignored
+                    if (!$language = $translation->getLanguage()) {
+                        $language = 'unknown';
                     }
+                    $core = $this->getTranslationLocaleCore($language);
+                    if (!isset($emailSettings[$email->getId()]['languages'][$core])) {
+                        $emailSettings[$email->getId()]['languages'][$core] = [];
+                    }
+                    $emailSettings[$email->getId()]['languages'][$core][$language] = $translation->getId();
                 }
             }
+        }
 
-            if ($includeVariants && $email->isVariant()) {
-                // get a list of variants for A/B testing
-                $childrenVariant = $email->getVariantChildren();
+        if ($includeVariants && $email->isVariant()) {
+            // get a list of variants for A/B testing
+            $childrenVariant = $email->getVariantChildren();
 
-                if (count($childrenVariant)) {
-                    $totalSent      = $emailSettings[$email->getId()]['variantCount'];
-                    $abTestSettings = $this->abTestSettingsService->getAbTestSettings($email);
+            if (count($childrenVariant)) {
+                $totalSent      = $emailSettings[$email->getId()]['variantCount'];
+                $abTestSettings = $this->abTestSettingsService->getAbTestSettings($email);
 
-                    // Normalize weights: AbTestSettingsService returns weights relative to totalWeight
-                    // (e.g. {319: 5, 320: 5} for totalWeight=10), but sendEmail expects weights summing to 1.0
-                    $totalAbWeight = array_sum(array_column($abTestSettings['variants'], 'weight'));
+                // Normalize weights: AbTestSettingsService returns weights relative to totalWeight
+                // (e.g. {319: 5, 320: 5} for totalWeight=10), but sendEmail expects weights summing to 1.0
+                $totalAbWeight = array_sum(array_column($abTestSettings['variants'], 'weight'));
 
-                    foreach ($childrenVariant as $child) {
-                        if ($child->isPublished()) {
-                            $childWeight = $totalAbWeight > 0
-                                ? $abTestSettings['variants'][$child->getId()]['weight'] / $totalAbWeight
-                                : 0;
+                foreach ($childrenVariant as $child) {
+                    if ($child->isPublished()) {
+                        $childWeight = $totalAbWeight > 0
+                            ? $abTestSettings['variants'][$child->getId()]['weight'] / $totalAbWeight
+                            : 0;
 
-                            $emailSettings[$child->getId()] = [
-                                'template'     => $child->getTemplate(),
-                                'sentCount'    => $child->getSentCount(),
-                                'variantCount' => $child->getVariantSentCount(),
-                                'isVariant'    => null !== $email->getVariantStartDate(),
-                                'weight'       => $childWeight,
-                                'entity'       => $child,
-                                'translations' => $child->getTranslations(true),
-                                'languages'    => ['default' => $child->getId()],
-                            ];
+                        $emailSettings[$child->getId()] = [
+                            'template'     => $child->getTemplate(),
+                            'sentCount'    => $child->getSentCount(),
+                            'variantCount' => $child->getVariantSentCount(),
+                            'isVariant'    => null !== $email->getVariantStartDate(),
+                            'weight'       => $childWeight,
+                            'entity'       => $child,
+                            'translations' => $child->getTranslations(true),
+                            'languages'    => ['default' => $child->getId()],
+                        ];
 
-                            if ($emailSettings[$child->getId()]['translations']) {
-                                // Add in the sent counts for translations of this email
-                                /** @var Email $translation */
-                                foreach ($emailSettings[$child->getId()]['translations'] as $translation) {
-                                    if ($translation->isPublished()) {
-                                        $emailSettings[$child->getId()]['sentCount'] += $translation->getSentCount();
-                                        $emailSettings[$child->getId()]['variantCount'] += $translation->getVariantSentCount();
+                        if ($emailSettings[$child->getId()]['translations']) {
+                            // Add in the sent counts for translations of this email
+                            /** @var Email $translation */
+                            foreach ($emailSettings[$child->getId()]['translations'] as $translation) {
+                                if ($translation->isPublished()) {
+                                    $emailSettings[$child->getId()]['sentCount'] += $translation->getSentCount();
+                                    $emailSettings[$child->getId()]['variantCount'] += $translation->getVariantSentCount();
 
-                                        // Prevent empty key due to misconfiguration - pretty much ignored
-                                        if (!$language = $translation->getLanguage()) {
-                                            $language = 'unknown';
-                                        }
-                                        $core = $this->getTranslationLocaleCore($language);
-                                        if (!isset($emailSettings[$child->getId()]['languages'][$core])) {
-                                            $emailSettings[$child->getId()]['languages'][$core] = [];
-                                        }
-                                        $emailSettings[$child->getId()]['languages'][$core][$language] = $translation->getId();
+                                    // Prevent empty key due to misconfiguration - pretty much ignored
+                                    if (!$language = $translation->getLanguage()) {
+                                        $language = 'unknown';
                                     }
+                                    $core = $this->getTranslationLocaleCore($language);
+                                    if (!isset($emailSettings[$child->getId()]['languages'][$core])) {
+                                        $emailSettings[$child->getId()]['languages'][$core] = [];
+                                    }
+                                    $emailSettings[$child->getId()]['languages'][$core][$language] = $translation->getId();
                                 }
                             }
-
-                            $totalSent += $emailSettings[$child->getId()]['variantCount'];
                         }
+
+                        $totalSent += $emailSettings[$child->getId()]['variantCount'];
                     }
-
-                    // set parent weight (normalized)
-                    $emailSettings[$email->getId()]['weight'] = $totalAbWeight > 0
-                        ? $abTestSettings['variants'][$email->getId()]['weight'] / $totalAbWeight
-                        : 1;
-                } else {
-                    $emailSettings[$email->getId()]['weight'] = 1;
                 }
-            }
 
-            $this->emailSettings[$email->getId()] = $emailSettings;
+                // set parent weight (normalized)
+                $emailSettings[$email->getId()]['weight'] = $totalAbWeight > 0
+                    ? $abTestSettings['variants'][$email->getId()]['weight'] / $totalAbWeight
+                    : 1;
+            } else {
+                $emailSettings[$email->getId()]['weight'] = 1;
+            }
         }
+
+        $this->emailSettings[$email->getId()] = $emailSettings;
 
         if ($includeVariants && $email->isVariant()) {
             // now find what percentage of current leads should receive the variants
@@ -1501,6 +1499,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         foreach ($groupedContactsByEmail as $parentId => $translatedEmails) {
             $useSettings = $emailSettings[$parentId];
             foreach ($translatedEmails as $translatedId => $contacts) {
+                /** @var Email $emailEntity */
                 $emailEntity = ($translatedId === $parentId) ? $useSettings['entity'] : $useSettings['translations'][$translatedId];
 
                 $this->sendModel->setEmail($emailEntity, $channel, $customHeaders, $assetAttachments)
@@ -1520,11 +1519,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
                         $this->sendModel->setContact($contact, $tokens)
                             ->send();
 
-                        // Update $emailSetting so campaign a/b tests are handled correctly
-                        ++$emailSettings[$parentId]['sentCount'];
+                        // Update the counters on the entity so campaign a/b tests are handled correctly
+                        $emailEntity->increaseSentCount();
 
                         if (!empty($emailSettings[$parentId]['isVariant'])) {
-                            ++$emailSettings[$parentId]['variantCount'];
+                            $emailEntity->increaseVariantSentCount();
                         }
                     } catch (FailedToSendToContactException) {
                         // move along to the next contact
