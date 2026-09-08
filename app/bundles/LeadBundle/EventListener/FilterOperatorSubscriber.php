@@ -13,6 +13,7 @@ use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Provider\FieldChoicesProviderInterface;
 use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
+use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Segment\SegmentFilterIconTrait;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -108,17 +109,21 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 }
             }
 
-            $event->addChoice(
-                $field->getObject(),
-                $field->getAlias(),
-                [
-                    'label'      => $field->getLabel(),
-                    'properties' => $properties,
-                    'object'     => $field->getObject(),
-                    'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType($type),
-                    'iconClass'  => $this->getSegmentFilterIcon($field->getAlias()),
-                ]
-            );
+            $choiceConfig = [
+                'label'      => $field->getLabel(),
+                'properties' => $properties,
+                'object'     => $field->getObject(),
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType($type),
+                'iconClass'  => $this->getSegmentFilterIcon($field->getAlias()),
+            ];
+
+            $event->addChoice($field->getObject(), $field->getAlias(), $choiceConfig);
+
+            if (ContactSegmentFilterCrate::COMPANY_OBJECT === $field->getObject() && (null === $event->getRequest() || $event->isForSegmentation())) {
+                $companyAllConfig           = $choiceConfig;
+                $companyAllConfig['object'] = ContactSegmentFilterCrate::COMPANY_ALL_OBJECT;
+                $event->addChoice(ContactSegmentFilterCrate::COMPANY_ALL_OBJECT, $field->getAlias(), $companyAllConfig);
+            }
         });
     }
 
