@@ -187,19 +187,18 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
 
     /**
      * @param Lead|int|array<Lead>|array<int> $sendTo
+     * @param array<string, mixed>            $options
      * @param array<int, Lead>                $contacts
      */
     public function sendSms(Sms $sms, $sendTo, array $options = [], array &$contacts = []): array
     {
         $channel = $options['channel'] ?? null;
-        $listId  = $options['listId'] ?? null;
+        $listIds = $options['listId'] ?? null;
         $sendTo  = is_array($sendTo) ? $sendTo : [$sendTo];
 
-        $sentCount       = [];
-        $stats           = [];
-        $results         = [];
-        $contacts        = []; // Shall we reset the passed contacts param here?
-        $fetchContacts   = [];
+        $results       = [];
+        $contacts      = [];
+        $fetchContacts = [];
         foreach ($sendTo as $contact) {
             if ($contact instanceof Lead) {
                 $contacts[$contact->getId()] = $contact;
@@ -217,6 +216,9 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
             }
         }
 
+        // Keep the by-reference output intact so callers can detach every loaded contact.
+        $sendContacts = $contacts;
+
         if (!$sms->isPublished()) {
             foreach ($contacts as $contactId => $contact) {
                 $results[$contactId] = [
@@ -228,7 +230,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
             return $results;
         }
 
-        $dncEvent = new DncEvent($contacts);
+        $dncEvent = new DncEvent($sendContacts);
         $this->dispatcher->dispatch($dncEvent, SmsEvents::DNC_FILTER_CONTACTS_ON_SEND);
 
         foreach ($dncEvent->getRemovedContacts() as $contactId) {
@@ -238,14 +240,14 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
             ];
         }
 
-        $contacts = $dncEvent->getContacts(); // The contacts param is reset here too, no?
+        $sendContacts = $dncEvent->getContacts();
 
         // Check if any contacts remain. If not, return early.
-        if ([] === $contacts) {
+        if ([] === $sendContacts) {
             return $results;
         }
 
-        $queueEvent = new QueueEvent($contacts, array_merge($options, ['sms_id' => $sms->getId()]));
+        $queueEvent = new QueueEvent($sendContacts, array_merge($options, ['sms_id' => $sms->getId()]));
         $this->dispatcher->dispatch($queueEvent, SmsEvents::QUEUE_FILTER_CONTACTS_ON_SEND);
 
         foreach ($queueEvent->getQueuedContacts() as $contactId) {
@@ -255,14 +257,14 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
             ];
         }
 
-        $contacts = $queueEvent->getContacts();
+        $sendContacts = $queueEvent->getContacts();
 
         // Check if any contacts remain. If not, return early.
-        if ([] === $contacts) {
+        if ([] === $sendContacts) {
             return $results;
         }
 
-        $filterEvent = new FilterEvent($contacts);
+        $filterEvent = new FilterEvent($sendContacts);
         $this->dispatcher->dispatch($filterEvent, SmsEvents::FILTER_CONTACTS_ON_SEND);
 
         foreach ($filterEvent->getRemovedContacts() as $contactId) {
@@ -272,9 +274,9 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
             ];
         }
 
-        $contacts = $filterEvent->getContacts();
+        $sendContacts = $filterEvent->getContacts();
 
-        if ([] === $contacts) {
+        if ([] === $sendContacts) {
             return $results;
         }
 
@@ -284,12 +286,19 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         $stats = [];
 
         /** @var Lead $contact */
-        foreach ($contacts as $contact) {
+        foreach ($sendContacts as $contact) {
             [, $translatedSms] = $this->getTranslatedEntity($sms, $contact);
             \assert($translatedSms instanceof Sms);
 
-            $stat    = $this->createStatEntry($translatedSms, $contact, $channel, false, $listId);
-            $stats[] = $stat;
+            $contactId = $contact->getId();
+            $stat      = $this->createStatEntry(
+                $translatedSms,
+                $contact,
+                $channel,
+                false,
+                $this->getContactListId($listIds, $contactId),
+            );
+            $stats[$contactId] = $stat;
 
             $smsEvent = new SmsSendEvent($translatedSms->getMessage(), $contact);
             $smsEvent->setSmsId($translatedSms->getId());
@@ -319,6 +328,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
             unset($smsEvent, $tokenEvent);
         }
 
+        $sentCount = [];
         foreach ($recipientCollections as $recipientCollection) {
             $translatedSms = $recipientCollection->getSms();
             $media         = $translatedSms->getMedia();
@@ -331,8 +341,8 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
                 } else {
                     $this->transport->sendBatchSms($recipientCollection, $message);
                 }
-            } catch (PrimaryTransportNotEnabledException $e) {
-                $this->logger->warning($e->getMessage());
+            } catch (PrimaryTransportNotEnabledException $exception) {
+                $this->logger->warning($exception->getMessage());
 
                 return $results;
             }
@@ -346,18 +356,19 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
             ];
 
             foreach ($recipientCollection as $recipient) {
+                $contactId = $recipient->getKey();
                 $defaultSendResult['content'] = $recipient->getFinalMessage();
                 if (true !== $recipient->getResult()) {
                     $defaultSendResult['sent']   = false;
                     $defaultSendResult['status'] = $recipient->getResult();
-                    unset($stats[$recipient->getKey()]);
+                    unset($stats[$contactId]);
                 } else {
                     $defaultSendResult['sent']          = true;
                     $defaultSendResult['status']        = 'mautic.sms.timeline.status.delivered';
                     $sentCount[$translatedSms->getId()] = ($sentCount[$translatedSms->getId()] ?? 0) + 1;
                 }
 
-                $results[$recipient->getKey()] = $defaultSendResult;
+                $results[$contactId] = $defaultSendResult;
             }
         }
 
@@ -378,6 +389,11 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         }
 
         return $results;
+    }
+
+    private function getContactListId(mixed $listIds, int $contactId): mixed
+    {
+        return is_array($listIds) ? ($listIds[$contactId] ?? null) : $listIds;
     }
 
     /**

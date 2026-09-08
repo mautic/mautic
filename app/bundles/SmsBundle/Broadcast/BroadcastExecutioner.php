@@ -2,26 +2,26 @@
 
 namespace Mautic\SmsBundle\Broadcast;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\ChannelBundle\Event\ChannelBroadcastEvent;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Entity\SmsRepository;
 use Mautic\SmsBundle\Model\SmsModel;
+use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class BroadcastExecutioner
+final readonly class BroadcastExecutioner
 {
-    private ?ContactLimiter $contactLimiter = null;
-
-    private ?BroadcastResult $result = null;
-
     public function __construct(
-        private readonly SmsModel $smsModel,
-        private readonly BroadcastQuery $broadcastQuery,
-        private readonly TranslatorInterface $translator,
-        private readonly LeadRepository $leadRepository,
-        private readonly SmsRepository $smsRepository,
+        private SmsModel $smsModel,
+        private BroadcastQuery $broadcastQuery,
+        private TranslatorInterface $translator,
+        private LeadRepository $leadRepository,
+        private SmsRepository $smsRepository,
+        private EntityManagerInterface $entityManager,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -30,51 +30,136 @@ final class BroadcastExecutioner
         // Get list of published broadcasts or broadcast if there is only a single ID
         $smses = $this->smsRepository->getPublishedBroadcastsIterable($event->getId());
         foreach ($smses as $sms) {
-            $this->contactLimiter = new ContactLimiter($event->getBatch(), null, $event->getMinContactIdFilter(), $event->getMaxContactIdFilter(), [], $event->getThreadId(), $event->getMaxThreads(), $event->getLimit());
-            $this->result         = new BroadcastResult();
+            $partition = new ContactLimiter(
+                $event->getBatch(),
+                null,
+                $event->getMinContactIdFilter(),
+                $event->getMaxContactIdFilter(),
+                [],
+                $event->getThreadId(),
+                $event->getMaxThreads(),
+            );
+            $result         = new BroadcastResult();
+            $remainingLimit = max(0, $event->getLimit());
+
             try {
-                $this->send($sms);
-            } catch (\Exception) {
+                while ($remainingLimit > 0) {
+                    $batchSize  = min($event->getBatch(), $remainingLimit);
+                    $batchResult = $this->sendNextBatch($sms, $batchSize, $partition);
+                    $result->merge($batchResult);
+
+                    $processedCount  = $batchResult->getProcessedCount();
+                    $remainingLimit -= $processedCount;
+
+                    if ($batchResult->getExecutionFailureCount() > 0 || 0 === $processedCount || 0 === $batchResult->getRemainingCount()) {
+                        break;
+                    }
+                }
+            } catch (\Throwable $exception) {
+                $result->executionFailed();
+                $this->reportExecutionFailure($sms, $exception);
             }
+
             $event->setResults(
                 sprintf('%s: %s', $this->translator->trans('mautic.sms.sms'), $sms->getName()),
-                $this->result->getSentCount(),
-                $this->result->getFailedCount()
+                $result->getSuccessfulCount(),
+                $result->getFailedCount()
             );
         }
     }
 
-    /**
-     * @throws \Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException
-     */
-    private function send(Sms $sms): void
+    public function sendNextBatch(Sms $sms, int $batchSize, ?ContactLimiter $partition = null): BroadcastResult
     {
-        $contacts = $this->broadcastQuery->getPendingContacts($sms, $this->contactLimiter);
-        while ([] !== $contacts) {
-            $reduction = 0;
-            $leads     = [];
-            foreach ($contacts as $contact) {
-                $contactId  = $contact['id'];
-                $results    = $this->smsModel->sendSms($sms, $contactId, [
-                    'channel'=> [
-                        'sms', $sms->getId(),
-                    ],
-                    'listId'=> $contact['listId'],
-                ], $leads);
-                $this->result->process($results);
-                $reduction += count($results);
-            }
-
-            $this->contactLimiter->setBatchMinContactId($contactId + 1);
-
-            if ($this->contactLimiter->hasCampaignLimit()) {
-                $this->contactLimiter->reduceCampaignLimitRemaining($reduction);
-            }
-
-            $this->leadRepository->detachEntities($leads);
-
-            // Next batch
-            $contacts = $this->broadcastQuery->getPendingContacts($sms, $this->contactLimiter);
+        $result = new BroadcastResult();
+        if ($batchSize <= 0 || null === $sms->getId()) {
+            return $result;
         }
+
+        $this->entityManager->refresh($sms);
+        if ('list' !== $sms->getSmsType() || !$sms->isPublished()) {
+            return $result;
+        }
+
+        $partition ??= new ContactLimiter($batchSize);
+        $contacts = $this->broadcastQuery->getPendingContacts($sms, $partition, $batchSize);
+        if ([] === $contacts) {
+            $result->setRemainingCount($this->broadcastQuery->getPendingCount($sms, $partition));
+
+            return $result;
+        }
+
+        $contactIds = [];
+        $listIds    = [];
+        foreach ($contacts as $contact) {
+            $contactId           = (int) $contact['id'];
+            $contactIds[]        = $contactId;
+            $listIds[$contactId] = (int) $contact['listId'];
+        }
+
+        $loadedContacts = [];
+        $sendFailure    = null;
+        try {
+            $sendResults = $this->smsModel->sendSms($sms, $contactIds, [
+                'channel' => ['sms', $sms->getId()],
+                'listId'  => $listIds,
+            ], $loadedContacts);
+            $result->process($sendResults, count($contactIds));
+        } catch (\Throwable $exception) {
+            $sendFailure = $exception;
+        }
+
+        $executionFailureReported = false;
+        try {
+            $this->leadRepository->detachEntities($loadedContacts);
+        } catch (\Throwable $exception) {
+            if (null === $sendFailure) {
+                // Submission has already completed. Preserve those known outcomes while
+                // reporting that cleanup could not be completed.
+                $result->executionFailed();
+                $this->reportExecutionFailure($sms, $exception);
+                $executionFailureReported = true;
+            }
+        }
+
+        if (null !== $sendFailure) {
+            throw $sendFailure;
+        }
+
+        $nextContactId = $contactIds[array_key_last($contactIds)] + 1;
+        if (null !== $partition->getMaxContactId() && $nextContactId > $partition->getMaxContactId()) {
+            $result->setRemainingCount(0);
+
+            return $result;
+        }
+
+        try {
+            $partition->setBatchMinContactId($nextContactId);
+            $result->setRemainingCount($this->broadcastQuery->getPendingCount($sms, $partition));
+        } catch (\Throwable $exception) {
+            // Submission has already completed. Preserve those known outcomes while
+            // reporting that cursor/count bookkeeping could not be completed.
+            if (!$executionFailureReported) {
+                $result->executionFailed();
+                $this->reportExecutionFailure($sms, $exception);
+            }
+        }
+
+        return $result;
+    }
+
+    private function reportExecutionFailure(Sms $sms, \Throwable $exception): void
+    {
+        $this->reportExecutionFailureClass($sms, $exception::class);
+    }
+
+    /**
+     * @param class-string<\Throwable> $exceptionClass
+     */
+    private function reportExecutionFailureClass(Sms $sms, string $exceptionClass): void
+    {
+        $this->logger->error('SMS broadcast execution failed.', [
+            'smsId'          => $sms->getId(),
+            'exceptionClass' => $exceptionClass,
+        ]);
     }
 }
