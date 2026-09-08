@@ -37,7 +37,8 @@ final class ChannelExtractor
     }
 
     /**
-     * @param string $channelIdField
+     * @param string               $channelIdField
+     * @param array<string, mixed> $properties
      */
     private static function getChannelId(array $properties, $channelIdField): ?int
     {

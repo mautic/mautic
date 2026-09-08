@@ -1893,6 +1893,9 @@ class MailHelper
         }
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function buildMetadata(?string $name, array $tokens): array
     {
         return [

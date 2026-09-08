@@ -37,7 +37,7 @@ final class JsPlumbFormatter implements NodeFormatterInterface
     }
 
     /**
-     * @param mixed[] $data
+     * @param array<string, mixed[]> $data
      *
      * @return mixed[]
      */

@@ -20,6 +20,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[AllowMockObjectsWithoutExpectations]
 final class ToBcBccFieldsTraitTest extends TypeTestCase
 {
+    /**
+     * @return ValidatorExtension[]
+     */
     protected function getExtensions(): array
     {
         $translator = $this->createMock(TranslatorInterface::class);

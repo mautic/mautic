@@ -56,8 +56,9 @@ final class CustomButtonEvent extends AbstractCustomRequestEvent
     /**
      * Add a single button.
      *
-     * @param string|null $location
-     * @param string|null $route
+     * @param string|null          $location
+     * @param string|null          $route
+     * @param array<string, mixed> $button
      */
     public function addButton(array $button, $location = null, $route = null): static
     {
@@ -104,6 +105,8 @@ final class CustomButtonEvent extends AbstractCustomRequestEvent
 
     /**
      * Generate a button ID that can be overridden by other plugins.
+     *
+     * @param array<string, mixed> $button
      */
     private function generateButtonKey(array $button): string
     {

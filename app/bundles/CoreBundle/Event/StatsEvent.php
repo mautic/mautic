@@ -176,6 +176,8 @@ class StatsEvent extends Event
 
     /**
      * Add an array of results and if so, stop propagation.
+     *
+     * @param array<string, mixed> $results
      */
     public function setResults(array $results): void
     {

@@ -82,6 +82,8 @@ final class EventLogModel extends AbstractCommonModel
     }
 
     /**
+     * @param array<string, mixed> $parameters
+     *
      * @return string|mixed[]
      */
     public function updateContactEvent(Event $event, Lead $contact, array $parameters): string|array

@@ -10,6 +10,8 @@ use Doctrine\DBAL\Exception;
 class ConnectionWrapper extends Connection
 {
     /**
+     * @param array<string, mixed> $dbParams
+     *
      * @throws Exception
      */
     public function initConnection(array $dbParams): void

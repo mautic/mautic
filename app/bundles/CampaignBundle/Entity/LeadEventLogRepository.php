@@ -59,7 +59,8 @@ class LeadEventLogRepository extends CommonRepository
     /**
      * Get a lead's page event log.
      *
-     * @param int|null $leadId
+     * @param int|null             $leadId
+     * @param array<string, mixed> $options
      *
      * @return array
      */
@@ -369,6 +370,9 @@ class LeadEventLogRepository extends CommonRepository
         }
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function getChartQuery(array $options): array
     {
         $chartQuery = new ChartQuery($this->getReplicaConnection(), $options['dateFrom'], $options['dateTo']);

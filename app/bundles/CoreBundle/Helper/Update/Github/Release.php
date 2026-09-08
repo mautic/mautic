@@ -24,6 +24,8 @@ final class Release
     private readonly Metadata $metadata;
 
     /**
+     * @param array<string, mixed> $release
+     *
      * @throws UpdatePackageNotFoundException
      */
     public function __construct(array $release, Metadata $metadata)

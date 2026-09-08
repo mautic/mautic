@@ -292,6 +292,8 @@ class ChartQuery extends AbstractChart
 
     /**
      * Go through the raw data and add the missing times.
+     *
+     * @param array<int, array<string, mixed>> $rawData
      */
     public function completeTimeData(array $rawData, $countAverage = false): array
     {
@@ -433,9 +435,9 @@ class ChartQuery extends AbstractChart
     /**
      * Modify the query to count occurences of a value in a column.
      *
-     * @param string $uniqueColumn name
-     * @param array  $options      for special behavior
-     * @param string $tablePrefix
+     * @param string               $uniqueColumn name
+     * @param array<string, mixed> $options      for special behavior
+     * @param string               $tablePrefix
      */
     public function modifyCountQuery(QueryBuilder &$query, $uniqueColumn, array $options = [], $tablePrefix = 't')
     {

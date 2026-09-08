@@ -215,6 +215,8 @@ abstract class AbstractFormController extends CommonController
     /**
      * generate $postActionVars with respect to available referer.
      *
+     * @param array<string, mixed> $vars
+     *
      * @return array
      */
     protected function refererPostActionVars(array $vars)
@@ -244,6 +246,9 @@ abstract class AbstractFormController extends CommonController
         return $vars;
     }
 
+    /**
+     * @param string[] $elements
+     */
     protected function getFormButton(FormInterface $form, array $elements): ClickableInterface
     {
         foreach ($elements as $element) {

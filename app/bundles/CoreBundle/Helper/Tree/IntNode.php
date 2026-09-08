@@ -56,6 +56,9 @@ final class IntNode implements NodeInterface
         return $this->params[$key] ?? $default;
     }
 
+    /**
+     * @return NodeInterface[]
+     */
     public function getChildrenArray(): array
     {
         return $this->children;

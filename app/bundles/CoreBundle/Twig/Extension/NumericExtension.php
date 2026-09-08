@@ -10,6 +10,9 @@ use Twig\TwigTest;
 
 final class NumericExtension extends AbstractExtension
 {
+    /**
+     * @return TwigTest[]
+     */
     public function getTests(): array
     {
         return [
@@ -17,6 +20,9 @@ final class NumericExtension extends AbstractExtension
         ];
     }
 
+    /**
+     * @return TwigFilter[]
+     */
     public function getFilters(): array
     {
         return [

@@ -57,6 +57,8 @@ final class StepProvider
     }
 
     /**
+     * @param StepInterface[] $steps
+     *
      * @return StepInterface[]
      */
     private function orderSteps(array $steps): array

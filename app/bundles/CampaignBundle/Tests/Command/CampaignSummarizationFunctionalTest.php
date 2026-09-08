@@ -111,7 +111,7 @@ final class CampaignSummarizationFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param mixed[] $properties
+     * @param array<string, int|int[]|string[]|null[]|string|float|null> $properties
      */
     private function createEvent(string $name, Campaign $campaign, array $properties = []): Event
     {

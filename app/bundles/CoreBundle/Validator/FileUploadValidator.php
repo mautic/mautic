@@ -44,7 +44,8 @@ class FileUploadValidator
     }
 
     /**
-     * @param string $extension
+     * @param string             $extension
+     * @param lowercase-string[] $allowedExtensions
      *
      * @throws FileInvalidException
      */

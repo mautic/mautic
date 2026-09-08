@@ -73,7 +73,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param mixed[] $fieldDetails
+     * @param array<string, string> $fieldDetails
      */
     private function makeField(array $fieldDetails): void
     {
@@ -91,7 +91,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param mixed[] $fieldDetails
+     * @param array<string, string> $fieldDetails
      */
     private function createTestLead(array $fieldDetails): Lead
     {

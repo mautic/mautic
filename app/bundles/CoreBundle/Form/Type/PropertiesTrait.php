@@ -9,6 +9,8 @@ trait PropertiesTrait
 {
     /**
      * @param FormBuilderInterface|Form $builder
+     * @param array<string, mixed>      $options
+     * @param array<string, mixed>      $masks
      */
     protected function addPropertiesType($builder, array $options, array &$masks): void
     {
