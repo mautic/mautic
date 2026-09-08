@@ -24,12 +24,12 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class FullObjectReportBuilder
+readonly class FullObjectReportBuilder
 {
     public function __construct(
-        private readonly FieldBuilder $fieldBuilder,
-        private readonly ObjectProvider $objectProvider,
-        private readonly EventDispatcherInterface $dispatcher,
+        private FieldBuilder $fieldBuilder,
+        private ObjectProvider $objectProvider,
+        private EventDispatcherInterface $dispatcher,
     ) {
     }
 

@@ -6,10 +6,10 @@ namespace Mautic\LeadBundle\Helper;
 
 use Mautic\LeadBundle\Field\FieldList;
 
-class FakeContactHelper
+readonly class FakeContactHelper
 {
     public function __construct(
-        private readonly FieldList $fieldList,
+        private FieldList $fieldList,
     ) {
     }
 

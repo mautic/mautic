@@ -24,19 +24,19 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * Provides several functions for export-related tasks,
  * like exporting to CSV or Excel.
  */
-class ExportHelper
+readonly class ExportHelper
 {
     public const EXPORT_TYPE_EXCEL = 'xlsx';
 
     public const EXPORT_TYPE_CSV   = 'csv';
 
     public function __construct(
-        private readonly TranslatorInterface $translator,
-        private readonly CoreParametersHelper $coreParametersHelper,
-        private readonly FilePathResolver $filePathResolver,
-        private readonly ProcessSignalService $processSignalService,
-        private readonly EventDispatcherInterface $eventDispatcher,
-        private readonly ?LoggerInterface $logger = null,
+        private TranslatorInterface $translator,
+        private CoreParametersHelper $coreParametersHelper,
+        private FilePathResolver $filePathResolver,
+        private ProcessSignalService $processSignalService,
+        private EventDispatcherInterface $eventDispatcher,
+        private ?LoggerInterface $logger = null,
     ) {
     }
 

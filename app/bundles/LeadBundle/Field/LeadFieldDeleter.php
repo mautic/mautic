@@ -12,13 +12,13 @@ use Mautic\LeadBundle\Exception\NoListenerException;
 use Mautic\LeadBundle\Field\Dispatcher\FieldDeleteDispatcher;
 use Mautic\LeadBundle\Field\Settings\BackgroundSettings;
 
-class LeadFieldDeleter
+readonly class LeadFieldDeleter
 {
     public function __construct(
-        private readonly LeadFieldRepository $leadFieldRepository,
-        private readonly FieldDeleteDispatcher $fieldDeleteDispatcher,
-        private readonly UserHelper $userHelper,
-        private readonly BackgroundSettings $backgroundSettings,
+        private LeadFieldRepository $leadFieldRepository,
+        private FieldDeleteDispatcher $fieldDeleteDispatcher,
+        private UserHelper $userHelper,
+        private BackgroundSettings $backgroundSettings,
     ) {
     }
 

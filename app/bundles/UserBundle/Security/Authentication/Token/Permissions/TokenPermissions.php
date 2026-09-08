@@ -15,12 +15,12 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class TokenPermissions
+readonly class TokenPermissions
 {
     public function __construct(
-        private readonly TokenStorageInterface $tokenStorage,
-        private readonly PermissionRepository $permissionRepository,
-        private readonly AccessTokenRepository $accessTokenRepository,
+        private TokenStorageInterface $tokenStorage,
+        private PermissionRepository $permissionRepository,
+        private AccessTokenRepository $accessTokenRepository,
     ) {
     }
 

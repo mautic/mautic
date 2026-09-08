@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Helper;
 
-class ImportHelper
+readonly class ImportHelper
 {
     public function __construct(
-        private readonly PathsHelper $pathsHelper,
+        private PathsHelper $pathsHelper,
     ) {
     }
 

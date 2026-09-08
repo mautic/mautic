@@ -7,10 +7,10 @@ use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\Page;
 
-class PointActionHelper
+readonly class PointActionHelper
 {
     public function __construct(
-        private readonly HitRepository $hitRepository,
+        private HitRepository $hitRepository,
     ) {
     }
 

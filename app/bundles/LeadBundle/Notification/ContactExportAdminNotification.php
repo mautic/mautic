@@ -13,15 +13,15 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ContactExportAdminNotification
+readonly class ContactExportAdminNotification
 {
     public function __construct(
-        private readonly NotificationModel $notificationModel,
-        private readonly TranslatorInterface $translator,
-        private readonly UserRepository $userRepository,
-        private readonly MailHelper $mailHelper,
-        private readonly CoreParametersHelper $coreParametersHelper,
-        private readonly DateHelper $dateHelper,
+        private NotificationModel $notificationModel,
+        private TranslatorInterface $translator,
+        private UserRepository $userRepository,
+        private MailHelper $mailHelper,
+        private CoreParametersHelper $coreParametersHelper,
+        private DateHelper $dateHelper,
     ) {
     }
 

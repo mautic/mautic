@@ -14,11 +14,11 @@ use Symfony\Component\HttpKernel\KernelInterface;
 /**
  * Provides several helper functions to interact with Composer (composer require, remove, etc.).
  */
-class ComposerHelper
+readonly class ComposerHelper
 {
     public function __construct(
-        private readonly KernelInterface $kernel,
-        private readonly LoggerInterface $logger,
+        private KernelInterface $kernel,
+        private LoggerInterface $logger,
     ) {
     }
 

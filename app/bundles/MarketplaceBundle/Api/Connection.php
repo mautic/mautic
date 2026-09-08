@@ -11,12 +11,12 @@ use Mautic\MarketplaceBundle\Exception\ApiException;
 use Mautic\MarketplaceBundle\Service\Config;
 use Psr\Log\LoggerInterface;
 
-class Connection
+readonly class Connection
 {
     public function __construct(
-        private readonly ClientInterface $httpClient,
-        private readonly LoggerInterface $logger,
-        private readonly Config $config,
+        private ClientInterface $httpClient,
+        private LoggerInterface $logger,
+        private Config $config,
     ) {
     }
 

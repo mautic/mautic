@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Helper\DncFormatterHelper;
 use Mautic\LeadBundle\Model\DoNotContact;
 
-class DncReportService
+readonly class DncReportService
 {
     public const DEFAULT_DNC_OPTIONS = [
         ['reason' => DNC::UNSUBSCRIBED, 'channel' => 'email'],
@@ -17,8 +17,8 @@ class DncReportService
     ];
 
     public function __construct(
-        private readonly DoNotContact $doNotContactModel,
-        private readonly DncFormatterHelper $dncFormatterHelper,
+        private DoNotContact $doNotContactModel,
+        private DncFormatterHelper $dncFormatterHelper,
     ) {
     }
 

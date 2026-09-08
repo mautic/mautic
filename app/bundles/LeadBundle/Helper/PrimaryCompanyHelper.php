@@ -5,10 +5,10 @@ namespace Mautic\LeadBundle\Helper;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 
-class PrimaryCompanyHelper
+readonly class PrimaryCompanyHelper
 {
     public function __construct(
-        private readonly CompanyLeadRepository $companyLeadRepository,
+        private CompanyLeadRepository $companyLeadRepository,
     ) {
     }
 

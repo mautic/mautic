@@ -4,10 +4,10 @@ namespace Mautic\LeadBundle\Segment;
 
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class RelativeDate
+readonly class RelativeDate
 {
     public function __construct(
-        private readonly TranslatorInterface $translator,
+        private TranslatorInterface $translator,
     ) {
     }
 

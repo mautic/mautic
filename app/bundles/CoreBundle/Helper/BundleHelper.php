@@ -2,20 +2,20 @@
 
 namespace Mautic\CoreBundle\Helper;
 
-class BundleHelper
+readonly class BundleHelper
 {
     /**
      * @var mixed[]
      */
-    private readonly array $allBundles;
+    private array $allBundles;
 
     /**
      * @param mixed[] $coreBundles
      * @param mixed[] $pluginBundles
      */
     public function __construct(
-        private readonly array $coreBundles,
-        private readonly array $pluginBundles,
+        private array $coreBundles,
+        private array $pluginBundles,
     ) {
         $this->allBundles    = array_merge($coreBundles, $pluginBundles);
     }

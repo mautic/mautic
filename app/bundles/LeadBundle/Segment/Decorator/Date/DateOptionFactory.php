@@ -22,12 +22,12 @@ use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\RelativeDate;
 
-class DateOptionFactory
+readonly class DateOptionFactory
 {
     public function __construct(
-        private readonly DateDecorator $dateDecorator,
-        private readonly RelativeDate $relativeDate,
-        private readonly TimezoneResolver $timezoneResolver,
+        private DateDecorator $dateDecorator,
+        private RelativeDate $relativeDate,
+        private TimezoneResolver $timezoneResolver,
     ) {
     }
 

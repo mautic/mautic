@@ -16,15 +16,15 @@ use Mautic\LeadBundle\Field\Exception\LeadFieldWasNotFoundException;
 use Mautic\LeadBundle\Field\Notification\CustomFieldNotification;
 use Mautic\LeadBundle\Model\FieldModel;
 
-class BackgroundService
+readonly class BackgroundService
 {
     public function __construct(
-        private readonly FieldModel $fieldModel,
-        private readonly CustomFieldColumn $customFieldColumn,
-        private readonly LeadFieldSaver $leadFieldSaver,
-        private readonly LeadFieldDeleter $leadFieldDeleter,
-        private readonly FieldColumnBackgroundJobDispatcher $fieldColumnBackgroundJobDispatcher,
-        private readonly CustomFieldNotification $customFieldNotification,
+        private FieldModel $fieldModel,
+        private CustomFieldColumn $customFieldColumn,
+        private LeadFieldSaver $leadFieldSaver,
+        private LeadFieldDeleter $leadFieldDeleter,
+        private FieldColumnBackgroundJobDispatcher $fieldColumnBackgroundJobDispatcher,
+        private CustomFieldNotification $customFieldNotification,
     ) {
     }
 

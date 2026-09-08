@@ -16,16 +16,16 @@ use Mautic\CoreBundle\Service\OptimisticLockServiceInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-class ActionExecutioner implements EventInterface
+readonly class ActionExecutioner implements EventInterface
 {
     public const TYPE = 'action';
 
     public function __construct(
-        private readonly ActionDispatcher $dispatcher,
-        private readonly EventLogger $eventLogger,
-        private readonly OptimisticLockServiceInterface $optimisticLockService,
+        private ActionDispatcher $dispatcher,
+        private EventLogger $eventLogger,
+        private OptimisticLockServiceInterface $optimisticLockService,
         #[Autowire(service: 'monolog.logger.mautic')]
-        private readonly LoggerInterface $logger,
+        private LoggerInterface $logger,
     ) {
     }
 

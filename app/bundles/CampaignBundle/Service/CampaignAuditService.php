@@ -8,12 +8,12 @@ use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\EmailBundle\Entity\Email;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class CampaignAuditService
+readonly class CampaignAuditService
 {
     public function __construct(
-        private readonly FlashBag $flashBag,
-        private readonly UrlGeneratorInterface $urlGenerator,
-        private readonly EventRepository $eventRepository,
+        private FlashBag $flashBag,
+        private UrlGeneratorInterface $urlGenerator,
+        private EventRepository $eventRepository,
     ) {
     }
 

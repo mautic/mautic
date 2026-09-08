@@ -11,15 +11,15 @@ use Mautic\CampaignBundle\Membership\Exception\ContactAlreadyRemovedFromCampaign
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class Remover
+readonly class Remover
 {
     public const NAME = 'removed';
 
-    private readonly string $unscheduledMessage;
+    private string $unscheduledMessage;
 
     public function __construct(
-        private readonly LeadRepository $leadRepository,
-        private readonly LeadEventLogRepository $leadEventLogRepository,
+        private LeadRepository $leadRepository,
+        private LeadEventLogRepository $leadEventLogRepository,
         TranslatorInterface $translator,
         DateHelper $dateHelper,
     ) {

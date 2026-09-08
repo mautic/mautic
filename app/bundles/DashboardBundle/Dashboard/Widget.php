@@ -10,14 +10,14 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-class Widget
+readonly class Widget
 {
     public const FORMAT_HUMAN = 'M j, Y';
 
     public function __construct(
-        private readonly DashboardModel $dashboardModel,
-        private readonly UserHelper $userHelper,
-        private readonly RequestStack $requestStack,
+        private DashboardModel $dashboardModel,
+        private UserHelper $userHelper,
+        private RequestStack $requestStack,
     ) {
     }
 

@@ -14,11 +14,11 @@ use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
 use Mautic\LeadBundle\Field\Settings\BackgroundSettings;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class FieldColumnDispatcher
+readonly class FieldColumnDispatcher
 {
     public function __construct(
-        private readonly EventDispatcherInterface $dispatcher,
-        private readonly BackgroundSettings $backgroundSettings,
+        private EventDispatcherInterface $dispatcher,
+        private BackgroundSettings $backgroundSettings,
     ) {
     }
 

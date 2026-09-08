@@ -10,11 +10,11 @@ use Mautic\PageBundle\Entity\PageDraft;
 use Mautic\PageBundle\Entity\PageDraftRepository;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class PageDraftModel
+readonly class PageDraftModel
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager,
-        private readonly PageDraftRepository $pageDraftRepository,
+        private EntityManagerInterface $entityManager,
+        private PageDraftRepository $pageDraftRepository,
     ) {
     }
 

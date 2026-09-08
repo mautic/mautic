@@ -17,10 +17,10 @@ use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use Mautic\IntegrationsBundle\Sync\Logger\DebugLogger;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
 
-class ObjectChangeGenerator
+readonly class ObjectChangeGenerator
 {
     public function __construct(
-        private readonly ValueHelper $valueHelper,
+        private ValueHelper $valueHelper,
     ) {
     }
 

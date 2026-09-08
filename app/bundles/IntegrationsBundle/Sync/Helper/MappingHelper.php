@@ -21,13 +21,13 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class MappingHelper
+readonly class MappingHelper
 {
     public function __construct(
-        private readonly FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
-        private readonly ObjectMappingRepository $objectMappingRepository,
-        private readonly ObjectProvider $objectProvider,
-        private readonly EventDispatcherInterface $dispatcher,
+        private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
+        private ObjectMappingRepository $objectMappingRepository,
+        private ObjectProvider $objectProvider,
+        private EventDispatcherInterface $dispatcher,
     ) {
     }
 

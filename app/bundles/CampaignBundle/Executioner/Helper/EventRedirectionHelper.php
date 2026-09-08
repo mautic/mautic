@@ -13,12 +13,12 @@ use Psr\Log\LoggerInterface;
  * This helper centralizes logic for finding and following chains of redirected events.
  * It also provides methods to handle the replacement of deleted events with their redirects.
  */
-class EventRedirectionHelper
+readonly class EventRedirectionHelper
 {
     private const int MAX_DEPTH = 20;
 
     public function __construct(
-        private readonly LoggerInterface $logger,
+        private LoggerInterface $logger,
     ) {
     }
 

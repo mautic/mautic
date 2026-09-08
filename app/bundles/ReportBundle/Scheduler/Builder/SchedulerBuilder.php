@@ -10,10 +10,10 @@ use Recurr\Exception\InvalidWeekday;
 use Recurr\Rule;
 use Recurr\Transformer\ArrayTransformer;
 
-class SchedulerBuilder
+readonly class SchedulerBuilder
 {
     public function __construct(
-        private readonly SchedulerTemplateFactory $schedulerTemplateFactory,
+        private SchedulerTemplateFactory $schedulerTemplateFactory,
     ) {
     }
 
