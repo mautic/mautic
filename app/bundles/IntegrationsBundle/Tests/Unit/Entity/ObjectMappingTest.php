@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Tests\Unit\Entity;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\Driver\AttributeDriver;
+use Doctrine\Persistence\Mapping\RuntimeReflectionService;
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use PHPUnit\Framework\TestCase;
 
@@ -32,10 +34,11 @@ final class ObjectMappingTest extends TestCase
         $this->assertEquals('ref', $objectMapping->getIntegrationReferenceId());
     }
 
-    public function testLoadMetadata(): void
+    public function testMetadataMapping(): void
     {
         $metadata = new ClassMetadata(ObjectMapping::class);
-        ObjectMapping::loadMetadata($metadata);
+        $metadata->initializeReflection(new RuntimeReflectionService());
+        new AttributeDriver([])->loadMetadataForClass(ObjectMapping::class, $metadata);
 
         $expectedFieldNames = [
             'id',
