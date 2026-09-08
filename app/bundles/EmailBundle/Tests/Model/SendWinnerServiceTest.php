@@ -1,40 +1,45 @@
 <?php
-/*
- * @copyright   2019 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+
+declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Model;
 
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\ChannelBroadcastEvent;
+use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\CoreBundle\Model\AbTest\AbTestResultService;
 use Mautic\CoreBundle\Model\AbTest\AbTestSettingsService;
 use Mautic\CoreBundle\Model\AbTest\VariantConverterService;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\AbTest\SendWinnerService;
 use Mautic\EmailBundle\Model\EmailModel;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class SendWinnerServiceTest extends \PHPUnit_Framework_TestCase
+final class SendWinnerServiceTest extends TestCase
 {
-    private $emailModel;
-    private $abTestResultService;
-    private $abTestSettingsService;
-    private $eventDispatcher;
-    private $sendWinnerService;
-    private $variantConverterService;
+    private EmailModel&MockObject $emailModel;
 
-    protected function setUp()
+    private AbTestResultService $abTestResultService;
+
+    private EventDispatcherInterface&MockObject $abTestDispatcher;
+
+    private AbTestSettingsService $abTestSettingsService;
+
+    private EventDispatcherInterface&MockObject $eventDispatcher;
+
+    private SendWinnerService $sendWinnerService;
+
+    private VariantConverterService $variantConverterService;
+
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->emailModel              = $this->createMock(EmailModel::class);
-        $this->abTestResultService     = $this->createMock(AbTestResultService::class);
+        $this->abTestDispatcher        = $this->createMock(EventDispatcherInterface::class);
+        $this->abTestResultService     = new AbTestResultService($this->abTestDispatcher);
         $this->abTestSettingsService   = new AbTestSettingsService();
         $this->eventDispatcher         = $this->createMock(EventDispatcherInterface::class);
         $this->variantConverterService = new VariantConverterService();
@@ -46,29 +51,18 @@ class SendWinnerServiceTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testProcessWinnerEmails()
+    public function testProcessWinnerEmails(): void
     {
         $sendWinnerDelay = 2;
         $winnerCriteria  = 'email.openrate';
 
         $emailId = 5;
-        $email   = $this->getMockBuilder(Email::class)
-            ->setMethods(['getId'])
-            ->getMock();
-        $email->expects($this->any())
-            ->method('getId')
-            ->will($this->returnValue($emailId));
+        $email   = $this->createEmailMockWithId($emailId);
         $email->setIsPublished(true);
 
         $variantId = 7;
-        $variant   = $this->getMockBuilder(Email::class)
-            ->setMethods(['getId'])
-            ->getMock();
+        $variant   = $this->createEmailMockWithId($variantId);
         $variant->setIsPublished(true);
-
-        $variant->expects($this->any())
-            ->method('getId')
-            ->will($this->returnValue($variantId));
 
         $email->addVariantChild($variant);
         $variant->setVariantParent($email);
@@ -79,10 +73,13 @@ class SendWinnerServiceTest extends \PHPUnit_Framework_TestCase
         $variantSettings = ['weight' => 21];
         $variant->setVariantSettings($variantSettings);
 
-        $this->emailModel->expects($this->at(0))
+        $this->emailModel->expects($this->exactly(2))
             ->method('getEntity')
-            ->with($emailId)
-            ->willReturn($email);
+            ->willReturnCallback(fn (mixed $id): Email => match (true) {
+                $emailId === $id   => $email,
+                $variantId === $id => $variant,
+                default            => throw new \LogicException('Unexpected getEntity() argument'),
+            });
 
         $this->emailModel->expects($this->once())
             ->method('isReadyToSendWinner')
@@ -92,34 +89,30 @@ class SendWinnerServiceTest extends \PHPUnit_Framework_TestCase
         $this->emailModel->expects($this->once())
             ->method('getBuilderComponents')
             ->with($email, 'abTestWinnerCriteria')
-            ->willReturn(['criteria' => [$winnerCriteria => []]]);
+            ->willReturn(['criteria' => [$winnerCriteria => ['event' => 'mautic.email_determine_winner']]]);
 
-        $this->abTestResultService->expects($this->once())
-            ->method('getAbTestResult')
-            ->with($email, [])
-            ->willReturn(['winners' => [$variant]]);
+        $this->abTestDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(self::isInstanceOf(DetermineWinnerEvent::class), 'mautic.email_determine_winner')
+            ->willReturnCallback(function (DetermineWinnerEvent $event) use ($variantId): DetermineWinnerEvent {
+                $event->setAbTestResults(['winners' => [$variantId]]);
 
-        $this->emailModel->expects($this->at(3))
-            ->method('getEntity')
-            ->willReturn($variant);
+                return $event;
+            });
 
         $event = new ChannelBroadcastEvent('email', $variantId);
         $event->setAbTestWinner(true);
 
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(ChannelEvents::CHANNEL_BROADCAST, $event);
-
-        $converter = $this->variantConverterService;
+            ->with($event, ChannelEvents::CHANNEL_BROADCAST)
+            ->willReturnArgument(0);
 
         $this->emailModel->expects($this->once())
             ->method('convertWinnerVariant')
-            ->will($this->returnCallback(
-                function ($variant) use ($converter) {
-                    return $converter->convertWinnerVariant($variant);
-                }
-            )
-            );
+            ->willReturnCallback(function (Email $variant): void {
+                $this->variantConverterService->convertWinnerVariant($variant);
+            });
 
         $this->sendWinnerService->processWinnerEmails($emailId);
 
@@ -127,34 +120,23 @@ class SendWinnerServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertEmpty($variant->getVariantParent());
         $this->assertTrue($variant->isPublished());
         $this->assertFalse($email->isPublished());
-        $this->assertEquals($email->getVariantParent(), $variant);
-        $this->assertEquals($variantSettings['totalWeight'], AbTestSettingsService::DEFAULT_TOTAL_WEIGHT);
-        $this->assertEquals($variantSettings['winnerCriteria'], $winnerCriteria);
+        $this->assertSame($variant, $email->getVariantParent());
+        $this->assertEquals(AbTestSettingsService::DEFAULT_TOTAL_WEIGHT, $variantSettings['totalWeight']);
+        $this->assertEquals($winnerCriteria, $variantSettings['winnerCriteria']);
     }
 
-    public function testProcessWinnerEmailsWithoutId()
+    public function testProcessWinnerEmailsWithoutId(): void
     {
         $sendWinnerDelay = 2;
         $winnerCriteria  = 'email.openrate';
 
         $emailId = 5;
-        $email   = $this->getMockBuilder(Email::class)
-            ->setMethods(['getId'])
-            ->getMock();
-        $email->expects($this->any())
-            ->method('getId')
-            ->will($this->returnValue($emailId));
+        $email   = $this->createEmailMockWithId($emailId);
         $email->setIsPublished(true);
 
         $variantId = 7;
-        $variant   = $this->getMockBuilder(Email::class)
-            ->setMethods(['getId'])
-            ->getMock();
+        $variant   = $this->createEmailMockWithId($variantId);
         $variant->setIsPublished(true);
-
-        $variant->expects($this->any())
-            ->method('getId')
-            ->will($this->returnValue($variantId));
 
         $email->addVariantChild($variant);
         $variant->setVariantParent($email);
@@ -165,7 +147,7 @@ class SendWinnerServiceTest extends \PHPUnit_Framework_TestCase
         $variantSettings = ['weight' => 21];
         $variant->setVariantSettings($variantSettings);
 
-        $this->emailModel->expects($this->at(0))
+        $this->emailModel->expects($this->once())
             ->method('getEmailsToSendWinnerVariant')
             ->willReturn([$email]);
 
@@ -177,15 +159,20 @@ class SendWinnerServiceTest extends \PHPUnit_Framework_TestCase
         $this->emailModel->expects($this->once())
             ->method('getBuilderComponents')
             ->with($email, 'abTestWinnerCriteria')
-            ->willReturn(['criteria' => [$winnerCriteria => []]]);
+            ->willReturn(['criteria' => [$winnerCriteria => ['event' => 'mautic.email_determine_winner']]]);
 
-        $this->abTestResultService->expects($this->once())
-            ->method('getAbTestResult')
-            ->with($email, [])
-            ->willReturn(['winners' => [$variant]]);
+        $this->abTestDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(self::isInstanceOf(DetermineWinnerEvent::class), 'mautic.email_determine_winner')
+            ->willReturnCallback(function (DetermineWinnerEvent $event) use ($variantId): DetermineWinnerEvent {
+                $event->setAbTestResults(['winners' => [$variantId]]);
 
-        $this->emailModel->expects($this->at(3))
+                return $event;
+            });
+
+        $this->emailModel->expects($this->once())
             ->method('getEntity')
+            ->with($variantId)
             ->willReturn($variant);
 
         $event = new ChannelBroadcastEvent('email', $variantId);
@@ -193,18 +180,14 @@ class SendWinnerServiceTest extends \PHPUnit_Framework_TestCase
 
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(ChannelEvents::CHANNEL_BROADCAST, $event);
-
-        $converter = $this->variantConverterService;
+            ->with($event, ChannelEvents::CHANNEL_BROADCAST)
+            ->willReturnArgument(0);
 
         $this->emailModel->expects($this->once())
             ->method('convertWinnerVariant')
-            ->will($this->returnCallback(
-                function ($variant) use ($converter) {
-                    return $converter->convertWinnerVariant($variant);
-                }
-            )
-            );
+            ->willReturnCallback(function (Email $variant): void {
+                $this->variantConverterService->convertWinnerVariant($variant);
+            });
 
         $this->sendWinnerService->processWinnerEmails();
 
@@ -212,21 +195,21 @@ class SendWinnerServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertEmpty($variant->getVariantParent());
         $this->assertTrue($variant->isPublished());
         $this->assertFalse($email->isPublished());
-        $this->assertEquals($email->getVariantParent(), $variant);
-        $this->assertEquals($variantSettings['totalWeight'], AbTestSettingsService::DEFAULT_TOTAL_WEIGHT);
-        $this->assertEquals($variantSettings['winnerCriteria'], $winnerCriteria);
+        $this->assertSame($variant, $email->getVariantParent());
+        $this->assertEquals(AbTestSettingsService::DEFAULT_TOTAL_WEIGHT, $variantSettings['totalWeight']);
+        $this->assertEquals($winnerCriteria, $variantSettings['winnerCriteria']);
     }
 
-    public function testProcessWinnerEmailsNoDelay()
+    public function testProcessWinnerEmailsNoDelay(): void
     {
         $sendWinnerDelay = 0;
         $winnerCriteria  = 'email.openrate';
 
         $emailId = 5;
-        $email   = new Email();
+        $email   = $this->createEmailMockWithId($emailId);
         $email->setIsPublished(true);
 
-        $variant = new Email();
+        $variant = $this->createEmailMockWithId(7);
         $variant->setIsPublished(true);
 
         $email->addVariantChild($variant);
@@ -238,7 +221,7 @@ class SendWinnerServiceTest extends \PHPUnit_Framework_TestCase
         $variantSettings = ['weight' => 21];
         $variant->setVariantSettings($variantSettings);
 
-        $this->emailModel->expects($this->at(0))
+        $this->emailModel->expects($this->once())
             ->method('getEntity')
             ->with($emailId)
             ->willReturn($email);
@@ -255,16 +238,16 @@ class SendWinnerServiceTest extends \PHPUnit_Framework_TestCase
         $this->sendWinnerService->processWinnerEmails($emailId);
     }
 
-    public function testProcessWinnerEmailsWrongTotalWeight()
+    public function testProcessWinnerEmailsWrongTotalWeight(): void
     {
         $sendWinnerDelay = 2;
         $winnerCriteria  = 'email.openrate';
 
         $emailId = 5;
-        $email   = new Email();
+        $email   = $this->createEmailMockWithId($emailId);
         $email->setIsPublished(true);
 
-        $variant = new Email();
+        $variant = $this->createEmailMockWithId(7);
         $variant->setIsPublished(true);
 
         $email->addVariantChild($variant);
@@ -276,7 +259,7 @@ class SendWinnerServiceTest extends \PHPUnit_Framework_TestCase
         $variantSettings = ['weight' => 21];
         $variant->setVariantSettings($variantSettings);
 
-        $this->emailModel->expects($this->at(0))
+        $this->emailModel->expects($this->once())
             ->method('getEntity')
             ->with($emailId)
             ->willReturn($email);
@@ -293,19 +276,19 @@ class SendWinnerServiceTest extends \PHPUnit_Framework_TestCase
         $this->sendWinnerService->processWinnerEmails($emailId);
     }
 
-    public function testProcessWinnerEmailsNoVariants()
+    public function testProcessWinnerEmailsNoVariants(): void
     {
         $sendWinnerDelay = 2;
         $winnerCriteria  = 'email.openrate';
 
         $emailId = 5;
-        $email   = new Email();
+        $email   = $this->createEmailMockWithId($emailId);
         $email->setIsPublished(true);
 
         $variantSettings = ['totalWeight' => 100, 'winnerCriteria' => $winnerCriteria, 'sendWinnerDelay' => $sendWinnerDelay];
         $email->setVariantSettings($variantSettings);
 
-        $this->emailModel->expects($this->at(0))
+        $this->emailModel->expects($this->once())
             ->method('getEntity')
             ->with($emailId)
             ->willReturn($email);
@@ -322,16 +305,16 @@ class SendWinnerServiceTest extends \PHPUnit_Framework_TestCase
         $this->sendWinnerService->processWinnerEmails($emailId);
     }
 
-    public function testProcessWinnerEmailsNoWinner()
+    public function testProcessWinnerEmailsNoWinner(): void
     {
         $sendWinnerDelay = 2;
         $winnerCriteria  = 'email.openrate';
 
         $emailId = 5;
-        $email   = new Email();
+        $email   = $this->createEmailMockWithId($emailId);
         $email->setIsPublished(true);
 
-        $variant = new Email();
+        $variant = $this->createEmailMockWithId(7);
         $variant->setIsPublished(true);
 
         $email->addVariantChild($variant);
@@ -343,14 +326,14 @@ class SendWinnerServiceTest extends \PHPUnit_Framework_TestCase
         $variantSettings = ['weight' => 21];
         $variant->setVariantSettings($variantSettings);
 
-        $this->emailModel->expects($this->at(0))
+        $this->emailModel->expects($this->once())
             ->method('getEntity')
             ->with($emailId)
             ->willReturn($email);
 
         $this->emailModel->expects($this->once())
             ->method('isReadyToSendWinner')
-            ->with(null, $sendWinnerDelay)
+            ->with($emailId, $sendWinnerDelay)
             ->willReturn(true);
 
         $this->emailModel->expects($this->once())
@@ -358,10 +341,8 @@ class SendWinnerServiceTest extends \PHPUnit_Framework_TestCase
             ->with($email, 'abTestWinnerCriteria')
             ->willReturn(['criteria' => [$winnerCriteria => []]]);
 
-        $this->abTestResultService->expects($this->once())
-            ->method('getAbTestResult')
-            ->with($email, [])
-            ->willReturn(['winners' => []]);
+        $this->abTestDispatcher->expects($this->never())
+            ->method('dispatch');
 
         $this->eventDispatcher->expects($this->never())
             ->method('dispatch');
@@ -372,16 +353,16 @@ class SendWinnerServiceTest extends \PHPUnit_Framework_TestCase
         $this->sendWinnerService->processWinnerEmails($emailId);
     }
 
-    public function testProcessWinnerEmailsNotReady()
+    public function testProcessWinnerEmailsNotReady(): void
     {
         $sendWinnerDelay = 2;
         $winnerCriteria  = 'email.openrate';
 
         $emailId = 5;
-        $email   = new Email();
+        $email   = $this->createEmailMockWithId($emailId);
         $email->setIsPublished(true);
 
-        $variant = new Email();
+        $variant = $this->createEmailMockWithId(7);
         $variant->setIsPublished(true);
 
         $email->addVariantChild($variant);
@@ -393,18 +374,18 @@ class SendWinnerServiceTest extends \PHPUnit_Framework_TestCase
         $variantSettings = ['weight' => 21];
         $variant->setVariantSettings($variantSettings);
 
-        $this->emailModel->expects($this->at(0))
+        $this->emailModel->expects($this->once())
             ->method('getEntity')
             ->with($emailId)
             ->willReturn($email);
 
         $this->emailModel->expects($this->once())
             ->method('isReadyToSendWinner')
-            ->with(null, $sendWinnerDelay)
+            ->with($emailId, $sendWinnerDelay)
             ->willReturn(false);
 
-        $this->abTestResultService->expects($this->never())
-            ->method('getAbTestResult');
+        $this->abTestDispatcher->expects($this->never())
+            ->method('dispatch');
 
         $this->eventDispatcher->expects($this->never())
             ->method('dispatch');
@@ -413,5 +394,18 @@ class SendWinnerServiceTest extends \PHPUnit_Framework_TestCase
             ->method('convertWinnerVariant');
 
         $this->sendWinnerService->processWinnerEmails($emailId);
+    }
+
+    /**
+     * @return Email&MockObject
+     */
+    private function createEmailMockWithId(int $id): Email
+    {
+        $email = $this->getMockBuilder(Email::class)
+            ->onlyMethods(['getId'])
+            ->getMock();
+        $email->method('getId')->willReturn($id);
+
+        return $email;
     }
 }
