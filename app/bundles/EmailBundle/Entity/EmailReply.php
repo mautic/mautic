@@ -9,11 +9,11 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Ramsey\Uuid\Uuid;
 
-readonly class EmailReply
+class EmailReply
 {
-    private string $id;
+    private readonly string $id;
 
-    private \DateTimeInterface $dateReplied;
+    private readonly \DateTimeInterface $dateReplied;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
@@ -57,8 +57,8 @@ readonly class EmailReply
     }
 
     public function __construct(
-        private Stat $stat,
-        private ?string $messageId,
+        private readonly Stat $stat,
+        private readonly ?string $messageId,
         ?\DateTime $dateReplied = null,
     ) {
         $this->id          = Uuid::uuid4()->toString();
