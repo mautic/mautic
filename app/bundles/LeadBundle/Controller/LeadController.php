@@ -3,8 +3,10 @@
 namespace Mautic\LeadBundle\Controller;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\CampaignBundle\Security\Permissions\CampaignPermissions;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Form\Type\FindReplaceType;
@@ -1394,7 +1396,7 @@ final class LeadController extends FormController
                 $lead->getPermissionUser()
             )
         ) {
-            $campaigns      = $this->campaignModel->getPublishedCampaigns(true);
+            $campaigns      = $this->campaignModel->getPublishedCampaignsForContactMembership(true);
             $leadsCampaigns = $this->campaignModel->getLeadCampaigns($lead, true);
 
             foreach ($campaigns as $c) {
@@ -1658,15 +1660,31 @@ final class LeadController extends FormController
                     ]
                 );
 
+                foreach ($campaigns as $key => $campaign) {
+                    if (!$campaign instanceof Campaign
+                        || !$this->security->hasEntityAccess(
+                            CampaignPermissions::LEADS_ADD_OWN,
+                            CampaignPermissions::LEADS_ADD_OTHER,
+                            $campaign->getCreatedBy()
+                        )
+                    ) {
+                        unset($campaigns[$key]);
+                    }
+                }
+
                 if (!empty($add)) {
                     foreach ($add as $cid) {
-                        $membershipManager->addContacts(new ArrayCollection($entities), $campaigns[$cid]);
+                        if (isset($campaigns[$cid])) {
+                            $membershipManager->addContacts(new ArrayCollection($entities), $campaigns[$cid]);
+                        }
                     }
                 }
 
                 if (!empty($remove)) {
                     foreach ($remove as $cid) {
-                        $membershipManager->removeContacts(new ArrayCollection($entities), $campaigns[$cid]);
+                        if (isset($campaigns[$cid])) {
+                            $membershipManager->removeContacts(new ArrayCollection($entities), $campaigns[$cid]);
+                        }
                     }
                 }
             }
@@ -1686,7 +1704,7 @@ final class LeadController extends FormController
             );
         }
         // Get a list of campaigns
-        $campaigns = $this->campaignModel->getPublishedCampaigns(true);
+        $campaigns = $this->campaignModel->getPublishedCampaignsForContactMembership(true);
         $items     = [];
         foreach ($campaigns as $campaign) {
             $items[$campaign['name'].' ('.$campaign['id'].')'] = $campaign['id'];

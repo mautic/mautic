@@ -95,7 +95,7 @@
         {% endif %}
     {% endif %}
 
-    {% if securityIsGranted('campaign:campaigns:edit') %}
+    {% if canEdit and (securityIsGranted('campaign:leads:addown') or securityIsGranted('campaign:leads:addother')) %}
         {% set buttons = buttons|merge([{
             'attr': {
                 'data-toggle': 'ajaxmodal',
