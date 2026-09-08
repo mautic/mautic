@@ -21,11 +21,7 @@ final class SendWinnerServiceTest extends TestCase
 {
     private EmailModel&MockObject $emailModel;
 
-    private AbTestResultService $abTestResultService;
-
     private EventDispatcherInterface&MockObject $abTestDispatcher;
-
-    private AbTestSettingsService $abTestSettingsService;
 
     private EventDispatcherInterface&MockObject $eventDispatcher;
 
@@ -39,14 +35,14 @@ final class SendWinnerServiceTest extends TestCase
 
         $this->emailModel              = $this->createMock(EmailModel::class);
         $this->abTestDispatcher        = $this->createMock(EventDispatcherInterface::class);
-        $this->abTestResultService     = new AbTestResultService($this->abTestDispatcher);
-        $this->abTestSettingsService   = new AbTestSettingsService();
+        $abTestResultService     = new AbTestResultService($this->abTestDispatcher);
+        $abTestSettingsService   = new AbTestSettingsService();
         $this->eventDispatcher         = $this->createMock(EventDispatcherInterface::class);
         $this->variantConverterService = new VariantConverterService();
         $this->sendWinnerService       = new SendWinnerService(
             $this->emailModel,
-            $this->abTestResultService,
-            $this->abTestSettingsService,
+            $abTestResultService,
+            $abTestSettingsService,
             $this->eventDispatcher
         );
     }
@@ -117,7 +113,7 @@ final class SendWinnerServiceTest extends TestCase
         $this->sendWinnerService->processWinnerEmails($emailId);
 
         $variantSettings = $variant->getVariantSettings();
-        $this->assertEmpty($variant->getVariantParent());
+        $this->assertNotInstanceOf(\Mautic\CoreBundle\Entity\VariantEntityInterface::class, $variant->getVariantParent());
         $this->assertTrue($variant->isPublished());
         $this->assertFalse($email->isPublished());
         $this->assertSame($variant, $email->getVariantParent());
@@ -192,7 +188,7 @@ final class SendWinnerServiceTest extends TestCase
         $this->sendWinnerService->processWinnerEmails();
 
         $variantSettings = $variant->getVariantSettings();
-        $this->assertEmpty($variant->getVariantParent());
+        $this->assertNotInstanceOf(\Mautic\CoreBundle\Entity\VariantEntityInterface::class, $variant->getVariantParent());
         $this->assertTrue($variant->isPublished());
         $this->assertFalse($email->isPublished());
         $this->assertSame($variant, $email->getVariantParent());
