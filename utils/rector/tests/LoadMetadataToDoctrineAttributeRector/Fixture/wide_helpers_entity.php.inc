@@ -98,7 +98,6 @@ class WideEntity
     #[ORM\Column(name: 'schedule_unit', type: Types::STRING, length: 191, nullable: true)]
     protected $scheduleUnit;
 
-    #[ORM\Column(type: 'guid', nullable: true)]
     protected $uuid;
 
     public static function addUuidField(ClassMetadataBuilder $builder): void

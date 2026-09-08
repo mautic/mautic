@@ -290,9 +290,11 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
             return null;
         }
 
-        // addUuidField($builder): createField('uuid', Types::GUID)->nullable()->build()
+        // addUuidField($builder): the uuid column lives on UuidTrait::$uuid, which carries its own
+        // #[ORM\Column] read via reflection. Emit no per-entity attribute (the property is not in the
+        // class body, so it cannot be annotated here) and do not bail.
         if ('addUuidField' === $call->name->toString()) {
-            return ['uuid' => $this->columnAttributes('uuid', null, new String_('guid'), null, true, false, [], false, false, null)];
+            return [];
         }
 
         return null;
