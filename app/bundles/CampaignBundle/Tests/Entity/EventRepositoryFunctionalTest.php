@@ -12,8 +12,9 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 
-class EventRepositoryFunctionalTest extends MauticMysqlTestCase
+final class EventRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     /**
      * @return iterable<string, array{?\DateTime, ?\DateTime, int}>
@@ -30,11 +31,12 @@ class EventRepositoryFunctionalTest extends MauticMysqlTestCase
         yield 'Publish Down in the future' => [null, new \DateTime('+1 day'), 1];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataGetContactPendingEventsConsidersCampaignPublishUpAndDown')]
+    #[DataProvider('dataGetContactPendingEventsConsidersCampaignPublishUpAndDown')]
     public function testGetContactPendingEventsConsidersCampaignPublishUpAndDown(?\DateTime $publishUp, ?\DateTime $publishDown, int $expectedCount): void
     {
-        $repository = static::getContainer()->get('mautic.campaign.repository.event');
-        \assert($repository instanceof EventRepository);
+        /** @var EventRepository $repository */
+        $repository = self::getContainer()->get(EventRepository::class);
+        $this->assertInstanceOf(EventRepository::class, $repository);
 
         $campaign = $this->createCampaign();
         $event    = $this->createEvent($campaign);
@@ -46,13 +48,14 @@ class EventRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($campaign);
         $this->em->flush();
 
-        Assert::assertCount($expectedCount, $repository->getContactPendingEvents($lead->getId(), $event->getType()));
+        $this->assertCount($expectedCount, $repository->getContactPendingEvents($lead->getId(), $event->getType()));
     }
 
     public function testSetEventsAsDeletedWithRedirectUpdatesChains(): void
     {
-        $repository = static::getContainer()->get('mautic.campaign.repository.event');
-        \assert($repository instanceof EventRepository);
+        /** @var EventRepository $repository */
+        $repository = self::getContainer()->get(EventRepository::class);
+        $this->assertInstanceOf(EventRepository::class, $repository);
 
         $campaign = $this->createCampaign();
 
@@ -95,11 +98,14 @@ class EventRepositoryFunctionalTest extends MauticMysqlTestCase
         $reloadedEventA = $this->em->find(Event::class, $eventA->getId());
         $reloadedEventB = $this->em->find(Event::class, $eventB->getId());
         $reloadedEventC = $this->em->find(Event::class, $eventCId);
+        $this->assertInstanceOf(Event::class, $reloadedEventC);
 
-        Assert::assertNotNull($reloadedEventC->getDeleted());
-        Assert::assertSame($eventDId, $reloadedEventA->getRedirectEvent()?->getId());
-        Assert::assertSame($eventDId, $reloadedEventB->getRedirectEvent()?->getId());
-        Assert::assertSame($eventDId, $reloadedEventC->getRedirectEvent()?->getId());
+        $this->assertInstanceOf(\DateTimeInterface::class, $reloadedEventC->getDeleted());
+        $this->assertInstanceOf(Event::class, $reloadedEventA);
+        $this->assertSame($eventDId, $reloadedEventA->getRedirectEvent()?->getId());
+        $this->assertInstanceOf(Event::class, $reloadedEventB);
+        $this->assertSame($eventDId, $reloadedEventB->getRedirectEvent()?->getId());
+        $this->assertSame($eventDId, $reloadedEventC->getRedirectEvent()?->getId());
     }
 
     public function testGetCampaignEmailEvents(): void
@@ -152,8 +158,9 @@ class EventRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         // 4. Call the method under test
-        $repository   = self::getContainer()->get('mautic.campaign.repository.event');
-        \assert($repository instanceof EventRepository);
+        /** @var EventRepository $repository */
+        $repository   = self::getContainer()->get(EventRepository::class);
+        $this->assertInstanceOf(EventRepository::class, $repository);
         $resultEmails = $repository->getCampaignEmailEvents($campaign->getId());
 
         // 5. Assert the results

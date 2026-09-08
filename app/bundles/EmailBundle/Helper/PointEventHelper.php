@@ -5,13 +5,14 @@ namespace Mautic\EmailBundle\Helper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
 
-class PointEventHelper
+final readonly class PointEventHelper
 {
-    public function __construct(private EmailModel $emailModel)
-    {
+    public function __construct(
+        private EmailModel $emailModel,
+    ) {
     }
 
-    public static function validateEmail($eventDetails, $action): bool
+    public static function validateEmail($eventDetails, array $action): bool
     {
         if (null === $eventDetails) {
             return false;
@@ -23,15 +24,11 @@ class PointEventHelper
             $limitToEmails = $action['properties']['emails'];
         }
 
-        if (!empty($limitToEmails) && !in_array($emailId, $limitToEmails)) {
-            // no points change
-            return false;
-        }
-
-        return true;
+        // no points change
+        return empty($limitToEmails) || in_array($emailId, $limitToEmails);
     }
 
-    public function sendEmail($event, Lead $lead): bool
+    public function sendEmail(array $event, Lead $lead): bool
     {
         $properties = $event['properties'];
         $emailId    = (int) $properties['email'];
@@ -48,7 +45,7 @@ class PointEventHelper
                 $options   = ['source' => ['trigger', $event['id']]];
                 $emailSent = $this->emailModel->sendEmail($email, $leadCredentials, $options);
 
-                return is_array($emailSent) ? false : true;
+                return !is_array($emailSent);
             }
         }
 

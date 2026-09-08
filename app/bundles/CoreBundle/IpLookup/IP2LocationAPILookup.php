@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\IpLookup;
 
-class IP2LocationAPILookup extends AbstractRemoteDataLookup
+final class IP2LocationAPILookup extends AbstractRemoteDataLookup
 {
     public function getAttribution(): string
     {
@@ -14,7 +14,7 @@ class IP2LocationAPILookup extends AbstractRemoteDataLookup
         return "api.ip2location.com/?ip={$this->ip}&key={$this->auth}&package=WS9&format=json";
     }
 
-    protected function parseResponse($response)
+    protected function parseResponse($response): void
     {
         try {
             $record = json_decode($response);

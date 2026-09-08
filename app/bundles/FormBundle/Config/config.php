@@ -1,15 +1,8 @@
 <?php
 
-use Mautic\FormBundle\Event\Service\FieldValueTransformer;
-use Mautic\FormBundle\Form\Type\FieldType;
-use Mautic\FormBundle\Form\Type\SubmitActionEmailType;
-use Mautic\FormBundle\Form\Type\SubmitActionRepostType;
+declare(strict_types=1);
+
 use Mautic\FormBundle\Helper\BlockedFreeEmailProvidersHelper;
-use Mautic\FormBundle\Helper\FormFieldHelper;
-use Mautic\FormBundle\Helper\FormUploader;
-use Mautic\FormBundle\Helper\TokenHelper;
-use Mautic\FormBundle\Validator\Constraint\FileExtensionConstraintValidator;
-use Mautic\FormBundle\Validator\UploadFieldValidator;
 
 return [
     'routes' => [
@@ -146,123 +139,6 @@ return [
         ],
     ],
 
-    'services' => [
-        'forms' => [
-            'mautic.form.type.field' => [
-                'class'       => FieldType::class,
-                'arguments'   => [
-                    'translator',
-                    'mautic.form.collector.object',
-                    'mautic.form.collector.field',
-                    'mautic.form.collector.already.mapped.field',
-                ],
-                'methodCalls' => [
-                    'setFieldModel' => ['mautic.form.model.field'],
-                    'setFormModel'  => ['mautic.form.model.form'],
-                ],
-            ],
-            'mautic.form.type.form_submitaction_sendemail' => [
-                'class'       => SubmitActionEmailType::class,
-                'arguments'   => [
-                    'translator',
-                    'mautic.helper.core_parameters',
-                ],
-                'methodCalls' => [
-                    'setFieldModel' => ['mautic.form.model.field'],
-                    'setFormModel'  => ['mautic.form.model.form'],
-                ],
-            ],
-            'mautic.form.type.form_submitaction_repost' => [
-                'class'       => SubmitActionRepostType::class,
-                'methodCalls' => [
-                    'setFieldModel' => ['mautic.form.model.field'],
-                    'setFormModel'  => ['mautic.form.model.form'],
-                ],
-            ],
-        ],
-        'other' => [
-            'mautic.form.collector.object' => [
-                'class'     => Mautic\FormBundle\Collector\ObjectCollector::class,
-                'arguments' => ['event_dispatcher'],
-            ],
-            'mautic.form.collector.field' => [
-                'class'     => Mautic\FormBundle\Collector\FieldCollector::class,
-                'arguments' => ['event_dispatcher'],
-            ],
-            'mautic.form.collector.mapped.object' => [
-                'class'     => Mautic\FormBundle\Collector\MappedObjectCollector::class,
-                'arguments' => ['mautic.form.collector.field'],
-            ],
-            'mautic.form.collector.already.mapped.field' => [
-                'class'     => Mautic\FormBundle\Collector\AlreadyMappedFieldCollector::class,
-                'arguments' => ['mautic.cache.provider_tag_aware'],
-            ],
-            'mautic.helper.form.field_helper' => [
-                'class'     => FormFieldHelper::class,
-                'arguments' => [
-                    'translator',
-                    'validator',
-                ],
-            ],
-            'mautic.form.helper.form_uploader' => [
-                'class'     => FormUploader::class,
-                'arguments' => [
-                    'mautic.helper.file_uploader',
-                    'mautic.helper.core_parameters',
-                ],
-            ],
-            'mautic.form.helper.token' => [
-                'class'     => TokenHelper::class,
-                'arguments' => [
-                    'mautic.form.model.form',
-                    'mautic.security',
-                ],
-            ],
-            'mautic.form.service.field.value.transformer' => [
-                'class'     => FieldValueTransformer::class,
-                'arguments' => [
-                    'router',
-                ],
-            ],
-            'mautic.form.helper.properties.accessor' => [
-                'class'     => Mautic\FormBundle\Helper\PropertiesAccessor::class,
-                'arguments' => [
-                    'mautic.form.model.form',
-                ],
-            ],
-        ],
-        'validator' => [
-            'mautic.form.validator.upload_field_validator' => [
-                'class'     => UploadFieldValidator::class,
-                'arguments' => [
-                    'mautic.core.validator.file_upload',
-                ],
-            ],
-            'mautic.form.validator.constraint.file_extension_constraint_validator' => [
-                'class'     => FileExtensionConstraintValidator::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                ],
-                'tags' => [
-                    'name'  => 'validator.constraint_validator',
-                    'alias' => 'file_extension_constraint_validator',
-                ],
-            ],
-        ],
-        'fixtures' => [
-            'mautic.form.fixture.form' => [
-                'class'     => Mautic\FormBundle\DataFixtures\ORM\LoadFormData::class,
-                'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => ['mautic.form.model.form', 'mautic.form.model.field', 'mautic.form.model.action', 'event_dispatcher'],
-            ],
-            'mautic.form.fixture.form_result' => [
-                'class'     => Mautic\FormBundle\DataFixtures\ORM\LoadFormResultData::class,
-                'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => ['mautic.page.model.page', 'mautic.form.model.submission'],
-            ],
-        ],
-    ],
-
     'parameters' => [
         'form_upload_dir'              => '%mautic.application_dir%/media/files/form',
         'blacklisted_extensions'       => ['php', 'sh'],
@@ -270,5 +146,6 @@ return [
         'blocked_free_email_providers' => BlockedFreeEmailProvidersHelper::load(),
         'form_results_data_sources'    => false,
         'successful_submit_action'     => 'top',
+        'form_field_autofill'          => false,
     ],
 ];

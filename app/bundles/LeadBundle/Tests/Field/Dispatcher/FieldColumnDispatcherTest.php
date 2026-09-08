@@ -6,7 +6,6 @@ namespace Mautic\LeadBundle\Tests\Field\Dispatcher;
 
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Field\Dispatcher\FieldColumnDispatcher;
-use Mautic\LeadBundle\Field\Event\AddColumnBackgroundEvent;
 use Mautic\LeadBundle\Field\Event\AddColumnEvent;
 use Mautic\LeadBundle\Field\Event\DeleteColumnEvent;
 use Mautic\LeadBundle\Field\Event\UpdateColumnEvent;
@@ -15,7 +14,7 @@ use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
 use Mautic\LeadBundle\Field\Settings\BackgroundSettings;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class FieldColumnDispatcherTest extends \PHPUnit\Framework\TestCase
+final class FieldColumnDispatcherTest extends \PHPUnit\Framework\TestCase
 {
     public function testNoBackground(): void
     {
@@ -85,10 +84,7 @@ class FieldColumnDispatcherTest extends \PHPUnit\Framework\TestCase
             ->expects($this->once())
             ->method('dispatch')
             ->with(
-                $this->callback(function ($event) {
-                    /* @var AddColumnBackgroundEvent $event */
-                    return $event instanceof UpdateColumnEvent;
-                }),
+                $this->isInstanceOf(UpdateColumnEvent::class),
                 'mautic.lead_field_pre_update_column'
             );
 
@@ -117,7 +113,7 @@ class FieldColumnDispatcherTest extends \PHPUnit\Framework\TestCase
         $dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                $this->callback(fn ($event) => $event instanceof DeleteColumnEvent),
+                $this->isInstanceOf(DeleteColumnEvent::class),
                 'mautic.lead_field_pre_delete_column',
             );
 

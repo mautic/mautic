@@ -11,7 +11,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class DatePickerType extends AbstractType
+final class DatePickerType extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {

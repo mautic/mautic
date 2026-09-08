@@ -7,21 +7,31 @@ namespace Mautic\LeadBundle\Tests\Model;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\SegmentActionModel;
+use PHPUnit\Framework\Exception;
 
-class SegmentActionModelTest extends \PHPUnit\Framework\TestCase
+final class SegmentActionModelTest extends \PHPUnit\Framework\TestCase
 {
-    private \PHPUnit\Framework\MockObject\MockObject $contactMock5;
+    /**
+     * @var \PHPUnit\Framework\MockObject\Stub&Lead
+     */
+    private \PHPUnit\Framework\MockObject\Stub $contactMock5;
 
-    private \PHPUnit\Framework\MockObject\MockObject $contactMock6;
+    /**
+     * @var \PHPUnit\Framework\MockObject\Stub&Lead
+     */
+    private \PHPUnit\Framework\MockObject\Stub $contactMock6;
 
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject&LeadModel
+     */
     private \PHPUnit\Framework\MockObject\MockObject $contactModelMock;
 
     private SegmentActionModel $actionModel;
 
     protected function setUp(): void
     {
-        $this->contactMock5        = $this->createMock(Lead::class);
-        $this->contactMock6        = $this->createMock(Lead::class);
+        $this->contactMock5        = $this->createStub(Lead::class);
+        $this->contactMock6        = $this->createStub(Lead::class);
         $this->contactModelMock    = $this->createMock(LeadModel::class);
         $this->actionModel         = new SegmentActionModel($this->contactModelMock);
     }
@@ -38,7 +48,7 @@ class SegmentActionModelTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->contactModelMock->expects($matcher)
-            ->method('canEditContact')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('canEditContact')->willReturnCallback(function (...$parameters) use ($matcher): bool {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($this->contactMock5, $parameters[0]);
 
@@ -49,6 +59,8 @@ class SegmentActionModelTest extends \PHPUnit\Framework\TestCase
 
                     return true;
                 }
+
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->contactModelMock->expects($this->once())
@@ -74,7 +86,7 @@ class SegmentActionModelTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->contactModelMock->expects($matcher)
-            ->method('canEditContact')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('canEditContact')->willReturnCallback(function (...$parameters) use ($matcher): bool {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($this->contactMock5, $parameters[0]);
 
@@ -85,6 +97,8 @@ class SegmentActionModelTest extends \PHPUnit\Framework\TestCase
 
                     return true;
                 }
+
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->contactModelMock->expects($this->once())
@@ -110,7 +124,7 @@ class SegmentActionModelTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->contactModelMock->expects($matcher)
-            ->method('canEditContact')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('canEditContact')->willReturnCallback(function (...$parameters) use ($matcher): true {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($this->contactMock5, $parameters[0]);
                 }
@@ -123,7 +137,7 @@ class SegmentActionModelTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->contactModelMock->expects($matcher)
-            ->method('addToLists')->willReturnCallback(function (...$parameters) use ($matcher, $segments) {
+            ->method('addToLists')->willReturnCallback(function (...$parameters) use ($matcher, $segments): void {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($this->contactMock5, $parameters[0]);
                     $this->assertSame($segments, $parameters[1]);
@@ -153,7 +167,7 @@ class SegmentActionModelTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->contactModelMock->expects($matcher)
-            ->method('canEditContact')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('canEditContact')->willReturnCallback(function (...$parameters) use ($matcher): true {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($this->contactMock5, $parameters[0]);
                 }
@@ -166,7 +180,7 @@ class SegmentActionModelTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->contactModelMock->expects($matcher)
-            ->method('removeFromLists')->willReturnCallback(function (...$parameters) use ($matcher, $segments) {
+            ->method('removeFromLists')->willReturnCallback(function (...$parameters) use ($matcher, $segments): void {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($this->contactMock5, $parameters[0]);
                     $this->assertSame($segments, $parameters[1]);

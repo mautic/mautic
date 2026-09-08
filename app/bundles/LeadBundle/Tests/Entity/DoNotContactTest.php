@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\LeadBundle\Entity\DoNotContact;
 
-class DoNotContactTest extends \PHPUnit\Framework\TestCase
+final class DoNotContactTest extends \PHPUnit\Framework\TestCase
 {
     public function testDoNotContactComments(): void
     {
         $doNotContact = new DoNotContact();
-        $doNotContact->setComments(null);
+        $doNotContact->setComments('');
         $this->assertSame('', $doNotContact->getComments());
 
         $comment      = '<script>alert(\'x\')</script>';

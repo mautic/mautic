@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\SmsBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\SmsBundle\Entity\Sms;
 
-class SmsEvent extends CommonEvent
+final class SmsEvent extends CommonEvent
 {
     /**
      * @param bool $isNew

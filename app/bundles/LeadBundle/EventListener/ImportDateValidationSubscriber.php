@@ -24,7 +24,7 @@ final class ImportDateValidationSubscriber implements EventSubscriberInterface
     private ?array $dateFields = null;
 
     public function __construct(
-        private FieldModel $fieldModel,
+        private readonly FieldModel $fieldModel,
     ) {
     }
 

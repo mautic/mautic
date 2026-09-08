@@ -13,7 +13,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
 use Doctrine\ORM\Query;
 
-class ResultCacheHelper
+final class ResultCacheHelper
 {
     /**
      * @return bool Returns true if cache was available and enabled on the $query

@@ -15,16 +15,16 @@ use Mautic\LeadBundle\Model\DoNotContact;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class TransportCallbackTest extends TestCase
+final class TransportCallbackTest extends TestCase
 {
     public function testStatSave(): void
     {
-        $dncModel = new class extends DoNotContact {
+        $dncModel = new class() extends DoNotContact {
             public function __construct()
             {
             }
 
-            public function addDncForContact($contactId, $channel, $reason = DNC::BOUNCED, $comments = '', $persist = true, $checkCurrentStatus = true, $allowUnsubscribeOverride = false)
+            public function addDncForContact($contactId, $channel, $reason = DNC::BOUNCED, ?string $comments = '', $persist = true, $checkCurrentStatus = true, $allowUnsubscribeOverride = false): bool
             {
                 Assert::assertSame('email', $channel);
                 Assert::assertSame(DNC::BOUNCED, $reason);
@@ -33,7 +33,7 @@ class TransportCallbackTest extends TestCase
             }
         };
 
-        $contactFinder = new class extends ContactFinder {
+        $contactFinder = new class() extends ContactFinder {
             public function __construct()
             {
             }
@@ -52,7 +52,7 @@ class TransportCallbackTest extends TestCase
             }
         };
 
-        $emailStatModel = new class extends EmailStatModel {
+        $emailStatModel = new class() extends EmailStatModel {
             public function __construct()
             {
             }

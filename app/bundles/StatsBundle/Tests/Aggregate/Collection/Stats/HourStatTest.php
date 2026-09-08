@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\StatsBundle\Tests\Aggregate\Collection\Stats;
 
 use Mautic\StatsBundle\Aggregate\Collection\Stats\HourStat;
 use PHPUnit\Framework\TestCase;
 
-class HourStatTest extends TestCase
+final class HourStatTest extends TestCase
 {
     public function testAll(): void
     {

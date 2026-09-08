@@ -16,6 +16,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\DateAddedTrait;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Validator\EntityEvent;
@@ -44,6 +45,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 class Event implements ChannelInterface, UuidInterface
 {
     use UuidTrait;
+    use DateAddedTrait;
 
     public const TABLE_NAME = 'campaign_events';
 
@@ -170,25 +172,25 @@ class Event implements ChannelInterface, UuidInterface
 
     /**
      * @var ArrayCollection<int, Event>
-     **/
+     */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private $children;
 
     /**
      * @var Event|null
-     **/
+     */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private $parent;
 
     /**
      * @var string|null
-     **/
+     */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private $decisionPath;
 
     /**
      * @var string|null
-     **/
+     */
     private $tempId;
 
     /**
@@ -216,10 +218,7 @@ class Event implements ChannelInterface, UuidInterface
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private $channelId;
 
-    /**
-     * @var array
-     */
-    private $changes = [];
+    private array $changes = [];
 
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private ?\DateTimeInterface $deleted = null;
@@ -227,7 +226,10 @@ class Event implements ChannelInterface, UuidInterface
     private int $failedCount = 0;
 
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
-    private ?Event $redirectEvent;
+    private ?Event $redirectEvent = null;
+
+    #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    private ?\DateTime $dateLinked = null;
 
     /**
      * Collection of events that redirect to this event.
@@ -236,12 +238,18 @@ class Event implements ChannelInterface, UuidInterface
      */
     private Collection $redirectingEvents;
 
-    public function __construct()
+    public function __construct(?\DateTime $dateAdded = null)
     {
         $this->log               = new ArrayCollection();
         $this->children          = new ArrayCollection();
-        $this->redirectEvent     = null;
         $this->redirectingEvents = new ArrayCollection();
+
+        if ($dateAdded) {
+            $this->setDateAdded($dateAdded);
+            $this->setDateLinked($dateAdded);
+        } else {
+            $this->setDateAdded(new \DateTime());
+        }
     }
 
     public function __clone()
@@ -389,6 +397,16 @@ class Event implements ChannelInterface, UuidInterface
             ->build();
 
         static::addUuidField($builder);
+
+        $builder->createField('dateAdded', Types::DATETIME_MUTABLE)
+            ->columnName('date_added')
+            ->option('default', '1970-01-01 00:00:00')
+            ->build();
+
+        $builder->createField('dateLinked', Types::DATETIME_MUTABLE)
+            ->columnName('date_linked')
+            ->nullable()
+            ->build();
     }
 
     /**
@@ -501,28 +519,30 @@ class Event implements ChannelInterface, UuidInterface
     }
 
     /**
-     * @param string $prop
-     * @param mixed  $val
+     * @param mixed $val
      */
-    private function isChanged($prop, $val): void
+    private function isChanged(string $prop, $val): bool
     {
         $getter  = 'get'.ucfirst($prop);
-        $current = $this->$getter();
-        if ('category' == $prop || 'parent' == $prop) {
+        $current = $this->{$getter}();
+        if ('category' === $prop || 'parent' === $prop) {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
                 $this->changes[$prop] = [$currentId, $newId];
+
+                return true;
             }
-        } elseif ($this->$prop != $val) {
-            $this->changes[$prop] = [$this->$prop, $val];
+        } elseif ($this->{$prop} != $val) {
+            $this->changes[$prop] = [$this->{$prop}, $val];
+
+            return true;
         }
+
+        return false;
     }
 
-    /**
-     * @return array
-     */
-    public function getChanges()
+    public function getChanges(): array
     {
         return $this->changes;
     }
@@ -542,10 +562,8 @@ class Event implements ChannelInterface, UuidInterface
 
     /**
      * @param int $order
-     *
-     * @return Event
      */
-    public function setOrder($order)
+    public function setOrder($order): static
     {
         $this->isChanged('order', $order);
 
@@ -564,10 +582,8 @@ class Event implements ChannelInterface, UuidInterface
 
     /**
      * @param array $properties
-     *
-     * @return Event
      */
-    public function setProperties($properties)
+    public function setProperties($properties): static
     {
         $this->isChanged('properties', $properties);
 
@@ -584,10 +600,7 @@ class Event implements ChannelInterface, UuidInterface
         return $this->properties;
     }
 
-    /**
-     * @return Event
-     */
-    public function setCampaign(Campaign $campaign)
+    public function setCampaign(Campaign $campaign): static
     {
         $this->campaign = $campaign;
 
@@ -604,10 +617,8 @@ class Event implements ChannelInterface, UuidInterface
 
     /**
      * @param string $type
-     *
-     * @return Event
      */
-    public function setType($type)
+    public function setType($type): static
     {
         $this->isChanged('type', $type);
         $this->type = $type;
@@ -630,10 +641,8 @@ class Event implements ChannelInterface, UuidInterface
 
     /**
      * @param string $description
-     *
-     * @return Event
      */
-    public function setDescription($description)
+    public function setDescription($description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -642,7 +651,7 @@ class Event implements ChannelInterface, UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getDescription()
     {
@@ -651,10 +660,8 @@ class Event implements ChannelInterface, UuidInterface
 
     /**
      * @param string $name
-     *
-     * @return Event
      */
-    public function setName($name)
+    public function setName($name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -670,19 +677,13 @@ class Event implements ChannelInterface, UuidInterface
         return $this->name;
     }
 
-    /**
-     * @return Event
-     */
-    public function addLog(LeadEventLog $log)
+    public function addLog(LeadEventLog $log): static
     {
         $this->log[] = $log;
 
         return $this;
     }
 
-    /**
-     * Remove log.
-     */
     public function removeLog(LeadEventLog $log): void
     {
         $this->log->removeElement($log);
@@ -708,7 +709,7 @@ class Event implements ChannelInterface, UuidInterface
             ->andWhere(Criteria::expr()->eq('rotation', $rotation))
             ->setMaxResults(1);
 
-        $log = $this->getLog()->matching($criteria);
+        $log = $this->log->matching($criteria);
 
         if (count($log)) {
             return $log->first();
@@ -719,10 +720,8 @@ class Event implements ChannelInterface, UuidInterface
 
     /**
      * Add children.
-     *
-     * @return Event
      */
-    public function addChild(Event $children)
+    public function addChild(self $children): static
     {
         $this->children[] = $children;
 
@@ -732,7 +731,7 @@ class Event implements ChannelInterface, UuidInterface
     /**
      * Remove children.
      */
-    public function removeChild(Event $children): void
+    public function removeChild(self $children): void
     {
         $this->children->removeElement($children);
     }
@@ -791,25 +790,21 @@ class Event implements ChannelInterface, UuidInterface
         return $this->getChildren()->matching($criteria);
     }
 
-    /**
-     * Set parent.
-     *
-     * @return Event
-     */
-    public function setParent(?Event $parent = null)
+    public function setParent(?self $parent = null): static
     {
-        $this->isChanged('parent', $parent);
+        $isChanged = $this->isChanged('parent', $parent);
+        if ($isChanged) {
+            $this->setDateLinked(new \DateTime());
+        }
         $this->parent = $parent;
 
         return $this;
     }
 
-    /**
-     * Remove parent.
-     */
     public function removeParent(): void
     {
         $this->isChanged('parent', '');
+        $this->setDateLinked(new \DateTime());
         $this->parent = null;
     }
 
@@ -822,7 +817,7 @@ class Event implements ChannelInterface, UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface|null
      */
     public function getTriggerDate()
     {
@@ -831,18 +826,14 @@ class Event implements ChannelInterface, UuidInterface
 
     public function setTriggerDate(mixed $triggerDate = 'now'): void
     {
-        if (is_array($triggerDate) && array_key_exists('date', $triggerDate)) {
-            $triggerDate = new \DateTime($triggerDate['date']);
-        } elseif (is_string($triggerDate)) {
-            $triggerDate = new \DateTime($triggerDate);
-        }
+        $triggerDate = $this->convertToDateTime($triggerDate);
 
         $this->isChanged('triggerDate', $triggerDate);
         $this->triggerDate = $triggerDate;
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getTriggerInterval()
     {
@@ -868,10 +859,8 @@ class Event implements ChannelInterface, UuidInterface
 
     /**
      * @param \DateTime|string|array<string,string> $triggerHour
-     *
-     * @return Event
      */
-    public function setTriggerHour($triggerHour)
+    public function setTriggerHour($triggerHour): static
     {
         $triggerHour = $this->convertToDateTime($triggerHour);
         $this->isChanged('triggerHour', $triggerHour ? $triggerHour->format('H:i') : $triggerHour);
@@ -881,7 +870,7 @@ class Event implements ChannelInterface, UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getTriggerIntervalUnit()
     {
@@ -898,17 +887,14 @@ class Event implements ChannelInterface, UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getEventType()
     {
         return $this->eventType;
     }
 
-    /**
-     * @return $this
-     */
-    public function setEventType($eventType)
+    public function setEventType($eventType): static
     {
         $this->isChanged('eventType', $eventType);
         $this->eventType = $eventType;
@@ -921,7 +907,7 @@ class Event implements ChannelInterface, UuidInterface
         return $this->triggerWindow;
     }
 
-    public function setTriggerWindow(?int $triggerWindow): Event
+    public function setTriggerWindow(?int $triggerWindow): self
     {
         $this->triggerWindow = $triggerWindow;
 
@@ -929,7 +915,7 @@ class Event implements ChannelInterface, UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getTriggerMode()
     {
@@ -946,7 +932,7 @@ class Event implements ChannelInterface, UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getDecisionPath()
     {
@@ -963,7 +949,7 @@ class Event implements ChannelInterface, UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getTempId()
     {
@@ -980,7 +966,7 @@ class Event implements ChannelInterface, UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getChannel()
     {
@@ -997,7 +983,7 @@ class Event implements ChannelInterface, UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getChannelId()
     {
@@ -1036,10 +1022,8 @@ class Event implements ChannelInterface, UuidInterface
      * Used by the API.
      *
      * @param array $contactLog
-     *
-     * @return Event
      */
-    public function setContactLog($contactLog)
+    public function setContactLog($contactLog): static
     {
         $this->contactLog = $contactLog;
 
@@ -1048,10 +1032,8 @@ class Event implements ChannelInterface, UuidInterface
 
     /**
      * Used by the API.
-     *
-     * @return Event
      */
-    public function addContactLog($contactLog)
+    public function addContactLog($contactLog): static
     {
         $this->contactLog[] = $contactLog;
 
@@ -1071,11 +1053,9 @@ class Event implements ChannelInterface, UuidInterface
     /**
      * Set the value of triggerRestrictedStartHour.
      *
-     * @param \DateTime|null $triggerRestrictedStartHour
-     *
-     * @return self
+     * @param \DateTime|string|array<string,string>|null $triggerRestrictedStartHour
      */
-    public function setTriggerRestrictedStartHour($triggerRestrictedStartHour)
+    public function setTriggerRestrictedStartHour($triggerRestrictedStartHour): static
     {
         $triggerRestrictedStartHour = $this->convertToDateTime($triggerRestrictedStartHour);
 
@@ -1099,11 +1079,9 @@ class Event implements ChannelInterface, UuidInterface
     /**
      * Set the value of triggerRestrictedStopHour.
      *
-     * @param \DateTime|null $triggerRestrictedStopHour
-     *
-     * @return self
+     * @param \DateTime|string|array<string,string>|null $triggerRestrictedStopHour
      */
-    public function setTriggerRestrictedStopHour($triggerRestrictedStopHour)
+    public function setTriggerRestrictedStopHour($triggerRestrictedStopHour): static
     {
         $triggerRestrictedStopHour = $this->convertToDateTime($triggerRestrictedStopHour);
 
@@ -1116,20 +1094,16 @@ class Event implements ChannelInterface, UuidInterface
 
     /**
      * Get the value of triggerRestrictedDaysOfWeek.
-     *
-     * @return array
      */
-    public function getTriggerRestrictedDaysOfWeek()
+    public function getTriggerRestrictedDaysOfWeek(): array
     {
         return (array) $this->triggerRestrictedDaysOfWeek;
     }
 
     /**
      * Set the value of triggerRestrictedDaysOfWeek.
-     *
-     * @return self
      */
-    public function setTriggerRestrictedDaysOfWeek(?array $triggerRestrictedDaysOfWeek = null)
+    public function setTriggerRestrictedDaysOfWeek(?array $triggerRestrictedDaysOfWeek = null): static
     {
         $this->triggerRestrictedDaysOfWeek = $triggerRestrictedDaysOfWeek;
         $this->isChanged('triggerRestrictedDaysOfWeek', $triggerRestrictedDaysOfWeek);
@@ -1137,7 +1111,7 @@ class Event implements ChannelInterface, UuidInterface
         return $this;
     }
 
-    public function setDeleted(mixed $deleted = 'now'): Event
+    public function setDeleted(mixed $deleted = 'now'): self
     {
         if (is_array($deleted) && array_key_exists('date', $deleted)) {
             $deleted = new \DateTime($deleted['date']);
@@ -1158,7 +1132,7 @@ class Event implements ChannelInterface, UuidInterface
 
     public function isDeleted(): bool
     {
-        return !is_null($this->deleted);
+        return null !== $this->deleted;
     }
 
     public function getFailedCount(): int
@@ -1169,17 +1143,42 @@ class Event implements ChannelInterface, UuidInterface
     private function convertToDateTime(mixed $triggerDate): mixed
     {
         if (empty($triggerDate)) {
-            $triggerDate = null;
-        } elseif (is_array($triggerDate) && array_key_exists('date', $triggerDate)) {
-            $triggerDate = new \DateTime($triggerDate['date']);
-        } elseif (is_string($triggerDate)) {
-            $triggerDate = new \DateTime($triggerDate);
+            return null;
+        }
+
+        if ($triggerDate instanceof \DateTimeInterface) {
+            return $triggerDate instanceof \DateTimeImmutable
+                ? \DateTime::createFromInterface($triggerDate)
+                : clone $triggerDate;
+        }
+
+        if (is_array($triggerDate) && array_key_exists('date', $triggerDate)) {
+            $timezone = !empty($triggerDate['timezone'])
+                ? new \DateTimeZone($triggerDate['timezone'])
+                : null;
+
+            return new \DateTime($triggerDate['date'], $timezone);
+        }
+
+        if (is_string($triggerDate)) {
+            return new \DateTime($triggerDate);
         }
 
         return $triggerDate;
     }
 
-    public function setRedirectEvent(?Event $redirectEvent = null): Event
+    public function getDateLinked(): ?\DateTime
+    {
+        return $this->dateLinked;
+    }
+
+    public function setDateLinked(?\DateTime $dateLinked): void
+    {
+        $this->isChanged('dateLinked', $dateLinked);
+        $this->dateLinked = $dateLinked;
+    }
+
+    public function setRedirectEvent(?self $redirectEvent = null): self
     {
         $this->isChanged('redirectEvent', $redirectEvent);
         $this->redirectEvent = $redirectEvent;
@@ -1187,7 +1186,7 @@ class Event implements ChannelInterface, UuidInterface
         return $this;
     }
 
-    public function getRedirectEvent(): ?Event
+    public function getRedirectEvent(): ?self
     {
         return $this->redirectEvent;
     }
@@ -1208,6 +1207,6 @@ class Event implements ChannelInterface, UuidInterface
 
     public function getPermissionUser(): mixed
     {
-        return $this->getCampaign()->getCreatedBy();
+        return $this->campaign->getCreatedBy();
     }
 }

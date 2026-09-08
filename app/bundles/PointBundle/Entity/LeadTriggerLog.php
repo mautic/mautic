@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PointBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -9,24 +11,25 @@ use Mautic\CoreBundle\Entity\IpAddress;
 class LeadTriggerLog
 {
     public const TABLE_NAME = 'point_lead_event_log';
+
     /**
      * @var TriggerEvent
-     **/
+     */
     private $event;
 
     /**
      * @var \Mautic\LeadBundle\Entity\Lead
-     **/
+     */
     private $lead;
 
     /**
      * @var IpAddress|null
-     **/
+     */
     private $ipAddress;
 
     /**
      * @var \DateTimeInterface
-     **/
+     */
     private $dateFired;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -52,7 +55,7 @@ class LeadTriggerLog
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface|null
      */
     public function getDateFired()
     {
@@ -84,7 +87,7 @@ class LeadTriggerLog
     }
 
     /**
-     * @return mixed
+     * @return \Mautic\LeadBundle\Entity\Lead|null
      */
     public function getLead()
     {
@@ -100,7 +103,7 @@ class LeadTriggerLog
     }
 
     /**
-     * @return mixed
+     * @return TriggerEvent|null
      */
     public function getEvent()
     {

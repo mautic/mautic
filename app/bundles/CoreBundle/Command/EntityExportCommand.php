@@ -9,18 +9,23 @@ use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+#[AsCommand(
+    name: self::COMMAND_NAME,
+    description: 'Export entity data.'
+)]
 final class EntityExportCommand extends ModeratedCommand
 {
     public const COMMAND_NAME = 'mautic:entity:export';
 
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
-        private ExportHelper $exportHelper,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly ExportHelper $exportHelper,
         PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper,
     ) {
@@ -30,8 +35,6 @@ final class EntityExportCommand extends ModeratedCommand
     protected function configure(): void
     {
         $this
-            ->setName(self::COMMAND_NAME)
-            ->setDescription('Export entity data.')
             ->addOption('entity', null, InputOption::VALUE_REQUIRED, 'The name of the entity to export (e.g., campaign, email)')
             ->addOption('id', null, InputOption::VALUE_REQUIRED, 'Comma-separated list of entity IDs to export (e.g., --id=1,2,3)')
             ->addOption('json-only', null, InputOption::VALUE_NONE, 'Output only JSON data.')
@@ -45,9 +48,9 @@ final class EntityExportCommand extends ModeratedCommand
         $entityName = $input->getOption('entity');
         $idOption   = $input->getOption('id');
 
-        $entityIds = array_filter(array_map('intval', explode(',', (string) $idOption)));
+        $entityIds = array_filter(array_map(intval(...), explode(',', (string) $idOption)));
 
-        if (empty($entityName) || empty($entityIds)) {
+        if (empty($entityName) || [] === $entityIds) {
             $output->writeln('<error>You must specify the entity and at least one valid entity ID.</error>');
 
             return self::FAILURE;
@@ -59,12 +62,12 @@ final class EntityExportCommand extends ModeratedCommand
             $event = $this->dispatchEntityExportEvent($entityName, $entityId);
             $data  = $event->getEntities();
 
-            if (!empty($data)) {
+            if ([] !== $data) {
                 $allData[] = $data;
             }
         }
 
-        if (empty($allData)) {
+        if ([] === $allData) {
             $output->writeln('<error>No data found for export.</error>');
 
             return self::FAILURE;

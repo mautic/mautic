@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CacheBundle\Cache\Adapter;
 
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 
 class FilesystemTagAwareAdapter extends TagAwareAdapter
@@ -13,8 +14,8 @@ class FilesystemTagAwareAdapter extends TagAwareAdapter
         $prefix = 'app_cache_'.$prefix;
 
         parent::__construct(
-            new \Symfony\Component\Cache\Adapter\FilesystemAdapter($prefix, $lifetime, $directory),
-            new \Symfony\Component\Cache\Adapter\FilesystemAdapter($prefix.'_tags')
+            new FilesystemAdapter($prefix, $lifetime, $directory),
+            new FilesystemAdapter($prefix.'_tags')
         );
     }
 }

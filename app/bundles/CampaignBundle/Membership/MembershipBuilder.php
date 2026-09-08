@@ -24,10 +24,10 @@ class MembershipBuilder
     private ?\Symfony\Component\Console\Helper\ProgressBar $progressBar = null;
 
     public function __construct(
-        private MembershipManager $manager,
-        private CampaignLeadRepository $campaignLeadRepository,
-        private LeadRepository $leadRepository,
-        private TranslatorInterface $translator,
+        private readonly MembershipManager $manager,
+        private readonly CampaignLeadRepository $campaignLeadRepository,
+        private readonly LeadRepository $leadRepository,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -36,7 +36,7 @@ class MembershipBuilder
      */
     public function build(Campaign $campaign, ContactLimiter $contactLimiter, $runLimit, ?OutputInterface $output = null): int
     {
-        defined('MAUTIC_REBUILDING_CAMPAIGNS') or define('MAUTIC_REBUILDING_CAMPAIGNS', 1);
+        defined('MAUTIC_REBUILDING_CAMPAIGNS') || define('MAUTIC_REBUILDING_CAMPAIGNS', 1);
 
         $this->campaign       = $campaign;
         $this->contactLimiter = $contactLimiter;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Event;
 
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -110,10 +112,7 @@ class CampaignScheduledEvent extends Event
         return $this->eventSettings;
     }
 
-    /**
-     * @return LeadEventLog|null
-     */
-    public function getLog()
+    public function getLog(): ?LeadEventLog
     {
         return $this->log;
     }

@@ -17,24 +17,23 @@ use Symfony\Contracts\Translation\TranslatorInterface;
         'mautic:integration:pushactivity',
     ]
 )]
-class PushLeadActivityCommand extends Command
+final class PushLeadActivityCommand extends Command
 {
     public function __construct(
-        private TranslatorInterface $translator,
-        private IntegrationHelper $integrationHelper,
+        private readonly TranslatorInterface $translator,
+        private readonly IntegrationHelper $integrationHelper,
     ) {
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addOption(
                 '--integration',
                 '-i',
                 InputOption::VALUE_REQUIRED,
-                'Integration name. Integration must be enabled and authorised.',
-                null
+                'Integration name. Integration must be enabled and authorised.'
             )
             ->addOption('--start-date', '-d', InputOption::VALUE_REQUIRED, 'Set start date for updated values.')
             ->addOption(

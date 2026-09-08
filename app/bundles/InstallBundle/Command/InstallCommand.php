@@ -22,15 +22,18 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
  */
 #[AsCommand(
     name: InstallCommand::COMMAND,
-    description: 'Installs Mautic'
+    description: 'Installs Mautic',
+    help: <<<'TXT'
+This command allows you to trigger the install process. It will try to get configuration values both from the local config file and command line options/arguments, where the latter takes precedence.
+TXT
 )]
-class InstallCommand extends Command
+final class InstallCommand extends Command
 {
     public const COMMAND = 'mautic:install';
 
     public function __construct(
-        private InstallService $installer,
-        private ManagerRegistry $doctrineRegistry,
+        private readonly InstallService $installer,
+        private readonly ManagerRegistry $doctrineRegistry,
     ) {
         parent::__construct();
     }
@@ -38,16 +41,13 @@ class InstallCommand extends Command
     /**
      * Note: in every option (addOption()), please leave the default value empty to prevent problems with values from local.php being overwritten.
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
-            ->setName(self::COMMAND)
-            ->setHelp('This command allows you to trigger the install process. It will try to get configuration values both from the local config file and command line options/arguments, where the latter takes precedence.')
             ->addArgument(
                 'site_url',
                 InputArgument::REQUIRED,
-                'Site URL.',
-                null
+                'Site URL.'
             )
             ->addArgument(
                 'step',
@@ -59,106 +59,91 @@ class InstallCommand extends Command
                 '--force',
                 '-f',
                 InputOption::VALUE_NONE,
-                'Do not ask confirmation if recommendations triggered.',
-                null
+                'Do not ask confirmation if recommendations triggered.'
             )
             ->addOption(
                 '--db_driver',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Database driver.',
-                null
+                'Database driver.'
             )
             ->addOption(
                 '--db_host',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Database host.',
-                null
+                'Database host.'
             )
             ->addOption(
                 '--db_port',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Database port.',
-                null
+                'Database port.'
             )
             ->addOption(
                 '--db_name',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Database name.',
-                null
+                'Database name.'
             )
             ->addOption(
                 '--db_user',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Database user.',
-                null
+                'Database user.'
             )
             ->addOption(
                 '--db_password',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Database password.',
-                null
+                'Database password.'
             )
             ->addOption(
                 '--db_table_prefix',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Database tables prefix.',
-                null
+                'Database tables prefix.'
             )
             ->addOption(
                 '--db_backup_tables',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Backup database tables if they exist; otherwise drop them. (true|false)',
-                null
+                'Backup database tables if they exist; otherwise drop them. (true|false)'
             )
             ->addOption(
                 '--db_backup_prefix',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Database backup tables prefix.',
-                null
+                'Database backup tables prefix.'
             )
             ->addOption(
                 '--admin_firstname',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Admin first name.',
-                null
+                'Admin first name.'
             )
             ->addOption(
                 '--admin_lastname',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Admin last name.',
-                null
+                'Admin last name.'
             )
             ->addOption(
                 '--admin_username',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Admin username.',
-                null
+                'Admin username.'
             )
             ->addOption(
                 '--admin_email',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Admin email.',
-                null
+                'Admin email.'
             )
             ->addOption(
                 '--admin_password',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Admin user.',
-                null
+                'Admin user.'
             );
 
         parent::configure();
@@ -214,7 +199,7 @@ class InstallCommand extends Command
         $allParams = $this->installer->localConfigParameters();
 
         // Initialize DB and admin params from local.php
-        foreach ((array) $allParams as $opt => $value) {
+        foreach ($allParams as $opt => $value) {
             if (str_starts_with($opt, 'db_')) {
                 $dbParams[substr($opt, 3)] = $value;
             } elseif (str_starts_with($opt, 'admin_')) {
@@ -247,8 +232,8 @@ class InstallCommand extends Command
             default:
             case InstallService::CHECK_STEP:
                 $output->writeln($step.' - Checking installation requirements...');
-                $messages = $this->stepAction($this->installer, ['site_url' => $siteUrl], $step);
-                if (!empty($messages)) {
+                $messages = $this->stepAction(['site_url' => $siteUrl], $step);
+                if ([] !== $messages) {
                     if (isset($messages['requirements']) && !empty($messages['requirements'])) {
                         // Stop install if requirements not met
                         $output->writeln('Missing requirements:');
@@ -256,7 +241,8 @@ class InstallCommand extends Command
                         $output->writeln('Install canceled');
 
                         return (int) -$step;
-                    } elseif (isset($messages['optional']) && !empty($messages['optional'])) {
+                    }
+                    if (isset($messages['optional']) && !empty($messages['optional'])) {
                         $output->writeln('Missing optional settings:');
                         $this->handleInstallerErrors($output, $messages['optional']);
 
@@ -287,8 +273,8 @@ class InstallCommand extends Command
                 $connectionWrapper = $this->doctrineRegistry->getConnection();
                 $connectionWrapper->initConnection($dbParams);
 
-                $messages = $this->stepAction($this->installer, $dbParams, $step);
-                if (!empty($messages)) {
+                $messages = $this->stepAction($dbParams, $step);
+                if ([] !== $messages) {
                     $output->writeln('Errors in database configuration/installation:');
                     $this->handleInstallerErrors($output, $messages);
 
@@ -299,8 +285,8 @@ class InstallCommand extends Command
 
                 $step = InstallService::DOCTRINE_STEP + .1;
                 $output->writeln($step.' - Creating schema...');
-                $messages = $this->stepAction($this->installer, $dbParams, $step);
-                if (!empty($messages)) {
+                $messages = $this->stepAction($dbParams, $step);
+                if ([] !== $messages) {
                     $output->writeln('Errors in schema configuration/installation:');
                     $this->handleInstallerErrors($output, $messages);
 
@@ -311,8 +297,8 @@ class InstallCommand extends Command
 
                 $step = InstallService::DOCTRINE_STEP + .2;
                 $output->writeln($step.' - Loading fixtures...');
-                $messages = $this->stepAction($this->installer, $dbParams, $step);
-                if (!empty($messages)) {
+                $messages = $this->stepAction($dbParams, $step);
+                if ([] !== $messages) {
                     $output->writeln('Errors in fixtures configuration/installation:');
                     $this->handleInstallerErrors($output, $messages);
 
@@ -327,8 +313,8 @@ class InstallCommand extends Command
                 // no break
             case InstallService::USER_STEP:
                 $output->writeln($step.' - Creating admin user...');
-                $messages = $this->stepAction($this->installer, $adminParam, $step);
-                if (!empty($messages)) {
+                $messages = $this->stepAction($adminParam, $step);
+                if ([] !== $messages) {
                     $output->writeln('Errors in admin user configuration/installation:');
                     $this->handleInstallerErrors($output, $messages);
 
@@ -342,8 +328,8 @@ class InstallCommand extends Command
                 // no break
             case InstallService::FINAL_STEP:
                 $output->writeln($step.' - Final steps...');
-                $messages = $this->stepAction($this->installer, $allParams, $step);
-                if (!empty($messages)) {
+                $messages = $this->stepAction($allParams, $step);
+                if ([] !== $messages) {
                     $output->writeln('Errors in final step:');
                     $this->handleInstallerErrors($output, $messages);
 
@@ -366,13 +352,12 @@ class InstallCommand extends Command
     /**
      * Controller action for install steps.
      *
-     * @param InstallService $installer The install process
-     * @param array          $params    The install parameters
-     * @param float          $index     The step number to process
+     * @param array $params The install parameters
+     * @param float $index  The step number to process
      *
      * @throws \Exception
      */
-    protected function stepAction(InstallService $installer, array $params, float $index = 0): array
+    private function stepAction(array $params, float $index = 0): array
     {
         if ($index - floor($index) > 0) {
             $subIndex = (int) (round($index - floor($index), 1) * 10);
@@ -385,30 +370,30 @@ class InstallCommand extends Command
         switch ($index) {
             case InstallService::CHECK_STEP:
                 // Check installation requirements
-                $step = $installer->getStep($index);
+                $step = $this->installer->getStep($index);
                 if ($step instanceof CheckStep) {
                     // Set all step fields based on parameters
                     $step->site_url = $params['site_url'];
                 }
 
-                $messages['requirements'] = $installer->checkRequirements($step);
-                $messages['optional']     = $installer->checkOptionalSettings($step);
+                $messages['requirements'] = $this->installer->checkRequirements($step);
+                $messages['optional']     = $this->installer->checkOptionalSettings($step);
                 break;
 
             case InstallService::DOCTRINE_STEP:
-                $step = $installer->getStep($index);
+                $step = $this->installer->getStep($index);
                 if ($step instanceof DoctrineStep) {
                     // Set all step fields based on parameters
                     foreach ($step as $key => $value) {
                         if (isset($params[$key])) {
-                            $step->$key = $params[$key];
+                            $step->{$key} = $params[$key];
                         }
                     }
                 }
 
                 if (!isset($subIndex)) {
                     // Install database
-                    $messages = $installer->createDatabaseStep($step, $params);
+                    $messages = $this->installer->createDatabaseStep($step, $params);
 
                     break;
                 }
@@ -416,27 +401,27 @@ class InstallCommand extends Command
                 switch ($subIndex) {
                     case 1:
                         // Install schema
-                        $messages = $installer->createSchemaStep($params);
+                        $messages = $this->installer->createSchemaStep($params);
                         break;
 
                     case 2:
                         // Install fixtures
-                        $messages = $installer->createFixturesStep();
+                        $messages = $this->installer->createFixturesStep();
                         break;
                 }
                 break;
 
             case InstallService::USER_STEP:
                 // Create admin user
-                $messages = $installer->createAdminUserStep($params);
+                $messages = $this->installer->createAdminUserStep($params);
                 break;
 
             case InstallService::FINAL_STEP:
                 // Save final configuration
                 $siteUrl  = $params['site_url'];
-                $messages = $installer->createFinalConfigStep($siteUrl);
-                if (empty($messages)) {
-                    $installer->finalMigrationStep();
+                $messages = $this->installer->createFinalConfigStep($siteUrl);
+                if ([] === $messages) {
+                    $this->installer->finalMigrationStep();
                 }
                 break;
         }
@@ -452,7 +437,8 @@ class InstallCommand extends Command
     private function handleInstallerErrors(OutputInterface $output, array $messages): void
     {
         foreach ($messages as $type => $message) {
-            $output->writeln("  - [$type] $message");
+            // Install translations include HTML for the web installer; strip it for CLI.
+            $output->writeln(sprintf('  - [%s] %s', $type, strip_tags($message)));
         }
     }
 }

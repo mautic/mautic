@@ -12,7 +12,7 @@ use Mautic\PluginBundle\Entity\Plugin;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository;
 
-class AssertCustomMjmlTest extends MauticMysqlTestCase
+final class AssertCustomMjmlTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {
@@ -47,6 +47,7 @@ class AssertCustomMjmlTest extends MauticMysqlTestCase
         $responseData = $this->createEmailViaApi();
         $emailId      = $responseData['email']['id'];
         $email        = $this->em->getRepository(Email::class)->find($emailId);
+        $this->assertInstanceOf(Email::class, $email);
         $this->addToGrapesJsBuilder($email);
 
         // Get email & check for both customHtml & customMjml in the response.
@@ -65,7 +66,7 @@ class AssertCustomMjmlTest extends MauticMysqlTestCase
         /** @var GrapesJsBuilderRepository $repository */
         $repository = $this->em->getRepository(GrapesJsBuilder::class);
 
-        $repository->setTranslator($this->getTranslatorMock());
+        $repository->autowireCommonRepository($this->getTranslatorMock());
 
         return $repository;
     }

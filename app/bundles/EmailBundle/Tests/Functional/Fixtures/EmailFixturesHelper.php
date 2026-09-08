@@ -13,10 +13,11 @@ use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
 
-final class EmailFixturesHelper
+final readonly class EmailFixturesHelper
 {
-    public function __construct(private EntityManagerInterface $em)
-    {
+    public function __construct(
+        private EntityManagerInterface $em,
+    ) {
     }
 
     /**
@@ -39,7 +40,7 @@ final class EmailFixturesHelper
             ->setTemplate($template)
             ->setCustomHtml($customHtml);
 
-        if (!empty($segments)) {
+        if ([] !== $segments) {
             $email->setLists($segments);
         }
 

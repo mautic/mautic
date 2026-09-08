@@ -56,6 +56,26 @@
                                 }
                             ]
                         } %}
+                        {% if themeInfo.config.tags is defined and themeInfo.config.tags|length %}
+                            {% set tags = [] %}
+                            {% for tag in themeInfo.config.tags %}
+                                {% set tagObj = {
+                                    'label': 'mautic.core.theme.tag.' ~ tag|replace({'-': '_'}),
+                                    'size': 'sm'
+                                } %}
+                                {% if tag == 'adaptative' %}
+                                    {% set tagObj = tagObj|merge({
+                                        'color': 'brand',
+                                        'icon_only': true,
+                                        'icon': 'ri-pantone-fill'
+                                    }) %}
+                                {% endif %}
+                                {% set tags = tags|merge([tagObj]) %}
+                            {% endfor %}
+                            <div class="mt-md">
+                                {% include '@MauticCore/Helper/_tag.html.twig' with { tags: tags } %}
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
                 {% if hasThumbnail %}

@@ -6,16 +6,18 @@ namespace Mautic\CoreBundle\ProcessSignal;
 
 use Mautic\CoreBundle\ProcessSignal\Exception\InvalidStateException;
 
-class ProcessSignalState implements \Stringable
+final readonly class ProcessSignalState implements \Stringable
 {
     private const START_TAG = '<<<StartOfState>>>';
+
     private const END_TAG   = '<<<EndOfState>>>';
 
     /**
      * @param mixed[] $data
      */
-    public function __construct(private array $data)
-    {
+    public function __construct(
+        private array $data,
+    ) {
     }
 
     /**

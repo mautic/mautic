@@ -6,6 +6,7 @@ namespace Mautic\ReportBundle\Tests\Form\DataTransformer;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\ReportBundle\Form\DataTransformer\ReportFilterDataTransformer;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -58,7 +59,7 @@ final class ReportFilterDataTransformerTest extends TestCase
         parent::tearDown();
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideTransformData')]
+    #[DataProvider('provideTransformData')]
     public function testTransformUtcToLocalForSupportedTypes(string $column, string $utcValue, string $expectedLocalValue): void
     {
         // Arrange
@@ -97,7 +98,7 @@ final class ReportFilterDataTransformerTest extends TestCase
         $this->assertSame($expectedUtcDateTime, $reverseTransformedFilters[0]['value']);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideStringConditions')]
+    #[DataProvider('provideStringConditions')]
     public function testTransformationIsSkippedForStringLikeConditions(string $condition): void
     {
         $transformer   = new ReportFilterDataTransformer($this->columns);

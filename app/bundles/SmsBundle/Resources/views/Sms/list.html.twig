@@ -112,6 +112,7 @@
             {# @var item \Mautic\SmsBundle\Entity\Sms #}
             {% for item in items %}
                 {% set type = item.getSmsType() %}
+                {% set media = item.getMedia() %}
                 <tr>
                     <td>
                         {% set edit = securityHasEntityAccess(
@@ -167,6 +168,9 @@
                                     <span data-toggle="tooltip" title="{{ 'mautic.sms.icon_tooltip.list_sms'|trans }}">
                                         <i class="ri-pie-chart-line fs-14"></i>
                                     </span>
+                                {% endif %}
+                                {% if media is not empty %}
+                                    <span data-toggle="tooltip" title="{{ 'mautic.sms.icon_tooltip.has_media'|trans }}"><i class="ri-file-image-line"></i></span>
                                 {% endif %}
                             </a>
                             {{ include('@MauticProject/Modules/projects.html.twig') }}

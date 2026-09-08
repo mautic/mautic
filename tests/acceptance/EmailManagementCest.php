@@ -6,7 +6,7 @@ use Page\Acceptance\EmailsPage;
 use Step\Acceptance\EmailStep;
 use Step\Acceptance\SegmentStep;
 
-class EmailManagementCest
+final class EmailManagementCest
 {
     public const ADMIN_PASSWORD = 'Maut1cR0cks!';
     public const ADMIN_USER     = 'admin';
@@ -43,10 +43,14 @@ class EmailManagementCest
         $this->verifyAllEmailsBelongTo($I, $newCategoryName);
     }
 
-    public function selectAllEmails(AcceptanceTester $I): void
+    private function selectAllEmails(AcceptanceTester $I): void
     {
         $I->waitForElementClickable(EmailsPage::SELECT_ALL_CHECKBOX);
         $I->click(EmailsPage::SELECT_ALL_CHECKBOX);
+        $I->waitForJS(
+            "return document.querySelectorAll('input.list-checkbox:not(:checked)').length === 0;",
+            10
+        );
         $I->seeCheckboxIsChecked(EmailsPage::SELECT_ALL_CHECKBOX);
     }
 
@@ -58,7 +62,7 @@ class EmailManagementCest
         $I->click(EmailsPage::CHANGE_CATEGORY_ACTION);
     }
 
-    protected function verifyAllEmailsBelongTo(AcceptanceTester $I, string $firstCategoryName): void
+    private function verifyAllEmailsBelongTo(AcceptanceTester $I, string $firstCategoryName): void
     {
         $I->waitForElementVisible('span.label-category');
         $categories = $I->grabMultiple('span.label-category');

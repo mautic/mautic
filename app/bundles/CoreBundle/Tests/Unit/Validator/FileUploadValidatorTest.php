@@ -6,11 +6,12 @@ namespace Mautic\CoreBundle\Tests\Unit\Validator;
 
 use Mautic\CoreBundle\Exception\FileInvalidException;
 use Mautic\CoreBundle\Validator\FileUploadValidator;
+use PHPUnit\Framework\Attributes\TestDox;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FileUploadValidatorTest extends \PHPUnit\Framework\TestCase
+final class FileUploadValidatorTest extends \PHPUnit\Framework\TestCase
 {
-    #[\PHPUnit\Framework\Attributes\TestDox('Check that extension is valid')]
+    #[TestDox('Check that extension is valid')]
     public function testValidExtension(): void
     {
         $translatorMock = $this->createMock(TranslatorInterface::class);
@@ -29,7 +30,7 @@ class FileUploadValidatorTest extends \PHPUnit\Framework\TestCase
         $fileUploadValidator->checkExtension($extension, $allowedExtensions, $extensionErrorMsg);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Check that extension is not valid')]
+    #[TestDox('Check that extension is not valid')]
     public function testInvalidExtension(): void
     {
         $translatorMock = $this->createMock(TranslatorInterface::class);
@@ -52,7 +53,7 @@ class FileUploadValidatorTest extends \PHPUnit\Framework\TestCase
         $fileUploadValidator->checkExtension($extension, $allowedExtensions, $extensionErrorMsg);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Check file size is ok')]
+    #[TestDox('Check file size is ok')]
     public function testFileSizeIsOk(): void
     {
         $translatorMock = $this->createMock(TranslatorInterface::class);
@@ -62,13 +63,13 @@ class FileUploadValidatorTest extends \PHPUnit\Framework\TestCase
         $fileUploadValidator = new FileUploadValidator($translatorMock);
 
         $fileSize        = 5_242_880; // 5MB
-        $maxUploadSizeMB = 6;
+        $maxUploadSizeMB = '6';
         $sizeErrorMsg    = 'My message';
 
         $fileUploadValidator->checkFileSize($fileSize, $maxUploadSizeMB, $sizeErrorMsg);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Check file size bigger than allowed one')]
+    #[TestDox('Check file size bigger than allowed one')]
     public function testFileSizeIsBiggerThanAllowed(): void
     {
         $translatorMock = $this->createMock(TranslatorInterface::class);
@@ -79,7 +80,7 @@ class FileUploadValidatorTest extends \PHPUnit\Framework\TestCase
         $fileUploadValidator = new FileUploadValidator($translatorMock);
 
         $fileSize        = 5_242_880; // 5MB
-        $maxUploadSizeMB = 4;
+        $maxUploadSizeMB = '4';
         $sizeErrorMsg    = 'My message';
 
         $this->expectException(FileInvalidException::class);
@@ -88,7 +89,7 @@ class FileUploadValidatorTest extends \PHPUnit\Framework\TestCase
         $fileUploadValidator->checkFileSize($fileSize, $maxUploadSizeMB, $sizeErrorMsg);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test concat message from validators')]
+    #[TestDox('Test concat message from validators')]
     public function testBadExtensionAndBadSize(): void
     {
         $translatorMock = $this->createMock(TranslatorInterface::class);

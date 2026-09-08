@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 
-class DataExporterHelper
+final class DataExporterHelper
 {
     /**
      * Standard function to generate an array of data via any model's "getEntities" method.
@@ -24,7 +24,7 @@ class DataExporterHelper
         array $args,
         ?callable $resultsCallback = null,
         bool $skipOrdering = false,
-    ) {
+    ): ?array {
         $args['limit']        = max($args['limit'], 200);
         $args['start']        = $start;
         $args['skipOrdering'] = $skipOrdering;
@@ -42,7 +42,7 @@ class DataExporterHelper
 
         if (is_callable($resultsCallback)) {
             foreach ($items as $item) {
-                $row = array_map(fn ($itemEncode) => html_entity_decode((string) $itemEncode, ENT_QUOTES), $resultsCallback($item));
+                $row = array_map(fn ($itemEncode): string => html_entity_decode((string) $itemEncode, ENT_QUOTES), $resultsCallback($item));
 
                 $toExport[] = $this->secureAgainstCsvInjection($row);
             }

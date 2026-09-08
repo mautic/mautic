@@ -8,18 +8,18 @@ use Mautic\CoreBundle\Event\AbstractCustomRequestEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
+final class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
 {
     /**
      * @param mixed[] $choices
      * @param mixed[] $operators Please refer to ListModel.php, inside getChoiceFields method, for default operators availabled.
      */
     public function __construct(
-        protected $choices,
-        protected $operators,
-        protected TranslatorInterface $translator,
+        private $choices,
+        private $operators,
+        private readonly TranslatorInterface $translator,
         ?Request $request = null,
-        private string $search = '',
+        private readonly string $search = '',
     ) {
         parent::__construct($request);
     }
@@ -40,10 +40,7 @@ class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
         return $this->operators;
     }
 
-    /**
-     * @return TranslatorInterface
-     */
-    public function getTranslator()
+    public function getTranslator(): TranslatorInterface
     {
         return $this->translator;
     }
@@ -107,11 +104,8 @@ class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
 
         // ajax request to load the filter's value fields
         $request = $this->getRequest();
-        if ('loadSegmentFilterForm' === $request->attributes->get('action')) {
-            return true;
-        }
 
         // something else such as dynamic content
-        return false;
+        return 'loadSegmentFilterForm' === $request->attributes->get('action');
     }
 }

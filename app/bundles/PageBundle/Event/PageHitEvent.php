@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PageBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
@@ -27,10 +29,8 @@ class PageHitEvent extends CommonEvent
 
     /**
      * Returns the Page entity.
-     *
-     * @return Page
      */
-    public function getPage()
+    public function getPage(): ?Page
     {
         return $this->page;
     }

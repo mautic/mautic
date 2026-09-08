@@ -300,6 +300,10 @@
         animation: formSlideIn 0.5s forwards;
     }
 
+    .mauticform-page-hidden {
+        display: none !important;
+    }
+
     @keyframes formSlideIn {
         from { transform: translateY(-20px); opacity: 0; }
         to   { transform: translateY(0); opacity: 1; }
@@ -455,7 +459,6 @@
         content: unset;
     }
 
-    /* Common hover state for card labels */
     .mauticform-page-wrapper .mauticform-row:only-child .mauticform-checkboxgrp-label:hover,
     .mauticform-page-wrapper .mauticform-row:only-child .mauticform-radiogrp-label:hover {
         background-color: var(--form-layer-hover);
@@ -501,23 +504,6 @@
         height: 15px;
         background-image: url("data:image/svg+xml,%3Csvg%20focusable%3D%22false%22%20preserveAspectRatio%3D%22xMidYMid%20meet%22%20fill%3D%22currentColor%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20aria-hidden%3D%22true%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M8%2C1C4.1%2C1%2C1%2C4.1%2C1%2C8c0%2C3.9%2C3.1%2C7%2C7%2C7s7-3.1%2C7-7C15%2C4.1%2C11.9%2C1%2C8%2C1z%20M7%2C11L4.3%2C8.3l0.9-0.8L7%2C9.3l4-3.9l0.9%2C0.8L7%2C11z%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22M7%2C11L4.3%2C8.3l0.9-0.8L7%2C9.3l4-3.9l0.9%2C0.8L7%2C11z%22%20data-icon-path%3D%22inner-path%22%20opacity%3D%220%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E");
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     .mauticform-button-wrapper .mauticform-button.btn-ghost,
     .mauticform-pagebreak-wrapper .mauticform-pagebreak.btn-ghost {
@@ -588,7 +574,6 @@
         background-position-x: 20px;
         padding-left: 45px;
     }
-
 
     .mauticform-pagebreak-wrapper .mauticform-pagebreak.mautic-pagebreak-back:hover {
         color: var(--text-primary);
@@ -753,6 +738,23 @@
     @media only screen and (max-width: 600px) {
         .autoComplete_wrapper>input {
             width: 18rem;
+        }
+    }
+
+    .mauticform-100 { width: 100%; }
+    .mauticform-75 { width: 75%; }
+    .mauticform-66 { width: 66.66%; }
+    .mauticform-50 { width: 50%; }
+    .mauticform-33 { width: 33.33%; }
+    .mauticform-25 { width: 25%; }
+    
+    @media (max-width: 767px) {
+        .mauticform-75,
+        .mauticform-66,
+        .mauticform-50,
+        .mauticform-33,
+        .mauticform-25 {
+            width: 100%;
         }
     }
 </style>

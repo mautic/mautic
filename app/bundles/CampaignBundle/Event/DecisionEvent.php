@@ -5,7 +5,7 @@ namespace Mautic\CampaignBundle\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 
-class DecisionEvent extends CampaignExecutionEvent
+final class DecisionEvent extends CampaignExecutionEvent
 {
     use ContextTrait;
 
@@ -34,18 +34,12 @@ class DecisionEvent extends CampaignExecutionEvent
         );
     }
 
-    /**
-     * @return AbstractEventAccessor
-     */
-    public function getEventConfig()
+    public function getEventConfig(): AbstractEventAccessor
     {
         return $this->eventConfig;
     }
 
-    /**
-     * @return LeadEventLog
-     */
-    public function getLog()
+    public function getLog(): LeadEventLog
     {
         return $this->eventLog;
     }
@@ -93,10 +87,8 @@ class DecisionEvent extends CampaignExecutionEvent
      * @deprecated 2.13.0 to be removed in 3.0; BC support
      *
      * @param mixed $result
-     *
-     * @return $this
      */
-    public function setResult($result)
+    public function setResult($result): static
     {
         $this->applicable = (bool) $result;
 

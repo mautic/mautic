@@ -8,26 +8,30 @@ use Mautic\CoreBundle\Helper\ExitCode;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Model\ListModel;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class DeleteLeadListsCommand extends Command
+#[AsCommand(
+    name: self::COMMAND_NAME,
+    description: 'Hard-delete segment(s) and all its references.'
+)]
+final class DeleteLeadListsCommand extends Command
 {
     public const COMMAND_NAME = 'mautic:segment:delete';
 
     public function __construct(
-        private ListModel $listModel,
-        private LeadListRepository $leadListRepository,
+        private readonly ListModel $listModel,
+        private readonly LeadListRepository $leadListRepository,
     ) {
         parent::__construct();
     }
 
     protected function configure(): void
     {
-        $this->setName(self::COMMAND_NAME)
-            ->setDescription('Hard-delete segment(s) and all its references.')
+        $this
             ->addArgument(
                 'list-id',
                 InputArgument::OPTIONAL,

@@ -5,6 +5,7 @@ namespace Mautic\CoreBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Model\AbTest\AbTestSettingsService;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
@@ -19,18 +20,26 @@ trait VariantEntityTrait
     private $variantChildren;
 
     /**
-     * @var VariantEntityInterface|null
-     *
-     * @phpstan-var T|null
-     **/
+     * @var T|null
+     */
     #[Groups(['email:read', 'email:write', 'download:read'])]
     private $variantParent;
+
+    /**
+     * @var array<string>
+     */
+    private array $variantSettingsKeys = ['weight', 'winnerCriteria'];
+
+    /**
+     * @var array<string>
+     */
+    private array $parentSettingsKeys = ['totalWeight', 'enableAbTest', 'winnerCriteria', 'sendWinnerDelay'];
 
     /**
      * @var array<mixed>|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
-    private $variantSettings = [];
+    private $variantSettings = ['totalWeight' => AbTestSettingsService::DEFAULT_AB_WEIGHT, 'enableAbTest' => false];
 
     /**
      * @var \DateTimeInterface|null
@@ -49,6 +58,7 @@ trait VariantEntityTrait
             ->setIndexBy('id')
             ->setOrderBy(['isPublished' => 'DESC'])
             ->mappedBy('variantParent')
+            ->cascadePersist()
             ->build();
 
         $builder->createField('variantSettings', 'array')
@@ -64,8 +74,6 @@ trait VariantEntityTrait
 
     /**
      * Add variant.
-     *
-     * @return $this
      */
     public function addVariantChild(VariantEntityInterface $child): static
     {
@@ -84,9 +92,6 @@ trait VariantEntityTrait
         $this->getVariantChildren()->removeElement($child);
     }
 
-    /**
-     * Get variantChildren.
-     */
     public function getVariantChildren(): ArrayCollection|Collection
     {
         return $this->variantChildren;
@@ -108,20 +113,13 @@ trait VariantEntityTrait
         return $this->variantParent;
     }
 
-    /**
-     * Remove variant parent.
-     */
     public function removeVariantParent(): void
     {
         $this->setVariantParent();
     }
 
     /**
-     * Set variantSettings.
-     *
      * @param array<mixed> $variantSettings
-     *
-     * @return $this
      */
     public function setVariantSettings(array $variantSettings): static
     {
@@ -129,14 +127,18 @@ trait VariantEntityTrait
             $this->isChanged('variantSettings', $variantSettings);
         }
 
-        $this->variantSettings = $variantSettings;
+        $this->variantSettings = [];
+
+        foreach ($this->getSettingsKeys() as $key) {
+            if (array_key_exists($key, $variantSettings)) {
+                $this->variantSettings[$key] = $variantSettings[$key];
+            }
+        }
 
         return $this;
     }
 
     /**
-     * Get variantSettings.
-     *
      * @return array<mixed>
      */
     public function getVariantSettings(): array
@@ -169,10 +171,15 @@ trait VariantEntityTrait
         $children = $this->getVariantChildren();
 
         if ($isChild) {
-            return (null === $parent) ? false : true;
+            return null !== $parent;
         }
 
-        return (!empty($parent) || count($children)) ? true : false;
+        return $parent instanceof VariantEntityInterface || count($children);
+    }
+
+    public function isParent(): bool
+    {
+        return $this->isVariant() && empty($this->getVariantParent());
     }
 
     /**
@@ -183,9 +190,6 @@ trait VariantEntityTrait
         return $this->getVariantChildren()->count();
     }
 
-    /**
-     * Clear variants.
-     */
     public function clearVariants(): void
     {
         $this->variantChildren = new ArrayCollection();
@@ -201,7 +205,7 @@ trait VariantEntityTrait
     public function getVariants(): array
     {
         $parent = $this->getVariantParent();
-        if (empty($parent)) {
+        if (!$parent instanceof VariantEntityInterface) {
             $parent = $this;
         }
 
@@ -247,10 +251,85 @@ trait VariantEntityTrait
         return array_unique($ids);
     }
 
+    /**
+     * @return string[]
+     */
+    private function getSettingsKeys(): array
+    {
+        if ($this->getVariantParent()) {
+            return $this->variantSettingsKeys;
+        }
+
+        return $this->parentSettingsKeys;
+    }
+
+    public function clearVariantSettings(): void
+    {
+        if (!$this->getVariantParent()) {
+            $this->variantSettings = [
+                'enableAbTest' => false,
+                'totalWeight'  => AbTestSettingsService::DEFAULT_AB_WEIGHT,
+            ];
+        } else {
+            $this->variantSettings = [];
+        }
+    }
+
+    public function isEnableAbTest(): bool
+    {
+        if ($this->getVariantParent()) {
+            return (bool) ($this->getVariantParent()->getVariantSettings()['enableAbTest'] ?? false);
+        }
+
+        return (bool) ($this->getVariantSettings()['enableAbTest'] ?? false);
+    }
+
+    public function getVariantsPendingCount(int $pendingCount): int
+    {
+        if (!$this->isEnableAbTest()) {
+            return $pendingCount;
+        }
+
+        $pendingCount += (int) (method_exists($this, 'getVariantSentCount') ? $this->getVariantSentCount(true) : 0);
+
+        $totalWeight = $this->variantSettings['totalWeight'] ?? null;
+        if ($this->getVariantParent()) {
+            $totalWeight = $this->getVariantParent()->getVariantSettings()['totalWeight'] ?? null;
+        }
+        $totalWeight = (int) ($totalWeight ?? AbTestSettingsService::DEFAULT_TOTAL_WEIGHT);
+
+        $variants           = $this->getVariantChildren();
+        $variantCount       = count($variants) + 1;
+        $singleVariantCount = (int) ceil(($pendingCount / $variantCount) * ($totalWeight / 100));
+
+        return $singleVariantCount * $variantCount;
+    }
+
+    public function getVariantEndDate(): ?\DateTime
+    {
+        /** @var \DateTime $startDate */
+        $startDate  = $this->getVariantStartDate();
+        $delayHours = $this->getSendWinnerDelay();
+
+        if (null === $startDate || 0 === $delayHours) {
+            return null;
+        }
+
+        $endDate = clone $startDate;
+        $endDate->modify("+{$delayHours} hours");
+
+        return $endDate;
+    }
+
+    private function getSendWinnerDelay(): int
+    {
+        return (int) ($this->getVariantSettings()['sendWinnerDelay'] ?? null);
+    }
+
     protected function getAccumulativeVariantCount(string $getter): mixed
     {
         [$parent, $children]     = $this->getVariants();
-        $count                   = $parent->$getter();
+        $count                   = $parent->{$getter}();
 
         if ($checkTranslations = method_exists($parent, 'getAccumulativeTranslationCount')) {
             // Append translations for this variant if applicable
@@ -258,7 +337,7 @@ trait VariantEntityTrait
         }
 
         foreach ($children as $variant) {
-            $count += $variant->$getter();
+            $count += $variant->{$getter}();
 
             if ($checkTranslations) {
                 // Append translations for this variant if applicable
@@ -278,7 +357,7 @@ trait VariantEntityTrait
      */
     protected function appendTranslationEntityIds(object $entity, array &$ids, bool $publishedOnly): void
     {
-        if (!($entity instanceof TranslationEntityInterface && method_exists($this, 'getTranslations'))) {
+        if (!$entity instanceof TranslationEntityInterface || !method_exists($this, 'getTranslations')) {
             return;
         }
 

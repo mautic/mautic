@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
@@ -10,7 +12,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-class AssetsSubscriber implements EventSubscriberInterface
+final readonly class AssetsSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private AssetsHelper $assetsHelper,

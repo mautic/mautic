@@ -49,7 +49,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 {% block button_group_widget %}
 {# apply attributes to radios #}
 {% set attr = form.vars.attr %}
-<div class="btn-group list-group nav-justified btn-block d-flex fw-nowrap-sm {{ buttonBlockClass }}" data-toggle="buttons">
+<div class="btn-group list-group nav-justified btn-block d-flex fw-nowrap-sm {{ buttonBlockClass }}" data-toggle="buttons" style="{{ (attr.readonly is defined and attr.readonly is not empty) or (attr.disabled is defined and attr.disabled is not empty) ? 'pointer-events: none;' : '' }}">
     {% for child in form %}
         {% set class = (child.vars.checked is not empty ? ' active' : '') ~ (child.vars.disabled is not empty or (attribute(attr, 'readonly') is defined and attr.readonly is not empty) ? ' disabled' : '') %}
         <label class="btn {{ class }} btn-block mt-0 list-group-item">
@@ -202,15 +202,16 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 {# Twig version of MauticCoreBundle:Views:FormTheme:Custom:form_errors.html.php #}
 {% block form_errors %}
 {% if errors|length > 0 %}
-    <div class="help-block">
+    {% set itemClass = attr.itemClass|default('alert alert-danger') %}
+    <div class="{{ attr.blockClass|default('help-block') }}">
     {% if errors|length > 1 %}
         <ul>
             {% for error in errors %}
-                <li class="alert alert-danger">{{ error.getMessage()|escape }}</li>
+                <li class="{{ itemClass }}">{{ error.getMessage()|escape }}</li>
             {% endfor %}
         </ul>
     {% else %}
-        <div class="alert alert-danger">{{ (errors|first).getMessage()|escape }}</div>
+        <div class="{{ itemClass }}">{{ (errors|first).getMessage()|escape }}</div>
     {% endif %}
     </div>
 {% endif %}
@@ -567,7 +568,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
     {% set yes_choice = form.vars.choices[1] %}
     {% set no_choice = form.vars.choices[0] %}
 
-    <div class="toggle"
+    <div class="toggle{{ attr.disabled|default(false) ? ' toggle--disabled' : '' }}{{ attr.readonly|default(false) ? ' toggle--readonly' : '' }}"
          data-yes="{{ yes_choice.label|trans }}"
          data-no="{{ no_choice.label|trans }}"
          data-yes-value="{{ yes_choice.value }}"
@@ -657,3 +658,19 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
         </div>
     </div>
 {%- endblock alert_widget %}
+
+{% block datespan_widget %}
+    {% set errorAttr = { attr: { blockClass: 'ma-0', itemClass: 'alert alert-danger ma-0' } } %}
+    <div class="row-no-gutters">
+        <div class="col-xs-12 col-lg-8">
+            {{ form_widget(form.interval) }}
+            {{ form_errors(form.interval, errorAttr) }}
+        </div>
+        <div class="col-xs-12 col-lg-4">
+            <div class="choice-wrapper">
+                {{ form_widget(form.unit) }}
+                {{ form_errors(form.unit, errorAttr) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

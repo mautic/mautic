@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\RequestOptions;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
@@ -13,32 +16,22 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class LanguageHelperTest extends TestCase
+final class LanguageHelperTest extends TestCase
 {
     /**
-     * @var PathsHelper&MockObject
+     * @var MockObject&PathsHelper
      */
     private MockObject $pathsHelper;
 
     /**
-     * @var Logger&MockObject
-     */
-    private MockObject $logger;
-
-    /**
-     * @var CoreParametersHelper&MockObject
+     * @var MockObject&CoreParametersHelper
      */
     private MockObject $coreParametersHelper;
 
     /**
-     * @var Client&MockObject
+     * @var MockObject&Client
      */
     private MockObject $client;
-
-    /**
-     * @var TranslatorInterface&MockObject
-     */
-    private MockObject $translator;
 
     private string $translationsPath;
 
@@ -46,10 +39,8 @@ class LanguageHelperTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->logger               = $this->createMock(Logger::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->client               = $this->createMock(Client::class);
-        $this->translator           = $this->createMock(TranslatorInterface::class);
 
         $this->translationsPath = __DIR__.'/resource/language';
         $this->tmpPath          = $this->translationsPath.'/tmp';
@@ -109,7 +100,7 @@ class LanguageHelperTest extends TestCase
         $this->client->expects($this->once())
             ->method('get')
             ->with('https://languages.test', [
-                \GuzzleHttp\RequestOptions::TIMEOUT => 10,
+                RequestOptions::TIMEOUT => 10,
             ])
             ->willReturn($response);
 
@@ -148,14 +139,31 @@ class LanguageHelperTest extends TestCase
         @unlink($this->tmpPath.'/es.zip');
     }
 
+    public function testFetchPackageWithNullLanguageCodeReturnsInvalidLanguageError(): void
+    {
+        $languages = ['languages' => ['es' => []]];
+        $langFile  = $this->tmpPath.'/../languageList.txt';
+        file_put_contents($langFile, json_encode($languages));
+
+        $this->client->expects($this->never())
+            ->method('get');
+
+        $error = $this->getHelper()->fetchPackage(null);
+        @unlink($langFile);
+
+        $this->assertTrue($error['error']);
+        $this->assertSame('mautic.core.language.helper.invalid.language', $error['message']);
+        $this->assertSame('', $error['vars']['%language%']);
+    }
+
     public function testSupportedLanguagesAreReturned(): void
     {
         $helper = $this->getHelper();
-        $this->assertEquals(['en_US' => 'English - United States'], $helper->getSupportedLanguages());
+        $this->assertSame(['en_US' => 'English - United States'], $helper->getSupportedLanguages());
     }
 
     private function getHelper(): LanguageHelper
     {
-        return new LanguageHelper($this->pathsHelper, $this->logger, $this->coreParametersHelper, $this->client, $this->translator);
+        return new LanguageHelper($this->pathsHelper, $this->createStub(Logger::class), $this->coreParametersHelper, $this->client, $this->createStub(TranslatorInterface::class));
     }
 }

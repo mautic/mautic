@@ -6,12 +6,36 @@
 {%- set aggregatorCount = report.aggregators|length -%}
 {%- set groupBy = report.groupBy -%}
 {%- set groupByCount = report.groupBy|length -%}
+{%- set hideDateRangeFilter = (report.settings.hideDateRangeFilter is defined and report.settings.hideDateRangeFilter) -%}
 {%- set startCount = totalResults > limit ? (reportPage * limit) - limit + 1 : 1 -%}
 {%- set graphContent = include('@MauticReport/Report/details_data_graphs.html.twig', {'graphOrder': graphOrder, 'graphs': graphs, 'report': report}, with_context=false) -%}
 
 {% if showGraphsAboveTable %}{{ graphContent|raw }}{% endif %}
 
 {% if columnOrder is not empty or aggregatorOrder is not empty %}
+    {% if not hideDateRangeFilter %}
+        <div class="col-xs-12">
+            <div class="report-date-range-filter clearfix mb-md">
+                <div class="d-flex fd-row fw-nowrap gap-sm ai-center jc-space-between">
+                    {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'mt-16'}) }}
+                    <div class="dropdown mt-16">
+                        <a href="#" class="btn btn-ghost btn-sm btn-nospin" data-toggle="dropdown" aria-expanded="false">
+                            {{ 'mautic.core.quick_filters'|trans }}
+                            <i class="ri-arrow-down-s-line"></i>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#" data-date-range-option="today">{{ 'mautic.report.date.today'|trans }}</a></li>
+                            <li><a href="#" data-date-range-option="yesterday">{{ 'mautic.report.date.yesterday'|trans }}</a></li>
+                            <li><a href="#" data-date-range-option="7">{{ 'mautic.report.date.last_7_days'|trans }}</a></li>
+                            <li><a href="#" data-date-range-option="30">{{ 'mautic.report.date.last_30_days'|trans }}</a></li>
+                            <li><a href="#" data-date-range-option="90">{{ 'mautic.report.date.last_90_days'|trans }}</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
     <!-- table section -->
     <div class="col-xs-12">
         <div id="page-list-wrapper" class="panel panel-default">
@@ -92,7 +116,7 @@
                                                     {% else %}
                                                         {% set value = htmlEntityDecode(format(cellVal, cellType)|purify) %}
                                                         <div data-toggle="collapse" data-target="#audit-log-details-{{ startCount }}" class="accordion-toggle" style="cursor: pointer">
-                                                            {{ value|length > 50 ? value|slice(0, 50) ~ '...' : value }}
+                                                            {{ value|u.truncate(50, '...') }}
                                                         </div>
                                                     {% endif %}
                                                 {% endif %}

@@ -11,10 +11,10 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class ConfigMonitoredEmailType extends AbstractType
+final class ConfigMonitoredEmailType extends AbstractType
 {
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
+        private readonly EventDispatcherInterface $dispatcher,
     ) {
     }
 

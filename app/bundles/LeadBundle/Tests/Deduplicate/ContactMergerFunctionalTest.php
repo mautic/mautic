@@ -5,20 +5,26 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Deduplicate;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
+use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
 
 final class ContactMergerFunctionalTest extends MauticMysqlTestCase
 {
     public function testMergedContactFound(): void
     {
-        $model = static::getContainer()->get('mautic.lead.model.lead');
-        \assert($model instanceof LeadModel);
+        /** @var LeadModel $model */
+        $model = self::getContainer()->get(LeadModel::class);
+        $this->assertInstanceOf(LeadModel::class, $model);
 
-        $merger = static::getContainer()->get('mautic.lead.merger');
-        \assert($merger instanceof ContactMerger);
+        /** @var ContactMerger $merger */
+        $merger = self::getContainer()->get(ContactMerger::class);
+        $this->assertInstanceOf(ContactMerger::class, $merger);
 
         $bob = new Lead();
         $bob->setFirstname('Bob')
@@ -38,11 +44,13 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
 
         // Bob should have been merged into Jane
         $jane = $model->getEntity($janeId);
-        $this->assertEquals($janeId, $jane->getId());
+        $this->assertInstanceOf(Lead::class, $jane);
+        $this->assertSame($janeId, $jane->getId());
 
         // If Bob is queried, Jane should be returned
         $jane = $model->getEntity($bobId);
-        $this->assertEquals($janeId, $jane->getId());
+        $this->assertInstanceOf(Lead::class, $jane);
+        $this->assertSame($janeId, $jane->getId());
 
         // Merge Jane into a third contact
         $joey = new Lead();
@@ -56,26 +64,29 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
 
         // Query for Bob which should now return Joey
         $joey = $model->getEntity($bobId);
-        $this->assertEquals($joeyId, $joey->getId());
+        $this->assertInstanceOf(Lead::class, $joey);
+        $this->assertSame($joeyId, $joey->getId());
 
         // If Joey is deleted, querying for Bob or Jane should result in null
         $model->deleteEntity($joey);
         $bob = $model->getEntity($bobId);
-        $this->assertNull($bob);
+        $this->assertNotInstanceOf(Lead::class, $bob);
         $jane = $model->getEntity($janeId);
-        $this->assertNull($jane);
+        $this->assertNotInstanceOf(Lead::class, $jane);
     }
 
     public function testMergedContactsPointsAreAccurate(): void
     {
-        $model = static::getContainer()->get('mautic.lead.model.lead');
-        \assert($model instanceof LeadModel);
+        /** @var LeadModel $model */
+        $model = self::getContainer()->get(LeadModel::class);
+        $this->assertInstanceOf(LeadModel::class, $model);
 
-        $em = static::getContainer()->get('doctrine.orm.entity_manager');
-        \assert($em instanceof EntityManager);
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+        $this->assertInstanceOf(EntityManager::class, $em);
 
-        $merger = static::getContainer()->get('mautic.lead.merger');
-        \assert($merger instanceof ContactMerger);
+        /** @var ContactMerger $merger */
+        $merger = self::getContainer()->get(ContactMerger::class);
+        $this->assertInstanceOf(ContactMerger::class, $merger);
 
         // Startout Jane with 50 points
         $jane = new Lead();
@@ -88,6 +99,7 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
 
         $em->detach($jane);
         $jane = $model->getEntity($jane->getId());
+        $this->assertInstanceOf(Lead::class, $jane);
         $this->assertEquals(50, $jane->getPoints());
         $janeId = $jane->getId();
 
@@ -97,21 +109,24 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
         $model->saveEntity($visitor);
         $em->detach($visitor);
         $visitor = $model->getEntity($visitor->getId());
+        $this->assertInstanceOf(Lead::class, $visitor);
         $this->assertEquals(3, $visitor->getPoints());
 
         // Jane submits a form or something that identifies her so the visitor should be merged into Jane giving her 53 points
         $jane = $model->getEntity($janeId);
+        $this->assertInstanceOf(Lead::class, $jane);
         // Jane should start out with 50 points
         $this->assertEquals(50, $jane->getPoints());
         // Jane should come out of the merge as Jane
         $jane = $merger->merge($jane, $visitor);
-        $this->assertEquals($janeId, $jane->getId());
+        $this->assertSame($janeId, $jane->getId());
         // Jane should now have 53 points
         $this->assertEquals(53, $jane->getPoints());
         $em->detach($jane);
         $em->detach($visitor);
         // Jane should still have 53 points
         $jane = $model->getEntity($janeId);
+        $this->assertInstanceOf(Lead::class, $jane);
         $this->assertEquals(53, $jane->getPoints());
 
         // Jane is on another device again and gets 3 points
@@ -120,16 +135,66 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
         $model->saveEntity($visitor2);
         $em->detach($visitor2);
         $visitor2 = $model->getEntity($visitor2->getId());
+        $this->assertInstanceOf(Lead::class, $visitor2);
         $this->assertEquals(3, $visitor2->getPoints());
 
         // Jane again identifies herself, gets merged into the new visitor and so should now have a total of 56 points
         $jane = $model->getEntity($janeId);
+        $this->assertInstanceOf(Lead::class, $jane);
         $jane = $merger->merge($jane, $visitor2);
-        $this->assertEquals($janeId, $jane->getId());
+        $this->assertSame($janeId, $jane->getId());
         $em->detach($jane);
         $em->detach($visitor2);
         $jane = $model->getEntity($jane->getId());
+        $this->assertInstanceOf(Lead::class, $jane);
 
         $this->assertEquals(56, $jane->getPoints());
+    }
+
+    public function testMergedContactKeepsCompanyAssociations(): void
+    {
+        /** @var LeadModel $model */
+        $model = self::getContainer()->get(LeadModel::class);
+        $this->assertInstanceOf(LeadModel::class, $model);
+
+        /** @var CompanyModel $companyModel */
+        $companyModel = self::getContainer()->get(CompanyModel::class);
+        $this->assertInstanceOf(CompanyModel::class, $companyModel);
+
+        /** @var ContactMerger $merger */
+        $merger = self::getContainer()->get(ContactMerger::class);
+        $this->assertInstanceOf(ContactMerger::class, $merger);
+
+        /** @var CompanyLeadRepository $companyLeadRepository */
+        $companyLeadRepository = self::getContainer()->get(CompanyLeadRepository::class);
+        $this->assertInstanceOf(CompanyLeadRepository::class, $companyLeadRepository);
+
+        // Jane is a known contact associated with a primary company
+        $jane = new Lead();
+        $jane->setFirstname('Jane')
+            ->setLastname('Smith')
+            ->setEmail('jane.smith@test.com');
+        $model->saveEntity($jane);
+
+        $company = new Company();
+        $company->setName('Acme Corp');
+        $companyModel->saveEntity($company);
+        $companyModel->addLeadToCompany($company, $jane);
+
+        $janeCompanies = $companyLeadRepository->getCompaniesByLeadId($jane->getId());
+        $this->assertCount(1, $janeCompanies);
+        $this->assertEquals(1, $janeCompanies[0]['is_primary']);
+
+        // Jane visits in a new session; the anonymous visitor wins the merge
+        $visitor = new Lead();
+        $model->saveEntity($visitor);
+
+        $winner = $merger->merge($visitor, $jane);
+
+        // The winner must keep Jane's company association including the primary flag
+        $winnerCompanies = $companyLeadRepository->getCompaniesByLeadId($winner->getId());
+        $this->assertCount(1, $winnerCompanies);
+        $this->assertEquals($company->getId(), $winnerCompanies[0]['company_id']);
+        $this->assertEquals(1, $winnerCompanies[0]['is_primary']);
     }
 }

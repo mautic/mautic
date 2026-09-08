@@ -15,9 +15,9 @@ class Widget
     public const FORMAT_HUMAN = 'M j, Y';
 
     public function __construct(
-        private DashboardModel $dashboardModel,
-        private UserHelper $userHelper,
-        private RequestStack $requestStack,
+        private readonly DashboardModel $dashboardModel,
+        private readonly UserHelper $userHelper,
+        private readonly RequestStack $requestStack,
     ) {
     }
 

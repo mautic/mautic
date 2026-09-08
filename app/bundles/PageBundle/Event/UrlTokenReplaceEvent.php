@@ -14,8 +14,8 @@ final class UrlTokenReplaceEvent extends Event
 {
     public function __construct(
         private string $content,
-        private Lead $lead,
-        private ?int $emailId = null,
+        private readonly Lead $lead,
+        private readonly ?int $emailId = null,
     ) {
     }
 
@@ -43,9 +43,6 @@ final class UrlTokenReplaceEvent extends Event
         return $this->lead;
     }
 
-    /**
-     * Get the email ID.
-     */
     public function getEmailId(): ?int
     {
         return $this->emailId;

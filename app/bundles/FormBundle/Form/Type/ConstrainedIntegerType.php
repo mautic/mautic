@@ -19,7 +19,7 @@ final class ConstrainedIntegerType extends IntegerType
 
         $resolver->setDefined('constraints');
         $resolver->setAllowedTypes('constraints', ['array']);
-        $resolver->setAllowedValues('constraints', function ($constraints) {
+        $resolver->setAllowedValues('constraints', function ($constraints): bool {
             if (!is_array($constraints)) {
                 return false;
             }

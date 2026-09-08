@@ -13,8 +13,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class PageDraftModel
 {
     public function __construct(
-        private EntityManagerInterface $entityManager,
-        private PageDraftRepository $pageDraftRepository,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly PageDraftRepository $pageDraftRepository,
     ) {
     }
 
@@ -24,7 +24,7 @@ class PageDraftModel
     public function createDraft(Page $page, string $html, string $template, bool $publicPreview = true): PageDraft
     {
         $pageDraft = $this->pageDraftRepository->findOneBy(['page' => $page]);
-        if (!is_null($pageDraft)) {
+        if (null !== $pageDraft) {
             throw new \Exception(sprintf('Draft already exists for page %d', $page->getId()));
         }
         $pageDraft = new PageDraft($page, $html, $template, $publicPreview);
@@ -43,7 +43,7 @@ class PageDraftModel
 
     public function deleteDraft(Page $page): void
     {
-        if (is_null($pageDraft = $page->getDraft())) {
+        if (null === ($pageDraft = $page->getDraft())) {
             throw new NotFoundHttpException(sprintf('Draft not found for page %d', $page->getId()));
         }
         $this->entityManager->remove($pageDraft);

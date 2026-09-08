@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\Tests\Controller;
 
 use Mautic\AssetBundle\Entity\Asset;
@@ -13,14 +15,14 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\ProjectBundle\Entity\Project;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FormControllerFunctionalTest extends MauticMysqlTestCase
+final class FormControllerFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
@@ -39,7 +41,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
     public function testIndexActionWhenNotFiltered(): void
     {
         $this->client->request('GET', '/s/forms');
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
     }
 
     /**
@@ -48,7 +50,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
     public function testIndexActionWhenFiltering(): void
     {
         $this->client->request('GET', '/s/forms?search=has%3Aresults&tmpl=list');
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
     }
 
     /**
@@ -57,7 +59,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
     public function testNewActionForm(): void
     {
         $this->client->request('GET', '/s/forms/new/');
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
     }
 
     /**
@@ -66,7 +68,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
     public function testSaveActionForm(): void
     {
         $crawler = $this->client->request('GET', '/s/forms/new/');
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         $form = $crawler->filterXPath('//form[@name="mauticform"]')->form();
         $form->setValues(
@@ -76,7 +78,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
             ]
         );
         $crawler = $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         $form = $crawler->filterXPath('//form[@name="mauticform"]')->form();
         $form->setValues(
@@ -87,29 +89,29 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
 
         // The form failed to save when saved for the second time with renderStyle=No.
         $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
-        $this->assertStringNotContainsString('Internal Server Error - Expected argument of type "null or string", "boolean" given', $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
+        $this->assertStringNotContainsString('Internal Server Error - Expected argument of type "null or string", "boolean" given', (string) $this->client->getResponse()->getContent());
     }
 
     public function testNewActionCheckDisplayMessageOptionsForm(): void
     {
         $this->client->request('GET', '/s/forms/new');
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
         $clientResponse = $this->client->getResponse();
         self::assertResponseStatusCodeSame(Response::HTTP_OK, $clientResponse->getContent());
-        $this->assertStringContainsString('Hide form', $clientResponse->getContent(), $clientResponse->getContent());
-        $this->assertStringContainsString('Redirect URL', $clientResponse->getContent(), $clientResponse->getContent());
-        $this->assertStringContainsString('Remain at form', $clientResponse->getContent(), $clientResponse->getContent());
+        $this->assertStringContainsString('Hide form', (string) $clientResponse->getContent(), $clientResponse->getContent());
+        $this->assertStringContainsString('Redirect URL', (string) $clientResponse->getContent(), $clientResponse->getContent());
+        $this->assertStringContainsString('Remain at form', (string) $clientResponse->getContent(), $clientResponse->getContent());
     }
 
     public function testErrorValidationWithHideFormTypeWithoutMessage(): void
     {
         $crawler = $this->client->request('GET', '/s/forms/new/');
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         $selectedValue = $crawler->filter('#mauticform_postAction option:selected')->attr('value');
 
-        $this->assertEquals('message', $selectedValue);
+        $this->assertSame('message', $selectedValue);
 
         $form = $crawler->filterXPath('//form[@name="mauticform"]')->form();
 
@@ -121,19 +123,19 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         $crawler = $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
         $divClass = $crawler->filter('#mauticform_postActionProperty')->ancestors()->first()->attr('class');
-        $this->assertStringContainsString('has-error', $divClass, $crawler->html());
+        $this->assertStringContainsString('has-error', (string) $divClass, $crawler->html());
     }
 
     public function testSuccessWithHideForm(): void
     {
         $crawler = $this->client->request('GET', '/s/forms/new/');
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         $selectedValue = $crawler->filter('#mauticform_postAction option:selected')->attr('value');
 
-        $this->assertEquals('message', $selectedValue);
+        $this->assertSame('message', $selectedValue);
 
         $form = $crawler->filterXPath('//form[@name="mauticform"]')->form();
 
@@ -145,9 +147,9 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
             ]
         );
         $crawler = $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
         $divClass = $crawler->filter('#mauticform_postActionProperty')->ancestors()->first()->attr('class');
-        $this->assertStringNotContainsString('has-error', $divClass, $crawler->html());
+        $this->assertStringNotContainsString('has-error', (string) $divClass, $crawler->html());
     }
 
     public function testLanguageForm(): void
@@ -160,7 +162,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $filesystem->mirror($translationsPath, $languagePath);
 
         /** @var LanguageHelper $languageHelper */
-        $languageHelper = $this->getContainer()->get('mautic.helper.language');
+        $languageHelper = $this->getContainer()->get(LanguageHelper::class);
 
         $formPayload = [
             'name'       => 'Test Form',
@@ -184,9 +186,8 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', '/api/forms/new', $formPayload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), json_encode($languageHelper->getLanguageChoices()));
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, json_encode($languageHelper->getLanguageChoices()));
         $form     = $response['form'];
-        $formId   = $form['id'];
 
         $crawler = $this->client->request('GET', '/form/'.$form['id']);
         $this->assertStringContainsString('Merci de patienter...', $crawler->html());
@@ -210,13 +211,13 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $crawler = $this->client->request('GET', sprintf('/s/forms/edit/%d', $form->getId()));
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         $formElement = $crawler->filterXPath('//form[@name="mauticform"]')->form();
         $this->client->submit($formElement);
         $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk());
-        $this->assertStringNotContainsString('contact: Email', $response->getContent(), 'Email field should not be marked as mapped.');
+        $this->assertResponseIsSuccessful();
+        $this->assertStringNotContainsString('contact: Email', (string) $response->getContent(), 'Email field should not be marked as mapped.');
     }
 
     public function testMappedFieldIsNotAutoFilledWhenUpdatingField(): void
@@ -233,15 +234,15 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $crawler = $this->client->request('GET', sprintf('/s/forms/edit/%d', $form->getId()));
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
 
         $formElement = $crawler->filterXPath('//form[@name="mauticform"]')->form();
         $this->client->submit($formElement);
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         $this->client->xmlHttpRequest('GET', sprintf('/s/forms/field/edit/%d?formId=%d', $field->getId(), $form->getId()));
         $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk());
+        $this->assertResponseIsSuccessful();
         $this->assertJson($response->getContent());
 
         $content = json_decode($response->getContent())->newContent;
@@ -284,14 +285,14 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         // Verify form creation
-        $crawler = $this->client->request('GET', sprintf('/s/forms/edit/%d', $form->getId()));
+        $this->client->request('GET', sprintf('/s/forms/edit/%d', $form->getId()));
         $this->assertResponseIsSuccessful();
 
         // Visit the form preview page
-        $crawler = $this->client->request('GET', sprintf('/s/forms/preview/%d', $form->getId()));
+        $this->client->request('GET', sprintf('/s/forms/preview/%d', $form->getId()));
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('First Option', $this->client->getResponse()->getContent());
-        $this->assertStringContainsString('Second Option', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('First Option', (string) $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('Second Option', (string) $this->client->getResponse()->getContent());
     }
 
     public function testCreateNewActionUsingBaseTemplateToDisplay(): void
@@ -401,13 +402,13 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
      *      message_arg: array<string, mixed>
      *  }> $expectedMessages The expected messages with translation arguments
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataTestLabelsForFormActions')]
+    #[DataProvider('dataTestLabelsForFormActions')]
     public function testLabelsForFormAction(array $inputValues, array $expectedMessages): void
     {
         $form = $this->createForm('test', 'test');
 
         // Persist entities if provided
-        if (!empty($inputValues['entities'])) {
+        if (isset($inputValues['entities'])) {
             foreach ($inputValues['entities'] as $entity) {
                 $this->em->persist($entity);
             }
@@ -424,8 +425,8 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request('GET', sprintf('/s/forms/edit/%d', $form->getId()));
         $this->assertResponseIsSuccessful();
 
-        $translator = $this->getContainer()->get('translator');
-        \assert($translator instanceof TranslatorInterface);
+        $translator = $this->getContainer()->get(TranslatorInterface::class);
+        $this->assertInstanceOf(TranslatorInterface::class, $translator);
 
         foreach ($expectedMessages as $expectedMessage) {
             $translatedMessage = $translator->trans($expectedMessage['message'], $expectedMessage['message_arg']);
@@ -653,21 +654,21 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->submit($mauticform);
 
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         $forms = $this->em->getRepository(Form::class)->findBy([], ['id' => 'ASC']);
-        Assert::assertCount(2, $forms);
+        $this->assertCount(2, $forms);
 
         $originalForm = $forms[0];
         $clonedForm   = $forms[1];
-        Assert::assertSame($form->getId(), $originalForm->getId());
-        Assert::assertNotSame($form->getId(), $clonedForm->getId());
+        $this->assertSame($form->getId(), $originalForm->getId());
+        $this->assertNotSame($form->getId(), $clonedForm->getId());
 
         $fields = $clonedForm->getFields()->getValues();
-        Assert::assertCount(3, $fields);
+        $this->assertCount(3, $fields);
 
-        list($clonedField1, $clonedField2, $clonedSubmit) = $fields;
-        Assert::assertSame((int) $clonedField2->getParent(), $clonedField1->getId());
+        [$clonedField1, $clonedField2, $clonedSubmit] = $fields;
+        $this->assertSame((int) $clonedField2->getParent(), $clonedField1->getId());
     }
 
     public function testFormWithProject(): void
@@ -690,7 +691,8 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $savedForm = $this->em->find(Form::class, $form->getId());
-        Assert::assertSame($project->getId(), $savedForm->getProjects()->first()->getId());
+        $this->assertInstanceOf(Form::class, $savedForm);
+        $this->assertSame($project->getId(), $savedForm->getProjects()->first()->getId());
     }
 
     public function testFormDetailsViewWithPreviewPanel(): void

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\SmsBundle\Integration\Twilio;
 
 use Mautic\PluginBundle\Helper\IntegrationHelper;
@@ -23,7 +25,7 @@ class Configuration
     private $authToken;
 
     public function __construct(
-        private IntegrationHelper $integrationHelper,
+        private readonly IntegrationHelper $integrationHelper,
     ) {
     }
 

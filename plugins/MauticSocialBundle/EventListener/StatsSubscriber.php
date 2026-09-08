@@ -1,23 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticSocialBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\EventListener\CommonStatsSubscriber;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use MauticPlugin\MauticSocialBundle\Entity\TweetStat;
 use MauticPlugin\MauticSocialBundle\Entity\TweetStatRepository;
 
-class StatsSubscriber extends CommonStatsSubscriber
+final class StatsSubscriber extends CommonStatsSubscriber
 {
-    public function __construct(CorePermissions $security, EntityManager $entityManager)
-    {
+    public function __construct(
+        CorePermissions $security,
+        EntityManagerInterface $entityManager,
+        TweetStatRepository $tweetStatRepository,
+    ) {
         parent::__construct($security, $entityManager);
 
-        /** @var TweetStatRepository $repo */
-        $repo                      = $entityManager->getRepository(TweetStat::class);
-        $table                     = $repo->getTableName();
-        $this->repositories[]      = $repo;
+        $table                     = $tweetStatRepository->getTableName();
+        $this->repositories[]      = $tweetStatRepository;
         $this->permissions[$table] = ['tweet' => 'mauticSocial:tweets'];
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\AssetBundle\Tests\Entity;
 
 use Mautic\AssetBundle\Entity\Asset;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use PHPUnit\Framework\TestCase;
 
 final class AssetTest extends TestCase
@@ -13,7 +14,7 @@ final class AssetTest extends TestCase
     {
         $asset = new Asset();
 
-        $this->setEntityId($asset);
+        ReflectionHelper::setValue($asset, 'id', 10);
         $asset->setUuid('123e4567-e89b-12d3-a456-426614174000');
 
         $this->assertSame(
@@ -26,7 +27,7 @@ final class AssetTest extends TestCase
     {
         $asset = new Asset();
 
-        $this->setEntityId($asset);
+        ReflectionHelper::setValue($asset, 'id', 10);
         $asset->setAlias('my-alias');
 
         $this->assertSame('10:my-alias', $asset->getSlug());
@@ -36,7 +37,7 @@ final class AssetTest extends TestCase
     {
         $asset = new Asset();
 
-        $this->setEntityId($asset);
+        ReflectionHelper::setValue($asset, 'id', 10);
         $asset->setAlias(null);
 
         $this->assertSame('10:', $asset->getSlug());
@@ -52,11 +53,5 @@ final class AssetTest extends TestCase
         );
 
         $asset->getSlug();
-    }
-
-    private function setEntityId(object $object): void
-    {
-        $reflection = new \ReflectionProperty($object, 'id');
-        $reflection->setValue($object, 10);
     }
 }

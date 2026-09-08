@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PageBundle\Model;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -11,18 +13,16 @@ use Symfony\Component\HttpFoundation\Request;
 class Tracking404Model
 {
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper,
-        private ContactTracker $contactTracker,
-        private PageModel $pageModel,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly ContactTracker $contactTracker,
+        private readonly PageModel $pageModel,
     ) {
     }
 
     /**
-     * @param Page|Redirect $entity
-     *
      * @throws \Exception
      */
-    public function hitPage($entity, Request $request): void
+    public function hitPage(Redirect|Page|null $entity, Request $request): void
     {
         $this->pageModel->hitPage($entity, $request, 404);
     }

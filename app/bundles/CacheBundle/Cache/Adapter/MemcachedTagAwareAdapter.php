@@ -8,7 +8,7 @@ use Mautic\CacheBundle\Exceptions\InvalidArgumentException;
 use Symfony\Component\Cache\Adapter\MemcachedAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 
-class MemcachedTagAwareAdapter extends TagAwareAdapter
+final class MemcachedTagAwareAdapter extends TagAwareAdapter
 {
     public function __construct(array $servers, string $namespace, int $lifetime)
     {

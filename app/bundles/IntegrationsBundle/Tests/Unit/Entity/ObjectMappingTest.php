@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\Entity;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use PHPUnit\Framework\TestCase;
 
-class ObjectMappingTest extends TestCase
+final class ObjectMappingTest extends TestCase
 {
     private \DateTime $dateCreated;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->dateCreated = new \DateTime();
 
@@ -33,7 +34,7 @@ class ObjectMappingTest extends TestCase
 
     public function testLoadMetadata(): void
     {
-        $metadata = new \Doctrine\ORM\Mapping\ClassMetadata(ObjectMapping::class);
+        $metadata = new ClassMetadata(ObjectMapping::class);
         ObjectMapping::loadMetadata($metadata);
 
         $expectedFieldNames = [

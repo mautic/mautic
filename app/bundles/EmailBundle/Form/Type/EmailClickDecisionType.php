@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\SortableListType;
@@ -9,7 +11,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class EmailClickDecisionType extends AbstractType
+final class EmailClickDecisionType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

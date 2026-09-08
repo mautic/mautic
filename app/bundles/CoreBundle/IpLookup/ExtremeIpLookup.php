@@ -2,17 +2,26 @@
 
 namespace Mautic\CoreBundle\IpLookup;
 
-class ExtremeIpLookup extends AbstractRemoteDataLookup
+final class ExtremeIpLookup extends AbstractRemoteDataLookup
 {
     public string $businessWebsite = '';
+
     public string $continent       = '';
+
     public string $countryCode     = '';
+
     public string $ipName          = '';
+
     public string $ipType          = '';
+
     public string $lat             = '';
+
     public string $lon             = '';
+
     public string $org             = '';
+
     public string $query           = '';
+
     public string $status          = '';
 
     /**
@@ -33,7 +42,7 @@ class ExtremeIpLookup extends AbstractRemoteDataLookup
         return 'https://extreme-ip-lookup.com/json/'.$this->ip.$auth;
     }
 
-    protected function parseResponse($response)
+    protected function parseResponse($response): void
     {
         $data = json_decode($response, true);
 
@@ -54,7 +63,7 @@ class ExtremeIpLookup extends AbstractRemoteDataLookup
                         break;
                 }
 
-                $this->$key = $value;
+                $this->{$key} = $value;
             }
         }
     }

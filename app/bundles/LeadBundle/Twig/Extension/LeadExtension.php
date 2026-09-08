@@ -9,20 +9,20 @@ use Mautic\LeadBundle\Twig\Helper\AvatarHelper;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class LeadExtension extends AbstractExtension
+final class LeadExtension extends AbstractExtension
 {
     public function __construct(
-        protected AvatarHelper $avatarHelper,
+        private readonly AvatarHelper $avatarHelper,
     ) {
     }
 
     /**
      * @see Twig_Extension::getFunctions()
      */
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
-            new TwigFunction('leadGetAvatar', [$this, 'getAvatar']),
+            new TwigFunction('leadGetAvatar', $this->getAvatar(...)),
         ];
     }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\EventListener;
 
 use Mautic\CampaignBundle\Entity\Event;
@@ -9,9 +11,10 @@ use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class NotifyOfUnpublishSubscriberTest extends TestCase
+final class NotifyOfUnpublishSubscriberTest extends TestCase
 {
     private MockObject&NotificationHelper $notificationHelper;
+
     private NotifyOfUnpublishSubscriber $subscriber;
 
     protected function setUp(): void
@@ -22,7 +25,7 @@ class NotifyOfUnpublishSubscriberTest extends TestCase
 
     public function testNotifyOfUnpublish(): void
     {
-        $event = $this->createMock(Event::class);
+        $event = $this->createStub(Event::class);
 
         $notifyEvent = new NotifyOfUnpublishEvent($event);
 
@@ -30,7 +33,7 @@ class NotifyOfUnpublishSubscriberTest extends TestCase
         $this->notificationHelper->expects($this->once())
             ->method('notifyOfUnpublish')
             ->with(
-                $this->equalTo($event)
+                $event
             );
 
         $this->subscriber->notifyOfUnpublish($notifyEvent);

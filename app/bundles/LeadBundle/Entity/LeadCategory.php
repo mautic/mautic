@@ -44,7 +44,7 @@ class LeadCategory
 
     /**
      * @var Category
-     **/
+     */
     #[Groups(['leadcategory:read', 'leadcategory:write'])]
     private $category;
 
@@ -102,7 +102,7 @@ class LeadCategory
     }
 
     /**
-     * @return mixed
+     * @return int|null
      */
     public function getId()
     {
@@ -126,7 +126,7 @@ class LeadCategory
     }
 
     /**
-     * @return mixed
+     * @return Lead|null
      */
     public function getLead()
     {
@@ -207,6 +207,6 @@ class LeadCategory
 
     public function getPermissionUser(): mixed
     {
-        return $this->getLead()?->getPermissionUser();
+        return $this->lead?->getPermissionUser();
     }
 }

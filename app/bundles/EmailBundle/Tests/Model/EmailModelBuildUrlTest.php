@@ -7,7 +7,7 @@ namespace Mautic\EmailBundle\Tests\Model;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Model\EmailModel;
 
-class EmailModelBuildUrlTest extends MauticMysqlTestCase
+final class EmailModelBuildUrlTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {
@@ -18,10 +18,10 @@ class EmailModelBuildUrlTest extends MauticMysqlTestCase
     public function testSiteUrlAlwaysTakesPrecedenceWhenBuildingUrls(): void
     {
         /** @var EmailModel $emailModel */
-        $emailModel = static::getContainer()->get('mautic.email.model.email');
+        $emailModel = self::getContainer()->get(EmailModel::class);
         $idHash     = uniqid();
         $url        = $emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash]);
 
-        self::assertSame('https://foo.bar.com/email/unsubscribe/'.$idHash, $url);
+        $this->assertSame('https://foo.bar.com/email/unsubscribe/'.$idHash, $url);
     }
 }

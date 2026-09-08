@@ -1,22 +1,31 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\AssetBundle\Tests\Controller\Api;
 
+use Mautic\AssetBundle\Tests\RemoteFileServerTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
+final class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
 {
+    use RemoteFileServerTrait;
+
+    private const LOCAL_IMAGE_PLACEHOLDER = '@local-image@';
+
     protected function setUp(): void
     {
+        $this->configParams['allowed_extensions']      = ['txt', 'csv', 'jpg', 'jpeg', 'png', 'pdf'];
         $this->configParams['validate_remote_domains'] = false;
-        $this->configParams['site_url']                = 'https://site.tld';
+        $this->configParams['site_url']                = 'https://raw.githubusercontent.com';
 
         if ('testCreateNewRemoteAssetWithValidateRemoteDomainsEnabled' === $this->name()) {
             $this->configParams['validate_remote_domains'] = true;
             $this->configParams['allowed_remote_domains']  = [
                 'first-allowed.tld',
                 'second-allowed.tld',
+                '127.0.0.1',
             ];
         }
 
@@ -36,22 +45,35 @@ class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
         $response = json_decode($clientResponse->getContent(), true);
         $this->assertEquals($payload['title'], $response['asset']['title']);
         $this->assertEquals($payload['storageLocation'], $response['asset']['storageLocation']);
-        $this->assertStringContainsString('application/pdf', $response['asset']['mime']);
-        $this->assertStringContainsString('pdf', $response['asset']['extension']);
+        $this->assertStringContainsString('application/pdf', (string) $response['asset']['mime']);
+        $this->assertStringContainsString('pdf', (string) $response['asset']['extension']);
         $this->assertNotNull($response['asset']['size']);
     }
 
-    public function testCreateNewRemoteAssetWithVulnerableFile(): void
+    /**
+     * @return iterable<array{string, string}>
+     */
+    public static function dataCreateNewRemoteAssetWithInvalidFile(): iterable
+    {
+        yield 'Malformed URL' => ['file:///etc/passwd', 'remotePath: The remote should be a valid URL.'];
+        yield 'URL returning 404' => ['https://www.google.com/non-existent-path', 'asset: The mimetype of the remote file could not be resolved. Make sure you entered a valid remote URL.'];
+        yield 'Not allowed html MIME type' => ['https://github.com/mautic/mautic', 'asset: Upload failed as the file mimetype text\/html'];
+        yield 'Not allowed php MIME type' => ['https://raw.githubusercontent.com/mautic/mautic/7.x/index.php', 'asset: Upload failed as the file mimetype text\/x-php'];
+    }
+
+    #[DataProvider('dataCreateNewRemoteAssetWithInvalidFile')]
+    public function testCreateNewRemoteAssetWithInvalidFile(string $file, string $expectedError): void
     {
         $payload = [
-            'file'            => 'file:///etc/passwd',
+            'file'            => $file,
             'storageLocation' => 'remote',
             'title'           => 'title',
         ];
         $this->client->request('POST', 'api/assets/new', $payload);
-        $clientResponse = $this->client->getResponse();
-        $this->assertResponseStatusCodeSame(400, $clientResponse->getContent());
-        $this->assertEquals('{"errors":[{"code":400,"message":"remotePath: The remote should be a valid URL.","details":{"remotePath":["The remote should be a valid URL."]}}]}', $clientResponse->getContent());
+        $response = $this->client->getResponse();
+        $content  = $response->getContent();
+        $this->assertResponseStatusCodeSame(400, $response->getContent());
+        $this->assertStringContainsString($expectedError, (string) $content);
     }
 
     /**
@@ -60,14 +82,19 @@ class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
     public static function dataCreateNewRemoteAssetWithValidateRemoteDomainsEnabled(): iterable
     {
         yield 'Not in allowed domains' => ['https://some-domain.com/foo.jpg', false];
-        yield 'Is in allowed domains' => ['https://second-allowed.tld/foo.jpg', true];
-        yield 'Using site URL' => ['https://site.tld/foo.jpg', true];
+        yield 'Is in allowed domains' => [self::LOCAL_IMAGE_PLACEHOLDER, true];
+        yield 'Using site URL' => ['https://raw.githubusercontent.com/mautic/mautic/7.x/.github/readme_logo.png', true];
     }
 
     #[DataProvider('dataCreateNewRemoteAssetWithValidateRemoteDomainsEnabled')]
     public function testCreateNewRemoteAssetWithValidateRemoteDomainsEnabled(string $file, bool $isAllowed): void
     {
         $message = 'remotePath: The remote domain in the URL is not allowed due to security reasons.';
+
+        if (self::LOCAL_IMAGE_PLACEHOLDER === $file) {
+            $file = $this->serveRemoteFile('image.jpg').'?hmac=SoX9UoHhN8HyklRA4A3vcCWJMVtiBXUg0W4ljWTor7s';
+        }
+
         $payload = [
             'file'            => $file,
             'storageLocation' => 'remote',
@@ -78,11 +105,11 @@ class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
         $content        = $clientResponse->getContent();
 
         if ($isAllowed) {
-            $this->assertSame(201, $clientResponse->getStatusCode(), $content);
-            $this->assertStringNotContainsString($message, $content);
+            $this->assertResponseStatusCodeSame(201, $content);
+            $this->assertStringNotContainsString($message, (string) $content);
         } else {
-            $this->assertSame(400, $clientResponse->getStatusCode(), $content);
-            $this->assertStringContainsString($message, $content);
+            $this->assertResponseStatusCodeSame(400, $content);
+            $this->assertStringContainsString($message, (string) $content);
         }
     }
 
@@ -102,9 +129,9 @@ class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
         $response = json_decode($clientResponse->getContent(), true);
         $this->assertEquals($payload['title'], $response['asset']['title']);
         $this->assertEquals($payload['storageLocation'], $response['asset']['storageLocation']);
-        $this->assertStringContainsString('text/plain', $response['asset']['mime']);
+        $this->assertStringContainsString('text/plain', (string) $response['asset']['mime']);
         $this->assertNotNull($response['asset']['size']);
-        $this->assertStringContainsString('txt', $response['asset']['extension']);
+        $this->assertStringContainsString('txt', (string) $response['asset']['extension']);
         unlink($assetsPath.'/file.txt');
     }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Tests\Scheduler\Validator;
 
 use Mautic\ReportBundle\Entity\Report;
@@ -12,13 +14,13 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
-class ScheduleIsValidValidatorTest extends \PHPUnit\Framework\TestCase
+final class ScheduleIsValidValidatorTest extends \PHPUnit\Framework\TestCase
 {
     public function testNoSchedule(): void
     {
         $schedulerBuilderMock = $this->createMock(SchedulerBuilder::class);
 
-        $constraintMock = $this->createMock(Constraint::class);
+        $constraintMock = $this->createStub(Constraint::class);
 
         $scheduleIsValidValidator = new ScheduleIsValidValidator($schedulerBuilderMock);
 
@@ -43,7 +45,7 @@ class ScheduleIsValidValidatorTest extends \PHPUnit\Framework\TestCase
     {
         $schedulerBuilderMock = $this->createMock(SchedulerBuilder::class);
 
-        $constraintMock = $this->createMock(Constraint::class);
+        $constraintMock = $this->createStub(Constraint::class);
 
         $executionContextInterfaceMock = $this->createMock(ExecutionContextInterface::class);
 
@@ -79,7 +81,7 @@ class ScheduleIsValidValidatorTest extends \PHPUnit\Framework\TestCase
     {
         $schedulerBuilderMock = $this->createMock(SchedulerBuilder::class);
 
-        $constraintMock = $this->createMock(Constraint::class);
+        $constraintMock = $this->createStub(Constraint::class);
 
         $scheduleIsValidValidator = new ScheduleIsValidValidator($schedulerBuilderMock);
 
@@ -107,7 +109,7 @@ class ScheduleIsValidValidatorTest extends \PHPUnit\Framework\TestCase
     {
         $schedulerBuilderMock = $this->createMock(SchedulerBuilder::class);
 
-        $constraintMock = $this->createMock(Constraint::class);
+        $constraintMock = $this->createStub(Constraint::class);
 
         $scheduleIsValidValidator = new ScheduleIsValidValidator($schedulerBuilderMock);
 
@@ -135,7 +137,7 @@ class ScheduleIsValidValidatorTest extends \PHPUnit\Framework\TestCase
     {
         $schedulerBuilderMock = $this->createMock(SchedulerBuilder::class);
 
-        $constraintMock = $this->createMock(Constraint::class);
+        $constraintMock = $this->createStub(Constraint::class);
 
         $scheduleIsValidValidator = new ScheduleIsValidValidator($schedulerBuilderMock);
 
@@ -163,7 +165,7 @@ class ScheduleIsValidValidatorTest extends \PHPUnit\Framework\TestCase
     {
         $schedulerBuilderMock = $this->createMock(SchedulerBuilder::class);
 
-        $constraintMock = $this->createMock(Constraint::class);
+        $constraintMock = $this->createStub(Constraint::class);
 
         $executionContextInterfaceMock = $this->createMock(ExecutionContextInterface::class);
 
@@ -203,7 +205,7 @@ class ScheduleIsValidValidatorTest extends \PHPUnit\Framework\TestCase
     {
         $schedulerBuilderMock = $this->createMock(SchedulerBuilder::class);
 
-        $constraintMock = $this->createMock(Constraint::class);
+        $constraintMock = $this->createStub(Constraint::class);
 
         $executionContextInterfaceMock = $this->createMock(ExecutionContextInterface::class);
 
@@ -245,7 +247,7 @@ class ScheduleIsValidValidatorTest extends \PHPUnit\Framework\TestCase
     {
         $schedulerBuilderMock = $this->createMock(SchedulerBuilder::class);
 
-        $constraintMock = $this->createMock(Constraint::class);
+        $constraintMock = $this->createStub(Constraint::class);
 
         $executionContextInterfaceMock = $this->createMock(ExecutionContextInterface::class);
 

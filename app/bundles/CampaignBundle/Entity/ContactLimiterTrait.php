@@ -3,6 +3,7 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\ORM\QueryBuilder as OrmQueryBuilder;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
@@ -19,38 +20,38 @@ trait ContactLimiterTrait
         $maxContactId = $contactLimiter->getMaxContactId();
         if ($contactId = $contactLimiter->getContactId()) {
             $qb->andWhere(
-                $qb->expr()->eq("$alias.lead_id", ':contactId')
+                $qb->expr()->eq("{$alias}.lead_id", ':contactId')
             )
-                ->setParameter('contactId', $contactId, \Doctrine\DBAL\ParameterType::INTEGER);
+                ->setParameter('contactId', $contactId, ParameterType::INTEGER);
         } elseif ($contactIds = $contactLimiter->getContactIdList()) {
             $qb->andWhere(
-                $qb->expr()->in("$alias.lead_id", ':contactIds')
+                $qb->expr()->in("{$alias}.lead_id", ':contactIds')
             )
                 ->setParameter('contactIds', $contactIds, ArrayParameterType::INTEGER);
         } elseif ($minContactId && $maxContactId) {
             $qb->andWhere(
-                "$alias.lead_id BETWEEN :minContactId AND :maxContactId"
+                "{$alias}.lead_id BETWEEN :minContactId AND :maxContactId"
             )
-                ->setParameter('minContactId', $minContactId, \Doctrine\DBAL\ParameterType::INTEGER)
-                ->setParameter('maxContactId', $maxContactId, \Doctrine\DBAL\ParameterType::INTEGER);
+                ->setParameter('minContactId', $minContactId, ParameterType::INTEGER)
+                ->setParameter('maxContactId', $maxContactId, ParameterType::INTEGER);
         } elseif ($minContactId) {
             $qb->andWhere(
-                $qb->expr()->gte("$alias.lead_id", ':minContactId')
+                $qb->expr()->gte("{$alias}.lead_id", ':minContactId')
             )
-                ->setParameter('minContactId', $minContactId, \Doctrine\DBAL\ParameterType::INTEGER);
+                ->setParameter('minContactId', $minContactId, ParameterType::INTEGER);
         } elseif ($maxContactId) {
             $qb->andWhere(
-                $qb->expr()->lte("$alias.lead_id", ':maxContactId')
+                $qb->expr()->lte("{$alias}.lead_id", ':maxContactId')
             )
-                ->setParameter('maxContactId', $maxContactId, \Doctrine\DBAL\ParameterType::INTEGER);
+                ->setParameter('maxContactId', $maxContactId, ParameterType::INTEGER);
         }
 
         if ($threadId = $contactLimiter->getThreadId()) {
             if ($maxThreads = $contactLimiter->getMaxThreads()) {
                 if ($threadId <= $maxThreads) {
-                    $qb->andWhere("MOD(($alias.lead_id + :threadShift), :maxThreads) = 0")
-                        ->setParameter('threadShift', $threadId - 1, \Doctrine\DBAL\ParameterType::INTEGER)
-                        ->setParameter('maxThreads', $maxThreads, \Doctrine\DBAL\ParameterType::INTEGER);
+                    $qb->andWhere("MOD(({$alias}.lead_id + :threadShift), :maxThreads) = 0")
+                        ->setParameter('threadShift', $threadId - 1, ParameterType::INTEGER)
+                        ->setParameter('maxThreads', $maxThreads, ParameterType::INTEGER);
                 }
             }
         }
@@ -70,37 +71,37 @@ trait ContactLimiterTrait
         $maxContactId = $contactLimiter->getMaxContactId();
         if ($contactId = $contactLimiter->getContactId()) {
             $qb->andWhere(
-                $qb->expr()->eq("IDENTITY($alias.lead)", ':contact')
+                $qb->expr()->eq("IDENTITY({$alias}.lead)", ':contact')
             )
-                ->setParameter('contact', $contactId, \Doctrine\DBAL\ParameterType::INTEGER);
+                ->setParameter('contact', $contactId, ParameterType::INTEGER);
         } elseif ($contactIds = $contactLimiter->getContactIdList()) {
             $qb->andWhere(
-                $qb->expr()->in("IDENTITY($alias.lead)", ':contactIds')
+                $qb->expr()->in("IDENTITY({$alias}.lead)", ':contactIds')
             )
                 ->setParameter('contactIds', $contactIds, ArrayParameterType::INTEGER);
         } elseif ($minContactId && $maxContactId) {
             $qb->andWhere(
-                "IDENTITY($alias.lead) BETWEEN :minContactId AND :maxContactId"
+                "IDENTITY({$alias}.lead) BETWEEN :minContactId AND :maxContactId"
             )
-                ->setParameter('minContactId', $minContactId, \Doctrine\DBAL\ParameterType::INTEGER)
-                ->setParameter('maxContactId', $maxContactId, \Doctrine\DBAL\ParameterType::INTEGER);
+                ->setParameter('minContactId', $minContactId, ParameterType::INTEGER)
+                ->setParameter('maxContactId', $maxContactId, ParameterType::INTEGER);
         } elseif ($minContactId) {
             $qb->andWhere(
-                $qb->expr()->gte("IDENTITY($alias.lead)", ':minContactId')
+                $qb->expr()->gte("IDENTITY({$alias}.lead)", ':minContactId')
             )
-                ->setParameter('minContactId', $minContactId, \Doctrine\DBAL\ParameterType::INTEGER);
+                ->setParameter('minContactId', $minContactId, ParameterType::INTEGER);
         } elseif ($maxContactId) {
             $qb->andWhere(
-                $qb->expr()->lte("IDENTITY($alias.lead)", ':maxContactId')
+                $qb->expr()->lte("IDENTITY({$alias}.lead)", ':maxContactId')
             )
-                ->setParameter('maxContactId', $maxContactId, \Doctrine\DBAL\ParameterType::INTEGER);
+                ->setParameter('maxContactId', $maxContactId, ParameterType::INTEGER);
         }
 
         if ($threadId = $contactLimiter->getThreadId()) {
             if ($maxThreads = $contactLimiter->getMaxThreads()) {
-                $qb->andWhere("MOD((IDENTITY($alias.lead) + :threadShift), :maxThreads) = 0")
-                    ->setParameter('threadShift', $threadId - 1, \Doctrine\DBAL\ParameterType::INTEGER)
-                    ->setParameter('maxThreads', $maxThreads, \Doctrine\DBAL\ParameterType::INTEGER);
+                $qb->andWhere("MOD((IDENTITY({$alias}.lead) + :threadShift), :maxThreads) = 0")
+                    ->setParameter('threadShift', $threadId - 1, ParameterType::INTEGER)
+                    ->setParameter('maxThreads', $maxThreads, ParameterType::INTEGER);
             }
         }
 

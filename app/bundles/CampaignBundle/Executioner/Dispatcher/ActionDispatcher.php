@@ -18,7 +18,7 @@ use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ActionDispatcher
+final readonly class ActionDispatcher
 {
     public function __construct(
         private EventDispatcherInterface $dispatcher,
@@ -47,11 +47,11 @@ class ActionDispatcher
 
             $this->validateProcessedLogs($logs, $success, $failed);
 
-            if ($success) {
+            if ($success->count()) {
                 $this->dispatchExecutedEvent($config, $event, $success);
             }
 
-            if ($failed) {
+            if ($failed->count()) {
                 $this->dispatchFailedEvent($config, $failed);
             }
 

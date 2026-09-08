@@ -6,7 +6,7 @@ namespace Mautic\InstallBundle\Install;
 
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Doctrine\Loader\FixturesLoaderInterface;
@@ -16,17 +16,20 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Loader\ParameterLoader;
 use Mautic\CoreBundle\Release\ThisRelease;
+use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 use Mautic\InstallBundle\Exception\AlreadyInstalledException;
 use Mautic\InstallBundle\Exception\DatabaseVersionTooOldException;
 use Mautic\InstallBundle\Helper\SchemaHelper;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -42,15 +45,16 @@ class InstallService
     public const FINAL_STEP = 3;
 
     public function __construct(
-        private Configurator $configurator,
-        private CacheHelper $cacheHelper,
+        private readonly Configurator $configurator,
+        private readonly CacheHelper $cacheHelper,
         protected PathsHelper $pathsHelper,
-        private EntityManager $entityManager,
-        private TranslatorInterface $translator,
-        private KernelInterface $kernel,
-        private ValidatorInterface $validator,
-        private UserPasswordHasher $hasher,
-        private FixturesLoaderInterface $fixturesLoader,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly TranslatorInterface $translator,
+        private readonly KernelInterface $kernel,
+        private readonly ValidatorInterface $validator,
+        private readonly UserPasswordHasherInterface $hasher,
+        private readonly FixturesLoaderInterface $fixturesLoader,
+        private readonly UserRepository $userRepository,
     ) {
     }
 
@@ -74,7 +78,7 @@ class InstallService
         $params = $this->configurator->getParameters();
 
         // Check to ensure the installer is in the right place
-        if ((empty($params)
+        if (([] === $params
                 || !isset($params['db_driver'])
                 || empty($params['db_driver'])) && $index > 1) {
             return $this->configurator->getStep(self::DOCTRINE_STEP)[0];
@@ -128,27 +132,40 @@ class InstallService
         // if db_driver and site_url are present then it is assumed all the steps of the installation have been
         // performed; manually deleting these values or deleting the config file will be required to re-enter
         // installation.
-        if (empty($params['db_driver']) || empty($params['site_url'])) {
-            return false;
-        }
-
-        return true;
+        return !empty($params['db_driver']) && !empty($params['site_url']);
     }
 
     /**
      * Translation messages array.
+     *
+     * @param array<int|string, string> $messages
+     *
+     * @return array<int|string, string>
      */
     private function translateMessages(array $messages): array
     {
-        if (empty($messages)) {
+        if ([] === $messages) {
             return $messages;
         }
 
         foreach ($messages as $key => $value) {
-            $messages[$key] = $this->translator->trans($value);
+            $messages[$key] = $this->translator->trans($value, $this->getTranslationParameters($value));
         }
 
         return $messages;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function getTranslationParameters(string $messageKey): array
+    {
+        return match ($messageKey) {
+            'mautic.install.memory.limit' => [
+                '%min_memory_limit%' => CheckStep::RECOMMENDED_MEMORY_LIMIT,
+            ],
+            default => [],
+        };
     }
 
     /**
@@ -248,7 +265,7 @@ class InstallService
     {
         $messages = $this->validateDatabaseParams($dbParams);
 
-        if (!empty($messages)) {
+        if ([] !== $messages) {
             return $messages;
         }
 
@@ -261,7 +278,7 @@ class InstallService
 
             if ($schemaHelper->createDatabase()) {
                 $messages = $this->saveConfiguration($dbParams, $step, true);
-                if (empty($messages)) {
+                if ([] === $messages) {
                     return $messages;
                 }
             }
@@ -351,7 +368,7 @@ class InstallService
     {
         $fixtures = $this->fixturesLoader->getFixtures(['group_install']);
 
-        if (!$fixtures) {
+        if ([] === $fixtures) {
             throw new \InvalidArgumentException('Could not find any fixtures to load with the "group_install" group.');
         }
 
@@ -372,12 +389,9 @@ class InstallService
      */
     public function createAdminUserStep(array $data): array
     {
-        $entityManager = $this->entityManager;
-
         // ensure the username and email are unique
         try {
-            /** @var User $existingUser */
-            $existingUser = $entityManager->getRepository(User::class)->find(1);
+            $existingUser = $this->userRepository->find(1);
         } catch (\Exception) {
             $existingUser = null;
         }
@@ -407,7 +421,7 @@ class InstallService
             }
         }
 
-        if (!empty($messages)) {
+        if ([] !== $messages) {
             return $messages;
         }
 
@@ -416,7 +430,7 @@ class InstallService
         $emailConstraint          = new Assert\Email();
         $emailConstraint->message = $this->translator->trans('mautic.core.email.required', [], 'validators');
 
-        $passwordConstraint             = new Assert\Length(['min' => 6]);
+        $passwordConstraint             = new Assert\Length(min: 6);
         $passwordConstraint->minMessage = $this->translator->trans('mautic.install.password.minlength', [], 'validators');
 
         $validations[] = $this->validator->validate($data['email'], $emailConstraint);
@@ -429,21 +443,19 @@ class InstallService
             }
         }
 
-        if (!empty($messages)) {
+        if ([] !== $messages) {
             return $messages;
         }
-
-        $hasher = $this->hasher;
 
         $user->setFirstName(InputHelper::clean($data['firstname']));
         $user->setLastName(InputHelper::clean($data['lastname']));
         $user->setUsername(InputHelper::clean($data['username']));
         $user->setEmail(InputHelper::email($data['email']));
-        $user->setPassword($hasher->hashPassword($user, $data['password']));
+        $user->setPassword($this->hasher->hashPassword($user, $data['password']));
 
         $adminRole = null;
         try {
-            $adminRole = $entityManager->getReference(Role::class, 1);
+            $adminRole = $this->entityManager->getReference(Role::class, 1);
         } catch (\Exception $exception) {
             $messages['error'] = $this->translator->trans(
                 'mautic.installer.error.getting.role',
@@ -456,8 +468,8 @@ class InstallService
             $user->setRole($adminRole);
 
             try {
-                $entityManager->persist($user);
-                $entityManager->flush();
+                $this->entityManager->persist($user);
+                $this->entityManager->flush();
             } catch (\Exception $exception) {
                 $messages['error'] = $this->translator->trans(
                     'mautic.installer.error.creating.user',
@@ -489,13 +501,22 @@ class InstallService
      */
     public function finalMigrationStep(): void
     {
-        // Add database migrations up to this point since this is a fresh install (must be done at this point
-        // after the cache has been rebuilt
-        $input  = new ArgvInput(['console', 'doctrine:migrations:version', '--add', '--all', '--no-interaction']);
-        $output = new BufferedOutput();
-
         $application = new Application($this->kernel);
         $application->setAutoExit(false);
-        $application->run($input, $output);
+
+        $commands = [
+            // Create the metadata storage before marking migrations as applied.
+            ['console', 'doctrine:migrations:sync-metadata-storage', '--no-interaction'],
+            ['console', 'doctrine:migrations:version', '--add', '--all', '--no-interaction'],
+        ];
+
+        foreach ($commands as $arguments) {
+            $output   = new BufferedOutput();
+            $exitCode = $application->run(new ArgvInput($arguments), $output);
+
+            if (Command::SUCCESS !== $exitCode) {
+                throw new \RuntimeException(sprintf('Command "%s" failed with exit code %d: %s', $arguments[1], $exitCode, trim($output->fetch())));
+            }
+        }
     }
 }

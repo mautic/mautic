@@ -49,7 +49,7 @@
             </div>
         {% elseif widget.template %}
             <!-- start: {{ widget.template }} -->
-            {{ include(widget.template, widget.templateData) }}
+            {{ include(widget.template, widget.templateData|merge({'fitChartToContainer': true})) }}
             <!-- end: {{ widget.template }} -->
         {% endif %}
     </div>

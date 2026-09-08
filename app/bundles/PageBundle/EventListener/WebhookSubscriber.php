@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PageBundle\EventListener;
 
 use Mautic\PageBundle\Event\PageHitEvent;
@@ -9,7 +11,7 @@ use Mautic\WebhookBundle\Model\WebhookModel;
 use Mautic\WebhookBundle\WebhookEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class WebhookSubscriber implements EventSubscriberInterface
+final readonly class WebhookSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private WebhookModel $webhookModel,

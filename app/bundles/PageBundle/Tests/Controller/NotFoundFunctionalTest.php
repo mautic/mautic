@@ -6,7 +6,6 @@ namespace Mautic\PageBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\Page;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -31,9 +30,9 @@ final class NotFoundFunctionalTest extends MauticMysqlTestCase
 
         // Test the custom 404 page:
         $crawler = $this->client->request(Request::METHOD_GET, '/page-that-does-not-exist');
-        Assert::assertSame(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
-        Assert::assertStringContainsString('Custom 404 Not Found Page', $crawler->text());
-        Assert::assertFalse($this->client->getResponse()->isRedirection(), 'The response should not be a redirect.');
-        Assert::assertSame('/page-that-does-not-exist', $this->client->getRequest()->getRequestUri(), 'The request URI should be the same as the original URI.');
+        self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
+        $this->assertStringContainsString('Custom 404 Not Found Page', $crawler->text());
+        $this->assertFalse($this->client->getResponse()->isRedirection(), 'The response should not be a redirect.');
+        $this->assertSame('/page-that-does-not-exist', $this->client->getRequest()->getRequestUri(), 'The request URI should be the same as the original URI.');
     }
 }

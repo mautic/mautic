@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Functional;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-class SearchWithCustomFieldDataFunctionalTest extends AbstractSearchTestCase
+final class SearchWithCustomFieldDataFunctionalTest extends AbstractSearchTestCase
 {
     protected $useCleanupRollback = false;
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataTestCreatingCustomFieldIndexableAndSearchable')]
+    #[DataProvider('dataTestCreatingCustomFieldIndexableAndSearchable')]
     public function testCreatingCustomFieldIndexableAndSearchable(int $isIndex, string $expectedValue): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/fields/new');
@@ -121,7 +123,7 @@ class SearchWithCustomFieldDataFunctionalTest extends AbstractSearchTestCase
         $this->assertStringContainsString('ABC', $crawler->html());
         $this->assertStringNotContainsString('XYZ', $crawler->html());
 
-        $translator = static::getContainer()->get('translator');
+        $translator = self::getContainer()->get(TranslatorInterface::class);
 
         $this->assertStringContainsString(
             $translator->trans('mautic.core.pagination.items', ['%count%' => 1]),

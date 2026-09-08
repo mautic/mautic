@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Form\Type;
 
 use Mautic\LeadBundle\Helper\FormFieldHelper;
@@ -10,7 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class CountryType extends AbstractType
+final class CountryType extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {
@@ -24,7 +26,7 @@ class CountryType extends AbstractType
         ]);
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return ChoiceType::class;
     }

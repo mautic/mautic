@@ -11,10 +11,10 @@ class IpLookupFactory
 {
     public function __construct(
         protected array $lookupServices,
-        protected ?LoggerInterface $logger = null,
-        protected ?Client $client = null,
+        protected LoggerInterface $logger,
+        protected Client $client,
+        protected CoreParametersHelper $coreParametersHelper,
         protected ?string $cacheDir = null,
-        protected ?CoreParametersHelper $coreParametersHelper = null,
     ) {
     }
 

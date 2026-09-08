@@ -1,8 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\CampaignBundle\Entity\CampaignRepository;
+use Mautic\CampaignBundle\Entity\EventRepository;
+use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
+use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Membership\MembershipBuilder;
 use Mautic\CampaignBundle\Model\CampaignModel;
@@ -11,6 +17,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\ListModel;
@@ -21,13 +28,18 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class CampaignTestAbstract extends TestCase
+abstract class CampaignTestAbstract extends TestCase
 {
     protected static int $mockId       = 232;
+
     protected static string $mockName  = 'Mock name';
+
     protected static string $mockAlias = 'Mock alias';
-    /** @var EntityManager&MockObject */
-    protected EntityManager $entityManager;
+
+    /**
+     * @var EntityManager&MockObject
+     */
+    protected ?MockObject $entityManager = null;
 
     protected function initCampaignModel(): CampaignModel
     {
@@ -36,15 +48,13 @@ class CampaignTestAbstract extends TestCase
 
         $security = $this->createMock(CorePermissions::class);
 
-        $security->expects($this->any())
+        $security
             ->method('isGranted')
             ->willReturn(true);
 
-        $userHelper = $this->createMock(UserHelper::class);
-
         $formRepository = $this->createMock(FormRepository::class);
 
-        $formRepository->expects($this->any())
+        $formRepository
             ->method('getFormList')
             ->willReturn([['id' => self::$mockId, 'name' => self::$mockName]]);
 
@@ -53,7 +63,7 @@ class CampaignTestAbstract extends TestCase
             ->setConstructorArgs([6 => $entityManager])
             ->getMock();
 
-        $leadListModel->expects($this->any())
+        $leadListModel
             ->method('getUserLists')
             ->willReturn([['id' => self::$mockId, 'name' => self::$mockName, 'alias' => self::$mockAlias]]);
 
@@ -62,25 +72,27 @@ class CampaignTestAbstract extends TestCase
             ->setConstructorArgs([12 => $entityManager])
             ->getMock();
 
-        $formModel->expects($this->any())
-            ->method('getRepository')
-            ->willReturn($formRepository);
-
         return new CampaignModel(
             $leadListModel,
             $formModel,
-            $this->createMock(EventCollector::class),
-            $this->createMock(MembershipBuilder::class),
-            $this->createMock(ContactTracker::class),
-            $this->createMock(GeneratedColumnsProviderInterface::class),
+            $this->createStub(EventCollector::class),
+            $this->createStub(MembershipBuilder::class),
+            $this->createStub(ContactTracker::class),
+            $this->createStub(GeneratedColumnsProviderInterface::class),
             $entityManager,
             $security,
-            $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(UrlGeneratorInterface::class),
-            $this->createMock(Translator::class),
-            $userHelper,
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(CoreParametersHelper::class),
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(UrlGeneratorInterface::class),
+            $this->createStub(Translator::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(CoreParametersHelper::class),
+            $this->createStub(CampaignRepository::class), // $campaignRepository
+            $this->createStub(EventRepository::class), // $eventRepository
+            $this->createStub(LeadRepository::class), // $leadRepository
+            $this->createStub(LeadEventLogRepository::class), // $leadEventLogRepository
+            $this->createStub(StatRepository::class), // $statRepository
+            $formRepository, // $formRepository
         );
     }
 }

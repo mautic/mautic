@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -18,16 +20,14 @@ use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
 use Mautic\EmailBundle\MonitoredEmail\Search\Result;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Monolog\Logger;
+use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ReplyTest extends \PHPUnit\Framework\TestCase
+final class ReplyTest extends \PHPUnit\Framework\TestCase
 {
-    private EmailAddressHelper $emailAddressHelper;
-
     /**
      * @var MockObject&StatRepository
      */
@@ -44,19 +44,9 @@ class ReplyTest extends \PHPUnit\Framework\TestCase
     private MockObject $contactFinder;
 
     /**
-     * @var MockObject&LeadModel
-     */
-    private MockObject $leadModel;
-
-    /**
      * @var MockObject&EventDispatcherInterface
      */
     private MockObject $dispatcher;
-
-    /**
-     * @var MockObject&Logger
-     */
-    private MockObject $logger;
 
     /**
      * @var MockObject&ContactTracker
@@ -77,39 +67,36 @@ class ReplyTest extends \PHPUnit\Framework\TestCase
         $this->statRepo           = $this->createMock(StatRepository::class);
         $this->emailStatModel     = $this->createMock(EmailStatModel::class);
         $this->contactFinder      = $this->createMock(ContactFinder::class);
-        $this->leadModel          = $this->createMock(LeadModel::class);
         $this->dispatcher         = $this->createMock(EventDispatcherInterface::class);
-        $this->logger             = $this->createMock(Logger::class);
         $this->contactTracker     = $this->createMock(ContactTracker::class);
-        $this->emailAddressHelper = new EmailAddressHelper();
+        $emailAddressHelper       = new EmailAddressHelper();
         $this->leadRepository     = $this->createMock(LeadRepository::class);
-        $this->leadModel->method('getRepository')->willReturn($this->leadRepository);
         $this->processor          = new Reply(
             $this->emailStatModel,
             $this->contactFinder,
-            $this->leadModel,
             $this->dispatcher,
-            $this->logger,
+            $this->createStub(Logger::class),
             $this->contactTracker,
-            $this->emailAddressHelper
+            $emailAddressHelper,
+            $this->leadRepository
         );
 
         $this->emailStatModel->method('getRepository')->willReturn($this->statRepo);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that the message is processed appropriately')]
+    #[TestDox('Test that the message is processed appropriately')]
     public function testContactIsFoundFromMessageAndDncRecordAdded(): void
     {
         // This tells us that a reply was found and processed
         $this->emailStatModel->expects($this->once())
             ->method('saveEntity');
 
-        $this->leadRepository->expects(self::atLeastOnce())
+        $this->leadRepository->expects($this->atLeastOnce())
             ->method('detachEntity');
 
         $this->contactFinder->method('findByHash')
             ->willReturnCallback(
-                function ($hash) {
+                function ($hash): Result {
                     $stat = new Stat();
                     $stat->setTrackingHash($hash);
 
@@ -159,7 +146,7 @@ BODY;
     {
         $trackingHash = '@Stat#';
         $stat         = $this->createMock(Stat::class);
-        $contact      = $this->createMock(Lead::class);
+        $contact      = $this->createStub(Lead::class);
 
         $this->statRepo->expects($this->once())
             ->method('findOneBy')
@@ -178,18 +165,16 @@ BODY;
             ->method('setDateRead')
             ->with($this->isInstanceOf(\DateTime::class));
 
-        $stat->expects($this->any())
+        $stat
             ->method('getReplies')
             ->willReturn(new ArrayCollection());
 
         $stat->expects($this->once())
             ->method('addReply')
-            ->with($this->callback(function (EmailReply $emailReply) use ($stat) {
+            ->willReturnCallback(function (EmailReply $emailReply) use ($stat): void {
                 $this->assertSame($stat, $emailReply->getStat());
                 $this->assertSame('api-msg1d', $emailReply->getMessageId());
-
-                return true;
-            }));
+            });
 
         $this->emailStatModel->expects($this->once())
             ->method('saveEntity')

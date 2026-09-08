@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Form\Validator\Constraints;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Helper\FieldAliasHelper;
 use Mautic\LeadBundle\Model\ListModel;
@@ -15,7 +15,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * Throws an exception if the field alias is equal some segment filter keyword.
  * It would cause odd behavior with segment filters otherwise.
  */
-class FieldAliasKeywordValidator extends ConstraintValidator
+final class FieldAliasKeywordValidator extends ConstraintValidator
 {
     public const RESTRICTED_ALIASES = [
         'contact_id',
@@ -33,11 +33,11 @@ class FieldAliasKeywordValidator extends ConstraintValidator
     ];
 
     public function __construct(
-        private ListModel $listModel,
-        private FieldAliasHelper $aliasHelper,
-        private EntityManager $em,
-        private TranslatorInterface $translator,
-        private ContactSegmentFilterDictionary $contactSegmentFilterDictionary,
+        private readonly ListModel $listModel,
+        private readonly FieldAliasHelper $aliasHelper,
+        private readonly EntityManagerInterface $em,
+        private readonly TranslatorInterface $translator,
+        private readonly ContactSegmentFilterDictionary $contactSegmentFilterDictionary,
     ) {
     }
 
@@ -50,7 +50,7 @@ class FieldAliasKeywordValidator extends ConstraintValidator
         $this->aliasHelper->makeAliasUnique($field);
 
         // If empty it's a new object else it's an edit
-        if (empty($oldValue) || (!empty($oldValue) && is_array($oldValue) && $oldValue['alias'] != $field->getAlias())) {
+        if (!$oldValue || (is_array($oldValue) && $oldValue['alias'] != $field->getAlias())) {
             if (in_array($field->getAlias(), self::RESTRICTED_ALIASES)) {
                 $this->context->addViolation(
                     $this->translator->trans(

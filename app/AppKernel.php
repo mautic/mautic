@@ -122,6 +122,7 @@ class AppKernel extends Kernel
             new FM\ElfinderBundle\FMElfinderBundle(),
             new Exercise\HTMLPurifierBundle\ExerciseHTMLPurifierBundle(),
             new ApiPlatform\Symfony\Bundle\ApiPlatformBundle(),
+            new Symfonycasts\SassBundle\SymfonycastsSassBundle(),
 
             // Mautic Bundles
             new Mautic\ApiBundle\MauticApiBundle(),
@@ -332,9 +333,6 @@ class AppKernel extends Kernel
         return $this->getProjectDir().'/var/logs';
     }
 
-    /**
-     * Get local config file.
-     */
     public function getLocalConfigFile(): string
     {
         return ParameterLoader::getLocalConfigFile($this->getApplicationDir().'/app');

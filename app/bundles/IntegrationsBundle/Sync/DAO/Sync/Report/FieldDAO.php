@@ -6,7 +6,7 @@ namespace Mautic\IntegrationsBundle\Sync\DAO\Sync\Report;
 
 use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 
-class FieldDAO
+final class FieldDAO
 {
     public const FIELD_CHANGED   = 'changed';
 
@@ -17,9 +17,9 @@ class FieldDAO
     private ?\DateTimeInterface $changeDateTime = null;
 
     public function __construct(
-        private string $name,
-        private NormalizedValueDAO $value,
-        private string $state = self::FIELD_CHANGED,
+        private readonly string $name,
+        private readonly NormalizedValueDAO $value,
+        private readonly string $state = self::FIELD_CHANGED,
     ) {
     }
 

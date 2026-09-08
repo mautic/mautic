@@ -4,20 +4,29 @@ namespace Mautic\FormBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\FormBundle\Entity\Action;
+use Mautic\FormBundle\Entity\ActionRepository;
 use Mautic\FormBundle\Form\Type\ActionType;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends CommonFormModel<Action>
  */
 class ActionModel extends CommonFormModel
 {
-    /**
-     * @return \Mautic\FormBundle\Entity\ActionRepository
-     */
-    public function getRepository()
+    private ActionRepository $actionRepository;
+
+    #[Required]
+    public function autowireActionModel(
+        ActionRepository $actionRepository,
+    ): void {
+        $this->actionRepository = $actionRepository;
+    }
+
+    public function getRepository(): ActionRepository
     {
-        return $this->em->getRepository(Action::class);
+        return $this->actionRepository;
     }
 
     public function getPermissionBase(): string
@@ -38,7 +47,7 @@ class ActionModel extends CommonFormModel
      * @param object $entity
      * @param array  $options
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Action) {
             throw new \InvalidArgumentException('Entity must be of class Action');

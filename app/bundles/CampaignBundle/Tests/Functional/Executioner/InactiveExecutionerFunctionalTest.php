@@ -10,6 +10,8 @@ use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
+use Mautic\CampaignBundle\Executioner\Result\Counter;
+use Mautic\CampaignBundle\Executioner\TestInactiveExecutioner;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -26,8 +28,8 @@ final class InactiveExecutionerFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->inactiveExecutioner = self::getContainer()->get('mautic.campaign.executioner.inactive');
-        \assert($this->inactiveExecutioner instanceof InactiveExecutioner);
+        $this->inactiveExecutioner = self::getContainer()->get(TestInactiveExecutioner::class);
+        $this->assertInstanceOf(InactiveExecutioner::class, $this->inactiveExecutioner);
     }
 
     public function testDecisionRedirectionToAlreadyExecutedAction(): void
@@ -211,8 +213,9 @@ final class InactiveExecutionerFunctionalTest extends MauticMysqlTestCase
 
         // Assertions - verify basic redirection to condition works
         $this->assertGreaterThan(0, count($redirectConditionLogs), 'Expected redirect condition to be executed');
-        $this->assertEquals(0, count($originalNegativeActionLogs),
+        $this->assertCount(0, $originalNegativeActionLogs,
             'Original decision negative action should NOT be executed');
+        $this->assertInstanceOf(Counter::class, $counter);
 
         // Verify execution counters
         $this->assertGreaterThan(0, $counter->getTotalEvaluated(), 'Expected contacts to be evaluated');
@@ -395,7 +398,7 @@ final class InactiveExecutionerFunctionalTest extends MauticMysqlTestCase
             'campaign' => $campaign,
             'lead'     => $contact,
         ]);
-        \assert($campaignLeadAfter instanceof CampaignLead);
+        $this->assertInstanceOf(CampaignLead::class, $campaignLeadAfter);
         $this->assertSame(2, $campaignLeadAfter->getRotation(), 'campaign_leads.rotation increments once per redirect');
     }
 

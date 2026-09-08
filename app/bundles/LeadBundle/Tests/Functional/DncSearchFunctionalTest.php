@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Functional;
 
+use Doctrine\DBAL\Types\Types;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpFoundation\Request;
@@ -125,7 +126,7 @@ final class DncSearchFunctionalTest extends MauticMysqlTestCase
         $this->em->getConnection()->executeStatement(
             'INSERT INTO '.MAUTIC_TABLE_PREFIX.'lead_donotcontact (lead_id, channel, reason, comments, date_added) VALUES (?, ?, ?, ?, ?)',
             [$contactId, $channel, 1, 'Test DNC', new \DateTime()],
-            [\Doctrine\DBAL\Types\Types::INTEGER, \Doctrine\DBAL\Types\Types::STRING, \Doctrine\DBAL\Types\Types::INTEGER, \Doctrine\DBAL\Types\Types::STRING, \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE]
+            [Types::INTEGER, Types::STRING, Types::INTEGER, Types::STRING, Types::DATETIME_MUTABLE]
         );
     }
 }

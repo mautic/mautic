@@ -6,27 +6,21 @@ namespace Mautic\IntegrationsBundle\Sync\DAO\Sync\Request;
 
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 
-class RequestDAO
+final class RequestDAO
 {
-    private int $syncIteration;
-
     /**
      * @var ObjectDAO[]
      */
     private array $objects = [];
 
     public function __construct(
-        private string $syncToIntegration,
-        int $syncIteration,
-        private InputOptionsDAO $inputOptionsDAO,
+        private readonly string $syncToIntegration,
+        private readonly int $syncIteration,
+        private readonly InputOptionsDAO $inputOptionsDAO,
     ) {
-        $this->syncIteration     = (int) $syncIteration;
     }
 
-    /**
-     * @return self
-     */
-    public function addObject(ObjectDAO $objectDAO)
+    public function addObject(ObjectDAO $objectDAO): static
     {
         $this->objects[] = $objectDAO;
 
@@ -72,6 +66,6 @@ class RequestDAO
      */
     public function shouldSync(): bool
     {
-        return !empty($this->objects);
+        return [] !== $this->objects;
     }
 }

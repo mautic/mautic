@@ -17,7 +17,7 @@
         </div>
 
         <p class="project-popover__description type-body-compact-01 mb-md">
-            {{ project.description|striptags|slice(0, 150) ~ (project.description|length > 150 ? '...' : '') }}
+            {{ project.description|striptags|u.truncate(150, '...') }}
         </p>
 
         <div class="project-popover__actions">

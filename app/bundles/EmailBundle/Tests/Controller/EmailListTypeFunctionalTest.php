@@ -12,7 +12,9 @@ use Symfony\Component\HttpFoundation\Request;
 final class EmailListTypeFunctionalTest extends MauticMysqlTestCase
 {
     private const PARENT_EMAIL      = 'Parent Email';
+
     private const VARIANT_EMAIL     = 'Variant Email';
+
     private const TRANSLATION_EMAIL = 'Translation Email';
 
     /**
@@ -122,10 +124,26 @@ final class EmailListTypeFunctionalTest extends MauticMysqlTestCase
 
         $items = $response[0]['items'] ?? [];
 
-        $actualNames = array_values($items);
-        sort($actualNames);
+        // Extract names without IDs from response
+        $actualNamesOnly = [];
+        foreach ($items as $name) {
+            $namePart          = preg_replace('/\s+\(\d+\)$/', '', $name);
+            $actualNamesOnly[] = $namePart;
+        }
+
+        sort($actualNamesOnly);
         sort($expectedNames);
 
-        $this->assertSame($expectedNames, $actualNames);
+        // Verify correct emails are returned
+        $this->assertSame($expectedNames, $actualNamesOnly);
+
+        // Verify format is "Name (ID)"
+        foreach ($items as $formattedName) {
+            $this->assertMatchesRegularExpression(
+                '/^.+\s+\(\d+\)$/',
+                $formattedName,
+                'Email name should be formatted as "Name (ID)"'
+            );
+        }
     }
 }

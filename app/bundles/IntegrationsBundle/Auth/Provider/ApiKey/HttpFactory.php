@@ -22,7 +22,7 @@ use Mautic\IntegrationsBundle\Exception\PluginNotConfiguredException;
 /**
  * Factory for building HTTP clients using basic auth.
  */
-class HttpFactory implements AuthProviderInterface
+final class HttpFactory implements AuthProviderInterface
 {
     public const NAME = 'api_key';
 
@@ -100,7 +100,7 @@ class HttpFactory implements AuthProviderInterface
 
         $handler->unshift(
             Middleware::mapRequest(
-                fn (Request $request) => $request->withUri(
+                fn (Request $request): \Psr\Http\Message\RequestInterface => $request->withUri(
                     Uri::withQueryValue($request->getUri(), $this->credentials->getKeyName(), $this->credentials->getApiKey())
                 )
             )

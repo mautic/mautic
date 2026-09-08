@@ -7,7 +7,7 @@ use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Segment\Query\LeadBatchLimiterTrait;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
-class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
+final class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 {
     use LeadBatchLimiterTrait;
 
@@ -41,7 +41,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
         $subQueryBuilder = $queryBuilder->createQueryBuilder();
 
-        if (!is_null($filter->getWhere())) {
+        if (null !== $filter->getWhere()) {
             $subQueryBuilder->andWhere(str_replace(str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()).'.', $tableAlias.'.', $filter->getWhere()));
         }
 
@@ -166,7 +166,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
                 $this->addLeadAndMinMaxLimiters($subQueryBuilder, $batchLimiters, str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()), $foreignContactColumn);
 
-                $expression = $subQueryBuilder->expr()->$filterOperator(
+                $expression = $subQueryBuilder->expr()->{$filterOperator}(
                     $tableAlias.'.'.$filter->getField(),
                     $filterParametersHolder
                 );

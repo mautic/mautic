@@ -2,14 +2,12 @@
 
 namespace Mautic\CoreBundle\Helper\Chart;
 
-class PieChart extends AbstractChart implements ChartInterface
+final class PieChart extends AbstractChart implements ChartInterface
 {
     /**
      * Holds the suma of the all dataset values.
-     *
-     * @var float
      */
-    protected $totalCount = 0;
+    private int $totalCount = 0;
 
     /**
      * @return array{labels: mixed[], datasets: mixed[]}
@@ -39,10 +37,8 @@ class PieChart extends AbstractChart implements ChartInterface
      *
      * @param string $label
      * @param int    $value
-     *
-     * @return $this
      */
-    public function setDataset($label, $value)
+    public function setDataset($label, $value): static
     {
         $this->totalCount += $value;
         $this->datasets[] = $value;

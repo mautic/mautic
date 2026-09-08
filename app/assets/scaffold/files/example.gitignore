@@ -10,8 +10,6 @@
 /.ddev/docker-compose.host-docker-internal.yaml
 !/.ddev/.env.*.dist
 /.ddev/docker-compose.phpmyadmin_norouter.yaml
-!.gitpod.Dockerfile
-!.gitpod.yml
 !.ddev/commands/web/dd
 .php_cs.cache
 /.env.local
@@ -26,11 +24,7 @@
 
 /var/bootstrap*
 
-/app/bundles/CoreBundle/Assets/css/app/less/**/*.css
 /app/bundles/CoreBundle/Assets/pictograms/
-/app/bundles/CoreBundle/Assets/css/libraries/**/*.css
-!/app/bundles/CoreBundle/Assets/css/libraries/builder.css
-!/app/bundles/CoreBundle/Assets/css/*.css
 
 /app/cache/*
 !/app/cache/.gitkeep
@@ -38,6 +32,8 @@
 !/var/cache/.gitkeep
 
 /var/phpstan-cache/*
+phpstan.dist.neon
+phpstan.neon.dist
 
 /app/logs/*
 !/app/logs/.gitkeep
@@ -68,6 +64,9 @@
 !/bin/console
 
 /assets/ckeditor/build/*
+/assets/build/*
+/var/dart-sass/*
+/var/sass/*
 
 /bundles
 /node_modules
@@ -97,6 +96,7 @@
 !/media/images/.htaccess
 /media/css/app.css
 /media/css/libraries.css
+/media/css/offline.css
 /media/css/mediaelementplayer.min.css
 /media/css/modal.min.css
 /media/js/app.js

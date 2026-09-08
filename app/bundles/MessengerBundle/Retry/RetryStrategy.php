@@ -9,12 +9,12 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Retry\MultiplierRetryStrategy;
 use Symfony\Component\Messenger\Retry\RetryStrategyInterface;
 
-class RetryStrategy implements RetryStrategyInterface
+final class RetryStrategy implements RetryStrategyInterface
 {
     private RetryStrategyInterface $retryStrategy;
 
     public function __construct(
-        private CoreParametersHelper $parametersHelper,
+        private readonly CoreParametersHelper $parametersHelper,
     ) {
     }
 

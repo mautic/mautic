@@ -8,7 +8,7 @@ use Mautic\IntegrationsBundle\Sync\DAO\Sync\RelationsDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\RelationDAO;
 use PHPUnit\Framework\TestCase;
 
-class RelationsDAOTest extends TestCase
+final class RelationsDAOTest extends TestCase
 {
     public function testAddRelations(): void
     {
@@ -30,9 +30,9 @@ class RelationsDAOTest extends TestCase
         $relationsDAO->addRelations($relations);
 
         $this->assertEquals($relationsDAO->current(), $relationObject);
-        $this->assertEquals($relationsDAO->current()->getObjectName(), $objectName);
-        $this->assertEquals($relationsDAO->current()->getRelObjectName(), $relObjectName);
-        $this->assertEquals($relationsDAO->current()->getObjectIntegrationId(), $integrationObjectId);
-        $this->assertEquals($relationsDAO->current()->getRelObjectIntegrationId(), $integrationRelObjectId);
+        $this->assertSame($relationsDAO->current()->getObjectName(), $objectName);
+        $this->assertSame($relationsDAO->current()->getRelObjectName(), $relObjectName);
+        $this->assertSame($relationsDAO->current()->getObjectIntegrationId(), $integrationObjectId);
+        $this->assertSame($relationsDAO->current()->getRelObjectIntegrationId(), $integrationRelObjectId);
     }
 }

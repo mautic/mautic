@@ -8,13 +8,15 @@ use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
 use Mautic\MarketplaceBundle\Exception\ApiException;
+use Mautic\MarketplaceBundle\Service\Config;
 use Psr\Log\LoggerInterface;
 
 class Connection
 {
     public function __construct(
-        private ClientInterface $httpClient,
-        private LoggerInterface $logger,
+        private readonly ClientInterface $httpClient,
+        private readonly LoggerInterface $logger,
+        private readonly Config $config,
     ) {
     }
 
@@ -23,27 +25,45 @@ class Connection
      */
     public function getPlugins(int $page, int $limit, string $query = ''): array
     {
-        return $this->makeRequest("https://packagist.org/search.json?page={$page}&per_page={$limit}&type=mautic-plugin&q={$query}");
+        $queryParams = [
+            'page'  => $page,
+            'limit' => $limit,
+        ];
+        if ('' !== $query) {
+            $queryParams['query'] = $query;
+        }
+        $url = $this->config->getRegistryUrl().'/api/registry/v1/packages?'.http_build_query($queryParams);
+
+        return $this->makeRequest($url);
     }
 
     /**
+     * @return mixed[]
+     *
      * @throws ApiException
      */
     public function getPackage(string $pluginName): array
     {
-        return $this->makeRequest("https://packagist.org/packages/{$pluginName}.json");
+        $url = $this->config->getRegistryUrl().'/api/registry/v1/packages/'.implode('/', array_map(rawurlencode(...), explode('/', $pluginName, 2)));
+
+        return $this->makeRequest($url);
     }
 
+    /**
+     * @return mixed[]
+     *
+     * @throws ApiException
+     */
     public function makeRequest(string $url): array
     {
-        $this->logger->debug('About to query the Packagist API: '.$url);
+        $this->logger->debug('About to query the marketplace API: '.$url);
 
-        $request  = new Request('GET', $url, $this->getHeaders());
+        $request = new Request('GET', $url, $this->getHeaders());
 
         try {
             $response = $this->httpClient->send($request);
         } catch (GuzzleException $e) {
-            throw new ApiException($e->getMessage(), $e->getCode());
+            throw new ApiException($e->getMessage(), $e->getCode(), $e);
         }
 
         $body = (string) $response->getBody();
@@ -59,6 +79,9 @@ class Connection
         return $payload;
     }
 
+    /**
+     * @return array<string, string>
+     */
     private function getHeaders(): array
     {
         return [

@@ -13,8 +13,8 @@ use Psr\Log\LoggerInterface;
 class ScheduledContactFinder
 {
     public function __construct(
-        private LeadRepository $leadRepository,
-        private LoggerInterface $logger,
+        private readonly LeadRepository $leadRepository,
+        private readonly LoggerInterface $logger,
     ) {
     }
 

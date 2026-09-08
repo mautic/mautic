@@ -1,18 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PointBundle\Helper;
 
 use Mautic\LeadBundle\Entity\Lead;
 
-class EventHelper
+final class EventHelper
 {
     /**
-     * @param Lead  $lead
-     * @param array $action
+     * @param Lead $lead
      *
      * @return int
      */
-    public static function engagePointAction($lead, $action)
+    public static function engagePointAction($lead, array $action)
     {
         static $initiated = [];
 

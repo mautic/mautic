@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\EventListener;
 
 use Mautic\CampaignBundle\Entity\Event;
@@ -10,7 +12,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class NotifyOfFailureSubscriberTest extends TestCase
+final class NotifyOfFailureSubscriberTest extends TestCase
 {
     private MockObject&NotificationHelper $notificationHelper;
 
@@ -25,7 +27,7 @@ class NotifyOfFailureSubscriberTest extends TestCase
     public function testNotifyOfFailure(): void
     {
         $lead  = new Lead();
-        $event = $this->createMock(Event::class);
+        $event = $this->createStub(Event::class);
 
         $notifyEvent = new NotifyOfFailureEvent($lead, $event);
 
@@ -33,8 +35,8 @@ class NotifyOfFailureSubscriberTest extends TestCase
         $this->notificationHelper->expects($this->once())
             ->method('notifyOfFailure')
             ->with(
-                $this->equalTo($lead),
-                $this->equalTo($event)
+                $lead,
+                $event
             );
 
         $this->subscriber->notifyOfFailure($notifyEvent);

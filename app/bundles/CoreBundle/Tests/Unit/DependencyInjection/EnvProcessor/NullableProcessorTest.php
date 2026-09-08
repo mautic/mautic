@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\DependencyInjection\EnvProcessor;
 
 use Mautic\CoreBundle\DependencyInjection\EnvProcessor\NullableProcessor;
 use PHPUnit\Framework\TestCase;
 
-class NullableProcessorTest extends TestCase
+final class NullableProcessorTest extends TestCase
 {
     public function testNullReturnedIfEmptyString(): void
     {
-        $getEnv = fn (string $name) => '';
+        $getEnv = fn (string $name): string => '';
 
         $processor = new NullableProcessor();
 
@@ -20,12 +22,12 @@ class NullableProcessorTest extends TestCase
 
     public function testValueReturnedIfNotEmptyString(): void
     {
-        $getEnv = fn (string $name) => 'foobar';
+        $getEnv = fn (string $name): string => 'foobar';
 
         $processor = new NullableProcessor();
 
         $value = $processor->getEnv('', 'test', $getEnv);
 
-        $this->assertEquals('foobar', $value);
+        $this->assertSame('foobar', $value);
     }
 }

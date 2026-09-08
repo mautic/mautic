@@ -1,7 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Event;
 
-class CompanyBuildSearchEvent extends LeadBuildSearchEvent
+final class CompanyBuildSearchEvent extends LeadBuildSearchEvent
 {
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\UserBundle\Tests\EventListener;
 
 use Mautic\UserBundle\EventListener\SAMLSubscriber;
@@ -11,15 +13,15 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Routing\Router;
 
-class SAMLSubscriberTest extends TestCase
+final class SAMLSubscriberTest extends TestCase
 {
     /**
-     * @var RequestEvent&MockObject
+     * @var MockObject&RequestEvent
      */
     private MockObject $event;
 
     /**
-     * @var Router&MockObject
+     * @var MockObject&Router
      */
     private MockObject $router;
 

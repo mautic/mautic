@@ -1,23 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Segment;
 
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
-use Mautic\LeadBundle\Segment\ContactSegmentFilters;
 use Mautic\LeadBundle\Segment\Decorator\DecoratorFactory;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
 use Mautic\LeadBundle\Segment\TableSchemaColumnsCache;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(ContactSegmentFilterFactory::class)]
-class ContactSegmentFilterFactoryTest extends \PHPUnit\Framework\TestCase
+#[CoversClass(ContactSegmentFilterFactory::class)]
+final class ContactSegmentFilterFactoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testLeadFilter(): void
     {
-        $tableSchemaColumnsCache = $this->createMock(TableSchemaColumnsCache::class);
+        $tableSchemaColumnsCache = $this->createStub(TableSchemaColumnsCache::class);
         $container               = $this->createMock(Container::class);
         $decoratorFactory        = $this->createMock(DecoratorFactory::class);
 
@@ -30,13 +32,13 @@ class ContactSegmentFilterFactoryTest extends \PHPUnit\Framework\TestCase
             ->method('getQueryType')
             ->willReturn('MyQueryTypeId');
 
-        $filterQueryBuilder = $this->createMock(FilterQueryBuilderInterface::class);
+        $filterQueryBuilder = $this->createStub(FilterQueryBuilderInterface::class);
         $container->expects($this->exactly(6))
             ->method('get')
             ->with('MyQueryTypeId')
             ->willReturn($filterQueryBuilder);
 
-        $contactSegmentFilterFactory = new ContactSegmentFilterFactory($tableSchemaColumnsCache, $container, $decoratorFactory, $this->createMock(EventDispatcherInterface::class));
+        $contactSegmentFilterFactory = new ContactSegmentFilterFactory($tableSchemaColumnsCache, $container, $decoratorFactory, $this->createStub(EventDispatcherInterface::class));
 
         $leadList = new LeadList();
         $leadList->setFilters([
@@ -100,7 +102,6 @@ class ContactSegmentFilterFactoryTest extends \PHPUnit\Framework\TestCase
 
         $contactSegmentFilters = $contactSegmentFilterFactory->getSegmentFilters($leadList);
 
-        $this->assertInstanceOf(ContactSegmentFilters::class, $contactSegmentFilters);
         $this->assertCount(6, $contactSegmentFilters);
     }
 }

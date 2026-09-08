@@ -8,15 +8,15 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class InputExtension extends AbstractExtension
+final class InputExtension extends AbstractExtension
 {
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
-            new TwigFunction('inputUrl', [InputHelper::class, 'url']),
-            new TwigFunction('inputAlphanum', [InputHelper::class, 'alphanum']),
-            new TwigFunction('inputTransliterate', [InputHelper::class, 'transliterate']),
-            new TwigFunction('inputClean', [InputHelper::class, 'clean']),
+            new TwigFunction('inputUrl', InputHelper::url(...)),
+            new TwigFunction('inputAlphanum', InputHelper::alphanum(...)),
+            new TwigFunction('inputTransliterate', InputHelper::transliterate(...)),
+            new TwigFunction('inputClean', InputHelper::clean(...)),
         ];
     }
 }

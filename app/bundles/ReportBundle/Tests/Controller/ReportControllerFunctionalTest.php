@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Tests\Controller;
 
 use Doctrine\ORM\Exception\NotSupported;
@@ -7,21 +9,24 @@ use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
+use Mautic\PageBundle\Model\PageModel;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Entity\SchedulerRepository;
 use Mautic\ReportBundle\Model\ReportFileWriter;
 use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ReportControllerFunctionalTest extends MauticMysqlTestCase
+final class ReportControllerFunctionalTest extends MauticMysqlTestCase
 {
     private const TEST_EMAIL         = 'test@email.com';
+
     private const DEFAULT_TEST_EMAIL = 'default@email.com';
 
     public function testHitRepositoryMostVisited(): void
@@ -34,13 +39,14 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $query->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph');
         $query->leftJoin('ph', MAUTIC_TABLE_PREFIX.'pages', 'p', 'ph.page_id = p.id');
 
-        $pageModel = self::getContainer()->get('mautic.page.model.page');
+        /** @var PageModel $pageModel */
+        $pageModel = self::getContainer()->get(PageModel::class);
         $res       = $pageModel->getHitRepository()->getMostVisited($query);   // $this->em->getRepository(Hit::class);
 
         foreach ($res as $hit) {
-            Assert::assertNotNull($hit['id']);
-            Assert::assertNotNull($hit['title']);
-            Assert::assertNotNull($hit['hits']);
+            $this->assertNotNull($hit['id']);
+            $this->assertNotNull($hit['title']);
+            $this->assertNotNull($hit['hits']);
         }
     }
 
@@ -58,7 +64,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         // Check the details page
         $this->client->request('GET', '/s/reports/view/'.$report->getId());
 
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
     }
 
     public function testReportTableOrderColumn(): void
@@ -101,28 +107,30 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
     public function testCreatingNewReportAndClone(): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/reports/new/');
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        self::assertResponseIsSuccessful();
 
         $saveButton = $crawler->selectButton('Save');
         $form       = $saveButton->form();
         $form['report[name]']->setValue('Report ABC');
 
         $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        self::assertResponseIsSuccessful();
         $report = $this->em->getRepository(Report::class)->findOneBy(['name' => 'Report ABC']);
+        $this->assertInstanceOf(Report::class, $report);
 
         $crawler = $this->client->request(Request::METHOD_GET, "/s/reports/clone/{$report->getId()}");
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        self::assertResponseIsSuccessful();
 
         $saveButton = $crawler->selectButton('Save');
         $form       = $saveButton->form();
         $form['report[name]']->setValue('Report ABC - cloned');
 
         $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        self::assertResponseIsSuccessful();
         $reportClone = $this->em->getRepository(Report::class)->findOneBy(['name' => 'Report ABC - cloned']);
+        $this->assertInstanceOf(Report::class, $reportClone);
 
-        Assert::assertSame($report->getId() + 1, $reportClone->getId());
+        $this->assertSame($report->getId() + 1, $reportClone->getId());
     }
 
     public function testContactReportSqlInjectionDontWork(): void
@@ -139,7 +147,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         ];
         $report->setColumns($coulmns);
 
-        $this->getContainer()->get('mautic.report.model.report')->saveEntity($report);
+        $this->getContainer()->get(ReportModel::class)->saveEntity($report);
 
         // Check sql injection in parameter orderby
         $this->assertSqlInjectionNotWork('/s/reports/view/'.$report->getId().'?tmpl=list&name=report.'.$report->getId().'&orderby=a_id\'');
@@ -154,7 +162,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSqlInjectionNotWork('/s/reports/view/'.$report->getId().'\'?tmpl=list&name=report.'.$report->getId().'&orderby=a_id');
 
         $this->client->request('GET', '/s/reports/view/'.$report->getId().'?tmpl=list&name=report.'.$report->getId().'&orderby=a_id');
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
     }
 
     public function testContactReportwithComanyDateAddedColumn(): void
@@ -169,16 +177,17 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         ];
         $report->setColumns($coulmns);
 
-        static::getContainer()->get('mautic.report.model.report')->saveEntity($report);
+        self::getContainer()->get(ReportModel::class)->saveEntity($report);
 
         // Check the details page
         $this->client->request('GET', '/s/reports/view/'.$report->getId());
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
     }
 
     public function testEmailReportWithAggregatedColumnsAndTotals(): void
     {
-        $contactModel = static::getContainer()->get('mautic.lead.model.lead');
+        /** @var LeadModel $contactModel */
+        $contactModel = self::getContainer()->get(LeadModel::class);
 
         // Create and save contacts
         $payload = [
@@ -260,7 +269,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
                 'function'  => 'AVG',
             ],
         ]);
-        static::getContainer()->get('mautic.report.model.report')->saveEntity($report);
+        self::getContainer()->get(ReportModel::class)->saveEntity($report);
 
         // Expected report table values [ID, Company name, MIN Points, Max Points, SUM Points, COUNT Points, AVG Points]
         $expected = [
@@ -273,17 +282,18 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         // Get report view
         $this->client->request('GET', '/s/reports/view/'.$report->getId());
         $response = $this->client->getResponse();
-        Assert::assertTrue($response->isOk());
+        self::assertResponseIsSuccessful();
 
         // Load view content as HTML and convert the report table to result array
         $result  = $this->parseReportTable($response->getContent());
 
-        Assert::assertSame($expected, $result);
+        $this->assertSame($expected, $result);
     }
 
     public function testContactReportNotLikeExpression(): void
     {
-        $contactModel = self::getContainer()->get('mautic.lead.model.lead');
+        /** @var LeadModel $contactModel */
+        $contactModel = self::getContainer()->get(LeadModel::class);
 
         // Create and save contacts
         $payload = [
@@ -322,15 +332,15 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
             ]]
         );
 
-        $this->getContainer()->get('mautic.report.model.report')->saveEntity($report);
+        $this->getContainer()->get(ReportModel::class)->saveEntity($report);
 
         // Check the details page
         $this->client->request('GET', '/s/reports/view/'.$report->getId());
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
         $response = $this->client->getResponse();
 
         $result = $this->parseReportTable($response->getContent());
-        $this->assertEquals(2, count($result));
+        $this->assertCount(2, $result);
     }
 
     public function testUtmTagReportContainsExpression(): void
@@ -351,18 +361,18 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
             ]]
         );
 
-        $this->getContainer()->get('mautic.report.model.report')->saveEntity($report);
+        $this->getContainer()->get(ReportModel::class)->saveEntity($report);
 
         // Check the details page
         $this->client->request('GET', '/s/reports/view/'.$report->getId());
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
     }
 
     /**
      * @throws NotSupported
      * @throws MappingException
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('scheduleProvider')]
+    #[DataProvider('scheduleProvider')]
     public function testScheduleEdit(?string $oldScheduleUnit, ?string $oldScheduleDay, ?string $oldScheduleMonthFrequency, string $newScheduleUnit, ?string $newScheduleDay, ?string $newScheduleMonthFrequency): void
     {
         $report = new Report();
@@ -379,7 +389,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $report->setScheduleUnit($oldScheduleUnit);
         $report->setScheduleDay($oldScheduleDay);
         $report->setScheduleMonthFrequency($oldScheduleMonthFrequency);
-        $this->getContainer()->get('mautic.report.model.report')->saveEntity($report);
+        $this->getContainer()->get(ReportModel::class)->saveEntity($report);
 
         $schedule = $report->getSchedule();
 
@@ -393,20 +403,19 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $buttonCrawler  =  $crawler->selectButton('Save & Close');
         $form           = $buttonCrawler->form();
         $form['report[scheduleUnit]']->setValue($newScheduleUnit);
-        if (!is_null($newScheduleDay)) {
+        if (null !== $newScheduleDay) {
             $form['report[scheduleDay]']->setValue($newScheduleDay);
         }
-        if (!is_null($newScheduleMonthFrequency)) {
+        if (null !== $newScheduleMonthFrequency) {
             $form['report[scheduleMonthFrequency]']->setValue($newScheduleMonthFrequency);
         }
 
         $this->client->submit($form);
-        $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk());
+        $this->assertResponseIsSuccessful();
 
         $report   = $this->em->getRepository(Report::class)->find($report->getId());
         $schedule = $report->getSchedule();
-        $this->getContainer()->get('mautic.report.model.report')->saveEntity($report);
+        $this->getContainer()->get(ReportModel::class)->saveEntity($report);
 
         $this->em->clear();
 
@@ -414,27 +423,22 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<mixed>[]
+     * @return \Iterator<(int|string), array<mixed>>
      */
-    public static function scheduleProvider(): array
+    public static function scheduleProvider(): \Iterator
     {
-        return [
-            'null_to_now'      => [null, null, null, SchedulerEnum::UNIT_NOW, null, null],
-            'null_to_daily'    => [null, null, null, SchedulerEnum::UNIT_DAILY, null, null],
-            'null_to_weekly'   => [null, null, null, SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_MO, null],
-            'null_to_monthly'  => [null, null, null, SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_MO, SchedulerEnum::MONTH_FREQUENCY_FIRST],
-
-            'daily_to_weekly'  => [SchedulerEnum::UNIT_DAILY, null, null, SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_MO, null],
-            'daily_to_monthly' => [SchedulerEnum::UNIT_DAILY, null, null, SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_MO, '1'],
-
-            'weekly_to_daily'   => [SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_MO, null, SchedulerEnum::UNIT_DAILY, null, null],
-            'weekly_to_weekly'  => [SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_MO, null, SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_TU, null],
-            'weekly_to_monthly' => [SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_WE, null, SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_TH, '-1'],
-
-            'monthly_to_daily'   => [SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_FR, '-1', SchedulerEnum::UNIT_DAILY, null, null],
-            'monthly_to_weekly'  => [SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_FR, '1', SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_SA, null],
-            'monthly_to_monthly' => [SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_FR, '1', SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_SU, '-1'],
-        ];
+        yield 'null_to_now' => [null, null, null, SchedulerEnum::UNIT_NOW, null, null];
+        yield 'null_to_daily' => [null, null, null, SchedulerEnum::UNIT_DAILY, null, null];
+        yield 'null_to_weekly' => [null, null, null, SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_MO, null];
+        yield 'null_to_monthly' => [null, null, null, SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_MO, SchedulerEnum::MONTH_FREQUENCY_FIRST];
+        yield 'daily_to_weekly' => [SchedulerEnum::UNIT_DAILY, null, null, SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_MO, null];
+        yield 'daily_to_monthly' => [SchedulerEnum::UNIT_DAILY, null, null, SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_MO, '1'];
+        yield 'weekly_to_daily' => [SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_MO, null, SchedulerEnum::UNIT_DAILY, null, null];
+        yield 'weekly_to_weekly' => [SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_MO, null, SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_TU, null];
+        yield 'weekly_to_monthly' => [SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_WE, null, SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_TH, '-1'];
+        yield 'monthly_to_daily' => [SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_FR, '-1', SchedulerEnum::UNIT_DAILY, null, null];
+        yield 'monthly_to_weekly' => [SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_FR, '1', SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_SA, null];
+        yield 'monthly_to_monthly' => [SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_FR, '1', SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_SU, '-1'];
     }
 
     public function testDescriptionIsNotEscaped(): void
@@ -443,19 +447,19 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $report->setName('HTML Test');
         $report->setDescription('<b>This is allowed HTML</b>');
         $report->setSource('email');
-        static::getContainer()->get('mautic.report.model.report')->saveEntity($report);
+        self::getContainer()->get(ReportModel::class)->saveEntity($report);
 
         // Check the details page
         $this->client->request('GET', '/s/reports/'.$report->getId());
         $clientResponse        = $this->client->getResponse();
         $clientResponseContent = $clientResponse->getContent();
-        $this->assertStringContainsString('<small><b>This is allowed HTML</b></small>', $clientResponseContent);
+        $this->assertStringContainsString('<small><b>This is allowed HTML</b></small>', (string) $clientResponseContent);
 
         // Check the list
         $this->client->request('GET', '/s/reports');
         $clientResponse        = $this->client->getResponse();
         $clientResponseContent = $clientResponse->getContent();
-        $this->assertStringContainsString('<small><b>This is allowed HTML</b></small>', $clientResponseContent);
+        $this->assertStringContainsString('<small><b>This is allowed HTML</b></small>', (string) $clientResponseContent);
     }
 
     public function testXssUrlFromQuery(): void
@@ -473,16 +477,16 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
             'ph.user_agent',
         ];
         $report->setColumns($coulmns);
-        $this->getContainer()->get('mautic.report.model.report')->saveEntity($report);
+        $this->getContainer()->get(ReportModel::class)->saveEntity($report);
         $xssHeader     = '<script>alert(1)</script>';
         $this->client->request('GET', '/mtracking.gif?page_url='.$xssHeader);
         $this->assertResponseStatusCodeSame(200);
         $this->client->request('GET', '/s/reports/view/'.$report->getId());
         $this->assertResponseStatusCodeSame(200);
-        $this->assertStringNotContainsString($xssHeader, $this->client->getResponse()->getContent());
+        $this->assertStringNotContainsString($xssHeader, (string) $this->client->getResponse()->getContent());
 
         $this->client->request('GET', '/s/reports/view/'.$report->getId().'/export/html');
-        $this->assertStringNotContainsString($xssHeader, $this->client->getResponse()->getContent());
+        $this->assertStringNotContainsString($xssHeader, (string) $this->client->getResponse()->getContent());
     }
 
     public function testDelayedTransport(): void
@@ -506,15 +510,14 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $form           = $buttonCrawler->form();
         $form['report[scheduleUnit]']->setValue(SchedulerEnum::UNIT_NOW);
         $this->client->submit($form);
-        $response = $this->client->getResponse();
-        self::assertTrue($response->isOk());
+        self::assertResponseIsSuccessful();
 
         $schedulerRepository = self::getContainer()->get(SchedulerRepository::class);
-        \assert($schedulerRepository instanceof SchedulerRepository);
+        $this->assertInstanceOf(SchedulerRepository::class, $schedulerRepository);
         $scheduler = $schedulerRepository->getSchedulerByReport($report);
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
-        self::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         // Find save & close button
         $buttonCrawler = $crawler->selectButton('config[buttons][save]');
@@ -527,7 +530,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         $this->client->submit($form);
-        self::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         while ($scheduler->getScheduleDate() > new \DateTime()) {
             // This ugly thing is needed, because \Mautic\ReportBundle\Scheduler\Model\SchedulerPlanner::computeScheduler
@@ -538,22 +541,22 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->testSymfonyCommand('mautic:reports:scheduler');
 
         $reportFileWriter = self::getContainer()->get(ReportFileWriter::class);
-        \assert($reportFileWriter instanceof ReportFileWriter);
+        $this->assertInstanceOf(ReportFileWriter::class, $reportFileWriter);
 
         $csvPath = $reportFileWriter->getFilePath($scheduler);
-        self::assertFileExists($csvPath);
+        $this->assertFileExists($csvPath);
 
         // Pretend Mautic has created a ZIP file as in \Mautic\ReportBundle\Scheduler\Model\FileHandler::zipIt
         $zipPath      = str_replace('.csv', '.zip', $csvPath);
         $bytesWritten = file_put_contents($zipPath, 'ZIP');
-        self::assertNotFalse($bytesWritten);
-        self::assertFileExists($zipPath);
+        $this->assertNotFalse($bytesWritten);
+        $this->assertFileExists($zipPath);
 
         $queuedMessage = self::getMailerMessagesByToAddress($toAddress);
 
-        self::assertCount(1, $queuedMessage);
-        self::assertFileExists($csvPath);
-        self::assertFileExists($zipPath);
+        $this->assertCount(1, $queuedMessage);
+        $this->assertFileExists($csvPath);
+        $this->assertFileExists($zipPath);
     }
 
     /**
@@ -582,7 +585,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
      */
     private function domTableToArray(Crawler $crawler): array
     {
-        return $crawler->filter('tr')->each(fn ($tr) => $tr->filter('td')->each(fn ($td) => trim($td->text())));
+        return $crawler->filter('tr')->each(fn ($tr) => $tr->filter('td')->each(fn ($td): string => trim($td->text())));
     }
 
     /**
@@ -635,7 +638,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('GET', $url);
         $this->assertStringNotContainsString(
             'You have an error in your SQL syntax',
-            $this->client->getResponse()->getContent()
+            (string) $this->client->getResponse()->getContent()
         );
     }
 
@@ -659,13 +662,13 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ]);
 
-        $this->getContainer()->get('mautic.report.model.report')->saveEntity($report);
+        $this->getContainer()->get(ReportModel::class)->saveEntity($report);
 
         $this->client->request('GET', '/s/reports/view/'.$report->getId());
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         $content  = $this->client->getResponse()->getcontent();
-        Assert::assertStringContainsString(self::TEST_EMAIL, $content);
+        $this->assertStringContainsString(self::TEST_EMAIL, (string) $content);
     }
 
     public function testDynamicFiltersWithDefaultValueAreApplied(): void
@@ -688,7 +691,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ]);
 
-        $this->getContainer()->get('mautic.report.model.report')->saveEntity($report);
+        $this->getContainer()->get(ReportModel::class)->saveEntity($report);
 
         // Mock the ReportModel to add a defaultValue to the filter definition
         $reportModel = $this->createMock(ReportModel::class);
@@ -704,12 +707,12 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         ];
 
         $reportModel->method('getFilterList')->willReturn($filterDefinitions);
-        static::getContainer()->set('mautic.report.model.report', $reportModel);
+        self::getContainer()->set('mautic.report.model.report', $reportModel);
 
         $this->client->request('GET', '/s/reports/view/'.$report->getId());
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         $content = $this->client->getResponse()->getContent();
-        Assert::assertStringContainsString(self::DEFAULT_TEST_EMAIL, $content);
+        $this->assertStringContainsString(self::DEFAULT_TEST_EMAIL, (string) $content);
     }
 }

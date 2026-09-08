@@ -18,13 +18,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class IcontactType extends AbstractType
+final class IcontactType extends AbstractType
 {
     public function __construct(
-        private IntegrationHelper $integrationHelper,
-        private PluginModel $pluginModel,
-        protected RequestStack $requestStack,
-        protected CoreParametersHelper $coreParametersHelper,
+        private readonly IntegrationHelper $integrationHelper,
+        private readonly PluginModel $pluginModel,
+        private readonly RequestStack $requestStack,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -75,9 +75,7 @@ class IcontactType extends AbstractType
             $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($error): void {
                 $form = $event->getForm();
 
-                if ($error) {
-                    $form['list']->addError(new FormError($error));
-                }
+                $form['list']->addError(new FormError($error));
             });
         }
 

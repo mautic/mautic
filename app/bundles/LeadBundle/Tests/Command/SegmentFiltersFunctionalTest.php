@@ -12,10 +12,11 @@ use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
+final class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
 {
     private const FIELD_NAME = 'car';
 
@@ -89,7 +90,7 @@ class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
         $field->setProperties($fieldDetails['properties']);
 
         /** @var FieldModel $fieldModel */
-        $fieldModel = static::getContainer()->get('mautic.lead.model.field');
+        $fieldModel = self::getContainer()->get(FieldModel::class);
         $fieldModel->saveEntity($field);
     }
 
@@ -121,7 +122,8 @@ class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
                         ],
                     ],
                 ]);
-                $leadModel = static::getContainer()->get('mautic.lead.model.lead');
+                /** @var LeadModel $leadModel */
+                $leadModel = self::getContainer()->get(LeadModel::class);
                 $leadModel->setFieldValues($contact, [self::FIELD_NAME => [$cars[$i % 3]]]);
             }
             $contacts[] = $contact;
@@ -204,9 +206,7 @@ class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
             // custom field
             $customField,
             $segmentData,
-            function ($contact): bool {
-                return empty($contact->getFields()) || 'value1' !== $contact->getField(self::FIELD_NAME)['value'];
-            },
+            fn ($contact): bool => empty($contact->getFields()) || 'value1' !== $contact->getField(self::FIELD_NAME)['value'],
         ];
 
         // to test multiple excluding values
@@ -215,11 +215,8 @@ class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
             // custom field
             $customField,
             $segmentData,
-            function ($contact): bool {
-                return
-                    empty($contact->getFields())
-                    || !in_array($contact->getField(self::FIELD_NAME)['value'], ['value1', 'value2']);
-            },
+            fn ($contact): bool => empty($contact->getFields())
+            || !in_array($contact->getField(self::FIELD_NAME)['value'], ['value1', 'value2']),
         ];
 
         // to test including filter, should NOT contain blank values
@@ -229,9 +226,7 @@ class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
             // custom field
             $customField,
             $segmentData,
-            function ($contact): bool {
-                return !empty($contact->getFields()) && 'value1' === $contact->getField(self::FIELD_NAME)['value'];
-            },
+            fn ($contact): bool => !empty($contact->getFields()) && 'value1' === $contact->getField(self::FIELD_NAME)['value'],
         ];
 
         // to test multiple including values
@@ -240,11 +235,8 @@ class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
             // custom field
             $customField,
             $segmentData,
-            function ($contact): bool {
-                return
-                    !empty($contact->getFields())
-                    && in_array($contact->getField(self::FIELD_NAME)['value'], ['value1', 'value2']);
-            },
+            fn ($contact): bool => !empty($contact->getFields())
+            && in_array($contact->getField(self::FIELD_NAME)['value'], ['value1', 'value2']),
         ];
     }
 }

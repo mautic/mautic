@@ -15,7 +15,7 @@ use Symfony\Component\Form\FormInterface;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class PointActionUrlHitType extends AbstractType
+final class PointActionUrlHitType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -39,7 +39,7 @@ class PointActionUrlHitType extends AbstractType
             ],
         ]);
 
-        $formModifier = function (FormInterface $form, $data) use ($builder): void {
+        $formModifier = function (FormInterface $form, array $data) use ($builder): void {
             $unit = $data['accumulative_time_unit'] ?? 'H';
             $form->add('accumulative_time_unit', HiddenType::class, [
                 'data' => $unit,

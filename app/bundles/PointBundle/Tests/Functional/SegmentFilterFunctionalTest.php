@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PointBundle\Tests\Functional;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -10,7 +12,7 @@ use Mautic\PointBundle\Entity\GroupContactScore;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
 
-class SegmentFilterFunctionalTest extends MauticMysqlTestCase
+final class SegmentFilterFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
@@ -67,13 +69,13 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request('GET', '/api/contacts?search=segment:group-a-points-gte1');
         $clientResponse = $this->client->getResponse();
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
         $response = json_decode($clientResponse->getContent(), true);
-        $this->assertEquals(1, (int) $response['total']);
+        $this->assertSame(1, (int) $response['total']);
         $contactIds = array_column($response['contacts'], 'id');
-        $this->assertContains((int) $contactA->getId(), $contactIds);
-        $this->assertNotContains((int) $contactB->getId(), $contactIds);
-        $this->assertNotContains((int) $contactC->getId(), $contactIds);
+        $this->assertContains($contactA->getId(), $contactIds);
+        $this->assertNotContains($contactB->getId(), $contactIds);
+        $this->assertNotContains($contactC->getId(), $contactIds);
     }
 
     private function createContact(

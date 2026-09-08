@@ -13,8 +13,8 @@ use Mautic\FormBundle\Entity\Submission;
 class FormUploader
 {
     public function __construct(
-        private FileUploader $fileUploader,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly FileUploader $fileUploader,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -121,7 +121,7 @@ class FormUploader
      * Fix iOS picture orientation after upload PHP
      * https://stackoverflow.com/questions/22308921/fix-ios-picture-orientation-after-upload-php.
      */
-    private function fixRotationJPG($filename): void
+    private function fixRotationJPG(string $filename): void
     {
         if (IMAGETYPE_JPEG != exif_imagetype($filename)) {
             return;
@@ -130,24 +130,22 @@ class FormUploader
         if (empty($exif['Orientation'])) {
             return;
         }
-        $ort  = $exif['Orientation']; /* STORES ORIENTATION FROM IMAGE */
-        $ort1 = $ort;
-        if (!empty($ort1)) {
-            $image = imagecreatefromjpeg($filename);
-            $ort   = $ort1;
-            switch ($ort) {
-                case 3:
-                    $image = imagerotate($image, 180, 0);
-                    break;
+        $ort   = $exif['Orientation']; /* STORES ORIENTATION FROM IMAGE */
+        $ort1  = $ort;
+        $image = imagecreatefromjpeg($filename);
+        $ort   = $ort1;
+        switch ($ort) {
+            case 3:
+                $image = imagerotate($image, 180, 0);
+                break;
 
-                case 6:
-                    $image = imagerotate($image, -90, 0);
-                    break;
+            case 6:
+                $image = imagerotate($image, -90, 0);
+                break;
 
-                case 8:
-                    $image = imagerotate($image, 90, 0);
-                    break;
-            }
+            case 8:
+                $image = imagerotate($image, 90, 0);
+                break;
         }
         imagejpeg($image, $filename, 90);
     }

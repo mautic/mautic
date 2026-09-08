@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\UserBundle\Tests\Security\SAML\User;
 
 use LightSaml\Model\Assertion\Assertion;
@@ -10,12 +12,12 @@ use Mautic\UserBundle\Security\SAML\User\UserMapper;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class UserMapperTest extends TestCase
+final class UserMapperTest extends TestCase
 {
     private UserMapper $mapper;
 
     /**
-     * @var Response|MockObject
+     * @var MockObject&Response
      */
     private MockObject $response;
 
@@ -49,7 +51,7 @@ class UserMapperTest extends TestCase
         $statement = $this->createMock(AttributeStatement::class);
         $statement->method('getFirstAttributeByName')
             ->willReturnCallback(
-                fn ($attributeName) => match ($attributeName) {
+                fn ($attributeName): MockObject => match ($attributeName) {
                     'EmailAddress' => $emailAttribute,
                     'FirstName'    => $firstnameAttribute,
                     'LastName'     => $lastnameAttribute,
@@ -70,7 +72,7 @@ class UserMapperTest extends TestCase
     {
         $user = $this->mapper->getUser($this->response);
         $this->assertEquals('hello@there.com', $user->getEmail());
-        $this->assertEquals('hello@there.com', $user->getUserIdentifier());
+        $this->assertSame('hello@there.com', $user->getUserIdentifier());
         $this->assertEquals('Joe', $user->getFirstName());
         $this->assertEquals('Smith', $user->getLastName());
     }
@@ -78,6 +80,6 @@ class UserMapperTest extends TestCase
     public function testUsernameIsReturned(): void
     {
         $username = $this->mapper->getUsername($this->response);
-        $this->assertEquals('hello@there.com', $username);
+        $this->assertSame('hello@there.com', $username);
     }
 }

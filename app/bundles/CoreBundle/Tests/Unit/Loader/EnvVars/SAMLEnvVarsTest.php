@@ -1,27 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Loader\EnvVars;
 
 use Mautic\CoreBundle\Loader\EnvVars\SAMLEnvVars;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-class SAMLEnvVarsTest extends TestCase
+final class SAMLEnvVarsTest extends TestCase
 {
-    /**
-     * @var ParameterBag
-     */
-    protected $config;
+    private ParameterBag $config;
 
-    /**
-     * @var ParameterBag
-     */
-    protected $defaultConfig;
+    private ParameterBag $defaultConfig;
 
-    /**
-     * @var ParameterBag
-     */
-    protected $envVars;
+    private ParameterBag $envVars;
 
     protected function setUp(): void
     {

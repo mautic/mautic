@@ -6,7 +6,7 @@ namespace Mautic\FormBundle\Collector;
 
 use Mautic\FormBundle\Collection\MappedObjectCollection;
 
-final class MappedObjectCollector implements MappedObjectCollectorInterface
+final readonly class MappedObjectCollector implements MappedObjectCollectorInterface
 {
     public function __construct(
         private FieldCollectorInterface $fieldCollector,

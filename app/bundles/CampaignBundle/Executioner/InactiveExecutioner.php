@@ -41,27 +41,25 @@ class InactiveExecutioner implements ExecutionerInterface
     protected ?\DateTime $now = null;
 
     public function __construct(
-        private InactiveContactFinder $inactiveContactFinder,
-        private LoggerInterface $logger,
-        private TranslatorInterface $translator,
-        private EventScheduler $scheduler,
-        private InactiveHelper $helper,
-        private EventExecutioner $executioner,
-        private ProcessSignalService $processSignalService,
-        private EventRedirectionHelper $redirectionHelper,
-        private LeadRepository $leadRepository,
+        private readonly InactiveContactFinder $inactiveContactFinder,
+        private readonly LoggerInterface $logger,
+        private readonly TranslatorInterface $translator,
+        private readonly EventScheduler $scheduler,
+        private readonly InactiveHelper $helper,
+        private readonly EventExecutioner $executioner,
+        private readonly ProcessSignalService $processSignalService,
+        private readonly EventRedirectionHelper $redirectionHelper,
+        private readonly LeadRepository $leadRepository,
     ) {
     }
 
     /**
-     * @return Counter
-     *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function execute(Campaign $campaign, ContactLimiter $limiter, ?OutputInterface $output = null)
+    public function execute(Campaign $campaign, ContactLimiter $limiter, ?OutputInterface $output = null): ?Counter
     {
         $this->campaign = $campaign;
         $this->limiter  = $limiter;
@@ -89,14 +87,12 @@ class InactiveExecutioner implements ExecutionerInterface
     /**
      * @param int $decisionId
      *
-     * @return Counter
-     *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function validate($decisionId, ContactLimiter $limiter, ?OutputInterface $output = null)
+    public function validate($decisionId, ContactLimiter $limiter, ?OutputInterface $output = null): ?Counter
     {
         $this->limiter = $limiter;
         $this->output  = $output ?: new NullOutput();

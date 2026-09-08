@@ -799,13 +799,13 @@ class UnitOfWork implements PropertyChangedListener
         $targetClass    = $this->em->getClassMetadata($assoc['targetEntity']);
 
         foreach ($unwrappedValue as $key => $entry) {
-            if (!($entry instanceof $targetClass->name)) {
+            if (!$entry instanceof $targetClass->name) {
                 throw ORMInvalidArgumentException::invalidAssociation($targetClass, $assoc, $entry);
             }
 
             $state = $this->getEntityState($entry, self::STATE_NEW);
 
-            if (!($entry instanceof $assoc['targetEntity'])) {
+            if (!$entry instanceof $assoc['targetEntity']) {
                 throw ORMException::unexpectedAssociationValue($assoc['sourceEntity'], $assoc['fieldName'], get_class($entry), $assoc['targetEntity']);
             }
 

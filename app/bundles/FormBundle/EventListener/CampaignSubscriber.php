@@ -7,22 +7,25 @@ use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Entity\FormRepository;
+use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\Form\Type\CampaignEventFormFieldValueType;
 use Mautic\FormBundle\Form\Type\CampaignEventFormSubmitType;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Model\FormModel;
-use Mautic\FormBundle\Model\SubmissionModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class CampaignSubscriber implements EventSubscriberInterface
+final readonly class CampaignSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private FormModel $formModel,
-        private SubmissionModel $formSubmissionModel,
         private RealTimeExecutioner $realTimeExecutioner,
         private FormFieldHelper $formFieldHelper,
+        private FormRepository $formRepository,
+        private SubmissionRepository $submissionRepository,
     ) {
     }
 
@@ -68,37 +71,51 @@ class CampaignSubscriber implements EventSubscriberInterface
         $this->realTimeExecutioner->execute('form.submit', $form, 'form', $form->getId());
     }
 
-    public function onCampaignTriggerDecision(CampaignExecutionEvent $event)
+    public function onCampaignTriggerDecision(CampaignExecutionEvent $event): void
     {
         $eventDetails = $event->getEventDetails();
 
         if (null === $eventDetails) {
-            return $event->setResult(true);
+            $event->setResult(true);
+
+            return;
+        }
+
+        if (!$eventDetails instanceof Form) {
+            $event->setResult(false);
+
+            return;
         }
 
         $limitToForms = $event->getConfig()['forms'];
 
         // check against selected forms
         if (!empty($limitToForms) && !in_array($eventDetails->getId(), $limitToForms)) {
-            return $event->setResult(false);
+            $event->setResult(false);
+
+            return;
         }
 
-        return $event->setResult(true);
+        $event->setResult(true);
     }
 
-    public function onCampaignTriggerCondition(CampaignExecutionEvent $event)
+    public function onCampaignTriggerCondition(CampaignExecutionEvent $event): void
     {
         $lead = $event->getLead();
 
         if (!$lead || !$lead->getId()) {
-            return $event->setResult(false);
+            $event->setResult(false);
+
+            return;
         }
 
         $operators = $this->formModel->getFilterExpressionFunctions();
-        $form      = $this->formModel->getRepository()->findOneById($event->getConfig()['form']);
+        $form      = $this->formRepository->findOneById($event->getConfig()['form']);
 
         if (!$form || !$form->getId()) {
-            return $event->setResult(false);
+            $event->setResult(false);
+
+            return;
         }
 
         $field = $this->formModel->findFormFieldByAlias($form, $event->getConfig()['field']);
@@ -106,7 +123,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         $filter = $this->formFieldHelper->getFieldFilter($field->getType());
         $value  = InputHelper::_($event->getConfig()['value'], $filter);
 
-        $result = $this->formSubmissionModel->getRepository()->compareValue(
+        $result = $this->submissionRepository->compareValue(
             $lead->getId(),
             $form->getId(),
             $form->getAlias(),
@@ -118,6 +135,6 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         $event->setChannel('form', $form->getId());
 
-        return $event->setResult($result);
+        $event->setResult($result);
     }
 }

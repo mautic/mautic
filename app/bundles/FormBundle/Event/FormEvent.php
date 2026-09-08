@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\FormBundle\Entity\Form;
 
-class FormEvent extends CommonEvent
+final class FormEvent extends CommonEvent
 {
     /**
      * @param bool $isNew

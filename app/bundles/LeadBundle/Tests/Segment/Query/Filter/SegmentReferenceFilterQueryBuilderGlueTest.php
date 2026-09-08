@@ -6,9 +6,9 @@ namespace Mautic\LeadBundle\Tests\Segment\Query\Filter;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
-use PHPUnit\Framework\Assert;
+use Mautic\LeadBundle\Model\ListModel;
 
-class SegmentReferenceFilterQueryBuilderGlueTest extends MauticMysqlTestCase
+final class SegmentReferenceFilterQueryBuilderGlueTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 
@@ -66,9 +66,10 @@ class SegmentReferenceFilterQueryBuilderGlueTest extends MauticMysqlTestCase
 
         $this->testSymfonyCommand('mautic:segments:update', ['--list-id' => $segmentD->getId()]);
 
-        $listModel = static::getContainer()->get('mautic.lead.model.list');
+        /** @var ListModel $listModel */
+        $listModel = self::getContainer()->get(ListModel::class);
 
         $leadCount = $listModel->getListLeadRepository()->getContactsCountBySegment($segmentD->getId());
-        Assert::assertSame(4, $leadCount, 'Segment must contain all the leads.');
+        $this->assertSame(4, $leadCount, 'Segment must contain all the leads.');
     }
 }

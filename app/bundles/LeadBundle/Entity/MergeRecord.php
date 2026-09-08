@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -68,10 +70,7 @@ class MergeRecord
         return $this->contact;
     }
 
-    /**
-     * @return MergeRecord
-     */
-    public function setContact(Lead $contact)
+    public function setContact(Lead $contact): static
     {
         $this->contact = $contact;
 
@@ -86,10 +85,7 @@ class MergeRecord
         return $this->dateAdded;
     }
 
-    /**
-     * @return MergeRecord
-     */
-    public function setDateAdded(?\DateTime $dateAdded = null)
+    public function setDateAdded(?\DateTime $dateAdded = null): static
     {
         if (null === $dateAdded) {
             $dateAdded = new \DateTime();
@@ -110,10 +106,8 @@ class MergeRecord
 
     /**
      * @param string $name
-     *
-     * @return MergeRecord
      */
-    public function setName($name)
+    public function setName($name): static
     {
         $this->name = $name;
 
@@ -130,10 +124,8 @@ class MergeRecord
 
     /**
      * @param int $mergedId
-     *
-     * @return MergeRecord
      */
-    public function setMergedId($mergedId)
+    public function setMergedId($mergedId): static
     {
         $this->mergedId = (int) $mergedId;
 

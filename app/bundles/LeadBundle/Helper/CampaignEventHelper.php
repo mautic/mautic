@@ -5,9 +5,9 @@ namespace Mautic\LeadBundle\Helper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 
-class CampaignEventHelper
+final class CampaignEventHelper
 {
-    public static function validatePointChange($event, Lead $lead): bool
+    public static function validatePointChange(array $event, Lead $lead): bool
     {
         $properties  = $event['properties'];
         $checkPoints = $properties['points'];
@@ -22,7 +22,7 @@ class CampaignEventHelper
         return true;
     }
 
-    public static function validateListChange(ListChangeEvent $eventDetails, $event): bool
+    public static function validateListChange(ListChangeEvent $eventDetails, array $event): bool
     {
         $limitAddTo      = $event['properties']['addedTo'];
         $limitRemoveFrom = $event['properties']['removedFrom'];
@@ -32,10 +32,6 @@ class CampaignEventHelper
             return false;
         }
 
-        if ($eventDetails->wasRemoved() && !empty($limitRemoveFrom) && !in_array($list->getId(), $limitRemoveFrom)) {
-            return false;
-        }
-
-        return true;
+        return !$eventDetails->wasRemoved() || empty($limitRemoveFrom) || in_array($list->getId(), $limitRemoveFrom);
     }
 }

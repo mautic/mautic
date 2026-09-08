@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\DataObject;
 
-class LeadManipulator
+final class LeadManipulator
 {
     /**
      * If true then the manipulator was logged and should not be logged for the second time.

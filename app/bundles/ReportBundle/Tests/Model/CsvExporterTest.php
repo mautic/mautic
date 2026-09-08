@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Tests\Model;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -10,9 +12,10 @@ use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Mautic\ReportBundle\Crate\ReportDataResult;
 use Mautic\ReportBundle\Model\CsvExporter;
 use Mautic\ReportBundle\Tests\Fixtures;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CsvExporterTest extends \PHPUnit\Framework\TestCase
+final class CsvExporterTest extends \PHPUnit\Framework\TestCase
 {
     public const DATEONLYFORMAT = 'F j, Y';
 
@@ -28,16 +31,16 @@ class CsvExporterTest extends \PHPUnit\Framework\TestCase
     private $file;
 
     /**
-     * @var TranslatorInterface
+     * @var MockObject&TranslatorInterface
      */
-    private mixed $translator;
+    private MockObject $translator;
 
     private FormatterHelper $formatterHelperMock;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->with('mautic.report.report.groupby.totals')
             ->willReturn('Totals');
@@ -61,7 +64,7 @@ class CsvExporterTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         if (is_resource($this->file)) {
             fclose($this->file);
@@ -78,7 +81,7 @@ class CsvExporterTest extends \PHPUnit\Framework\TestCase
         $this->csvExporter->export($reportDataResult, $this->file);
 
         fclose($this->file);
-        $result = array_map(fn ($line) => CsvHelper::strGetCsv($line), file($this->tmpFile));
+        $result = array_map(fn (string $line): array => CsvHelper::strGetCsv($line), file($this->tmpFile));
 
         $expected = [
             [
@@ -191,7 +194,7 @@ class CsvExporterTest extends \PHPUnit\Framework\TestCase
         $this->csvExporter->export($reportDataResult, $this->file);
 
         fclose($this->file);
-        $result = array_map(fn ($line) => CsvHelper::strGetCsv($line), file($this->tmpFile));
+        $result = array_map(fn (string $line): array => CsvHelper::strGetCsv($line), file($this->tmpFile));
 
         $expectedHeaders                                  = ['ID', 'Name', 'SUM Read', 'AVG Read', 'COUNT Contact ID'];
         $expectedTotals                                   = $reportDataResult->getTotalsToExport($this->formatterHelperMock);
@@ -214,7 +217,7 @@ class CsvExporterTest extends \PHPUnit\Framework\TestCase
         $this->csvExporter->putTotals($expected, $this->file);
         fclose($this->file);
 
-        $result = array_map(fn ($line) => CsvHelper::strGetCsv($line), file($this->tmpFile));
+        $result = array_map(fn (string $line): array => CsvHelper::strGetCsv($line), file($this->tmpFile));
 
         $this->assertCount(1, $result);
         $this->assertSame('Totals', $result[0][0]);
@@ -230,7 +233,7 @@ class CsvExporterTest extends \PHPUnit\Framework\TestCase
         $this->csvExporter->putHeader($reportDataResult, $this->file);
         fclose($this->file);
 
-        $result = array_map(fn ($line) => CsvHelper::strGetCsv($line), file($this->tmpFile));
+        $result = array_map(fn (string $line): array => CsvHelper::strGetCsv($line), file($this->tmpFile));
 
         $this->assertCount(1, $result);
         $this->assertSame(array_values($expected), array_values($result[0]));

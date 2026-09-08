@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\UserBundle\Tests\Security\SAML\Store;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -7,10 +9,10 @@ use Mautic\UserBundle\Security\SAML\Store\TrustOptionsStore;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class TrustOptionsStoreTest extends TestCase
+final class TrustOptionsStoreTest extends TestCase
 {
     /**
-     * @var CoreParametersHelper|MockObject
+     * @var MockObject&CoreParametersHelper
      */
     private MockObject $coreParametersHelper;
 

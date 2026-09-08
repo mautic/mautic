@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 
 final class DoNotContactRepositoryFunctionalTest extends MauticMysqlTestCase
 {
@@ -26,21 +25,21 @@ final class DoNotContactRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $repository = $this->em->getRepository(DoNotContact::class);
-        \assert($repository instanceof DoNotContactRepository);
+        $this->assertInstanceOf(DoNotContactRepository::class, $repository);
 
         $allDncRecords = $repository->getChannelList(null);
         $allSmsRecords = $repository->getChannelList('sms');
 
-        Assert::assertCount(3, $allDncRecords, 'Get all records for all channels (dangerous, do not use, there is no limit. One would expect this to return all 4 records, but they are grouped by contact ID.');
-        Assert::assertCount(2, $allSmsRecords, 'Get all records for sms channel (dangerous, do not use, there is no limit.');
-        Assert::assertCount(0, $repository->getChannelList('sms', []), 'Get all records for sms channel where the user filtered for a contact that do not exist. It must return an empty array. Not all DNC records.');
-        Assert::assertCount(1, $repository->getChannelList('sms', [$john->getId()]));
-        Assert::assertCount(2, $repository->getChannelList('sms', [$john->getId(), $jane->getId(), $josh->getId()]));
-        Assert::assertSame(['email' => (string) DoNotContact::IS_CONTACTABLE], $allDncRecords[$josh->getId()]);
-        Assert::assertSame(['email' => (string) DoNotContact::UNSUBSCRIBED, 'sms' => (string) DoNotContact::BOUNCED], $allDncRecords[$john->getId()]);
-        Assert::assertSame(['sms' => (string) DoNotContact::MANUAL], $allDncRecords[$jane->getId()]);
-        Assert::assertSame((string) DoNotContact::BOUNCED, $allSmsRecords[$john->getId()]);
-        Assert::assertSame((string) DoNotContact::MANUAL, $allSmsRecords[$jane->getId()]);
+        $this->assertCount(3, $allDncRecords, 'Get all records for all channels (dangerous, do not use, there is no limit. One would expect this to return all 4 records, but they are grouped by contact ID.');
+        $this->assertCount(2, $allSmsRecords, 'Get all records for sms channel (dangerous, do not use, there is no limit.');
+        $this->assertCount(0, $repository->getChannelList('sms', []), 'Get all records for sms channel where the user filtered for a contact that do not exist. It must return an empty array. Not all DNC records.');
+        $this->assertCount(1, $repository->getChannelList('sms', [$john->getId()]));
+        $this->assertCount(2, $repository->getChannelList('sms', [$john->getId(), $jane->getId(), $josh->getId()]));
+        $this->assertSame(['email' => (string) DoNotContact::IS_CONTACTABLE], $allDncRecords[$josh->getId()]);
+        $this->assertSame(['email' => (string) DoNotContact::UNSUBSCRIBED, 'sms' => (string) DoNotContact::BOUNCED], $allDncRecords[$john->getId()]);
+        $this->assertSame(['sms' => (string) DoNotContact::MANUAL], $allDncRecords[$jane->getId()]);
+        $this->assertSame((string) DoNotContact::BOUNCED, $allSmsRecords[$john->getId()]);
+        $this->assertSame((string) DoNotContact::MANUAL, $allSmsRecords[$jane->getId()]);
     }
 
     public function createDnc(string $channel, Lead $contact, int $reason): DoNotContact

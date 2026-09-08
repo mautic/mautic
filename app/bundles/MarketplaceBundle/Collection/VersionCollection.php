@@ -7,7 +7,7 @@ namespace Mautic\MarketplaceBundle\Collection;
 use Mautic\MarketplaceBundle\DTO\Version;
 use Mautic\MarketplaceBundle\Exception\RecordNotFoundException;
 
-class VersionCollection implements \Iterator, \Countable, \ArrayAccess
+final class VersionCollection implements \Iterator, \Countable, \ArrayAccess
 {
     /**
      * @var Version[]
@@ -24,34 +24,34 @@ class VersionCollection implements \Iterator, \Countable, \ArrayAccess
         $this->records = array_values($records);
     }
 
-    public static function fromArray(array $array): VersionCollection
+    public static function fromArray(array $array): self
     {
         return new self(
             array_map(
-                fn (array $record) => Version::fromArray($record),
+                Version::fromArray(...),
                 $array
             )
         );
     }
 
-    public function map(callable $callback): VersionCollection
+    public function map(callable $callback): self
     {
         return new self(array_map($callback, $this->records));
     }
 
-    public function sortByLatest(): VersionCollection
+    public function sortByLatest(): self
     {
         $records = $this->records;
 
         usort(
             $records,
-            fn (Version $versionA, Version $versionB) => $versionB->time->getTimestamp() - $versionA->time->getTimestamp()
+            fn (Version $versionA, Version $versionB): int => $versionB->time->getTimestamp() - $versionA->time->getTimestamp()
         );
 
         return new self($records);
     }
 
-    public function filter(callable $callback): VersionCollection
+    public function filter(callable $callback): self
     {
         return new self(array_values(array_filter($this->records, $callback)));
     }
@@ -61,7 +61,7 @@ class VersionCollection implements \Iterator, \Countable, \ArrayAccess
      */
     public function findLatestStableVersionPackage(): ?Version
     {
-        return $this->sortByLatest()->filter(fn (Version $version) => $version->isStable())->first();
+        return $this->sortByLatest()->filter(fn (Version $version): bool => $version->isStable())->first();
     }
 
     /**
@@ -109,7 +109,7 @@ class VersionCollection implements \Iterator, \Countable, \ArrayAccess
 
     public function offsetSet($offset, $value): void
     {
-        if (is_null($offset)) {
+        if (null === $offset) {
             $this->records[] = $value;
         } else {
             $this->records[$offset] = $value;

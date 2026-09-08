@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ApiBundle\Tests;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -7,7 +9,7 @@ use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\TestCase;
 
-class EntityResultHelperTest extends TestCase
+final class EntityResultHelperTest extends TestCase
 {
     public const NEW_TITLE = 'Callback Title';
 
@@ -27,12 +29,12 @@ class EntityResultHelperTest extends TestCase
 
         $this->assertEquals($results, $arrayResult);
 
-        $arrayResult = $resultHelper->getArray($results, function ($entity): void {
+        $arrayResult = $resultHelper->getArray($results, function (Lead $entity): void {
             $this->modifyEntityData($entity);
         });
 
         foreach ($arrayResult as $entity) {
-            $this->assertEquals($entity->getTitle(), self::NEW_TITLE);
+            $this->assertEquals(self::NEW_TITLE, $entity->getTitle());
         }
     }
 
@@ -55,7 +57,7 @@ class EntityResultHelperTest extends TestCase
             ->onlyMethods(['getIterator'])
             ->getMock();
 
-        $paginator->expects($this->any())
+        $paginator
             ->method('getIterator')
             ->willReturn($iterator);
 
@@ -63,12 +65,12 @@ class EntityResultHelperTest extends TestCase
 
         $this->assertEquals($results, $arrayResult);
 
-        $arrayResult = $resultHelper->getArray($results, function ($entity): void {
+        $arrayResult = $resultHelper->getArray($results, function (Lead $entity): void {
             $this->modifyEntityData($entity);
         });
 
         foreach ($arrayResult as $entity) {
-            $this->assertEquals($entity->getTitle(), self::NEW_TITLE);
+            $this->assertEquals(self::NEW_TITLE, $entity->getTitle());
         }
     }
 
@@ -97,12 +99,12 @@ class EntityResultHelperTest extends TestCase
             $this->assertEquals($entity->getTitle(), 'Title '.$entity->getId());
         }
 
-        $arrayResult = $resultHelper->getArray($data, function ($entity): void {
+        $arrayResult = $resultHelper->getArray($data, function (Lead $entity): void {
             $this->modifyEntityData($entity);
         });
 
         foreach ($arrayResult as $entity) {
-            $this->assertEquals($entity->getTitle(), self::NEW_TITLE);
+            $this->assertEquals(self::NEW_TITLE, $entity->getTitle());
         }
     }
 

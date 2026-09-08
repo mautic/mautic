@@ -4,20 +4,32 @@ namespace MauticPlugin\MauticSocialBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
+use MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository;
 use MauticPlugin\MauticSocialBundle\Event as Events;
 use MauticPlugin\MauticSocialBundle\Form\Type\MonitoringType;
 use MauticPlugin\MauticSocialBundle\Form\Type\TwitterHashtagType;
 use MauticPlugin\MauticSocialBundle\Form\Type\TwitterMentionType;
 use MauticPlugin\MauticSocialBundle\SocialEvents;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends FormModel<Monitoring>
  */
-class MonitoringModel extends FormModel
+final class MonitoringModel extends FormModel
 {
+    private MonitoringRepository $monitoringRepository;
+
+    #[Required]
+    public function autowireMonitoringModel(
+        MonitoringRepository $monitoringRepository,
+    ): void {
+        $this->monitoringRepository = $monitoringRepository;
+    }
+
     /**
      * @var array<string, mixed>
      */
@@ -37,7 +49,7 @@ class MonitoringModel extends FormModel
      * @param string|null $action
      * @param mixed[]     $options
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Monitoring) {
             throw new MethodNotAllowedHttpException(['Monitoring']);
@@ -85,7 +97,7 @@ class MonitoringModel extends FormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new Events\SocialEvent($entity, $isNew);
             }
 
@@ -118,12 +130,9 @@ class MonitoringModel extends FormModel
         parent::saveEntity($monitoringEntity, $unlock);
     }
 
-    /**
-     * @return \MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository
-     */
-    public function getRepository()
+    public function getRepository(): MonitoringRepository
     {
-        return $this->em->getRepository(Monitoring::class);
+        return $this->monitoringRepository;
     }
 
     public function getPermissionBase(): string

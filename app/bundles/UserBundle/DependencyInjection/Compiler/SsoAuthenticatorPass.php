@@ -13,7 +13,7 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
  * This will replace $options in the
  * \Mautic\UserBundle\DependencyInjection\Firewall\Factory\MauticSsoFactory::createAuthenticator.
  */
-class SsoAuthenticatorPass implements CompilerPassInterface
+final class SsoAuthenticatorPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {

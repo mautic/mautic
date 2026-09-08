@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\LeadBundle\Services\ContactColumnsDictionary;
@@ -10,10 +12,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class ContactColumnsType extends AbstractType
+final class ContactColumnsType extends AbstractType
 {
     public function __construct(
-        private ContactColumnsDictionary $columnsDictionary,
+        private readonly ContactColumnsDictionary $columnsDictionary,
     ) {
     }
 
@@ -34,7 +36,7 @@ class ContactColumnsType extends AbstractType
         );
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return ChoiceType::class;
     }

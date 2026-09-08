@@ -9,13 +9,14 @@ use Mautic\LeadBundle\Entity\CustomFieldEntityInterface;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
-use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Service\Attribute\Required;
 
 trait CustomFieldsApiControllerTrait
 {
-    private ?RequestStack $requestStack = null;
+    private RequestStack $requestStack;
 
     /**
      * @var mixed[]
@@ -105,7 +106,7 @@ trait CustomFieldsApiControllerTrait
                 if (!isset($fieldDefinition['properties'])) {
                     $fieldDefinition['properties'] = [];
                 }
-                $properties = is_string($fieldDefinition['properties']) ? unserialize($fieldDefinition['properties']) : $fieldDefinition['properties'];
+                $properties = is_string($fieldDefinition['properties']) ? \Mautic\CoreBundle\Helper\Serializer::decode($fieldDefinition['properties']) : $fieldDefinition['properties'];
 
                 $fields[$group][$field]['value']           = empty($properties['scale']) ? (int) $fields[$group][$field]['value']
                     : (float) $fields[$group][$field]['value'];
@@ -164,10 +165,10 @@ trait CustomFieldsApiControllerTrait
     }
 
     /**
-     * @param Lead|Company $entity
-     * @param Form         $form
-     * @param mixed[]      $parameters
-     * @param bool         $isPostOrPatch
+     * @param Lead|Company         $entity
+     * @param FormInterface<mixed> $form
+     * @param mixed[]              $parameters
+     * @param bool                 $isPostOrPatch
      *
      * @return bool|void
      */
@@ -191,7 +192,7 @@ trait CustomFieldsApiControllerTrait
                 $parameters,
                 function ($value): bool {
                     if (is_numeric($value)) {
-                        return 0 !== (int) $value;
+                        return 0.0 !== (float) $value;
                     }
 
                     return true;
@@ -208,9 +209,10 @@ trait CustomFieldsApiControllerTrait
         $this->model->setFieldValues($entity, $parameters, $overwriteWithBlank);
     }
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function setRequestStack(RequestStack $requestStack): void
-    {
+    #[Required]
+    public function setRequestStack(
+        RequestStack $requestStack,
+    ): void {
         $this->requestStack = $requestStack;
     }
 }

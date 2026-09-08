@@ -13,17 +13,26 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use PHPUnit\Framework\TestCase;
 
-class CampaignSubscriberTest extends TestCase
+final class CampaignSubscriberTest extends TestCase
 {
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject&IpLookupHelper
+     */
     private \PHPUnit\Framework\MockObject\MockObject $ipLookupHelper;
 
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject&AuditLogModel
+     */
     private \PHPUnit\Framework\MockObject\MockObject $auditLogModel;
 
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject&CampaignAuditService
+     */
     private \PHPUnit\Framework\MockObject\MockObject $campaignAuditService;
 
     private CampaignSubscriber $subscriber;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -40,13 +49,10 @@ class CampaignSubscriberTest extends TestCase
 
     public function testGetSubscribedEvents(): void
     {
-        self::assertEquals(
-            [
-                CampaignEvents::CAMPAIGN_POST_SAVE     => ['onCampaignPostSave', 0],
-                CampaignEvents::CAMPAIGN_POST_DELETE   => ['onCampaignDelete', 0],
-            ],
-            CampaignSubscriber::getSubscribedEvents()
-        );
+        $this->assertSame([
+            CampaignEvents::CAMPAIGN_POST_SAVE     => ['onCampaignPostSave', 0],
+            CampaignEvents::CAMPAIGN_POST_DELETE   => ['onCampaignDelete', 0],
+        ], CampaignSubscriber::getSubscribedEvents());
     }
 
     public function testOnCampaignPostSaveNothingHappened(): void

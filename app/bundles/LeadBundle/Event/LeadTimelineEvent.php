@@ -7,21 +7,17 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class LeadTimelineEvent extends Event
+final class LeadTimelineEvent extends Event
 {
     /**
      * Container with all filtered events.
-     *
-     * @var array
      */
-    protected $events = [];
+    private array $events = [];
 
     /**
      * Container with all registered events types.
-     *
-     * @var array
      */
-    protected $eventTypes = [];
+    private array $eventTypes = [];
 
     /**
      * Array of filters
@@ -31,54 +27,36 @@ class LeadTimelineEvent extends Event
      *
      * @var mixed[]
      */
-    protected array $filters;
+    private array $filters;
 
     /**
      * @var array<string, int>
      */
-    protected $totalEvents = [];
+    private array $totalEvents = [];
 
-    /**
-     * @var array
-     */
-    protected $totalEventsByUnit = [];
+    private array $totalEventsByUnit = [];
 
-    /**
-     * @var bool
-     */
-    protected $countOnly = false;
+    private bool $countOnly = false;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    protected $dateFrom;
+    private ?\DateTime $dateFrom = null;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    protected $dateTo;
+    private ?\DateTime $dateTo = null;
 
     /**
      * Time unit to group counts by (M = month, D = day, Y = year, null = no grouping).
      *
      * @var string
      */
-    protected $groupUnit;
+    private $groupUnit;
 
-    /**
-     * @var ChartQuery
-     */
-    protected $chartQuery;
+    private ?ChartQuery $chartQuery = null;
 
-    /**
-     * @var bool
-     */
-    protected $fetchTypesOnly = false;
+    private bool $fetchTypesOnly = false;
 
     /**
      * @var array
      */
-    protected $serializerGroups = [
+    private $serializerGroups = [
         'ipAddressList',
     ];
 
@@ -90,15 +68,15 @@ class LeadTimelineEvent extends Event
      * @param string|null $siteDomain
      */
     public function __construct(
-        protected ?Lead $lead = null,
+        private readonly ?Lead $lead = null,
         array $filters = [],
-        protected ?array $orderBy = null,
-        protected $page = 1,
-        protected $limit = 25,
-        protected $forTimeline = true,
-        protected $siteDomain = null,
+        private ?array $orderBy = null,
+        private $page = 1,
+        private $limit = 25,
+        private $forTimeline = true,
+        private $siteDomain = null,
     ) {
-        $this->filters = !empty($filters)
+        $this->filters = [] !== $filters
             ? $filters
             :
             [
@@ -151,7 +129,7 @@ class LeadTimelineEvent extends Event
                 $this->events[$data['event']] = [];
             }
 
-            if (!$this->isForTimeline()) {
+            if (!$this->forTimeline) {
                 // standardize the payload
                 $keepThese = [
                     'event'      => true,
@@ -197,11 +175,11 @@ class LeadTimelineEvent extends Event
      */
     public function getEvents()
     {
-        if (empty($this->events)) {
+        if ([] === $this->events) {
             return [];
         }
 
-        $events = call_user_func_array('array_merge', array_values($this->events));
+        $events = call_user_func_array(array_merge(...), array_values($this->events));
 
         foreach ($events as &$e) {
             if (!$e['timestamp'] instanceof \DateTime) {
@@ -214,7 +192,7 @@ class LeadTimelineEvent extends Event
         if (!empty($this->orderBy)) {
             usort(
                 $events,
-                function ($a, $b) {
+                function (array $a, array $b) {
                     switch ($this->orderBy[0]) {
                         case 'eventLabel':
                             $aLabel = '';
@@ -252,10 +230,8 @@ class LeadTimelineEvent extends Event
 
     /**
      * Get the max number of pages for pagination.
-     *
-     * @return float|int
      */
-    public function getMaxPage()
+    public function getMaxPage(): int|float
     {
         if (!$this->totalEvents) {
             return 1;
@@ -284,7 +260,7 @@ class LeadTimelineEvent extends Event
      *
      * @return array of available types
      */
-    public function getEventTypes()
+    public function getEventTypes(): array
     {
         natcasesort($this->eventTypes);
 
@@ -303,10 +279,8 @@ class LeadTimelineEvent extends Event
 
     /**
      * Fetch the order for queries.
-     *
-     * @return array|null
      */
-    public function getEventOrder()
+    public function getEventOrder(): ?array
     {
         return $this->orderBy;
     }
@@ -342,10 +316,8 @@ class LeadTimelineEvent extends Event
 
     /**
      * Fetches the lead being acted on.
-     *
-     * @return Lead
      */
-    public function getLead()
+    public function getLead(): ?Lead
     {
         return $this->lead;
     }
@@ -386,10 +358,8 @@ class LeadTimelineEvent extends Event
 
     /**
      * Check if the event is getting an engagement count only.
-     *
-     * @return bool
      */
-    public function isEngagementCount()
+    public function isEngagementCount(): bool
     {
         return $this->countOnly;
     }
@@ -451,7 +421,7 @@ class LeadTimelineEvent extends Event
         if (is_array($count)) {
             if (isset($count['total'])) {
                 $this->totalEvents[$eventType] += $count['total'];
-            } elseif ($this->isEngagementCount() && $this->groupUnit) {
+            } elseif ($this->countOnly && $this->groupUnit) {
                 // Group counts across events by unit
                 foreach ($count as $key => $data) {
                     if (!isset($this->totalEventsByUnit[$key])) {
@@ -471,7 +441,7 @@ class LeadTimelineEvent extends Event
     /**
      * Subtract from the total counter if there is an event that was skipped for whatever reason.
      */
-    public function subtractFromCounter($eventType, $count = 1): void
+    public function subtractFromCounter(string $eventType, $count = 1): void
     {
         $this->totalEvents[$eventType] -= $count;
     }
@@ -490,10 +460,8 @@ class LeadTimelineEvent extends Event
 
     /**
      * Get chart query helper to format dates.
-     *
-     * @return ChartQuery
      */
-    public function getChartQuery()
+    public function getChartQuery(): ?ChartQuery
     {
         return $this->chartQuery;
     }

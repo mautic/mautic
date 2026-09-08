@@ -1,0 +1,16 @@
+<td class="col-company-value-name">
+    <div>
+        {% if securityHasEntityAccess(permissions['lead:leads:editown'], permissions['lead:leads:editother'], item.createdBy) %}
+            <a href="{{ path('mautic_company_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
+                {% if fields.core.companyname is defined %}
+                    {{ fields.core.companyname.value|purify }}
+                {% endif %}
+            </a>
+        {% else %}
+            {% if fields.core.companyname is defined %}
+                {{ fields.core.companyname.value|purify }}
+            {% endif %}
+        {% endif %}
+        {{ include('@MauticProject/Modules/projects.html.twig') }}
+    </div>
+</td>

@@ -3,25 +3,28 @@
 namespace Mautic\CoreBundle\Tests\Unit\Doctrine;
 
 use Doctrine\DBAL\Platforms\MySQLPlatform;
+use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;
+use Mautic\CoreBundle\Doctrine\Type\ArrayType;
+use Mautic\IntegrationsBundle\Sync\DAO\Value\ReferenceValueDAO;
 
-class ExampleClassWithPrivateProperty
+final class ExampleClassWithPrivateProperty
 {
     /**
      * @phpstan-ignore-next-line
      */
-    private $test = 'value';
+    private string $test = 'value';
 }
 
-class ExampleClassWithProtectedProperty
+final class ExampleClassWithProtectedProperty
 {
     /**
      * @phpstan-ignore-next-line
      */
-    protected $test = 'value';
+    private string $test = 'value';
 }
 
-class ExampleClassWithPublicProperty
+final class ExampleClassWithPublicProperty
 {
     /**
      * @phpstan-ignore-next-line
@@ -29,14 +32,11 @@ class ExampleClassWithPublicProperty
     public $test = 'value';
 }
 
-class ArrayTypeTest extends \PHPUnit\Framework\TestCase
+final class ArrayTypeTest extends \PHPUnit\Framework\TestCase
 {
     public const MAUTIC_ARRAY_TYPE_NAME = 'mautic-array-type';
 
-    /**
-     * @var Type
-     */
-    private $arrayType;
+    private Type $arrayType;
 
     private MySQLPlatform $platform;
 
@@ -45,7 +45,7 @@ class ArrayTypeTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
 
         if (!Type::hasType(self::MAUTIC_ARRAY_TYPE_NAME)) {
-            Type::addType(self::MAUTIC_ARRAY_TYPE_NAME, \Mautic\CoreBundle\Doctrine\Type\ArrayType::class);
+            Type::addType(self::MAUTIC_ARRAY_TYPE_NAME, ArrayType::class);
         }
 
         $this->arrayType = Type::getType(self::MAUTIC_ARRAY_TYPE_NAME);
@@ -62,21 +62,21 @@ class ArrayTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testGivenNullPoisonedStringWhenConvertsToDatabaseValueThenError(): void
     {
-        $this->expectException(\Doctrine\DBAL\Types\ConversionException::class);
+        $this->expectException(ConversionException::class);
 
         $this->arrayType->convertToDatabaseValue(["abcd\0efgh"], $this->platform);
     }
 
     public function testGivenObjectWithPrivatePropertyWhenConvertsToDatabaseValueThenError(): void
     {
-        $this->expectException(\Doctrine\DBAL\Types\ConversionException::class);
+        $this->expectException(ConversionException::class);
 
         $this->arrayType->convertToDatabaseValue([new ExampleClassWithPrivateProperty()], $this->platform);
     }
 
     public function testGivenObjectWithProtectedPropertyWhenConvertsToDatabaseValueThenError(): void
     {
-        $this->expectException(\Doctrine\DBAL\Types\ConversionException::class);
+        $this->expectException(ConversionException::class);
 
         $this->arrayType->convertToDatabaseValue([new ExampleClassWithProtectedProperty()], $this->platform);
     }
@@ -108,7 +108,7 @@ class ArrayTypeTest extends \PHPUnit\Framework\TestCase
             'fields' => [
                 'field_account_executive_o' => [
                     null,
-                    new \Mautic\IntegrationsBundle\Sync\DAO\Value\ReferenceValueDAO(),
+                    new ReferenceValueDAO(),
                 ],
             ],
             'dateModified' => [

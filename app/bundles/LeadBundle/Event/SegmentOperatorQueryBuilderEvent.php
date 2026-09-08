@@ -13,14 +13,14 @@ final class SegmentOperatorQueryBuilderEvent extends Event
 {
     private bool $operatorHandled = false;
 
-    private string $leadsTableAlias;
+    private readonly string $leadsTableAlias;
 
     /**
      * @param string|string[] $parameterHolder
      */
     public function __construct(
-        private QueryBuilder $queryBuilder,
-        private ContactSegmentFilter $filter,
+        private readonly QueryBuilder $queryBuilder,
+        private readonly ContactSegmentFilter $filter,
         private $parameterHolder,
     ) {
         $this->leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');

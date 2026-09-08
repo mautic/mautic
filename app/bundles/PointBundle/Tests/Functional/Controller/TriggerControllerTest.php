@@ -7,7 +7,6 @@ namespace Mautic\PointBundle\Tests\Functional\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\ProjectBundle\Entity\Project;
-use PHPUnit\Framework\Assert;
 
 final class TriggerControllerTest extends MauticMysqlTestCase
 {
@@ -33,6 +32,7 @@ final class TriggerControllerTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $savedAsset = $this->em->find(Trigger::class, $trigger->getId());
-        Assert::assertSame($project->getId(), $savedAsset->getProjects()->first()->getId());
+        $this->assertInstanceOf(Trigger::class, $savedAsset);
+        $this->assertSame($project->getId(), $savedAsset->getProjects()->first()->getId());
     }
 }

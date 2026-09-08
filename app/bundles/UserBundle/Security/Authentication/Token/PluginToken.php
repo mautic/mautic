@@ -20,7 +20,7 @@ class PluginToken extends AbstractToken
         $user = null,
         private string $credentials = '',
         array $roles = [],
-        private ?Response $response = null,
+        private readonly ?Response $response = null,
     ) {
         parent::__construct($roles);
 
@@ -64,7 +64,7 @@ class PluginToken extends AbstractToken
      */
     public function __serialize(): array
     {
-        return array_merge([$this->authenticatingService, $this->credentials, $this->providerKey, parent::__serialize()]);
+        return [$this->authenticatingService, $this->credentials, $this->providerKey, parent::__serialize()];
     }
 
     /**

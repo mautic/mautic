@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -9,23 +11,19 @@ use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\IpAddressModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class IpAddressModelTest extends TestCase
+final class IpAddressModelTest extends TestCase
 {
     /**
-     * @var EntityManager|MockObject
+     * @var MockObject&EntityManager
      */
     private MockObject $entityManager;
-
-    /**
-     * @var MockObject|LoggerInterface
-     */
-    private MockObject $logger;
 
     private IpAddressModel $ipAddressModel;
 
@@ -34,8 +32,7 @@ class IpAddressModelTest extends TestCase
         parent::setUp();
 
         $this->entityManager  = $this->createMock(EntityManager::class);
-        $this->logger         = $this->createMock(LoggerInterface::class);
-        $this->ipAddressModel = new IpAddressModel($this->entityManager, $this->logger);
+        $this->ipAddressModel = new IpAddressModel($this->entityManager, $this->createStub(LoggerInterface::class), $this->createStub(IpAddressRepository::class));
     }
 
     /**
@@ -52,10 +49,8 @@ class IpAddressModelTest extends TestCase
     public function testSaveIpAddressReferencesForContactThatHasIpsButNoChanges(): void
     {
         $contact      = $this->createMock(Lead::class);
-        $ipAddress    = $this->createMock(IpAddress::class);
+        $ipAddress    = $this->createStub(IpAddress::class);
         $ipAddresses  = new ArrayCollection(['1.2.3.4' => $ipAddress]);
-        $connection   = $this->createMock(Connection::class);
-        $queryBuilder = $this->createMock(QueryBuilder::class);
 
         $contact->expects($this->exactly(1))
             ->method('getIpAddresses')
@@ -149,7 +144,7 @@ class IpAddressModelTest extends TestCase
 
         $queryBuilder->expects($this->once())
             ->method('executeStatement')
-            ->willThrowException(new UniqueConstraintViolationException($this->createMock(DriverException::class), null));
+            ->willThrowException(new UniqueConstraintViolationException($this->createStub(DriverException::class), null));
 
         $connection->expects($this->once())
             ->method('createQueryBuilder')

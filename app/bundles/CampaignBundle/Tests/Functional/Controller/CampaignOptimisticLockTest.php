@@ -9,9 +9,8 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
-use PHPUnit\Framework\Assert;
 
-class CampaignOptimisticLockTest extends MauticMysqlTestCase
+final class CampaignOptimisticLockTest extends MauticMysqlTestCase
 {
     use CampaignControllerTrait;
 
@@ -47,17 +46,17 @@ class CampaignOptimisticLockTest extends MauticMysqlTestCase
         $crawler = $this->submitForm($pageCrawler, $campaign, ++$version, [
             'campaign[allowRestart]' => '0',
         ]);
-        Assert::assertStringNotContainsString(self::OPTIMISTIC_LOCK_ERROR, $crawler->text());
+        $this->assertStringNotContainsString(self::OPTIMISTIC_LOCK_ERROR, $crawler->text());
 
         // we should get an optimistic lock error as the page wasn't refreshed
         $crawler = $this->submitForm($pageCrawler, $campaign, $version, [
             'campaign[isPublished]' => '1',
         ]);
-        Assert::assertStringContainsString(self::OPTIMISTIC_LOCK_ERROR, $crawler->text());
+        $this->assertStringContainsString(self::OPTIMISTIC_LOCK_ERROR, $crawler->text());
 
         // we should get an optimistic lock error even if there is no change
         $crawler = $this->submitForm($pageCrawler, $campaign, $version);
-        Assert::assertStringContainsString(self::OPTIMISTIC_LOCK_ERROR, $crawler->text());
+        $this->assertStringContainsString(self::OPTIMISTIC_LOCK_ERROR, $crawler->text());
     }
 
     private function setupCampaign(): Campaign
@@ -70,6 +69,8 @@ class CampaignOptimisticLockTest extends MauticMysqlTestCase
 
         $campaign = new Campaign();
         $campaign->setName('Test campaign');
+        $campaign->setIsPublished(true);
+        $campaign->setPublishUp(new \DateTime());
         $campaign->addList($leadList);
         $this->em->persist($campaign);
 

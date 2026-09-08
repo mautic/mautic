@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Tests\Scheduler\Date;
 
 use Mautic\ReportBundle\Scheduler\Builder\SchedulerBuilder;
@@ -12,10 +14,10 @@ use Mautic\ReportBundle\Scheduler\Exception\NotSupportedScheduleTypeException;
 use Mautic\ReportBundle\Scheduler\Factory\SchedulerTemplateFactory;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class DateBuilderTest extends \PHPUnit\Framework\TestCase
+final class DateBuilderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|SchedulerBuilder
+     * @var MockObject&SchedulerBuilder
      */
     private MockObject $schedulerBuilder;
 

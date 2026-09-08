@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Twig;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+
 /**
  * Trait to provide PHPUnit 10 compatibility for Twig integration tests
  * This handles the static data provider requirements and legacy test overrides.
@@ -50,8 +52,6 @@ trait TwigIntegrationTestTrait
     }
 
     /**
-     * @dataProvider integrationTestDataProvider
-     *
      * @param string                $file
      * @param string                $message
      * @param string                $condition
@@ -60,6 +60,7 @@ trait TwigIntegrationTestTrait
      * @param array<mixed>          $outputs
      * @param string                $deprecation
      */
+    #[DataProvider('integrationTestDataProvider')]
     public function testIntegration($file, $message, $condition, $templates, $exception, $outputs, $deprecation = ''): void
     {
         $this->doIntegrationTest($file, $message, $condition, $templates, $exception, $outputs, $deprecation);

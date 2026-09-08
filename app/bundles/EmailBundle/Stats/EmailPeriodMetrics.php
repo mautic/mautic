@@ -9,9 +9,10 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
-class EmailPeriodMetrics
+final readonly class EmailPeriodMetrics
 {
     private const CAMPAIGN_EVENT_SOURCE = 'campaign.event';
+
     private const EMAIL_SOURCE          = 'email';
 
     public function __construct(
@@ -149,12 +150,12 @@ class EmailPeriodMetrics
     {
         return $this->connection->createQueryBuilder()
             ->select(
-                "WEEKDAY(TIMESTAMPADD(SECOND, :timezoneOffset, $dateColumn)) AS $groupByAlias",
-                "COUNT(id) AS $countAlias"
+                "WEEKDAY(TIMESTAMPADD(SECOND, :timezoneOffset, {$dateColumn})) AS {$groupByAlias}",
+                "COUNT(id) AS {$countAlias}"
             )
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'es')
-            ->where("es.$dateColumn IS NOT NULL")
-            ->andWhere("es.$dateColumn BETWEEN :dateFrom AND :dateTo")
+            ->where("es.{$dateColumn} IS NOT NULL")
+            ->andWhere("es.{$dateColumn} BETWEEN :dateFrom AND :dateTo")
             ->andWhere('es.source = :campaign_event_source')
             ->andWhere('es.source_id IN (:source_ids)')
             ->groupBy($groupByAlias)
@@ -165,12 +166,12 @@ class EmailPeriodMetrics
     {
         return $this->connection->createQueryBuilder()
             ->select(
-                "TIME_FORMAT(TIMESTAMPADD(SECOND, :timezoneOffset, $dateColumn), :format) AS $groupByAlias",
-                "COUNT(id) AS $countAlias"
+                "TIME_FORMAT(TIMESTAMPADD(SECOND, :timezoneOffset, {$dateColumn}), :format) AS {$groupByAlias}",
+                "COUNT(id) AS {$countAlias}"
             )
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'es')
-            ->where("es.$dateColumn IS NOT NULL")
-            ->andWhere("es.$dateColumn BETWEEN :dateFrom AND :dateTo")
+            ->where("es.{$dateColumn} IS NOT NULL")
+            ->andWhere("es.{$dateColumn} BETWEEN :dateFrom AND :dateTo")
             ->andWhere('es.source = :campaign_event_source')
             ->andWhere('es.source_id IN (:source_ids)')
             ->groupBy($groupByAlias)

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\LeadBundle\Model\ListModel;
@@ -11,11 +13,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class DashboardLeadsLifetimeWidgetType extends AbstractType
+final class DashboardLeadsLifetimeWidgetType extends AbstractType
 {
     public function __construct(
-        private ListModel $segmentModel,
-        private TranslatorInterface $translator,
+        private readonly ListModel $segmentModel,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 

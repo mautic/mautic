@@ -6,15 +6,12 @@ use LightSaml\Model\Metadata\EntityDescriptor;
 use LightSaml\Store\EntityDescriptor\EntityDescriptorStoreInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
-class EntityDescriptorStore implements EntityDescriptorStoreInterface
+final class EntityDescriptorStore implements EntityDescriptorStoreInterface
 {
-    /**
-     * @var EntityDescriptor
-     */
-    private $entityDescriptor;
+    private ?EntityDescriptor $entityDescriptor = null;
 
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -43,11 +40,7 @@ class EntityDescriptorStore implements EntityDescriptorStoreInterface
         $entityDescriptor = $this->get($entityId);
 
         // EntityIds do not match
-        if (!$entityDescriptor) {
-            return false;
-        }
-
-        return true;
+        return null !== $entityDescriptor;
     }
 
     /**

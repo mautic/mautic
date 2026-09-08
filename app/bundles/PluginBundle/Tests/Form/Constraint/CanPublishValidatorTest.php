@@ -15,17 +15,18 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Context\ExecutionContext;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
-class CanPublishValidatorTest extends TestCase
+final class CanPublishValidatorTest extends TestCase
 {
     /**
-     * @var MockObject|EventDispatcherInterface
+     * @var MockObject&EventDispatcherInterface
      */
-    private $dispatcher;
+    private MockObject $dispatcher;
 
     /**
-     * @var MockObject|PluginIsPublishedEvent
+     * @var MockObject&PluginIsPublishedEvent
      */
-    private $event;
+    private MockObject $event;
+
     private CanPublishValidator $canPublishValidator;
 
     protected function setUp(): void
@@ -52,9 +53,9 @@ class CanPublishValidatorTest extends TestCase
             ->method('dispatch')
             ->willReturn($this->event);
 
-        $this->canPublishValidator->initialize($this->createMock(ExecutionContext::class));
+        $this->canPublishValidator->initialize($this->createStub(ExecutionContext::class));
 
-        $this->canPublishValidator->validate(1, new CanPublish('testIntegration'));
+        $this->canPublishValidator->validate(1, new CanPublish(integrationName: 'testIntegration'));
     }
 
     public function testEventNotDispatchedIfUnpublished(): void
@@ -72,9 +73,9 @@ class CanPublishValidatorTest extends TestCase
             ->with(PluginEvents::PLUGIN_IS_PUBLISHED_STATE_CHANGING)
             ->willReturn($this->event);
 
-        $this->canPublishValidator->initialize($this->createMock(ExecutionContext::class));
+        $this->canPublishValidator->initialize($this->createStub(ExecutionContext::class));
 
-        $this->canPublishValidator->validate(0, new CanPublish('testIntegration'));
+        $this->canPublishValidator->validate(0, new CanPublish(integrationName: 'testIntegration'));
     }
 
     public function testExceptionIsThrown(): void
@@ -92,10 +93,10 @@ class CanPublishValidatorTest extends TestCase
             ->with(PluginEvents::PLUGIN_IS_PUBLISHED_STATE_CHANGING)
             ->willReturn($this->event);
 
-        $this->canPublishValidator->initialize($this->createMock(ExecutionContext::class));
+        $this->canPublishValidator->initialize($this->createStub(ExecutionContext::class));
 
         $this->expectException(UnexpectedTypeException::class);
 
-        $this->canPublishValidator->validate(1, new class extends Constraint {});
+        $this->canPublishValidator->validate(1, new class() extends Constraint {});
     }
 }

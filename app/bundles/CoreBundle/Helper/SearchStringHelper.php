@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Helper;
 
-class SearchStringHelper
+final class SearchStringHelper
 {
     public const COMMAND_NEGATE  = 0;
 
@@ -10,27 +10,18 @@ class SearchStringHelper
 
     public const COMMAND_NEUTRAL = 2;
 
-    /**
-     * @var array
-     */
-    protected $needsParsing = [
+    private array $needsParsing = [
         ' ',
         '(',
         ')',
     ];
 
-    /**
-     * @var array
-     */
-    protected $needsClosing = [
+    private array $needsClosing = [
         'quote'       => '"',
         'parenthesis' => '(',
     ];
 
-    /**
-     * @var array
-     */
-    protected $closingChars = [
+    private array $closingChars = [
         'quote'       => '"',
         'parenthesis' => ')',
     ];
@@ -52,10 +43,8 @@ class SearchStringHelper
 
     /**
      * @param string $input
-     *
-     * @return \stdClass
      */
-    public static function parseSearchString($input, ?array $needsParsing = null, ?array $needsClosing = null, ?array $closingChars = null)
+    public static function parseSearchString($input, ?array $needsParsing = null, ?array $needsClosing = null, ?array $closingChars = null): \stdClass
     {
         $input = trim(strip_tags($input));
 
@@ -64,7 +53,7 @@ class SearchStringHelper
         return $self->parseString($input);
     }
 
-    public function parseString($input)
+    public function parseString($input): \stdClass
     {
         return $this->splitUpSearchString($input);
     }
@@ -88,7 +77,7 @@ class SearchStringHelper
         }
     }
 
-    protected function addFilterCommand(&$filters, $mergeFilter)
+    private function addFilterCommand(&$filters, $mergeFilter): void
     {
         $command = $mergeFilter->command;
         if ('is' === $command) {
@@ -108,12 +97,8 @@ class SearchStringHelper
 
     /**
      * @param string $input
-     * @param string $baseName
-     * @param string $overrideCommand
-     *
-     * @return \stdClass
      */
-    protected function splitUpSearchString($input, $baseName = 'root', $overrideCommand = '')
+    private function splitUpSearchString($input, string $baseName = 'root', string $overrideCommand = ''): \stdClass
     {
         $keyCount                                 = 0;
         $command                                  = $overrideCommand;
@@ -139,7 +124,7 @@ class SearchStringHelper
             unset($chars[$pos]);
             ++$pos;
 
-            if (':' == $char) {
+            if (':' === $char) {
                 // the string is a command
                 $command = trim(substr($string, 0, -1));
                 // does this have a negative?
@@ -148,19 +133,21 @@ class SearchStringHelper
                     $command                              = substr($command, 1);
                 }
 
-                if (empty($chars)) {
+                if ([] === $chars) {
                     // Command hasn't been defined so don't allow empty or could end up searching entire table
-                    unset($filters->{$baseName}[$keyCount]);
+                    $filters->{$baseName}[$keyCount]->command      = $command;
+                    $filters->{$baseName}[$keyCount]->missingValue = true;
+                    $this->addFilterCommand($filters, $filters->{$baseName}[$keyCount]);
                 } else {
                     $filters->{$baseName}[$keyCount]->command = $command;
                     $string                                   = '';
                 }
-            } elseif (' ' == $char) {
+            } elseif (' ' === $char) {
                 // arrived at the end of a single word that is not within a quote or parenthesis so add it as standalone
-                if (' ' != $string) {
+                if (' ' !== $string) {
                     $string = trim($string);
                     $type   = ('OR' === $string || 'AND' === $string) ? $string : '';
-                    $this->setFilter($filters, $baseName, $keyCount, $string, $command, $overrideCommand, true, $type, !empty($chars));
+                    $this->setFilter($filters, $baseName, $keyCount, $string, $command, $overrideCommand, true, $type, [] !== $chars);
                 }
                 continue;
             } elseif (in_array($char, $this->needsClosing)) {
@@ -209,7 +196,8 @@ class SearchStringHelper
                         $this->setFilter($filters, $baseName, $keyCount, $string, $command, $overrideCommand, !$neededParsing);
 
                         break;
-                    } elseif ($c === $char) {
+                    }
+                    if ($c === $char) {
                         // this is another opening char so keep track of it to properly handle nested strings
                         ++$openingCount;
                     } elseif ($c === $this->closingChars[$key]) {
@@ -217,7 +205,7 @@ class SearchStringHelper
                         ++$closingCount;
                     }
                 }
-            } elseif (empty($chars)) {
+            } elseif ([] === $chars) {
                 $filters->{$baseName}[$keyCount]->command = $command;
                 $this->setFilter($filters, $baseName, $keyCount, $string, $command, $overrideCommand, true, null, false);
             }// else keep concocting chars
@@ -226,10 +214,10 @@ class SearchStringHelper
         return $filters;
     }
 
-    private function setFilter(&$filters, &$baseName, &$keyCount, &$string, &$command, $overrideCommand,
-        $setFilter = true,
-        $type = null,
-        $setUpNext = true): void
+    private function setFilter(\stdClass &$filters, string &$baseName, int &$keyCount, string &$string, string &$command, string $overrideCommand,
+        bool $setFilter = true,
+        ?string $type = null,
+        bool $setUpNext = true): void
     {
         if (!empty($type)) {
             $filters->{$baseName}[$keyCount]->type = ('OR' === $type || 'AND' === $type) ? strtolower($type) : 'and';

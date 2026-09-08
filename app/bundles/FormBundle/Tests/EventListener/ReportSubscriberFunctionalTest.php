@@ -11,7 +11,7 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestCase
+final class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestCase
 {
     public function testLeadReportWithDncListColumn(): void
     {
@@ -167,7 +167,7 @@ class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestCase
         $response       = json_decode($clientResponse->getContent(), true);
         $formId         = (int) $response['form']['id'];
 
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
 
         return $formId;
     }

@@ -21,7 +21,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * - other and not own: only foreign (plus unowned) items
  * - own and other: no filtering
  */
-final class OwnershipScopedCollectionExtension implements QueryCollectionExtensionInterface
+final readonly class OwnershipScopedCollectionExtension implements QueryCollectionExtensionInterface
 {
     public function __construct(
         private Security $security,
@@ -113,35 +113,33 @@ final class OwnershipScopedCollectionExtension implements QueryCollectionExtensi
             return;
         }
 
-        if ($canViewOther && !$canViewOwn) {
-            if ($usesOwnerField) {
-                // Lead/Company pattern: NOT owned by current user
-                $parts     = explode('.', $ownershipField);
-                $baseAlias = $parts[0];
+        if ($usesOwnerField) {
+            // Lead/Company pattern: NOT owned by current user
+            $parts     = explode('.', $ownershipField);
+            $baseAlias = $parts[0];
 
-                $queryBuilder
-                    ->andWhere(
-                        sprintf(
-                            '((%s.owner != :%s OR %s.owner IS NULL) AND (%s.owner IS NOT NULL OR %s.createdBy != :%s OR %s.createdBy IS NULL))',
-                            $baseAlias,
-                            $parameterName,
-                            $baseAlias,
-                            $baseAlias,
-                            $baseAlias,
-                            $parameterName,
-                            $baseAlias
-                        )
+            $queryBuilder
+                ->andWhere(
+                    sprintf(
+                        '((%s.owner != :%s OR %s.owner IS NULL) AND (%s.owner IS NOT NULL OR %s.createdBy != :%s OR %s.createdBy IS NULL))',
+                        $baseAlias,
+                        $parameterName,
+                        $baseAlias,
+                        $baseAlias,
+                        $baseAlias,
+                        $parameterName,
+                        $baseAlias
                     )
-                    ->setParameter($parameterName, $userId);
-            } else {
-                // Match hasEntityAccess() semantics for "other": include all
-                // entities not created by the current user, plus unowned entities.
-                $queryBuilder
-                    ->andWhere(
-                        sprintf('(%s != :%s OR %s IS NULL)', $ownershipField, $parameterName, $ownershipField)
-                    )
-                    ->setParameter($parameterName, $userId);
-            }
+                )
+                ->setParameter($parameterName, $userId);
+        } else {
+            // Match hasEntityAccess() semantics for "other": include all
+            // entities not created by the current user, plus unowned entities.
+            $queryBuilder
+                ->andWhere(
+                    sprintf('(%s != :%s OR %s IS NULL)', $ownershipField, $parameterName, $ownershipField)
+                )
+                ->setParameter($parameterName, $userId);
         }
     }
 

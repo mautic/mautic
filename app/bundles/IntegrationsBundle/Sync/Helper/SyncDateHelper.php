@@ -23,7 +23,7 @@ class SyncDateHelper
     private ?\DateTimeInterface $internalSyncStartDateTime = null;
 
     public function __construct(
-        private Connection $connection,
+        private readonly Connection $connection,
     ) {
     }
 

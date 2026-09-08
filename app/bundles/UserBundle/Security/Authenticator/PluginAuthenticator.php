@@ -33,8 +33,16 @@ use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 final class PluginAuthenticator extends AbstractAuthenticator
 {
-    public function __construct(private TokenPermissions $tokenPermissions, private EventDispatcherInterface $dispatcher, private IntegrationHelper $integrationHelper, private UserProviderInterface $userProvider, private AuthenticationHandler $authenticationHandler, private OAuth2 $oAuth2, private LoggerInterface $logger, private string $firewallName)
-    {
+    public function __construct(
+        private readonly TokenPermissions $tokenPermissions,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly IntegrationHelper $integrationHelper,
+        private readonly UserProviderInterface $userProvider,
+        private readonly AuthenticationHandler $authenticationHandler,
+        private readonly OAuth2 $oAuth2,
+        private readonly LoggerInterface $logger,
+        private readonly string $firewallName,
+    ) {
     }
 
     public function supports(Request $request): ?bool
@@ -43,7 +51,7 @@ final class PluginAuthenticator extends AbstractAuthenticator
         return null === $this->oAuth2->getBearerToken($request) ? null : false;
     }
 
-    public function authenticate(Request $request): Passport
+    public function authenticate(Request $request): SelfValidatingPassport
     {
         $authenticatingService = $request->get('integration');
         \assert(null === $authenticatingService || is_string($authenticatingService));
@@ -69,7 +77,6 @@ final class PluginAuthenticator extends AbstractAuthenticator
                 $integrations
             );
             $authEvent = $this->dispatcher->dispatch($authEvent, UserEvents::USER_PRE_AUTHENTICATION);
-            \assert($authEvent instanceof AuthenticationEvent);
 
             if ($authenticated = $authEvent->isAuthenticated()) {
                 $eventToken            = $authEvent->getToken();

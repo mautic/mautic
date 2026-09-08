@@ -1,4 +1,5 @@
 {% set target = target is defined ? target : '.page-list' %}
+{% set headerTooltip = tooltip is defined and tooltip is not empty ? tooltip|trans : '' %}
 
 {% if checkall is defined and checkall is not empty %}
 <th class="col-actions" {% if tooltip is defined and tooltip is not empty %} data-toggle="tooltip" title="" data-placement="top" data-original-title="{{ tooltip|trans }}"{% endif %}>
@@ -59,7 +60,7 @@
 </th>
 {% elseif sessionVar is not defined or sessionVar is empty %}
 <th{% if class is defined and class is not empty %} class="{{ class }}"{% endif %}>
-    <span>{{ text|trans }}</span>
+    <span{% if headerTooltip is not empty %} data-toggle="tooltip" title="" data-placement="top" data-original-title="{{ headerTooltip|e('html_attr') }}"{% endif %}>{{ text|trans }}</span>
 </th>
 {% else %}
 {% set defaultOrder = default is defined and default is not empty ? orderBy : '' %}
@@ -72,7 +73,7 @@
     aria-sort="{% if orderBy is defined and orderBy is not empty and order == orderBy %}{% if dir == 'ASC' %}ascending{% else %}descending{% endif %}{% else %}none{% endif %}">
     {% if orderBy is defined and orderBy is not empty %}
     <a aria-label="{% if order == orderBy and dir == 'ASC' %}{{ 'mautic.core.sort.descending.description'|trans({'%header%': text|trans}) }}{% else %}{{ 'mautic.core.sort.ascending.description'|trans({'%header%': text|trans}) }}{% endif %}" class="btn btn-ghost btn-block jc-space-between table-sort" href="javascript: void(0);" onclick="Mautic.reorderTableData('{{ sessionVar }}','{{ orderBy }}','{{ tmpl }}','{{ target }}'{% if baseUrl is defined and baseUrl is not empty %},'{{ baseUrl }}'{% endif %});">
-        <span class="fw-b">{{ text|trans }}</span>
+        <span class="fw-b"{% if headerTooltip is not empty %} data-toggle="tooltip" title="" data-placement="top" data-original-title="{{ headerTooltip|e('html_attr') }}"{% endif %}>{{ text|trans }}</span>
         {% if order == orderBy %}
             {% if dir == 'ASC' %}
                 <i class="ri-arrow-up-line ri-lg fw-n" aria-hidden="true" focusable="false"></i>
@@ -84,7 +85,7 @@
         {% endif %}
     </a>
     {% else %}
-    <span class="pa-md">{{ text|trans }}</span>
+    <span class="pa-md"{% if headerTooltip is not empty %} data-toggle="tooltip" title="" data-placement="top" data-original-title="{{ headerTooltip|e('html_attr') }}"{% endif %}>{{ text|trans }}</span>
     {% endif %}
 
     <div class="thead-filter">

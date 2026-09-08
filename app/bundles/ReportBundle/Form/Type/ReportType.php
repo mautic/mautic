@@ -24,10 +24,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<Report>
  */
-class ReportType extends AbstractType
+final class ReportType extends AbstractType
 {
     public function __construct(
-        private ReportModel $reportModel,
+        private readonly ReportModel $reportModel,
     ) {
     }
 
@@ -434,7 +434,7 @@ class ReportType extends AbstractType
      *
      * @param array $tables Array with the table list and columns
      */
-    private function buildTableSourceList($tables): array
+    private function buildTableSourceList(array $tables): array
     {
         $temp = array_keys($tables);
 

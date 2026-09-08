@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<Tweet>
  */
-class TweetRepository extends CommonRepository
+final class TweetRepository extends CommonRepository
 {
     /**
      * @param string $search
@@ -24,7 +24,7 @@ class TweetRepository extends CommonRepository
 
         if (!empty($search)) {
             if (is_array($search)) {
-                $search = array_map('intval', $search);
+                $search = array_map(intval(...), $search);
                 $qb->andWhere($qb->expr()->in('t.id', ':search'))
                     ->setParameter('search', $search);
             } else {
@@ -38,7 +38,7 @@ class TweetRepository extends CommonRepository
                 ->setParameter('id', $this->currentUser->getId());
         }
 
-        if (!empty($ignoreIds)) {
+        if ([] !== $ignoreIds) {
             $qb->andWhere($qb->expr()->notIn('t.id', ':ignoreIds'))
                 ->setParameter('ignoreIds', $ignoreIds);
         }

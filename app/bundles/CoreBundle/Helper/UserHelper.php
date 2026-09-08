@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Helper;
 
 use Mautic\UserBundle\Entity\User;
@@ -14,10 +16,8 @@ class UserHelper
 
     /**
      * @param bool $nullIfGuest
-     *
-     * @return User|null
      */
-    public function getUser($nullIfGuest = false)
+    public function getUser($nullIfGuest = false): ?User
     {
         $user  = null;
         $token = $this->tokenStorage->getToken();

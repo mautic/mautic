@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<mixed>
  */
-class ConfigType extends AbstractType
+final class ConfigType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -75,9 +75,7 @@ class ConfigType extends AbstractType
             'required'    => false,
             'data'        => $options['data']['contact_export_limit'] ?? 0,
             'constraints' => [
-                new GreaterThanOrEqual([
-                    'value' => 0,
-                ]),
+                new GreaterThanOrEqual(value: 0),
             ],
         ]);
 
@@ -104,7 +102,7 @@ class ConfigType extends AbstractType
                     'expanded'    => false,
                     'constraints' => [
                         new NotBlank(
-                            ['message' => 'mautic.core.value.required']
+                            message: 'mautic.core.value.required'
                         ),
                     ],
                     'data'=> array_flip($orderColumns),
@@ -139,6 +137,18 @@ class ConfigType extends AbstractType
                 'data'  => $options['data']['contact_export_in_background'] ?? false,
                 'attr'  => [
                     'tooltip' => 'mautic.lead.background.export.csv.tooltip',
+                ],
+            ]
+        );
+
+        $builder->add(
+            'contact_export_notify_admins',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.lead.export.notify.admins',
+                'data'  => $options['data']['contact_export_notify_admins'] ?? true,
+                'attr'  => [
+                    'tooltip' => 'mautic.lead.export.notify.admins.tooltip',
                 ],
             ]
         );

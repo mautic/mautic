@@ -9,7 +9,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class UpdateTranslationsStep implements StepInterface
+final readonly class UpdateTranslationsStep implements StepInterface
 {
     public function __construct(
         private TranslatorInterface $translator,

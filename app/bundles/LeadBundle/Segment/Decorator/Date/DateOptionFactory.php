@@ -25,9 +25,9 @@ use Mautic\LeadBundle\Segment\RelativeDate;
 class DateOptionFactory
 {
     public function __construct(
-        private DateDecorator $dateDecorator,
-        private RelativeDate $relativeDate,
-        private TimezoneResolver $timezoneResolver,
+        private readonly DateDecorator $dateDecorator,
+        private readonly RelativeDate $relativeDate,
+        private readonly TimezoneResolver $timezoneResolver,
     ) {
     }
 
@@ -74,7 +74,7 @@ class DateOptionFactory
                 return new DateYearThis($this->dateDecorator, $dateOptionParameters);
             case str_contains($timeframe[0], '-') // -5 days
                 || str_contains($timeframe[0], '+') // +5 days
-                || false !== $this->isRelativeFormatsPresent($timeframe):
+                || $this->isRelativeFormatsPresent($timeframe):
                 return new DateRelativeInterval($this->dateDecorator, $originalValue, $dateOptionParameters);
             default:
                 return new DateDefault($this->dateDecorator, $originalValue);

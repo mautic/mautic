@@ -20,8 +20,8 @@ trait CampaignControllerTrait
     private function refreshPage(Campaign $campaign): Crawler
     {
         $crawler = $this->client->request('GET', sprintf('/s/campaigns/edit/%s', $campaign->getId()));
-        Assert::assertTrue($this->client->getResponse()->isOk());
-        Assert::assertStringContainsString('Edit Campaign', $crawler->text());
+        $this->assertResponseIsSuccessful();
+        Assert::assertStringContainsString('Edit Campaign', (string) $crawler->text());
 
         return $crawler;
     }
@@ -38,7 +38,7 @@ trait CampaignControllerTrait
         $form = $crawler->selectButton('Save')->form();
         $form->setValues($formValues);
         $newCrawler = $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         $this->em->clear();
         $campaign = $this->em->find(Campaign::class, $campaign->getId());

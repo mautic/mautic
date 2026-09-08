@@ -11,17 +11,27 @@ use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ChannelActionModelTest extends \PHPUnit\Framework\TestCase
+final class ChannelActionModelTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject&Lead
+     */
     private \PHPUnit\Framework\MockObject\MockObject $contactMock5;
 
-    private \PHPUnit\Framework\MockObject\MockObject $contactMock6;
+    /**
+     * @var \PHPUnit\Framework\MockObject\Stub&Lead
+     */
+    private \PHPUnit\Framework\MockObject\Stub $contactMock6;
 
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject&LeadModel
+     */
     private \PHPUnit\Framework\MockObject\MockObject $contactModelMock;
 
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject&DoNotContact
+     */
     private \PHPUnit\Framework\MockObject\MockObject $doNotContactMock;
-
-    private \PHPUnit\Framework\MockObject\MockObject $translatorMock;
 
     private ChannelActionModel $actionModel;
 
@@ -30,14 +40,13 @@ class ChannelActionModelTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
 
         $this->contactMock5     = $this->createMock(Lead::class);
-        $this->contactMock6     = $this->createMock(Lead::class);
+        $this->contactMock6     = $this->createStub(Lead::class);
         $this->contactModelMock = $this->createMock(LeadModel::class);
         $this->doNotContactMock = $this->createMock(DoNotContact::class);
-        $this->translatorMock   = $this->createMock(TranslatorInterface::class);
         $this->actionModel      = new ChannelActionModel(
             $this->contactModelMock,
             $this->doNotContactMock,
-            $this->translatorMock
+            $this->createStub(TranslatorInterface::class)
         );
 
         $this->contactMock5->method('getId')->willReturn(5);
@@ -54,7 +63,7 @@ class ChannelActionModelTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->contactModelMock->expects($matcher)
-            ->method('canEditContact')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('canEditContact')->willReturnCallback(function (...$parameters) use ($matcher): false {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($this->contactMock5, $parameters[0]);
                 }
@@ -179,7 +188,7 @@ class ChannelActionModelTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->doNotContactMock->expects($matcher)
-            ->method('addDncForContact')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('addDncForContact')->willReturnCallback(function (...$parameters) use ($matcher): void {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(5, $parameters[0]);
                     $this->assertSame('email', $parameters[1]);

@@ -11,7 +11,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class CompanyFieldsType extends AbstractType
+final class CompanyFieldsType extends AbstractType
 {
     use FieldsTypeTrait;
 

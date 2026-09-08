@@ -7,7 +7,7 @@ namespace Mautic\CoreBundle\Helper;
 class ImportHelper
 {
     public function __construct(
-        private PathsHelper $pathsHelper,
+        private readonly PathsHelper $pathsHelper,
     ) {
     }
 
@@ -28,6 +28,12 @@ class ImportHelper
         $maxSize      = 100 * 1024 * 1024;  // 100MB total uncompressed size
         $maxRatio     = 10;    // Maximum compression ratio (1:10)
         $readLength   = 1024;  // Read buffer size
+
+        // The ratio check only makes sense for sizable entries: legitimate text payloads such as
+        // the exported entity_data.json compress far better than 1:10, so enforcing the ratio on
+        // small files yields false positives. A real zip bomb still trips the absolute $maxSize
+        // and per-file streaming caps below, so we skip the ratio check under this threshold.
+        $minRatioCheckSize = 1024 * 1024; // 1MB
 
         if (true !== $zip->open($filePath)) {
             throw new \RuntimeException(sprintf('Unable to open ZIP file: %s', $filePath));
@@ -71,7 +77,7 @@ class ImportHelper
             }
 
             // Check compression ratio for potential zip bomb
-            if (isset($stat['size']) && isset($stat['comp_size']) && $stat['comp_size'] > 0) {
+            if (isset($stat['size'], $stat['comp_size']) && $stat['comp_size'] > 0 && $stat['size'] > $minRatioCheckSize) {
                 $ratio = $stat['size'] / $stat['comp_size'];
                 if ($ratio > $maxRatio) {
                     $zip->close();
@@ -133,7 +139,7 @@ class ImportHelper
                     }
 
                     // Check compression ratio during extraction
-                    if (isset($stat['comp_size']) && $stat['comp_size'] > 0) {
+                    if (isset($stat['comp_size']) && $stat['comp_size'] > 0 && $currentSize > $minRatioCheckSize) {
                         $ratio = $currentSize / $stat['comp_size'];
                         if ($ratio > $maxRatio) {
                             fclose($fileHandle);
@@ -181,7 +187,9 @@ class ImportHelper
                         throw new \RuntimeException(sprintf('Failed to copy file to destination: %s', $destinationPath));
                     }
                 }
-            } elseif ('json' === pathinfo($normalizedFilename, PATHINFO_EXTENSION)) {
+            } elseif ('json' === pathinfo($normalizedFilename, PATHINFO_EXTENSION) && 'composer.json' !== basename($normalizedFilename)) {
+                // composer.json carries package metadata in marketplace resource ZIPs,
+                // never entity data — picking it here would corrupt the import.
                 $jsonFilePath = $tempDir.'/'.$normalizedFilename;
             }
         }
@@ -216,7 +224,7 @@ class ImportHelper
                 continue;
             }
             if ('..' === $segment) {
-                if (!empty($parts)) {
+                if ([] !== $parts) {
                     array_pop($parts);
                 } else {
                     // Cannot resolve upward — preserve so callers detect traversal.
@@ -231,7 +239,7 @@ class ImportHelper
     }
 
     /**
-     * @param array<string, string|array<mixed, mixed>> &$input
+     * @param array<string, string|array<mixed, mixed>> $input
      */
     public function recursiveRemoveEmailaddress(array &$input): void
     {

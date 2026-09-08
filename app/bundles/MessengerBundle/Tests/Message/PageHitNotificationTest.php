@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\MessengerBundle\Tests\Message;
 
 use Mautic\MessengerBundle\Message\PageHitNotification;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
-class PageHitNotificationTest extends TestCase
+final class PageHitNotificationTest extends TestCase
 {
     public function testConstruct(): void
     {

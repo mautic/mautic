@@ -7,6 +7,7 @@ use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -20,26 +21,25 @@ use Symfony\Contracts\Translation\TranslatorInterface;
         'mautic:campaigns:messages',
     ]
 )]
-class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
+final class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
 {
     public function __construct(
-        private TranslatorInterface $translator,
-        private MessageQueueModel $messageQueueModel,
+        private readonly TranslatorInterface $translator,
+        private readonly MessageQueueModel $messageQueueModel,
         PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addOption(
                 '--channel',
                 '-c',
                 InputOption::VALUE_OPTIONAL,
-                'Channel to use for sending messages i.e. email, sms.',
-                null
+                'Channel to use for sending messages i.e. email, sms.'
             )
             ->addOption('--channel-id', '-i', InputOption::VALUE_REQUIRED, 'The ID of the message i.e. email ID, sms ID.')
             ->addOption('--message-id', '-m', InputOption::VALUE_REQUIRED, 'ID of a specific queued message')
@@ -47,8 +47,7 @@ class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
                 '--limit',
                 '-l',
                 InputOption::VALUE_OPTIONAL,
-                'Maximum number of messages to process',
-                null
+                'Maximum number of messages to process'
             )
             ->addOption(
                 '--batch',
@@ -72,7 +71,7 @@ class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
         $key        = $channel.$channelId.$messageId;
 
         if (!$this->checkRunStatus($input, $output, $key)) {
-            return \Symfony\Component\Console\Command\Command::SUCCESS;
+            return Command::SUCCESS;
         }
 
         $output->writeln('<info>'.$this->translator->trans('mautic.campaign.command.process.messages').'</info>');
@@ -96,6 +95,6 @@ class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
 
         $this->completeRun();
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
 }

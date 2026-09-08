@@ -7,27 +7,46 @@ namespace MauticPlugin\MauticFocusBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\HttpFoundation\Request;
 
-class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
+final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
 {
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
     public function testGenerateFocusItemScript(): void
     {
         /** @var FocusModel $focusModel */
-        $focusModel = static::getContainer()->get('mautic.focus.model.focus');
+        $focusModel = self::getContainer()->get(FocusModel::class);
         $focus      = $this->createFocus('popup');
+        $focus->setStyle('bar');
         $focusModel->saveEntity($focus);
 
         $this->client->request(Request::METHOD_GET, "/focus/{$focus->getId()}.js");
         $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk());
-        $this->assertNotEmpty($response->getContent());
+        $this->assertResponseIsSuccessful();
+        $content = (string) $response->getContent();
+
+        $this->assertStringContainsString("MauticFocus{$focus->getId()}", $content);
+        $this->assertStringContainsString("mautic_focus_{$focus->getId()}", $content);
+        $this->assertStringContainsString("mautic_focus_{$focus->getId()}_closed", $content);
+        $this->assertStringContainsString("mf-bar-collapser-{$focus->getId()}", $content);
+        $this->assertMatchesRegularExpression("/Focus\\.cookies\\.setItem\\(['\"]mautic_focus_{$focus->getId()}['\"]\\s*,\\s*-1\\s*,/", $content);
+        $this->assertStringNotContainsString('MauticJS', $content);
+        $this->assertStringNotContainsString('mtc_id', $content);
+        $this->assertStringNotContainsString('mautic_device_id', $content);
+        $this->assertStringNotContainsString('/mtc.js', $content);
+        $this->assertStringNotContainsString('/mautic-essential.js', $content);
+        $this->assertStringNotContainsString('/mautic-tracking.js', $content);
     }
 
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
     public function testInactiveFocusItemScript(): void
     {
         /** @var FocusModel $focusModel */
-        $focusModel = static::getContainer()->get('mautic.focus.model.focus');
+        $focusModel = self::getContainer()->get(FocusModel::class);
         $focus      = $this->createFocus('popup');
         $focus->setIsPublished(false);
         $focusModel->saveEntity($focus);

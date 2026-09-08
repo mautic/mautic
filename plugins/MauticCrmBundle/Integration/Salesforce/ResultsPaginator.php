@@ -5,7 +5,7 @@ namespace MauticPlugin\MauticCrmBundle\Integration\Salesforce;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use Psr\Log\LoggerInterface;
 
-class ResultsPaginator
+final class ResultsPaginator
 {
     /**
      * @var array
@@ -30,17 +30,15 @@ class ResultsPaginator
      * @param string $salesforceBaseUrl
      */
     public function __construct(
-        private LoggerInterface $logger,
+        private readonly LoggerInterface $logger,
         private $salesforceBaseUrl,
     ) {
     }
 
     /**
-     * @return $this
-     *
      * @throws ApiErrorException
      */
-    public function setResults(array $results)
+    public function setResults(array $results): static
     {
         if (!isset($results['records'])) {
             throw new ApiErrorException(var_export($results, true));

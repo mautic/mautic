@@ -1,34 +1,44 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticClearbitBundle\Helper;
 
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
+use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticClearbitBundle\Integration\ClearbitIntegration;
 use MauticPlugin\MauticClearbitBundle\Services\Clearbit_Company;
 use MauticPlugin\MauticClearbitBundle\Services\Clearbit_Person;
-use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 
-class LookupHelper
+final class LookupHelper
 {
-    /**
-     * @var bool|ClearbitIntegration
-     */
-    protected $integration;
+    private ?ClearbitIntegration $integration = null;
 
     public function __construct(
-        IntegrationHelper $integrationHelper,
-        protected UserHelper $userHelper,
-        protected Logger $logger,
-        protected LeadModel $leadModel,
-        protected CompanyModel $companyModel,
+        IntegrationsHelper $integrationsHelper,
+        private readonly UserHelper $userHelper,
+        private readonly LoggerInterface $logger,
+        private readonly LeadModel $leadModel,
+        private readonly CompanyModel $companyModel,
+        private readonly LeadRepository $leadRepository,
+        private readonly CompanyRepository $companyRepository,
     ) {
-        $this->integration  = $integrationHelper->getIntegrationObject('Clearbit');
+        try {
+            /** @var ClearbitIntegration $integration */
+            $integration       = $integrationsHelper->getIntegration('Clearbit');
+            $this->integration = $integration;
+        } catch (IntegrationNotFoundException) {
+            $this->integration = null;
+        }
     }
 
     /**
@@ -41,7 +51,6 @@ class LookupHelper
             return;
         }
 
-        /* @var Clearbit_Person $clearbit */
         if ($clearbit = $this->getClearbit()) {
             if (!$checkAuto || $this->integration->shouldAutoUpdate()) {
                 try {
@@ -58,7 +67,7 @@ class LookupHelper
                         $lead->setSocialCache($cache);
 
                         if ($checkAuto) {
-                            $this->leadModel->getRepository()->saveEntity($lead);
+                            $this->leadRepository->saveEntity($lead);
                         } else {
                             $this->leadModel->saveEntity($lead);
                         }
@@ -80,7 +89,6 @@ class LookupHelper
             return;
         }
 
-        /* @var Clearbit_Company $clearbit */
         if ($clearbit = $this->getClearbit(false)) {
             if (!$checkAuto || $this->integration->shouldAutoUpdate()) {
                 try {
@@ -88,7 +96,6 @@ class LookupHelper
                     [$cacheId, $webhookId, $cache]     = $this->getCache($company, $notify);
 
                     if (isset($parse['host']) && !array_key_exists($cacheId, $cache['clearbit'])) {
-                        /* @var Router $router */
                         $clearbit->setWebhookId($webhookId);
                         $res = $clearbit->lookupByDomain($parse['host']);
                         // Prevent from filling up the cache
@@ -98,7 +105,7 @@ class LookupHelper
                         ];
                         $company->setSocialCache($cache);
                         if ($checkAuto) {
-                            $this->companyModel->getRepository()->saveEntity($company);
+                            $this->companyRepository->saveEntity($company);
                         } else {
                             $this->companyModel->saveEntity($company);
                         }
@@ -110,11 +117,16 @@ class LookupHelper
         }
     }
 
-    public function validateRequest($oid, $type)
+    /**
+     * @return array{notify: mixed, entity: mixed}|false
+     */
+    public function validateRequest($oid, $type): array|false
     {
         // prefix#entityId#hour#userId#nonce
         [$w, $id, $hour, $uid, $nonce]     = explode('#', $oid, 5);
         $notify                            = (str_contains($w, '_notify') && $uid) ? $uid : false;
+
+        $entity = null;
 
         switch ($type) {
             case 'person':
@@ -142,24 +154,19 @@ class LookupHelper
         return false;
     }
 
-    /**
-     * @param bool $person
-     *
-     * @return bool|Clearbit_Company|Clearbit_Person
-     */
-    protected function getClearbit($person = true)
+    private function getClearbit(bool $person = true): false|Clearbit_Person|Clearbit_Company
     {
-        if (!$this->integration || !$this->integration->getIntegrationSettings()->getIsPublished()) {
+        if (!$this->integration || !$this->integration->getIntegrationConfiguration()->getIsPublished()) {
             return false;
         }
 
         // get api_key from plugin settings
-        $keys = $this->integration->getDecryptedApiKeys();
+        $keys = $this->integration->getIntegrationConfiguration()->getApiKeys();
 
         return ($person) ? new Clearbit_Person($keys['apikey']) : new Clearbit_Company($keys['apikey']);
     }
 
-    protected function getCache($entity, $notify): array
+    private function getCache(Lead|Company $entity, $notify): array
     {
         $user      = $this->userHelper->getUser();
         $nonce     = substr(EncryptionHelper::generateKey(), 0, 16);

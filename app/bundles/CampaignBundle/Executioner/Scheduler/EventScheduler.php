@@ -30,16 +30,16 @@ class EventScheduler
 {
     public function __construct(
         #[Autowire(service: 'monolog.logger.mautic')]
-        private LoggerInterface $logger,
-        private EventLogger $eventLogger,
-        private IntervalScheduler $intervalScheduler,
-        private DateTimeScheduler $dateTimeScheduler,
-        private OptimizedScheduler $optimizedScheduler,
-        private EventCollector $collector,
-        private EventDispatcherInterface $dispatcher,
-        private CoreParametersHelper $coreParametersHelper,
-        private OptimisticLockServiceInterface $optimisticLockService,
-        private PublishStateService $publishStateService,
+        private readonly LoggerInterface $logger,
+        private readonly EventLogger $eventLogger,
+        private readonly IntervalScheduler $intervalScheduler,
+        private readonly DateTimeScheduler $dateTimeScheduler,
+        private readonly OptimizedScheduler $optimizedScheduler,
+        private readonly EventCollector $collector,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly OptimisticLockServiceInterface $optimisticLockService,
+        private readonly PublishStateService $publishStateService,
     ) {
     }
 
@@ -87,6 +87,7 @@ class EventScheduler
     public function reschedule(LeadEventLog $log, \DateTimeInterface $toBeExecutedOn): void
     {
         $log->setTriggerDate($toBeExecutedOn, 'Event rescheduled');
+        $log->setDateQueued(null);
         $this->eventLogger->persistLog($log);
 
         $event  = $log->getEvent();
@@ -102,6 +103,7 @@ class EventScheduler
     {
         foreach ($logs as $log) {
             $log->setTriggerDate($toBeExecutedOn, 'Bulk rescheduling of events');
+            $log->setDateQueued(null);
         }
 
         $this->eventLogger->persistCollection($logs);
@@ -343,10 +345,7 @@ class EventScheduler
         throw new NotSchedulableException();
     }
 
-    /**
-     * @param bool $isReschedule
-     */
-    private function dispatchScheduledEvent(AbstractEventAccessor $config, LeadEventLog $log, $isReschedule = false): void
+    private function dispatchScheduledEvent(AbstractEventAccessor $config, LeadEventLog $log, bool $isReschedule = false): void
     {
         $this->dispatcher->dispatch(
             new ScheduledEvent($config, $log, $isReschedule),
@@ -354,10 +353,7 @@ class EventScheduler
         );
     }
 
-    /**
-     * @param bool $isReschedule
-     */
-    private function dispatchBatchScheduledEvent(AbstractEventAccessor $config, Event $event, ArrayCollection $logs, $isReschedule = false): void
+    private function dispatchBatchScheduledEvent(AbstractEventAccessor $config, Event $event, ArrayCollection $logs, bool $isReschedule = false): void
     {
         if (!$logs->count()) {
             return;

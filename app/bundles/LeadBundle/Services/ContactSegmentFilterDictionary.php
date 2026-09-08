@@ -19,19 +19,19 @@ class ContactSegmentFilterDictionary
     /**
      * @var mixed[]
      */
-    private $filters = [];
+    private array $filters = [];
 
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
+        private readonly EventDispatcherInterface $dispatcher,
     ) {
     }
 
     /**
      * @return mixed[]
      */
-    public function getFilters()
+    public function getFilters(): array
     {
-        if (empty($this->filters)) {
+        if ([] === $this->filters) {
             $this->setDefaultFilters();
             $this->fetchFiltersFromSubscribers();
         }

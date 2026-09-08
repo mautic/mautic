@@ -6,7 +6,14 @@
 
 {% block publishStatus %}
     {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity' : item}) -}}
-    <div class="label__divider"></div>
+    {% set hasFocusTags = (item.type is defined and item.type is not empty)
+        or (item.style is defined and item.style is not empty)
+        or (item.properties.when is defined and item.properties.when is not empty)
+        or (item.properties.frequency is defined and item.properties.frequency is not empty)
+        or (item.properties.timeout is defined and item.properties.timeout is not empty) %}
+    {% if hasFocusTags %}
+        <div class="label__divider"></div>
+    {% endif %}
     {% if item.type is defined and item.type is not empty %}
         {% include '@MauticCore/Helper/_tag.html.twig' with {
             tags: [{
@@ -249,6 +256,9 @@
 
               {% set belowFoldContent %}
                   <p class="mt-lg mb-lg">{{ 'mautic.focus.install.description'|trans }}</p>
+                  <div class="alert alert-warning" role="alert">
+                      {{ 'mautic.focus.install.tracking.warning'|trans }}
+                  </div>
                   <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="&lt;script src=&quot;{{ url('mautic_focus_generate', {'id': item.id}, true) }}&quot; type=&quot;text/javascript&quot; charset=&quot;utf-8&quot; async=&quot;async&quot;&gt;&lt;/script&gt;"/>
               {% endset %}
 

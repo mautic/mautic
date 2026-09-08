@@ -11,6 +11,7 @@
     <link rel="icon" sizes="192x192" href="{{ getOverridableUrl('images/favicon.ico') }}">
     <link rel="apple-touch-icon" href="{{ getOverridableUrl('images/apple-touch-icon.png') }}" />
 
+    {{ importmap('app') }}
     {{ outputSystemStylesheets() }}
 
     {% include('@MauticCore/Default/script.html.twig') %}

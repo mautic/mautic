@@ -22,10 +22,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class SendEmailToUser
 {
     public function __construct(
-        private EmailModel $emailModel,
-        private EventDispatcherInterface $dispatcher,
-        private CustomFieldValidator $customFieldValidator,
-        private EmailValidator $emailValidator,
+        private readonly EmailModel $emailModel,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly CustomFieldValidator $customFieldValidator,
+        private readonly EmailValidator $emailValidator,
     ) {
     }
 

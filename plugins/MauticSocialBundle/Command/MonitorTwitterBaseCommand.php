@@ -52,7 +52,7 @@ abstract class MonitorTwitterBaseCommand extends Command
         protected EventDispatcherInterface $dispatcher,
         protected Translator $translator,
         protected IntegrationHelper $integrationHelper,
-        private TwitterCommandHelper $twitterCommandHelper,
+        private readonly TwitterCommandHelper $twitterCommandHelper,
         CoreParametersHelper $coreParametersHelper,
     ) {
         $this->translator->setLocale($coreParametersHelper->get('locale', 'en_US'));
@@ -63,7 +63,7 @@ abstract class MonitorTwitterBaseCommand extends Command
     /**
      * Command configuration. Set the name, description, and options here.
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addOption(
@@ -230,7 +230,7 @@ abstract class MonitorTwitterBaseCommand extends Command
      *
      * @param array $statuses
      */
-    protected function printTweets($statuses)
+    protected function printTweets($statuses): void
     {
         if (!$this->input->getOption('show-posts') && $this->output->getVerbosity() < OutputInterface::VERBOSITY_VERY_VERBOSE) {
             return;
@@ -252,10 +252,8 @@ abstract class MonitorTwitterBaseCommand extends Command
     /**
      * Prints the search query metadata from twitter.
      * Only shows stats if explicitly requested or if we're in verbose mode.
-     *
-     * @param array $metadata
      */
-    protected function printQueryMetadata($metadata)
+    protected function printQueryMetadata(array $metadata): void
     {
         if (!$this->input->getOption('show-stats') && $this->output->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
             return;
@@ -279,9 +277,8 @@ abstract class MonitorTwitterBaseCommand extends Command
      * Only shows stats if explicitly requested or if we're in verbose mode.
      *
      * @param Monitoring $monitor
-     * @param array      $results
      */
-    protected function printInformation($monitor, $results)
+    protected function printInformation($monitor, array $results): void
     {
         if (!$this->input->getOption('show-stats') && $this->output->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
             return;

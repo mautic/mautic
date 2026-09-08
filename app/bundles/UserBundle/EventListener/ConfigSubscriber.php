@@ -9,7 +9,7 @@ use Mautic\UserBundle\Form\Type\ConfigType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class ConfigSubscriber implements EventSubscriberInterface
+final class ConfigSubscriber implements EventSubscriberInterface
 {
     /**
      * @var string[]
@@ -92,7 +92,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         $event->setConfig($data, 'userconfig');
     }
 
-    private function validateXml($content): bool
+    private function validateXml(string $content): bool
     {
         $valid = true;
 

@@ -8,7 +8,7 @@ use Doctrine\ORM\ORMException;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
 use Mautic\IntegrationsBundle\Sync\Notification\Writer;
 
-class UserNotificationHelper
+final readonly class UserNotificationHelper
 {
     public function __construct(
         private Writer $writer,

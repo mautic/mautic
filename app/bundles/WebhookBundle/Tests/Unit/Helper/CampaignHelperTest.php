@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\WebhookBundle\Tests\Unit\Helper;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\RequestOptions;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\WebhookBundle\Helper\CampaignHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -22,31 +24,11 @@ final class CampaignHelperTest extends \PHPUnit\Framework\TestCase
     private MockObject $contact;
 
     /**
-     * @var MockObject|Client
+     * @var MockObject&Client
      */
     private MockObject $client;
 
-    /**
-     * @var MockObject|CompanyModel
-     */
-    private MockObject $companyModel;
-
-    /**
-     * @var MockObject|CompanyRepository
-     */
-    private MockObject $companyRepository;
-
-    /**
-     * @var ArrayCollection<int,IpAddress>
-     */
-    private ArrayCollection $ipCollection;
-
     private CampaignHelper $campaignHelper;
-
-    /**
-     * @var MockObject|EventDispatcherInterface
-     */
-    private MockObject $dispatcher;
 
     protected function setUp(): void
     {
@@ -54,22 +36,18 @@ final class CampaignHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->contact           = $this->createMock(Lead::class);
         $this->client            = $this->createMock(Client::class);
-        $this->companyModel      = $this->createMock(CompanyModel::class);
-        $this->dispatcher        = $this->createMock(EventDispatcherInterface::class);
-        $this->ipCollection      = new ArrayCollection();
-        $this->companyRepository = $this->getMockBuilder(CompanyRepository::class)
+        $ipCollection            = new ArrayCollection();
+        $companyRepository       = $this->getMockBuilder(CompanyRepository::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getCompaniesByLeadId'])
             ->getMock();
 
-        $this->companyRepository->method('getCompaniesByLeadId')->willReturn([new Company()]);
+        $companyRepository->method('getCompaniesByLeadId')->willReturn([new Company()]);
 
-        $this->companyModel->method('getRepository')->willReturn($this->companyRepository);
+        $this->campaignHelper = new CampaignHelper($this->client, $this->createStub(EventDispatcherInterface::class), $companyRepository);
 
-        $this->campaignHelper = new CampaignHelper($this->client, $this->companyModel, $this->dispatcher);
-
-        $this->ipCollection->add((new IpAddress())->setIpAddress('127.0.0.1'));
-        $this->ipCollection->add((new IpAddress())->setIpAddress('127.0.0.2'));
+        $ipCollection->add((new IpAddress())->setIpAddress('127.0.0.1'));
+        $ipCollection->add((new IpAddress())->setIpAddress('127.0.0.2'));
 
         $this->contact->expects($this->once())
             ->method('getProfileFields')
@@ -77,7 +55,7 @@ final class CampaignHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->contact->expects($this->once())
             ->method('getIpAddresses')
-            ->willReturn($this->ipCollection);
+            ->willReturn($ipCollection);
     }
 
     public function testFireWebhookWithGet(): void
@@ -87,8 +65,8 @@ final class CampaignHelperTest extends \PHPUnit\Framework\TestCase
         $this->client->expects($this->once())
             ->method('get')
             ->with($expectedUrl, [
-                \GuzzleHttp\RequestOptions::HEADERS => ['test' => 'tee', 'company' => 'Mautic'],
-                \GuzzleHttp\RequestOptions::TIMEOUT => 10,
+                RequestOptions::HEADERS => ['test' => 'tee', 'company' => 'Mautic'],
+                RequestOptions::TIMEOUT => 10,
             ])
             ->willReturn(new Response(200));
 
@@ -102,9 +80,9 @@ final class CampaignHelperTest extends \PHPUnit\Framework\TestCase
         $this->client->expects($this->once())
             ->method('request')
             ->with('post', 'https://mautic.org', [
-                \GuzzleHttp\RequestOptions::FORM_PARAMS => ['test'  => 'tee', 'email' => 'john@doe.email', 'IP' => '127.0.0.1,127.0.0.2'],
-                \GuzzleHttp\RequestOptions::HEADERS     => ['test' => 'tee', 'company' => 'Mautic'],
-                \GuzzleHttp\RequestOptions::TIMEOUT     => 10,
+                RequestOptions::FORM_PARAMS => ['test'  => 'tee', 'email' => 'john@doe.email', 'IP' => '127.0.0.1,127.0.0.2'],
+                RequestOptions::HEADERS     => ['test' => 'tee', 'company' => 'Mautic'],
+                RequestOptions::TIMEOUT     => 10,
             ])
             ->willReturn(new Response(200));
 
@@ -117,13 +95,13 @@ final class CampaignHelperTest extends \PHPUnit\Framework\TestCase
         $this->client->expects($this->once())
             ->method('request')
             ->with('post', 'https://mautic.org', [
-                \GuzzleHttp\RequestOptions::HEADERS => [
+                RequestOptions::HEADERS => [
                     'test'         => 'tee',
                     'company'      => 'Mautic',
                     'content-type' => 'application/json',
                 ],
-                \GuzzleHttp\RequestOptions::TIMEOUT => 10,
-                \GuzzleHttp\RequestOptions::BODY    => json_encode(
+                RequestOptions::TIMEOUT => 10,
+                RequestOptions::BODY    => json_encode(
                     ['test' => 'tee', 'email' => 'john@doe.email', 'IP' => '127.0.0.1,127.0.0.2']
                 ),
             ])
@@ -181,12 +159,11 @@ final class CampaignHelperTest extends \PHPUnit\Framework\TestCase
                 ],
             ],
         ];
-        if ('application/json' == $type) {
-            array_push($sample['headers']['list'],
-                [
-                    'label' => 'content-type',
-                    'value' => 'application/json',
-                ]);
+        if ('application/json' === $type) {
+            $sample['headers']['list'][] = [
+                'label' => 'content-type',
+                'value' => 'application/json',
+            ];
         }
 
         return $sample;

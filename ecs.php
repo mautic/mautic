@@ -2,33 +2,42 @@
 
 declare(strict_types=1);
 
-use PhpCsFixer\Fixer\Import\NoUnusedImportsFixer;
 use Symplify\EasyCodingStandard\Config\ECSConfig;
-use Symplify\EasyCodingStandard\ValueObject\Set\SetList;
 
-return function (ECSConfig $ecsConfig): void {
-    $ecsConfig->paths([
+return ECSConfig::configure()
+    ->withPaths([
         __DIR__.'/app',
         __DIR__.'/config',
         __DIR__.'/plugins',
         __DIR__.'/tests',
-    ]);
+        __DIR__.'/utils',
+    ])
+    ->withRootFiles()
+    ->withSkip([
+        'node_modules',
+        PhpCsFixer\Fixer\Phpdoc\PhpdocNoEmptyReturnFixer::class => [
+            // in docbclock on purpose, to avoid BC return on child classes
+            __DIR__.'/app/bundles/CoreBundle/Entity/CommonEntity.php',
+        ],
 
-    // this way you add a single rule
-    $ecsConfig->rules([
-        NoUnusedImportsFixer::class,
-        Symplify\CodingStandard\Fixer\Spacing\StandaloneLinePromotedPropertyFixer::class,
-        PhpCsFixer\Fixer\ClassNotation\ClassAttributesSeparationFixer::class,
-    ]);
-
-    // this way you can add sets - group of rules
-    $ecsConfig->sets([
-        // run and fix, one by one
-        // SetList::SPACES,
-        // SetList::ARRAY,
-        SetList::DOCBLOCK,
-        SetList::NAMESPACES,
-        SetList::COMMENTS,
-        // SetList::PSR_12,
-    ]);
-};
+        PhpCsFixer\Fixer\Phpdoc\GeneralPhpdocAnnotationRemoveFixer::class,
+        PhpCsFixer\Fixer\Operator\BinaryOperatorSpacesFixer::class,
+        PhpCsFixer\Fixer\Operator\ConcatSpaceFixer::class,
+        PhpCsFixer\Fixer\Operator\NotOperatorWithSpaceFixer::class,
+        PhpCsFixer\Fixer\Operator\NotOperatorWithSuccessorSpaceFixer::class,
+        PhpCsFixer\Fixer\Whitespace\MethodChainingIndentationFixer::class,
+        Symplify\CodingStandard\Fixer\Spacing\MethodChainingNewlineFixer::class,
+        PhpCsFixer\Fixer\ControlStructure\YodaStyleFixer::class,
+    ])
+//    ->withRules([
+//        Symplify\CodingStandard\Fixer\Spacing\StandaloneLinePromotedPropertyFixer::class,
+//        Symplify\CodingStandard\Fixer\Spacing\StandaloneLineSymfonyAttributeParamFixer::class,
+//    ])
+    ->withPreparedSets(
+        comments: true,
+        docblocks: true,
+        namespaces: true,
+        cleanup: true,
+        controlStructures: true,
+        standaloneLine: true,
+    );

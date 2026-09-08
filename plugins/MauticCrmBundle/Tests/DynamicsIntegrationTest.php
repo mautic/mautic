@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticCrmBundle\Tests;
 
 use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticCrmBundle\Integration\DynamicsIntegration;
 
-class DynamicsIntegrationTest extends AbstractIntegrationTestCase
+final class DynamicsIntegrationTest extends AbstractIntegrationTestCase
 {
     private DynamicsIntegration $integration;
 

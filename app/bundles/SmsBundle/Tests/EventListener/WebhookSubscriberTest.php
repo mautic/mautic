@@ -15,7 +15,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|WebhookModel
+     * @var MockObject&WebhookModel
      */
     private MockObject $webhookModel;
 
@@ -49,7 +49,7 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testOnSend(): void
     {
         $event   = $this->createMock(SmsSendEvent::class);
-        $contact = $this->createMock(Lead::class);
+        $contact = $this->createStub(Lead::class);
 
         $event->expects($this->once())
             ->method('getSmsId')
