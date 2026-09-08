@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class DetailsTypeTest extends TestCase
 {
     public function testBuildFormRemovesHiddenKeys(): void

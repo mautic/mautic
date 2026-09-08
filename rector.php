@@ -32,15 +32,11 @@ return RectorConfig::configure()
         Utils\Rector\AssertTrueResponseIsOkToAssertResponseIsSuccessfulRector::class,
         Utils\Rector\ModelGetRepositoryToRepositoryServiceRector::class,
     ])
-    ->reportUnusedSkips()
     ->withComposerBased(phpunit: true, symfony: true)
     ->withSkip([
         '*/Fixture/*',
-        // handle later
-        Rector\PHPUnit\PHPUnit120\Rector\Class_\AllowMockObjectsForDataProviderRector::class,
 
         // prefer implicit compare on object|null
-        Rector\Php74\Rector\If_\IfToNullCoalescingAssignRector::class,
         Rector\TypeDeclaration\Rector\BooleanAnd\BinaryOpNullableToInstanceofRector::class,
         Rector\CodeQuality\Rector\If_\ObjectExplicitBoolCompareRector::class,
         Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector::class,

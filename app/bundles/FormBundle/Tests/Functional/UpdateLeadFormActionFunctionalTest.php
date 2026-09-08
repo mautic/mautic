@@ -11,6 +11,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class UpdateLeadFormActionFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
