@@ -867,12 +867,12 @@ class EmailRepository extends CommonRepository
     /**
      * @return iterable<Email>
      */
-    public function getPublishedBroadcastsIterable(?int $id = null, $allowNullForPublishedUp = false): iterable
+    public function getPublishedBroadcastsIterable(?int $id = null, bool $allowNullForPublishedUp = false): iterable
     {
         return $this->getPublishedBroadcastsQuery($id, $allowNullForPublishedUp)->toIterable();
     }
 
-    private function getPublishedBroadcastsQuery(?int $id = null, $allowNullForPublishedUp = false): Query
+    private function getPublishedBroadcastsQuery(?int $id = null, bool $allowNullForPublishedUp = false): Query
     {
         $qb   = $this->createQueryBuilder($this->getTableAlias());
         $expr = $this->getPublishedByDateOrmExpression($qb, null, true, true, $allowNullForPublishedUp);

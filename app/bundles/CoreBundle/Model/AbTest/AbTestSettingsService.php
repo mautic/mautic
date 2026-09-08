@@ -117,7 +117,7 @@ class AbTestSettingsService
     private function setVariantSettings(VariantEntityInterface $variant): void
     {
         $variantsSettings = $variant->getVariantSettings();
-        $weight           = (int) $variantsSettings['weight'] ?? 0;
+        $weight           = (int) ($variantsSettings['weight'] ?? 0);
         $parentVariant    = $variant->getVariantParent();
 
         if ($parentVariant instanceof VariantEntityInterface) {

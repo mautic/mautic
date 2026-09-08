@@ -998,7 +998,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         ++$this->variantSentCount;
     }
 
-    public function setVariantSentCount($variantSentCount): static
+    public function setVariantSentCount(int $variantSentCount): static
     {
         $this->variantSentCount = $variantSentCount;
 
@@ -1092,15 +1092,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getVariantReadCount()
+    public function getVariantReadCount(): int
     {
         return $this->variantReadCount;
     }
 
-    public function setVariantReadCount($variantReadCount): static
+    public function setVariantReadCount(int $variantReadCount): static
     {
         $this->variantReadCount = $variantReadCount;
 
