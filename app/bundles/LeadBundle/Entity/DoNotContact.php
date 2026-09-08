@@ -77,7 +77,7 @@ class DoNotContact
 
         $builder->addLead(true, 'CASCADE', false, 'doNotContact');
 
-        $builder->addDateAdded();
+        $builder->addDateAdded(false, 3);
 
         $builder->createField('reason', 'smallint')
             ->build();

@@ -160,6 +160,7 @@ class Stat
 
         $builder->createField('dateSent', 'datetime')
             ->columnName('date_sent')
+            ->precision(3)
             ->build();
 
         $builder->createField('isRead', 'boolean')
@@ -176,6 +177,7 @@ class Stat
 
         $builder->createField('dateRead', 'datetime')
             ->columnName('date_read')
+            ->precision(3)
             ->nullable()
             ->build();
 
@@ -208,7 +210,11 @@ class Stat
 
         $builder->addNullableField('openCount', 'integer', 'open_count');
 
-        $builder->addNullableField('lastOpened', 'datetime', 'last_opened');
+        $builder->createField('lastOpened', 'datetime')
+            ->columnName('last_opened')
+            ->precision(3)
+            ->nullable()
+            ->build();
 
         $builder->addNullableField('openDetails', 'array', 'open_details');
 
