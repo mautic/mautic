@@ -451,7 +451,7 @@ final class LeadSubscriberTest extends TestCase
     }
 
     /**
-     * @param mixed[] $fieldChanges
+     * @param array<string, array<string, string[]>>|array<string, int[]> $fieldChanges
      */
     private function createLeadMock(array $fieldChanges, int $objectId): Lead
     {
@@ -484,7 +484,7 @@ final class LeadSubscriberTest extends TestCase
     }
 
     /**
-     * @param mixed[] $fieldChanges
+     * @param array<string, array<string, string[]>>|array<string, int[]> $fieldChanges
      */
     private function createCompanyMock(array $fieldChanges, int $objectId): Company
     {

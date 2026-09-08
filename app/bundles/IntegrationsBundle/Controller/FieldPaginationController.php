@@ -99,6 +99,9 @@ final class FieldPaginationController extends CommonController
         );
     }
 
+    /**
+     * @param array<string, mixed> $featureSettings
+     */
     private function getFields(Request $request, ConfigFormSyncInterface $integrationObject, array $featureSettings, string $object): array
     {
         $fields = $featureSettings['sync']['fieldMappings'] ?? [];

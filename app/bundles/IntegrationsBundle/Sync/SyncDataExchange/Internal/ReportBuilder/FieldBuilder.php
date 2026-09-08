@@ -31,6 +31,8 @@ class FieldBuilder
     }
 
     /**
+     * @param array<string, mixed> $mauticObject
+     *
      * @throws FieldNotFoundException
      */
     public function buildObjectField(

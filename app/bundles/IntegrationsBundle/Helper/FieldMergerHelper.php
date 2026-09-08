@@ -136,6 +136,9 @@ final class FieldMergerHelper
         return $supportedDirections;
     }
 
+    /**
+     * @param array<string, mixed> $fieldMapping
+     */
     private function getMergedSyncDirection(array $fieldMapping, string $object, string $fieldName): string
     {
         if (empty($fieldMapping['syncDirection'])) {
@@ -150,6 +153,9 @@ final class FieldMergerHelper
         return reset($supportedDirections);
     }
 
+    /**
+     * @param array<string, mixed> $fieldMapping
+     */
     private function getMergedMappedField(array $fieldMapping, string $object, string $fieldName): string
     {
         if (empty($fieldMapping['mappedField'])) {

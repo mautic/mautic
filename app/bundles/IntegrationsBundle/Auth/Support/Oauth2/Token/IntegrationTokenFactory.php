@@ -56,7 +56,7 @@ final readonly class IntegrationTokenFactory implements TokenFactoryInterface
     }
 
     /**
-     * @param mixed[] $data
+     * @param array<string, mixed> $data
      */
     private function getExpiration(array $data): ?int
     {

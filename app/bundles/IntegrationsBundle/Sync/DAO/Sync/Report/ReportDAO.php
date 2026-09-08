@@ -14,6 +14,9 @@ class ReportDAO
 {
     private array $objects = [];
 
+    /**
+     * @var RemappedObjectDAO[]
+     */
     private array $remappedObjects = [];
 
     private readonly RelationsDAO $relationsDAO;
