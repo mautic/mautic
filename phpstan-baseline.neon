@@ -577,6 +577,12 @@ parameters:
 			path: app/bundles/CampaignBundle/Model/SummaryModel.php
 
 		-
+			message: '#^Service "Mautic\\CampaignBundle\\Service\\CampaignShareService" is not registered in the container\.$#'
+			identifier: symfonyContainer.serviceNotFound
+			count: 3
+			path: app/bundles/CampaignBundle/Tests/Functional/Controller/CampaignShareControllerTest.php
+
+		-
 			message: '#^Property Mautic\\CategoryBundle\\Entity\\Category\:\:\$id \(int\) does not accept null\.$#'
 			identifier: assign.propertyType
 			count: 1
@@ -1319,12 +1325,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\CoreBundle\\Entity\\CommonRepository\:\:findOneBySlugs\(\) has parameter \$lang with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Entity/CommonRepository.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Entity\\CommonRepository\:\:getPublishedByDateExpression\(\) has parameter \$q with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/CoreBundle/Entity/CommonRepository.php
@@ -2534,12 +2534,6 @@ parameters:
 
 		-
 			message: '#^Property Mautic\\DynamicContentBundle\\Form\\Type\\DynamicContentType\:\:\$deviceBrandsChoices has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/DynamicContentBundle/Form/Type/DynamicContentType.php
-
-		-
-			message: '#^Property Mautic\\DynamicContentBundle\\Form\\Type\\DynamicContentType\:\:\$timezoneChoices has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
 			path: app/bundles/DynamicContentBundle/Form/Type/DynamicContentType.php
@@ -8956,19 +8950,7 @@ parameters:
 			path: plugins/MauticCrmBundle/Integration/ConnectwiseIntegration.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\ConnectwiseIntegration\:\:getLeads\(\) has parameter \$object with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/ConnectwiseIntegration.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\ConnectwiseIntegration\:\:getLeads\(\) has parameter \$query with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/ConnectwiseIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\ConnectwiseIntegration\:\:getLeads\(\) has parameter \$result with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/ConnectwiseIntegration.php
@@ -9112,12 +9094,6 @@ parameters:
 			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\CrmAbstractIntegration\:\:getFetchQuery\(\) has parameter \$config with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\CrmAbstractIntegration\:\:getFieldsByPriority\(\) has parameter \$direction with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -9142,19 +9118,7 @@ parameters:
 			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\CrmAbstractIntegration\:\:getLeads\(\) has parameter \$object with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\CrmAbstractIntegration\:\:getLeads\(\) has parameter \$query with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\CrmAbstractIntegration\:\:getLeads\(\) has parameter \$result with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
@@ -9190,12 +9154,6 @@ parameters:
 			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\CrmAbstractIntegration\:\:pushLeadActivity\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
-
-		-
 			message: '#^Parameter \#1 \$json of function json_decode expects string, object given\.$#'
 			identifier: argument.type
 			count: 2
@@ -9221,18 +9179,6 @@ parameters:
 
 		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\DynamicsIntegration\:\:getLeads\(\) has parameter \$executed with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/DynamicsIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\DynamicsIntegration\:\:getLeads\(\) has parameter \$object with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/DynamicsIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\DynamicsIntegration\:\:getLeads\(\) has parameter \$result with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/DynamicsIntegration.php
@@ -9461,12 +9407,6 @@ parameters:
 
 		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SalesforceIntegration\:\:getCompanyName\(\) has parameter \$searchBy with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SalesforceIntegration\:\:getFetchQuery\(\) has parameter \$params with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
@@ -9898,25 +9838,7 @@ parameters:
 			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SugarcrmIntegration\:\:getFetchQuery\(\) has parameter \$params with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SugarcrmIntegration\:\:getLeads\(\) has parameter \$executed with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SugarcrmIntegration\:\:getLeads\(\) has parameter \$object with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SugarcrmIntegration\:\:getLeads\(\) has parameter \$result with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
@@ -10130,12 +10052,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: plugins/MauticEmailMarketingBundle/Api/ConstantContactApi.php
-
-		-
-			message: '#^Property MauticPlugin\\MauticEmailMarketingBundle\\Api\\EmailMarketingApi\:\:\$keys has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: plugins/MauticEmailMarketingBundle/Api/EmailMarketingApi.php
 
 		-
 			message: '#^Method MauticPlugin\\MauticEmailMarketingBundle\\Api\\IcontactApi\:\:request\(\) has no return type specified\.$#'
