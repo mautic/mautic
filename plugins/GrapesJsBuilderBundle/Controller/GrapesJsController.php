@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\PageBundle\Entity\Page;
+use MauticPlugin\GrapesJsBuilderBundle\Helper\MjmlContentHelper;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -182,6 +183,10 @@ class GrapesJsController extends CommonController
 
         $renderedTemplateHtml = ('html' === $type) ? $renderedTemplate : '';
         $renderedTemplateMjml = ('mjml' === $type) ? $renderedTemplate : '';
+
+        if ('' === $renderedTemplateHtml && '' !== $renderedTemplateMjml) {
+            $renderedTemplateHtml = MjmlContentHelper::toHtml($renderedTemplateMjml) ?? '';
+        }
 
         return $this->render(
             '@GrapesJsBuilder/Builder/template.html.twig',

@@ -11,6 +11,7 @@ use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\PageBundle\Entity\Page;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository;
+use MauticPlugin\GrapesJsBuilderBundle\Helper\MjmlContentHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -100,8 +101,23 @@ class GrapesJsBuilderModel extends AbstractCommonModel
             $customHtml = $request->request->get('customHtml') ?? null;
         }
 
+        $customHtml = $this->resolveCustomHtmlFromMjml($customHtml, $grapesJsBuilder->getCustomMjml());
+
         $entity->setCustomHtml($customHtml);
         $this->emailRepository->saveEntity($entity);
+    }
+
+    private function resolveCustomHtmlFromMjml(?string $customHtml, ?string $customMjml): ?string
+    {
+        if (null !== $customHtml && '' !== trim($customHtml)) {
+            return $customHtml;
+        }
+
+        if (null === $customMjml || '' === trim($customMjml)) {
+            return $customHtml;
+        }
+
+        return MjmlContentHelper::toHtml($customMjml) ?? $customHtml;
     }
 
     /**
