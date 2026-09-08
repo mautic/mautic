@@ -24,10 +24,12 @@ use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CampaignBundle\Form\Type\CampaignEventJumpToEventType;
 use Mautic\CampaignBundle\Helper\RemovedContactTracker;
+use Mautic\CoreBundle\Service\OptimisticLockServiceInterface;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Form\Type\EmailSendType;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Form\Type\PointActionType;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 
@@ -63,6 +65,11 @@ final class EventExecutionerTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $eventRepository;
 
+    /**
+     * @var OptimisticLockServiceInterface&MockObject
+     */
+    private MockObject $optimisticLockService;
+
     protected function setUp(): void
     {
         $this->eventCollector        = $this->createMock(EventCollector::class);
@@ -73,6 +80,7 @@ final class EventExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->eventScheduler        = $this->createMock(EventScheduler::class);
         $this->leadRepository        = $this->createMock(LeadRepository::class);
         $this->eventRepository       = $this->createMock(EventRepository::class);
+        $this->optimisticLockService = $this->createMock(OptimisticLockServiceInterface::class);
     }
 
     public function testJumpToEventsAreProcessedAfterOtherEvents(): void
@@ -184,6 +192,7 @@ final class EventExecutionerTest extends \PHPUnit\Framework\TestCase
             $this->createStub(LoggerInterface::class),
             $this->eventScheduler,
             $this->createStub(RemovedContactTracker::class),
+            $this->optimisticLockService
         );
     }
 
@@ -252,5 +261,48 @@ final class EventExecutionerTest extends \PHPUnit\Framework\TestCase
 
         $this->assertCount(1, $pendingEvent->getSuccessful());
         $this->assertCount(0, $pendingEvent->getFailures());
+    }
+
+    public function testActionExecutionHandlesExceptionAndResetsVersionForFailedLogs(): void
+    {
+        $event = $this->createMock(Event::class);
+        $event->method('getId')->willReturn(123);
+        $event->method('getEventType')->willReturn(Event::TYPE_ACTION);
+
+        $config = new ActionAccessor(
+            [
+                'label'                => 'mautic.lead.lead.events.changepoints',
+                'description'          => 'mautic.lead.lead.events.changepoints_descr',
+                'formType'             => PointActionType::class,
+            ]
+        );
+
+        $this->eventCollector->method('getEventConfig')
+            ->with($event)
+            ->willReturn($config);
+
+        $executedLog = $this->createMock(LeadEventLog::class);
+        $executedLog->method('isExecuted')->willReturn(true);
+
+        $failedLog = $this->createMock(LeadEventLog::class);
+        $failedLog->method('isExecuted')->willReturn(false);
+
+        $logs = new ArrayCollection([$executedLog, $failedLog]);
+
+        $exception = new \Exception('Test exception');
+
+        $this->actionExecutioner->expects($this->once())
+            ->method('execute')
+            ->with($config, $logs)
+            ->willThrowException($exception);
+
+        $this->optimisticLockService->expects($this->once())
+            ->method('resetVersion')
+            ->with($failedLog);
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Test exception');
+
+        $this->getEventExecutioner()->executeLogs($event, $logs);
     }
 }
