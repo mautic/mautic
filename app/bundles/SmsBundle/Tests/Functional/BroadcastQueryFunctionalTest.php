@@ -50,14 +50,14 @@ final class BroadcastQueryFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         /** @var BroadcastQuery $broadcastQuery */
-        $broadcastQuery = static::getContainer()->get(BroadcastQuery::class);
+        $broadcastQuery = self::getContainer()->get(BroadcastQuery::class);
 
         $pendingContacts = $broadcastQuery->getPendingContacts($sms, new ContactLimiter(50));
 
-        self::assertCount(1, $pendingContacts);
-        self::assertSame($contact->getId(), (int) $pendingContacts[0]['id']);
-        self::assertSame($segment->getId(), (int) $pendingContacts[0]['listId']);
-        self::assertSame(1, (int) $broadcastQuery->getPendingCount($sms));
+        $this->assertCount(1, $pendingContacts);
+        $this->assertSame($contact->getId(), (int) $pendingContacts[0]['id']);
+        $this->assertSame($segment->getId(), (int) $pendingContacts[0]['listId']);
+        $this->assertSame(1, (int) $broadcastQuery->getPendingCount($sms));
     }
 
     /**
@@ -72,10 +72,10 @@ final class BroadcastQueryFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         /** @var BroadcastQuery $broadcastQuery */
-        $broadcastQuery = static::getContainer()->get(BroadcastQuery::class);
+        $broadcastQuery = self::getContainer()->get(BroadcastQuery::class);
 
         $sql = $broadcastQuery->getBasicQuery($sms)->getSQL();
 
-        self::assertStringEndsWith('ORDER BY l.id ASC', $sql);
+        $this->assertStringEndsWith('ORDER BY l.id ASC', $sql);
     }
 }
