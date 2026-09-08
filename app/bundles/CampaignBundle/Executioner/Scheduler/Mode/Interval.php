@@ -241,7 +241,7 @@ final class Interval implements ScheduleModeInterface
 
             // When the days-of-week loop advanced past the original day, "hour already passed today" no longer
             // applies: we are on a new allowed day and must honour the configured send-hour.
-            if ($hour && (int) $groupDateTime->format('w') !== $dayBeforeAdvancement) {
+            if ($groupDateTime instanceof \DateTime && $hour && (int) $groupDateTime->format('w') !== $dayBeforeAdvancement) {
                 $groupDateTime->setTime((int) $hour->format('H'), (int) $hour->format('i'), 0);
             }
         }
