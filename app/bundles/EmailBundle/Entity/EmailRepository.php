@@ -394,7 +394,7 @@ class EmailRepository extends CommonRepository
      *
      * @return array
      */
-    public function getEmailList($search = '', $limit = 10, $start = 0, bool $viewOther = false, bool|string $topLevel = false, $emailType = null, array $ignoreIds = [], $variantParentId = null)
+    public function getEmailList($search = '', $limit = 10, $start = 0, bool $viewOther = false, bool|string|array $topLevel = false, $emailType = null, array $ignoreIds = [], $variantParentId = null)
     {
         $q = $this->createQueryBuilder('e');
         $q->select('partial e.{id, subject, name, language}');
