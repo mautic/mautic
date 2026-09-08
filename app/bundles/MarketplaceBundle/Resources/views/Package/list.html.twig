@@ -38,6 +38,26 @@
             {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
                 'searchValue' : searchValue,
                 'action'      : currentRoute,
+                'quickFilters': [
+                    {
+                        'search': 'marketplace.searchcommand.isplugin',
+                        'label': 'marketplace.package.type.plugin',
+                        'tooltip': 'marketplace.searchcommand.isplugin.description',
+                        'icon': 'ri-plug-line'
+                    },
+                    {
+                        'search': 'marketplace.searchcommand.istheme',
+                        'label': 'marketplace.package.type.theme',
+                        'tooltip': 'marketplace.searchcommand.istheme.description',
+                        'icon': 'ri-palette-line'
+                    },
+                    {
+                        'search': 'marketplace.searchcommand.iscampaign',
+                        'label': 'marketplace.package.type.campaign',
+                        'tooltip': 'marketplace.searchcommand.iscampaign.description',
+                        'icon': 'ri-flag-line'
+                    }
+                ]
             }) -}}
             <div class="page-list">
                 {{ block('listResults') }}

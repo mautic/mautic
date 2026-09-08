@@ -16,9 +16,9 @@ final class PluginCollector
     ) {
     }
 
-    public function collectPackages(int $page, int $limit, string $query = ''): PackageCollection
+    public function collectPackages(int $page, int $limit, string $query = '', ?string $type = null): PackageCollection
     {
-        $payload = $this->connection->getPlugins($page, $limit, $query);
+        $payload = $this->connection->getPlugins($page, $limit, $query, $type);
 
         $this->total = (int) $payload['total'];
 
