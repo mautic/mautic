@@ -95,6 +95,67 @@ final class BroadcastQueryFunctionalTest extends MauticMysqlTestCase
         );
     }
 
+    public function testScheduleModeControlsTheSegmentMembershipCutoff(): void
+    {
+        $firstSegment  = $this->createSegment('sms-snapshot-first');
+        $secondSegment = $this->createSegment('sms-snapshot-second');
+        $sms           = $this->createBroadcastSms([$firstSegment, $secondSegment]);
+        $publishUp     = new \DateTime((new \DateTime('-1 hour'))->format('Y-m-d H:i:s'));
+
+        $beforeStart = $this->createContact('+41790000601', null);
+        $atStart     = $this->createContact('+41790000602', null);
+        $afterStart  = $this->createContact('+41790000603', null);
+        $multiSegmentContact = $this->createContact('+41790000604', null);
+
+        $this->addContactToSegment($beforeStart, $firstSegment, false, (clone $publishUp)->modify('-1 second'));
+        $this->addContactToSegment($atStart, $firstSegment, false, clone $publishUp);
+        $this->addContactToSegment($afterStart, $firstSegment, false, (clone $publishUp)->modify('+1 second'));
+        // Only the membership in the second segment is inside the one-time snapshot.
+        $this->addContactToSegment($multiSegmentContact, $firstSegment, false, (clone $publishUp)->modify('+1 second'));
+        $this->addContactToSegment($multiSegmentContact, $secondSegment, false, (clone $publishUp)->modify('-1 second'));
+
+        $sms->setPublishUp($publishUp);
+        $sms->setContinueSending(false);
+        $this->em->flush();
+
+        $oneTimeContacts = $this->getBroadcastQuery()->getPendingContacts($sms, new ContactLimiter(100));
+        $oneTimeIds      = $this->getIds($oneTimeContacts);
+        $expectedOneTimeIds = [
+            $beforeStart->getId(),
+            $atStart->getId(),
+            $multiSegmentContact->getId(),
+        ];
+        sort($expectedOneTimeIds);
+
+        $this->assertSame($expectedOneTimeIds, $oneTimeIds);
+        $this->assertSame($oneTimeIds, array_values(array_unique($oneTimeIds)));
+        $this->assertSame(count($oneTimeIds), $this->getBroadcastQuery()->getPendingCount($sms));
+
+        $multiSegmentRows = array_values(array_filter(
+            $oneTimeContacts,
+            fn (array $row): bool => $multiSegmentContact->getId() === (int) $row['id'],
+        ));
+        $this->assertCount(1, $multiSegmentRows);
+        $this->assertSame($secondSegment->getId(), (int) $multiSegmentRows[0]['listId']);
+
+        $sms->setContinueSending(true);
+
+        $continuingIds = $this->getIds(
+            $this->getBroadcastQuery()->getPendingContacts($sms, new ContactLimiter(100)),
+        );
+        $expectedContinuingIds = [
+            $beforeStart->getId(),
+            $atStart->getId(),
+            $afterStart->getId(),
+            $multiSegmentContact->getId(),
+        ];
+        sort($expectedContinuingIds);
+
+        $this->assertSame($expectedContinuingIds, $continuingIds);
+        $this->assertSame($continuingIds, array_values(array_unique($continuingIds)));
+        $this->assertSame(count($continuingIds), $this->getBroadcastQuery()->getPendingCount($sms));
+    }
+
     public function testPendingContactsCanRecheckABoundedListOfIds(): void
     {
         $segment = $this->createSegment('sms-bounded-ids');
@@ -355,12 +416,16 @@ final class BroadcastQueryFunctionalTest extends MauticMysqlTestCase
         return $contact;
     }
 
-    private function addContactToSegment(Lead $contact, LeadList $segment, bool $manuallyRemoved = false): void
-    {
+    private function addContactToSegment(
+        Lead $contact,
+        LeadList $segment,
+        bool $manuallyRemoved = false,
+        ?\DateTime $dateAdded = null,
+    ): void {
         $listLead = new ListLead();
         $listLead->setLead($contact);
         $listLead->setList($segment);
-        $listLead->setDateAdded(new \DateTime());
+        $listLead->setDateAdded($dateAdded ?? new \DateTime());
         $listLead->setManuallyRemoved($manuallyRemoved);
         $this->em->persist($listLead);
     }

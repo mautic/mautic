@@ -20,6 +20,7 @@ use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Entity\SmsRepository;
 use Mautic\SmsBundle\Model\SmsModel;
 use Mautic\SmsBundle\Sms\TransportChain;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -392,6 +393,241 @@ final class BroadcastExecutionerTest extends MauticMysqlTestCase
         $this->assertSame(0, $unpublishedResult->getProcessedCount());
     }
 
+    #[DataProvider('inactiveScheduleProvider')]
+    public function testExecuteRechecksTheActiveScheduleBeforeEveryBatch(string $scheduleState): void
+    {
+        [$sms] = $this->createBroadcast(2, 'schedule-recheck-'.$scheduleState);
+
+        $smsModel = $this->createMock(SmsModel::class);
+        $smsModel->expects($this->once())
+            ->method('sendSms')
+            ->willReturnCallback(function (Sms $sentSms, array $contactIds) use ($scheduleState): array {
+                if ('unpublished' === $scheduleState) {
+                    $this->em->getConnection()->executeStatement(
+                        'UPDATE '.MAUTIC_TABLE_PREFIX.'sms_messages SET is_published = 0 WHERE id = :id',
+                        ['id' => $sentSms->getId()],
+                    );
+                } else {
+                    match ($scheduleState) {
+                        'cancelled' => $sentSms->setPublishUp(null),
+                        'future'    => $sentSms->setPublishUp(new \DateTime('+1 hour')),
+                        'expired'   => $sentSms->setPublishDown(new \DateTime('-1 second')),
+                        default     => throw new \LogicException('Unexpected schedule state.'),
+                    };
+                    $this->em->persist($sentSms);
+                    $this->em->flush();
+                }
+
+                return [
+                    $contactIds[0] => [
+                        'sent'   => true,
+                        'status' => 'mautic.sms.timeline.status.delivered',
+                    ],
+                ];
+            });
+        $executioner = $this->createExecutioner($smsModel, $this->createStub(LoggerInterface::class));
+        $event       = new ChannelBroadcastEvent('sms', $sms->getId(), new BufferedOutput());
+        $event->setBatch(1);
+        $event->setLimit(2);
+
+        $executioner->execute($event);
+
+        $this->assertSame([
+            'success'                => 1,
+            'failed'                 => 0,
+            'failedRecipientsByList' => [],
+        ], array_values($event->getResults())[0]);
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function inactiveScheduleProvider(): iterable
+    {
+        yield 'cancelled schedule' => ['cancelled'];
+        yield 'future schedule' => ['future'];
+        yield 'expired schedule' => ['expired'];
+        yield 'unpublished schedule' => ['unpublished'];
+    }
+
+    #[DataProvider('oneTimeThreadProvider')]
+    public function testExecuteAutoUnpublishesCompletedOneTimeScheduleOnlyFromTheFirstThread(
+        ?int $threadId,
+        bool $shouldUnpublish,
+    ): void {
+        [$sms] = $this->createBroadcast(0, 'one-time-thread-'.($threadId ?? 'none'));
+        $sms->setContinueSending(false);
+        $this->em->persist($sms);
+        $this->em->flush();
+
+        $smsModel = $this->createMock(SmsModel::class);
+        $smsModel->expects($this->never())->method('sendSms');
+        $smsModel->expects($shouldUnpublish ? $this->once() : $this->never())
+            ->method('saveEntity')
+            ->with($this->callback(static fn (Sms $savedSms): bool => !$savedSms->getIsPublished()));
+        $executioner = $this->createExecutioner($smsModel, $this->createStub(LoggerInterface::class));
+        $output      = new BufferedOutput();
+        $event       = new ChannelBroadcastEvent('sms', $sms->getId(), $output);
+        $event->setBatch(1);
+        $event->setLimit(1);
+        $event->setThreadId($threadId);
+        $event->setMaxThreads(null === $threadId ? null : 2);
+
+        $executioner->execute($event);
+
+        $this->assertSame(!$shouldUnpublish, (bool) $sms->getIsPublished());
+        $this->assertSame($shouldUnpublish, str_contains($output->fetch(), 'SMS'));
+        $this->assertSame([
+            'success'                => 0,
+            'failed'                 => 0,
+            'failedRecipientsByList' => [],
+        ], array_values($event->getResults())[0]);
+    }
+
+    /**
+     * @return iterable<string, array{int|null, bool}>
+     */
+    public static function oneTimeThreadProvider(): iterable
+    {
+        yield 'single process' => [null, true];
+        yield 'first worker thread' => [1, true];
+        yield 'later worker thread' => [2, false];
+    }
+
+    public function testExecuteKeepsOneTimeSchedulePublishedWhileGlobalRecipientsRemainPending(): void
+    {
+        [$sms, $contacts, $segment] = $this->createBroadcast(1, 'one-time-global-pending');
+        $sms->setContinueSending(false);
+        $this->em->persist($sms);
+
+        $membership = $this->em->getRepository(ListLead::class)->findOneBy([
+            'lead' => $contacts[0],
+            'list' => $segment,
+        ]);
+        $this->assertInstanceOf(ListLead::class, $membership);
+        $membership->setDateAdded(new \DateTime('-2 minutes'));
+        $this->em->persist($membership);
+        $this->em->flush();
+
+        $broadcastQuery = self::getContainer()->get(BroadcastQuery::class);
+        $this->assertSame(1, $broadcastQuery->getPendingCount($sms));
+
+        $smsModel = $this->createMock(SmsModel::class);
+        $smsModel->expects($this->never())->method('sendSms');
+        $smsModel->expects($this->never())->method('saveEntity');
+        $executioner = $this->createExecutioner($smsModel, $this->createStub(LoggerInterface::class));
+        $event       = new ChannelBroadcastEvent('sms', $sms->getId(), new BufferedOutput());
+        $event->setBatch(1);
+        $event->setLimit(1);
+        $event->setMinContactIdFilter($contacts[0]->getId() + 1);
+
+        $executioner->execute($event);
+
+        $this->assertTrue((bool) $sms->getIsPublished());
+        $this->assertSame(1, $broadcastQuery->getPendingCount($sms));
+    }
+
+    public function testExecuteKeepsContinuingSchedulePublishedWhenNoRecipientsArePending(): void
+    {
+        [$sms] = $this->createBroadcast(0, 'continuing-empty');
+
+        $smsModel = $this->createMock(SmsModel::class);
+        $smsModel->expects($this->never())->method('sendSms');
+        $smsModel->expects($this->never())->method('saveEntity');
+        $executioner = $this->createExecutioner($smsModel, $this->createStub(LoggerInterface::class));
+        $event       = new ChannelBroadcastEvent('sms', $sms->getId(), new BufferedOutput());
+        $event->setBatch(1);
+        $event->setLimit(1);
+
+        $executioner->execute($event);
+
+        $this->assertTrue((bool) $sms->getIsPublished());
+    }
+
+    public function testSuccessfulOneTimeScheduleUnpublishesOnTheFollowingEmptyRun(): void
+    {
+        [$sms, $contacts, $segment] = $this->createBroadcast(1, 'one-time-complete');
+        $sms->setContinueSending(false);
+        $this->moveMembershipBeforeSchedule($contacts[0], $segment);
+        $this->em->persist($sms);
+        $this->em->flush();
+        $this->assertFalse($sms->isContinueSending());
+        $this->assertSame(1, self::getContainer()->get(BroadcastQuery::class)->getPendingCount($sms));
+
+        $transport = $this->createMock(TransportChain::class);
+        $transport->expects($this->once())
+            ->method('sendBatchSms')
+            ->willReturnCallback(static function (RecipientCollection $recipients): RecipientCollection {
+                foreach ($recipients as $recipient) {
+                    $recipient->setResult(true);
+                }
+
+                return $recipients;
+            });
+        self::getContainer()->set('mautic.sms.transport_chain', $transport);
+
+        $smsModel = self::getContainer()->get(SmsModel::class);
+        ReflectionHelper::setValue($smsModel, 'transport', $transport);
+        $executioner = $this->createExecutioner($smsModel, $this->createStub(LoggerInterface::class));
+
+        $firstEvent = new ChannelBroadcastEvent('sms', $sms->getId(), new BufferedOutput());
+        $firstEvent->setBatch(1);
+        $firstEvent->setLimit(1);
+        $executioner->execute($firstEvent);
+
+        $this->assertTrue((bool) $sms->getIsPublished());
+        $this->assertSame(1, array_values($firstEvent->getResults())[0]['success']);
+        $this->assertSame(0, self::getContainer()->get(BroadcastQuery::class)->getPendingCount($sms));
+
+        $secondOutput = new BufferedOutput();
+        $secondEvent  = new ChannelBroadcastEvent('sms', $sms->getId(), $secondOutput);
+        $secondEvent->setBatch(1);
+        $secondEvent->setLimit(1);
+        $executioner->execute($secondEvent);
+
+        $this->em->refresh($sms);
+        $this->assertFalse((bool) $sms->getIsPublished());
+        $this->assertSame(0, array_values($secondEvent->getResults())[0]['success']);
+        $this->assertStringContainsString('SMS', $secondOutput->fetch());
+    }
+
+    public function testTerminalMissingNumberFailureDrainsAndUnpublishesOneTimeSchedule(): void
+    {
+        [$sms, $contacts, $segment] = $this->createBroadcast(1, 'one-time-missing-number');
+        $sms->setContinueSending(false);
+        $contacts[0]->setMobile("\t");
+        $this->moveMembershipBeforeSchedule($contacts[0], $segment);
+        $this->em->persist($sms);
+        $this->em->persist($contacts[0]);
+        $this->em->flush();
+        $this->assertFalse($sms->isContinueSending());
+        $this->assertSame(1, self::getContainer()->get(BroadcastQuery::class)->getPendingCount($sms));
+
+        $transport = $this->createMock(TransportChain::class);
+        $transport->expects($this->never())->method('sendBatchSms');
+        self::getContainer()->set('mautic.sms.transport_chain', $transport);
+
+        $smsModel = self::getContainer()->get(SmsModel::class);
+        ReflectionHelper::setValue($smsModel, 'transport', $transport);
+        $executioner = $this->createExecutioner($smsModel, $this->createStub(LoggerInterface::class));
+        $output      = new BufferedOutput();
+        $event       = new ChannelBroadcastEvent('sms', $sms->getId(), $output);
+        $event->setBatch(1);
+        $event->setLimit(1);
+
+        $executioner->execute($event);
+
+        $this->em->refresh($sms);
+        $this->assertFalse((bool) $sms->getIsPublished());
+        $this->assertSame([
+            'success'                => 0,
+            'failed'                 => 1,
+            'failedRecipientsByList' => [],
+        ], array_values($event->getResults())[0]);
+        $this->assertStringContainsString('SMS', $output->fetch());
+        $this->assertSame(0, self::getContainer()->get(BroadcastQuery::class)->getPendingCount($sms));
+    }
+
     private function createExecutioner(
         SmsModel $smsModel,
         LoggerInterface $logger,
@@ -448,6 +684,17 @@ final class BroadcastExecutionerTest extends MauticMysqlTestCase
         return $smsModel;
     }
 
+    private function moveMembershipBeforeSchedule(Lead $contact, LeadList $segment): void
+    {
+        $membership = $this->em->getRepository(ListLead::class)->findOneBy([
+            'lead' => $contact,
+            'list' => $segment,
+        ]);
+        $this->assertInstanceOf(ListLead::class, $membership);
+        $membership->setDateAdded(new \DateTime('-2 minutes'));
+        $this->em->persist($membership);
+    }
+
     /**
      * @return array{Sms, Lead[], LeadList}
      */
@@ -480,6 +727,7 @@ final class BroadcastExecutionerTest extends MauticMysqlTestCase
         $sms->setName($alias);
         $sms->setMessage('Broadcast message');
         $sms->setSmsType('list');
+        $sms->setContinueSending(true);
         $sms->setIsPublished(true);
         $sms->setPublishUp(new \DateTime('-1 minute'));
         $sms->addList($segment);
