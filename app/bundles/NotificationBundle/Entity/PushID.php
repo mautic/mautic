@@ -60,10 +60,7 @@ class PushID
         return $this;
     }
 
-    /**
-     * @return Lead|null
-     */
-    public function getLead()
+    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;
     }

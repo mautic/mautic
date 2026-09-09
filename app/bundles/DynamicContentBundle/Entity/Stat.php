@@ -123,10 +123,7 @@ class Stat
         $this->id = (string) $id;
     }
 
-    /**
-     * @return DynamicContent|null
-     */
-    public function getDynamicContent()
+    public function getDynamicContent(): ?\Mautic\DynamicContentBundle\Entity\DynamicContent
     {
         return $this->dynamicContent;
     }

@@ -20,6 +20,7 @@ use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
 use PhpParser\Node\Name\FullyQualified;
+use PhpParser\Node\Param;
 use PhpParser\Node\Scalar\Int_;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\Class_;
@@ -91,7 +92,7 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
         $resolved = [];
         foreach ($propertyAttributes as $propertyName => $attributeGroups) {
             $property = $this->findProperty($node, $propertyName);
-            if (!$property instanceof Property) {
+            if (!$property instanceof Property && !$property instanceof Param) {
                 return null;
             }
 
@@ -1487,12 +1488,22 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
         return $value instanceof ConstFetch && $this->isName($value, 'true');
     }
 
-    private function findProperty(Class_ $class, string $name): ?Property
+    private function findProperty(Class_ $class, string $name): Property|Param|null
     {
         foreach ($class->getProperties() as $property) {
             foreach ($property->props as $prop) {
                 if ($this->isName($prop, $name)) {
                     return $property;
+                }
+            }
+        }
+
+        // Constructor-promoted properties are Param nodes, not Stmt\Property.
+        $constructor = $class->getMethod('__construct');
+        if ($constructor instanceof ClassMethod) {
+            foreach ($constructor->params as $param) {
+                if (0 !== $param->flags && $param->var instanceof Variable && $this->isName($param->var, $name)) {
+                    return $param;
                 }
             }
         }

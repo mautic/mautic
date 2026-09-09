@@ -128,7 +128,7 @@ class UtmTag
     /**
      * @return \DateTimeInterface
      */
-    public function getDateAdded()
+    public function getDateAdded(): ?\DateTimeInterface
     {
         return $this->dateAdded;
     }
@@ -136,7 +136,7 @@ class UtmTag
     /**
      * @return Lead
      */
-    public function getLead()
+    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;
     }

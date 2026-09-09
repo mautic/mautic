@@ -172,10 +172,7 @@ class Stat
         $this->dateSent = $dateSent;
     }
 
-    /**
-     * @return Notification|null
-     */
-    public function getNotification()
+    public function getNotification(): ?\Mautic\NotificationBundle\Entity\Notification
     {
         return $this->notification;
     }
@@ -216,10 +213,7 @@ class Stat
         $this->isClicked = $isClicked;
     }
 
-    /**
-     * @return Lead|null
-     */
-    public function getLead()
+    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;
     }
@@ -298,10 +292,7 @@ class Stat
         $this->source = $source;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getSourceId()
+    public function getSourceId(): ?int
     {
         return $this->sourceId;
     }
@@ -366,10 +357,7 @@ class Stat
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getLastClicked()
+    public function getLastClicked(): ?\DateTime
     {
         return $this->lastClicked;
     }

@@ -222,7 +222,7 @@ class FrequencyRule extends CommonEntity
     /**
      * @return \DateTimeInterface
      */
-    public function getPauseFromDate()
+    public function getPauseFromDate(): ?\DateTime
     {
         return $this->pauseFromDate;
     }
@@ -239,7 +239,7 @@ class FrequencyRule extends CommonEntity
     /**
      * @return \DateTimeInterface
      */
-    public function getPauseToDate()
+    public function getPauseToDate(): ?\DateTime
     {
         return $this->pauseToDate;
     }

@@ -125,7 +125,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
 
     #[Groups(['user:read', 'user:write'])]
     #[Assert\NotBlank(message: 'mautic.user.user.role.notblank')]
-    #[ORM\ManyToOne(targetEntity: 'Role', inversedBy: 'users', cascade: ['merge'])]
+    #[ORM\ManyToOne(targetEntity: 'Role', cascade: ['merge'], inversedBy: 'users')]
     #[ORM\JoinColumn(name: 'role_id', nullable: false)]
     private ?\Mautic\UserBundle\Entity\Role $role = null;
 
@@ -455,10 +455,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return $this;
     }
 
-    /**
-     * @return Role|null
-     */
-    public function getRole()
+    public function getRole(): ?\Mautic\UserBundle\Entity\Role
     {
         return $this->role;
     }
@@ -470,10 +467,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getActivePermissions()
+    public function getActivePermissions(): ?array
     {
         return $this->activePermissions;
     }
@@ -524,10 +518,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getLocale()
+    public function getLocale(): ?string
     {
         return $this->locale;
     }

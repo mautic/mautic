@@ -91,10 +91,7 @@ class Widget extends FormEntity
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -107,10 +104,7 @@ class Widget extends FormEntity
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getType()
+    public function getType(): ?string
     {
         return $this->type;
     }
@@ -126,10 +120,7 @@ class Widget extends FormEntity
         return $this;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getWidth()
+    public function getWidth(): ?int
     {
         return $this->width;
     }
@@ -164,10 +155,7 @@ class Widget extends FormEntity
         return $this;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getHeight()
+    public function getHeight(): ?int
     {
         return $this->height;
     }
@@ -183,18 +171,12 @@ class Widget extends FormEntity
         return $this;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getOrdering()
+    public function getOrdering(): ?int
     {
         return $this->ordering;
     }
 
-    /**
-     * @return array
-     */
-    public function getParams()
+    public function getParams(): array
     {
         return $this->params;
     }
@@ -226,10 +208,7 @@ class Widget extends FormEntity
         return $this->template;
     }
 
-    /**
-     * @return array
-     */
-    public function getTemplateData()
+    public function getTemplateData(): array
     {
         return $this->templateData;
     }

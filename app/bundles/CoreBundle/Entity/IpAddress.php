@@ -24,6 +24,10 @@ use Symfony\Component\Serializer\Attribute\Groups;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[ORM\Entity(repositoryClass: IpAddressRepository::class)]
+#[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\Index(columns: ['ip_address'], name: 'ip_search')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class IpAddress
 {
     public const TABLE_NAME = 'ip_addresses';
@@ -38,34 +42,17 @@ class IpAddress
      * @var int
      */
     #[Groups(['ipaddress:read', 'ipaddress:write', 'download:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
      * @var mixed[]
      */
     #[Groups(['ipaddress:read', 'ipaddress:write', 'download:read'])]
+    #[ORM\Column(name: 'ip_details', type: 'array', nullable: true)]
     private $ipDetails;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(IpAddressRepository::class)
-            ->addIndex(['ip_address'], 'ip_search');
-
-        $builder->addId();
-
-        $builder->createField('ipAddress', 'string')
-            ->columnName('ip_address')
-            ->length(45)
-            ->build();
-
-        $builder->createField('ipDetails', 'array')
-            ->columnName('ip_details')
-            ->nullable()
-            ->build();
-    }
 
     /**
      * Prepares the metadata for API usage.
@@ -90,7 +77,7 @@ class IpAddress
     }
 
     public function __construct(
-        #[Groups(['ipaddress:read', 'ipaddress:write', 'download:read'])]
+        #[Groups(['ipaddress:read', 'ipaddress:write', 'download:read'])] #[ORM\Column(name: 'ip_address', type: 'string', length: 45)]
         private ?string $ipAddress = null,
     ) {
     }

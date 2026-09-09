@@ -171,7 +171,7 @@ class PointsChangeLog
     /**
      * @return Lead
      */
-    public function getLead()
+    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;
     }
@@ -183,10 +183,7 @@ class PointsChangeLog
         return $this;
     }
 
-    /**
-     * @return IpAddress|null
-     */
-    public function getIpAddress()
+    public function getIpAddress(): ?\Mautic\CoreBundle\Entity\IpAddress
     {
         return $this->ipAddress;
     }

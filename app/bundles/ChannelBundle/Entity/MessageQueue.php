@@ -197,10 +197,7 @@ class MessageQueue
         return $this;
     }
 
-    /**
-     * @return Event|null
-     */
-    public function getEvent()
+    public function getEvent(): ?\Mautic\CampaignBundle\Entity\Event
     {
         return $this->event;
     }
@@ -260,10 +257,7 @@ class MessageQueue
         $this->lastAttempt = $lastAttempt;
     }
 
-    /**
-     * @return Lead|null
-     */
-    public function getLead()
+    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;
     }
@@ -337,18 +331,12 @@ class MessageQueue
         $this->status = $status;
     }
 
-    /**
-     * @return bool
-     */
-    public function getSuccess()
+    public function getSuccess(): bool
     {
         return $this->success;
     }
 
-    /**
-     * @return bool
-     */
-    public function isSuccess()
+    public function isSuccess(): bool
     {
         return $this->success;
     }
@@ -358,10 +346,7 @@ class MessageQueue
         $this->success = $success;
     }
 
-    /**
-     * @return bool
-     */
-    public function isFailed()
+    public function isFailed(): bool
     {
         return $this->failed;
     }
@@ -373,10 +358,7 @@ class MessageQueue
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function isProcessed()
+    public function isProcessed(): bool
     {
         return $this->processed;
     }

@@ -166,7 +166,7 @@ class TweetStat
     /**
      * @return TheLead
      */
-    public function getLead()
+    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;
     }
@@ -262,10 +262,7 @@ class TweetStat
         $this->source = $source;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getSourceId()
+    public function getSourceId(): ?int
     {
         return $this->sourceId;
     }

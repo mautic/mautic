@@ -48,7 +48,7 @@ class MergeRecord
     /**
      * @return Lead
      */
-    public function getContact()
+    public function getContact(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->contact;
     }
@@ -63,7 +63,7 @@ class MergeRecord
     /**
      * @return \DateTimeInterface
      */
-    public function getDateAdded()
+    public function getDateAdded(): ?\DateTime
     {
         return $this->dateAdded;
     }
@@ -98,7 +98,7 @@ class MergeRecord
     /**
      * @return int
      */
-    public function getMergedId()
+    public function getMergedId(): ?int
     {
         return $this->mergedId;
     }

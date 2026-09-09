@@ -171,7 +171,7 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
     /**
      * @return ArrayCollection<int, Permission>
      */
-    public function getPermissions()
+    public function getPermissions(): \Doctrine\Common\Collections\ArrayCollection|array
     {
         return $this->permissions;
     }
@@ -233,10 +233,7 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
         $this->rawPermissions = $permissions;
     }
 
-    /**
-     * @return array|null
-     */
-    public function getRawPermissions()
+    public function getRawPermissions(): ?array
     {
         return $this->rawPermissions;
     }
@@ -262,7 +259,7 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
     /**
      * @return ArrayCollection<int, User>
      */
-    public function getUsers()
+    public function getUsers(): \Doctrine\Common\Collections\ArrayCollection|array
     {
         return $this->users;
     }

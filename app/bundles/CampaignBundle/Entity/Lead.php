@@ -92,7 +92,7 @@ class Lead
     /**
      * @return \Mautic\LeadBundle\Entity\Lead
      */
-    public function getLead()
+    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;
     }
@@ -105,7 +105,7 @@ class Lead
     /**
      * @return Campaign
      */
-    public function getCampaign()
+    public function getCampaign(): ?\Mautic\CampaignBundle\Entity\Campaign
     {
         return $this->campaign;
     }
@@ -163,10 +163,7 @@ class Lead
         return $this->manuallyAdded;
     }
 
-    /**
-     * @return int
-     */
-    public function getRotation()
+    public function getRotation(): int
     {
         return $this->rotation;
     }
@@ -189,10 +186,7 @@ class Lead
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getDateLastExited()
+    public function getDateLastExited(): ?\DateTime
     {
         return $this->dateLastExited;
     }

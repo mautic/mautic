@@ -413,10 +413,7 @@ class VideoHit
         return $this;
     }
 
-    /**
-     * @return IpAddress|null
-     */
-    public function getIpAddress()
+    public function getIpAddress(): ?\Mautic\CoreBundle\Entity\IpAddress
     {
         return $this->ipAddress;
     }
@@ -457,10 +454,7 @@ class VideoHit
         return $this->browserLanguages;
     }
 
-    /**
-     * @return Lead|null
-     */
-    public function getLead()
+    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;
     }
@@ -493,7 +487,7 @@ class VideoHit
     /**
      * @return int
      */
-    public function getChannelId()
+    public function getChannelId(): ?int
     {
         return $this->channelId;
     }
@@ -511,7 +505,7 @@ class VideoHit
     /**
      * @return Redirect
      */
-    public function getRedirect()
+    public function getRedirect(): ?\Mautic\PageBundle\Entity\Redirect
     {
         return $this->redirect;
     }

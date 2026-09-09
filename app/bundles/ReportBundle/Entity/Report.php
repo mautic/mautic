@@ -199,10 +199,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
             ->build();
     }
 
-    /**
-     * @return int|null
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -369,7 +366,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     /**
      * @return array<array-key, mixed>
      */
-    public function getTableOrder()
+    public function getTableOrder(): array
     {
         return $this->tableOrder;
     }
@@ -384,7 +381,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     /**
      * @return array<array-key, mixed>
      */
-    public function getGraphs()
+    public function getGraphs(): array
     {
         return $this->graphs;
     }
@@ -399,7 +396,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     /**
      * @return array<array-key, mixed>
      */
-    public function getGroupBy()
+    public function getGroupBy(): array
     {
         return $this->groupBy;
     }
@@ -414,7 +411,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     /**
      * @return array<array-key, mixed>
      */
-    public function getAggregators()
+    public function getAggregators(): array
     {
         return $this->aggregators;
     }
@@ -456,7 +453,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     /**
      * @return array<array-key, mixed>|null
      */
-    public function getSettings()
+    public function getSettings(): array
     {
         return $this->settings;
     }

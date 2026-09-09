@@ -14,7 +14,7 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 class FailedLeadEventLog
 {
     #[ORM\Id]
-    #[ORM\OneToOne(targetEntity: 'LeadEventLog', inversedBy: 'failedLog')]
+    #[ORM\OneToOne(inversedBy: 'failedLog', targetEntity: 'LeadEventLog')]
     #[ORM\JoinColumn(name: 'log_id', nullable: false, onDelete: 'CASCADE')]
     private ?\Mautic\CampaignBundle\Entity\LeadEventLog $log = null;
 
@@ -45,7 +45,7 @@ class FailedLeadEventLog
     /**
      * @return LeadEventLog
      */
-    public function getLog()
+    public function getLog(): ?\Mautic\CampaignBundle\Entity\LeadEventLog
     {
         return $this->log;
     }
@@ -64,7 +64,7 @@ class FailedLeadEventLog
     /**
      * @return \DateTimeInterface
      */
-    public function getDateAdded()
+    public function getDateAdded(): ?\DateTime
     {
         return $this->dateAdded;
     }

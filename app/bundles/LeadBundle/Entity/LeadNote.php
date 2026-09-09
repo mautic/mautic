@@ -115,7 +115,7 @@ class LeadNote extends FormEntity
     /**
      * @return Lead
      */
-    public function getLead()
+    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;
     }

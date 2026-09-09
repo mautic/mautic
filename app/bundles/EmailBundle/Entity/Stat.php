@@ -200,10 +200,7 @@ class Stat
         $this->dateSent = $dateSent;
     }
 
-    /**
-     * @return Email|null
-     */
-    public function getEmail()
+    public function getEmail(): ?\Mautic\EmailBundle\Entity\Email
     {
         return $this->email;
     }
@@ -253,10 +250,7 @@ class Stat
         $this->isRead = $isRead;
     }
 
-    /**
-     * @return Lead|null
-     */
-    public function getLead()
+    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;
     }
@@ -400,10 +394,7 @@ class Stat
         $this->source = $source;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getSourceId()
+    public function getSourceId(): ?int
     {
         return $this->sourceId;
     }
@@ -417,10 +408,7 @@ class Stat
         $this->sourceId = (int) $sourceId;
     }
 
-    /**
-     * @return array|null
-     */
-    public function getTokens()
+    public function getTokens(): array
     {
         return $this->tokens;
     }
@@ -502,10 +490,7 @@ class Stat
         return $this;
     }
 
-    /**
-     * @return Copy|null
-     */
-    public function getStoredCopy()
+    public function getStoredCopy(): ?\Mautic\EmailBundle\Entity\Copy
     {
         return $this->storedCopy;
     }
@@ -520,7 +505,7 @@ class Stat
     /**
      * @return ArrayCollection<int, EmailReply>
      */
-    public function getReplies()
+    public function getReplies(): \Doctrine\Common\Collections\ArrayCollection|array
     {
         return $this->replies;
     }

@@ -45,10 +45,7 @@ class Log
         return $this->id;
     }
 
-    /**
-     * @return Webhook|null
-     */
-    public function getWebhook()
+    public function getWebhook(): ?\Mautic\WebhookBundle\Entity\Webhook
     {
         return $this->webhook;
     }
@@ -78,10 +75,7 @@ class Log
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getDateAdded()
+    public function getDateAdded(): ?\DateTime
     {
         return $this->dateAdded;
     }
@@ -108,10 +102,7 @@ class Log
         return $this;
     }
 
-    /**
-     * @return float|null
-     */
-    public function getRuntime()
+    public function getRuntime(): ?float
     {
         return $this->runtime;
     }

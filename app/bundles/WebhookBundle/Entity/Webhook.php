@@ -272,10 +272,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         return $this;
     }
 
-    /**
-     * @return Category|null
-     */
-    public function getCategory()
+    public function getCategory(): ?\Mautic\CategoryBundle\Entity\Category
     {
         return $this->category;
     }

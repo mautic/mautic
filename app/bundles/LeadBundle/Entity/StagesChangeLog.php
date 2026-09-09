@@ -119,7 +119,7 @@ class StagesChangeLog
     /**
      * @return Lead
      */
-    public function getLead()
+    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;
     }
@@ -131,10 +131,7 @@ class StagesChangeLog
         return $this;
     }
 
-    /**
-     * @return Stage|null
-     */
-    public function getStage()
+    public function getStage(): ?\Mautic\StageBundle\Entity\Stage
     {
         return $this->stage;
     }

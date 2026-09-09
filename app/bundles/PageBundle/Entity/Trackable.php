@@ -14,7 +14,7 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 class Trackable
 {
     #[ORM\Id]
-    #[ORM\ManyToOne(targetEntity: Redirect::class, inversedBy: 'trackables', cascade: ['persist'])]
+    #[ORM\ManyToOne(targetEntity: Redirect::class, cascade: ['persist'], inversedBy: 'trackables')]
     #[ORM\JoinColumn(name: 'redirect_id', onDelete: 'CASCADE')]
     private ?\Mautic\PageBundle\Entity\Redirect $redirect = null;
 
@@ -64,7 +64,7 @@ class Trackable
     /**
      * @return Redirect
      */
-    public function getRedirect()
+    public function getRedirect(): ?\Mautic\PageBundle\Entity\Redirect
     {
         return $this->redirect;
     }

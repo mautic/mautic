@@ -149,10 +149,7 @@ class Submission
         return $this;
     }
 
-    /**
-     * @return Form|null
-     */
-    public function getForm()
+    public function getForm(): ?\Mautic\FormBundle\Entity\Form
     {
         return $this->form;
     }
@@ -164,10 +161,7 @@ class Submission
         return $this;
     }
 
-    /**
-     * @return IpAddress|null
-     */
-    public function getIpAddress()
+    public function getIpAddress(): ?\Mautic\CoreBundle\Entity\IpAddress
     {
         return $this->ipAddress;
     }
@@ -194,18 +188,12 @@ class Submission
         return $this;
     }
 
-    /**
-     * @return Page|null
-     */
-    public function getPage()
+    public function getPage(): ?\Mautic\PageBundle\Entity\Page
     {
         return $this->page;
     }
 
-    /**
-     * @return Lead|null
-     */
-    public function getLead()
+    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;
     }

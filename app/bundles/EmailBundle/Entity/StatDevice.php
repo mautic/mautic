@@ -101,10 +101,7 @@ class StatDevice
         $this->dateOpened = $dateOpened;
     }
 
-    /**
-     * @return LeadDevice|null
-     */
-    public function getDevice()
+    public function getDevice(): ?\Mautic\LeadBundle\Entity\LeadDevice
     {
         return $this->device;
     }

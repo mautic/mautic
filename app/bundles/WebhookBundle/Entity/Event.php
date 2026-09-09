@@ -21,7 +21,7 @@ class Event
     #[ORM\GeneratedValue]
     private $id;
 
-    #[ORM\ManyToOne(targetEntity: 'Webhook', inversedBy: 'events', cascade: ['detach', 'merge'])]
+    #[ORM\ManyToOne(targetEntity: 'Webhook', cascade: ['detach', 'merge'], inversedBy: 'events')]
     #[ORM\JoinColumn(name: 'webhook_id', nullable: false, onDelete: 'CASCADE')]
     private ?\Mautic\WebhookBundle\Entity\Webhook $webhook = null;
 
@@ -64,10 +64,7 @@ class Event
         return $this->id;
     }
 
-    /**
-     * @return Webhook|null
-     */
-    public function getWebhook()
+    public function getWebhook(): ?\Mautic\WebhookBundle\Entity\Webhook
     {
         return $this->webhook;
     }

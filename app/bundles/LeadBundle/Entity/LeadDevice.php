@@ -83,7 +83,7 @@ class LeadDevice
     /**
      * @var string|null
      */
-    #[ORM\Column(name: 'tracking_id', type: 'string', length: 191, nullable: true, unique: true)]
+    #[ORM\Column(name: 'tracking_id', type: 'string', length: 191, unique: true, nullable: true)]
     private $trackingId;
 
     /**
@@ -306,7 +306,7 @@ class LeadDevice
     /**
      * @return Lead
      */
-    public function getLead()
+    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;
     }

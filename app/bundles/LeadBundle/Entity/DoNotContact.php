@@ -101,10 +101,7 @@ class DoNotContact
         return $this->id;
     }
 
-    /**
-     * @return Lead|null
-     */
-    public function getLead()
+    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;
     }
@@ -119,7 +116,7 @@ class DoNotContact
     /**
      * @return \DateTimeInterface
      */
-    public function getDateAdded()
+    public function getDateAdded(): ?\DateTime
     {
         return $this->dateAdded;
     }
@@ -149,10 +146,7 @@ class DoNotContact
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getComments()
+    public function getComments(): ?string
     {
         return $this->comments;
     }

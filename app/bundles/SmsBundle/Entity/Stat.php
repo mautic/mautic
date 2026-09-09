@@ -113,10 +113,7 @@ class Stat
         return (int) $this->id;
     }
 
-    /**
-     * @return Sms|null
-     */
-    public function getSms()
+    public function getSms(): ?\Mautic\SmsBundle\Entity\Sms
     {
         return $this->sms;
     }
@@ -128,10 +125,7 @@ class Stat
         return $this;
     }
 
-    /**
-     * @return Lead|null
-     */
-    public function getLead()
+    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;
     }
@@ -143,10 +137,7 @@ class Stat
         return $this;
     }
 
-    /**
-     * @return LeadList|null
-     */
-    public function getList()
+    public function getList(): ?\Mautic\LeadBundle\Entity\LeadList
     {
         return $this->list;
     }
@@ -158,10 +149,7 @@ class Stat
         return $this;
     }
 
-    /**
-     * @return IpAddress|null
-     */
-    public function getIpAddress()
+    public function getIpAddress(): ?\Mautic\CoreBundle\Entity\IpAddress
     {
         return $this->ipAddress;
     }
@@ -248,7 +236,7 @@ class Stat
     /**
      * @return array<array-key, mixed>
      */
-    public function getTokens()
+    public function getTokens(): array
     {
         return $this->tokens;
     }
