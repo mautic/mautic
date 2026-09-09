@@ -281,6 +281,7 @@ rules:
     - Utils\PHPStan\Rule\NoServiceGetterRule
     - Utils\PHPStan\Rule\NoReadonlyEntityClassRule
     - Utils\PHPStan\Rule\NoReadonlyApiParamRule
+    - Utils\PHPStan\Rule\NoLoadMetadataMethodRule
 
 services:
     - Utils\PHPStan\ServiceNameUsageResolver
