@@ -13,7 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Index(columns: ['expiration'], name: 'IDX_USER_INVITES_EXPIRATION')]
 #[ORM\Index(columns: ['role_id'], name: 'IDX_USER_INVITES_ROLE')]
 #[ORM\Index(columns: ['used'], name: 'IDX_USER_INVITES_USED')]
-#[ORM\UniqueConstraint(columns: ['token_selector'], name: 'UNIQ_USER_INVITES_TOKEN_SELECTOR')]
+#[ORM\UniqueConstraint(name: 'UNIQ_USER_INVITES_TOKEN_SELECTOR', columns: ['token_selector'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class UserInvite
 {

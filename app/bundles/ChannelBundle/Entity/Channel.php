@@ -44,7 +44,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ORM\Table(name: 'message_channels')]
 #[ORM\Index(columns: ['channel', 'channel_id'], name: 'channel_entity_index')]
 #[ORM\Index(columns: ['channel', 'is_enabled'], name: 'channel_enabled_index')]
-#[ORM\UniqueConstraint(columns: ['message_id', 'channel'], name: 'channel_index')]
+#[ORM\UniqueConstraint(name: 'channel_index', columns: ['message_id', 'channel'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Channel extends CommonEntity implements UuidInterface
 {

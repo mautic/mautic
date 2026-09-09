@@ -26,10 +26,7 @@ final class Reference
         return $this->emailId;
     }
 
-    /**
-     * @return int
-     */
-    public function getLeadId()
+    public function getLeadId(): int
     {
         return $this->leadId;
     }

@@ -38,7 +38,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 )]
 #[ORM\Entity(repositoryClass: PermissionRepository::class)]
 #[ORM\Table(name: 'permissions')]
-#[ORM\UniqueConstraint(columns: ['bundle', 'name', 'role_id'], name: 'unique_perm')]
+#[ORM\UniqueConstraint(name: 'unique_perm', columns: ['bundle', 'name', 'role_id'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Permission implements CacheInvalidateInterface, UuidInterface
 {

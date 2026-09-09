@@ -21,6 +21,7 @@ use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
 use PhpParser\Node\Name\FullyQualified;
+use PhpParser\Node\NullableType;
 use PhpParser\Node\Param;
 use PhpParser\Node\PropertyItem;
 use PhpParser\Node\Scalar\Int_;
@@ -326,14 +327,20 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
                 continue;
             }
 
-            // Hybrid classes already map their fields via attributes; leave field chains behind.
-            if ($this->isHybrid) {
-                return null;
-            }
-
             $fields = $this->handleFieldChain($segmentCalls);
             if (null === $fields) {
                 return null;
+            }
+
+            // A hybrid class already maps its own fields via attributes, so a field whose property
+            // is declared here is left behind to avoid duplicating it. A field whose property is
+            // missing (it lives in a parent) is still converted and redeclared by resolveTargets.
+            if ($this->isHybrid) {
+                foreach (array_keys($fields) as $fieldName) {
+                    if (null !== $this->findProperty($node, $fieldName)) {
+                        return null;
+                    }
+                }
             }
 
             foreach ($fields as $fieldName => $attributeGroups) {
@@ -386,7 +393,7 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
                 Modifiers::PROTECTED,
                 [new PropertyItem($propertyName)],
                 [],
-                null,
+                $this->parentPropertyType($node, $propertyName),
                 $attributeGroups,
             );
         }
@@ -1978,6 +1985,42 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
         }
 
         $node->attrGroups = array_merge($node->attrGroups, $toAppend);
+    }
+
+    /**
+     * The declared type of a property inherited from a parent class, mirrored so a redeclaration
+     * stays compatible with the parent (PHP requires an identical type). Null when the parent, the
+     * property or its type cannot be resolved, leaving the redeclaration untyped.
+     */
+    private function parentPropertyType(Class_ $class, string $propertyName): Identifier|Name|NullableType|null
+    {
+        if (!$class->extends instanceof Name) {
+            return null;
+        }
+
+        $parentClass = $this->getName($class->extends);
+        if (null === $parentClass || !class_exists($parentClass)) {
+            return null;
+        }
+
+        $reflection = new \ReflectionClass($parentClass);
+        if (!$reflection->hasProperty($propertyName)) {
+            return null;
+        }
+
+        $type = $reflection->getProperty($propertyName)->getType();
+        if (!$type instanceof \ReflectionNamedType) {
+            return null;
+        }
+
+        $typeName = $type->getName();
+        $typeNode = $type->isBuiltin() ? new Identifier($typeName) : new FullyQualified($typeName);
+
+        if ($type->allowsNull() && 'null' !== $typeName && 'mixed' !== $typeName) {
+            return new NullableType($typeNode);
+        }
+
+        return $typeNode;
     }
 
     private function findProperty(Class_ $class, string $name): Property|Param|null

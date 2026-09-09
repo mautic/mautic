@@ -5,6 +5,8 @@ namespace Utils\Rector\Tests\LoadMetadataToDoctrineAttributeRector\Fixture;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
+#[ORM\Entity]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class AccessTokenEntity extends BaseAccessToken
 {
     public static function loadMetadata(ORM\ClassMetadata $metadata): void

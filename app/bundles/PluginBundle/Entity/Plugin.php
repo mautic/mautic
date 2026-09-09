@@ -161,10 +161,7 @@ class Plugin extends CommonEntity implements CacheInvalidateInterface
         return $this->description && preg_match(self::DESCRIPTION_DELIMITER_REGEX, $this->description) >= 1;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getSecondaryDescription()
+    public function getSecondaryDescription(): ?string
     {
         return $this->secondaryDescription;
     }
