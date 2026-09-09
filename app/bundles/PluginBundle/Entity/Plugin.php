@@ -8,7 +8,9 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 use Mautic\CoreBundle\Entity\CommonEntity;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: PluginRepository::class)]
+#[ORM\Table(name: 'plugins')]
+#[ORM\UniqueConstraint(columns: ['bundle'], name: 'unique_bundle')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Plugin extends CommonEntity implements CacheInvalidateInterface
 {
@@ -79,15 +81,6 @@ class Plugin extends CommonEntity implements CacheInvalidateInterface
     public function __construct()
     {
         $this->integrations = new ArrayCollection();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable('plugins')
-            ->setCustomRepositoryClass(PluginRepository::class)
-            ->addUniqueConstraint(['bundle'], 'unique_bundle');
     }
 
     public function __clone()

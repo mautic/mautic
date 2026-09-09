@@ -13,6 +13,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadata as OrmClassMetadata;
+use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
@@ -41,7 +42,9 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     ]
 )]
 #[UniqueName]
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: ProjectRepository::class)]
+#[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\UniqueConstraint(columns: ['name'], name: 'unique_project_name')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Project extends FormEntity implements UuidInterface
 {
@@ -82,15 +85,6 @@ class Project extends FormEntity implements UuidInterface
         $this->id = null;
 
         parent::__clone();
-    }
-
-    public static function loadMetadata(OrmClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(ProjectRepository::class)
-            ->addUniqueConstraint(['name'], 'unique_project_name');
     }
 
     public static function loadApiMetadata(ApiMetadataDriver $metadata): void
