@@ -6,51 +6,64 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
+#[ORM\Entity(repositoryClass: PointInsightRepository::class)]
+#[ORM\Table(name: 'point_insights')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class PointInsight extends FormEntity
 {
     public const INSIGHT_TYPE_COMPARE_POINT_GROUPS = 'compare_point_groups';
 
     public const INSIGHT_ACTION_SET_CUSTOM_FIELD = 'set_custom_field';
 
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private ?int $id = null;
 
     #[Assert\NotBlank(message: 'mautic.core.name.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     private string $name = '';
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
      * @var string
      */
     #[Assert\NotBlank(message: 'mautic.point.insight.type.required')]
+    #[ORM\Column(name: 'insight_type', type: Types::STRING, length: 191)]
     private $insightType = self::INSIGHT_TYPE_COMPARE_POINT_GROUPS;
 
     /**
      * @var string
      */
     #[Assert\NotBlank(message: 'mautic.point.insight.action.required')]
+    #[ORM\Column(name: 'insight_action', type: Types::STRING, length: 191)]
     private $insightAction = self::INSIGHT_ACTION_SET_CUSTOM_FIELD;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'custom_field', type: Types::STRING, length: 191, nullable: true)]
     private $customField;
 
     /**
      * @var array<int>
      */
+    #[ORM\Column(name: 'point_groups', type: Types::JSON)]
     private $pointGroups = [];
 
     /**
      * @var Category|null
      */
+    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['merge', 'detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
     private $category;
 
     public function __clone()
@@ -58,35 +71,6 @@ class PointInsight extends FormEntity
         $this->id = null;
 
         parent::__clone();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable('point_insights')
-            ->setCustomRepositoryClass(PointInsightRepository::class);
-
-        $builder->addIdColumns();
-
-        $builder->createField('insightType', Types::STRING)
-            ->columnName('insight_type')
-            ->build();
-
-        $builder->createField('insightAction', Types::STRING)
-            ->columnName('insight_action')
-            ->build();
-
-        $builder->createField('customField', Types::STRING)
-            ->columnName('custom_field')
-            ->nullable()
-            ->build();
-
-        $builder->createField('pointGroups', Types::JSON)
-            ->columnName('point_groups')
-            ->build();
-
-        $builder->addCategory();
     }
 
     /**

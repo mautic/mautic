@@ -5,54 +5,37 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
+#[ORM\Entity(repositoryClass: MergeRecordRepository::class)]
+#[ORM\Table(name: 'contact_merge_records')]
+#[ORM\Index(columns: ['date_added'], name: 'contact_merge_date_added')]
+#[ORM\Index(columns: ['merged_id'], name: 'contact_merge_ids')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class MergeRecord
 {
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue]
     private $id;
 
-    /**
-     * @var Lead
-     */
-    private $contact;
+    #[ORM\ManyToOne(targetEntity: \Mautic\LeadBundle\Entity\Lead::class)]
+    #[ORM\JoinColumn(name: 'contact_id', nullable: false, onDelete: 'CASCADE')]
+    private ?\Mautic\LeadBundle\Entity\Lead $contact = null;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private $dateAdded;
+    #[ORM\Column(name: 'date_added', type: 'datetime')]
+    private ?\DateTime $dateAdded = null;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
-    /**
-     * @var int
-     */
-    private $mergedId;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable('contact_merge_records')
-            ->setCustomRepositoryClass(MergeRecordRepository::class)
-            ->addIndex(['date_added'], 'contact_merge_date_added')
-            ->addIndex(['merged_id'], 'contact_merge_ids');
-
-        $builder->createField('id', 'integer')
-            ->makePrimaryKey()
-            ->generatedValue()
-            ->build();
-
-        $builder->addContact()
-            ->addDateAdded()
-            ->addNamedField('mergedId', 'integer', 'merged_id')
-            ->addField('name', 'string');
-    }
+    #[ORM\Column(name: 'merged_id', type: 'integer')]
+    private ?int $mergedId = null;
 
     /**
      * @return int

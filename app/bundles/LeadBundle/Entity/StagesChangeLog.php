@@ -5,68 +5,47 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\StageBundle\Entity\Stage;
 
+#[ORM\Entity(repositoryClass: StagesChangeLogRepository::class)]
+#[ORM\Table(name: 'lead_stages_change_log')]
+#[ORM\Index(columns: ['date_added'], name: 'lead_stages_change_log_date_added')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class StagesChangeLog
 {
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
-    /**
-     * @var Lead
-     */
-    private $lead;
+    #[ORM\ManyToOne(targetEntity: \Mautic\LeadBundle\Entity\Lead::class, inversedBy: 'stageChangeLog')]
+    #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
+    private ?\Mautic\LeadBundle\Entity\Lead $lead = null;
 
-    /**
-     * @var Stage|null
-     */
-    private $stage;
+    #[ORM\ManyToOne(targetEntity: Stage::class, inversedBy: 'log')]
+    #[ORM\JoinColumn(name: 'stage_id', onDelete: 'CASCADE')]
+    private ?\Mautic\StageBundle\Entity\Stage $stage = null;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'event_name', type: 'string', length: 191)]
     private $eventName;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'action_name', type: 'string', length: 191)]
     private $actionName;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_added', type: 'datetime')]
     private $dateAdded;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable('lead_stages_change_log')
-            ->setCustomRepositoryClass(StagesChangeLogRepository::class)
-            ->addIndex(['date_added'], 'lead_stages_change_log_date_added');
-
-        $builder->addId();
-
-        $builder->addLead(false, 'CASCADE', false, 'stageChangeLog');
-
-        $builder->createField('eventName', 'string')
-            ->columnName('event_name')
-            ->build();
-
-        $builder->createField('actionName', 'string')
-            ->columnName('action_name')
-            ->build();
-
-        $builder->createManyToOne('stage', Stage::class)
-            ->inversedBy('log')
-            ->addJoinColumn('stage_id', 'id', true, false, 'CASCADE')
-            ->build();
-
-        $builder->addDateAdded();
-    }
 
     /**
      * @return int

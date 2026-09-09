@@ -5,47 +5,38 @@ declare(strict_types=1);
 namespace MauticPlugin\MauticSocialBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
+#[ORM\Entity(repositoryClass: PostCountRepository::class)]
+#[ORM\Table(name: 'monitor_post_count')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class PostCount
 {
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
      * @var Monitoring|null
      */
+    #[ORM\ManyToOne(targetEntity: 'Monitoring')]
+    #[ORM\JoinColumn(name: 'monitor_id', onDelete: 'CASCADE')]
     private $monitor;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'post_date', type: 'date')]
     private $postDate;
 
     /**
      * @var int
      */
+    #[ORM\Column(name: 'post_count', type: 'integer')]
     private $postCount;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable('monitor_post_count')
-            ->setCustomRepositoryClass(PostCountRepository::class);
-
-        $builder->addId();
-
-        $builder->createManyToOne('monitor', 'Monitoring')
-            ->addJoinColumn('monitor_id', 'id', true, false, 'CASCADE')
-            ->build();
-
-        $builder->addNamedField('postDate', 'date', 'post_date');
-
-        $builder->addNamedField('postCount', 'integer', 'post_count');
-    }
 
     /**
      * @return mixed

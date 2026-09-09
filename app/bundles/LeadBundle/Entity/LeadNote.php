@@ -6,61 +6,44 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+#[ORM\Entity(repositoryClass: LeadNoteRepository::class)]
+#[ORM\Table(name: 'lead_notes')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class LeadNote extends FormEntity
 {
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
-    /**
-     * @var Lead
-     */
-    private $lead;
+    #[ORM\ManyToOne(targetEntity: \Mautic\LeadBundle\Entity\Lead::class, inversedBy: 'notes')]
+    #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
+    private ?\Mautic\LeadBundle\Entity\Lead $lead = null;
 
     /**
      * @var string
      */
     #[NotBlank(message: 'mautic.lead.note.text.notblank')]
+    #[ORM\Column(type: 'text')]
     private $text;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 50, nullable: true)]
     private $type = 'general';
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_time', type: 'datetime', nullable: true)]
     private $dateTime;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable('lead_notes')
-            ->setCustomRepositoryClass(LeadNoteRepository::class);
-
-        $builder->addId();
-
-        $builder->addLead(false, 'CASCADE', false, 'notes');
-
-        $builder->addField('text', 'text');
-
-        $builder->createField('type', 'string')
-            ->length(50)
-            ->nullable()
-            ->build();
-
-        $builder->createField('dateTime', 'datetime')
-            ->columnName('date_time')
-            ->nullable()
-            ->build();
-    }
 
     /**
      * Prepares the metadata for API usage.

@@ -5,28 +5,39 @@ namespace Mautic\ApiBundle\Entity\oAuth2;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\OAuthServerBundle\Model\Client as BaseClient;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use OAuth2\OAuth2;
 use Symfony\Component\Validator\Constraints as Assert;
 
+#[ORM\Entity(repositoryClass: ClientRepository::class)]
+#[ORM\Table(name: 'oauth2_clients')]
+#[ORM\Index(columns: ['random_id'], name: 'client_id_search')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Client extends BaseClient
 {
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     protected $id;
 
     /**
      * @var string
      */
     #[Assert\NotBlank(message: 'mautic.core.name.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     protected $name;
 
     /**
      * @var ArrayCollection<int, User>
      */
+    #[ORM\ManyToMany(targetEntity: User::class, fetch: 'EXTRA_LAZY')]
+    #[ORM\JoinTable(name: 'oauth2_user_client_xref')]
+    #[ORM\JoinColumn(name: 'client_id', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'user_id', nullable: false, onDelete: 'CASCADE')]
     protected $users;
 
     /**
@@ -34,21 +45,27 @@ class Client extends BaseClient
      */
     protected $authCodes;
 
+    #[ORM\Column(name: 'random_id', type: 'string', length: 191)]
     protected ?string $randomId = null;
 
+    #[ORM\Column(type: 'string', length: 191)]
     protected ?string $secret = null;
 
     /**
      * @var array<string>
      */
     #[Assert\NotBlank(message: 'mautic.api.client.redirecturis.notblank')]
+    #[ORM\Column(name: 'redirect_uris', type: 'array')]
     protected array $redirectUris = [];
 
     /**
      * @var array<string>
      */
+    #[ORM\Column(name: 'allowed_grant_types', type: 'array')]
     protected array $allowedGrantTypes;
 
+    #[ORM\ManyToOne(targetEntity: Role::class, cascade: ['persist'])]
+    #[ORM\JoinColumn(name: 'role_id')]
     protected ?Role $role = null;
 
     public function __construct()
@@ -62,43 +79,6 @@ class Client extends BaseClient
 
         $this->users     = new ArrayCollection();
         $this->authCodes = new ArrayCollection();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable('oauth2_clients')
-            ->setCustomRepositoryClass(ClientRepository::class)
-            ->addIndex(['random_id'], 'client_id_search');
-
-        $builder->addIdColumns('name', false);
-
-        $builder->createManyToMany('users', User::class)
-            ->setJoinTable('oauth2_user_client_xref')
-            ->addInverseJoinColumn('user_id', 'id', false, false, 'CASCADE')
-            ->addJoinColumn('client_id', 'id', false, false, 'CASCADE')
-            ->fetchExtraLazy()
-            ->build();
-
-        $builder->createField('randomId', 'string')
-            ->columnName('random_id')
-            ->build();
-
-        $builder->addField('secret', 'string');
-
-        $builder->createField('redirectUris', 'array')
-            ->columnName('redirect_uris')
-            ->build();
-
-        $builder->createField('allowedGrantTypes', 'array')
-            ->columnName('allowed_grant_types')
-            ->build();
-
-        $builder->createManyToOne('role', Role::class)
-            ->addJoinColumn('role_id', 'id', true, false)
-            ->cascadePersist()
-            ->build();
     }
 
     /**

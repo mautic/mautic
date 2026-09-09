@@ -8,13 +8,18 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Table(name: 'tweets')]
 #[ORM\Entity(repositoryClass: TweetRepository::class)]
+#[ORM\Entity(repositoryClass: TweetRepository::class)]
+#[ORM\Table(name: 'tweets')]
+#[ORM\Index(columns: ['sent_count'], name: 'sent_count_index')]
+#[ORM\Index(columns: ['favorite_count'], name: 'favorite_count_index')]
+#[ORM\Index(columns: ['retweet_count'], name: 'retweet_count_index')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Tweet extends FormEntity
 {
     /**
@@ -22,6 +27,9 @@ class Tweet extends FormEntity
      *
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -29,6 +37,7 @@ class Tweet extends FormEntity
      *
      * @var string|null
      */
+    #[ORM\Column(name: 'media_id', type: Types::STRING, length: 191, nullable: true)]
     private $mediaId;
 
     /**
@@ -36,6 +45,7 @@ class Tweet extends FormEntity
      *
      * @var string|null
      */
+    #[ORM\Column(name: 'media_path', type: Types::STRING, length: 191, nullable: true)]
     private $mediaPath;
 
     /**
@@ -43,6 +53,7 @@ class Tweet extends FormEntity
      *
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
@@ -51,6 +62,7 @@ class Tweet extends FormEntity
      * @var string
      */
     #[Assert\Length(max: 280)]
+    #[ORM\Column(type: Types::STRING, length: 280)]
     private $text;
 
     /**
@@ -58,47 +70,50 @@ class Tweet extends FormEntity
      *
      * @var string|null
      */
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'lang', type: Types::STRING, length: 191, nullable: true)]
     private $language = 'en';
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'sent_count', type: Types::INTEGER, nullable: true)]
     private $sentCount = 0;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'favorite_count', type: Types::INTEGER, nullable: true)]
     private $favoriteCount = 0;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'retweet_count', type: Types::INTEGER, nullable: true)]
     private $retweetCount = 0;
 
-    /**
-     * @var Page|null
-     */
-    private $page;
+    #[ORM\ManyToOne(targetEntity: Page::class)]
+    #[ORM\JoinColumn(name: 'page_id', onDelete: 'SET NULL')]
+    private ?\Mautic\PageBundle\Entity\Page $page = null;
 
-    /**
-     * @var Asset|null
-     */
-    private $asset;
+    #[ORM\ManyToOne(targetEntity: Asset::class)]
+    #[ORM\JoinColumn(name: 'asset_id', onDelete: 'SET NULL')]
+    private ?\Mautic\AssetBundle\Entity\Asset $asset = null;
 
-    /**
-     * @var Category|null
-     */
-    private $category;
+    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['merge', 'detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
+    private ?\Mautic\CategoryBundle\Entity\Category $category = null;
 
     /**
      * @var ArrayCollection<int, TweetStat>
      */
-    private $stats;
+    #[ORM\OneToMany(mappedBy: 'tweet', targetEntity: 'TweetStat', cascade: ['persist'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
+    private \Doctrine\Common\Collections\ArrayCollection $stats;
 
     public function __construct()
     {
@@ -114,42 +129,6 @@ class Tweet extends FormEntity
         $this->stats         = new ArrayCollection();
 
         parent::__clone();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable('tweets')
-            ->setCustomRepositoryClass(TweetRepository::class)
-            ->addIndex(['sent_count'], 'sent_count_index')
-            ->addIndex(['favorite_count'], 'favorite_count_index')
-            ->addIndex(['retweet_count'], 'retweet_count_index');
-
-        $builder->addIdColumns();
-        $builder->addCategory();
-        $builder->addNullableField('mediaId', Types::STRING, 'media_id');
-        $builder->addNullableField('mediaPath', Types::STRING, 'media_path');
-        $builder->addField('text', Types::STRING, ['length' => 280]);
-        $builder->addNullableField('sentCount', Types::INTEGER, 'sent_count');
-        $builder->addNullableField('favoriteCount', Types::INTEGER, 'favorite_count');
-        $builder->addNullableField('retweetCount', Types::INTEGER, 'retweet_count');
-        $builder->addNullableField('language', Types::STRING, 'lang');
-
-        $builder->createManyToOne('page', Page::class)
-            ->addJoinColumn('page_id', 'id', true, false, 'SET NULL')
-            ->build();
-
-        $builder->createManyToOne('asset', Asset::class)
-            ->addJoinColumn('asset_id', 'id', true, false, 'SET NULL')
-            ->build();
-
-        $builder->createOneToMany('stats', 'TweetStat')
-            ->setIndexBy('id')
-            ->mappedBy('tweet')
-            ->cascadePersist()
-            ->fetchExtraLazy()
-            ->build();
     }
 
     /**

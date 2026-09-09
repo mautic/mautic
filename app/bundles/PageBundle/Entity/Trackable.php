@@ -6,61 +6,42 @@ namespace Mautic\PageBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
+#[ORM\Entity(repositoryClass: TrackableRepository::class)]
+#[ORM\Table(name: 'channel_url_trackables')]
+#[ORM\Index(columns: ['channel', 'channel_id'], name: 'channel_url_trackable_search')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Trackable
 {
-    /**
-     * @var Redirect
-     */
-    private $redirect;
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: Redirect::class, inversedBy: 'trackables', cascade: ['persist'])]
+    #[ORM\JoinColumn(name: 'redirect_id', onDelete: 'CASCADE')]
+    private ?\Mautic\PageBundle\Entity\Redirect $redirect = null;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 191)]
     private $channel;
 
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(name: 'channel_id', type: 'integer')]
     private $channelId;
 
     /**
      * @var int
      */
+    #[ORM\Column(type: 'integer')]
     private $hits = 0;
 
     /**
      * @var int
      */
+    #[ORM\Column(name: 'unique_hits', type: 'integer')]
     private $uniqueHits = 0;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable('channel_url_trackables')
-            ->setCustomRepositoryClass(TrackableRepository::class)
-            ->addIndex(['channel', 'channel_id'], 'channel_url_trackable_search');
-
-        $builder->createManyToOne('redirect', Redirect::class)
-            ->addJoinColumn('redirect_id', 'id', true, false, 'CASCADE')
-            ->cascadePersist()
-            ->inversedBy('trackables')
-            ->isPrimaryKey()
-            ->build();
-
-        $builder->createField('channelId', 'integer')
-            ->columnName('channel_id')
-            ->makePrimaryKey()
-            ->build();
-
-        $builder->addField('channel', 'string');
-
-        $builder->addField('hits', 'integer');
-
-        $builder->addNamedField('uniqueHits', 'integer', 'unique_hits');
-    }
 
     /**
      * Prepares the metadata for API usage.

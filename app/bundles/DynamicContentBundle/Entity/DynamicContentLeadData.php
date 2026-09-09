@@ -3,30 +3,40 @@
 namespace Mautic\DynamicContentBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CommonEntity;
 use Mautic\LeadBundle\Entity\Lead;
 
+#[ORM\Entity(repositoryClass: DynamicContentLeadDataRepository::class)]
+#[ORM\Table(name: 'dynamic_content_lead_data')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class DynamicContentLeadData extends CommonEntity
 {
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_added', type: 'datetime', nullable: true)]
     private $dateAdded;
 
     /**
      * @var DynamicContent|null
      */
+    #[ORM\ManyToOne(targetEntity: 'DynamicContent', inversedBy: 'id')]
+    #[ORM\JoinColumn(name: 'dynamic_content_id', onDelete: 'CASCADE')]
     private $dynamicContent;
 
     /**
      * @var Lead
      */
+    #[ORM\ManyToOne(targetEntity: \Mautic\LeadBundle\Entity\Lead::class)]
+    #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
     private $lead;
 
     /**
@@ -37,30 +47,8 @@ class DynamicContentLeadData extends CommonEntity
     /**
      * @var string
      */
+    #[ORM\Column(type: 'text')]
     private $slot;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable('dynamic_content_lead_data')
-            ->setCustomRepositoryClass(DynamicContentLeadDataRepository::class);
-
-        $builder->addIdColumns(false, false);
-
-        $builder->addDateAdded(true);
-
-        $builder->addLead();
-
-        $builder->createManyToOne('dynamicContent', 'DynamicContent')
-            ->inversedBy('id')
-            ->addJoinColumn('dynamic_content_id', 'id', true, false, 'CASCADE')
-            ->build();
-
-        $builder->createField('slot', 'text')
-            ->columnName('slot')
-            ->build();
-    }
 
     /**
      * @return int|null

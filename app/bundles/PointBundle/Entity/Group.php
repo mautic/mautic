@@ -4,12 +4,14 @@ namespace Mautic\PointBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Symfony\Component\Validator\Constraints as Assert;
 
+#[ORM\Entity(repositoryClass: GroupRepository::class)]
+#[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Group extends FormEntity implements UuidInterface
 {
     use UuidTrait;
@@ -18,27 +20,17 @@ class Group extends FormEntity implements UuidInterface
 
     public const ENTITY_NAME = 'point_group';
 
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private ?int $id             = null;
 
     #[Assert\NotBlank(message: 'mautic.core.name.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     private ?string $name        = '';
 
+    #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = '';
-
-    /**
-     * @param ORM\ClassMetadata<Group> $metadata
-     */
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(GroupRepository::class);
-
-        static::addUuidField($builder);
-
-        $builder->addIdColumns();
-    }
 
     public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {

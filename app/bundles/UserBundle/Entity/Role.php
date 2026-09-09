@@ -14,7 +14,6 @@ use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
@@ -41,6 +40,9 @@ use Symfony\Component\Validator\Constraints as Assert;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[ORM\Entity(repositoryClass: RoleRepository::class)]
+#[ORM\Table(name: 'roles')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
 {
     use UuidTrait;
@@ -51,6 +53,9 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
      * @var int
      */
     #[Groups(['role:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -58,74 +63,44 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
      */
     #[Groups(['role:read', 'role:write'])]
     #[Assert\NotBlank(message: 'mautic.core.name.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var string|null
      */
     #[Groups(['role:read', 'role:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
      * @var bool
      */
     #[Groups(['role:read', 'role:write'])]
+    #[ORM\Column(name: 'is_admin', type: 'boolean')]
     private $isAdmin = false;
 
     /**
      * @var ArrayCollection<int, Permission>
      */
     #[Groups(['role:read', 'role:write'])]
-    private $permissions;
+    #[ORM\OneToMany(mappedBy: 'role', targetEntity: 'Permission', cascade: ['persist', 'remove'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
+    private \Doctrine\Common\Collections\ArrayCollection|array $permissions;
 
-    /**
-     * @var array
-     */
     #[Groups(['role:read', 'role:write'])]
-    private $rawPermissions;
+    #[ORM\Column(name: 'readable_permissions', type: 'array')]
+    private ?array $rawPermissions = null;
 
     /**
      * @var ArrayCollection<int, User>
      */
-    private $users;
+    #[ORM\OneToMany(mappedBy: 'role', targetEntity: 'User', fetch: 'EXTRA_LAZY')]
+    private \Doctrine\Common\Collections\ArrayCollection|array $users;
 
     public function __construct()
     {
         $this->permissions = new ArrayCollection();
         $this->users       = new ArrayCollection();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable('roles')
-            ->setCustomRepositoryClass(RoleRepository::class);
-
-        $builder->addIdColumns();
-
-        $builder->createField('isAdmin', 'boolean')
-            ->columnName('is_admin')
-            ->build();
-
-        $builder->createOneToMany('permissions', 'Permission')
-            ->orphanRemoval()
-            ->mappedBy('role')
-            ->cascadePersist()
-            ->cascadeRemove()
-            ->fetchExtraLazy()
-            ->build();
-
-        $builder->createField('rawPermissions', 'array')
-            ->columnName('readable_permissions')
-            ->build();
-
-        $builder->createOneToMany('users', 'User')
-            ->mappedBy('role')
-            ->fetchExtraLazy()
-            ->build();
-
-        static::addUuidField($builder);
     }
 
     /**

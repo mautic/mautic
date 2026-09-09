@@ -6,77 +6,48 @@ namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
+#[ORM\Entity(repositoryClass: LeadRepository::class)]
+#[ORM\Table(name: 'campaign_leads')]
+#[ORM\Index(columns: ['date_added'], name: 'campaign_leads_date_added')]
+#[ORM\Index(columns: ['date_last_exited'], name: 'campaign_leads_date_exited')]
+#[ORM\Index(columns: ['campaign_id', 'manually_removed', 'lead_id', 'rotation'], name: 'campaign_leads')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Lead
 {
-    /**
-     * @var Campaign
-     */
-    private $campaign;
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: 'Campaign', inversedBy: 'leads')]
+    #[ORM\JoinColumn(name: 'campaign_id', nullable: false, onDelete: 'CASCADE')]
+    private ?\Mautic\CampaignBundle\Entity\Campaign $campaign = null;
 
-    /**
-     * @var \Mautic\LeadBundle\Entity\Lead
-     */
-    private $lead;
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: \Mautic\LeadBundle\Entity\Lead::class)]
+    #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
+    private ?\Mautic\LeadBundle\Entity\Lead $lead = null;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_added', type: 'datetime')]
     private $dateAdded;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private $dateLastExited;
+    #[ORM\Column(name: 'date_last_exited', type: 'datetime', nullable: true)]
+    private ?\DateTime $dateLastExited = null;
 
     /**
      * @var bool
      */
+    #[ORM\Column(name: 'manually_removed', type: 'boolean')]
     private $manuallyRemoved = false;
 
     /**
      * @var bool
      */
+    #[ORM\Column(name: 'manually_added', type: 'boolean')]
     private $manuallyAdded = false;
 
-    /**
-     * @var int
-     */
-    private $rotation = 1;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable('campaign_leads')
-            ->setCustomRepositoryClass(LeadRepository::class)
-            ->addIndex(['date_added'], 'campaign_leads_date_added')
-            ->addIndex(['date_last_exited'], 'campaign_leads_date_exited')
-            ->addIndex(['campaign_id', 'manually_removed', 'lead_id', 'rotation'], 'campaign_leads');
-
-        $builder->createManyToOne('campaign', 'Campaign')
-            ->makePrimaryKey()
-            ->inversedBy('leads')
-            ->addJoinColumn('campaign_id', 'id', false, false, 'CASCADE')
-            ->build();
-
-        $builder->addLead(false, 'CASCADE', true);
-
-        $builder->addDateAdded();
-
-        $builder->createField('manuallyRemoved', 'boolean')
-            ->columnName('manually_removed')
-            ->build();
-
-        $builder->createField('manuallyAdded', 'boolean')
-            ->columnName('manually_added')
-            ->build();
-
-        $builder->addNamedField('dateLastExited', 'datetime', 'date_last_exited', true);
-
-        $builder->addField('rotation', 'integer');
-    }
+    #[ORM\Column(type: 'integer')]
+    private int $rotation = 1;
 
     /**
      * Prepares the metadata for API usage.

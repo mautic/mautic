@@ -6,10 +6,13 @@ namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\LeadDevice;
 
+#[ORM\Entity(repositoryClass: StatDeviceRepository::class)]
+#[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\Index(columns: ['date_opened'], name: 'date_opened_search')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class StatDevice
 {
     public const TABLE_NAME = 'email_stats_devices';
@@ -17,46 +20,28 @@ class StatDevice
     /**
      * @var string
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'bigint', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
+    #[ORM\ManyToOne(targetEntity: 'Stat')]
+    #[ORM\JoinColumn(name: 'stat_id', onDelete: 'CASCADE')]
     private ?Stat $stat = null;
 
-    /**
-     * @var LeadDevice|null
-     */
-    private $device;
+    #[ORM\ManyToOne(targetEntity: LeadDevice::class)]
+    #[ORM\JoinColumn(name: 'device_id', onDelete: 'CASCADE')]
+    private ?\Mautic\LeadBundle\Entity\LeadDevice $device = null;
 
+    #[ORM\ManyToOne(targetEntity: \Mautic\CoreBundle\Entity\IpAddress::class, cascade: ['persist', 'merge', 'detach'])]
+    #[ORM\JoinColumn(name: 'ip_id', onDelete: 'SET NULL')]
     private ?IpAddress $ipAddress = null;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_opened', type: 'datetime')]
     private $dateOpened;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(StatDeviceRepository::class)
-            ->addIndex(['date_opened'], 'date_opened_search');
-
-        $builder->addBigIntIdField();
-
-        $builder->createManyToOne('device', LeadDevice::class)
-            ->addJoinColumn('device_id', 'id', true, false, 'CASCADE')
-            ->build();
-
-        $builder->createManyToOne('stat', 'Stat')
-            ->addJoinColumn('stat_id', 'id', true, false, 'CASCADE')
-            ->build();
-
-        $builder->addIpAddress(true);
-
-        $builder->createField('dateOpened', 'datetime')
-            ->columnName('date_opened')
-            ->build();
-    }
 
     /**
      * Prepares the metadata for API usage.

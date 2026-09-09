@@ -5,69 +5,51 @@ namespace Mautic\PageBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 
+#[ORM\Entity(repositoryClass: RedirectRepository::class)]
+#[ORM\Table(name: 'page_redirects')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Redirect extends FormEntity
 {
     /**
      * @var string
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'bigint', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'redirect_id', type: 'string', length: 25)]
     private $redirectId;
 
-    private $url;
+    #[ORM\Column(type: 'text')]
+    private ?string $url = null;
 
     /**
      * @var int
      */
+    #[ORM\Column(type: 'integer')]
     private $hits = 0;
 
     /**
      * @var int
      */
+    #[ORM\Column(name: 'unique_hits', type: 'integer')]
     private $uniqueHits = 0;
 
     /**
      * @var ArrayCollection<int, Trackable>
      */
+    #[ORM\OneToMany(mappedBy: 'redirect', targetEntity: 'Trackable', fetch: 'EXTRA_LAZY')]
     private $trackables;
 
     public function __construct()
     {
         $this->trackables = new ArrayCollection();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable('page_redirects')
-            ->setCustomRepositoryClass(RedirectRepository::class);
-
-        $builder->addBigIntIdField();
-
-        $builder->createField('redirectId', 'string')
-            ->columnName('redirect_id')
-            ->length(25)
-            ->build();
-
-        $builder->addField('url', 'text');
-
-        $builder->addField('hits', 'integer');
-
-        $builder->createField('uniqueHits', 'integer')
-            ->columnName('unique_hits')
-            ->build();
-
-        $builder->createOneToMany('trackables', 'Trackable')
-            ->mappedBy('redirect')
-            ->fetchExtraLazy()
-            ->build();
     }
 
     /**

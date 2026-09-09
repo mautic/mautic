@@ -3,43 +3,35 @@
 namespace MauticPlugin\MauticSocialBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Table(name: 'monitoring_leads')]
 #[ORM\Entity(repositoryClass: LeadRepository::class)]
+#[ORM\Entity(repositoryClass: LeadRepository::class)]
+#[ORM\Table(name: 'monitoring_leads')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Lead
 {
     /**
      * @var Monitoring
      */
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: 'Monitoring')]
+    #[ORM\JoinColumn(name: 'monitor_id', nullable: false, onDelete: 'CASCADE')]
     private $monitor;
 
     /**
      * @var \Mautic\LeadBundle\Entity\Lead
      */
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: \Mautic\LeadBundle\Entity\Lead::class)]
+    #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
     private $lead;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_added', type: 'datetime')]
     private $dateAdded;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable('monitoring_leads')
-            ->setCustomRepositoryClass(LeadRepository::class);
-
-        $builder->createManyToOne('monitor', 'Monitoring')
-            ->isPrimaryKey()
-            ->addJoinColumn('monitor_id', 'id', false, false, 'CASCADE')
-            ->build();
-
-        $builder->addLead(false, 'CASCADE', true);
-
-        $builder->addNamedField('dateAdded', 'datetime', 'date_added');
-    }
 
     /**
      * @return mixed

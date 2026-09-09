@@ -17,7 +17,6 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\SkipModifiedInterface;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -44,6 +43,9 @@ use Symfony\Component\Validator\Constraints\NotBlank;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[ORM\Entity(repositoryClass: WebhookRepository::class)]
+#[ORM\Table(name: 'webhooks')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Webhook extends FormEntity implements SkipModifiedInterface
 {
     public const LOGS_DISPLAY_LIMIT = 100;
@@ -52,6 +54,9 @@ class Webhook extends FormEntity implements SkipModifiedInterface
      * @var ?int
      */
     #[Groups(['webhook:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -59,12 +64,14 @@ class Webhook extends FormEntity implements SkipModifiedInterface
      */
     #[Groups(['webhook:read', 'webhook:write'])]
     #[NotBlank(message: 'mautic.core.name.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var string|null
      */
     #[Groups(['webhook:read', 'webhook:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
@@ -73,29 +80,33 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     #[Groups(['webhook:read', 'webhook:write'])]
     #[NotBlank(message: 'mautic.core.valid_url_required')]
     #[Assert\Url(message: 'mautic.core.valid_url_required')]
+    #[ORM\Column(name: 'webhook_url', type: Types::TEXT)]
     private $webhookUrl;
 
     /**
      * @var ?string
      */
     #[Groups(['webhook:read', 'webhook:write'])]
+    #[ORM\Column(type: Types::STRING, length: 191)]
     private $secret;
 
-    /**
-     * @var Category|null
-     */
     #[Groups(['webhook:read', 'webhook:write'])]
-    private $category;
+    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['merge', 'detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
+    private ?\Mautic\CategoryBundle\Entity\Category $category = null;
 
     /**
      * @var Collection<int, Event>
      */
     #[Groups(['webhook:read', 'webhook:write'])]
+    #[ORM\OneToMany(mappedBy: 'webhook', targetEntity: 'Event', cascade: ['persist', 'merge', 'detach'], orphanRemoval: true, indexBy: 'eventType')]
     private $events;
 
     /**
      * @var ArrayCollection<int, Log>
      */
+    #[ORM\OneToMany(mappedBy: 'webhook', targetEntity: 'Log', cascade: ['persist', 'merge', 'detach'], fetch: 'EXTRA_LAZY')]
+    #[ORM\OrderBy(['dateAdded' => Order::Descending->value])]
     private $logs;
 
     /**
@@ -130,53 +141,22 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         Order::Ascending->value,
         Order::Descending->value,
     ])]
+    #[ORM\Column(name: 'events_orderby_dir', type: Types::STRING, length: 191, nullable: true)]
     private $eventsOrderbyDir;
 
+    #[ORM\Column(name: 'marked_unhealthy_at', type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $markedUnhealthyAt      = null;
 
+    #[ORM\Column(name: 'unhealthy_since', type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $unHealthySince         = null;
 
+    #[ORM\Column(name: 'last_notification_sent_at', type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $lastNotificationSentAt = null;
 
     public function __construct()
     {
         $this->events = new ArrayCollection();
         $this->logs   = new ArrayCollection();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-        $builder->setTable('webhooks')
-            ->setCustomRepositoryClass(WebhookRepository::class);
-
-        $builder->addIdColumns();
-
-        $builder->addCategory();
-
-        $builder->createOneToMany('events', 'Event')
-            ->orphanRemoval()
-            ->setIndexBy('eventType')
-            ->mappedBy('webhook')
-            ->cascadePersist()
-            ->cascadeMerge()
-            ->cascadeDetach()
-            ->build();
-
-        $builder->createOneToMany('logs', 'Log')->setOrderBy(['dateAdded' => Order::Descending->value])
-            ->fetchExtraLazy()
-            ->mappedBy('webhook')
-            ->cascadePersist()
-            ->cascadeMerge()
-            ->cascadeDetach()
-            ->build();
-
-        $builder->addNamedField('webhookUrl', Types::TEXT, 'webhook_url');
-        $builder->addField('secret', Types::STRING);
-        $builder->addNullableField('eventsOrderbyDir', Types::STRING, 'events_orderby_dir');
-        $builder->addNullableField('markedUnhealthyAt', Types::DATETIME_IMMUTABLE, 'marked_unhealthy_at');
-        $builder->addNullableField('unHealthySince', Types::DATETIME_IMMUTABLE, 'unhealthy_since');
-        $builder->addNullableField('lastNotificationSentAt', Types::DATETIME_IMMUTABLE, 'last_notification_sent_at');
     }
 
     /**

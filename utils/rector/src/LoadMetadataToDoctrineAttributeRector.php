@@ -46,6 +46,21 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
     private const int DEFAULT_STRING_LENGTH = 191;
 
     /**
+     * @var string[]
+     */
+    private const array CLASS_LEVEL_METHODS = ['setTable', 'setCustomRepositoryClass', 'addIndex', 'addFulltextIndex'];
+
+    /**
+     * @var string[]
+     */
+    private const array FIELD_CREATOR_METHODS = [
+        'createField', 'addBigIntIdField', 'addDateAdded', 'addId', 'addIdColumns',
+        'addNullableField', 'addNamedField', 'addField', 'addPublishDates',
+        'createManyToOne', 'createOneToMany', 'createOneToOne', 'createManyToMany',
+        'addLead', 'addContact', 'addCategory', 'addIpAddress',
+    ];
+
+    /**
      * @return array<class-string<Node>>
      */
     public function getNodeTypes(): array
@@ -151,38 +166,48 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
                 return null;
             }
 
-            $first = $this->methodName($calls[0]);
-
-            // $builder->setMappedSuperClass(): emit #[ORM\MappedSuperclass] instead of #[ORM\Entity].
-            if ('setMappedSuperClass' === $first) {
-                if (1 !== count($calls) || [] !== $calls[0]->args) {
-                    return null;
-                }
-
-                $isMappedSuperclass = true;
-
-                continue;
-            }
-
-            if (in_array($first, ['setTable', 'setCustomRepositoryClass', 'addIndex', 'addFulltextIndex'], true)) {
-                $handled = $this->handleClassChain($calls);
-                if (null === $handled) {
-                    return null;
-                }
-
-                $classAttributes = array_merge($classAttributes, $handled['attributes']);
-                $entityArgs      = array_merge($entityArgs, $handled['entityArgs']);
-
-                continue;
-            }
-
-            $fields = $this->handleFieldChain($calls);
-            if (null === $fields) {
+            // A single fluent chain may mix class-level and field-level builder calls,
+            // e.g. setTable()->setCustomRepositoryClass()->addNamedField()->addId().
+            // Split it into per-creator segments so each is interpreted on its own.
+            $segments = $this->splitIntoSegments($calls);
+            if (null === $segments) {
                 return null;
             }
 
-            foreach ($fields as $fieldName => $attributeGroups) {
-                $propertyAttributes[$fieldName] = $attributeGroups;
+            foreach ($segments as $calls) {
+                $first = $this->methodName($calls[0]);
+
+                // $builder->setMappedSuperClass(): emit #[ORM\MappedSuperclass] instead of #[ORM\Entity].
+                if ('setMappedSuperClass' === $first) {
+                    if (1 !== count($calls) || [] !== $calls[0]->args) {
+                        return null;
+                    }
+
+                    $isMappedSuperclass = true;
+
+                    continue;
+                }
+
+                if (in_array($first, self::CLASS_LEVEL_METHODS, true)) {
+                    $handled = $this->handleClassChain($calls);
+                    if (null === $handled) {
+                        return null;
+                    }
+
+                    $classAttributes = array_merge($classAttributes, $handled['attributes']);
+                    $entityArgs      = array_merge($entityArgs, $handled['entityArgs']);
+
+                    continue;
+                }
+
+                $fields = $this->handleFieldChain($calls);
+                if (null === $fields) {
+                    return null;
+                }
+
+                foreach ($fields as $fieldName => $attributeGroups) {
+                    $propertyAttributes[$fieldName] = $attributeGroups;
+                }
             }
         }
 
@@ -193,6 +218,47 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
         array_unshift($classAttributes, $rootAttribute);
 
         return [$classAttributes, $propertyAttributes];
+    }
+
+    /**
+     * Splits a flattened builder chain into segments, each headed by a class-level or
+     * field-level creator; trailing modifier calls (columnName, build, addJoinColumn, ...)
+     * attach to the segment they follow. Null when a modifier precedes any creator.
+     *
+     * @param list<MethodCall> $calls
+     *
+     * @return list<list<MethodCall>>|null
+     */
+    private function splitIntoSegments(array $calls): ?array
+    {
+        $starters = [...self::CLASS_LEVEL_METHODS, 'setMappedSuperClass', ...self::FIELD_CREATOR_METHODS];
+
+        $segments = [];
+        $current  = null;
+
+        foreach ($calls as $call) {
+            if (in_array($this->methodName($call), $starters, true)) {
+                if (null !== $current) {
+                    $segments[] = $current;
+                }
+
+                $current = [$call];
+
+                continue;
+            }
+
+            if (null === $current) {
+                return null;
+            }
+
+            $current[] = $call;
+        }
+
+        if (null !== $current) {
+            $segments[] = $current;
+        }
+
+        return $segments;
     }
 
     /**
