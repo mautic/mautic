@@ -19,9 +19,9 @@ final class SearchQueryEvent extends AbstractSearchEvent
     private array $parameters = [];
 
     public function __construct(
-        private object $filter,
-        private ORMQueryBuilder|DBALQueryBuilder $query,
-        private string $alias,
+        private readonly object $filter,
+        private readonly ORMQueryBuilder|DBALQueryBuilder $query,
+        private readonly string $alias,
         protected string $context,
     ) {
     }

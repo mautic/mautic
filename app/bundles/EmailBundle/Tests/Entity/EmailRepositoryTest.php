@@ -38,8 +38,7 @@ final class EmailRepositoryTest extends TestCase
         });
         $this->repo->autowireCommonRepository($translator);
 
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $this->repo->autowireDispatcher($dispatcher);
+        $this->repo->autowireDispatcher($this->createMock(EventDispatcherInterface::class));
     }
 
     /**
