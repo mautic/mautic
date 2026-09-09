@@ -194,13 +194,6 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
         parent::__clone();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        self::addVersionField($builder);
-    }
-
     /**
      * Prepares the metadata for API usage.
      */

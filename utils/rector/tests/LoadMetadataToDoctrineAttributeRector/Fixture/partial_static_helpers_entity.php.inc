@@ -67,12 +67,4 @@ class PageEntity
 
     #[ORM\Column(type: 'text', nullable: true)]
     protected $description;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        self::addTranslationMetadata($builder, self::class);
-        self::addVariantMetadata($builder, self::class);
-    }
 }

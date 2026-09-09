@@ -660,11 +660,13 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
             return null;
         }
 
-        // addUuidField()/addVersionField(): the column lives on a trait property (UuidTrait::$uuid,
-        // OptimisticLockTrait::$version) that carries its own #[ORM\Column]. Emit no per-entity
-        // attribute (the property is not in the class body, so it cannot be annotated here) and do
-        // not bail, so the call drops out of loadMetadata.
-        if (in_array($call->name->toString(), ['addUuidField', 'addVersionField'], true)) {
+        // These helpers map trait properties (UuidTrait::$uuid, OptimisticLockTrait::$version,
+        // TranslationEntityTrait, VariantEntityTrait, DynamicContentEntityTrait) that carry their
+        // own mapping attributes. Emit no per-entity attribute (the properties are not in the class
+        // body, so they cannot be annotated here) and do not bail, so the call drops out of
+        // loadMetadata.
+        $noOpHelpers = ['addUuidField', 'addVersionField', 'addTranslationMetadata', 'addVariantMetadata', 'addDynamicContentMetadata'];
+        if (in_array($call->name->toString(), $noOpHelpers, true)) {
             return [];
         }
 

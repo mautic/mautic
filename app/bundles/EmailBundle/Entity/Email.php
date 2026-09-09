@@ -439,11 +439,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                 'default' => false,
             ],
         ]);
-
-        self::addTranslationMetadata($builder, self::class);
-        self::addVariantMetadata($builder, self::class);
-        self::addDynamicContentMetadata($builder);
-        self::addVersionField($builder);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void

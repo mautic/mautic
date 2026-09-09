@@ -12,7 +12,18 @@ use Mautic\CoreBundle\Entity\OptimisticLockTrait;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead as LeadEntity;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: LeadEventLogRepository::class)]
+#[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\Index(columns: ['is_scheduled', 'lead_id'], name: 'campaign_event_upcoming_search')]
+#[ORM\Index(columns: ['campaign_id', 'is_scheduled', 'trigger_date'], name: 'campaign_event_schedule_counts')]
+#[ORM\Index(columns: ['date_triggered'], name: 'campaign_date_triggered')]
+#[ORM\Index(columns: ['campaign_id', 'lead_id', 'rotation'], name: 'campaign_leads')]
+#[ORM\Index(columns: ['channel', 'channel_id', 'lead_id'], name: 'campaign_log_channel')]
+#[ORM\Index(columns: ['campaign_id', 'event_id', 'date_triggered'], name: 'campaign_actions')]
+#[ORM\Index(columns: ['campaign_id', 'date_triggered', 'event_id', 'non_action_path_taken'], name: 'campaign_stats')]
+#[ORM\Index(columns: ['trigger_date'], name: 'campaign_trigger_date_order')]
+#[ORM\Index(columns: ['is_scheduled', 'event_id', 'trigger_date'], name: 'idx_scheduled_events')]
+#[ORM\UniqueConstraint(columns: ['event_id', 'lead_id', 'rotation'], name: 'campaign_rotation')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class LeadEventLog implements ChannelInterface, OptimisticLockInterface
 {
@@ -128,26 +139,6 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
 
     #[ORM\Column(name: 'date_queued', type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTime $dateQueued = null;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(LeadEventLogRepository::class)
-            ->addIndex(['is_scheduled', 'lead_id'], 'campaign_event_upcoming_search')
-            ->addIndex(['campaign_id', 'is_scheduled', 'trigger_date'], 'campaign_event_schedule_counts')
-            ->addIndex(['date_triggered'], 'campaign_date_triggered')
-            ->addIndex(['campaign_id', 'lead_id', 'rotation'], 'campaign_leads')
-            ->addIndex(['channel', 'channel_id', 'lead_id'], 'campaign_log_channel')
-            ->addIndex(['campaign_id', 'event_id', 'date_triggered'], 'campaign_actions')
-            ->addIndex(['campaign_id', 'date_triggered', 'event_id', 'non_action_path_taken'], 'campaign_stats')
-            ->addIndex(['trigger_date'], 'campaign_trigger_date_order')
-            ->addIndex(['is_scheduled', 'event_id', 'trigger_date'], 'idx_scheduled_events')
-            ->addUniqueConstraint(['event_id', 'lead_id', 'rotation'], 'campaign_rotation');
-
-        self::addVersionField($builder);
-    }
 
     /**
      * Prepares the metadata for API usage.

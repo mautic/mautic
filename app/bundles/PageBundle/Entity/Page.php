@@ -262,15 +262,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         $this->initializeProjects();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        self::addTranslationMetadata($builder, self::class);
-        self::addVariantMetadata($builder, self::class);
-        self::addVersionField($builder);
-    }
-
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addConstraint(new Callback(

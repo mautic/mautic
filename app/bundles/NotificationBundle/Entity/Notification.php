@@ -206,13 +206,6 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         $this->stats = new ArrayCollection();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        self::addTranslationMetadata($builder, self::class);
-    }
-
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint(
