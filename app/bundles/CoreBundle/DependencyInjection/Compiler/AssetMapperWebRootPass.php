@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\DependencyInjection\Compiler;
 
+use Mautic\CoreBundle\Loader\ParameterLoader;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -57,46 +58,13 @@ final class AssetMapperWebRootPass implements CompilerPassInterface
             return null;
         }
 
-        $projectDir    = rtrim($projectDir, '/');
-        $composerFile  = $projectDir.'/composer.json';
-        $configuredDir = $this->resolveConfiguredPublicDir($composerFile, $container);
-
-        if (null === $configuredDir || '' === $configuredDir || '.' === $configuredDir) {
-            return $projectDir;
+        $projectDir   = rtrim($projectDir, '/');
+        $composerFile = $projectDir.'/composer.json';
+        if (is_file($composerFile)) {
+            $container->addResource(new FileResource($composerFile));
         }
 
-        return $projectDir.'/'.trim($configuredDir, '/');
-    }
-
-    private function resolveConfiguredPublicDir(string $composerFile, ContainerBuilder $container): ?string
-    {
-        if (!is_file($composerFile)) {
-            return null;
-        }
-
-        $container->addResource(new FileResource($composerFile));
-
-        $contents = file_get_contents($composerFile);
-        if (false === $contents) {
-            return null;
-        }
-
-        $composerConfig = json_decode($contents, true);
-        if (!is_array($composerConfig)) {
-            return null;
-        }
-
-        $webRoot = $composerConfig['extra']['mautic-scaffold']['locations']['web-root'] ?? null;
-        if (is_string($webRoot) && '' !== trim($webRoot)) {
-            return $webRoot;
-        }
-
-        $publicDir = $composerConfig['extra']['public-dir'] ?? null;
-        if (is_string($publicDir) && '' !== trim($publicDir)) {
-            return $publicDir;
-        }
-
-        return null;
+        return rtrim(ParameterLoader::getWebrootDir($projectDir), '/');
     }
 
     private function resolvePublicPrefix(ContainerBuilder $container): string

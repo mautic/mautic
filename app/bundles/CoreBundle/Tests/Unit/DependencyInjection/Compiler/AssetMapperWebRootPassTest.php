@@ -71,9 +71,11 @@ final class AssetMapperWebRootPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.project_dir', $this->projectDir);
+        mkdir($this->projectDir.'/docroot');
 
         file_put_contents($this->projectDir.'/composer.json', json_encode([
             'extra' => [
+                'public-dir'      => 'docroot',
                 'mautic-scaffold' => [
                     'locations' => [
                         'web-root' => 'docroot/',
@@ -111,6 +113,12 @@ final class AssetMapperWebRootPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.project_dir', $this->projectDir);
+
+        file_put_contents($this->projectDir.'/composer.json', json_encode([
+            'extra' => [
+                'public-dir' => '.',
+            ],
+        ]));
 
         $container
             ->register('asset_mapper.public_assets_path_resolver')
