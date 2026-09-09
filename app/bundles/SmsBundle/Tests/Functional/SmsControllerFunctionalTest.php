@@ -243,7 +243,7 @@ final class SmsControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(1, $crawler->filter('form[name="schedule_send"]'));
     }
 
-    public function testScheduleModalShowsCronNoticeAndExistingOneTimeActions(): void
+    public function testScheduleModalShowsExistingOneTimeActionsWithoutCronNotice(): void
     {
         $sms = $this->createAndPersistSegmentSms('Scheduled SMS', 'Segment message');
         $sms->setPublishUp(new \DateTime('+1 day'));
@@ -252,7 +252,7 @@ final class SmsControllerFunctionalTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/sms/scheduleSend/'.$sms->getId());
         $this->assertResponseIsSuccessful();
-        $this->assertSelectorTextContains('.alert-info', 'mautic:broadcasts:send --channel=sms');
+        $this->assertStringNotContainsString('mautic:broadcasts:send --channel=sms', $crawler->filter('body')->text());
         $this->assertCount(1, $crawler->selectButton('Update schedule'));
         $this->assertCount(1, $crawler->selectButton('Cancel schedule'));
         $this->assertCount(1, $crawler->selectButton('Close'));
