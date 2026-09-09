@@ -478,7 +478,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
                 'tablePrefix'     => $model->getRepository()->getTableAlias(),
                 'modelName'       => $this->getModelName(),
                 'translationBase' => $this->getTranslationBase(),
-                'tmpl'            => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                'tmpl'            => $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index',
                 'entity'          => $entity,
                 'form'            => $this->getFormView($form, 'edit'),
             ],
@@ -841,7 +841,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
             $start = 0;
         }
 
-        $search = $request->get('search', $session->get('mautic.'.$this->getSessionBase().'.filter', ''));
+        $search = $request->attributes->all()['search'] ?? $request->query->all()['search'] ?? $request->request->all()['search'] ?? $session->get('mautic.'.$this->getSessionBase().'.filter', '');
         $session->set('mautic.'.$this->getSessionBase().'.filter', $search);
 
         $filter = ['string' => $search, 'force' => []];
@@ -898,7 +898,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
             'page'            => $page,
             'limit'           => $limit,
             'permissions'     => $permissions,
-            'tmpl'            => $request->get('tmpl', 'index'),
+            'tmpl'            => $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index',
         ];
 
         return $this->delegateView(
@@ -1016,7 +1016,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
                 'tablePrefix'     => $model->getRepository()->getTableAlias(),
                 'modelName'       => $this->getModelName(),
                 'translationBase' => $this->getTranslationBase(),
-                'tmpl'            => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                'tmpl'            => $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index',
                 'entity'          => $entity,
                 'form'            => $this->getFormView($form, 'new'),
             ],
@@ -1109,7 +1109,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
             'viewParameters' => [
                 $itemName     => $entity,
                 'logs'        => $logs,
-                'tmpl'        => $request->isXmlHttpRequest() ? $request->get('tmpl', 'details') : 'details',
+                'tmpl'        => $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'details' : 'details',
                 'permissions' => $this->security->isGranted(
                     [
                         $this->getPermissionBase().':view',

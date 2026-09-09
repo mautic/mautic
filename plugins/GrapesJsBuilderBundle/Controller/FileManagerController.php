@@ -30,7 +30,7 @@ final class FileManagerController extends AjaxController
 
     public function deleteAction(Request $request, FileManager $fileManager): JsonResponse
     {
-        $fileName = basename($request->get('filename'));
+        $fileName = basename($request->attributes->all()['filename'] ?? $request->query->all()['filename'] ?? $request->request->all()['filename'] ?? null);
         $filePath = $fileManager->getCompleteFilePath($fileName);
 
         if (!file_exists($filePath) || !exif_imagetype($filePath)) {

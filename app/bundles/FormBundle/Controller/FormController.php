@@ -106,7 +106,7 @@ class FormController extends CommonFormController
         $pageHelper = $pageHelperFactory->make('mautic.form', $page);
         $limit      = $pageHelper->getLimit();
         $start      = $pageHelper->getStart();
-        $search     = $request->get('search', $session->get('mautic.form.filter', ''));
+        $search     = $request->attributes->all()['search'] ?? $request->query->all()['search'] ?? $request->request->all()['search'] ?? $session->get('mautic.form.filter', '');
         $filter     = ['string' => $search, 'force' => []];
         $session->set('mautic.form.filter', $search);
 
@@ -160,7 +160,7 @@ class FormController extends CommonFormController
                     'limit'       => $limit,
                     'permissions' => $permissions,
                     'security'    => $this->security,
-                    'tmpl'        => $request->get('tmpl', 'index'),
+                    'tmpl'        => $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index',
                 ],
                 'contentTemplate' => '@MauticForm/Form/list.html.twig',
                 'passthroughVars' => [
@@ -473,7 +473,7 @@ class FormController extends CommonFormController
                     'actionSettings' => $customComponents['actions'],
                     'formActions'    => $modifiedActions,
                     'deletedActions' => $deletedActions,
-                    'tmpl'           => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                    'tmpl'           => $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index',
                     'activeForm'     => $entity,
                     'form'           => $form->createView(),
                     'inBuilder'      => true,
@@ -833,7 +833,7 @@ class FormController extends CommonFormController
                     'actions'            => $customComponents['choices'],
                     'actionSettings'     => $customComponents['actions'],
                     'fieldSettings'      => $customComponents['fields'],
-                    'tmpl'               => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                    'tmpl'               => $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index',
                     'activeForm'         => $entity,
                     'form'               => $form->createView(),
                     'forceTypeSelection' => $forceTypeSelection,

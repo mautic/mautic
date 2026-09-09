@@ -60,7 +60,7 @@ readonly class FlashBag
             };
 
             // If the user has not interacted with the browser for the last 30 seconds, consider the message unread
-            $lastActive = $this->requestStack->getCurrentRequest()->get('mauticUserLastActive', 0);
+            $lastActive = $this->requestStack->getCurrentRequest()->attributes->all()['mauticUserLastActive'] ?? $this->requestStack->getCurrentRequest()->query->all()['mauticUserLastActive'] ?? $this->requestStack->getCurrentRequest()->request->all()['mauticUserLastActive'] ?? 0;
             $isRead     = $lastActive > 30 ? 0 : 1;
 
             $this->notificationModel->addNotification($message, $level, $isRead, null, $iconClass);

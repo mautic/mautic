@@ -44,7 +44,7 @@ final class PublicController extends CommonController
 
     public function viewPixelAction(Request $request, ContactTracker $contactTracker): Response
     {
-        $id = $request->get('id', false);
+        $id = $request->attributes->all()['id'] ?? $request->query->all()['id'] ?? $request->request->all()['id'] ?? false;
         if ($id) {
             $focus = $this->focusModel->getEntity($id);
 

@@ -79,7 +79,7 @@ final class ReportController extends FormController
 
         $limit  = $pageHelper->getLimit();
         $start  = $pageHelper->getStart();
-        $search = $request->get('search', $request->getSession()->get('mautic.report.filter', ''));
+        $search = $request->attributes->all()['search'] ?? $request->query->all()['search'] ?? $request->request->all()['search'] ?? $request->getSession()->get('mautic.report.filter', '');
         $filter = ['string' => $search, 'force' => []];
         $request->getSession()->set('mautic.report.filter', $search);
 
@@ -136,7 +136,7 @@ final class ReportController extends FormController
                     'limit'       => $limit,
                     'permissions' => $permissions,
                     'model'       => $this->reportModel,
-                    'tmpl'        => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                    'tmpl'        => $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index',
                     'security'    => $this->security,
                 ],
                 'contentTemplate' => '@MauticReport/Report/list.html.twig',
@@ -699,7 +699,7 @@ final class ReportController extends FormController
                     'reportPage'       => $reportPage,
                     'graphs'           => $reportData['graphs'],
                     'reportDataResult' => $reportDataResult,
-                    'tmpl'             => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                    'tmpl'             => $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index',
                     'limit'            => $reportData['limit'],
                     'permissions'      => $this->security->isGranted(
                         [

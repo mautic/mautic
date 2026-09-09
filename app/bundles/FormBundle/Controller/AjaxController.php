@@ -56,9 +56,9 @@ final class AjaxController extends CommonAjaxController
 
     public function getFieldsForObjectAction(Request $request): JsonResponse
     {
-        $formId       = $request->get('formId');
-        $mappedObject = $request->get('mappedObject');
-        $mappedField  = $request->get('mappedField');
+        $formId       = $request->attributes->all()['formId'] ?? $request->query->all()['formId'] ?? $request->request->all()['formId'] ?? null;
+        $mappedObject = $request->attributes->all()['mappedObject'] ?? $request->query->all()['mappedObject'] ?? $request->request->all()['mappedObject'] ?? null;
+        $mappedField  = $request->attributes->all()['mappedField'] ?? $request->query->all()['mappedField'] ?? $request->request->all()['mappedField'] ?? null;
         $mappedFields = $this->mappedFieldCollector->getFields($formId, $mappedObject);
         $fields       = $this->fieldCollector->getFields($mappedObject);
         $fields       = $fields->removeFieldsWithKeys($mappedFields, $mappedField);

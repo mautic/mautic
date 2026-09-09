@@ -42,7 +42,7 @@ final class FileController extends AjaxController
      */
     public function uploadAction(Request $request, PathsHelper $pathsHelper, FileUploader $fileUploader): JsonResponse
     {
-        $editor   = $request->get('editor');
+        $editor   = $request->attributes->all()['editor'] ?? $request->query->all()['editor'] ?? $request->request->all()['editor'] ?? null;
         $mediaDir = $this->getMediaAbsolutePath($pathsHelper);
         if (!isset($this->response['error'])) {
             foreach ($request->files as $file) {

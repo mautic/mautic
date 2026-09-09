@@ -89,8 +89,8 @@ final class RoleController extends FormController
         $start      = $pageHelper->getStart();
         $orderBy    = $request->getSession()->get('mautic.role.orderby', 'r.name');
         $orderByDir = $request->getSession()->get('mautic.role.orderbydir', 'ASC');
-        $filter     = $request->get('search', $request->getSession()->get('mautic.role.filter', ''));
-        $tmpl       = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
+        $filter     = $request->attributes->all()['search'] ?? $request->query->all()['search'] ?? $request->request->all()['search'] ?? $request->getSession()->get('mautic.role.filter', '');
+        $tmpl       = $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index';
         $items = $this->roleModel->getEntities(
             [
                 'start'      => $start,

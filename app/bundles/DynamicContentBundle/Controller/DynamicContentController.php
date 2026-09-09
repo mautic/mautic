@@ -90,7 +90,7 @@ final class DynamicContentController extends FormController
         }
 
         // fetch
-        $search = $request->get('search', $request->getSession()->get('mautic.dynamicContent.filter', ''));
+        $search = $request->attributes->all()['search'] ?? $request->query->all()['search'] ?? $request->request->all()['search'] ?? $request->getSession()->get('mautic.dynamicContent.filter', '');
         $request->getSession()->set('mautic.dynamicContent.filter', $search);
 
         $filter = [
@@ -117,7 +117,7 @@ final class DynamicContentController extends FormController
         // set what page currently on so that we can return here after form submission/cancellation
         $request->getSession()->set('mautic.dynamicContent.page', $page);
 
-        $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
+        $tmpl = $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index';
         $categories = $this->pageModel->getLookupResults('category', '', 0);
 
         return $this->delegateView(
@@ -159,7 +159,7 @@ final class DynamicContentController extends FormController
         $dwc          = $request->request->all()['dwc'] ?? [];
         $updateSelect = 'POST' === $method
             ? ($dwc['updateSelect'] ?? false)
-            : $request->get('updateSelect', false);
+            : $request->attributes->all()['updateSelect'] ?? $request->query->all()['updateSelect'] ?? $request->request->all()['updateSelect'] ?? false;
         $form         = $this->dynamicContentModel->createForm($entity, $action, ['update_select' => $updateSelect]);
 
         if (Request::METHOD_POST === $method) {
@@ -298,7 +298,7 @@ final class DynamicContentController extends FormController
         $dwc          = $request->request->all()['dwc'] ?? [];
         $updateSelect = 'POST' === $method
             ? ($dwc['updateSelect'] ?? false)
-            : $request->get('updateSelect', false);
+            : $request->attributes->all()['updateSelect'] ?? $request->query->all()['updateSelect'] ?? $request->request->all()['updateSelect'] ?? false;
 
         $form = $this->dynamicContentModel->createForm($entity, $action, ['update_select' => $updateSelect]);
 
@@ -430,7 +430,7 @@ final class DynamicContentController extends FormController
                     'entity'       => $entity,
                     'permissions'  => $this->getPermissions(),
                     'logs'         => $logs,
-                    'isEmbedded'   => $request->get('isEmbedded') ?: false,
+                    'isEmbedded'   => $request->attributes->all()['isEmbedded'] ?? $request->query->all()['isEmbedded'] ?? $request->request->all()['isEmbedded'] ?? null ?: false,
                     'translations' => [
                         'parent'   => $translationParent,
                         'children' => $translationChildren,

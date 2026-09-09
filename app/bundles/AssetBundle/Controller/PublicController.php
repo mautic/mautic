@@ -151,10 +151,10 @@ final class PublicController extends AbstractFormController
             $response->headers->set('X-Robots-Tag', 'noindex, nofollow, noarchive');
         }
 
-        $stream = $request->get('stream', in_array(
+        $stream = $request->attributes->all()['stream'] ?? $request->query->all()['stream'] ?? $request->request->all()['stream'] ?? in_array(
             $entity->getExtension(),
             $this->coreParametersHelper->get('streamed_extensions')
-        ));
+        );
 
         if (!$stream) {
             $response->headers->set(

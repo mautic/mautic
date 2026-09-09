@@ -53,7 +53,7 @@ final class ListController extends CommonController
         $this->setListFilters();
 
         $request = $this->getCurrentRequest();
-        $search  = InputHelper::clean($request->get('search', ''));
+        $search  = InputHelper::clean($request->attributes->all()['search'] ?? $request->query->all()['search'] ?? $request->request->all()['search'] ?? '');
 
         $session = $request->getSession();
         if (empty($page)) {
@@ -73,7 +73,7 @@ final class ListController extends CommonController
                     'count'             => $this->pluginCollector->getTotal(),
                     'page'              => $page,
                     'limit'             => $limit,
-                    'tmpl'              => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                    'tmpl'              => $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index',
                     'isComposerEnabled' => $this->config->isComposerEnabled(),
                 ],
                 'contentTemplate' => '@Marketplace/Package/list.html.twig',

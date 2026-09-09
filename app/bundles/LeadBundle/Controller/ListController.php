@@ -111,7 +111,7 @@ final class ListController extends FormController
             $start = 0;
         }
 
-        $search = $request->get('search', $session->get('mautic.segment.filter', ''));
+        $search = $request->attributes->all()['search'] ?? $request->query->all()['search'] ?? $request->request->all()['search'] ?? $session->get('mautic.segment.filter', '');
         $session->set('mautic.segment.filter', $search);
 
         // do some default filtering
@@ -122,7 +122,7 @@ final class ListController extends FormController
             'string' => $search,
         ];
 
-        $tmpl       = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
+        $tmpl       = $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index';
         $tableAlias = $this->leadListRepository->getTableAlias();
 
         if (!$permissions[LeadPermissions::LISTS_VIEW_OTHER]) {
@@ -680,7 +680,7 @@ final class ListController extends FormController
             ],
         ];
 
-        $leadId = $request->get('leadId');
+        $leadId = $request->attributes->all()['leadId'] ?? $request->query->all()['leadId'] ?? $request->request->all()['leadId'] ?? null;
         if (!empty($leadId) && 'POST' === $request->getMethod()) {
             /** @var LeadList $list */
             $list = $this->listModel->getEntity($listId);
@@ -861,7 +861,7 @@ final class ListController extends FormController
         $request        = $this->getCurrentRequest();
         $session        = $request->getSession();
         $currentFilters = $session->get('mautic.lead.list.list_filters', []);
-        $updatedFilters = $request->get('filters', false);
+        $updatedFilters = $request->attributes->all()['filters'] ?? $request->query->all()['filters'] ?? $request->request->all()['filters'] ?? false;
 
         $sourceLists = $this->listModel->getSourceLists();
         $listFilters = [

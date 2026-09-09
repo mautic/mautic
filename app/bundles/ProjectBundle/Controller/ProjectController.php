@@ -73,7 +73,7 @@ final class ProjectController extends AbstractFormController
             $start = 0;
         }
 
-        $search = $request->get('search', $session->get('mautic.projects.filter', ''));
+        $search = $request->attributes->all()['search'] ?? $request->query->all()['search'] ?? $request->request->all()['search'] ?? $session->get('mautic.projects.filter', '');
         $session->set('mautic.projects.filter', $search);
 
         $orderBy    = $session->get('mautic.projects.orderby', 'p.dateModified');
@@ -84,7 +84,7 @@ final class ProjectController extends AbstractFormController
             $filter = ['string' => $search];
         }
 
-        $tmpl  = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
+        $tmpl  = $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index';
         $items = $projectModel->getEntities(
             [
                 'start'      => $start,
@@ -506,7 +506,7 @@ final class ProjectController extends AbstractFormController
             $this->throwAccessDenied();
         }
 
-        $projectId = $request->get('objectId');
+        $projectId = $request->attributes->all()['objectId'] ?? $request->query->all()['objectId'] ?? $request->request->all()['objectId'] ?? null;
 
         /** @var ?Project $project */
         $project = $projectModel->getEntity($projectId);
@@ -532,8 +532,8 @@ final class ProjectController extends AbstractFormController
             $this->throwAccessDenied();
         }
 
-        $projectId  = $request->get('objectId');
-        $entityType = $request->get('entityType');
+        $projectId  = $request->attributes->all()['objectId'] ?? $request->query->all()['objectId'] ?? $request->request->all()['objectId'] ?? null;
+        $entityType = $request->attributes->all()['entityType'] ?? $request->query->all()['entityType'] ?? $request->request->all()['entityType'] ?? null;
 
         /** @var ?Project $project */
         $project = $projectModel->getEntity($projectId);
@@ -678,9 +678,9 @@ final class ProjectController extends AbstractFormController
             $this->throwAccessDenied();
         }
 
-        $projectId  = $request->get('objectId');
-        $entityType = $request->get('entityType');
-        $entityId   = $request->get('entityId');
+        $projectId  = $request->attributes->all()['objectId'] ?? $request->query->all()['objectId'] ?? $request->request->all()['objectId'] ?? null;
+        $entityType = $request->attributes->all()['entityType'] ?? $request->query->all()['entityType'] ?? $request->request->all()['entityType'] ?? null;
+        $entityId   = $request->attributes->all()['entityId'] ?? $request->query->all()['entityId'] ?? $request->request->all()['entityId'] ?? null;
         $flashes    = [];
 
         $returnUrl = $this->generateUrl(self::ROUTE_ACTION, [

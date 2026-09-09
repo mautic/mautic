@@ -61,7 +61,7 @@ final class PointController extends AbstractFormController
 
         $limit      = $pageHelper->getLimit();
         $start      = $pageHelper->getStart();
-        $search     = $request->get('search', $request->getSession()->get('mautic.point.filter', ''));
+        $search     = $request->attributes->all()['search'] ?? $request->query->all()['search'] ?? $request->request->all()['search'] ?? $request->getSession()->get('mautic.point.filter', '');
         $filter     = ['string' => $search, 'force' => []];
         $orderBy    = $request->getSession()->get('mautic.point.orderby', 'p.name');
         $orderByDir = $request->getSession()->get('mautic.point.orderbydir', 'ASC');
@@ -106,7 +106,7 @@ final class PointController extends AbstractFormController
                 'page'        => $page,
                 'limit'       => $limit,
                 'permissions' => $permissions,
-                'tmpl'        => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                'tmpl'        => $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index',
             ],
             'contentTemplate' => '@MauticPoint/Point/list.html.twig',
             'passthroughVars' => [
@@ -197,7 +197,7 @@ final class PointController extends AbstractFormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'tmpl'       => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                'tmpl'       => $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index',
                 'entity'     => $entity,
                 'form'       => $form->createView(),
                 'actions'    => $actions['actions'],
@@ -327,7 +327,7 @@ final class PointController extends AbstractFormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'tmpl'       => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                'tmpl'       => $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index',
                 'entity'     => $entity,
                 'form'       => $form->createView(),
                 'actions'    => $actions['actions'],

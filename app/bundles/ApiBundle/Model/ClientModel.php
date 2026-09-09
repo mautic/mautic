@@ -52,7 +52,7 @@ final class ClientModel extends FormModel implements GlobalSearchInterface
         }
 
         if (null !== $request = $this->requestStack->getCurrentRequest()) {
-            return $request->get('api_mode', $request->getSession()->get('mautic.client.filter.api_mode', self::DEFAULT_API_MODE));
+            return $request->attributes->all()['api_mode'] ?? $request->query->all()['api_mode'] ?? $request->request->all()['api_mode'] ?? $request->getSession()->get('mautic.client.filter.api_mode', self::DEFAULT_API_MODE);
         }
 
         return self::DEFAULT_API_MODE;

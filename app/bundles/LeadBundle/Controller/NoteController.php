@@ -59,7 +59,7 @@ final class NoteController extends FormController
             $start = 0;
         }
 
-        $search = $request->get('search', $session->get('mautic.lead.'.$lead->getId().'.note.filter', ''));
+        $search = $request->attributes->all()['search'] ?? $request->query->all()['search'] ?? $request->request->all()['search'] ?? $session->get('mautic.lead.'.$lead->getId().'.note.filter', '');
         $session->set('mautic.lead.'.$lead->getId().'.note.filter', $search);
 
         // do some default filtering
@@ -74,7 +74,7 @@ final class NoteController extends FormController
             ],
         ];
 
-        $tmpl     = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
+        $tmpl     = $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index';
         $noteType = InputHelper::clean($request->request->all()['noteTypes'] ?? []);
         if (empty($noteType) && 'index' === $tmpl) {
             $noteType = $session->get('mautic.lead.'.$lead->getId().'.notetype.filter', []);

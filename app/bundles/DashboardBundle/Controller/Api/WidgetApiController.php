@@ -89,11 +89,11 @@ final class WidgetApiController extends CommonApiController
     public function getDataAction(Request $request, string $type): Response
     {
         $start      = microtime(true);
-        $timezone   = InputHelper::clean($request->get('timezone'));
-        $from       = InputHelper::clean($request->get('dateFrom'));
-        $to         = InputHelper::clean($request->get('dateTo'));
-        $dataFormat = InputHelper::clean($request->get('dataFormat'));
-        $unit       = InputHelper::clean($request->get('timeUnit', 'Y'));
+        $timezone   = InputHelper::clean($request->attributes->all()['timezone'] ?? $request->query->all()['timezone'] ?? $request->request->all()['timezone'] ?? null);
+        $from       = InputHelper::clean($request->attributes->all()['dateFrom'] ?? $request->query->all()['dateFrom'] ?? $request->request->all()['dateFrom'] ?? null);
+        $to         = InputHelper::clean($request->attributes->all()['dateTo'] ?? $request->query->all()['dateTo'] ?? $request->request->all()['dateTo'] ?? null);
+        $dataFormat = InputHelper::clean($request->attributes->all()['dataFormat'] ?? $request->query->all()['dataFormat'] ?? $request->request->all()['dataFormat'] ?? null);
+        $unit       = InputHelper::clean($request->attributes->all()['timeUnit'] ?? $request->query->all()['timeUnit'] ?? $request->request->all()['timeUnit'] ?? 'Y');
         $dataset    = InputHelper::clean($request->query->all()['dataset'] ?? $request->request->all()['dataset'] ?? []);
         $response   = ['success' => 0];
 
@@ -112,11 +112,11 @@ final class WidgetApiController extends CommonApiController
         }
 
         $params = [
-            'timeUnit'   => InputHelper::clean($request->get('timeUnit', 'Y')),
-            'dateFormat' => InputHelper::clean($request->get('dateFormat')),
+            'timeUnit'   => InputHelper::clean($request->attributes->all()['timeUnit'] ?? $request->query->all()['timeUnit'] ?? $request->request->all()['timeUnit'] ?? 'Y'),
+            'dateFormat' => InputHelper::clean($request->attributes->all()['dateFormat'] ?? $request->query->all()['dateFormat'] ?? $request->request->all()['dateFormat'] ?? null),
             'dateFrom'   => $fromDate,
             'dateTo'     => $toDate,
-            'limit'      => (int) $request->get('limit'),
+            'limit'      => (int) ($request->attributes->all()['limit'] ?? $request->query->all()['limit'] ?? $request->request->all()['limit'] ?? null),
             'filter'     => InputHelper::clean($request->query->all()['filter'] ?? $request->request->all()['filter'] ?? []),
             'dataset'    => $dataset,
         ];
@@ -124,8 +124,8 @@ final class WidgetApiController extends CommonApiController
         // Merge filters into the root array as well as that's how widget edit forms send them.
         $params = array_merge($params, $params['filter']);
 
-        $cacheTimeout = (int) $request->get('cacheTimeout', 0);
-        $widgetHeight = (int) $request->get('height', 300);
+        $cacheTimeout = (int) ($request->attributes->all()['cacheTimeout'] ?? $request->query->all()['cacheTimeout'] ?? $request->request->all()['cacheTimeout'] ?? 0);
+        $widgetHeight = (int) ($request->attributes->all()['height'] ?? $request->query->all()['height'] ?? $request->request->all()['height'] ?? 300);
 
         $widget = new Widget();
         $widget->setParams($params);

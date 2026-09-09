@@ -440,7 +440,7 @@ final class AjaxController extends CommonAjaxController
     public function getNewLeadsAction(Request $request, ContactColumnsDictionary $contactColumnsDictionary, LeadModel $model): array|JsonResponse
     {
         $dataArray = ['success' => 0];
-        $maxId     = $request->get('maxId');
+        $maxId     = $request->attributes->all()['maxId'] ?? $request->query->all()['maxId'] ?? $request->request->all()['maxId'] ?? null;
 
         if (!empty($maxId)) {
             // set some permissions
@@ -499,7 +499,7 @@ final class AjaxController extends CommonAjaxController
                 $maxLeadId = $this->leadRepository->getMaxLeadId();
 
                 // We need the EmailRepository to check if a lead is flagged as do not contact
-                $indexMode          = $request->get('view', $session->get('mautic.lead.indexmode', 'list'));
+                $indexMode          = $request->attributes->all()['view'] ?? $request->query->all()['view'] ?? $request->request->all()['view'] ?? $session->get('mautic.lead.indexmode', 'list');
                 $template           = ('list' == $indexMode) ? 'list_rows' : 'grid_cards';
                 $dataArray['leads'] = $this->render(
                     "@MauticLead/Lead/{$template}.html.twig",
@@ -618,8 +618,8 @@ final class AjaxController extends CommonAjaxController
     {
         $dataArray = ['success' => 0];
         $order     = InputHelper::clean($request->request->get('field'));
-        $page      = (int) $request->get('page');
-        $limit     = (int) $request->get('limit');
+        $page      = (int) ($request->attributes->all()['page'] ?? $request->query->all()['page'] ?? $request->request->all()['page'] ?? null);
+        $limit     = (int) ($request->attributes->all()['limit'] ?? $request->query->all()['limit'] ?? $request->request->all()['limit'] ?? null);
 
         if (!empty($order)) {
             $startAt = ($page > 1) ? ($page * $limit) + 1 : 1;
@@ -752,7 +752,7 @@ final class AjaxController extends CommonAjaxController
      */
     public function getLeadCountAction(Request $request, ListModel $model): JsonResponse
     {
-        $id = (int) InputHelper::clean($request->get('id'));
+        $id = (int) InputHelper::clean($request->attributes->all()['id'] ?? $request->query->all()['id'] ?? $request->request->all()['id'] ?? null);
 
         $leadList = $model->getEntity($id);
         if (!$leadList) {
@@ -772,7 +772,7 @@ final class AjaxController extends CommonAjaxController
 
     public function getSegmentDependencyTreeAction(Request $request, SegmentDependencyTreeFactory $segmentDependencyTreeFactory, ListModel $model): JsonResponse
     {
-        $id      = (int) $request->get('id');
+        $id      = (int) ($request->attributes->all()['id'] ?? $request->query->all()['id'] ?? $request->request->all()['id'] ?? null);
         $segment = $model->getEntity($id);
 
         if (!$segment) {

@@ -60,7 +60,7 @@ final class BatchTagController extends AbstractFormController
 
     public function execAction(Request $request): JsonResponse
     {
-        $params   = $request->get('batch_tag');
+        $params   = $request->attributes->all()['batch_tag'] ?? $request->query->all()['batch_tag'] ?? $request->request->all()['batch_tag'] ?? null;
         $ids    = empty($params['ids']) ? [] : json_decode($params['ids']);
         if (empty($ids)) {
             $this->addFlashMessage('mautic.core.error.ids.missing');

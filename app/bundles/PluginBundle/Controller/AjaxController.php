@@ -27,7 +27,7 @@ final class AjaxController extends CommonAjaxController
     public function setIntegrationFilterAction(Request $request): JsonResponse
     {
         $session      = $request->getSession();
-        $pluginFilter = (int) $request->get('plugin');
+        $pluginFilter = (int) ($request->attributes->all()['plugin'] ?? $request->query->all()['plugin'] ?? $request->request->all()['plugin'] ?? null);
         $session->set('mautic.integrations.filter', $pluginFilter);
 
         return $this->sendJsonResponse(['success' => 1]);

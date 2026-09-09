@@ -217,7 +217,7 @@ final class AjaxController extends CommonAjaxController
         }
 
         // Support for legacy calls
-        if ($request->get('id') && !empty($data[0])) {
+        if (($request->attributes->all()['id'] ?? $request->query->all()['id'] ?? $request->request->all()['id'] ?? null) && !empty($data[0])) {
             $data = $data[0];
         } else {
             $data = [

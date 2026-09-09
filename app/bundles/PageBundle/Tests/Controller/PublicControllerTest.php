@@ -453,7 +453,7 @@ final class PublicControllerTest extends TestCase
                     $response = $event->getResponse();
 
                     $response->set('tracking', $contact);
-                    $response->set('foo', $request->get('foo'));
+                    $response->set('foo', $request->attributes->all()['foo'] ?? $request->query->all()['foo'] ?? $request->request->all()['foo'] ?? null);
 
                     return $event;
                 }

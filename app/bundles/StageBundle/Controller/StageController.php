@@ -72,7 +72,7 @@ final class StageController extends AbstractFormController
 
         $limit      = $pageHelper->getLimit();
         $start      = $pageHelper->getStart();
-        $search     = $request->get('search', $request->getSession()->get('mautic.stage.filter', ''));
+        $search     = $request->attributes->all()['search'] ?? $request->query->all()['search'] ?? $request->request->all()['search'] ?? $request->getSession()->get('mautic.stage.filter', '');
         $filter     = ['string' => $search, 'force' => []];
         $orderBy    = $request->getSession()->get('mautic.stage.orderby', 's.name');
         $orderByDir = $request->getSession()->get('mautic.stage.orderbydir', 'ASC');
@@ -122,7 +122,7 @@ final class StageController extends AbstractFormController
                     'page'        => $page,
                     'limit'       => $limit,
                     'permissions' => $permissions,
-                    'tmpl'        => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                    'tmpl'        => $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index',
                 ],
                 'contentTemplate' => '@MauticStage/Stage/list.html.twig',
                 'passthroughVars' => [
@@ -229,7 +229,7 @@ final class StageController extends AbstractFormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'tmpl'         => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                    'tmpl'         => $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index',
                     'entity'       => $entity,
                     'form'         => $form->createView(),
                     'actions'      => $actions['actions'],
@@ -379,7 +379,7 @@ final class StageController extends AbstractFormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'tmpl'         => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                    'tmpl'         => $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index',
                     'entity'       => $entity,
                     'form'         => $form->createView(),
                     'actions'      => $actions['actions'],
@@ -471,7 +471,7 @@ final class StageController extends AbstractFormController
             return $this->handleMergeFormSubmission($request, $form, $model, $secondaryStage, $postActionVars, $page);
         }
 
-        $tmpl = $request->get('tmpl', 'index');
+        $tmpl = $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index';
 
         return $this->delegateView(
             [
@@ -641,7 +641,7 @@ final class StageController extends AbstractFormController
         if (!$this->isFormValid($form)) {
             return $this->delegateView([
                 'viewParameters' => [
-                    'tmpl'         => $request->get('tmpl', 'index'),
+                    'tmpl'         => $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index',
                     'action'       => $this->generateUrl('mautic_stage_action', ['objectAction' => 'merge', 'objectId' => $secondaryStage->getId()]),
                     'form'         => $form->createView(),
                     'currentRoute' => $this->generateUrl('mautic_stage_action', [
@@ -652,7 +652,7 @@ final class StageController extends AbstractFormController
                 'contentTemplate' => '@MauticStage/Stage/merge.html.twig',
                 'passthroughVars' => [
                     'route'  => false,
-                    'target' => ('update' === $request->get('tmpl', 'index')) ? '.stage-merge-options' : null,
+                    'target' => ('update' === ($request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index')) ? '.stage-merge-options' : null,
                 ],
             ]);
         }

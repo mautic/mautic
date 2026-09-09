@@ -30,9 +30,9 @@ final readonly class ControllerSubscriber implements EventSubscriberInterface
     {
         $request = $event->getRequest();
 
-        if ('Mautic\PluginBundle\Controller\PluginController::configAction' === $request->get('_controller')) {
-            $integrationName = $request->get('name');
-            $page            = $request->get('page');
+        if ('Mautic\PluginBundle\Controller\PluginController::configAction' === ($request->attributes->all()['_controller'] ?? $request->query->all()['_controller'] ?? $request->request->all()['_controller'] ?? null)) {
+            $integrationName = $request->attributes->all()['name'] ?? $request->query->all()['name'] ?? $request->request->all()['name'] ?? null;
+            $page            = $request->attributes->all()['page'] ?? $request->query->all()['page'] ?? $request->request->all()['page'] ?? null;
 
             try {
                 $this->integrationsHelper->getIntegration($integrationName);

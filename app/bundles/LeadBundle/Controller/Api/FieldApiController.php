@@ -59,7 +59,7 @@ final class FieldApiController extends CommonApiController
         \assert(null !== $request);
 
         $this->model           = $fieldModel;
-        $this->fieldObject     = $request->get('object');
+        $this->fieldObject     = $request->attributes->all()['object'] ?? $request->query->all()['object'] ?? $request->request->all()['object'] ?? null;
         $this->entityClass     = LeadField::class;
         $this->entityNameOne   = 'field';
         $this->entityNameMulti = 'fields';

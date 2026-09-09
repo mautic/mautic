@@ -24,7 +24,7 @@ final class AjaxController extends CommonAjaxController
      */
     public function getSourceDataAction(Request $request): JsonResponse
     {
-        $context = $request->get('context');
+        $context = $request->attributes->all()['context'] ?? $request->query->all()['context'] ?? $request->request->all()['context'] ?? null;
 
         $graphs  = $this->reportModel->getGraphList($context);
         $columns = $this->reportModel->getColumnList($context);

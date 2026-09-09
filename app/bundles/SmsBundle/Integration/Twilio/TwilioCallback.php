@@ -32,7 +32,7 @@ final readonly class TwilioCallback implements CallbackInterface
     {
         $this->validateRequest($request->request);
 
-        $number = $request->get('From');
+        $number = $request->attributes->all()['From'] ?? $request->query->all()['From'] ?? $request->request->all()['From'] ?? null;
 
         return $this->contactHelper->findContactsByNumber($number);
     }
@@ -41,7 +41,7 @@ final readonly class TwilioCallback implements CallbackInterface
     {
         $this->validateRequest($request->request);
 
-        return trim($request->get('Body'));
+        return trim($request->attributes->all()['Body'] ?? $request->query->all()['Body'] ?? $request->request->all()['Body'] ?? null);
     }
 
     /**

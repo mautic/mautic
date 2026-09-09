@@ -63,7 +63,7 @@ class AjaxController extends CommonController
         AuthorizationCheckerInterface $authorizationChecker,
     ): Response|JsonResponse {
         // process ajax actions
-        $action     = $request->get('action');
+        $action     = $request->attributes->all()['action'] ?? $request->query->all()['action'] ?? $request->request->all()['action'] ?? null;
         $bundleName = null;
         if (empty($action)) {
             // check POST
@@ -323,7 +323,7 @@ class AjaxController extends CommonController
 
     public function clearNotificationAction(Request $request): JsonResponse
     {
-        $id = (int) $request->get('id', 0);
+        $id = (int) ($request->attributes->all()['id'] ?? $request->query->all()['id'] ?? $request->request->all()['id'] ?? 0);
         $this->notificationModel->clearNotification($id, 200);
 
         return $this->sendJsonResponse(['success' => 1]);

@@ -89,7 +89,7 @@ final class SmsController extends FormController
             $start = 0;
         }
 
-        $search = $request->get('search', $session->get('mautic.sms.filter', ''));
+        $search = $request->attributes->all()['search'] ?? $request->query->all()['search'] ?? $request->request->all()['search'] ?? $session->get('mautic.sms.filter', '');
         $session->set('mautic.sms.filter', $search);
 
         $filter = ['string' => $search];
@@ -148,7 +148,7 @@ final class SmsController extends FormController
                 'totalItems'  => $count,
                 'page'        => $page,
                 'limit'       => $limit,
-                'tmpl'        => $request->get('tmpl', 'index'),
+                'tmpl'        => $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index',
                 'permissions' => $permissions,
                 'model'       => $this->smsModel,
                 'security'    => $this->security,
@@ -234,7 +234,7 @@ final class SmsController extends FormController
                 'sms'         => $sms,
                 'trackables'  => $trackableLinks,
                 'logs'        => $logs,
-                'isEmbedded'  => $request->get('isEmbedded') ?: false,
+                'isEmbedded'  => $request->attributes->all()['isEmbedded'] ?? $request->query->all()['isEmbedded'] ?? $request->request->all()['isEmbedded'] ?? null ?: false,
                 'permissions' => $security->isGranted([
                     'sms:smses:viewown',
                     'sms:smses:viewother',
@@ -295,7 +295,7 @@ final class SmsController extends FormController
         $sms          = $request->request->all()['sms'] ?? [];
         $updateSelect = 'POST' === $method
             ? ($sms['updateSelect'] ?? false)
-            : $request->get('updateSelect', false);
+            : $request->attributes->all()['updateSelect'] ?? $request->query->all()['updateSelect'] ?? $request->request->all()['updateSelect'] ?? false;
 
         if ($updateSelect) {
             $entity->setSmsType('template');
@@ -461,7 +461,7 @@ final class SmsController extends FormController
         $sms          = $request->request->all()['sms'] ?? [];
         $updateSelect = 'POST' === $method
             ? ($sms['updateSelect'] ?? false)
-            : $request->get('updateSelect', false);
+            : $request->attributes->all()['updateSelect'] ?? $request->query->all()['updateSelect'] ?? $request->request->all()['updateSelect'] ?? false;
 
         $form = $this->smsModel->createForm($entity, $action, ['update_select' => $updateSelect]);
 

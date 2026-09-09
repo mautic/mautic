@@ -86,7 +86,7 @@ final class NotificationController extends AbstractFormController
             $start = 0;
         }
 
-        $search = $request->get('search', $session->get('mautic.notification.filter', ''));
+        $search = $request->attributes->all()['search'] ?? $request->query->all()['search'] ?? $request->request->all()['search'] ?? $session->get('mautic.notification.filter', '');
         $session->set('mautic.notification.filter', $search);
 
         $filter = [
@@ -152,7 +152,7 @@ final class NotificationController extends AbstractFormController
                     'totalItems'  => $count,
                     'page'        => $page,
                     'limit'       => $limit,
-                    'tmpl'        => $request->get('tmpl', 'index'),
+                    'tmpl'        => $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index',
                     'permissions' => $permissions,
                     'model'       => $this->notificationModel,
                     'security'    => $this->security,
@@ -289,7 +289,7 @@ final class NotificationController extends AbstractFormController
         $notification = $request->request->all()['notification'] ?? [];
         $updateSelect = ('POST' === $method)
             ? ($notification['updateSelect'] ?? false)
-            : $request->get('updateSelect', false);
+            : $request->attributes->all()['updateSelect'] ?? $request->query->all()['updateSelect'] ?? $request->request->all()['updateSelect'] ?? false;
 
         if ($updateSelect) {
             $entity->setNotificationType('template');
@@ -452,7 +452,7 @@ final class NotificationController extends AbstractFormController
         $notification = $request->request->all()['notification'] ?? [];
         $updateSelect = 'POST' === $method
             ? ($notification['updateSelect'] ?? false)
-            : $request->get('updateSelect', false);
+            : $request->attributes->all()['updateSelect'] ?? $request->query->all()['updateSelect'] ?? $request->request->all()['updateSelect'] ?? false;
 
         $form = $this->notificationModel->createForm($entity, $action, ['update_select' => $updateSelect]);
 

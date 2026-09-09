@@ -190,7 +190,7 @@ final class TriggerApiController extends CommonApiController
             return $this->notFound();
         }
 
-        $eventsToDelete = $this->requestStack->getCurrentRequest()->get('events');
+        $eventsToDelete = $this->requestStack->getCurrentRequest()->attributes->all()['events'] ?? $this->requestStack->getCurrentRequest()->query->all()['events'] ?? $this->requestStack->getCurrentRequest()->request->all()['events'] ?? null;
         $currentEvents  = $entity->getEvents();
 
         if (!is_array($eventsToDelete)) {

@@ -54,7 +54,7 @@ final class DefaultController extends CommonController
 
     public function globalSearchAction(Request $request): Response
     {
-        $searchStr = $request->get('global_search', $request->getSession()->get('mautic.global_search', ''));
+        $searchStr = $request->attributes->all()['global_search'] ?? $request->query->all()['global_search'] ?? $request->request->all()['global_search'] ?? $request->getSession()->get('mautic.global_search', '');
         $request->getSession()->set('mautic.global_search', $searchStr);
 
         if (!empty($searchStr)) {

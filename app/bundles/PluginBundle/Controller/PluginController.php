@@ -63,7 +63,7 @@ final class PluginController extends FormController
         );
 
         $session      = $request->getSession();
-        $pluginFilter = $request->get('plugin', $session->get('mautic.integrations.filter', ''));
+        $pluginFilter = $request->attributes->all()['plugin'] ?? $request->query->all()['plugin'] ?? $request->request->all()['plugin'] ?? $session->get('mautic.integrations.filter', '');
 
         $session->set('mautic.integrations.filter', $pluginFilter);
 
@@ -107,7 +107,7 @@ final class PluginController extends FormController
             strnatcasecmp(...)
         );
 
-        $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
+        $tmpl = $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index';
 
         if (!empty($pluginFilter)) {
             foreach ($plugins as $plugin) {
@@ -151,8 +151,8 @@ final class PluginController extends FormController
         if (!$this->security->isGranted('plugin:plugins:manage')) {
             $this->throwAccessDenied();
         }
-        if (!empty($request->get('activeTab'))) {
-            $activeTab = $request->get('activeTab');
+        if (!empty($request->attributes->all()['activeTab'] ?? $request->query->all()['activeTab'] ?? $request->request->all()['activeTab'] ?? null)) {
+            $activeTab = $request->attributes->all()['activeTab'] ?? $request->query->all()['activeTab'] ?? $request->request->all()['activeTab'] ?? null;
         }
 
         $session   = $request->getSession();

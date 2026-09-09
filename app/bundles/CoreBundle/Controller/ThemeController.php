@@ -52,10 +52,10 @@ final class ThemeController extends FormController
         $this->setListFilters();
 
         $session = $request->getSession();
-        $search  = $request->get('search', $session->get('mautic.theme.filter', ''));
+        $search  = $request->attributes->all()['search'] ?? $request->query->all()['search'] ?? $request->request->all()['search'] ?? $session->get('mautic.theme.filter', '');
         $session->set('mautic.theme.filter', $search);
 
-        $tmpl   = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
+        $tmpl   = $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index';
         $dir    = $pathsHelper->getSystemPath('themes', true);
         $action = $this->generateUrl('mautic_themes_index');
         $form   = $this->formFactory->create(ThemeUploadType::class, [], ['action' => $action]);
@@ -186,7 +186,7 @@ final class ThemeController extends FormController
         $response->headers->set('Content-Type', 'application/octet-stream');
         $response->headers->set('Content-Length', (string) filesize($zipPath));
 
-        $stream = $request->get('stream', 0);
+        $stream = $request->attributes->all()['stream'] ?? $request->query->all()['stream'] ?? $request->request->all()['stream'] ?? 0;
 
         if (!$stream) {
             $response->headers->set('Content-Disposition', 'attachment;filename="'.$themeName.'.zip"');

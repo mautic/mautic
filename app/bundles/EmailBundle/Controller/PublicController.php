@@ -153,12 +153,12 @@ final class PublicController extends CommonFormController
         $lead                   = null;
         $template               = null;
         $session                = $request->getSession();
-        $isOneClickUnsubscribe  = $request->isMethod(Request::METHOD_POST) && 'One-Click' === $request->get('List-Unsubscribe');
-        $isUnsubscribeAll       = $request->get('unsubscribe_all');
+        $isOneClickUnsubscribe  = $request->isMethod(Request::METHOD_POST) && 'One-Click' === ($request->attributes->all()['List-Unsubscribe'] ?? $request->query->all()['List-Unsubscribe'] ?? $request->request->all()['List-Unsubscribe'] ?? null);
+        $isUnsubscribeAll       = $request->attributes->all()['unsubscribe_all'] ?? $request->query->all()['unsubscribe_all'] ?? $request->request->all()['unsubscribe_all'] ?? null;
         $showContactPreferences = $this->coreParametersHelper->get('show_contact_preferences');
         $isHeadRequest          = $request->isMethod(Request::METHOD_HEAD);
 
-        if ($request->isMethod(Request::METHOD_POST) && 'One-Click' === $request->get('List-Unsubscribe')) {
+        if ($request->isMethod(Request::METHOD_POST) && 'One-Click' === ($request->attributes->all()['List-Unsubscribe'] ?? $request->query->all()['List-Unsubscribe'] ?? $request->request->all()['List-Unsubscribe'] ?? null)) {
             return $this->oneClickUnsubscribe($model, $stat);
         }
 

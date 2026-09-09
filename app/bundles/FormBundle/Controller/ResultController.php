@@ -193,7 +193,7 @@ final class ResultController extends CommonFormController
                     'page'           => $page,
                     'totalCount'     => $count,
                     'limit'          => $limit,
-                    'tmpl'           => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                    'tmpl'           => $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index',
                     'canDelete'      => $this->security->hasEntityAccess(
                         'form:forms:editown',
                         'form:forms:editother',
@@ -368,8 +368,8 @@ final class ResultController extends CommonFormController
      */
     public function deleteAction(Request $request): Response
     {
-        $formId   = $request->get('formId', 0);
-        $objectId = $request->get('objectId', 0);
+        $formId   = $request->attributes->all()['formId'] ?? $request->query->all()['formId'] ?? $request->request->all()['formId'] ?? 0;
+        $objectId = $request->attributes->all()['objectId'] ?? $request->query->all()['objectId'] ?? $request->request->all()['objectId'] ?? 0;
         $session  = $request->getSession();
         $page     = $session->get('mautic.formresult.'.$formId.'.page', 1);
         $flashes  = [];
