@@ -239,7 +239,7 @@ final class MenuHelper
      */
     private function handleRequestChecks(string $name, $value): bool
     {
-        return $this->requestStack->getCurrentRequest()->get($name) == $value;
+        return ($this->requestStack->getCurrentRequest()->attributes->all()[$name] ?? $this->requestStack->getCurrentRequest()->query->all()[$name] ?? $this->requestStack->getCurrentRequest()->request->all()[$name] ?? null) == $value;
     }
 
     /**

@@ -179,16 +179,16 @@ final class SsoAuthenticator extends AbstractAuthenticator implements Interactiv
     private function getCredentials(Request $request): array
     {
         $credentials               = [];
-        $credentials['csrf_token'] = $request->get($this->options['csrf_parameter']);
+        $credentials['csrf_token'] = $request->attributes->all()[$this->options['csrf_parameter']] ?? $request->query->all()[$this->options['csrf_parameter']] ?? $request->request->all()[$this->options['csrf_parameter']] ?? null;
 
         if ($this->options['post_only']) {
             $credentials['username']    = $request->request->get($this->options['username_parameter']);
             $credentials['password']    = $request->request->get($this->options['password_parameter']) ?? '';
             $credentials['integration'] = $request->request->get($this->options['integration_parameter']);
         } else {
-            $credentials['username']    = $request->get($this->options['username_parameter']);
-            $credentials['password']    = $request->get($this->options['password_parameter']) ?? '';
-            $credentials['integration'] = $request->get($this->options['integration_parameter']);
+            $credentials['username']    = $request->attributes->all()[$this->options['username_parameter']] ?? $request->query->all()[$this->options['username_parameter']] ?? $request->request->all()[$this->options['username_parameter']] ?? null;
+            $credentials['password']    = ($request->attributes->all()[$this->options['password_parameter']] ?? $request->query->all()[$this->options['password_parameter']] ?? $request->request->all()[$this->options['password_parameter']] ?? null) ?? '';
+            $credentials['integration'] = $request->attributes->all()[$this->options['integration_parameter']] ?? $request->query->all()[$this->options['integration_parameter']] ?? $request->request->all()[$this->options['integration_parameter']] ?? null;
         }
 
         if (!\is_string($credentials['username'])) {
