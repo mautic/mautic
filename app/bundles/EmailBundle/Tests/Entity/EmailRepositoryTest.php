@@ -12,6 +12,7 @@ use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class EmailRepositoryTest extends TestCase
@@ -36,6 +37,9 @@ final class EmailRepositoryTest extends TestCase
             default                                       => $id,
         });
         $this->repo->autowireCommonRepository($translator);
+
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->repo->autowireDispatcher($dispatcher);
     }
 
     /**
