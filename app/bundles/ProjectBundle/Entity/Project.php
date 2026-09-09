@@ -41,6 +41,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     ]
 )]
 #[UniqueName]
+#[ORM\Entity]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Project extends FormEntity implements UuidInterface
 {
     use UuidTrait;
@@ -48,19 +50,25 @@ class Project extends FormEntity implements UuidInterface
     public const TABLE_NAME = 'projects';
 
     #[Groups(['project:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private ?int $id = null;
 
     #[Groups(['project:read', 'project:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = null;
 
     #[Groups(['project:read', 'project:write'])]
     #[NotBlank(message: 'mautic.core.name.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     private ?string $name = null;
 
     /**
      * @var mixed[]
      */
     #[Groups(['project:read', 'project:write'])]
+    #[ORM\Column(type: Types::JSON)]
     private array $properties = [];
 
     /**
@@ -83,12 +91,6 @@ class Project extends FormEntity implements UuidInterface
         $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(ProjectRepository::class)
             ->addUniqueConstraint(['name'], 'unique_project_name');
-
-        $builder->addIdColumns();
-
-        $builder->addField('properties', Types::JSON);
-
-        static::addUuidField($builder);
     }
 
     public static function loadApiMetadata(ApiMetadataDriver $metadata): void

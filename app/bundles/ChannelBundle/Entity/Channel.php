@@ -39,6 +39,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[ORM\Entity]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Channel extends CommonEntity implements UuidInterface
 {
     use UuidTrait;
@@ -47,18 +49,23 @@ class Channel extends CommonEntity implements UuidInterface
      * @var int
      */
     #[Groups(['channel:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
      * @var string
      */
     #[Groups(['channel:read', 'channel:write', 'message:read'])]
+    #[ORM\Column(type: 'string', length: 191)]
     private $channel;
 
     /**
      * @var int|null
      */
     #[Groups(['channel:read', 'channel:write'])]
+    #[ORM\Column(name: 'channel_id', type: 'integer', nullable: true)]
     private $channelId;
 
     /**
@@ -77,12 +84,14 @@ class Channel extends CommonEntity implements UuidInterface
      * @var array
      */
     #[Groups(['channel:read', 'channel:write'])]
+    #[ORM\Column(type: Types::JSON)]
     private $properties = [];
 
     /**
      * @var bool
      */
     #[Groups(['channel:read', 'channel:write', 'message:read'])]
+    #[ORM\Column(name: 'is_enabled', type: 'boolean')]
     private $isEnabled = false;
 
     public static function loadMetadata(ClassMetadata $metadata): void
@@ -94,22 +103,11 @@ class Channel extends CommonEntity implements UuidInterface
                 ->addIndex(['channel', 'is_enabled'], 'channel_enabled_index')
                 ->addUniqueConstraint(['message_id', 'channel'], 'channel_index');
 
-        $builder
-            ->addId()
-            ->addField('channel', 'string')
-            ->addNamedField('channelId', 'integer', 'channel_id', true)
-            ->addField('properties', Types::JSON)
-            ->createField('isEnabled', 'boolean')
-                ->columnName('is_enabled')
-                ->build();
-
         $builder->createManyToOne('message', Message::class)
                 ->addJoinColumn('message_id', 'id', false, false, 'CASCADE')
                 ->inversedBy('channels')
                 ->isOwnershipParent()
                 ->build();
-
-        static::addUuidField($builder);
     }
 
     /**

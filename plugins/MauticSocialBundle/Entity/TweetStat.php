@@ -163,9 +163,6 @@ class TweetStat
         $this->tweet = $tweet;
     }
 
-    /**
-     * @return TheLead
-     */
     public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;

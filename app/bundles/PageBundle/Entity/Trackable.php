@@ -61,9 +61,6 @@ class Trackable
             ->build();
     }
 
-    /**
-     * @return Redirect
-     */
     public function getRedirect(): ?\Mautic\PageBundle\Entity\Redirect
     {
         return $this->redirect;

@@ -55,6 +55,12 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[ORM\Entity(repositoryClass: DynamicContentRepository::class)]
+#[ORM\Table(name: 'dynamic_content')]
+#[ORM\Index(columns: ['is_campaign_based'], name: 'is_campaign_based_index')]
+#[ORM\Index(columns: ['slot_name'], name: 'slot_name_index')]
+#[ORM\HasLifecycleCallbacks]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 /**
  * @use TranslationEntityTrait<DynamicContent>
  * @use VariantEntityTrait<DynamicContent>
@@ -66,6 +72,12 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     use FiltersEntityTrait;
     use UuidTrait;
     use ProjectTrait;
+    #[ORM\ManyToMany(targetEntity: \Mautic\ProjectBundle\Entity\Project::class, cascade: ['merge', 'persist', 'detach'], fetch: 'LAZY', indexBy: 'name')]
+    #[ORM\JoinTable(name: 'dynamic_content_projects_xref')]
+    #[ORM\JoinColumn(name: 'dynamic_content_id', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'project_id', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\OrderBy(['name' => 'ASC'])]
+    private \Doctrine\Common\Collections\Collection $projects;
 
     public const ENTITY_NAME = 'dynamic_content';
 
@@ -73,66 +85,81 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
      * @var int
      */
     #[Groups(['dynamicContent:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
+    #[ORM\Column(type: 'string', length: 191)]
     private ?string $name = null;
 
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
     private string $type = TypeList::HTML;
 
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = null;
 
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
+    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['merge', 'detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
     private ?Category $category = null;
 
     /**
      * @var \DateTimeInterface
      */
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
+    #[ORM\Column(name: 'publish_up', type: 'datetime', nullable: true)]
     private $publishUp;
 
     /**
      * @var \DateTimeInterface
      */
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
+    #[ORM\Column(name: 'publish_down', type: 'datetime', nullable: true)]
     private $publishDown;
 
     /**
      * @var string|null
      */
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $content;
 
     /**
      * @var array|null
      */
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
+    #[ORM\Column(name: 'utm_tags', type: Types::JSON, nullable: true)]
     private $utmTags = [];
 
     /**
      * @var int
      */
     #[Groups(['dynamicContent:read'])]
+    #[ORM\Column(name: 'sent_count', type: 'integer')]
     private $sentCount = 0;
 
     /**
      * @var ArrayCollection<Stat>
      */
     #[Groups(['dynamicContent:read'])]
+    #[ORM\OneToMany(mappedBy: 'dynamicContent', targetEntity: 'Stat', cascade: ['persist'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
     private $stats;
 
     /**
      * @var bool
      */
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
+    #[ORM\Column(name: 'is_campaign_based', type: 'boolean', options: ['default' => 1])]
     private $isCampaignBased = true;
 
     /**
      * @var string|null
      */
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
+    #[ORM\Column(name: 'slot_name', type: 'string', length: 191, nullable: true)]
     private $slotName;
 
     public function __construct()
@@ -163,17 +190,6 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('dynamic_content')
-            ->addIndex(['is_campaign_based'], 'is_campaign_based_index')
-            ->addIndex(['slot_name'], 'slot_name_index')
-            ->setCustomRepositoryClass(DynamicContentRepository::class)
-            ->addLifecycleEvent('cleanSlotName', Events::prePersist)
-            ->addLifecycleEvent('cleanSlotName', Events::preUpdate);
-
-        $builder->addIdColumns();
-
-        $builder->addCategory();
-
         $builder->addField(
             'type',
             Types::STRING,
@@ -183,45 +199,9 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
             ]
         );
 
-        $builder->addPublishDates();
-
-        $builder->createField('sentCount', 'integer')
-            ->columnName('sent_count')
-            ->build();
-
-        $builder->createField('content', 'text')
-            ->columnName('content')
-            ->nullable()
-            ->build();
-
-        $builder->createField('utmTags', Types::JSON)
-            ->columnName('utm_tags')
-            ->nullable()
-            ->build();
-
-        $builder->createOneToMany('stats', 'Stat')
-            ->setIndexBy('id')
-            ->mappedBy('dynamicContent')
-            ->cascadePersist()
-            ->fetchExtraLazy()
-            ->build();
-
         self::addTranslationMetadata($builder, self::class);
         self::addVariantMetadata($builder, self::class);
         self::addFiltersMetadata($builder);
-
-        $builder->createField('isCampaignBased', 'boolean')
-                ->columnName('is_campaign_based')
-                ->option('default', 1)
-                ->build();
-
-        $builder->createField('slotName', 'string')
-                ->columnName('slot_name')
-                ->nullable()
-                ->build();
-
-        static::addUuidField($builder);
-        self::addProjectsField($builder, 'dynamic_content_projects_xref', 'dynamic_content_id');
     }
 
     /**
@@ -495,6 +475,8 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     /**
      * Lifecycle callback to clear the slot name if is_campaign is true.
      */
+    #[ORM\PrePersist]
+    #[ORM\PreUpdate]
     public function cleanSlotName(): void
     {
         if ($this->isCampaignBased) {

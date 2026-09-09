@@ -484,9 +484,6 @@ class VideoHit
         return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getChannelId(): ?int
     {
         return $this->channelId;
@@ -502,9 +499,6 @@ class VideoHit
         return $this;
     }
 
-    /**
-     * @return Redirect
-     */
     public function getRedirect(): ?\Mautic\PageBundle\Entity\Redirect
     {
         return $this->redirect;

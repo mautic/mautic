@@ -42,9 +42,6 @@ class FailedLeadEventLog
             ->build();
     }
 
-    /**
-     * @return LeadEventLog
-     */
     public function getLog(): ?\Mautic\CampaignBundle\Entity\LeadEventLog
     {
         return $this->log;

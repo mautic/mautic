@@ -45,9 +45,6 @@ class MergeRecord
         return $this->id;
     }
 
-    /**
-     * @return Lead
-     */
     public function getContact(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->contact;
@@ -95,9 +92,6 @@ class MergeRecord
         return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getMergedId(): ?int
     {
         return $this->mergedId;

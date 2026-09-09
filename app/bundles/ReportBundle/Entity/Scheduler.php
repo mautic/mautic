@@ -6,7 +6,6 @@ namespace Mautic\ReportBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: SchedulerRepository::class)]
 #[ORM\Table(name: 'reports_schedulers')]

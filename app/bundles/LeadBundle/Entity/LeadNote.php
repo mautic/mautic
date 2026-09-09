@@ -112,9 +112,6 @@ class LeadNote extends FormEntity
     /**
      * Form validation rules.
      */
-    /**
-     * @return Lead
-     */
     public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;

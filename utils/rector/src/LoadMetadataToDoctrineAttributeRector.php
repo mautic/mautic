@@ -48,6 +48,12 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
      */
     private const int DEFAULT_STRING_LENGTH = 191;
 
+    private bool $isHybrid = false;
+
+    private bool $hybridHasTable = false;
+
+    private bool $hybridEntityHasRepositoryClass = false;
+
     /**
      * @var string[]
      */
@@ -82,13 +88,16 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
             return null;
         }
 
-        // A class already carrying ORM mapping attributes is dual-mapped; merging the
-        // generated attributes would duplicate them. Leave it untouched.
-        if ($this->hasOrmMappingAttribute($node->attrGroups)) {
-            return null;
-        }
+        // A class may already carry ORM attributes on its properties while class-level and
+        // lifecycle mapping stays in loadMetadata. In that hybrid state we convert the leftover
+        // calls and merge the generated attributes into the existing ones instead of duplicating.
+        $this->isHybrid                       = $this->hasOrmMappingAttribute($node->attrGroups);
+        $this->hybridHasTable                 = $this->hasAttributeNamed($node->attrGroups, 'Table');
+        $this->hybridEntityHasRepositoryClass = $this->entityHasRepositoryClass($node->attrGroups);
 
+        fwrite(STDERR, "\nDEBUG PageDraft: class=".$node->name?->toString()." isHybrid=".var_export($this->isHybrid, true)." hasTable=".var_export($this->hybridHasTable, true)." hasRepo=".var_export($this->hybridEntityHasRepositoryClass, true)."\n");
         $result = $this->interpret($loadMetadata->stmts, $node);
+        fwrite(STDERR, 'DEBUG PageDraft: interpret='.(null === $result ? 'NULL' : 'ok')."\n");
         if (null === $result) {
             return null;
         }
@@ -106,7 +115,11 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
             $method->attrGroups = array_merge($method->attrGroups, $attributeGroups);
         }
 
-        $node->attrGroups = array_merge($node->attrGroups, $classAttributes);
+        if ($this->isHybrid) {
+            $this->mergeClassAttributes($node, $classAttributes);
+        } else {
+            $node->attrGroups = array_merge($node->attrGroups, $classAttributes);
+        }
 
         if ([] === $keptStatements) {
             // Everything converted: drop loadMetadata entirely.
@@ -234,6 +247,11 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
 
         // self::addUuidField($builder) and friends.
         if ($expr instanceof StaticCall) {
+            // Hybrid classes already map their fields via attributes; leave field helpers behind.
+            if ($this->isHybrid) {
+                return null;
+            }
+
             // self::addProjectsField($builder, $table, $column): emit a standalone projects property.
             $projectsProperty = $this->tryProjectsField($expr);
             if ($projectsProperty instanceof Property) {
@@ -301,6 +319,11 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
                 }
 
                 continue;
+            }
+
+            // Hybrid classes already map their fields via attributes; leave field chains behind.
+            if ($this->isHybrid) {
+                return null;
             }
 
             $fields = $this->handleFieldChain($segmentCalls);
@@ -455,7 +478,8 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
     }
 
     /**
-     * Flattens $builder->a()->b()->c() into [a, b, c]; null when not rooted at $builder.
+     * Flattens $builder->a()->b()->c() into [a, b, c]; null when the chain is not rooted at a
+     * variable. The builder may be held under any name, so we do not require it to be $builder.
      *
      * @return list<MethodCall>|null
      */
@@ -469,7 +493,7 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
             $current = $current->var;
         }
 
-        if (!$current instanceof Variable || !$this->isName($current, 'builder')) {
+        if (!$current instanceof Variable) {
             return null;
         }
 
@@ -494,11 +518,21 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
                         return null;
                     }
 
+                    // Already mapped by an existing #[ORM\Table]: keep the call for a follow-up.
+                    if ($this->isHybrid && $this->hybridHasTable) {
+                        return null;
+                    }
+
                     $attributes[] = $this->attribute('Table', [$this->namedArg('name', $call->args[0]->value)]);
                     break;
 
                 case 'setCustomRepositoryClass':
                     if (!isset($call->args[0]) || !$call->args[0] instanceof Arg) {
+                        return null;
+                    }
+
+                    // Already declared on the existing #[ORM\Entity]: keep the call for a follow-up.
+                    if ($this->isHybrid && $this->hybridEntityHasRepositoryClass) {
                         return null;
                     }
 
@@ -529,7 +563,7 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
 
                 case 'addLifecycleEvent':
                     $methodName = $this->stringArg($call, 0);
-                    $event      = $this->stringArg($call, 1);
+                    $event      = $this->lifecycleEventArg($call, 1);
                     if (null === $methodName || null === $event) {
                         return null;
                     }
@@ -563,6 +597,32 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
             'preFlush'    => 'PreFlush',
             default       => null,
         };
+    }
+
+    /**
+     * The event name argument of addLifecycleEvent(): a string literal or a Doctrine Events::*
+     * constant, whose constant name equals the event string (Events::preUpdate === 'preUpdate').
+     */
+    private function lifecycleEventArg(MethodCall $call, int $index): ?string
+    {
+        $string = $this->stringArg($call, $index);
+        if (null !== $string) {
+            return $string;
+        }
+
+        if (!isset($call->args[$index]) || !$call->args[$index] instanceof Arg) {
+            return null;
+        }
+
+        $value = $call->args[$index]->value;
+        if ($value instanceof ClassConstFetch
+            && $value->class instanceof Name && 'Events' === $value->class->getLast()
+            && $value->name instanceof Identifier
+        ) {
+            return $value->name->toString();
+        }
+
+        return null;
     }
 
     /**
@@ -1740,6 +1800,112 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
         }
 
         return false;
+    }
+
+    /**
+     * The short name of an attribute (Entity, Table, ...), stripped of the ORM\ or FQCN prefix.
+     */
+    private function attributeShortName(Attribute $attr): string
+    {
+        return $attr->name->getLast();
+    }
+
+    /**
+     * @param AttributeGroup[] $attrGroups
+     */
+    private function hasAttributeNamed(array $attrGroups, string $shortName): bool
+    {
+        foreach ($attrGroups as $attrGroup) {
+            foreach ($attrGroup->attrs as $attr) {
+                if ($shortName === $this->attributeShortName($attr)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param AttributeGroup[] $attrGroups
+     * @param string[]         $shortNames
+     */
+    private function findAttribute(array $attrGroups, array $shortNames): ?Attribute
+    {
+        foreach ($attrGroups as $attrGroup) {
+            foreach ($attrGroup->attrs as $attr) {
+                if (in_array($this->attributeShortName($attr), $shortNames, true)) {
+                    return $attr;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param AttributeGroup[] $attrGroups
+     */
+    private function entityHasRepositoryClass(array $attrGroups): bool
+    {
+        $entity = $this->findAttribute($attrGroups, ['Entity']);
+        if (!$entity instanceof Attribute) {
+            return false;
+        }
+
+        foreach ($entity->args as $arg) {
+            if ($arg instanceof Arg && $arg->name instanceof Identifier && 'repositoryClass' === $arg->name->toString()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Folds generated class attributes into the ones the class already carries: the repositoryClass
+     * merges into the existing #[ORM\Entity], and only attributes not yet present are appended,
+     * right after the root attribute for a tidy block.
+     *
+     * @param list<AttributeGroup> $generated
+     */
+    private function mergeClassAttributes(Class_ $node, array $generated): void
+    {
+        $existingRoot = $this->findAttribute($node->attrGroups, ['Entity', 'MappedSuperclass']);
+
+        $toAppend = [];
+        foreach ($generated as $attributeGroup) {
+            $attr      = $attributeGroup->attrs[0];
+            $shortName = $this->attributeShortName($attr);
+
+            if (in_array($shortName, ['Entity', 'MappedSuperclass'], true)) {
+                if ($existingRoot instanceof Attribute) {
+                    $existingRoot->args = array_merge($existingRoot->args, $attr->args);
+                }
+
+                continue;
+            }
+
+            if ($this->hasAttributeNamed($node->attrGroups, $shortName)) {
+                continue;
+            }
+
+            $toAppend[] = $attributeGroup;
+        }
+
+        if ([] === $toAppend) {
+            return;
+        }
+
+        foreach ($node->attrGroups as $index => $attrGroup) {
+            if (in_array($this->attributeShortName($attrGroup->attrs[0]), ['Entity', 'MappedSuperclass'], true)) {
+                array_splice($node->attrGroups, $index + 1, 0, $toAppend);
+
+                return;
+            }
+        }
+
+        $node->attrGroups = array_merge($node->attrGroups, $toAppend);
     }
 
     private function findProperty(Class_ $class, string $name): Property|Param|null

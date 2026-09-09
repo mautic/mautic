@@ -46,6 +46,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 )]
 #[LeadFieldMinimumLength]
 #[UniqueEntity(fields: ['alias'], message: 'mautic.lead.field.alias.unique')]
+#[ORM\Entity(repositoryClass: LeadFieldRepository::class)]
+#[ORM\Table(name: 'lead_fields')]
+#[ORM\Index(columns: ['object', 'field_order', 'is_published'], name: 'idx_object_field_order_is_published')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInterface
 {
     use UuidTrait;
@@ -68,6 +72,9 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
      * @var int
      */
     #[Groups(['leadfield:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     private bool $isCloned = false;
@@ -78,72 +85,84 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     #[Groups(['leadfield:read', 'leadfield:write'])]
     #[Assert\NotBlank(message: 'mautic.lead.field.label.notblank')]
     #[Assert\Length(max: 191, maxMessage: 'mautic.lead.field.label.maxlength')]
+    #[ORM\Column(type: 'string', length: 191)]
     private $label;
 
     /**
      * @var string
      */
     #[Groups(['leadfield:read', 'leadfield:write'])]
+    #[ORM\Column(type: 'string', length: 191)]
     private $alias;
 
     /**
      * @var string
      */
     #[Groups(['leadfield:read', 'leadfield:write'])]
+    #[ORM\Column(type: 'string', length: 50)]
     private $type = 'text';
 
     /**
      * @var string|null
      */
     #[Groups(['leadfield:read', 'leadfield:write'])]
+    #[ORM\Column(name: 'field_group', type: 'string', length: 191, nullable: true)]
     private $group = 'core';
 
     /**
      * @var string|null
      */
     #[Groups(['leadfield:read', 'leadfield:write'])]
+    #[ORM\Column(name: 'default_value', type: 'string', length: 191, nullable: true)]
     private $defaultValue;
 
     /**
      * @var bool
      */
     #[Groups(['leadfield:read', 'leadfield:write'])]
+    #[ORM\Column(name: 'is_required', type: 'boolean')]
     private $isRequired = false;
 
     /**
      * @var bool
      */
     #[Groups(['leadfield:read', 'leadfield:write'])]
+    #[ORM\Column(name: 'is_fixed', type: 'boolean')]
     private $isFixed = false;
 
     /**
      * @var bool
      */
     #[Groups(['leadfield:read', 'leadfield:write'])]
+    #[ORM\Column(name: 'is_visible', type: 'boolean')]
     private $isVisible = true;
 
     /**
      * @var bool
      */
     #[Groups(['leadfield:read', 'leadfield:write'])]
+    #[ORM\Column(name: 'is_short_visible', type: 'boolean', options: ['default' => false])]
     private $isShortVisible = false;
 
     /**
      * @var bool
      */
     #[Groups(['leadfield:read', 'leadfield:write'])]
+    #[ORM\Column(name: 'is_listable', type: 'boolean')]
     private $isListable = true;
 
     /**
      * @var bool
      */
     #[Groups(['leadfield:read', 'leadfield:write'])]
+    #[ORM\Column(name: 'is_publicly_updatable', type: 'boolean')]
     private $isPubliclyUpdatable = false;
 
     /**
      * @var bool|null
      */
     #[Groups(['leadfield:read', 'leadfield:write'])]
+    #[ORM\Column(name: 'is_unique_identifer', type: 'boolean', nullable: true)]
     private $isUniqueIdentifer = false;
 
     /**
@@ -155,27 +174,32 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     private $isUniqueIdentifier = false;
 
     #[Groups(['leadfield:read', 'leadfield:write'])]
+    #[ORM\Column(name: 'char_length_limit', type: 'integer', nullable: true)]
     private ?int $charLengthLimit = 64;
 
     /**
      * @var int|null
      */
     #[Groups(['leadfield:read', 'leadfield:write'])]
+    #[ORM\Column(name: 'field_order', type: 'integer', nullable: true)]
     private $order = 1;
 
     /**
      * @var string|null
      */
     #[Groups(['leadfield:read', 'leadfield:write'])]
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $object = 'lead';
 
     /**
      * @var array
      */
     #[Groups(['leadfield:read', 'leadfield:write'])]
+    #[ORM\Column(type: 'array', nullable: true)]
     private $properties = [];
 
     #[Groups(['leadfield:read', 'leadfield:write'])]
+    #[ORM\Column(name: 'is_index', type: 'boolean', options: ['default' => false])]
     private bool $isIndex = false;
 
     /**
@@ -183,12 +207,14 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
      * Entity cannot be published and we cannot work with it until column is created.
      */
     #[Groups(['leadfield:read'])]
+    #[ORM\Column(name: 'column_is_not_created', type: 'boolean', options: ['default' => false])]
     private bool $columnIsNotCreated = false;
 
     /**
      * The column in lead_fields table was not removed yet if this property is true.
      */
     #[Groups(['leadfield:read'])]
+    #[ORM\Column(name: 'column_is_not_removed', type: Types::BOOLEAN, options: ['default' => false])]
     private bool $columnIsNotRemoved = false;
 
     /**
@@ -196,6 +222,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
      * $isPublished is always set on false if $columnIsNotCreated is true.
      */
     #[Groups(['leadfield:read'])]
+    #[ORM\Column(name: 'original_is_published_value', type: 'boolean', options: ['default' => false])]
     private bool $originalIsPublishedValue = false;
 
     /**
@@ -217,99 +244,6 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->addLifecycleEvent('identifierWorkaround', 'postLoad');
-
-        $builder->setTable('lead_fields')
-            ->setCustomRepositoryClass(LeadFieldRepository::class)
-            ->addIndex(['object', 'field_order', 'is_published'], 'idx_object_field_order_is_published');
-
-        $builder->addId();
-
-        $builder->addField('label', 'string');
-
-        $builder->addField('alias', 'string');
-
-        $builder->createField('type', 'string')
-            ->length(50)
-            ->build();
-
-        $builder->createField('group', 'string')
-            ->columnName('field_group')
-            ->nullable()
-            ->build();
-
-        $builder->createField('defaultValue', 'string')
-            ->columnName('default_value')
-            ->nullable()
-            ->build();
-
-        $builder->createField('isRequired', 'boolean')
-            ->columnName('is_required')
-            ->build();
-
-        $builder->createField('isFixed', 'boolean')
-            ->columnName('is_fixed')
-            ->build();
-
-        $builder->createField('isVisible', 'boolean')
-            ->columnName('is_visible')
-            ->build();
-
-        $builder->createField('isShortVisible', 'boolean')
-            ->columnName('is_short_visible')
-            ->nullable(false)
-            ->option('default', false)
-            ->build();
-
-        $builder->createField('isListable', 'boolean')
-            ->columnName('is_listable')
-            ->build();
-
-        $builder->createField('isPubliclyUpdatable', 'boolean')
-            ->columnName('is_publicly_updatable')
-            ->build();
-
-        $builder->addNullableField('isUniqueIdentifer', 'boolean', 'is_unique_identifer');
-
-        $builder->createField('isIndex', 'boolean')
-            ->columnName('is_index')
-            ->option('default', false)
-            ->nullable(false)
-            ->build();
-
-        $builder->createField('charLengthLimit', 'integer')
-            ->columnName('char_length_limit')
-            ->nullable()
-            ->build();
-
-        $builder->createField('order', 'integer')
-            ->columnName('field_order')
-            ->nullable()
-            ->build();
-
-        $builder->createField('object', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('properties', 'array')
-            ->nullable()
-            ->build();
-
-        $builder->createField('columnIsNotCreated', 'boolean')
-            ->columnName('column_is_not_created')
-            ->option('default', false)
-            ->build();
-
-        $builder->createField('columnIsNotRemoved', Types::BOOLEAN)
-            ->columnName('column_is_not_removed')
-            ->option('default', false)
-            ->build();
-
-        $builder->createField('originalIsPublishedValue', 'boolean')
-            ->columnName('original_is_published_value')
-            ->option('default', false)
-            ->build();
-
-        static::addUuidField($builder);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void

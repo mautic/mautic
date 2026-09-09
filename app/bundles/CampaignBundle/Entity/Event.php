@@ -42,6 +42,12 @@ use Symfony\Component\Serializer\Attribute\Groups;
     ]
 )]
 #[EntityEvent]
+#[ORM\Entity(repositoryClass: EventRepository::class)]
+#[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\Index(columns: ['type', 'event_type'], name: 'campaign_event_search')]
+#[ORM\Index(columns: ['event_type'], name: 'campaign_event_type')]
+#[ORM\Index(columns: ['channel', 'channel_id'], name: 'campaign_event_channel')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Event implements ChannelInterface, UuidInterface
 {
     use UuidTrait;
@@ -75,93 +81,111 @@ class Event implements ChannelInterface, UuidInterface
      * @var int
      */
     #[Groups(['event:read', 'campaign:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
      * @var string
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var string|null
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
      * @var string
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(type: 'string', length: 50)]
     private $type;
 
     /**
      * @var string
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'event_type', type: 'string', length: 50)]
     private $eventType;
 
     /**
      * @var int
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'event_order', type: 'integer')]
     private $order = 0;
 
     /**
      * @var array
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(type: 'array')]
     private $properties = [];
 
     /**
      * @var \DateTimeInterface|null
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'trigger_date', type: 'datetime', nullable: true)]
     private $triggerDate;
 
     /**
      * @var int|null
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'trigger_interval', type: 'integer', nullable: true)]
     private $triggerInterval = 0;
 
     /**
      * @var string|null
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'trigger_interval_unit', type: 'string', length: 1, nullable: true)]
     private $triggerIntervalUnit;
 
     /**
      * @var \DateTimeInterface|null
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'trigger_hour', type: 'time', nullable: true)]
     private $triggerHour;
 
     /**
      * @var \DateTimeInterface|null
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'trigger_restricted_start_hour', type: 'time', nullable: true)]
     private $triggerRestrictedStartHour;
 
     /**
      * @var \DateTimeInterface|null
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'trigger_restricted_stop_hour', type: 'time', nullable: true)]
     private $triggerRestrictedStopHour;
 
     /**
      * @var array|null
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'trigger_restricted_dow', type: 'array', nullable: true)]
     private $triggerRestrictedDaysOfWeek = [];
 
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'trigger_window', type: 'integer', nullable: true)]
     private ?int $triggerWindow = null;
 
     /**
      * @var string|null
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'trigger_mode', type: 'string', length: 10, nullable: true)]
     private $triggerMode;
 
     /**
@@ -174,28 +198,35 @@ class Event implements ChannelInterface, UuidInterface
      * @var ArrayCollection<int, Event>
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\OneToMany(mappedBy: 'parent', targetEntity: 'Event', indexBy: 'id')]
+    #[ORM\OrderBy(['order' => 'ASC'])]
     private $children;
 
     /**
      * @var Event|null
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\ManyToOne(targetEntity: 'Event', cascade: ['persist'], inversedBy: 'children')]
+    #[ORM\JoinColumn(name: 'parent_id')]
     private $parent;
 
     /**
      * @var string|null
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'decision_path', type: 'string', length: 191, nullable: true)]
     private $decisionPath;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'temp_id', type: 'string', length: 191, nullable: true)]
     private $tempId;
 
     /**
      * @var ArrayCollection<int, LeadEventLog>
      */
+    #[ORM\OneToMany(mappedBy: 'event', targetEntity: 'LeadEventLog', cascade: ['persist'], fetch: 'EXTRA_LAZY')]
     private $log;
 
     /**
@@ -210,25 +241,32 @@ class Event implements ChannelInterface, UuidInterface
      * @var string|null
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $channel;
 
     /**
      * @var string|null
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'channel_id', type: Types::STRING, length: 64, nullable: true)]
     private $channelId;
 
     private array $changes = [];
 
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $deleted = null;
 
+    #[ORM\Column(name: 'failed_count', type: 'integer')]
     private int $failedCount = 0;
 
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\ManyToOne(targetEntity: 'Event', cascade: ['persist'])]
+    #[ORM\JoinColumn(name: 'redirect_event_id', onDelete: 'SET NULL')]
     private ?Event $redirectEvent = null;
 
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'date_linked', type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTime $dateLinked = null;
 
     /**
@@ -236,6 +274,7 @@ class Event implements ChannelInterface, UuidInterface
      *
      * @var ArrayCollection<int, Event>
      */
+    #[ORM\OneToMany(mappedBy: 'redirectEvent', targetEntity: 'Event', fetch: 'EXTRA_LAZY')]
     private Collection $redirectingEvents;
 
     public function __construct(?\DateTime $dateAdded = null)
@@ -266,146 +305,15 @@ class Event implements ChannelInterface, UuidInterface
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(EventRepository::class)
-            ->addIndex(['type', 'event_type'], 'campaign_event_search')
-            ->addIndex(['event_type'], 'campaign_event_type')
-            ->addIndex(['channel', 'channel_id'], 'campaign_event_channel');
-
-        $builder->addIdColumns();
-
-        $builder->createField('type', 'string')
-            ->length(50)
-            ->build();
-
-        $builder->createField('eventType', 'string')
-            ->columnName('event_type')
-            ->length(50)
-            ->build();
-
-        $builder->createField('order', 'integer')
-            ->columnName('event_order')
-            ->build();
-
-        $builder->addField('properties', 'array');
-
-        $builder->addNullableField('deleted', 'datetime');
-
-        $builder->createManyToOne('redirectEvent', 'Event')
-            ->cascadePersist()
-            ->addJoinColumn('redirect_event_id', 'id', true, false, 'SET NULL')
-            ->build();
-
-        $builder->createOneToMany('redirectingEvents', 'Event')
-            ->mappedBy('redirectEvent')
-            ->fetchExtraLazy()
-            ->build();
-
-        $builder->createField('triggerDate', 'datetime')
-            ->columnName('trigger_date')
-            ->nullable()
-            ->build();
-
-        $builder->createField('triggerInterval', 'integer')
-            ->columnName('trigger_interval')
-            ->nullable()
-            ->build();
-
-        $builder->createField('triggerIntervalUnit', 'string')
-            ->columnName('trigger_interval_unit')
-            ->length(1)
-            ->nullable()
-            ->build();
-
-        $builder->createField('triggerHour', 'time')
-            ->columnName('trigger_hour')
-            ->nullable()
-            ->build();
-
-        $builder->createField('triggerRestrictedStartHour', 'time')
-            ->columnName('trigger_restricted_start_hour')
-            ->nullable()
-            ->build();
-
-        $builder->createField('triggerRestrictedStopHour', 'time')
-            ->columnName('trigger_restricted_stop_hour')
-            ->nullable()
-            ->build();
-
-        $builder->createField('triggerRestrictedDaysOfWeek', 'array')
-            ->columnName('trigger_restricted_dow')
-            ->nullable()
-            ->build();
-
-        $builder->createField('triggerWindow', 'integer')
-            ->columnName('trigger_window')
-            ->nullable()
-            ->build();
-
-        $builder->createField('triggerMode', 'string')
-            ->columnName('trigger_mode')
-            ->length(10)
-            ->nullable()
-            ->build();
-
         $builder->createManyToOne('campaign', 'Campaign')
             ->inversedBy('events')
             ->addJoinColumn('campaign_id', 'id', false, false, 'CASCADE')
             ->isOwnershipParent()
             ->build();
 
-        $builder->createOneToMany('children', 'Event')
-            ->setIndexBy('id')
-            ->setOrderBy(['order' => 'ASC'])
-            ->mappedBy('parent')
-            ->build();
-
-        $builder->createManyToOne('parent', 'Event')
-            ->inversedBy('children')
-            ->cascadePersist()
-            ->addJoinColumn('parent_id', 'id')
-            ->build();
-
-        $builder->createField('decisionPath', 'string')
-            ->columnName('decision_path')
-            ->nullable()
-            ->build();
-
-        $builder->createField('tempId', 'string')
-            ->columnName('temp_id')
-            ->nullable()
-            ->build();
-
-        $builder->createOneToMany('log', 'LeadEventLog')
-            ->mappedBy('event')
-            ->cascadePersist()
-            ->fetchExtraLazy()
-            ->build();
-
-        $builder->createField('channel', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('channelId', Types::STRING)
-            ->columnName('channel_id')
-            ->length(64)
-            ->nullable()
-            ->build();
-
-        $builder->createField('failedCount', 'integer')
-            ->columnName('failed_count')
-            ->build();
-
-        static::addUuidField($builder);
-
         $builder->createField('dateAdded', Types::DATETIME_MUTABLE)
             ->columnName('date_added')
             ->option('default', '1970-01-01 00:00:00')
-            ->build();
-
-        $builder->createField('dateLinked', Types::DATETIME_MUTABLE)
-            ->columnName('date_linked')
-            ->nullable()
             ->build();
     }
 

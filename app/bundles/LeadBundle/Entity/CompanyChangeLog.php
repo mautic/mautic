@@ -161,9 +161,6 @@ class CompanyChangeLog
         return $this;
     }
 
-    /**
-     * @return Lead
-     */
     public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;

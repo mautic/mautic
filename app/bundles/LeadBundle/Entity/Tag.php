@@ -92,9 +92,6 @@ class Tag implements UuidInterface
         return $this->id;
     }
 
-    /**
-     * @return string
-     */
     public function getTag(): ?string
     {
         return $this->tag;

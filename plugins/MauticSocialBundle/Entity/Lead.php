@@ -6,8 +6,6 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Table(name: 'monitoring_leads')]
 #[ORM\Entity(repositoryClass: LeadRepository::class)]
-#[ORM\Entity(repositoryClass: LeadRepository::class)]
-#[ORM\Table(name: 'monitoring_leads')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Lead
 {

@@ -9,48 +9,38 @@ use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
+#[ORM\Entity(repositoryClass: EmailDraftRepository::class)]
+#[ORM\Table(name: 'emails_draft')]
+#[ORM\HasLifecycleCallbacks]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class EmailDraft
 {
     /**
      * @api cannot be readonly as modified by external source
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private int $id;
 
     public function __construct(
+        #[ORM\OneToOne(inversedBy: 'draft', targetEntity: Email::class)]
+        #[ORM\JoinColumn(name: 'email_id', nullable: false)]
         private Email $email,
+        #[ORM\Column(type: Types::TEXT, nullable: true)]
         private ?string $html,
+        #[ORM\Column(type: Types::STRING, length: 191, nullable: true)]
         private ?string $template,
+        #[ORM\Column(name: 'public_preview', type: Types::BOOLEAN, options: ['default' => 1])]
         private ?bool $publicPreview = true,
     ) {
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable('emails_draft')
-            ->setCustomRepositoryClass(EmailDraftRepository::class)
-            ->addLifecycleEvent('cleanUrlsInContent', Events::preUpdate)
-            ->addLifecycleEvent('cleanUrlsInContent', Events::prePersist);
-
-        $builder->addId();
-        $builder->addNullableField('html', Types::TEXT);
-        $builder->addNullableField('template', Types::STRING);
-        $builder->createField('publicPreview', Types::BOOLEAN)
-            ->columnName('public_preview')
-            ->nullable(false)
-            ->option('default', 1)
-            ->build();
-
-        $builder->createOneToOne('email', Email::class)
-            ->inversedBy('draft')
-            ->addJoinColumn('email_id', 'id', false)
-            ->build();
     }
 
     /**
      * Lifecycle callback to clean URLs in the content.
      */
+    #[ORM\PreUpdate]
+    #[ORM\PrePersist]
     public function cleanUrlsInContent(): void
     {
         $this->decodeAmpersands($this->html);

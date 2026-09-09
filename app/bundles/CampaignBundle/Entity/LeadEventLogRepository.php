@@ -624,9 +624,9 @@ SQL;
             )
             ->setParameters(
                 [
-                    'contactId'     => (int) $contactId,
+                    'contactId'     => $contactId,
                     'campaignId'    => (int) $campaignId,
-                    'rotation'      => (int) $rotation,
+                    'rotation'      => $rotation,
                 ]
             )
             ->executeStatement();

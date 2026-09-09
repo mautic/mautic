@@ -125,17 +125,11 @@ class UtmTag
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
     public function getDateAdded(): ?\DateTimeInterface
     {
         return $this->dateAdded;
     }
 
-    /**
-     * @return Lead
-     */
     public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;

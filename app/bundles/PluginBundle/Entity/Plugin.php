@@ -8,6 +8,8 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 use Mautic\CoreBundle\Entity\CommonEntity;
 
+#[ORM\Entity]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Plugin extends CommonEntity implements CacheInvalidateInterface
 {
     public const DESCRIPTION_DELIMITER_REGEX = "/\R---\R/";
@@ -17,16 +19,21 @@ class Plugin extends CommonEntity implements CacheInvalidateInterface
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
@@ -42,26 +49,31 @@ class Plugin extends CommonEntity implements CacheInvalidateInterface
     /**
      * @var bool
      */
+    #[ORM\Column(name: 'is_missing', type: 'boolean')]
     private $isMissing = false;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 50)]
     private $bundle;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $version;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $author;
 
     /**
      * @var ArrayCollection<int, Integration>
      */
+    #[ORM\OneToMany(mappedBy: 'plugin', targetEntity: 'Integration', fetch: 'EXTRA_LAZY', indexBy: 'id')]
     private $integrations;
 
     public function __construct()
@@ -76,30 +88,6 @@ class Plugin extends CommonEntity implements CacheInvalidateInterface
         $builder->setTable('plugins')
             ->setCustomRepositoryClass(PluginRepository::class)
             ->addUniqueConstraint(['bundle'], 'unique_bundle');
-
-        $builder->addIdColumns();
-
-        $builder->createField('isMissing', 'boolean')
-            ->columnName('is_missing')
-            ->build();
-
-        $builder->createField('bundle', 'string')
-            ->length(50)
-            ->build();
-
-        $builder->createField('version', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('author', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createOneToMany('integrations', 'Integration')
-            ->setIndexBy('id')
-            ->mappedBy('plugin')
-            ->fetchExtraLazy()
-            ->build();
     }
 
     public function __clone()
