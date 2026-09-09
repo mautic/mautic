@@ -1998,12 +1998,14 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
             return null;
         }
 
-        $parentClass = $this->getName($class->extends);
-        if (null === $parentClass || !class_exists($parentClass)) {
+        // Reflect the entity itself so an inherited property's declared type resolves through the
+        // whole parent chain without having to resolve the parent's alias by hand.
+        $className = $this->getName($class);
+        if (null === $className || !class_exists($className)) {
             return null;
         }
 
-        $reflection = new \ReflectionClass($parentClass);
+        $reflection = new \ReflectionClass($className);
         if (!$reflection->hasProperty($propertyName)) {
             return null;
         }
