@@ -92,6 +92,15 @@ parameters:
             message: '#Property .+::\$variantParent type mapping mismatch: property can contain .+VariantEntityInterface\|null but database expects#'
             path: app/bundles/CoreBundle/Entity/VariantEntityTrait.php
             identifier: doctrine.associationType
+        # oAuth2 entities redeclare FOS parent properties whose declared types (interfaces, int) differ from the concrete Doctrine mapping
+        -
+            message: '#Property .+::\$(client|user) type mapping mismatch: property can contain .+but database expects#'
+            path: app/bundles/ApiBundle/Entity/oAuth2/*.php
+            identifier: doctrine.associationType
+        -
+            message: '#Property .+::\$expiresAt type mapping mismatch: database can contain string\|null but property expects int\|null#'
+            path: app/bundles/ApiBundle/Entity/oAuth2/*.php
+            identifier: doctrine.columnType
         # mocks
         - '#is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject#'
         - '#Call to an undefined method PHPUnit\\Framework\\MockObject\\MockObject#'
