@@ -4,7 +4,6 @@ namespace Mautic\PageBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
@@ -12,7 +11,13 @@ use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\PageBundle\Validator\PageHit;
 
 #[PageHit]
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: HitRepository::class)]
+#[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\Index(columns: ['tracking_id'], name: 'page_hit_tracking_search')]
+#[ORM\Index(columns: ['code'], name: 'page_hit_code_search')]
+#[ORM\Index(columns: ['source', 'source_id'], name: 'page_hit_source_search')]
+#[ORM\Index(columns: ['date_hit', 'date_left'], name: 'date_hit_left_index')]
+#[ORM\Index(columns: ['url'], name: 'page_hit_url', options: ['lengths' => [0 => 128]])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Hit
 {
@@ -169,19 +174,6 @@ class Hit
     #[ORM\ManyToOne(targetEntity: LeadDevice::class, cascade: ['persist'])]
     #[ORM\JoinColumn(name: 'device_id', onDelete: 'SET NULL')]
     private $device;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(HitRepository::class)
-            ->addIndex(['tracking_id'], 'page_hit_tracking_search')
-            ->addIndex(['code'], 'page_hit_code_search')
-            ->addIndex(['source', 'source_id'], 'page_hit_source_search')
-            ->addIndex(['date_hit', 'date_left'], 'date_hit_left_index')
-            ->addIndexWithOptions(['url'], 'page_hit_url', ['lengths' => [0 => 128]]);
-    }
 
     /**
      * Prepares the metadata for API usage.

@@ -57,7 +57,7 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
     /**
      * @var string[]
      */
-    private const array CLASS_LEVEL_METHODS = ['setTable', 'setCustomRepositoryClass', 'addIndex', 'addFulltextIndex', 'addUniqueConstraint'];
+    private const array CLASS_LEVEL_METHODS = ['setTable', 'setCustomRepositoryClass', 'addIndex', 'addFulltextIndex', 'addIndexWithOptions', 'addUniqueConstraint'];
 
     /**
      * @var string[]
@@ -564,6 +564,22 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
                     }
 
                     $attributes[] = $this->attribute('Index', $indexArgs);
+                    break;
+
+                case 'addIndexWithOptions':
+                    if (3 !== count($call->args) || !$call->args[0] instanceof Arg || !$call->args[1] instanceof Arg || !$call->args[2] instanceof Arg) {
+                        return null;
+                    }
+
+                    if (!$call->args[0]->value instanceof Array_ || !$call->args[2]->value instanceof Array_) {
+                        return null;
+                    }
+
+                    $attributes[] = $this->attribute('Index', [
+                        $this->namedArg('columns', $call->args[0]->value),
+                        $this->namedArg('name', $call->args[1]->value),
+                        $this->namedArg('options', $call->args[2]->value),
+                    ]);
                     break;
 
                 case 'addUniqueConstraint':

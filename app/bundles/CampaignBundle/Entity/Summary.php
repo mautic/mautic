@@ -6,7 +6,6 @@ namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: SummaryRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]

@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace Mautic\PageBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: PageDraftRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
