@@ -12,7 +12,6 @@ use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\PropertyFetch;
 use PhpParser\Node\Name;
-use PhpParser\Node\Scalar\String_;
 use PHPStan\Type\ObjectType;
 use Rector\Rector\AbstractRector;
 
@@ -26,7 +25,7 @@ use Rector\Rector\AbstractRector;
  * $request->get('key')        => $request->attributes->all()['key'] ?? $request->query->all()['key'] ?? $request->request->all()['key'] ?? null
  * $request->get('key', $d)    => $request->attributes->all()['key'] ?? $request->query->all()['key'] ?? $request->request->all()['key'] ?? $d
  *
- * Calls with a non-literal key are skipped and must be migrated manually.
+ * Dynamic keys are migrated the same way, keeping the existing behavior.
  */
 final class RequestGetToParameterBagsRector extends AbstractRector
 {
@@ -57,11 +56,6 @@ final class RequestGetToParameterBagsRector extends AbstractRector
 
         $keyExpr = $node->args[0]->value;
 
-        if (!$keyExpr instanceof String_) {
-            // Dynamic keys need a human to decide which bag(s) apply.
-            return null;
-        }
-
         $default = isset($node->args[1]) && $node->args[1] instanceof Arg
             ? $node->args[1]->value
             : new ConstFetch(new Name('null'));
@@ -78,7 +72,7 @@ final class RequestGetToParameterBagsRector extends AbstractRector
         );
     }
 
-    private function createBagArrayFetch(Node\Expr $requestExpr, string $bag, String_ $keyExpr): ArrayDimFetch
+    private function createBagArrayFetch(Node\Expr $requestExpr, string $bag, Node\Expr $keyExpr): ArrayDimFetch
     {
         return new ArrayDimFetch(
             new MethodCall(new PropertyFetch(clone $requestExpr, $bag), 'all'),
