@@ -3,6 +3,7 @@
 namespace Mautic\WebhookBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: LogRepository::class)]
 #[ORM\Table(name: 'webhook_logs')]
