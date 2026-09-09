@@ -10,9 +10,11 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\EventListener\EmailExportListEventSubscriber;
 use Mautic\EmailBundle\Helper\EmailMediaImageHelper;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
+#[AllowMockObjectsWithoutExpectations]
 final class EmailExportListEventSubscriberTest extends TestCase
 {
     private Filesystem $filesystem;
