@@ -251,6 +251,7 @@ parameters:
 rules:
     - Symplify\PHPStanRules\Rules\Complexity\NoJustPropertyAssignRule
     - Utils\PHPStan\Rule\AbstractClassNameMustBeAbstractRule
+    - Utils\PHPStan\Rule\NoStringTargetEntityRule
     - Utils\PHPStan\Rule\NoTablePrefixDefinitionInTestsRule
     - Utils\PHPStan\Rule\AutowireMethodNameMustMatchClassRule
     - Utils\PHPStan\Rule\NoGetModelWithStringInControllerRule
