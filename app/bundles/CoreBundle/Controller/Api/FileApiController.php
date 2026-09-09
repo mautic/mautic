@@ -169,9 +169,8 @@ final class FileApiController extends CommonApiController
      * Get the Media directory full file system path.
      *
      * @param string $dir
-     * @param bool   $createDir
      */
-    protected function getAbsolutePath(Request $request, PathsHelper $pathsHelper, $dir, $createDir = false): string
+    protected function getAbsolutePath(Request $request, PathsHelper $pathsHelper, $dir, bool $createDir = false): string
     {
         try {
             $possibleDirs = ['media', 'images'];

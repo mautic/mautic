@@ -30,9 +30,8 @@ class DoNotContactRepository extends CommonRepository
      * @param array<int,int|string>|int|null      $ids
      * @param int|null                            $reason
      * @param array<int,int|string>|int|true|null $listId
-     * @param bool                                $combined
      */
-    public function getCount($channel = null, $ids = null, $reason = null, $listId = null, ?ChartQuery $chartQuery = null, $combined = false): array|int
+    public function getCount($channel = null, $ids = null, $reason = null, $listId = null, ?ChartQuery $chartQuery = null, bool $combined = false): array|int
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 

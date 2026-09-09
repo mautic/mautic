@@ -94,7 +94,7 @@ class TrackableModel extends AbstractCommonModel
     public function generateTrackableUrl(
         Trackable $trackable,
         array $clickthrough = [],
-        $shortenUrl = false,
+        bool $shortenUrl = false,
         $utmTags = [],
     ) {
         $clickthrough['channel'] ??= [$trackable->getChannel() => $trackable->getChannelId()];
@@ -237,7 +237,7 @@ class TrackableModel extends AbstractCommonModel
      *
      * @return array{string|string[],Redirect[]|Trackable[]}
      */
-    public function parseContentForTrackables($content, array $contentTokens = [], ?string $channel = null, int|string|null $channelId = null, $usingClickthrough = true): array
+    public function parseContentForTrackables($content, array $contentTokens = [], ?string $channel = null, int|string|null $channelId = null, bool $usingClickthrough = true): array
     {
         $this->usingClickthrough = $usingClickthrough;
 
@@ -524,10 +524,7 @@ class TrackableModel extends AbstractCommonModel
         return $this->isValidUrl($tokenValue);
     }
 
-    /**
-     * @param bool $forceScheme
-     */
-    protected function isValidUrl($url, $forceScheme = true): bool
+    protected function isValidUrl($url, bool $forceScheme = true): bool
     {
         $urlParts = (!is_array($url)) ? parse_url($url) : $url;
 

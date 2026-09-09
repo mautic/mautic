@@ -147,7 +147,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Report) {
             throw new MethodNotAllowedHttpException(['Report']);
@@ -291,7 +291,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
      *
      * @return \stdClass ['choices' => [], 'choiceHtml' => '', definitions => []]
      */
-    public function getColumnList($context, $isGroupBy = false): \stdClass
+    public function getColumnList($context, bool $isGroupBy = false): \stdClass
     {
         $tableData           = $this->getTableData($context);
         $columns             = $tableData['columns'] ?? [];

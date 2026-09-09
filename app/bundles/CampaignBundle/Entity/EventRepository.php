@@ -178,12 +178,11 @@ class EventRepository extends CommonRepository
     }
 
     /**
-     * @param int  $campaignId
-     * @param bool $ignoreDeleted
+     * @param int $campaignId
      *
      * @return array<int,mixed[]>
      */
-    public function getCampaignEvents($campaignId, $ignoreDeleted = true): array
+    public function getCampaignEvents($campaignId, bool $ignoreDeleted = true): array
     {
         $q = $this->getEntityManager()->createQueryBuilder();
         $q->select('e, IDENTITY(e.parent)')

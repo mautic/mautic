@@ -31,12 +31,10 @@ trait FrequencyRuleTrait
 
     /**
      * @param array $viewParameters
-     * @param bool  $isPublic
-     * @param bool  $isPreferenceCenter
      *
      * @return true|FormInterface
      */
-    protected function getFrequencyRuleForm(Lead $lead, &$viewParameters = [], &$data = null, $isPublic = false, $action = null, $isPreferenceCenter = false)
+    protected function getFrequencyRuleForm(Lead $lead, &$viewParameters = [], &$data = null, bool $isPublic = false, $action = null, bool $isPreferenceCenter = false)
     {
         /** @var LeadModel $model */
         $model = $this->getModel('lead');
@@ -98,10 +96,7 @@ trait FrequencyRuleTrait
         return $form;
     }
 
-    /**
-     * @param bool $isPublic
-     */
-    protected function getFrequencyRuleFormData(Lead $lead, ?array $allChannels = null, $leadChannels = null, $isPublic = false, $frequencyRules = null, $isPreferenceCenter = false): array
+    protected function getFrequencyRuleFormData(Lead $lead, ?array $allChannels = null, $leadChannels = null, bool $isPublic = false, $frequencyRules = null, bool $isPreferenceCenter = false): array
     {
         $data = [];
 

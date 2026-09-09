@@ -21,12 +21,11 @@ final readonly class FormatterHelper
      *
      * @param mixed  $val
      * @param string $type
-     * @param bool   $textOnly
      * @param int    $round
      *
      * @return string
      */
-    public function _($val, $type = 'html', $textOnly = false, $round = 1)
+    public function _($val, $type = 'html', bool $textOnly = false, $round = 1)
     {
         if (empty($val) && 'bool' !== $type && 'float' !== $type) {
             return $val;

@@ -80,7 +80,7 @@ final class NoteModel extends FormModel
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof LeadNote) {
             throw new MethodNotAllowedHttpException(['LeadNote']);
@@ -117,7 +117,7 @@ final class NoteModel extends FormModel
         return null;
     }
 
-    public function getNoteCount(Lead $lead, $useFilters = false): int
+    public function getNoteCount(Lead $lead, bool $useFilters = false): int
     {
         $viewPermissions = $this->security->isGranted(['lead:notes:viewown', 'lead:notes:viewother'], 'RETURN_ARRAY');
         $canViewOwn      = $viewPermissions['lead:notes:viewown'] ?? false;

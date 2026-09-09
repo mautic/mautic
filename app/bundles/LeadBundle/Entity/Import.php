@@ -503,7 +503,7 @@ class Import extends FormEntity
      *
      * @phpstan-impure
      */
-    public function end($removeFile = true): self
+    public function end(bool $removeFile = true): self
     {
         $this->setDateEnded(new \DateTime());
 

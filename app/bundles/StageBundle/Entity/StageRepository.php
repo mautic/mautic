@@ -124,12 +124,11 @@ class StageRepository extends CommonRepository
     /**
      * Get a list of lists.
      *
-     * @param bool|object $user
-     * @param string      $id
+     * @param string $id
      *
      * @return array<int, array<string, mixed>>
      */
-    public function getStages($user = false, $id = ''): array
+    public function getStages(object|bool $user = false, $id = ''): array
     {
         if (is_object($user)) {
             $user = $user->getId();

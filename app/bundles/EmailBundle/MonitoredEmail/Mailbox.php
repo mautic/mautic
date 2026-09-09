@@ -709,12 +709,11 @@ class Mailbox
      *  SORTCC - mailbox in first cc address
      *  SORTSIZE - size of mail in octets
      *
-     * @param int  $criteria
-     * @param bool $reverse
+     * @param int $criteria
      *
      * @return array Mails ids
      */
-    public function sortMails($criteria = SORTARRIVAL, $reverse = true): array|bool
+    public function sortMails($criteria = SORTARRIVAL, bool $reverse = true): array|bool
     {
         return imap_sort($this->getImapStream(), $criteria, $reverse, SE_UID);
     }
@@ -769,10 +768,8 @@ class Mailbox
 
     /**
      * Get mail data.
-     *
-     * @param bool $markAsSeen
      */
-    public function getMail($mailId, $markAsSeen = true): Message
+    public function getMail($mailId, bool $markAsSeen = true): Message
     {
         $header     = imap_fetchheader($this->getImapStream(), $mailId, FT_UID);
         $headObject = imap_rfc822_parse_headers($header);
@@ -850,12 +847,7 @@ class Mailbox
         return $mail;
     }
 
-    /**
-     * @param bool|true  $markAsSeen
-     * @param bool|false $isDsn
-     * @param bool|false $isFbl
-     */
-    protected function initMailPart(Message $mail, $partStructure, $partNum, $markAsSeen = true, $isDsn = false, $isFbl = false): void
+    protected function initMailPart(Message $mail, $partStructure, $partNum, bool $markAsSeen = true, bool $isDsn = false, bool $isFbl = false): void
     {
         $options = FT_UID;
         if (!$markAsSeen) {

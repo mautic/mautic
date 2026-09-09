@@ -87,10 +87,9 @@ class TrackableRepository extends CommonRepository
     }
 
     /**
-     * @param int  $increaseBy
-     * @param bool $unique
+     * @param int $increaseBy
      */
-    public function upHitCount($redirectId, $channel, $channelId, $increaseBy = 1, $unique = false): void
+    public function upHitCount($redirectId, $channel, $channelId, $increaseBy = 1, bool $unique = false): void
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -115,12 +114,11 @@ class TrackableRepository extends CommonRepository
     /**
      * Get hit count.
      *
-     * @param bool   $combined
      * @param string $countColumn
      *
      * @return array|int
      */
-    public function getCount($channel, $channelIds, $listId, ?ChartQuery $chartQuery = null, $combined = false, $countColumn = 'ph.id')
+    public function getCount($channel, $channelIds, $listId, ?ChartQuery $chartQuery = null, bool $combined = false, $countColumn = 'ph.id')
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('count('.$countColumn.') as click_count')

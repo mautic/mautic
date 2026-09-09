@@ -408,10 +408,7 @@ class MessageQueue
         return $this->success;
     }
 
-    /**
-     * @param bool $success
-     */
-    public function setSuccess($success = true): void
+    public function setSuccess(bool $success = true): void
     {
         $this->success = $success;
     }
@@ -424,10 +421,7 @@ class MessageQueue
         return $this->failed;
     }
 
-    /**
-     * @param bool $failed
-     */
-    public function setFailed($failed = true): static
+    public function setFailed(bool $failed = true): static
     {
         $this->failed = $failed;
 
@@ -442,10 +436,7 @@ class MessageQueue
         return $this->processed;
     }
 
-    /**
-     * @param bool $processed
-     */
-    public function setProcessed($processed = true): static
+    public function setProcessed(bool $processed = true): static
     {
         $this->processed = $processed;
 

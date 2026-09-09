@@ -180,7 +180,7 @@ final class ThemeHelperTest extends TestCase
 
         $this->pathsHelper->expects($this->exactly(46))->method('getSystemPath')
             ->willReturnCallback(
-                function ($path, $absolute) {
+                function ($path, bool $absolute) {
                     switch ($path) {
                         case 'themes':
                             return ($absolute) ? __DIR__.'/../../../../../../themes' : 'themes';
@@ -215,7 +215,7 @@ final class ThemeHelperTest extends TestCase
 
         $this->pathsHelper->expects($this->exactly(46))->method('getSystemPath')
             ->willReturnCallback(
-                function ($path, $absolute) {
+                function ($path, bool $absolute) {
                     switch ($path) {
                         case 'themes':
                             return ($absolute) ? __DIR__.'/../../../../../../themes' : 'themes';
@@ -241,7 +241,7 @@ final class ThemeHelperTest extends TestCase
                 {
                 }
 
-                public function getSystemPath($name, $fullPath = false): string
+                public function getSystemPath($name, bool $fullPath = false): string
                 {
                     Assert::assertSame('themes', $name);
 
@@ -326,7 +326,7 @@ final class ThemeHelperTest extends TestCase
                 {
                 }
 
-                public function getSystemPath($name, $fullPath = false): string
+                public function getSystemPath($name, bool $fullPath = false): string
                 {
                     Assert::assertSame('themes', $name);
 
