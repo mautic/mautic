@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\LeadBundle\Form\Validator\Constraints\UniqueCustomField;
 use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -48,6 +49,10 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
 {
     use CustomFieldEntityTrait;
     use ProjectTrait;
+
+    /**
+     * @var \Doctrine\Common\Collections\Collection<int, Project>
+     */
     #[ORM\ManyToMany(targetEntity: \Mautic\ProjectBundle\Entity\Project::class, cascade: ['merge', 'persist', 'detach'], fetch: 'LAZY', indexBy: 'name')]
     #[ORM\JoinTable(name: 'company_projects_xref')]
     #[ORM\JoinColumn(name: 'company_id', nullable: false, onDelete: 'CASCADE')]

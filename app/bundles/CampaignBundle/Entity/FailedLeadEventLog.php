@@ -58,9 +58,6 @@ class FailedLeadEventLog
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
     public function getDateAdded(): ?\DateTime
     {
         return $this->dateAdded;

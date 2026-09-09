@@ -82,9 +82,6 @@ class Stat
     #[ORM\Column(name: 'viewed_in_browser', type: 'boolean')]
     private $viewedInBrowser = false;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[ORM\Column(name: 'date_read', type: 'datetime', nullable: true)]
     private ?\DateTime $dateRead = null;
 
@@ -135,7 +132,7 @@ class Stat
      * @var ArrayCollection|EmailReply[]
      */
     #[ORM\OneToMany(mappedBy: 'stat', targetEntity: EmailReply::class, cascade: ['all'], fetch: 'EXTRA_LAZY')]
-    private \Doctrine\Common\Collections\Collection|array $replies;
+    private \Doctrine\Common\Collections\Collection $replies;
 
     /**
      * @var array<string,mixed[]>

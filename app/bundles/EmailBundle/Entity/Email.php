@@ -37,6 +37,7 @@ use Mautic\EmailBundle\Validator\ValidEmailLinks;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Entity\Page;
+use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\Callback;
@@ -84,6 +85,10 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     use UuidTrait;
     use ProjectTrait;
     use OptimisticLockTrait;
+
+    /**
+     * @var Collection<int, Project>
+     */
     #[ORM\ManyToMany(targetEntity: \Mautic\ProjectBundle\Entity\Project::class, cascade: ['merge', 'persist', 'detach'], fetch: 'LAZY', indexBy: 'name')]
     #[ORM\JoinTable(name: 'email_projects_xref')]
     #[ORM\JoinColumn(name: 'email_id', nullable: false, onDelete: 'CASCADE')]

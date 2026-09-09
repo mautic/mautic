@@ -50,6 +50,10 @@ class Focus extends FormEntity implements UuidInterface
 {
     use UuidTrait;
     use ProjectTrait;
+
+    /**
+     * @var \Doctrine\Common\Collections\Collection<int, \Mautic\ProjectBundle\Entity\Project>
+     */
     #[ORM\ManyToMany(targetEntity: \Mautic\ProjectBundle\Entity\Project::class, cascade: ['merge', 'persist', 'detach'], fetch: 'LAZY', indexBy: 'name')]
     #[ORM\JoinTable(name: 'focus_projects_xref')]
     #[ORM\JoinColumn(name: 'focus_id', nullable: false, onDelete: 'CASCADE')]

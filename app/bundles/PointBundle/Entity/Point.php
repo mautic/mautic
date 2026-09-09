@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Helper\IntHelper;
+use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -50,6 +51,10 @@ class Point extends FormEntity implements UuidInterface
 {
     use UuidTrait;
     use ProjectTrait;
+
+    /**
+     * @var \Doctrine\Common\Collections\Collection<int, Project>
+     */
     #[ORM\ManyToMany(targetEntity: \Mautic\ProjectBundle\Entity\Project::class, cascade: ['merge', 'persist', 'detach'], fetch: 'LAZY', indexBy: 'name')]
     #[ORM\JoinTable(name: 'point_projects_xref')]
     #[ORM\JoinColumn(name: 'point_id', nullable: false, onDelete: 'CASCADE')]

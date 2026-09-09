@@ -85,7 +85,7 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
      */
     #[Groups(['role:read', 'role:write'])]
     #[ORM\OneToMany(mappedBy: 'role', targetEntity: Permission::class, cascade: ['persist', 'remove'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
-    private \Doctrine\Common\Collections\Collection|array $permissions;
+    private \Doctrine\Common\Collections\Collection $permissions;
 
     #[Groups(['role:read', 'role:write'])]
     #[ORM\Column(name: 'readable_permissions', type: 'array')]
@@ -95,7 +95,7 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
      * @var ArrayCollection<int, User>
      */
     #[ORM\OneToMany(mappedBy: 'role', targetEntity: User::class, fetch: 'EXTRA_LAZY')]
-    private \Doctrine\Common\Collections\Collection|array $users;
+    private \Doctrine\Common\Collections\Collection $users;
 
     public function __construct()
     {

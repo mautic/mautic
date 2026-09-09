@@ -24,6 +24,7 @@ use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Entity\VariantEntityTrait;
 use Mautic\CoreBundle\Validator\EntityEvent;
+use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -67,6 +68,10 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     use UuidTrait;
     use ProjectTrait;
     use OptimisticLockTrait;
+
+    /**
+     * @var \Doctrine\Common\Collections\Collection<int, Project>
+     */
     #[ORM\ManyToMany(targetEntity: \Mautic\ProjectBundle\Entity\Project::class, cascade: ['merge', 'persist', 'detach'], fetch: 'LAZY', indexBy: 'name')]
     #[ORM\JoinTable(name: 'page_projects_xref')]
     #[ORM\JoinColumn(name: 'page_id', nullable: false, onDelete: 'CASCADE')]

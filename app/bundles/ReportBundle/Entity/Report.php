@@ -451,7 +451,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     }
 
     /**
-     * @return array<array-key, mixed>|null
+     * @return array<array-key, mixed>
      */
     public function getSettings(): array
     {

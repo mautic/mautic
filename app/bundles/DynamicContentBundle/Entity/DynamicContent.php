@@ -26,6 +26,7 @@ use Mautic\CoreBundle\Entity\VariantEntityTrait;
 use Mautic\DynamicContentBundle\DynamicContent\TypeList;
 use Mautic\DynamicContentBundle\Validator\Constraints\NoNesting;
 use Mautic\DynamicContentBundle\Validator\Constraints\SlotNameType;
+use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\Callback;
@@ -71,6 +72,10 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     use FiltersEntityTrait;
     use UuidTrait;
     use ProjectTrait;
+
+    /**
+     * @var \Doctrine\Common\Collections\Collection<int, Project>
+     */
     #[ORM\ManyToMany(targetEntity: \Mautic\ProjectBundle\Entity\Project::class, cascade: ['merge', 'persist', 'detach'], fetch: 'LAZY', indexBy: 'name')]
     #[ORM\JoinTable(name: 'dynamic_content_projects_xref')]
     #[ORM\JoinColumn(name: 'dynamic_content_id', nullable: false, onDelete: 'CASCADE')]

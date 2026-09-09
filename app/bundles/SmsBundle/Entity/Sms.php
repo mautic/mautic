@@ -24,6 +24,7 @@ use Mautic\CoreBundle\Entity\VariantEntityTrait;
 use Mautic\CoreBundle\Validator\EntityEvent;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccess;
+use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Mautic\SmsBundle\Form\Validator\Constraints\MediaMaxAllowedSize;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -67,6 +68,10 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
     use ProjectTrait;
     use TranslationEntityTrait;
     use VariantEntityTrait;
+
+    /**
+     * @var \Doctrine\Common\Collections\Collection<int, Project>
+     */
     #[ORM\ManyToMany(targetEntity: \Mautic\ProjectBundle\Entity\Project::class, cascade: ['merge', 'persist', 'detach'], fetch: 'LAZY', indexBy: 'name')]
     #[ORM\JoinTable(name: 'sms_projects_xref')]
     #[ORM\JoinColumn(name: 'sms_id', nullable: false, onDelete: 'CASCADE')]

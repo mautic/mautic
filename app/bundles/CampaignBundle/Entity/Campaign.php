@@ -61,6 +61,10 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     use OptimisticLockTrait;
 
     use ProjectTrait;
+
+    /**
+     * @var Collection<int, Project>
+     */
     #[ORM\ManyToMany(targetEntity: \Mautic\ProjectBundle\Entity\Project::class, cascade: ['merge', 'persist', 'detach'], fetch: 'LAZY', indexBy: 'name')]
     #[ORM\JoinTable(name: 'campaign_projects_xref')]
     #[ORM\JoinColumn(name: 'campaign_id', nullable: false, onDelete: 'CASCADE')]
