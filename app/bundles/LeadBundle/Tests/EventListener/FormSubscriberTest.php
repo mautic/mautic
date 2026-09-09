@@ -12,6 +12,7 @@ use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
+use Mautic\LeadBundle\Entity\UtmTagRepository;
 use Mautic\LeadBundle\EventListener\FormSubscriber;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\DoNotContact;
@@ -19,10 +20,11 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PointBundle\Model\PointGroupModel;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Request;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class FormSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
@@ -61,7 +63,7 @@ final class FormSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->createStub(PointGroupModel::class),
             $this->createStub(DoNotContact::class),
             $this->createStub(FieldModel::class),
-            $this->createStub(\Mautic\LeadBundle\Entity\UtmTagRepository::class)
+            $this->createStub(UtmTagRepository::class)
         );
     }
 

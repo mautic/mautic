@@ -10,9 +10,10 @@ use Mautic\FormBundle\Event\FormEvent;
 use Mautic\FormBundle\EventListener\FormConditionalSubscriber;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class FormConditionalSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**

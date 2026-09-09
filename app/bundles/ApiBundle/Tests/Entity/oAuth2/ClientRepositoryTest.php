@@ -8,6 +8,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\ApiBundle\Entity\oAuth2\ClientRepository;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -42,7 +43,7 @@ final class ClientRepositoryTest extends TestCase
         $this->assertContains('mautic.core.searchcommand.ids', $commands);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataSearchCommandFilters')]
+    #[DataProvider('dataSearchCommandFilters')]
     public function testAddSearchCommandWhereClauseHandlesClientFilters(string $command, string $expectedColumn): void
     {
         $repository = $this->getRepository();

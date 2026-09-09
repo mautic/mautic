@@ -20,6 +20,7 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Services\CompanyColumnsDictionary;
+use Mautic\UserBundle\Entity\UserRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,7 +33,7 @@ final class CompanyController extends FormController
 
     private CompanyRepository $companyRepository;
 
-    private \Mautic\UserBundle\Entity\UserRepository $userRepository;
+    private UserRepository $userRepository;
 
     private FieldModel $fieldModel;
 
@@ -48,7 +49,7 @@ final class CompanyController extends FormController
         CompanyModel $companyModel,
         FieldModel $fieldModel,
         CompanyRepository $companyRepository,
-        \Mautic\UserBundle\Entity\UserRepository $userRepository,
+        UserRepository $userRepository,
         CompanyLeadRepository $companyLeadRepository,
     ): void {
         $this->leadModel = $leadModel;

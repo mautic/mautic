@@ -8,11 +8,12 @@ use Mautic\IntegrationsBundle\Exception\InvalidFormOptionException;
 use Mautic\IntegrationsBundle\Form\Type\IntegrationSyncSettingsObjectFieldType;
 use Mautic\IntegrationsBundle\Mapping\MappedFieldInfoInterface;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class IntegrationSyncSettingsObjectFieldTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**

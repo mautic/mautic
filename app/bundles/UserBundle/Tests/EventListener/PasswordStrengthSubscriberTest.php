@@ -6,12 +6,13 @@ namespace Mautic\UserBundle\Tests\EventListener;
 
 use Mautic\UserBundle\EventListener\PasswordStrengthSubscriber;
 use Mautic\UserBundle\Security\Authenticator\Passport\Badge\PasswordStrengthBadge;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class PasswordStrengthSubscriberTest extends TestCase
 {
     public function testNoCheckPassportEvent(): void
