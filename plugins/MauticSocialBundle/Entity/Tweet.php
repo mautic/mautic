@@ -14,8 +14,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Table(name: 'tweets')]
 #[ORM\Entity(repositoryClass: TweetRepository::class)]
-#[ORM\Entity(repositoryClass: TweetRepository::class)]
-#[ORM\Table(name: 'tweets')]
 #[ORM\Index(columns: ['sent_count'], name: 'sent_count_index')]
 #[ORM\Index(columns: ['favorite_count'], name: 'favorite_count_index')]
 #[ORM\Index(columns: ['retweet_count'], name: 'retweet_count_index')]
