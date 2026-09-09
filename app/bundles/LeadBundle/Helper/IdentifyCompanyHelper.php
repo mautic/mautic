@@ -95,7 +95,7 @@ final readonly class IdentifyCompanyHelper
     }
 
     /**
-     * @param mixed[] $parameters
+     * @param array<string, mixed> $parameters
      *
      * @return mixed[]
      */

@@ -344,6 +344,8 @@ class UtmTag
 
     /**
      * Available fields and it's setters.
+     *
+     * @return array<string, string>
      */
     public function getFieldSetterList(): array
     {

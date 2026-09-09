@@ -40,6 +40,9 @@ class ContactSegmentFilterCrate
      */
     private $operator;
 
+    /**
+     * @var array<string, mixed>
+     */
     private readonly array $sourceArray;
 
     private $nullValue;
@@ -49,6 +52,9 @@ class ContactSegmentFilterCrate
      */
     private array $mergedProperty;
 
+    /**
+     * @param array<string, mixed> $filter
+     */
     public function __construct(array $filter)
     {
         $bcFilter               = $filter['filter'] ?? null;
@@ -165,11 +171,17 @@ class ContactSegmentFilterCrate
         return $this->type;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getArray(): array
     {
         return $this->sourceArray;
     }
 
+    /**
+     * @param array<string, mixed> $filter
+     */
     private function setOperator(array $filter): void
     {
         $operator = $filter['operator'] ?? null;

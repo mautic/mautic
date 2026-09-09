@@ -23,6 +23,9 @@ readonly class RelativeDate
         return $strings;
     }
 
+    /**
+     * @return array<int, string>
+     */
     private function getRelativeDateTranslationKeys(): array
     {
         return [

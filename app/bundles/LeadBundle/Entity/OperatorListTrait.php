@@ -168,8 +168,8 @@ trait OperatorListTrait
     }
 
     /**
-     * @param mixed[] $definition
-     * @param mixed[] $overrideHiddenOperators
+     * @param array<string, mixed> $definition
+     * @param mixed[]              $overrideHiddenOperators
      *
      * @return mixed[]
      */

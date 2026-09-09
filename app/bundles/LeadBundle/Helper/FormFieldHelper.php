@@ -7,6 +7,9 @@ use Symfony\Component\Intl\Locales;
 
 final class FormFieldHelper extends AbstractFormFieldHelper
 {
+    /**
+     * @var array<string, array<string, array<mixed[]>>>
+     */
     private static array $types = [
         'text' => [
             'properties' => [],
@@ -102,6 +105,9 @@ final class FormFieldHelper extends AbstractFormFieldHelper
         return self::$types;
     }
 
+    /**
+     * @return array<int, string>
+     */
     public static function getListTypes(): array
     {
         return ['select', 'multiselect', 'boolean', 'lookup', 'country', 'region', 'timezone', 'locale'];
@@ -204,6 +210,8 @@ final class FormFieldHelper extends AbstractFormFieldHelper
 
     /**
      * Get date field choices.
+     *
+     * @return array<string, string>
      */
     public function getDateChoices(): array
     {

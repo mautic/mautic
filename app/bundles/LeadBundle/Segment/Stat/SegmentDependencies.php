@@ -21,6 +21,9 @@ final readonly class SegmentDependencies
     ) {
     }
 
+    /**
+     * @return array<int, array<string, string|mixed[]>>
+     */
     public function getChannelsIds($segmentId): array
     {
         return [

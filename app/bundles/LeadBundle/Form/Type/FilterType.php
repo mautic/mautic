@@ -150,7 +150,7 @@ final class FilterType extends AbstractType
      * fields were moved there.
      *
      * @param FormInterface<mixed> $filterPropertiesType
-     * @param mixed[]              $data
+     * @param array<string, mixed> $data
      */
     private function setPropertiesFormData(FormInterface $filterPropertiesType, array $data): void
     {

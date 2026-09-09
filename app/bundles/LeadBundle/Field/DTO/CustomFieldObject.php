@@ -9,6 +9,9 @@ use Mautic\LeadBundle\Exception\InvalidObjectTypeException;
 
 final class CustomFieldObject
 {
+    /**
+     * @var array<string, string>
+     */
     private array $objects = [
         'lead'    => 'leads',
         'company' => 'companies',

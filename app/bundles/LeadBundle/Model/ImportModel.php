@@ -504,8 +504,9 @@ class ImportModel extends FormModel
     /**
      * Get line chart data of imported rows.
      *
-     * @param string $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param string $dateFormat
+     * @param string               $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string               $dateFormat
+     * @param array<string, mixed> $filter
      */
     public function getImportedRowsLineChartData($unit, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo, $dateFormat = null, array $filter = []): array
     {

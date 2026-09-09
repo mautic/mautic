@@ -92,9 +92,10 @@ class LeadEventLogRepository extends CommonRepository
     }
 
     /**
-     * @param ?string           $bundle
-     * @param ?string           $object
-     * @param array|string|null $actions
+     * @param ?string              $bundle
+     * @param ?string              $object
+     * @param array|string|null    $actions
+     * @param array<string, mixed> $options
      *
      * @return array
      */

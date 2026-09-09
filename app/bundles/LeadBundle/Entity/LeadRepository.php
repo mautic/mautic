@@ -599,12 +599,12 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Get contacts for a specific channel entity.
      *
-     * @param array      $args             same as getEntity/getEntities
-     * @param string     $joinTable
-     * @param int        $entityId
-     * @param array      $filters
-     * @param string     $entityColumnName
-     * @param array|null $additionalJoins  [ ['type' => 'join|leftJoin', 'from_alias' => '', 'table' => '', 'condition' => ''], ... ]
+     * @param array<string, mixed> $args             same as getEntity/getEntities
+     * @param string               $joinTable
+     * @param int                  $entityId
+     * @param array                $filters
+     * @param string               $entityColumnName
+     * @param array|null           $additionalJoins  [ ['type' => 'join|leftJoin', 'from_alias' => '', 'table' => '', 'condition' => ''], ... ]
      */
     public function getEntityContacts(
         array $args,
@@ -1301,10 +1301,10 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
 
     /**
-     * @param array $tables          $tables[0] should be primary table
-     * @param bool  $innerJoinTables
-     * @param mixed $whereExpression
-     * @param mixed $having
+     * @param array<int, mixed> $tables          $tables[0] should be primary table
+     * @param bool              $innerJoinTables
+     * @param mixed             $whereExpression
+     * @param mixed             $having
      */
     public function applySearchQueryRelationship(QueryBuilder $q, array $tables, $innerJoinTables, $whereExpression = null, $having = null): void
     {
@@ -1417,6 +1417,9 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
     }
 
+    /**
+     * @param array<string, mixed> $fields
+     */
     protected function prepareDbalFieldsForSave(array &$fields): void
     {
         // Do not save points as they are handled by postSaveEntity

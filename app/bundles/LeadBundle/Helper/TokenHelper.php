@@ -80,8 +80,8 @@ final class TokenHelper
     /**
      * Returns correct token value from provided list of tokens and the concrete token.
      *
-     * @param array  $tokens like ['{contactfield=website}' => 'https://mautic.org']
-     * @param string $token  like '{contactfield=website|https://default.url}'
+     * @param array<string, mixed> $tokens like ['{contactfield=website}' => 'https://mautic.org']
+     * @param string               $token  like '{contactfield=website|https://default.url}'
      *
      * @return string empty string if no match
      */
@@ -95,6 +95,8 @@ final class TokenHelper
     }
 
     /**
+     * @param array<string, mixed> $lead
+     *
      * @return mixed
      */
     private static function getTokenValue(array $lead, string $alias, string $defaultValue)
