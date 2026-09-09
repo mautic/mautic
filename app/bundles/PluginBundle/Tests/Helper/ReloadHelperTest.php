@@ -124,6 +124,27 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Updated description', $updatedPlugins['MauticZapierBundle']->getDescription());
     }
 
+    public function testUpdatePluginWithoutDoctrineMetadata(): void
+    {
+        $this->sampleAllPlugins['MauticZapierBundle']['config']['version'] = '1.0.1';
+        $sampleInstalledPlugins                                            = [
+            'MauticZapierBundle' => $this->createSampleZapierPlugin(),
+        ];
+        $plugin = $this->createSampleZapierPlugin();
+        $plugin->setVersion('1.0.1');
+        $event = new PluginUpdateEvent(
+            $plugin,
+            '1.0',
+            [],
+            $this->sampleSchemas['MauticPlugin\MauticZapierBundle']
+        );
+        $this->eventDispatcher->expects($this->once())->method('dispatch')->with($event, PluginEvents::ON_PLUGIN_UPDATE);
+
+        $updatedPlugins = $this->helper->updatePlugins($this->sampleAllPlugins, $sampleInstalledPlugins, [], $this->sampleSchemas);
+
+        $this->assertCount(1, $updatedPlugins);
+    }
+
     public function testInstallPlugins(): void
     {
         $sampleInstalledPlugins = [
