@@ -28,8 +28,6 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->set(Mautic\CampaignBundle\Executioner\ScheduledExecutioner::class)->tag('kernel.reset', ['method' => 'reset']);
 
-    $services->set(Mautic\CampaignBundle\Service\CampaignShareService::class);
-
     if ('test' === ($_ENV['APP_ENV'] ?? $_SERVER['APP_ENV'] ?? 'prod')) {
         $services->set(Mautic\CampaignBundle\Executioner\TestInactiveExecutioner::class)
             ->decorate(Mautic\CampaignBundle\Executioner\InactiveExecutioner::class)
