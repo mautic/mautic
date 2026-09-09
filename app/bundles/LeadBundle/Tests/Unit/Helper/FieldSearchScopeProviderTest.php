@@ -7,8 +7,10 @@ namespace Mautic\LeadBundle\Tests\Unit\Helper;
 use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Mautic\LeadBundle\Helper\FieldSearchScopeProvider;
 use Mautic\LeadBundle\Model\FieldModel;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 final class FieldSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
     protected function createProvider(): FieldSearchScopeProvider

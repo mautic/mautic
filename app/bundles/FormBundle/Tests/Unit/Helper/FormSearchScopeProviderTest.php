@@ -7,8 +7,10 @@ namespace Mautic\FormBundle\Tests\Unit\Helper;
 use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Mautic\FormBundle\Helper\FormSearchScopeProvider;
 use Mautic\FormBundle\Model\FormModel;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 final class FormSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
     protected function createProvider(): FormSearchScopeProvider

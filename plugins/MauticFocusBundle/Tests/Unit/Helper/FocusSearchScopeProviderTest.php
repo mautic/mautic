@@ -7,8 +7,10 @@ namespace MauticPlugin\MauticFocusBundle\Tests\Unit\Helper;
 use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use MauticPlugin\MauticFocusBundle\Helper\FocusSearchScopeProvider;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 final class FocusSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
     protected function createProvider(): FocusSearchScopeProvider

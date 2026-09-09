@@ -7,8 +7,10 @@ namespace Mautic\DynamicContentBundle\Tests\Unit\Helper;
 use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Mautic\DynamicContentBundle\Helper\DynamicContentSearchScopeProvider;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 final class DynamicContentSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
     protected function createProvider(): DynamicContentSearchScopeProvider

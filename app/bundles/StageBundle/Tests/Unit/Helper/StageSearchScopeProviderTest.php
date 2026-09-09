@@ -7,8 +7,10 @@ namespace Mautic\StageBundle\Tests\Unit\Helper;
 use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Mautic\StageBundle\Helper\StageSearchScopeProvider;
 use Mautic\StageBundle\Model\StageModel;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 final class StageSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
     protected function createProvider(): StageSearchScopeProvider
