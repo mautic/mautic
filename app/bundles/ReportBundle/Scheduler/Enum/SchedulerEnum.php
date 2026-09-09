@@ -34,6 +34,9 @@ final class SchedulerEnum
 
     public const string MONTH_FREQUENCY_LAST  = '-1';
 
+    /**
+     * @return array<string, string>
+     */
     public static function getUnitEnumForSelect(): array
     {
         return [
@@ -44,6 +47,9 @@ final class SchedulerEnum
         ];
     }
 
+    /**
+     * @return array<string, string>
+     */
     public static function getDayEnumForSelect(): array
     {
         return [
@@ -58,6 +64,9 @@ final class SchedulerEnum
         ];
     }
 
+    /**
+     * @return array<string, string>
+     */
     public static function getMonthFrequencyForSelect(): array
     {
         return [
@@ -66,6 +75,9 @@ final class SchedulerEnum
         ];
     }
 
+    /**
+     * @return array<int, string>
+     */
     public static function getWeekDays(): array
     {
         return [

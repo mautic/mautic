@@ -13,7 +13,8 @@ final class SugarcrmApi extends CrmApi
     private string $object = 'Leads';
 
     /**
-     * @param string $method
+     * @param string               $method
+     * @param array<string, mixed> $data
      *
      * @return mixed|string
      *
@@ -103,6 +104,8 @@ final class SugarcrmApi extends CrmApi
     }
 
     /**
+     * @param array<string, mixed> $fields
+     *
      * @return array
      *
      * @throws ApiErrorException
@@ -548,7 +551,8 @@ final class SugarcrmApi extends CrmApi
     /**
      * Get SugarCRM leads.
      *
-     * @param string $object
+     * @param string               $object
+     * @param array<string, mixed> $query
      *
      * @return mixed
      */

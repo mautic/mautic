@@ -228,8 +228,8 @@ class DynamicContentHelper
     }
 
     /**
-     * @param mixed[] $filters
-     * @param mixed[] $contactArray
+     * @param mixed[]              $filters
+     * @param array<string, mixed> $contactArray
      */
     private function filtersMatchContact(array $filters, array $contactArray): bool
     {

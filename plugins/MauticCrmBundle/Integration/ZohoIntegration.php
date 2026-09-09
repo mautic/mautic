@@ -471,7 +471,8 @@ final class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $result
+     * @param array                $result
+     * @param array<string, mixed> $params
      */
     public function getCompanies(array $params = [], $query = null, &$executed = null, &$result = []): int
     {
@@ -764,6 +765,8 @@ final class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @param array<string, mixed> $params
+     *
      * @return mixed[]
      */
     public function pushLeads(array $params = []): array
@@ -1148,7 +1151,8 @@ final class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array<mixed, mixed> $fields
+     * @param array<mixed, mixed>  $fields
+     * @param array<string, mixed> $data
      */
     private function parseZohoRecord(array $data, array $fields): array
     {

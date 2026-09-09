@@ -18,10 +18,10 @@ class WebhookBuilderEvent extends Event
     /**
      * Add an event for the event list.
      *
-     * @param string $key   - a unique identifier; it is recommended that it be namespaced i.e. lead.mytrigger
-     * @param array  $event - can contain the following keys:
-     *                      'label'       => (required) what to display in the list
-     *                      'description' => (optional) short description of event
+     * @param string               $key   - a unique identifier; it is recommended that it be namespaced i.e. lead.mytrigger
+     * @param array<string, mixed> $event - can contain the following keys:
+     *                                    'label'       => (required) what to display in the list
+     *                                    'description' => (optional) short description of event
      */
     public function addEvent($key, array $event): void
     {

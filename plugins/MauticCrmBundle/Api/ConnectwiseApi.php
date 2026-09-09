@@ -60,7 +60,8 @@ class ConnectwiseApi extends CrmApi
     }
 
     /**
-     * @param int $page
+     * @param int                  $page
+     * @param array<string, mixed> $params
      *
      * @return mixed|string
      *
@@ -86,7 +87,8 @@ class ConnectwiseApi extends CrmApi
     }
 
     /**
-     * @param int $page
+     * @param int                  $page
+     * @param array<string, mixed> $params
      *
      * @return mixed|string
      *

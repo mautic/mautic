@@ -216,6 +216,8 @@ class InstallService
     }
 
     /**
+     * @param array<string, mixed> $dbParams
+     *
      * @return array Validation errors
      */
     public function validateDatabaseParams(array $dbParams): array
@@ -259,6 +261,8 @@ class InstallService
 
     /**
      * Create the database.
+     *
+     * @param array<string, mixed> $dbParams
      */
     public function createDatabaseStep(StepInterface $step, array $dbParams): array
     {
@@ -384,6 +388,8 @@ class InstallService
 
     /**
      * Create the administrator user.
+     *
+     * @param array<string, mixed> $data
      */
     public function createAdminUserStep(array $data): array
     {

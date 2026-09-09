@@ -18,25 +18,25 @@ final class StageBuilderEvent extends Event
     /**
      * Adds an action to the list of available .
      *
-     * @param string $key    - a unique identifier; it is recommended that it be namespaced i.e. lead.action
-     * @param array  $action - can contain the following keys:
-     *                       'label'           => (required) what to display in the list
-     *                       'description'     => (optional) short description of event
-     *                       'template'        => (optional) template to use for the action's HTML in the stage builder
-     *                       i.e AcmeMyBundle:StageAction:theaction.html.twig
-     *                       'formType'        => (optional) name of the form type SERVICE for the action; will use a default form with stage change only
-     *                       'formTypeOptions' => (optional) array of options to pass to formType
-     *                       'callback'        => (optional) callback function that will be passed when the action is triggered; return true to
-     *                       change the configured stages or false to ignore the action
-     *                       The callback function can receive the following arguments by name (via ReflectionMethod::invokeArgs())
-     *                       Mautic\LeadBundle\Entity\Lead $lead
-     *                       $eventDetails - variable sent from firing function to call back function
-     *                       array $action = array(
-     *                       'id' => int
-     *                       'type' => string
-     *                       'name' => string
-     *                       'properties' => array()
-     *                       )
+     * @param string               $key    - a unique identifier; it is recommended that it be namespaced i.e. lead.action
+     * @param array<string, mixed> $action - can contain the following keys:
+     *                                     'label'           => (required) what to display in the list
+     *                                     'description'     => (optional) short description of event
+     *                                     'template'        => (optional) template to use for the action's HTML in the stage builder
+     *                                     i.e AcmeMyBundle:StageAction:theaction.html.twig
+     *                                     'formType'        => (optional) name of the form type SERVICE for the action; will use a default form with stage change only
+     *                                     'formTypeOptions' => (optional) array of options to pass to formType
+     *                                     'callback'        => (optional) callback function that will be passed when the action is triggered; return true to
+     *                                     change the configured stages or false to ignore the action
+     *                                     The callback function can receive the following arguments by name (via ReflectionMethod::invokeArgs())
+     *                                     Mautic\LeadBundle\Entity\Lead $lead
+     *                                     $eventDetails - variable sent from firing function to call back function
+     *                                     array $action = array(
+     *                                     'id' => int
+     *                                     'type' => string
+     *                                     'name' => string
+     *                                     'properties' => array()
+     *                                     )
      *
      * @throws InvalidArgumentException
      */
@@ -97,6 +97,10 @@ final class StageBuilderEvent extends Event
     }
 
     /**
+     * @param string[]             $keys
+     * @param string[]             $methods
+     * @param array<string, mixed> $component
+     *
      * @throws InvalidArgumentException
      */
     private function verifyComponent(array $keys, array $methods, array $component): void

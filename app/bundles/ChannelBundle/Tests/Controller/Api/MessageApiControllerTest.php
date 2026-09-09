@@ -191,8 +191,8 @@ JSON;
     }
 
     /**
-     * @param mixed[] $expectedPayload
-     * @param mixed[] $actualPayload
+     * @param array<array<string, mixed>, mixed> $expectedPayload
+     * @param array<string, mixed>               $actualPayload
      */
     private function assertMessagePayload(array $expectedPayload, array $actualPayload, string $deliveredPayloadJson): void
     {

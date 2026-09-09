@@ -9,6 +9,8 @@ final class MailchimpApi extends EmailMarketingApi
     private string $version = '3.0';
 
     /**
+     * @param array<string, int> $parameters
+     *
      * @return mixed|string
      *
      * @throws ApiErrorException

@@ -40,7 +40,7 @@ class Clearbit_Base
     }
 
     /**
-     * @param mixed[] $hdr
+     * @param array<string, mixed> $hdr
      */
     private function _update_rate_limit(array $hdr): void
     {
@@ -74,6 +74,8 @@ class Clearbit_Base
     }
 
     /**
+     * @param array<string, mixed> $params
+     *
      * @return object
      */
     protected function _execute(array $params = [])

@@ -52,8 +52,8 @@ class ReportBuilderEvent extends AbstractReportEvent
      * 'display_name' => The translation key to display in the select list
      * 'columns'      => An array containing the table's columns
      *
-     * @param string $context Context for data
-     * @param array  $data    Data array for the table
+     * @param string               $context Context for data
+     * @param array<string, mixed> $data    Data array for the table
      */
     public function addTable($context, array $data, $group = null): static
     {
@@ -180,6 +180,8 @@ class ReportBuilderEvent extends AbstractReportEvent
 
     /**
      * Add campaign columns joined by the campaign lead event log table.
+     *
+     * @return array<string, array<string, string>>
      */
     public function getCampaignByChannelColumns(): array
     {

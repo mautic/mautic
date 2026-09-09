@@ -77,7 +77,7 @@ final readonly class CampaignSendSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param mixed[] $result
+     * @param array<int, mixed> $result
      */
     private function processResponse(PendingEvent $event, array $result): void
     {

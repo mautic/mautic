@@ -89,6 +89,9 @@ final class Mapper
         return $mapped;
     }
 
+    /**
+     * @return array[]
+     */
     public function getArray(): array
     {
         return $this->objectMappedValues;

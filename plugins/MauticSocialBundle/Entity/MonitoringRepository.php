@@ -11,6 +11,8 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 final class MonitoringRepository extends CommonRepository
 {
     /**
+     * @param array<string, mixed> $args
+     *
      * @return Paginator
      */
     public function getPublishedEntities(array $args = [])
