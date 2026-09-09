@@ -366,13 +366,29 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
     private function resolveTargets(array $propertyAttributes, array $methodAttributes, Class_ $node): ?array
     {
         $propertyResolved = [];
+        $newProperties    = [];
         foreach ($propertyAttributes as $propertyName => $attributeGroups) {
             $property = $this->findProperty($node, $propertyName);
-            if (!$property instanceof Property && !$property instanceof Param) {
+            if ($property instanceof Property || $property instanceof Param) {
+                $propertyResolved[] = [$property, $attributeGroups];
+
+                continue;
+            }
+
+            // The property is not declared in this class. When the class extends a parent, the
+            // mapped property lives there - often a vendor base class we cannot annotate - so
+            // redeclare it here as a protected property carrying the mapping attributes.
+            if (null === $node->extends) {
                 return null;
             }
 
-            $propertyResolved[] = [$property, $attributeGroups];
+            $newProperties[] = new Property(
+                Modifiers::PROTECTED,
+                [new PropertyItem($propertyName)],
+                [],
+                null,
+                $attributeGroups,
+            );
         }
 
         $methodResolved = [];
@@ -389,7 +405,7 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
             'classAttributes'    => [],
             'entityArgs'         => [],
             'isMappedSuperclass' => false,
-            'newProperties'      => [],
+            'newProperties'      => $newProperties,
             'propertyResolved'   => $propertyResolved,
             'methodResolved'     => $methodResolved,
         ];
