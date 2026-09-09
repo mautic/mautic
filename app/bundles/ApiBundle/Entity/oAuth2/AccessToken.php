@@ -20,14 +20,14 @@ class AccessToken extends BaseAccessToken
     protected $id;
     #[ORM\ManyToOne(targetEntity: Client::class)]
     #[ORM\JoinColumn(name: 'client_id', nullable: false, onDelete: 'CASCADE')]
-    protected $client;
+    protected \FOS\OAuthServerBundle\Model\ClientInterface $client;
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'user_id', onDelete: 'CASCADE')]
-    protected $user;
+    protected ?\Symfony\Component\Security\Core\User\UserInterface $user;
     #[ORM\Column(type: 'string', length: 191, unique: true)]
-    protected $token;
+    protected string $token;
     #[ORM\Column(name: 'expires_at', type: 'bigint', nullable: true)]
-    protected $expiresAt;
+    protected ?int $expiresAt;
     #[ORM\Column(type: 'string', length: 191, nullable: true)]
-    protected $scope;
+    protected ?string $scope;
 }
