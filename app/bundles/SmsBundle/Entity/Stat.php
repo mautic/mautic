@@ -30,7 +30,7 @@ class Stat
     #[ORM\GeneratedValue]
     private $id;
 
-    #[ORM\ManyToOne(targetEntity: 'Sms', inversedBy: 'stats')]
+    #[ORM\ManyToOne(targetEntity: Sms::class, inversedBy: 'stats')]
     #[ORM\JoinColumn(name: 'sms_id', onDelete: 'SET NULL')]
     private ?\Mautic\SmsBundle\Entity\Sms $sms = null;
 

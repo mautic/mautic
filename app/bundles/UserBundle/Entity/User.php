@@ -125,7 +125,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
 
     #[Groups(['user:read', 'user:write'])]
     #[Assert\NotBlank(message: 'mautic.user.user.role.notblank')]
-    #[ORM\ManyToOne(targetEntity: 'Role', cascade: ['merge'], inversedBy: 'users')]
+    #[ORM\ManyToOne(targetEntity: Role::class, cascade: ['merge'], inversedBy: 'users')]
     #[ORM\JoinColumn(name: 'role_id', nullable: false)]
     private ?\Mautic\UserBundle\Entity\Role $role = null;
 

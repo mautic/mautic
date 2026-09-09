@@ -29,7 +29,7 @@ class Stat
     #[ORM\GeneratedValue]
     private $id;
 
-    #[ORM\ManyToOne(targetEntity: 'Notification', inversedBy: 'stats')]
+    #[ORM\ManyToOne(targetEntity: Notification::class, inversedBy: 'stats')]
     #[ORM\JoinColumn(name: 'notification_id', onDelete: 'SET NULL')]
     private ?\Mautic\NotificationBundle\Entity\Notification $notification = null;
 

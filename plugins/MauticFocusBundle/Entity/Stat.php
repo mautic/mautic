@@ -33,7 +33,7 @@ class Stat
     /**
      * @var Focus
      */
-    #[ORM\ManyToOne(targetEntity: 'Focus')]
+    #[ORM\ManyToOne(targetEntity: Focus::class)]
     #[ORM\JoinColumn(name: 'focus_id', nullable: false, onDelete: 'CASCADE')]
     private $focus;
 

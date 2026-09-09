@@ -84,8 +84,8 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
      * @var ArrayCollection<int, Permission>
      */
     #[Groups(['role:read', 'role:write'])]
-    #[ORM\OneToMany(mappedBy: 'role', targetEntity: 'Permission', cascade: ['persist', 'remove'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
-    private \Doctrine\Common\Collections\ArrayCollection|array $permissions;
+    #[ORM\OneToMany(mappedBy: 'role', targetEntity: Permission::class, cascade: ['persist', 'remove'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
+    private \Doctrine\Common\Collections\Collection|array $permissions;
 
     #[Groups(['role:read', 'role:write'])]
     #[ORM\Column(name: 'readable_permissions', type: 'array')]
@@ -94,8 +94,8 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
     /**
      * @var ArrayCollection<int, User>
      */
-    #[ORM\OneToMany(mappedBy: 'role', targetEntity: 'User', fetch: 'EXTRA_LAZY')]
-    private \Doctrine\Common\Collections\ArrayCollection|array $users;
+    #[ORM\OneToMany(mappedBy: 'role', targetEntity: User::class, fetch: 'EXTRA_LAZY')]
+    private \Doctrine\Common\Collections\Collection|array $users;
 
     public function __construct()
     {
@@ -171,7 +171,7 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
     /**
      * @return ArrayCollection<int, Permission>
      */
-    public function getPermissions(): \Doctrine\Common\Collections\ArrayCollection|array
+    public function getPermissions(): \Doctrine\Common\Collections\Collection|array
     {
         return $this->permissions;
     }
@@ -259,7 +259,7 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
     /**
      * @return ArrayCollection<int, User>
      */
-    public function getUsers(): \Doctrine\Common\Collections\ArrayCollection|array
+    public function getUsers(): \Doctrine\Common\Collections\Collection|array
     {
         return $this->users;
     }

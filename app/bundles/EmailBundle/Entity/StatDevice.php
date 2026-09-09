@@ -25,7 +25,7 @@ class StatDevice
     #[ORM\GeneratedValue]
     private $id;
 
-    #[ORM\ManyToOne(targetEntity: 'Stat')]
+    #[ORM\ManyToOne(targetEntity: Stat::class)]
     #[ORM\JoinColumn(name: 'stat_id', onDelete: 'CASCADE')]
     private ?Stat $stat = null;
 

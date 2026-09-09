@@ -19,7 +19,7 @@ class Log
     #[ORM\GeneratedValue]
     private $id;
 
-    #[ORM\ManyToOne(targetEntity: 'Webhook', inversedBy: 'logs')]
+    #[ORM\ManyToOne(targetEntity: Webhook::class, inversedBy: 'logs')]
     #[ORM\JoinColumn(name: 'webhook_id', nullable: false, onDelete: 'CASCADE')]
     private ?\Mautic\WebhookBundle\Entity\Webhook $webhook = null;
 

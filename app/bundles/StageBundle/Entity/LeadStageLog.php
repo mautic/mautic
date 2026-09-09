@@ -18,7 +18,7 @@ class LeadStageLog
      * @var Stage
      */
     #[ORM\Id]
-    #[ORM\ManyToOne(targetEntity: 'Stage', inversedBy: 'log')]
+    #[ORM\ManyToOne(targetEntity: Stage::class, inversedBy: 'log')]
     #[ORM\JoinColumn(name: 'stage_id', onDelete: 'CASCADE')]
     private $stage;
 

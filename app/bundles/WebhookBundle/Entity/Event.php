@@ -21,14 +21,14 @@ class Event
     #[ORM\GeneratedValue]
     private $id;
 
-    #[ORM\ManyToOne(targetEntity: 'Webhook', cascade: ['detach', 'merge'], inversedBy: 'events')]
+    #[ORM\ManyToOne(targetEntity: Webhook::class, cascade: ['detach', 'merge'], inversedBy: 'events')]
     #[ORM\JoinColumn(name: 'webhook_id', nullable: false, onDelete: 'CASCADE')]
     private ?\Mautic\WebhookBundle\Entity\Webhook $webhook = null;
 
     /**
      * @var ArrayCollection<int, WebhookQueue>
      */
-    #[ORM\OneToMany(mappedBy: 'event', targetEntity: 'WebhookQueue', cascade: ['detach', 'merge'], fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToMany(mappedBy: 'event', targetEntity: WebhookQueue::class, cascade: ['detach', 'merge'], fetch: 'EXTRA_LAZY')]
     private $queues;
 
     /**

@@ -17,7 +17,7 @@ class CompanyLead
      * @var Company
      */
     #[ORM\Id]
-    #[ORM\ManyToOne(targetEntity: 'Company')]
+    #[ORM\ManyToOne(targetEntity: Company::class)]
     #[ORM\JoinColumn(name: 'company_id', nullable: false, onDelete: 'CASCADE')]
     private $company;
 

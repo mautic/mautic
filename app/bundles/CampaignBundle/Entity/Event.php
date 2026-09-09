@@ -198,7 +198,7 @@ class Event implements ChannelInterface, UuidInterface
      * @var ArrayCollection<int, Event>
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
-    #[ORM\OneToMany(mappedBy: 'parent', targetEntity: 'Event', indexBy: 'id')]
+    #[ORM\OneToMany(mappedBy: 'parent', targetEntity: self::class, indexBy: 'id')]
     #[ORM\OrderBy(['order' => 'ASC'])]
     private $children;
 
@@ -206,7 +206,7 @@ class Event implements ChannelInterface, UuidInterface
      * @var Event|null
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
-    #[ORM\ManyToOne(targetEntity: 'Event', cascade: ['persist'], inversedBy: 'children')]
+    #[ORM\ManyToOne(targetEntity: self::class, cascade: ['persist'], inversedBy: 'children')]
     #[ORM\JoinColumn(name: 'parent_id')]
     private $parent;
 
@@ -226,7 +226,7 @@ class Event implements ChannelInterface, UuidInterface
     /**
      * @var ArrayCollection<int, LeadEventLog>
      */
-    #[ORM\OneToMany(mappedBy: 'event', targetEntity: 'LeadEventLog', cascade: ['persist'], fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToMany(mappedBy: 'event', targetEntity: LeadEventLog::class, cascade: ['persist'], fetch: 'EXTRA_LAZY')]
     private $log;
 
     /**
@@ -261,7 +261,7 @@ class Event implements ChannelInterface, UuidInterface
     private int $failedCount = 0;
 
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
-    #[ORM\ManyToOne(targetEntity: 'Event', cascade: ['persist'])]
+    #[ORM\ManyToOne(targetEntity: self::class, cascade: ['persist'])]
     #[ORM\JoinColumn(name: 'redirect_event_id', onDelete: 'SET NULL')]
     private ?Event $redirectEvent = null;
 
@@ -274,7 +274,7 @@ class Event implements ChannelInterface, UuidInterface
      *
      * @var ArrayCollection<int, Event>
      */
-    #[ORM\OneToMany(mappedBy: 'redirectEvent', targetEntity: 'Event', fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToMany(mappedBy: 'redirectEvent', targetEntity: self::class, fetch: 'EXTRA_LAZY')]
     private Collection $redirectingEvents;
 
     public function __construct(?\DateTime $dateAdded = null)

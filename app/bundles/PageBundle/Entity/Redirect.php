@@ -44,7 +44,7 @@ class Redirect extends FormEntity
     /**
      * @var ArrayCollection<int, Trackable>
      */
-    #[ORM\OneToMany(mappedBy: 'redirect', targetEntity: 'Trackable', fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToMany(mappedBy: 'redirect', targetEntity: Trackable::class, fetch: 'EXTRA_LAZY')]
     private $trackables;
 
     public function __construct()

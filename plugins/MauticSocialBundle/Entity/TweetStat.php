@@ -38,7 +38,7 @@ class TweetStat
     #[ORM\Column(name: 'twitter_tweet_id', type: 'string', length: 191, nullable: true)]
     private $twitterTweetId;
 
-    #[ORM\ManyToOne(targetEntity: 'Tweet', inversedBy: 'stats')]
+    #[ORM\ManyToOne(targetEntity: Tweet::class, inversedBy: 'stats')]
     #[ORM\JoinColumn(name: 'tweet_id', onDelete: 'SET NULL')]
     private ?Tweet $tweet = null;
 

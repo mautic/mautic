@@ -18,7 +18,7 @@ class LeadPointLog
      * @var Point
      */
     #[ORM\Id]
-    #[ORM\ManyToOne(targetEntity: 'Point', inversedBy: 'log')]
+    #[ORM\ManyToOne(targetEntity: Point::class, inversedBy: 'log')]
     #[ORM\JoinColumn(name: 'point_id', onDelete: 'CASCADE')]
     private $point;
 

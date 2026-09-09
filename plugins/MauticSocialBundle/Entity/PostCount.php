@@ -22,7 +22,7 @@ class PostCount
     /**
      * @var Monitoring|null
      */
-    #[ORM\ManyToOne(targetEntity: 'Monitoring')]
+    #[ORM\ManyToOne(targetEntity: Monitoring::class)]
     #[ORM\JoinColumn(name: 'monitor_id', onDelete: 'CASCADE')]
     private $monitor;
 

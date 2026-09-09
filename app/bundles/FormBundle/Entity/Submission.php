@@ -27,7 +27,7 @@ class Submission
     #[ORM\GeneratedValue]
     private $id;
 
-    #[ORM\ManyToOne(targetEntity: 'Form', inversedBy: 'submissions')]
+    #[ORM\ManyToOne(targetEntity: Form::class, inversedBy: 'submissions')]
     #[ORM\JoinColumn(name: 'form_id', nullable: false, onDelete: 'CASCADE')]
     private ?\Mautic\FormBundle\Entity\Form $form = null;
 

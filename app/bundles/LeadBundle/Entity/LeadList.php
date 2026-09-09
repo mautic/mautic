@@ -138,7 +138,7 @@ class LeadList extends FormEntity implements UuidInterface
     /**
      * @var ArrayCollection<ListLead>
      */
-    #[ORM\OneToMany(mappedBy: 'list', targetEntity: 'ListLead', fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToMany(mappedBy: 'list', targetEntity: ListLead::class, fetch: 'EXTRA_LAZY')]
     private $leads;
 
     #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]

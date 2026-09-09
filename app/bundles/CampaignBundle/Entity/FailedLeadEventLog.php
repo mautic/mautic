@@ -14,7 +14,7 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 class FailedLeadEventLog
 {
     #[ORM\Id]
-    #[ORM\OneToOne(inversedBy: 'failedLog', targetEntity: 'LeadEventLog')]
+    #[ORM\OneToOne(inversedBy: 'failedLog', targetEntity: LeadEventLog::class)]
     #[ORM\JoinColumn(name: 'log_id', nullable: false, onDelete: 'CASCADE')]
     private ?\Mautic\CampaignBundle\Entity\LeadEventLog $log = null;
 

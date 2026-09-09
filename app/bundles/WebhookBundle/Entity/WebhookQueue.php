@@ -21,7 +21,7 @@ class WebhookQueue
     #[ORM\GeneratedValue]
     private ?string $id = null;
 
-    #[ORM\ManyToOne(targetEntity: 'Webhook')]
+    #[ORM\ManyToOne(targetEntity: Webhook::class)]
     #[ORM\JoinColumn(name: 'webhook_id', nullable: false, onDelete: 'CASCADE')]
     private ?Webhook $webhook = null;
 
@@ -36,7 +36,7 @@ class WebhookQueue
      */
     private $payloadCompressed;
 
-    #[ORM\ManyToOne(targetEntity: 'Event', inversedBy: 'queues')]
+    #[ORM\ManyToOne(targetEntity: Event::class, inversedBy: 'queues')]
     #[ORM\JoinColumn(name: 'event_id', nullable: false, onDelete: 'CASCADE')]
     private ?Event $event = null;
 

@@ -28,7 +28,7 @@ class DynamicContentLeadData extends CommonEntity
     /**
      * @var DynamicContent|null
      */
-    #[ORM\ManyToOne(targetEntity: 'DynamicContent', inversedBy: 'id')]
+    #[ORM\ManyToOne(targetEntity: DynamicContent::class, inversedBy: 'id')]
     #[ORM\JoinColumn(name: 'dynamic_content_id', onDelete: 'CASCADE')]
     private $dynamicContent;
 

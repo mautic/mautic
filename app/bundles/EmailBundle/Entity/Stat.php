@@ -36,7 +36,7 @@ class Stat
     #[ORM\GeneratedValue]
     private ?string $id = null;
 
-    #[ORM\ManyToOne(targetEntity: 'Email', inversedBy: 'stats')]
+    #[ORM\ManyToOne(targetEntity: Email::class, inversedBy: 'stats')]
     #[ORM\JoinColumn(name: 'email_id', onDelete: 'SET NULL')]
     private ?\Mautic\EmailBundle\Entity\Email $email = null;
 
@@ -135,7 +135,7 @@ class Stat
      * @var ArrayCollection|EmailReply[]
      */
     #[ORM\OneToMany(mappedBy: 'stat', targetEntity: EmailReply::class, cascade: ['all'], fetch: 'EXTRA_LAZY')]
-    private \Doctrine\Common\Collections\ArrayCollection|array $replies;
+    private \Doctrine\Common\Collections\Collection|array $replies;
 
     /**
      * @var array<string,mixed[]>
@@ -505,7 +505,7 @@ class Stat
     /**
      * @return ArrayCollection<int, EmailReply>
      */
-    public function getReplies(): \Doctrine\Common\Collections\ArrayCollection|array
+    public function getReplies(): \Doctrine\Common\Collections\Collection|array
     {
         return $this->replies;
     }

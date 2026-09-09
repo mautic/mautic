@@ -41,7 +41,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     /**
      * @var Event
      */
-    #[ORM\ManyToOne(targetEntity: 'Event', inversedBy: 'log')]
+    #[ORM\ManyToOne(targetEntity: Event::class, inversedBy: 'log')]
     #[ORM\JoinColumn(name: 'event_id', nullable: false)]
     private $event;
 
@@ -55,7 +55,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     /**
      * @var Campaign|null
      */
-    #[ORM\ManyToOne(targetEntity: 'Campaign')]
+    #[ORM\ManyToOne(targetEntity: Campaign::class)]
     #[ORM\JoinColumn(name: 'campaign_id')]
     private $campaign;
 
@@ -128,7 +128,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     /**
      * @var FailedLeadEventLog|null
      */
-    #[ORM\OneToOne(mappedBy: 'log', targetEntity: 'FailedLeadEventLog', cascade: ['all'], fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToOne(mappedBy: 'log', targetEntity: FailedLeadEventLog::class, cascade: ['all'], fetch: 'EXTRA_LAZY')]
     private $failedLog;
 
     /**

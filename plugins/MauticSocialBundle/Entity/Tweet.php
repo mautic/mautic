@@ -110,8 +110,8 @@ class Tweet extends FormEntity
     /**
      * @var ArrayCollection<int, TweetStat>
      */
-    #[ORM\OneToMany(mappedBy: 'tweet', targetEntity: 'TweetStat', cascade: ['persist'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
-    private \Doctrine\Common\Collections\ArrayCollection $stats;
+    #[ORM\OneToMany(mappedBy: 'tweet', targetEntity: TweetStat::class, cascade: ['persist'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
+    private \Doctrine\Common\Collections\Collection $stats;
 
     public function __construct()
     {
@@ -392,7 +392,7 @@ class Tweet extends FormEntity
         return $this;
     }
 
-    public function getStats(): \Doctrine\Common\Collections\ArrayCollection
+    public function getStats(): \Doctrine\Common\Collections\Collection
     {
         return $this->stats;
     }

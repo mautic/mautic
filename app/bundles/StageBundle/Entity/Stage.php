@@ -103,7 +103,7 @@ class Stage extends FormEntity implements UuidInterface
     /**
      * @var ArrayCollection<int,LeadStageLog>
      */
-    #[ORM\OneToMany(mappedBy: 'stage', targetEntity: 'LeadStageLog', cascade: ['persist', 'remove'], fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToMany(mappedBy: 'stage', targetEntity: LeadStageLog::class, cascade: ['persist', 'remove'], fetch: 'EXTRA_LAZY')]
     private $log;
 
     /**

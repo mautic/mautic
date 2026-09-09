@@ -98,7 +98,7 @@ class TriggerEvent implements UuidInterface
     /**
      * @var ArrayCollection<int,LeadTriggerLog>
      */
-    #[ORM\OneToMany(mappedBy: 'event', targetEntity: 'LeadTriggerLog', cascade: ['persist', 'remove'], fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToMany(mappedBy: 'event', targetEntity: LeadTriggerLog::class, cascade: ['persist', 'remove'], fetch: 'EXTRA_LAZY')]
     private $log;
 
     /**

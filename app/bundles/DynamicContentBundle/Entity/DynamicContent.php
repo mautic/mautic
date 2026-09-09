@@ -144,7 +144,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
      * @var ArrayCollection<Stat>
      */
     #[Groups(['dynamicContent:read'])]
-    #[ORM\OneToMany(mappedBy: 'dynamicContent', targetEntity: 'Stat', cascade: ['persist'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
+    #[ORM\OneToMany(mappedBy: 'dynamicContent', targetEntity: Stat::class, cascade: ['persist'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
     private $stats;
 
     /**

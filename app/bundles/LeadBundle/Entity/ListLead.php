@@ -22,7 +22,7 @@ class ListLead
      * @var LeadList
      */
     #[ORM\Id]
-    #[ORM\ManyToOne(targetEntity: 'LeadList', inversedBy: 'leads')]
+    #[ORM\ManyToOne(targetEntity: LeadList::class, inversedBy: 'leads')]
     #[ORM\JoinColumn(name: 'leadlist_id', nullable: false, onDelete: 'CASCADE')]
     private $list;
 

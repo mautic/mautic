@@ -21,7 +21,7 @@ class Stat
     #[ORM\GeneratedValue]
     private ?string $id = null;
 
-    #[ORM\ManyToOne(targetEntity: 'DynamicContent', inversedBy: 'stats')]
+    #[ORM\ManyToOne(targetEntity: DynamicContent::class, inversedBy: 'stats')]
     #[ORM\JoinColumn(name: 'dynamic_content_id', onDelete: 'SET NULL')]
     private ?\Mautic\DynamicContentBundle\Entity\DynamicContent $dynamicContent = null;
 

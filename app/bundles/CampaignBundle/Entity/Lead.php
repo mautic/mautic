@@ -16,7 +16,7 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 class Lead
 {
     #[ORM\Id]
-    #[ORM\ManyToOne(targetEntity: 'Campaign', inversedBy: 'leads')]
+    #[ORM\ManyToOne(targetEntity: Campaign::class, inversedBy: 'leads')]
     #[ORM\JoinColumn(name: 'campaign_id', nullable: false, onDelete: 'CASCADE')]
     private ?\Mautic\CampaignBundle\Entity\Campaign $campaign = null;
 

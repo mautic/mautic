@@ -294,7 +294,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @var ArrayCollection<Stat>
      */
-    #[ORM\OneToMany(mappedBy: 'email', targetEntity: 'Stat', cascade: ['persist'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
+    #[ORM\OneToMany(mappedBy: 'email', targetEntity: Stat::class, cascade: ['persist'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
     private $stats;
 
     /**

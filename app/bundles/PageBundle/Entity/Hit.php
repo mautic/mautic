@@ -43,14 +43,14 @@ class Hit
     #[ORM\Column(name: 'date_left', type: 'datetime', nullable: true)]
     private $dateLeft;
 
-    #[ORM\ManyToOne(targetEntity: 'Page')]
+    #[ORM\ManyToOne(targetEntity: Page::class)]
     #[ORM\JoinColumn(name: 'page_id', onDelete: 'SET NULL')]
     private ?Page $page = null;
 
     /**
      * @var Redirect|null
      */
-    #[ORM\ManyToOne(targetEntity: 'Redirect')]
+    #[ORM\ManyToOne(targetEntity: Redirect::class)]
     #[ORM\JoinColumn(name: 'redirect_id', onDelete: 'SET NULL')]
     private $redirect;
 

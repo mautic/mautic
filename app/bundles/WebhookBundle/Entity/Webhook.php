@@ -99,13 +99,13 @@ class Webhook extends FormEntity implements SkipModifiedInterface
      * @var Collection<int, Event>
      */
     #[Groups(['webhook:read', 'webhook:write'])]
-    #[ORM\OneToMany(mappedBy: 'webhook', targetEntity: 'Event', cascade: ['persist', 'merge', 'detach'], orphanRemoval: true, indexBy: 'eventType')]
+    #[ORM\OneToMany(mappedBy: 'webhook', targetEntity: Event::class, cascade: ['persist', 'merge', 'detach'], orphanRemoval: true, indexBy: 'eventType')]
     private $events;
 
     /**
      * @var ArrayCollection<int, Log>
      */
-    #[ORM\OneToMany(mappedBy: 'webhook', targetEntity: 'Log', cascade: ['persist', 'merge', 'detach'], fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToMany(mappedBy: 'webhook', targetEntity: Log::class, cascade: ['persist', 'merge', 'detach'], fetch: 'EXTRA_LAZY')]
     #[ORM\OrderBy(['dateAdded' => Order::Descending->value])]
     private $logs;
 

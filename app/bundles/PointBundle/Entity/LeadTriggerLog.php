@@ -18,7 +18,7 @@ class LeadTriggerLog
      * @var TriggerEvent
      */
     #[ORM\Id]
-    #[ORM\ManyToOne(targetEntity: 'TriggerEvent', inversedBy: 'log')]
+    #[ORM\ManyToOne(targetEntity: TriggerEvent::class, inversedBy: 'log')]
     #[ORM\JoinColumn(name: 'event_id', nullable: false, onDelete: 'CASCADE')]
     private $event;
 

@@ -13,7 +13,7 @@ class Lead
      * @var Monitoring
      */
     #[ORM\Id]
-    #[ORM\ManyToOne(targetEntity: 'Monitoring')]
+    #[ORM\ManyToOne(targetEntity: Monitoring::class)]
     #[ORM\JoinColumn(name: 'monitor_id', nullable: false, onDelete: 'CASCADE')]
     private $monitor;
 

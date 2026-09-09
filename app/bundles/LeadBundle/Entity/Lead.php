@@ -165,7 +165,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @var Collection<int, PointsChangeLog>
      */
-    #[ORM\OneToMany(mappedBy: 'lead', targetEntity: 'PointsChangeLog', cascade: ['all'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'lead', targetEntity: PointsChangeLog::class, cascade: ['all'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
     #[ORM\OrderBy(['dateAdded' => 'DESC'])]
     private $pointsChangeLog;
 
@@ -174,7 +174,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @var Collection<int, CompanyChangeLog>
      */
-    #[ORM\OneToMany(mappedBy: 'lead', targetEntity: 'CompanyChangeLog', cascade: ['all'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'lead', targetEntity: CompanyChangeLog::class, cascade: ['all'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
     #[ORM\OrderBy(['dateAdded' => 'DESC'])]
     private $companyChangeLog;
 
@@ -251,7 +251,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @var Collection<int, LeadNote>
      */
-    #[ORM\OneToMany(mappedBy: 'lead', targetEntity: 'LeadNote', cascade: ['detach', 'merge'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'lead', targetEntity: LeadNote::class, cascade: ['detach', 'merge'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
     #[ORM\OrderBy(['dateAdded' => 'DESC'])]
     private $notes;
 
@@ -288,7 +288,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @var Collection<int, StagesChangeLog>
      */
-    #[ORM\OneToMany(mappedBy: 'lead', targetEntity: 'StagesChangeLog', cascade: ['all'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'lead', targetEntity: StagesChangeLog::class, cascade: ['all'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
     #[ORM\OrderBy(['dateAdded' => 'DESC'])]
     private $stageChangeLog;
 

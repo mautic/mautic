@@ -24,7 +24,7 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
     /**
      * @var Plugin|null
      */
-    #[ORM\ManyToOne(targetEntity: 'Plugin', inversedBy: 'integrations')]
+    #[ORM\ManyToOne(targetEntity: Plugin::class, inversedBy: 'integrations')]
     #[ORM\JoinColumn(name: 'plugin_id', onDelete: 'CASCADE')]
     private $plugin;
 
