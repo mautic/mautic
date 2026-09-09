@@ -496,7 +496,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $this->leadModel->setFieldValues($lead, ['score' => 0], false, true);
 
-        $this->assertSame(0.0, $lead->getFieldValue('score'), 'A zero must not be overwritten from the social cache.');
+        $this->assertEqualsWithDelta(0.0, $lead->getFieldValue('score'), PHP_FLOAT_EPSILON, 'A zero must not be overwritten from the social cache.');
     }
 
     public function testImportIsIgnoringContactWithNotFoundStage(): void

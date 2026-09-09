@@ -208,8 +208,8 @@ final class LeadApiZeroValueFunctionalTest extends MauticMysqlTestCase
         $field->setAlias($alias);
         $field->setProperties($properties);
 
-        $fieldModel = static::getContainer()->get(FieldModel::class);
-        \assert($fieldModel instanceof FieldModel);
+        $fieldModel = self::getContainer()->get(FieldModel::class);
+        $this->assertInstanceOf(FieldModel::class, $fieldModel);
         $fieldModel->saveEntity($field);
 
         $this->em->flush();
