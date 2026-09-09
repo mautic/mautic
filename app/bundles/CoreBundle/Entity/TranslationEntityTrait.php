@@ -17,25 +17,25 @@ trait TranslationEntityTrait
      *
      * @var string
      */
-    #[Groups(['page:read', 'download:read', 'email:read'])]
+    #[Groups(['page:read', 'download:read', 'email:read', 'form:read'])]
     public $languageSlug;
 
     /**
      * @var Collection<int, T>
      */
-    #[Groups(['page:read', 'page:write', 'download:read', 'download:write', 'email:read', 'email:write', 'dynamicContent:read', 'dynamicContent:write'])]
+    #[Groups(['page:read', 'page:write', 'download:read', 'download:write', 'email:read', 'email:write', 'dynamicContent:read', 'dynamicContent:write', 'form:read', 'form:write'])]
     private $translationChildren;
 
     /**
      * @var T|null
      */
-    #[Groups(['page:read', 'page:write', 'download:read', 'download:write', 'email:read', 'email:write', 'dynamicContent:read', 'dynamicContent:write'])]
+    #[Groups(['page:read', 'page:write', 'download:read', 'download:write', 'email:read', 'email:write', 'dynamicContent:read', 'dynamicContent:write', 'form:read', 'form:write'])]
     private $translationParent;
 
-    #[Groups(['page:read', 'page:write', 'download:read', 'download:write', 'email:read', 'email:write', 'dynamicContent:read', 'dynamicContent:write'])]
-    private string $language = 'en';
+    #[Groups(['page:read', 'page:write', 'download:read', 'download:write', 'email:read', 'email:write', 'dynamicContent:read', 'dynamicContent:write', 'form:read', 'form:write'])]
+    private ?string $language = 'en';
 
-    protected static function addTranslationMetadata(ClassMetadataBuilder $builder, string $entityClass, string $languageColumnName = 'lang'): void
+    protected static function addTranslationMetadata(ClassMetadataBuilder $builder, string $entityClass, string $languageColumnName = 'lang', bool $nullableLanguage = false): void
     {
         $builder->createOneToMany('translationChildren', $entityClass)
             ->setIndexBy('id')
@@ -48,9 +48,14 @@ trait TranslationEntityTrait
             ->addJoinColumn('translation_parent_id', 'id', true, false, 'CASCADE')
             ->build();
 
-        $builder->createField('language', 'string')
-            ->columnName($languageColumnName)
-            ->build();
+        $languageField = $builder->createField('language', 'string')
+            ->columnName($languageColumnName);
+
+        if ($nullableLanguage) {
+            $languageField->nullable();
+        }
+
+        $languageField->build();
     }
 
     public function addTranslationChild(TranslationEntityInterface $child): static
@@ -177,13 +182,7 @@ trait TranslationEntityTrait
         return [$parent, $children];
     }
 
-    /**
-     * @param string                      $getter
-     * @param ?TranslationEntityInterface $variantParent
-     *
-     * @return int
-     */
-    protected function getAccumulativeTranslationCount($getter, $variantParent = null)
+    protected function getAccumulativeTranslationCount(string $getter, ?TranslationEntityInterface $variantParent = null): int
     {
         $count = 0;
 
