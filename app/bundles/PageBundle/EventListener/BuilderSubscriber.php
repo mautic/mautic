@@ -6,6 +6,7 @@ use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\DTO\TokenFormatOptions;
 use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\DynamicContentBundle\EventListener\DwcTokensSubscriber;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -21,20 +22,19 @@ use Twig\Environment;
 
 final class BuilderSubscriber implements EventSubscriberInterface
 {
-    private const pageTokenRegex         = '{pagelink=(.*?)}';
+    public const pageTokenRegex           = '{pagelink=(.*?)}';
 
-    private const dwcTokenRegex          = '{dwc=(.*?)}';
-
-    private const langBarRegex           = '{langbar}';
-
-    private const shareButtonsRegex      = '{sharebuttons}';
-
-    private const titleRegex             = '{pagetitle}';
-
-    private const descriptionRegex       = '{pagemetadescription}';
+    /**
+     * @deprecated use DwcTokensSubscriber::DWCTOKENREGEX instead
+     */
+    public const dwcTokenRegex            = DwcTokensSubscriber::DWCTOKENREGEX;
+    public const langBarRegex             = '{langbar}';
+    public const shareButtonsRegex        = '{sharebuttons}';
+    public const titleRegex               = '{pagetitle}';
 
     public const brandName                = '{brand=name}';
 
+    public const descriptionRegex         = '{pagemetadescription}';
     public const segmentListRegex         = '{segmentlist}';
 
     public const categoryListRegex        = '{categorylist}';
@@ -133,7 +133,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
             $event->addAbTestWinnerCriteria('page.dwelltime', $dwellTime);
         }
 
-        if ($event->tokensRequested([self::pageTokenRegex, self::dwcTokenRegex])) {
+        if ($event->tokensRequested([self::pageTokenRegex])) {
             $tokenFilter = $event->getTokenFilter();
             $labelFilter = 'label' === $tokenFilter['target'] ? $tokenFilter['filter'] : '';
             $tokens      = $tokenHelper->getFormattedTokens(

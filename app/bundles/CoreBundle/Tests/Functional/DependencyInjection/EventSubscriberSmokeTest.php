@@ -127,6 +127,7 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
             \Mautic\CampaignBundle\EventListener\ReportSubscriber::class,
             \Mautic\ChannelBundle\EventListener\ReportSubscriber::class,
             \Mautic\CoreBundle\EventListener\ReportSubscriber::class,
+            \Mautic\DynamicContentBundle\EventListener\DynamicContentReportSubscriber::class,
             \Mautic\EmailBundle\EventListener\ReportSubscriber::class,
             \Mautic\FormBundle\EventListener\ReportSubscriber::class,
             ReportDNCSubscriber::class,
@@ -168,6 +169,7 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
         ],
         'mautic.email_on_send' => [
             \Mautic\AssetBundle\EventListener\BuilderSubscriber::class,
+            \Mautic\DynamicContentBundle\EventListener\DynamicContentSubscriber::class,
             \Mautic\EmailBundle\EventListener\BuilderSubscriber::class,
             DateTimeTokenSubscriber::class,
             \Mautic\EmailBundle\EventListener\EmailSubscriber::class,
