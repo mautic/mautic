@@ -4,13 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Event;
 
-use Symfony\Contracts\EventDispatcher\Event;
-
-class SearchHelpEvent extends Event
+final class SearchHelpEvent extends AbstractSearchEvent
 {
-    use SearchEventTrait;
-
-    public function __construct(private string $help, private string $context)
+    public function __construct(private string $help, protected string $context)
     {
     }
 

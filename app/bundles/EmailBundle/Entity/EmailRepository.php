@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Helper\QueryBuilderManipulatorTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends CommonRepository<Email>
@@ -28,9 +29,10 @@ class EmailRepository extends CommonRepository
     use ProjectRepositoryTrait;
     use QueryBuilderManipulatorTrait;
 
-    protected ?EventDispatcherInterface $dispatcher = null;
+    protected EventDispatcherInterface $dispatcher;
 
-    public function setDispatcher(EventDispatcherInterface $dispatcher): void
+    #[Required]
+    public function autowireDispatcher(EventDispatcherInterface $dispatcher): void
     {
         $this->dispatcher = $dispatcher;
     }
@@ -704,11 +706,9 @@ class EmailRepository extends CommonRepository
             'mautic.project.searchcommand.name',
         ];
 
-        if (null !== $this->dispatcher) {
-            $searchCommandEvent = new SearchCommandEvent($commands, 'email');
-            $this->dispatcher->dispatch($searchCommandEvent);
-            $commands = $searchCommandEvent->getCommands();
-        }
+        $searchCommandEvent = new SearchCommandEvent($commands, 'email');
+        $this->dispatcher->dispatch($searchCommandEvent);
+        $commands = $searchCommandEvent->getCommands();
 
         return array_merge($commands, parent::getSearchCommands());
     }
@@ -1005,10 +1005,6 @@ class EmailRepository extends CommonRepository
      */
     private function dispatchAddSearchCommandWhereClause($query, object $filter): array
     {
-        if (null === $this->dispatcher) {
-            return [null, []];
-        }
-
         $searchQueryEvent = new SearchQueryEvent($filter, $query, $this->getTableAlias(), 'email');
         $this->dispatcher->dispatch($searchQueryEvent);
 

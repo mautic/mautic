@@ -8,12 +8,9 @@ use Doctrine\DBAL\Query\QueryBuilder as DBALQueryBuilder;
 use Doctrine\ORM\Query\Expr\Base;
 use Doctrine\ORM\Query\Expr\Comparison;
 use Doctrine\ORM\QueryBuilder as ORMQueryBuilder;
-use Symfony\Contracts\EventDispatcher\Event;
 
-class SearchQueryEvent extends Event
+final class SearchQueryEvent extends AbstractSearchEvent
 {
-    use SearchEventTrait;
-
     private Base|Comparison|null $expr = null;
 
     /**
@@ -25,7 +22,7 @@ class SearchQueryEvent extends Event
         private object $filter,
         private ORMQueryBuilder|DBALQueryBuilder $query,
         private string $alias,
-        private string $context,
+        protected string $context,
     ) {
     }
 
