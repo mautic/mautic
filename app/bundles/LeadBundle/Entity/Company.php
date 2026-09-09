@@ -41,10 +41,19 @@ use Symfony\Component\Validator\Constraints as Assert;
     ]
 )]
 #[UniqueCustomField(object: 'company')]
+#[ORM\Entity(repositoryClass: CompanyRepository::class)]
+#[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Company extends FormEntity implements CustomFieldEntityInterface, IdentifierFieldEntityInterface
 {
     use CustomFieldEntityTrait;
     use ProjectTrait;
+    #[ORM\ManyToMany(targetEntity: \Mautic\ProjectBundle\Entity\Project::class, cascade: ['merge', 'persist', 'detach'], fetch: 'LAZY', indexBy: 'name')]
+    #[ORM\JoinTable(name: 'company_projects_xref')]
+    #[ORM\JoinColumn(name: 'company_id', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'project_id', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\OrderBy(['name' => 'ASC'])]
+    private \Doctrine\Common\Collections\Collection $projects;
 
     public const FIELD_ALIAS = 'company';
 
@@ -54,6 +63,9 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
      * @var int
      */
     #[Groups(['company:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -61,15 +73,19 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
      */
     #[Groups(['company:read', 'company:write'])]
     #[Assert\Range(min: 0, max: 2147483647)]
+    #[ORM\Column(type: 'integer', nullable: true)]
     private $score = 0;
 
     #[Groups(['company:read', 'company:write'])]
+    #[ORM\ManyToOne(targetEntity: User::class, cascade: ['merge'])]
+    #[ORM\JoinColumn(name: 'owner_id', onDelete: 'SET NULL')]
     private ?User $owner = null;
 
     /**
      * @var mixed[]
      */
     #[Groups(['company:read', 'company:write'])]
+    #[ORM\Column(name: 'social_cache', type: 'array', nullable: true)]
     private $socialCache = [];
 
     /**
@@ -145,6 +161,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     private $description;
 
     #[Groups(['company:read', 'company:write'])]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $deleted = null;
 
     public function __construct()
@@ -178,29 +195,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-        $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(CompanyRepository::class);
-
-        $builder->createField('id', 'integer')
-            ->makePrimaryKey()
-            ->generatedValue()
-            ->build();
-
-        $builder->createField('socialCache', 'array')
-            ->columnName('social_cache')
-            ->nullable()
-            ->build();
-
-        $builder->createManyToOne('owner', User::class)
-            ->cascadeMerge()
-            ->addJoinColumn('owner_id', 'id', true, false, 'SET NULL')
-            ->build();
-
-        $builder->createField('score', 'integer')
-            ->nullable()
-            ->build();
-
-        $builder->addNullableField('deleted', Types::DATETIME_MUTABLE);
 
         self::loadFixedFieldMetadata(
             $builder,
@@ -220,8 +214,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
             ],
             FieldModel::$coreCompanyFields
         );
-
-        self::addProjectsField($builder, 'company_projects_xref', 'company_id');
     }
 
     /**

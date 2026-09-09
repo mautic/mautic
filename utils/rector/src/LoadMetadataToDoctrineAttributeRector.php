@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Utils\Rector;
 
+use PhpParser\Modifiers;
 use PhpParser\Node;
 use PhpParser\Node\Arg;
 use PhpParser\Node\ArrayItem;
@@ -21,23 +22,25 @@ use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
 use PhpParser\Node\Name\FullyQualified;
 use PhpParser\Node\Param;
+use PhpParser\Node\PropertyItem;
 use PhpParser\Node\Scalar\Int_;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Property;
+use PhpParser\Node\Stmt\TraitUse;
 use Rector\Rector\AbstractRector;
 
 /**
  * Converts a static loadMetadata() ClassMetadataBuilder mapping into Doctrine attributes.
  *
- * Deliberately conservative: if the method contains any builder call this rule does not
- * understand, the whole class is left untouched. A partial rewrite would silently drift
- * the schema, so it is all-or-nothing per class.
+ * Builder chains ($builder->...) are all-or-nothing: an unknown one leaves the class
+ * untouched, since a partial field rewrite would silently drift the schema.
  *
- * Not yet handled (these make a class bail): isOwnershipParent and custom static
- * helpers such as addProjectsField/addTranslationMetadata.
+ * Unsupported static helpers (addTranslationMetadata, addVariantMetadata, addVersionField,
+ * ...) are the exception: they stay behind in a trimmed loadMetadata for a follow-up change,
+ * while the rest of the method is still converted.
  */
 final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
 {
@@ -80,12 +83,18 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
             return null;
         }
 
+        // A class already carrying ORM mapping attributes is dual-mapped; merging the
+        // generated attributes would duplicate them. Leave it untouched.
+        if ($this->hasOrmMappingAttribute($node->attrGroups)) {
+            return null;
+        }
+
         $result = $this->interpret($loadMetadata->stmts);
         if (null === $result) {
             return null;
         }
 
-        [$classAttributes, $propertyAttributes] = $result;
+        [$classAttributes, $propertyAttributes, $newProperties, $builderAssignStatement, $keptStatements, $methodAttributes] = $result;
 
         // Resolve every target property up front. Bail before mutating anything if one
         // is missing, otherwise a half-applied change makes Rector loop forever.
@@ -99,6 +108,17 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
             $resolved[] = [$property, $attributeGroups];
         }
 
+        // Resolve lifecycle callback methods the same way.
+        $resolvedMethods = [];
+        foreach ($methodAttributes as $methodName => $attributeGroups) {
+            $method = $node->getMethod($methodName);
+            if (!$method instanceof ClassMethod) {
+                return null;
+            }
+
+            $resolvedMethods[] = [$method, $attributeGroups];
+        }
+
         // Every entity gets DEFERRED_EXPLICIT from the builder constructor.
         $classAttributes[] = $this->attribute('ChangeTrackingPolicy', [new Arg(new String_('DEFERRED_EXPLICIT'))]);
 
@@ -106,12 +126,36 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
             $property->attrGroups = array_merge($property->attrGroups, $attributeGroups);
         }
 
+        foreach ($resolvedMethods as [$method, $attributeGroups]) {
+            $method->attrGroups = array_merge($method->attrGroups, $attributeGroups);
+        }
+
         $node->attrGroups = array_merge($node->attrGroups, $classAttributes);
 
-        $node->stmts = array_values(array_filter(
-            $node->stmts,
-            static fn (Node $stmt): bool => $stmt !== $loadMetadata
-        ));
+        if ([] === $keptStatements) {
+            // Nothing left unconverted: drop loadMetadata entirely.
+            $node->stmts = array_values(array_filter(
+                $node->stmts,
+                static fn (Node $stmt): bool => $stmt !== $loadMetadata
+            ));
+        } else {
+            // Unsupported static helpers (addTranslationMetadata, addVersionField, ...) stay
+            // behind in a trimmed loadMetadata for a follow-up change; keep the builder they need.
+            $loadMetadata->stmts = array_values(array_filter([$builderAssignStatement, ...$keptStatements]));
+        }
+
+        // Properties whose declaration lives in a trait (e.g. projects) get emitted into the
+        // class body so their per-entity mapping can be attached; place them after trait uses.
+        if ([] !== $newProperties) {
+            $insertAt = 0;
+            foreach ($node->stmts as $index => $stmt) {
+                if ($stmt instanceof TraitUse) {
+                    $insertAt = $index + 1;
+                }
+            }
+
+            array_splice($node->stmts, $insertAt, 0, $newProperties);
+        }
 
         return $node;
     }
@@ -119,14 +163,18 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
     /**
      * @param Node\Stmt[] $stmts
      *
-     * @return array{list<AttributeGroup>, array<string, list<AttributeGroup>>}|null
+     * @return array{list<AttributeGroup>, array<string, list<AttributeGroup>>, list<Property>, ?Expression, list<Expression>, array<string, list<AttributeGroup>>}|null
      */
     private function interpret(array $stmts): ?array
     {
-        $classAttributes    = [];
-        $propertyAttributes = [];
-        $entityArgs         = [];
-        $isMappedSuperclass = false;
+        $classAttributes        = [];
+        $propertyAttributes     = [];
+        $methodAttributes       = [];
+        $newProperties          = [];
+        $entityArgs             = [];
+        $isMappedSuperclass     = false;
+        $builderAssignStatement = null;
+        $keptStatements         = [];
 
         foreach ($stmts as $stmt) {
             if (!$stmt instanceof Expression) {
@@ -141,14 +189,30 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
                     return null;
                 }
 
+                $builderAssignStatement = $stmt;
+
                 continue;
             }
 
             // self::addUuidField($builder) and friends.
             if ($expr instanceof StaticCall) {
+                // self::addProjectsField($builder, $table, $column): the projects property is
+                // declared in ProjectTrait, so emit a standalone property carrying its mapping.
+                $projectsProperty = $this->tryProjectsField($expr);
+                if ($projectsProperty instanceof Property) {
+                    $newProperties[] = $projectsProperty;
+
+                    continue;
+                }
+
                 $fields = $this->handleStaticHelper($expr);
                 if (null === $fields) {
-                    return null;
+                    // Unsupported static helper (addTranslationMetadata, addVariantMetadata,
+                    // addVersionField, ...): leave the call in place for a follow-up change
+                    // instead of bailing on the whole class.
+                    $keptStatements[] = $stmt;
+
+                    continue;
                 }
 
                 foreach ($fields as $fieldName => $attributeGroups) {
@@ -198,6 +262,10 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
                     $classAttributes = array_merge($classAttributes, $handled['attributes']);
                     $entityArgs      = array_merge($entityArgs, $handled['entityArgs']);
 
+                    foreach ($handled['lifecycle'] as $methodName => $attributeGroups) {
+                        $methodAttributes[$methodName] = array_merge($methodAttributes[$methodName] ?? [], $attributeGroups);
+                    }
+
                     continue;
                 }
 
@@ -212,13 +280,64 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
             }
         }
 
+        // Lifecycle callbacks on methods require the class-level marker attribute.
+        if ([] !== $methodAttributes) {
+            $classAttributes[] = $this->attribute('HasLifecycleCallbacks', []);
+        }
+
         // The mapping root attribute is mandatory; place it first.
         $rootAttribute = $isMappedSuperclass
             ? $this->attribute('MappedSuperclass', $entityArgs)
             : $this->attribute('Entity', $entityArgs);
         array_unshift($classAttributes, $rootAttribute);
 
-        return [$classAttributes, $propertyAttributes];
+        return [$classAttributes, $propertyAttributes, $newProperties, $builderAssignStatement, $keptStatements, $methodAttributes];
+    }
+
+    /**
+     * self::addProjectsField($builder, $tableName, $columnName) maps the trait-declared
+     * `projects` ManyToMany with a per-entity join table. Emit it as a standalone property.
+     */
+    private function tryProjectsField(StaticCall $call): ?Property
+    {
+        if (!$call->class instanceof Name || !in_array($call->class->toString(), ['self', 'static'], true)) {
+            return null;
+        }
+
+        if (!$call->name instanceof Identifier || 'addProjectsField' !== $call->name->toString()) {
+            return null;
+        }
+
+        // args: ($builder, $tableName, $columnName)
+        $tableName  = $this->stringFromArg($call->args, 1);
+        $columnName = $this->stringFromArg($call->args, 2);
+        if (null === $tableName || null === $columnName) {
+            return null;
+        }
+
+        $target = new ClassConstFetch(new FullyQualified('Mautic\\ProjectBundle\\Entity\\Project'), new Identifier('class'));
+
+        $attributeGroups = $this->manyToManyAttributes(
+            $target,
+            null,
+            null,
+            ['merge', 'persist', 'detach'],
+            'LAZY',
+            false,
+            'name',
+            new Array_([new ArrayItem(new String_('ASC'), new String_('name'))]),
+            $tableName,
+            [$this->joinColumn($columnName, 'id', false, false, 'CASCADE')],
+            [$this->joinColumn('project_id', 'id', false, false, 'CASCADE')],
+        );
+
+        return new Property(
+            Modifiers::PRIVATE,
+            [new PropertyItem('projects')],
+            [],
+            new FullyQualified('Doctrine\\Common\\Collections\\Collection'),
+            $attributeGroups,
+        );
     }
 
     /**
@@ -287,12 +406,13 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
     /**
      * @param list<MethodCall> $calls
      *
-     * @return array{attributes: list<AttributeGroup>, entityArgs: list<Arg>}|null
+     * @return array{attributes: list<AttributeGroup>, entityArgs: list<Arg>, lifecycle: array<string, list<AttributeGroup>>}|null
      */
     private function handleClassChain(array $calls): ?array
     {
         $attributes = [];
         $entityArgs = [];
+        $lifecycle  = [];
 
         foreach ($calls as $call) {
             switch ($this->methodName($call)) {
@@ -334,12 +454,42 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
                     $attributes[] = $this->attribute('Index', $indexArgs);
                     break;
 
+                case 'addLifecycleEvent':
+                    $methodName = $this->stringArg($call, 0);
+                    $event      = $this->stringArg($call, 1);
+                    if (null === $methodName || null === $event) {
+                        return null;
+                    }
+
+                    $eventShortName = $this->lifecycleEventShortName($event);
+                    if (null === $eventShortName) {
+                        return null;
+                    }
+
+                    $lifecycle[$methodName][] = $this->attribute($eventShortName, []);
+                    break;
+
                 default:
                     return null;
             }
         }
 
-        return ['attributes' => $attributes, 'entityArgs' => $entityArgs];
+        return ['attributes' => $attributes, 'entityArgs' => $entityArgs, 'lifecycle' => $lifecycle];
+    }
+
+    private function lifecycleEventShortName(string $event): ?string
+    {
+        return match ($event) {
+            'prePersist'  => 'PrePersist',
+            'postPersist' => 'PostPersist',
+            'preUpdate'   => 'PreUpdate',
+            'postUpdate'  => 'PostUpdate',
+            'preRemove'   => 'PreRemove',
+            'postRemove'  => 'PostRemove',
+            'postLoad'    => 'PostLoad',
+            'preFlush'    => 'PreFlush',
+            default       => null,
+        };
     }
 
     /**
@@ -1433,6 +1583,20 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
         return $call->name instanceof Identifier ? $call->name->toString() : '';
     }
 
+    /**
+     * @param array<Arg|Node\VariadicPlaceholder> $args
+     */
+    private function stringFromArg(array $args, int $index): ?string
+    {
+        if (!isset($args[$index]) || !$args[$index] instanceof Arg) {
+            return null;
+        }
+
+        $value = $args[$index]->value;
+
+        return $value instanceof String_ ? $value->value : null;
+    }
+
     private function stringArg(MethodCall $call, int $index): ?string
     {
         if (!isset($call->args[$index]) || !$call->args[$index] instanceof Arg) {
@@ -1486,6 +1650,23 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
         $value = $call->args[$index]->value;
 
         return $value instanceof ConstFetch && $this->isName($value, 'true');
+    }
+
+    /**
+     * @param AttributeGroup[] $attrGroups
+     */
+    private function hasOrmMappingAttribute(array $attrGroups): bool
+    {
+        foreach ($attrGroups as $attrGroup) {
+            foreach ($attrGroup->attrs as $attr) {
+                $name = $attr->name->toString();
+                if (str_starts_with($name, 'ORM\\') || str_starts_with($name, 'Doctrine\\ORM\\Mapping\\')) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     private function findProperty(Class_ $class, string $name): Property|Param|null

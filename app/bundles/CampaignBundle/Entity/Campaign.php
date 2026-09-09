@@ -52,6 +52,9 @@ use Symfony\Component\Validator\Constraints as Assert;
     ]
 )]
 #[NoOrphanEvents]
+#[ORM\Entity(repositoryClass: CampaignRepository::class)]
+#[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterface
 {
     use UuidTrait;
@@ -59,6 +62,12 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     use OptimisticLockTrait;
 
     use ProjectTrait;
+    #[ORM\ManyToMany(targetEntity: \Mautic\ProjectBundle\Entity\Project::class, cascade: ['merge', 'persist', 'detach'], fetch: 'LAZY', indexBy: 'name')]
+    #[ORM\JoinTable(name: 'campaign_projects_xref')]
+    #[ORM\JoinColumn(name: 'campaign_id', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'project_id', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\OrderBy(['name' => 'ASC'])]
+    private \Doctrine\Common\Collections\Collection $projects;
 
     public const TABLE_NAME  = 'campaigns';
 
@@ -68,6 +77,9 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
      * @var int
      */
     #[Groups(['campaign:read', 'campaign:write'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -75,70 +87,91 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
      */
     #[Groups(['campaign:read', 'campaign:write'])]
     #[Assert\NotBlank(message: 'mautic.core.name.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var string|null
      */
     #[Groups(['campaign:read', 'campaign:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
      * @var \DateTimeInterface|null
      */
     #[Groups(['campaign:read', 'campaign:write'])]
+    #[ORM\Column(name: 'publish_up', type: 'datetime', nullable: true)]
     private $publishUp;
 
     /**
      * @var \DateTimeInterface|null
      */
     #[Groups(['campaign:read', 'campaign:write'])]
+    #[ORM\Column(name: 'publish_down', type: 'datetime', nullable: true)]
     private $publishDown;
 
     #[Groups(['campaign:read', 'campaign:write'])]
+    #[ORM\Column(type: 'datetime', nullable: true)]
     public ?\DateTimeInterface $deleted = null;
 
     // see Mautic\CampaignBundle\Enum\RepublishBehavior for available values.
     #[Groups(['campaign:read', 'campaign:write'])]
+    #[ORM\Column(name: 'republish_behavior', type: Types::STRING, length: 32, nullable: true)]
     private ?string $republishBehavior = null;
 
     /**
      * @var Category|null
      */
     #[Groups(['campaign:read', 'campaign:write'])]
+    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['merge', 'detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
     private $category;
 
     /**
      * @var Collection<int, Event>|ArrayCollection<int, Event>
      */
     #[Groups(['campaign:read', 'campaign:write'])]
+    #[ORM\OneToMany(mappedBy: 'campaign', targetEntity: Event::class, cascade: ['all'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
+    #[ORM\OrderBy(['order' => 'ASC'])]
     private $events;
 
     /**
      * @var ArrayCollection<int, Lead>
      */
     #[Groups(['campaign:read', 'campaign:write'])]
+    #[ORM\OneToMany(mappedBy: 'campaign', targetEntity: Lead::class, fetch: 'EXTRA_LAZY')]
     private Collection $leads;
 
     /**
      * @var Collection<int, LeadList>
      */
     #[Groups(['campaign:read', 'campaign:write'])]
+    #[ORM\ManyToMany(targetEntity: LeadList::class, indexBy: 'id')]
+    #[ORM\JoinTable(name: 'campaign_leadlist_xref')]
+    #[ORM\JoinColumn(name: 'campaign_id', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'leadlist_id', nullable: false, onDelete: 'CASCADE')]
     private Collection $lists;
 
     /**
      * @var Collection<int, Form>
      */
     #[Groups(['campaign:read', 'campaign:write'])]
+    #[ORM\ManyToMany(targetEntity: Form::class, indexBy: 'id')]
+    #[ORM\JoinTable(name: 'campaign_form_xref')]
+    #[ORM\JoinColumn(name: 'campaign_id', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'form_id', nullable: false, onDelete: 'CASCADE')]
     private Collection $forms;
 
     /**
      * @var array<string, mixed>
      */
     #[Groups(['campaign:read', 'campaign:write'])]
+    #[ORM\Column(name: 'canvas_settings', type: 'array', nullable: true)]
     private array $canvasSettings = [];
 
     #[Groups(['campaign:read', 'campaign:write'])]
+    #[ORM\Column(name: 'allow_restart', type: 'boolean')]
     private bool $allowRestart = false;
 
     public function __construct()
@@ -165,59 +198,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(CampaignRepository::class);
-
-        $builder->addIdColumns();
-
-        $builder->addPublishDates();
-
-        $builder->createField('republishBehavior', Types::STRING)
-            ->columnName('republish_behavior')
-            ->nullable()
-            ->length(32)
-            ->build();
-
-        $builder->addCategory();
-
-        $builder->createOneToMany('events', Event::class)
-            ->setIndexBy('id')
-            ->setOrderBy(['order' => 'ASC'])
-            ->mappedBy('campaign')
-            ->cascadeAll()
-            ->fetchExtraLazy()
-            ->build();
-
-        $builder->createOneToMany('leads', Lead::class)
-            ->mappedBy('campaign')
-            ->fetchExtraLazy()
-            ->build();
-
-        $builder->createManyToMany('lists', LeadList::class)
-            ->setJoinTable('campaign_leadlist_xref')
-            ->setIndexBy('id')
-            ->addInverseJoinColumn('leadlist_id', 'id', false, false, 'CASCADE')
-            ->addJoinColumn('campaign_id', 'id', true, false, 'CASCADE')
-            ->build();
-
-        $builder->createManyToMany('forms', Form::class)
-            ->setJoinTable('campaign_form_xref')
-            ->setIndexBy('id')
-            ->addInverseJoinColumn('form_id', 'id', false, false, 'CASCADE')
-            ->addJoinColumn('campaign_id', 'id', true, false, 'CASCADE')
-            ->build();
-
-        $builder->createField('canvasSettings', 'array')
-            ->columnName('canvas_settings')
-            ->nullable()
-            ->build();
-
-        $builder->addNamedField('allowRestart', 'boolean', 'allow_restart');
-        $builder->addNullableField('deleted', 'datetime');
-
         self::addVersionField($builder);
-        static::addUuidField($builder);
-        self::addProjectsField($builder, 'campaign_projects_xref', 'campaign_id');
     }
 
     /**

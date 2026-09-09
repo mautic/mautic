@@ -36,6 +36,10 @@ use Symfony\Component\Validator\Constraints as Assert;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[ORM\Entity(repositoryClass: MonitoringRepository::class)]
+#[ORM\Table(name: 'monitoring')]
+#[ORM\HasLifecycleCallbacks]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Monitoring extends FormEntity implements UuidInterface
 {
     use UuidTrait;
@@ -44,6 +48,9 @@ class Monitoring extends FormEntity implements UuidInterface
      * @var int
      */
     #[Groups(['monitoring:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -51,24 +58,29 @@ class Monitoring extends FormEntity implements UuidInterface
      */
     #[Groups(['monitoring:read', 'monitoring:write'])]
     #[Assert\NotBlank(message: 'mautic.core.title.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     private $title;
 
     /**
      * @var string|null
      */
     #[Groups(['monitoring:read', 'monitoring:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
      * @var \Mautic\CategoryBundle\Entity\Category|null
      */
     #[Groups(['monitoring:read', 'monitoring:write'])]
+    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['merge', 'detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
     private $category;
 
     /**
      * @var array
      */
     #[Groups(['monitoring:read', 'monitoring:write'])]
+    #[ORM\Column(type: 'array', nullable: true)]
     private $lists = [];
 
     /**
@@ -76,65 +88,43 @@ class Monitoring extends FormEntity implements UuidInterface
      */
     #[Groups(['monitoring:read', 'monitoring:write'])]
     #[Assert\NotBlank(message: 'mautic.social.network.type')]
+    #[ORM\Column(name: 'network_type', type: 'string', length: 191, nullable: true)]
     private $networkType;
 
     /**
      * @var int
      */
     #[Groups(['monitoring:read', 'monitoring:write'])]
+    #[ORM\Column(type: 'integer')]
     private $revision = 1;
 
     /**
      * @var array
      */
     #[Groups(['monitoring:read'])]
+    #[ORM\Column(type: 'array', nullable: true)]
     private $stats = [];
 
     /**
      * @var array
      */
     #[Groups(['monitoring:read', 'monitoring:write'])]
+    #[ORM\Column(type: 'array', nullable: true)]
     private $properties = [];
 
     /**
      * @var \DateTimeInterface
      */
     #[Groups(['monitoring:read', 'monitoring:write'])]
+    #[ORM\Column(name: 'publish_down', type: 'datetime', nullable: true)]
     private $publishDown;
 
     /**
      * @var \DateTimeInterface
      */
     #[Groups(['monitoring:read', 'monitoring:write'])]
+    #[ORM\Column(name: 'publish_up', type: 'datetime', nullable: true)]
     private $publishUp;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable('monitoring')
-            ->setCustomRepositoryClass(MonitoringRepository::class)
-            ->addLifecycleEvent('cleanMonitorData', 'preUpdate')
-            ->addLifecycleEvent('cleanMonitorData', 'prePersist');
-
-        $builder->addCategory();
-
-        $builder->addIdColumns('title');
-
-        $builder->addNullableField('lists', 'array');
-
-        $builder->addNamedField('networkType', 'string', 'network_type', true);
-
-        $builder->addField('revision', 'integer');
-
-        $builder->addNullableField('stats', 'array');
-
-        $builder->addNullableField('properties', 'array');
-
-        $builder->addPublishDates();
-
-        static::addUuidField($builder);
-    }
 
     /**
      * Constraints for required fields.
@@ -345,6 +335,8 @@ class Monitoring extends FormEntity implements UuidInterface
     /**
      * Clear out old properties data.
      */
+    #[ORM\PreUpdate]
+    #[ORM\PrePersist]
     public function cleanMonitorData(): void
     {
         $property = $this->properties;

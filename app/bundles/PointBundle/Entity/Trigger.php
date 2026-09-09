@@ -40,10 +40,19 @@ use Symfony\Component\Validator\Constraints as Assert;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[ORM\Entity(repositoryClass: TriggerRepository::class)]
+#[ORM\Table(name: 'point_triggers')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Trigger extends FormEntity implements UuidInterface
 {
     use UuidTrait;
     use ProjectTrait;
+    #[ORM\ManyToMany(targetEntity: \Mautic\ProjectBundle\Entity\Project::class, cascade: ['merge', 'persist', 'detach'], fetch: 'LAZY', indexBy: 'name')]
+    #[ORM\JoinTable(name: 'point_trigger_projects_xref')]
+    #[ORM\JoinColumn(name: 'point_trigger_id', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'project_id', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\OrderBy(['name' => 'ASC'])]
+    private \Doctrine\Common\Collections\Collection $projects;
 
     public const ENTITY_NAME = 'point_trigger';
 
@@ -51,6 +60,9 @@ class Trigger extends FormEntity implements UuidInterface
      * @var int
      */
     #[Groups(['trigger:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -58,57 +70,70 @@ class Trigger extends FormEntity implements UuidInterface
      */
     #[Groups(['trigger:read', 'trigger:write'])]
     #[Assert\NotBlank(message: 'mautic.core.name.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var string|null
      */
     #[Groups(['trigger:read', 'trigger:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
      * @var \DateTimeInterface
      */
     #[Groups(['trigger:read', 'trigger:write'])]
+    #[ORM\Column(name: 'publish_up', type: 'datetime', nullable: true)]
     private $publishUp;
 
     /**
      * @var \DateTimeInterface
      */
     #[Groups(['trigger:read', 'trigger:write'])]
+    #[ORM\Column(name: 'publish_down', type: 'datetime', nullable: true)]
     private $publishDown;
 
     /**
      * @var int
      */
     #[Groups(['trigger:read', 'trigger:write'])]
+    #[ORM\Column(type: 'integer')]
     private $points = 0;
 
     /**
      * @var string
      */
     #[Groups(['trigger:read', 'trigger:write'])]
+    #[ORM\Column(type: 'string', length: 7)]
     private $color = 'a0acb8';
 
     /**
      * @var bool
      */
     #[Groups(['trigger:read', 'trigger:write'])]
+    #[ORM\Column(name: 'trigger_existing_leads', type: 'boolean')]
     private $triggerExistingLeads = false;
 
     /**
      * @var Category|null
      */
     #[Groups(['trigger:read', 'trigger:write'])]
+    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['merge', 'detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
     private $category;
 
     /**
      * @var ArrayCollection<int, TriggerEvent>
      */
     #[Groups(['trigger:read', 'trigger:write'])]
+    #[ORM\OneToMany(mappedBy: 'trigger', targetEntity: 'TriggerEvent', cascade: ['all'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
+    #[ORM\OrderBy(['order' => 'ASC'])]
     private $events;
 
     #[Groups(['trigger:read', 'trigger:write'])]
+    #[ORM\ManyToOne(targetEntity: Group::class)]
+    #[ORM\JoinColumn(name: 'group_id', onDelete: 'CASCADE')]
     private ?Group $group = null;
 
     public function __clone()
@@ -122,45 +147,6 @@ class Trigger extends FormEntity implements UuidInterface
     {
         $this->events = new ArrayCollection();
         $this->initializeProjects();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable('point_triggers')
-            ->setCustomRepositoryClass(TriggerRepository::class);
-
-        $builder->addIdColumns();
-
-        $builder->addPublishDates();
-
-        $builder->addField('points', 'integer');
-
-        $builder->createField('color', 'string')
-            ->length(7)
-            ->build();
-
-        $builder->createField('triggerExistingLeads', 'boolean')
-            ->columnName('trigger_existing_leads')
-            ->build();
-
-        $builder->addCategory();
-
-        $builder->createOneToMany('events', 'TriggerEvent')
-            ->setIndexBy('id')
-            ->setOrderBy(['order' => 'ASC'])
-            ->mappedBy('trigger')
-            ->cascadeAll()
-            ->fetchExtraLazy()
-            ->build();
-
-        $builder->createManyToOne('group', Group::class)
-            ->addJoinColumn('group_id', 'id', true, false, 'CASCADE')
-            ->build();
-
-        static::addUuidField($builder);
-        self::addProjectsField($builder, 'point_trigger_projects_xref', 'point_trigger_id');
     }
 
     /**

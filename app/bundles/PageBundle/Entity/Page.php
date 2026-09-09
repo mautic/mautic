@@ -57,6 +57,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  * @use VariantEntityTrait<Page>
  */
 #[EntityEvent]
+#[ORM\Entity(repositoryClass: PageRepository::class)]
+#[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\Index(columns: ['alias'], name: 'page_alias_search')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Page extends FormEntity implements TranslationEntityInterface, VariantEntityInterface, UuidInterface, OptimisticLockInterface
 {
     use TranslationEntityTrait;
@@ -64,6 +68,12 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     use UuidTrait;
     use ProjectTrait;
     use OptimisticLockTrait;
+    #[ORM\ManyToMany(targetEntity: \Mautic\ProjectBundle\Entity\Project::class, cascade: ['merge', 'persist', 'detach'], fetch: 'LAZY', indexBy: 'name')]
+    #[ORM\JoinTable(name: 'page_projects_xref')]
+    #[ORM\JoinColumn(name: 'page_id', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'project_id', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\OrderBy(['name' => 'ASC'])]
+    private \Doctrine\Common\Collections\Collection $projects;
 
     public const ENTITY_NAME = 'page';
 
@@ -73,6 +83,9 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
      * @var int
      */
     #[Groups(['page:read', 'download:read', 'email:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -80,114 +93,134 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     #[NotBlank(message: 'mautic.core.title.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     private $title;
 
     /**
      * @var string
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\Column(type: 'string', length: 191)]
     private $alias;
 
     /**
      * @var string|null
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $template;
 
     /**
      * @var string|null
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'custom_html', type: 'text', nullable: true)]
     private $customHtml;
 
     /**
      * @var array
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\Column(type: 'array', nullable: true)]
     private $content = [];
 
     /**
      * @var \DateTimeInterface|null
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'publish_up', type: 'datetime', nullable: true)]
     private $publishUp;
 
     /**
      * @var \DateTimeInterface|null
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'publish_down', type: 'datetime', nullable: true)]
     private $publishDown;
 
     /**
      * @var int
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\Column(type: 'integer')]
     private $hits = 0;
 
     /**
      * @var int
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'unique_hits', type: 'integer')]
     private $uniqueHits = 0;
 
     /**
      * @var int
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'variant_hits', type: 'integer')]
     private $variantHits = 0;
 
     /**
      * @var int
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\Column(type: 'integer')]
     private $revision = 1;
 
     /**
      * @var string|null
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'meta_description', type: 'string', length: 191, nullable: true)]
     private $metaDescription;
 
     /**
      * @var string|null
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'head_script', type: 'text', nullable: true)]
     private $headScript;
 
     /**
      * @var string|null
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'footer_script', type: 'text', nullable: true)]
     private $footerScript;
 
     /**
      * @var string|null
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'redirect_type', type: 'string', length: 100, nullable: true)]
     private $redirectType;
 
     /**
      * @var string|null
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'redirect_url', type: 'string', length: 2048, nullable: true)]
     private $redirectUrl;
 
     /**
      * @var Category|null
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['merge', 'detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
     private $category;
 
     /**
      * @var bool|null
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'is_preference_center', type: 'boolean', nullable: true)]
     private $isPreferenceCenter;
 
     /**
      * @var bool|null
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'no_index', type: 'boolean', nullable: true)]
     private $noIndex;
 
     /**
@@ -195,6 +228,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
      */
     private $sessionId;
 
+    #[ORM\OneToOne(mappedBy: 'page', targetEntity: PageDraft::class, cascade: ['all'], fetch: 'EXTRA_LAZY')]
     private ?PageDraft $draft = null;
 
     private bool $isCloned = false;
@@ -202,6 +236,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     private ?int $cloneObjectId = null;
 
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'public_preview', type: Types::BOOLEAN, nullable: true)]
     private ?bool $publicPreview = true;
 
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
@@ -231,92 +266,8 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(PageRepository::class)
-            ->addIndex(['alias'], 'page_alias_search');
-
-        $builder->addId();
-
-        $builder->addField('title', 'string');
-
-        $builder->addField('alias', 'string');
-
-        $builder->addNullableField('template', 'string');
-
-        $builder->createField('customHtml', 'text')
-            ->columnName('custom_html')
-            ->nullable()
-            ->build();
-
-        $builder->createField('content', 'array')
-            ->nullable()
-            ->build();
-
-        $builder->addPublishDates();
-
-        $builder->addField('hits', 'integer');
-
-        $builder->createField('uniqueHits', 'integer')
-            ->columnName('unique_hits')
-            ->build();
-
-        $builder->createField('variantHits', 'integer')
-            ->columnName('variant_hits')
-            ->build();
-
-        $builder->addField('revision', 'integer');
-
-        $builder->createField('metaDescription', 'string')
-            ->columnName('meta_description')
-            ->nullable()
-            ->build();
-
-        $builder->createField('headScript', 'text')
-            ->columnName('head_script')
-            ->nullable()
-            ->build();
-
-        $builder->createField('footerScript', 'text')
-            ->columnName('footer_script')
-            ->nullable()
-            ->build();
-
-        $builder->createField('redirectType', 'string')
-            ->columnName('redirect_type')
-            ->nullable()
-            ->length(100)
-            ->build();
-
-        $builder->createField('redirectUrl', 'string')
-            ->columnName('redirect_url')
-            ->nullable()
-            ->length(2048)
-            ->build();
-
-        $builder->addCategory();
-
-        $builder->createField('isPreferenceCenter', 'boolean')
-            ->columnName('is_preference_center')
-            ->nullable()
-            ->build();
-
-        $builder->createField('noIndex', 'boolean')
-            ->columnName('no_index')
-            ->nullable()
-            ->build();
-
-        $builder->createOneToOne('draft', PageDraft::class)
-            ->mappedBy('page')
-            ->fetchExtraLazy()
-            ->cascadeAll()
-            ->build();
-
-        $builder->addNullableField('publicPreview', Types::BOOLEAN, 'public_preview');
-
         self::addTranslationMetadata($builder, self::class);
         self::addVariantMetadata($builder, self::class);
-        static::addUuidField($builder);
-        self::addProjectsField($builder, 'page_projects_xref', 'page_id');
         self::addVersionField($builder);
     }
 
