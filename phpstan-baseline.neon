@@ -3736,12 +3736,6 @@ parameters:
 			path: app/bundles/EmailBundle/Model/EmailModel.php
 
 		-
-			message: '#^Method Mautic\\EmailBundle\\Model\\EmailModel\:\:getEmailStatus\(\) has parameter \$idHash with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Model/EmailModel.php
-
-		-
 			message: '#^Method Mautic\\EmailBundle\\Model\\EmailModel\:\:getEmailsIdsWithDependenciesOnSegment\(\) has parameter \$segmentId with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
