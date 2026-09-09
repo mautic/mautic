@@ -20,13 +20,13 @@ final class SmsTest extends TestCase
 
         $clone = clone $sms;
 
-        self::assertNull($clone->getPublishUp());
-        self::assertFalse($clone->isContinueSending());
-        self::assertFalse($clone->getIsPublished());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $clone->getPublishUp());
+        $this->assertFalse($clone->isContinueSending());
+        $this->assertFalse($clone->getIsPublished());
 
         // Enable continuing mode so getPublishDown() exposes the stored value.
         $clone->setContinueSending(true);
-        self::assertNull($clone->getPublishDown());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $clone->getPublishDown());
     }
 
     public function testDisablingContinuingModeClearsTheStopDateForSegmentSms(): void
@@ -39,22 +39,22 @@ final class SmsTest extends TestCase
         $sms->setContinueSending(false);
         $sms->setContinueSending(true);
 
-        self::assertNull($sms->getPublishDown());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $sms->getPublishDown());
     }
 
     public function testActiveScheduledSmsIsBackgroundSending(): void
     {
         $sms = $this->createScheduledSms(new \DateTime('-1 hour'));
 
-        self::assertTrue($sms->isBackgroundSending());
+        $this->assertTrue($sms->isBackgroundSending());
     }
 
     public function testFutureScheduledSmsIsNotBackgroundSendingAndIsPending(): void
     {
         $sms = $this->createScheduledSms(new \DateTime('+1 hour'));
 
-        self::assertFalse($sms->isBackgroundSending());
-        self::assertSame('pending', $sms->getSendingStatus());
+        $this->assertFalse($sms->isBackgroundSending());
+        $this->assertSame('pending', $sms->getSendingStatus());
     }
 
     public function testExpiredScheduledSmsIsNotBackgroundSendingAndIsExpired(): void
@@ -63,8 +63,8 @@ final class SmsTest extends TestCase
         $sms->setContinueSending(true);
         $sms->setPublishDown(new \DateTime('-1 hour'));
 
-        self::assertFalse($sms->isBackgroundSending());
-        self::assertSame('expired', $sms->getSendingStatus());
+        $this->assertFalse($sms->isBackgroundSending());
+        $this->assertSame('expired', $sms->getSendingStatus());
     }
 
     public function testUnpublishedScheduledSmsIsNotBackgroundSending(): void
@@ -72,8 +72,8 @@ final class SmsTest extends TestCase
         $sms = $this->createScheduledSms(new \DateTime('-1 hour'));
         $sms->setIsPublished(false);
 
-        self::assertFalse($sms->isBackgroundSending());
-        self::assertSame('unpublished', $sms->getSendingStatus());
+        $this->assertFalse($sms->isBackgroundSending());
+        $this->assertSame('unpublished', $sms->getSendingStatus());
     }
 
     public function testActiveSmsWithPendingContactsHasSendingStatus(): void
@@ -81,7 +81,7 @@ final class SmsTest extends TestCase
         $sms = $this->createScheduledSms(new \DateTime('-1 hour'));
         $sms->setPendingCount(2);
 
-        self::assertSame('sending', $sms->getSendingStatus());
+        $this->assertSame('sending', $sms->getSendingStatus());
     }
 
     public function testDrainedOneTimeSmsWithPriorSendsHasSentStatus(): void
@@ -90,7 +90,7 @@ final class SmsTest extends TestCase
         $sms->setPendingCount(0);
         $sms->setSentCount(1);
 
-        self::assertSame('sent', $sms->getSendingStatus());
+        $this->assertSame('sent', $sms->getSendingStatus());
     }
 
     public function testDrainedContinuingSmsRemainsPublished(): void
@@ -100,7 +100,7 @@ final class SmsTest extends TestCase
         $sms->setPendingCount(0);
         $sms->setSentCount(1);
 
-        self::assertSame('published', $sms->getSendingStatus());
+        $this->assertSame('published', $sms->getSendingStatus());
     }
 
     private function createScheduledSms(\DateTimeInterface $publishUp): Sms

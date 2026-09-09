@@ -36,21 +36,18 @@ final class ScheduleSendTypeTest extends TypeTestCase
     {
         $form = $this->createForm(false);
 
-        self::assertSame('mautic.sms.send.schedule', $this->getButtonLabel($form, 'save'));
-        self::assertFalse($form->get('buttons')->has('apply'));
-        self::assertSame(
-            '{"schedule_send_continueSending_1":"checked"}',
-            $form->get('publishDown')->getConfig()->getOption('attr')['data-show-on']
-        );
+        $this->assertSame('mautic.sms.send.schedule', $this->getButtonLabel($form, 'save'));
+        $this->assertFalse($form->get('buttons')->has('apply'));
+        $this->assertSame('{"schedule_send_continueSending_1":"checked"}', $form->get('publishDown')->getConfig()->getOption('attr')['data-show-on']);
     }
 
     public function testExistingOneTimeScheduleUsesUpdateCancelAndCloseButtons(): void
     {
         $form = $this->createForm(true);
 
-        self::assertSame('mautic.sms.send.schedule.update', $this->getButtonLabel($form, 'save'));
-        self::assertSame('mautic.sms.send.schedule.cancel', $this->getButtonLabel($form, 'apply'));
-        self::assertSame('mautic.core.close', $this->getButtonLabel($form, 'cancel'));
+        $this->assertSame('mautic.sms.send.schedule.update', $this->getButtonLabel($form, 'save'));
+        $this->assertSame('mautic.sms.send.schedule.cancel', $this->getButtonLabel($form, 'apply'));
+        $this->assertSame('mautic.core.close', $this->getButtonLabel($form, 'cancel'));
     }
 
     public function testDisablingContinuingModeClearsSubmittedStopDate(): void
@@ -62,10 +59,10 @@ final class ScheduleSendTypeTest extends TypeTestCase
             'publishDown'     => '2026-01-01 11:00',
         ]);
 
-        self::assertTrue($form->isSynchronized());
-        self::assertTrue($form->isValid());
-        self::assertSame(0, $form->getData()['continueSending']);
-        self::assertNull($form->getData()['publishDown']);
+        $this->assertTrue($form->isSynchronized());
+        $this->assertTrue($form->isValid());
+        $this->assertSame(0, $form->getData()['continueSending']);
+        $this->assertNull($form->getData()['publishDown']);
     }
 
     public function testContinuingScheduleAcceptsAnOptionalStopDate(): void
@@ -77,9 +74,9 @@ final class ScheduleSendTypeTest extends TypeTestCase
             'publishDown'     => '',
         ]);
 
-        self::assertTrue($form->isSynchronized());
-        self::assertTrue($form->isValid());
-        self::assertNull($form->getData()['publishDown']);
+        $this->assertTrue($form->isSynchronized());
+        $this->assertTrue($form->isValid());
+        $this->assertNull($form->getData()['publishDown']);
     }
 
     public function testContinuingScheduleRejectsStopAtOrBeforeStart(): void
@@ -91,9 +88,9 @@ final class ScheduleSendTypeTest extends TypeTestCase
             'publishDown'     => '2026-01-01 10:00',
         ]);
 
-        self::assertTrue($form->isSynchronized());
-        self::assertFalse($form->isValid());
-        self::assertCount(1, $form->get('publishDown')->getErrors());
+        $this->assertTrue($form->isSynchronized());
+        $this->assertFalse($form->isValid());
+        $this->assertCount(1, $form->get('publishDown')->getErrors());
     }
 
     public function testStartDateIsRequired(): void
@@ -105,9 +102,9 @@ final class ScheduleSendTypeTest extends TypeTestCase
             'publishDown'     => '',
         ]);
 
-        self::assertTrue($form->isSynchronized());
-        self::assertFalse($form->isValid());
-        self::assertCount(1, $form->get('publishUp')->getErrors());
+        $this->assertTrue($form->isSynchronized());
+        $this->assertFalse($form->isValid());
+        $this->assertCount(1, $form->get('publishUp')->getErrors());
     }
 
     /**

@@ -31,9 +31,9 @@ final class SmsScheduleApiV2Test extends OwnershipScopedApiAuthorizationTestBase
         $this->em->clear();
 
         $updatedSms = $this->em->find(Sms::class, $id);
-        self::assertInstanceOf(Sms::class, $updatedSms);
-        self::assertTrue($updatedSms->isContinueSending());
-        self::assertSame('2030-01-02 10:00:00+00:00', $updatedSms->getPublishDown()?->format('Y-m-d H:i:sP'));
+        $this->assertInstanceOf(Sms::class, $updatedSms);
+        $this->assertTrue($updatedSms->isContinueSending());
+        $this->assertSame('2030-01-02 10:00:00+00:00', $updatedSms->getPublishDown()?->format('Y-m-d H:i:sP'));
     }
 
     /**
@@ -76,9 +76,9 @@ final class SmsScheduleApiV2Test extends OwnershipScopedApiAuthorizationTestBase
         $this->em->clear();
 
         $updatedSms = $this->em->find(Sms::class, $id);
-        self::assertInstanceOf(Sms::class, $updatedSms);
-        self::assertTrue($updatedSms->isContinueSending());
-        self::assertSame('2030-01-02 10:00:00+00:00', $updatedSms->getPublishDown()?->format('Y-m-d H:i:sP'));
+        $this->assertInstanceOf(Sms::class, $updatedSms);
+        $this->assertTrue($updatedSms->isContinueSending());
+        $this->assertSame('2030-01-02 10:00:00+00:00', $updatedSms->getPublishDown()?->format('Y-m-d H:i:sP'));
     }
 
     public function testPutCannotCancelAScheduleByOmittingItWithoutPublishPermission(): void
@@ -94,10 +94,10 @@ final class SmsScheduleApiV2Test extends OwnershipScopedApiAuthorizationTestBase
         $id = (int) $sms->getId();
         $this->em->clear();
         $persistedSms = $this->em->find(Sms::class, $id);
-        self::assertInstanceOf(Sms::class, $persistedSms);
-        self::assertTrue($persistedSms->isContinueSending());
-        self::assertSame('2030-01-01 10:00:00+00:00', $persistedSms->getPublishUp()?->format('Y-m-d H:i:sP'));
-        self::assertSame('2030-01-02 10:00:00+00:00', $persistedSms->getPublishDown()?->format('Y-m-d H:i:sP'));
+        $this->assertInstanceOf(Sms::class, $persistedSms);
+        $this->assertTrue($persistedSms->isContinueSending());
+        $this->assertSame('2030-01-01 10:00:00+00:00', $persistedSms->getPublishUp()?->format('Y-m-d H:i:sP'));
+        $this->assertSame('2030-01-02 10:00:00+00:00', $persistedSms->getPublishDown()?->format('Y-m-d H:i:sP'));
         $this->em->clear();
         $this->loginAsApiUser($user);
 
@@ -112,10 +112,10 @@ final class SmsScheduleApiV2Test extends OwnershipScopedApiAuthorizationTestBase
         $this->em->clear();
 
         $unchangedSms = $this->em->find(Sms::class, $id);
-        self::assertInstanceOf(Sms::class, $unchangedSms);
-        self::assertTrue($unchangedSms->isContinueSending());
-        self::assertSame('2030-01-01 10:00:00+00:00', $unchangedSms->getPublishUp()?->format('Y-m-d H:i:sP'));
-        self::assertSame('2030-01-02 10:00:00+00:00', $unchangedSms->getPublishDown()?->format('Y-m-d H:i:sP'));
+        $this->assertInstanceOf(Sms::class, $unchangedSms);
+        $this->assertTrue($unchangedSms->isContinueSending());
+        $this->assertSame('2030-01-01 10:00:00+00:00', $unchangedSms->getPublishUp()?->format('Y-m-d H:i:sP'));
+        $this->assertSame('2030-01-02 10:00:00+00:00', $unchangedSms->getPublishDown()?->format('Y-m-d H:i:sP'));
     }
 
     public function testFalseContinuingModeClearsAStopDateSubmittedAfterIt(): void
@@ -137,9 +137,9 @@ final class SmsScheduleApiV2Test extends OwnershipScopedApiAuthorizationTestBase
         $this->em->clear();
 
         $updatedSms = $this->em->find(Sms::class, $id);
-        self::assertInstanceOf(Sms::class, $updatedSms);
-        self::assertFalse($updatedSms->isContinueSending());
-        self::assertNull($updatedSms->getPublishDown());
+        $this->assertInstanceOf(Sms::class, $updatedSms);
+        $this->assertFalse($updatedSms->isContinueSending());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $updatedSms->getPublishDown());
     }
 
     public function testScheduleFieldsRequirePublishPermissionButOrdinaryEditsDoNot(): void
@@ -166,12 +166,12 @@ final class SmsScheduleApiV2Test extends OwnershipScopedApiAuthorizationTestBase
 
         $this->em->clear();
         $updatedSms = $this->em->find(Sms::class, $id);
-        self::assertInstanceOf(Sms::class, $updatedSms);
-        self::assertSame('An edit-only user can change ordinary fields.', $updatedSms->getDescription());
-        self::assertTrue($updatedSms->getIsPublished());
-        self::assertNull($updatedSms->getPublishUp());
-        self::assertNull($updatedSms->getPublishDown());
-        self::assertFalse($updatedSms->isContinueSending());
+        $this->assertInstanceOf(Sms::class, $updatedSms);
+        $this->assertSame('An edit-only user can change ordinary fields.', $updatedSms->getDescription());
+        $this->assertTrue($updatedSms->getIsPublished());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $updatedSms->getPublishUp());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $updatedSms->getPublishDown());
+        $this->assertFalse($updatedSms->isContinueSending());
     }
 
     public function testPublishingAnotherUsersScheduleRequiresPublishOther(): void

@@ -30,8 +30,8 @@ final class SmsApiControllerFunctionalTest extends MauticMysqlTestCase
 
         self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
         $sms = $this->getResponseSms();
-        self::assertFalse($sms['continueSending']);
-        self::assertNull($sms['publishDown']);
+        $this->assertFalse($sms['continueSending']);
+        $this->assertNull($sms['publishDown']);
         $smsId = (int) $sms['id'];
 
         $this->client->request(Request::METHOD_PATCH, "/api/smses/{$smsId}/edit", [
@@ -42,9 +42,9 @@ final class SmsApiControllerFunctionalTest extends MauticMysqlTestCase
 
         self::assertResponseIsSuccessful();
         $sms = $this->getResponseSms();
-        self::assertTrue($sms['continueSending']);
-        self::assertSame('2030-01-01T10:00:00+00:00', $sms['publishUp']);
-        self::assertSame('2030-01-02T10:00:00+00:00', $sms['publishDown']);
+        $this->assertTrue($sms['continueSending']);
+        $this->assertSame('2030-01-01T10:00:00+00:00', $sms['publishUp']);
+        $this->assertSame('2030-01-02T10:00:00+00:00', $sms['publishDown']);
 
         $this->client->request(Request::METHOD_PATCH, "/api/smses/{$smsId}/edit", [
             'description' => 'Continue sending was omitted from this update',
@@ -52,8 +52,8 @@ final class SmsApiControllerFunctionalTest extends MauticMysqlTestCase
 
         self::assertResponseIsSuccessful();
         $sms = $this->getResponseSms();
-        self::assertTrue($sms['continueSending']);
-        self::assertSame('2030-01-02T10:00:00+00:00', $sms['publishDown']);
+        $this->assertTrue($sms['continueSending']);
+        $this->assertSame('2030-01-02T10:00:00+00:00', $sms['publishDown']);
 
         $this->client->request(Request::METHOD_PATCH, "/api/smses/{$smsId}/edit", [
             'continueSending' => false,
@@ -62,15 +62,15 @@ final class SmsApiControllerFunctionalTest extends MauticMysqlTestCase
 
         self::assertResponseIsSuccessful();
         $sms = $this->getResponseSms();
-        self::assertFalse($sms['continueSending']);
-        self::assertNull($sms['publishDown']);
+        $this->assertFalse($sms['continueSending']);
+        $this->assertNull($sms['publishDown']);
 
         $this->client->request(Request::METHOD_GET, "/api/smses/{$smsId}");
 
         self::assertResponseIsSuccessful();
         $sms = $this->getResponseSms();
-        self::assertFalse($sms['continueSending']);
-        self::assertNull($sms['publishDown']);
+        $this->assertFalse($sms['continueSending']);
+        $this->assertNull($sms['publishDown']);
     }
 
     public function testContinueSendingRejectsAnInvalidDateRange(): void
@@ -86,13 +86,13 @@ final class SmsApiControllerFunctionalTest extends MauticMysqlTestCase
 
         self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
         $response = $this->getJsonResponse();
-        self::assertNotEmpty($response['errors']);
+        $this->assertNotEmpty($response['errors']);
     }
 
     public function testContinueSendingWriteRequiresPublishPermission(): void
     {
         $owner = $this->getUser('sales');
-        self::assertInstanceOf(User::class, $owner);
+        $this->assertInstanceOf(User::class, $owner);
 
         $sms = $this->createSms('api-schedule-permission');
         $sms->setCreatedBy($owner->getId());
@@ -111,9 +111,9 @@ final class SmsApiControllerFunctionalTest extends MauticMysqlTestCase
 
         self::assertResponseIsSuccessful();
         $sms = $this->getResponseSms();
-        self::assertFalse($sms['continueSending']);
-        self::assertNull($sms['publishUp']);
-        self::assertNull($sms['publishDown']);
+        $this->assertFalse($sms['continueSending']);
+        $this->assertNull($sms['publishUp']);
+        $this->assertNull($sms['publishDown']);
     }
 
     private function createSegment(string $alias): LeadList
@@ -153,7 +153,7 @@ final class SmsApiControllerFunctionalTest extends MauticMysqlTestCase
     private function setPermission(Role $role, array $permissions): void
     {
         $roleModel = self::getContainer()->get(RoleModel::class);
-        self::assertInstanceOf(RoleModel::class, $roleModel);
+        $this->assertInstanceOf(RoleModel::class, $roleModel);
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);
         $this->em->flush();
@@ -165,8 +165,8 @@ final class SmsApiControllerFunctionalTest extends MauticMysqlTestCase
     private function getResponseSms(): array
     {
         $response = $this->getJsonResponse();
-        self::assertArrayHasKey('sms', $response);
-        self::assertIsArray($response['sms']);
+        $this->assertArrayHasKey('sms', $response);
+        $this->assertIsArray($response['sms']);
 
         return $response['sms'];
     }
@@ -177,9 +177,9 @@ final class SmsApiControllerFunctionalTest extends MauticMysqlTestCase
     private function getJsonResponse(): array
     {
         $content = $this->client->getResponse()->getContent();
-        self::assertIsString($content);
+        $this->assertIsString($content);
         $response = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
-        self::assertIsArray($response);
+        $this->assertIsArray($response);
 
         return $response;
     }

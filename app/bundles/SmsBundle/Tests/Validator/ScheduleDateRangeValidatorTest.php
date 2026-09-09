@@ -42,7 +42,7 @@ final class ScheduleDateRangeValidatorTest extends TestCase
         $sms->setPublishDown(new \DateTime('2026-01-01 09:00:00'));
         $sms->setContinueSending(false);
 
-        $this->context->expects(self::never())->method('buildViolation');
+        $this->context->expects($this->never())->method('buildViolation');
 
         $this->validator->validate($sms, new ScheduleDateRange());
     }
@@ -56,7 +56,7 @@ final class ScheduleDateRangeValidatorTest extends TestCase
         $sms->setPublishUp($publishUp);
         $sms->setPublishDown($publishDown);
 
-        $this->context->expects(self::never())->method('buildViolation');
+        $this->context->expects($this->never())->method('buildViolation');
 
         $this->validator->validate($sms, new ScheduleDateRange());
     }
@@ -99,7 +99,7 @@ final class ScheduleDateRangeValidatorTest extends TestCase
 
     public function testFormValidationIsSkippedWhenContinuingIsDisabled(): void
     {
-        $this->context->expects(self::never())->method('buildViolation');
+        $this->context->expects($this->never())->method('buildViolation');
 
         $this->validator->validate([
             'continueSending' => false,
@@ -121,7 +121,7 @@ final class ScheduleDateRangeValidatorTest extends TestCase
 
     public function testUnsupportedValueIsIgnored(): void
     {
-        $this->context->expects(self::never())->method('buildViolation');
+        $this->context->expects($this->never())->method('buildViolation');
 
         $this->validator->validate('not schedule data', new ScheduleDateRange());
     }
@@ -129,13 +129,13 @@ final class ScheduleDateRangeValidatorTest extends TestCase
     private function expectViolationAtPath(string $path): void
     {
         $violationBuilder = $this->createMock(ConstraintViolationBuilderInterface::class);
-        $violationBuilder->expects(self::once())
+        $violationBuilder->expects($this->once())
             ->method('atPath')
             ->with($path)
             ->willReturnSelf();
-        $violationBuilder->expects(self::once())->method('addViolation');
+        $violationBuilder->expects($this->once())->method('addViolation');
 
-        $this->context->expects(self::once())
+        $this->context->expects($this->once())
             ->method('buildViolation')
             ->with('mautic.form.date_time_range.invalid_range')
             ->willReturn($violationBuilder);

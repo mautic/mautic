@@ -203,7 +203,7 @@ final class SmsControllerFunctionalTest extends MauticMysqlTestCase
             $this->assertResponseIsSuccessful();
             $this->assertScheduleModalWasClosed();
             $this->em->refresh($sms);
-            $this->assertNull($sms->getPublishUp());
+            $this->assertNotInstanceOf(\DateTimeInterface::class, $sms->getPublishUp());
         }
     }
 
@@ -277,7 +277,7 @@ final class SmsControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertTrue($sms->getIsPublished());
         $this->assertSame($start, $sms->getPublishUp()?->format('Y-m-d H:i'));
         $this->assertFalse($sms->isContinueSending());
-        $this->assertNull($sms->getPublishDown());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $sms->getPublishDown());
 
         $updatedStart = (new \DateTime('+3 days'))->format('Y-m-d H:i');
         $updatedStop  = (new \DateTime('+4 days'))->format('Y-m-d H:i');
@@ -299,8 +299,8 @@ final class SmsControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         $this->em->refresh($sms);
-        $this->assertNull($sms->getPublishUp());
-        $this->assertNull($sms->getPublishDown());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $sms->getPublishUp());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $sms->getPublishDown());
         $this->assertFalse($sms->isContinueSending());
         $this->assertTrue($sms->getIsPublished());
     }
@@ -348,7 +348,7 @@ final class SmsControllerFunctionalTest extends MauticMysqlTestCase
             $crawler->filter('body')->text()
         );
         $this->em->refresh($sms);
-        $this->assertNull($sms->getPublishUp());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $sms->getPublishUp());
         $this->assertFalse($sms->getIsPublished());
     }
 
@@ -366,7 +366,7 @@ final class SmsControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertResponseIsSuccessful();
         $this->em->refresh($sms);
-        $this->assertNull($sms->getPublishUp());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $sms->getPublishUp());
         $this->assertFalse($sms->getIsPublished());
     }
 
@@ -387,7 +387,7 @@ final class SmsControllerFunctionalTest extends MauticMysqlTestCase
         }
 
         $this->em->refresh($templateSms);
-        $this->assertNull($templateSms->getPublishUp());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $templateSms->getPublishUp());
     }
 
     public function testTranslationChildScheduleRouteRedirectsToParent(): void

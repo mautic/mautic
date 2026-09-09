@@ -23,10 +23,10 @@ final class Version20260908120000Test extends TestCase
         $migration->up($schema);
 
         $statements = array_map(
-            static fn ($query): string => $query->getStatement(),
+            static fn (\Doctrine\Migrations\Query\Query $query): string => $query->getStatement(),
             $migration->getSql(),
         );
-        self::assertSame([
+        $this->assertSame([
             'ALTER TABLE sms_messages ADD `continue_sending` TINYINT(1) DEFAULT 0 NOT NULL',
             'UPDATE sms_messages SET `continue_sending` = 1 WHERE publish_up IS NOT NULL',
         ], $statements);
@@ -40,7 +40,7 @@ final class Version20260908120000Test extends TestCase
 
         $migration->up($schema);
 
-        self::assertSame([], $migration->getSql());
+        $this->assertSame([], $migration->getSql());
     }
 
     public function testDownDropsContinueSendingWhenItExists(): void
@@ -51,10 +51,7 @@ final class Version20260908120000Test extends TestCase
 
         $migration->down($schema);
 
-        self::assertSame(
-            'ALTER TABLE sms_messages DROP continue_sending',
-            $migration->getSql()[0]->getStatement(),
-        );
+        $this->assertSame('ALTER TABLE sms_messages DROP continue_sending', $migration->getSql()[0]->getStatement());
     }
 
     private function createMigration(): Version20260908120000
