@@ -35,12 +35,11 @@ use Rector\Rector\AbstractRector;
 /**
  * Converts a static loadMetadata() ClassMetadataBuilder mapping into Doctrine attributes.
  *
- * Builder chains ($builder->...) are all-or-nothing: an unknown one leaves the class
- * untouched, since a partial field rewrite would silently drift the schema.
- *
- * Unsupported static helpers (addTranslationMetadata, addVariantMetadata, addVersionField,
- * ...) are the exception: they stay behind in a trimmed loadMetadata for a follow-up change,
- * while the rest of the method is still converted.
+ * Works statement by statement: every builder call the rule understands becomes an attribute,
+ * while anything it does not (isOwnershipParent, custom static helpers such as
+ * addTranslationMetadata, a field whose property is not in the class body, ...) stays behind
+ * in a trimmed loadMetadata for a follow-up change. A class is left untouched only when no
+ * statement could be converted.
  */
 final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
 {
@@ -89,58 +88,35 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
             return null;
         }
 
-        $result = $this->interpret($loadMetadata->stmts);
+        $result = $this->interpret($loadMetadata->stmts, $node);
         if (null === $result) {
             return null;
         }
 
-        [$classAttributes, $propertyAttributes, $newProperties, $builderAssignStatement, $keptStatements, $methodAttributes] = $result;
-
-        // Resolve every target property up front. Bail before mutating anything if one
-        // is missing, otherwise a half-applied change makes Rector loop forever.
-        $resolved = [];
-        foreach ($propertyAttributes as $propertyName => $attributeGroups) {
-            $property = $this->findProperty($node, $propertyName);
-            if (!$property instanceof Property && !$property instanceof Param) {
-                return null;
-            }
-
-            $resolved[] = [$property, $attributeGroups];
-        }
-
-        // Resolve lifecycle callback methods the same way.
-        $resolvedMethods = [];
-        foreach ($methodAttributes as $methodName => $attributeGroups) {
-            $method = $node->getMethod($methodName);
-            if (!$method instanceof ClassMethod) {
-                return null;
-            }
-
-            $resolvedMethods[] = [$method, $attributeGroups];
-        }
+        [$classAttributes, $propertyResolved, $newProperties, $builderAssignStatement, $keptStatements, $methodResolved] = $result;
 
         // Every entity gets DEFERRED_EXPLICIT from the builder constructor.
         $classAttributes[] = $this->attribute('ChangeTrackingPolicy', [new Arg(new String_('DEFERRED_EXPLICIT'))]);
 
-        foreach ($resolved as [$property, $attributeGroups]) {
+        foreach ($propertyResolved as [$property, $attributeGroups]) {
             $property->attrGroups = array_merge($property->attrGroups, $attributeGroups);
         }
 
-        foreach ($resolvedMethods as [$method, $attributeGroups]) {
+        foreach ($methodResolved as [$method, $attributeGroups]) {
             $method->attrGroups = array_merge($method->attrGroups, $attributeGroups);
         }
 
         $node->attrGroups = array_merge($node->attrGroups, $classAttributes);
 
         if ([] === $keptStatements) {
-            // Nothing left unconverted: drop loadMetadata entirely.
+            // Everything converted: drop loadMetadata entirely.
             $node->stmts = array_values(array_filter(
                 $node->stmts,
                 static fn (Node $stmt): bool => $stmt !== $loadMetadata
             ));
         } else {
-            // Unsupported static helpers (addTranslationMetadata, addVersionField, ...) stay
-            // behind in a trimmed loadMetadata for a follow-up change; keep the builder they need.
+            // Builder calls this rule does not understand (isOwnershipParent, custom static
+            // helpers, ...) stay in a trimmed loadMetadata for a follow-up; keep their builder.
             $loadMetadata->stmts = array_values(array_filter([$builderAssignStatement, ...$keptStatements]));
         }
 
@@ -161,127 +137,65 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
     }
 
     /**
+     * Convert every statement the rule understands; leave the rest in loadMetadata. Returns
+     * null only when nothing was understood, so the file is left untouched.
+     *
      * @param Node\Stmt[] $stmts
      *
-     * @return array{list<AttributeGroup>, array<string, list<AttributeGroup>>, list<Property>, ?Expression, list<Expression>, array<string, list<AttributeGroup>>}|null
+     * @return array{list<AttributeGroup>, list<array{0: Property|Param, 1: list<AttributeGroup>}>, list<Property>, ?Expression, list<Expression>, list<array{0: ClassMethod, 1: list<AttributeGroup>}>}|null
      */
-    private function interpret(array $stmts): ?array
+    private function interpret(array $stmts, Class_ $node): ?array
     {
         $classAttributes        = [];
-        $propertyAttributes     = [];
-        $methodAttributes       = [];
-        $newProperties          = [];
         $entityArgs             = [];
         $isMappedSuperclass     = false;
+        $newProperties          = [];
+        $propertyResolved       = [];
+        $methodResolved         = [];
         $builderAssignStatement = null;
         $keptStatements         = [];
+        $anyConverted           = false;
 
         foreach ($stmts as $stmt) {
-            if (!$stmt instanceof Expression) {
-                return null;
-            }
+            $converted = $this->convertStatement($stmt, $node);
 
-            $expr = $stmt->expr;
-
-            // $builder = new ClassMetadataBuilder($metadata);
-            if ($expr instanceof Expr\Assign) {
-                if (!$expr->var instanceof Variable || !$this->isName($expr->var, 'builder') || !$expr->expr instanceof New_) {
-                    return null;
-                }
-
+            if ('assign' === $converted) {
                 $builderAssignStatement = $stmt;
 
                 continue;
             }
 
-            // self::addUuidField($builder) and friends.
-            if ($expr instanceof StaticCall) {
-                // self::addProjectsField($builder, $table, $column): the projects property is
-                // declared in ProjectTrait, so emit a standalone property carrying its mapping.
-                $projectsProperty = $this->tryProjectsField($expr);
-                if ($projectsProperty instanceof Property) {
-                    $newProperties[] = $projectsProperty;
-
-                    continue;
-                }
-
-                $fields = $this->handleStaticHelper($expr);
-                if (null === $fields) {
-                    // Unsupported static helper (addTranslationMetadata, addVariantMetadata,
-                    // addVersionField, ...): leave the call in place for a follow-up change
-                    // instead of bailing on the whole class.
-                    $keptStatements[] = $stmt;
-
-                    continue;
-                }
-
-                foreach ($fields as $fieldName => $attributeGroups) {
-                    $propertyAttributes[$fieldName] = $attributeGroups;
-                }
+            if (null === $converted) {
+                // Not understood, or a target property/method is missing: leave the statement
+                // in loadMetadata for a follow-up instead of bailing the whole class.
+                $keptStatements[] = $stmt;
 
                 continue;
             }
 
-            if (!$expr instanceof MethodCall) {
-                return null;
+            $classAttributes    = array_merge($classAttributes, $converted['classAttributes']);
+            $entityArgs         = array_merge($entityArgs, $converted['entityArgs']);
+            $isMappedSuperclass = $isMappedSuperclass || $converted['isMappedSuperclass'];
+            $newProperties      = array_merge($newProperties, $converted['newProperties']);
+
+            foreach ($converted['propertyResolved'] as $pair) {
+                $propertyResolved[] = $pair;
             }
 
-            $calls = $this->flattenChain($expr);
-            if (null === $calls) {
-                return null;
+            foreach ($converted['methodResolved'] as $pair) {
+                $methodResolved[] = $pair;
             }
 
-            // A single fluent chain may mix class-level and field-level builder calls,
-            // e.g. setTable()->setCustomRepositoryClass()->addNamedField()->addId().
-            // Split it into per-creator segments so each is interpreted on its own.
-            $segments = $this->splitIntoSegments($calls);
-            if (null === $segments) {
-                return null;
-            }
+            $anyConverted = true;
+        }
 
-            foreach ($segments as $calls) {
-                $first = $this->methodName($calls[0]);
-
-                // $builder->setMappedSuperClass(): emit #[ORM\MappedSuperclass] instead of #[ORM\Entity].
-                if ('setMappedSuperClass' === $first) {
-                    if (1 !== count($calls) || [] !== $calls[0]->args) {
-                        return null;
-                    }
-
-                    $isMappedSuperclass = true;
-
-                    continue;
-                }
-
-                if (in_array($first, self::CLASS_LEVEL_METHODS, true)) {
-                    $handled = $this->handleClassChain($calls);
-                    if (null === $handled) {
-                        return null;
-                    }
-
-                    $classAttributes = array_merge($classAttributes, $handled['attributes']);
-                    $entityArgs      = array_merge($entityArgs, $handled['entityArgs']);
-
-                    foreach ($handled['lifecycle'] as $methodName => $attributeGroups) {
-                        $methodAttributes[$methodName] = array_merge($methodAttributes[$methodName] ?? [], $attributeGroups);
-                    }
-
-                    continue;
-                }
-
-                $fields = $this->handleFieldChain($calls);
-                if (null === $fields) {
-                    return null;
-                }
-
-                foreach ($fields as $fieldName => $attributeGroups) {
-                    $propertyAttributes[$fieldName] = $attributeGroups;
-                }
-            }
+        // Nothing understood: leave the file untouched.
+        if (!$anyConverted) {
+            return null;
         }
 
         // Lifecycle callbacks on methods require the class-level marker attribute.
-        if ([] !== $methodAttributes) {
+        if ([] !== $methodResolved) {
             $classAttributes[] = $this->attribute('HasLifecycleCallbacks', []);
         }
 
@@ -291,7 +205,166 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
             : $this->attribute('Entity', $entityArgs);
         array_unshift($classAttributes, $rootAttribute);
 
-        return [$classAttributes, $propertyAttributes, $newProperties, $builderAssignStatement, $keptStatements, $methodAttributes];
+        return [$classAttributes, $propertyResolved, $newProperties, $builderAssignStatement, $keptStatements, $methodResolved];
+    }
+
+    /**
+     * Convert a single loadMetadata statement. Returns 'assign' for the builder assignment,
+     * a conversion struct when fully understood and its targets exist, or null when the
+     * statement should stay in loadMetadata.
+     *
+     * @return 'assign'|array{classAttributes: list<AttributeGroup>, entityArgs: list<Arg>, isMappedSuperclass: bool, newProperties: list<Property>, propertyResolved: list<array{0: Property|Param, 1: list<AttributeGroup>}>, methodResolved: list<array{0: ClassMethod, 1: list<AttributeGroup>}>}|null
+     */
+    private function convertStatement(Node\Stmt $stmt, Class_ $node): string|array|null
+    {
+        if (!$stmt instanceof Expression) {
+            return null;
+        }
+
+        $expr = $stmt->expr;
+
+        // $builder = new ClassMetadataBuilder($metadata);
+        if ($expr instanceof Expr\Assign) {
+            if ($expr->var instanceof Variable && $this->isName($expr->var, 'builder') && $expr->expr instanceof New_) {
+                return 'assign';
+            }
+
+            return null;
+        }
+
+        // self::addUuidField($builder) and friends.
+        if ($expr instanceof StaticCall) {
+            // self::addProjectsField($builder, $table, $column): emit a standalone projects property.
+            $projectsProperty = $this->tryProjectsField($expr);
+            if ($projectsProperty instanceof Property) {
+                $conversion                  = $this->resolveTargets([], [], $node);
+                $conversion['newProperties'] = [$projectsProperty];
+
+                return $conversion;
+            }
+
+            $fields = $this->handleStaticHelper($expr);
+            if (null === $fields) {
+                return null;
+            }
+
+            return $this->resolveTargets($fields, [], $node);
+        }
+
+        if (!$expr instanceof MethodCall) {
+            return null;
+        }
+
+        $calls = $this->flattenChain($expr);
+        if (null === $calls) {
+            return null;
+        }
+
+        // A single fluent chain may mix class-level and field-level builder calls; split it
+        // into per-creator segments so each is interpreted on its own.
+        $segments = $this->splitIntoSegments($calls);
+        if (null === $segments) {
+            return null;
+        }
+
+        $classAttributes    = [];
+        $entityArgs         = [];
+        $isMappedSuperclass = false;
+        $propertyAttributes = [];
+        $methodAttributes   = [];
+
+        foreach ($segments as $segmentCalls) {
+            $first = $this->methodName($segmentCalls[0]);
+
+            // $builder->setMappedSuperClass(): emit #[ORM\MappedSuperclass] instead of #[ORM\Entity].
+            if ('setMappedSuperClass' === $first) {
+                if (1 !== count($segmentCalls) || [] !== $segmentCalls[0]->args) {
+                    return null;
+                }
+
+                $isMappedSuperclass = true;
+
+                continue;
+            }
+
+            if (in_array($first, self::CLASS_LEVEL_METHODS, true)) {
+                $handled = $this->handleClassChain($segmentCalls);
+                if (null === $handled) {
+                    return null;
+                }
+
+                $classAttributes = array_merge($classAttributes, $handled['attributes']);
+                $entityArgs      = array_merge($entityArgs, $handled['entityArgs']);
+
+                foreach ($handled['lifecycle'] as $methodName => $attributeGroups) {
+                    $methodAttributes[$methodName] = array_merge($methodAttributes[$methodName] ?? [], $attributeGroups);
+                }
+
+                continue;
+            }
+
+            $fields = $this->handleFieldChain($segmentCalls);
+            if (null === $fields) {
+                return null;
+            }
+
+            foreach ($fields as $fieldName => $attributeGroups) {
+                $propertyAttributes[$fieldName] = $attributeGroups;
+            }
+        }
+
+        // A missing target property or method keeps the whole statement in loadMetadata.
+        $conversion = $this->resolveTargets($propertyAttributes, $methodAttributes, $node);
+        if (null === $conversion) {
+            return null;
+        }
+
+        $conversion['classAttributes']    = $classAttributes;
+        $conversion['entityArgs']         = $entityArgs;
+        $conversion['isMappedSuperclass'] = $isMappedSuperclass;
+
+        return $conversion;
+    }
+
+    /**
+     * Resolves field/method names against the class body. Returns a conversion struct, or null
+     * when any target is missing so the caller can keep the statement.
+     *
+     * @param array<string, list<AttributeGroup>> $propertyAttributes
+     * @param array<string, list<AttributeGroup>> $methodAttributes
+     *
+     * @return array{classAttributes: list<AttributeGroup>, entityArgs: list<Arg>, isMappedSuperclass: bool, newProperties: list<Property>, propertyResolved: list<array{0: Property|Param, 1: list<AttributeGroup>}>, methodResolved: list<array{0: ClassMethod, 1: list<AttributeGroup>}>}|null
+     */
+    private function resolveTargets(array $propertyAttributes, array $methodAttributes, Class_ $node): ?array
+    {
+        $propertyResolved = [];
+        foreach ($propertyAttributes as $propertyName => $attributeGroups) {
+            $property = $this->findProperty($node, $propertyName);
+            if (!$property instanceof Property && !$property instanceof Param) {
+                return null;
+            }
+
+            $propertyResolved[] = [$property, $attributeGroups];
+        }
+
+        $methodResolved = [];
+        foreach ($methodAttributes as $methodName => $attributeGroups) {
+            $method = $node->getMethod($methodName);
+            if (!$method instanceof ClassMethod) {
+                return null;
+            }
+
+            $methodResolved[] = [$method, $attributeGroups];
+        }
+
+        return [
+            'classAttributes'    => [],
+            'entityArgs'         => [],
+            'isMappedSuperclass' => false,
+            'newProperties'      => [],
+            'propertyResolved'   => $propertyResolved,
+            'methodResolved'     => $methodResolved,
+        ];
     }
 
     /**
