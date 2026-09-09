@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\DependencyInjection\Compiler;
 
-use Mautic\CoreBundle\Loader\ParameterLoader;
-use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -14,73 +12,33 @@ final class AssetMapperWebRootPass implements CompilerPassInterface
     private const PUBLIC_ASSETS_PATH_RESOLVER_ID         = 'asset_mapper.public_assets_path_resolver';
     private const LOCAL_PUBLIC_ASSETS_FILESYSTEM_ID      = 'asset_mapper.local_public_assets_filesystem';
     private const COMPILED_ASSET_MAPPER_CONFIG_READER_ID = 'asset_mapper.compiled_asset_mapper_config_reader';
-    private const DEFAULT_PUBLIC_PREFIX                  = '/assets/build/';
+    private const MAUTIC_LOCAL_ROOT                       = '%env(default:kernel.project_dir:resolve:MAUTIC_LOCAL_ROOT)%';
 
     public function process(ContainerBuilder $container): void
     {
-        $webRoot = $this->resolveWebRoot($container);
-        if (!$webRoot) {
+        if (!$container->hasDefinition(self::LOCAL_PUBLIC_ASSETS_FILESYSTEM_ID)
+            || !$container->hasDefinition(self::COMPILED_ASSET_MAPPER_CONFIG_READER_ID)
+            || !$container->hasDefinition(self::PUBLIC_ASSETS_PATH_RESOLVER_ID)) {
             return;
         }
 
-        if ($container->hasDefinition(self::LOCAL_PUBLIC_ASSETS_FILESYSTEM_ID)) {
-            $container
-                ->findDefinition(self::LOCAL_PUBLIC_ASSETS_FILESYSTEM_ID)
-                ->replaceArgument(0, $webRoot);
-        }
-
-        if (!$container->hasDefinition(self::COMPILED_ASSET_MAPPER_CONFIG_READER_ID)) {
-            return;
-        }
-
-        $publicPrefix = $this->resolvePublicPrefix($container);
-
-        $container
-            ->findDefinition(self::COMPILED_ASSET_MAPPER_CONFIG_READER_ID)
-            ->replaceArgument(0, $webRoot.'/'.ltrim($publicPrefix, '/'));
-    }
-
-    private function resolveWebRoot(ContainerBuilder $container): ?string
-    {
-        if ($container->hasParameter('mautic.local_root')) {
-            $localRoot = $container->getParameter('mautic.local_root');
-            if (is_string($localRoot) && '' !== trim($localRoot) && !str_contains($localRoot, '%env(')) {
-                return rtrim($localRoot, '/');
-            }
-        }
-
-        if (!$container->hasParameter('kernel.project_dir')) {
-            return null;
-        }
-
-        $projectDir = $container->getParameter('kernel.project_dir');
-        if (!is_string($projectDir) || '' === trim($projectDir)) {
-            return null;
-        }
-
-        $projectDir   = rtrim($projectDir, '/');
-        $composerFile = $projectDir.'/composer.json';
-        if (is_file($composerFile)) {
-            $container->addResource(new FileResource($composerFile));
-        }
-
-        return rtrim(ParameterLoader::getWebrootDir($projectDir), '/');
-    }
-
-    private function resolvePublicPrefix(ContainerBuilder $container): string
-    {
-        if (!$container->hasDefinition(self::PUBLIC_ASSETS_PATH_RESOLVER_ID)) {
-            return self::DEFAULT_PUBLIC_PREFIX;
-        }
-
+        $webRoot = $container->resolveEnvPlaceholders(self::MAUTIC_LOCAL_ROOT, true);
         $publicPrefix = $container
-            ->findDefinition(self::PUBLIC_ASSETS_PATH_RESOLVER_ID)
+            ->getDefinition(self::PUBLIC_ASSETS_PATH_RESOLVER_ID)
             ->getArgument(0);
 
-        if (!is_string($publicPrefix) || '' === trim($publicPrefix)) {
-            return self::DEFAULT_PUBLIC_PREFIX;
+        if (!is_string($webRoot) || !is_string($publicPrefix)) {
+            return;
         }
 
-        return $publicPrefix;
+        $webRoot = rtrim($webRoot, '/');
+
+        $container
+            ->getDefinition(self::LOCAL_PUBLIC_ASSETS_FILESYSTEM_ID)
+            ->replaceArgument(0, $webRoot);
+
+        $container
+            ->getDefinition(self::COMPILED_ASSET_MAPPER_CONFIG_READER_ID)
+            ->replaceArgument(0, $webRoot.'/'.trim($publicPrefix, '/'));
     }
 }
