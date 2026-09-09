@@ -796,8 +796,9 @@ class PageModel extends FormModel implements GlobalSearchInterface
     /**
      * Get line chart data of hits.
      *
-     * @param ?string $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param string  $dateFormat
+     * @param ?string              $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string               $dateFormat
+     * @param array<string, mixed> $filter
      */
     public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], bool $canViewOthers = true): array
     {

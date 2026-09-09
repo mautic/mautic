@@ -59,7 +59,8 @@ class HitRepository extends CommonRepository
     /**
      * Get a lead's page hits.
      *
-     * @param int|null $leadId
+     * @param int|null             $leadId
+     * @param array<string, mixed> $options
      *
      * @return array
      */
@@ -326,6 +327,8 @@ class HitRepository extends CommonRepository
 
     /**
      * Get array of dwell time labels with ranges.
+     *
+     * @return array<int, array<string, string|int>>
      */
     public function getDwellTimeLabels(): array
     {
@@ -356,6 +359,8 @@ class HitRepository extends CommonRepository
 
     /**
      * Get the dwell times for bunch of pages.
+     *
+     * @param array<string, mixed> $options
      */
     public function getDwellTimesForPages(array $pageIds, array $options): array
     {
@@ -407,7 +412,8 @@ class HitRepository extends CommonRepository
     /**
      * Get the dwell times for bunch of URLs.
      *
-     * @param string $url
+     * @param string               $url
+     * @param array<string, mixed> $options
      */
     public function getDwellTimesForUrl($url, array $options): array
     {
@@ -442,6 +448,8 @@ class HitRepository extends CommonRepository
      * Count stats from hit times.
      *
      * @param array $times
+     *
+     * @return array<string, mixed>
      */
     public function countStats($times): array
     {
