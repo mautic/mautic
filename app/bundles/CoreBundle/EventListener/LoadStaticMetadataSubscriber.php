@@ -32,11 +32,13 @@ final class LoadStaticMetadataSubscriber
             return;
         }
 
+        $loadMetadataMethod = $reflectionClass->getMethod('loadMetadata');
+
         // Skip a loadMetadata() inherited from a parent; it is meant for the parent's own metadata.
-        if ($reflectionClass->getMethod('loadMetadata')->getDeclaringClass()->getName() !== $reflectionClass->getName()) {
+        if ($loadMetadataMethod->getDeclaringClass()->getName() !== $reflectionClass->getName()) {
             return;
         }
 
-        $reflectionClass->getName()::loadMetadata($classMetadata);
+        $loadMetadataMethod->invoke(null, $classMetadata);
     }
 }
