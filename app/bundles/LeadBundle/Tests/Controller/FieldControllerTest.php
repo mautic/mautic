@@ -16,6 +16,13 @@ final class FieldControllerTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
+    protected function setUp(): void
+    {
+        $this->configParams['create_custom_field_in_background'] = 'testAbortColumnCreateExceptionIsHandledOnEditAction' === $this->name();
+
+        parent::setUp();
+    }
+
     public function testLengthValidationOnLabelFieldWhenAddingCustomFieldFailure(): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/fields/new');
@@ -42,6 +49,39 @@ final class FieldControllerTest extends MauticMysqlTestCase
 
         $field = $this->em->getRepository(LeadField::class)->findOneBy(['label' => $label]);
         $this->assertInstanceOf(LeadField::class, $field);
+    }
+
+    public function testAbortColumnCreateExceptionIsHandledOnEditAction(): void
+    {
+        // First create a field
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/fields/new');
+        $form    = $crawler->selectButton('Save & Close')->form();
+        $label   = 'Test field for edit exception';
+        $alias   = 'test_field_edit_exception';
+        $form['leadfield[label]']->setValue($label);
+        $form['leadfield[alias]']->setValue($alias);
+        $crawler = $this->client->submit($form);
+
+        // Check for successful response (2xx or 3xx status code)
+        $response = $this->client->getResponse();
+        $this->assertTrue($response->isSuccessful() || $response->isRedirect());
+
+        // Get the created field
+        $field = $this->em->getRepository(LeadField::class)->findOneBy(['alias' => $alias]);
+        $this->assertNotNull($field, 'Field was not created');
+
+        // Run the background command to create the column
+        $commandTester = $this->testSymfonyCommand('mautic:custom-field:create-column', ['--id' => $field->getId()]);
+        $this->assertEquals(0, $commandTester->getStatusCode());
+
+        // Now edit the field - just change the label
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/fields/edit/'.$field->getId());
+        $form    = $crawler->selectButton('Save & Close')->form();
+        $crawler = $this->client->submit($form);
+
+        // Check for successful response (2xx or 3xx status code)
+        $response = $this->client->getResponse();
+        $this->assertTrue($response->isSuccessful() || $response->isRedirect());
     }
 
     public function testCloneFieldSubmission(): void
