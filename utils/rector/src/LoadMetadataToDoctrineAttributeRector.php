@@ -1073,7 +1073,7 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
             return null;
         }
 
-        $target = $create->args[1]->value;
+        $target = $this->resolveTargetEntity($create->args[1]->value);
 
         $mappedBy      = null;
         $inversedBy    = null;
@@ -1192,7 +1192,7 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
             return null;
         }
 
-        $target = $create->args[1]->value;
+        $target = $this->resolveTargetEntity($create->args[1]->value);
 
         $mappedBy            = null;
         $inversedBy          = null;
@@ -1698,6 +1698,23 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
     private function namedArg(string $name, Expr $value): Arg
     {
         return new Arg($value, false, false, [], new Identifier($name));
+    }
+
+    /**
+     * A createManyToOne('field', 'Target') string target becomes Target::class. Doctrine resolves a
+     * relative name against the entity's namespace, so a short name stays a same-namespace ::class
+     * and a fully-qualified string becomes a \Fully\Qualified::class. Non-string targets pass through.
+     */
+    private function resolveTargetEntity(Expr $value): Expr
+    {
+        if (!$value instanceof String_) {
+            return $value;
+        }
+
+        $className = ltrim($value->value, '\\');
+        $name      = str_contains($className, '\\') ? new FullyQualified($className) : new Name($className);
+
+        return new ClassConstFetch($name, new Identifier('class'));
     }
 
     /**
