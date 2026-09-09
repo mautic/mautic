@@ -62,6 +62,18 @@ final class LeadApiZeroValueFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
+     * A text "0" already survived POST /new before this change: checkForDuplicateContact()
+     * calls setFieldValues() before the controller filter runs, and '0' was never loosely empty.
+     * Kept as a guard that narrowing the filter does not disturb that.
+     */
+    public function testPostNewPersistsZeroStringOnATextField(): void
+    {
+        $contactId = $this->createContact('zero-text-post@example.com', [self::TEXT_FIELD => '0']);
+
+        $this->assertSame('0', $this->getStoredValue($contactId, self::TEXT_FIELD));
+    }
+
+    /**
      * A field whose default is 0 receives it on POST /new. This already held before the change
      * (checked at the database level on both sides), so it is a guard that narrowing the filter
      * does not disturb how defaults are applied, not a fix.
