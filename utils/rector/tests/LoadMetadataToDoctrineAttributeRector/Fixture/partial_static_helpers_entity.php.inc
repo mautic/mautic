@@ -74,6 +74,5 @@ class PageEntity
 
         self::addTranslationMetadata($builder, self::class);
         self::addVariantMetadata($builder, self::class);
-        self::addVersionField($builder);
     }
 }

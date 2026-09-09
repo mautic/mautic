@@ -57,7 +57,7 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
     /**
      * @var string[]
      */
-    private const array CLASS_LEVEL_METHODS = ['setTable', 'setCustomRepositoryClass', 'addIndex', 'addFulltextIndex'];
+    private const array CLASS_LEVEL_METHODS = ['setTable', 'setCustomRepositoryClass', 'addIndex', 'addFulltextIndex', 'addUniqueConstraint'];
 
     /**
      * @var string[]
@@ -95,9 +95,7 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
         $this->hybridHasTable                 = $this->hasAttributeNamed($node->attrGroups, 'Table');
         $this->hybridEntityHasRepositoryClass = $this->entityHasRepositoryClass($node->attrGroups);
 
-        fwrite(STDERR, "\nDEBUG PageDraft: class=".$node->name?->toString()." isHybrid=".var_export($this->isHybrid, true)." hasTable=".var_export($this->hybridHasTable, true)." hasRepo=".var_export($this->hybridEntityHasRepositoryClass, true)."\n");
         $result = $this->interpret($loadMetadata->stmts, $node);
-        fwrite(STDERR, 'DEBUG PageDraft: interpret='.(null === $result ? 'NULL' : 'ok')."\n");
         if (null === $result) {
             return null;
         }
@@ -247,9 +245,16 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
 
         // self::addUuidField($builder) and friends.
         if ($expr instanceof StaticCall) {
-            // Hybrid classes already map their fields via attributes; leave field helpers behind.
+            // Hybrid classes already map their own fields via attributes, so a helper that emits a
+            // property is left behind; a known no-op helper (its column lives on a trait property
+            // that carries its own attribute) is still understood and drops out of loadMetadata.
             if ($this->isHybrid) {
-                return null;
+                $fields = $this->handleStaticHelper($expr);
+                if (null === $fields) {
+                    return null;
+                }
+
+                return $this->resolveTargets($fields, [], $node);
             }
 
             // self::addProjectsField($builder, $table, $column): emit a standalone projects property.
@@ -561,6 +566,21 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
                     $attributes[] = $this->attribute('Index', $indexArgs);
                     break;
 
+                case 'addUniqueConstraint':
+                    if (2 !== count($call->args) || !$call->args[0] instanceof Arg || !$call->args[1] instanceof Arg) {
+                        return null;
+                    }
+
+                    if (!$call->args[0]->value instanceof Array_) {
+                        return null;
+                    }
+
+                    $attributes[] = $this->attribute('UniqueConstraint', [
+                        $this->namedArg('columns', $call->args[0]->value),
+                        $this->namedArg('name', $call->args[1]->value),
+                    ]);
+                    break;
+
                 case 'addLifecycleEvent':
                     $methodName = $this->stringArg($call, 0);
                     $event      = $this->lifecycleEventArg($call, 1);
@@ -640,10 +660,11 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
             return null;
         }
 
-        // addUuidField($builder): the uuid column lives on UuidTrait::$uuid, which carries its own
-        // #[ORM\Column] read via reflection. Emit no per-entity attribute (the property is not in the
-        // class body, so it cannot be annotated here) and do not bail.
-        if ('addUuidField' === $call->name->toString()) {
+        // addUuidField()/addVersionField(): the column lives on a trait property (UuidTrait::$uuid,
+        // OptimisticLockTrait::$version) that carries its own #[ORM\Column]. Emit no per-entity
+        // attribute (the property is not in the class body, so it cannot be annotated here) and do
+        // not bail, so the call drops out of loadMetadata.
+        if (in_array($call->name->toString(), ['addUuidField', 'addVersionField'], true)) {
             return [];
         }
 
