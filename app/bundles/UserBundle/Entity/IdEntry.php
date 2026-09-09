@@ -5,7 +5,6 @@ namespace Mautic\UserBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-#[ORM\Entity]
 #[ORM\Table(name: 'saml_id_entry')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class IdEntry

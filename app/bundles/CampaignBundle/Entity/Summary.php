@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SummaryRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
-#[ORM\UniqueConstraint(columns: ['campaign_id', 'event_id', 'date_triggered'], name: 'campaign_event_date_triggered')]
+#[ORM\UniqueConstraint(name: 'campaign_event_date_triggered', columns: ['campaign_id', 'event_id', 'date_triggered'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Summary
 {

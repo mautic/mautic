@@ -166,7 +166,7 @@ final class TrackableModelTest extends TestCase
 
         // Assert that the URL redirect equals $url
         $redirect = $trackables[$match[0]]->getRedirect();
-        $this->assertEquals(str_replace('&amp;', '&', $url), $redirect->getUrl());
+        $this->assertSame(str_replace('&amp;', '&', $url), $redirect->getUrl());
     }
 
     #[DataProvider('trackMapProvider')]
@@ -203,7 +203,7 @@ final class TrackableModelTest extends TestCase
 
         // Assert that the URL redirect equals $url
         $redirect = $trackables[$match[0]]->getRedirect();
-        $this->assertEquals($url, $redirect->getUrl());
+        $this->assertSame($url, $redirect->getUrl());
     }
 
     #[DataProvider('trackMapProvider')]
@@ -419,7 +419,7 @@ final class TrackableModelTest extends TestCase
         $this->assertArrayHasKey('{trackable='.$match[1].'}', $trackables);
 
         $this->assertCount(1, $trackables);
-        $this->assertEquals('{contactfield=website|https://mautic.org}', $trackables[$trackableKey]->getRedirect()->getUrl());
+        $this->assertSame('{contactfield=website|https://mautic.org}', $trackables[$trackableKey]->getRedirect()->getUrl());
     }
 
     #[TestDox('Test that a URL injected into the do not track list is not converted')]

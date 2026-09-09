@@ -57,7 +57,7 @@ final class AdderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($contact, $campaignMember->getLead());
         $this->assertEquals($campaign, $campaignMember->getCampaign());
         $this->assertEquals(true, $campaignMember->wasManuallyAdded());
-        $this->assertEquals(2, $campaignMember->getRotation());
+        $this->assertSame(2, $campaignMember->getRotation());
     }
 
     public function testManuallyRemovedAddedBackWhenManualActionAddsTheMember(): void
@@ -72,7 +72,7 @@ final class AdderTest extends \PHPUnit\Framework\TestCase
         $this->getAdder()->updateExistingMembership($campaignMember, true);
 
         $this->assertEquals(true, $campaignMember->wasManuallyAdded());
-        $this->assertEquals(2, $campaignMember->getRotation());
+        $this->assertSame(2, $campaignMember->getRotation());
     }
 
     public function testFilterRemovedAddedBackWhenManualActionAddsTheMember(): void
@@ -88,7 +88,7 @@ final class AdderTest extends \PHPUnit\Framework\TestCase
         $this->getAdder()->updateExistingMembership($campaignMember, false);
 
         $this->assertEquals(false, $campaignMember->wasManuallyAdded());
-        $this->assertEquals(2, $campaignMember->getRotation());
+        $this->assertSame(2, $campaignMember->getRotation());
     }
 
     public function testManuallyRemovedIsNotAddedBackWhenFilterActionAddsTheMember(): void
@@ -117,7 +117,7 @@ final class AdderTest extends \PHPUnit\Framework\TestCase
         $this->getAdder()->updateExistingMembership($campaignMember, true);
 
         $this->assertEquals(true, $campaignMember->wasManuallyAdded());
-        $this->assertEquals(2, $campaignMember->getRotation());
+        $this->assertSame(2, $campaignMember->getRotation());
     }
 
     public function testNaturallyExitedContactCannotBeAddedBackByCampaignActionWhenRestartIsDisabled(): void

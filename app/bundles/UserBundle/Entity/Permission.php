@@ -36,7 +36,9 @@ use Symfony\Component\Serializer\Attribute\Groups;
         'swagger_definition_name' => 'Write',
     ]
 )]
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: PermissionRepository::class)]
+#[ORM\Table(name: 'permissions')]
+#[ORM\UniqueConstraint(columns: ['bundle', 'name', 'role_id'], name: 'unique_perm')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Permission implements CacheInvalidateInterface, UuidInterface
 {
@@ -83,10 +85,6 @@ class Permission implements CacheInvalidateInterface, UuidInterface
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable('permissions')
-            ->setCustomRepositoryClass(PermissionRepository::class)
-            ->addUniqueConstraint(['bundle', 'name', 'role_id'], 'unique_perm');
 
         $builder->createManyToOne('role', 'Role')
             ->inversedBy('permissions')

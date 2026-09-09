@@ -543,7 +543,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
 
             // Check to see if this is an update from AJAX
             $selectedGraphs = (!empty($options['graphName'])) ? [$options['graphName']] : $entity->getGraphs();
-            if (!empty($selectedGraphs)) {
+            if ($selectedGraphs !== []) {
                 $availableGraphs = $this->getGraphData($entity->getSource());
                 if (empty($query)) {
                     $query = $reportGenerator->getQuery();

@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Entity\CommonEntity;
 
 #[ORM\Entity(repositoryClass: PluginRepository::class)]
 #[ORM\Table(name: 'plugins')]
-#[ORM\UniqueConstraint(columns: ['bundle'], name: 'unique_bundle')]
+#[ORM\UniqueConstraint(name: 'unique_bundle', columns: ['bundle'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Plugin extends CommonEntity implements CacheInvalidateInterface
 {
@@ -37,15 +37,9 @@ class Plugin extends CommonEntity implements CacheInvalidateInterface
     #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
-    /**
-     * @var string
-     */
-    private $primaryDescription;
+    private ?string $primaryDescription = null;
 
-    /**
-     * @var string
-     */
-    private $secondaryDescription;
+    private ?string $secondaryDescription = null;
 
     /**
      * @var bool

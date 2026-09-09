@@ -8,10 +8,7 @@ final class Reference
 {
     private readonly ?int $emailId;
 
-    /**
-     * @var int
-     */
-    private $leadId = 0;
+    private int $leadId = 0;
 
     private readonly ?string $statId;
 

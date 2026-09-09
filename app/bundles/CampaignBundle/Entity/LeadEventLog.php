@@ -22,7 +22,7 @@ use Mautic\LeadBundle\Entity\Lead as LeadEntity;
 #[ORM\Index(columns: ['campaign_id', 'date_triggered', 'event_id', 'non_action_path_taken'], name: 'campaign_stats')]
 #[ORM\Index(columns: ['trigger_date'], name: 'campaign_trigger_date_order')]
 #[ORM\Index(columns: ['is_scheduled', 'event_id', 'trigger_date'], name: 'idx_scheduled_events')]
-#[ORM\UniqueConstraint(columns: ['event_id', 'lead_id', 'rotation'], name: 'campaign_rotation')]
+#[ORM\UniqueConstraint(name: 'campaign_rotation', columns: ['event_id', 'lead_id', 'rotation'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class LeadEventLog implements ChannelInterface, OptimisticLockInterface
 {

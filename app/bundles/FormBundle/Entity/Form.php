@@ -768,10 +768,8 @@ class Form extends FormEntity implements UuidInterface
 
     /**
      * Check if some Progressive Profiling setting is turned on on any of the form fields.
-     *
-     * @return bool
      */
-    public function usesProgressiveProfiling()
+    public function usesProgressiveProfiling(): bool
     {
         if (null !== $this->usesProgressiveProfiling) {
             return $this->usesProgressiveProfiling;
