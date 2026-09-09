@@ -103,7 +103,7 @@ final readonly class BroadcastSubscriber implements EventSubscriberInterface
                 if ($isNotParallelSending && !$totalPendingCount && !$sentCount) {
                     $emailEntity->setIsPublished(false);
                     $this->model->saveEntity($emailEntity);
-                    $event->getOutput()->writeln('Email "'.$emailEntity->getName().'" has been unpublished as there are no more pending contacts to send to.');
+                    $event->getOutput()?->writeln('Email "'.$emailEntity->getName().'" has been unpublished as there are no more pending contacts to send to.');
                 }
             }
 
