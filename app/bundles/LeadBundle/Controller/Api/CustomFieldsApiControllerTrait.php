@@ -174,6 +174,11 @@ trait CustomFieldsApiControllerTrait
      */
     protected function setCustomFieldValues($entity, $form, $parameters, $isPostOrPatch = false)
     {
+        // The loop below adds an entry for every form field, including ones the request did not
+        // contain, so record the keys first. Comparing against them is what distinguishes a value
+        // that was supplied from one the form filled in.
+        $parameterKeysBeforeForm = array_keys($parameters);
+
         // set the custom field values
         // pull the data from the form in order to apply the form's formatting
         foreach ($form as $f) {
@@ -186,17 +191,25 @@ trait CustomFieldsApiControllerTrait
                 unset($parameters['points']);
             }
 
-            // When merging a contact because of a unique identifier match in POST /api/contacts//new or PATCH /api/contacts//edit all 0 values must be unset because
-            // we have to assume 0 was not meant to overwrite an existing value. Other empty values will be caught by LeadModel::setFieldValues
+            // On POST /api/contacts//new a unique identifier match turns the request into an update, and
+            // PATCH is always one. A 0 that only appeared via the loop above came from the entity or from
+            // the field default, so it must not overwrite an existing value. A 0 that was supplied in the
+            // request is an explicit instruction and is kept. Other empty values will be caught by
+            // LeadModel::setFieldValues.
             $parameters = array_filter(
                 $parameters,
-                function ($value): bool {
+                function ($value, $key) use ($parameterKeysBeforeForm): bool {
+                    if (in_array($key, $parameterKeysBeforeForm, true)) {
+                        return true;
+                    }
+
                     if (is_numeric($value)) {
                         return 0.0 !== (float) $value;
                     }
 
                     return true;
-                }
+                },
+                ARRAY_FILTER_USE_BOTH
             );
         }
 
