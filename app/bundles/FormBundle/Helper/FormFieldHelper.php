@@ -20,6 +20,9 @@ class FormFieldHelper extends AbstractFormFieldHelper
 {
     private readonly ValidatorInterface $validator;
 
+    /**
+     * @var array<string, array<string|array<string, array<string, string>>>>
+     */
     private array $types = [
         'captcha' => [
             'constraints' => [
@@ -88,6 +91,9 @@ class FormFieldHelper extends AbstractFormFieldHelper
         $this->translationKeyPrefix = 'mautic.form.field.type.';
     }
 
+    /**
+     * @return array<string, array<string|array<string, array<string, string>>>>
+     */
     public function getTypes(): array
     {
         return $this->types;
@@ -100,6 +106,8 @@ class FormFieldHelper extends AbstractFormFieldHelper
 
     /**
      * @param Field $f
+     *
+     * @return string[]
      */
     public function validateFieldValue($type, $value, $f = null): array
     {
