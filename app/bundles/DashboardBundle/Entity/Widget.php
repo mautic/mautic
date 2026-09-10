@@ -4,48 +4,41 @@ namespace Mautic\DashboardBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+#[ORM\Entity(repositoryClass: WidgetRepository::class)]
+#[ORM\Table(name: 'widgets')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Widget extends FormEntity
 {
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
-    /**
-     * @var string
-     */
-    private $name;
+    #[ORM\Column(type: 'string', length: 191)]
+    private ?string $name = null;
 
-    /**
-     * @var int
-     */
-    private $width;
+    #[ORM\Column(type: Types::INTEGER)]
+    private ?int $width = null;
 
-    /**
-     * @var int
-     */
-    private $height;
+    #[ORM\Column(type: Types::INTEGER)]
+    private ?int $height = null;
 
-    /**
-     * @var int|null
-     */
-    private $ordering;
+    #[ORM\Column(type: Types::INTEGER, nullable: true)]
+    private ?int $ordering = null;
 
-    /**
-     * @var string
-     */
     #[NotBlank(message: 'mautic.core.type.required')]
-    private $type;
+    #[ORM\Column(type: Types::STRING, length: 191)]
+    private ?string $type = null;
 
-    /**
-     * @var array
-     */
-    private $params = [];
+    #[ORM\Column(type: Types::ARRAY, nullable: true)]
+    private array $params = [];
 
     /**
      * @var string
@@ -70,32 +63,16 @@ class Widget extends FormEntity
     /**
      * @var int|null (minutes)
      */
+    #[ORM\Column(name: 'cache_timeout', type: Types::INTEGER, nullable: true)]
     private $cacheTimeout;
 
-    /**
-     * @var array
-     */
-    private $templateData = [];
+    private array $templateData = [];
 
     public function __clone()
     {
         $this->id = null;
 
         parent::__clone();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-        $builder->setTable('widgets');
-        $builder->setCustomRepositoryClass(WidgetRepository::class);
-        $builder->addIdColumns('name', false);
-        $builder->addField('type', Types::STRING);
-        $builder->addField('width', Types::INTEGER);
-        $builder->addField('height', Types::INTEGER);
-        $builder->addNullableField('cacheTimeout', Types::INTEGER, 'cache_timeout');
-        $builder->addNullableField('ordering', Types::INTEGER);
-        $builder->addNullableField('params', Types::ARRAY);
     }
 
     /**
@@ -114,10 +91,7 @@ class Widget extends FormEntity
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -130,10 +104,7 @@ class Widget extends FormEntity
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getType()
+    public function getType(): ?string
     {
         return $this->type;
     }
@@ -149,10 +120,7 @@ class Widget extends FormEntity
         return $this;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getWidth()
+    public function getWidth(): ?int
     {
         return $this->width;
     }
@@ -187,10 +155,7 @@ class Widget extends FormEntity
         return $this;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getHeight()
+    public function getHeight(): ?int
     {
         return $this->height;
     }
@@ -206,18 +171,12 @@ class Widget extends FormEntity
         return $this;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getOrdering()
+    public function getOrdering(): ?int
     {
         return $this->ordering;
     }
 
-    /**
-     * @return array
-     */
-    public function getParams()
+    public function getParams(): array
     {
         return $this->params;
     }
@@ -249,10 +208,7 @@ class Widget extends FormEntity
         return $this->template;
     }
 
-    /**
-     * @return array
-     */
-    public function getTemplateData()
+    public function getTemplateData(): array
     {
         return $this->templateData;
     }

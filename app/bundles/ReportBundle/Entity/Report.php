@@ -12,7 +12,6 @@ use ApiPlatform\Metadata\Put;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
@@ -43,82 +42,81 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     ]
 )]
 #[ReportAssert\ScheduleIsValid]
+#[ORM\Entity(repositoryClass: ReportRepository::class)]
+#[ORM\Table(name: 'reports')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Report extends FormEntity implements SchedulerInterface, UuidInterface
 {
     use UuidTrait;
 
-    /**
-     * @var int
-     */
     #[Groups(['report:read'])]
-    private $id;
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
+    private ?int $id = null;
 
     /**
      * @var string
      */
     #[Groups(['report:read', 'report:write'])]
     #[NotBlank(message: 'mautic.core.name.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var string|null
      */
     #[Groups(['report:read', 'report:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
      * @var bool
      */
     #[Groups(['report:read', 'report:write'])]
+    #[ORM\Column(name: '`system`', type: Types::BOOLEAN)]
     private $system = false;
 
     /**
      * @var string
      */
     #[Groups(['report:read', 'report:write'])]
+    #[ORM\Column(type: Types::STRING, length: 191)]
     private $source;
 
     /**
      * @var array
      */
     #[Groups(['report:read', 'report:write'])]
+    #[ORM\Column(type: Types::ARRAY, nullable: true)]
     private $columns = [];
 
     /**
      * @var array
      */
     #[Groups(['report:read', 'report:write'])]
+    #[ORM\Column(type: Types::ARRAY, nullable: true)]
     private $filters = [];
 
-    /**
-     * @var array
-     */
     #[Groups(['report:read', 'report:write'])]
-    private $tableOrder = [];
+    #[ORM\Column(name: 'table_order', type: Types::ARRAY, nullable: true)]
+    private array $tableOrder = [];
 
-    /**
-     * @var array
-     */
     #[Groups(['report:read', 'report:write'])]
-    private $graphs = [];
+    #[ORM\Column(type: Types::ARRAY, nullable: true)]
+    private array $graphs = [];
 
-    /**
-     * @var array
-     */
     #[Groups(['report:read', 'report:write'])]
-    private $groupBy = [];
+    #[ORM\Column(name: 'group_by', type: Types::ARRAY, nullable: true)]
+    private array $groupBy = [];
 
-    /**
-     * @var array
-     */
     #[Groups(['report:read', 'report:write'])]
-    private $aggregators = [];
+    #[ORM\Column(type: Types::ARRAY, nullable: true)]
+    private array $aggregators = [];
 
-    /**
-     * @var array|null
-     */
     #[Groups(['report:read', 'report:write'])]
-    private $settings = [];
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private array $settings = [];
 
     /**
      * @var bool
@@ -126,6 +124,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
      * @ApiProperty(readable=true)
      */
     #[Groups(['report:read', 'report:write'])]
+    #[ORM\Column(name: 'is_scheduled', type: Types::BOOLEAN)]
     private $isScheduled = false;
 
     /**
@@ -133,24 +132,28 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
      */
     #[Groups(['report:read', 'report:write'])]
     #[EmailAssert\MultipleEmailsValid]
+    #[ORM\Column(name: 'to_address', type: Types::STRING, length: 191, nullable: true)]
     private $toAddress;
 
     /**
      * @var string|null
      */
     #[Groups(['report:read', 'report:write'])]
+    #[ORM\Column(name: 'schedule_unit', type: Types::STRING, length: 191, nullable: true)]
     private $scheduleUnit;
 
     /**
      * @var string|null
      */
     #[Groups(['report:read', 'report:write'])]
+    #[ORM\Column(name: 'schedule_day', type: Types::STRING, length: 191, nullable: true)]
     private $scheduleDay;
 
     /**
      * @var string|null
      */
     #[Groups(['report:read', 'report:write'])]
+    #[ORM\Column(name: 'schedule_month_frequency', type: Types::STRING, length: 191, nullable: true)]
     private $scheduleMonthFrequency;
 
     private bool $hasScheduleChanged = false;
@@ -160,63 +163,6 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
         $this->id = null;
 
         parent::__clone();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable('reports')
-            ->setCustomRepositoryClass(ReportRepository::class);
-
-        $builder->addIdColumns();
-
-        $builder->addField('system', Types::BOOLEAN, ['columnName'=>'`system`']);
-
-        $builder->addField('source', Types::STRING);
-
-        $builder->createField('columns', Types::ARRAY)
-            ->nullable()
-            ->build();
-
-        $builder->createField('filters', Types::ARRAY)
-            ->nullable()
-            ->build();
-
-        $builder->createField('tableOrder', Types::ARRAY)
-            ->columnName('table_order')
-            ->nullable()
-            ->build();
-
-        $builder->createField('graphs', Types::ARRAY)
-            ->nullable()
-            ->build();
-
-        $builder->createField('groupBy', Types::ARRAY)
-            ->columnName('group_by')
-            ->nullable()
-            ->build();
-
-        $builder->createField('aggregators', Types::ARRAY)
-            ->columnName('aggregators')
-            ->nullable()
-            ->build();
-
-        $builder->createField('settings', Types::JSON)
-            ->columnName('settings')
-            ->nullable()
-            ->build();
-
-        $builder->createField('isScheduled', Types::BOOLEAN)
-            ->columnName('is_scheduled')
-            ->build();
-
-        $builder->addNullableField('scheduleUnit', Types::STRING, 'schedule_unit');
-        $builder->addNullableField('toAddress', Types::STRING, 'to_address');
-        $builder->addNullableField('scheduleDay', Types::STRING, 'schedule_day');
-        $builder->addNullableField('scheduleMonthFrequency', Types::STRING, 'schedule_month_frequency');
-
-        static::addUuidField($builder);
     }
 
     /**
@@ -253,10 +199,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
             ->build();
     }
 
-    /**
-     * @return int|null
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -423,7 +366,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     /**
      * @return array<array-key, mixed>
      */
-    public function getTableOrder()
+    public function getTableOrder(): array
     {
         return $this->tableOrder;
     }
@@ -438,7 +381,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     /**
      * @return array<array-key, mixed>
      */
-    public function getGraphs()
+    public function getGraphs(): array
     {
         return $this->graphs;
     }
@@ -453,7 +396,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     /**
      * @return array<array-key, mixed>
      */
-    public function getGroupBy()
+    public function getGroupBy(): array
     {
         return $this->groupBy;
     }
@@ -468,7 +411,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     /**
      * @return array<array-key, mixed>
      */
-    public function getAggregators()
+    public function getAggregators(): array
     {
         return $this->aggregators;
     }
@@ -508,9 +451,9 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     }
 
     /**
-     * @return array<array-key, mixed>|null
+     * @return array<array-key, mixed>
      */
-    public function getSettings()
+    public function getSettings(): array
     {
         return $this->settings;
     }

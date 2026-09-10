@@ -136,7 +136,7 @@ final class WidgetApiController extends CommonApiController
         $this->model->populateWidgetContent($widget);
         $data = $widget->getTemplateData();
 
-        if (!$data) {
+        if ($data === []) {
             return $this->notFound();
         }
 

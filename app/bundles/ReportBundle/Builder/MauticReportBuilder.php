@@ -255,7 +255,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
             }
 
             $queryBuilder->addGroupBy($groupByColumns);
-        } elseif (!empty($options['groupby']) && empty($groupByOptions)) {
+        } elseif (!empty($options['groupby'])) {
             $queryBuilder->addGroupBy($options['groupby']);
         }
 
@@ -288,7 +288,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         // Build SELECT clause
         if (!$event->getSelectColumns()) {
             $fields           = $this->entity->getColumns();
-            $groupByFieldKeys = $groupByOptions ? array_flip($groupByOptions) : [];
+            $groupByFieldKeys = $groupByOptions !== [] ? array_flip($groupByOptions) : [];
 
             foreach ($fields as $field) {
                 // With GROUP BY + aggregators, a column listed only for COUNT/AVG must not

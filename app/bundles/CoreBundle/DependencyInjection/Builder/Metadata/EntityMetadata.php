@@ -33,12 +33,14 @@ final class EntityMetadata
         $bundleNamespace = $this->metadata->getNamespace();
         $bundleName      = $this->metadata->getBundleName();
 
+        $hasAttributeMapping = false;
+        $hasStaticPhpMapping = false;
+
         foreach ($finder as $file) {
             // Check to see if entities are organized by subfolder
             $subFolder = $file->getRelativePath() ? $file->getRelativePath().'\\' : '';
             $fileName  = basename($file->getFilename(), '.php');
 
-            // Just check first file for the loadMetadata function
             $className       = sprintf('\\%s\\Entity\\%s%s', $bundleNamespace, $subFolder, $fileName);
             $reflectionClass = new \ReflectionClass($className);
 
@@ -55,16 +57,37 @@ final class EntityMetadata
                 ];
             }
 
-            // The bundle leverages the static loadMetadata method
-            if ([] === $this->ormConfig && $reflectionClass->hasMethod('loadMetadata')) {
-                $this->ormConfig = [
-                    'dir'       => 'Entity',
-                    'type'      => 'staticphp',
-                    'prefix'    => $bundleNamespace.'\\Entity',
-                    'mapping'   => true,
-                    'is_bundle' => true,
-                ];
+            if ($reflectionClass->getAttributes(\Doctrine\ORM\Mapping\Entity::class)
+                || $reflectionClass->getAttributes(\Doctrine\ORM\Mapping\MappedSuperclass::class)
+                || $reflectionClass->getAttributes(\Doctrine\ORM\Mapping\Embeddable::class)
+            ) {
+                $hasAttributeMapping = true;
             }
+
+            if ($reflectionClass->hasMethod('loadMetadata')) {
+                $hasStaticPhpMapping = true;
+            }
+        }
+
+        // Prefer the attribute driver whenever the bundle has any attribute-mapped entity; a
+        // loadClassMetadata subscriber supplements it by calling any remaining static loadMetadata().
+        // This lets an entity carry both attributes and a partial loadMetadata during the migration.
+        if ($hasAttributeMapping) {
+            $this->ormConfig = [
+                'dir'       => 'Entity',
+                'type'      => 'attribute',
+                'prefix'    => $bundleNamespace.'\\Entity',
+                'mapping'   => true,
+                'is_bundle' => true,
+            ];
+        } elseif ($hasStaticPhpMapping) {
+            $this->ormConfig = [
+                'dir'       => 'Entity',
+                'type'      => 'staticphp',
+                'prefix'    => $bundleNamespace.'\\Entity',
+                'mapping'   => true,
+                'is_bundle' => true,
+            ];
         }
     }
 
