@@ -7,45 +7,33 @@ namespace Mautic\PointBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CommonEntity;
 use Mautic\LeadBundle\Entity\Lead;
 
+#[ORM\Entity(repositoryClass: GroupContactScoreRepository::class)]
+#[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class GroupContactScore extends CommonEntity
 {
     public const TABLE_NAME = 'point_group_contact_score';
 
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: \Mautic\LeadBundle\Entity\Lead::class, inversedBy: 'groupScores')]
+    #[ORM\JoinColumn(name: 'contact_id', nullable: false, onDelete: 'CASCADE')]
     private Lead $contact;
 
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: Group::class)]
+    #[ORM\JoinColumn(name: 'group_id', onDelete: 'CASCADE')]
     private Group $group;
 
+    #[ORM\Column(type: Types::INTEGER)]
     private int $score = 0;
 
     public function __construct()
     {
         $this->contact = new Lead();
         $this->group   = new Group();
-    }
-
-    /**
-     * @param ORM\ClassMetadata<GroupContactScore> $metadata
-     */
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(GroupContactScoreRepository::class);
-
-        $builder->addContact(false, 'CASCADE', true, 'groupScores');
-
-        $builder->createManyToOne('group', Group::class)
-            ->isPrimaryKey()
-            ->addJoinColumn('group_id', 'id', true, false, 'CASCADE')
-            ->build();
-
-        $builder->createField('score', Types::INTEGER)
-            ->build();
     }
 
     public static function loadApiMetadata(ApiMetadataDriver $metadata): void

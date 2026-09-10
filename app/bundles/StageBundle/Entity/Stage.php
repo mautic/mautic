@@ -13,10 +13,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
+use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -42,15 +42,31 @@ use Symfony\Component\Validator\Constraints as Assert;
     ]
 )]
 #[UniqueEntity(fields: ['weight'], message: 'mautic.stage.weight.unique')]
+#[ORM\Entity(repositoryClass: StageRepository::class)]
+#[ORM\Table(name: 'stages')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Stage extends FormEntity implements UuidInterface
 {
     use UuidTrait;
     use ProjectTrait;
 
     /**
+     * @var \Doctrine\Common\Collections\Collection<int, Project>
+     */
+    #[ORM\ManyToMany(targetEntity: \Mautic\ProjectBundle\Entity\Project::class, cascade: ['merge', 'persist', 'detach'], fetch: 'LAZY', indexBy: 'name')]
+    #[ORM\JoinTable(name: 'stage_projects_xref')]
+    #[ORM\JoinColumn(name: 'stage_id', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'project_id', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\OrderBy(['name' => 'ASC'])]
+    private \Doctrine\Common\Collections\Collection $projects;
+
+    /**
      * @var int
      */
     #[Groups(['stage:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -58,41 +74,49 @@ class Stage extends FormEntity implements UuidInterface
      */
     #[Groups(['stage:read', 'stage:write'])]
     #[Assert\NotBlank(message: 'mautic.core.name.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var string|null
      */
     #[Groups(['stage:read', 'stage:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
      * @var int
      */
     #[Groups(['stage:read', 'stage:write'])]
+    #[ORM\Column(type: 'integer')]
     private $weight = 0;
 
     /**
      * @var \DateTimeInterface
      */
     #[Groups(['stage:read', 'stage:write'])]
+    #[ORM\Column(name: 'publish_up', type: 'datetime', nullable: true)]
     private $publishUp;
 
     /**
      * @var \DateTimeInterface
      */
     #[Groups(['stage:read', 'stage:write'])]
+    #[ORM\Column(name: 'publish_down', type: 'datetime', nullable: true)]
     private $publishDown;
 
     /**
      * @var ArrayCollection<int,LeadStageLog>
      */
+    #[ORM\OneToMany(mappedBy: 'stage', targetEntity: LeadStageLog::class, cascade: ['persist', 'remove'], fetch: 'EXTRA_LAZY')]
     private $log;
 
     /**
      * @var Category|null
      */
     #[Groups(['stage:read', 'stage:write'])]
+    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['merge', 'detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
     private $category;
 
     public function __clone()
@@ -106,32 +130,6 @@ class Stage extends FormEntity implements UuidInterface
     {
         $this->log = new ArrayCollection();
         $this->initializeProjects();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-        $builder->setTable('stages')
-            ->setCustomRepositoryClass(StageRepository::class);
-
-        $builder->addIdColumns();
-
-        $builder->createField('weight', 'integer')
-            ->build();
-
-        $builder->addPublishDates();
-
-        $builder->createOneToMany('log', 'LeadStageLog')
-            ->mappedBy('stage')
-            ->cascadePersist()
-            ->cascadeRemove()
-            ->fetchExtraLazy()
-            ->build();
-
-        $builder->addCategory();
-
-        static::addUuidField($builder);
-        self::addProjectsField($builder, 'stage_projects_xref', 'stage_id');
     }
 
     /**

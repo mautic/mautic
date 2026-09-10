@@ -37,6 +37,10 @@ use Symfony\Component\Serializer\Attribute\Groups;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[ORM\Entity(repositoryClass: TriggerEventRepository::class)]
+#[ORM\Table(name: 'point_trigger_events')]
+#[ORM\Index(columns: ['type'], name: 'trigger_type_search')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class TriggerEvent implements UuidInterface
 {
     use UuidTrait;
@@ -45,36 +49,44 @@ class TriggerEvent implements UuidInterface
      * @var int|null
      */
     #[Groups(['trigger_event:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
      * @var string
      */
     #[Groups(['trigger_event:read', 'trigger_event:write'])]
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var string|null
      */
     #[Groups(['trigger_event:read', 'trigger_event:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
      * @var string
      */
     #[Groups(['trigger_event:read', 'trigger_event:write'])]
+    #[ORM\Column(type: 'string', length: 50)]
     private $type;
 
     /**
      * @var int
      */
     #[Groups(['trigger_event:read', 'trigger_event:write'])]
+    #[ORM\Column(name: 'action_order', type: 'integer')]
     private $order = 0;
 
     /**
      * @var array
      */
     #[Groups(['trigger_event:read', 'trigger_event:write'])]
+    #[ORM\Column(type: 'array')]
     private $properties = [];
 
     /**
@@ -86,6 +98,7 @@ class TriggerEvent implements UuidInterface
     /**
      * @var ArrayCollection<int,LeadTriggerLog>
      */
+    #[ORM\OneToMany(mappedBy: 'event', targetEntity: LeadTriggerLog::class, cascade: ['persist', 'remove'], fetch: 'EXTRA_LAZY')]
     private $log;
 
     /**
@@ -107,36 +120,11 @@ class TriggerEvent implements UuidInterface
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('point_trigger_events')
-            ->setCustomRepositoryClass(TriggerEventRepository::class)
-            ->addIndex(['type'], 'trigger_type_search');
-
-        $builder->addIdColumns();
-
-        $builder->createField('type', 'string')
-            ->length(50)
-            ->build();
-
-        $builder->createField('order', 'integer')
-            ->columnName('action_order')
-            ->build();
-
-        $builder->addField('properties', 'array');
-
         $builder->createManyToOne('trigger', 'Trigger')
             ->inversedBy('events')
             ->addJoinColumn('trigger_id', 'id', false, false, 'CASCADE')
             ->isOwnershipParent()
             ->build();
-
-        $builder->createOneToMany('log', 'LeadTriggerLog')
-            ->mappedBy('event')
-            ->cascadePersist()
-            ->cascadeRemove()
-            ->fetchExtraLazy()
-            ->build();
-
-        static::addUuidField($builder);
     }
 
     /**
