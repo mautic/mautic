@@ -5,13 +5,25 @@ namespace Mautic\CampaignBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Entity\OptimisticLockInterface;
 use Mautic\CoreBundle\Entity\OptimisticLockTrait;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead as LeadEntity;
 
+#[ORM\Entity(repositoryClass: LeadEventLogRepository::class)]
+#[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\Index(columns: ['is_scheduled', 'lead_id'], name: 'campaign_event_upcoming_search')]
+#[ORM\Index(columns: ['campaign_id', 'is_scheduled', 'trigger_date'], name: 'campaign_event_schedule_counts')]
+#[ORM\Index(columns: ['date_triggered'], name: 'campaign_date_triggered')]
+#[ORM\Index(columns: ['campaign_id', 'lead_id', 'rotation'], name: 'campaign_leads')]
+#[ORM\Index(columns: ['channel', 'channel_id', 'lead_id'], name: 'campaign_log_channel')]
+#[ORM\Index(columns: ['campaign_id', 'event_id', 'date_triggered'], name: 'campaign_actions')]
+#[ORM\Index(columns: ['campaign_id', 'date_triggered', 'event_id', 'non_action_path_taken'], name: 'campaign_stats')]
+#[ORM\Index(columns: ['trigger_date'], name: 'campaign_trigger_date_order')]
+#[ORM\Index(columns: ['is_scheduled', 'event_id', 'trigger_date'], name: 'idx_scheduled_events')]
+#[ORM\UniqueConstraint(name: 'campaign_rotation', columns: ['event_id', 'lead_id', 'rotation'])]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class LeadEventLog implements ChannelInterface, OptimisticLockInterface
 {
     use OptimisticLockTrait;
@@ -21,66 +33,85 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     /**
      * @var string|null
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'bigint', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
      * @var Event
      */
+    #[ORM\ManyToOne(targetEntity: Event::class, inversedBy: 'log')]
+    #[ORM\JoinColumn(name: 'event_id', nullable: false)]
     private $event;
 
     /**
      * @var LeadEntity
      */
+    #[ORM\ManyToOne(targetEntity: \Mautic\LeadBundle\Entity\Lead::class)]
+    #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
     private $lead;
 
     /**
      * @var Campaign|null
      */
+    #[ORM\ManyToOne(targetEntity: Campaign::class)]
+    #[ORM\JoinColumn(name: 'campaign_id')]
     private $campaign;
 
     /**
      * @var IpAddress|null
      */
+    #[ORM\ManyToOne(targetEntity: \Mautic\CoreBundle\Entity\IpAddress::class, cascade: ['persist', 'merge', 'detach'])]
+    #[ORM\JoinColumn(name: 'ip_id', onDelete: 'SET NULL')]
     private $ipAddress;
 
     /**
      * @var \DateTimeInterface|null
      */
+    #[ORM\Column(name: 'date_triggered', type: 'datetime', nullable: true)]
     private $dateTriggered;
 
     /**
      * @var bool
      */
+    #[ORM\Column(name: 'is_scheduled', type: 'boolean')]
     private $isScheduled = false;
 
     /**
      * @var \DateTimeInterface|null
      */
+    #[ORM\Column(name: 'trigger_date', type: 'datetime', nullable: true)]
     private $triggerDate;
 
     /**
      * @var bool
      */
+    #[ORM\Column(name: 'system_triggered', type: 'boolean')]
     private $systemTriggered = false;
 
     /**
      * @var array
      */
+    #[ORM\Column(type: 'array', nullable: true)]
     private $metadata = [];
 
     /**
      * @var bool|null
      */
+    #[ORM\Column(name: 'non_action_path_taken', type: 'boolean', nullable: true)]
     private $nonActionPathTaken = false;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $channel;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'channel_id', type: 'integer', nullable: true)]
     private $channelId;
 
     /**
@@ -91,11 +122,13 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     /**
      * @var int
      */
+    #[ORM\Column(type: 'integer')]
     private $rotation = 1;
 
     /**
      * @var FailedLeadEventLog|null
      */
+    #[ORM\OneToOne(mappedBy: 'log', targetEntity: FailedLeadEventLog::class, cascade: ['all'], fetch: 'EXTRA_LAZY')]
     private $failedLog;
 
     /**
@@ -103,85 +136,8 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
      */
     private ?\DateInterval $rescheduleInterval = null;
 
+    #[ORM\Column(name: 'date_queued', type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTime $dateQueued = null;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(LeadEventLogRepository::class)
-            ->addIndex(['is_scheduled', 'lead_id'], 'campaign_event_upcoming_search')
-            ->addIndex(['campaign_id', 'is_scheduled', 'trigger_date'], 'campaign_event_schedule_counts')
-            ->addIndex(['date_triggered'], 'campaign_date_triggered')
-            ->addIndex(['campaign_id', 'lead_id', 'rotation'], 'campaign_leads')
-            ->addIndex(['channel', 'channel_id', 'lead_id'], 'campaign_log_channel')
-            ->addIndex(['campaign_id', 'event_id', 'date_triggered'], 'campaign_actions')
-            ->addIndex(['campaign_id', 'date_triggered', 'event_id', 'non_action_path_taken'], 'campaign_stats')
-            ->addIndex(['trigger_date'], 'campaign_trigger_date_order')
-            ->addIndex(['is_scheduled', 'event_id', 'trigger_date'], 'idx_scheduled_events')
-            ->addUniqueConstraint(['event_id', 'lead_id', 'rotation'], 'campaign_rotation');
-
-        $builder->addBigIntIdField();
-
-        $builder->createManyToOne('event', 'Event')
-            ->inversedBy('log')
-            ->addJoinColumn('event_id', 'id', false, false)
-            ->build();
-
-        $builder->addLead(false, 'CASCADE');
-
-        $builder->addField('rotation', 'integer');
-
-        $builder->createManyToOne('campaign', 'Campaign')
-            ->addJoinColumn('campaign_id', 'id')
-            ->build();
-
-        $builder->addIpAddress(true);
-
-        $builder->createField('dateTriggered', 'datetime')
-            ->columnName('date_triggered')
-            ->nullable()
-            ->build();
-
-        $builder->createField('isScheduled', 'boolean')
-            ->columnName('is_scheduled')
-            ->build();
-
-        $builder->createField('triggerDate', 'datetime')
-            ->columnName('trigger_date')
-            ->nullable()
-            ->build();
-
-        $builder->createField('systemTriggered', 'boolean')
-            ->columnName('system_triggered')
-            ->build();
-
-        $builder->createField('metadata', 'array')
-            ->nullable()
-            ->build();
-
-        $builder->createField('channel', 'string')
-                ->nullable()
-                ->build();
-
-        $builder->addNamedField('channelId', 'integer', 'channel_id', true);
-
-        $builder->addNullableField('nonActionPathTaken', 'boolean', 'non_action_path_taken');
-
-        $builder->createOneToOne('failedLog', 'FailedLeadEventLog')
-            ->mappedBy('log')
-            ->fetchExtraLazy()
-            ->cascadeAll()
-            ->build();
-
-        $builder->createField('dateQueued', Types::DATETIME_MUTABLE)
-            ->columnName('date_queued')
-            ->nullable()
-            ->build();
-
-        self::addVersionField($builder);
-    }
 
     /**
      * Prepares the metadata for API usage.

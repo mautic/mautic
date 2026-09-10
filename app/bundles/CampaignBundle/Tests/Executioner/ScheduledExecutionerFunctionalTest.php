@@ -441,7 +441,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
 
         $this->em->refresh($campaignMember);
 
-        $this->assertEquals($initialRotation + 1, $campaignMember->getRotation(),
+        $this->assertSame($initialRotation + 1, $campaignMember->getRotation(),
             'Campaign member rotation should be incremented during redirection.');
 
         $updatedLog = $this->em->getRepository(LeadEventLog::class)->findOneBy([
