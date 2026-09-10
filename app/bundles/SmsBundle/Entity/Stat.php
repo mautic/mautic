@@ -7,11 +7,17 @@ namespace Mautic\SmsBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 
+#[ORM\Entity(repositoryClass: StatRepository::class)]
+#[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\Index(columns: ['sms_id', 'lead_id'], name: 'stat_sms_search')]
+#[ORM\Index(columns: ['tracking_hash'], name: 'stat_sms_hash_search')]
+#[ORM\Index(columns: ['source', 'source_id'], name: 'stat_sms_source_search')]
+#[ORM\Index(columns: ['is_failed'], name: 'stat_sms_failed_search')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Stat
 {
     public const TABLE_NAME = 'sms_message_stats';
@@ -19,118 +25,65 @@ class Stat
     /**
      * @var string
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'bigint', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
-    /**
-     * @var Sms|null
-     */
-    private $sms;
+    #[ORM\ManyToOne(targetEntity: Sms::class, inversedBy: 'stats')]
+    #[ORM\JoinColumn(name: 'sms_id', onDelete: 'SET NULL')]
+    private ?\Mautic\SmsBundle\Entity\Sms $sms = null;
 
-    /**
-     * @var Lead|null
-     */
-    private $lead;
+    #[ORM\ManyToOne(targetEntity: \Mautic\LeadBundle\Entity\Lead::class)]
+    #[ORM\JoinColumn(name: 'lead_id', onDelete: 'SET NULL')]
+    private ?\Mautic\LeadBundle\Entity\Lead $lead = null;
 
-    /**
-     * @var LeadList|null
-     */
-    private $list;
+    #[ORM\ManyToOne(targetEntity: LeadList::class)]
+    #[ORM\JoinColumn(name: 'list_id', onDelete: 'SET NULL')]
+    private ?\Mautic\LeadBundle\Entity\LeadList $list = null;
 
-    /**
-     * @var IpAddress|null
-     */
-    private $ipAddress;
+    #[ORM\ManyToOne(targetEntity: \Mautic\CoreBundle\Entity\IpAddress::class, cascade: ['persist', 'merge', 'detach'])]
+    #[ORM\JoinColumn(name: 'ip_id', onDelete: 'SET NULL')]
+    private ?\Mautic\CoreBundle\Entity\IpAddress $ipAddress = null;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_sent', type: 'datetime')]
     private $dateSent;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'tracking_hash', type: 'string', length: 191, nullable: true)]
     private $trackingHash;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $source;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'source_id', type: 'integer', nullable: true)]
     private $sourceId;
 
-    /**
-     * @var array
-     */
-    private $tokens = [];
+    #[ORM\Column(type: 'array', nullable: true)]
+    private array $tokens = [];
 
     /**
      * @var array
      */
+    #[ORM\Column(type: Types::JSON)]
     private $details = [];
 
     /**
      * @var bool|null
      */
+    #[ORM\Column(name: 'is_failed', type: 'boolean', nullable: true)]
     private $isFailed = false;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(StatRepository::class)
-            ->addIndex(['sms_id', 'lead_id'], 'stat_sms_search')
-            ->addIndex(['tracking_hash'], 'stat_sms_hash_search')
-            ->addIndex(['source', 'source_id'], 'stat_sms_source_search')
-            ->addIndex(['is_failed'], 'stat_sms_failed_search');
-
-        $builder->addBigIntIdField();
-
-        $builder->createManyToOne('sms', 'Sms')
-            ->inversedBy('stats')
-            ->addJoinColumn('sms_id', 'id', true, false, 'SET NULL')
-            ->build();
-
-        $builder->addLead(true, 'SET NULL');
-
-        $builder->createManyToOne('list', LeadList::class)
-            ->addJoinColumn('list_id', 'id', true, false, 'SET NULL')
-            ->build();
-
-        $builder->addIpAddress(true);
-
-        $builder->createField('dateSent', 'datetime')
-            ->columnName('date_sent')
-            ->build();
-
-        $builder->createField('isFailed', 'boolean')
-            ->columnName('is_failed')
-            ->nullable()
-            ->build();
-
-        $builder->createField('trackingHash', 'string')
-            ->columnName('tracking_hash')
-            ->nullable()
-            ->build();
-
-        $builder->createField('source', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('sourceId', 'integer')
-            ->columnName('source_id')
-            ->nullable()
-            ->build();
-
-        $builder->createField('tokens', 'array')
-            ->nullable()
-            ->build();
-
-        $builder->addField('details', Types::JSON);
-    }
 
     /**
      * Prepares the metadata for API usage.
@@ -160,10 +113,7 @@ class Stat
         return (int) $this->id;
     }
 
-    /**
-     * @return Sms|null
-     */
-    public function getSms()
+    public function getSms(): ?\Mautic\SmsBundle\Entity\Sms
     {
         return $this->sms;
     }
@@ -175,10 +125,7 @@ class Stat
         return $this;
     }
 
-    /**
-     * @return Lead|null
-     */
-    public function getLead()
+    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;
     }
@@ -190,10 +137,7 @@ class Stat
         return $this;
     }
 
-    /**
-     * @return LeadList|null
-     */
-    public function getList()
+    public function getList(): ?\Mautic\LeadBundle\Entity\LeadList
     {
         return $this->list;
     }
@@ -205,10 +149,7 @@ class Stat
         return $this;
     }
 
-    /**
-     * @return IpAddress|null
-     */
-    public function getIpAddress()
+    public function getIpAddress(): ?\Mautic\CoreBundle\Entity\IpAddress
     {
         return $this->ipAddress;
     }
@@ -295,7 +236,7 @@ class Stat
     /**
      * @return array<array-key, mixed>
      */
-    public function getTokens()
+    public function getTokens(): array
     {
         return $this->tokens;
     }
