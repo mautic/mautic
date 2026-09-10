@@ -14,12 +14,12 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\AssetBundle\Validator\Constraints\Upload;
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Helper\FileHelper;
 use Mautic\CoreBundle\Validator\SafeRemoteUrl;
+use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
@@ -48,27 +48,48 @@ use Symfony\Component\Validator\Constraints\Sequentially;
     ]
 )]
 #[Upload]
+#[ORM\Entity(repositoryClass: AssetRepository::class)]
+#[ORM\Table(name: 'assets')]
+#[ORM\Index(columns: ['alias'], name: 'asset_alias_search')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Asset extends FormEntity implements UuidInterface
 {
     use UuidTrait;
 
     use ProjectTrait;
 
+    /**
+     * @var \Doctrine\Common\Collections\Collection<int, Project>
+     */
+    #[ORM\ManyToMany(targetEntity: \Mautic\ProjectBundle\Entity\Project::class, cascade: ['merge', 'persist', 'detach'], fetch: 'LAZY', indexBy: 'name')]
+    #[ORM\JoinTable(name: 'asset_projects_xref')]
+    #[ORM\JoinColumn(name: 'asset_id', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'project_id', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\OrderBy(['name' => 'ASC'])]
+    private \Doctrine\Common\Collections\Collection $projects;
+
     public const ENTITY_NAME = 'asset';
 
     #[Groups(['asset:read', 'download:read', 'email:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private ?int $id = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(type: 'string', length: 191)]
     private ?string $title = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'storage_location', type: Types::STRING, length: 191, nullable: true)]
     private ?string $storageLocation = 'local';
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(type: Types::STRING, length: 191, nullable: true)]
     private ?string $path = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
@@ -76,9 +97,11 @@ class Asset extends FormEntity implements UuidInterface
         new Assert\Url(message: 'mautic.asset.validation.error.url'),
         new SafeRemoteUrl(),
     ])]
+    #[ORM\Column(name: 'remote_path', type: Types::TEXT, nullable: true)]
     private ?string $remotePath = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'original_file_name', type: Types::TEXT, nullable: true)]
     private ?string $originalFileName = null;
 
     private ?File $file = null;
@@ -113,119 +136,60 @@ class Asset extends FormEntity implements UuidInterface
     private ?string $tempName = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(type: Types::STRING, length: 191, nullable: true)]
     private ?string $alias = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'lang', type: Types::STRING, length: 191)]
     private string $language = 'en';
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'publish_up', type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $publishUp = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'publish_down', type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $publishDown = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'download_count', type: Types::INTEGER)]
     private int $downloadCount = 0;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'unique_download_count', type: Types::INTEGER)]
     private int $uniqueDownloadCount = 0;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(type: Types::INTEGER)]
     private int $revision = 1;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['merge', 'detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
     private ?Category $category = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(type: Types::STRING, length: 191, nullable: true)]
     private ?string $extension = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(type: Types::STRING, length: 191, nullable: true)]
     private ?string $mime = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(type: Types::INTEGER, nullable: true)]
     private ?int $size = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
     private ?string $downloadUrl = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(type: Types::BOOLEAN, nullable: true)]
     private ?bool $disallow = true;
 
     public function __construct()
     {
         $this->initializeProjects();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable('assets')
-            ->setCustomRepositoryClass(AssetRepository::class)
-            ->addIndex(['alias'], 'asset_alias_search');
-
-        $builder->addIdColumns('title');
-
-        $builder->createField('alias', Types::STRING)
-            ->columnName('alias')
-            ->nullable()
-            ->build();
-
-        $builder->createField('storageLocation', Types::STRING)
-            ->columnName('storage_location')
-            ->nullable()
-            ->build();
-
-        $builder->createField('path', Types::STRING)
-            ->nullable()
-            ->build();
-
-        $builder->createField('remotePath', Types::TEXT)
-            ->columnName('remote_path')
-            ->nullable()
-            ->build();
-
-        $builder->createField('originalFileName', Types::TEXT)
-            ->columnName('original_file_name')
-            ->nullable()
-            ->build();
-
-        $builder->createField('language', Types::STRING)
-            ->columnName('lang')
-            ->build();
-
-        $builder->addPublishDates();
-
-        $builder->createField('downloadCount', Types::INTEGER)
-            ->columnName('download_count')
-            ->build();
-
-        $builder->createField('uniqueDownloadCount', Types::INTEGER)
-            ->columnName('unique_download_count')
-            ->build();
-
-        $builder->addField('revision', Types::INTEGER);
-
-        $builder->addCategory();
-
-        $builder->createField('extension', Types::STRING)
-            ->nullable()
-            ->build();
-
-        $builder->createField('mime', Types::STRING)
-            ->nullable()
-            ->build();
-
-        $builder->createField('size', Types::INTEGER)
-            ->nullable()
-            ->build();
-
-        $builder->createField('disallow', Types::BOOLEAN)
-            ->nullable()
-            ->build();
-
-        static::addUuidField($builder);
-        self::addProjectsField($builder, 'asset_projects_xref', 'asset_id');
     }
 
     /**

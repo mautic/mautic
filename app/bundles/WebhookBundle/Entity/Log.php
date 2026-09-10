@@ -3,60 +3,40 @@
 namespace Mautic\WebhookBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Doctrine\ORM\Mapping as ORM;
 
+#[ORM\Entity(repositoryClass: LogRepository::class)]
+#[ORM\Table(name: 'webhook_logs')]
+#[ORM\Index(columns: ['webhook_id', 'date_added'], name: 'webhook_id_date_added')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Log
 {
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
-    /**
-     * @var Webhook
-     */
-    private $webhook;
+    #[ORM\ManyToOne(targetEntity: Webhook::class, inversedBy: 'logs')]
+    #[ORM\JoinColumn(name: 'webhook_id', nullable: false, onDelete: 'CASCADE')]
+    private ?\Mautic\WebhookBundle\Entity\Webhook $webhook = null;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'status_code', type: Types::STRING, length: 50)]
     private $statusCode;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private $dateAdded;
+    #[ORM\Column(name: 'date_added', type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTime $dateAdded = null;
 
-    /**
-     * @var float|null
-     */
-    private $runtime;
+    #[ORM\Column(type: Types::FLOAT, nullable: true)]
+    private ?float $runtime = null;
 
+    #[ORM\Column(type: Types::STRING, length: 191, nullable: true)]
     private ?string $note = null;
-
-    public static function loadMetadata(ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-        $builder->setTable('webhook_logs')
-            ->setCustomRepositoryClass(LogRepository::class)
-            ->addIndex(['webhook_id', 'date_added'], 'webhook_id_date_added')
-            ->addId();
-
-        $builder->createManyToOne('webhook', 'Webhook')
-            ->inversedBy('logs')
-            ->addJoinColumn('webhook_id', 'id', false, false, 'CASCADE')
-            ->build();
-
-        $builder->createField('statusCode', Types::STRING)
-            ->columnName('status_code')
-            ->length(50)
-            ->build();
-
-        $builder->addNullableField('dateAdded', Types::DATETIME_MUTABLE, 'date_added');
-        $builder->addNullableField('note', Types::STRING);
-        $builder->addNullableField('runtime', Types::FLOAT);
-    }
 
     /**
      * @return int|null
@@ -66,10 +46,7 @@ class Log
         return $this->id;
     }
 
-    /**
-     * @return Webhook|null
-     */
-    public function getWebhook()
+    public function getWebhook(): ?\Mautic\WebhookBundle\Entity\Webhook
     {
         return $this->webhook;
     }
@@ -99,10 +76,7 @@ class Log
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getDateAdded()
+    public function getDateAdded(): ?\DateTime
     {
         return $this->dateAdded;
     }
@@ -129,10 +103,7 @@ class Log
         return $this;
     }
 
-    /**
-     * @return float|null
-     */
-    public function getRuntime()
+    public function getRuntime(): ?float
     {
         return $this->runtime;
     }

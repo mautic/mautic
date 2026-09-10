@@ -4,6 +4,7 @@ namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Model\AbTest\AbTestSettingsService;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -16,12 +17,16 @@ trait VariantEntityTrait
     /**
      * @var mixed
      */
+    #[ORM\OneToMany(mappedBy: 'variantParent', targetEntity: self::class, cascade: ['persist'], indexBy: 'id')]
+    #[ORM\OrderBy(['isPublished' => 'DESC'])]
     #[Groups(['email:read', 'email:write', 'download:read'])]
     private $variantChildren;
 
     /**
      * @var T|null
      */
+    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'variantChildren')]
+    #[ORM\JoinColumn(name: 'variant_parent_id', onDelete: 'CASCADE')]
     #[Groups(['email:read', 'email:write', 'download:read'])]
     private $variantParent;
 
@@ -38,12 +43,14 @@ trait VariantEntityTrait
     /**
      * @var array<mixed>|null
      */
+    #[ORM\Column(name: 'variant_settings', type: 'array', nullable: true)]
     #[Groups(['email:read', 'email:write', 'download:read'])]
     private $variantSettings = ['totalWeight' => AbTestSettingsService::DEFAULT_AB_WEIGHT, 'enableAbTest' => false];
 
     /**
      * @var \DateTimeInterface|null
      */
+    #[ORM\Column(name: 'variant_start_date', type: 'datetime', nullable: true)]
     #[Groups(['email:read', 'email:write', 'download:read'])]
     private $variantStartDate;
 

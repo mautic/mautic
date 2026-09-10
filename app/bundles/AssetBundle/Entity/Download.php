@@ -28,6 +28,12 @@ use Symfony\Component\Serializer\Attribute\Groups;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[ORM\Entity(repositoryClass: DownloadRepository::class)]
+#[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\Index(columns: ['tracking_id'], name: 'download_tracking_search')]
+#[ORM\Index(columns: ['source', 'source_id'], name: 'download_source_search')]
+#[ORM\Index(columns: ['date_download'], name: 'asset_date_download')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Download
 {
     public const TABLE_NAME = 'asset_downloads';
@@ -36,12 +42,16 @@ class Download
      * @var string
      */
     #[Groups(['download:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'bigint', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
      * @var \DateTimeInterface
      */
     #[Groups(['download:read', 'download:write'])]
+    #[ORM\Column(name: 'date_download', type: 'datetime')]
     private $dateDownload;
 
     /**
@@ -54,125 +64,77 @@ class Download
      * @var IpAddress|null
      */
     #[Groups(['download:read', 'download:write'])]
+    #[ORM\ManyToOne(targetEntity: \Mautic\CoreBundle\Entity\IpAddress::class, cascade: ['persist', 'merge', 'detach'])]
+    #[ORM\JoinColumn(name: 'ip_id', onDelete: 'SET NULL')]
     private $ipAddress;
 
     #[Groups(['download:read', 'download:write'])]
+    #[ORM\ManyToOne(targetEntity: \Mautic\LeadBundle\Entity\Lead::class)]
+    #[ORM\JoinColumn(name: 'lead_id', onDelete: 'SET NULL')]
     private ?Lead $lead = null;
 
     /**
      * @var int
      */
     #[Groups(['download:read', 'download:write'])]
+    #[ORM\Column(type: 'integer')]
     private $code;
 
     /**
      * @var string|null
      */
     #[Groups(['download:read', 'download:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $referer;
 
     /**
      * @var string
      */
     #[Groups(['download:read', 'download:write'])]
+    #[ORM\Column(name: 'tracking_id', type: 'string', length: 191)]
     private $trackingId;
 
     /**
      * @var string|null
      */
     #[Groups(['download:read', 'download:write'])]
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $source;
 
     /**
      * @var int|null
      */
     #[Groups(['download:read', 'download:write'])]
+    #[ORM\Column(name: 'source_id', type: 'integer', nullable: true)]
     private $sourceId;
 
     #[Groups(['download:read', 'download:write'])]
+    #[ORM\ManyToOne(targetEntity: Email::class)]
+    #[ORM\JoinColumn(name: 'email_id', onDelete: 'SET NULL')]
     private ?Email $email = null;
 
+    #[ORM\Column(name: 'utm_campaign', type: Types::STRING, length: 191, nullable: true)]
     private ?string $utmCampaign = null;
 
+    #[ORM\Column(name: 'utm_content', type: Types::STRING, length: 191, nullable: true)]
     private ?string $utmContent = null;
 
+    #[ORM\Column(name: 'utm_medium', type: Types::STRING, length: 191, nullable: true)]
     private ?string $utmMedium = null;
 
+    #[ORM\Column(name: 'utm_source', type: Types::STRING, length: 191, nullable: true)]
     private ?string $utmSource = null;
 
+    #[ORM\Column(name: 'utm_term', type: Types::STRING, length: 191, nullable: true)]
     private ?string $utmTerm = null;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(DownloadRepository::class)
-            ->addIndex(['tracking_id'], 'download_tracking_search')
-            ->addIndex(['source', 'source_id'], 'download_source_search')
-            ->addIndex(['date_download'], 'asset_date_download');
-
-        $builder->addBigIntIdField();
-
-        $builder->createField('dateDownload', 'datetime')
-            ->columnName('date_download')
-            ->build();
-
         $builder->createManyToOne('asset', 'Asset')
             ->addJoinColumn('asset_id', 'id', true, false, 'CASCADE')
             ->isOwnershipParent()
-            ->build();
-
-        $builder->addIpAddress(true);
-
-        $builder->addLead(true, 'SET NULL');
-
-        $builder->addField('code', 'integer');
-
-        $builder->createField('referer', 'text')
-            ->nullable()
-            ->build();
-
-        $builder->createField('trackingId', 'string')
-            ->columnName('tracking_id')
-            ->build();
-
-        $builder->createField('source', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('sourceId', 'integer')
-            ->columnName('source_id')
-            ->nullable()
-            ->build();
-
-        $builder->createManyToOne('email', Email::class)
-            ->addJoinColumn('email_id', 'id', true, false, 'SET NULL')
-            ->build();
-
-        $builder->createField('utmCampaign', Types::STRING)
-            ->columnName('utm_campaign')
-            ->nullable()
-            ->build();
-
-        $builder->createField('utmContent', Types::STRING)
-            ->columnName('utm_content')
-            ->nullable()
-            ->build();
-
-        $builder->createField('utmMedium', Types::STRING)
-            ->columnName('utm_medium')
-            ->nullable()
-            ->build();
-
-        $builder->createField('utmSource', Types::STRING)
-            ->columnName('utm_source')
-            ->nullable()
-            ->build();
-
-        $builder->createField('utmTerm', Types::STRING)
-            ->columnName('utm_term')
-            ->nullable()
             ->build();
     }
 
