@@ -4,6 +4,7 @@ namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Symfony\Component\Serializer\Attribute\Groups;
 
@@ -23,15 +24,20 @@ trait TranslationEntityTrait
     /**
      * @var Collection<int, T>
      */
+    #[ORM\OneToMany(mappedBy: 'translationParent', targetEntity: self::class, indexBy: 'id')]
+    #[ORM\OrderBy(['isPublished' => 'DESC'])]
     #[Groups(['page:read', 'page:write', 'download:read', 'download:write', 'email:read', 'email:write', 'dynamicContent:read', 'dynamicContent:write'])]
     private $translationChildren;
 
     /**
      * @var T|null
      */
+    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'translationChildren')]
+    #[ORM\JoinColumn(name: 'translation_parent_id', onDelete: 'CASCADE')]
     #[Groups(['page:read', 'page:write', 'download:read', 'download:write', 'email:read', 'email:write', 'dynamicContent:read', 'dynamicContent:write'])]
     private $translationParent;
 
+    #[ORM\Column(name: 'lang', type: 'string', length: 191)]
     #[Groups(['page:read', 'page:write', 'download:read', 'download:write', 'email:read', 'email:write', 'dynamicContent:read', 'dynamicContent:write'])]
     private string $language = 'en';
 
