@@ -12,6 +12,7 @@ use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 use Mautic\CampaignBundle\Executioner\TestScheduledExecutioner;
+use Mautic\CoreBundle\Service\OptimisticLockServiceInterface;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -122,7 +123,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $optimisticLockService = self::getContainer()->get(OptimisticLockServiceInterface::class);
-        \assert($optimisticLockService instanceof OptimisticLockServiceInterface);
+        $this->assertInstanceOf(OptimisticLockServiceInterface::class, $optimisticLockService);
         $this->assertTrue($optimisticLockService->acquireLock($log));
         $this->assertSame(2, $log->getVersion());
 
