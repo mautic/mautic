@@ -31,7 +31,6 @@ return RectorConfig::configure()
         UnserializeToSerializerDecodeRector::class,
         Utils\Rector\AssertTrueResponseIsOkToAssertResponseIsSuccessfulRector::class,
         Utils\Rector\ModelGetRepositoryToRepositoryServiceRector::class,
-        Utils\Rector\RequestGetToParameterBagsRector::class,
     ])
     ->withComposerBased(phpunit: true, symfony: true)
     ->withSkip([
