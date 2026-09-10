@@ -16,7 +16,6 @@ use PhpParser\Node\Expr\ClassConstFetch;
 use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\New_;
-use PhpParser\Node\Expr\StaticCall;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
@@ -244,37 +243,8 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
             return null;
         }
 
-        // self::addUuidField($builder) and friends.
-        if ($expr instanceof StaticCall) {
-            // Hybrid classes already map their own fields via attributes, so a helper that emits a
-            // property is left behind; a known no-op helper (its column lives on a trait property
-            // that carries its own attribute) is still understood and drops out of loadMetadata.
-            if ($this->isHybrid) {
-                $fields = $this->handleStaticHelper($expr);
-                if (null === $fields) {
-                    return null;
-                }
-
-                return $this->resolveTargets($fields, [], $node);
-            }
-
-            // self::addProjectsField($builder, $table, $column): emit a standalone projects property.
-            $projectsProperty = $this->tryProjectsField($expr);
-            if ($projectsProperty instanceof Property) {
-                $conversion                  = $this->resolveTargets([], [], $node);
-                $conversion['newProperties'] = [$projectsProperty];
-
-                return $conversion;
-            }
-
-            $fields = $this->handleStaticHelper($expr);
-            if (null === $fields) {
-                return null;
-            }
-
-            return $this->resolveTargets($fields, [], $node);
-        }
-
+        // Static helper calls (self::addUuidField, self::addProjectsField, ...) are left in
+        // loadMetadata for LoadMetadataStaticHelperToAttributeRector to convert.
         if (!$expr instanceof MethodCall) {
             return null;
         }
@@ -416,52 +386,6 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
             'propertyResolved'   => $propertyResolved,
             'methodResolved'     => $methodResolved,
         ];
-    }
-
-    /**
-     * self::addProjectsField($builder, $tableName, $columnName) maps the trait-declared
-     * `projects` ManyToMany with a per-entity join table. Emit it as a standalone property.
-     */
-    private function tryProjectsField(StaticCall $call): ?Property
-    {
-        if (!$call->class instanceof Name || !in_array($call->class->toString(), ['self', 'static'], true)) {
-            return null;
-        }
-
-        if (!$call->name instanceof Identifier || 'addProjectsField' !== $call->name->toString()) {
-            return null;
-        }
-
-        // args: ($builder, $tableName, $columnName)
-        $tableName  = $this->stringFromArg($call->args, 1);
-        $columnName = $this->stringFromArg($call->args, 2);
-        if (null === $tableName || null === $columnName) {
-            return null;
-        }
-
-        $target = new ClassConstFetch(new FullyQualified('Mautic\\ProjectBundle\\Entity\\Project'), new Identifier('class'));
-
-        $attributeGroups = $this->manyToManyAttributes(
-            $target,
-            null,
-            null,
-            ['merge', 'persist', 'detach'],
-            'LAZY',
-            false,
-            'name',
-            new Array_([new ArrayItem(new String_('ASC'), new String_('name'))]),
-            $tableName,
-            [$this->joinColumn($columnName, 'id', false, false, 'CASCADE')],
-            [$this->joinColumn('project_id', 'id', false, false, 'CASCADE')],
-        );
-
-        return new Property(
-            Modifiers::PRIVATE,
-            [new PropertyItem('projects')],
-            [],
-            new FullyQualified('Doctrine\\Common\\Collections\\Collection'),
-            $attributeGroups,
-        );
     }
 
     /**
@@ -679,34 +603,6 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
             && $value->name instanceof Identifier
         ) {
             return $value->name->toString();
-        }
-
-        return null;
-    }
-
-    /**
-     * Static mapping helpers shared across entities, called as self::x($builder).
-     *
-     * @return array<string, list<AttributeGroup>>|null
-     */
-    private function handleStaticHelper(StaticCall $call): ?array
-    {
-        if (!$call->class instanceof Name || !in_array($call->class->toString(), ['self', 'static'], true)) {
-            return null;
-        }
-
-        if (!$call->name instanceof Identifier) {
-            return null;
-        }
-
-        // These helpers map trait properties (UuidTrait::$uuid, OptimisticLockTrait::$version,
-        // TranslationEntityTrait, VariantEntityTrait, DynamicContentEntityTrait) that carry their
-        // own mapping attributes. Emit no per-entity attribute (the properties are not in the class
-        // body, so they cannot be annotated here) and do not bail, so the call drops out of
-        // loadMetadata.
-        $noOpHelpers = ['addUuidField', 'addVersionField', 'addTranslationMetadata', 'addVariantMetadata', 'addDynamicContentMetadata'];
-        if (in_array($call->name->toString(), $noOpHelpers, true)) {
-            return [];
         }
 
         return null;
@@ -1793,20 +1689,6 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
     private function methodName(MethodCall $call): string
     {
         return $call->name instanceof Identifier ? $call->name->toString() : '';
-    }
-
-    /**
-     * @param array<Arg|Node\VariadicPlaceholder> $args
-     */
-    private function stringFromArg(array $args, int $index): ?string
-    {
-        if (!isset($args[$index]) || !$args[$index] instanceof Arg) {
-            return null;
-        }
-
-        $value = $args[$index]->value;
-
-        return $value instanceof String_ ? $value->value : null;
     }
 
     private function stringArg(MethodCall $call, int $index): ?string

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
+use Utils\Rector\LoadMetadataStaticHelperToAttributeRector;
 use Utils\Rector\UnserializeToSerializerDecodeRector;
 
 return RectorConfig::configure()
@@ -26,6 +27,7 @@ return RectorConfig::configure()
     ->withRules([
         // to be used next on loadMetadata()
         // \Utils\Rector\LoadMetadataToDoctrineAttributeRector::class,
+        // LoadMetadataStaticHelperToAttributeRector::class,
 
         Rector\PHPUnit\CodeQuality\Rector\ClassMethod\AssertClassToThisAssertRector::class,
         Rector\TypeDeclarationDocblocks\Rector\Property\MergePhpstanDocTagIntoNativeRector::class,
