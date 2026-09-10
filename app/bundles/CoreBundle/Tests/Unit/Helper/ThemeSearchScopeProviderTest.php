@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\ThemeSearchScopeProvider;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 final class ThemeSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
     protected function createProvider(): ThemeSearchScopeProvider

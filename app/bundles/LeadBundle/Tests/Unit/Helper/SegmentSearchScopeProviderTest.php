@@ -7,8 +7,10 @@ namespace Mautic\LeadBundle\Tests\Unit\Helper;
 use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Mautic\LeadBundle\Helper\SegmentSearchScopeProvider;
 use Mautic\LeadBundle\Model\ListModel;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 final class SegmentSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
     protected function createProvider(): SegmentSearchScopeProvider

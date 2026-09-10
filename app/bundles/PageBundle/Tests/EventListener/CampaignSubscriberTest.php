@@ -14,9 +14,11 @@ use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\EventListener\CampaignSubscriber;
 use Mautic\PageBundle\Helper\TrackingHelper;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 final class CampaignSubscriberTest extends TestCase
 {
     private CampaignSubscriber $subscriber;

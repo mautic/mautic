@@ -7,8 +7,10 @@ namespace MauticPlugin\MauticTagManagerBundle\Tests\Unit\Helper;
 use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Mautic\LeadBundle\Entity\TagRepository;
 use MauticPlugin\MauticTagManagerBundle\Helper\TagSearchScopeProvider;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 final class TagSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
     protected function createProvider(): TagSearchScopeProvider

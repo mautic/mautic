@@ -7,8 +7,10 @@ namespace Mautic\EmailBundle\Tests\Unit\Helper;
 use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Mautic\EmailBundle\Helper\EmailSearchScopeProvider;
 use Mautic\EmailBundle\Model\EmailModel;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 final class EmailSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
     protected function createProvider(): EmailSearchScopeProvider

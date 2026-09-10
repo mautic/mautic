@@ -7,10 +7,12 @@ namespace Mautic\EmailBundle\Tests\Helper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\EmailBundle\Helper\EmailMediaImageHelper;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
+#[AllowMockObjectsWithoutExpectations]
 final class EmailMediaImageHelperTest extends TestCase
 {
     private Filesystem $filesystem;

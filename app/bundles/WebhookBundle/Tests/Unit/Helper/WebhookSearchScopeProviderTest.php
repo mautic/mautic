@@ -7,8 +7,10 @@ namespace Mautic\WebhookBundle\Tests\Unit\Helper;
 use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Mautic\WebhookBundle\Helper\WebhookSearchScopeProvider;
 use Mautic\WebhookBundle\Model\WebhookModel;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 final class WebhookSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
     protected function createProvider(): WebhookSearchScopeProvider

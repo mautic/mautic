@@ -7,8 +7,10 @@ namespace Mautic\CampaignBundle\Tests\Unit\Helper;
 use Mautic\CampaignBundle\Helper\CampaignSearchScopeProvider;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 final class CampaignSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
     protected function createProvider(): CampaignSearchScopeProvider

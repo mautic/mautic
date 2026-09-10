@@ -7,8 +7,10 @@ namespace Mautic\UserBundle\Tests\Unit\Helper;
 use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Mautic\UserBundle\Helper\UserSearchScopeProvider;
 use Mautic\UserBundle\Model\UserModel;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 final class UserSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
     protected function createProvider(): UserSearchScopeProvider

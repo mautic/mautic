@@ -7,8 +7,10 @@ namespace Mautic\PointBundle\Tests\Unit\Helper;
 use Mautic\CoreBundle\Model\SearchCommandListInterface;
 use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Mautic\PointBundle\Helper\PointInsightSearchScopeProvider;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 final class PointInsightSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
     protected function createProvider(): PointInsightSearchScopeProvider

@@ -7,8 +7,10 @@ namespace Mautic\PointBundle\Tests\Unit\Helper;
 use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Mautic\PointBundle\Helper\PointGroupSearchScopeProvider;
 use Mautic\PointBundle\Model\PointGroupModel;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 final class PointGroupSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
     protected function createProvider(): PointGroupSearchScopeProvider

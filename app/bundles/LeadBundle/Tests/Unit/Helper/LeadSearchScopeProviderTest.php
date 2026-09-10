@@ -8,8 +8,10 @@ use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Helper\LeadSearchScopeProvider;
 use Mautic\LeadBundle\Model\LeadModel;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 final class LeadSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
     protected function createProvider(): LeadSearchScopeProvider

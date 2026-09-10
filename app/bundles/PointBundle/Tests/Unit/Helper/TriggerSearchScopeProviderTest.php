@@ -7,8 +7,10 @@ namespace Mautic\PointBundle\Tests\Unit\Helper;
 use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Mautic\PointBundle\Helper\TriggerSearchScopeProvider;
 use Mautic\PointBundle\Model\TriggerModel;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 final class TriggerSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
     protected function createProvider(): TriggerSearchScopeProvider

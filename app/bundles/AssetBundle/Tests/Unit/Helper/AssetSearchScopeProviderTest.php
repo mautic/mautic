@@ -7,8 +7,10 @@ namespace Mautic\AssetBundle\Tests\Unit\Helper;
 use Mautic\AssetBundle\Helper\AssetSearchScopeProvider;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 final class AssetSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
     protected function createProvider(): AssetSearchScopeProvider

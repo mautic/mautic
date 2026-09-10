@@ -7,8 +7,10 @@ namespace Mautic\PageBundle\Tests\Unit\Helper;
 use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Mautic\PageBundle\Helper\PageSearchScopeProvider;
 use Mautic\PageBundle\Model\PageModel;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 final class PageSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
     protected function createProvider(): PageSearchScopeProvider
