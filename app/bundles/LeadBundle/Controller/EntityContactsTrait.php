@@ -84,7 +84,7 @@ trait EntityContactsTrait
             $this->setListFilters($sessionVar.'.contact');
         }
 
-        $search = $request->get('search', $request->getSession()->get('mautic.'.$sessionVar.'.contact.filter', ''));
+        $search = $request->attributes->all()['search'] ?? $request->query->all()['search'] ?? $request->request->all()['search'] ?? $request->getSession()->get('mautic.'.$sessionVar.'.contact.filter', '');
         $request->getSession()->set('mautic.'.$sessionVar.'.contact.filter', $search);
 
         $pageHelper = $pageHelperFactory->make("mautic.{$sessionVar}", $page);

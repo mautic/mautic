@@ -58,7 +58,7 @@ final class MonitoringController extends FormController
             $start = 0;
         }
 
-        $search = $request->get('search', $session->get('mautic.social.monitoring.filter', ''));
+        $search = $request->attributes->all()['search'] ?? $request->query->all()['search'] ?? $request->request->all()['search'] ?? $session->get('mautic.social.monitoring.filter', '');
         $session->set('mautic.social.monitoring.filter', $search);
 
         $filter = ['string' => $search, 'force' => []];
@@ -103,7 +103,7 @@ final class MonitoringController extends FormController
         // set what asset currently on so that we can return here after form submission/cancellation
         $session->set('mautic.social.monitoring.page', $page);
 
-        $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
+        $tmpl = $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index';
 
         return $this->delegateView(
             [
@@ -224,7 +224,7 @@ final class MonitoringController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'tmpl'   => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                    'tmpl'   => $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index',
                     'entity' => $entity,
                     'form'   => $form->createView(),
                 ],
@@ -369,7 +369,7 @@ final class MonitoringController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'tmpl'   => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                    'tmpl'   => $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index',
                     'entity' => $entity,
                     'form'   => $form->createView(),
                 ],
@@ -408,7 +408,7 @@ final class MonitoringController extends FormController
         // set the asset we came from
         $page = $session->get('mautic.social.monitoring.page', 1);
 
-        $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'details') : 'details';
+        $tmpl = $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'details' : 'details';
 
         if (null === $monitoringEntity) {
             // set the return URL
@@ -444,7 +444,7 @@ final class MonitoringController extends FormController
         );
 
         // Init the date range filter form
-        $dateRangeValues = $request->get('daterange', []);
+        $dateRangeValues = $request->attributes->all()['daterange'] ?? $request->query->all()['daterange'] ?? $request->request->all()['daterange'] ?? [];
         $dateRangeForm   = $this->formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $returnUrl]);
         $dateFrom        = new \DateTime($dateRangeForm['date_from']->getData());
         $dateTo          = new \DateTime($dateRangeForm['date_to']->getData());
@@ -463,7 +463,7 @@ final class MonitoringController extends FormController
                 'viewParameters' => [
                     'activeMonitoring' => $monitoringEntity,
                     'logs'             => $logs,
-                    'isEmbedded'       => $request->get('isEmbedded') ?: false,
+                    'isEmbedded'       => $request->attributes->all()['isEmbedded'] ?? $request->query->all()['isEmbedded'] ?? $request->request->all()['isEmbedded'] ?? null ?: false,
                     'tmpl'             => $tmpl,
                     'security'         => $security,
                     'leadStats'        => $chart->render(),

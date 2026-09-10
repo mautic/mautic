@@ -66,7 +66,7 @@ final class FieldController extends FormController
         $this->setListFilters();
 
         $limit  = $session->get('mautic.leadfield.limit', $this->coreParametersHelper->get('default_pagelimit'));
-        $search = $request->get('search', $session->get('mautic.leadfield.filter', ''));
+        $search = $request->attributes->all()['search'] ?? $request->query->all()['search'] ?? $request->request->all()['search'] ?? $session->get('mautic.leadfield.filter', '');
         $session->set('mautic.leadfield.filter', $search);
 
         // do some default filtering
@@ -120,7 +120,7 @@ final class FieldController extends FormController
         // set what page currently on so that we can return here after form submission/cancellation
         $session->set('mautic.leadfield.page', $page);
 
-        $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
+        $tmpl = $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index';
 
         return $this->delegateView([
             'viewParameters' => [

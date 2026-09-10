@@ -77,8 +77,8 @@ final class ContactExportSchedulerModel extends AbstractCommonModel
         /** @var Request $request */
         $request = $this->getRequest();
 
-        $ids      = $request->get('ids');
-        $fileType = $request->get('filetype', 'csv');
+        $ids      = $request->attributes->all()['ids'] ?? $request->query->all()['ids'] ?? $request->request->all()['ids'] ?? null;
+        $fileType = $request->attributes->all()['filetype'] ?? $request->query->all()['filetype'] ?? $request->request->all()['filetype'] ?? 'csv';
 
         $filter = ['string' => $search, 'force' => []];
 

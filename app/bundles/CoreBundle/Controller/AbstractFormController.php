@@ -27,7 +27,7 @@ abstract class AbstractFormController extends CommonController
             }
 
             $currentUrl = $request->getUri();
-            $returnUrl  = urldecode($request->get('returnUrl'));
+            $returnUrl  = urldecode($request->attributes->all()['returnUrl'] ?? $request->query->all()['returnUrl'] ?? $request->request->all()['returnUrl'] ?? null);
 
             if (!filter_var($returnUrl, FILTER_VALIDATE_URL)) {
                 $returnUrl = $this->generateUrl('mautic_dashboard_index');
@@ -43,7 +43,7 @@ abstract class AbstractFormController extends CommonController
             $this->addFlashMessage(
                 'mautic.core.action.entity.unlocked',
                 [
-                    '%name%' => htmlspecialchars(urldecode($request->get('name')), ENT_QUOTES, 'UTF-8'),
+                    '%name%' => htmlspecialchars(urldecode($request->attributes->all()['name'] ?? $request->query->all()['name'] ?? $request->request->all()['name'] ?? null), ENT_QUOTES, 'UTF-8'),
                 ]
             );
 

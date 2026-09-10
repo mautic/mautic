@@ -57,7 +57,7 @@ class CategoryModel extends FormModel implements AjaxLookupModelInterface
 
     public function getPermissionBase(?string $bundle = null): string
     {
-        $bundle ??= $this->requestStack->getCurrentRequest()->get('bundle');
+        $bundle ??= $this->requestStack->getCurrentRequest()->attributes->all()['bundle'] ?? $this->requestStack->getCurrentRequest()->query->all()['bundle'] ?? $this->requestStack->getCurrentRequest()->request->all()['bundle'] ?? null;
 
         if ('global' === $bundle || empty($bundle)) {
             $bundle = 'category';

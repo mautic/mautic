@@ -195,7 +195,7 @@ final class LeadController extends FormController
             $start = 0;
         }
 
-        $search = $request->get('search', $session->get('mautic.lead.filter', ''));
+        $search = $request->attributes->all()['search'] ?? $request->query->all()['search'] ?? $request->request->all()['search'] ?? $session->get('mautic.lead.filter', '');
         $session->set('mautic.lead.filter', $search);
 
         // do some default filtering
@@ -209,7 +209,7 @@ final class LeadController extends FormController
         $anonymous   = $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous');
         $listCommand = $this->translator->trans('mautic.lead.lead.searchcommand.list');
         $mine        = $this->translator->trans('mautic.core.searchcommand.ismine');
-        $indexMode   = $request->get('view', $session->get('mautic.lead.indexmode', 'list'));
+        $indexMode   = $request->attributes->all()['view'] ?? $request->query->all()['view'] ?? $request->request->all()['view'] ?? $session->get('mautic.lead.indexmode', 'list');
 
         $session->set('mautic.lead.indexmode', $indexMode);
 
@@ -267,7 +267,7 @@ final class LeadController extends FormController
         // set what page currently on so that we can return here after form submission/cancellation
         $session->set('mautic.lead.page', $page);
 
-        $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
+        $tmpl = $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index';
 
         $listArgs = [];
         if (!$this->security->isGranted('lead:lists:viewother')) {
@@ -654,7 +654,7 @@ final class LeadController extends FormController
                         ]
                     );
 
-                    $inQuickForm = $request->get('qf', false);
+                    $inQuickForm = $request->attributes->all()['qf'] ?? $request->query->all()['qf'] ?? $request->request->all()['qf'] ?? false;
 
                     if ($inQuickForm) {
                         $viewParameters = ['page' => $page];
@@ -671,7 +671,7 @@ final class LeadController extends FormController
                         return $this->editAction($request, $userHelper, $avatarHelper, $lead->getId(), true);
                     }
                 } else {
-                    if ($request->get('qf', false)) {
+                    if ($request->attributes->all()['qf'] ?? $request->query->all()['qf'] ?? $request->request->all()['qf'] ?? false) {
                         return $this->quickAddAction($request, $tokenStorage);
                     }
 
@@ -971,7 +971,7 @@ final class LeadController extends FormController
 
         // do some default filtering
         $session = $request->getSession();
-        $search  = $request->get('search', $session->get('mautic.lead.merge.filter', ''));
+        $search  = $request->attributes->all()['search'] ?? $request->query->all()['search'] ?? $request->request->all()['search'] ?? $session->get('mautic.lead.merge.filter', '');
         $session->set('mautic.lead.merge.filter', $search);
         $leads = [];
 
@@ -1089,7 +1089,7 @@ final class LeadController extends FormController
             }
         }
 
-        $tmpl = $request->get('tmpl', 'index');
+        $tmpl = $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index';
 
         return $this->delegateView(
             [
@@ -1162,7 +1162,7 @@ final class LeadController extends FormController
             );
         }
 
-        $tmpl = $request->get('tmpl', 'index');
+        $tmpl = $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index';
 
         return $this->delegateView(
             [
@@ -1459,7 +1459,7 @@ final class LeadController extends FormController
         $leadFields['owner_id'] = $userHelper->getUser()->getId();
 
         $inList = ('GET' === $request->getMethod())
-            ? $request->get('list', 0)
+            ? $request->attributes->all()['list'] ?? $request->query->all()['list'] ?? $request->request->all()['list'] ?? 0
             : $request->request->get(
                 'lead_quickemail[list]',
                 0
@@ -2212,7 +2212,7 @@ final class LeadController extends FormController
             $this->throwAccessDenied();
         }
 
-        $fileType = $request->get('filetype', 'csv');
+        $fileType = $request->attributes->all()['filetype'] ?? $request->query->all()['filetype'] ?? $request->request->all()['filetype'] ?? 'csv';
         $session    = $request->getSession();
         $search     = $session->get('mautic.lead.filter', '');
         $orderBy    = $session->get('mautic.lead.orderby', 'l.last_active');
@@ -2220,7 +2220,7 @@ final class LeadController extends FormController
         $orderById  = 'l.id' !== $orderBy ? ', l.id' : '';
         $orderBy .= $orderById;
         $orderByDir = $session->get('mautic.lead.orderbydir', 'DESC');
-        $ids        = $request->get('ids');
+        $ids        = $request->attributes->all()['ids'] ?? $request->query->all()['ids'] ?? $request->request->all()['ids'] ?? null;
 
         $filter     = ['string' => $search, 'force' => ''];
         $anonymous  = $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous');
@@ -2315,7 +2315,7 @@ final class LeadController extends FormController
             $this->throwAccessDenied();
         }
         $lead      = $this->leadModel->getEntity($contactId);
-        $dataType  = $request->get('filetype', 'csv');
+        $dataType  = $request->attributes->all()['filetype'] ?? $request->query->all()['filetype'] ?? $request->request->all()['filetype'] ?? 'csv';
 
         if (!$lead instanceof Lead) {
             return $this->notFound();

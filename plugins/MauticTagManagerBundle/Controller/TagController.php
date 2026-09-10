@@ -81,7 +81,7 @@ final class TagController extends FormController
             $start = 0;
         }
 
-        $search = $request->get('search', $session->get('mautic.tags.filter', ''));
+        $search = $request->attributes->all()['search'] ?? $request->query->all()['search'] ?? $request->request->all()['search'] ?? $session->get('mautic.tags.filter', '');
         $session->set('mautic.tags.filter', $search);
 
         // do some default filtering
@@ -90,7 +90,7 @@ final class TagController extends FormController
 
         $filter = !empty($search) ? ['string' => $search] : '';
 
-        $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
+        $tmpl = $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index';
 
         $items = $this->tagManagerModel->getEntities(
             [
@@ -678,7 +678,7 @@ final class TagController extends FormController
 
     private function renderMergeForm(Request $request, string $action, FormInterface $form, Tag $secondaryTag): Response
     {
-        $tmpl = $request->get('tmpl', 'index');
+        $tmpl = $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index';
 
         return $this->delegateView([
             'viewParameters' => [

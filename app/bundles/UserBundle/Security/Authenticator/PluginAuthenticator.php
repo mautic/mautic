@@ -53,7 +53,7 @@ final class PluginAuthenticator extends AbstractAuthenticator
 
     public function authenticate(Request $request): SelfValidatingPassport
     {
-        $authenticatingService = $request->get('integration');
+        $authenticatingService = $request->attributes->all()['integration'] ?? $request->query->all()['integration'] ?? $request->request->all()['integration'] ?? null;
         \assert(null === $authenticatingService || is_string($authenticatingService));
         $token = new PluginToken($this->firewallName, $authenticatingService);
 

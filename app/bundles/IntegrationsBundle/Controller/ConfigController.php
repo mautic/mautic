@@ -212,7 +212,7 @@ final class ConfigController extends AbstractFormController
                 'viewParameters' => [
                     'integrationObject'   => $this->integrationObject,
                     'form'                => $formView,
-                    'activeTab'           => $request->get('activeTab'),
+                    'activeTab'           => $request->attributes->all()['activeTab'] ?? $request->query->all()['activeTab'] ?? $request->request->all()['activeTab'] ?? null,
                     'showFeaturesTab'     => $showFeaturesTab,
                     'hasFeatureErrors'    => $hasFeatureErrors,
                     'hasAuthErrors'       => $hasAuthErrors,

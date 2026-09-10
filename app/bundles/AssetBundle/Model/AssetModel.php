@@ -124,11 +124,11 @@ class AssetModel extends FormModel implements GlobalSearchInterface
 
         $download = new Download();
         $download->setDateDownload(new \DateTime());
-        $download->setUtmCampaign($request->get('utm_campaign'));
-        $download->setUtmContent($request->get('utm_content'));
-        $download->setUtmMedium($request->get('utm_medium'));
-        $download->setUtmSource($request->get('utm_source'));
-        $download->setUtmTerm($request->get('utm_term'));
+        $download->setUtmCampaign($request->attributes->all()['utm_campaign'] ?? $request->query->all()['utm_campaign'] ?? $request->request->all()['utm_campaign'] ?? null);
+        $download->setUtmContent($request->attributes->all()['utm_content'] ?? $request->query->all()['utm_content'] ?? $request->request->all()['utm_content'] ?? null);
+        $download->setUtmMedium($request->attributes->all()['utm_medium'] ?? $request->query->all()['utm_medium'] ?? $request->request->all()['utm_medium'] ?? null);
+        $download->setUtmSource($request->attributes->all()['utm_source'] ?? $request->query->all()['utm_source'] ?? $request->request->all()['utm_source'] ?? null);
+        $download->setUtmTerm($request->attributes->all()['utm_term'] ?? $request->query->all()['utm_term'] ?? $request->request->all()['utm_term'] ?? null);
 
         // Check if request is trackable (includes IP, bot, privacy signal, and prefetch checks)
         if (!$this->ipLookupHelper->isRequestTrackable()) {
@@ -140,7 +140,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         // Download triggered by lead
         if ([] === $systemEntry) {
             // check for any clickthrough info
-            $clickthrough = $request->get('ct', false);
+            $clickthrough = $request->attributes->all()['ct'] ?? $request->query->all()['ct'] ?? $request->request->all()['ct'] ?? false;
             if (!empty($clickthrough)) {
                 $clickthrough = $this->decodeArrayFromUrl($clickthrough);
 
@@ -389,8 +389,8 @@ class AssetModel extends FormModel implements GlobalSearchInterface
                 $request   = $this->requestStack->getCurrentRequest();
                 $this->assetRepository->setCurrentUser($this->userHelper->getUser());
                 // During the form submit & edit, make sure that the data is checked against available assets
-                if ('mautic_segment_action' === $request->get('_route')
-                    && (Request::METHOD_POST === $request->getMethod() || 'edit' === $request->get('objectAction'))
+                if ('mautic_segment_action' === ($request->attributes->all()['_route'] ?? $request->query->all()['_route'] ?? $request->request->all()['_route'] ?? null)
+                    && (Request::METHOD_POST === $request->getMethod() || 'edit' === ($request->attributes->all()['objectAction'] ?? $request->query->all()['objectAction'] ?? $request->request->all()['objectAction'] ?? null))
                 ) {
                     $limit = 0;
                 }

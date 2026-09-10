@@ -61,7 +61,7 @@ final readonly class FocusSubscriber implements EventSubscriberInterface
             $formGenerateUrl = $this->router->generate('mautic_form_generateform');
 
             if (str_contains($requestUri, $formGenerateUrl)) {
-                $id = InputHelper::_($this->requestStack->getCurrentRequest()->get('id'));
+                $id = InputHelper::_($this->requestStack->getCurrentRequest()->attributes->all()['id'] ?? $this->requestStack->getCurrentRequest()->query->all()['id'] ?? $this->requestStack->getCurrentRequest()->request->all()['id'] ?? null);
                 if (str_starts_with($id, 'mf-')) {
                     $mfId             = str_replace('mf-', '', $id);
                     $focusGenerateUrl = $this->router->generate('mautic_focus_generate', ['id' => $mfId]);

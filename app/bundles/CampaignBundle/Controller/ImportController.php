@@ -291,7 +291,7 @@ final class ImportController extends AbstractFormController
             $userId        = $this->userHelper->getUser()->getId();
             $importSummary = [];
 
-            $importActions = $this->requestStack->getCurrentRequest()->get('importAction', []);
+            $importActions = $this->requestStack->getCurrentRequest()->attributes->all()['importAction'] ?? $this->requestStack->getCurrentRequest()->query->all()['importAction'] ?? $this->requestStack->getCurrentRequest()->request->all()['importAction'] ?? [];
 
             $importHelper->recursiveRemoveEmailaddress($fileData);
 

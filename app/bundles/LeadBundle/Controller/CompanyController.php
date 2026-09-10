@@ -143,7 +143,7 @@ final class CompanyController extends FormController
 
         $limit      = $pageHelper->getLimit();
         $start      = $pageHelper->getStart();
-        $search     = $request->get('search', $request->getSession()->get('mautic.company.filter', ''));
+        $search     = $request->attributes->all()['search'] ?? $request->query->all()['search'] ?? $request->request->all()['search'] ?? $request->getSession()->get('mautic.company.filter', '');
         $filter     = ['string' => $search, 'force' => []];
         $orderBy    = $request->getSession()->get('mautic.company.orderby', 'comp.companyname');
         $orderByDir = $request->getSession()->get('mautic.company.orderbydir', 'ASC');
@@ -184,7 +184,7 @@ final class CompanyController extends FormController
 
         $pageHelper->rememberPage($page);
 
-        $tmpl  = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
+        $tmpl  = $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index';
         $companyIds = array_keys($companies);
         $leadCounts = ([] !== $companyIds) ? $this->companyRepository->getLeadCount($companyIds) : [];
 
@@ -289,7 +289,7 @@ final class CompanyController extends FormController
         $updateSelect = InputHelper::clean(
             'POST' === $method
                 ? ($company['updateSelect'] ?? false)
-                : $request->get('updateSelect', false)
+                : $request->attributes->all()['updateSelect'] ?? $request->query->all()['updateSelect'] ?? $request->request->all()['updateSelect'] ?? false
         );
         $fields = $this->fieldModel->getPublishedFieldArrays('company');
         $form   = $this->companyModel->createForm($entity, $action, ['fields' => $fields, 'update_select' => $updateSelect]);
@@ -373,12 +373,12 @@ final class CompanyController extends FormController
         $fields = $this->companyModel->organizeFieldsByGroup($fields);
         $groups = array_keys($fields);
         sort($groups);
-        $template = '@MauticLead/Company/form_'.($request->get('modal', false) ? 'embedded' : 'standalone').'.html.twig';
+        $template = '@MauticLead/Company/form_'.($request->attributes->all()['modal'] ?? $request->query->all()['modal'] ?? $request->request->all()['modal'] ?? false ? 'embedded' : 'standalone').'.html.twig';
 
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'tmpl'   => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                    'tmpl'   => $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index',
                     'entity' => $entity,
                     'form'   => $form->createView(),
                     'fields' => $fields,
@@ -460,7 +460,7 @@ final class CompanyController extends FormController
         $company      = $request->request->all()['company'] ?? [];
         $updateSelect = 'POST' === $method
             ? ($company['updateSelect'] ?? false)
-            : $request->get('updateSelect', false);
+            : $request->attributes->all()['updateSelect'] ?? $request->query->all()['updateSelect'] ?? $request->request->all()['updateSelect'] ?? false;
         $fields = $this->fieldModel->getPublishedFieldArrays('company');
         $form   = $this->companyModel->createForm(
             $entity,
@@ -556,12 +556,12 @@ final class CompanyController extends FormController
         $fields = $this->companyModel->organizeFieldsByGroup($fields);
         $groups = array_keys($fields);
         sort($groups);
-        $template = '@MauticLead/Company/form_'.($request->get('modal', false) ? 'embedded' : 'standalone').'.html.twig';
+        $template = '@MauticLead/Company/form_'.($request->attributes->all()['modal'] ?? $request->query->all()['modal'] ?? $request->request->all()['modal'] ?? false ? 'embedded' : 'standalone').'.html.twig';
 
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'tmpl'   => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                    'tmpl'   => $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index',
                     'entity' => $entity,
                     'form'   => $form->createView(),
                     'fields' => $fields,
@@ -1196,7 +1196,7 @@ final class CompanyController extends FormController
             );
         }
 
-        $tmpl = $request->get('tmpl', 'index');
+        $tmpl = $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index';
 
         return $this->delegateView(
             [
@@ -1244,7 +1244,7 @@ final class CompanyController extends FormController
             $this->throwAccessDenied();
         }
         $company       = $this->companyModel->getEntity($companyId);
-        $dataType      = $request->get('filetype', 'csv');
+        $dataType      = $request->attributes->all()['filetype'] ?? $request->query->all()['filetype'] ?? $request->request->all()['filetype'] ?? 'csv';
 
         if (!$company instanceof Company) {
             return $this->notFound();

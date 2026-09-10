@@ -935,7 +935,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                         }
 
                         if ('authorization_code' === $grantType) {
-                            $parameters['code'] = $this->request->get('code');
+                            $parameters['code'] = $this->request->attributes->all()['code'] ?? $this->request->query->all()['code'] ?? $this->request->request->all()['code'] ?? null;
                         }
                         if (empty($settings['ignore_redirecturi'])) {
                             $callback                   = $this->getAuthCallbackUrl();
@@ -1080,7 +1080,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             case 'oauth2':
                 if ($this->requestStack->getCurrentRequest()?->hasSession()) {
                     $state      = $this->requestStack->getSession()->get($this->getName().'_csrf_token', false);
-                    $givenState = ($this->request->isXmlHttpRequest()) ? $this->request->request->get('state') : $this->request->get('state');
+                    $givenState = ($this->request->isXmlHttpRequest()) ? $this->request->request->get('state') : $this->request->attributes->all()['state'] ?? $this->request->query->all()['state'] ?? $this->request->request->all()['state'] ?? null;
 
                     if ($state && $state !== $givenState) {
                         $this->requestStack->getSession()->remove($this->getName().'_csrf_token');
@@ -1106,7 +1106,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                 $settings['include_verifier'] = true;
 
                 // Get request token returned from Twitter and submit it to get access_token
-                $settings['request_token'] = ($this->request) ? $this->request->get('oauth_token') : '';
+                $settings['request_token'] = ($this->request) ? $this->request->attributes->all()['oauth_token'] ?? $this->request->query->all()['oauth_token'] ?? $this->request->request->all()['oauth_token'] ?? null : '';
 
                 break;
         }

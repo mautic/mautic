@@ -41,7 +41,7 @@ final readonly class ContactTrackingService implements ContactTrackingServiceInt
 
         $leadId = $this->cookieHelper->getCookie($trackingId);
         if (null === $leadId) {
-            $leadId = $request->get('mtc_id');
+            $leadId = $request->attributes->all()['mtc_id'] ?? $request->query->all()['mtc_id'] ?? $request->request->all()['mtc_id'] ?? null;
             if (null === $leadId) {
                 return null;
             }

@@ -25,7 +25,7 @@ final class BatchEmailController extends AbstractFormController
     )]
     public function execAction(Request $request, EmailActionModel $actionModel, CategoryModel $categoryModel): JsonResponse
     {
-        $params = $request->get('email_batch');
+        $params = $request->attributes->all()['email_batch'] ?? $request->query->all()['email_batch'] ?? $request->request->all()['email_batch'] ?? null;
         $ids    = empty($params['ids']) ? [] : json_decode($params['ids']);
 
         if ($ids && is_array($ids)) {

@@ -533,8 +533,8 @@ final class PublicController extends CommonFormController
     )]
     public function previewAction(Request $request, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, ThemeHelper $themeHelper, int $id = 0): Response
     {
-        $objectId          = (empty($id)) ? (int) $request->get('id') : $id;
-        $css               = InputHelper::string((string) $request->get('css'));
+        $objectId          = (empty($id)) ? (int) ($request->attributes->all()['id'] ?? $request->query->all()['id'] ?? $request->request->all()['id'] ?? null) : $id;
+        $css               = InputHelper::string((string) ($request->attributes->all()['css'] ?? $request->query->all()['css'] ?? $request->request->all()['css'] ?? null));
         $form              = $this->formModel->getEntity($objectId);
         $customStylesheets = (!empty($css)) ? explode(',', $css) : [];
 
@@ -605,7 +605,7 @@ final class PublicController extends CommonFormController
         // Don't store a visitor with this request
         defined('MAUTIC_NON_TRACKABLE_REQUEST') || define('MAUTIC_NON_TRACKABLE_REQUEST', 1);
 
-        $formId = (int) $request->get('id');
+        $formId = (int) ($request->attributes->all()['id'] ?? $request->query->all()['id'] ?? $request->request->all()['id'] ?? null);
         $form  = $this->formModel->getEntity($formId);
         $js    = '';
 
@@ -630,13 +630,13 @@ final class PublicController extends CommonFormController
     )]
     public function embedAction(Request $request): Response
     {
-        $formId = (int) $request->get('id');
+        $formId = (int) ($request->attributes->all()['id'] ?? $request->query->all()['id'] ?? $request->request->all()['id'] ?? null);
         $form  = $this->formModel->getEntity($formId);
 
         if (null !== $form) {
             $status = $form->getPublishStatus();
             if ('published' === $status) {
-                if ($request->get('video')) {
+                if ($request->attributes->all()['video'] ?? $request->query->all()['video'] ?? $request->request->all()['video'] ?? null) {
                     return $this->render(
                         '@MauticForm/Public/videoembed.html.twig',
                         ['form' => $form, 'fieldSettings' => $this->formModel->getCustomComponents()['fields']]

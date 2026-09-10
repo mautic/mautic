@@ -240,12 +240,12 @@ final class EventController extends CommonFormController
 
             if ($request->query->has('anchor')) {
                 // Override the anchor
-                $event['anchor'] = $request->get('anchor');
+                $event['anchor'] = $request->attributes->all()['anchor'] ?? $request->query->all()['anchor'] ?? $request->request->all()['anchor'] ?? null;
             }
 
             if ($request->query->has('anchorEventType')) {
                 // Override the anchorEventType
-                $event['anchorEventType'] = $request->get('anchorEventType');
+                $event['anchorEventType'] = $request->attributes->all()['anchorEventType'] ?? $request->query->all()['anchorEventType'] ?? $request->request->all()['anchorEventType'] ?? null;
             }
         }
 
@@ -385,7 +385,7 @@ final class EventController extends CommonFormController
             if (!in_array($objectId, $deletedEvents)) {
                 // If event is new don't add to deleted list
                 if (!str_contains($objectId, 'new')) {
-                    $redirectEvent = $request->get('redirectTo');
+                    $redirectEvent = $request->attributes->all()['redirectTo'] ?? $request->query->all()['redirectTo'] ?? $request->request->all()['redirectTo'] ?? null;
 
                     $deletedEvents[] = [
                         'id'            => $objectId,

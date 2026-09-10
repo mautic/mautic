@@ -492,9 +492,9 @@ final class LeadApiController extends CommonApiController
         }
 
         $filters = $this->sanitizeEventFilter(InputHelper::clean($request->query->all()['filters'] ?? $request->request->all()['filters'] ?? []));
-        $limit   = (int) $request->get('limit', 25);
-        $page    = (int) $request->get('page', 1);
-        $order   = InputHelper::clean($request->get('order', ['timestamp', 'DESC']));
+        $limit   = (int) ($request->attributes->all()['limit'] ?? $request->query->all()['limit'] ?? $request->request->all()['limit'] ?? 25);
+        $page    = (int) ($request->attributes->all()['page'] ?? $request->query->all()['page'] ?? $request->request->all()['page'] ?? 1);
+        $order   = InputHelper::clean($request->attributes->all()['order'] ?? $request->query->all()['order'] ?? $request->request->all()['order'] ?? ['timestamp', 'DESC']);
 
         [$events, $serializerGroups] = $this->model->getEngagements($lead, $filters, $order, $page, $limit, false);
 

@@ -143,7 +143,7 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
     public function testGetTrackedDeviceGetFromRequest(): void
     {
         $trackingId     = 'randomTrackingId';
-        $requestMock    = $this->createMock(Request::class);
+        $requestMock    = new Request(['mautic_device_id' => $trackingId]);
         $leadDeviceMock = $this->createStub(LeadDevice::class);
 
         $this->requestStackMock->expects($this->once())
@@ -154,11 +154,6 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
             ->method('getCookie')
             ->with('mautic_device_id', null)
             ->willReturn(null);
-
-        $requestMock->expects($this->once())
-            ->method('get')
-            ->with('mautic_device_id', null)
-            ->willReturn($trackingId);
 
         $this->security->expects($this->once())
             ->method('isAnonymous')
@@ -174,7 +169,7 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
 
     public function testGetTrackedDeviceNoTrackingId(): void
     {
-        $requestMock = $this->createMock(Request::class);
+        $requestMock = new Request();
 
         $this->requestStackMock->expects($this->once())
             ->method('getCurrentRequest')
@@ -182,11 +177,6 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
 
         $this->cookieHelperMock->expects($this->once())
             ->method('getCookie')
-            ->with('mautic_device_id', null)
-            ->willReturn(null);
-
-        $requestMock->expects($this->once())
-            ->method('get')
             ->with('mautic_device_id', null)
             ->willReturn(null);
 
@@ -317,7 +307,7 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
     {
         $leadDeviceMock           = $this->createMock(LeadDevice::class);
         $uniqueTrackingIdentifier = '1234567890abcdefghij123';
-        $requestMock              = $this->createMock(Request::class);
+        $requestMock              = new Request();
 
         $this->requestStackMock->expects($this->once())
             ->method('getCurrentRequest')
@@ -325,11 +315,6 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
 
         $this->cookieHelperMock->expects($this->once())
             ->method('getCookie')
-            ->with('mautic_device_id', null)
-            ->willReturn(null);
-
-        $requestMock->expects($this->once())
-            ->method('get')
             ->with('mautic_device_id', null)
             ->willReturn(null);
 

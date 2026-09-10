@@ -74,17 +74,11 @@ final class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
 
     public function testMessageIsReturned(): void
     {
-        $request      = $this->createMock(Request::class);
-        $request->method('get')
-            ->willReturn('Hello');
-
-        $inputBag = new InputBag([
+        $request = new Request(request: [
             'AccountSid' => '123',
             'From'       => '321',
             'Body'       => 'Hello',
         ]);
-
-        $request->request = $inputBag;
 
         $this->assertSame('Hello', $this->getCallback()->getMessage($request));
     }

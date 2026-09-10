@@ -58,8 +58,8 @@ final class ClientController extends AbstractStandardFormController
         $start     = $pageHelper->getStart();
         $orderBy   = $request->getSession()->get('mautic.api.client.orderby', 'c.name');
         $orderByDir= $request->getSession()->get('mautic.api.client.orderbydir', 'ASC');
-        $filter    = $request->get('search', $request->getSession()->get('mautic.api.client.filter', ''));
-        $apiMode   = $request->get('api_mode', $request->getSession()->get('mautic.api.client.filter.api_mode', 'oauth2'));
+        $filter    = $request->attributes->all()['search'] ?? $request->query->all()['search'] ?? $request->request->all()['search'] ?? $request->getSession()->get('mautic.api.client.filter', '');
+        $apiMode   = $request->attributes->all()['api_mode'] ?? $request->query->all()['api_mode'] ?? $request->request->all()['api_mode'] ?? $request->getSession()->get('mautic.api.client.filter.api_mode', 'oauth2');
         $request->getSession()->set('mautic.api.client.filter.api_mode', $apiMode);
         $request->getSession()->set('mautic.api.client.filter', $filter);
 
@@ -116,7 +116,7 @@ final class ClientController extends AbstractStandardFormController
                         'edit'   => $this->security->isGranted('api:clients:editother'),
                         'delete' => $this->security->isGranted('api:clients:deleteother'),
                     ],
-                    'tmpl'            => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                    'tmpl'            => $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index',
                     'searchValue'     => $filter,
                     'searchScopes'    => $clientSearchScopeProvider->getScopes(),
                     'filters'         => $filters,
@@ -267,7 +267,7 @@ final class ClientController extends AbstractStandardFormController
             [
                 'viewParameters' => [
                     'form' => $form->createView(),
-                    'tmpl' => $request->get('tmpl', 'form'),
+                    'tmpl' => $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'form',
                 ],
                 'contentTemplate' => '@MauticApi/Client/form.html.twig',
                 'passthroughVars' => [
@@ -371,7 +371,7 @@ final class ClientController extends AbstractStandardFormController
             [
                 'viewParameters' => [
                     'form' => $form->createView(),
-                    'tmpl' => $request->get('tmpl', 'form'),
+                    'tmpl' => $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'form',
                 ],
                 'contentTemplate' => '@MauticApi/Client/form.html.twig',
                 'passthroughVars' => [

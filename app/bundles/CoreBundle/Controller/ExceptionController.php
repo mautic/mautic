@@ -64,7 +64,7 @@ final class ExceptionController extends CommonController
             return new JsonResponse($dataArray, $code);
         }
 
-        if ($request->get('prod')) {
+        if ($request->attributes->all()['prod'] ?? $request->query->all()['prod'] ?? $request->request->all()['prod'] ?? null) {
             $layout = 'Error';
         }
 

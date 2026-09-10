@@ -413,7 +413,7 @@ class CampaignController extends AbstractStandardFormController
         $filter      = $session->get('mautic.campaign.filter', '');
         $orderByDir  = $session->get('mautic.campaign.orderbydir', 'ASC');
 
-        $ids            = $request->get('ids');
+        $ids            = $request->attributes->all()['ids'] ?? $request->query->all()['ids'] ?? $request->request->all()['ids'] ?? null;
         $date           = new \DateTimeImmutable()->format(DateTimeHelper::FORMAT_DB);
         $exportFileName = $this->translator->trans('mautic.campaign.campaign_export_file.name', ['%date%' => $date]);
         $objectIds      = json_decode($ids, true);
@@ -727,7 +727,7 @@ class CampaignController extends AbstractStandardFormController
                 'tablePrefix'     => 'c',
                 'modelName'       => 'campaign',
                 'translationBase' => $this->getTranslationBase(),
-                'tmpl'            => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                'tmpl'            => $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index',
                 'entity'          => $campaign,
                 'form'            => $this->getFormView($form, 'new'),
             ],
@@ -1033,7 +1033,7 @@ class CampaignController extends AbstractStandardFormController
     {
         $session        = $this->getCurrentRequest()->getSession();
         $currentFilters = $session->get('mautic.campaign.list_filters', []);
-        $updatedFilters = $this->requestStack->getCurrentRequest()->get('filters', false);
+        $updatedFilters = $this->requestStack->getCurrentRequest()->attributes->all()['filters'] ?? $this->requestStack->getCurrentRequest()->query->all()['filters'] ?? $this->requestStack->getCurrentRequest()->request->all()['filters'] ?? false;
 
         $sourceLists = $this->campaignModel->getSourceLists();
         $listFilters = [
@@ -1229,7 +1229,7 @@ class CampaignController extends AbstractStandardFormController
                 $entity   = $args['entity'];
                 $objectId = $args['objectId'];
                 // Init the date range filter form
-                $dateRangeValues     = $this->requestStack->getCurrentRequest()->get('daterange', []);
+                $dateRangeValues     = $this->requestStack->getCurrentRequest()->attributes->all()['daterange'] ?? $this->requestStack->getCurrentRequest()->query->all()['daterange'] ?? $this->requestStack->getCurrentRequest()->request->all()['daterange'] ?? [];
                 $action              = $this->generateUrl('mautic_campaign_action', ['objectAction' => 'view', 'objectId' => $objectId]);
                 $dateRangeForm       = $this->formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
                 $isEmailStatsEnabled = (bool) $this->coreParametersHelper->get('campaign_email_stats_enabled', true);

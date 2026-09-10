@@ -374,7 +374,7 @@ final class DashboardController extends AbstractFormController
      */
     public function deleteDashboardFileAction(Request $request, PathsHelper $pathsHelper): RedirectResponse
     {
-        $file = $request->get('file');
+        $file = $request->attributes->all()['file'] ?? $request->query->all()['file'] ?? $request->request->all()['file'] ?? null;
 
         $parts = explode('.', $file);
         $type  = array_shift($parts);
@@ -398,7 +398,7 @@ final class DashboardController extends AbstractFormController
     public function applyDashboardFileAction(Request $request, PathsHelper $pathsHelper, RouterInterface $urlGenerator, $file = null): RedirectResponse
     {
         if (!$file) {
-            $file = $request->get('file');
+            $file = $request->attributes->all()['file'] ?? $request->query->all()['file'] ?? $request->request->all()['file'] ?? null;
         }
 
         $parts = explode('.', $file);
@@ -442,7 +442,7 @@ final class DashboardController extends AbstractFormController
 
     public function importAction(Request $request, PathsHelper $pathsHelper): Response
     {
-        $preview = $request->get('preview');
+        $preview = $request->attributes->all()['preview'] ?? $request->query->all()['preview'] ?? $request->request->all()['preview'] ?? null;
 
         $directories = [
             'user'   => $pathsHelper->getSystemPath('dashboard.user'),
@@ -561,6 +561,6 @@ final class DashboardController extends AbstractFormController
      */
     private function getNameFromRequest(Request $request): string
     {
-        return $request->get('name', new \DateTime()->format('Y-m-dTH:i:s'));
+        return $request->attributes->all()['name'] ?? $request->query->all()['name'] ?? $request->request->all()['name'] ?? new \DateTime()->format('Y-m-dTH:i:s');
     }
 }

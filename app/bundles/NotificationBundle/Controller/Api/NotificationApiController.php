@@ -63,7 +63,7 @@ final class NotificationApiController extends CommonApiController
     )]
     public function subscribeAction(Request $request): JsonResponse
     {
-        $osid = $request->get('osid');
+        $osid = $request->attributes->all()['osid'] ?? $request->query->all()['osid'] ?? $request->request->all()['osid'] ?? null;
         if ($osid) {
             if ($currentLead = $this->contactTracker->getContact()) {
                 $currentLead->addPushIDEntry($osid);

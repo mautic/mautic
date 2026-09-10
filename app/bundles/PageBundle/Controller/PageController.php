@@ -81,7 +81,7 @@ final class PageController extends FormController
 
         $limit  = $pageHelper->getLimit();
         $start  = $pageHelper->getStart();
-        $search = $request->get('search', $request->getSession()->get('mautic.page.filter', ''));
+        $search = $request->attributes->all()['search'] ?? $request->query->all()['search'] ?? $request->request->all()['search'] ?? $request->getSession()->get('mautic.page.filter', '');
         $filter = ['string' => $search, 'force' => []];
 
         $request->getSession()->set('mautic.page.filter', $search);
@@ -170,7 +170,7 @@ final class PageController extends FormController
                 'limit'       => $limit,
                 'permissions' => $permissions,
                 'model'       => $model,
-                'tmpl'        => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                'tmpl'        => $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index',
                 'security'    => $this->security,
                 'pageConfig'  => $pageConfig,
             ],
@@ -1103,7 +1103,7 @@ final class PageController extends FormController
         // set what page currently on so that we can return here if need be
         $session->set('mautic.pageresult.page', $page);
 
-        $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
+        $tmpl = $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index';
 
         return $this->delegateView(
             [

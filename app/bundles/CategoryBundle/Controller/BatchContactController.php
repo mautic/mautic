@@ -36,7 +36,7 @@ final class BatchContactController extends AbstractFormController
     )]
     public function execAction(Request $request): JsonResponse
     {
-        $params = $request->get('lead_batch');
+        $params = $request->attributes->all()['lead_batch'] ?? $request->query->all()['lead_batch'] ?? $request->request->all()['lead_batch'] ?? null;
         $ids    = empty($params['ids']) ? [] : json_decode($params['ids']);
 
         if ($ids && is_array($ids)) {

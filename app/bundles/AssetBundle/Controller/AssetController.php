@@ -77,7 +77,7 @@ final class AssetController extends FormController
             $start = 0;
         }
 
-        $search = $request->get('search', $request->getSession()->get('mautic.asset.filter', ''));
+        $search = $request->attributes->all()['search'] ?? $request->query->all()['search'] ?? $request->request->all()['search'] ?? $request->getSession()->get('mautic.asset.filter', '');
         $request->getSession()->set('mautic.asset.filter', $search);
 
         $filter = ['string' => $search, 'force' => []];
@@ -125,7 +125,7 @@ final class AssetController extends FormController
         // set what asset currently on so that we can return here after form submission/cancellation
         $request->getSession()->set('mautic.asset.page', $page);
 
-        $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
+        $tmpl = $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index';
 
         // retrieve a list of categories
         $categories = $assetModel->getLookupResults('category', '', 0);
@@ -164,10 +164,10 @@ final class AssetController extends FormController
         // set the asset we came from
         $page = $request->getSession()->get('mautic.asset.page', 1);
 
-        $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'details') : 'details';
+        $tmpl = $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'details' : 'details';
 
         // Init the date range filter form
-        $dateRangeValues = $request->get('daterange', []);
+        $dateRangeValues = $request->attributes->all()['daterange'] ?? $request->query->all()['daterange'] ?? $request->request->all()['daterange'] ?? [];
         $action          = $this->generateUrl('mautic_asset_action', ['objectAction' => 'view', 'objectId' => $objectId]);
         $dateRangeForm   = $this->formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
 
@@ -745,7 +745,7 @@ final class AssetController extends FormController
         // Check for integrations to cloud providers
         $integrations = $integrationHelper->getIntegrationObjects(null, ['cloud_storage']);
 
-        $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
+        $tmpl = $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index';
 
         return $this->delegateView([
             'viewParameters' => [

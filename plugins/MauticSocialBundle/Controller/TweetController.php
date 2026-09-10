@@ -68,7 +68,7 @@ final class TweetController extends FormController
 
         return ('POST' === $request->getMethod())
             ? ($request->request->all()['twitter_tweet']['updateSelect'] ?? false)
-            : $request->get('updateSelect', false);
+            : $request->attributes->all()['updateSelect'] ?? $request->query->all()['updateSelect'] ?? $request->request->all()['updateSelect'] ?? false;
     }
 
     /**
@@ -102,7 +102,7 @@ final class TweetController extends FormController
      */
     protected function getTemplateName($file): string
     {
-        if (('form.html.twig' === $file) && 1 == $this->getCurrentRequest()->get('modal')) {
+        if (('form.html.twig' === $file) && 1 == ($this->getCurrentRequest()->attributes->all()['modal'] ?? $this->getCurrentRequest()->query->all()['modal'] ?? $this->getCurrentRequest()->request->all()['modal'] ?? null)) {
             return '@MauticSocial/Tweet/form_modal.html.twig';
         }
 

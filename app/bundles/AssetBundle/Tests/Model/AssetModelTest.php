@@ -30,14 +30,12 @@ use Mautic\LeadBundle\Tracker\Service\DeviceCreatorService\DeviceCreatorService;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\ServerBag;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
@@ -175,53 +173,15 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
 
         $this->ipLookupHelper->method('isRequestTrackable')->willReturn(true);
 
-        $request = $this->createMock(Request::class);
+        $request = new Request([
+            'utm_campaign' => 'test_utm_campaign',
+            'utm_content'  => 'test_utm_content',
+            'utm_medium'   => 'test_utm_medium',
+            'utm_source'   => 'test_utm_source',
+            'utm_term'     => 'test_utm_term',
+        ]);
 
-        $serverBag = $this->createMock(ServerBag::class);
-
-        $serverBag->expects($this->once())
-            ->method('get')
-            ->with('HTTP_REFERER')
-            ->willReturn('http://localhost');
-
-        $request->server = $serverBag;
-        $matcher         = $this->exactly(6);
-
-        $request->expects($matcher)
-            ->method('get')->willReturnCallback(function (...$parameters) use ($matcher): string|false {
-                if (1 === $matcher->numberOfInvocations()) {
-                    $this->assertEquals('utm_campaign', $parameters[0]);
-
-                    return 'test_utm_campaign';
-                }
-                if (2 === $matcher->numberOfInvocations()) {
-                    $this->assertEquals('utm_content', $parameters[0]);
-
-                    return 'test_utm_content';
-                }
-                if (3 === $matcher->numberOfInvocations()) {
-                    $this->assertEquals('utm_medium', $parameters[0]);
-
-                    return 'test_utm_medium';
-                }
-                if (4 === $matcher->numberOfInvocations()) {
-                    $this->assertEquals('utm_source', $parameters[0]);
-
-                    return 'test_utm_source';
-                }
-                if (5 === $matcher->numberOfInvocations()) {
-                    $this->assertEquals('utm_term', $parameters[0]);
-
-                    return 'test_utm_term';
-                }
-                if (6 === $matcher->numberOfInvocations()) {
-                    $this->assertEquals('ct', $parameters[0]);
-
-                    return false;
-                }
-
-                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
-            });
+        $request->server->set('HTTP_REFERER', 'http://localhost');
 
         $this->requestStack->expects($this->once())
             ->method('getCurrentRequest')

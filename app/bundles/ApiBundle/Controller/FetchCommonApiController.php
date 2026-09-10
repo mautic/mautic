@@ -146,8 +146,8 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     {
         $repo          = $this->model->getRepository();
         $tableAlias    = $repo->getTableAlias();
-        $publishedOnly = $request->get('published', 0);
-        $minimal       = $request->get('minimal', 0);
+        $publishedOnly = $request->attributes->all()['published'] ?? $request->query->all()['published'] ?? $request->request->all()['published'] ?? 0;
+        $minimal       = $request->attributes->all()['minimal'] ?? $request->query->all()['minimal'] ?? $request->request->all()['minimal'] ?? 0;
         try {
             if (!$this->security->isGranted($this->permissionBase.':view')) {
                 return $this->accessDenied();
@@ -287,7 +287,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     public function getEntityAction(Request $request, $id): Response
     {
         $args = [];
-        if ($select = InputHelper::cleanArray($request->get('select', []))) {
+        if ($select = InputHelper::cleanArray($request->attributes->all()['select'] ?? $request->query->all()['select'] ?? $request->request->all()['select'] ?? [])) {
             $args['select']              = $select;
             $this->customSelectRequested = true;
         }

@@ -88,13 +88,13 @@ final class UserController extends FormController
         $start         = $pageHelper->getStart();
         $orderBy       = $request->getSession()->get('mautic.user.orderby', 'u.lastName, u.firstName, u.username');
         $orderByDir    = $request->getSession()->get('mautic.user.orderbydir', 'ASC');
-        $search        = $request->get('search', $request->getSession()->get('mautic.user.filter', ''));
+        $search        = $request->attributes->all()['search'] ?? $request->query->all()['search'] ?? $request->request->all()['search'] ?? $request->getSession()->get('mautic.user.filter', '');
         $search        = html_entity_decode($search);
         $request->getSession()->set('mautic.user.filter', $search);
 
         // do some default filtering
         $filter = ['string' => $search, 'force' => ''];
-        $tmpl   = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
+        $tmpl   = $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index';
         $users  = $this->userModel->getEntities(
             [
                 'start'      => $start,
@@ -623,10 +623,10 @@ final class UserController extends FormController
                 return $this->redirect($returnUrl);
             }
         } else {
-            $reEntityId = (int) $request->get('id');
-            $reSubject  = InputHelper::clean($request->get('subject'));
-            $returnUrl  = InputHelper::clean($request->get('returnUrl', $this->generateUrl('mautic_dashboard_index')));
-            $reEntity   = InputHelper::clean($request->get('entity'));
+            $reEntityId = (int) ($request->attributes->all()['id'] ?? $request->query->all()['id'] ?? $request->request->all()['id'] ?? null);
+            $reSubject  = InputHelper::clean($request->attributes->all()['subject'] ?? $request->query->all()['subject'] ?? $request->request->all()['subject'] ?? null);
+            $returnUrl  = InputHelper::clean($request->attributes->all()['returnUrl'] ?? $request->query->all()['returnUrl'] ?? $request->request->all()['returnUrl'] ?? $this->generateUrl('mautic_dashboard_index'));
+            $reEntity   = InputHelper::clean($request->attributes->all()['entity'] ?? $request->query->all()['entity'] ?? $request->request->all()['entity'] ?? null);
 
             $form->get('entity')->setData($reEntity);
             $form->get('id')->setData($reEntityId);

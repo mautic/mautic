@@ -128,7 +128,7 @@ final class EmailController extends FormController
             $start = 0;
         }
 
-        $search = $request->get('search', $session->get('mautic.email.filter', ''));
+        $search = $request->attributes->all()['search'] ?? $request->query->all()['search'] ?? $request->request->all()['search'] ?? $session->get('mautic.email.filter', '');
         $session->set('mautic.email.filter', $search);
 
         $filter = [
@@ -155,7 +155,7 @@ final class EmailController extends FormController
         ];
 
         $currentFilters = $session->get('mautic.email.list_filters', []);
-        $updatedFilters = $request->get('filters', false);
+        $updatedFilters = $request->attributes->all()['filters'] ?? $request->query->all()['filters'] ?? $request->request->all()['filters'] ?? false;
         $ignoreListJoin = true;
 
         if ($updatedFilters) {
@@ -283,7 +283,7 @@ final class EmailController extends FormController
                     'totalItems'     => $count,
                     'page'           => $page,
                     'limit'          => $limit,
-                    'tmpl'           => $request->get('tmpl', 'index'),
+                    'tmpl'           => $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index',
                     'permissions'    => $permissions,
                     'model'          => $model,
                     'isDraftEnabled' => $isDraftEnabled,
@@ -393,7 +393,7 @@ final class EmailController extends FormController
             $session->get('mautic.email.clicks.orderbydir', 'DESC')
         );
 
-        if ('click_counts' === $request->get('tmpl')) {
+        if ('click_counts' === ($request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? null)) {
             $view = [
                 'viewParameters' => [
                     'trackables'          => $trackableLinks,
@@ -453,7 +453,7 @@ final class EmailController extends FormController
                     'email'              => $email,
                     'trackables'         => $trackableLinks,
                     'logs'               => $logs,
-                    'isEmbedded'         => $request->get('isEmbedded') ?: false,
+                    'isEmbedded'         => $request->attributes->all()['isEmbedded'] ?? $request->query->all()['isEmbedded'] ?? $request->request->all()['isEmbedded'] ?? null ?: false,
                     'clickCountsSorting' => $clickCountsSorting,
                     'variants'           => $variants,
                     'translations'       => $translations,
@@ -543,7 +543,7 @@ final class EmailController extends FormController
         $emailForm    = $request->request->all()['emailform'] ?? [];
         $updateSelect = 'POST' === $method
             ? ($emailForm['updateSelect'] ?? false)
-            : $request->get('updateSelect', false);
+            : $request->attributes->all()['updateSelect'] ?? $request->query->all()['updateSelect'] ?? $request->request->all()['updateSelect'] ?? false;
 
         if ($updateSelect) {
             // Force type to template
@@ -744,7 +744,7 @@ final class EmailController extends FormController
         $emailform    = $request->request->all()['emailform'] ?? [];
         $updateSelect = 'POST' === $method
             ? ($emailform['updateSelect'] ?? false)
-            : $request->get('updateSelect', false);
+            : $request->attributes->all()['updateSelect'] ?? $request->query->all()['updateSelect'] ?? $request->request->all()['updateSelect'] ?? false;
 
         if ($updateSelect) {
             // Force type to template

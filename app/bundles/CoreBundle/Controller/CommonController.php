@@ -176,7 +176,7 @@ class CommonController extends AbstractController implements MauticController
             $args['viewParameters']['currentRoute'] = $args['passthroughVars']['route'];
         }
 
-        if (!isset($args['passthroughVars']['inBuilder']) && $inBuilder = $request->get('inBuilder')) {
+        if (!isset($args['passthroughVars']['inBuilder']) && $inBuilder = $request->attributes->all()['inBuilder'] ?? $request->query->all()['inBuilder'] ?? $request->request->all()['inBuilder'] ?? null) {
             $args['passthroughVars']['inBuilder'] = (bool) $inBuilder;
         }
 
@@ -189,7 +189,7 @@ class CommonController extends AbstractController implements MauticController
             $args['viewParameters']['mauticContent'] = $mauticContent;
         }
 
-        if ($request->isXmlHttpRequest() && !$request->get('ignoreAjax', false)) {
+        if ($request->isXmlHttpRequest() && !($request->attributes->all()['ignoreAjax'] ?? $request->query->all()['ignoreAjax'] ?? $request->request->all()['ignoreAjax'] ?? false)) {
             return $this->ajaxAction($request, $args);
         }
 
@@ -344,7 +344,7 @@ class CommonController extends AbstractController implements MauticController
 
         // Ajax call so respond with json
         $newContent = '';
-        $ignoreAjax = $request->get('ignoreAjax', false); // get the value here as the forward can overwrite it.
+        $ignoreAjax = $request->attributes->all()['ignoreAjax'] ?? $request->query->all()['ignoreAjax'] ?? $request->request->all()['ignoreAjax'] ?? false; // get the value here as the forward can overwrite it.
         if ($contentTemplate) {
             if ($forward) {
                 // the content is from another controller action so we must retrieve the response from it instead of
@@ -383,7 +383,7 @@ class CommonController extends AbstractController implements MauticController
             $passthrough['notifications'] = $this->getNotificationContent();
         }
 
-        $tmpl = $parameters['tmpl'] ?? $request->get('tmpl', 'index');
+        $tmpl = $parameters['tmpl'] ?? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index';
         if ('index' == $tmpl) {
             $updatedContent = [];
             if (!empty($newContent)) {
@@ -587,7 +587,7 @@ class CommonController extends AbstractController implements MauticController
     {
         $request ??= $this->getCurrentRequest();
 
-        $afterId = $request->get('mauticLastNotificationId');
+        $afterId = $request->attributes->all()['mauticLastNotificationId'] ?? $request->query->all()['mauticLastNotificationId'] ?? $request->request->all()['mauticLastNotificationId'] ?? null;
 
         [$notifications, $showNewIndicator, $updateMessage] = $this->notificationModel->getNotificationContent($afterId, false, 200);
 

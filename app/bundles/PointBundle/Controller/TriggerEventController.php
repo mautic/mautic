@@ -278,7 +278,7 @@ final class TriggerEventController extends CommonFormController
     public function deleteAction(Request $request, $objectId): JsonResponse
     {
         $session   = $request->getSession();
-        $triggerId = $request->get('triggerId');
+        $triggerId = $request->attributes->all()['triggerId'] ?? $request->query->all()['triggerId'] ?? $request->request->all()['triggerId'] ?? null;
         $events    = $session->get('mautic.point.'.$triggerId.'.triggerevents.modified', []);
         $delete    = $session->get('mautic.point.'.$triggerId.'.triggerevents.deleted', []);
 
@@ -337,7 +337,7 @@ final class TriggerEventController extends CommonFormController
     public function undeleteAction(Request $request, $objectId): JsonResponse
     {
         $session   = $request->getSession();
-        $triggerId = $request->get('triggerId');
+        $triggerId = $request->attributes->all()['triggerId'] ?? $request->query->all()['triggerId'] ?? $request->request->all()['triggerId'] ?? null;
         $events    = $session->get('mautic.point.'.$triggerId.'.triggerevents.modified', []);
         $delete    = $session->get('mautic.point.'.$triggerId.'.triggerevents.deleted', []);
 

@@ -34,7 +34,7 @@ final class AjaxController extends CommonAjaxController
 
     public function getSmsCountStatsAction(Request $request, BroadcastQuery $broadcastQuery, CacheProviderInterface $cacheProvider): JsonResponse
     {
-        $id  = $request->get('id');
+        $id  = $request->attributes->all()['id'] ?? $request->query->all()['id'] ?? $request->request->all()['id'] ?? null;
         $ids = $request->query->all()['ids'] ?? [];
 
         // Support for legacy calls
@@ -65,7 +65,7 @@ final class AjaxController extends CommonAjaxController
         }
 
         // Support for legacy calls
-        if ($request->get('id')) {
+        if ($request->attributes->all()['id'] ?? $request->query->all()['id'] ?? $request->request->all()['id'] ?? null) {
             $data = $data[0];
         } else {
             $data = [

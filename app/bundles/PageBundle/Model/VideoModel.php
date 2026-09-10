@@ -74,16 +74,16 @@ final class VideoModel extends FormModel
         }
 
         $lead = $this->contactTracker->getContact();
-        $guid = $request->get('guid');
+        $guid = $request->attributes->all()['guid'] ?? $request->query->all()['guid'] ?? $request->request->all()['guid'] ?? null;
 
         $hit = ($lead) ? $this->getHitForLeadByGuid($lead, $guid) : new VideoHit();
 
         $hit->setGuid($guid);
         $hit->setDateHit(new \DateTime());
 
-        $hit->setDuration($request->get('duration'));
-        $hit->setUrl($request->get('url'));
-        $hit->setTimeWatched($request->get('total_watched'));
+        $hit->setDuration($request->attributes->all()['duration'] ?? $request->query->all()['duration'] ?? $request->request->all()['duration'] ?? null);
+        $hit->setUrl($request->attributes->all()['url'] ?? $request->query->all()['url'] ?? $request->request->all()['url'] ?? null);
+        $hit->setTimeWatched($request->attributes->all()['total_watched'] ?? $request->query->all()['total_watched'] ?? $request->request->all()['total_watched'] ?? null);
 
         // check for existing IP
         $ipAddress = $this->ipLookupHelper->getIpAddress();

@@ -9,6 +9,8 @@ use Mautic\CoreBundle\Service\FlashBag;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\InputBag;
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag as SymfonyFlashBag;
@@ -193,12 +195,10 @@ final class FlashBagTest extends TestCase
             ->with($message, $messageVars, $domain)
             ->willReturn($translatedMessage);
 
-        $request = $this->createMock(Request::class);
-        $request
-            ->expects($this->once())
-            ->method('get')
-            ->with('mauticUserLastActive', 0)
-            ->willReturn($mauticUserLastActive);
+        $request            = $this->createMock(Request::class);
+        $request->attributes = new ParameterBag(['mauticUserLastActive' => $mauticUserLastActive]);
+        $request->query      = new InputBag();
+        $request->request    = new InputBag();
 
         $this->requestStack
             ->expects($this->once())
@@ -238,12 +238,10 @@ final class FlashBagTest extends TestCase
             ->with($message, $messageVars, $domain)
             ->willReturn($translatedMessage);
 
-        $request = $this->createMock(Request::class);
-        $request
-            ->expects($this->once())
-            ->method('get')
-            ->with('mauticUserLastActive', 0)
-            ->willReturn($mauticUserLastActive);
+        $request            = $this->createMock(Request::class);
+        $request->attributes = new ParameterBag(['mauticUserLastActive' => $mauticUserLastActive]);
+        $request->query      = new InputBag();
+        $request->request    = new InputBag();
 
         $this->requestStack
             ->expects($this->once())

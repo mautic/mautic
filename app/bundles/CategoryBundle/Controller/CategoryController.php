@@ -172,7 +172,7 @@ final class CategoryController extends AbstractFormController
         // set what page currently on so that we can return here after form submission/cancellation
         $session->set('mautic.category.page', $page);
 
-        $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
+        $tmpl = $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index';
 
         return $this->delegateView(
             [
@@ -581,7 +581,7 @@ final class CategoryController extends AbstractFormController
 
     private function getInFormValue(Request $request, string $method): int
     {
-        $inForm = $request->get('inForm', 0);
+        $inForm = $request->attributes->all()['inForm'] ?? $request->query->all()['inForm'] ?? $request->request->all()['inForm'] ?? 0;
         if (Request::METHOD_POST === $method) {
             $category_form = $request->request->all()['category_form'] ?? [];
             $inForm        = $category_form['inForm'] ?? 0;

@@ -180,7 +180,7 @@ final class ConfigController extends FormController
             }
         }
 
-        $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
+        $tmpl = $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index';
 
         return $this->delegateView(
             [
@@ -220,7 +220,7 @@ final class ConfigController extends FormController
         }
 
         $content  = $this->coreParametersHelper->get($objectId);
-        $filename = $request->get('filename', $objectId);
+        $filename = $request->attributes->all()['filename'] ?? $request->query->all()['filename'] ?? $request->request->all()['filename'] ?? $objectId;
 
         if ($decoded = base64_decode($content)) {
             $response = new Response($decoded);

@@ -206,7 +206,7 @@ final class ImportController extends FormController
         $this->requestStack->getSession()->set('mautic.import.object', $object);
 
         // Move the file to cache and rename it
-        $forceStop = $request->get('cancel', false);
+        $forceStop = $request->attributes->all()['cancel'] ?? $request->query->all()['cancel'] ?? $request->request->all()['cancel'] ?? false;
         $step      = ($forceStop) ? self::STEP_UPLOAD_CSV : $this->requestStack->getSession()->get('mautic.'.$object.'.import.step', self::STEP_UPLOAD_CSV);
         $fileName  = $this->getImportFileName($object);
         $importDir = $this->getImportDirName();
@@ -224,7 +224,7 @@ final class ImportController extends FormController
 
         $progress = new Progress()->bindArray($this->requestStack->getSession()->get('mautic.'.$object.'.import.progress', [0, 0]));
         $import   = $this->importModel->getEntity();
-        $action   = $this->generateUrl('mautic_import_action', ['object' => $request->get('object'), 'objectAction' => 'new']);
+        $action   = $this->generateUrl('mautic_import_action', ['object' => $request->attributes->all()['object'] ?? $request->query->all()['object'] ?? $request->request->all()['object'] ?? null, 'objectAction' => 'new']);
 
         switch ($step) {
             case self::STEP_UPLOAD_CSV:
@@ -238,7 +238,7 @@ final class ImportController extends FormController
                 break;
             case self::STEP_MATCH_FIELDS:
                 $mappingEvent = $this->dispatcher->dispatch(
-                    new ImportMappingEvent($request->get('object'))
+                    new ImportMappingEvent($request->attributes->all()['object'] ?? $request->query->all()['object'] ?? $request->request->all()['object'] ?? null)
                 );
 
                 try {
@@ -392,7 +392,7 @@ final class ImportController extends FormController
                     }
                     break;
                 case self::STEP_MATCH_FIELDS:
-                    $validateEvent = new ImportValidateEvent($request->get('object'), $form);
+                    $validateEvent = new ImportValidateEvent($request->attributes->all()['object'] ?? $request->query->all()['object'] ?? $request->request->all()['object'] ?? null, $form);
 
                     $this->dispatcher->dispatch($validateEvent);
 
@@ -690,7 +690,7 @@ final class ImportController extends FormController
     {
         if (!isset($parameters['object'])) {
             $request              = $this->getCurrentRequest();
-            $parameters['object'] = $request->get('object', 'contacts');
+            $parameters['object'] = $request->attributes->all()['object'] ?? $request->query->all()['object'] ?? $request->request->all()['object'] ?? 'contacts';
         }
 
         return parent::generateUrl($route, $parameters, $referenceType);
@@ -743,7 +743,7 @@ final class ImportController extends FormController
     private function dispatchImportOnInit(): ImportInitEvent
     {
         $request = $this->getCurrentRequest();
-        $event   = new ImportInitEvent($request->get('object'));
+        $event   = new ImportInitEvent($request->attributes->all()['object'] ?? $request->query->all()['object'] ?? $request->request->all()['object'] ?? null);
 
         $this->dispatcher->dispatch($event);
 

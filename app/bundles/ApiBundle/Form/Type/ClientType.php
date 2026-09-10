@@ -39,10 +39,7 @@ final class ClientType extends AbstractType
      */
     private function getApiMode()
     {
-        return $this->requestStack->getCurrentRequest()->get(
-            'api_mode',
-            $this->requestStack->getSession()->get('mautic.client.filter.api_mode', 'oauth2')
-        );
+        return $this->requestStack->getCurrentRequest()->attributes->all()['api_mode'] ?? $this->requestStack->getCurrentRequest()->query->all()['api_mode'] ?? $this->requestStack->getCurrentRequest()->request->all()['api_mode'] ?? $this->requestStack->getSession()->get('mautic.client.filter.api_mode', 'oauth2');
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

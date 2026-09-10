@@ -255,7 +255,7 @@ class SourceController extends CommonFormController
     {
         $this->setCampaignElements($request->request);
         $modifiedSources = $this->modifiedSources;
-        $sourceType      = $request->get('sourceType');
+        $sourceType      = $request->attributes->all()['sourceType'] ?? $request->query->all()['sourceType'] ?? $request->request->all()['sourceType'] ?? null;
 
         // ajax only for form fields
         if (!$request->isXmlHttpRequest()

@@ -246,7 +246,7 @@ final class TimelineController extends CommonController
             $session->get('mautic.lead.'.$leadId.'.timeline.orderbydir'),
         ];
 
-        $dataType = $request->get('filetype', 'csv');
+        $dataType = $request->attributes->all()['filetype'] ?? $request->query->all()['filetype'] ?? $request->request->all()['filetype'] ?? 'csv';
 
         $resultsCallback = function (array $event) use ($dateHelper): array {
             $eventLabel = $event['eventLabel'] ?? $event['eventType'];

@@ -129,7 +129,7 @@ final class FocusController extends AbstractStandardFormController
             $item = $args['viewParameters']['item'];
 
             // For line graphs in the view
-            $dateRangeValues = $this->getCurrentRequest()->get('daterange', []);
+            $dateRangeValues = $this->getCurrentRequest()->attributes->all()['daterange'] ?? $this->getCurrentRequest()->query->all()['daterange'] ?? $this->getCurrentRequest()->request->all()['daterange'] ?? [];
             $dateRangeForm   = $this->formFactory->create(
                 DateRangeType::class,
                 $dateRangeValues,
@@ -190,7 +190,7 @@ final class FocusController extends AbstractStandardFormController
         $focus        = $this->getCurrentRequest()->request->all()['focus'] ?? [];
         $updateSelect = 'POST' === $this->getCurrentRequest()->getMethod()
             ? ($focus['updateSelect'] ?? false)
-            : $this->getCurrentRequest()->get('updateSelect', false);
+            : $this->getCurrentRequest()->attributes->all()['updateSelect'] ?? $this->getCurrentRequest()->query->all()['updateSelect'] ?? $this->getCurrentRequest()->request->all()['updateSelect'] ?? false;
 
         if ($updateSelect) {
             switch ($action) {
@@ -221,7 +221,7 @@ final class FocusController extends AbstractStandardFormController
         $focus        = $this->getCurrentRequest()->request->all()['focus'] ?? [];
         $updateSelect = 'POST' === $this->getCurrentRequest()->getMethod()
             ? ($focus['updateSelect'] ?? false)
-            : $this->getCurrentRequest()->get('updateSelect', false);
+            : $this->getCurrentRequest()->attributes->all()['updateSelect'] ?? $this->getCurrentRequest()->query->all()['updateSelect'] ?? $this->getCurrentRequest()->request->all()['updateSelect'] ?? false;
 
         if ($updateSelect) {
             return ['update_select' => $updateSelect];
