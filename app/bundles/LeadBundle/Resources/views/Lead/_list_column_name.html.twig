@@ -7,13 +7,16 @@
                 }) }}
             </div>
         {% endif %}
-        {% set primaryIdentifier = item.isAnonymous ? item.primaryIdentifier|trans : item.primaryIdentifier|purify %}
         <div>
-            {{ primaryIdentifier }}
+            {% if item.isAnonymous %}
+                {{ item.primaryIdentifier|trans }}
+            {% else %}
+                {{ htmlEntityDecode(item.primaryIdentifier)|purify }}
+            {% endif %}
         </div>
         {{ customContent('lead.name.after', _context) }}
-        {% if 'company' in columns|keys and primaryIdentifier != item.secondaryIdentifier and item.secondaryIdentifier %}
-            <div class="small">{{ item.secondaryIdentifier|purify }}</div>
+        {% if 'company' in columns|keys and item.primaryIdentifier != item.secondaryIdentifier and item.secondaryIdentifier %}
+            <div class="small">{{ htmlEntityDecode(item.secondaryIdentifier)|purify }}</div>
         {% endif %}
     </a>
 </td>
