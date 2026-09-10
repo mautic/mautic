@@ -36,7 +36,7 @@ final class EntityMetadataTest extends TestCase
         $this->assertEquals(
             [
                 'dir'       => 'Entity',
-                'type'      => 'staticphp',
+                'type'      => 'attribute',
                 'prefix'    => 'Mautic\\CoreBundle\\Entity',
                 'mapping'   => true,
                 'is_bundle' => true,
