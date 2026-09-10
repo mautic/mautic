@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
@@ -12,6 +13,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
  */
 trait OptimisticLockTrait
 {
+    #[ORM\Column(type: Types::INTEGER, options: ['default' => OptimisticLockInterface::INITIAL_VERSION, 'unsigned' => true])]
     private int $version = OptimisticLockInterface::INITIAL_VERSION;
 
     private ?int $currentVersion = null;

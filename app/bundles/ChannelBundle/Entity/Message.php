@@ -12,13 +12,13 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
+use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -42,15 +42,32 @@ use Symfony\Component\Validator\Constraints\NotBlank;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[ORM\Entity(repositoryClass: MessageRepository::class)]
+#[ORM\Table(name: 'messages')]
+#[ORM\Index(columns: ['date_added'], name: 'date_message_added')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Message extends FormEntity implements UuidInterface
 {
     use UuidTrait;
     use ProjectTrait;
 
     /**
+     * @var \Doctrine\Common\Collections\Collection<int, Project>
+     */
+    #[ORM\ManyToMany(targetEntity: \Mautic\ProjectBundle\Entity\Project::class, cascade: ['merge', 'persist', 'detach'], fetch: 'LAZY', indexBy: 'name')]
+    #[ORM\JoinTable(name: 'message_projects_xref')]
+    #[ORM\JoinColumn(name: 'message_id', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'project_id', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\OrderBy(['name' => 'ASC'])]
+    private \Doctrine\Common\Collections\Collection $projects;
+
+    /**
      * @var ?int
      */
     #[Groups(['message:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -58,67 +75,48 @@ class Message extends FormEntity implements UuidInterface
      */
     #[Groups(['message:read', 'message:write', 'channel:read'])]
     #[NotBlank(message: 'mautic.core.name.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var ?string
      */
     #[Groups(['message:read', 'message:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
      * @var ?\DateTimeInterface
      */
     #[Groups(['message:read', 'message:write'])]
+    #[ORM\Column(name: 'publish_up', type: 'datetime', nullable: true)]
     private $publishUp;
 
     /**
      * @var ?\DateTimeInterface
      */
     #[Groups(['message:read', 'message:write'])]
+    #[ORM\Column(name: 'publish_down', type: 'datetime', nullable: true)]
     private $publishDown;
 
     /**
      * @var ?Category
      */
     #[Groups(['message:read', 'message:write'])]
+    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['merge', 'detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
     private $category;
 
     /**
      * @var ArrayCollection<int,Channel>
      */
     #[Groups(['message:read', 'message:write'])]
+    #[ORM\OneToMany(mappedBy: 'message', targetEntity: Channel::class, cascade: ['merge', 'persist', 'detach'], orphanRemoval: true, indexBy: 'channel')]
     private $channels;
 
     public function __clone()
     {
         $this->id = null;
-    }
-
-    public static function loadMetadata(ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable('messages')
-            ->setCustomRepositoryClass(MessageRepository::class)
-            ->addIndex(['date_added'], 'date_message_added');
-
-        $builder
-            ->addIdColumns()
-            ->addPublishDates()
-            ->addCategory();
-
-        $builder->createOneToMany('channels', Channel::class)
-            ->setIndexBy('channel')
-            ->orphanRemoval()
-            ->mappedBy('message')
-            ->cascadeMerge()
-            ->cascadePersist()
-            ->cascadeDetach()
-            ->build();
-
-        static::addUuidField($builder);
-        self::addProjectsField($builder, 'message_projects_xref', 'message_id');
     }
 
     public static function loadApiMetadata(ApiMetadataDriver $metadata): void
