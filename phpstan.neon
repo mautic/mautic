@@ -297,7 +297,6 @@ rules:
     - Utils\PHPStan\Rule\NoReadonlyEntityClassRule
     - Utils\PHPStan\Rule\NoReadonlyApiParamRule
     # enable later, might not be needed
-    # - Utils\PHPStan\Rule\NoLoadMetadataMethodRule
     - Utils\PHPStan\Rule\NoDuplicateNonRepeatableAttributeRule
 
 services:
