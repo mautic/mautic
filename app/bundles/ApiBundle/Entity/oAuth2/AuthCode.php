@@ -22,13 +22,13 @@ class AuthCode extends BaseAuthCode
     protected \FOS\OAuthServerBundle\Model\ClientInterface $client;
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'user_id', nullable: false, onDelete: 'CASCADE')]
-    protected ?\Symfony\Component\Security\Core\User\UserInterface $user;
+    protected ?\Symfony\Component\Security\Core\User\UserInterface $user = null;
     #[ORM\Column(type: 'string', length: 191, unique: true)]
     protected string $token;
     #[ORM\Column(name: 'expires_at', type: 'bigint', nullable: true)]
-    protected ?int $expiresAt;
+    protected ?int $expiresAt = null;
     #[ORM\Column(type: 'string', length: 191, nullable: true)]
-    protected ?string $scope;
+    protected ?string $scope = null;
     #[ORM\Column(name: 'redirect_uri', type: 'text')]
     protected string $redirectUri;
 }
